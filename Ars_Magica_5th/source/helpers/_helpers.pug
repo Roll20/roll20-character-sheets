@@ -1,0 +1,96 @@
+//- Helpers
+
+//- Load the PUG-side code of the helpers
+//- The require() node.js function needs to be passed into the PUG when calling the PUG compiler
+//- This is done in generate.js, called by `npm run start|build` (see package.json)
+//- - arm5.helpers = require("./source/helpers/helpers.pug.js").helpers;
+
+
+
+
+//- Allows to transfer data from the PUG runtime to the sheet runtime
+mixin transfer_data_to_sheet(destination, data)
+    | // Data that was created during sheet building and persisted
+    | !{destination} = !{JSON.stringify(data, null, 2)};
+
+
+
+//- Alert are call-outs/admonition
+//- TODO: remove once kScaffold has it
+
+//- @pugdoc
+  name: alerts
+  description: A mixin that creates a fieldset containing alerts (aka callouts, admonitions). The fieldset name is prepended by `alerts--`. All elements added by this mixin are in a containing div, to which any attributes passed to the mixin will be applied. The content of the mixin is ignored.
+  arguments:
+    - {string} name - The name of the repeating section. Will be prefixed with `repeating_alerts--` and spaces will be replaced with dashes (`-`).
+    - {object} [fieldsetTrigger] - A trigger object that is passed to the underlying `fieldset()`. `Optional`.
+    - {object} [closeTrigger] - A trigger object that is passed to the underlying `action()` mixin used to make the close button. `Optional`. If not provided, defaults to `{triggeredFuncs: ["kDeleteAlert"]}`. If you override this default, it is your responsability to call `kDeleteAlert`.
+  attributes:
+  example: |
+    include ../_k.pug
+    // A simple alert declaration.
+    +alerts({name:"global-alerts"})
+    
+    // An alert declaration with a trigger and attributes
+    +fieldset({name:'global-alerts',trigger:{triggeredFuncs:['doWhenRemoved']}})(class="my-class")
+mixin alerts({name, fieldsetTrigger, closeTrigger})
+    - name = actionButtonName(replaceProblems(name));
+    - attributes.class = attributes.class ? ` ${replaceProblems(attributes.class)}` : '';
+    - attributes.class = `kalerts kalerts--${name} kalerts__container kalerts--${name}__container${attributes.class}`;
+    - closeTrigger = closeTrigger || {triggeredFuncs: ["kDeleteAlert"]};
+    div&attributes(attributes)
+        +fieldset({name: `alerts--${name}`, trigger: fieldsetTrigger})
+            +hidden({name: "level", value: "info", class: `kalerts kalerts--${name} kalerts__level kalerts--${name}__level`})
+            div(class=`kalerts kalerts--${name} kalerts__content kalerts--${name}__content`)
+                span(class=`kalerts kalerts--${name} kalerts__title kalerts--${name}__title`)
+                    +adaptiveInput({type: "text", name: "title", readonly: true, value: "title"})
+                +adaptiveTextarea({name: "text", readonly: true, class:`kalerts kalerts--${name} kalerts__text kalerts--${name}__text`})
+                +action({name: "close", class:`kalerts kalerts--${name} kalerts__close kalerts--${name}__close`, trigger: closeTrigger})
+
+
+mixin link({name, href, color})
+    - let value = `/w @{character_name} &{template:custom} {{title=${name}}} {{desc=[${href}](${href})}}`;
+    -
+        if (color)
+            value = `${value} {{color=${color}}} {{button-color=${color}}}`;
+    //- .kscaffold-compatible
+    span.link
+        button(type="roll" value=value title=href)
+            block
+
+//- In Roll20 sheet, <a href> tag can only link to the sheet itself
+//- We replace <a href> tags in markdown rendering by a roll button similar to the
+//- +link() mixin above
+-
+    const md = require("markdown-it")({"html": true});
+    md.renderer.rules["link_open"] = function link_open(tokens, idx, options, env, self) {
+        const token = tokens[idx];
+        const href = Object.fromEntries(token.attrs)["href"];
+        if (href === undefined) { throw new Error(`No href found on token\n${token}`); }
+        const value = `/w @{character_name} &{template:custom} {{title=Link}} {{desc=[${href}](${href})}} {{color=mediumblue}} {{button-color=mediumblue}}`;
+        return `<span class="link"><button type="roll" value="${value}" title="${href}">`;
+    }
+    md.renderer.rules["link_close"] = function link_close(tokens, idx, options, env, self) {
+        return "</button></span>";
+    }
+
+mixin markdown({file, string})
+    - let markdown = "";
+    if file
+        -
+            const fs = require("fs");
+            if (! fs.existsSync(file)) { throw new Error(`${file} doesn't exists`); }
+            markdown = md.render(fs.readFileSync(file, "utf8"));
+    if string
+        - markdown = md.render(string);
+    if markdown
+        div.markdown
+            != markdown
+
+
+
+//- The +module() mixin comes from k-scaffold: https://kurohyou-studios.github.io/k-scaffold/pug#module
+//- It let us schedule PUG code to be run when injecting sheetworker source code into the sheet
++module
+    //- Include the sheet-side source code of our helpers
+    include helpers.sheet.js

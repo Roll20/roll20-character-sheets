@@ -1,0 +1,57 @@
+//- Don't include k-scaffold multiple times
+//- include ../../k-scaffold/_kpug.pug
+//-
+  Fake nested repeating section
+
+  This mixin makes a repeating section that mimics a nested repeating section. This works by defining
+  the levels of the nested repeating section inside a local mixin, and adding some CSS so that a given entry
+  of the repeating section hides all levels except the one it actually uses
+- const nestedFieldSetStorage = {}
+mixin nestedFieldset({name,trigger,addClass,addActionObj,modifyActionObj})
+
+    //- Parse arguments
+    -
+        obj.name = replaceSpaces(obj.name);
+        
+
+    //- Prepare storage and inner mixin to accept multiple blocks
+    - const levels = [];
+    
+
+    mixin level(obj)
+        - obj.name = replaceSpaces(obj.name)
+        - obj.locked = obj.locked ? obj.locked : false
+        - levels.push({"name": obj.name, "locked": obj.locked || false, "block": block})
+    
+    //- pug code for the actual repeating section
+    .nestedFieldset
+        +fieldset({name,trigger,addClass})
+            //- Evaluate the block so the above mixin in executed and fills the storage
+            //- most of the time the actual block is empty, we need to handle that
+            - block ? block() : undefined
+            //- hidden input use to make the active level of this repeating row visible
+            //- this is set by the sheetworker that adds the rows
+            each level, index in levels
+                +hidden({name:"nestedFieldsetLevel" + index})
+                div(class='nestedFieldsetLevel' + index)
+                    - level.block()
+        
+        //- Add custom controls to add and modify the repeating section
+        //- TODO: write the JS code to add a level in the repeating section
+        //- TODO: add on add button per non-locked level, do not add the level name if only a single level is hear
+        - const unlockedLevels = [];
+        each level in levels
+            unless level.locked
+                - unlockedLevels.push(level)
+        if unlockedLevels.length == 1
+            - level = unlockedLevels[0]
+            +action({name:`add ${level.name}`,class:'btn repcontrol_edit repcontrol-button repcontrol-button--add',trigger:{listenerFunc:'addItem'}})
+                | +Add
+        else
+            each level in unlockedLevels
+                +action({name:`add ${level.name}`,class:'btn repcontrol_edit repcontrol-button repcontrol-button--add',trigger:{listenerFunc:'addItem'}})
+                    | Add #{level.name}
+        +action({name:`edit ${name}`,class:'btn repcontrol_edit repcontrol-button repcontrol-button--edit',trigger:{listenerFunc:'editSection'}})
+            | Modify
+    - nestedFieldSetStorage[name] = {lname:name, evels:levels, unlockedLevels: unlockedLevels}
+        

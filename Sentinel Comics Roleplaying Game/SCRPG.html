@@ -896,13 +896,25 @@
 					<input type="hidden" name="attr_edit_health" value="1" class="sheet-hide-on-zero">
 					<div class="sheet-smalldata-row sheet-padding">
 						<div class="sheet-smalldata sheet-centered">
-							<input type="number" name="attr_health_max" value="17" min="0">
-							<span>Max Health</span>
+							<div>
+								<input type="number" name="attr_health_max_base" value="17" min="0">
+								+
+								<span class="sheet-h-icon"></span><input type="number" name="attr_hero_count" value="0" min="0">
+								x 5 =
+								<input type="hidden" name="attr_health_max">
+								<b style="font-size: 120%;"><span name="attr_health_max"></span></b>
+							</div>
+							<span>Max Health (Base + H x 5)</span> <!-- Villain Max Health? -->
 						</div>
 					</div>
 					<div class="sheet-centered">
 						<input type="hidden" name="attr_healthcolor" value="green" class="sheet-colorizer">
 						<input type="number" name="attr_health" value="17" min="0" class="sheet-bignum">
+					</div>
+					<div class="sheet-centered">
+						Max = <input type="hidden" name="attr_health_max"><span name="attr_health_max"></span>
+						&nbsp; &nbsp;
+						<span class="sheet-h-icon"></span> = <input type="hidden" name="attr_hero_count"><input type="number" name="attr_hero_count" value="0" min="0">
 					</div>
 				</div>
 				<input type="hidden" name="attr_toggle_health" class="sheet-hide-on-one" value="0">
@@ -4767,7 +4779,7 @@
 					<div class="sheet-smalldata-row sheet-padding">
 						<div class="sheet-smalldata sheet-centered">
 							<input type="number" name="attr_health_max" value="17" min="0">
-							<span>Max Health</span>
+							<span>Max Health</span> <!-- Hero max health? -->
 						</div>
 					</div>
 					<div class="sheet-centered">
@@ -6291,6 +6303,36 @@ on("change:health_max", function(e) {
 				};
 				setAttrs(hupdate);
 			}
+		}
+	);
+});
+
+on("change:health_max_base change:hero_count", function(e) {
+	log("change:health_max_base change:hero_count");
+	log(e);
+	getAttrs(
+		["health_max_base","hero_count","health"],
+		function(a) {
+			var base = Number(a.health_max_base);
+			var hcount = Number(a.hero_count);
+			var health = Number(a.health);
+			if ( typeof base === "undefined" ) { base = 0; }
+			if ( typeof hcount === "undefined" ) { hcount = 0; }
+			if ( typeof health === "undefined" ) { health = base + hcount * 5; }
+			var max = base + hcount * 5; 
+			var hupdate = {
+				"health_max": max,
+			};
+			if ( e.sourceAttribute === "hero_count" ) { 
+				var prev = Number(e.previousValue);
+				var newv = Number(e.newValue);
+				if ( typeof prev === "undefined" ) { prev = 0; }
+				if ( typeof newv === "undefined" ) { newv = 0; }
+				var diff = newv - prev;
+				health = health + diff * 5;
+				hupdate["health"] = health;
+			}
+			setAttrs(hupdate);
 		}
 	);
 });

@@ -61,20 +61,17 @@ dexterityTable['dexreact'] = ['Error','-6','-4','-3','-2','-1','0','0','0','0','
 dexterityTable['dexmissile'] = ['Error','-6','-4','-3','-2','-1','0','0','0','0','0','0','0','0','0','0','+1','+2','+2','+3','+3','+4','+4','+4','+5','+5'];
 dexterityTable['dexdefense'] = ['Error','+5','+5','+4','+3','+2','+1','0','0','0','0','0','0','0','0','-1','-2','-3','-4','-4','-4','-5','-5','-5','-6','-6'];
 
-dexterityTable['dex-pickpocket'] = ['0','0','0','0','0','0','0','0','0','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+25','+30','+30','+30','+30'];
-dexterityTable['dex-openlocks'] = ['0','0','0','0','0','0','0','0','0','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+25','+30','+35','+35','+35','+35'];
-dexterityTable['dex-findtraps'] = ['0','0','0','0','0','0','0','0','0','-10','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+25','+25','+25','+25'];
-dexterityTable['dex-movesilently'] = ['0','0','0','0','0','0','0','0','0','-20','-15','-10','-5','0','0','0','0','+5','+10','+15','+20','+25','+30','+30','+30','+30'];
-dexterityTable['dex-hideinshadows'] = ['0','0','0','0','0','0','0','0','0','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+25','+30','+30','+30','+30'];
-dexterityTable['dex-climbwalls'] = ['0','0','0','0','0','0','0','0','0','-10','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+25','+25','+25','+25'];
-dexterityTable['dex-tunneling'] = ['0','0','0','0','0','0','0','0','0','-10','-5','-0','0','0','0','0','0','0','+5','+10','+15','+20','+30','+30','+30','+30'];
-dexterityTable['dex-escapebonds'] = ['0','0','0','0','0','0','0','0','0','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+25','+30','+30','+30','+30'];
+// Player's Handbook Premium Edition, extended by Player's Options: Skills & Powers, 2nd printing
+dexterityTable['pickpocket'] = ['0','0','0','-30','-25','-25','-20','-20','-15','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+20','+25','+25','+30','+30'];
+dexterityTable['openlocks'] = ['0','0','0','-30','-25','-20','-20','-15','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+20','+25','+25','+30','+30','+35'];
+dexterityTable['findtraps'] = ['0','0','0','-10','-10','-10','-10','-10','-10','-10','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+20','+20','+20','+20'];
+dexterityTable['movesilently'] = ['0','0','0','-30','-30','-30','-25','-25','-20','-20','-15','-10','-5','0','0','0','0','+5','+10','+15','+15','+20','+20','+25','+25','+30'];
+dexterityTable['hideinshadows'] = ['0','0','0','-10','-10','-10','-10','-10','-10','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+25','+30','+30','+30','+30'];
+dexterityTable['climbwalls'] = ['0','0','0','-30','-25','-20','-20','-15','-15','-10','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+20','+25','+25','+30','+30'];
 
-dexterityTable['aim-pickpocket'] = ['0','0','0','-30','-25','-25','-20','-20','-15','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+20','+25','+25','+30','+30'];
-dexterityTable['aim-openlocks'] = ['0','0','0','-30','-25','-20','-20','-15','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+20','+25','+25','+30','+30','+35'];
-
-dexterityTable['balance-movesilently'] = ['0','0','0','-30','-30','-30','-25','-25','-20','-20','-15','-10','-5','0','0','0','0','+5','+10','+15','+15','+20','+20','+25','+25','+30'];
-dexterityTable['balance-climbwalls'] = ['0','0','0','-30','-25','-20','-20','-15','-15','-10','-5','0','0','0','0','0','0','+5','+10','+15','+20','+20','+25','+25','+30','+30'];
+// Player's Option: Skills & Powers
+dexterityTable['tunneling'] = ['0','0','0','-10','-10','-10','-10','-10','-10','-10','-5','0','0','0','0','0','0','0','+5','+10','+15','+20','+30','+30','+30','+30'];
+dexterityTable['escapebonds'] = ['0','0','0','-15','-15','-15','-15','-15','-15','-15','-10','-5','0','0','0','0','0','+5','+10','+15','+20','+25','+30','+30','+30','+30'];
 
 dexterityTable['dexnotes'] = ['INVALID DEXTERITY','','','','','','','','','','','','','','','','','','','','','','','','','',''];
 
@@ -83,8 +80,8 @@ constitutionTable['conadj'] = ['Error','-3','-2','-2','-1','-1','-1','0','0','0'
 constitutionTable['conshock'] = ['Error','25','30','35','40','45','50','55','60','65','70','75','80','85','88','90','95','97','99','99','99','99','99','99','99','100'];
 constitutionTable['conres'] = ['Error','30','35','40','45','50','55','60','65','70','75','80','85','90','92','94','96','98','100','100','100','100','100','100','100','100'];
 constitutionTable['conpoisonsave'] = ['Error','-2','-1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','+1','+1','+2','+2','+3','+3','+4'];
-constitutionTable['conregen'] = ['Error','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','1/6','1/5','1/4','1/3','1/2','1/1'];
-constitutionTable['connotes'] = ['INVALID CONSTITUTION','','','','','','','','','','','','','','','','','','','','1 hp/6 turns - not acid/fire','1 hp/5 turns - not acid/fire','1 hp/4 turns - not acid/fire','1 hp/3 turns - not acid/fire','1 hp/2 turns - not acid/fire','1 hp/turn - not acid/fire'];
+constitutionTable['conregen'] = ['Error','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','Nil','1/6 turns','1/5 turns','1/4 turns','1/3 turns','1/2 turns','1/1 turn'];
+constitutionTable['connotes'] = ['INVALID CONSTITUTION','','','','','','','','','','','','','','','','','','','','Fire and acid damage cannot be regenerated, PHB p. 21','Fire and acid damage cannot be regenerated, PHB p. 21','Fire and acid damage cannot be regenerated, PHB p. 21','Fire and acid damage cannot be regenerated, PHB p. 21','Fire and acid damage cannot be regenerated, PHB p. 21','Fire and acid damage cannot be regenerated, PHB p. 21'];
 constitutionTable['con2notes'] = ['INVALID CONSTITUTION','','','','','','','','','','','','','','','','','(+3) Warriors only','(+4) Warriors only','(+5) Warriors only','(+5) Warriors only','(+6) Warriors only','(+6) Warriors only','(+6) Warriors only','(+7) Warriors only','(+7) Warriors only'];
 
 const intelligenceTable = {};
@@ -100,15 +97,15 @@ intelligenceTable['intimm5th'] = ['Error','','','','','','','','','','','','',''
 intelligenceTable['intimm6th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','','6th-level','6th-level'];
 intelligenceTable['intimm7th'] = ['Error','','','','','','','','','','','','','','','','','','','','','','','','','7th-level'];
 intelligenceTable['intnotes'] = ['INVALID INTELLIGENCE','Communicate by Grunts & Gestures','','','','','','','','','','','','','','','','','','','','','','','','',''];
+intelligenceTable['spell-points-int'] = [0,0,0,0,0,0,0,0,0,2,2,2,3,3,4,4,5,6,7,8,9,9,9,9,9,9];
 
 const wisdomTable = {};
 wisdomTable['wisdef'] = ['Error','-6','-4','-3','-2','-1','-1','-1','0','0','0','0','0','0','0','+1','+2','+3','+4','+4','+4','+4','+4','+4','+4','+4'];
 wisdomTable['wisbonus'] = ['Error','—','—','—','—','—','—','—','—','0','0','0','0','1st','1st','2nd','2nd','3rd','4th','1st,3rd','2nd,4th','3rd,5th','4th,5th','1st,6th','5th,6th','6th,7th'];
-wisdomTable['wisbonus-prime'] = ['Error','','','','','','','','','','','','','1st','2x1st','2x1st, 2nd','2x1st, 2x2nd','2x1st, 2x2nd, 3rd','2x1st, 2x2nd, 3rd, 4th','3x1st, 2x2nd, 2x3rd, 4th','3x1st, 3x2nd, 2x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th'];
-wisdomTable['wisbonus-extra'] = ['Error','','','','','','','','','','','','','','','','','','','','','5th','2x5th','2x5th, 6th','3x5th, 2x6th','3x5th, 3x6th, 7th'];
 wisdomTable['wisfail'] = ['Error','80','60','50','45','40','35','30','25','20','15','10','5','0','0','0','0','0','0','0','0','0','0','0','0','0'];
 wisdomTable['wisimmune'] = ['Error','','','','','','','','','','','','','','','','','','','cause fear, charm person, command, friends, hypnotism','forget, hold person, ray of enfeeblement, scare','fear','charm monster, confusion, emotion, fumble, suggestion','chaos, feeblemind, hold monster, magic jar, quest','geas, mass suggestion, rod of rulership','antipathy/sympathy, death spell, mass charm'];
 wisdomTable['wisnotes'] = ['INVALID WISDOM','','','','','','','','','','','','','','','','','','','','','','','','','',''];
+wisdomTable['wisdom-wind']  = [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,3,4,5,6,7,8,9,10,11,12];
 
 const charismaTable = {};
 charismaTable['chamax'] = ['Error','0','1','1','1','2','2','3','3','4','4','4','5','5','6','7','8','10','15','20','25','30','35','40','45','50'];
@@ -118,3 +115,4 @@ charismaTable['chanotes'] = ['INVALID CHARISMA','','','','','','','','','','',''
 
 const ABILITY_MODIFIERS = [0,0,0,-5,-4,-3,-2,-1,0,0,0,0,0,0,1,2,3,4,5,5,5,5,5,5,5,5];
 /* ---- Attributes tables end ---- */
+module.exports = dexterityTable;

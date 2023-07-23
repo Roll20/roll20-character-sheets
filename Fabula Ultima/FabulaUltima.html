@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+
+<!--
+	Ref Sheet : https://drive.google.com/file/d/1FwqxXuneEyOToUCFt66o3-j0VK8A_c_y/view?usp=sharing
+
+	EVERYTHING UNDER HERE IS ON THE TOP SIDE OF THE FIRST TAB
+	(This tab contains almost all infos except Spells and Levels/Abilities)
+	ON THE LEFT SIDE
+	Done TODO : Traits
+	TODO : Bonds => text input with 3 columns of 2 toggles, see default sheet
+	TODO : Fabula & XP => Nothing to do, except 1 number input for each and a bunch of text
+	Done TODO : Money => Just over the equipment ?
+	Done TODO : Togglable fieldset of Projects => Each project has a name, a togglable textbox for description, a total cost (as a number input) that defines an unmodifiable max progress and a progess value
+	ON THE RIGHT SIDE
+	TODO : CSS the attributes and status effect like on the sheet
+	TODO : Add a toggle cogwheele to make the buffs appear and disappear
+
+	EVERYTHING UNDER HERE IS ON THE BOTTOM SIDE OF THE FIRST TAB
+	ON THE LEFT SIDE
+	Done TODO : HP, Crisis, MP and IP => Need to compute with base Might and Willpower times 5, later adding levels, later adding bonus from classes
+		REMINDER : There should be an 'Expand' toggle for each value, to add special modifiers from items of skills
+	Done TODO : Current HP, MP and IP
+	Done TODO : Defense, Magic defense, Initiative => Calculated from CURRENT Dex and Insight
+	REMINDER : Initiative is a button to roll initiative
+	REMINDER : There should be an 'Expand' toggle for each value, to add special modifiers from items of skills
+	Done TODO : Toggles for Proficiencies (Shields, Armor, Melee, Ranged) => Has no interaction
+	Done TODO : Add Equipment => Firstly Armor to get def, magic def and init modifiers
+		REMINDER : On Armor, if no '+' is added in the defense or magic defense text, replace defense with value instead of adding to Dex and Ins
+	Done TODO : Add Equipment => Accessory, with text box and that's it
+	TODO : Add Main hand Weapon => Dropdown for type of weapon, dropdown for melee or ranged, checkbox for two handed (disables off-hand modifications), dropdowns for both attributes for accuracy, Number input for HR+ X where X is the input, dropdown for damage type, description textbox, name textbox, button to roll (maybe on name)
+	TODO : Roll should roll both dice, print result, print if critical or fumble, extract biggest result to compute damage.
+		REMINDER : Add possible modifier popup for Accuracy and Damages (with ?{Modifier|0})
+		TODO : Find a way to detect criticals and print something when critting (double 6 and up)
+		TODO : Find a way to detect doubles and print something when doubling (double 2, 3, 4 and 5 for Furies)
+		TODO : Find a way to detect fumbles and print something when fumbling (double 1)
+		TODO : Print that in a nice macro => maybe one that only prints the result of the Accuracy, the damage and if Critting, Doubles or Fumbles (Doubles is useful for Furies)
+	TODO : Add Off Hand Weapon => Same thing as main hand but one handed only
+		TODO : REMINDER : Can be a shield
+	Done TODO : Add additional weapons with Fieldsets (https://help.roll20.net/hc/en-us/articles/360037773413-Intro-to-Sheet-Development#repeating-sections-0-20)
+
+	ON THE RIGHT SIDE
+	Done TODO : Add open roll => two Dropdowns with a number box and a button, so that players can do basic rolls easily
+		TODO : Find a way to detect criticals and print something when critting (double 6 and up)
+		TODO : Find a way to detect doubles and print something when doubling (double 2, 3, 4 and 5 for Furies)
+		TODO : Find a way to detect fumbles and print something when fumbling (double 1)
+	Done TODO : Add default list of rolls => See Frequently used Checks page 51 of the core rulebook
+	Done TODO : Default list of rolls can be expanded, see Fieldsets
+
+	SECOND TAB (Spells)
+	UP
+	Done TODO : Toggles of each type of magic for rituals, with Fieldset for additional magic types (Arcanist)
+	Done TODO : Togglable Fieldset of Clocks (with clickable parts and a name, and a dropdown selection of which type of clock. 4/6/8/10/12)
+	LEFT
+	Done TODO : Fieldset of Offensive Spells => Contains two Dropdowns, one for each casting attributes (default INS + WLP) and a number input for cast bonuses, number input for damage, textbox for the spell name, textbox for mana cost (string cuz some spells are 10xT), textbox for target, textbox for duration, textbox for effect. Obviously has a button to roll for cast
+		TODO : Create a nice macro that prints the cast result, damage if damage input is more than 0, and a button that prints the cost, target, duration and effect of the spell
+	RIGHT
+	Done TODO : Fieldset of Non Offensive Spells => Contains a textbox for the spell name, textbox for mana cost (string cuz some spells are 10xT), textbox for target, textbox for duration, textbox for effect. Has a button with a nice macro to print infos like above
+
+	THIRD TAB (Levels)
+	Done TODO : Total level, adds itself to max HP and MP
+	Done TODO : Fieldset of Classes => Contains name textbox, dropdown of HP/MP/IP bonus (5 HP or 5 MP or 2 IP) [these add themselves to HP, MP and IP], textbox of other benefits, non-modifiable level count
+		Done TODO : Contains a Fieldset of skills, each with a modifiable level that adds to the class level and total level
+			Remark : Modified for a simpler set of 5 skills. More wordy but less algorithm heavy.
+		Done TODO : Skills have a name textbox, a modifiable number input for level and a textbox for description
+		TODO : On level 10, automatically adds a Skill with 'Heroic' mention somewhere. It does not have a level and does not add a level to the total.
+
+	FOURTH TAB (Background stuffs)
+	Done TODO : Fieldset of big text boxes with names for Background, notes, backpack and stuffs.
+
+
+	TODO : Simplified sheet for NPC, but that's going to be on another time
+-->
+
+<html>
+<script type="text/worker">
+		function parseBool(bool) {
+			return bool == "on"
+		}
+
+		function positive(value) {
+			return (value < 0)? 0 : value;
+		}
+
+		function clamp(value, min = 6, max = 12) {
+			if (value < min) {return min;}
+			else if (value > max) {return max;}
+			else {return value;}
+		}
+
+		function diceParse(baseDie, buffs, debuffs) {
+			var baseValue = parseInt(baseDie.replace('d',''), 10);
+			var finalModifier = (buffs - debuffs) *2;
+			return clamp(baseValue + finalModifier, 6, 12);
+		}
+
+		on('change:dexterity change:dexterityincreases change:slow change:enraged sheet:opened', function() {
+			getAttrs(["dexterity", "dexterityIncreases", "slow", "enraged"], function(values) {
+				var debuffValue = (parseBool(values.slow)?1:0)+(parseBool(values.enraged)?1:0);
+				var buffValue = positive(parseInt(values.dexterityIncreases));
+				var finalDie = diceParse(values.dexterity, buffValue, debuffValue);
+
+				setAttrs({
+					dexterityIncreases: buffValue,
+					hiddenCurrentDexterity: String(finalDie)
+				});
+			});
+		});
+
+		on('change:insight change:insightincreases change:dazed change:enraged sheet:opened', function() {
+			getAttrs(["insight", "insightIncreases", "dazed", "enraged"], function(values) {
+				var debuffValue = (parseBool(values.dazed)?1:0)+(parseBool(values.enraged)?1:0);
+				var buffValue = positive(parseInt(values.insightIncreases));
+				var finalDie = diceParse(values.insight, buffValue, debuffValue);
+
+				setAttrs({
+					insightIncreases: buffValue,
+					hiddenCurrentInsight: String(finalDie)
+				});
+			});
+		});
+
+		on('change:might change:mightincreases change:weak change:poisoned sheet:opened', function(){
+			getAttrs(["might", "mightIncreases", "weak", "poisoned"], function(values) {
+				var debuffValue = (parseBool(values.weak)?1:0)+(parseBool(values.poisoned)?1:0);
+				var buffValue = positive(parseInt(values.mightIncreases));
+				var finalDie = diceParse(values.might, buffValue, debuffValue);
+
+				setAttrs({
+					mightIncreases: buffValue,
+					hiddenCurrentMight: String(finalDie)
+				});
+			});
+		});
+
+		on('change:willpower change:willpowerincreases change:shaken change:poisoned sheet:opened', function() {
+			getAttrs(["willpower", "willpowerIncreases", "shaken", "poisoned"], function(values) {
+				var debuffValue = (parseBool(values.shaken)?1:0)+(parseBool(values.poisoned)?1:0);
+				var buffValue = positive(parseInt(values.willpowerIncreases));
+				var finalDie = diceParse(values.willpower, buffValue, debuffValue);
+
+				setAttrs({
+					willpowerIncreases: buffValue,
+					hiddenCurrentWillpower: String(finalDie)
+				});
+			});
+		});
+
+		// add change:armor and armor
+		on('change:hiddencurrentdexterity change:addeddefense change:armordefense change:shielddefense sheet:opened', function(){
+			getAttrs(["hiddenCurrentDexterity", "addedDefense", "armorDefense", "shieldDefense"], function(values){
+				if (values.shieldDefense.startsWith("+"))
+				{
+					values.shieldDefense = values.shieldDefense.substring(1);
+				}
+
+				if (values.armorDefense.startsWith("+"))
+				{
+					//if armor start with '+'
+					var defenseBonus = values.armorDefense.substring(1);
+
+					setAttrs({
+						hiddenDefense: (parseInt(values.hiddenCurrentDexterity) + parseInt(values.addedDefense) + parseInt(defenseBonus) + parseInt(values.shieldDefense))
+					});
+				}
+				else
+				{
+					setAttrs({
+						hiddenDefense: (parseInt(values.armorDefense) + parseInt(values.addedDefense) + parseInt(values.shieldDefense))
+					});
+				}
+
+			});
+		});
+
+		// add change:shieldresist and shieldResist
+		on('change:hiddencurrentinsight change:addedmagicdefense change:armorresist change:shieldresist sheet:opened', function(){
+			getAttrs(["hiddenCurrentInsight", "addedMagicDefense", "armorResist", "shieldResist"], function(values) {
+				if (values.shieldResist.startsWith("+"))
+				{
+					values.shieldResist = values.shieldResist.substring(1);
+				}
+
+				if (values.armorResist.startsWith("+"))
+				{
+					//if magicArmor start with '+'
+					var resistBonus = values.armorResist.substring(1);
+
+					setAttrs({
+						hiddenMagicDefense: (parseInt(values.hiddenCurrentInsight) + parseInt(values.addedMagicDefense) + parseInt(resistBonus) + parseInt(values.shieldResist))
+					});
+				}
+				else
+				{
+					setAttrs({
+						hiddenMagicDefense: (parseInt(values.armorResist) + parseInt(values.addedMagicDefense) + parseInt(values.shieldResist))
+					});
+				}
+			});
+		});
+
+		on('change:repeating_charclasses remove:repeating_charclasses ', function() {
+			getSectionIDs("charClasses", function(idArray) {
+				var attributesToGet = [];
+				idArray.forEach(id => {
+					attributesToGet.push(`repeating_charClasses_${id}_firstSkillLevel`);
+					attributesToGet.push(`repeating_charClasses_${id}_secondSkillLevel`);
+					attributesToGet.push(`repeating_charClasses_${id}_thirdSkillLevel`);
+					attributesToGet.push(`repeating_charClasses_${id}_fourthSkillLevel`);
+					attributesToGet.push(`repeating_charClasses_${id}_fifthSkillLevel`);
+				});
+
+				getAttrs(attributesToGet, function(values) {
+					var totalLevel = 0;
+					for (let value of Object.values(values)){
+						totalLevel += parseInt(value);
+					}
+
+					setAttrs({
+						hiddenTotalLevel: totalLevel
+					});
+				});
+			});
+			getSectionIDs("charClasses", function(idArray) {
+				var attributesToGet = [];
+				idArray.forEach(id => attributesToGet.push(`repeating_charClasses_${id}_classBonus`));
+
+				getAttrs(attributesToGet, function(values) {
+					var health = 0;
+					var magic = 0;
+					var inventory = 0;
+					for (let value of Object.values(values))
+					{
+						if (value == "HP")
+							health++;
+						else if (value == "MP")
+							magic++;
+						else if (value == "IP")
+							inventory++;
+					}
+
+					setAttrs({
+						hiddenBonusHealthPoints: health,
+						hiddenBonusMagicPoints: magic,
+						hiddenBonusInventoryPoints: inventory
+					});
+				});
+			});
+		});
+
+		//tabs handler
+		const buttonlist = ["character","stats","magic","class","notes"];
+		buttonlist.forEach(button => {
+			on(`clicked:${button}`, function() {
+				setAttrs({
+					sheetTab: button
+				});
+			});
+		});
+	</script>
+
+
+<div>
+	<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="character" />
+	<div>
+		<button type="action" class="toggle-button" name="act_character">Character</button>
+		<button type="action" class="toggle-button" name="act_stats">Stats</button>
+		<button type="action" class="toggle-button" name="act_magic">Magic</button>
+		<button type="action" class="toggle-button" name="act_class">Class</button>
+		<button type="action" class="toggle-button" name="act_notes">Notes</button>
+	</div>
+	<div class="sheet-character">
+		<div class="tab up">
+			<div class="column left ">
+				<div class="frame charTraits">
+					<label>Traits</label>
+					<div class="name"> Name <input type="text" name="attr_character_name" /></div>
+					<div class="identity">Identity <input type="text" name="attr_characterIdentity" value="" /></div>
+					<div class="theme">Theme <input type="text" name="attr_characterTheme" value="" /></div>
+					<div class="origin">Origin <input type="text" name="attr_characterOrigin" value="" /></div>
+				</div>
+				<div class="frame charBonds">
+					<label>Bonds</label>
+					<div class="grid">
+						<div class="tab">
+							<div class="bond">
+								<div class="name">
+									Bond 1
+									<input type="text" name="attr_firstBondName" value="Bond name" />
+								</div>
+								<div>
+									<input type="checkbox" name="attr_firstBondAdmiration" />Admiration
+								</div>
+								<div>
+									<input type="checkbox" name="attr_firstBondInferiority" />Inferiority
+								</div>
+								<div>
+									<input type="checkbox" name="attr_firstBondLoyalty" />Loyalty
+								</div>
+								<div>
+									<input type="checkbox" name="attr_firstBondMistrust" />Mistrust
+								</div>
+								<div>
+									<input type="checkbox" name="attr_firstBondAffection" />Affection
+								</div>
+								<div>
+									<input type="checkbox" name="attr_firstBondHatred" />Hatred
+								</div>
+							</div>
+							<div class="bond">
+								<div class="name">
+									Bond 2
+									<input type="text" name="attr_secondBondName" value="Bond name" />
+								</div>
+								<div>
+									<input type="checkbox" name="attr_secondBondAdmiration" />Admiration
+								</div>
+								<div>
+									<input type="checkbox" name="attr_secondBondInferiority" />Inferiority
+								</div>
+								<div>
+									<input type="checkbox" name="attr_secondBondLoyalty" />Loyalty
+								</div>
+								<div>
+									<input type="checkbox" name="attr_secondBondMistrust" />Mistrust
+								</div>
+								<div>
+									<input type="checkbox" name="attr_secondBondAffection" />Affection
+								</div>
+								<div>
+									<input type="checkbox" name="attr_secondBondHatred" />Hatred
+								</div>
+							</div>
+							<div class="bond">
+								<div class="name">
+									Bond 3
+									<input type="text" name="attr_thirdBondName" value="Bond name" />
+								</div>
+								<div>
+									<input type="checkbox" name="attr_thirdBondAdmiration" />Admiration
+								</div>
+								<div>
+									<input type="checkbox" name="attr_thirdBondInferiority" />Inferiority
+								</div>
+								<div>
+									<input type="checkbox" name="attr_thirdBondLoyalty" />Loyalty
+								</div>
+								<div>
+									<input type="checkbox" name="attr_thirdBondMistrust" />Mistrust
+								</div>
+								<div>
+									<input type="checkbox" name="attr_thirdBondAffection" />Affection
+								</div>
+								<div>
+									<input type="checkbox" name="attr_thirdBondHatred" />Hatred
+								</div>
+							</div>
+						</div>
+						<div class="tab">
+							<div class="bond">
+								<div class="name">
+									Bond 4
+									<input type="text" name="attr_fourthBondName" value="Bond name" />
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fourthBondAdmiration" />Admiration
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fourthBondInferiority" />Inferiority
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fourthBondLoyalty" />Loyalty
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fourthBondMistrust" />Mistrust
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fourthBondAffection" />Affection
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fourthBondHatred" />Hatred
+								</div>
+							</div>
+							<div class="bond">
+								<div class="name">
+									Bond 5
+									<input type="text" name="attr_fifthBondName" value="Bond name" />
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fifthBondAdmiration" />Admiration
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fifthBondInferiority" />Inferiority
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fifthBondLoyalty" />Loyalty
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fifthBondMistrust" />Mistrust
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fifthBondAffection" />Affection
+								</div>
+								<div>
+									<input type="checkbox" name="attr_fifthBondHatred" />Hatred
+								</div>
+							</div>
+							<div class="bond">
+								<div class="name">
+									Bond 6
+									<input type="text" name="attr_sixthBondName" value="Bond name" />
+								</div>
+								<div>
+									<input type="checkbox" name="attr_sixthBondAdmiration" />Admiration
+								</div>
+								<div>
+									<input type="checkbox" name="attr_sixthBondInferiority" />Inferiority
+								</div>
+								<div>
+									<input type="checkbox" name="attr_sixthBondLoyalty" />Loyalty
+								</div>
+								<div>
+									<input type="checkbox" name="attr_sixthBondMistrust" />Mistrust
+								</div>
+								<div>
+									<input type="checkbox" name="attr_sixthBondAffection" />Affection
+								</div>
+								<div>
+									<input type="checkbox" name="attr_sixthBondHatred" />Hatred
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="charFabula no-frame">
+					<div class="grid">
+						<label>Fabula</label>
+						<input type="number" class="circle-container" name="attr_fabulaPoints" />
+						<ul class="info-left">
+							<li>+1 Fabula Point if you have none at the start of the session</li>
+							<li>+1 Fabula Point when a Villain makes an entrance</li>
+						</ul>
+						<ul class="info-right">
+							<li>+1 Fabula Point when you fumble a check</li>
+							<li>+2 Fabula Point if you surrender at zero HP</li>
+						</ul>
+					</div>
+					<ul>
+						<li>Spend 1 Fabula Point after performing a Check to invoke a trait to reroll one or both dice
+							(not a
+							fumble)</li>
+						<li>Spend 1 Fabula Point after performing a Check to invoke a bond and add its strength to the
+							result
+							(once per check)</li>
+						<li>Spend 1 Fabula Point to alter the story. If you alter an existing element, you need
+							permission from
+							whoever introduced it.</li>
+					</ul>
+				</div>
+				<div class="separation-line"></div>
+				<div class="charExperience no-frame">
+					<div class="grid">
+						<label>Experience</label>
+						<input type="number" class="circle-container" name="attr_experiencePoints" />
+						<div>
+							At the end of each session, you automatically gain 5 XP. Then :
+							<ul>
+								<li>
+									Gain XP equal to [Fabula Points spent by the group / number of Player Characters]
+								</li>
+								<li>
+									Gain XP equal to [Ultima Points spent by Villains]</li>
+							</ul>
+							Finally if you have 10 or more XP, lose 10 XP and gain 1 level
+						</div>
+					</div>
+				</div>
+				<div class="charMoney frame">
+					<label>Money</label>
+					Zenit <input type="number" name="attr_characterMoney" value="0" />
+					<div class="separation-line"></div>
+					Projects <fieldset class="repeating_projects">
+						<div class="no-frame">
+							Project <input type="text" name="attr_projectName" value="Project name" />
+							Description <textarea name="attr_projectDescription" value="" />
+							Cost <input type="number" name="attr_projectCost" value="100" />
+							Advancement <input type="number" name="attr_projectAdvancement" value="0" />
+							Max advancement <input type="number" name="attr_projectTotalAdvance"
+								value="(@{projectCost}/100)" disabled="true" />
+						</div>
+					</fieldset>
+				</div>
+			</div>
+			<div style="display: flex;">
+				<div class="column right frame charAttribute half-width ">
+					<label>Attributes</label>
+					<div class="grid">
+						<div class="charAttribute char-dex">
+							<button type="roll" value="/roll d@{currentDexterity}" name="roll_dexterityRoll"></button>
+							Dexterity <select name="attr_dexterity" value="8">
+								<option value="6">d6</option>
+								<option value="8" selected="selected">d8</option>
+								<option value="10">d10</option>
+								<option value="12">d12</option>
+							</select>
+							Buffs <input type="number" name="attr_dexterityIncreases" value="0" />
+							<input type="hidden" name="attr_hiddenCurrentDexterity" value="8" />
+							Current Dexterity <input type="text" name="attr_currentDexterity"
+								value="@{hiddenCurrentDexterity}" disabled="true" title="Current Dexterity in use" />
+							<input type="hidden" name="attr_dexterityHiddenDebuffs" value="0" />
+							Slow <input type="checkbox" name="attr_slow" />
+						</div>
+						<div class="charAttribute char-ins">
+							<button type="roll" value="/roll d@{currentInsight}" name="roll_insightRoll"></button>
+							Insight <select name="attr_insight" value="8">
+								<option value="6">d6</option>
+								<option value="8" selected="selected">d8</option>
+								<option value="10">d10</option>
+								<option value="12">d12</option>
+							</select>
+							Buffs <input type="number" name="attr_insightIncreases" value="0" />
+							<input type="hidden" name="attr_hiddenCurrentInsight" value="8" />
+							Current Insight <input type="text" name="attr_currentInsight"
+								value="@{hiddenCurrentInsight}" disabled="true" title="Current Insight in use" />
+							Dazed <input type="checkbox" name="attr_dazed" />
+						</div>
+						<div class="charAttribute char-migth">
+							<button type="roll" value="/roll d@{currentMight}" name="roll_mightRoll"></button>
+							Might <select name="attr_might" value="8">
+								<option value="6">d6</option>
+								<option value="8" selected="selected">d8</option>
+								<option value="10">d10</option>
+								<option value="12">d12</option>
+							</select>
+							Buffs <input type="number" name="attr_mightIncreases" value="0" />
+							<input type="hidden" name="attr_hiddenCurrentMight" value="8" />
+							Current Might <input type="text" name="attr_currentMight" value="@{hiddenCurrentMight}"
+								disabled="true" title="Current Might in use" />
+							Weak <input type="checkbox" name="attr_weak" />
+						</div>
+						<div class="charAttribute char-will">
+							<button type="roll" value="/roll d@{currentWillpower}" name="roll_willpowerRoll"></button>
+							Willpower <select name="attr_willpower" value="8">
+								<option value="6">d6</option>
+								<option value="8" selected="selected">d8</option>
+								<option value="10">d10</option>
+								<option value="12">d12</option>
+							</select>
+							Buffs <input type="number" name="attr_willpowerIncreases" value="0" />
+							<input type="hidden" name="attr_hiddenCurrentWillpower" value="8" />
+							Current Willpower <input type="text" name="attr_currentWillpower"
+								value="@{hiddenCurrentWillpower}" disabled="true" title="Current Willpower in use" />
+							Shaken <input type="checkbox" name="attr_shaken" />
+						</div>
+						<div class="charAttribute char-rage">
+							Enraged <input type="checkbox" name="attr_enraged" />
+						</div>
+						<div class="charAttribute char-pois">
+							Poisoned <input type="checkbox" name="attr_poisoned" />
+						</div>
+					</div>
+				</div>
+				<div class="charGauges frame half-width">
+					<label>Health, Mana, Inventory</label>
+					<div class="grid">
+						<div class="gird-hp">
+							<div>HP</div>
+							<input type="number" name="attr_maxHealthPoints"
+								value="(@{might}*5+@{addedHealthPoints}+@{hiddenBonusHealthPoints}*5+@{hiddenTotalLevel})"
+								disabled="true" />
+						</div>
+						<div class="gird-add-hp">
+							<div>Added HP</div>
+							<input type="number" name="attr_addedHealthPoints" value="0" />
+							<input type="hidden" name="attr_hiddenBonusHealthPoints" value="0" />
+						</div>
+						<div class="grid-crisis">
+							<div>Crisis</div>
+							<input type="number" name="attr_crisis" value="floor(@{maxHealthPoints}/2)"
+								disabled="true" />
+						</div>
+						<div class="grid-current-hp">
+							<div>Current</div>
+							<input type="number" name="attr_currentHealthPoints" value="0" />
+						</div>
+						<div class="grid-mp">
+							<div>MP</div> <input type="number" name="attr_maxMagicPoints"
+								value="(@{willpower}*5+@{addedMagicPoints}+@{hiddenBonusMagicPoints}*5+@{hiddenTotalLevel})"
+								disabled="true" />
+						</div>
+						<div class="gird-add-mp">
+							<div>Added mp</div> <input type="number" name="attr_addedMagicPoints" value="0" />
+							<input type="hidden" name="attr_hiddenBonusMagicPoints" value="0" />
+						</div>
+						<div class="gird-currrent-mp">
+							<div>Current</div> <input type="number" name="attr_currentMagicPoints" value="0" />
+						</div>
+						<div class="gird-ip">
+							<div>IP</div> <input type="number" name="attr_maxInventoryPoints"
+								value="(6+@{addedInventoryPoints}+@{hiddenBonusInventoryPoints}*2)" disabled="true" />
+						</div>
+						<div class="gird-add-ip">
+							<div>Added ip</div> <input type="number" name="attr_addedInventoryPoints" value="0" />
+							<input type="hidden" name="attr_hiddenBonusInventoryPoints" value="0" />
+						</div>
+						<div class="gird-currrent-ip">
+							<div> Current </div> <input type="number" name="attr_currentInventoryPoints" value="0" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="sheet-stats">
+		<div class="tab down ">
+			<div class="column left  ">
+
+				<div class="charProficiencies no-frame">
+					<label> Equipment </label>
+					<div class="inline-display">
+						<div><input type="checkbox" name="attr_armorProficiency" /> Martial Armor</div>
+						<div><input type="checkbox" name="attr_shieldProficiency" /> Martial Shields</div>
+						<div><input type="checkbox" name="attr_meleeProficiency" /> Martial Melee Weapons</div>
+						<div><input type="checkbox" name="attr_rangedProficiency" /> Martial Ranged Weapons</div>
+					</div>
+				</div>
+				<div class="charDefenses no-frame">
+					<label>Defenses</label>
+					<div class="grid">
+						<div>Defense <input type="number" name="attr_defense" value="(@{hiddenDefense})"
+								disabled="true" /></div>
+						<div>Added defense <input type="number" name="attr_addedDefense" value="0" />
+							<input type="hidden" name="attr_hiddenDefense" value="0" />
+						</div>
+
+						<div>Magic defense <input type="number" name="attr_magicDefense" value="(@{hiddenMagicDefense})"
+								disabled="true" /></div>
+						<div>Added magic defense <input type="number" name="attr_addedMagicDefense" value="0" />
+							<input type="hidden" name="attr_hiddenMagicDefense" value="0" />
+						</div>
+
+						<div><button type="roll" name="roll_initiativeRoll"
+								value="&{template:Skills} {{name=Initiative}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + @{initiative}[baseInit] + @{shieldInitiative}[shieldInit] + ?{Modifier|0}[Modifier] ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}">
+								Initiative
+							</button>
+							<input type="number" name="attr_initiative" value="(@{addedInitiative}+@{armorInitiative})"
+								disabled="true" />
+						</div>
+						<div> initiative <input type="number" name="attr_addedInitiative" value="0" /></div>
+					</div>
+				</div>
+				<div class="charArmor no-frame">
+					<label>Armor</label>
+					Name <input type="text" name="attr_armorName" value="" />
+					<br />
+					Defense <input type="text" name="attr_armorDefense" value="+0" />
+					Magic defense<input type="text" name="attr_armorResist" value="+0" />
+					<br />
+					Armor initiative<input type="number" name="attr_armorInitiative" value="0" />
+					<br />
+					Description <textarea name="attr_armorDescription" value=""> </textarea>
+				</div>
+				<div class="charAccessory no-frame">
+					<label>Accessory</label>
+					<div class="inline-display">
+						Name
+						<input type="text" name="attr_accessoryName" value="" />
+					</div>
+					Description <textarea name="attr_accessoryDescription" value=""></textarea>
+				</div>
+				<div class="charWeapons frame">
+					<label>Weapons</label>
+					<div class="inline-display">
+						<div class="weapon no-frame half-width">
+							<label>Main hand</label>
+							<div class="inline-display">
+								Name <input type="text" name="attr_mainWeaponName" value="" />
+							</div>
+							<div class="inline-display">
+								Category <select class="full-width" name="attr_mainWeaponCategory" value="Brawling">
+									<option value="Brawling" selected="selected">Brawling</option>
+									<option value="Arcane">Arcane</option>
+									<option value="Bow">Bow</option>
+									<option value="Dagger">Dagger</option>
+									<option value="Firearm">Firearm</option>
+									<option value="Flail">Flail</option>
+									<option value="Heavy">Heavy</option>
+									<option value="Spear">Spear</option>
+									<option value="Sword">Sword</option>
+									<option value="Thrown">Thrown</option>
+								</select>
+							</div>
+							<div class="inline-display">
+								<button type="roll"
+									value="&{template:Attack} [[ [[d@{mainWeaponFirstAttribute}]][d@{mainWeaponFirstAttribute}] + [[d@{mainWeaponSecondAttribute}]][d@{mainWeaponSecondAttribute}] + [[@{mainWeaponAccuracy}]][BaseWeaponAccuracy] ]] {{weaponName=@{mainWeaponName}}} {{weaponCategory=@{mainWeaponCategory}}} {{weaponRange=@{mainWeaponRange}}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{attack=$[[3]]}} {{weaponDamage=@{mainWeaponDamage}}} {{damageType=@{mainWeaponDamageType}}} {{desc=@{mainWeaponDescription}}}">Accuracy</button>
+								<select class="full-width" name="attr_mainWeaponFirstAttribute"
+									value="@{hiddenCurrentMight}">
+									<option value="@{hiddenCurrentDexterity}">DEX</option>
+									<option value="@{hiddenCurrentInsight}">INS</option>
+									<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+									<option value="@{hiddenCurrentWillpower}">WLP</option>
+								</select>
+								<select class="full-width" name="attr_mainWeaponSecondAttribute"
+									value="@{hiddenCurrentDexterity}">
+									<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+									<option value="@{hiddenCurrentInsight}">INS</option>
+									<option value="@{hiddenCurrentMight}">MIG</option>
+									<option value="@{hiddenCurrentWillpower}">WLP</option>
+								</select>
+							</div>
+							<input type="number" name="attr_mainWeaponAccuracy" value="0" />
+							<div class="inline-display">
+								Damages [HR + <input type="number" name="attr_mainWeaponDamage" value="5" />]
+								<select class="full-width" name="attr_mainWeaponDamageType" value="physical">
+									<option value="physical" selected="selected">physical</option>
+									<option value="air">air</option>
+									<option value="bolt">bolt</option>
+									<option value="dark">dark</option>
+									<option value="earth">earth</option>
+									<option value="fire">fire</option>
+									<option value="ice">ice</option>
+									<option value="light">light</option>
+									<option value="poison">poison</option>
+								</select>
+							</div>
+							<div class="inline-display">
+								Grip <select class="full-width" name="attr_mainWeaponGrip" value="One-handed">
+									<option value="One-handed">One-handed</option>
+									<option value="Two-handed">Two-handed</option>
+								</select>
+							</div>
+							<div class="inline-display">
+								Range <select class="full-width" name="attr_mainWeaponRange" value="Melee">
+									<option value="Melee">Melee</option>
+									<option value="Ranged">Ranged</option>
+								</select>
+							</div>
+							<div>Martial <input type="checkbox" name="attr_mainWeaponMartial" /></div>
+							<div>Description <br /><textarea type="text" name="attr_mainWeaponDescription"
+									value=""></textarea></div>
+						</div>
+						<div class="weapon no-frame half-width">
+							<label>Off hand</label>
+							<div class="inline-display">Name <input type="text" name="attr_offWeaponName" value="" />
+							</div>
+							<div class="inline-display">
+								Category <select class="full-width" name="attr_offWeaponCategory" value="Brawling">
+									<option value="Brawling" selected="selected">Brawling</option>
+									<option value="Arcane">Arcane</option>
+									<option value="Bow">Bow</option>
+									<option value="Dagger">Dagger</option>
+									<option value="Firearm">Firearm</option>
+									<option value="Flail">Flail</option>
+									<option value="Heavy">Heavy</option>
+									<option value="Spear">Spear</option>
+									<option value="Sword">Sword</option>
+									<option value="Thrown">Thrown</option>
+									<option value="Shield">Shield</option>
+								</select>
+							</div>
+							<div class="offWeaponShield">
+								<div class="inline-display">
+									Bonus Defense <input class="small-width" type="text" name="attr_shieldDefense"
+										value="+0" />
+									Bonus Magic defense<input class="small-width" type="text" name="attr_shieldResist"
+										value="+0" />
+								</div>
+								Shield initiative<input class="small-width" type="number" name="attr_shieldInitiative"
+									value="0" />
+							</div>
+							<div class="offWeaponWeapon">
+								<div class="inline-display">
+									<button type="roll"
+										value="&{template:Attack} [[ [[d@{offWeaponFirstAttribute}]][d@{offWeaponFirstAttribute}] + [[d@{offWeaponSecondAttribute}]][d@{offWeaponSecondAttribute}] + [[@{offWeaponAccuracy}]][BaseWeaponAccuracy] ]] {{weaponName=@{offWeaponName}}} {{weaponCategory=@{offWeaponCategory}}} {{weaponRange=@{offWeaponRange}}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{attack=$[[3]]}} {{weaponDamage=@{offWeaponDamage}}} {{damageType=@{offWeaponDamageType}}} {{desc=@{offWeaponDescription}}}">Accuracy</button>
+									<select class="full-width" name="attr_offWeaponFirstAttribute"
+										value="@{hiddenCurrentMight}">
+										<option value="@{hiddenCurrentDexterity}">DEX</option>
+										<option value="@{hiddenCurrentInsight}">INS</option>
+										<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+										<option value="@{hiddenCurrentWillpower}">WLP</option>
+									</select>
+									<select class="full-width" name="attr_offWeaponSecondAttribute"
+										value="@{hiddenCurrentDexterity}">
+										<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+										<option value="@{hiddenCurrentInsight}">INS</option>
+										<option value="@{hiddenCurrentMight}">MIG</option>
+										<option value="@{hiddenCurrentWillpower}">WLP</option>
+									</select>
+								</div>
+								<input type="number" name="attr_offWeaponAccuracy" value="0" />
+								<div class="inline-display">
+									Damages [HR + <input type="number" name="attr_offWeaponDamage" value="5" />]
+									<select class="full-width" name="attr_offWeaponDamageType" value="physical">
+										<option value="physical" selected="selected">physical</option>
+										<option value="air">air</option>
+										<option value="bolt">bolt</option>
+										<option value="dark">dark</option>
+										<option value="earth">earth</option>
+										<option value="fire">fire</option>
+										<option value="ice">ice</option>
+										<option value="light">light</option>
+										<option value="poison">poison</option>
+									</select>
+								</div>
+								<div class="inline-display">
+									Grip <select class="full-width" name="attr_offWeaponGrip" value="One-handed">
+										<option value="One-handed">One-handed</option>
+										<option value="Two-handed">Two-handed</option>
+									</select>
+								</div>
+								<div class="inline-display">
+									Range <select class="full-width" name="attr_offWeaponRange" value="Melee">
+										<option value="Melee">Melee</option>
+										<option value="Ranged">Ranged</option>
+									</select>
+								</div>
+								<div>
+									Martial <input type="checkbox" name="attr_offWeaponMartial" />
+								</div>
+							</div>
+							<div>
+								Description <br /><textarea class="full-width" type="text"
+									name="attr_offWeaponDescription" value=""></textarea>
+							</div>
+						</div>
+					</div>
+					<div>
+						<div class="weapon no-frame ">
+							<label>Other</label>
+							<fieldset class="repeating_weapons">
+								<div style="width: -webkit-fill-available;">
+									<div class="inline-display">
+										Name <input type="text" name="attr_additionalWeaponName" value="" />
+									</div>
+									<div class="inline-display">
+										Category <select class="full-width" name="attr_additionalWeaponCategory"
+											value="Brawling">
+											<option value="Brawling" selected="selected">Brawling</option>
+											<option value="Arcane">Arcane</option>
+											<option value="Bow">Bow</option>
+											<option value="Dagger">Dagger</option>
+											<option value="Firearm">Firearm</option>
+											<option value="Flail">Flail</option>
+											<option value="Heavy">Heavy</option>
+											<option value="Spear">Spear</option>
+											<option value="Sword">Sword</option>
+											<option value="Thrown">Thrown</option>
+										</select>
+									</div>
+									<div class="inline-display">
+										<button type="roll"
+											value="&{template:Attack} [[ [[d@{additionalWeaponFirstAttribute}]][d@{additionalWeaponFirstAttribute}] + [[d@{additionalWeaponSecondAttribute}]][d@{additionalWeaponSecondAttribute}] + [[@{additionalWeaponAccuracy}]][BaseWeaponAccuracy] ]] {{weaponName=@{additionalWeaponName}}} {{weaponCategory=@{additionalWeaponCategory}}} {{weaponRange=@{additionalWeaponRange}}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{attack=$[[3]]}} {{weaponDamage=@{additionalWeaponDamage}}} {{damageType=@{additionalWeaponDamageType}}} {{desc=@{additionalWeaponDescription}}}">Accuracy</button>
+										<select name="attr_additionalWeaponFirstAttribute"
+											value="@{hiddenCurrentMight}">
+											<option value="@{hiddenCurrentDexterity}">DEX</option>
+											<option value="@{hiddenCurrentInsight}">INS</option>
+											<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+											<option value="@{hiddenCurrentWillpower}">WLP</option>
+										</select> <select name="attr_additionalWeaponSecondAttribute"
+											value="@{hiddenCurrentMight}">
+											<option value="@{hiddenCurrentDexterity}">DEX</option>
+											<option value="@{hiddenCurrentInsight}">INS</option>
+											<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+											<option value="@{hiddenCurrentWillpower}">WLP</option>
+										</select>
+									</div>
+									<input type="number" name="attr_additionalWeaponAccuracy" value="0" />
+									<div class="inline-display">
+										Damages [HR + <input type="number" name="attr_additionalWeaponDamage"
+											value="5" />]
+										<select name="attr_additionalWeaponDamageType" value="physical">
+											<option value="physical" selected="selected">physical</option>
+											<option value="air">air</option>
+											<option value="bolt">bolt</option>
+											<option value="dark">dark</option>
+											<option value="earth">earth</option>
+											<option value="fire">fire</option>
+											<option value="ice">ice</option>
+											<option value="light">light</option>
+											<option value="poison">poison</option>
+										</select>
+									</div>
+									<div class="inline-display">
+										Grip <select class="full-width" name="attr_additionalWeaponGrip"
+											value="One-handed">
+											<option value="One-handed">One-handed</option>
+											<option value="Two-handed">Two-handed</option>
+										</select>
+									</div>
+									<div class="inline-display">
+										Range <select class="full-width" name="attr_additionalWeaponRange"
+											value="Melee">
+											<option value="Melee">Melee</option>
+											<option value="Ranged">Ranged</option>
+										</select>
+									</div>
+									<div>
+										Martial <input type="checkbox" name="attr_additionalWeaponMartial" />
+									</div>
+									Description <textarea type="text" name="attr_additionalWeaponDescription"
+										value=""></textarea>
+								</div>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="column right">
+				<div class="defaultRolls no-frame">
+					<label>Rolls</label>
+					<button type="roll"
+						value="&{template:Skills} {{name=Generic Roll}} {{total=[[ [[d@{genericRollFirstAttribute}]][d@{genericRollFirstAttribute}] + [[d@{genericRollSecondAttribute}]][d@{genericRollSecondAttribute}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}">Roll</button>
+					<select name="attr_genericRollFirstAttribute" value="@{hiddenCurrentDexterity}">
+						<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+						<option value="@{hiddenCurrentInsight}">INS</option>
+						<option value="@{hiddenCurrentMight}">MIG</option>
+						<option value="@{hiddenCurrentWillpower}">WLP</option>
+					</select>
+					<select name="attr_genericRollSecondAttribute" value="@{hiddenCurrentDexterity}">
+						<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+						<option value="@{hiddenCurrentInsight}">INS</option>
+						<option value="@{hiddenCurrentMight}">MIG</option>
+						<option value="@{hiddenCurrentWillpower}">WLP</option>
+					</select>
+				</div>
+				<div class="defaultRolls ">
+					<div class="basicRolls no-frame justify-element">
+						<button type="roll"
+							value="&{template:Skills} {{name=Discretion [DEX + DEX]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Moving silently, hiding and acting unnoticed.">Discretion [DEX + DEX]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Dodge [DEX +INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Avoiding a trap or finding a way to flee a collapsing building.">Dodge [DEX + INS]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Anticipate [DEX + INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Anticipating someone’s movements and catching them by surprise.">Anticipate [DEX + INS]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Craft [DEX + INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Completing a work of craftsmanship or repairing something.">Craft [DEX + INS]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Captivate [DEX + WLP]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Moving gracefully to earn someone’s attention.">Captivate [DEX + WLP]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Inspect [INS + INS]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Examining or investigating someone or something.">Inspect [INS + INS]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Recall [INS + INS]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Remembering useful information about something.">Recall [INS + INS]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Interrogate [INS + WLP]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Getting information from someone during a conversation.">Interrogate [INS + WLP]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Persuade [INS + WLP]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Persuading someone through authority or diplomacy.">Persuade [INS + WLP]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Effort [MIG + MIG]}} {{total=[[ [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Hard work, such as lifting a portcullis or pushing a statue.">Effort [MIG + MIG]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Endure [MIG + WLP]}} {{total=[[ [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Resisting intense pain or fatigue.">Endure [MIG + WLP]
+						</button>
+						<button type="roll"
+							value="&{template:Skills} {{name=Intimidate [MIG + WLP]}} {{total=[[ [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"
+							title="Intimidating someone with your strength.">Intimidate [MIG + WLP]
+						</button>
+					</div>
+					<div class="customRolls no-frame">
+						<fieldset class="repeating_rolls">
+							<div class="inline-display">
+								<input type="text" name="attr_genericRollName" value="Action name" />
+								<select name="attr_genericRollFirstAttribute" value="@{hiddenCurrentDexterity}">
+									<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+									<option value="@{hiddenCurrentInsight}">INS</option>
+									<option value="@{hiddenCurrentMight}">MIG</option>
+									<option value="@{hiddenCurrentWillpower}">WLP</option>
+								</select>
+								<select name="attr_genericRollSecondAttribute" value="@{hiddenCurrentInsight}">
+									<option value="@{hiddenCurrentDexterity}">DEX</option>
+									<option value="@{hiddenCurrentInsight} " selected="selected">INS</option>
+									<option value="@{hiddenCurrentMight}">MIG</option>
+									<option value="@{hiddenCurrentWillpower}">WLP</option>
+								</select>
+								<button type="roll"
+									value="&{template:Skills} {{name=@{genericRollName}}} {{total=[[ [[d@{genericRollFirstAttribute}]][d@{genericRollFirstAttribute}] + [[d@{genericRollSecondAttribute}]][d@{genericRollSecondAttribute}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}">
+								</button>
+							</div>
+						</fieldset>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="sheet-magic">
+		<div class="tab up">
+			<div class="rituals no-frame">
+				<label>Disciplines</label>
+				<div class="justify-element">
+					<div>Arcanism<input type="checkbox" name="attr_ritualArcanism" /></div>
+					<div>Chimerism<input type="checkbox" name="attr_ritualChimerism" /></div>
+					<div>Elementalism<input type="checkbox" name="attr_ritualElementalism" /></div>
+					<div>Entropism<input type="checkbox" name="attr_ritualEntropism" /></div>
+					<div>Ritualism<input type="checkbox" name="attr_ritualRitualism" /></div>
+					<div>Spiritism<input type="checkbox" name="attr_ritualSpiritism" /></div>
+				</div>
+				<fieldset class="repeating_rituals">
+					<div class="inline-display">
+						<input type="text" name="attr_ritualCustomName" value="Discipline name" />
+						<input type="checkbox" name="attr_ritualCustom" />
+					</div>
+				</fieldset>
+			</div>
+			<div class="clocks no-frame">
+				<label>Rituals</label>
+				<fieldset class="repeating_clocks">
+					<div class="inline-display">Name <input type="text" name="attr_clockCustomName" /></div>
+					<div>Advancement <input type="number" name="attr_clockAdvancement" />
+						Clock max <input type="number" name="attr_clockMaxAdvancement" /></div>
+					<div>Effect <textarea name="attr_clockDescription"></textarea> </div>
+				</fieldset>
+			</div>
+		</div>
+		<div class="tab down justify-element">
+			<div class="tab left half-width no-frame">
+				<label>Offensive spells </label>
+				<fieldset class="repeating_offensiveSpells">
+					<div class="inline-display">
+						<input type="text" name="attr_offensiveSpellName" value="New Spell" />
+						<button type="roll" value="&{template:Magic} [[ [[d@{offensiveSpellFirstAttribute}]][d@{offensiveSpellFirstAttribute}] + [[d@{offensiveSpellSecondAttribute}]][d@{offensiveSpellSecondAttribute}] + [[@{offensiveSpellCastBonus}]][BaseSpellAccuracy] ]] {{spellName=@{offensiveSpellName}}} {{spellCost=@{offensiveSpellCost}}} {{spellTarget=@{offensiveSpellTarget}}} {{spellDuration=@{offensiveSpellDuration}}} {{magicAttack=$[[3]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{magicDamage=@{offensiveSpellDamage}}} {{magicEffect=@{offensiveSpellEffect}}}"></button>
+					</div>
+					<div class="inline-display">
+						<select name="attr_offensiveSpellFirstAttribute" value="@{hiddenCurrentInsight}">
+							<option value="@{hiddenCurrentDexterity}">DEX</option>
+							<option value="@{hiddenCurrentInsight}" selected="selected">INS</option>
+							<option value="@{hiddenCurrentMight}">MIG</option>
+							<option value="@{hiddenCurrentWillpower}">WLP</option>
+						</select>
+						<select name="attr_offensiveSpellSecondAttribute" value="@{hiddenCurrentWillpower}">
+							<option value="@{hiddenCurrentDexterity}">DEX</option>
+							<option value="@{hiddenCurrentInsight} ">INS</option>
+							<option value="@{hiddenCurrentMight}">MIG</option>
+							<option value="@{hiddenCurrentWillpower}" selected="selected">WLP</option>
+						</select>
+						<input type="number" name="attr_offensiveSpellCastBonus" />
+						Damages [HR + <input type="number" name="attr_offensiveSpellDamage" />
+
+					</div>
+					<div class="inline-display">
+						Cost <input class="very-small-width" type="text" name="attr_offensiveSpellCost" value="10xT" />
+						Target <input type="text" name="attr_offensiveSpellTarget" value="One Target" />
+						Duration <input type="text" name="attr_offensiveSpellDuration" />
+					</div>
+					Effect <textarea name="attr_offensiveSpellEffect"></textarea>
+				</fieldset>
+			</div>
+			<div class="tab right half-width no-frame">
+				<label>Other spells </label>
+				<fieldset class="repeating_baseSpells">
+					<div class="inline-display">
+						Name <input type="text" name="attr_baseSpellName" value="New Spell" />
+						<button type="roll" value="&{template:Magic} {{spellName=@{baseSpellName}}} {{spellCost=@{baseSpellCost}}} {{spellTarget=@{baseSpellTarget}}} {{spellDuration=@{baseSpellDuration}}} {{magicEffect=@{baseSpellEffect}}}"></button>
+					</div>
+					<div class="inline-display">
+						Cost <input class="very-small-width" type="text" name="attr_baseSpellCost" value="10 x T" />
+						Target <input type="text" name="attr_baseSpellTarget" value="Up to three creatures" />
+						Duration <input type="text" name="attr_baseSpellDuration" value="Instantaneous" />
+					</div>
+					Effect <textarea name="attr_baseSpellEffect"></textarea>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+	<div class="sheet-class">
+		<label class="no-frame side-padding" style="margin-top: 15px;">Total Levels </label>
+		<div class="no-frame side-padding">
+			<input type="hidden" name="attr_hiddenTotalLevel" value="0" />
+			<input type="number" name="attr_totalLevel" value="@{hiddenTotalLevel}" disabled="true" />
+		</div>
+		<label class="no-frame side-padding">Classes </label>
+		<fieldset class="repeating_charClasses">
+			<div class="frame">
+				<div class="class">
+					<div class="inline-display">
+						Name <input type="text" name="attr_className" value="" />
+					</div>
+					<div>
+						Bonus <select name="attr_classBonus" value="HP">
+							<option value="HP" selected="selected">+5 HP</option>
+							<option value="MP">+5 MP</option>
+							<option value="IP">+2 IP</option>
+						</select>
+						Level <input type="hidden" name="attr_hiddenClassLevel" />
+						<input type="number" name="attr_classLevel"
+							value="@{firstSkillLevel} +@{secondSkillLevel} +@{thirdSkillLevel} +@{fourthSkillLevel} +@{fifthSkillLevel}"
+							disabled="true" />
+					</div>
+					Description <textarea name="attr_classDescription"></textarea>
+				</div>
+				<div class="heroicSkill">
+					<label>Heroic Skill </label>
+					<div class="inline-display">
+						Name <input type="text" name="attr_heroicSkillName" />
+					</div>
+					Effect <textarea name="attr_heroicSkillDescription"></textarea>
+				</div>
+				<div class="skills">
+					<label>Skills </label>
+					<div class="skill">
+						<div class="inline-display">
+							Name <input type="text" name="attr_firstSkillName" />
+							Level <input type="number" name="attr_firstSkillLevel" value="0" />
+						</div>
+						Description <textarea name="attr_firstSkillDescription"></textarea>
+					</div>
+					<div class="skill">
+						<div class="inline-display">
+							Name <input type="text" name="attr_secondSkillName" />
+							Level <input type="number" name="attr_secondSkillLevel" value="0" />
+						</div>
+						Description <textarea type="text" name="attr_secondSkillDescription"></textarea>
+					</div>
+					<div class="skill">
+						<div class="inline-display">
+							Name <input type="text" name="attr_thirdSkillName" />
+							Level <input type="number" name="attr_thirdSkillLevel" value="0" />
+						</div>
+						Description <textarea name="attr_thirdSkillDescription"></textarea>
+					</div>
+					<div class="skill">
+						<div class="inline-display">
+							Name <input type="text" name="attr_fourthSkillName" />
+							Level <input type="number" name="attr_fourthSkillLevel" value="0" />
+						</div>
+						Description <textarea name="attr_fourthSkillDescription"></textarea>
+					</div>
+					<div class="skill">
+						<div class="inline-display">
+							Name <input type="text" name="attr_fifthSkillName" />
+							Level <input type="number" name="attr_fifthSkillLevel" value="0" />
+						</div>
+						Description <textarea name="attr_fifthSkillDescription"></textarea>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+	<div class="sheet-notes">
+		<div class="notes no-frame">
+			<label>Notes</label>
+			<fieldset class="repeating_notes">
+				<input type="text" name="attr_noteName" value="Note name" />
+				<textarea name="attr_noteText"></textarea>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<!-- End Of Characters Sheet -->
+
+<!-- Rolls Templates  -->
+
+<rolltemplate class="sheet-rolltemplate-Attack">
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			<h3> **Weapon Attack** </h3>
+			<div class="sheet-template-line">
+				<h4> **{{weaponName}}** </h4>
+				{{#weaponCategory}} <h5> **{{weaponCategory}}** </h5> {{/weaponCategory}}
+			</div>
+			<div class="sheet-template-line">
+				{{#weaponRange}} <h4> **{{weaponRange}}** </h4> {{/weaponRange}}
+			</div>
+		</div>
+
+		<div class="Attack">**Attack:** {{attack}}</div>
+
+		{{#rollTotal() dice2 dice1}}
+			{{#^rollWasFumble() dice1}}
+
+				{{#rollGreater() dice1 5}}
+					<div class="Critical"> **Critical Success !** </div>
+				{{/rollGreater() dice1 5}}
+
+				{{#^rollGreater() dice1 5}}
+					<div class="DoublesIndicator"> **Doubles !** </div>
+				{{/^rollGreater() dice1 5}}
+
+				<div class="Damages">**Damage:** {{dice1}} + {{weaponDamage}} {{damageType}} </div>
+
+			{{/^rollWasFumble() dice1}}
+
+			{{#rollWasFumble() dice1}}
+				<div class="CriticalFail"> **Critical Fail !** </div>
+			{{/rollWasFumble() dice1}}
+
+		{{/rollTotal() dice2 dice1}}
+
+		{{#rollGreater() dice1 dice2}}
+			<div class="Damages">**Damage:** {{dice1}} + {{weaponDamage}} {{damageType}} </div>
+		{{/rollGreater() dice1 dice2}}
+		{{#rollGreater() dice2 dice1}}
+			<div class="Damages">**Damage:** {{dice2}} + {{weaponDamage}} {{damageType}} </div>
+		{{/rollGreater() dice2 dice1}}
+
+		{{#desc}} <div class="description">**Description :** {{desc}} </div>{{/desc}}
+
+
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-Magic">
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			<h3> **{{spellName}}** </h3>
+			<div class="sheet-template-line">
+				<h4> **Cost: **{{spellCost}} </h4>
+				<h4> **Target: **{{spellTarget}} </h4>
+				<h4> **Duration: **{{spellDuration}} </h4>
+			</div>
+		</div>
+
+		{{#magicAttack}}
+		{{#dice1}}
+		{{#dice2}}
+
+			<div class="Magic-Attack">**Magic Attack:** {{magicAttack}}</div>
+
+			{{#rollTotal() dice2 dice1}}
+				{{#^rollWasFumble() dice1}}
+
+					{{#rollGreater() dice1 5}}
+						<div class="Critical"> **Critical Success !** </div>
+					{{/rollGreater() dice1 5}}
+
+					{{#^rollGreater() dice1 5}}
+						<div class="DoublesIndicator"> **Doubles !** </div>
+					{{/^rollGreater() dice1 5}}
+
+					{{#magicDamage}}<div class="Damages">**Damage:** {{dice1}} + {{magicDamage}} </div>{{/magicDamage}}
+
+				{{/^rollWasFumble() dice1}}
+
+				{{#rollWasFumble() dice1}}
+					<div class="CriticalFail"> **Critical Fail !** </div>
+				{{/rollWasFumble() dice1}}
+
+			{{/rollTotal() dice2 dice1}}
+
+			{{#rollGreater() dice1 dice2}}
+				{{#magicDamage}}<div class="Damages">**Damage:** {{dice1}} + {{magicDamage}} </div>{{/magicDamage}}
+			{{/rollGreater() dice1 dice2}}
+			{{#rollGreater() dice2 dice1}}
+				{{#magicDamage}}<div class="Damages">**Damage:** {{dice2}} + {{magicDamage}} </div>{{/magicDamage}}
+			{{/rollGreater() dice2 dice1}}
+		{{/dice2}}
+		{{/dice1}}
+		{{/magicAttack}}
+
+		{{#magicEffect}} <div class="Magic-Effect">**Effect :** {{magicEffect}} </div>{{/magicEffect}}
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-Skills">
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			<h3> **{{name}}** </h3>
+		</div>
+
+		<div class="Skill-Result"> **Result : ** {{total}} </div>
+
+		{{#rollTotal() dice2 dice1}}
+			{{#^rollWasFumble() dice1}}
+
+				{{#rollGreater() dice1 5}}
+					<div class="Critical"> **Critical Success !** </div>
+				{{/rollGreater() dice1 5}}
+
+				{{#^rollGreater() dice1 5}}
+					<div class="DoublesIndicator"> **Doubles !** </div>
+				{{/^rollGreater() dice1 5}}
+
+			{{/^rollWasFumble() dice1}}
+
+			{{#rollWasFumble() dice1}}
+				<div class="CriticalFail"> **Critical Fail !** </div>
+			{{/rollWasFumble() dice1}}
+
+		{{/rollTotal() dice2 dice1}}
+
+
+	</div>
+</rolltemplate>
+
+<!-- Rolls Templates End -->
+
+</html>

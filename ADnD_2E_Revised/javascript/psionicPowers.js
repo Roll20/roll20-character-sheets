@@ -1,6 +1,6 @@
 const CLAIRSENTIENT = {Devotion: {}, Science: {}};
 CLAIRSENTIENT['Science']['Aura Sight'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '?{Target’s level modifier? (-1 for every 3 levels, rounded down)|0}',
     'initial-cost': '9',
@@ -20,7 +20,7 @@ CLAIRSENTIENT['Science']['Aura Sight'] = {
     'effect': 'An aura is a glowing halo or envelope of colored light which surrounds all living things. It is invisible to the naked eye. A creature’s aura reflects both its alignment and its experience level.\n&emsp;When a psionicist uses this power, he can see auras. Interpreting an aura requires some concentration, however. With each use of this power, the psionicist can learn only one piece of information—either the subject’s alignment or experience level, but not both simultaneously.\n&emsp;A psionicist can examine up to two auras per round (he must be able to see both subjects). Alternately, he can examine the same aura twice, to verify his first impression with a second reading or to pick up remaining information. In any case, the psionicist must make a new power check each time he attempts to interpret an aura.\n&emsp;The psionicist can be reasonably discreet when he uses this power. He doesn’t have to poke at the subject or give him the hairy eyeball. However, he does need to gaze at the subject intently. Since the range of this power is the range of vision, the psionicist can go unnoticed by maintaining his distance. If he tries to sense auras on the people he is conversing with, they certainly will notice that he is staring and probably will be uncomfortable.\n&emsp;The level of the character being analyzed affects the psionicist’s power check. The higher the subject’s experience level, the tougher it is to interpret the subject’s aura. This translates into a -1 penalty for every three levels of the subject, rounded down. For example, a psionicist reading the aura of an 8th level character would suffer a -2 penalty.\n&emsp;If the die roll for the power check is a 1, the psionicist’s reading is incomplete or slightly incorrect. For example, the psionicist may learn only the chaotic portion of a chaotic neutral alignment. Or he may interpret the character’s level with an error of one or two levels.\n&emsp;*Power Score*—The psionicist can examine up to four auras per round instead of two.\n&emsp;*20*—The initiator can’t use this power again for 24 hours.'
 };
 CLAIRSENTIENT['Science']['Clairaudience'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '?{Listening spot distance modifier?|0 [100 yards]|-2 [1.000 yards]|-4 [10 miles]|-6 [100 miles]|-8 [1.000 miles]|-10 [10.000 miles]|-12 [Interplanetary]}',
     'initial-cost': '6',
@@ -40,7 +40,7 @@ CLAIRSENTIENT['Science']['Clairaudience'] = {
     'effect': 'Clairaudience allows the user to hear sounds from a distant area. The psionicist picks a spot anywhere within range. He then can hear everything that he would be able to hear normally if he were standing in that spot. If the psionicist has enhanced senses, the senses apply to clairaudience as well.\n&emsp;The farther the “listening spot” is from the psionicist, the more difficult it is to use this power. The table below gives specifics.}}{{style=center2}}{{cc1-1=bottom}}{{c1-1=**Range**}}{{c2-1=100 yards}}{{c3-1=1,000 yards}}{{c4-1=10 miles}}{{c5-1=100 miles}}{{c6-1=1,000 miles}}{{c7-1=10,000 miles}}{{c8-1=Interplanetary&ast;}}{{c1-2=**Power Score Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-4}}{{c5-2=-6}}{{c6-2=-8}}{{c7-2=-10}}{{c8-2=-12}}{{effects2=&emsp;&ast; Players with the SPELLJAMMER boxed set should note that clairaudience works only within a given crystal sphere or plane.\n\n&emsp;Using clairaudience does not screen out background noise around the psionicist. If something in his own neighborhood is raising a racket, he may have trouble hearing what is happening somewhere else. Clairaudience also does not give the psionicist the ability to understand a foreign or alien language, nor does it help him interpret sounds. For example, if the psionicist hears furniture scraping across the floor, he can only guess whether it’s a chair or something else—just as if he heard it while blindfolded.\n&emsp;*Power Score*—The psionicist automatically gains clairvoyance of the area as well.\n&emsp;*20*—The psionicist is deaf for 1d12 hours.'
 };
 CLAIRSENTIENT['Science']['Clairvoyance'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '?{Viewing spot distance modifier?|0 [100 yards]|-2 [1.000 yards]|-4 [10 miles]|-6 [100 miles]|-8 [1.000 miles]|-10 [10.000 miles]|-12 [interplanetary]}',
     'initial-cost': '7',
@@ -60,7 +60,7 @@ CLAIRSENTIENT['Science']['Clairvoyance'] = {
     'effect': 'Clairvoyance allows the user to see images from a distant area. The psionicist picks a viewing spot anywhere within range. He can then see anything that he could normally see if he were standing in that spot. His field of vision is no wider than usual, but he can scan the area by turning his head.\n&emsp;Clairvoyance does not replace the character’s normal eyesight. The psionicist can still “see” what is actually before him, but the distant scene is superimposed. For this reason, most clairvoyants close their eyes to avoid the confusion of images.\n&emsp;The more distant the viewed area is, the more difficult it is to use clairvoyance. The table below shows how the range to a viewed area can diminish the psionicist’s power score.}}{{style=center2}}{{cc1-1=bottom}}{{c1-1=**Range**}}{{c2-1=100 yards}}{{c3-1=1,000 yards}}{{c4-1=10 miles}}{{c5-1=100 miles}}{{c6-1=1,000 miles}}{{c7-1=10,000 miles}}{{c8-1=interplanetary&ast;}}{{c1-2=**Power Score Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-4}} {{c5-2=-6}}{{c6-2=-8}} {{c7-2=-10}} {{c8-2=-12}}{{effects2=&emsp;&ast; Players with the SPELLJAMMER boxed set should note that clairvoyance works only within a given crystal sphere or plane.\n\n&emsp;Clairvoyance does nothing to enhance the character’s vision. Unless some other power or magic is at work, he still cannot see objects that are invisible, hidden in shadow, or behind other objects. This power also provides no sound, so the character actually sees a kind of silent movie (without subtitles, of course).\n&emsp;Once the viewing spot is chosen, it is fixed in space. To enjoy the view from another location, the psionicist must use this power another time, and make a new power check.\n&emsp;The psionicist’s clairvoyant presence is undetectable by normal means. It cannot be dispelled, repelled, or kept away by any form of magic.\n&emsp;*Power Score*—The psionicist automatically gains clairaudience, too, for the duration of the clairvoyant vision.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
 };
 CLAIRSENTIENT['Science']['Object Reading'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '16',
@@ -80,8 +80,8 @@ CLAIRSENTIENT['Science']['Object Reading'] = {
     'effect': 'Object reading is the ability to detect psychic impressions left on an object by its previous owner, including his race, sex, age, and alignment. The power can also reveal how the owner came to possess the item, as well as how he lost it. The amount of information gained depends on the result of the power check. If the psionicist’s power check is successful, he learns the information listed beside that result in the table below, plus all the information listed above it.}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**Power Check**\n**Result**}}{{c2-1=1-2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c6-1=6-7}}{{c7-1=8+}}{{c1-2=**Information Gained**}}{{c2-2=Last owner’s race}}{{c3-2=Last owner’s sex}}{{c4-2=Last owner’s age}}{{c5-2=Last owner’s alignment}}{{c6-2=How last owner gained and lost item}}{{c7-2=All this information about all owners}}{{effects2=&emsp;An object can be read only once per experience level of the psionicist; additional readings at that level reveal no additional information. When the clairvoyant gains a new experience level, he can try reading the same object again, even if his object reading score has not changed.\n&emsp;*Power Score*—The psionicist automatically learns all information on the table above.\n&emsp;*20*—The psionicist becomes obsessed with the object; he strives to keep it until he can attempt to read it again.'
 };
 CLAIRSENTIENT['Science']['Precognition'] = {
-    'roll-override': 'Secret by DM',
-    'attribute': '@{Wisdom}',
+    'secret-by-dm': true,
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '24',
@@ -96,12 +96,12 @@ CLAIRSENTIENT['Science']['Precognition'] = {
     'damage-type': '',
     'healing': '',
     'power-score': 'The psionicist’s player may reroll three die rolls to maintain the precognition’s validity.',
-    '20': 'The character sees himself meeting his own death in a particularly nasty and grisly way and must make a saving throw vs. petrification. If the character fails the save, he is so completely shaken up by the vision that all his psionic power scores are reduced by three for [[1d6]]s hours.',
+    '20': 'The character sees himself meeting his own death in a particularly nasty and grisly way and must make a saving throw vs. petrification. If the character fails the save, he is so completely shaken up by the vision that all his psionic power scores are reduced by three for [[1d6]] hour(s).',
     '1': '',
     'effect': 'Precognition enables the psionicist to foresee the probable outcome of a course of action. This foresight is limited to the near future—no more than several hours from the time he uses the power. Furthermore, the character must describe the intended course of action in some detail in order to establish the course of events.\n&emsp;The DM makes the power check secretly. If the check fails, the character gains no information. If the roll is 20 exactly, the character sees himself meeting his own death in a particularly nasty and grisly way and must make a saving throw vs. petrification. If the character fails the save, he is so completely shaken up by the vision that all his psionic power scores are reduced by three for 1d6 hours.\n&emsp;If the power check succeeds, the character sees the most likely outcome of the actions described. The DM has some liberty in describing the scene and should use the d20 roll as a guide to how much detail to include. High rolls get more detail.\n&emsp;Even when it’s successful, precognition offers no guarantees. The psionicist sees only one possible (albeit likely) outcome to a specific course of action. If the characters involved deviate from the actions the psionicist describes, then they are changing the conditions and the lines of time, thereby making other outcomes more likely. Die rolls (particularly for surprise, initiative, and normal combat) also play a large part in a precognition’s inaccuracy. The DM cannot be expected to engineer die rolls to the players’ advantage, and even events with 95% certainty fail to occur 5% of the time. Anyone who relies on precognition to the exclusion of caution and common sense is asking for trouble.\n&emsp;Precognition is tiring. Regardless of the outcome, a psionicist who has used this power must rest for at least one turn before he can use any other clairsentient powers (the use of other disciplines is not affected).\n&emsp;*Power Score*—The psionicist’s player may reroll three die rolls to maintain the precognition’s validity.\n&emsp;*20*—See above. (Not an optional result.)'
 };
 CLAIRSENTIENT['Science']['Sensitivity to Psychic Impressions'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '12',
@@ -121,7 +121,7 @@ CLAIRSENTIENT['Science']['Sensitivity to Psychic Impressions'] = {
     'effect': 'With this power, a psionicist gains a sense of history. He perceives the residue of powerful emotions which were experienced in a given area. These impressions offer him a picture of the location’s past.\n&emsp;Battles and betrayals, marriages and murders, childbirth and great pain—only events which elicited strong emotional or psychic energy leave their impression on an area. Everyday occurrences leave no residue for the psionicist to detect.\n&emsp;To determine how far into the past a psionicist can delve, divide the result of his power check by two and round up. This is the number of strong events which he can sense. Only one event can be noted per round, however, beginning with the most recent and proceeding backward through time.\n&emsp;The character’s understanding of these events is vague and shadowy, as if he were viewing a dream. The dominant emotion involved—anger, hate, fear, love, etc.—comes through very clearly.\n&emsp;*Power Score*—The character gains an unusually clear understanding of each event.\n&emsp;*20*—An angry ghost comes forward and attempts to use *magic jar* against the psionicist.'
 };
 CLAIRSENTIENT['Devotion']['All-Round Vision'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '6',
@@ -141,7 +141,7 @@ CLAIRSENTIENT['Devotion']['All-Round Vision'] = {
     'effect': 'This power gives the psionicist “eyes in the back of his head”—and in the sides and top, as well. (Of course, this is figurative; he does not literally sprout eyeballs.) In effect, the character can see in all directions simultaneously. Besides its obvious application when combined with the clairvoyance power, all-round vision prevents anyone from sneaking up on the character without some sort of concealment. On the down side, the psionicist suffers a -4 penalty against all gaze attacks while using this power.\n&emsp;*Power Score*—Infravision is also gained.\n&emsp;*20*—The psionicist is blind for 1d4 hours.'
 };
 CLAIRSENTIENT['Devotion']['Combat Mind'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '5',
@@ -161,8 +161,8 @@ CLAIRSENTIENT['Devotion']['Combat Mind'] = {
     'effect': 'A character using this power has an unusually keen understanding of his enemies and their fighting tactics. As a result, the psionicist’s side in combat gains a -1 bonus when making initiative die rolls. This is cumulative with any other modifiers which may apply.\n&emsp;*Power Score*—The psionicist (but not his companions) also gains a +1 AC bonus.\n&emsp;*20*—The psionicist and his companions suffer a +1 initiative penalty.'
 };
 CLAIRSENTIENT['Devotion']['Danger Sense'] = {
-    'roll-override': 'Secret by DM',
-    'attribute': '@{Wisdom}',
+    'secret-by-dm': true,
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '4',
@@ -182,7 +182,7 @@ CLAIRSENTIENT['Devotion']['Danger Sense'] = {
     'effect': 'When using danger sense, a psionicist will experience a slight tingling sensation at the back of his neck when a hazard or threat is near. The DM must make a successful power check on the psionicist’s behalf before the character detects the danger. This power does not give the psionicist any specific information about the type of danger. He does not learn how or when it will strike. However, he does learn the general direction of the threat (i.e., to the right, left, ahead, or behind).\n&emsp;The character’s power check results determine how much warning he gets. If the roll is 12 or more, he knows whether danger is lurking anywhere in the immediate area. If the roll is 8 or more, he enjoys a full round of warning before that danger strikes. If the roll is 7 or less, however, the psionicist isn’t alerted until moments before danger strikes. If the roll is 1 exactly, he still has several moments’ warning but the direction is off; e.g., if the attack, is coming from the left, he thinks it is coming from ahead, behind, or the right (DM’s option).\n&emsp;If the psionicist and his companions have enough warning, they can do something to prepare—getting into defensive positions, preparing spells, or running away, for example. If they have less than one round of warning, the DM must decide how much preparation is possible. In any case, they always gain a +2 bonus on their own surprise rolls.\n&emsp;*Power Score*—The psionicist learns how far away the danger is.\n&emsp;*20*—The psionicist cannot sense danger successfully for 1d6 hours.'
 };
 CLAIRSENTIENT['Devotion']['Feel Light'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '7',
@@ -202,7 +202,7 @@ CLAIRSENTIENT['Devotion']['Feel Light'] = {
     'effect': 'This extrasensory power allows the psionicist to experience light through tactile sensations (by touch). His entire body becomes a receiver for light waves. In effect, his body replaces his eyes; he can see what his eyes would normally reveal. (His field of vision does not change.) This power does not allow him to see in the dark, since there must be light for him to feel. Nor does it counter magical darkness, which actually destroys or blocks light waves. The character gains a +4 bonus when saving against gaze attacks.\n&emsp;*Power Score*—The character can feel light in all directions.\n&emsp;*20*—The psionicist becomes overly sensitive to light for 1d10 rounds. Exposure to light causes 1 point of damage per round, and the character cannot see.'
 };
 CLAIRSENTIENT['Devotion']['Feel Sound'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '5',
@@ -222,7 +222,7 @@ CLAIRSENTIENT['Devotion']['Feel Sound'] = {
     'effect': 'This power is almost identical to feeling light, but it makes the psionicist’s body sensitive to sound. It allows him to continue hearing when his ears are disabled. This power does not detect sound where there is none, however, nor is it effective inside magical silence. The psionicist gains a +2 bonus against sonic attacks or effects, including a siren’s song.\n&emsp;*Power Score*—The psionicist can detect noise like a thief of the same experience level.\n&emsp;*20*—For 1d4 rounds, any sound causes 1 point of damage per round and is garbled.'
 };
 CLAIRSENTIENT['Devotion']['Hear Light'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '6',
@@ -242,7 +242,7 @@ CLAIRSENTIENT['Devotion']['Hear Light'] = {
     'effect': 'This extrasensory power resembles “feel light,” but it relies on the character’s hearing rather than his sense of touch. A character who has been blinded, either artificially, naturally, or by an injury, can “see” with his ears. Any light waves which reach him are converted to sound, and he “hears” the image. The image his mind perceives is just like an image offered by normal sight, and the character suffers no penalties for anything requiring vision.\n&emsp;*Power Score*—The psionicist can “hear” in the dark, as if he had infravision.\n&emsp;*20*—Bright light causes deafness, and all other light is just a buzz.'
 };
 CLAIRSENTIENT['Devotion']['Know Direction'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '1',
@@ -262,7 +262,7 @@ CLAIRSENTIENT['Devotion']['Know Direction'] = {
     'effect': 'The psionicist becomes his own compass. By paying 1 PSP and making a successful power check, he knows which way is north.\n&emsp;*Power Score*—The power is automatically maintained for one day.\n&emsp;*20*—The psionicist is disoriented; he cannot use this power again for 1d6 hours.'
 };
 CLAIRSENTIENT['Devotion']['Know Location'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '10',
@@ -282,7 +282,7 @@ CLAIRSENTIENT['Devotion']['Know Location'] = {
     'effect': 'This power is useful to characters who frequently travel by using teleportation, gates, or via other planes of existence. When it works, the power reveals general information about the character’s location. The information is usually no more detailed than the response of a simple farmer when asked, “Where am I?” Typical answers include “a few miles southwest of Waterdeep... as the crow flies,” “in the house of Kilgore the taxidermist,” or “adrift on the Blood Sea.”\n&emsp;The higher the result of the power check, the more precise the location will be. If the die roll is 8 or more, the location is specified within a mile or less. If the roll is 7 or less, the location is specified within 10 miles.\n&emsp;The character can get additional information that is *less* specific than the initial answer if his player asks for it (the psionicist does not make another power check). For example, if the DM’s first response is “you’re in the house of Kilgore the Taxidermist,” the player might then ask where the house is. The DM might answer by saying Kilgore’s house is in Chendl, in the Kingdom of Furyondy.\n&emsp;*Power Score*—The psionicist learns the exact location he’s trying to determine.\n&emsp;*20*—Nothing within 100 miles can be located with this power for 24 hours.'
 };
 CLAIRSENTIENT['Devotion']['Poison Sense'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '1',
@@ -302,7 +302,7 @@ CLAIRSENTIENT['Devotion']['Poison Sense'] = {
     'effect': 'This power enables a psionicist to detect the presence of poison and identify its location within 1 yard of his body (or his presence, if he is using clairvoyance or traveling astrally). The type of poison is not revealed, only its presence. Any poison, including animal venom, can be detected.\n&emsp;*Power Score*—The psionicist determines the exact type of poison.\n&emsp;*20*—If poison exists, the sense of it mentally overwhelms the psionicist. The effects match those of actual exposure to the poison.'
 };
 CLAIRSENTIENT['Devotion']['Radial Navigation'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '4',
@@ -322,7 +322,7 @@ CLAIRSENTIENT['Devotion']['Radial Navigation'] = {
     'effect': 'As long as this power is in use, the psionicist knows where he is in relation to a fixed starting point. In other words, no matter how or where he moves, he still knows the exact direction and distance to his starting point.\n&emsp;He cannot necessarily tell someone how to get back to that starting point, however. If he is in a maze or dungeon, for example, he may know the starting point is 500 yards north, but he cannot retrace his steps through the maze automatically. Radial navigation *does* enhance his ability to do so, however. Every time the character comes to a decision point—e.g., “should I turn right or left?”—the DM makes a power check for him. If the check succeeds, the character knows which way he came. If the roll fails, he isn’t sure. (He can still maintain the power normally, however.)\n&emsp;Radial navigation can be helpful in several ways that are not obvious. For example, teleportation and other extraordinary means of travel become simpler. Let’s say a character cannot see a particular location because he’s blindfolded. He leaves that location, but uses radial navigation to get a fix on it. That means he can still teleport back there. Furthermore, if the character has a fix on a place, he can reach it through the astral plane in just seven hours, the minimum possible (assuming of course that he can travel through the astral plane). And he can reach the same location by dimension walking (see the psychoportation discipline) with no chance of getting lost. Radial navigation can aid in telepathy, too. If the psionicist wants to make telepathic contact, and he has a fix on the target’s location, he doesn’t suffer the usual penalties for range.\n&emsp;If the character stops maintaining this power, he loses his fix on the location. He can get it back by resuming this power and making a successful power check within six hours. After six hours, the location is lost. Only one location can be fixed at a time unless the character pays the maintenance cost individually for each.\n&emsp;*Power Score*—The psionicist can automatically retrace his steps to the starting point.\n&emsp;*20*—The psionicist forgets where he is for 1d4 rounds.'
 };
 CLAIRSENTIENT['Devotion']['See Sound'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '6',
@@ -342,7 +342,7 @@ CLAIRSENTIENT['Devotion']['See Sound'] = {
     'effect': 'This power enables a character to perceive sound waves visually—with his eyes—by converting the sound waves to light impulses (it works in much the same way as feel light). Only a character who can see normally can use this power. The psionicist can see sound even in darkness, because sound waves do not require light. The character can still be “blinded” by silence, however.\n&emsp;*Power Score*—The psionicist can maintain this power for 1 PSP per round.\n&emsp;*20*—Loud sounds cause “blindness”, and all other sounds are as disturbing as bright lights.'
 };
 CLAIRSENTIENT['Devotion']['Spirit Sense'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '10',
@@ -364,7 +364,7 @@ CLAIRSENTIENT['Devotion']['Spirit Sense'] = {
 
 const PSYCHOKINETIC = {Devotion: {}, Science: {}};
 PSYCHOKINETIC['Science']['Create Object'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '16',
@@ -384,7 +384,7 @@ PSYCHOKINETIC['Science']['Create Object'] = {
     'effect': 'A psionicist with this power can assemble matter from air and the surrounding area to create a solid object. This object remains in existence as long as the psionicist pays the power’s maintenance cost. When he stops maintaining it, the object breaks into its constituent parts.\n&emsp;An object created this way can have any shape, color, and texture the psionicist desires, provided it fulfills at least one of the following conditions:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c4-1=•}}{{c1-2=Fits entirely within a sphere no more than 4 feet in diameter.}}{{c2-2=Fits entirely within a cylinder no more than 20 feet long and 1 foot in diameter.}}{{c3-2=Fits entirely within a cylinder no more than 2 feet high and 6 feet in diameter.}}{{c4-2=Weighs no more than 10 pounds.}}{{effects2=&emsp;Only available materials within 20 yards of the psionicist can be used in the construction. However, these materials can be rearranged or restructured if the psionicist also has the power of molecular rearrangement. By combining these two powers, he could manufacture diamonds from coal dust or a sword from rocks containing iron ore.\n&emsp;If the power check result is a 1, the item contains a flaw—e.g., a sword breaks when struck, a diamond contains impurities obvious to a jeweler, and so on.\n&emsp;*Power Score*—The object is permanent. No cost is expended to maintain it.\n&emsp;*20*—The power backfires, and a personal belonging (chosen randomly) disintegrates.'
 };
 PSYCHOKINETIC['Science']['Detonate'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '18',
@@ -404,7 +404,7 @@ PSYCHOKINETIC['Science']['Detonate'] = {
     'effect': 'Some psionicists can make a bush self-destruct, or cause a zombie to explode. With the detonate power, latent energy inside plants or inanimate objects can be harnessed, focused, and released explosively. The power even works against animated undead (skeletons and zombies). It does not affect noncorporeal undead, such as ghosts, because they aren’t material. Furthermore, the science has no effect on animals of any sort, including intelligent creatures such as humans, or undead with free will.\n&emsp;The detonation inflicts 1d10 points of damage upon all vulnerable objects which the psionicist chooses to attack, within 10 feet. A saving throw vs. breath weapon reduces damage to half. To determine what percentage of the object was destroyed, multiply the result of the psionicist’s power check by 10. If the product is 100 or more—i.e., 100% or more—the target has been completely destroyed. Anything less means a few significant chunks remain.\n&emsp;No more than 8 cubic feet of material can be destroyed with this power. A portion of a wall can be blown out, for example, but if the wall is 10 inches thick, an opening about 3 feet square will appear.\n&emsp;*Power Score*—Damage and range double, to 2d10 points and 20 feet, respectively.\n&emsp;*20*—The air surrounding the initiator detonates; everyone within 10 feet of him is attacked.'
 };
 PSYCHOKINETIC['Science']['Disintegrate'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '40',
@@ -424,7 +424,7 @@ PSYCHOKINETIC['Science']['Disintegrate'] = {
     'effect': 'The disintegrate science reduces an item or creature to microscopic pieces and scatters them. Anything is vulnerable unless it is protected by magical shielding such as a minor or regular *globe of invulnerability* or by an inertial barrier. The psionicist chooses his target, but he can disintegrate no more than 8 cubic feet of material with one use of this power.\n&emsp;If the target is an inanimate object, it must save vs. disintegration; success means it is unaffected. If the target is a living creature, character, or an undead creature with free will, it must make a saving throw vs. death magic. If it succeeds, the creature feels only a slight tingle, but is otherwise unaffected. If the save fails, the creature is disintegrated (or 8 cubic feet right out of its center, which should be enough to kill most anything).\n&emsp;*Power Score*—The power affects 16 cubic feet and saves are made with a -5 penalty.\n&emsp;*20*—The power backfires and it affects the initiator (save with +5 bonus).'
 };
 PSYCHOKINETIC['Science']['Molecular Rearrangement'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '20',
@@ -444,7 +444,7 @@ PSYCHOKINETIC['Science']['Molecular Rearrangement'] = {
     'effect': 'Molecular rearrangement is the psionic equivalent of alchemy. By toying with an object’s molecular structure, the psionicist can change its fundamental nature or properties. This power cannot create matter or mass from nothing, however. Nor can it change a material’s state from liquid to solid, gas to liquid, and so on. It is best suited to converting one sort of element into another, but it can also be used for more complex operations—neutralizing a poison, for example.\n&emsp;Converting one element to another is usually a simple operation, in which one ounce of material can be changed each hour. Typical conversions of this type include steel to lead, or any metal to gold. More complex rearrangement, like changing a metal to glass or changing a wooden goblet to a ruby goblet, takes four times longer.\n&emsp;The creation of gold coins from other metals is possible, but it’s no way to get rich quick. At the rate of one ounce per hour, it would take 16 hours—about two work days—to change 10 copper pieces into 10 gold pieces, for a net profit of 9 gold pieces.\n&emsp;Molecular rearrangement is often used to create superior weapons. A psionically tempered weapon may receive a +1 on damage rolls (see “Weapon Quality” in Chapter 6 of the *DMG*). The process is time-consuming, however. For example, a typical short sword takes at least 40 hours to temper psionically. (The average short sword weighs 3 pounds, or 48 ounces, most of which is the blade.) A psionically tempered weapon does *not* automatically offer a +1 attack-roll bonus. In order to receive that bonus, the psionicist must 1) have the weaponsmithing proficiency and 2) make a successful proficiency check when he fashions the weapon.\n&emsp;The psionicist makes his power check when the process is complete. If it fails, he did not waste all his effort. The difference between the character’s die roll and his power score, multiplied by 10, equals the percentage of work which must be redone.\n&emsp;If the roll is 1, the item seems perfect but contains a hidden flaw which will cause it to break, or fail, or simply look wrong when it is put to use (the ruby goblet might leak, for example, or the sword might contain a soft portion which causes it to bend).\n&emsp;This power has no effect against living creatures weighing more than one ounce. Creatures weighing one ounce or less are killed if their molecules are rearranged.\n&emsp;*Power Score*—The new material is extraordinary (DM’s arbitration).\n&emsp;*20*—The item is seriously flawed and utterly useless.'
 };
 PSYCHOKINETIC['Science']['Project Force'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '10',
@@ -465,11 +465,11 @@ PSYCHOKINETIC['Science']['Project Force'] = {
 };
 
 PSYCHOKINETIC['Science']['Telekinesis'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
-    'context-modifier': '[[ceil(?{Object’s weight in pounds|0}/-3)]] [?{Object’s weight in pounds|0} pounds]',
-    'initial-cost': '[[{3,?{Object’s weight in pounds|0}}kh1]]',
-    'maintenance-cost': '[[{1,floor(?{Object’s weight in pounds|0}/2)}kh1]]/round',
+    'context-modifier': '[[floor(?{Object’s weight in pounds|0}/3)*([[{?{Object’s weight in pounds|0},4}<3]]-1)]] [?{Object’s weight in pounds|0} pounds]',
+    'initial-cost': '[[{?{Object’s weight in pounds|0},3}kh1]]',
+    'maintenance-cost': '[[{floor(?{Object’s weight in pounds|0}/2),1}kh1]]/round',
     'range': '30 yards',
     'prep': '0',
     'aoe': 'single item',
@@ -482,10 +482,10 @@ PSYCHOKINETIC['Science']['Telekinesis'] = {
     'power-score': 'The character can lift a second item of equal or lesser weight simultaneously for the same cost.',
     '20': 'The psionicist “fumbles” the item, knocking it over, etc.',
     '1': '',
-    'effect': 'Telekinesis, or “TK” for short, is the ability to move objects through space without touching them. All telekinetic efforts tend to be physically taxing, because they involve real work. Moving small, light objects is relatively easy. As the objects become more massive, the task becomes significantly more difficult.\n&emsp;The costs above (3 PSPs initially and 1 per round of maintenance) assume that the object being moved weighs 3 pounds or less. For heavier objects, these rules apply:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c1-2=The initial cost equals the object’s weight in pounds.}}{{c2-2=The maintenance cost is half the initial cost, rounded down.}}{{c3-2=The character’s power score is decreased by one-third of the object’s weight in pounds, rounded down.}}{{effects2=&emsp;For example, to telekinetically snatch a 15-pound battle axe from a rack, a psionicist must pay 15 PSPs and make a power check with a -5 modifier to his score.\n&emsp;A psionicist using TK can move an object up to 60 feet per round. The object can serve as a weapon. In this case, the character attacks using his own TAHC0 score, with a penalty equaling the objects weight modifier (one—third its weight, rounded down).\n&emsp;*Power Score*—The character can lift a second item of equal or lesser weight simultaneously for the same cost.\n&emsp;*20*—The psionicist “fumbles” the item, knocking it over, etc.'
+    'effect': 'Telekinesis, or “TK” for short, is the ability to move objects through space without touching them. All telekinetic efforts tend to be physically taxing, because they involve real work. Moving small, light objects is relatively easy. As the objects become more massive, the task becomes significantly more difficult.\n&emsp;The costs above (3 PSPs initially and 1 per round of maintenance) assume that the object being moved weighs 3 pounds or less. For heavier objects, these rules apply:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c1-2=The initial cost equals the object’s weight in pounds.}}{{c2-2=The maintenance cost is half the initial cost, rounded down.}}{{c3-2=The character’s power score is decreased by one-third of the object’s weight in pounds, rounded down.}}{{effects2=&emsp;For example, to telekinetically snatch a 15-pound battle axe from a rack, a psionicist must pay 15 PSPs and make a power check with a -5 modifier to his score.\n&emsp;A psionicist using TK can move an object up to 60 feet per round. The object can serve as a weapon. In this case, the character attacks using his own THAC0 score, with a penalty equaling the objects weight modifier (one—third its weight, rounded down). Currently [[floor(?{Object’s weight in pounds|0}/3)*([[{?{Object’s weight in pounds|0},4}<3]]-1) [?{Object’s weight in pounds|0} pounds] ]] attack penalty.\n&emsp;*Power Score*—The character can lift a second item of equal or lesser weight simultaneously for the same cost.\n&emsp;*20*—The psionicist “fumbles” the item, knocking it over, etc.'
 };
 PSYCHOKINETIC['Devotion']['Animate Object'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-3',
     'context-modifier': '?{Material animated modifier?|0 [Cloth / paper]|-1 [Live wood / dead animal]|-2 [Dead wood]|-3 [Water]|-4 [Thin metal]|-5 [Thick metal]|-6 [Stone]}',
     'initial-cost': '8',
@@ -505,7 +505,7 @@ PSYCHOKINETIC['Devotion']['Animate Object'] = {
     'effect': 'Inanimate objects can be “brought to life” with this devotion. The objects are not actually alive, but they move under the psionicist’s control as if they were. For example, chairs may walk, trees may dance, and stones may waddle around.\n&emsp;The object being animated must weigh 100 pounds or less. The material being animated affects the difficulty of the task; stronger or more brittle materials are harder to animate than weak or floppy materials. Once animated, however, all materials become flexible to some extent.}}{{style=center2 sheet-spell-bottom2}}{{cc1-1=bottom}}{{c1-1=**Material**}}{{c2-1=Cloth, paper}}{{c3-1=Live wood, dead animal}} {{c4-1=Dead wood}}{{c5-1=Water}}{{c6-1=Thin metal}}{{c7-1=Thick metal}}{{c8-1=Stone}}{{c1-2=**Power Score**\n**Modifier**}}{{c2-2=0}}{{c3-2=-1}}{{c4-2=-2}}{{c5-2=-3}}{{c6-2=-4}}{{c7-2=-5}}{{c8-2=-6}}{{effects2=&emsp;Fluid motion is not common. The animated item moves more like a puppet. Its movements are jerky and clumsy, and if the item was rigid to begin with, it makes a loud creaking, groaning, or grating sound. It can move 60 feet per round (movement rate 6), in any direction chosen by the psionicist. It can attack as a club with a THAC0 of 20.\n&emsp;*Power Score*—Animation is smooth and lifelike.\n&emsp;*20*—No additional effect.'
 };
 PSYCHOKINETIC['Devotion']['Animate Shadow'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '7',
@@ -525,7 +525,7 @@ PSYCHOKINETIC['Devotion']['Animate Shadow'] = {
     'effect': 'With this devotion the psionicist can animate the shadow cast by anyone or anything and make it seem to have life of its own. The shadow can even move away from the person or thing that cast it. It must, however, remain flatly cast along a surface. It can never be more than two-dimensional.\n&emsp;An animated shadow can’t really do anything other than startle or amuse someone. It cannot attack or disrupt a mage’s concentration. In this regard, it is similar to a *cantrip’s* effect. It can serve as a diversion by entertaining someone or attracting a guard’s attention.\n&emsp;*Power Score*—The range increases to 100 yards.\n&emsp;*20*—The shadow disappears completely for one round.'
 };
 PSYCHOKINETIC['Devotion']['Ballistic Attack'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '5',
@@ -545,7 +545,7 @@ PSYCHOKINETIC['Devotion']['Ballistic Attack'] = {
     'effect': 'This power can make any psionicist a “David” when he’s facing “Goliath.” It’s a special variation of the telekinesis science. Instead of moving any object relatively slowly, ballistic attack allows the character to hurl a small object at a target. The object, no more than 1 pound in weight, can achieve deadly speeds. It must be within sight of the psionicist and cannot be anchored or attached to anything else. A rock is the most common weapon.\n&emsp;The psionicist uses his regular TAHC0 to determine whether he hits the target. If he succeeds, the missile inflicts 1d6 points of damage (assuming, of course, that the character made a successful power check in the first place).\n&emsp;*Power Score*—Damage increases to 1d12.\n&emsp;*20*—Ballistic boomerang. The psionicist becomes the object’s target.'
 };
 PSYCHOKINETIC['Devotion']['Control Body'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '8',
@@ -565,7 +565,7 @@ PSYCHOKINETIC['Devotion']['Control Body'] = {
     'effect': 'This power allows psychokinetic control of another person’s body. In effect, the victim becomes a marionette. He knows that someone else is pulling his strings, though, and he’s probably mad as all get-out.\n&emsp;Before this power actually works, the psionicist must engage in a psychic contest, pitting his power score directly against the victims Strength. If the victim wins the contest, he breaks free (the psionicist still pays the power cost). In a tie, the contest continues into the next round, provided the psionicist maintains the power. The victim can’t do anything else during this contest; all his effort is focused on retaining control of his own body.\n&emsp;If the power works, the psionicist has rudimentary control over the victim’s limbs. He can make the victim stand up, sit down, walk, turn around, etc. The body can be forced to attack physically, but with a -6 penalty on attack rolls (using the victim’s own TAHC0). The victim can’t be forced to speak. In fact, he keeps control over his own voice and can say whatever he likes.\n&emsp;The victim must stay within the 80-yard range or the psionicist’s control is broken automatically. If the body is forced to do something obviously suicidal, like walking off a cliff or poking at a red dragon, the victim can fight another contest with the psionicist to regain control (the adrenaline rush of imminent danger gives him renewed strength).\n&emsp;*Power Score*—The psionicist automatically wins the initial psychic contest.\n&emsp;*20*—The psionicist suffers partial paralysis (an arm or leg) for 1d10 turns.'
 };
 PSYCHOKINETIC['Devotion']['Control Flames'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-1',
     'context-modifier': '',
     'initial-cost': '6',
@@ -585,7 +585,7 @@ PSYCHOKINETIC['Devotion']['Control Flames'] = {
     'effect': 'By controlling flames, a psionicist can make a normal fire bigger, smaller, hotter, or colder. He can even make it move around as if it were a living creature.\n&emsp;A fire’s size can be increased by 100% or decreased by 50%. If the fire’s heat is increased, it causes double damage. If its heat is reduced, the damage is halved. This applies to flaming torches, burning oil, and other normal fires, but not to magical fires such as *fireballs* or *burning hands*.\n&emsp;An animated fire can move up to 90 feet per round (MR 9). It can be shaped like a person or an animal, as long as it covers no more than 10 square feet of ground. If the fire moves away from its fuel, it can survive for only one more round, then dies out.\n&emsp;An animated fire can also attack by engulfing an opponent. The psionicist must make an attack roll using his regular TAHC0. If successful, the attack causes 1d6 points of damage.\n&emsp;*Power Score*—Size can increase up to 200% or decrease to 0% (the fire is extinguished).\n&emsp;*20*—The psionicist burns himself, suffering 1d4 points of damage.'
 };
 PSYCHOKINETIC['Devotion']['Control Light'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '12',
@@ -605,7 +605,7 @@ PSYCHOKINETIC['Devotion']['Control Light'] = {
     'effect': 'The psionicist can manipulate existing light with this devotion. He cannot create light from darkness, but he can create darkness from light. This power can accomplish the following, and anything else the DM allows:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c4-1=•}}{{c5-1=•}}{{c6-1=•}}{{c1-2=Deepen existing shadows, making them inky black. A thief hiding in this shadow gets a 20% bonus on his ability roll.}}{{c2-2=Lighten existing shadows, reducing a thief’s hiding ability by 20%.}}{{c3-2=Brighten a light source until it hurts to look at it. This gives everyone exposed to the light a -2 penalty on attack rolls.}}{{c4-2=Dim a light source so it resembles twilight. This does not affect anyone’s attack rolls.}}{{c5-2=Extend shadows into areas that are otherwise well lit. Only an existing shadow can be extended, but its size can be increased by 200% (i.e., its size can be tripled).}}{{c6-2=Extend light into areas that are otherwise in shadow. Shadows can be reduced in size by 50%.}}{{effects2=&emsp;*Power Score*—The maintenance cost is reduced to 1 PSP per round.\n&emsp;*20*—The effect is the opposite of what is desired, and maintenance fails.'
 };
 PSYCHOKINETIC['Devotion']['Control Sound'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '5',
@@ -625,7 +625,7 @@ PSYCHOKINETIC['Devotion']['Control Sound'] = {
     'effect': 'This power allows the psionicist to shape and alter existing sounds. As a woman speaks, for example, the psionicist could change her words into a lion’s roar, or even into different words. Or he could disguise the sound of 20 men marching past a guard as falling rain. Sounds can also be layered—so that one singing person sounds like an entire choir, for example.\n&emsp;If the character’s power check is a 1, something about the sound he’s altered isn’t quite right, so it arouses suspicion. If he is trying to exactly duplicate another voice, this fault occurs on a roll of 1 or 2.\n&emsp;This power can also dampen a sound. The player must specify which sound the character intends to eliminate; the power has no area of effect. For example, the psionicist might quiet the sound of a hammer, muffle the words from someone’s mouth, or eliminate the creaking of a door. He could not do all three simultaneously, however.\n&emsp;*Power Score*—The maintenance cost is reduced to 1 PSP per round.\n&emsp;*20*—A loud boom erupts from the psionicist’s location.'
 };
 PSYCHOKINETIC['Devotion']['Control Wind'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '16',
@@ -645,7 +645,7 @@ PSYCHOKINETIC['Devotion']['Control Wind'] = {
     'effect': 'The psionicist can gain limited control over wind speed and direction with this devotion. The speed of any existing wind can be increased or decreased by 10 miles per hour or 25%, whichever is greater. The direction of the wind can also be changed by up to 90 degrees.\n&emsp;These changes are temporary, lasting only as long as the psionicist pays the maintenance cost. The changes occur within moments after he wills them, and die out in less than a minute when he stops maintaining them.\n&emsp;Winds above 19 miles per hour prevent anything smaller than a man or a condor from flying and impose a -4 modifier on missile fire. They also whip up waves on the sea and make sailing difficult. Winds gusting at over 32 miles per hour cause minor damage to ships and buildings. These gusts also kick up clouds of dust, and prevent all but the largest creatures from flying. Winds over 55 miles per hour prevent all flight, knock down trees and wooden buildings, and threaten to swamp ships. Winds over 73 miles per hour are hurricane gales.\n&emsp;*Power Score*—The psionicist gains total direction control and can change speeds by up to 25 mph or 50%, whichever is greater.\n&emsp;*20*—No additional effect.'
 };
 PSYCHOKINETIC['Devotion']['Create Sound'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '8',
@@ -665,7 +665,7 @@ PSYCHOKINETIC['Devotion']['Create Sound'] = {
     'effect': 'Unlike the control sound devotion, this power allows a psionicist to create sound from silence. That means the psionicist can choose the source or location of the sound. For example, he can make rocks sing, weapons cast insults, and trees sound as if a battle is occurring inside. The sound can be as soft as a whisper or as loud as several people shouting in unison. Once the sound is created, the psionicist can control it without expending additional PSPs (other than normal maintenance).\n&emsp;If the die roll for the character’s power check is a 1, the sound is not quite true and may arouse suspicion in listeners. If a specific human voice is being mimicked, this happens on a roll of 1 or 2.\n&emsp;Created sounds cannot have any magical effect. The psionicist might duplicate a banshee’s wail, for example, but it cannot harm anyone.\n&emsp;*Power Score*—Sound volume can be up to that of a dragon’s roar.\n&emsp;*20*—A loud boom erupts near the initiator.'
 };
 PSYCHOKINETIC['Devotion']['Inertial Barrier'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '7',
@@ -685,7 +685,7 @@ PSYCHOKINETIC['Devotion']['Inertial Barrier'] = {
     'effect': 'The inertial barrier is a defense. The psionicist creates a barrier of “elastic” air around himself and anyone else within 3 yards. Like an unpoppable, semipermeable bubble, this barrier helps soften missile blows and can shield those inside from many forms of damage.\n&emsp;Specifically, the barrier helps protect against the following, by absorbing some (or with luck all) of the potential damage:}}{{style=min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c4-1=•}}{{c5-1=•}}{{c6-1=•}}{{c7-1=•}}{{c8-1=•}}{{cs9-1=2}}{{cc9-1=justify}}{{c9-1=&emsp;The inertial barrier has no effect against the following:}}{{c10-1=•}}{{c11-1=•}}{{c12-1=•}}{{c13-1=•}}{{c1-2=Any nonmagical missile weapon.}}{{c2-2=Any physical missile which was created with magic.}}{{c3-2=Any missile with magical pluses.}}{{c4-2=Flames.}}{{c5-2=Some breath weapon attacks, depending on the nature of the breath.}}{{c6-2=Acid. The barrier stops or slows the attack. This doesn’t matter much if the acid comes from above, because it just drips on the characters.}}{{c7-2=Gas. The barrier turns it aside, at least partially (depending on the defender’s die roll), but after a turn it will eventually work its way inside and take full effect.}}{{c8-2=Falling. A psionicist with an inertial barrier in place suffers only one-half damage from a fall; the barrier absorbs a lot of the impact, but the character still gets banged around inside.}}{{c10-2=Missiles conjured from pure magic.}}{{c11-2=Raw heat or cold.}}{{c12-2=Pure energy or light}}{{c13-2=Gaze weapons.}}{{effects2=&emsp;Furthermore, the barrier cannot keep enemies out, but it does slow them a bit. Anyone trying to cross the barrier must stop moving when he hits it. He can then cross inside (or outside) in the next round.\n&emsp;**Handling Missile Attacks:** The inertial barrier saps energy from missile weapons by tightening around them as they pass through. If a missile strikes its target inside the barrier, the attacker rolls damage normally. The defender then rolls the same type of die (as the attacker just did) to see how much damage the barrier absorbed. The defender does *not* include any magical pluses the weapon may have.\n&emsp;The defender then subtracts the result of his die roll from the attacker’s damage. If anything is left over, the defender loses that many hit points. If the defender’s roll equals or exceeds the total damage, the weapon falls harmlessly to the ground. If the missile is explosive, the barrier does prevent damage, but not the explosion.\n&emsp;The barrier does not differentiate the direction of travel. If a weapon is fired from the inside, the penalties above still apply.\n&emsp;*Power Score*—The barrier blocks an additional point per die.\n&emsp;*20*—The psionicist creates a bizarre wind pocket that knocks him to the ground.'
 };
 PSYCHOKINETIC['Devotion']['Levitation'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '[[ceil(?{Additional weight (equipment / passengers) in pounds?|0}/-25)]] [?{Additional weight (equipment / passengers) in pounds?|0} pounds]',
     'initial-cost': '12',
@@ -705,7 +705,7 @@ PSYCHOKINETIC['Devotion']['Levitation'] = {
     'effect': 'Levitation allows the user to float. It is the use of telekinesis on oneself.\n&emsp;A character can lift himself at the rate of 1 foot per second, or 60 feet per round. The character can descend as quickly as he wants by simply letting himself fall, then slowing down as he nears the ground.\n&emsp;Levitation is not flying; it doesn’t provide any horizontal movement. The character can hover motionless, and will drift with the wind, however. He can also push himself off a wall or other fixed object and drift up to 60 feet per round in a straight line, but he can’t stop until he meets another solid object or lowers himself to the ground.\n&emsp;Two other powers—control wind and project force—can help the levitating psionicist propel himself forward. Control wind allows him to determine the direction in which he drifts. Project force allows him to create a “wall” wherever it’s wanted; movement is up to 60 feet per round, in any direction. Each change of direction or speed is a distinct use of the power, however, and costs PSPs.\n&emsp;A psionicist can always levitate his own weight. Additional weight, however, such as equipment or passengers, is a hindrance. Every 25 pounds of added weight reduces the character’s power score by one point.\n&emsp;*Power Score*—The rate of levitation is doubled (to 120 feet/round).\n&emsp;*20*—The psionicist doubles his weight for one round. If he falls, he suffers an extra d6 points of damage.'
 };
 PSYCHOKINETIC['Devotion']['Molecular Agitation'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '7',
@@ -725,7 +725,7 @@ PSYCHOKINETIC['Devotion']['Molecular Agitation'] = {
     'effect': 'Molecular agitation enables the user to excite the molecules of a substance: paper ignites, wood smolders, skin blisters, water boils, etc. The list below shows what’s possible, depending on how many rounds the substance is agitated.}}{{style=min1}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c1-2=round: readily flammable materials (e.g., paper, dry grass) ignite, skin becomes red and tender (1 point of damage), wood becomes dark.}}{{c2-2=rounds: wood smolders and smokes, metal becomes hot to the touch, skin blisters (1d4 points of damage), hair smolders, paint shrivels.}}{{c3-2=rounds: wood ignites, metal scorches (1d4 points of damage), skin burns away (1d6 points of damage), water boils, lead melts (damage does not increase after this round, but does continue).}}{{c4-2=rounds: steel grows soft.}}{{c5-2=rounds: steel melts.}}{{effects2=&emsp;Where magical items are concerned, allow saving throws against destruction, but add a +10 penalty to the saving throw number (this heat is quite destructive, coming from inside the material rather than outside).\n&emsp;*Power Score*—After round one, the rate of agitation doubles (3 rounds of damage occurs in just 2, 5 rounds of damage occurs in 3).\n&emsp;*20*—An item belonging to the psionicist (chosen at random) is affected for one round.'
 };
 PSYCHOKINETIC['Devotion']['Molecular Manipulation'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '6',
@@ -745,7 +745,7 @@ PSYCHOKINETIC['Devotion']['Molecular Manipulation'] = {
     'effect': 'This power allows the user to weaken the molecular bonds within an object or structure. When someone stresses the object or strikes a blow it, it snaps.\n&emsp;The psionicist can create a “breaking point” of approximately two square inches per round. Deterioration occurs across a plane (in two dimensions, not three). One round’s work is enough to fatally weaken most small objects—e.g., swords, ropes, saddle straps, belts, and bows. Larger objects require more time, and DM discretion.\n&emsp;DMs must decide how vulnerable this power makes larger, oddly shaped items like shields or doors. They should keep in mind that an object need not be in two pieces before it’s virtually useless. For example, a little boat with a cracked hull is unsafe at sea. And a shield that is split halfway across offers little or no protection; if successive blows don’t shatter it, they certainly will rattle the holders arm unmercifully.\n&emsp;*Power Score*—Weakening occurs at twice the rate above.\n&emsp;*20*—The item is strengthened. Now it requires twice the normal effort to weaken.'
 };
 PSYCHOKINETIC['Devotion']['Soften'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '4',
@@ -767,7 +767,7 @@ PSYCHOKINETIC['Devotion']['Soften'] = {
 
 const PSYCHOMETABOLIC = {Devotion: {}, Science: {}};
 PSYCHOMETABOLIC['Science']['Animal Affinity'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '15',
@@ -787,7 +787,7 @@ PSYCHOMETABOLIC['Science']['Animal Affinity'] = {
     'effect': 'When the psionicist first learns this power, he develops an affinity for a particular type of animal. He cannot choose the animal; the affinity is dictated by his aura. To determine the nature of the affinity, the psionicist’s player rolls 1d20 and consults the table below.\n&emsp;From that point on, when the character invokes this power, he can claim one of the animal’s attributes as his own—temporarily. He can gain the animal’s armor class, movement rate and mode, attacks and damage, THAC0, hit points, or any other special ability. Only one of these can be used at a time, however. The effect lasts as long as the psionicist maintains the power. Switching to a different ability means paying the initial cost of the power again, and making a new power check.\n&emsp;The character does undergo a physical change when this power is invoked. The extent of the change depends on the animal and the ability. For example, adopting a hawk’s movement obviously requires wings, while attacking like a tiger calls for fangs and claws.}}{{style=gray-pair3}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c6-1=6}}{{c7-1=7}}{{c8-1=8}}{{c9-1=9}}{{c10-1=10}}{{c11-1=11}}{{c12-1=12}}{{c13-1=13}}{{c14-1=14}}{{c15-1=15}}{{c16-1=16}}{{c17-1=17}}{{c18-1=18}}{{c19-1=19}}{{c20-1=20}}{{c1-2=Ape}}{{c2-2=Barracuda}}{{c3-2=Boar}}{{c4-2=Bull}}{{c5-2=Crocodile}}{{c6-2=Eagle, giant}}{{c7-2=Elephant}}{{c8-2=Falcon}}{{c9-2=Griffon}}{{c10-2=Grizzly bear}}{{c11-2=Lion}}{{c12-2=Panther (black leopard)}}{{c13-2=Percheron (draft horse)}}{{c14-2=Peregrine falcon (hawk)}}{{c15-2=Rattlesnake}}{{c16-2=Scorpion, giant}}{{c17-2=Shark}}{{c18-2=Stag}}{{c19-2=Tiger}}{{c20-2=Wolf}}{{effects2=&emsp;*Power Score*—The character gains two abilities instead of one.\n&emsp;*20*—The character’s skin takes on the appearance of the animal’s skin until the power is used again successfully (no change in AC).'
 };
 PSYCHOMETABOLIC['Science']['Complete Healing'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '30',
@@ -807,7 +807,7 @@ PSYCHOMETABOLIC['Science']['Complete Healing'] = {
     'effect': 'The psionicist who has mastered this power can heal himself completely of all ailments, wounds, and normal diseases. He places himself in a trance for 24 hours to accomplish the healing. The trance is deep, and cannot be broken unless the character loses 5 or more hit points. As he uses this power, the psionicist’s body is repairing itself at an incredible rate. At the end of the 24-hour period, the character awakes, restored to complete health in every regard except for the 30 PSPs he expended to use complete healing.\n&emsp;If the character’s power check fails, he breaks his trance after only one hour, having realized that the power was not working. Only 5 PSPs have been expended.\n&emsp;*Power Score*—The healing occurs in just one hour.\n&emsp;*20*—The psionicist awakes after the full 24 hours to discover that the attempt failed. He has expended 5 PSPs.'
 };
 PSYCHOMETABOLIC['Science']['Death Field'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-8',
     'context-modifier': '',
     'initial-cost': '40',
@@ -827,7 +827,7 @@ PSYCHOMETABOLIC['Science']['Death Field'] = {
     'effect': 'A death field is a life-sapping region of negative energy. Only psionicists of evil alignment can learn this power without suffering side effects. If any other psionicist tries to learn the death field, his alignment will gradually be twisted toward evil as he explores this very dark portion of his psyche.\n&emsp;A successful death field takes it toll on everyone inside it, including the psionicist. Before he initiates this power, he must decide how many hit points he will sacrifice. If the power works, the loss is inevitable; he gets no saving throw. Every other living thing within the death field must make a saving throw vs. death. Those who succeed escape damage. Those who fail lose the same number of hit points as the psionicist. For the weak, that can mean death.\n&emsp;*Power Score*—The psionicist loses only half the number of hit points he specifies; victims who fail their saving throws lose the full amount.\n&emsp;*20*—The power fails, but the psionicist loses the hit points anyway.'
 };
 PSYCHOMETABOLIC['Science']['Energy Containment'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '10',
@@ -847,7 +847,7 @@ PSYCHOMETABOLIC['Science']['Energy Containment'] = {
     'effect': 'A psionicist with this power has trained himself to safely absorb and assimilate energy from electricity, fire, cold, heat, and sound—energy that would fry, freeze, or otherwise harm a normal character. Any physical assault based on these energy types can be drawn into the psionicist’s body. The character transforms the energy, and safely releases it as visible radiance (light).\n&emsp;In effect, this protects the psionicist against energy attacks. If the psionicist makes a successful power check, he can double the result of his die roll when saving against an energy attack. If the character makes a successful saving throw, he suffers no damage from the attack. If he fails, he suffers only half damage, regardless of what the spell description (if applicable) states.\n&emsp;When the character absorbs energy, he radiates visible light for a number of rounds equal to the points of damage he absorbed. If he suffered half damage, he radiates for that many rounds. If he suffered no damage, roll for damage anyway to see how long he glows.\n&emsp;This glow is definitely noticeable, but it is soft, and illuminates no more than an area with a 2-yard radius.\n&emsp;*Power Score*—All saves against energy attacks automatically succeed during the round in which the power is in effect.\n&emsp;*20*—The psionicist becomes an energy attractor for 1 turn. All saves vs. energy attacks fail, causing full standard damage.'
 };
 PSYCHOMETABOLIC['Science']['Life Draining'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '11',
@@ -858,16 +858,17 @@ PSYCHOMETABOLIC['Science']['Life Draining'] = {
     'prerequisites': 'none',
     'reference': 'p. 52',
     'book': 'The Complete Psionics Handbook',
+    'errata': 'Deck of Psionic Powers #78 of 288\nSage Advice #186 p. 52',
     'damage': '1d6 per round',
     'damage-type': '',
     'healing': 'Same as damage',
     'power-score': 'Rate of drain increases to 1d20 points per round.',
     '20': 'Backfire! Half of the psionicist’s remaining hit points ([[@{HP}/2]]) are absorbed by the target, reversing the power’s effects.',
     '1': '',
-    'effect': 'With this devotion, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
+    'effect': 'With this power, a psionicist can drain hit points from another character and use them to recover his own. This transfer occurs at the rate of 1d6 points per round.\n&emsp;The character can absorb up to 10 more hit points than his healthy total, but these bonus points last only one hour. After that, if the psionicist still has more hit points than he should, the excess points vanish.\n&emsp;*Power Score*—Rate of drain increases to 1d20 points per round.\n&emsp;*20*—Backfire! Half of the psionicist’s remaining hit points are absorbed by the target, reversing the power’s effects.'
 };
 PSYCHOMETABOLIC['Science']['Metamorphosis'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-6',
     'context-modifier': '',
     'initial-cost': '21',
@@ -887,7 +888,7 @@ PSYCHOMETABOLIC['Science']['Metamorphosis'] = {
     'effect': 'This science resembles polymorphing, but it has a much wider application. The psionicist can change himself into *anything* with approximately the same mass as his body: a wolf, a condor, a chair, a rock, a tree. While in this form, he retains his own hit points and THAC0, if possible, but gains the armor class of the new form. The psionicist also gains all physical attacks that form allows, but no magical or special abilities (this all depends on the new form; a tree cannot attack, so THAC0s and attacks are meaningless).\n&emsp;Like any massive change of shape, however, this causes great physical stress. The psionicist must make a system shock roll to survive the change. If the roll fails, he does not die, but the PSPs are expended and he passes out for 2d6 turns.\n&emsp;*Power Score*—The system shock roll automatically succeeds, and the new form’s mass can be up to three times that of the psionicist’s body.\n&emsp;*20*—The psionicist must save vs. paralyzation. Failure means he changes to the new form permanently.'
 };
 PSYCHOMETABOLIC['Science']['Shadow-form'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-6',
     'context-modifier': '',
     'initial-cost': '12',
@@ -907,7 +908,7 @@ PSYCHOMETABOLIC['Science']['Shadow-form'] = {
     'effect': 'A psionicist using this power actually transforms himself into living shadow, along with his clothing, armor, and up to 20 pounds of equipment. He can blend perfectly into any other shadow and travel with a movement rate of 6. He can only travel through darkness and shadow, however. Areas of open light are impassable.\n&emsp;While in shadow-form, the psionicist can be detected only by life detection, other types of psychic detection, or by a *true seeing* spell. He cannot harm anyone physically, or manipulate any corporeal object, but he can still use psionic powers.\n&emsp;If the psionicist rolls a 1 on his power check, he becomes shadow but none of his clothing or equipment makes the switch.\n&emsp;*Power Score*—The psionicist gains all desirable powers of the “shadow” monster for 1d4 turns.\n&emsp;*20*—The player must roll a save vs. lightning for the psionicist’s most valuable item. If it fails, the item becomes shadow and drifts away, lost forever.'
 };
 PSYCHOMETABOLIC['Devotion']['Absorb Disease'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '12',
@@ -927,7 +928,7 @@ PSYCHOMETABOLIC['Devotion']['Absorb Disease'] = {
     'effect': 'This power lets the psionicist take the disease from another character’s body, and absorb it himself. Presumably, the psionicist will then heal himself (using complete healing). This power can absorb magical diseases, but not curses, such as lycanthropy.\n&emsp;*Power Score*—The disease is automatically destroyed by the psionicist’s immune system.\n&emsp;*20*—The disease remains in the victim while spreading to the psionicist.'
 };
 PSYCHOMETABOLIC['Devotion']['Adrenaline Control'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '8',
@@ -947,7 +948,7 @@ PSYCHOMETABOLIC['Devotion']['Adrenaline Control'] = {
     'effect': 'By controlling the production and release of adrenaline in his system, the psionicist can give himself temporary physical boosts on demand. When he increases his adrenaline, the character gains 1d6 points, which he can add directly to his Strength, Dexterity, or Constitution scores however he chooses. He enjoys all the normal bonuses for high physical attributes while this power is in effect.\n&emsp;If the psionicist’s power check result is a 1, he overtaxes his system with this adrenaline. He still gets the boost, but he loses twice that many hit points, too.\n&emsp;*Power Score*—Instead of dividing the d6 result, the character applies that many points to each of the three attributes.\n&emsp;*20*—The psionicist must make a successful system shock roll or suffer a 50% loss in current hps and pass out for 1d8 hours.'
 };
 PSYCHOMETABOLIC['Devotion']['Aging'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '10',
@@ -967,7 +968,7 @@ PSYCHOMETABOLIC['Devotion']['Aging'] = {
     'effect': 'With this power, an evil psionicist can cause unnatural aging by touch. (Other psionicists can use this power, too, but their alignment would begin to twist toward evil). The victim ages 1d4 years instantly and must make a saving throw vs. polymorph. Failure means that the change was traumatic, and he ages another year automatically.\n&emsp;If the psionicist’s power check result was a 1, there is a backlash and he, too, ages 1d4 years.\n&emsp;*Power Score*—The victim ages 1d20 years.\n&emsp;*20*—The psionicist ages 1d10 years.'
 };
 PSYCHOMETABOLIC['Devotion']['Biofeedback'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '6',
@@ -987,7 +988,7 @@ PSYCHOMETABOLIC['Devotion']['Biofeedback'] = {
     'effect': 'Biofeedback is the power to control the flow of blood through one’s own body. This power has two key effects.\n&emsp;First, the psionicist can easily control bleeding. As a result, he suffers two fewer points of damage from every attack against him which causes physical injury.\n&emsp;Second, by flooding key portions of his body with blood, the psionicist effectively cushions blows against him and reduces their effect. The character’s armor class is reduced by one.\n&emsp;*Power Score*—AC is reduced by three.\n&emsp;*20*—Excessive blood flow results in scattered bruises and a 10% hp loss.'
 };
 PSYCHOMETABOLIC['Devotion']['Body Control'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '7',
@@ -1007,7 +1008,7 @@ PSYCHOMETABOLIC['Devotion']['Body Control'] = {
     'effect': 'This power allows a psionicist to adapt his body to a hostile environment. The change must be keyed to a specific surrounding: water, acid, extreme heat, extreme cold, an elemental plane, etc. If the power works, the psionicist not only survives, he fits in like a native organism. He can breathe and move normally, and he takes no damage simply from being in that environment.\n&emsp;An attack in any form does not constitute an environment. For example, a character who can survive subarctic temperatures is still vulnerable to a *cone of cold*.\n&emsp;*Power Score*—The psionicist can adapt himself to a new environment while maintaining the power.\n&emsp;*20*—The character becomes even more vulnerable, and the environment causes 1d4 points of damage per round (a second use of body control halts damage).'
 };
 PSYCHOMETABOLIC['Devotion']['Body Equilibrium'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '2',
@@ -1027,7 +1028,7 @@ PSYCHOMETABOLIC['Devotion']['Body Equilibrium'] = {
     'effect': 'Body equilibrium allows the user to adjust the weight of his or her body to correspond with the surface he’s standing on. Thus he can walk on water, quicksand, or even a spider’s web without sinking or breaking through. If the character is falling when he uses this power, he will fall 120 feet per round—slow enough to escape injury.\n&emsp;Because of his lightness, the character must be wary of wind gusts, which can easily sweep him up and blow him away.\n&emsp;*Power Score*—The effect lasts up to a day without maintenance.\n&emsp;*20*—The psionicist’s weight instantly rises by a factor of 10; he must use body equilibrium to fix the problem.'
 };
 PSYCHOMETABOLIC['Devotion']['Body Weaponry'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '9',
@@ -1067,7 +1068,7 @@ PSYCHOMETABOLIC['Devotion']['Catfall'] = {
     'effect': 'A character using this power can spring like a cat in the same round, and always land gracefully on his feet. He still suffers damage from falling, but the damage is halved. He can jump down 30 feet without risking any injury at all.\n&emsp;*Power Score*—The psionicist can jump 50 feet instead of 30 during this single use of the power.\n&emsp;*20*—No effect.'
 };
 PSYCHOMETABOLIC['Devotion']['Cause Decay'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '4',
@@ -1087,7 +1088,7 @@ PSYCHOMETABOLIC['Devotion']['Cause Decay'] = {
     'effect': 'This power works only against inanimate objects. The psionicist’s touch causes instant decay: metal rusts, wood ages and splits, cloth falls to dust. The DM rolls a saving throw vs. acid for the item touched. If this fails, the item—or a maximum of 60 pounds of it—is consumed by decay within one round.\n&emsp;*Power Score*—The save automatically fails.\n&emsp;*20*—One of the psionicist’s own items decays (no save)—either the first item touched, or an item chosen randomly by the DM.'
 };
 PSYCHOMETABOLIC['Devotion']['Cell Adjustment'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '5',
@@ -1107,7 +1108,7 @@ PSYCHOMETABOLIC['Devotion']['Cell Adjustment'] = {
     'effect': 'Cell adjustment allows the psionicist to heal wounds and cure diseases. Any sort of wound can be healed, but only nonmagical diseases are affected (e.g., this power cannot heal mummy rot, nor can it cure a lycanthropic curse).\n&emsp;The psionicist can cure a disease in one round by spending 5 PSPs and making a successful power check. If the die roll equals a 1, he succeeds but it’s doubly taxing (10 PSPs). If it equals a 2, he fails because the disease is too widespread; he must spend another 5 PSPs and try again next round.\n&emsp;A “cure” doesn’t automatically restore hit points lost due to illness; it merely arrests the disease. However, the psionicist can heal up to 4 points of damage in each subsequent round by spending 5 psionic strength points per hit point recovered. He cannot cure the disease and restore hit points during the same round.\n&emsp;*Power Score*—All disease—or up to 10 points of damage—is instantly healed at a cost of 5 PSPs.\n&emsp;*20*—The psionicist suffers 1d10 points of damage but the patient is unaffected.'
 };
 PSYCHOMETABOLIC['Devotion']['Chameleon Power'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-1',
     'context-modifier': '',
     'initial-cost': '6',
@@ -1127,7 +1128,7 @@ PSYCHOMETABOLIC['Devotion']['Chameleon Power'] = {
     'effect': 'The psionicist using this power actually changes the coloration of his skin, clothing, and equipment to match his background. The match is automatic; he does not choose the appearance. The change takes several seconds. As he moves, the coloration changes and shifts to reflect any changes in the surroundings.\n&emsp;In effect, chameleon power makes a psionicist very difficult to spot. If the character remains stationary, he can avoid detection simply by making a successful power check. If the character moves, his power score is reduced by three when he makes the check.\n&emsp;This power is most effective in natural surroundings, where one’s coloration would logically conceal him. In an urban setting, or in an area without natural cover during broad daylight, the character’s chameleon power score is halved (rounded down).\n&emsp;*Power Score*—The psionicist’s power score gains a +3 bonus during “hiding” checks.\n&emsp;*20*—The psionicist’s colorations strongly clash with the background; he sticks out like a sore thumb.'
 };
 PSYCHOMETABOLIC['Devotion']['Chemical Simulation'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '9',
@@ -1147,7 +1148,7 @@ PSYCHOMETABOLIC['Devotion']['Chemical Simulation'] = {
     'effect': 'With this devotion, a psionicist can make his body simulate the action of acids. The character secretes an “acid” through his hand. Any item he touches and holds briefly must make a saving throw vs. acid or be dissolved. If used as a weapon, this acid cannot inflict more than two or three points of damage, though it can cause considerable pain.\n&emsp;*Power Score*—All saves for normal items fail; magical items still get a saving throw.\n&emsp;*20*—Acid oozes from the psionicist’s sweat glands; all items touching his skin must save vs. acid.'
 };
 PSYCHOMETABOLIC['Devotion']['Displacement'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '6',
@@ -1167,7 +1168,7 @@ PSYCHOMETABOLIC['Devotion']['Displacement'] = {
     'effect': 'This power resembles the displacer beast’s natural ability to make itself appear to be up to 3 feet from his actual location. The psionicist decides where this false image will appear. This is a very effective means of protecting oneself from attack, giving the psionicist a two-point bonus on his armor class (lowering it two points). *True seeing* will reveal the character’s real location.\n&emsp;*Power Score*—The AC bonus is +4\n&emsp;*20*—No effect.'
 };
 PSYCHOMETABOLIC['Devotion']['Double Pain'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '7',
@@ -1187,7 +1188,7 @@ PSYCHOMETABOLIC['Devotion']['Double Pain'] = {
     'effect': 'By touching another person, the psionicist greatly lowers that character’s pain threshold. (Even a little scrape will feel like a serious injury.) The effect lasts one turn. During that time, all damage scored against that character is doubled. However, only half of this damage is real; the other half represents the amplified pain. When the character’s total of real damage and pain reduces his hit points to zero or less, he passes out. He will regain consciousness 1d10 rounds later. At that time he also regains “fake” hit points—those lost only to pain.\n&emsp;If the victim does not pass out in one turn (the duration of this power’s effects), damage scored against him is no longer doubled. However, the points of “pain damage” which he has an already incurred will remain in effect for another 1d6 rounds.\n&emsp;*Power Score*—The victim must make a system shock roll upon each hit, or pass out due to the excruciating pain.\n&emsp;*20*—The power backfires and affects the psionicist for one hour.'
 };
 PSYCHOMETABOLIC['Devotion']['Ectoplasmic Form'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '9',
@@ -1207,7 +1208,7 @@ PSYCHOMETABOLIC['Devotion']['Ectoplasmic Form'] = {
     'effect': 'With this power a psionicist converts himself to ectoplasm, (a fine-spun, smoky substance). He becomes insubstantial, ghostlike, and able to walk through solid material as if it didn’t exist. The psionicist is still visible as a wispy outline. He moves at his normal movement rate and in the normal fashion (e.g., if he couldn’t fly before, he can’t now).\n&emsp;The psionicist can also convert the following to ectoplasm: his clothing, armor, and up to 15 pounds of equipment that he’s carrying.\n&emsp;*Power Score*—The maintenance cost is 3 PSPs per round.\n&emsp;*20*—The psionicist’s items become ectoplasmic, but he doesn’t. He must use this power again (successfully) to retrieve them.'
 };
 PSYCHOMETABOLIC['Devotion']['Enhanced Strength'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'varies',
@@ -1227,7 +1228,7 @@ PSYCHOMETABOLIC['Devotion']['Enhanced Strength'] = {
     'effect': 'A psionicist can increase his physical Strength score to a maximum of 18 through this devotion. The PSP cost is twice the number of points he adds to his Strength score. (If he fails, he loses half this amount; see Chapter 1.) The maintenance cost per round equals the number of Strength points he has added.\n&emsp;Physical Strength cannot be raised above 18 psionically. The psionicist does not qualify for exceptional Strength bonuses if he raises his Strength to 18.\n&emsp;*Power Score*—The psionicist can raise his strength to 18/00, with each 25% increase costing an additional PSP.\n&emsp;*20*—The power backfires and lowers Strength by 1d6 until arrested by this power.'
 };
 PSYCHOMETABOLIC['Devotion']['Expansion'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '6',
@@ -1247,7 +1248,7 @@ PSYCHOMETABOLIC['Devotion']['Expansion'] = {
     'effect': 'The psionicist can expand his own body proportions in any dimension: height, length, width, or thickness. He can increase any or all of these proportions by 50% of their original size per round. Maximum expansion is four times original size.\n&emsp;This power has no effect on clothing or equipment. Ability scores don’t increase either. In other words, the character does not grow stronger simply because he became taller. However, being very big often has other advantages.\n&emsp;*Power Score*—Maximum expansion becomes 10 times and the rate is 100% per round.\n&emsp;*20*—The psionicist shrinks by 50% until arrested by this power.'
 };
 PSYCHOMETABOLIC['Devotion']['Flesh Armor'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '8',
@@ -1267,7 +1268,7 @@ PSYCHOMETABOLIC['Devotion']['Flesh Armor'] = {
     'effect': 'The psionicist transforms his own skin into nonmagical armor. No one can see the change, but it’s as if he had actually acquired some type of armor. The type of armor his body mimics depends on the result of his power check, as shown in the following table:}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3-4}}{{c4-1=5-6}}{{c5-1=7-8}}{{c6-1=9-10}} {{c7-1=11+}}{{c1-2=left hand functions as a shield, AC 9}}{{c2-2=leather, AC 8}}{{c3-2=ring mail, AC7}}{{c4-2=scale mail, AC6}}{{c5-2=chain mail, AC5}}{{c6-2=banded mail, AC 4}}{{c7-2=plate mail, AC3}}{{effects2=&emsp;Because this armor is part of his body, the psionicist can enjoy its benefits without suffering any penalty he might have if he were actually wearing that type of armor. The armor created by this power weighs nothing, has no magnetic properties, and in no way encumbers the psionicist. Its effect may be combined with *rings of protection*.\n&emsp;*Power Score*—The psionicist gains a +1 bonus to the armor class listed above.\n&emsp;*20*—The power just grows ugly hair over his body, which must be shaved off or he loses 2 points of Charisma.'
 };
 PSYCHOMETABOLIC['Devotion']['Graft Weapon'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '10',
@@ -1287,7 +1288,7 @@ PSYCHOMETABOLIC['Devotion']['Graft Weapon'] = {
     'effect': 'With this power the psionicist can graft any one-handed melee weapon directly onto his body. He picks up the weapon, activates this power, and the weapon becomes an extension of the character’s arm. Assuming the character is proficient with that type of weapon, he gains a +1 bonus to attack rolls and damage. If he is not proficient with the weapon, he suffers the usual nonproficiency penalties, but still gets the +1 bonus.\n&emsp;*Power Score*—The +1 bonus for attacks and damage increases to +4.\n&emsp;*20*—The weapon has been weakened; it will break on any attack roll of 1.'
 };
 PSYCHOMETABOLIC['Devotion']['Heightened Senses'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '5',
@@ -1307,7 +1308,7 @@ PSYCHOMETABOLIC['Devotion']['Heightened Senses'] = {
     'effect': 'By means of this devotion the psionicist sharpens all five of his normal senses: sight, hearing, taste, touch, and smell. This has several effects, which are described below. The DM may allow additional applications as he sees fit.\n&emsp;First, the character has a good chance to notice thieves who are hiding in shadows or moving silently. The thief’s skill chance is halved when someone with heightened senses is observing him. Even if the thief is already hidden, he must roll again when a character with heightened senses enters the picture.\n&emsp;Second, the psionicist can track someone like a bloodhound. He must make an Intelligence check every turn to stay on the trail or recover the trail if it is lost. His movement rate when tracking is 6. The trail can be no more than 24 hours old.\n&emsp;Third, the psionicist’s ranges for hearing and seeing are tripled. He can, for example, identify a person (in daylight) at a range of 400 yards.\n&emsp;Fourth, the character can taste poisons or other impurities in quantities that are much too small to cause any harm.\n&emsp;Fifth, the character can identify almost anything by touch. He can, for example, tell two gold pieces from each other after having previously handled just one of them. He can also tell if something has been handled in the last five minutes simply by handling it himself.\n&emsp;*Power Score*—One of the heightened senses (chosen randomly) stays with the psionicist for a full day.\n&emsp;*20*—One of the psionicist’s five senses is lost for 1d12 hours.'
 };
 PSYCHOMETABOLIC['Devotion']['Immovability'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '9',
@@ -1327,7 +1328,7 @@ PSYCHOMETABOLIC['Devotion']['Immovability'] = {
     'effect': 'When a psionicist makes himself immovable, he is exactly that. A tremendous amount of force is required to uproot him from his spot.\n&emsp;Moving the psionicist requires a combined Strength total that is at least 10 times greater than his immovability score (Con -5). If a character is pushing the psionicist, and makes a successful bend bars roll, that character can double the Strength he’s contributing to the total. Even if a group manages to move the psionicist once, they may not be able to move him any easier the next time. The psionicist remains immovable until he stops maintaining the power.\n&emsp;This power has nothing to do with weight. A character will not crash through the floor because he made himself immovable. He has instead attached himself to the fabric of the universe, which is considerably more powerful than the strongest castle. He does, however, need a horizontal surface as an anchor.\n&emsp;If the psionicist’s power check results in a 1, he attaches himself so well that even he can’t break free simply by shutting off the power. He must pay the initial cost again (9 PSPs) to free himself.\n&emsp;*Power Score*—Moving the psionicist becomes impossible.\n&emsp;*20*—The psionicist can’t stop the power; he maintains it until he runs out of PSPs.'
 };
 PSYCHOMETABOLIC['Devotion']['Lend Health'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-1',
     'context-modifier': '',
     'initial-cost': '4',
@@ -1347,7 +1348,7 @@ PSYCHOMETABOLIC['Devotion']['Lend Health'] = {
     'effect': 'Lend health is a power of healing. The psionicist who makes a successful power check can transfer his own hit points to someone else he is touching. Each hit point transferred heals one point of damage. The character can transfer as many points as he wants to in a single round.\n&emsp;If the psionicist tries to transfer hit points when he has fewer than five remaining, he must make another power check. If this fails, he cannot transfer the points. In any case, he cannot transfer hit points if he has only one remaining.\n&emsp;The beneficiary of this power can never exceed his normal, healthy total of hit points.\n&emsp;*Power Score*—Every point drained from the psionicist heals two hit points in the beneficiary.\n&emsp;*20*—The psionicist suffers all the wounds which his target currently has. No one is healed.'
 };
 PSYCHOMETABOLIC['Devotion']['Mind Over Body'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'na',
@@ -1367,7 +1368,7 @@ PSYCHOMETABOLIC['Devotion']['Mind Over Body'] = {
     'effect': 'Mind over body allows the user to suppress his body’s need for food, water, and sleep. In exchange for one hour of meditation per day, all of the psionicist’s physical needs are overcome. He does not feel hunger, exhaustion, or thirst, nor does he suffer any ability reductions for privation.\n&emsp;The psionicist can also suppress the basic needs of others while suppressing his own. To do so, he must pay an additional 10 PSPs per person and spend an additional hour of meditation per person. Each person being aided must be in physical contact with the psionicist throughout the entire period of meditation. Usually, all the characters hold hands, forming a continuous line or circle.\n&emsp;The psionicist can survive in this fashion for a number of days equal to his experience level, or five days, whichever is more. At the end of that time, he collapses from exhaustion. He must then rest one day for every two days spent sublimating his body’s needs. Or he can be restored through 24 hours of complete healing. These rules also apply to any characters the psionicist has aided.\n&emsp;*Power Score*—The psionicist need not rest after using this power.\n&emsp;*20*—The power fails, but the psionicist collapses with exhaustion and must rest for 24 hours.'
 };
 PSYCHOMETABOLIC['Devotion']['Reduction'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'varies',
@@ -1387,7 +1388,7 @@ PSYCHOMETABOLIC['Devotion']['Reduction'] = {
     'effect': 'This power is the reverse of expansion. The psionicist can reduce his body’s dimensions along any or all axes: height, length, width, or thickness. The change amounts to 1 foot per PSP spent, until the dimension being affected is 1 foot or less. After that, the psionicist can halve his dimensions each time he spends a PSP.\n&emsp;For example, let’s assume Magnilda (a dual-class psionicist and warrior maiden) stands 6 feet tall. Five strength points reduce her height to 1 foot. Three more strength points halve her size three times: to 6 inches, then 3 inches, and finally to 1.5 inches.\n&emsp;Now let’s assume Magnilda only wants to make her arm thin enough to slide through a keyhole. At its thickest point, her arm measures 4 inches across. Three strength points will reduce the thickness of her arm to 1/2 inch (from 4 to 2, then to 1, then to 1/2) without altering its length at all. She can now slide her arm through the keyhole and unlock the door from the inside.\n&emsp;*Power Score*—Each PSP spent results in twice the described effect (if desired).\n&emsp;*20*—The psionicist doubles in size, and stays this big for an hour or until he uses this power again successfully.'
 };
 PSYCHOMETABOLIC['Devotion']['Share Strength'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '6',
@@ -1407,7 +1408,7 @@ PSYCHOMETABOLIC['Devotion']['Share Strength'] = {
     'effect': 'The psionicist can effectively lend his physical Strength to another character. The psionicist sacrifices *two* of his own Strength points (ability points, not PSPs) for every single point the recipient gains. This transfer remains in effect until the psionicist stops paying the devotion’s maintenance cost; then all points return in one round. If the recipient is killed before the psionicist gets his Strength points back, the psionicist’s Strength score is permanently reduced.\n&emsp;If the psionicist’s die roll is a 1, he must expend three points for each point his pal gains, instead of two for one.\n&emsp;*Power Score*—The point transfer is 1:1.\n&emsp;*20*—The psionicist loses one Strength point for a day. If he fails a save vs. paralyzation, the loss is permanent.'
 };
 PSYCHOMETABOLIC['Devotion']['Suspend Animation'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '12',
@@ -1429,7 +1430,7 @@ PSYCHOMETABOLIC['Devotion']['Suspend Animation'] = {
 
 const PSYCHOPORTIVE = {Devotion: {}, Science: {}};
 PSYCHOPORTIVE['Science']['Banishment'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-1',
     'context-modifier': '',
     'initial-cost': '30',
@@ -1449,7 +1450,7 @@ PSYCHOPORTIVE['Science']['Banishment'] = {
     'effect': 'With this power, the psionicist can teleport a creature against its will to a pocket dimension and hold it there. The creature being banished must be extremely close—within 5 yards. The pocket dimension is a featureless area with a benign environment—it may be hot or cold, dark or light, but not so much that it will cause injury.\n&emsp;Banishment has a boomerang feature. If the psionicist fails to pay the pay the maintenance cost, the banished creature automatically returns to its original location. The creature cannot reappear in a location that now contains other matter, however (e.g., to a doorway that has been closed, or to a spot that now has sharp stakes upon it). If this happens, the creature returns to the nearest open space. In other words, psionicists cannot rely on the boomerang feature to kill or harm a creature.\n&emsp;As long as the psionicist pays the maintenance cost, the creature will not automatically return. If the creature has access to the astral or ethereal planes, or it can teleport between planes, it could try to return that way. If the banisher is still maintaining the power, however, a psychic contest takes place. If the banisher wins, the victim is prevented from returning.\n&emsp;*Power Score*—The banished figure cannot return of its own accord; it must wait until it is allowed to return.\n&emsp;*20*—Both the intended victim and the psionicist are banished to the same place. The other figure bounces back when the psionicist stops paying the maintenance cost, but the psionicist himself must return via some other method: teleportation, probability travel, etc.'
 };
 PSYCHOPORTIVE['Science']['Probability Travel'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '20',
@@ -1469,7 +1470,7 @@ PSYCHOPORTIVE['Science']['Probability Travel'] = {
     'effect': 'With probability travel, a psionicist can traverse the astral plane physically as if he’s in astral form. This power has a distinct advantage over magical astral travel. When a wizard uses the *astral spell*, he forms an astral body, which remains connected to his material body by a silvery cord. In contrast, a psionicist using probability travel never leaves his physical form; he brings it along. He has no cord, so, unlike the wizard, he can never die because his cord has been severed. (On the other hand, he can still be blown to bits.)\n&emsp;The astral plane boasts nothing that would attract tourists, but its two-dimensional color pools serve as highways to the outer planes. These pools, scattered randomly throughout the astral plane, provide connections to all surface layers of the outer planes.\n&emsp;Travel through the astral plane is speedy: 10 yards per minute per Intelligence point. However, distance on the astral plane does not equate to distance on other planes. After 1d6 + 6 hours of travel, the traveler reaches the color pool he sought. There is a flat 75% chance that this pool leads to the exact destination the character wants. Otherwise, it is at least 10 miles off target—maybe more.\n&emsp;The psionicist can take other persons (as defined by the *charm person* spell) along on his probability trip. Each passenger costs 12 extra PSPs initially, plus 4 extra PSPs per hour, and adds one-half hour to the time needed to find the correct color pool. Passengers must travel voluntarily; this power cannot drag a character into the astral plane against his will.\n&emsp;Combat on the astral plane is unusual. The traveler’s physical body cannot affect astral bodies in any way. However, psionic powers do work against the minds of astral travelers. Most magical items do not work in the astral plane. Magical items which are keyed to a particular plane do function there, often with enhanced effect.\n&emsp;If the psionicist simply turns off this power while in the astral plane, he doesn’t leave. Instead, he’s stranded, unable to move except by physically pushing off of solid objects (which are extremely rare in the astral plane). He’s also stranded if he runs out of PSPs or is knocked unconscious on the astral plane. The only exit from this plane is a color pool.\n&emsp;If you’d like to learn more about traveling on the astral plane, see the new *PLANESCAPE* accessory.\n&emsp;*Power Score*—The color pool is right where the character wants it to be.\n&emsp;*20*—The character attracts the attention of an astral creature, which may or may not be hostile, at the DM’s discretion.'
 };
 PSYCHOPORTIVE['Science']['Summon Planar Creature'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '45/90',
@@ -1489,7 +1490,7 @@ PSYCHOPORTIVE['Science']['Summon Planar Creature'] = {
     'effect': 'This science allows the psionicist to reach into another plane, grab whatever creature he happens to find there, and teleport it to his own plane. The victim will be disoriented for one round after arriving; as a result, he suffers a two-point penalty on die rolls for initiative, attacks, and saving throws.\n&emsp;A *magical* summons offers some control over a planar creature, and usually returns that creature to its home automatically. This psionic power does neither; it merely teleports something. To be rid of the creature, the psionicist must banish it, teleport it again, kill it, or control it somehow. If the creature is intelligent, the psionicist might reason with it. However, the creature is almost certain to fly into a murderous rage when it discovers its plight.\n&emsp;The psionicist can make the summoned creature materialize anywhere within 200 yards of his present position. This is a tremendous advantage, since the creature, at least initially, has no idea who summoned it. Its anger is likely to be vented against the first target it finds. However, if the psionicist’s power check result was a 2, this range is reduced to 50 yards. If the result was a 1, the creature pops in within 10 yards. Obviously, some risk is involved.\n&emsp;The psionicist chooses the plane from which the creature will come. He does not choose the creature, however; that’s determined at random. A creature from one of the elemental planes usually will be an elemental of the appropriate type. A creature from an outer plane probably will be a native of that particular plane, but it could also be a visitor, or even an adventurer who happened to be in the wrong place at the right time. In contrast, the astral or ethereal planes are a cornucopia of creatures, frequented by beings of every imaginable description. In any event, the DM decides which creature is summoned, drawing from the monsters for which he has game statistics. This book describes some extraplanar creatures. Many more are covered in the *Manual of the Planes* and various MONSTROUS COMPENDIUM Volumes, especially the appendix featuring outer planar creatures.\n&emsp;It costs 45 PSPs to summon a creature from the astral or ethereal plane. If the psionicist is dipping into an inner or outer plane, the cost soars to 90 PSPs.\n&emsp;*Power Score*—The creature summoned enjoys this sort of thing and won’t be angry with the psionicist.\n&emsp;*20*—The psionicist attracts the attention of a powerful, extraplanar creature without summoning it.'
 };
 PSYCHOPORTIVE['Science']['Teleport'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '?{Distance modifier?|+1 [10 yards]|0 [100 yards]|-1 [1.000 yards]|-2 [10 miles]|-3 [100 miles]|-4 [1.000 miles]|-5 [10.000 miles]|-6 [planet to planet]}',
     'initial-cost': '10+',
@@ -1509,7 +1510,7 @@ PSYCHOPORTIVE['Science']['Teleport'] = {
     'effect': 'Teleport is the essential power within this discipline. It allows the psionicist to teleport to a familiar spot. The destination must be a place that the character knows and can picture mentally—even if he’s never actually been there. For example, a psionicist may still know a location that he has seen through a crystal ball, via a sight link, or even by scanning someone else’s mind for the information.\n&emsp;The psionicist can still teleport to a place even if it has somehow changed from the way he pictures it. For example, if a room has been rearranged, or is currently on fire, such changes won’t affect the teleport.\n&emsp;Teleports always take characters to a fixed location. For example, if a character tries to teleport into a gypsy wagon which is on the move, he’ll arrive at the wagon’s location when he last knew it. The wagon itself may be miles away by then. Also, if the character was picturing the wagon’s interior, he will teleport to the space corresponding to the wagon’s interior—which is several feet off the ground! Because the wagon itself has moved, the teleporter will fall when he arrives. (Imagine teleporting to a room on the fifth floor of a tower, only to discover the tower has been razed by marauders since your last visit.)\n&emsp;Teleportation is instantaneous. The teleporting character simply ceases to exist in his previous location and springs into being at the destination. There is a slight, audible “pop” at both ends, as air rushes into the sudden vacuum or is instantly displaced.\n&emsp;Restraints do not affect teleportation. A character who is tied up, shackled to a wall, or buried up to his neck can still teleport. The restraints remain behind.\n&emsp;Clothing, on the other hand, does accompany a character who teleports. He may also carry small items in his grasp or wear equipment (e.g., armor) on his person, not exceeding one-fifth of his own body mass. If he doubles the amount of PSPs expended, he can carry up to three times his body mass, or take along one or two other characters on whom he has a firm grasp.\n&emsp;A character can teleport any distance, but as the distance increases, so does the chance of failure and the cost in PSPs. Ranges, point costs, and power score modifiers are shown below.\n&emsp;If the teleportation die roll is a 1 or 2, the character and anyone else with him are momentarily disoriented by the jump. They can do nothing during the round which immediately follows the teleport. After that, they suffer a 2-point penalty to the following for 1d6 rounds: initiative die rolls, psionic power checks, and attack rolls.}}{{style=bottom sheet-spell-center2 sheet-spell-center3}}{{c1-1=**Distance**}}{{c2-1=10 yards}}{{c3-1=100 yards}}{{c4-1=1,000 yards}}{{c5-1=10 miles}}{{c6-1=100 miles}}{{c7-1=1,000 miles}}{{c8-1=10,000 miles}} {{c9-1=planet to planet&ast;}}{{c1-2=**Initial**\n**Cost**}}{{c2-2=10}}{{c3-2=20}}{{c4-2=30}}{{c5-2=40}}{{c6-2=50}}{{c7-2=60}}{{c8-2=70}}{{c9-2=100}}{{c1-3=**Power Score**\n**Modifier**}}{{c2-3=+1}}{{c3-3=0}}{{c4-3=-1}}{{c5-3=-2}}{{c6-3=-3}}{{c7-3=-4}}{{c8-3=-5}}{{c9-3=-6}}{{effects2=&ast; Players with the SPELLJAMMER boxed set should note that interplanetary teleports are possible only within the same crystal sphere. It is impossible to teleport between crystal spheres or different planes of existence.\n&emsp;*Power Score*—The PSP cost is reduced by 20 percent, rounded up.\n&emsp;*20*—No effect.'
 };
 PSYCHOPORTIVE['Science']['Teleport Other'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-2',
     'context-modifier': '?{Distance modifier?|+1 [10 yards]|0 [100 yards]|-1 [1.000 yards]|-2 [10 miles]|-3 [100 miles]|-4 [1.000 miles]|-5 [10.000 miles]|-6 [planet to planet]}',
     'initial-cost': '10+',
@@ -1529,7 +1530,7 @@ PSYCHOPORTIVE['Science']['Teleport Other'] = {
     'effect': 'This power is identical to the one listed directly above, except it is used to teleport other characters. The psionicist stays where he is while someone else is teleported. The character must be willing to be teleported, or unconscious. PSP costs and power score modifications are the same as for teleportation. (In other words, cost and difficulty increase with distance.) If the psionicist pays twice the usual PSP cost, he can teleport up to three characters, provided they are firmly grasping one another.\n&emsp;*Power Score*—The PSP cost is reduced by 20 percent, rounded up.\n&emsp;*20*—All would-be teleporters are seriously disoriented. They cannot cast spells and suffer a -4 penalty on all die rolls for 1d4 turns.'
 };
 PSYCHOPORTIVE['Devotion']['Astral Projection'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '6',
@@ -1549,7 +1550,7 @@ PSYCHOPORTIVE['Devotion']['Astral Projection'] = {
     'effect': 'Astral projection is similar to probability travel, except the traveler is not accompanied by his physical body. Instead, an astral body is created. This astral body immediately leaps into the astral plane. Only creatures or characters who are also on the astral plane can see it.\n&emsp;A silvery cord connects the astral body to the physical body. Nearly all astral travelers have such a cord. It is visible as a translucent string which stretches 10 feet from the astral body, and then becomes invisible and intangible. If the cord is severed, both bodies die (so does the character). The silvery cord is nearly indestructible, however. Usually it can be severed only by the psychic wind at its most powerful, or by the *silver swords* of the githyanki.\n&emsp;Since the astral plane is a highway leading to other planes, a character who uses this power usually has another destination in mind—either a distant point on the prime material plane or an outerplanar locale. When the traveler reaches his destination, a temporary physical body is formed there. This body resembles the character’s real body in every respect, and the two are still connected by the invisible, silvery cord.\n&emsp;If either the astral body or the temporary physical body is killed, the cord returns to the real body. This second physical body is not formed if the character travels to another location on the same plane where his real physical body is located. He can view that plane in astral form, but cannot affect it or even enter it physically, nor can he direct magical or psionic powers into it.\n&emsp;Magical items can be taken into the astral plane, but most lose their magical properties temporarily while in that plane.\n&emsp;If you’d like more detail on astral travel and the astral plane, see the new *PLANESCAPE* accessory for the AD&D game.\n&emsp;*Power Score*—The first color pool found is precisely where the psionicist wants it.\n&emsp;*20*—The psionicist attracts the attention of a powerful creature in the astral plane.'
 };
 PSYCHOPORTIVE['Devotion']['Dimensional Door'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-1',
     'context-modifier': '?{Distance between doors modifier?|0 [50 yards]|-2 [75 yards]|-5 [100 yards]|-8 [150 yards]|-12 [200 yards]}',
     'initial-cost': '4',
@@ -1569,7 +1570,7 @@ PSYCHOPORTIVE['Devotion']['Dimensional Door'] = {
     'effect': 'Like teleportation, a dimensional door takes a character from one location to another. The similarity stops there, however. With dimensional door, the psionicist opens a man-sized portal which leads to the edge of another dimension. The edge acts as a lightning-quick transit system, carrying travelers to a destination chosen by the psionicist who uses this power.\n&emsp;When the psionicist uses this devotion, he creates a door leading into the alternate dimension. The door is a vaguely outlined portal, which appears in front of the psionicist. At the same time, an identical portal appears wherever he wants it, within range (see below). The door can have whatever orientation the psionicist chooses. If someone (including the psionicist) steps into either portal, he immediately steps out of the other. Both doors remain in place for as long as the psionicist maintains the power.\n&emsp;The dimension accessed by this power is not fully understood. Clearly, it has very different qualities of time and space, such that motion is greatly accelerated. For many years this transit was thought to be instantaneous, but arduous experiments by Larue d’jar Azif of Dhaztanar have proved that a very tiny bit of time does elapse. What this means is still unknown.\n&emsp;Travel via this power is disorienting. Presumably, exposure to the alternate dimension traumatizes the body in some way. As a result, a traveler is dazed and cannot attack or move for one round after stepping through a dimensional skip portal. Quick transit is advisable. People who shove only an arm through a portal suffer intense pain. Fools who poke their head through a portal must make a system shock roll; failure means they lose 50% of their current hit points and pass out.\n&emsp;Inanimate objects are not affected by exposure to the dimension’s edge. In fact, a character can throw or fire objects through a portal, and they’ll come out on the other side. Attackers suffer a -4 penalty on their to-hit rolls against targets on the other side of the dimension’s edge.\n&emsp;**Range:** The normal range of this power—i.e., the maximum distance between the two portals—is 50 yards. The distance can be extended only with severe reductions to the character’s power score, as shown below. Increasing the range does not increase the PSP cost, however.}}{{style=right2}}{{c1-1=**Distance**\n**Between**\n**Doors**}}{{c2-1=50 yards}}{{c3-1=75 yards}}{{c4-1=100 yards}}{{c5-1=150 yards}}{{c6-1=200 yards}}{{c1-2=**Power**\n**Score**\n**Modifier**}}{{c2-2=0}}{{c3-2=-2}}{{c4-2=-5}}{{c5-2=-8}}{{c6-2=-12}}{{c1-3= }}{{effects2=&emsp;*Power Score*—Transit does not cause disorientation.\n&emsp;*20*—The psionicist is momentarily exposed to the transit dimension and is disoriented as if he had stepped through the portal.'
 };
 PSYCHOPORTIVE['Devotion']['Dimension Walk'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '8',
@@ -1589,8 +1590,8 @@ PSYCHOPORTIVE['Devotion']['Dimension Walk'] = {
     'effect': 'With dimension walk, a psionicist can travel from place to place in his own dimension by piercing other dimensions at right angles. This has two advantages over a dimensional door: 1) a dimension walk is not physically traumatizing and 2) the range of travel is greater. On the other hand, dimension walk only allows the psionicist himself to travel, and he can easily get lost.\n&emsp;The dimension walker opens up a vaguely shimmering portal. Only the psionicist who opened the portal can enter it. As soon as he does, the portal closes behind him. He finds himself engulfed by an inky grayness that is virtually without features. The effect is one of extreme sensory deprivation.\n&emsp;The psionicist can travel through this gray realm at a speed of 7 leagues (21 miles) per turn. He cannot see where he is or where he’s going while in the realm. He has only his instinct to guide him, and must make a Wisdom check every turn. If these checks succeed, he’ll find himself at his chosen destination when he steps out of the realm. If any single Wisdom check fails, however, the character will stray off course by several miles. When the walker steps out of the gray realm, the DM can place him in any location, within the maximum distance from his starting point (e.g., if the psionicist walked for 10 rounds, he must be within 21 miles of his origin). It’s up to the psionicist to figure out his location; this power doesn’t help him gain his bearings.\n&emsp;Aside from getting lost, dimension walking is completely safe. Apparently anything that lives in the other dimensions crossed cannot interact with dimensional travelers (Larue d’jar Azif of Dhaztanar postulated that these other dimensions teem with life just as much as our own, but because the traveler is crossing them “against the grain”, as it were, they do not register on his senses.) The character can bring along as much as he can carry, but *bags of holding* and other dimensional storage devices spill their contents immediately if taken into this space.\n&emsp;*Power Score*—The psionicist receives a +2 bonus when making his Wisdom checks.\n&emsp;*20*—Overcome with vertigo, the character can do nothing but retch for three rounds.'
 };
 PSYCHOPORTIVE['Devotion']['Dream Travel'] = {
-    'roll-override': 'Secret by DM',
-    'attribute': '@{Wisdom}',
+    'secret-by-dm': true,
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '-?{How many passengers? (Excluding the psionist)|0} [passengers]',
     'initial-cost': '[[1+(?{How many passengers? (Excluding the psionist)|0} [passengers])]]/25 miles',
@@ -1610,7 +1611,7 @@ PSYCHOPORTIVE['Devotion']['Dream Travel'] = {
     'effect': 'Dream travel is a powerful but unreliable means of getting from here to there. The traveler journeys in his dreams, and awakes wherever his nocturnal wandering carried him. The psionicist can even take other characters with him, although it’s more difficult than traveling alone (see “Passengers” below).\n&emsp;To use dream travel, the psionicist must be asleep. Once asleep, he begins fashioning a dream that involves traveling from his present location to his intended destination. At the beginning of the journey, the DM secretly makes a power check for the character. If the check succeeds, the psionicist will reach his destination. If the check fails, the character will fall short 10% for each point that the die roll exceeded the power score.\n&emsp;If the DM wants, this power check is all that’s required to handle dream travel during a game. However, it’s far more satisfying to actually role-play the dream. The player creates the setting and describes his intentions, with the DM interrupting to change things arbitrarily and throw obstacles in the character’s path. If the player overcomes the obstacles and solves problems inventively, the DM is justified in giving a bonus to the character’s power check. If the dream is dull and lifeless, the DM can also penalize the power check.\n&emsp;The DM should remember that this is a dream; terrain on the journey may not resemble actual terrain, the character may be completely different, and the world may be completely strange. The length of the dream journey should be approximately the same as the real distance, however, and the final destination should be at least similar to the real destination. Such dream adventures should minimize combat and maximize problems, puzzles, and surreal atmosphere. If combat does occur, it has no effect on the character physically, but if he is killed, he wakes up, right where he started. All dream journeys take approximately eight hours to complete, successful or not.\n&emsp;**Passengers:** The psionicist can bring other characters along with him in the dream. His power score is reduced by one for each passenger he carries. Passengers must also be sleeping. A single power check launches everyone on the dream journey. If the check fails, they still attempt the dream journey but fall short of their target. The psionicist must pay the PSP cost of the trip individually for each character accompanying him in the dream.\n&emsp;Intelligent animals can also be drawn into the dream, but normal animals (horses, dogs, falcons, whatever) are very difficult to bring along. The psionicist must make a separate power check to draw in each animal and his power score is halved, rounded down, when making this check.\n&emsp;When the dream travelers reach their destination, they awaken. In the place where they lay sleeping, their bodies and any equipment carried or worn fades away. At the same time, they fade into being at their new location, still in sleeping posture, but fully awake.\n&emsp;*Power Score*—No additional effect.\n&emsp;*20*—The dream is nightmarish. The psionicist must save vs. paralyzation or appear dead until violently struck.'
 };
 PSYCHOPORTIVE['Devotion']['Teleport Trigger'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '+1',
     'context-modifier': '',
     'initial-cost': '0',
@@ -1630,7 +1631,7 @@ PSYCHOPORTIVE['Devotion']['Teleport Trigger'] = {
     'effect': 'A teleport trigger is a programmed event which causes the psionicist to instantly and reflexively teleport to a safe location. After making a successful power check, the psionicist must specify where he intends to go. He must also define very specifically what conditions will trigger the teleportation. These can be anything he wants, but the teleport will not be triggered unless he is aware that the conditions have been met. A volcanic eruption 500 miles away will not trigger teleportation unless the character has some way to know that the volcano is erupting.\n&emsp;For example, here are three typical triggers: being reduced to 10 or fewer hit points, seeing a mind flayer, and being attacked by a *magic missile* spell. When such predetermined conditions are fulfilled, the character instantly teleports to the programmed location.\n&emsp;When the teleport is triggered, the character must have enough PSPs remaining to teleport to that location, because he pays the cost just as if he were performing a normal teleport (See “teleport.”) He must also make a teleport power check, with penalties based on the distance traveled. If this power check fails, so does the programmed teleport.\n&emsp;No PSPs are spent when the trigger is defined, but the character spends two points per hour from that time just to maintain the trigger. The trigger remains in effect until the character stops paying the maintenance cost.\n&emsp;*Power Score*—The character can ignore power score penalties for distance.\n&emsp;*20*—No other effect.'
 };
 PSYCHOPORTIVE['Devotion']['Time Shift'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '?{Rounds traveled into the future modifier?|0 [1 round]|-2 [2 rounds]|-6 [3 rounds]}',
     'initial-cost': '16',
@@ -1650,7 +1651,7 @@ PSYCHOPORTIVE['Devotion']['Time Shift'] = {
     'effect': 'Time shifting allows the psionicist to travel up to three rounds into the future and observe things until time catches up with him. He sees everything frozen around him just as it will be when that moment in the future actually arrives.\n&emsp;The psionicist enters a different reality when he uses this power. No one in the “still life” that surrounds him can see or detect him in any way. He can move freely through the environment, putting himself wherever he wants to be when he returns to normal time. But he cannot affect anything around him, nor can anything affect him. Even two time-shifted characters are completely invisible to each other. To the people in real time, the character simply vanishes and then reappears sometime later.\n&emsp;The character does not exist for any normal game purpose during the period when he is time shifted. If, for example, a *fireball* spell detonates in the room while the character is time shifted, the character is completely protected against its effects. In fact, unless the blast leaves visible effects (charred walls or corpses or sulfurous fumes), the character won’t even know it happened. He sees none of the intervening events.\n&emsp;This power cannot help a character escape contact, however. If someone has established contact or tangents (see Chapter 2) with the time shifter—and continues paying their maintenance cost—then the tangents or contact will still be in effect when the character returns to normal time.\n&emsp;Time shifting offers an obvious advantage in combat. A psionicist can leap one round into the future and maneuver into position for an attack. In that case, the shifter receives a +4 bonus to his attack roll. With enough time, he could even escape.\n&emsp;How long does a time shift last? If the psionicist travels one round forward, then he has one round in which to maneuver. If he travels two rounds forward, then it takes two rounds for reality to catch up. Three rounds is the limit. The farther (or longer) the trip, the more difficult it is to make, as shown in the table below.}}{{style=bottom sheet-spell-center2 sheet-spell-center3}}{{c1-1=**Time**\n**Shifted**}}{{c2-1=1 round}}{{c3-1=2 rounds}}{{c4-1=3 rounds}}{{c1-2=**Psionic**\n**Strength**\n**Cost**}}{{c2-2=3}}{{c3-2=6}}{{c4-2=12}}{{c1-3=**Power**\n**Score**\n**Modifier**}}{{c2-3=0}}{{c3-3=-2}}{{c4-3=-6}}{{effects2=&emsp;*Power Score*—No other effect.\n&emsp;*20*—The psionicist is disoriented, and suffers a -2 penalty on all die rolls for as many rounds as he intended to shift.'
 };
 PSYCHOPORTIVE['Devotion']['Time/Space Anchor'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '5',
@@ -1674,7 +1675,7 @@ const TELEPATHIC = {Devotion: {}, Science: {}};
 const ATTACK = {Devotion: {}, Science: {}};
 const DEFENSE = {Devotion: {}, Science: {}};
 TELEPATHIC['Science']['Domination'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1694,7 +1695,7 @@ TELEPATHIC['Science']['Domination'] = {
     'effect': 'With domination, a psionicist can project signals from his own mind into the mind of one other person or creature. As a result, the subject is forced to do nearly anything the psionicist wishes. The dominated subject knows what is happening, but he cannot resist the psionicist’s will. Commands are given mentally and automatically.\n&emsp;The victim’s abilities are neither diminished nor enhanced by this power. The subject can be forced to use any power or ability he normally can—assuming the psionicist knows about it. Domination does not reveal facts or secrets about a victim.\n&emsp;As soon as domination is attempted, the victim makes a saving throw vs. spells. If this saving throw succeeds, the victim is not dominated. If it fails, the victim has fallen under the psionicist’s control. However, if the victim is later forced to do something completely abhorrent (against his alignment), he can make another saving throw to regain his free will.\n&emsp;Domination can exact a high price in PSPs. The cost to establish and maintain this power equals twice the cost to *contact* the victim.\n&emsp;*Power Score*—The maintenance cost is halved.\n&emsp;*20*—The victim knows that someone attempted to dominate him.'
 };
 TELEPATHIC['Science']['Ejection'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'varies',
@@ -1714,7 +1715,7 @@ TELEPATHIC['Science']['Ejection'] = {
     'effect': 'Ejection is the final defense against unwanted contact. If one psionicist has forced contact with another’s mind, or has been granted contact and is now doing things he should not be, he can be ejected.\n&emsp;The cost of ejection is twice the opponent’s contact power score (even if contact was established through combat).\n&emsp;Ejection is risky for the user. If the power check result is 8 or less, consult the table below to see what “side effects” the psionicist suffers.}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3}}{{c4-1=4}}{{c5-1=5}}{{c6-1=6}}{{c7-1=7}}{{c8-1=8}}{{c1-2=Lose access to all sciences for 1d10 hours}}{{c2-2=Lose access to one discipline, selected by the DM, for 1d10 hours}}{{c3-2=Lose 1d10 +10 additional PSPs}}{{c4-2=Lose 1d10 additional PSPs}}{{c5-2=Lose 1 point of Constitution permanently}}{{c6-2=Lose 1d10 hit points}}{{c7-2=Sever only one portion of contact (one successful attack reestablishes it)}}{{c8-2=Sever only two portions of contact (two successful attacks reestablish it)}}{{effects2=&emsp;*Power Score*—Roll 1d6 on the table above. The result applies to the ejected being.\n&emsp;*20*—Ejection fails, but the psionicist still makes a d6 roll on the table above.'
 };
 TELEPATHIC['Science']['Fate Link'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1734,7 +1735,7 @@ TELEPATHIC['Science']['Fate Link'] = {
     'effect': 'This power enables the telepath to intertwine his own fate with that of another creature. If either being experiences pain, both feel it. When one loses hit points, both lose the same amount. If either dies, the other must immediately make a saving throw vs. death to avoid the same fate.\n&emsp;*Power Score*—Range is unlimited.\n&emsp;*20*—Social regression. The psionicist loses 1d6 points of Charisma for a day.'
 };
 TELEPATHIC['Science']['Mass Domination'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-6',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1754,7 +1755,7 @@ TELEPATHIC['Science']['Mass Domination'] = {
     'effect': 'This power is identical to domination except the psionicist can control up to five creatures simultaneously. Each one must be contacted and dominated individually. The maintenance cost—twice the victim’s level or hit dice—must be paid for each dominated figure.\n&emsp;*Power Score*—The range is extended to 100 yards.\n&emsp;*20*—The intended targets are aware of the psionicist’s efforts.'
 };
 TELEPATHIC['Science']['Mindlink'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1774,7 +1775,7 @@ TELEPATHIC['Science']['Mindlink'] = {
     'effect': 'Mindlink allows the user to communicate wordlessly with any intelligent creature he can contact (Intelligence 5 or greater on a human scale). This is two-way communication. It is not the same as mind-reading because the psionicist only receives thoughts which the other party wants to send. Language is not a barrier. Distance affects the telepath’s ability to make contact, but it has no other effect (see “contact” ).\n&emsp;*Power Score*—The mindlink allows one probing question (see probe).\n&emsp;*20*—The psionicist must save vs. petrification or be stunned for 1d4 rounds.'
 };
 TELEPATHIC['Science']['Mindwipe'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-6',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1794,7 +1795,7 @@ TELEPATHIC['Science']['Mindwipe'] = {
     'effect': 'Mindwiping is a crude form of psychic surgery which affects the subject’s IQ. (It’s like a temporary lobotomy.) The telepath systematically seals off portions of the subject’s mind, making whatever knowledge was contained there inaccessible.\n&emsp;When a mindwipe is attempted, the victim saves vs. spells. If he succeeds, the mindwipe is thwarted for one round, but next round the psionicist can try again.\n&emsp;Each round of mindwiping has two important, immediate effects. First, it reduces the victim’s Intelligence and Wisdom scores by 1 point. Second, it reduces his experience level or hit dice by 1 point.\n&emsp;These reductions have considerable impact. All characters may lose languages or proficiencies and their magical defense adjustment. Experience level and hit dice losses affect everything except hit points. The victim keeps all of his hit points regardless of what is wiped from his mind.\n&emsp;Intelligence and Wisdom losses affect wizards and clerics as if those losses were permanent. Clerics lose bonus spells, their chance of spell failure rises, and eventually they cannot cast spells. Wizards suffer reductions in their maximum spell level, their chance to learn spells, and their maximum spells per level.\n&emsp;When the number of available spells at a given spell-level drops, a character must make an ability check before attempting to cast a spell of that level. Wizards roll an Intelligence check. Clerics roll a Wisdom check. Both use *current* scores. If the check succeeds, the character can cast the spell. If it fails, he has forgotten the spell and can’t cast any spell that round.\n&emsp;Mindwipe only seals off information; it doesn’t erase it. All of a character’s lost Wisdom, Intelligence, and experience levels can be restored through psychic surgery (a metapsionic science).\n&emsp;This power has no effect against creatures with neither stats nor hit dice.\n&emsp;*Power Score*—No saving throw allowed.\n&emsp;*20*—The power affects the psionicist instead of his intended victim.'
 };
 TELEPATHIC['Science']['Probe'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1814,7 +1815,7 @@ TELEPATHIC['Science']['Probe'] = {
     'effect': 'A probe is similar to ESP (a telepathic devotion), but a probe allows psionicists to dig much deeper into a subject’s subconscious. If the subject fails a saving throw vs. spells, then all his memories and knowledge are accessible to the prober—from memories deep below the surface to those still fresh in the subject’s mind. The information gained is not necessarily true, but it is true as far as the subject knows.\n&emsp;The telepath can learn the answer to one question per round. DMs have some discretion in determining this rate. If the telepath’s questions (or the answers) become too complicated, each may take longer than one round to resolve.\n&emsp;Telepaths can probe a subject who is conscious, as well as one who resists. A probe can even be carried out in the midst of melee, provided the telepath can get close enough. If a probed wizard or cleric tries casting a spell, the telepath knows both that a spell is being cast and what the general effects of that spell are.\n&emsp;*Power Score*—Two questions may be asked per round.\n&emsp;*20*—The subject knows about the probe attempt and is not pleased.'
 };
 TELEPATHIC['Science']['Psionic Blast'] = ATTACK['Science']['Psionic Blast'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '?{Range to target modifier?|0 [20 yards]|-2 [40 yards]|-5 [60 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|+2 [Mind Blank]|+3 [Thought Shield]|0 [Mental Barrier]|-1 [Intellect Fortress]|-2 [Tower of Iron Will]}',
     'initial-cost': '10 (both attacks)',
@@ -1834,7 +1835,7 @@ TELEPATHIC['Science']['Psionic Blast'] = ATTACK['Science']['Psionic Blast'] = {
     'effect': 'Psionic blast is a wave of brain force which can jolt a subject’s mind like shocking news. This is one of the five telepathic attacks used to establish contact with another psionicist. (An illithid’s mind blast is not the same).\n&emsp;If this power is used against a mind that has already been contacted, the subject must save vs. death. Failure means he loses 80% of his remaining hit points, *but only in his mind*. The hit points are still there; he only thinks they’re gone. He will pass out when the remaining 20% of his hit points are gone but won’t die unless all of them are actually lost. In any case, this effect wears off after six turns. At that time, an unconscious character awakens.\n&emsp;This power has three ranges: short, medium, and long. At medium range, the psionicist’s power score is reduced by two. At long range, it is reduced by five.\n&emsp;*Power Score*—A victim who fails his save passes out for one turn.\n&emsp;*20*—No other effect.'
 };
 TELEPATHIC['Science']['Superior Invisibility'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1854,7 +1855,7 @@ TELEPATHIC['Science']['Superior Invisibility'] = {
     'effect': 'Superior invisibility is very much like Invisibility (see page 86), but it masks the character completely. The psionicist makes no sound and has no smell, though he can still be felt if touched. If he attacks someone physically, he automatically breaks contact with that character.\n&emsp;*Power Score*—Opponents affected by this power cannot detect the psionicist even if he touches or physically attacks them.\n&emsp;*20*—Everyone contacted becomes aware of the psionicist’s presence and his desire to be invisible.'
 };
 TELEPATHIC['Science']['Switch Personality'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact +30',
@@ -1874,7 +1875,7 @@ TELEPATHIC['Science']['Switch Personality'] = {
     'effect': 'Some psionicists can literally put themselves in another man’s (or woman’s) shoes. This science allows the psionicist to switch his own mind with someone else’s. In effect, they exchange bodies. The other person’s mind inhabits the psionicist’s body, while the psionicist’s mind inhabits his subject’s body. The switch is permanent, and lasts until the psionicist uses this power to reverse it.\n&emsp;Each character gains the other’s physical attributes. However, both minds retain all their own knowledge and knowledge-based abilities. For example, a telepath who switches minds with a 10th level fighter gains a body with that fighter’s hit points and physical attributes (Strength, Constitution, and Dexterity). However, he retains his own THAC0, proficiencies, and so forth.\n&emsp;The switch takes a turn to complete, and the process is quite traumatic. At the end of the turn, both characters must make system shock saving throws using their new Constitution scores. A character who fails this roll lapses into a coma for 1-100 hours.\n&emsp;Bodies that have undergone a personality switch tend to degenerate. Both characters must make a Constitution ability check every day. If a check fails, the character loses one point of Constitution. If his Constitution drops to zero, he dies.\n&emsp;This Constitution loss is temporary, but it does not reverse itself until the personalities are restored to their proper bodies. At that point, both bodies recover one point of Constitution per day.\n&emsp;The psionicist does not lose his psionic powers if his Constitution drops below 11. However, if a power score is based on Constitution—like this power’s score is—the score drops accordingly.\n&emsp;*Power Score*—System shock rolls automatically succeed, and the Constitution checks are made only once a week.\n&emsp;*20*—The psionicist lapses into a coma for 1d100 hours.'
 };
 TELEPATHIC['Science']['Tower of Iron Will'] = DEFENSE['Science']['Tower of Iron Will'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '6',
@@ -1894,7 +1895,7 @@ TELEPATHIC['Science']['Tower of Iron Will'] = DEFENSE['Science']['Tower of Iron 
     'effect': 'Tower of iron will is one of the five telepathic defenses against unwanted contact. It relies only upon the superego to build an unassailable haven for the brain.\n&emsp;Like intellect fortress (a telepathic devotion), tower of iron will has an area of effect beyond the psionicist’s mind. At 3 feet, it’s very limited.\n&emsp;A psionicist can initiate one other psionic power during the round in which he uses the tower of iron will.\n&emsp;*Power Score*—The area of effect increases to 10 feet.\n&emsp;*20*—The psionicist is “lost inside himself” and cannot engage in psionic activity for 1d4 hours.'
 };
 TELEPATHIC['Devotion']['Attraction'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1914,7 +1915,7 @@ TELEPATHIC['Devotion']['Attraction'] = {
     'effect': 'The opposite of aversion (a telepathic devotion), this power creates an overwhelming attraction to a particular person or thing—be it an item, creature, action, or event. A victim of this power will do whatever seems reasonable to get close to the object of his attraction.\n&emsp;The key word is “reasonable.” The victim is completely fascinated, but he doesn’t suffer from blind obsession. He won’t leap into a fire or over a cliff, for example, or climb into the arms of a tarrasque (a bipedal killing machine). He can still recognize danger, but he will not flee unless the threat is strong and immediate. And if the danger is not apparent, (such as poison in a goblet of wine), the character could easily destroy himself in pursuit of the attraction.\n&emsp;*Power Score*—The effect borders on an obsession; the victim takes serious risks.\n&emsp;*20*—No additional effect.'
 };
 TELEPATHIC['Devotion']['Aversion'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -1954,7 +1955,7 @@ TELEPATHIC['Devotion']['Awe'] = {
     'effect': 'A psionicist can use this power to make others hold him in awe. Each character contacted must make a saving throw vs. spells. Characters who fail are mentally cowed; they sense the telepath’s “awesome might.” They have no desire to serve or befriend him, but they won’t attack him unless forced to do so. (For example, someone says, “You kill him or I’ll kill you.”) They’ll do whatever they can to avoid angering or upsetting the psionicist. If possible, they’ll avoid him altogether, and take the first opportunity to escape him.\n&emsp;*Power Score*—The save automatically fails.\n&emsp;*20*—All contacted characters view the psionicist as pathetic and ridiculous.'
 };
 TELEPATHIC['Devotion']['Conceal Thoughts'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '5',
@@ -1974,7 +1975,7 @@ TELEPATHIC['Devotion']['Conceal Thoughts'] = {
     'effect': 'This defensive devotion protects the psionicist against psionic or magical ESP, probes, mindlink, life detection, and other powers or spells which read or detect thoughts. To overcome thought concealment, an attacker must wage and win a psychic contest.\n&emsp;*Power Score*—All related psychic contests will automatically be won by the defender.\n&emsp;*20*—No additional effect.'
 };
 TELEPATHIC['Devotion']['Contact'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '?{Distance modifier?|0 [Line-of-sight]|-1 [1 mile]|-3 [10 miles]|-5 [100 miles]|-7 [1.000 miles]|-9 [10.000 miles]})+(?{Is the target a nonpsionicist and resisting?|No (0),0|Yes (-2),-2 [Resisting nonpsionicist]})+(?{Life Order modifier?|0 [Humanoid]|-1 [Mammal (except marsupial)]|-2 [Marsupial]|-3 [Bird]|-4 [Reptile / amphibian]|-5 [Fish]|-6 [Arachnid / insect]|-7 [Monster]|-8 [Plant]}',
     'initial-cost': 'varies',
@@ -1994,7 +1995,7 @@ TELEPATHIC['Devotion']['Contact'] = {
     'effect': 'Contact must be established before virtually any telepathic power can be used on another character or creature. It is just what its name implies—contact between the minds of the telepath and another character or creature. Contact does not allow communication by itself; it is merely the conduit for other telepathic exchanges.\n&emsp;Many telepathic powers list “contact” as their initial cost. That means contact must be established in a previous round before those powers can be used. As long as contact is maintained, the psionicist can use other powers which require it, and can even switch (using attraction and then mindlink on the same subject after contact was established, for example).\n&emsp;A psionicist can maintain contact with more than one subject at a time, but he must contact each one individually, and pay a maintenance cost for each use of the power. For example, if a psionicist wishes to inspire awe in two subjects, he must establish and maintain contact with each one separately.\n&emsp;Once contact is established, it costs 1 PSP per round to maintain. The psionicist can perform any other action while maintaining contact. *If he uses another telepathic power on the same subject while maintaining contact, the contact power is “free.”* (The cost of maintaining contact is covered by the other power’s cost).\n&emsp;**Establishing Contact:** The initial cost of contact is based on the target’s level or hit dice, as shown below.}}{{style=bottom2}}{{cs1-1=2}}{{cs2-1=2}}{{cs3-1=2}}{{cs4-1=2}}{{c1-1=1-5 levels or hit dice}}{{c2-1=6-10 levels or hit dice}}{{c3-1=11-15 levels or hit dice}}{{c4-1=16-20 levels or hit dice}}{{c1-2=3 PSPs/round}}{{c2-2=8 PSPs/round}}{{cc3-2=min sheet-spell-fixed}}{{c3-2=13 PSPs/round}}{{c4-2=18 PSPs/round}}{{cc5-1=justify}}{{cs5-1=3}}{{c5-1=\n&emsp;A psionicist cannot contact a subject that he knows nothing about. In other words, he can’t use this power to scan around and “see what’s out there.” He must either have his subject in sight or know specifically who or what he is looking for. He cannot, for example, try to contact any random orc which may or may not be standing behind a closed door. However, he can try to contact a *particular* orc which he has seen before.\n&emsp;If a psionicist fails to establish contact, he can try again the next round. Failure doesn’t necessarily mean the target’s mind cannot be contacted. Rather, it means the target has not been found yet. The psionicist can continue searching.\n&emsp;Several factors can make telepathic contact difficult to establish:\n\n}}{{cc6-1=min}}{{c6-1=•}}{{cc7-1=min}}{{c7-1=•}}{{cc8-1=min}}{{c8-1=•}}{{cs6-2=2}}{{c6-2=how far the target is (distance)}}{{cs7-2=2}}{{c7-2=resistance by the target—especially if the target is a psionicist}}{{cs8-2=2}}{{c8-2=whether or not the target is an intelligent mammal}} {{cc9-1=justify}}{{cs9-1=3}}{{c9-1=&emsp;Each factor is described below.\n\n&emsp;**Distance:** The greater the distance between the two minds, the more difficult it usually becomes to make contact. If the psionicist can see the target—either with normal vision or by using psionic powers—distance is not a factor. If the psionicist cannot see his target, normal range modifiers apply. Simply knowing where to look does not constitute “seeing the target.”\n\n}}{{cs10-1=2}}{{cs11-1=2}}{{cs12-1=2}}{{cs13-1=2}}{{cs14-1=2}}{{cs15-1=2}}{{cs16-1=2}}{{cc10-1=bottom}}{{c10-1=**Separation**\n**Distance**}}{{c11-1=Line-of-sight}}{{c12-1=1 mile}}{{c13-1=10 miles}}{{c14-1=100 miles}}{{c15-1=1,000 miles}}{{c16-1=10,000 miles}}{{cc10-2=center}}{{cc11-2=center}}{{cc12-2=center}}{{cc13-2=center}}{{cc14-2=center}}{{cc15-2=center}}{{cc16-2=center}}{{c10-2=**Power Score**\n**Modifier**}}{{c11-2=0}}{{c12-2=-1}}{{c13-2=-3}}{{c14-2=-5}}{{c15-2=-7}}{{c16-2=-9}}{{cc17-1=justify}}{{cs17-1=4}}{{c17-1=\n&emsp;The maximum range for establishing contact is 10,000 miles when a psionicist cannot view his subject. Contact can be maintained across any distance, however; it is not broken if a contacted subject moves out of range. There is one exception: contact *cannot* be extended beyond a crystal sphere.\n&emsp;**Resistance:** An untrained character—i.e., a nonpsionicist—can actively resist intrusion, resulting in a -2 modifier to the psionicist’s power score. To resist, the character fills his mind with a barrage of thoughts and emotions—much as a child avoids a lecture by plugging his ears and yelling. For example, a character might repeat a poem ad nauseam, or scream battle cries. However, even these efforts won’t work unless 1) the character is specifically resisting psychic intrusion, and 2) resisting intrusion is his sole activity. If the character tries to fight or cast a spell, for example, his psychic defense has too many “holes” to be useful. Unless a wild talent knows a telepathic defense mode, he is as vulnerable to contact as any nonpsionicist.\n&emsp;Psionicists (and psionic creatures) are much better at resisting contact. In fact, this power won’t work against them unless they intentionally drop their natural defenses. They must *allow* another psionicist to use contact on them, and can exclude some contacts while remaining open to others. If a psionicist resists, contact can only be established through mental attacks: psychic crush, ego whip, id insinuation, mind thrust, or psionic blast. See Chapter 2, “Psionic Combat,” for more information.\n&emsp;**Unusual Subjects:** Contact can also be established with nonhuman minds, even plants. The further the subject is removed from mammals, the more difficult it becomes to establish contact. Modifiers that affect power scores are listed below.\n\n}}{{cs18-1=2}}{{cs19-1=2}}{{cs20-1=2}}{{cs21-1=2}}{{cs22-1=2}}{{cs23-1=2}}{{cs24-1=2}}{{cs25-1=2}}{{cs26-1=2}}{{cc18-1=bottom}}{{c18-1=**Life Order**}}{{c19-1=Mammal (except marsupial)}}{{c20-1=Marsupial}}{{c21-1=Bird}}{{c22-1=Reptile, amphibian}}{{c23-1=Fish}}{{c24-1=Arachnid, insect}}{{c25-1=Monster}}{{c26-1=Plant}}{{cc18-2=center}}{{cc19-2=center}}{{cc20-2=center}}{{cc21-2=center}}{{cc22-2=center}}{{cc23-2=center}}{{cc24-2=center}}{{cc25-2=center}}{{cc26-2=center}}{{c18-2=**Contact**\n**Score**\n**Modifier**}}{{c19-2=-1}}{{c20-2=-2}}{{c21-2=-3}}{{c22-2=-4}}{{c23-2=-5}}{{c24-2=-6}}{{c25-2=-7}}{{c26-2=-8}}{{effects2=These modifiers are in addition to any distance modifiers that may apply. That means contacting a distant plant or monster is an uncertain proposition at best.\n&emsp;**Breaking Contact:** Contact is not severed until the psionicist breaks it off (fails to maintain it). If the person contacted is a psionicist, he may also do something to sever it. A psionicist often can eject an unwanted intruder (see “ejection”).\n&emsp;**Optional Rule:** The minds of very intelligent beings are more difficult to latch onto. Increase the cost of contact by adding the creature’s “# of Languages,” minus two, as shown on Table 4 in Chapter 1 of the *Player’s Handbook*. For example, a creature with Intelligence 17 knows six languages. The cost of contacting this creature’s mind is increased by four.\n&emsp;*Power Score*—The contact is maintained for four rounds for free.\n&emsp;*20*—Further contact with this mind is impossible at this experience level.'
 };
 TELEPATHIC['Devotion']['Daydream'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2014,7 +2015,7 @@ TELEPATHIC['Devotion']['Daydream'] = {
     'effect': 'By using this power, the telepath causes someone’s mind to wander. This is only effective against characters with Intelligence 14 or less who are not concentrating hard on the task before them, but are just going about their business in a casual, relaxed manner.\n&emsp;Once affected, the daydreamer pays little attention to his surroundings, making it much easier for someone to pick his pocket, slip past him unobserved, or otherwise escape his notice. Thieves gain a 20% bonus on their pick pockets, move silently, and hide in shadows scores. Other characters can perform these tasks as an average 4th level thief (pick pockets, 45%; move silently, 33%; hide in shadows, 25%). The DM can assign chances for success to other types of skulking and skullduggery.\n&emsp;*Power Score*—Increase the bonuses to 30% for thieves and 5th level for others.\n&emsp;*20*—The victim realizes someone is toying with his mind.'
 };
 TELEPATHIC['Devotion']['Ego Whip'] = ATTACK['Devotion']['Ego Whip'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '?{Range to target modifier?|0 [40 yards]|-2 [80 yards]|-5 [120 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|+5 [Mind Blank]|+0 [Thought Shield]|-3 [Mental Barrier]|-4 [Intellect Fortress]|-3 [Tower of Iron Will]}',
     'initial-cost': '4 (both attacks)',
@@ -2034,7 +2035,7 @@ TELEPATHIC['Devotion']['Ego Whip'] = ATTACK['Devotion']['Ego Whip'] = {
     'effect': 'Ego whip is one of the five telepathic attacks used to establish contact with another psionicist’s mind. (See Chapter 2.) The power assaults the victim’s ego, leaving him with feelings of inferiority and worthlessness. If used against a contacted mind, the target is dazed for 1-4 rounds, during which all of his die rolls (psionic attacks, melee attacks, saving throws, etc.) are penalized five points (or 25%) and he cannot cast any spells above third level.\n&emsp;This power has three ranges: short, medium, and long. At medium range, the psionicist’s power score is reduced by two. At long range, it is reduced by five.\n&emsp;*Power Score*—No additional effect.\n&emsp;*20*—No additional effect.'
 };
 TELEPATHIC['Devotion']['Empathy'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': 'contact (or 1&ast;)',
@@ -2054,7 +2055,7 @@ TELEPATHIC['Devotion']['Empathy'] = {
     'effect': 'By using empathy, a psionicist can sense the basic needs, drives, and/or emotions generated by any mind. Thirst, hunger, fear, fatigue, pain, rage, hatred, uncertainty, curiosity, hostility, friendliness, love—all these and more can be sensed.\n&emsp;&ast;When used against nonpsionic targets, contact is not required.\n&emsp;*Power Score*—The subject of the emotion is revealed.\n&emsp;*20*—The target senses the attempt.'
 };
 TELEPATHIC['Devotion']['ESP'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2074,7 +2075,7 @@ TELEPATHIC['Devotion']['ESP'] = {
     'effect': 'Extrasensory perception, or ESP, allows a psionicist to read someone else’s mind (as the power is treated here). The telepath can only perceive surface or active thoughts. He cannot use ESP to explore someone’s memories or delve into their subconscious.\n&emsp;Most intelligent creatures tend to think in words, so language *is* a barrier to understanding. Unintelligent creatures think in pictures. Magical thought, such as a wizard uses in casting spells, is also unintelligible. However, a telepath can easily recognize such thoughts as part of the spell-casting process.\n&emsp;*Power Score*—The first round of maintenance is free.\n&emsp;*20*—The psionicist develops a splitting headache and suffers a -1 penalty on all telepathic power scores for one hour.'
 };
 TELEPATHIC['Devotion']['False Sensory Input'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2094,7 +2095,7 @@ TELEPATHIC['Devotion']['False Sensory Input'] = {
     'effect': 'This devotion allows the psionicist to falsify someone’s sensory input—making the victim think that he sees, hears, smells, tastes, or feels something other than he really does. The falsehoods are somewhat limited. Nothing can be completely hidden or made to disappear, and everything must retain its general size and intensity.\n&emsp;For example, a human could be made to look like a dwarf, but not like a parrot. A slamming door could be made to sound like a thunderclap or a cough, but not like rustling paper. Oil could be made to taste like garlic, but not like water.\n&emsp;*Power Score*—Almost any false perception can be achieved.\n&emsp;*20*—The psionicist cannot see, hear, or otherwise sense the intended victim for 1d4 rounds, except psionically.'
 };
 TELEPATHIC['Devotion']['Id Insinuation'] = ATTACK['Devotion']['Id Insinuation'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '?{Range to target modifier?|0 [60 yards]|-2 [120 yards]|-5 [180 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|-3 [Mind Blank]|+2 [Thought Shield]|+4 [Mental Barrier]|-1 [Intellect Fortress]|-3 [Tower of Iron Will]}',
     'initial-cost': '5 (both attacks)',
@@ -2114,7 +2115,7 @@ TELEPATHIC['Devotion']['Id Insinuation'] = ATTACK['Devotion']['Id Insinuation'] 
     'effect': 'Id insinuation is one of the five telepathic attack modes. It seeks to unleash the uncontrolled subconscious of the defender, pitting it against his superego. The attack leaves the victim in a state of moral uproar.\n&emsp;Technically speaking, this power drives him nuts, at least temporarily. His id—the seat of primitive needs, animal drives, cruelty, and ferocity—seeks to launch him into a rage of violence and desire. His superego—the seat of moral conscience and the “civilized” part of his brain—struggles to maintain the upper hand. If this power is used against a contacted mind, the target can do nothing for 1d4 rounds.\n&emsp;Id insinuation has three ranges: short, medium, and long. At medium range, the telepath’s power score is reduced by two. At long range, it is reduced by five.\n&emsp;*Power Score*—The victim’s id overpowers his superego and he turns against his allies for 1d4 rounds.\n&emsp;*20*—The psionicist’s id is unleashed; the resulting rage imposes a -1 penalty on all his attack rolls and power checks for one turn.'
 };
 TELEPATHIC['Devotion']['Identity Penetration'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2134,7 +2135,7 @@ TELEPATHIC['Devotion']['Identity Penetration'] = {
     'effect': 'Identity penetration allows the user to determine the target’s true identity in spite of polymorphs, illusions, disguises, etc.\n&emsp;*Power Score*—No additional effect.\n&emsp;*20*—Until he gains another level, the telepath cannot penetrate the identity of the current target.'
 };
 TELEPATHIC['Devotion']['Incarnation Awareness'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2154,7 +2155,7 @@ TELEPATHIC['Devotion']['Incarnation Awareness'] = {
     'effect': 'By applying this power to another character, the psionicist can gain knowledge about past lives. One past life can be explored per round, starting with the most powerful personalities (usually these are also the most famous, but not always).\n&emsp;The psionicist also knows immediately how many times this particular personality has been killed and raised from the dead. It is up to the players to put this information to use.\n&emsp;*Power Score*—All past life information is gained in one quick mental blast.\n&emsp;*20*—Overwhelmed, the psionicist lapses into a trance until jolted or slapped—or for 1d4 hours, whichever comes first.'
 };
 TELEPATHIC['Devotion']['Inflict Pain'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2174,7 +2175,7 @@ TELEPATHIC['Devotion']['Inflict Pain'] = {
     'effect': 'This is a particularly nasty form of torture. It causes no actual harm to the subject and leaves no marks or scars, but causes excruciating pain of any sort the telepath desires. Only evil characters can learn this power freely; others find their alignments twisting toward evil if they wish to inflict pain.\n&emsp;If the victim is an NPC who is being questioned, he must make a saving throw vs. paralyzation to withstand this agony.\n&emsp;If the psionicist finds a way to use this power in combat, the victim must also make a saving throw vs. paralyzation. Success means he grits his teeth and keeps on fighting. Failure means the pain imposes a four-point penalty on the character’s attack rolls that round, or disrupts and ruins a spell.\n&emsp;*Power Score*—The pain is so excruciating that the victim passes out for 1d10 rounds.\n&emsp;*20*—This particular contact is broken.'
 };
 TELEPATHIC['Devotion']['Intellect Fortress'] = DEFENSE['Devotion']['Intellect Fortress'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '4',
@@ -2194,7 +2195,7 @@ TELEPATHIC['Devotion']['Intellect Fortress'] = DEFENSE['Devotion']['Intellect Fo
     'effect': 'Intellect fortress is one of five telepathic defenses against unwanted contact. It calls forth the powers of the ego and superego to stop attacks.\n&emsp;Unlike most other defenses, intellect fortress has an area of effect beyond the psionicist’s mind, offering protection to other minds within that radius. Every mind within that area defends against telepathic attack with the psionicist’s intellect fortress power score.\n&emsp;A psionicist can initiate one other psionic power in the same round that he uses intellect fortress.\n&emsp;*Power Score*—No additional effect.\n&emsp;*20*—This defense falters and is not usable again for 1d4 rounds.'
 };
 TELEPATHIC['Devotion']['Invincible Foes'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2214,7 +2215,7 @@ TELEPATHIC['Devotion']['Invincible Foes'] = {
     'effect': 'The victim of this devotion believes that any blow struck against him will cripple or kill him. Even if the blow actually causes just one point of damage, the victim thinks he’s dying, and that he can no longer fight. He falls to the ground in horrible pain.\n&emsp;A character who is struck while under the effect of this power won’t recover until a turn later, even if the psionicist stops concentrating on him and turns his attention elsewhere. As long as the character was under this effect when the blow was struck, he’s out for 10 rounds.\n&emsp;Even if the victim of this power is never actually struck, his behavior is likely to change. Fully expecting the next blow to kill him, he may stop attacking and simply parry, or try to flee, or even surrender and beg for quarter. If the character has not been struck, however, the psionicist must keep renewing the power every round; otherwise future blows will affect him normally.\n&emsp;“Invincible foes” can also work in reverse. In other words, an attacker can be made to believe that every blow he strikes is fatal. The belief is strong enough to create an illusion: even if the attacker barely scratches his foe, he sees the “victim” lying down, mortally wounded. He will continue to imagine that opponent lying on the ground until the opponent attacks again (it doesn’t matter whom he attacks; any attack breaks the illusion).\n&emsp;This reversal has several consequences. Characters who have been “killed”—i.e., struck—can simply walk away from the fight, leaving their “corpses” behind. Or they can move into position and attack again, gaining a +2 bonus to hit. After this happens three times, the affected character must make a saving throw vs. spells. If it fails, he becomes convinced that his foes are unkillable and reacts accordingly. (PCs, of course, are free to react as they see fit.)\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—No other effect.'
 };
 TELEPATHIC['Devotion']['Invisibility'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2234,8 +2235,8 @@ TELEPATHIC['Devotion']['Invisibility'] = {
     'effect': 'Psionic invisibility differs significantly from magical invisibility. To make himself invisible, the psionicist must individually contact each mind that he wants deceive. Once they are all contacted, he makes himself invisible to them only. He can still see himself, as can anyone who was not contacted. Only characters within 100 yards of the psionicist can be affected by this power.\n&emsp;Invisibility is a delusion affecting one or more select characters, not an illusion affecting everyone. The only real change occurs in the mind of the psionicist’s targets. For this reason, the psionicist can make *anyone* invisible—not just himself. The “invisible” being must be approximately man-sized (or smaller), however.\n&emsp;The psionicist must make a separate power check for each delusion, and pay a separate maintenance cost for each. In this case, a delusion is one “invisible” creature or character, as perceived by one other character. For example, if the psionicist wants to make two things invisible to two people, he must make four separate power checks.\n&emsp;This power affects vision only. Observers may still be able to hear or smell “invisible” creatures.\n&emsp;*Power Score*—The power works like superior invisibility (a telepathic science).\n&emsp;*20*—All contacts are broken.'
 };
 TELEPATHIC['Devotion']['Life Detection'] = {
-    'roll-override': 'Secret By DM',
-    'attribute': '@{Intelligence}',
+    'secret-by-dm': true,
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '3',
@@ -2255,7 +2256,7 @@ TELEPATHIC['Devotion']['Life Detection'] = {
     'effect': 'A telepath can detect the presence of living, thinking creatures within a limited area. He must scan like radar. If he is scanning at short range, he can cover a large angle. At long range, the angle is significantly reduced. He can scan through 180 degrees to a range of 40 yards, 90 degrees to a range of 60 yards, or 30 degrees to a range of 100 yards.\n&emsp;One round of scanning will detect humans, demihumans, humanoids, mammals, and monsters with eight or more hit dice. A second round of scanning will detect birds, reptiles, amphibians, fish, and monsters with less than eight hit dice. In either case the character gets an accurate count of the creatures.\n&emsp;The DM should make this power check and keep the result secret from the player. If the psionicist doesn’t detect anything, the player won’t know whether that means there’s nothing there, or the power didn’t work. If the roll is 1, the psionicist gets faulty information. He detects what is there, but gets the numbers wrong by +/- 50%.\n&emsp;*Power Score*—The psionicist can instantly detect everything within 100 yards, in every direction.\n&emsp;*20*—The telepath detects 1d6 creatures which aren’t there.'
 };
 TELEPATHIC['Devotion']['Mental Barrier'] = DEFENSE['Devotion']['Mental Barrier'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '3',
@@ -2275,7 +2276,7 @@ TELEPATHIC['Devotion']['Mental Barrier'] = DEFENSE['Devotion']['Mental Barrier']
     'effect': 'Mental barrier is one of five telepathic defenses against unwanted contact. It is a carefully built wall of thought repetition which exposes only one small area of the mind at a time.\n&emsp;A psionicist can initiate one other psionic power in the same round that he uses mental barrier.\n&emsp;*Power Score*—Contact during this round and the next is impossible.\n&emsp;*20*—The barrier fails, and the mental attempt disrupts any currently active powers.'
 };
 TELEPATHIC['Devotion']['Mind Bar'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': '6',
@@ -2295,7 +2296,7 @@ TELEPATHIC['Devotion']['Mind Bar'] = {
     'effect': 'Mind bar is a magician’s bane and the telepath’s boon. It gives the psionicist 75% magic resistance against *charm, confusion, ESP, fear, feeblemind, magic jar, sleep,* and *suggestion* spells. It also offers complete protection against possession of any sort.\n&emsp;In addition, mind bar protects a psionicist against all telepathic powers, except the five contact-establishing attacks. No telepathic power can affect a barred mind unless the telepathic attack prevails in a psychic contest. (The defender uses mind bar.)\n&emsp;*Power Score*—The telepath gains a +5 bonus to his power score when defending in a psychic contest.\n&emsp;*20*—The telepath’s saving throws vs. the spells listed above have a -4 penalty for one hour.'
 };
 TELEPATHIC['Devotion']['Mind Blank'] = DEFENSE['Devotion']['Mind Blank'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-7',
     'context-modifier': '',
     'initial-cost': '0',
@@ -2315,7 +2316,7 @@ TELEPATHIC['Devotion']['Mind Blank'] = DEFENSE['Devotion']['Mind Blank'] = {
     'effect': 'Mind blank is one of five telepathic defenses against unwanted contact. It attempts to hide the mind from attack, making its parts unidentifiable. This defense is particularly effective against a psionic blast and id insinuation. (See Chapter 2, “Psionic Combat” for details.)\n&emsp;Mind blank is unique. Unlike the other four defense modes, it costs nothing to maintain. *In fact, a character can still recover PSPs while using this power.* That’s because mind blank is almost instinctual; if a character knows it, it’s nearly always active, even when he’s sleeping or meditating. The power is inactive only if 1) the player announces it, or 2) the character uses another defense mode.\n&emsp;Even though mind blank has no PSP cost, it *still constitutes psionic activity.* If the power is active, a character is vulnerable to detection. He still may attract psionic feeders, or suffer some other unpleasant effect.\n&emsp;A psionicist can use one other psionic power (but not another defense mode) in the same round that he uses mind blank.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The character cannot use mind blank for 1d4 hours.'
 };
 TELEPATHIC['Devotion']['Mind Thrust'] = ATTACK['Devotion']['Mind Thrust'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-2',
     'context-modifier': '?{Range to target modifier?|0 [30 yards]|-2 [60 yards]|-5 [90 yards]})+(?{Target\'s Defense mode modifier?|No defense mode,0|+5 [Mind Blank]|-2 [Thought Shield]|-4 [Mental Barrier]|-4 [Intellect Fortress]|-5 [Tower of Iron Will]}',
     'initial-cost': '2',
@@ -2335,7 +2336,7 @@ TELEPATHIC['Devotion']['Mind Thrust'] = ATTACK['Devotion']['Mind Thrust'] = {
     'effect': 'Mind thrust is one of the five telepathic attacks used to establish contact with another psionicist’s mind. It is a stabbing attack which seeks to “short” the synapses of the defender.\n&emsp;If the subject’s mind has already been contacted, and he has psionic powers, then this power can do some damage. The subject loses the use of one power, chosen randomly, for 2d6 days. Beyond establishing contact, mind thrust has no effect on creatures or characters without psionic powers.\n&emsp;This power has three ranges: short, medium, and long. At medium range, the psionicist’s power score is reduced by two. At long range, it’s reduced by five.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The telepath loses all tangents, but not contacts.'
 };
 TELEPATHIC['Devotion']['Phobia Amplification'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2355,7 +2356,7 @@ TELEPATHIC['Devotion']['Phobia Amplification'] = {
     'effect': 'This power allows the psionicist to reach into someone’s mind and discover his greatest fear, then amplify it to the point of irrationality. A victim who fails a saving throw vs., spells believes he is imminently threatened by the object of this fear, even if it is completely absurd. A character with a fear of falling, for example, is convinced he could pitch over a cliff at any moment—even while on an endless prairie—unless he stands absolutely still.\n&emsp;The reaction of the frightened character depends on the fear. He will defend himself if attacked (unless defending himself is somehow tied in to his phobia). A wizard may teleport away or use other spells to guarantee his safety. Other characters might freeze in place or flee for their lives. But all of their actions will be geared toward protecting against the fearsome object or situation.\n&emsp;This fear lasts as long as the psionicist maintains the effect. Once he stops, the fear fades back to its normal proportions, probably leaving the character slightly shaken and more than slightly chagrined.\n&emsp;*Power Score*—The target’s save vs. spells automatically fails.\n&emsp;*20*—The subject has no detectable phobias.'
 };
 TELEPATHIC['Devotion']['Post-Hypnotic Suggestion'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2375,7 +2376,7 @@ TELEPATHIC['Devotion']['Post-Hypnotic Suggestion'] = {
     'effect': 'Any creature with an Intelligence between 7 and 17 can receive a post-hypnotic suggestion. (Very dim or very brilliant creatures are not susceptible.) The psionicist plants a suggestion of some reasonable course of action in the creature’s subconscious, along with the situation that will trigger this action. When that situation arises, the DM makes a power check against the psionicist’s post-hypnotic suggestion score, with a -1 penalty for each day that has passed since the suggestion was planted.\n&emsp;A “reasonable course of action” is one that does not violate the creature’s alignment or class restrictions. It can be something that he would not normally do, but if it is too strange, he just won’t do it.\n&emsp;The maintenance cost for this power is a one-time-only payment, made when the suggestion is implanted.\n&emsp;*Power Score*—The psionicist’s power score is not reduced for the passage of time.\n&emsp;*20*—The intended victim is aware of the attempt.'
 };
 TELEPATHIC['Devotion']['Psychic Crush'] = ATTACK['Devotion']['Psychic Crush'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '?{Target\'s Defense mode modifier?|No defense mode,0|+1 [Mind Blank]|-3 [Thought Shield]|-1 [Mental Barrier]|-3 [Intellect Fortress]|-4 [Tower of Iron Will]}',
     'initial-cost': '7',
@@ -2395,7 +2396,7 @@ TELEPATHIC['Devotion']['Psychic Crush'] = ATTACK['Devotion']['Psychic Crush'] = 
     'effect': 'Psychic crush is one of the five telepathic attacks used to establish contact with another psionicist’s mind. It is a massive assault upon all neurons in the brain, attempting to destroy all by a massive overload of signals.\n&emsp;If this attack is used against any mind that the psionicist has contacted, the victim must make a saving throw vs. paralyzation. Failure costs the target 1d8 hit points.\n&emsp;*Power Score*—The save automatically fails.\n&emsp;*20*—The victim is immune to further crushes by this psionicist for 24 hours.'
 };
 TELEPATHIC['Devotion']['Psychic Impersonation'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '10',
@@ -2415,7 +2416,7 @@ TELEPATHIC['Devotion']['Psychic Impersonation'] = {
     'effect': 'This power enables a psionicist to mask his own aura and thought patterns, and make them match someone else’s perfectly. To accomplish this, the psionicist must first probe the subject he wishes to impersonate.\n&emsp;Psychic impersonation does not alter any of the psionicist’s other features. It only changes his identity to other creatures with psionic powers. Even then, a psychic contest with identity penetration or probe can penetrate the disguise.\n&emsp;While psychic impersonation is in effect, all of the user’s psionic power scores are reduced by one.\n&emsp;*Power Score*—The disguise cannot be detected psionically and power scores are not decreased.\n&emsp;*20*—Until the psionicist reaches a new experience level, he cannot impersonate that subject.'
 };
 TELEPATHIC['Devotion']['Psychic Messenger'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '4',
@@ -2435,7 +2436,7 @@ TELEPATHIC['Devotion']['Psychic Messenger'] = {
     'effect': 'This power allows a character to create an insubstantial, 3-D image of himself, which can appear anywhere within 200 miles and deliver a message. Everyone present can see and hear the messenger. Communication is one-way. The telepath has no idea what is happening around his messenger unless he’s using some other power.\n&emsp;*Power Score*—The psionicist can make the messenger’s appearance differ from his own.\n&emsp;*20*—No effect.'
 };
 TELEPATHIC['Devotion']['Repugnance'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2455,7 +2456,7 @@ TELEPATHIC['Devotion']['Repugnance'] = {
     'effect': 'With this power, a psionicist makes something—a particular person, place, or object—completely repugnant to another character. That character is overwhelmed with loathing for the “thing,” and he will seek to destroy it as completely and quickly as possible.\n&emsp;If this destruction is strongly against the character’s alignment (such as making a temple repugnant to its cleric), the character gets to make a saving throw vs. spells to shake off the effect.\n&emsp;*Power Score*—No save is allowed.\n&emsp;*20*—The victim is aware of the attempt.'
 };
 TELEPATHIC['Devotion']['Send Thoughts'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-1',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2475,7 +2476,7 @@ TELEPATHIC['Devotion']['Send Thoughts'] = {
     'effect': 'This is one-way communication, allowing the telepath to send his own thoughts to someone else’s mind. The telepath can send information or simply distract the target.\n&emsp;If the target is a wizard casting a spell, he must make a saving throw vs. spells. The wizard applies a modifier to the save: the difference between his Intelligence and the telepath’s power score. (If the wizard’s Intelligence is higher, it’s a bonus; if it’s lower, it’s a penalty.) If this save fails, the wizard’s concentration is broken and the spell is spoiled.\n&emsp;If the target being distracted is someone involved in melee, he has a two-point penalty on all attack rolls (but not damage rolls).\n&emsp;*Power Score*—Wizards cannot make the saving throw.\n&emsp;*20*—If the receiver is a friend, he is distracted.'
 };
 TELEPATHIC['Devotion']['Sight Link'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2495,7 +2496,7 @@ TELEPATHIC['Devotion']['Sight Link'] = {
     'effect': 'Sight link allows the telepath to tap into another character’s optical system. The telepath sees whatever his link sees. (His own vision is unaffected.) If the linked creature is subjected to a gaze attack, the telepath must make the appropriate saving throw or also be affected by the gaze.\n&emsp;*Power Score*—Sound link is also gained.\n&emsp;*20*—The psionicist is blinded for 1d4 hours.'
 };
 TELEPATHIC['Devotion']['Sound Link'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2515,7 +2516,7 @@ TELEPATHIC['Devotion']['Sound Link'] = {
     'effect': 'By means of a sound link, the telepath taps into the auditory system of another person or creature. He hears whatever his link hears. If the linked creature is subjected to an auditory attack (by sirens, shriekers, etc.), the telepath must make the appropriate saving throw or also be affected.\n&emsp;*Power Score*—Sight link is also gained.\n&emsp;*20*—The psionicist is deaf for 1d4 hours.'
 };
 TELEPATHIC['Devotion']['Synaptic Static'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-4',
     'context-modifier': '?{Area of effect range modifier?|0 [20 yards]|-2 [50 yards]|-5 [90 yards]}',
     'initial-cost': '15',
@@ -2535,7 +2536,7 @@ TELEPATHIC['Devotion']['Synaptic Static'] = {
     'effect': 'Synaptic static interferes with all psionic activity within a given area. Even the psionicist is affected; when he creates static, he cannot use any other power simultaneously. However, he may also prevent others from using their powers. Anyone who tries to use a psionic power within the area of effect must fight the static’s creator in a psychic contest. If an opponent succeeds, his power functions normally. If not, his power fails.\n&emsp;Exposure to synaptic static for more than five rounds will give anyone a splitting headache. This has no game effect, but it will make NPCs and animals irritable.\n&emsp;This power has three ranges: short, medium, and long. At medium range, the character’s power score is reduced by two. At long range, it is reduced by five.\n&emsp;*Power Score*—The psionicist receives a +1 bonus in all psychic contests prompted by the current use of static.\n&emsp;*20*—The character has injured himself trying to create static. He immediately loses 1d20 PSPs and 1d6 hps.'
 };
 TELEPATHIC['Devotion']['Taste Link'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2555,7 +2556,7 @@ TELEPATHIC['Devotion']['Taste Link'] = {
     'effect': 'Could this be a dieter’s dream? Taste link allows the telepath to tap into the flavor senses of another person or creature. The psionicist tastes whatever his link tastes.\n&emsp;If the linked creature takes poison orally, the telepath must make a saving throw vs. poison to avoid passing out and severing the link. The psionicist can’t actually be poisoned this way, however.\n&emsp;*Power Score*—Scent link is also gained (not a defined power).\n&emsp;*20*—The psionicist has a bitter taste in his mouth, but no other effect occurs.'
 };
 TELEPATHIC['Devotion']['Telempathic Projection'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-2',
     'context-modifier': '',
     'initial-cost': 'contact',
@@ -2575,7 +2576,7 @@ TELEPATHIC['Devotion']['Telempathic Projection'] = {
     'effect': 'Telempathic projection allows the user to send emotions to everyone who has been contacted within a common 10-yard diameter. This power cannot radically change a character’s emotional state, however. A character who is very angry could be made only slightly angry, for example, but not happy. Empathic changes are a matter of degrees, no more.\n&emsp;*Power Score*—Emotions can be drastically altered (love to hatred, etc.) while this power is maintained.\n&emsp;*20*—All affected characters experience strong negative emotions toward the psionicist for 1d6 rounds.'
 };
 TELEPATHIC['Devotion']['Thought Shield'] = DEFENSE['Devotion']['Thought Shield'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '1',
@@ -2595,7 +2596,7 @@ TELEPATHIC['Devotion']['Thought Shield'] = DEFENSE['Devotion']['Thought Shield']
     'effect': 'Thought shield is one of five telepathic defenses against unwanted contact. It clouds the mind so as to hide first one part, then another.\n&emsp;A psionicist can initiate one other psionic power during the same round in which he uses thought shield.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—No other effect.'
 };
 TELEPATHIC['Devotion']['Truthear'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '4',
@@ -2617,7 +2618,7 @@ TELEPATHIC['Devotion']['Truthear'] = {
 
 const METAPSIONIC = {Devotion: {}, Science: {}};
 METAPSIONIC['Science']['Appraise'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '14',
@@ -2637,7 +2638,7 @@ METAPSIONIC['Science']['Appraise'] = {
     'effect': 'With this power, a psionicist can determine the likelihood that a specific course of action will succeed. He focuses on a course of action and examines the possibilities. He assigns probabilities. Then he mentally processes enormous calculations to arrive at an overall probability of success.\n&emsp;In game play, the character must first pass a power check. If he does, the DM must reveal the percentage chance for the plan or action’s success. Exact odds may be difficult or impossible to determine, but the DM should provide his most accurate, honest appraisal.\n&emsp;No one, not even a psionicist, can foresee the future with assured accuracy. Like precognition, the success of this power depends on how closely the characters adhere to their plans. Do they act as they intended? React as they intended? What factors did they fail to foresee? Every deviation steers events away from the predicted path. If this power is used, the DM should give the best answer he can, based on information the characters have. Factors they don’t know about, and therefore can’t take into account while forming a plan, can change things dramatically.\n&emsp;*Power Score*—The player is allowed to reroll any three die rolls to help make his character’s forecast more accurate.\n&emsp;*20*—The psionicist can’t use this power successfully again for 1d4 days.'
 };
 METAPSIONIC['Science']['Aura Alteration'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '?{Are you trying to remove a curse, geas, or quest?|No (0),0|Yes (-6),-6 [Removing curse, geas, or quest]}',
     'initial-cost': '10',
@@ -2657,7 +2658,7 @@ METAPSIONIC['Science']['Aura Alteration'] = {
     'effect': 'With aura alteration, a psionicist can temporarily disguise a person’s alignment, disguise his level, or remove aura afflictions like curses, geases, and quests.\n&emsp;Disguising a character’s alignment or level is the easiest to do. The disguise is temporary, lasting only 1-6 hours. It has no effect on the character’s real alignment or class, but a psionicist with aura sight will be fooled by the fake aura.\n&emsp;Because curses, geases, and quests are imprinted on the character’s aura, they can be removed with this power. A psionicist who tries this suffers a -6 penalty to his power score and must expend 20 PSPs instead of 10. If the die roll is 1, the psionicist’s patient must make a saving throw vs. spells to avoid losing one experience level. (A slip of the psychic scalpel can close off vital parts of the brain.)\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The full PSP cost of the power must be paid despite the lack of success, and this psionicist cannot alter this aura until he achieves a higher experience level.'
 };
 METAPSIONIC['Science']['Empower'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-12',
     'context-modifier': '',
     'initial-cost': 'varies',
@@ -2677,7 +2678,7 @@ METAPSIONIC['Science']['Empower'] = {
     'effect': 'This is not a tool for weak or inexperienced characters. Empower allows a psionicist to imbue an item with rudimentary intelligence and psionic ability. The process, which requires extraordinary time and effort, is described below.\n&emsp;**Item Requirements.** An item must meet two requirements before it can be empowered. First, it must be of exceptional quality—worth 250% to 500% of the normal cost for an item of its type. Second, it must be new. The process of empowering must begin within 48 hours after the item is manufactured. If it is delayed longer, the item cannot be empowered. (If the psionicist still tries, he automatically fails Step One below, expending 50 PSPs.) If the item meets these two requirements, the psionicist can begin the empowerment.\n&emsp;**Step One.** At the start of each day, the psionicist must first prepare the item to receive psionic power. This costs 50 PSPs and requires a power check. If this check fails, the day is wasted; no further progress can be made until the next day.\n&emsp;**Step Two.** If the item has been prepared, the psionicist can give it access to a discipline. It can have access to only one discipline, never more, and the psionicist himself must have access to it. This step costs 100 PSPs and requires a power check.\n&emsp;**Step Three.** The psionicist can attempt to empower the item with any single power he knows within the chosen discipline. (The item must have been properly prepared on the same day.) The psionicist must make two successful power checks: first, a check for the chosen power (using the appropriate power score), and second, another empower check. If both checks succeed, the item has that psionic power, with a score two points below the psionicist’s. If Step Three is successful, the psionicist expends another 100 PSPs. (Failure means he expends half that amount, as usual.)\n&emsp;**Step Four.** The psionicist can imbue the item with other powers by repeating Step Three. The item can acquire *one* power per day, provided it has been properly prepared (see Step One).\n&emsp;**Step Five.** When the item has acquired all the powers which the psionicist intends to give it, the psionicist can seal those powers within the item. To do this, he must prepare the item one more time (expending 50 PSPs), and make an endowment power check one last time. If the item is sealed successfully, it can never gain any additional powers—but it can’t lose them, either. An item that has not been sealed will lose one power per month until it is just a normal object again.\n&emsp;An empowered object has 8 PSPs per devotion and 12 per science. It has Intelligence equal to its maker’s intelligence minus 1d6 points, with a minimum of 12. Its ego is 2 points per devotion and 3 points per science. Unless it was empowered with another telepathic power, it communicates as indicated on Table 113, “Weapon Intelligence and Capabilities” in the AD&D 2nd Edition *DMG* (p. 246). Its alignment matches its creator’s. The weapon has its own personality, however, and like all intelligent weapons, it will try to assert its independence at every opportunity.\n&emsp;The empowering process must be unbroken. *If a day passes in which the psionicist does not at least try to prepare the object, it is finished as is.* He cannot even try to seal the powers; they will wear off over the course of time.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—If three 20’s are rolled during the empowering process, the item is a complete and utter failure.'
 };
 METAPSIONIC['Science']['Psychic Clone'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-8',
     'context-modifier': '',
     'initial-cost': '50',
@@ -2697,7 +2698,7 @@ METAPSIONIC['Science']['Psychic Clone'] = {
     'effect': 'When this power is initiated, a clone of the psionicist steps out of his body. It is in every way identical to the original form, except that it has no substance. The psionicist can see and hear what the clone sees and hears. The clone will do anything the psionicist wants it to (as if it were actually him). Furthermore, the psionicist’s psyche goes with the clone, thus enabling it to perform all of his psionic powers.\n&emsp;This power has a serious drawback. As long as the clone exists, the psionicist himself is practically a turnip. He retains only three senses: smell, taste, and touch. He cannot move, see, or hear. All his psionic powers are transferred to the clone. In effect, the immobile character is no longer a psionicist; not even psionic sense will reveal his true nature. He can be slain without any combat rolls if an opponent wishes to do so.\n&emsp;The clone can travel up to 60 feet from the psionicist. It can go anywhere the psionicist himself could go. For example, it can walk down a corridor, walk across acid (the clone has no substance and cannot be hurt), and swim (provided the psionicist can). Because the psionicist could walk through an unlocked door, so can the clone—although the clone passes through like a ghost. However, a clone cannot travel through walls or walk on water, because the psionicist could not either.\n&emsp;The clone is impervious to all forms of attack and damage except psionic or mental attack (which will affect the psionicist).\n&emsp;*Power Score*—The clone can travel through walls and other solid objects.\n&emsp;*20*—No other effect.'
 };
 METAPSIONIC['Science']['Psychic Surgery'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '?{Operating on self?|No (0),0|Yes (-5),-5 [Operating on self]}',
     'initial-cost': 'contact',
@@ -2717,7 +2718,7 @@ METAPSIONIC['Science']['Psychic Surgery'] = {
     'effect': 'Psychic surgery allows a telepath to repair psychic damage. He can even operate on himself if need be, though his power score is reduced by 5 in this case. Phobias, aversions, idiocy, comas, seizures—all these psychic ailments can be treated and cured, as well as several others. Curses or magical conditions—such as geases and charms—cannot be cured.\n&emsp;This power cannot cure possession, either. However, psychic surgery *can* confirm that the problem really is possession, and *can force the possessing entity into psionic combat* if the surgeon desires. This may be risky, since creatures capable of possession are often quite powerful and the psionicist cannot ascertain their power beforehand. On the other hand, psychic surgery could cure the possession indirectly by forcing a psionically weak entity to flee rather than face combat.\n&emsp;Most psychic ailments can be cured in one turn or less. However, if the psionicist’s power check result equals 1 or 2, the problem is particularly tricky and requires another turn to repair. If the power check fails, the problem is too great for the psionicist to fix. He can try again after gaining another experience level.\n&emsp;**Special Operations:** Psychic surgery has two special uses. First, the surgeon can use this power to help nonpsionicists unleash their wild powers. If the psionicist performs this kind of operation successfully, the patient gains a -2 bonus to his wild talent roll. (See Chapter 1.)\n&emsp;The second operation can make the effect of any power in the telepathy discipline permanent with no maintenance cost. The patient is rarely grateful, because the *power* is not bestowed on the subject, only its effect. In this way, a person can be permanently dominated or fate-linked, for example. The following restrictions apply:}}{{style=min1}}{{c1-1=1)}}{{c2-1=2)}}{{c3-1=3)}}{{c4-1=4)}}{{c5-1=5)}}{{c1-2=The power must be maintainable (i.e., it must have a maintenance cost).}}{{c2-2=The power must have a range of other than zero.}}{{c3-2=The surgeon must know the power and use it successfully on the patient.}}{{c4-2=A psionicist cannot use this type of surgery on himself or on another psionicist. If he tries, nothing happens.}}{{c5-2=At most, only one power can made permanent per turn. If the result of the power check is 1 or 2, the procedure takes two turns instead of one.}}{{effects2=&emsp;This procedure can also be reversed; i.e., psychic surgery can be used to remove a permanently implanted telepathic effect.\n&emsp;*Power Score*—The surgery takes only 5 rounds per “implanted” power.\n&emsp;*20*—The surgeon cannot use this power successfully again for 1d4 days.'
 };
 METAPSIONIC['Science']['Split Personality'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '40',
@@ -2737,7 +2738,7 @@ METAPSIONIC['Science']['Split Personality'] = {
     'effect': 'This is not a psychosis; it’s the power to divide one’s mind into two independent parts. Each part functions in complete autonomy, like two characters in one body. Both parts communicate fully. Both can use psionic powers, even at the same time. That means a split personality can use twice as many psionic powers per round. (The character’s total number of PSPs remains the same, however, with both personalities drawing from it.) Alternately, one personality can use psionic powers while the other does something else—e.g., converse, ponder a puzzle, or control the body in melee. Thus, split personality allows a character to fight physically and psionically at the same time.\n&emsp;Mental attacks directed against the psionicist affect only half of the mind. Contact must be established separately with each half. If one half is destroyed, controlled, or subdued somehow, the other half can continue fighting independently and retains control of the body.\n&emsp;Before he attempts to make his personality whole again, the psionicist must make a saving throw vs. paralyzation if any of the following is true: 1) he does not control both portions of his mind, 2) he has unrepaired psychic damage, or 3) is suffering unwanted contact. A successful save means that his mind returns to complete health and throws off all undesired influences. Failure means that the afflicted portion of his mind becomes dominant and he passes out for 1d6 turns, but regains consciousness free of undesired influences.\n&emsp;*Power Score*—The mind splits into three parts instead of two.\n&emsp;*20*—The character passes out for 1d6 turns.'
 };
 METAPSIONIC['Science']['Ultrablast'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-10',
     'context-modifier': '',
     'initial-cost': '75',
@@ -2757,7 +2758,7 @@ METAPSIONIC['Science']['Ultrablast'] = {
     'effect': 'A character using psionic ultrablast can overwhelm and damage nearby psyches. To do this, he casts thought waves in all directions. In laymen’s terms, the psionicist “grumbles” psychically for three rounds. Then his consciousness bursts forth and a horrid, psychic scream penetrates all minds within 50 feet. Victims may never be the same again.\n&emsp;All characters within 50 feet of the psionic ultrablast must save vs. paralyzation. Failure means they pass out for 2d6 turns. Those who pass out must immediately save vs. paralyzation again. If they fail a second time, they lose all psionic power. Only psychic surgery can help them recover this loss.\n&emsp;Although the blast does not affect the initiator, the risks are great. If the power check fails, he becomes comatose for 1d10 days. Some characters may think he’s dead.\n&emsp;*Power Score*—Creatures of 3 hit dice or less die if they fail their save.\n&emsp;*20*—The initiator must save vs. paralyzation or die. If he lives, he loses the use of all his psionic powers for 2d6 days.'
 };
 METAPSIONIC['Devotion']['Cannibalize'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '0',
@@ -2777,7 +2778,7 @@ METAPSIONIC['Devotion']['Cannibalize'] = {
     'effect': 'This power allows the character to cannibalize his own body for extra PSPs. When it is used, the character can take any number of Constitution points and convert them directly to PSPs at a ratio of 1:8. (One Constitution point becomes eight psionic strength points.) The psionicist can use these points anytime, as if they were part of his total.\n&emsp;The Constitution reduction is not permanent, but it *is* debilitating and long-lasting. The character immediately loses bonus hit points. His system shock and resurrection survival chances are reduced. Most importantly, all of his psionic power scores which are based on Constitution are reduced by the appropriate amount.\n&emsp;A psionicist can recover one cannibalized point of Constitution per week of rest. Rest means staying quietly at home (safely indoors). Adventuring is not allowed.\n&emsp;*Power Score*—The psionicist gains 8 PSPs without reducing his Constitution.\n&emsp;*20*—The character loses 1d4 Constitution points, but can regain them by resting.'
 };
 METAPSIONIC['Devotion']['Convergence'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '0',
     'context-modifier': '',
     'initial-cost': '8',
@@ -2797,7 +2798,7 @@ METAPSIONIC['Devotion']['Convergence'] = {
     'effect': 'When psionicists put their heads together, the results can be impressive. Convergence allows psionicists to link their minds into one synergetic being—an entity more powerful than the sum of the individual parts.\n&emsp;There is no limit to the number of psionicists who join minds. Each participating psionicist must know the convergence power, however, and each must make a successful power check in the same round. Then they are linked. All their PSPs flow into a single pool, from which each draws his strength. If one participant knows a power, now anyone in the group can use it.\n&emsp;Each participant can use psionic powers at the normal rate per turn: one defense and one other power per round. If the group is attacked psionically, the attack must overcome *every* working defense. If it does, the attack affects every character in the convergence, or as many as possible.\n&emsp;When the convergence is discontinued, PSPs that remain in the pool are evenly divided among all the participants. Fractions are rounded down, and no individual can exceed his usual maximum (extra points are lost).\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The participant loses 1d20 PSPs.'
 };
 METAPSIONIC['Devotion']['Enhancement'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '30',
@@ -2817,7 +2818,7 @@ METAPSIONIC['Devotion']['Enhancement'] = {
     'effect': 'This power yields the same results as the Meditative Focus proficiency, in less time. When a psionicist learns this power, he selects one discipline to enhance. As long as he maintains the enhancement power, all of his power scores within the chosen discipline are increased by two. At the same time, all other power scores are reduced by one.\n&emsp;*Power Score*—Other scores are not reduced.\n&emsp;*20*—All power scores in the chosen discipline are reduced by one for 24 hours.'
 };
 METAPSIONIC['Devotion']['Gird'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '0',
@@ -2837,7 +2838,7 @@ METAPSIONIC['Devotion']['Gird'] = {
     'effect': 'Each time a psionicist girds another power, he can maintain that power automatically—i.e., without mental concentration. Thus, a psionicist who is maintaining only girded powers can sleep without disrupting those powers.\n&emsp;To use gird, the psionicist must first initiate and maintain the power he intends to affect. Then he must make a girding power check. If he succeeds, he automatically pays twice the normal maintenance cost for the girded power—or a minimum of 1 PSP per hour. To remove the girding, he must consciously decide to do so (no power check is required). Otherwise, the girding remains in place until the psionicist runs out of PSPs. That means a psionicist who’s unconscious or sleeping could awaken to find all his psionic strength girded away. If the psionicist wishes to reestablish a gird that he discontinued, he must make a new power check.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The gird attempt disrupts the power.'
 };
 METAPSIONIC['Devotion']['Intensify'] = {
-    'attribute': '?{What ability score is being Intensified?|Constitution,@{Constitution}|Intelligence,@{Intelligence}|Wisdom,@{Wisdom}}',
+    'attribute': '?{What ability score is being Intensified?|Constitution,@{Constitution-psi}|Intelligence,@{Intelligence-psi}|Wisdom,@{Wisdom-psi}}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '5/increase',
@@ -2857,7 +2858,7 @@ METAPSIONIC['Devotion']['Intensify'] = {
     'effect': 'Intensify allows the psionicist to improve either his Constitution, his Intelligence, or his Wisdom for psionic applications. To improve one—for psionic purposes only—he must weaken the other two—for *all* purposes. Each point of increase in the targeted ability decreases the other two abilities by the same amount. In addition, each point of increase costs 5 PSPs.\n&emsp;For example, Zenita is a psionicist with Con 15, Int 16, and Wis 17. She wants to intensify her Intelligence by 4 points. To do so, she must spend 20 PSPs initially (5 PSPs for each bonus point of Intelligence). Her Intelligence is raised 4 points to 20. Meanwhile, her Constitution and Wisdom scores drop 4 points (to 11 and 13, respectively). The increase in Intelligence affects psionic powers only. The drop in Constitution and Wisdom affects everything applicable except psionic strength points: psionic power scores, hps, system shock rolls, saving throws, spell bonuses, spell failure, etc.\n&emsp;A psionicist can raise an ability score to a maximum of 25, provided he has enough PSPs and no other score is reduced below zero.\n&emsp;*Power Score*—The character’s ability is raised to the level he intended, but the cost of this power is reduced to 3 PSPs per increased point.\n&emsp;*20*—The psionicist must make a system shock roll or the ability he intended to boost decreases by 1 point for 24 hours.'
 };
 METAPSIONIC['Devotion']['Magnify'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '25 x magnification',
@@ -2877,7 +2878,7 @@ METAPSIONIC['Devotion']['Magnify'] = {
     'effect': 'Magnify allows the psionicist to magnify the effects of another power in all conceivable ways—e.g., double damage, double range, double modifiers, and so on. However, the affected power’s initial cost is proportionately magnified, as is its maintenance cost.\n&emsp;The psionicist initiates the magnify power first. At the same time, he must designate which power he intends to improve. Unless he maintains the magnification, he must immediately use the power he wishes to improve (in the same round). Otherwise he can maintain the magnification until he uses the affected power (a costly endeavor). Once the power has been performed, magnify must be reinitiated to perform again.\n&emsp;The amount of magnification depends upon the psionicist’s level, as follows:}}{{c1-1=Levels 6-10}}{{c2-1=Levels 11-15}}{{c3-1=Levels 16-20}}{{c1-2=x2}}{{c2-2=x3}}{{c3-2=x4}}{{effects2=&emsp;*Power Score*—The magnification factor is one greater, with no additional cost.\n&emsp;*20*—The affected power becomes inoperative for a day.'
 };
 METAPSIONIC['Devotion']['Martial Trance'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '7',
@@ -2897,7 +2898,7 @@ METAPSIONIC['Devotion']['Martial Trance'] = {
     'effect': 'In some situations, the psionicist may find it useful to enter a trance before engaging in psionic combat. This trance focuses the character’s complete attention on his psionic activity and tunes out all other distractions. While in the trance, he gains a +1 bonus on all of his Telepathy scores (all powers in the discipline).\n&emsp;The martial trance ends whenever the character chooses to end it. It is not deep; the character is brought out of it by any blow, shake, or slap. His attention is completely occupied, so any melee attack against him hits automatically and causes maximum damage.\n&emsp;*Power Score*—He manages to maintain enough awareness to dodge melee attacks.\n&emsp;*20*—No other effect.'
 };
 METAPSIONIC['Devotion']['Prolong'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '5',
@@ -2917,7 +2918,7 @@ METAPSIONIC['Devotion']['Prolong'] = {
     'effect': 'When this power is in effect, the range of all powers is increased by 50%, as is the radius of their areas of effect. This has no effect on powers with a range of zero or individual, nor does it alter personal, or single-item areas of effect. It does alter powers that affect a quantity of stuff; prolonged disintegration, for example, destroys up to 12 cubic feet of material instead of 8.\n&emsp;*Power Score*—The increase is 100%.\n&emsp;*20*—All ranges/areas of effect are halved for 1d4 hours.'
 };
 METAPSIONIC['Devotion']['Psionic Inflation'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '20',
@@ -2937,7 +2938,7 @@ METAPSIONIC['Devotion']['Psionic Inflation'] = {
     'effect': 'When a psionicist invokes this power, he sends out a powerful ring of psionic noise (extending to 100 feet). All psionic activity within this area requires twice the normal initial cost and maintenance. The initiating psionicist is not affected; the noise actually begins about an inch beyond his aura, creating a bubble of relative quiet around him.\n&emsp;Other psionicists in the area of effect will not realize anything is wrong until they have actually used a power. If they are maintaining a power, they discover the inflated rate after paying twice the normal maintenance cost.\n&emsp;If two psionicists initiate psionic inflation in the same area, the psionicists must conduct a psychic contest. The loser’s psionic inflation ceases. If both characters fail, then both cease their power maintenance. Reroll ties.\n&emsp;*Power Score*—All psionic activity within the area requires three times the normal initial cost and maintenance.\n&emsp;*20*—The psionicist cannot recover PSPs for two hours.'
 };
 METAPSIONIC['Devotion']['Psionic Sense'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '4',
@@ -2957,7 +2958,7 @@ METAPSIONIC['Devotion']['Psionic Sense'] = {
     'effect': 'With psionic sense, a character can detect psionic activity anywhere within 200 yards. Any expenditure of PSPs constitutes psionic activity, even if it is only to maintain a power. Use of the mind blank power is psionic activity, too, even though it expends no PSPs.\n&emsp;When the character makes his first successful power check, he learns whether or not someone—or something—is psionically active within range. If the psionicist makes another successful power check in the following round, he also learns 1) how many PSPs are being spent, and 2) where the psionic activity is occurring (direction and distance). If psionic activity is occurring in more than one place, the psionicist gets a fix on all of it within 200 yards.\n&emsp;*Power Score*—Second-round information is gained in the first round.\n&emsp;*20*—This power cannot be used effectively for one turn.'
 };
 METAPSIONIC['Devotion']['Psychic Drain'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-6',
     'context-modifier': '',
     'initial-cost': '10/person + contact',
@@ -2977,7 +2978,7 @@ METAPSIONIC['Devotion']['Psychic Drain'] = {
     'effect': 'Psychic drain enables the psionicist to tap into the personal, psychic energy of other people to augment his own psionic strength. Up to six people can be tapped at one time.\n&emsp;Each subject, who is often called a *host*, must first be asleep. Next, the psionicist must make contact with the person’s mind. Then he expends another 10 PSPs and makes a psychic drain power check. If he succeeds, the host falls into a trance, which lasts 4-9 (1d6+3) hours. The character can be awakened with some difficulty before then, but he’ll be groggy and disoriented for another hour.\n&emsp;While the host is in the trance, the psionicist can siphon psychic energy. Just as a vampire draws blood to grow strong, the psionicist drains Wisdom, Intelligence, and Constitution points. He can drain as much as he desires. For every ability point the psionicist drains, he gains 10 PSPs.\n&emsp;Any PSPs gained cannot be banked (added to the psionicist’s total). They cannot be siphoned any faster than they are used. In other words, when the psionicist expends PSPs, he automatically draws these points from his host(s)—unless he specifies otherwise. The psionicist must remain within range of the entranced characters in order to draw strength points from them.\n&emsp;If he exercises moderation, the psionicist does not harm his hosts. A host only begins to suffer ill effects when he loses more than 50% of his psionic potential. (Potential depends on Wisdom, Intelligence, and Constitution scores. See “Psionic Strength Points” in Chapter 1.) The table below shows the effects of excessive depletion. Psychic surgery can correct these problems.}}{{style=bottom2}}{{c1-1=**Potential**\n**Lost**}}{{c2-1=51-60%}}{{c3-1=61-70%}}{{c4-1=71-80%}}{{c5-1=81-90%}}{{c6-1=91-100%}}{{c1-2=**Effect on host**}}{{c2-2=Temporary amnesia (2-12 weeks)}}{{c3-2=Permanent amnesia}}{{c4-2=Intelligence reduced to 4}}{{c5-2=Intelligence reduced to 4; put in coma for 1-12 days, must make system shock roll every day or die.}}{{c6-2=Save vs. death or die; if subject lives, Intelligence, Wisdom, and Constitution each reduced to 3, permanently.}}{{effects2=&emsp;*Power Score*—The psionicist does not harm the subject(s) this time, regardless of how much he drains.\n&emsp;*20*—Contact broken.'
 };
 METAPSIONIC['Devotion']['Receptacle'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-5',
     'context-modifier': '',
     'initial-cost': '0',
@@ -2997,7 +2998,7 @@ METAPSIONIC['Devotion']['Receptacle'] = {
     'effect': 'This power allows a psionicist to store psionic energy in a special receptacle. The psionicist can draw upon the energy later to fuel his other psionic powers. He cannot use these points when his total pool of psionic strength is at its maximum. However, he can keep the stored PSPs on hand until he’s running low on psionic energy, and then use them immediately. (It’s like storing a pint of your own blood at a hospital. With a little time, your body replaces the pint. Later, if you should lose blood in an accident or operation, you can use the stored blood to recover the loss quickly.)\n&emsp;Before powers can be stored, a receptacle must be prepared. Two types of containers are appropriate: a vessel prepared with empower (a metapsionic science), or a valuable gem that has been specially prepared using the receptacle power.\n&emsp;**Empowered Vessel.** Any vessel can serve as a receptacle for psionic energy if it is empowered first. The psionicist must perform the initial preparation and final sealing described earlier under “empower.” He does not do anything further; the vessel needs no additional powers. It can hold PSPs equal to his psionic potential, multiplied by his experience level.\n&emsp;**Valuable Gem.** A gem can hold 1 PSP for every 100 gold pieces of its worth, rounded down. For example, a gem worth 650 gold pieces can hold 6 PSPs, and a gem worth 1,000 gold pieces can hold 10 PSPs. The gem still requires preparation, however. To do this, the psionicist must slowly fill the gem with PSPs—1 per turn—until the gem reaches maximum capacity (1/100 of its value). The psionicist can do nothing else while filling the gem. When the task is complete, the psionicist must make a power check. If he fails, only one-half of the gem’s capacity is useable.\n&emsp;**Storing Points.** Using his receptacle power, he can automatically place 1 PSP into a properly prepared container per round. When he is finished, the psionicist must make a receptacle power check. If it succeeds, all is well; if it fails, only half the points he expended are stored in the receptacle, while the rest are merely spent.\n&emsp;**Using Stored Points.** The psionicist can retrieve stored points automatically. The receptacle must be in contact with his flesh. He can never retrieve more points than the receptacle currently holds, *nor can he retrieve so many that it raises his current psionic point total above his maximum*. No matter how many receptacles he has, a psionicist can never store more PSPs than his maximum total. (For example, if his usual maximum is 100 PSPs, he can store no more than 100.) Only the psionicist who placed the points in the item can use them.\n&emsp;The danger of this power is receptacle loss. If the receptacle is damaged or destroyed, its contents (PSPs) are instantly subtracted from the psionicist’s total possible points. This loss is temporary, but until the psionicist is once again back up to his full PSP score he recovers PSPs only half as fast as normal.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—No other effect.'
 };
 METAPSIONIC['Devotion']['Retrospection'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '120',
@@ -3017,7 +3018,7 @@ METAPSIONIC['Devotion']['Retrospection'] = {
     'effect': 'Retrospection is a kind of psionic seance. It allows psionicists to delve into the past and locate memories that have been loosed from other minds. A psionicist must join at least two other psionicists in a convergence before he can use this power. He—or one of the other participants in the convergence—then poses a question regarding a specific event in the past. To find the answer, the psionicist must make a successful power check.\n&emsp;When retrospection succeeds, the characters tap into a universal, pervasive memory. They have access to any information that ever existed in anyone’s memory regarding the incident they are investigating. The amount of detail that comes to mind depends on power check results:}}{{style=center1}}{{c1-1=1}}{{c2-1=2}}{{c3-1=3-5}}{{c4-1=6+}}{{c1-2=extremely vague and fragmentary}}{{c2-2=vague or incomplete}}{{c3-2=complete but not very specific}}{{c4-2=reasonably complete and specific}}{{effects2=&emsp;Memories bear the mark of the personalities who created them. The DM should role-play the memories accordingly, not just recite information. If the psionicists’ alignments differ significantly from the memories’ alignments, reaction rolls are in order. Memories can be polite and helpful, or they can be cantankerous and downright rude. Memories which have lain undisturbed for centuries may be angered by the intrusion, or they may be delighted for the chance to air themselves out and bring the truth to light.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—No other effect.'
 };
 METAPSIONIC['Devotion']['Splice'] = {
-    'attribute': '@{Intelligence}',
+    'attribute': '@{Intelligence-psi}',
     'modifier': '-2*?{How many powers are being spliced?|2}',
     'context-modifier': '',
     'initial-cost': '[[5*?{How many powers are being spliced?|2}]]',
@@ -3037,7 +3038,7 @@ METAPSIONIC['Devotion']['Splice'] = {
     'effect': 'Splicing psionic powers is tremendously useful. In effect, the psionicist is splicing together two or more separate powers into one psionic release. This is very difficult, however, and it requires great precision. The more powers the psionicist attempts to splice, the more likely he is to fail.\n&emsp;First, the character must make a successful splice check. His power score is decreased 2 points for each power being spliced. For example, if he is splicing two powers, his score equals Intelligence -4. The initial cost of this endeavor is 5 PSPs for every power being spliced.\n&emsp;If the character passes this first power check, he must then initiate each spliced power in succession—without interruption. He does not have to make a separate splicing check for each of these powers, but he still pays their initial costs. Furthermore, each spliced power has absolutely no effect at this time.\n&emsp;Once all the powers have been initiated, the psionicist must make a second splice check. (His power score is still reduced two points for each power being spliced.) If he fails this check, all his efforts are lost; the PSPs he spent are gone, and none of the powers works. If the power check succeeds, the psionicist can maintain the splice by expending 1 PSP per spliced power per round.\n&emsp;At any later time (during which the splice has been maintained), the psionicist can unleash the spliced series of powers. In effect, he performs all of the spliced powers simultaneously—or with split second separations if desired. Success is not automatic. The psionicist must perform the individual power checks for these spliced powers when he releases them. He does not have to pay their initial costs again, however.\n&emsp;The maximum number of powers that a psionicist can splice equals his experience level. For example, a 2nd level psionicist can splice up to two powers, and a 3rd level psionicist can splice up to three. A complex splice is a long shot at best, however. As noted above, a psionicist’s power score decreases two points for every power he attempts to splice. That means a character who attempts a five-power splice has a score of Int -10.\n&emsp;Many psionicists use splice to combine just two powers: contact, and another power that requires contact. This is the most common combination.\n&emsp;*Power Score*—The character receives a +2 bonus on power checks when unleashing the spliced powers.\n&emsp;*20*—No other effect.'
 };
 METAPSIONIC['Devotion']['Stasis Field'] = {
-    'attribute': '@{Constitution}',
+    'attribute': '@{Constitution-psi}',
     'modifier': '-3',
     'context-modifier': '',
     'initial-cost': '20',
@@ -3057,7 +3058,7 @@ METAPSIONIC['Devotion']['Stasis Field'] = {
     'effect': 'A stasis field is a region in which time slows to a crawl and energy is reduced to a meaningless fizzle. When created, the stasis field surrounds the psionicist like a bubble. It can have any radius he desires, up to a maximum of 1 yard per each level of his experience. For example, a 10th level psionicist can create a field with up to a 10-yard radius.\n&emsp;From the outside, the stasis field looks like a slightly shimmering, completely smooth silver globe. When something presses against the edge, it gives slight resistance, but the object passes through.\n&emsp;Inside the field, all is murky and dim. Light filters through from the outside, but it turns gray. A light source inside is only about one-fourth as bright as usual.\n&emsp;Time is 60 times slower in a stasis field. That is, for every round (or minute) that passes inside, an hour elapses outside. (This dilation is not apparent to those inside the field, however.) Each round the psionicist spends inside, he must pay 20 points to maintain the stasis field.\n&emsp;Energy and motion also change inside a stasis field. Energy magicks—e.g., *fireball, magic missile, cone of cold*, and *flamestrike*—have no effect; the spells appear and then fizzle in midair. Movement is slowed down visibly, and swift objects are affected more than slow objects. Character and creature movement rates are halved. A dagger can easily be pushed through someone, but a lightninglike slash with a sword is slowed to a graceful arc, almost like slow motion. A missile weapon is useless; the missile drifts lazily through the air, only to bounce off an unwary target or be dodged by a target who’s looking.\n&emsp;If the psionicist keeps the stasis field centered on himself, it moves with him. He can transfer the focal point of the field to anything he touches, however. Then he can move freely within the field, or even leave it. If he does leave the field, the cost to maintain it is reduced to 1 point per round. (From one perspective, this is actually an increase in cost, since it equals 60 points for every round which passes inside. Remember, one hour outside equals one round inside.) While outside the field, the psionicist can roam up to 100 yards from it and still maintain the field. However, he cannot move the field from the outside. To move it again, he must re-enter it.\n&emsp;*Power Score*—No other effect.\n&emsp;*20*—The psionicist pays the full initial PSP cost.'
 };
 METAPSIONIC['Devotion']['Wrench'] = {
-    'attribute': '@{Wisdom}',
+    'attribute': '@{Wisdom-psi}',
     'modifier': '-4',
     'context-modifier': '',
     'initial-cost': '15',

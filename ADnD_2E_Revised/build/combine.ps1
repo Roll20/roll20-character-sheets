@@ -1,8 +1,6 @@
 $sanitizeScript = Join-Path $PSScriptRoot "sanitizeFiles.ps1"
 & $sanitizeScript
 
-"---- Combining files ----"
-
 $sourceFolder = Join-Path $PSScriptRoot ".."
 $baseFile = Join-Path $sourceFolder "html" "2ESheet-base.html"
 $outputFile = Join-Path $sourceFolder '2ESheet.html'

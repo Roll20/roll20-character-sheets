@@ -23,6 +23,11 @@ These should be imported automatically by your browser, but in the event that th
 
 ## Changelog
 
+#### v0.4.4 (23-02-16)
+- re-arranged the order of abilities and relics sections in combat tab
+- made combat ability textareas bigger by default
+- fixed broken github link so users can now report additional issues directly
+
 #### v0.4.3 (23-01-21)
 - Made class resources into a repeating segment
 - Added light and heavy attacks separately

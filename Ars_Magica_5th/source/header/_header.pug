@@ -1,0 +1,125 @@
+include ../legacy/topbar.pug
+
+mixin arm5_help()
+    .welcome
+        h1.heading_label Ars Magica 5th Edition Sheet (version 2.0)
+
+        br
+
+        div(data-i18n="welcome-title")
+            | Welcome to the Ars Magica 5th Edition Sheet !
+        
+    
+    +markdown({file: "./help_feedback.md"})
+    
+    .welcome
+        h3.heading_label Forenote
+
+        br
+
+        div(data-i18n="welcome-0")
+            | Here are a few important notes you'll need to read before using the sheet. A more complete documentation can be found below.
+
+        br
+
+        div(data-i18n="welcome-1")
+            | First, this sheet features some configuration options, found below. Be sure to review those. Configure is your character is a Magi, how you want botches to be rolled and display in chat, and how you want to chose between simple and stress rolls (when applicable).
+
+        br
+
+        div(data-i18n="welcome-2")
+            | Second, you might want to read a bit the section on the documentation on how rolls works. The stress dice of Ars Magica 5th edition are quite complicated, and this sheet isn't <i>quite</i> able to handle them completely automatically. You'll need to copy the result before the critical roll, for instance.
+
+        br
+
+        div
+            span(data-i18n="welcome-3a") Third, some element of the sheet are
+            span.has_tooltip
+                span(data-i18n="welcome-3b") underlined
+                span(data-i18n="tooltip-welcome").sheet-tooltip Underlined texts feature a tooltip with additional informations
+            | :
+            span(data-i18n="welcome-3c") this means they have a tooltip that shows additional info about them.
+    
+    +markdown({file: "./documentation.md"})
+
+
+mixin arm5_settings()
+    h3.heading_label(data-i18n="config-configuration")
+        Configuration
+    
+    .config
+        span(data-i18n="config-botch") Botch formula
+        +select({name: "botch_formula"}).select_1
+            +option({"value": "&{template:botch} {{roll= [[{[[?{@{botch_num_i18n}|1}]]d10cs0cf10}=10]] }} {{type=Grouped}}", "data-i18n": "config-botch-grouped", "selected": true})
+                | Grouped rolls
+            +option({"value": "&{template:botch} {{roll= ?{@{botch_num_i18n} | 1 Die,[[1d10cf10cs0]]|2 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]]|3 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]]|4 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]]|5 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]]|6 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]]|7 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]]|8 Dice,[[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]] [[1d10cf10cs0]]} }} {{type=Grouped}}", "data-i18n": "config-botch-separate"})
+                | Separate rolls
+        
+        span(data-i18n="config-dice") Dice type
+        // TODO: switch to snake_case
+        +select({name: "die-type-selection"}).select_1
+            +option({value: "both", "data-i18n": "config-dice-both", selected: true})
+                | Both
+            +option({value: "toggle", "data-i18n": "config-dice-toggle"})
+                | Toggle
+        
+        span(data-i18n="config-magi") Magi character ?
+        // TODO: switch to snake_case
+        +select({name: "isMagi"})
+            +option({value:"yes", "data-i18n":"config-magi-yes", selected:true})
+                | Yes
+            +option({value:"no", "data-i18n": "config-magi-no"})
+                | No
+            
+
+mixin arm5_legacy()
+    h3(data-i18n="legacy-title").heading_label Legacy sheet elements
+
+    br
+
+    div(data-i18n="legacy-content").welcome
+        | This section contains part of the sheet that are no longer used, but cannot be removed because they contain character data.
+    
+    br
+    // This is legacy code
+    <div style="margin-top: 15px;">
+        <h4 class="heading_label" data-i18n="armor" >Armor</h4>
+        <table class="table_2" style="width:800px;">
+            <tr>
+                <th colspan="2" data-i18n="armor-worn" >Armor Worn</th>
+                <th colspan="2" data-i18n="combat-modifiers" >Combat Modifiers</th>
+            </tr>
+            <tr>
+                <th colspan="2"><textarea class="textarea_2" name="attr_ArmorWorn"></textarea></th>
+                <th colspan="2"><textarea class="textarea_2" name="attr_ArmorModifiers"></textarea></th>
+            </tr>
+        </table>
+    </div>
+
+.kscaffold-compatible
+    +modalWindow({name: "settings"})
+        +arm5_settings
+    
+    +modalWindow({name: "help"})
+        +arm5_help
+        
+    +modalWindow({name: "history"})
+        +arm5_legacy()
+        +markdown({file: "./changelog.md"})
+
+
+.flexrow.top_bar.header
+    +legacy_header().flexrow.header__main
+
+    .flexcol.header__controls
+        +modalButton({name: "settings"})
+            span.material-icons(disabled) settings
+
+        +modalButton({name: "help"})
+            span.material-icons help
+
+        +modalButton({name: "history"})
+            span.material-icons history
+
+        +link({name:"Discord", href:"https://discord.gg/9M9fhwr6T9", color:"cornflowerblue"})
+            span.material-icons(disabled=true) forum

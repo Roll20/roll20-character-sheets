@@ -1,0 +1,21 @@
+- const arm5rolls = {}
+
+mixin arm5roller(obj)
+    - roll = obj.roll ? obj.roll : "";
+    - delete obj.roll;
+    //- copied from k-scaffold internals, so the name corresponds
+    - let attrName = replaceSpaces(actionInputName(obj.name));
+    - let actionName = actionButtonName(attrName);
+    - arm5rolls[actionName] = roll;
+    - obj["trigger"] = {triggeredFuncs:["arm5roll"]};
+    +roller(obj)
+
+mixin arm5rollers_storage()
+    //- Export the arm5rolls constant from pug to the sheet's javascrip
+    //- so the roll strings are available
+    |
+    | // This constants is exported from PUG, and stores the rolls for each roll button
+    | // The sheetworker for custom roll parsing fetches from this constant to find the rolls
+    |const arm5rolls = {
+    != "\n  " + Object.entries(arm5rolls).map(([roller, template]) => `  "${roller}": "${template}",`).join("\n  ") + "\n"
+    |   };
