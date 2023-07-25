@@ -81,10 +81,15 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+July 8th 2023 v1.66a
+
+- Fixed Legs plate amror penalty when modified with pracitcal quality. It will now reduce the -20 pen to stealth to -10, instead of to 0.
+
+
 June 30nd 2023 v1.66
 
 - Added Practical Quality option tick box to all Mail/Plate Armor, this will reduce all penalties by -10 on the given armor piece and update the penalties boxes accordingly.
-- Corrected issue on Armor Tab where Shield Durability was adding to AP on the hit locatiojns display to the right.
+- Corrected issue on Armor Tab where Shield Durability was adding to AP on the hit locations display to the right.
 
 
 June 22nd 2023 v1.65c
