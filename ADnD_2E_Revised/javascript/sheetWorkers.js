@@ -1989,12 +1989,12 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
 const SPELL_HITS_REGEX = /\((\dd\d\+?\d?|\d) hit/i;
 
 async function debugSeverity(severityDice) {
-    return false
+    return true
         ? parseInt(await extractQueryResult('?{Debug severity|1}'))
         : await extractRollResult(severityDice);
 }
 
-function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set) {
+function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set, severityDice) {
     let effect;
     let additionalHit = {};
     if (severityRoll < 4) {
@@ -2012,7 +2012,7 @@ function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType,
     }
 
     critEffectExplanations(effect, set);
-    effect = `[[${severityRoll}]]: ${effect}`;
+    effect = `${severityDice}&#61;[[${severityRoll}]]: ${effect}`;
     return {
         effect: effect,
         additionalLocations: additionalHit.locations
@@ -2027,7 +2027,7 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
     let additionalLocation = additionalLocations.find(l => additionalLocationRoll <= l.chance);
     let displayAdditionalLocationRoll = additionalLocations.length === 1
         ? ''
-        :`(1d100:${additionalLocationRoll})`;
+        :`(1d100&#61;[[${additionalLocationRoll}]])`;
     let severityRoll = await debugSeverity(severityDice);
     let generalLocation = additionalLocation.general;
     let specificLocation = additionalLocation.specific;
@@ -2040,8 +2040,8 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
         specificLocation = 'Tail';
         locationNote = SPELL_CRIT_13_EFFECT_TABLE[targetType]['Tail'].note;
     }
-    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set);
-    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
+    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set, severityDice);
+    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting the **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
     rollBuilder.push(displayAdditionalEffect);
 
     return await recursiveAdditionalHit(effectObj.additionalLocations, iteration, additionalString+' additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
@@ -2226,15 +2226,16 @@ function setupSpellCrit(section) {
                 '|Major 2d4 (Max. potential damage is less than target max hp),2d4' +
                 '|Severe 2d6 (Max. potential damage is less than twice target max hp),2d6' +
                 '|Mortal 2d8 (Max. potential damage is twice or more target max hp),2d8}');
+            let severityName;
             switch (severityDice) { // optional to add this
-                case '1d6': rollBuilder.push(`severity=Minor`); break;
-                case '2d4': rollBuilder.push(`severity=Major`); break;
-                case '2d6': rollBuilder.push(`severity=Severe`); break;
-                case '2d8': rollBuilder.push(`severity=Mortal`); break;
+                case '1d6': severityName='Minor'; break;
+                case '2d4': severityName='Major'; break;
+                case '2d6': severityName='Severe'; break;
+                case '2d8': severityName='Mortal'; break;
             }
 
             if (hits > 0 && errors.length === 0)
-                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and causing **${severityName}** effect (rolling ${severityDice})`);
             else
                 rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
 
@@ -2255,8 +2256,8 @@ function setupSpellCrit(section) {
                     let severityRoll = await debugSeverity(severityDice);
                     let displayLocationRoll = attackType === 'Called Shot'
                         ? ''
-                        : `(${locationDice}:${locationRoll})`;
-                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
+                        : `(${locationDice}&#61;[[${locationRoll}]])`;
+                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set, severityDice);
                     let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
                     rollBuilder.push(displayEffect);
 
