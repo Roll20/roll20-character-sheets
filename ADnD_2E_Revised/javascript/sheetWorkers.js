@@ -2405,19 +2405,20 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
             }
         }
 
+        let severityName;
         let severityDice;
         const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
         if (sizeDiff < 0) {
-            rollBuilder.push(`severity=Minor`);
+            severityName='Minor';
             severityDice = '1d6';
         } else if (sizeDiff === 0) {
-            rollBuilder.push(`severity=Major`);
+            severityName='Major';
             severityDice = '2d4';
         } else if (sizeDiff === 1) {
-            rollBuilder.push(`severity=Severe`);
+            severityName='Severe';
             severityDice = '2d6';
         } else if (sizeDiff > 1) {
-            rollBuilder.push(`severity=Mortal`);
+            severityName='Mortal';
             severityDice = '2d8';
         }
         let severityRoll = await extractRollResult(severityDice);
@@ -2436,8 +2437,8 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
             let displayLocationRoll = attackType === 'Called Shot'
                 ? ''
-                : `(${locationDice}:${locationRoll})`;
-            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and rolling ${severityDice} for effect=[[${severityRoll}]]: ${critEffect}`);
+                : `(${locationDice}&#61;[[${locationRoll}]])`;
+            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and causing **${severityName}** effect (rolling ${severityDice})=${severityDice}&#61;[[${severityRoll}]]: ${critEffect}`);
             critEffectExplanations(critEffect, set);
         } else {
             errors.push('weapon type');
