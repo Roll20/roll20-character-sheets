@@ -992,12 +992,14 @@ const getSpellSchools = function (spell, books) {
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
-    if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
-        return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
+    return spell['sphere'] + `%NEWLINE%Druid: ${spell['sphere-druids']}%NEWLINE%Necro: ${spell['sphere-necromancers']}%NEWLINE%S&M: ${spell[SPHERE_SPELLS_AND_MAGIC]}`
 
-    let sphere = spell['sphere'];
-    sphereRules.forEach(rule => sphere += spell[rule] || '');
-    return sphere;
+    // if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
+    //     return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
+
+    // let sphere = spell['sphere'];
+    // sphereRules.forEach(rule => sphere += spell[rule] || '');
+    // return sphere;
 }
 
 function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks, optionalSpheres) {

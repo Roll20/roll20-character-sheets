@@ -494,6 +494,7 @@ wiz1['Jump'] = {
     'materials': 'A grasshopper’s hind leg, to be broken by the caster when the spell is cast.',
     'reference': 'p. 176',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 478',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -505,17 +506,19 @@ wiz1['Light'] = {
     'school': 'Alteration',
     'range': '60 yards',
     'duration': '[[@{level-wizard}]] turns',
-    'aoe': '20-foot radius',
+    'aoe': '20-foot radius globe',
     'components': 'V, M',
     'cast-time': '1',
     'saving-throw': 'Special',
     'materials': 'A firefly or a piece of phosphorescent moss.',
     'reference': 'p. 176',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 515',
+    'errata': 'Dungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4 and worsening its Armor Class by 4. The caster can end the spell at any time by uttering a single word.'
+    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4 and worsening its Armor Class by 4. The caster can end the spell at any time by uttering a single word. Note that, unlike the 1st-level priest spell, this spell is not reversible.'
 };
 
 wiz1['Magic Missile'] = {
