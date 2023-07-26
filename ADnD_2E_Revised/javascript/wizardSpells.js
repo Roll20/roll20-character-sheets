@@ -192,8 +192,8 @@ wiz1['Color Spray'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 154',
-    'errata': 'Sage Advice #213 p. 85',
-    'damage': 'Dungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Sage Advice #213 p. 85\nDungeon Master Option: High-Level Campaigns p. 70',
+    'damage': '',
     'damage-type': '',
     'healing': '',
     'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
@@ -253,11 +253,11 @@ wiz1['Detect Magic'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 237',
-    'errata': 'Sage Advice #213 p. 85',
+    'errata': 'Sage Advice #213 p. 85\nSage Advice #245 p. 17',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *detect magic* spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[10*[[@{level-wizard}]] ]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.'
+    'effect': 'When the *detect magic* spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[{10*[[@{level-wizard}]],100}kl1]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.\n&emsp;Casting *detect magic* on a cursed item generally indicates the school of magic the cursed item is imitating, i.e. *dust of sneezing and choking* that imitates *dust of disappearance* would radiate illusion/phantasm magic. If the *dust* imitates *dust of appearance* it would radiate divination or abjuration magic.'
 };
 
 wiz1['Detect Undead'] = {
@@ -345,7 +345,7 @@ wiz1['Find Familiar'] = {
     'level': '1',
     'school': 'Conjuration/Summoning',
     'school-spells-and-magic': 'Conjuration/Summoning, Song',
-    'range': '[[@{level-wizard}]] miles',
+    'range': '[[@{level-wizard}]] mile(s)',
     'duration': 'Special',
     'aoe': '1 familiar',
     'components': 'V, S, M',
@@ -354,6 +354,7 @@ wiz1['Find Familiar'] = {
     'materials': '1000 gp worth of incense and herbs.',
     'reference': 'p. 174',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 353',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -373,6 +374,7 @@ wiz1['Friends'] = {
     'materials': 'Chalk (or white flour), lampblack (or soot), and vermilion applied to the face before casting the spell.',
     'reference': 'p. 174',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 390',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -392,6 +394,7 @@ wiz1['Gaze Reflection'] = {
     'materials': '',
     'reference': 'p. 174',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 398',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -404,13 +407,14 @@ wiz1['Grease'] = {
     'school-spells-and-magic': 'Conjuration/Summoning, Alchemy',
     'range': '10 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
-    'aoe': '10 x 10 feet',
+    'aoe': '10 ✕ 10 feet',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'Special',
     'materials': 'A bit of pork rind or butter.',
     'reference': 'p. 175',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 412',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -430,10 +434,11 @@ wiz1['Hold Portal'] = {
     'materials': '',
     'reference': 'p. 175',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 433',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell magically bars a door, gate, or valve of wood, metal, or stone. The magical closure holds the portal fast, just as if it were securely closed and locked. Any extraplanar creature (djinn, elemental, etc.) with 4 or more Hit Dice can shatter the spell and burst open the portal. A wizard of 4 or more experience levels higher than the spellcaster can open the held portal at will. A *knock* spell or a successful *dispel magic* spell can negate the *hold portal*. Held portals can be broken or physically battered down.'
+    'effect': 'This spell magically bars a door, gate, or valve of wood, metal, or stone. The magical closure holds the portal fast, just as if it were securely closed and locked. Any extraplanar creature (djinn, elemental, etc.) with 4 or more Hit Dice can shatter the spell and burst open the portal. A wizard of 4 or more experience levels higher than the spellcaster can open the held portal at will. Currently a wizard of level [[4+[[@{level-wizard}]] ]] or higher can open the held portal at will. A *knock* spell or a successful *dispel magic* spell can negate the *hold portal*. Held portals can be broken or physically battered down.'
 };
 
 wiz1['Hypnotism'] = {
@@ -442,17 +447,18 @@ wiz1['Hypnotism'] = {
     'school-spells-and-magic': 'Enchantment/Charm, Mentalism',
     'range': '5 yards',
     'duration': '[[1+[[@{level-wizard}]] ]] rounds',
-    'aoe': '30 foot cube',
+    'aoe': '30 foot cube, [[1d6]] creatures',
     'components': 'V, S',
     'cast-time': '1',
     'saving-throw': 'Negate',
     'materials': '',
     'reference': 'p. 175',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 442',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The gestures of the wizard, along with his droning incantation, cause [[1d6]] creatures within the area to become susceptible to a suggestion—a brief and reasonable-sounding request (see the 3rd-level wizard *suggestion* spell). The request must be given after the *hypnotism* spell is cast. Until that time, the success of the spell is unknown. Note that the subsequent suggestion is not a spell, but simply a vocalized urging (the caster must speak a language the creature understands for this spell to work). Creatures that successfully roll their saving throws are not under hypnotic influence. Those who are exceptionally wary or hostile save with +1 to +3 bonuses. If the spell is cast at an individual creature that meets the caster’s gaze, the saving throw is made with a penalty of –2. A creature that fails its saving throw does not remember that the caster enspelled it.'
+    'effect': 'The gestures of the wizard, along with his droning incantation, cause 1d6 creatures within the area to become susceptible to a suggestion—a brief and reasonable-sounding request (see the 3rd-level wizard *suggestion* spell). The request must be given after the *hypnotism* spell is cast. Until that time, the success of the spell is unknown. Note that the subsequent suggestion is not a spell, but simply a vocalized urging—the caster must speak a language the creature understands for this spell to work. Creatures that successfully roll their saving throws are not under hypnotic influence. Those who are exceptionally wary or hostile save with +1 to +3 bonuses. If the spell is cast at an individual creature that meets the caster’s gaze, the saving throw is made with a penalty of –2. A creature that fails its saving throw does not remember that the caster enspelled it.'
 };
 
 wiz1['Identify'] = {
@@ -468,10 +474,12 @@ wiz1['Identify'] = {
     'materials': 'A pearl (of at least 100 gp value) and an owl feather steeped in wine.',
     'reference': 'p. 175',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 445',
+    'errata': 'Sage Advice #152 p. 8\nSage Advice #245 p. 17\nDungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When an *identify* spell is cast, magical items subsequently touched by the wizard can be identified. The eight hours immediately preceding the casting of the spell must be spent purifying the items and removing influences that would corrupt and blur their magical auras. If this period is interrupted, it must be begun again. When the spell is cast, each item must be handled in turn by the wizard. Any consequences of this handling fall fully upon the wizard and may end the spell, although the wizard is allowed any applicable saving throw.\n&emsp;The chance of learning a piece of information about an item is equal to 10% per level of the caster, to a maximum of 90%, rolled by the DM. Current chance is [[{{(10*[[@{level-wizard}]]),90}kl1}]]%. Any roll of 96–00 indicates a false reading (91–95 reveals nothing). Only one function of a multifunction item is discovered per handling (i.e., a 5th-level wizard could attempt to determine the nature of five different items, five different functions of a single item, or any combination of the two). If any attempt at reading fails, the caster cannot learn any more about that item until he advances a level. Note that some items, such as special magical tomes, cannot be identified with this spell.\n&emsp;The item never reveals its exact attack or damage bonuses, although the fact that it has few or many bonuses can be determined. If it has charges, only a general indication of the number of charges remaining is learned: powerful (81% – 100% of the total possible charges), strong (61% – 80%), moderate (41% – 60%), weak (6% – 40%), or faint (five charges or less). The faint result takes precedence, so a fully charged *ring of three wishes* always appears to be only faintly charged.\n&emsp;After casting the spell and determining what can be learned from it, the wizard loses 8 points of Constitution. He must rest for one hour to recover each point of Constitution. If the 8-point loss drops the spellcaster below a Constitution of 1, he falls unconscious. Consciousness is not regained until full Constitution is restored, which takes 24 hours (one point per three hours for an unconscious character).\n&emsp;The material components infusion must be drunk prior to spellcasting. If a *luckstone* is powdered and added to the infusion, the divination becomes much more potent: Exact bonuses or charges can be determined, and the functions of a multifunctional item can be learned from a single reading. At the DM’s option, certain properties of an artifact or relic might also be learned.'
+    'effect': 'When an *identify* spell is cast, magical items subsequently touched by the wizard can be identified. The eight hours immediately preceding the casting of the spell must be spent purifying the items and removing influences that would corrupt and blur their magical auras. If this period is interrupted, it must be begun again. When the spell is cast, each item must be handled in turn by the wizard. Any consequences of this handling fall fully upon the wizard and may end the spell, although the wizard is allowed any applicable saving throw.\n&emsp;The chance of learning a piece of information about an item is equal to 10% per level of the caster, to a maximum of 90%, rolled by the DM. Current chance is [[{{(10*[[@{level-wizard}]]),90}kl1}]]%. Any roll of 96–00 indicates a false reading (91–95 reveals nothing). Only one function of a multifunction item is discovered per handling (i.e., a 5th-level wizard could attempt to determine the nature of five different items, five different functions of a single item, or any combination of the two). If any attempt at reading fails, the caster cannot learn any more about that item until he advances a level. Note that some items, such as special magical tomes, cannot be identified with this spell.\n&emsp;The item never reveals its exact attack or damage bonuses, although the fact that it has few or many bonuses can be determined. If it has charges, only a general indication of the number of charges remaining is learned: *powerful* (81% – 100% of the total possible charges), *strong* (61% – 80%), *moderate* (41% – 60%), *weak* (6% – 40%), or *faint* (five charges or less). The *faint* result takes precedence, so a fully charged *ring of three wishes* always appears to be only faintly charged.\n&emsp;After casting the spell and determining what can be learned from it, the wizard loses 8 points of Constitution. He must rest for one hour to recover each point of Constitution. If the 8-point loss drops the spellcaster below a Constitution of 1, he falls unconscious. Consciousness is not regained until full Constitution is restored, which takes 24 hours (one point per three hours for an unconscious character).\n&emsp;The material components infusion must be drunk prior to spellcasting. If a *luckstone* is powdered and added to the infusion, the divination becomes much more potent: Exact bonuses or charges can be determined, and the functions of a multifunctional item can be learned from a single reading. At the DM’s option, certain properties of an artifact or relic might also be learned.\n&emsp;Casting *contact other plane* or *commune* can also reveal exact bonuses and charges of an item.\n&emsp;*Identify* generally gives false results when used on cursed items—usually revealing a power (or magical bonus) the item seems to have. Casting *contact other plane* or *commune* can confirm if a magical item is indeed beneficial.'
 };
 
 wiz1['Jump'] = {

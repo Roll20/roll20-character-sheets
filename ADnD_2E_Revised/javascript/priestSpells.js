@@ -151,11 +151,11 @@ pri1['Detect Magic'] = {
     'reference': 'p. 253',
     'book': 'PHB',
     'book-compendium': 'Priest’ Spell Compendium Volume One p. 201',
-    'errata': 'Sage Advice #213 p. 85',
+    'errata': 'Sage Advice #213 p. 85\nSage Advice #245 p. 17',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*[[@{level-priest}]] ]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.'
+    'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[{10*[[@{level-priest}]],100}kl1]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.\n&emsp;Casting *detect magic* on a cursed item generally indicates the sphere of magic the cursed item is imitating, i.e. *cloak of poisonousness* that imitates *cloak of protection* would radiate the protection sphere.'
 };
 
 pri1['Detect Poison'] = {
