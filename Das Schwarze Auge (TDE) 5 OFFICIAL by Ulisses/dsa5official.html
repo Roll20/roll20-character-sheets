@@ -1,3 +1,4 @@
+
 <div class="dsaWrapper compendium-drop-target Creature Kreatur Akteur Actor creature kreatur akteur actor">
   <input accept="data" name="attr_drop_data" type="hidden"/>
   <input accept="uniqueName" name="attr_drop_uniquename" type="hidden"/>
@@ -21466,6 +21467,11 @@
 
     <div class="section optnsub2 filterBorder" style="margin: 40px 0;">
 <div  style="margin-top: 40px;">
+  <h3>v1.5.8 (07/10/2023)</h3>
+  <ul>
+    <li>Fixes inured to encumbrance</li>
+    <li>Change behaviour of passive combat skill bonuses to always apply their effect</li>
+  </ul>
   <h3>v1.5.5 (03/20/2023)</h3>
   <ul>
     <li>Preview ranged attack roll final die</li>
@@ -25656,6 +25662,7 @@
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="1"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="2"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="3"/>
+                                            <input name="attr_sonderfertigkeitkampftyp" type="radio" class="hidden passiveHider" value="3" />
                                             <div class="rating col30">
   <label>
     <input type="radio" name="attr_selectedLevel" value="0" />
@@ -26097,6 +26104,7 @@
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="1"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="2"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="3"/>
+                                            <input name="attr_sonderfertigkeitkampftyp" type="radio" class="hidden passiveHider" value="3" />
                                             <div class="rating col30">
   <label>
     <input type="radio" name="attr_selectedLevel" value="0" />
@@ -29117,9 +29125,9 @@
       const az = Armorzones.calcEncumbrance(beSum)
       be = Math.max(0, az.be + Math.max(...armorEncumbranceModifiers) - belastungsgewoehnung_mod)
       ini = az.ini
-    }else{
-      be = Math.max(0, [0, 0, 1, 1, 2, 2, 3, 3][Math.min(beSum, 7)] - belastungsgewoehnung_mod);
-      ini = beSum % 2;
+    }else{      
+      be = Math.max(0, [0, 0, 1, 1, 2, 2, 3, 3][Math.min(beSum, 7)] - (belastungsgewoehnung_mod ));
+      ini = Math.max(0, Math.min(beSum, 7) - (belastungsgewoehnung_mod * 2)) % 2
     }
     rs_be_mod += be
     be_gs_mod += ini
@@ -29758,6 +29766,7 @@
         `repeating_sonderfertigkeit_${id}_sonderfertigkeit_stufe`,
         `repeating_sonderfertigkeit_${id}_selectedLevel`,
         `repeating_sonderfertigkeit_${id}_sonderfertigkeittyp`,
+        `repeating_sonderfertigkeit_${id}_sonderfertigkeitkampftyp`,
         ...dsa5Module().dsa5.modifiers.map((x) => `repeating_sonderfertigkeit_${id}_sonderfertigkeit_auswahl${x}`),
         ...dsa5Module().dsa5.modifiers.map((x) => `repeating_sonderfertigkeit_${id}_sonderfertigkeit_mod${x}`)
       );
@@ -29846,6 +29855,7 @@
     for (let x of dsa5Module().dsa5.modifiers) {
       for (const id of specIds) {
         const isCombat = Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeittyp`]) == 3;
+        const passiveCombatskill = isCombat && Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeitkampftyp`]) == 3;
         const activated = Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_aktiviert`]) == 1;
         if (activated || isCombat) {
           const selection = _getAttrfromSelection(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_auswahl${x}`]);
@@ -29853,7 +29863,7 @@
             const dataVal = Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_mod${x}`]);
 
             let multiplier = 1;
-            if (isCombat) {
+            if (isCombat && !passiveCombatskill) {
               multiplier = Number(values[`repeating_sonderfertigkeit_${id}_selectedLevel`]);
             } else {
               multiplier = multiply ? Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_stufe`]) : 1;
