@@ -377,17 +377,19 @@ pri1['Protection From Evil'] = {
     'sphere': 'Protection',
     'range': 'Touch',
     'duration': '[[3*[[@{level-priest}]] ]] rounds',
-    'aoe': '1 creature',
+    'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'Holy water or burning incense / A circle of unholy water or smoldering dung.',
+    'materials': '*Protection From Evil:* Holy water or burning incense.\n*Protection From Good:* A circle of unholy water or smoldering dung.',
     'reference': 'p. 256',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 466',
+    'errata': 'Sage Advice #156 p. 57\nSage Advice #225 p. 83\nDungeon Master Option: High-Level Campaigns p. 74',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects:\n&emsp;First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of –2 to each attack roll, and any saving throws caused by such attacks are made by the protected creature with a +2 bonus.\n&emsp;Second, any attempt to exercise mental control over the protected creature (if, for example, it has been charmed by a vampire) or to invade and take over its mind (as by a ghost’s magic jar attack) is blocked by this spell. Note that the protection does not prevent a vampire’s charm itself, nor end it, but it does prevent the vampire from exercising mental control through the barrier. Likewise, an outside life force is merely kept out, and would not be expelled if in place before the protection was cast.\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creature to recoil if such attacks require touching the protected creature. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character. This protection ends if the protected character makes a melee attack against or tries to force the barrier against the blocked creature.\n&emsp;This spell can be reversed to become *protection from good*, with the second and third benefits remaining unchanged.'
+    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects:\n&emsp;First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of –2 to each attack roll, and any saving throws caused by such attacks are made by the protected creature with a +2 bonus.\n&emsp;Second, any attempt to exercise mental control over the protected creature (if, for example, it has been charmed by a vampire) or to invade and take over its mind (as by a ghost’s *magic jar* attack) is blocked by this spell. Note that the protection does not prevent a vampire’s *charm* itself, nor end it, but it does prevent the vampire from exercising mental control through the barrier. Likewise, an outside life force is merely kept out, and would not be expelled if in place before the protection was cast.\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creature to recoil if such attacks require touching the protected creature. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character. This protection ends if the protected character makes a melee attack against or tries to force the barrier against the blocked creature.\n&emsp;This spell can be reversed to become *protection from good*; the second and third benefits remaining unchanged.\n\n&emsp;This spell does not specifically hedge out undead creatures (except ghouls, as stated in the *MONSTROUS MANUAL* tome), unless these have been brought by a *monster summoning* spell or equivalent magic or are from another plane.'
 };
 
 pri1['Purify Food & Drink'] = {

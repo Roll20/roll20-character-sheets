@@ -554,6 +554,7 @@ wiz1['Mending'] = {
     'materials': 'Two small magnets of any type (lodestone in all likelihood) or two burrs.',
     'reference': 'p. 176',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 559',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -572,10 +573,11 @@ wiz1['Message'] = {
     'materials': 'A short piece of copper wire.',
     'reference': 'p. 176',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 561',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard can whisper messages and receive replies with little chance of being overheard. When the spell is cast, the wizard secretly or openly points his finger at each creature to be included in the spell effect. Up to one creature per level can be included. Currently [[@{level-wizard}]] creatures. When the wizard whispers, the whispered message travels in a straight line and is audible to all of the involved creatures within 30 feet, plus 10 feet per level of the caster. Current range is [[30+(10*[[@{level-wizard}]])]] feet. The creatures who receive the message can whisper a reply that is heard by the spellcaster. Note that there must be an unobstructed path between the spellcaster and the recipients of the spell. The message must be in a language the caster speaks; this spell does not by itself confer understanding upon the recipients. This spell is most often used to conduct quick and private conferences when the caster does not wish to be overheard.'
+    'effect': 'When this spell is cast, the wizard can whisper messages and receive replies with little chance of being overheard. When the spell is cast, the wizard secretly or openly points his finger at each creature to be included in the spell effect. Up to one creature per level can be included. Currently [[@{level-wizard}]] creatures. When the wizard whispers, the whispered message travels in a straight line and is audible to all of the involved creatures within 30 feet, plus 10 feet per level of the caster. Currently within [[30+(10*[[@{level-wizard}]])]] feet. The creatures who receive the message can whisper a reply that is heard by the spellcaster. Note that there must be an unobstructed path between the spellcaster and the recipients of the spell. The message must be in a language the caster speaks; this spell does not by itself confer understanding upon the recipients. This spell is most often used to conduct quick and private conferences when the caster does not wish to be overheard.'
 };
 
 wiz1['Mount'] = {
@@ -590,17 +592,19 @@ wiz1['Mount'] = {
     'materials': 'A bit of hair from the type of animal to be conjured.',
     'reference': 'p. 177',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 600',
+    'errata': 'Sage Advice #525 p. 22',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster conjures a normal animal to serve him as a mount. The animal serves willingly and well, but at the expiration of the spell duration it disappears, returning to its own place. The type of mount gained by this spell depends on the level of the caster; of course, a caster can choose a lesser mount if desired. Available mounts include the following:}}{{style=center1}}{{c1-1=**Caster Level**}}{{c2-1=1–3}}{{c3-1=4–7}}{{c4-1=8–12}}{{c5-1=13–14}}{{c6-1=15+}}{{c1-2=**Mount**}}{{c2-2=Mule or light horse}}{{c3-2=Draft horse or war horse}}{{c4-2=Camel}}{{c5-2=Elephant}}{{c6-2=Griffon}}{{effects2=&emsp;The mount does not come with any riding gear, unless it is of a class lower than the caster would normally be entitled to; thus, a 4th-level wizard can gain a war horse without saddle and harness, or a light horse with saddle and harness. Elephants comes with howdah at 18th level. Griffon comes with saddle at 18th level. The statistics of the animal gained are typical of all creatures of the same class. The mount disappears when slain.',
+    'effect': 'By means of this spell, the caster conjures a normal animal to serve him as a mount. The animal serves willingly and well, but at the expiration of the spell duration it disappears, returning to its own place. The type of mount gained by this spell depends on the level of the caster; of course, a caster can choose a lesser mount if desired. Available mounts include the following:}}{{style=center1}}{{c1-1=**Caster Level**}}{{c2-1=1–3}}{{c3-1=4–7}}{{c4-1=8–12}}{{c5-1=13–14}}{{c6-1=15+}}{{c1-2=**Mount**}}{{c2-2=Mule or light horse}}{{c3-2=Draft horse or war horse}}{{c4-2=Camel}}{{c5-2=Elephant (and howdah at 18th level)}}{{c6-2=Griffon (and saddle at 18th level)}}{{effects2=&emsp;The mount does not come with any riding gear, unless it is of a class lower than the caster would normally be entitled to; thus, a 4th-level wizard can gain a war horse without saddle and harness, or a light horse with saddle and harness. Elephants comes with howdah at 18th level. Griffon comes with saddle at 18th level. The statistics of the animal gained are typical of all creatures of the same class. The mount disappears when slain.\n&emsp;A *detect magic* cast on the mount will reveal the presence of a spell. A successful use of the spellcraft proficiency also reveals that the mount was created with magic.',
 };
 
 wiz1['Nystul\'s Magical Aura'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
-    'duration': '[[@{level-wizard}]] days',
+    'duration': '[[@{level-wizard}]] day(s)',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -608,10 +612,11 @@ wiz1['Nystul\'s Magical Aura'] = {
     'materials': 'A small square of silk, which must be passed over the object that receives the aura.',
     'reference': 'p. 177',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 628',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, any one item of no more than five pounds weight per level of the spellcaster ([[ [[@{level-wizard}]]*5]] pounds) can be given an aura that is noticed by someone using magic detection. Furthermore, the caster can specify the type of magical aura that is detected (alteration, conjuration, etc.) and this effectively masks the item’s actual aura, if any, unless the item’s own aura is exceptionally powerful (if it is an artifact, for instance). If the object bearing Nystul’s magical aura has an *identify* spell cast on it or is similarly examined, the examiner has a 50% chance of recognizing that the aura has been placed to mislead the unwary. Otherwise, the aura is believed and no amount of testing reveals what the true magic is.'
+    'effect': 'By means of this spell, any one item of no more than five pounds weight per level of the spellcaster (currently [[5*[[@{level-wizard}]] ]] pounds) can be given an aura that is noticed by someone using magic detection. Furthermore, the caster can specify the type of magical aura that is detected (alteration, conjuration, etc.) and this effectively masks the item’s actual aura, if any, unless the item’s own aura is exceptionally powerful—an artifact, for instance. If the object bearing Nystul’s magical aura has an *identify* spell cast on it or is similarly examined, the examiner has a 50% chance of recognizing that the aura has been placed to mislead the unwary. Otherwise, the aura is believed and no amount of testing reveals what the true magic is.'
 };
 
 wiz1['Phantasmal Force'] = {
@@ -626,6 +631,8 @@ wiz1['Phantasmal Force'] = {
     'materials': 'A bit of fleece.',
     'reference': 'p. 177',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 660',
+    'errata': 'Sage Advice #249 p. 22',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -635,20 +642,22 @@ wiz1['Phantasmal Force'] = {
 wiz1['Protection From Evil'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
-    'school-spells-and-magic': 'Abjuration, Alchemy (Reversible)',
+    'school-spells-and-magic': 'Abjuration, Alchemy, Geometry (Reversible)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
-    'cast-time': '1 turn',
+    'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'The wizard must trace a 3-foot-diameter circle on the floor (or ground) with powdered silver.',
+    'materials': 'The wizard must trace a 3-foot-diameter circle on the floor (or ground) with\n*Protection From Evil:* Powdered silver\n*Protection Frm Good:* Powdered iron.',
     'reference': 'p. 177',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 700',
+    'errata': 'Sage Advice #156 p. 57\nSage Advice #225 p. 83\nDungeon Master Option: High-Level Campaigns p. 74',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects:\n&emsp;First, all attacks made by evil (or evilly enchanted) creatures against the protected creature suffer –2 penalties to attack rolls; any saving throws caused by such attacks are made with +2 bonuses. Second, any attempt to possess (as by a *magic jar* attack) or to exercise mental control over (as by a vampire’s *charm* ability) the protected creature is blocked by this spell. Note that the protection does not prevent a vampire’s *charm* itself, but it does prevent the exercise of mental control through the barrier. Likewise, a possessing life force is merely kept out. It would not be expelled if in place before the protection is cast.\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creatures to recoil, if such attacks require touching the protected being. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character.\n&emsp;This protection ends if the protected character makes a melee attack against or tries to force the barrier against the blocked creature.\n&emsp;This spell can be reversed to become *protection from good*; the second and third benefits remain unchanged. The material component for the reverse is a circle of powdered iron.'
+    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects:\n&emsp;First, all attacks made by evil (or evilly enchanted) creatures against the protected creature suffer –2 penalties to attack rolls; any saving throws caused by such attacks are made with +2 bonuses.\n&emsp;Second, any attempt to possess (as by a *magic jar* attack) or to exercise mental control over (as by a vampire’s *charm* ability) the protected creature is blocked by this spell. Note that the protection does not prevent a vampire’s *charm* itself, but it does prevent the exercise of mental control through the barrier. Likewise, a possessing life force is merely kept out. It would not be expelled if in place before the protection is cast.\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creatures to recoil, if such attacks require touching the protected being. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character. This protection ends if the protected character makes a melee attack against or tries to force the barrier against the blocked creature.\n&emsp;This spell can be reversed to become *protection from good*; the second and third benefits remain unchanged.\n\n&emsp;This spell does not specifically hedge out undead creatures (except ghouls, as stated in the *MONSTROUS MANUAL* accessory), unless these have been brought by a *monster summoning* spell or equivalent magic or are from another plane.'
 };
 
 wiz1['Read Magic'] = {
