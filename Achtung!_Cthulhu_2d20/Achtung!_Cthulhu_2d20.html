@@ -565,21 +565,15 @@
           <button type="roll" name="roll_weapon" class="chat_button"
             value="@{whisper}&{template:weapon} {{title=@{character_name}}} {{name=@{weapons_name}}} {{type=@{weapons_type}}} {{focus=@{weapons_focus}}} {{range=@{weapons_range}}} {{damage=@{weapons_damage}}} {{ammo=@{weapons_ammo}}} {{salvo=@{weapons_salvo}}} {{size=@{weapons_size}}} {{qualities=@{weapons_qualities}}}"></button>
         </div>
-
         <div class="f1">
           <span style="display: block">&nbsp;</span>
-
           <!-- The visible and draggable button for the macro bar -->
           <button type="roll" name="roll_attack" value="@{attack_action}"></button>
           <!-- The invisible button allowing the use of custom roll parsing -->
           <button type="action" name="act_attack-action" class="hidden"></button>
           <!-- The invisible field for the attribute which contains the ability call -->
           <input type="hidden" name="attr_attack_action" value="">
-
         </div>
-
-
-
         <div class="f8">
           <label>Name:</label>
           <input name="attr_weapons_name" type="text" style="width: 250px" />
@@ -789,6 +783,9 @@
       {{#subtitle}}
       <div class="sheet-subtitle">{{subtitle}}</div>
       {{/subtitle}}
+      {{#description}}
+      <div class="sheet-description">{{description}}</div>
+      {{/description}}
     </div>
     <div class="sheet-result">
       {{#rollTotal() computed::outcome 1}}
@@ -819,14 +816,14 @@
         <span class="sheet-roll-normal">{{computed::target_skill}}</span>
         <span>Target number is:</span>
         <span class="sheet-roll-normal">{{computed::target_number}}</span>
-        {{#rollTotal() focus_apply 0}}
+        {{#rollTotal() computed::focus_apply 0}}
         <span>Does a focus apply:</span>
         <span class="sheet-roll-normal">No</span>
-        {{/rollTotal() focus_apply 0}}
-        {{#rollTotal() focus_apply 1}}
+        {{/rollTotal() computed::focus_apply 0}}
+        {{#rollTotal() computed::focus_apply 1}}
         <span>Does a focus apply:</span>
         <span class="sheet-roll-normal">Yes</span>
-        {{/rollTotal() focus_apply 1}}
+        {{/rollTotal() computed::focus_apply 1}}
         <span>Difficulty is:</span>
         <span class="sheet-roll-normal">{{computed::difficulty}}</span>
         <span>Crit range is:</span>
@@ -837,7 +834,7 @@
         <span class="sheet-roll-normal">{{computed::complication_range}}</span>
         <span>Dice rolled:</span>
         <span class="sheet-roll-normal">{{computed::dice_text}}</span>
-        </div>
+      </div>
     </div>
   </div>
 </rolltemplate>
@@ -1075,8 +1072,6 @@
   <!-- Custom Roll Parsing -->
 
 // abilities
-
-
   stats.forEach(button => {
     on(`clicked:${button}-action`, () => {
       getAttrs(skills, async function(values) {
@@ -1185,27 +1180,152 @@
             crit_range: crit_range_text,
             bonus_momentum: bonus_momentum,
             outcome: outcome,
-            dice_text: dice_text
+            dice_text: dice_text,
+            focus_apply: focus_apply
+            
           }
         );      
       });
     });
   });
 
-
-
-
-
-// weapons
-
-
-//attacks.forEach(button => {
+// attacks
+  const attackSkills = ["repeating_weapons_weapons_type", "repeating_weapons_weapons_focus", "repeating_weapons_weapons_name", "brawn", "coordination", "will", "skill_fighting", "foc_close_quarters", "foc_handguns", "foc_hand_to_hand", "foc_heavy_weapons", "foc_melee_weapons", "foc_rifles", "foc_exotic", "foc_throwing"];
   on("clicked:repeating_weapons:attack-action", function () {
+    getAttrs(attackSkills, async function(values) {
+      let weaponType = values.repeating_weapons_weapons_type || "";
+      let weaponFocus = values.repeating_weapons_weapons_focus || "";
+      const subTitle = ((weaponType == "None" || weaponType == "") ? 'Attack' : `${weaponType} - Attack`);
+      const description = values.repeating_weapons_weapons_name || "";
 
-    debugger
+      let rollString = "";
+      if ((weaponType == "None" || weaponType == "") && (weaponFocus == "None" || weaponFocus == "")) {
+        //neither selected
+        rollString = `&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{weapon_type=[[?{Weapon type|Melee,0|Ranged,1|Mental,2}]]}} {{target_skill=[[0]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      } else if (weaponType == "None" || weaponType == "") {
+        //type not selected
+        rollString = `&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{weapon_type=[[?{Weapon type|Melee,0|Ranged,1|Mental,2}]]}} {{target_skill=[[0]]}} {{focus_apply=[[0]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      } else if (weaponFocus == "None" || weaponFocus == "") {
+        // focus not selected
+        rollString = `&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{weapon_type=[[0}]]}} {{target_skill=[[0]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      } else {
+        //both selected
+        rollString = `&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{weapon_type=[[0}]]}} {{target_skill=[[0]]}} {{focus_apply=[[0]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      }
 
+      const results = await startRoll(rollString);
+
+      const target_skill_text = "Fighting"; //string of skill
+      const skill_value = parseInt(values.skill_fighting)||0; //numeric skill value
+
+      weaponType = ((weaponType == "None" || weaponType == "") ? results.results.weapon_type.result : weaponType);
+      let target_attribute_text = "";
+      let attribute_value = 0;
+
+      switch(weaponType) {
+        case "Melee":
+        case 0:
+          attribute_value = parseInt(values.brawn)||0;
+          target_attribute_text = "Brawn";
+          break;
+        case "Ranged":
+        case 1:
+          attribute_value = parseInt(values.coordination)||0;
+          target_attribute_text = "Coordination";
+          break;
+        case "Mental":
+        case 2:
+          attribute_value = parseInt(values.will)||0;
+          target_attribute_text = "Will";
+          break;
+        default:
+          attribute_value = parseInt(values.brawn)||0;
+          target_attribute_text = "Brawn";
+          break;
+      }
+
+      const number_dice = results.results.num_dice.result;
+      const difficulty = results.results.difficulty.result;
+      let focus_apply = results.results.focus_apply.result;
+
+      if ((weaponFocus != "None" && weaponFocus != "")) {
+
+        switch(weaponFocus) {
+          case "Hand to Hand":
+            focus_apply =  (values.foc_hand_to_hand == "on" ? 1 : 0);
+            break;
+          case "Close Quarters":
+            focus_apply =  (values.foc_close_quarters == "on" ? 1 : 0);
+            break;
+          case "Melee Weapons":
+            focus_apply =  (values.foc_melee_weapons == "on" ? 1 : 0);
+            break;
+          case "Handguns":
+            focus_apply =  (values.foc_handguns == "on" ? 1 : 0);
+            break;
+          case "Rifles":
+            focus_apply =  (values.foc_rifles == "on" ? 1 : 0);
+            break;
+          case "Heavy Weapons":
+            focus_apply =  (values.foc_heavy_weapons == "on" ? 1 : 0);
+            break;
+          case "Exotic":
+            focus_apply =  (values.foc_exotic == "on" ? 1 : 0);
+            break;
+          case "Throwing":
+            focus_apply =  (values.foc_throwing == "on" ? 1 : 0);
+            break;
+          default:
+            focus_apply =  (values.foc_hand_to_hand == "on" ? 1 : 0);
+            break;
+        }
+      }
+
+      const focus_target = focus_apply == 1 ? skill_value : 1;
+
+      let target_number = attribute_value + skill_value;
+      let complication_range = 21 - difficulty;
+      const complication_range_text = `${complication_range} - 20`;
+
+      const dice = results.results.roll1.dice;
+      let successCount = dice.filter(d => d <= target_number).length;
+      successCount += dice.filter(d => d <= focus_target).length;
+      let complicationCount = dice.filter(d => d >= complication_range).length;
+
+      const success_range_text = `${focus_target + 1} - ${target_number}`;
+      const crit_range_text = `1 - ${focus_target}`;
+
+      target_attribute_text = target_attribute_text[0].toUpperCase() + target_attribute_text.slice(1);
+
+      let bonus_momentum = successCount - difficulty;
+      bonus_momentum = bonus_momentum < 0 ? 0 : bonus_momentum;
+      let outcome = successCount >= difficulty ? 1 : 0;
+
+      const dice_text = results.results.roll1.dice.toString();
+
+      finishRoll(
+        results.rollId,
+        {
+          roll1: number_dice,
+          successes: successCount,
+          complications: complicationCount,
+          target_number: target_number,
+          target_attribute: attribute_value,
+          target_skill: skill_value,
+          skill_text: target_skill_text,
+          attribute_text: target_attribute_text,
+          difficulty: difficulty,
+          complication_range: complication_range_text,
+          success_range: success_range_text,
+          crit_range: crit_range_text,
+          bonus_momentum: bonus_momentum,
+          outcome: outcome,
+          dice_text: dice_text,
+          focus_apply: focus_apply
+        }
+      );      
+    });
   });
-//});
 
 
 
