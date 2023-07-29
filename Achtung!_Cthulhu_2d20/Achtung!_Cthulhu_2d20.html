@@ -560,11 +560,26 @@
 
     <fieldset class="repeating_weapons">
       <div class="f-row weapons_row1">
-        <div class="f1 weapoons-chat">
+        <div class="f1 weapons-chat">
           <span style="display: block">&nbsp;</span>
           <button type="roll" name="roll_weapon" class="chat_button"
             value="@{whisper}&{template:weapon} {{title=@{character_name}}} {{name=@{weapons_name}}} {{type=@{weapons_type}}} {{focus=@{weapons_focus}}} {{range=@{weapons_range}}} {{damage=@{weapons_damage}}} {{ammo=@{weapons_ammo}}} {{salvo=@{weapons_salvo}}} {{size=@{weapons_size}}} {{qualities=@{weapons_qualities}}}"></button>
         </div>
+
+        <div class="f1">
+          <span style="display: block">&nbsp;</span>
+
+          <!-- The visible and draggable button for the macro bar -->
+          <button type="roll" name="roll_attack" value="@{attack_action}"></button>
+          <!-- The invisible button allowing the use of custom roll parsing -->
+          <button type="action" name="act_attack-action" class="hidden"></button>
+          <!-- The invisible field for the attribute which contains the ability call -->
+          <input type="hidden" name="attr_attack_action" value="">
+
+        </div>
+
+
+
         <div class="f8">
           <label>Name:</label>
           <input name="attr_weapons_name" type="text" style="width: 250px" />
@@ -942,8 +957,6 @@
 
   const hideShowSpellTradition = () => {
     getAttrs(["spell_skill"], function(values) {
-      let skill = parseInt(values.spell_skill)||"";
-
       $20("#NoTradition").removeClass("show_element").addClass("hide_element");
       $20("#YesTradition").removeClass("show_element").addClass("hide_element");;
 
@@ -1009,20 +1022,6 @@
     });
   };
 
-  const setActionButtons = () => {
-    getAttrs(["character_name", "agility_action", "brawn_action", "coordination_action", "insight_action", "reason_action", "will_action"], function(v) {
-      var attrsToChange = {};
-      attrsToChange["agility_action"] = "%{" + v["character_name"] + "|agility-action}";
-      attrsToChange["brawn_action"] = "%{" + v["character_name"] + "|brawn-action}";
-      attrsToChange["coordination_action"] = "%{" + v["character_name"] + "|coordination-action}";
-      attrsToChange["insight_action"] = "%{" + v["character_name"] + "|insight-action}";
-      attrsToChange["reason_action"] = "%{" + v["character_name"] + "|reason-action}";
-      attrsToChange["will_action"] = "%{" + v["character_name"] + "|will-action}";
-      setAttrs(attrsToChange);
-    });
-  };
-
-
   <!-- Add on change or onclick events -->
 
   on("change:spell_skill", function() {  
@@ -1073,12 +1072,10 @@
     calcualteStressValues();
   });
 
-  on("change:character_name", function(eventInfo) {
-    setActionButtons();
-  });
-
-
   <!-- Custom Roll Parsing -->
+
+// abilities
+
 
   stats.forEach(button => {
     on(`clicked:${button}-action`, () => {
@@ -1196,6 +1193,39 @@
   });
 
 
+
+
+
+// weapons
+
+
+//attacks.forEach(button => {
+  on("clicked:repeating_weapons:attack-action", function () {
+
+    debugger
+
+  });
+//});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <!-- Some stuff to run everytime the sheet opens -->
 
   on('sheet:opened',function(){
@@ -1207,8 +1237,76 @@
     calcualteStressValues();
     checkAttributesBounds();
     checkSkillsBounds();
-    setActionButtons();
   });
+
+
+
+
+
+
+
+
+
+
+
+  <!-- set the attributes and buttons correct so roll buttons trigger action buttons -->
+
+  //A function to combine getting repeating and non repeating attributes.
+const getAllAttrs = function(props,sectionDetails,callback){
+  getSections(sectionDetails,(repeats,sections)=>{
+    getAttrs([...props,...repeats],(attributes)=>{
+      callback(attributes,sections);
+    })
+  });
+};
+//Iterates over the provided repeating sections and assembles an array of attributes to get from those sections for each row.
+const getSections = function(section_details,callback){
+  let queueClone = _.clone(section_details);
+  const worker = (queue,repeatAttrs=[],sections={})=>{
+    let detail = queue.shift();
+    getSectionIDs(detail.section,(IDs)=>{
+      sections[detail.section] = IDs;
+      IDs.forEach((id)=>{
+        detail.fields.forEach((f)=>{
+          repeatAttrs.push(`${detail.section}_${id}_${f}`);
+        });
+      });
+      repeatAttrs.push(`_reporder_${detail.section}`);
+      if(queue.length){
+        worker(queue,repeatAttrs,sections);
+      }else{
+        callback(repeatAttrs,sections);
+      }
+    });
+  };
+  if(!queueClone[0]){
+    callback([],{});
+  }
+  worker(queueClone);
+};
+
+const repeatingSections = [{section:'repeating_weapons',fields:['attack_action']}];//Replace these with your sheet's repeating sections
+const actionRefs = ['character_name', 'agility_action', 'brawn_action', 'coordination_action', 'insight_action', 'reason_action', 'will_action'];//Replace these with the non repeating attributes for your sheet.
+const actionCallUpdate = function(){
+  getAllAttrs(['character_name',...actionRefs],repeatingSections,(attributes,sections)=>{
+    let actions = Object.keys(attributes).filter((key)=>key!=='character_name');
+    const setObj = actions.reduce((accumulator,actionName)=>{
+      accumulator[actionName] = `%{${attributes.character_name}|${actionName.replace(/_([^_]*)$/,'-' + '$1')}}`;//Update the action call
+      return accumulator;//The memo (accumulator in this case) must always be returned when using a reduce function
+    },{});
+    setAttrs(setObj,{silent:true});//Apply the changes
+  });
+};
+
+on('sheet:opened change:character_name',actionCallUpdate);
+
+
+
+
+
+
+
+
 
 
 </script>
