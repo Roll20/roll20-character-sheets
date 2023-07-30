@@ -595,6 +595,7 @@
             <option value="Heavy Weapons">Heavy Weapons</option>
             <option value="Exotic">Exotic</option>
             <option value="Throwing">Throwing</option>
+            <option value="Occultism">Occultism</option>
           </select>
         </div>
       </div>
@@ -1186,7 +1187,7 @@
   });
 
 // attacks
-  const attackSkills = ["repeating_weapons_weapons_type", "repeating_weapons_weapons_focus", "repeating_weapons_weapons_name", "brawn", "coordination", "will", "skill_fighting", "foc_close_quarters", "foc_handguns", "foc_hand_to_hand", "foc_heavy_weapons", "foc_melee_weapons", "foc_rifles", "foc_exotic", "foc_throwing"];
+  const attackSkills = ["repeating_weapons_weapons_type", "repeating_weapons_weapons_focus", "repeating_weapons_weapons_name", "agility", "coordination", "will", "skill_fighting", "skill_academia", "foc_close_quarters", "foc_handguns", "foc_hand_to_hand", "foc_heavy_weapons", "foc_melee_weapons", "foc_rifles", "foc_exotic", "foc_throwing", "foc_occultism"];
   on("clicked:repeating_weapons:attack-action", function () {
     getAttrs(attackSkills, async function(values) {
       let weaponType = values.repeating_weapons_weapons_type || "";
@@ -1211,32 +1212,39 @@
 
       const results = await startRoll(rollString);
 
-      const target_skill_text = "Fighting"; //string of skill
-      const skill_value = parseInt(values.skill_fighting)||0; //numeric skill value
-
       weaponType = ((weaponType == "None" || weaponType == "") ? results.results.weapon_type.result : weaponType);
       let target_attribute_text = "";
       let attribute_value = 0;
+      let target_skill_text = ""; //string of skill
+      let skill_value = 0; //numeric skill value
 
       switch(weaponType) {
         case "Melee":
         case 0:
-          attribute_value = parseInt(values.brawn)||0;
-          target_attribute_text = "Brawn";
+          attribute_value = parseInt(values.agility)||0;
+          target_attribute_text = "Agility";
+          target_skill_text = "Fighting"; //string of skill
+          skill_value = parseInt(values.skill_fighting)||0; //numeric skill value
           break;
         case "Ranged":
         case 1:
           attribute_value = parseInt(values.coordination)||0;
           target_attribute_text = "Coordination";
-          break;
+          target_skill_text = "Fighting"; //string of skill
+          skill_value = parseInt(values.skill_fighting)||0; //numeric skill value
+              break;
         case "Mental":
         case 2:
           attribute_value = parseInt(values.will)||0;
           target_attribute_text = "Will";
-          break;
+          target_skill_text = "Academia"; //string of skill
+          skill_value = parseInt(values.skill_academia)||0; //numeric skill value
+              break;
         default:
-          attribute_value = parseInt(values.brawn)||0;
-          target_attribute_text = "Brawn";
+          attribute_value = parseInt(values.agility)||0;
+          target_attribute_text = "Agility";
+          target_skill_text = "Fighting"; //string of skill
+          skill_value = parseInt(values.skill_fighting)||0; //numeric skill value
           break;
       }
 
@@ -1270,6 +1278,9 @@
             break;
           case "Throwing":
             focus_apply =  (values.foc_throwing == "on" ? 1 : 0);
+            break;
+          case "Occultism":
+            focus_apply =  (values.foc_occultism == "on" ? 1 : 0);
             break;
           default:
             focus_apply =  (values.foc_hand_to_hand == "on" ? 1 : 0);
