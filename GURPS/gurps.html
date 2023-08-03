@@ -4359,30 +4359,13 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.10 -->
+				<!-- current version notes: 2.9.11 -->
 				<ul>
 					<li>
-						Traits Tab. Improve ability to drag/drop repeating culture items.
+						Shotgun Damage Tool. Changed the title, added some additional tooltips and moved the DR mulitplier note next to the damage roll.
 					</li>
 					<li>
-						Skills Tab. Moved the field <b>Reason for MOD (Modifier):</b> to its own line and expanded the input field.
-					</li>
-					<li>
-						Active Defense Rolls. Updated title of roll template to be [type of defense] using [defensive name]. Example, <b>Unarmed Parry</b> using punch.
-					</li>
-					<li>
-						Several small changes to text information; Active Defense notes for <b>INFO</b> field updated to show page 269 instead of 208. 
-						Added some additional help text show if malfunction is enabled or disabled.
-					</li>
-					<li>
-						Chat Log Roll Results. The roll number and hit/success note are now on one line and additional notes related to the results are shown on a separate line. This should reduce 
-						the size of the roll results chat log, saving room.
-					</li>
-					<li>
-						Repeating Skill Chat Log Roll. If there's a Tech Level associated with the skill, it will be appended to the name.
-					</li>
-					<li>
-						Melee Tab - Max skill of 9 checkbox. Fixed bug where the summary would show "Mighty Blow 1 FP per attack. +2 Damage or +1 per die!". 
+						Spell Roll Chat Log. Streamlined some of the content so spells take up a little less space.
 					</li>
 				</ul>
 					
@@ -13027,7 +13010,11 @@ visualize what it will look like in chat.
 							
 							<div class="row title">
 								<div class="cell">
-									<span data-i18n="close-range-shotgun-label">Close Range Shotgun Damage Tool</span>
+									<div class="popup">
+										<span data-i18n="close-range-shotgun-label">Close Range Shotgun & Multiple Projectile Damage Tool</span></div>
+									<div class="tooltip">
+										<span data-i18n="close-range-shotgun-label-tooltip">Used for extremely close combat at a range of 10% of the ½D Range or less. See Shotguns and Multiple Projectiles for more details.</span>
+									</div>
 								</div>
 							</div>
 							
@@ -13054,7 +13041,7 @@ visualize what it will look like in chat.
 										<span data-i18n="close-label">Close</span>
 									</div>
 									<div class="tooltip">
-										<span data-i18n="shotgun-close-range-tooltip">Close range.</span>
+										<span data-i18n="shotgun-close-range-tooltip">This value is 10% of the ½D Range of the weapon. This is the maximum range this tool is used for.</span>
 									</div>
 								</div>
 								<div class="cell close-rof">
@@ -13138,7 +13125,7 @@ visualize what it will look like in chat.
 			Damage x1
 			Vitals Damage x3
 			Skull Damage x4" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{shotgun_dr_multiplier_notes}}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{drMultiplier=@{shotgun_dr_multiplier}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_shotgun_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14764,7 +14751,18 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.10 -->
+			<!-- current version notes: 2.9.11 -->
+			<ul>
+				<li>
+					Shotgun Damage Tool. Changed the title, added some additional tooltips and moved the DR mulitplier note next to the damage roll.
+				</li>
+				<li>
+					Spell Roll Chat Log. Streamlined some of the content so spells take up a little less space.
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.10</h4>
+			<p>Pull Requst: 7/31/2023</p>
 			<ul>
 				<li>
 					Traits Tab. Improve ability to drag/drop repeating culture items.
@@ -18779,6 +18777,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					</td>
                     <td class="damage-roll">
                         {{damageRoll}} <span class="damageType">{{damageType}}</span>
+						{{#drMultiplier}}
+							<span>DR Multiplier: {{drMultiplier}}</span>
+						{{/drMultiplier}}
                     </td>
 				</tr>
 				{{#rollTotal() showMinimumDmgNote 1}}
@@ -18847,6 +18848,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					<tr>
 						<td colspan="2" class="tool-modifier-title">
 							<span data-i18n="spell-summary-label">Spell Summary</span>
+							{{#castingClass}}
+								(<span data-i18n="class-label">Class</span>: {{castingClass}})
+							{{/castingClass}}
 						</td>
 					</tr>
                 
@@ -18861,41 +18865,27 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					{{/spellNotes}}
 					{{/rollTotal() showSpellNotes 1}}
 					
-					{{#castingTime}}
 					<tr>
-						<td class="label">
-							<span data-i18n="time-label">Time</span>:
+						<td colspan="2">
+							<div class="rolltemplate-spell-grid">
+								<div class="label"><span data-i18n="time-label">Time</span>:</div>
+								<div>{{castingTime}}</div>
+								<div class="label"><span data-i18n="duration-abbreviated-label">Dur.</span>:</div>
+								<div>{{castingDuration}}</div>
+							</div>
 						</td>
-						<td>{{castingTime}}</td>
 					</tr>
-					{{/castingTime}}
 					
-					{{#castingDuration}}
 					<tr>
-						<td class="label">
-							<span data-i18n="duration-label">Duration</span>:
+						<td colspan="2">
+							<div class="rolltemplate-spell-grid">
+								<div class="label"><span data-i18n="cost-label">Cost</span>:</div>
+								<div>{{castingCost}}</div>
+								<div class="label"><span data-i18n="maintain-abbreviated-label">Maint.</span>:</div>
+								<div>{{castingMaintain}}</div>
+							</div>
 						</td>
-						<td>{{castingDuration}}</td>
 					</tr>
-					{{/castingDuration}}
-					
-					{{#castingCost}}
-					<tr>
-						<td class="label">
-							<span data-i18n="cost-label">Cost</span>:
-						</td>
-						<td>{{castingCost}}</td>
-					</tr>
-					{{/castingCost}}
-					
-					{{#castingMaintain}}
-					<tr>
-						<td class="label">
-							<span data-i18n="maintain-label">Maintain</span>:
-						</td>
-						<td>{{castingMaintain}}</td>
-					</tr>
-					{{/castingMaintain}}				
 					
 					{{#castingResist}}
 					<tr>
@@ -18904,14 +18894,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					</tr>
 					{{/castingResist}}
 					
-					{{#castingClass}}
-					<tr>
-						<td class="label">
-							<span data-i18n="class-label">Class</span>:
-						</td>
-						<td>{{castingClass}}</td>
-					</tr>
-					{{/castingClass}}
 				{{/rollTotal() showCastingDetails 1}}
 				
                 
@@ -19090,9 +19072,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.10";
+	const version = "2.9.11";
 	
-	const latestChangesDate = "7/31/2023";
+	const latestChangesDate = "8/7/2023";
 	
 	let modCascade = true;
 	
@@ -28399,7 +28381,7 @@ B378
 			shotgun_close_range: "5",
 			shotgun_close_rof: "2",
 			shotgun_close_damage: "4d6+4",
-			shotgun_dr_multiplier: "DR x 4",
+			shotgun_dr_multiplier: "x4",
 			shotgun_dr_multiplier_notes: "Multiply targets DR by 4."
 		};
 	
@@ -28503,7 +28485,7 @@ B378
 	
 			}
 	
-			let drMultiplier = `DR x ${modifier}`;
+			let drMultiplier = `x${modifier}`;
 
 			let multiplierNote = `Multiply Targets DR by ${modifier}`;
 	
