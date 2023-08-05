@@ -708,9 +708,14 @@
     <fieldset class="repeating_spells">
       <div class="f-row spell_row1">
         <div class="f1 spells-chat">
-          <span style="display: block">&nbsp;</span>
           <button type="roll" name="roll_spell" class="chat_button"
             value="@{whisper}&{template:spell} {{title=@{character_name}}} {{name=@{spell_name}}} {{skill=@{spell_skill}}} {{difficulty=@{spell_difficulty}}} {{cost=@{spell_cost}}} {{duration=@{spell_duration}}} {{effect=@{spell_effect}}} {{momentum=@{spell_momentum}}}"></button>
+          <!-- The visible and draggable button for the macro bar -->
+          <button type="roll" name="roll_spell" value="@{spell_action}"></button>
+          <!-- The invisible button allowing the use of custom roll parsing -->
+          <button type="action" name="act_spell-action" class="hidden"></button>
+          <!-- The invisible field for the attribute which contains the ability call -->
+          <input type="hidden" name="attr_spell_action" value="">
         </div>
         <div class="f8">
           <label>Name:</label>
@@ -1128,7 +1133,7 @@
   stats.forEach(button => {
     on(`clicked:${button}-action`, () => {
       getAttrs([...skills,'increasedComplication'], async function(values) {
-        const results = await startRoll(`@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${button}}} {{num_dice=[[?{Dice|2}]]}} {{target_skill=[[?{Relevant Skill|None,0|Acedemia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[@{${button}}]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`);
+        const results = await startRoll(`@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${button}}} {{num_dice=[[?{Dice|2}]]}} {{target_skill=[[?{Relevant Skill|None,0|Academia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[@{${button}}]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`);
 
         const target_skill = results.results.target_skill.result; //int select value 
         let target_skill_text = ""; //string of skill
@@ -1400,6 +1405,220 @@
     });
   });
 
+  // cast spell
+  const spellSkills = ["spell_skill", "repeating_spells_spell_name", "repeating_spells_spell_skill", "repeating_spells_spell_difficulty", "reason", "insight", "will", "foc_occultism", "foc_instincts", "foc_invocation", "foc_discipline", "foc_mysticism"];
+  on("clicked:repeating_spells:spell-action", function () {
+    getAttrs([...skills,...spellSkills], async function(values) {
+
+      let casterType = values.spell_skill || "";
+      let spellSkill = values.repeating_spells_spell_skill || "";
+      const subTitle = ((spellSkill == "None" || spellSkill == "") ? 'Spell Cast' : `Spell Cast - ${spellSkill}`);
+      const description = values.repeating_spells_spell_name || "";
+      const defaultDifficulty = int(values.repeating_spells_spell_difficulty);
+
+      let focus_apply = 0;
+      let focusString = '[[?{Does A Focus Apply|No,0|Yes,1}]]'
+
+      switch(spellSkill) {
+        case "Academia":
+          focus_apply = (values.foc_occultism == "on" ? 1 : 0);
+          break;
+        case "Observation":
+          focus_apply = (values.foc_instincts == "on" ? 1 : 0);
+          break;
+        case "Persuasion":
+          focus_apply = (values.foc_invocation == "on" ? 1 : 0);
+          break;
+        case "Resilience":
+          focus_apply = (values.foc_discipline == "on" ? 1 : 0);
+          break;
+        case "Survival":
+          focus_apply = (values.foc_mysticism == "on" ? 1 : 0);
+          break;
+        default:
+          focus_apply = 0;
+          break;
+      }
+
+      if (focus_apply == 1) {
+        focusString = '[[?{Does A Focus Apply|Yes,1|No,0}]]'
+      }
+
+      let rollString = "";
+
+      if ((spellSkill == "None" || spellSkill == "") && (casterType == "None" || casterType == "")) {
+        //neither selected
+        rollString = `@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{spellcaster_type=[[?{Spellcaster type|Traditional,0|Researcher,1|Dabbler,2}]]}} {{target_skill=[[?{Relevant Skill|None,0|Academia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=${focusString}}} {{difficulty=[[?{Difficulty|${defaultDifficulty}}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      } else if (casterType == "None" || casterType == "") {
+        //caster type not selected
+        rollString = `@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{spellcaster_type=[[?{Spellcaster type|Traditional,0|Researcher,1|Dabbler,2}]]}} {{target_skill=[[0]]}} {{focus_apply=${focusString}}} {{difficulty=[[?{Difficulty|${defaultDifficulty}}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      } else if (spellSkill == "None" || spellSkill == "") {
+        // spell skill not selected
+        rollString = `@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{spellcaster_type=[[0}]]}} {{target_skill=[[?{Relevant Skill|None,0|Academia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=${focusString}}} {{difficulty=[[?{Difficulty|${defaultDifficulty}}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      } else {
+        //both selected
+        rollString = `@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{description=${description}}} {{num_dice=[[?{Dice|2}]]}} {{spellcaster_type=[[0}]]}} {{target_skill=[[0]]}} {{focus_apply=${focusString}}} {{difficulty=[[?{Difficulty|${defaultDifficulty}}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`;
+      }
+
+      const results = await startRoll(rollString);
+
+      casterType = ((casterType == "None" || casterType == "") ? results.results.spellcaster_type.result : casterType);
+      let target_attribute_text = "";
+      let attribute_value = 0;
+      let target_skill_text = ""; //string of skill
+      let skill_value = 0; //numeric skill value
+
+      switch(casterType) {
+        case "Traditional":
+        case 0:
+          attribute_value = int(values.insight);
+          target_attribute_text = "Insight";
+          break;
+        case "Researcher":
+        case 1:
+          attribute_value = int(values.reason);
+          target_attribute_text = "Reason";
+          break;
+        case "Dabbler":
+        case 2:
+          attribute_value = int(values.will);
+          target_attribute_text = "Will";
+          break;
+        default:
+          attribute_value = int(values.reason);
+          target_attribute_text = "Reason";
+        break;
+      }
+
+      spellSkill = ((spellSkill == "None" || spellSkill == "") ? results.results.target_skill.result : spellSkill);
+      switch(spellSkill) {
+        case "None":
+        case 0:
+          target_skill_text = "None"; //string of skill
+          skill_value = 0; //numeric skill value
+          break;
+        case "Academia":
+        case 1:
+          target_skill_text = "Academia"; //string of skill
+          skill_value = int(values.skill_academia); //numeric skill value
+          break;
+        case "Athletics":
+        case 2:
+          target_skill_text = "Athletics"; //string of skill
+          skill_value = int(values.skill_athletics); //numeric skill value
+          break;
+        case "Engineering":
+        case 3:
+          target_skill_text = "Engineering"; //string of skill
+          skill_value = int(values.skill_engineering); //numeric skill value
+          break;
+        case "Fighting":
+        case 4:
+          target_skill_text = "Fighting"; //string of skill
+          skill_value = int(values.skill_fighting); //numeric skill value
+          break;
+        case "Medicine":
+        case 5:
+          target_skill_text = "Medicine"; //string of skill
+          skill_value = int(values.skill_medicine); //numeric skill value
+          break;
+        case "Observation":
+        case 6:
+          target_skill_text = "Observation"; //string of skill
+          skill_value = int(values.skill_observation); //numeric skill value
+          break;
+        case "Persuasion":
+        case 7:
+          target_skill_text = "Persuasion"; //string of skill
+          skill_value = int(values.skill_persuasion); //numeric skill value
+          break;
+        case "Resilience":
+        case 8:
+          target_skill_text = "Resilience"; //string of skill
+          skill_value = int(values.skill_resilience); //numeric skill value
+          break;
+        case "Stealth":
+        case 9:
+          target_skill_text = "Stealth"; //string of skill
+          skill_value = int(values.skill_stealth); //numeric skill value
+          break;
+        case "Survival":
+        case 10:
+          target_skill_text = "Survival"; //string of skill
+          skill_value = int(values.skill_survival); //numeric skill value
+          break;
+        case "Tactics":
+        case 11:
+          target_skill_text = "Tactics"; //string of skill
+          skill_value = int(values.skill_tactics); //numeric skill value
+          break;
+        case "Vehicles":
+        case 12:
+          target_skill_text = "Vehicles"; //string of skill
+          skill_value = int(values.skill_vehicles); //numeric skill value
+          break;
+        default:
+          target_skill_text = "None"; //string of skill
+          skill_value = 0; //numeric skill value
+          break;
+      }
+
+      const number_dice = results.results.num_dice.result;
+      const difficulty = results.results.difficulty.result;
+      focus_apply = results.results.focus_apply.result;
+
+      const focus_target = focus_apply == 1 ? skill_value : 1;
+
+      let target_number = attribute_value + skill_value;
+
+      //spell casting always uses increased complications, page 141
+      //let optionalComplication = values.increasedComplication === 'N' ? 'N' : 'Y';
+      let complication_range = 21 - difficulty;
+      //if (optionalComplication === 'N') {
+        //complication_range = 20;
+      //}
+      const complication_range_text = `${complication_range} - 20`;
+
+      const dice = results.results.roll1.dice;
+      let successCount = dice.filter(d => d <= target_number).length;
+      successCount += dice.filter(d => d <= focus_target).length;
+      let complicationCount = dice.filter(d => d >= complication_range).length;
+
+      const success_range_text = `${focus_target + 1} - ${target_number}`;
+      const crit_range_text = `1 - ${focus_target}`;
+
+      target_attribute_text = target_attribute_text[0].toUpperCase() + target_attribute_text.slice(1);
+
+      let bonus_momentum = successCount - difficulty;
+      bonus_momentum = bonus_momentum < 0 ? 0 : bonus_momentum;
+      let outcome = successCount >= difficulty ? 1 : 0;
+
+      const dice_text = results.results.roll1.dice.toString();
+
+      finishRoll(
+        results.rollId,
+        {
+          roll1: number_dice,
+          successes: successCount,
+          complications: complicationCount,
+          target_number: target_number,
+          target_attribute: attribute_value,
+          target_skill: skill_value,
+          skill_text: target_skill_text,
+          attribute_text: target_attribute_text,
+          difficulty: difficulty,
+          complication_range: complication_range_text,
+          success_range: success_range_text,
+          crit_range: crit_range_text,
+          bonus_momentum: bonus_momentum,
+          outcome: outcome,
+          dice_text: dice_text,
+          focus_apply: focus_apply
+        }
+      );      
+    });
+  });
+
 // weapons damage
 const damageSkills = ["repeating_weapons_weapons_type", "repeating_weapons_stress_dice", "repeating_weapons_weapons_name", "repeating_weapons_weapons_damage", "repeating_weapons_weapons_salvo", "brawn_bonus_dmg", "insight_bonus_dmg", "will_bonus_dmg"];
 on("clicked:repeating_weapons:damage-action", function () {
@@ -1522,7 +1741,8 @@ const getSections = function(section_details,callback){
   worker(queueClone);
 };
 
-const repeatingSections = [{section:'repeating_weapons',fields:['attack_action', 'damage_action']}];//Replace these with your sheet's repeating sections
+
+const repeatingSections = [{section:'repeating_weapons',fields:['attack_action', 'damage_action']},{section:'repeating_spells',fields:['spell_action']}];//Replace these with your sheet's repeating sections
 const actionRefs = ['character_name', 'agility_action', 'brawn_action', 'coordination_action', 'insight_action', 'reason_action', 'will_action'];//Replace these with the non repeating attributes for your sheet.
 const actionCallUpdate = function(){
   getAllAttrs(['character_name',...actionRefs],repeatingSections,(attributes,sections)=>{
