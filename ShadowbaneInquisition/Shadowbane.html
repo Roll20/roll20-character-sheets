@@ -2,6 +2,7 @@
 <!-- Every fieldset requires its named element to be of attr_ prefix. -->
 <input type="hidden" name="attr_sheet_version"/>
 <input type="hidden" name="attr_rollTemplate" value="@{to-gm}&{template:mythic} {{character= @{character_name}}}"/>
+<button type="action" name="act_reactroll" class="hidden"></button>
 <div class='sheet-background_radius sheet-collapsible_entity_toggle'>
 	<div class='sheet-background sheet-radius_border_heading'>
 
@@ -2378,8 +2379,10 @@
 								<label title='Expand' class='sheet-wb3'><input type='checkbox' name='attr_wep_display' value='expand' class='sheet-select_button sheet-hidden' /><span class='sheet-select_text'>&#128470;</span></label>
 							</div>
 							<h3 class='sheet-equipment_weapon_rep_h2'><span name='attr_R_weapon_name'></span></h3>
-							<button name='weapon_hit' class='sheet-equipment_weapon_rep_h3 sheet-full_width sheet-clear' type='roll' value='@{rollTemplate} {{attack= }} {{weapon= @{R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{ {@{R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}
-!wammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit
+							<!-- <button name='weapon_hit' class='sheet-equipment_weapon_rep_h3 sheet-full_width sheet-clear' type='roll' value='@{rollTemplate} {{attack= }} {{weapon= @{R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{ {@{R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}'>Hit -->
+							<input type="hidden" name="attr_hit_action"></input>
+							<button type="action" name="act_hit-action" class="hidden"></button>
+							<button name='weapon_hit' class='sheet-equipment_weapon_rep_h3 sheet-full_width sheet-clear' type='roll' value='@{hit_action}'>Hit
 								|<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{atk_accurate_aim} + @{atk_scatter_aim}' class='sheet-input_background sheet-input_char_background' disabled ></button>
 							<button name='weapon_dmg' class='sheet-equipment_weapon_rep_h4 sheet-full_width sheet-clear' type='roll' value='@{rollTemplate} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}+@{atk_scatter_dmg}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }} {{@{settings_weapondescription}=@{R_ability_r} }} @{atk_accurate_dmg}'>DMG</button>
 						</div>
@@ -4424,6 +4427,29 @@ NOTE: replace worker by javascript for IDE functionality
 <script type='text/worker'>
 // <script>
 
+	
+	// Helper - the data passed through in an action button needs these characters escaped
+	// I've used a mongrel escape sequence to avoid triggering anything internal in Roll20
+	// This may not be a complete list of characters that need escaping! If you have heavily
+	// punctuated text, it might break the passthrough!
+	const rollEscape = {
+		chars: {
+			'"': '%quot;',
+			',': '%comma;',
+			':': '%colon;',
+			'}': '%rcub;',
+			'{': '%lcub;',
+		},
+		escape(str) {
+			str = (typeof(str) === 'object') ? JSON.stringify(str) : (typeof(str) === 'string') ? str : null;
+			return (str) ? `${str}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+		},
+		unescape(str) {
+			str = `${str}`.replace(new RegExp(`(${Object.values(this.chars).join('|')})`, 'g'), (r) => Object.entries(this.chars).find(e=>e[1]===r)[0]);
+			return JSON.parse(str);
+		}
+	}
+
 	// Async Await functions
 
 	const asw = (() => {
@@ -4515,19 +4541,43 @@ NOTE: replace worker by javascript for IDE functionality
 		return parseInt(result)
 	}
 
-	on('clicked:repeating_rangedweapons:hit', () => {
-		getAttrs(['repeating_rangedweapons_id'], (v) => {
+	let CRPsRolls = ['']
+	on('sheet:opened change:character_name', () => {
+		let CRPslist = []
+		getSectionIDs('repeating_rangedweapons', ids => {
+			ids.forEach( id => {
+				CRPslist.push(`repeating_rangedweapons_${id}`);
+			});
+			getAttrs(['character_name'], (v) => {
+				let attrs = {};
+				CRPslist.forEach(field => attrs[`${field}_hit_action`] = `%{${v['character_name']}|${field}_hit-action}`)
+				console.log("crp debug", attrs)
+				if (attrs) setAttrs(attrs);
+			});
+		})
+	})
+
+	on('clicked:repeating_rangedweapons:hit-action', () => {
+		console.log("Hit Button Cliqued")
+		getAttrs(['repeating_rangedweapons_id', 'character_name'], (v) => {
 			let id = `repeating_rangedweapons_${v.repeating_rangedweapons_id}`
-			console.log(id)
-			startRoll(`@{rollTemplate} {{attack= }}{{weapon= @{${id}_R_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{ {@{${id}_R_weapon_target}+@{inlinemod-toggle}},{@{bsTotal}-@{limiter}}}kh1,{@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{${id}_R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{${id}_R_weapon_aim}]]}}{{${id}_R_type= [[@{${id}_R_weapon_attack}]]}}{{range= [[@{${id}_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{${id}_R_weapon_mod1}]]}}{{trained= [[@{${id}_R_weapon_trained}]]}}{{burst=@{${id}_R_weapon_burst}}}{{auto=@{${id}_R_weapon_auto}}}`, (results) => {
-				console.log(results)
+			console.log("id", id)
+			startRoll(`@{rollTemplate} {{attack= }}{{weapon= @{${id}_R_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{ {@{${id}_R_weapon_target}+@{inlinemod-toggle}},{@{bsTotal}-@{limiter}}}kh1,{@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{${id}_R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{${id}_R_weapon_aim}]]}}{{${id}_R_type= [[@{${id}_R_weapon_attack}]]}}{{range= [[@{${id}_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{${id}_R_weapon_mod1}]]}}{{trained= [[@{${id}_R_weapon_trained}]]}}{{burst=@{${id}_R_weapon_burst}}}{{auto=@{${id}_R_weapon_auto}}} {{passthroughdata=[[0]]}} {{buttonlabel=Dodge}} {{buttonlink=reactroll}}`, (results) => {
+				console.log("result", results)
 				let roll = results.results.roll.result
 				let hitRoll = reverseRoll(roll)
-				console.log(hitRoll)
+				console.log("hitroll", hitRoll)
 
-				console.log(determineHitsLocations(hitRoll))
+				console.log("func hit loc", determineHitsLocations(hitRoll))
 
-				console.log(roll)
+				console.log("roll", roll)
+
+				let rollData = {
+					attacker: v.character_name,
+					dos: results.results.dos.result,
+					action: "dodge",
+				}
+
 				finishRoll(
 					results.rollId,
 					{
@@ -4542,11 +4592,36 @@ NOTE: replace worker by javascript for IDE functionality
 						advancement: results.results.advancement.result,
 						weaponmod: results.results.weaponmod.result,
 						trained: results.results.trained.result,
-						loc: determineHitsLocations(hitRoll)[0]
+						loc: determineHitsLocations(hitRoll)[0],
+						passthroughdata: rollEscape.escape(rollData),
 					}
 				);
 			});
 		});
+	});
+
+
+
+	// The defend roll triggered from the button sent to chat by rollAttack()
+	const rollReact = async (ev) => {
+		// The data we passed into the button will be stored in the originalRollId key
+		let attackRoll = rollEscape.unescape(ev.originalRollId);
+		console.info(attackRoll);
+		let attrs = await asw.getAttrs(['dodge_total', 'dodge_unnat', 'character_name'])
+		console.log('react roll attributes :', attrs)
+		let rollName = `${attrs.character_name} is attempting to ${attackRoll.action} ${attackRoll.attacker}'s inescapable attack that has ${attackRoll.dos} Degrees of Success`
+
+		let rollBase = `@{rollTemplate} {{roll-name=${rollName}}} {{dos=[[[[1+floor(abs([[{{ {@{dodge_total}-${attackRoll.dos * 5}}, {@{dodge_focus}-@{limiter}}}kh1, {@{dodge_focus}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{dodge_unnat}/2)]]}} {{target=$[[0]]}} {{roll=$[[1]]}} {{dof=$[[2]]}}`;
+		startRoll(rollBase, results => {
+			finishRoll(results.rollId, {});
+		})
+	}
+
+	// The reactroll button still needs its event listener, just like a normal button
+	on('clicked:reactroll', async (ev) => {
+		console.log(`Starting react roll`);
+		await rollReact(ev);
+		console.log(`Completed react roll`);
 	});
 
 	// repeating sections data array
@@ -5071,9 +5146,11 @@ NOTE: replace worker by javascript for IDE functionality
 	]
 	const TIER_1_TALENTS = [
 		{name: "Ambidextrous", aptitudes : ["Weapon Skill", "Ballistic Skill"]},
+		{name: "Ambush", aptitudes : ["Perception", "Fieldcraft"]},
 		{name: "Blind Fighting", aptitudes : ["Perception", "Fieldcraft"]},
 		{name: "Bodyguard", aptitudes : ["Agility", "Defence"]},
 		{name: "Catfall", aptitudes : ["Agility", "Fieldcraft"]},
+		{name: "Cease the Flow", aptitudes : ["Agility", "Fieldcraft"]},
 		{name: "Clues from the Crowds", aptitudes : ["General", "Social"]},
 		{name: "Die Hard", aptitudes : ["Willpower", "Defence"]},
 		{name: "Disarm", aptitudes : ["Weapon Skill", "Defence"]},
@@ -7675,7 +7752,10 @@ NOTE: replace worker by javascript for IDE functionality
 					{{#attack}}
 						<div class="sheet-template-content">
 					{{/attack}}
+					<div class="sheet-template-row sheet-template-center sheet-template-break">Based on hit roll (new)</div>
 					<div class="sheet-template-row sheet-template-center sheet-template-break">Hit Location {{computed::loc}}</div>
+					<div class="sheet-template-row sheet-template-center sheet-template-break">Based on extra D100 (old)</div>
+					<div class="sheet-template-row sheet-template-center sheet-template-break">Hit Location {{loc}}</div>
 					<div class="sheet-template-row sheet-template-center">
 						{{#rollBetween() loc 1 10}} HEAD {{/rollBetween() loc 1 10}}
 						{{#rollBetween() loc 11 20}} RIGHT ARM {{/rollBetween() loc 11 20}}
@@ -7828,6 +7908,13 @@ NOTE: replace worker by javascript for IDE functionality
 				{{/multi}}
 		{{/^rollGreater() roll target }}
 	{{/loc}}
+
+	
+	{{#^rollTotal() computed::passthroughdata 0}}
+		<div class="sheet-button">
+			[{{buttonlabel}}](~selected|{{buttonlink}}||{{computed::passthroughdata}})
+		</div>
+	{{/^rollTotal() computed::passthroughdata 0}}
 
 
 
