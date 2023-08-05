@@ -572,7 +572,7 @@
         </div>
         <div class="f4">
           <label>Name</label>
-          <input name="attr_weapons_name" type="text" style="" />
+          <input name="attr_weapons_name" type="text" />
         </div>
         <div class="f3">
           <label>Type</label>
@@ -771,7 +771,7 @@
 
   <section class="settings_left f-col">
     <div>
-      <label>Whisper roles to GM:</label>
+      <label>Whisper roles to GM?</label>
       <select name="attr_whisper">
         <option value="" selected>Never</option>
         <option value="/w gm ">Always</option>
@@ -780,6 +780,13 @@
   </section>
 
   <section class="settings_right f-col">
+    <div>
+      <label>Use optional increased complication range based on difficulty (page 22)?</label>
+      <select name="attr_increasedComplication">
+        <option value="Y" selected>Yes</option>
+        <option value="N">No</option>
+      </select>
+    </div>
   </section>
 </div>
 
@@ -1120,7 +1127,7 @@
 // abilities
   stats.forEach(button => {
     on(`clicked:${button}-action`, () => {
-      getAttrs(skills, async function(values) {
+      getAttrs([...skills,'increasedComplication'], async function(values) {
         const results = await startRoll(`@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${button}}} {{num_dice=[[?{Dice|2}]]}} {{target_skill=[[?{Relevant Skill|None,0|Acedemia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[@{${button}}]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`);
 
         const target_skill = results.results.target_skill.result; //int select value 
@@ -1189,7 +1196,12 @@
         const focus_target = focus_apply == 1 ? skill_value : 1;
   
         let target_number = target_attribute + skill_value;
+
+        let optionalComplication = values.increasedComplication === 'N' ? 'N' : 'Y';
         let complication_range = 21 - difficulty;
+        if (optionalComplication === 'N') {
+          complication_range = 20;
+        }
         const complication_range_text = `${complication_range} - 20`;
   
         const dice = results.results.roll1.dice;
@@ -1236,7 +1248,7 @@
   });
 
 // attacks
-  const attackSkills = ["repeating_weapons_weapons_type", "repeating_weapons_weapons_focus", "repeating_weapons_weapons_name", "agility", "coordination", "will", "skill_fighting", "skill_academia", "foc_close_quarters", "foc_handguns", "foc_hand_to_hand", "foc_heavy_weapons", "foc_melee_weapons", "foc_rifles", "foc_exotic", "foc_throwing", "foc_occultism"];
+  const attackSkills = ["repeating_weapons_weapons_type", "repeating_weapons_weapons_focus", "repeating_weapons_weapons_name", "agility", "coordination", "will", "skill_fighting", "skill_academia", "foc_close_quarters", "foc_handguns", "foc_hand_to_hand", "foc_heavy_weapons", "foc_melee_weapons", "foc_rifles", "foc_exotic", "foc_throwing", "foc_occultism","increasedComplication"];
   on("clicked:repeating_weapons:attack-action", function () {
     getAttrs(attackSkills, async function(values) {
       let weaponType = values.repeating_weapons_weapons_type || "";
@@ -1340,7 +1352,12 @@
       const focus_target = focus_apply == 1 ? skill_value : 1;
 
       let target_number = attribute_value + skill_value;
+
+      let optionalComplication = values.increasedComplication === 'N' ? 'N' : 'Y';
       let complication_range = 21 - difficulty;
+      if (optionalComplication === 'N') {
+        complication_range = 20;
+      }
       const complication_range_text = `${complication_range} - 20`;
 
       const dice = results.results.roll1.dice;
