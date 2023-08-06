@@ -1,5 +1,5 @@
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="main_char" />
-<div>
+<div style="width: 800px;">
   <button type="action" class="tab_button" id="act_main_char" name="act_main_char">
     Main
   </button>
@@ -12,6 +12,20 @@
   <button type="action" class="tab_button settings_button" id="act_settings" name="act_settings">
     settings
   </button>
+
+  <!-- The visible and draggable button for the macro bar -->
+  <button type="roll" name="roll_genericDamage" value="@{genericDamage_action}" class="helper_button">Damage Dice</button>
+  <!-- The invisible button allowing the use of custom roll parsing -->
+  <button type="action" name="act_genericDamage-action" class="hidden"></button>
+  <!-- The invisible field for the attribute which contains the ability call -->
+  <input type="hidden" name="attr_genericDamage_action" value="">
+
+  <!-- The visible and draggable button for the macro bar -->
+  <button type="roll" name="roll_genericSkill" value="@{genericSkill_action}" class="helper_button">Skill Check</button>
+  <!-- The invisible button allowing the use of custom roll parsing -->
+  <button type="action" name="act_genericSkill-action" class="hidden"></button>
+  <!-- The invisible field for the attribute which contains the ability call -->
+  <input type="hidden" name="attr_genericSkill_action" value="">
 </div>
 
 <div class="sheet-main_char">
@@ -71,13 +85,13 @@
       </div>
       <div class="f-row nowrap">
         <div class="f1">
-          <input type="number" id="attr_stress_attributes" name="attr_stress_attributes" value="0" />
+          <input type="number" id="attr_stress_attributes" name="attr_stress_attributes" value="0" />+
         </div>
         <div class="f1">
-          <input type="number" id="attr_stress_bonus" name="attr_stress_bonus" value="0" />
+          <input type="number" id="attr_stress_bonus" name="attr_stress_bonus" value="0" />-
         </div>
         <div class="f1">
-          <input type="number" id="attr_stress_fatigue" name="attr_stress_fatigue" value="0" />
+          <input type="number" id="attr_stress_fatigue" name="attr_stress_fatigue" value="0" />=
         </div>
         <div class="f1">
           <input type="number" id="attr_stress_total" name="attr_stress_total" value="0" />
@@ -692,9 +706,33 @@
         <label>Tradition</label>
         <input name="attr_spell_tradition" type="text" style="width: 150px" />
       </div>
-      <div class="f2">
-        <label>Power</label>
-        <input type="number" name="attr_spells_power" value="0" />
+      <div class="f4">
+
+        <div class="nowrap">
+          <label>Power</label>
+        </div>
+        <div class="f-row nowrap">
+          <span class="f1 spells_sublabel">Attributes</span>
+          <span class="f1 spells_sublabel">Bonus</span>
+          <span class="f2 spells_sublabel">Total</span>
+        </div>
+        <div class="f-row nowrap">
+          <div class="f1">
+            <input type="number" id="attr_spells_power_attributes" name="attr_spells_power_attributes" value="0" />+
+          </div>
+          <div class="f1">
+            <input type="number" id="attr_spells_power_bonus" name="attr_spells_power_bonus" value="0" />=
+          </div>
+          <div class="f2">
+            <input type="number" id="attr_spells_power_total" name="attr_spells_power_total" value="0" />
+            <!-- The visible and draggable button for the macro bar -->
+            <button type="roll" name="roll_spell_power" value="@{spell_power_action}"></button>
+            <!-- The invisible button allowing the use of custom roll parsing -->
+            <button type="action" name="act_spell_power-action" class="hidden"></button>
+            <!-- The invisible field for the attribute which contains the ability call -->
+            <input type="hidden" name="attr_spell_power_action" value="">
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -704,7 +742,6 @@
       <h3>Spells</h3>
     </div>
     <hr>
-
     <fieldset class="repeating_spells">
       <div class="f-row spell_row1">
         <div class="f1 spells-chat">
@@ -717,9 +754,9 @@
           <!-- The invisible field for the attribute which contains the ability call -->
           <input type="hidden" name="attr_spell_action" value="">
         </div>
-        <div class="f8">
+        <div class="f5">
           <label>Name:</label>
-          <input name="attr_spell_name" type="text" style="width: 200px" />
+          <input name="attr_spell_name" type="text" style="width: 150px" />
         </div>
         <div class="f4">
           <label>Skill:</label>
@@ -739,15 +776,19 @@
             <option value="Vehicles">Vehicles</option>
           </select>
         </div>
-        <div class="f4">
+        <div class="f3">
           <label>Difficulty</label>
           <input type="number" name="attr_spell_difficulty" value="0" />
         </div>
-        <div class="f4">
+        <div class="f2">
           <label>Cost</label>
-          <input name="attr_spell_cost" type="text" style="width: 100px" />
+          <input type="number" name="attr_spell_cost_dice" value="0" />
         </div>
         <div class="f4">
+          <label>Cost Effects</label>
+          <input name="attr_spell_cost" type="text" style="width: 100px" />
+        </div>
+        <div class="f3">
           <label>Duration</label>
           <input name="attr_spell_duration" type="text" style="width: 100px" />
         </div>
@@ -1046,6 +1087,40 @@
       }
     });
   };
+  
+  const calcualteSpellPower = () => {
+    getAttrs(["reason_bonus_dmg","will_bonus_dmg","insight_bonus_dmg","spell_skill", "spells_power_bonus"], function(values) {
+
+      let spellSkill = values.spell_skill || '';
+      let spellBonus = int(values.spells_power_bonus);
+      let reasonBonus = int(values.reason_bonus_dmg);
+      let willBonus = int(values.will_bonus_dmg);
+      let insightBonus = int(values.insight_bonus_dmg);
+      let attributePower = 0;
+      let totalPower = 0;
+
+      switch(spellSkill) {
+        case "Traditional":
+          attributePower = 2 + insightBonus;
+          break;
+        case "Researcher":
+          attributePower = 2 + reasonBonus;
+          break;
+        case "Dabbler":
+          attributePower = 1 + willBonus;
+          break;
+        default:
+          attributePower += 0;
+          break;
+      }
+      totalPower = attributePower + spellBonus;
+
+      setAttrs({                            
+        "spells_power_attributes": attributePower,
+        "spells_power_total": totalPower
+      });
+    });
+  };
 
   const setAttributesBounds = (attributeValue,attribute) => {
     $20(`#attr_${attribute}`).removeClass('attributeOutOfBounds');
@@ -1125,6 +1200,10 @@
 
   on("change:brawn change:will change:skill_resilience change:stress_bonus change:stress_fatigue", function() {  
     calcualteStressValues();
+  });
+
+  on("change:reason_bonus_dmg change:insight_bonus_dmg change:will_bonus_dmg change:spell_skill change:spells_power_bonus", function() {  
+    calcualteSpellPower();
   });
 
   <!-- Custom Roll Parsing -->
@@ -1245,7 +1324,6 @@
             outcome: outcome,
             dice_text: dice_text,
             focus_apply: focus_apply
-            
           }
         );      
       });
@@ -1619,6 +1697,159 @@
     });
   });
 
+// generic skill check
+on(`clicked:genericSkill-action`, () => {
+  getAttrs([...skills,...stats], async function(values) {
+    const subTitle = 'Skill Check';
+    const results = await startRoll(`@{whisper}&{template:skill} {{title=@{character_name}}} {{subtitle=${subTitle}}} {{num_dice=[[?{Dice|2}]]}} {{relevant_attribute=[[?{Relevant Attribute|Agility,1|Brawn,2|Coordination,3|Insight,4|Reason,5|Will,6}]]}} {{target_skill=[[?{Relevant Skill|None,0|Academia,1|Athletics,2|Engineering,3|Fighting,4|Medicine,5|Observation,6|Persuasion,7|Resilience,8|Stealth,9|Survival,10|Tactics,11|Vehicles,12}]]}} {{focus_apply=[[?{Does A Focus Apply|No,0|Yes,1}]]}} {{difficulty=[[?{Difficulty|1}]]}} {{target_attribute=[[0]]}} {{roll1=[[?{Dice}d20cs<0cf>21]]}} {{skill_text=[[0]]}} {{attribute_text=[[0]]}} {{target_number=[[0]]}} {{successes=[[0]]}} {{complications=[[0]]}} {{complication_range=[[0]]}} {{success_range=[[0]]}} {{crit_range=[[0]]}} {{bonus_momentum=[[0]]}} {{outcome=[[0]]}} {{dice_text=[[0]]}} }`);
+
+    const target_skill = results.results.target_skill.result; //int select value 
+    let target_skill_text = ""; //string of skill
+    let skill_value = 0; //numeric skill value
+
+    switch(target_skill) {
+      case 1:
+        skill_value = int(values.skill_academia);
+        target_skill_text = "Academia";
+        break;
+      case 2:
+        skill_value = int(values.skill_athletics);
+        target_skill_text = "Athletics";
+        break;
+      case 3:
+        skill_value = int(values.skill_engineering);
+        target_skill_text = "Engineering";
+        break;
+      case 4:
+        skill_value = int(values.skill_fighting);
+        target_skill_text = "Fighting";
+        break;
+      case 5:
+        skill_value = int(values.skill_medicine);
+        target_skill_text = "Medicine";
+        break;
+      case 6:
+        skill_value = int(values.skill_observation);
+        target_skill_text = "Observation";
+        break;
+      case 7:
+        skill_value = int(values.skill_persuasion);
+        target_skill_text = "Persuasion";
+        break;
+      case 8:
+        skill_value = int(values.skill_resilience);
+        target_skill_text = "Resilience";
+        break;
+      case 9:
+        skill_value = int(values.skill_stealth);
+        target_skill_text = "Stealth";
+        break;
+      case 10:
+        skill_value = int(values.skill_survival);
+        target_skill_text = "Survival";
+        break;
+      case 11:
+        skill_value = int(values.skill_tactics);
+        target_skill_text = "Tactics";
+        break;
+      case 12:
+        skill_value = int(values.skill_vehicles);
+        target_skill_text = "Vehicles";
+        break;
+      default:
+        skill_value = 0;
+        target_skill_text = "None";
+        break;
+    }
+
+    const relevant_attribute = results.results.relevant_attribute.result;
+    let target_attribute = 0;
+    let target_attribute_text = "";
+
+    switch(relevant_attribute) {
+      case 1:
+        target_attribute = int(values.agility);
+        target_attribute_text = "Agility";
+        break;
+      break;
+      case 2:
+        target_attribute = int(values.brawn);
+        target_attribute_text = "Brawn";
+        break;
+      case 3:
+        target_attribute = int(values.coordination);
+        target_attribute_text = "Coordination";
+        break;
+      case 4:
+        target_attribute = int(values.insight);
+        target_attribute_text = "Insight";
+        break;
+      case 5:
+        target_attribute = int(values.reason);
+        target_attribute_text = "Reason";
+        break;
+      case 6:
+        target_attribute = int(values.will);
+        target_attribute_text = "Will";
+        break;
+      default:
+        target_attribute = 0;
+        target_attribute_text = "None";
+        break;
+    }
+
+    const number_dice = results.results.num_dice.result;
+    const difficulty = results.results.difficulty.result;
+    const focus_apply = results.results.focus_apply.result;
+    const focus_target = focus_apply == 1 ? skill_value : 1;
+
+    let target_number = target_attribute + skill_value;
+
+    let optionalComplication = values.increasedComplication === 'N' ? 'N' : 'Y';
+    let complication_range = 21 - difficulty;
+    if (optionalComplication === 'N') {
+      complication_range = 20;
+    }
+    const complication_range_text = `${complication_range} - 20`;
+
+    const dice = results.results.roll1.dice;
+    let successCount = dice.filter(d => d <= target_number).length;
+    successCount += dice.filter(d => d <= focus_target).length;
+    let complicationCount = dice.filter(d => d >= complication_range).length;
+
+    const success_range_text = `${focus_target + 1} - ${target_number}`;
+    const crit_range_text = `1 - ${focus_target}`;
+
+    let bonus_momentum = successCount - difficulty;
+    bonus_momentum = bonus_momentum < 0 ? 0 : bonus_momentum;
+    let outcome = successCount >= difficulty ? 1 : 0;
+
+    const dice_text = results.results.roll1.dice.toString();
+
+    finishRoll(
+      results.rollId,
+      {
+        roll1: number_dice,
+        successes: successCount,
+        complications: complicationCount,
+        target_number: target_number,
+        target_attribute: target_attribute,
+        target_skill: skill_value,
+        skill_text: target_skill_text,
+        attribute_text: target_attribute_text,
+        difficulty: difficulty,
+        complication_range: complication_range_text,
+        success_range: success_range_text,
+        crit_range: crit_range_text,
+        bonus_momentum: bonus_momentum,
+        outcome: outcome,
+        dice_text: dice_text,
+        focus_apply: focus_apply
+      }
+    );      
+  });
+});
+
 // weapons damage
 const damageSkills = ["repeating_weapons_weapons_type", "repeating_weapons_stress_dice", "repeating_weapons_weapons_name", "repeating_weapons_weapons_damage", "repeating_weapons_weapons_salvo", "brawn_bonus_dmg", "insight_bonus_dmg", "will_bonus_dmg"];
 on("clicked:repeating_weapons:damage-action", function () {
@@ -1691,7 +1922,107 @@ on("clicked:repeating_weapons:damage-action", function () {
   });
 });
 
-  <!-- Some stuff to run everytime the sheet opens -->
+// spell damage
+const spellDamageSkills = ["spells_power_total"];
+on("clicked:spell_power-action", function () {
+  getAttrs(spellDamageSkills, async function(values) {
+
+    let numDice = int(values.spells_power_total);
+
+    const description = "Spell Damage";
+    const stressEffects = "";
+    const salvoEffects = "";
+    const rollString = `@{whisper}&{template:damage} {{title=@{character_name}}} {{subtitle=Damage Roll}} {{description=${description}}} {{num_dice=[[?{Dice|${numDice}}]]}} {{roll1=[[?{Dice}d6cs<0cf>21]]}} {{total_stress=[[0]]}} {{total_effects=[[0]]}} {{stress_effects=${stressEffects}}} {{salvo_effects=${salvoEffects}}} }`;
+    const results = await startRoll(rollString);
+
+    const number_dice = results.results.num_dice.result;
+    const dice = results.results.roll1.dice;
+    let nmbrStress = 0;
+    let nmbrEffects = 0;
+    
+    dice.forEach(die => {
+      switch(die) {
+        case 1:
+          nmbrStress += 1;
+          break;
+        case 2:
+          nmbrStress += 2;
+          break;
+        case 3:
+          break;
+        case 4:
+          break;
+        case 5:
+          nmbrStress += 1;
+          nmbrEffects += 1;
+          break;
+        case 6:
+          nmbrStress += 1;
+          nmbrEffects += 1;
+          break;
+      }
+    });
+
+    finishRoll(
+      results.rollId,
+      {
+        roll1: number_dice,
+        total_stress: nmbrStress,
+        total_effects: nmbrEffects
+      }
+    );      
+  });
+});
+
+// generic damage
+on("clicked:genericDamage-action", async function () {
+  let numDice = 1;
+
+  const description = "Generic Damage";
+  const stressEffects = "";
+  const salvoEffects = "";
+  const rollString = `@{whisper}&{template:damage} {{title=@{character_name}}} {{subtitle=Damage Roll}} {{description=${description}}} {{num_dice=[[?{Dice|${numDice}}]]}} {{roll1=[[?{Dice}d6cs<0cf>21]]}} {{total_stress=[[0]]}} {{total_effects=[[0]]}} {{stress_effects=${stressEffects}}} {{salvo_effects=${salvoEffects}}} }`;
+  const results = await startRoll(rollString);
+
+  const number_dice = results.results.num_dice.result;
+  const dice = results.results.roll1.dice;
+  let nmbrStress = 0;
+  let nmbrEffects = 0;
+  
+  dice.forEach(die => {
+    switch(die) {
+      case 1:
+        nmbrStress += 1;
+        break;
+      case 2:
+        nmbrStress += 2;
+        break;
+      case 3:
+        break;
+      case 4:
+        break;
+      case 5:
+        nmbrStress += 1;
+        nmbrEffects += 1;
+        break;
+      case 6:
+        nmbrStress += 1;
+        nmbrEffects += 1;
+        break;
+    }
+  });
+
+  finishRoll(
+    results.rollId,
+    {
+      roll1: number_dice,
+      total_stress: nmbrStress,
+      total_effects: nmbrEffects
+    }
+  );      
+});
+
+<!-- Some stuff to run everytime the sheet opens -->
 
   on('sheet:opened',function(){
   	$20("#act_main_char").addClass('tab_button_selected');
@@ -1700,6 +2031,7 @@ on("clicked:repeating_weapons:damage-action", function () {
   	});
     hideShowSpellTradition();
     calcualteStressValues();
+    calcualteSpellPower();
     checkAttributesBounds();
     checkSkillsBounds();
   });
@@ -1743,7 +2075,7 @@ const getSections = function(section_details,callback){
 
 
 const repeatingSections = [{section:'repeating_weapons',fields:['attack_action', 'damage_action']},{section:'repeating_spells',fields:['spell_action']}];//Replace these with your sheet's repeating sections
-const actionRefs = ['character_name', 'agility_action', 'brawn_action', 'coordination_action', 'insight_action', 'reason_action', 'will_action'];//Replace these with the non repeating attributes for your sheet.
+const actionRefs = ['character_name', 'agility_action', 'brawn_action', 'coordination_action', 'insight_action', 'reason_action', 'will_action', 'spell_power_action','genericDamage_action', 'genericSkill_action'];//Replace these with the non repeating attributes for your sheet.
 const actionCallUpdate = function(){
   getAllAttrs(['character_name',...actionRefs],repeatingSections,(attributes,sections)=>{
     let actions = Object.keys(attributes).filter((key)=>key!=='character_name');
