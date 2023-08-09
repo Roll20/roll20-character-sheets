@@ -1925,7 +1925,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
 
-  if (eBourreau) {
+  if (eBourreau !== '0') {
     isBourreau = true;
     eBourreauValue = eBourreauV;
     exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauV} ${i18n_inclus}}}`);
@@ -1944,7 +1944,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{chocCondition=${i18n_chocCondition}}}`);
   }
 
-  if (eConviction !== 0) {
+  if (eConviction !== '0') {
     autresEffets.push(i18n_conviction);
   }
 
@@ -1962,7 +1962,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{destructeurCondition=${i18n_destructeurCondition}}}`);
   }
 
-  if (eDevastation) {
+  if (eDevastation !== '0') {
     isDevastation = true;
     eDevastationValue = eDevastationV;
     exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationV} ${i18n_inclus}}}`);
@@ -1982,7 +1982,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
-  if (eExcellence) {
+  if (eExcellence !== '0') {
     isConditionnelD = true;
     isConditionnelV = true;
 
@@ -2046,7 +2046,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{vPrecision=${vPrecision}}}`);
   }
 
-  if (eRegularite) {
+  if (eRegularite !== '0') {
     isRegularite = true;
     exec.push('{{vRegularite=[[0]]}}');
   }
