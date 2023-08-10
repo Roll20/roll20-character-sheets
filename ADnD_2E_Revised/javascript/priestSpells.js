@@ -123,17 +123,18 @@ pri1['Detect Evil'] = {
     'sphere-spells-and-magic': 'Divination',
     'range': '0',
     'duration': '1 turn + [[5*[[@{level-priest}]] ]] rounds',
-    'aoe': '10 feet x 120 yards',
+    'aoe': '10 feet path ✕ 120 yards',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': 'The use of the priest’s holy symbol as its material component, with the priest holding it before him.',
     'reference': 'p. 253',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume One p. 198',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell discovers emanations of evil, or of good in the case of the reverse spell, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil *if intent upon appropriate actions*. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not.\n&emsp;The degree of evil (dim, faint, moderate, strong, or overwhelming) and possibly its general nature (expectant, malignant, gloating, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level ([[10*[[@{level-priest}]] ]]%) of detecting its general bent (lawful, neutral, or chaotic). The duration of a *detect evil* (or *detect good*) spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration. Current duration [[10+(5*[[@{level-priest}]])]] rounds. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura— for at least one round to receive a reading.'
+    'effect': 'This spell discovers emanations of evil, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil *if intent upon appropriate actions*. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not.\n&emsp;The degree of evil (*faint, moderate, strong, overwhelming*) and possibly its general nature (*expectant, malignant, gloating*, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level (currently [[{10*[[@{level-priest}]],100}kl1]]% chance) of detecting its general bent (*lawful, neutral, chaotic*). The duration of a *detect evil* spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration, etc. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura—for at least one round to receive a reading.\n&emsp;The reverse spell, *detect good*, operates the same way, but good emanations are discovered.'
 };
 
 pri1['Detect Magic'] = {

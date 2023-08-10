@@ -926,7 +926,7 @@ wiz2['Bind'] = {
     'school': 'Enchantment',
     'school-spells-and-magic': 'Enchantment, Artifice',
     'range': '30 yards',
-    'duration': '[[@{level-wizard}]] round(s)',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[50+(5*[[@{level-wizard}]])]] feet',
     'components': 'V, S, M',
     'cast-time': '2',
@@ -975,6 +975,7 @@ wiz2['Blur'] = {
     'reference': 'p. 181',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 102',
+    'errata': 'Wizard’s Spell Compendium Volume Four p. 1152',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1015,10 +1016,12 @@ wiz2['Darkness, 15\' Radius'] = {
     'materials': 'A bit of bat fur and either a drop of pitch or a piece of coal.',
     'reference': 'p. 181',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 210',
+    'errata': 'Dungeon Master Guide p. 160',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes total, impenetrable darkness in the area of effect. Infravision is useless. Neither normal nor magical light works unless a *light* or *continual light* spell is used. In the former event, the *darkness* spell is negated by the *light* spell, and vice versa.'
+    'effect': 'This spell causes total, impenetrable darkness in the area of effect. Infravision is useless. Neither normal nor magical light works unless a *light* or *continual light* spell is used. In the former event, the *darkness* spell is negated by the *light* spell, and vice versa.\n&emsp;**Notes:** Inside *darkness* the character is effectively blind causing -4 penalty to attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
 };
 
 wiz2['Deafness'] = {
@@ -1033,6 +1036,7 @@ wiz2['Deafness'] = {
     'materials': 'Beeswax.',
     'reference': 'p. 181',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 214',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1042,7 +1046,7 @@ wiz2['Deafness'] = {
 wiz2['Deeppockets'] = {
     'level': '2',
     'school': 'Alteration, Enchantment',
-    'school-spells-and-magic': 'Alteration, Enchantment/Charm, Dimension',
+    'school-spells-and-magic': 'Alteration, Enchantment, Dimension',
     'range': 'Touch',
     'duration': '[[12+[[@{level-wizard}]] ]] hours',
     'aoe': '1 garment',
@@ -1052,10 +1056,11 @@ wiz2['Deeppockets'] = {
     'materials': 'In addition to the garment, which is reusable, the material components of this spell are a tiny golden needle and a strip of fine cloth given a half-twist and fastened at the ends.',
     'reference': 'p. 182',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 224',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to specially prepare a garment so as to hold far more than it normally could. A finely sewn gown or robe of high-quality material (at least 50 gp value) is fashioned so as to contain numerous hand-sized pockets. One dozen is the minimum number. The *deeppockets* spell then enables these pockets to hold a total of 100 pounds (5 cubic feet in volume) as if it were only 10 pounds of weight. Furthermore, there are no discernible bulges where the special pockets are. At the time of casting, the caster can instead choose to have 10 pockets each holding 10 pounds (1⁄2 cubic foot volume each). If the robe or like garment is sewn with 100 or more pockets (200 gp minimum cost), 100 pockets can be created to contain one pound of weight and 1⁄6 cubic foot volume each. Each special pocket is actually an extradimensional holding space.\n&emsp;If the spell duration expires while there is material within the enchanted pockets, or if a successful *dispel magic* is cast upon the enchanted garment, all the material suddenly appears around the wearer and immediately falls to the ground. The caster can also cause all the pockets to empty with a single command.'
+    'effect': 'This spell enables the wizard to specially prepare a garment so as to hold far more than it normally could. A finely sewn gown or robe of high-quality material (at least 50 gp value) is fashioned so as to contain numerous hand-sized pockets. One dozen is the minimum number. The *deeppockets* spell then enables these pockets to hold a total of 100 pounds (5 cubic feet in volume) as if it were only 10 pounds of weight. Furthermore, there are no discernible bulges where the special pockets are. At the time of casting, the caster can instead choose to have 10 pockets each holding 10 pounds (½ cubic foot volume each). If the robe or like garment is sewn with 100 or more pockets (200 gp minimum cost), 100 pockets can be created to contain one pound of weight and ⅙ cubic foot volume each. Each special pocket is actually an extradimensional holding space.\n&emsp;If the spell duration expires while there is material within the enchanted pockets, or if a successful *dispel magic* is cast upon the enchanted garment, all the material suddenly appears around the wearer and immediately falls to the ground. The caster can also cause all the pockets to empty with a single command.'
 };
 
 wiz2['Detect Evil'] = {
@@ -1063,17 +1068,18 @@ wiz2['Detect Evil'] = {
     'school': 'Divination (Reversible)',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
-    'aoe': '10 x 180 feet',
+    'aoe': '10 x 180 feet path',
     'components': 'V, S',
     'cast-time': '2',
     'saving-throw': 'None',
     'materials': '',
     'reference': 'p. 182',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 235',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell discovers emanations of evil (or of good in the case of the reverse spell) from any creature, object, or area. Character alignment is *not* revealed under most circumstances: Characters who are strongly aligned, do not stray from their faith, and who are at least 9th level might radiate good or evil if they are intent upon appropriate actions. Powerful monsters, such as ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enables them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not. The degree of evil (faint, moderate, strong, overwhelming) can be noted. Note that priests have a more powerful version of this spell. The spell has a path of detection 10 feet wide and 60 yards long in the direction in which the wizard is facing. The wizard must concentrate— stop, have quiet, and intently seek to detect the aura—for at least one round to receive a reading.'
+    'effect': 'This spell discovers emanations of evil (or of good in the case of the reverse spell) from any creature, object, or area. Character alignment is *not* revealed under most circumstances: Characters who are strongly aligned, do not stray from their faith, and who are at least 9th level *might* radiate good or evil if they are intent upon appropriate actions. Powerful monsters, such as ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enables them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not. The degree of evil (faint, moderate, strong, overwhelming) can be noted. Note that priests have a more powerful version of this spell.\n&emsp;The spell has a path of detection 10 feet wide and 60 yards long in the direction in which the wizard is facing. The wizard must concentrate—stop, have quiet, and intently seek to detect the aura—for at least one round to receive a reading.\n&emsp;The reversed form of this spell is *detect good*.'
 };
 
 wiz2['Detect Invisibility'] = {
@@ -1081,13 +1087,14 @@ wiz2['Detect Invisibility'] = {
     'school': 'Divination',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
-    'aoe': '[[10*[[@{level-wizard}]] ]] yards',
+    'aoe': '10 feet ✕ [[10*[[@{level-wizard}]] ]] feet path',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'None',
     'materials': 'A pinch of talc and a small sprinkling of powdered silver.',
     'reference': 'p. 182',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 235',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1107,26 +1114,29 @@ wiz2['ESP'] = {
     'materials': 'A copper piece.',
     'reference': 'p. 182',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 324',
+    'errata': 'Sage Advice #228 p. 84\nDungeon Master Option: High-Level Campaigns p. 70-71',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When an *ESP* spell is used, the caster is able to detect the surface thoughts of any creatures in range—except for those of undead and creatures without minds (as we know them). The ESP is stopped by 2 feet of rock, 2 inches of any metal other than lead, or a thin sheet of lead foil.\n&emsp;The wizard employing the spell is able to probe the surface thoughts of one creature per round, getting simple instinctual thoughts from lower order creatures. Probes can continue on the same creature from round to round or can move on to other creatures. The caster can use the spell to help determine if a creature lurks behind a door, for example, but the ESP does not always reveal what sort of creature it is. If used as part of a program of interrogation, an intelligent and wary subject receives an initial saving throw. If successful, the creature successfully resists and the spell reveals no additional information. If the saving throw is failed, the caster may learn additional information, according to the DM’s ruling. The creature’s Wisdom adjustment applies, as may additional bonuses up to +4, based on the sensitivity of the information sought.'
+    'effect': 'When an *ESP* spell is used, the caster is able to detect the surface thoughts—that is, whatever the subject happens to be thinking about at the time—of any creatures in range—except for those of undead and creatures without minds (as we know them). The ESP is stopped by 2 feet of rock, 2 inches of any metal other than lead, or a thin sheet of lead foil.\n&emsp;The wizard employing the spell is able to probe the surface thoughts of one creature per round, getting simple instinctual thoughts from lower order creatures. Probes can continue on the same creature from round to round or can move on to other creatures. The caster can use the spell to help determine if a creature lurks behind a door, for example. The caster can sense which direction the thoughts are coming from (left, right, ahead, behind, up, down, or some combination of these). If the caster spends one round studying an area containing hidden creatures, he can tell about how many there are, but he still doesn’t know exactly where they are. The ESP does not always reveal what sort of creature it is.\n&emsp;If used as part of a program of interrogation, an intelligent and wary subject receives an initial saving throw. If successful, the creature successfully resists and the spell reveals no additional information. If the saving throw is failed, the caster may learn additional information, according to the DM’s ruling. The creature’s Wisdom adjustment always applies, as may additional bonuses up to +4, based on the sensitivity of the information sought, at the DM’s option. Guidelines for the bonus is given in Dungeon Master Option: High-Level Campaign p. 71.'
 };
 
 wiz2['Flaming Sphere'] = {
     'level': '2',
     'school': 'Evocation',
-    'school-spells-and-magic': 'Invocation/Evocation, Elemental Fire',
+    'school-spells-and-magic': 'Evocation, Elemental Fire',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
-    'aoe': '3-foot radius',
+    'aoe': 'Sphere, 3-foot radius',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'Negate',
     'materials': 'A bit of tallow, a pinch of sulphur, and a dusting of powdered iron.',
     'reference': 'p. 182',
     'book': 'PHB',
-    'damage': '*Direct contact:* 2d4 Fire.\n*5 feet proximity:* 1d4',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 376',
+    'damage': '*Direct contact:* [[2d4]] Fire.\n*5 feet proximity:* [[1d4]]',
     'damage-type': 'Heat',
     'healing': '',
     'effect': 'A *flaming sphere* spell creates a burning globe of fire within 10 yards of the caster. This sphere rolls in whichever direction the wizard points, at a rate of 30 feet per round. It rolls over barriers less than 4 feet tall, such as furniture, low walls, etc. Flammable substances are set afire by contact with the sphere. Creatures in contact with the globe must successfully save vs. spell or suffer 2d4 points of fire damage. Those within 5 feet of the sphere’s surface must also save or suffer 1d4 points of heat damage. A successful saving throw means no damage is suffered. The DM may adjust the saving throws if there is little or no room to dodge the sphere.\n&emsp;The sphere moves as long as the spellcaster actively directs it; otherwise, it merely stays at rest and burns. It can be extinguished by the same means as any normal fire of its size. The surface of the sphere has a spongy, yielding consistency and so does not cause damage except by its flame. It cannot push unwilling creatures aside or batter down large obstacles.'
@@ -1145,16 +1155,17 @@ wiz2['Fog Cloud'] = {
     'materials': '',
     'reference': 'p. 183',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 385',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *fog cloud* spell can be cast in one of two ways, at the caster’s option: as a large, stationary bank of normal fog, or as a harmless fog that resembles the 5th-level wizard spell *cloudkill*.\n&emsp;As a fog bank, this spell creates a fog of any size and shape up to a maximum 20-foot cube per caster level. The fog obscures all sight, normal and infravision, beyond 2 feet.\n&emsp;As a cloudkill-like fog, this is a billowing mass of ghastly, yellowishgreen vapors, measuring 40 feet × 20 feet × 20 feet. This moves away from the caster at 10 feet per round. The vapors are heavier than air and sink to the lowest level, even pouring down sinkholes and den openings. Very thick vegetation breaks up the fog after it has moved 20 feet into the vegetation.\n&emsp;The only effect of either version is to obscure vision. A strong breeze will disperse either effect in one round, while a moderate breeze will reduce the spell duration by 50%. The spell cannot be cast under water.'
+    'effect': 'The *fog cloud* spell can be cast in one of two ways, at the caster’s option: as a large, stationary bank of normal fog, or as a harmless fog that resembles the 5th-level wizard spell *cloudkill*.\n&emsp;As a fog bank, this spell creates a fog of any size and shape up to a maximum 20-foot cube per caster level. Currently [[@{level-wizard}]] 20-foot cubes. The fog obscures all sight, normal and infravision, beyond 2 feet.\n&emsp;As a cloudkill-like fog, this is a billowing mass of ghastly, yellowish-green vapors, measuring 40 feet × 20 feet × 20 feet. This moves away from the caster at 10 feet per round. The vapors are heavier than air and sink to the lowest level, even pouring down sinkholes and den openings. Very thick vegetation breaks up the fog after it has moved 20 feet into the vegetation.\n&emsp;The only effect of either version is to obscure vision. A strong breeze will disperse either effect in one round, while a moderate breeze will reduce the spell duration by 50%. The spell cannot be cast under water.'
 };
 
 wiz2['Fools\' Gold'] = {
     'level': '2',
     'school': 'Alteration, Illusion',
-    'school-spells-and-magic': 'Alteration, Illusion/Phantasm, Elemental Earth, Alchemy',
+    'school-spells-and-magic': 'Alteration, Illusion, Elemental Earth, Alchemy',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] hours',
     'aoe': '[[10*[[@{level-wizard}]] ]] cubic inches',
@@ -1164,10 +1175,11 @@ wiz2['Fools\' Gold'] = {
     'materials': 'Copper coins or brass items.',
     'reference': 'p. 183',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 386',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Copper coins can temporarily be changed to gold pieces, or brass items turned to solid gold, for the spell duration by means of this magic. The area of effect is 10 cubic inches per level—i.e., a 1-inch × 1-inch × 10-inch volume or equivalent, equal to about 150 gold coins. (Current max is about [[150*[[@{level-wizard}]] ]]). Any creature viewing the “gold” is entitled to a saving throw vs. spell, which can be modified by the creature’s Wisdom; for every level of the wizard, the creature must subtract 1 from his dice roll. Thus, it is unlikely that fools’ gold will be detected if created by a high-level caster. If the “gold” is struck hard by an object of cold-wrought iron, there is a slight chance it will revert to its natural state, depending on the material component used to create the “gold.” If a 25-gp citrine is powdered and sprinkled over the metal as this spell is cast, the chance that cold iron will return it to its true nature is 30%; if a 50-gp amber stone is powdered and used, the chance drops to 25%; if a 250-gp topaz is powdered and used, the chance drops to 10%; and if a 500-gp oriental (corundum) topaz is powdered and used, there is only a 1% chance that the cold iron will reveal that it is fools’ gold.'
+    'effect': 'Copper coins can temporarily be changed to gold pieces, or brass items turned to solid gold, for the spell duration by means of this magic. The area of effect is 10 cubic inches per level—i.e., a 1-inch × 1-inch × 10-inch volume or equivalent, equal to about 150 gold coins. Currently about [[150*[[@{level-wizard}]] ]] coins. Any creature viewing the “gold” is entitled to a saving throw vs. spell, which can be modified by the creature’s Wisdom; for every level of the wizard, the creature must subtract 1 from his dice roll. Currently [[-[[@{level-wizard}]] ]] to saving throw. Thus, it is unlikely that *fools’ gold* will be detected if created by a high-level caster. If the “gold” is struck hard by an object of cold-wrought iron, there is a slight chance it will revert to its natural state, depending on the material component used to create the “gold.” If a 25-gp citrine is powdered and sprinkled over the metal as this spell is cast, the chance that cold iron will return it to its true nature is 30%; if a 50-gp amber stone is powdered and used, the chance drops to 25%; if a 250-gp topaz is powdered and used, the chance drops to 10%; and if a 500-gp oriental (corundum) topaz is powdered and used, there is only a 1% chance that the cold iron will reveal that it is fools’ gold.'
 };
 
 wiz2['Forget'] = {
@@ -1183,10 +1195,12 @@ wiz2['Forget'] = {
     'materials': '',
     'reference': 'p. 183',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 389',
+    'errata': 'Sage Advice #206 p. 89',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the spellcaster causes creatures within the area of effect to forget the events of the previous minute (the one minute of time previous to the utterance of the spell). For every three levels of experience of the spellcaster, another minute of past time is forgotten ([[1+floor([[@{level-wizard}]]/3)]] minutes). This does not negate *charm*, *suggestion*, *geas*, *quest*, or similar spells, but it is possible that the being who placed such magic upon the recipient could be forgotten. From one to four creatures can be affected, at the discretion of the caster. If only one is to be affected, the recipient saves vs. spell with a –2 penalty; if two, they save with –1 penalties; if three or four are to be affected, they save normally. All saving throws are adjusted by Wisdom. A priest’s *heal* or *restoration* spell, if specially cast for this purpose, will restore the lost memories, as will a *limited wish* or *wish*, but no other means will do so.'
+    'effect': 'By means of this spell, the spellcaster causes creatures within the area of effect to forget the events of the previous minute (the one minute of time previous to the utterance of the spell). For every three levels of experience of the spellcaster, another minute of past time is forgotten. Currently [[1+floor([[@{level-wizard}]]/3)]] minutes are forgotten. This does not negate *charm*, *suggestion*, *geas*, *quest*, or similar spells, but it is possible that the being who placed such magic upon the recipient could be forgotten. From one to four creatures can be affected, at the discretion of the caster. If only one is to be affected, the recipient saves vs. spell with a –2 penalty; if two, they save with –1 penalties; if three or four are to be affected, they save normally. All saving throws are adjusted by Wisdom. A priest’s *heal* or *restoration* spell, if specially cast for this purpose, will restore the lost memories, as will a *limited wish* or *wish*, but no other means will do so.'
 };
 
 wiz2['Glitterdust'] = {
@@ -1195,17 +1209,19 @@ wiz2['Glitterdust'] = {
     'school-spells-and-magic': 'Conjuration/Summoning, Alchemy',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
-    'aoe': '20 foot cube',
+    'aoe': '20-foot cube',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'Special',
     'materials': 'Ground mica.',
     'reference': 'p. 183',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 408',
+    'errata': 'Dungeon Master Guide p. 160',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a cloud of glittering golden particles within the area of effect. Those in the area must roll a successful saving throw vs. spell or be blinded (–4 penalties to attack rolls, saving throws, and Armor Class) for [[1d4+1]] rounds. In addition, all within the area are covered by the dust, which cannot be removed and continues to sparkle until it fades. Note that this reveals invisible creatures. The dust fades in 1d4 rounds plus one round per caster level. Thus, glitterdust cast by a 3rd-level wizard lasts for four to seven rounds. Dust fades in [[1d4+[[@{level-wizard}]] ]] rounds.'
+    'effect': 'This spell creates a cloud of glittering golden particles within the area of effect. Those in the area must roll a successful saving throw vs. spell or be blinded (–4 penalties to attack rolls, saving throws, and Armor Class (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.) for [[1d4+1]] rounds. In addition, all within the area are covered by the dust, which cannot be removed and continues to sparkle until it fades. Note that this reveals invisible creatures. The dust fades in 1d4 rounds plus one round per caster level.  Currently dust fades in [[1d4+[[@{level-wizard}]] ]] rounds. Thus, *glitterdust* cast by a 3rd-level wizard lasts for four to seven rounds.'
 };
 
 wiz2['Hypnotic Pattern'] = {
