@@ -192,11 +192,11 @@ wiz1['Color Spray'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 154',
-    'errata': 'Sage Advice #213 p. 85\nDungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Dungeon Master Guide p. 160\nSage Advice #213 p. 85\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
+    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.\n&emsp;**Notes:** Blindness causes -4 penalty to attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
 };
 
 wiz1['Comprehend Languages'] = {
@@ -514,11 +514,11 @@ wiz1['Light'] = {
     'reference': 'p. 176',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 515',
-    'errata': 'Dungeon Master Option: High-Level Campaigns p. 72',
+    'errata': 'Dungeon Master Guide p. 160\nDungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4 and worsening its Armor Class by 4. The caster can end the spell at any time by uttering a single word. Note that, unlike the 1st-level priest spell, this spell is not reversible.'
+    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4 and worsening its Armor Class by 4 (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check. The caster can end the spell at any time by uttering a single word. Note that, unlike the 1st-level priest spell, this spell is not reversible.'
 };
 
 wiz1['Magic Missile'] = {
@@ -673,16 +673,18 @@ wiz1['Read Magic'] = {
     'materials': 'A clear crystal or mineral prism, which is not expended, to cast the spell.',
     'reference': 'p. 178',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 735',
+    'errata': 'Sage Advice #175 p. 77\nSage Advice #216 p. 103\nSage Advice #263 p. 26',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of a *read magic* spell, the wizard is able to read magical inscriptions on objects—books, scrolls, weapons, and the like—that would otherwise be totally unintelligible. (The personal books of the wizard, and works already magically read, are intelligible.) This deciphering does not normally invoke the magic contained in the writing, although it may do so in the case of a cursed scroll. Furthermore, once the spell is cast and the wizard has read the magical inscription, he is thereafter able to read that particular writing without recourse to the use of the *read magic* spell. The duration of the spell is two rounds per level of experience of the spellcaster; the wizard can read one page or its equivalent per round.'
+    'effect': 'By means of a *read magic* spell, the wizard is able to read magical inscriptions on objects—books, scrolls, weapons, and the like—that would otherwise be totally unintelligible. (The personal books of the wizard, and works already magically read, are intelligible.)\n&emsp;This deciphering does not normally invoke the magic contained in the writing, although it may do so in the case of a cursed scroll. Furthermore, once the spell is cast and the wizard has read the magical inscription, he is thereafter able to read that particular writing without recourse to the use of the *read magic* spell. The duration of the spell is two rounds per level of experience of the spellcaster; the wizard can read one page or its equivalent per round.\n&emsp;**Notes:** All those who cast wizard spells must know this spell, save those with specific alternative disciplines (bards, illusionists in some settings, *hishna*, *pluma*, paramanders, the Old Empire in the FORGOTTEN REALM setting).'
 };
 
 wiz1['Shield'] = {
     'level': '1',
     'school': 'Evocation',
-    'school-spells-and-magic': 'Invocation/Evocation, Force, Geometry',
+    'school-spells-and-magic': 'Evocation, Force, Geometry',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Special',
@@ -692,10 +694,12 @@ wiz1['Shield'] = {
     'materials': '',
     'reference': 'p. 178',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 808',
+    'errata': 'Sage Advice #157 p. 25\nSage Advice #193 p. 85\nSage Advice #261 p. 8',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, an invisible barrier comes into being in front of the wizard. This shield totally negates magic missile attacks. It provides the equivalent protection of AC 2 against hand-hurled missiles (axes, darts, javelins, spears, etc.), AC 3 against small devicepropelled missiles (arrows, bolts, bullets, manticore spikes, sling stones, etc.), and AC 4 against all other forms of attack. The shield also adds a +1 bonus to the wizard’s saving throws against attacks that are basically frontal. Note that these benefits apply only if the attacks originate from in front of the wizard, where the shield can move to interpose itself.'
+    'effect': 'When this spell is cast, an invisible barrier comes into being in front of the wizard. This shield totally negates *magic missile* attacks. It provides the equivalent protection of AC 2 against hand-hurled missiles (axes, darts, javelins, spears, etc.), AC 3 against small device-propelled missiles (arrows, bolts, bullets, manticore spikes, sling stones, etc.), and AC 4 against all other forms of attack. The shield also adds a +1 bonus to the wizard’s saving throws against attacks that are basically frontal. Note that these benefits apply only if the attacks originate from in front of the wizard, where the shield can move to interpose itself.\n&emsp;It is up to the DM if Dexterity defense bonuses are cumulative with the *shield* spell.\n&emsp;Magical items granting a defensive bonus such as *ring of protection* or *cloak of protection* are cumulative with the *shield* spell. Items that provide a basic armor class, such as armor, shields, and *bracers of defense* are not cumulative with the *shield* spell.'
 };
 
 wiz1['Shocking Grasp'] = {
@@ -710,10 +714,12 @@ wiz1['Shocking Grasp'] = {
     'materials': '',
     'reference': 'p. 178',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 811',
+    'errata': 'Sage Advice #232 p. 93\nSage Advice #238 p. 83',
     'damage': '[[1d8+[[@{level-wizard}]] ]]',
     'damage-type': 'Electrical',
     'healing': '',
-    'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[@{level-wizard}]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.'
+    'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[@{level-wizard}]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.\n&emsp;A *shocking grasp* spell won’t work as a fantasy defibrillator to bring back a character from negative hit points.',
 };
 
 wiz1['Sleep'] = {
@@ -729,10 +735,11 @@ wiz1['Sleep'] = {
     'materials': 'A pinch of fine sand, rose petals, or a live cricket.',
     'reference': 'p. 178',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 825',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When a wizard casts a *sleep* spell, he causes a comatose slumber to come upon one or more creatures (other than undead and certain other creatures specifically excluded from the spell’s effects). All creatures to be affected by the *sleep* spell must be within 30 feet of each other. The number of creatures that can be affected is a function of Hit Dice or levels. The spell affects [[2d4]] Hit Dice of monsters. Monsters with 4+3 Hit Dice (4 Hit Dice plus 3 hit points) or more are unaffected. The center of the area of effect is determined by the spellcaster. The creatures with the least Hit Dice are affected first, and partial effects are ignored.\n&emsp;For example, a wizard casts *sleep* at three kobolds, two gnolls, and an ogre. The roll (2d4) result is 4. All the kobolds and one gnoll are affected (1⁄2 + 1⁄2 + 1⁄2 + 2 = 3 1⁄2 Hit Dice). Note that the remainder is not enough to affect the last gnoll or the ogre.\n&emsp;Slapping or wounding awakens affected creatures but normal noise does not. Awakening requires one entire round. Magically sleeping opponents can be attacked with substantial bonuses (see “Modifiers to the Attack Roll” in Chapter 9: Combat).'
+    'effect': 'When a wizard casts a *sleep* spell, he causes a comatose slumber to come upon one or more creatures (other than undead and certain other creatures specifically excluded from the spell’s effects). All creatures to be affected by the *sleep* spell must be within 30 feet of each other. The number of creatures that can be affected is a function of Hit Dice or levels. The spell affects [[2d4]] Hit Dice of monsters. Monsters with 4+3 Hit Dice (4 Hit Dice plus 3 hit points) or more are unaffected. The center of the area of effect is determined by the spellcaster. The creatures with the least Hit Dice are affected first, and partial effects are ignored.\n&emsp;For example, a wizard casts *sleep* at three kobolds, two gnolls, and an ogre. The roll (2d4) result is 4. All the kobolds and one gnoll are affected (½ + ½ + ½ + 2 = 3 ½ Hit Dice). Note that the remainder is not enough to affect the last gnoll or the ogre.\n&emsp;Slapping or wounding awakens affected creatures but normal noise does not. Awakening requires one entire round. Magically sleeping opponents can be attacked with substantial bonuses (see “Modifiers to the Attack Roll” in Chapter 9: Combat).'
 };
 
 wiz1['Spider Climb'] = {
@@ -747,17 +754,18 @@ wiz1['Spider Climb'] = {
     'materials': 'A drop of bitumen and a live spider, both of which must be eaten by the spell recipient.',
     'reference': 'p. 179',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 855',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *spider climb* spell enables the recipient to climb and travel upon vertical surfaces as well as a giant spider, or even hang upside down from ceilings. Unwilling victims must be touched and are then allowed a saving throw vs. spell to negate the effect. The affected creature must have bare hands and feet in order to climb in this manner, at a movement rate of 6 (3 if at all encumbered). During the course of the spell, the recipient cannot handle objects that weigh less than a dagger (one pound), for such objects stick to his hands and feet. Thus, a wizard will find it virtually impossible to cast spells if under a *spider climb* spell. Sufficient force can pull the recipient free; the DM can assign a saving throw based on circumstances, the strength of the force, and so on. For example, a creature with a Strength of 12 might pull the subject free if the subject fails a saving throw vs. paralyzation (a moderately difficult saving throw). The caster can end the spell effect with a word.'
+    'effect': 'A *spider climb* spell enables the recipient to climb and travel upon vertical surfaces as well as a giant spider, or even hang upside down from ceilings. Unwilling victims must be touched and are then allowed a saving throw vs. spell to negate the effect. The affected creature must have bare hands and feet in order to climb in this manner, at a movement rate of 6 (3 if at all encumbered).\n&emsp;During the course of the spell, the recipient cannot handle objects that weigh less than a dagger (one pound), for such objects stick to his hands and feet. Thus, a wizard will find it virtually impossible to cast spells if under a *spider climb* spell. Sufficient force can pull the recipient free; the DM can assign a saving throw based on circumstances, the strength of the force, and so on. For example, a creature with a Strength of 12 might pull the subject free if the subject fails a saving throw vs. paralyzation (a moderately difficult saving throw). The caster can end the spell effect with a word.'
 };
 
 wiz1['Spook'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
     'school-spells-and-magic': 'Illusion/Phantasm, Mentalism, Shadow',
-    'range': '30 feet',
+    'range': '10 yards',
     'duration': 'Special',
     'aoe': '1 creature',
     'components': 'V, S',
@@ -766,10 +774,11 @@ wiz1['Spook'] = {
     'materials': '',
     'reference': 'p. 179',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 861',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *spook* spell enables the wizard to play upon natural fears to cause the target creature to perceive the spellcaster as someone or something inimical. Without actually knowing what this is, the wizard merely advances threateningly upon the creature. If the creature does not make a successful saving throw vs. spell, it turns and flees at maximum speed as far from the wizard as possible, though items carried are not dropped. The creature has a saving throw penalty of –1 for every two experience levels of the caster, to a maximum of –6 at 12th level. Current penalty [[{{[[floor(-[[@{level-wizard}]]/2)]],-6}kh1}]]. Note that a natural (unmodified) roll of 20 automatically succeeds, regardless of saving throw penalties. Although the caster does not actually pursue the fleeing creature, a phantasm from its own mind does. Each round after the initial casting, the creature receives another saving throw, without penalty, until it successfully saves and the spell is broken. In any event, the spell functions only against creatures with Intelligences of 2 or more, and undead are not affected at all.'
+    'effect': 'A *spook* spell enables the wizard to play upon natural fears to cause the target creature to perceive the spellcaster as someone or something inimical. Without actually knowing what this is, the wizard merely advances threateningly upon the creature. If the creature does not make a successful saving throw vs. spell, it turns and flees at maximum speed as far from the wizard as possible, though items carried are not dropped. The creature has a saving throw penalty of –1 for every two experience levels of the caster, to a maximum of –6 at 12th level. Current penalty [[{{ceil(-[[@{level-wizard}]]/2),-6}kh1}]]. Note that a natural (unmodified) roll of 20 automatically succeeds, regardless of saving throw penalties.\n&emsp;Although the caster does not actually pursue the fleeing creature, a phantasm from its own mind does. Each round after the initial casting, the creature receives another saving throw, without penalty, until it successfully saves and the spell is broken. In any event, the spell functions only against creatures with Intelligences of 2 or more, and undead are not affected at all.'
 };
 
 wiz1['Taunt'] = {
@@ -778,23 +787,24 @@ wiz1['Taunt'] = {
     'school-spells-and-magic': 'Enchantment/Charm, Song',
     'range': '60 yards',
     'duration': '1 round',
-    'aoe': '30 foot radius',
+    'aoe': '30-foot radius',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'Negate',
     'materials': 'A slug, which is hurled at the creatures to be taunted.',
     'reference': 'p. 179',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 920',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *taunt* spell enables the caster to jape and jeer effectively at a single type of creature with an Intelligence of 2 or greater. The caster need not speak the language of the creatures. His words and sounds have real meaning for the subject creature or creatures, challenging, insulting, and generally irritating and angering the listeners. Those failing to save vs. spell rush forth in fury to do battle with the spellcaster. All affected creatures attack the spellcaster in melee if physically capable of doing so, seeking to use body or hand-held weapons rather than missile weapons or spells.\n&emsp;Separation of the caster from the victim by an impenetrable or uncrossable boundary (a wall of fire, a deep chasm, a formation of set pikemen) causes the spell to break. If the caster taunts a mixed group, he must choose the type of creature to be affected. Creatures commanded by a strong leader (i.e., with a Charisma bonus, with higher Hit Dice, etc.) might gain a saving throw bonus of +1 to +4, at the DM’s discretion. If used in conjunction with a *ventriloquism* spell, the creatures may attack the apparent source, depending upon their Intelligence, a leader’s presence, and so on.'
+    'effect': 'A *taunt* spell enables the caster to jape and jeer effectively at a single type of creature with an Intelligence of 2 or greater. The caster need not speak the language of the creatures. His words and sounds have real meaning for the subject creature or creatures, challenging, insulting, and generally irritating and angering the listeners.\n&emsp;Those failing to save vs. spell rush forth in fury to do battle with the spellcaster. All affected creatures attack the spellcaster in melee if physically capable of doing so, seeking to use body or hand-held weapons rather than missile weapons or spells. Separation of the caster from the victim by an impenetrable or uncrossable boundary (a wall of fire, a deep chasm, a formation of set pikemen) causes the spell to break.\n&emsp;If the caster taunts a mixed group, he must choose the type of creature to be affected. Creatures commanded by a strong leader (i.e., with a Charisma bonus, with higher Hit Dice, etc.) might gain a saving throw bonus of +1 to +4, at the DM’s discretion. If used in conjunction with a *ventriloquism* spell, the creatures may attack the apparent source, depending upon their Intelligence, a leader’s presence, and so on.'
 };
 
 wiz1['Tenser\'s Floating Disc'] = {
     'level': '1',
     'school': 'Evocation',
-    'school-spells-and-magic': 'Invocation/Evocation, Force',
+    'school-spells-and-magic': 'Evocation, Force',
     'range': '20 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] turns',
     'aoe': 'Special',
@@ -804,17 +814,18 @@ wiz1['Tenser\'s Floating Disc'] = {
     'materials': 'A drop of mercury.',
     'reference': 'p. 179',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 930',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, the caster creates the slightly concave, circular plane of force known as Tenser’s floating disc (after the famed wizard whose greed and ability to locate treasure are well known). The disc is 3 feet in diameter and holds 100 pounds of weight per level of the wizard casting the spell. Current weight limit [[100*[[@{level-wizard}]] ]] pounds. The disc floats approximately 3 feet above the ground at all times and remains level. It floats along horizontally within its range of 20 yards at the command of the caster, and will accompany him at a movement rate of no more than 6. If unguided, it maintains a constant interval of 6 feet between itself and the wizard. If the spellcaster moves beyond range (by moving faster, by such means as a *teleport* spell, or by trying to take the disc more than 3 feet from the surface beneath it), or if the spell duration expires, the floating disc winks out of existence, and whatever it was supporting crashes to the surface beneath it.'
+    'effect': 'With this spell, the caster creates the slightly concave, circular plane of force known as *Tenser’s floating disc* (after the famed wizard whose greed and ability to locate treasure are well known). The disc is 3 feet in diameter and holds 100 pounds of weight per level of the wizard casting the spell. Currently holds [[100*[[@{level-wizard}]] ]] pounds. The disc floats approximately 3 feet above the ground at all times and remains level. It floats along horizontally within its range of 20 yards at the command of the caster, and will accompany him at a movement rate of no more than 6. If unguided, it maintains a constant interval of 6 feet between itself and the wizard. If the spellcaster moves beyond range (by moving faster, by such means as a *teleport* spell, or by trying to take the disc more than 3 feet from the surface beneath it), or if the spell duration expires, the floating disc winks out of existence, and whatever it was supporting crashes to the surface beneath it.'
 };
 
 wiz1['Unseen Servant'] = {
     'level': '1',
     'school': 'Conjuration/Summoning',
     'range': '0',
-    'duration': '1 hours + [[@{level-wizard}]] turns',
+    'duration': '1 hour + [[@{level-wizard}]] turn(s)',
     'aoe': '30-foot radius',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -822,47 +833,52 @@ wiz1['Unseen Servant'] = {
     'materials': 'A piece of string and a bit of wood.',
     'reference': 'p. 180',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 972',
+    'errata': 'Dungeon Master Option: High-Level Campaigns p. 75',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The unseen servant is an invisible, mindless, and shapeless force, used to step and fetch, open unstuck doors, and hold chairs, as well as to clean and mend. It is not strong, but unfailingly obeys the command of the wizard. It can perform only one activity at a time and can move only lightweight items, carrying a maximum of 20 pounds or pushing/pulling 40 pounds across a smooth surface. It can open only normal doors, drawers, lids, etc. The unseen servant cannot fight, nor can it be killed, as it is a force rather than a creature. It can be magically dispelled, or eliminated after receiving 6 points of damage from areaeffect spells, breath weapons, or similar attacks. If the caster attempts to send it beyond the allowed radius, the spell ends immediately.'
+    'effect': 'The *unseen servant* is an non-visible, mindless, and shapeless force, used to step and fetch, open unstuck doors, and hold chairs, as well as to clean and mend. It is not strong, but unfailingly obeys the command of the wizard. It can perform only one activity at a time and can move only lightweight items, carrying a maximum of 20 pounds or push or pull 40 pounds across a smooth surface. It can open only normal doors, drawers, lids, etc. The *unseen servant* cannot fight, nor can it be killed, as it is a force rather than a creature. It can be magically dispelled, or eliminated after receiving 6 points of damage from area-effect spells, breath weapons, or similar attacks. If the caster attempts to send it beyond the allowed radius, the spell ends immediately.\n\n&emsp;The *unseen servant* does not have any sense or powers of reason. It is incapable of any action except following its instructions to the letter. Thus, while it can be sent to the bottom of a pool to grab whatever objects it encounters, it cannot be directed to grab any gems or coins it might find.\n&emsp;A *permanent unseen servant* always hovers within 30 feet of the caster. If destroyed, it reforms in 2d10 rounds.\n&emsp;A *permanent unseen servant* can be cast on an area and instructed to endlessly perform a single task, such as forever cleaning a room. Once a task is set, it cannot be changed.'
 };
 
 wiz1['Ventriloquism'] = {
     'level': '1',
     'school': 'Illusion/Phantasm',
-    'range': '[[{{[[10*#LEVLE#]],90}kl1}]] yards',
+    'range': '[[{{10*[[@{level-wizard}]],90}kl1}]] yards',
     'duration': '[[4+[[@{level-wizard}]] ]] rounds',
     'aoe': '1 creature or object',
     'components': 'V, M',
     'cast-time': '1',
-    'saving-throw': 'Negate',
+    'saving-throw': 'Special',
     'materials': 'A parchment rolled up into a small cone.',
     'reference': 'p. 180',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 978',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to make his voice—or someone else’s voice—or a similar sound seem to issue from someplace else, such as from another creature, a statue, from behind a door, down a passage, etc. The spellcaster can speak in any language that he knows, or make any sound that he can normally make. With respect to such voices and sounds, anyone rolling a successful saving throw vs. spell with a –2 penalty detects the ruse. If cast in conjunction with other illusions, the DM may rule greater penalties or disallow an independent saving throw against this spell in consideration of its contribution to the total effect of the combined illusion.'
+    'effect': 'This spell enables the wizard to make his voice—or someone else’s voice or a similar sound seem to issue from someplace else, such as from another creature, a statue, from behind a door, down a passage, etc. The spellcaster can speak in any language that he knows, or make any sound that he can normally make. With respect to such voices and sounds, anyone rolling a successful saving throw vs. spell with a –2 penalty detects the ruse. If cast in conjunction with other illusions, the DM may rule greater penalties or disallow an independent saving throw against this spell in consideration of its contribution to the total effect of the combined illusion.'
 };
 
 wiz1['Wall of Fog'] = {
     'level': '1',
     'school': 'Evocation',
-    'school-spells-and-magic': 'Invocation/Evocation, Elemental Air',
+    'school-spells-and-magic': 'Evocation, Elemental Air',
     'range': '30 yards',
     'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
-    'aoe': '[[20+(10*[[@{level-wizard}]])]] foot cube',
+    'aoe': '20-foot cube + [[@{level-wizard}]] 10-foot cube(s) or a total of [[4+[[@{level-wizard}]] ]] 10-foot cubes',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
     'materials': 'A pinch of split dried peas.',
     'reference': 'p. 180',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 987',
+    'errata': 'Sage Advice #175 p. 78\nSage Advice #264 p. 26',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By casting this spell, the wizard creates a billowing wall of misty vapors in any area within the spell range. The wall of fog obscures all sight, normal and infravision, beyond 2 feet. The caster may create less vapor if he wishes. The wall must be a roughly cubic or rectangular mass, at least 10 feet across in its smallest dimension. The misty vapors persist for three or more rounds. Their duration can be halved by a moderate wind, and they can be blown away by a strong wind.'
+    'effect': 'By casting this spell, the wizard creates a billowing wall of misty vapors in any area within the spell range. The *wall of fog* obscures all sight, normal and infravision, beyond 2 feet. The caster may create less vapor if he wishes. The wall must be a roughly cubic or rectangular mass, at least 10 feet across in its smallest dimension. The misty vapors persist for three or more rounds. Their duration can be halved by a moderate wind, and they can be blown away by a strong wind.'
 };
 
 wiz1['Wizard Mark'] = {
@@ -878,10 +894,11 @@ wiz1['Wizard Mark'] = {
     'materials': 'A pinch of diamond dust (about 100 gp worth) and a pigment or pigments for the coloration of the mark. If the mark is to be invisible, the pigments are still used, but the caster uses a stylus of some sort rather than his finger.',
     'reference': 'p. 179',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1029',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard is able to inscribe, visibly or invisibly, his personal rune or mark, as well as up to six additional characters of smaller size. A *wizard mark* spell enables the caster to etch the rune upon stone, metal, or any softer substance without harm to the material upon which the mark is placed. If an invisible mark is made, a *detect magic* spell will cause it to glow and be visible (though not necessarily understandable). *Detect invisibility*, *true seeing*, a *gem of seeing*, or a *robe of eyes* will likewise expose an invisible wizard mark. A *read magic* spell will reveal the maker’s words, if any. The mark cannot be dispelled, but it can be removed by the caster or by an *erase* spell. If cast on a living being, normal wear gradually causes the mark to fade.'
+    'effect': 'When this spell is cast, the wizard is able to inscribe, visibly or invisibly, his personal rune or mark, as well as up to six additional characters of smaller size. A *wizard mark* spell enables the caster to etch the rune upon stone, metal, or any softer substance without harm to the material upon which the mark is placed. If an invisible mark is made, a *detect magic* spell will cause it to glow and be visible (though not necessarily understandable). *Detect invisibility*, *true seeing*, a *gem of seeing*, or a *robe of eyes* will likewise expose an invisible *wizard mark*. A *read magic* spell will reveal the maker’s words, if any. The mark cannot be dispelled, but it can be removed by the caster or by an *erase* spell. If cast on a living being, normal wear gradually causes the mark to fade.'
 };
 
 let wiz2 = {};
@@ -897,18 +914,19 @@ wiz2['Alter Self'] = {
     'materials': '',
     'reference': 'p. 180',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 36',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard can alter his appearance and form—including clothing and equipment—to appear taller or shorter; thin, fat, or in between; human, humanoid, or any other generally man-shaped bipedal creature. The caster’s body can undergo a limited physical alteration and his size can be changed up to 50%. If the form selected has wings, the wizard can actually fly, but at only onethird the speed of a true creature of that type, and with a loss of two maneuverability classes (to a minimum of E). If the form has gills, the caster can breathe under water as long as the spell lasts. However, the caster does not gain any multiple attack routines or additional damage allowed to an assumed form.\n&emsp;The caster’s attack rolls, Armor Class, and saving throws do not change. The spell does not confer special abilities, attack forms, or defenses. Once the new form is chosen, it remains for the duration of the spell. The caster can change back into his own form at will; this ends the spell immediately. A caster who is slain automatically returns to his normal form.'
+    'effect': 'When this spell is cast, the wizard can alter his appearance and form—including clothing and equipment—to appear taller or shorter; thin, fat, or in between; human, humanoid, or any other generally man-shaped bipedal creature. The caster’s body can undergo a limited physical alteration and his size can be changed up to 50%. If the form selected has wings, the wizard can actually fly, but at only one-third the speed of a true creature of that type, and with a loss of two maneuverability classes (to a minimum of E). If the form has gills, the caster can breathe under water as long as the spell lasts. However, the caster does not gain any multiple attack routines or additional damage allowed to an assumed form.\n&emsp;The caster’s attack rolls, Armor Class, and saving throws do not change. The spell does not confer special abilities, attack forms, or defenses. Once the new form is chosen, it remains for the duration of the spell. The caster can change back into his own form at will; this ends the spell immediately. A caster who is slain automatically returns to his normal form.'
 };
 
 wiz2['Bind'] = {
     'level': '2',
     'school': 'Enchantment',
-    'school-spells-and-magic': 'Enchantment/Charm, Artifice',
+    'school-spells-and-magic': 'Enchantment, Artifice',
     'range': '30 yards',
-    'duration': '[[@{level-wizard}]] rounds',
+    'duration': '[[@{level-wizard}]] round(s)',
     'aoe': '[[50+(5*[[@{level-wizard}]])]] feet',
     'components': 'V, S, M',
     'cast-time': '2',
@@ -916,10 +934,11 @@ wiz2['Bind'] = {
     'materials': '',
     'reference': 'p. 181',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 85',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is employed, the wizard can command any nonliving ropelike object, including string, yarn, cord, line, rope, or even a cable. The spell affects 50 feet of normal rope (with a 1 inch diameter), plus 5 feet per caster level. This length is reduced by 50% for every additional inch of thickness and increased by 50% for each half-inch less. The possible commands are Coil (form a neat, coiled stack), Coil & Knot, Loop, Loop & Knot, Tie & Knot, and the reverses of all of the above (Uncoil, etc.). One command can be given each round.\n&emsp;The rope can only enwrap a creature or an object within 1 foot of it—it does not snake outward—so it must be thrown or hurled near the intended target. Note that the rope itself, and any knots tied in it, are not magical. A typical rope might be AC 6 and take 4 points of slashing damage before breaking. The rope does not inflict damage of any type, but it can be used as a trip line or to entangle a single opponent who fails a saving throw vs. spell.'
+    'effect': 'When this spell is employed, the wizard can command any nonliving ropelike object, including string, yarn, cord, line, rope, or even a cable. The spell affects 50 feet of normal rope (with a 1 inch diameter), plus 5 feet per caster level. This length is reduced by 50% for every additional inch of thickness and increased by 50% for each half-inch less. The possible commands are *Coil* (form a neat, coiled stack), *Coil & Knot, Loop, Loop & Knot, Tie & Knot*, and the reverses of all of the above (*Uncoil*, etc.). One command can be given each round.\n&emsp;The rope can only enwrap a creature or an object within 1 foot of it—it does not snake outward—so it must be thrown or hurled near the intended target. Note that the rope itself, and any knots tied in it, are not magical. A typical rope might be AC 6 and take 4 points of slashing damage before breaking. The rope does not inflict damage of any type, but it can be used as a trip line or to entangle a single opponent who fails a saving throw vs. spell.'
 };
 
 wiz2['Blindness'] = {
@@ -934,10 +953,12 @@ wiz2['Blindness'] = {
     'materials': '',
     'reference': 'p. 181',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 96',
+    'errata': 'Dungeon Master Guide p. 160',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *blindness* spell causes the victim to become blind, able to see only a grayness before its eyes. Various *cure* spells will not remove this effect, and only a *dispel magic* or the spellcaster can do away with the blindness if the creature fails its initial saving throw vs. spell. A blinded creature suffers a –4 penalty to its attack rolls, and its opponents gain a +4 bonus to their attack rolls.'
+    'effect': 'The *blindness* spell causes the victim to become blind, able to see only a grayness before its eyes. Various *cure* spells will not remove this effect, and only a *dispel magic* or the spellcaster can do away with the blindness if the creature fails its initial saving throw vs. spell. A blinded creature suffers a –4 penalty to its attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
 };
 
 wiz2['Blur'] = {
