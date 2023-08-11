@@ -192,11 +192,11 @@ wiz1['Color Spray'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 154',
-    'errata': 'Dungeon Master Guide p. 160\nSage Advice #213 p. 85\nDungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #213 p. 85\nSage Advice #256 p. 28\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.\n&emsp;**Notes:** Blindness causes -4 penalty to attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
+    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.\n&emsp;**Notes:** Blindness causes -4 penalty to attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). -2 penalty to surprise rolls. Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
 };
 
 wiz1['Comprehend Languages'] = {
@@ -514,11 +514,11 @@ wiz1['Light'] = {
     'reference': 'p. 176',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 515',
-    'errata': 'Dungeon Master Guide p. 160\nDungeon Master Option: High-Level Campaigns p. 72',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #256 p. 28\nDungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4 and worsening its Armor Class by 4 (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check. The caster can end the spell at any time by uttering a single word. Note that, unlike the 1st-level priest spell, this spell is not reversible.'
+    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4, worsening its Armor Class by 4 (to a limit of 10), and -2 penalty to surprise rolls. Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check. The caster can end the spell at any time by uttering a single word. Note that, unlike the 1st-level priest spell, this spell is not reversible.'
 };
 
 wiz1['Magic Missile'] = {
@@ -632,11 +632,11 @@ wiz1['Phantasmal Force'] = {
     'reference': 'p. 177',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 660',
-    'errata': 'Sage Advice #249 p. 22',
+    'errata': 'Sage Advice #249 p. 22\nSage Advice #256 p. 27',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates the illusion of any object, creature, or force, as long as it is within the boundaries of the spell’s area of effect. The illusion is visual and affects all believing creatures (undead are immune) that view it. It does not create sound, smell, or temperature. Effects that depend on these senses usually fail. The illusion lasts until struck by an opponent—unless the spellcaster causes the illusion to react appropriately—or until the wizard ceases concentration upon the spell (due to desire, moving, or a successful attack that causes damage). Saving throws for illusions are explained under “Illusions” in Chapter 7: Magic and under “Adjudicating Illusions” at the beginning of Appendix 2. Creatures that disbelieve the illusion see it for what it is and add +4 to associates’ saving throws if this knowledge can be communicated effectively. Creatures believing the illusion are subject to its effects (again, as explained in Chapter 7).\n&emsp;The illusionary effect can be moved by the caster within the limits of the area of effect. The DM has to rule on the effectiveness of this spell; detailed guidelines are outlined in Chapter 7: Magic and under “Adjudicating Illusions” at the beginning of Appendix 2.'
+    'effect': 'This spell creates the illusion of any object, creature, or force, as long as it is within the boundaries of the spell’s area of effect. The illusion is visual and affects all believing creatures (undead are immune) that view it. It does not create sound, smell, or temperature. Effects that depend on these senses usually fail. The illusion lasts until struck by an opponent—unless the spellcaster causes the illusion to react appropriately—or until the wizard ceases concentration upon the spell (due to desire, moving, or a successful attack that causes damage). Saving throws for illusions are explained under “Illusions” in Chapter 7: Magic and under “Adjudicating Illusions” at the beginning of Appendix 2. Creatures that disbelieve the illusion see it for what it is and add +4 to associates’ saving throws if this knowledge can be communicated effectively. Creatures believing the illusion are subject to its effects (again, as explained in Chapter 7).\n&emsp;The illusionary effect can be moved by the caster within the limits of the area of effect. The DM has to rule on the effectiveness of this spell; detailed guidelines are outlined in Chapter 7: Magic and under “Adjudicating Illusions” at the beginning of Appendix 2.\n&emsp;This spell cannot be used to create a limited form of invisibility. *Phantasmal force* can create an illusionary object that a creature can hide behind, but not the illusion that the creature is not there.'
 };
 
 wiz1['Protection From Evil'] = {
@@ -954,11 +954,11 @@ wiz2['Blindness'] = {
     'reference': 'p. 181',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 96',
-    'errata': 'Dungeon Master Guide p. 160',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #256 p. 28',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *blindness* spell causes the victim to become blind, able to see only a grayness before its eyes. Various *cure* spells will not remove this effect, and only a *dispel magic* or the spellcaster can do away with the blindness if the creature fails its initial saving throw vs. spell. A blinded creature suffers a –4 penalty to its attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
+    'effect': 'The *blindness* spell causes the victim to become blind, able to see only a grayness before its eyes. Various *cure* spells will not remove this effect, and only a *dispel magic* or the spellcaster can do away with the blindness if the creature fails its initial saving throw vs. spell. A blinded creature suffers a –4 penalty to its attack rolls and saving throws. Armor Class is 4 worse (to a limit of 10). -2 penalty to surprise rolls. Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.'
 };
 
 wiz2['Blur'] = {
@@ -996,11 +996,11 @@ wiz2['Continual Light'] = {
     'reference': 'p. 181',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 175',
-    'errata': 'Dungeon Master Guide p. 160\nSage Advice #172 p. 90\nSage Advice #265 p. 24\nDungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #172 p. 90\nSage Advice #256 p. 28\nSage Advice #265 p. 24\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures who suffer penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, it can be cast into the air, onto an object, or at a creature. When cast at a creature, the target gets a saving throw vs. spell; success indicates that the spell affects the space about 1 foot behind the creature instead. Note that this spell can also blind a creature if it is successfully cast upon the creature’s visual organs, reducing its attack rolls, saving throws, and Armor Class by 4 (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check. If the spell is cast on a small object that is then placed in a light-proof covering, the spell’s effects are blocked until the covering is removed.\n&emsp;A *continual light* brought into an area of magical darkness (or vice versa) is temporarily negated so that the otherwise prevailing light conditions exist in the overlapping areas of effect. A direct casting of *continual light* against a similar or weaker magical darkness cancels both. The wizard’s version of *continual light* cannot be reversed to create magical darkness.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in the typical campaign. Extremely hard and expensive materials can last hundreds or even thousands of years.'
+    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures who suffer penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, it can be cast into the air, onto an object, or at a creature. When cast at a creature, the target gets a saving throw vs. spell; success indicates that the spell affects the space about 1 foot behind the creature instead. Note that this spell can also blind a creature if it is successfully cast upon the creature’s visual organs, reducing its attack rolls, saving throws, Armor Class by 4 (to a limit of 10), and -2 penalty to surprise rolls. Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check. If the spell is cast on a small object that is then placed in a light-proof covering, the spell’s effects are blocked until the covering is removed.\n&emsp;A *continual light* brought into an area of magical darkness (or vice versa) is temporarily negated so that the otherwise prevailing light conditions exist in the overlapping areas of effect. A direct casting of *continual light* against a similar or weaker magical darkness cancels both. The wizard’s version of *continual light* cannot be reversed to create magical darkness.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in the typical campaign. Extremely hard and expensive materials can last hundreds or even thousands of years.'
 };
 
 wiz2['Darkness, 15\' Radius'] = {
@@ -1217,11 +1217,11 @@ wiz2['Glitterdust'] = {
     'reference': 'p. 183',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 408',
-    'errata': 'Dungeon Master Guide p. 160',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #256 p. 28',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a cloud of glittering golden particles within the area of effect. Those in the area must roll a successful saving throw vs. spell or be blinded (–4 penalties to attack rolls, saving throws, and Armor Class (to a limit of 10). Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.) for [[1d4+1]] rounds. In addition, all within the area are covered by the dust, which cannot be removed and continues to sparkle until it fades. Note that this reveals invisible creatures. The dust fades in 1d4 rounds plus one round per caster level.  Currently dust fades in [[1d4+[[@{level-wizard}]] ]] rounds. Thus, *glitterdust* cast by a 3rd-level wizard lasts for four to seven rounds.'
+    'effect': 'This spell creates a cloud of glittering golden particles within the area of effect. Those in the area must roll a successful saving throw vs. spell or be blinded (–4 penalties to attack rolls, saving throws, Armor Class (to a limit of 10), and -2 penalty to surprise rolls. Sight-related damage bonuses (backstabbing, etc.) are negated. Safe movement rate is slowed by ⅓ of normal and faster movement requires a Dexterity check.) for [[1d4+1]] rounds. In addition, all within the area are covered by the dust, which cannot be removed and continues to sparkle until it fades. Note that this reveals invisible creatures. The dust fades in 1d4 rounds plus one round per caster level.  Currently dust fades in [[1d4+[[@{level-wizard}]] ]] rounds. Thus, *glitterdust* cast by a 3rd-level wizard lasts for four to seven rounds.'
 };
 
 wiz2['Hypnotic Pattern'] = {
@@ -1237,6 +1237,7 @@ wiz2['Hypnotic Pattern'] = {
     'materials': 'A glowing stick of incense or a crystal rod filled with phosphorescent material.',
     'reference': 'p. 183',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 442',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1255,10 +1256,12 @@ wiz2['Improved Phantasmal Force'] = {
     'materials': 'A bit of fleece.',
     'reference': 'p. 184',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 455',
+    'errata': 'Sage Advice #249 p. 22\nSage Advice #256 p. 27',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Like the 1st-level *phantasmal force* spell, this spell creates the illusion of any object, creature, or force, as long as it is within the spell’s area of effect. The spellcaster can maintain the illusion with minimal concentration; thus, he can move at half normal speed (but not cast other spells). Some minor sounds are included in the effects of the spell, but not understandable speech. Also, the improved phantasm continues for two rounds after the wizard ceases to concentrate upon it.'
+    'effect': 'Like the 1st-level *phantasmal force* spell, this spell creates the illusion of any object, creature, or force, as long as it is within the spell’s area of effect. The spellcaster can maintain the illusion with minimal concentration; thus, he can move at half normal speed (but not cast other spells). Some minor sounds are included in the effects of the spell, but not understandable speech. Also, the improved phantasm continues for two rounds after the wizard ceases to concentrate upon it.\n&emsp;*Improved phantasmal force* can create an illusionary object that a creature can hide behind, but not the illusion that the creature is not there.'
 };
 
 wiz2['Invisibility'] = {
@@ -1273,10 +1276,12 @@ wiz2['Invisibility'] = {
     'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter.',
     'reference': 'p. 184',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 464',
+    'errata': 'Sage Advice #168 p. 56\nSage Advice #176 p. 93\nSage Advice #206 p. 89+90\nSage Advice #253 p. 22\nDungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes the creature touched to vanish from sight and be undetectable by normal vision or even infravision. Of course, the invisible creature is not magically silenced, and certain other conditions can render the creature detectable. Even allies cannot see the invisible creature or his gear, unless these allies can normally see invisible things or employ magic to do so. Items dropped or put down by the invisible creature become visible; items picked up disappear if tucked into the clothing or pouches worn by the creature. Note, however, that light never becomes invisible, although a source of light can become so (thus, the effect is that of a light with no visible source).\n&emsp;The spell remains in effect until it is magically broken or dispelled, until the wizard or recipient cancels it, until the recipient attacks any creature, or until 24 hours have passed. Thus, the invisible being can open doors, talk, eat, climb stairs, etc., but if he attacks, he immediately becomes visible, although the invisibility enables him to attack first. Note that the priest spells *bless*, *chant*, and *prayer* are not attacks for this purpose. All highly Intelligent (Intelligence 13 or more) creatures with 10 or more Hit Dice or levels of experience have a chance to detect invisible objects (they roll saving throws vs. spell; success means they noticed the invisible object).'
+    'effect': 'This spell causes the creature touched to vanish from sight and be undetectable by normal vision or even infravision. Of course, the invisible creature is not magically silenced, and certain other conditions can render the creature detectable. Even allies cannot see the invisible creature or his gear, unless these allies can normally see invisible things or employ magic to do so. Items dropped or put down by the invisible creature become visible; items picked up disappear if tucked into the clothing or pouches worn by the creature. Note, however, that light never becomes invisible, although a source of light can become so (thus, the effect is that of a light with no visible source).\n&emsp;The spell remains in effect until it is magically broken or dispelled, until the wizard or recipient cancels it, until the recipient attacks any creature, or until 24 hours have passed. Thus, the invisible being can open doors, talk, eat, climb stairs, etc., but if he attacks, he immediately becomes visible, although the invisibility enables him to attack first. Note that the priest spells *bless*, *chant*, and *prayer* are not attacks for this purpose. All highly Intelligent (Intelligence 13 or more) creatures with 10 or more Hit Dice or levels of experience have a chance to detect invisible objects (they roll saving throws vs. spell; success means they noticed the invisible object). Undead are not immune to *invisibility* and can therefore not see an invisible creature.\n&emsp;An invisible wizard breaks his *invisibility* if he directs an illusion to attack or another magical effect that cannot act without direction from the spell-caster such as *unseen servants*, and the various *Bigby’s hand* effects. Note that independent creatures that obay the caster, such as golems, attack on their own and do not break the caster’s *invisibility*.\n&emsp;If this spell is made permanent, the recipient gains the innate ability to become invisible at will and remain so indefinitely. Any attack breaks the invisibility, but the recipient can become invisible again during the next round. The return to invisibility has an initiative modifier of +3 (slower), and the recipient can take no other action other than normal movement during a round in which he becomes invisible.'
 };
 
 wiz2['Irritation'] = {
