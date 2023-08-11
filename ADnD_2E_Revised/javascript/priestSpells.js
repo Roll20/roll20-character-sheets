@@ -1238,7 +1238,7 @@ pri3['Locate Object'] = {
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '[[60+10*[[@{level-priest}]] ]] yards',
-    'duration': '8 hours.',
+    'duration': '[[@{level-priest}]] rounds',
     'aoe': '1 object',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -1246,10 +1246,12 @@ pri3['Locate Object'] = {
     'materials': 'A piece of lodestone',
     'reference': 'p. 268',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 380',
+    'errata': 'Sage Advice #206 p. 88',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell helps locate a known or familiar object. The priest casts the spell, slowly turns, and will sense when he is facing in the direction of the object to be located, provided the object is within range—for example, 90 yards for 3rd-level priests, 100 yards for 4th, 110 yards for 5th, etc. The spell locates such objects as apparel, jewelry, furniture, tools, weapons, or even a ladder or stairway. Once the caster has fixed in his mind the items sought, the spell locates only that item. Attempting to find a specific item, such as a kingdom’s crown, requires an accurate mental image. If the image is not close enough to the actual item, the spell does not work; in short, desired but unique objects cannot be located by this spell unless they are known by the caster. The spell is blocked by lead.\n&emsp;The reversal, *obscure object*, hides an object from location by spell, *crystal ball*, or similar means for eight hours. The caster must touch the object being concealed.\n&emsp;Neither application of the spell affects living creatures.'
+    'effect': 'This spell helps locate a known or familiar object. The priest casts the spell, slowly turns, and will sense when he is facing in the direction of the object to be located, provided the object is within range—for example, 90 yards for 3rd-level priests, 100 yards for 4th, 110 yards for 5th, etc. The spell locates such objects as apparel, jewelry, furniture, tools, weapons, or even a ladder or stairway. Once the caster has fixed in his mind the items sought, the spell locates only that item. Attempting to find a specific item, such as a kingdom’s crown, requires an accurate mental image. If the image is not close enough to the actual item, the spell does not work; in short, desired but unique objects cannot be located by this spell unless they are known by the caster. The spell is blocked by lead.\n&emsp;The reverse, *obscure object*, hides an object from location by spell, *crystal ball*, or similar means for eight hours. The caster must touch the object being concealed.\n&emsp;Neither application of the spell affects living creatures.'
 };
 
 pri3['Magical Vestment'] = {
