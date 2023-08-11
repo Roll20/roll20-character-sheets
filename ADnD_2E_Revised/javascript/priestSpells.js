@@ -758,10 +758,12 @@ pri2['Know Alignment'] = {
     'materials': '',
     'reference': 'p. 261',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 324',
+    'errata': 'Sage Advice #241 p. 16',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *know alignment* spell enables the priest to exactly read the aura of a creature or an aligned object (unaligned objects reveal nothing). The caster must remain stationary and concentrate on the subject for a full round. If the creature rolls a successful saving throw vs. spell, the caster learns nothing about that particular creature from the casting. Certain magical devices negate the power of the *know alignment* spell.\n&emsp;The reverse, *undetectable alignment*, conceals the alignment of an object or creature for 24 hours.'
+    'effect': 'A *know alignment* spell enables the priest to exactly read the aura of a creature or an aligned object, including sentient magical items (unaligned objects reveal nothing). The caster must remain stationary and concentrate on the subject for a full round. If the creature rolls a successful saving throw vs. spell, the caster learns nothing about that particular creature from the casting. Certain magical devices negate the power of the *know alignment* spell.\n&emsp;The reverse, *undetectable alignment*, conceals the alignment of an object or creature for 24 hours.'
 };
 
 pri2['Messenger'] = {
