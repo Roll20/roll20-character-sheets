@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const SHEET_NAME = 'AD&D 2E Revised';
-const SHEET_VERSION = '4.16.0';
+const SHEET_VERSION = '4.18.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -33,6 +33,12 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(4, 16, 0))
                 migrate4_16_0();
+
+            if (oldSheetVersion.isBelowMigrate(4, 17, 0))
+                migrate4_17_0();
+
+            if (oldSheetVersion.isBelowMigrate(4, 18, 0))
+                migrate4_18_0();
         }
     });
 });
@@ -77,6 +83,77 @@ function moveStaticToRepeating(section, fieldsToMove) {
             setAttrs(newValue);
         }
     });
+}
+//#endregion
+
+//#region verison 4.18.0
+function migrate4_18_0() {
+    console.log('Migrate to v4.18.0');
+    TAS.repeating('hench5')
+        .attrs('psionclai-science-macro527','psionclair-science-macro527')
+        .fields('psiontelepathic-macro505','psiontelepathic-science-macro505')
+        .each(function (row) {
+            let macro = row.S['psiontelepathic-macro505'].trim();
+            if (macro !== '') {
+                console.log('Moved macro from psiontelepathic-macro505 to psiontelepathic-science-macro505');
+                row.S['psiontelepathic-science-macro505'] = macro;
+            }
+        }, function (rowSet, attrSet) {
+            let macro = attrSet.S['psionclai-science-macro527'].trim();
+            if (macro !== '') {
+                console.log('Moved macro from psionclai-science-macro527 to psionclair-science-macro527');
+                attrSet.S['psionclair-science-macro527'] = macro;
+            }
+        }).execute();
+}
+//#endregion
+
+//#region version 4.17.0
+function migrate4_17_0() {
+    console.log('Migrate to v4.17.0');
+    calculateFormula('rogue-level-base', 'rogue-level-total');
+    TAS.repeating('customrogue')
+        .attrs(ROGUE_STANDARD_SKILLS.flatMap(skill => [`${skill}armorp`, `${skill}a`]))
+        .fields('cra','crarmorp')
+        .each(function (row) {
+            let armorValue = row.I['crarmorp'];
+            if (armorValue === 0)
+                return
+
+            console.log(`Moving value ${armorValue} from crarmorp to cra`);
+            row.I['cra'] = armorValue;
+        }, function (rowSet, attrSet) {
+            ROGUE_STANDARD_SKILLS.forEach(skill => {
+                let armorValue = attrSet.I[`${skill}armorp`];
+                if (armorValue === 0)
+                    return;
+
+                attrSet.I[`${skill}a`] = armorValue;
+                console.log(`Moving value ${armorValue} from ${skill}armorp to ${skill}a`);
+            })
+        })
+        .execute(function () {
+            let allRogueSkills = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).flatMap(skill => ROGUE_SKILL_COLUMNS.map(c => `${skill}${c}`));
+
+            getAttrs(allRogueSkills, function (values) {
+                let newValue = {};
+
+                ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).forEach(skill => {
+                    let totalField = `${skill}t`;
+                    let total = 0;
+                    ROGUE_SKILL_COLUMNS.forEach(c => {
+                        let skillNumber = parseInt(values[`${skill}${c}`]) || 0;
+                        total += skillNumber;
+                    });
+                    if (total !== 0) {
+                        console.log(`Updating ${totalField} to ${total}`);
+                        newValue[totalField] = total;
+                    }
+                });
+
+                setAttrs(newValue);
+            });
+        });
 }
 //#endregion
 
