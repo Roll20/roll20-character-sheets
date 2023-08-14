@@ -1458,10 +1458,12 @@ wiz2['Mirror Image'] = {
     'materials': '',
     'reference': 'p. 186',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 571',
+    'errata': 'Sage Advice #176 p. 93\nSage Advice #200 p. 104\nSage Advice #225 p. 81\nSage Advice #253 p. 26\nSage Advice #256 p. 27',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When a *mirror image* spell is invoked, the spellcaster causes from two to eight exact duplicates of himself to come into being around him. These images do exactly what the wizard does. Since the spell causes a blurring and slight distortion when it is cast, it is impossible for opponents to be certain which are the illusions and which is the actual wizard. When an image is struck by a melee or missile attack, magical or otherwise, it disappears, but any other existing images remain intact until struck. The images seem to shift from round to round, so that if the actual wizard is struck during one round, he cannot be picked out from among his images the next. To determine the number of images that appear, roll 1d4 and add 1 for every three levels of experience the wizard has achieved, to a maximum of eight images ([[{{[[1d4+floor([[@{level-wizard}]]/3)]],8}kl1}]] images). At the end of the spell duration, all surviving images wink out.'
+    'effect': 'When a *mirror image* spell is invoked, the spellcaster causes from two to eight exact duplicates of himself to come into being around him. These images do exactly what the wizard does. Since the spell causes a blurring and slight distortion when it is cast, it is impossible for opponents to be certain which are the illusions and which is the actual wizard. When an image is struck by a melee or missile attack, magical or otherwise, it disappears, but any other existing images remain intact until struck. The images seem to shift from round to round, so that if the actual wizard is struck during one round, he cannot be picked out from among his images the next. To determine the number of images that appear, roll 1d4 and add 1 for every three levels of experience the wizard has achieved, to a maximum of eight images. Currently [[{[[1d4]]+floor([[@{level-wizard}]]/3),8}kl1}]] images. At the end of the spell duration, all surviving images wink out.\n&emsp;*Mirror image* cannot be disbelieved. Area of effect spells such as *fireball* or dragon breath does not dispel or remove any images. If the wizard starts flying the images continue to shift around within a 6-foot radius. The images do not gain the power of independent flight from the *fly* spell.',
 };
 
 wiz2['Misdirection'] = {
