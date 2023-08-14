@@ -736,6 +736,7 @@ wiz1['Sleep'] = {
     'reference': 'p. 178',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 825',
+    'errata': 'Sage Advice #245 p. 17',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1427,7 +1428,7 @@ wiz2['Magic Mouth'] = {
 wiz2['Melf\'s Acid Arrow'] = {
     'level': '2',
     'school': 'Conjuration',
-    'school-spells-and-magic': 'Conjuration/Summoning, Alchemy',
+    'school-spells-and-magic': 'Conjuration, Alchemy',
     'range': '180 yards',
     'duration': 'Special',
     'aoe': '1 target',
@@ -1437,10 +1438,12 @@ wiz2['Melf\'s Acid Arrow'] = {
     'materials': 'A dart, powdered rhubarb leaf, and an adder’s stomach.',
     'reference': 'p. 186',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 556',
+    'errata': 'Sage Advice #165 p. 91\nSage Advice #198 p. 36\nSage Advice #206 p. 89\nSage Advice #245 p. 18',
     'damage': '2d4 for [[1+floor([[@{level-wizard}]]/3)]] rounds of',
     'damage-type': 'Acid',
     'healing': '',
-    'effect': 'By means of this spell, the wizard creates a magical arrow that speeds to its target as if fired from the bow of a fighter of the same level as the wizard (THAC0 [[21-[[@{level-wizard}]] ]]). No modifiers for range, nonproficiency, or specialization are used. The arrow has no attack or damage bonus, but it inflicts 2d4 points of acid damage (with saving throws for items on the target); there is no splash damage. For every three levels that the caster has achieved, the acid, unless somehow neutralized, lasts for another round, inflicting another 2d4 points of damage each round. So at 3rd–5th level, the acid lasts two rounds; at 6th–8th level, the acid lasts for three rounds, etc. Currently [[1+floor([[@{level-wizard}]]/3)]] total rounds.'
+    'effect': 'By means of this spell, the wizard creates a magical arrow that speeds to its target as if fired from the bow of a fighter of the same level as the wizard. Currently THAC0 [[21-[[@{level-wizard}]] ]]. No modifiers for strength, dexterity, range, nonproficiency, or specialization are used. The arrow has no attack or damage bonus, but it inflicts 2d4 points of acid damage (with saving throws for items on the target); there is no splash damage. For every three levels that the caster has achieved, the acid, unless somehow neutralized, lasts for another round, inflicting another 2d4 points of damage each round. So at 3rd–5th level, the acid lasts two rounds; at 6th–8th level, the acid lasts for three rounds, etc. Currently [[1+floor([[@{level-wizard}]]/3)]] total rounds.\n&emsp;The spell duration can be shortened if the acid is washed off, magically dispelled, or removed in other ways at the DM’s discretion (such as hastily removing the victim’s armor).}}{{dot=1'
 };
 
 wiz2['Mirror Image'] = {
