@@ -1478,6 +1478,7 @@ wiz2['Misdirection'] = {
     'materials': '',
     'reference': 'p. 186',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 571',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1497,6 +1498,7 @@ wiz2['Protection From Cantrips'] = {
     'materials': '',
     'reference': 'p. 186',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 697',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1509,17 +1511,19 @@ wiz2['Pyrotechnics'] = {
     'school-spells-and-magic': 'Alteration, Elemental Fire, Alchemy',
     'range': '120 yards',
     'duration': 'Special',
-    'aoe': '1 fire source',
+    'aoe': '10 or 100 times the fire source used',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'None',
-    'materials': 'One fire source within a 20-foot cube.',
+    'materials': 'One fire source within a 20-foot cube, which is immediately extinguished.',
     'reference': 'p. 186',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 719',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #256 p. 28',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce one of two effects, at the option of the caster. First, it can produce a flashing and fiery burst of glowing, colored aerial fireworks that lasts one round. This effect temporarily blinds those creatures in, under, or within 120 feet of the area and that have an unobstructed line of sight to the burst. Creatures viewing this are blinded for 1d4+1 rounds unless they successfully save vs. spell. The fireworks fill a volume 10 times greater than that of the original fire source.\n&emsp;This spell can also cause a thick, writhing stream of smoke to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. This covers a roughly spherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source. All within the cloud must roll successful saving throws vs. spell or suffer –2 penalties to all combat rolls and Armor Class.\n&emsp;The spell uses one fire source within a 20-foot cube, which is immediately extinguished. An extremely large fire used as a source might be only partially extinguished. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers 1 point of damage per caster level.'
+    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce one of two effects, at the option of the caster.\n&emsp;First, it can produce a flashing and fiery burst of glowing, colored aerial *fireworks* that lasts one round. This effect temporarily blinds those creatures in, under, or within 120 feet of the area and that have an unobstructed line of sight to the burst. Creatures viewing this are blinded for 1d4+1 rounds unless they successfully save vs. spell. The fireworks fill a volume 10 times greater than that of the original fire source.\n&emsp;Second, this spell can also cause a thick, writhing stream of *smoke* to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. Currently [[@{level-wizard}]] rounds. This covers a roughly spherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source. All within the cloud must roll successful saving throws vs. spell or suffer –2 penalties to all combat rolls and Armor Class.\n&emsp;The spell uses one fire source within a 20-foot cube, which is immediately extinguished. An extremely large fire used as a source might be only partially extinguished. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers 1 point of damage per caster level. Currently [[@{level-wizard}]] points of damage. This spell does not function under water.}}{{blindness=1'
 };
 
 wiz2['Ray of Enfeeblement'] = {
@@ -1535,6 +1539,8 @@ wiz2['Ray of Enfeeblement'] = {
     'materials': '',
     'reference': 'p. 187',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 731',
+    'errata': 'Sage Advice #250 p. 22',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1554,10 +1560,12 @@ wiz2['Rope Tricks'] = {
     'materials': 'Powdered corn extract and a twisted loop of parchment.',
     'reference': 'p. 187',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 756',
+    'errata': 'Sage Advice #247 p. 28\nSage Advice #272 p. 116\nDungeon Master Option: High-Level Campaigns p. 74',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast upon a piece of rope from 5 to 30 feet long, one end of the rope rises into the air until the whole rope hangs perpendicular, as if affixed at the upper end. The upper end is, in fact, fastened to an extradimensional space. The spellcaster and up to seven others can climb up the rope and disappear into this place of safety where no creature can find them. The rope can be taken into the extradimensional space if fewer than eight persons have climbed it; otherwise, it simply stays hanging in the air (extremely strong creatures might be able to remove it, at the DM’s option). Spells cannot be cast across the interdimensional interface, nor can area effects cross it. Those in the extradimensional space can see out of it as if there were a 3-foot × 5-foot window centered on the rope. The persons in the extradimensional space must climb down prior to the end of the spell, or they are dropped from the height at which they entered the extradimensional space. The rope can be climbed by only one person at a time. Note that the *rope trick* spell enables climbers to reach a normal place if they do not climb all the way to the extradimensional space. Also note that creating or taking extradimensional spaces into an existing extradimensional space is hazardous.'
+    'effect': 'When this spell is cast upon a piece of rope from 5 to 30 feet long, one end of the rope rises into the air until the whole rope hangs perpendicular, as if affixed at the upper end. The upper end is, in fact, fastened to an extradimensional space. The spellcaster and up to seven others can climb up the rope and disappear into this place of safety where no creature can find them. The rope can be taken into the extradimensional space if fewer than eight persons have climbed it; otherwise, it simply stays hanging in the air (extremely strong creatures might be able to remove it, at the DM’s option).\n&emsp;Spells cannot be cast across the interdimensional interface, nor can area effects cross it. Those in the extradimensional space can see out of it as if there were a 3-foot × 5-foot window centered on the rope. Creatures in the extradimensional space will not run out of air while the spell lasts.\n&emsp;The persons in the extradimensional space must climb down prior to the end of the spell, or they are dropped from the height at which they entered the extradimensional space. The rope can be climbed by only one person at a time. Note that the *rope trick* spell enables climbers to reach a normal place if they do not climb all the way to the extradimensional space. Also note that creating or taking extradimensional spaces into an existing extradimensional space is hazardous as it has catastrophic effects. The spell is ineffective in any locale where extradimensional spaces are inaccessible, such as the Astral Plane.\n&emsp;A rope lowered from the space is fixed at only one end. There is nothing to stop someone from tossing the loose end over a nearby barrier (even a *wall of force*) and then climbing down.\n&emsp;A rope trick can support about 1,000 pounds, but the DM is free to assign a higher or lower limit. A frayed or rotten rope might break before the spell’s limit is exceeded.'
 };
 
 wiz2['Scare'] = {

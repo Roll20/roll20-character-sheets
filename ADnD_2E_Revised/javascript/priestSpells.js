@@ -1375,17 +1375,19 @@ pri3['Pyrotechnics'] = {
     'sphere': 'Elemental (Fire)',
     'range': '160 yards',
     'duration': 'Special',
-    'aoe': '10 or 100 x fire',
+    'aoe': '10 or 100 times a single fire source',
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Special',
-    'materials': 'One fire source within the area of effect which is immediately extinguished',
+    'materials': 'One fire source within a 20-foot cube, which is immediately extinguished.',
     'reference': 'p. 270',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 476',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #256 p. 28',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce either of two effects, at the option of the caster.\n&emps;First, it can produce a flashing and fiery burst of glowing, colored  aerial fireworks that lasts one round. Creatures in, under, or within 120 feet of the area that have an unobstructed line of sight to the effect are blinded for [[1d4+1]] rounds unless they roll successful saving throws vs. spell. The fireworks fill a volume 10 times greater than the original fire source.\n&emsp;Second, it can cause a thick, writhing stream of smoke to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. (Currently [[@{level-priest}]] rounds). This covers a roughly hemispherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source.\n&emsp;The spell uses one fire source within the area of effect, which is immediately extinguished. If an extremely large fire is used as the source, it is only partially extinguished by the casting. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers [[1d4+[[@{level-priest}]] points of damage. This spell does not function under water.'
+    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce either of two effects, at the option of the caster.\n&emsp;First, it can produce a flashing and fiery burst of glowing, colored  aerial *fireworks* that lasts one round. Creatures in, under, or within 120 feet of the area that have an unobstructed line of sight to the effect are blinded for 1d4+1 rounds unless they roll successful saving throws vs. spell. The fireworks fill a volume 10 times greater than the original fire source.\n&emsp;Second, it can cause a thick, writhing stream of *smoke* to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. Currently [[@{level-priest}]] rounds. This covers a roughly hemispherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source.\n&emsp;The spell uses one fire source within a 20-foot cube, which is immediately extinguished. If an extremely large fire is used as the source, it is only partially extinguished by the casting. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers 1d4 points of damage, plus 1 point of damage per caster level. Currently [[1d4+[[@{level-priest}]] ]] points of damage. This spell does not function under water.}}{{blindness=1'
 };
 
 pri3['Remove Curse'] = {
