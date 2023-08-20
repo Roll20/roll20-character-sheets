@@ -192,7 +192,7 @@ wiz1['Color Spray'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 154',
-    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #213 p. 85\nSage Advice #256 p. 28\nDungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #213 p. 85\nSage Advice #256 p. 28\nSage Advice #273 p. 114\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -736,7 +736,7 @@ wiz1['Sleep'] = {
     'reference': 'p. 178',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 825',
-    'errata': 'Sage Advice #245 p. 17',
+    'errata': 'Sage Advice #245 p. 17\nSage Advice #273 p. 114',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1581,15 +1581,17 @@ wiz2['Scare'] = {
     'materials': 'A bit of bone from an undead skeleton, zombie, ghoul, ghast, or mummy.',
     'reference': 'p. 187',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 772',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes creatures with fewer than 6 Hit Dice or levels of experience to fall into fits of trembling and shaking. The frightened creatures have a –2 reaction adjustment and may drop items held if encumbered. If cornered, they fight, but with –1 penalties to attack rolls, damage rolls, and saving throws.\n&emsp;Only elves, half-elves, and priests are allowed saving throws against this spell. Note that this spell has no effect on the undead (skeletons, zombies, ghouls, and so on), or on upper or lower planar creatures of any sort.'
+    'effect': 'This spell causes creatures with fewer than 6 Hit Dice or levels of experience to fall into fits of trembling and shaking. The frightened creatures have a –2 reaction adjustment and may drop items held if encumbered. If cornered, they fight, but with –1 penalties to attack rolls, damage rolls, and saving throws.\n&emsp;Only elves, half-elves, and priests are allowed saving throws against this spell. This spell has no effect on the undead (skeletons, zombies, ghouls, and so on), or on upper or lower planar creatures of any sort.'
 };
 
 wiz2['Shatter'] = {
     'level': '2',
     'school': 'Alteration',
+    'school-spells-and-magic': 'Alteration, Song',
     'range': '[[30+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Instantaneous',
     'aoe': '3-foot radius',
@@ -1599,10 +1601,11 @@ wiz2['Shatter'] = {
     'materials': 'A chip of mica.',
     'reference': 'p. 188',
     'book': 'PHB',
-    'damage': '',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 807',
+    'damage': '*Crystalline creatures*: [[{[[@{level-wizard}]],6}kl1]]d6',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *shatter* spell is a sound-based attack that affects nonmagical objects of crystal, glass, ceramic, or porcelain, such as vials, bottles, flasks, jugs, windows, mirrors, etc. All such objects within a 3-foot radius of the center of the spell effect are smashed into dozens of pieces by the spell. Objects weighing more than one pound per level of the caster ([[@{level-wizard}]] pounds) are not affected, but all other objects of the appropriate composition must save vs. crushing blow or be shattered. Alternatively, the spell can be focused against a single item of up to 10 pounds per caster level. Crystalline creatures usually suffer 1d6 points of damage per caster level to a maximum of 6d6, with a saving throw vs. spell for half damage.'
+    'effect': 'The *shatter* spell is a sound-based attack that affects nonmagical objects of crystal, glass, ceramic, or porcelain, such as vials, bottles, flasks, jugs, windows, mirrors, etc. All such objects within a 3-foot radius of the center of the spell effect are smashed into dozens of pieces by the spell. Objects weighing more than one pound per level of the caster (currently more than [[@{level-wizard}]] pounds) are not affected, but all other objects of the appropriate composition must save vs. crushing blow or be shattered. Alternatively, the spell can be focused against a single item of up to 10 pounds per caster level. Currently up to [[10*[[@{level-wizard}]] ]] pounds. Crystalline creatures usually suffer 1d6 points of damage per caster level to a maximum of 6d6, with a saving throw vs. spell for half damage. '
 };
 
 wiz2['Spectral Hand'] = {
@@ -1618,16 +1621,18 @@ wiz2['Spectral Hand'] = {
     'materials': 'A chip of mica.',
     'reference': 'p. 188',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 841',
+    'errata': 'Sage Advice #193 p. 85',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes a ghostly, glowing hand, shaped from the caster’s life force, to materialize within the spell range and move as the caster desires. Any touch attack spell of 4th level or less that is subsequently cast by the wizard can be delivered by the spectral hand. The spell gives the caster a +2 bonus to his attack roll. The caster cannot perform any other actions when attacking with the hand; the hand returns to the caster and hovers if the caster takes other actions. The hand lasts the full spell duration unless dismissed by the caster, and it is possible to use more than one touch attack with it. The hand receives flank and rear attack bonuses if the caster is in a position to do so. The hand is vulnerable to magical attack but has an Armor Class of –2. Any damage to the hand ends the spell and inflicts 1d4 points of damage to the caster.'
+    'effect': 'This spell causes a ghostly, glowing hand, shaped from the caster’s life force, to materialize within the spell range and move as the caster desires. Any touch attack spell of 4th level or less that is subsequently cast by the wizard can be delivered by the spectral hand. The spell gives the caster a +2 bonus to his attack roll.\n&emsp;The caster cannot perform any other actions when attacking with the hand; the hand returns to the caster and hovers if the caster takes other actions. The hand lasts the full spell duration unless dismissed by the caster, and it is possible to use more than one touch attack with it. The hand receives flank and rear attack bonuses if the caster is in a position to do so. The hand is vulnerable to magical attack but has an Armor Class of –2. Any damage to the hand ends the spell and inflicts 1d4 points of damage to the caster.'
 };
 
 wiz2['Stinking Cloud'] = {
     'level': '2',
     'school': 'Evocation',
-    'school-spells-and-magic': 'Invocation/Evocation, Elemental Air, Alchemy',
+    'school-spells-and-magic': 'Evocation, Elemental Air, Alchemy',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '20-foot cube',
@@ -1637,10 +1642,12 @@ wiz2['Stinking Cloud'] = {
     'materials': 'A rotten egg or several skunk cabbage leaves.',
     'reference': 'p. 188',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 881',
+    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #232 p. 94\nDungeon Master Option: High-Level Campaigns p. 74',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When a *stinking cloud* is cast, the wizard creates a billowing mass of nauseous vapors up to 30 yards away from his position. Any creature caught within the cloud must roll a successful saving throw vs. poison or be reeling and unable to attack because of nausea for 1d4+1 rounds after leaving the cloud. Those who make successful saving throws can leave the cloud without suffering any ill effects, although those remaining in the cloud must continue to save each round. These poisonous effects can be slowed or neutralized by appropriate magic. The cloud duration is halved in a moderate breeze (8–18 m.p.h.) and is dispersed in one round by a stronger breeze.'
+    'effect': 'When a *stinking cloud* is cast, the wizard creates a billowing mass of nauseous vapors up to 30 yards away from his position. Any creature caught within the cloud must roll a successful saving throw vs. poison or be reeling and unable to attack because of nausea for 1d4+1 rounds after leaving the cloud. Those who make successful saving throws can leave the cloud without suffering any ill effects, although those remaining in the cloud must continue to save each round. These poisonous effects can be slowed or neutralized by appropriate magic. The cloud duration is halved in a moderate breeze (8–18 m.p.h.) and is dispersed in one round by a stronger breeze.\n&emsp;The gas from a *stinking cloud* spell is not flammable. A *fireball* does not generate nearly enough pressure to disperse a *stinking cloud*.\n&emsp;A permanent *stinking cloud* remains where it is created and generally is not disturbed by minor effects. If dispersed by a strong breeze or a *gust of wind* spell, the vapors return one round after the breeze or wind ceases. Even hurricane force winds cannot destroy the cloud, though the vapors are dispersed and ineffective while the winds last.'
 };
 
 wiz2['Strength'] = {
@@ -1655,10 +1662,12 @@ wiz2['Strength'] = {
     'materials': 'A few hairs, or a pinch of dung, from a particularly strong animal—ape, bear, ox, etc.',
     'reference': 'p. 188',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 888',
+    'errata': 'Sage Advice #273 p. 115',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Application of this spell increases the Strength of the character by  a number of points—or tenths of points after 18 Strength is attained  (only if the character is a warrior). Benefits of the strength spell last  for the duration of the magic. The amount of added Strength  depends upon the spell recipient’s group and is subject to all restrictions on Strength due to race and class. Multiclass characters use the best die.}}{{c1-1=&emsp;**Class**}}{{c2-1=&emsp;Priest}}{{c3-1=&emsp;Rogue}}{{c4-1=&emsp;Warrior}}{{c5-1=&emsp;Wizard}}{{c1-2=**Strength Gain**}}{{c2-2=1d6 points}}{{c3-2=1d6 points}}{{c4-2=1d8 points}}{{c5-2=1d4 points}}{{effects2=&emsp;If a warrior has an 18 Strength already, from 10% to 80% is  added to his extraordinary Strength roll. The spell cannot confer a Strength of 19 or more, nor is it cumulative with other magic that adds to Strength. Beings without Strength scores (kobolds, lizard  men, etc.) receive a +1 to attack and damage rolls.'
+    'effect': 'Application of this spell increases the Strength of the character by a number of points—or tenths of points after 18 Strength is attained (only if the character is a warrior). Benefits of the strength spell last  for the duration of the magic. The amount of added Strength  depends upon the spell recipient’s group and is subject to all restrictions on Strength due to race and class. Multiclass characters use the best die.}}{{c1-1=&emsp;**Class**}}{{c2-1=&emsp;Priest}}{{c3-1=&emsp;Rogue}}{{c4-1=&emsp;Warrior}}{{c5-1=&emsp;Wizard}}{{c1-2=**Strength Gain**}}{{c2-2=1d6 points}}{{c3-2=1d6 points}}{{c4-2=1d8 points}}{{c5-2=1d4 points}}{{effects2=&emsp;If a warrior has an 18 Strength already, from 10% to 80% is  added to his extraordinary Strength roll. The spell cannot confer a Strength of 19 or more, nor is it cumulative with other magic that adds to Strength. Beings without Strength scores (kobolds, lizard  men, etc.) receive a +1 to attack and damage rolls.'
 };
 
 wiz2['Summon Swarm'] = {
