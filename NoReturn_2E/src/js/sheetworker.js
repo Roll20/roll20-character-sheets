@@ -1,6 +1,6 @@
 /*
     CREATED by          Gorthian
-    Letzte Änderung		2023-05-27
+    Letzte Änderung		2023-07-30
 */
 
 
@@ -107,22 +107,35 @@ function setDicebot(skill,attribut,summe,skillNotiz,hazard=1,biomechanik=0) {
 
 //Trefferpunkte setzen
 function setTrefferpunkte() {
-    getAttrs(["trefferpunkte"], function(values) {
+    getAttrs(["trefferpunkte","trefferpunkte-old","trefferpunkte-zone-2","trefferpunkte-zone-3","trefferpunkte-zone-4","trefferpunkte-zone-5","trefferpunkte-zone-6","trefferpunkte-zone-7","trefferpunkte-zone-8","trefferpunkte-zone-9","trefferpunkte-zone-10","trefferpunkte-zone-11","trefferpunkte-zone-12"], function(values) {
         let trefferpunkte = parseInt(values["trefferpunkte"]||30); //Standardwert ist 30
+        let trefferpunkte_old = parseInt(values["trefferpunkte-old"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone2 = parseInt(values["trefferpunkte-zone-2"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone3 = parseInt(values["trefferpunkte-zone-3"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone4 = parseInt(values["trefferpunkte-zone-4"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone5 = parseInt(values["trefferpunkte-zone-5"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone6 = parseInt(values["trefferpunkte-zone-6"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone7 = parseInt(values["trefferpunkte-zone-7"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone8 = parseInt(values["trefferpunkte-zone-8"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone9 = parseInt(values["trefferpunkte-zone-9"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone10 = parseInt(values["trefferpunkte-zone-10"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone11 = parseInt(values["trefferpunkte-zone-11"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone12 = parseInt(values["trefferpunkte-zone-12"]||trefferpunkte); //Standardwert sind die allgemeinen TP
 
         setAttrs({
             "trefferpunkte"             : trefferpunkte,
-            "trefferpunkte-zone-2"      : trefferpunkte,
-            "trefferpunkte-zone-3"      : trefferpunkte,
-            "trefferpunkte-zone-4"      : trefferpunkte,
-            "trefferpunkte-zone-5"      : trefferpunkte,
-            "trefferpunkte-zone-6"      : trefferpunkte,
-            "trefferpunkte-zone-7"      : trefferpunkte,
-            "trefferpunkte-zone-8"      : trefferpunkte,
-            "trefferpunkte-zone-9"      : trefferpunkte,
-            "trefferpunkte-zone-10"     : trefferpunkte,
-            "trefferpunkte-zone-11"     : trefferpunkte,
-            "trefferpunkte-zone-12"     : trefferpunkte
+            "trefferpunkte-zone-2"      : zone2==trefferpunkte_old?trefferpunkte:zone2,
+            "trefferpunkte-zone-3"      : zone3==trefferpunkte_old?trefferpunkte:zone3,
+            "trefferpunkte-zone-4"      : zone4==trefferpunkte_old?trefferpunkte:zone4,
+            "trefferpunkte-zone-5"      : zone5==trefferpunkte_old?trefferpunkte:zone5,
+            "trefferpunkte-zone-6"      : zone6==trefferpunkte_old?trefferpunkte:zone6,
+            "trefferpunkte-zone-7"      : zone7==trefferpunkte_old?trefferpunkte:zone7,
+            "trefferpunkte-zone-8"      : zone8==trefferpunkte_old?trefferpunkte:zone8,
+            "trefferpunkte-zone-9"      : zone9==trefferpunkte_old?trefferpunkte:zone9,
+            "trefferpunkte-zone-10"     : zone10==trefferpunkte_old?trefferpunkte:zone10,
+            "trefferpunkte-zone-11"     : zone11==trefferpunkte_old?trefferpunkte:zone11,
+            "trefferpunkte-zone-12"     : zone12==trefferpunkte_old?trefferpunkte:zone12,
+            "trefferpunkte-old"         : trefferpunkte
         });
     });
 }
