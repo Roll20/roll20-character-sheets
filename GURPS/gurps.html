@@ -4362,6 +4362,7 @@
 				<!-- current version notes: 2.9.12 -->
 				<ul>
 					<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
+					<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.</li>
 					<li>
 						List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
 					</li>
@@ -12862,8 +12863,12 @@ visualize what it will look like in chat.
 					<div class="box firing-up-down">
 						<div class="table">
 							<div class="row title">
-								<div class="cell">
+								
+								<div class="cell range-calculator-title">
 									<span data-i18n="range-calculator-label">Range Calculator</span>
+								</div>
+								<div class="cell reset range-calculator-reset">
+									<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
 								</div>
 							</div>
 							<div class="header">
@@ -12943,10 +12948,15 @@ visualize what it will look like in chat.
 								<div class="cell hit-mod">
 									<span data-i18n="abbreviation-hit-modifier-label">Hit Mod</span>
 								</div>
-								<div class="cell reset">
-									&nbsp;
+								<div class="cell braced">
+									<div class="popup">
+										<span data-i18n="braced-title">Braced</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="braced-title-tooltip">If you brace a firearm or crossbow, you get an extra +1 to Acc. See B364.</span>
+									</span>
 								</div>
-								<div class="cell reset apply-button">
+								<div class="cell braced apply-button">
 									<div class="popup">
 										<span data-i18n="help-label">Help</span>
 									</div>
@@ -12990,10 +13000,10 @@ visualize what it will look like in chat.
 									<div class="cell hit-mod">
 										<input type="number" step="1" value="0" name="attr_firing_hit_mod" readonly="readonly" title="Macro: @{NAME|firing_hit_mod}" />
 									</div>
-									<div class="cell reset">
-										<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
+									<div class="cell braced roll-modifiers centered">
+										<input type="checkbox" name="attr_firing_braced" value="1" title="Macro: @{NAME|firing_braced}">
 									</div>
-									<div class="cell reset apply-button">
+									<div class="cell braced reset apply-button">
 										<button type="action" name="act_apply_firing_modifiers" class="reset"><span data-i18n="apply-label">Apply</span></button>
 									</div>
 								</div>
@@ -14752,6 +14762,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<!-- current version notes: 2.9.12 -->
 			<ul>
 				<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
+				<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.</li>
 				<li>
 					List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
 				</li>
@@ -24437,6 +24448,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				"firing_size_mod": 0,
 				"firing_elevation": 0,
 				"firing_acc": 0,
+				"firing_braced": 0,
 				"firing_aiming_bonus": 0,
 				"firing_rof": 0,
 			}, null, callback);
@@ -24472,6 +24484,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			"firing_acc",
 			"firing_aiming_bonus",
 			"firing_rof",
+			"firing_braced",
 			"size"
 		];
 	
@@ -24493,6 +24506,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let acc = Number(values.firing_acc);
 	
 			let aiming = Number(values.firing_aiming_bonus);
+
+			let braced = Number(values.firing_braced);
 	
 			let rof = Number(values.firing_rof);
 	
@@ -24558,6 +24573,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 				}
 	
+				if (braced) {
+	
+					rangedRollModSummary += `+${braced} Braced\n`;
+	
+				}
+	
 				if (rofModifier) {
 	
 					rangedRollModSummary += `+${rofModifier} RoF\n`;
@@ -24591,6 +24612,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					target_size_modifier: sizeMod,
 					ranged_accuracy_bonus: acc,
 					ranged_aiming_bonus: aiming,
+					ranged_braced: braced,
 					ranged_rof: rof,
 					ranged_elevation: elevation,
 					ranged_range_speed: linearDistance + speed
