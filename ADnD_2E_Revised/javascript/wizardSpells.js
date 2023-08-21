@@ -1747,7 +1747,7 @@ wiz2['Whispering Wind'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard is able to either send a message or cause some desired sound effect. The whispering wind can travel as many miles above ground as the spellcaster has levels of experience, to a specific location within range that is familiar to the wizard. The whispering wind is as gentle and unnoticed as a zephyr until it reaches the location. It then delivers its whisper-quiet message or other sound. Note that the message is delivered regardless of whether anyone is present to hear it. The wind then dissipates. The wizard can prepare the spell to bear a message of up to 25 words, cause the spell to deliver other sounds for one round, or merely have the whispering wind seem to be a faint stirring of the air that has a susurrant sound. He can likewise cause the whispering wind to move as slowly as a mile per hour or as quickly as a mile per turn. When the spell reaches its objective, it swirls and remains until the message is delivered. As with the *magic mouth* spell, no spells may be cast via the *whispering wind*.'
+    'effect': 'By means of this spell, the wizard is able to either send a message or cause some desired sound effect. The *whispering wind* can travel as many miles above ground as the spellcaster has levels of experience, to a specific location within range that is familiar to the wizard. The wind is as gentle and unnoticed as a zephyr until it reaches the location. It then delivers its whisper-quiet message or other sound. Note that the message is delivered regardless of whether anyone is present to hear it. The wind then dissipates.\n&emsp;The wizard can prepare the spell to bear a message of up to 25 words, cause the spell to deliver other sounds for one round, or merely have the *whispering wind* seem to be a faint stirring of the air that has a susurrant sound. He can likewise cause the *whispering wind* to move as slowly as a mile per hour or as quickly as a mile per turn. When the spell reaches its objective, it swirls and remains until the message is delivered. As with the *magic mouth* spell, no spells may be cast via the *whispering wind*.'
 };
 
 wiz2['Wizard Lock'] = {
@@ -1763,10 +1763,11 @@ wiz2['Wizard Lock'] = {
     'materials': '',
     'reference': 'p. 189',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1028',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *wizard lock* spell cast upon a door, chest, or portal magically locks it. The caster can freely pass his own lock without affecting it; otherwise, the wizard-locked door or object can be opened only by breaking in, by a successful *dispel magic* or *knock* spell, or by a wizard four or more levels higher than the one casting the spell. Note that the last two methods do not remove the wizard lock; they only negate it for a brief duration— about one turn. Creatures from other planes cannot burst a wizard lock as they can a held portal (see the *hold portal* spell).'
+    'effect': 'A *wizard lock* spell cast upon a door, chest, or portal magically locks it. The caster can freely pass his own lock without affecting it; otherwise, the *wizard locked* door or object can be opened only by breaking in, by a successful *dispel magic* or *knock* spell, or by a wizard four or more levels higher than the one casting the spell. Currently a wizard of level [[4+[[@{level-wizard}]] ]] or higher. Note that the last two methods do not remove the *wizard lock*, they only negate it for a brief duration, about one turn. Creatures from other planes cannot burst a *wizard lock* as they can a held portal (see the *hold portal* spell).'
 };
 
 let wiz3 = {};
