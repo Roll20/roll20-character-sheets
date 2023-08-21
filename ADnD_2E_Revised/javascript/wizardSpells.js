@@ -1683,10 +1683,11 @@ wiz2['Summon Swarm'] = {
     'materials': 'A square of red cloth.',
     'reference': 'p. 188',
     'book': 'PHB',
-    'damage': '*Defending:* 1 damage per round\n*Other actions:* 1d4+[[@{level-wizard}]]',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 899',
+    'damage': '*Defending:* 1 damage per round\n*Other actions:* 1d4+[[floor([[@{level-wizard}]]/3)]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'The swarm of small animals (roll on following table to determine type, or the DM can assign an appropriate creature) drawn by the *summon swarm* spell will viciously attack all creatures in the area chosen by the caster. Creatures actively defending against the swarm to the exclusion of other activities suffer 1 point of damage for each round spent in the swarm. Those taking other actions, including leaving the swarm, receive damage equal to 1d4 points + 1 point per three levels of the caster each round. Note that spellcasting within the swarm is impossible.}}{{style=center1}}{{c1-1=**Dice Roll**}}{{c2-1=01–40}}{{c3-1=41–70}}{{c4-1=71–80}}{{c5-1=81–90}}{{c6-1=91–100}}{{c1-2=**Swarm Type**}}{{c2-2=Rats}}{{c3-2=Bats}}{{c4-2=Spiders}}{{c5-2=Centipedes/beetles}}{{c6-2=Flying insects}}{{effects2=&emsp;The swarm cannot be fought effectively with weapons, but fire and area effects can force it to disperse by inflicting damage. The swarm disperses when it has taken a total of 2 hit points per caster level from these attacks. Currently [[2*[[@{level-wizard}]] ]] damage to disperse. A *protection from evil* spell keeps the swarm at bay, and certain area-effect spells, such as *gust of wind* and *stinking cloud*, disperse a swarm immediately, if appropriate to the swarm summoned (for example, only flyers are affected by a *gust of wind*). The caster must remain stationary and undisturbed to control the swarm; if his concentration lapses or is broken, the swarm disperses in two rounds. The swarm is stationary once conjured.'
+    'effect': 'The swarm of small animals (roll on following table to determine type, or the DM can assign an appropriate creature) drawn by the *summon swarm* spell will viciously attack all creatures in the area chosen by the caster. Creatures actively defending against the swarm to the exclusion of other activities suffer 1 point of damage for each round spent in the swarm. Those taking other actions, including leaving the swarm, receive damage equal to 1d4 points + 1 point per three levels of the caster, every round. Note that spellcasting within the swarm is impossible.}}{{style=center1}}{{c1-1=**Dice Roll**}}{{c2-1=01–40}}{{c3-1=41–70}}{{c4-1=71–80}}{{c5-1=81–90}}{{c6-1=91–100}}{{c1-2=**Swarm Type**}}{{c2-2=Rats}}{{c3-2=Bats}}{{c4-2=Spiders}}{{c5-2=Centipedes/beetles}}{{c6-2=Flying insects}}{{effects2=The swarm cannot be fought effectively with weapons, but fire and area effects can force it to disperse by inflicting damage. The swarm disperses when it has taken a total of 2 hit points per caster level from these attacks. Currently [[2*[[@{level-wizard}]] ]] damage to disperse. A *protection from evil* spell keeps the swarm at bay, and certain area effect spells, such as *gust of wind* and *stinking cloud*, disperse a swarm immediately, if appropriate to the swarm summoned (e.g., only flyers are affected by a *gust of wind*). The caster must remain stationary and undisturbed to control the swarm; if his concentration lapses or is broken, the swarm disperses in two rounds. The swarm is stationary once conjured.'
 };
 
 wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
@@ -1702,35 +1703,37 @@ wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
     'materials': 'A small feather and minute tarts.',
     'reference': 'p. 189',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 918',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The victim of this spell perceives everything as hilariously funny. The effect is not immediate, and the creature feels only a slight tingling on the round the spell is cast. On the round immediately following, the victim begins smiling, then giggling, chuckling, tittering, snickering, guffawing, and finally collapsing into gales of uncontrollable, hideous laughter. Although this magical mirth lasts only a single round, the affected creature must spend the next round regaining its feet, and it loses 2 points from its Strength (or –2 to attack and damage rolls) for all remaining rounds of the spell.\n&emsp;The saving throw vs. spell is modified by the Intelligence of the creature. Creatures with Intelligences of 4 or less (semi-intelligent) are totally unaffected. Those with Intelligences of 5–7 (low) save with –6 penalties. Those with Intelligences of 8–12 (average to very) save with –4 penalties. Those with Intelligences of 13–14 (high) save with –2 penalties. Those with Intelligences of 15 or greater (exceptional) have unmodified saving throws.\n&emsp;The caster can affect one creature for every three levels attained ([[floor([[@{level-wizard}]]/3)]] creatures)— for example, one at 3rd level, two at 6th level, three at 9th level, etc. All affected beings must be within 30 feet of each other.\n&emsp;The material components are a small feather and minute tarts. The tarts are hurled at the subjects, while the feather is waved in one hand.'
+    'effect': 'The victim of this spell perceives everything as hilariously funny. The effect is not immediate, and the creature feels only a slight tingling on the round the spell is cast. On the round immediately following, the victim begins smiling, then giggling, chuckling, tittering, snickering, guffawing, and finally collapsing into gales of uncontrollable, hideous laughter. Although this magical mirth lasts only a single round, the affected creature must spend the next round regaining its feet, and it loses 2 points from its Strength (or –2 to attack and damage rolls) for all remaining rounds of the spell.\n&emsp;The saving throw vs. spell is modified by the Intelligence of the creature. Creatures with Intelligences of 4 or less (semi-intelligent) are totally unaffected. Those with Intelligences of 5–7 (low) save with –6 penalties. Those with Intelligences of 8–12 (average to very) save with –4 penalties. Those with Intelligences of 13–14 (high) save with –2 penalties. Those with Intelligences of 15 or greater (exceptional) have unmodified saving throws.\n&emsp;The caster can affect one creature for every three levels attained—e.g., one at 3rd level, two at 6th level, three at 9th level, etc. Currently [[floor([[@{level-wizard}]]/3)]] creature(s). All affected beings must be within 30 feet of each other.\n&emsp;The material components are a small feather and minute tarts. The tarts are hurled at the subjects, while the feather is waved in one hand.'
 };
 
 wiz2['Web'] = {
     'level': '2',
     'school': 'Evocation',
-    'school-spells-and-magic': 'Invocation/Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[2*[[@{level-wizard}]] ]] turns',
-    'aoe': '8000 cubic feet',
+    'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'Negate or ½',
     'materials': 'A bit of spider web.',
     'reference': 'p. 189',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1007',
+    'errata': 'Sage Advice #261 p. 8\nDungeon Master Option: High-Level Campaigns p. 75',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *web* spell creates a many-layered mass of strong, sticky strands similar to spider webs but far larger and tougher. These masses must be anchored to two or more solid and diametrically opposed points— floor and ceiling, opposite walls, etc.—or the web collapses upon itself and disappears.\n&emsp;The *web* spell covers a maximum area of eight 10-foot × 10-foot × 10-foot cubes and the webs must be at least 10 feet thick, so a mass 40 feet high, 20 feet wide, and 10 feet deep may be cast. Creatures caught within webs, or simply touching them, become stuck among the gluey fibers.\n&emsp;Anyone in the area when the spell is cast must roll a saving throw vs. spell with a –2 penalty. If the saving throw is successful, two things may have occurred. If the creature has room to escape the area, then it is assumed to have jumped free. If there is no room to escape, then the webs are only half strength. Creatures with less than 13 Strength (7 if the webs are half strength) are stuck until freed by another or until the spell wears off. Missile fire is generally ineffective against creatures trapped in webs.\n&emsp;Creatures with Strengths between 13 and 17 can break through 1 foot of webs per round. Creatures with 18 or greater Strength can break through 2 feet of webs per round. If the webs are at half strength, these rates are doubled. (Great mass equates to great strength in this case, and creatures of large mass hardly notice webs.) Strong and huge creatures can break through 10 feet of webs per round.\n&emsp;Furthermore, the strands of a *web* spell are flammable. A magical *flaming sword* can slash them away as easily as a hand brushes away cobwebs. Any fire—torch, flaming oil, flaming sword, etc.—can set them alight and burn them away in a single round. All creatures within flaming webs suffer 2d4 points of damage from the flames, but those free of the strands are not harmed.'
+    'effect': 'A *web* spell creates a many-layered mass of strong, sticky strands similar to spider webs but far larger and tougher. These masses must be anchored to two or more solid and diametrically opposed points, floor and ceiling, opposite walls, etc., or the web collapses upon itself and disappears.\n&emsp;The *web* spell covers a maximum area of eight 10 ✕ 10 ✕ 10-foot cubes and the webs must be at least 10 feet thick, so a mass 40 feet high, 20 feet wide, and 10 feet deep may be cast. Creatures caught within webs, or simply touching them, become stuck among the gluey fibers.\n&emsp;Anyone in the area when the spell is cast must roll a saving throw vs. spell with a –2 penalty. If the saving throw is successful, two things may have occurred. If the creature has room to escape the area, then it is assumed to have jumped free. If there is no room to escape, then the webs are only half strength. Creatures with less than 13 Strength (7 if the webs are half strength) are stuck until freed by another or until the spell wears off. Missile fire is generally ineffective against creatures trapped in webs.\n&emsp;Creatures with Strengths between 13 and 17 can break through one foot of webs per round. Creatures with 18 or greater Strength can break through two feet of webs per round. If the webs are at half strength, these rates are doubled. (Great mass equates to great strength in this case, and creatures of large mass hardly notice webs.) Strong and huge creatures can break through 10 feet of webs per round.\n&emsp;Furthermore, the strands of a *web* spell are flammable. A magical *flaming sword* can slash them away as easily as a hand brushes away cobwebs. Any fire—torch, flaming oil, flaming sword, etc.—can set them alight and burn them away in a single round. All creatures within flaming webs suffer 2d4 points of damage from the flames, but those free of the strands are not harmed.\n&emsp;*Webs* must be properly supported if they are to be made permanent. Permanent webbing remains where it is created, if torn away, new webs spring into existence to take its place. Chunks of webbing carried out of the area of effect dissolve in seconds. Creatures can break through the webbing at the rates given in the spell description, but the webs immediately fill in behind them. Creatures who blunder into permanent webbing (or who are thrown in) can be trapped and suffocated if they fail to save vs. spell just as they can if caught in normal webbing.\n&emsp;Permanent *webs* can be burned away with fire, but they spring back into being one round after the flames die away.'
 };
 
 wiz2['Whispering Wind'] = {
     'level': '2',
     'school': 'Alteration, Phantasm',
-    'school-spells-and-magic': 'Alteration, Illusion/Phantasm, Elemental Air, Song',
+    'school-spells-and-magic': 'Alteration, Phantasm, Elemental Air, Song',
     'range': '[[@{level-wizard}]] miles',
     'duration': 'Special',
     'aoe': '2-foot radius',
@@ -1740,6 +1743,7 @@ wiz2['Whispering Wind'] = {
     'materials': '',
     'reference': 'p. 189',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1015',
     'damage': '',
     'damage-type': '',
     'healing': '',
