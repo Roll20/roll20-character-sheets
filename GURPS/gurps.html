@@ -4359,18 +4359,12 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.11 -->
+				<!-- current version notes: 2.9.12 -->
 				<ul>
+					<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
+					<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.</li>
 					<li>
-						Shotgun Damage Tool. Changed the title, added some additional tooltips and moved the DR multiplier note next to the damage roll.
-					</li>
-					<li>
-						Spell Roll Chat Log. Streamlined some of the content so spells take up a little less space.
-					</li>
-					<li>
-						List of minor changes: roll results notes font size changed from 13px to 12px.<br />
-						Moved the custom success/fail messages for spells just below the roll result in chat dialog.<br />
-						Fixed bug where repeating languages were not calculating correctly.<br />
+						List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
 					</li>
 				</ul>
 					
@@ -12869,8 +12863,12 @@ visualize what it will look like in chat.
 					<div class="box firing-up-down">
 						<div class="table">
 							<div class="row title">
-								<div class="cell">
+								
+								<div class="cell range-calculator-title">
 									<span data-i18n="range-calculator-label">Range Calculator</span>
+								</div>
+								<div class="cell reset range-calculator-reset">
+									<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
 								</div>
 							</div>
 							<div class="header">
@@ -12950,10 +12948,15 @@ visualize what it will look like in chat.
 								<div class="cell hit-mod">
 									<span data-i18n="abbreviation-hit-modifier-label">Hit Mod</span>
 								</div>
-								<div class="cell reset">
-									&nbsp;
+								<div class="cell braced">
+									<div class="popup">
+										<span data-i18n="braced-title">Braced</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="braced-title-tooltip">If you brace a firearm or crossbow, you get an extra +1 to Acc. See B364.</span>
+									</span>
 								</div>
-								<div class="cell reset apply-button">
+								<div class="cell braced apply-button">
 									<div class="popup">
 										<span data-i18n="help-label">Help</span>
 									</div>
@@ -12997,10 +13000,10 @@ visualize what it will look like in chat.
 									<div class="cell hit-mod">
 										<input type="number" step="1" value="0" name="attr_firing_hit_mod" readonly="readonly" title="Macro: @{NAME|firing_hit_mod}" />
 									</div>
-									<div class="cell reset">
-										<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
+									<div class="cell braced roll-modifiers centered">
+										<input type="checkbox" name="attr_firing_braced" value="1" title="Macro: @{NAME|firing_braced}">
 									</div>
-									<div class="cell reset apply-button">
+									<div class="cell braced reset apply-button">
 										<button type="action" name="act_apply_firing_modifiers" class="reset"><span data-i18n="apply-label">Apply</span></button>
 									</div>
 								</div>
@@ -14756,7 +14759,17 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.11 -->
+			<!-- current version notes: 2.9.12 -->
+			<ul>
+				<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
+				<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.</li>
+				<li>
+					List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.11</h4>
+			<p>Pull Request: 8/14/2023</p>
 			<ul>
 				<li>
 					Shotgun Damage Tool. Changed the title, added some additional tooltips, and moved the DR multiplier note next to the damage roll.
@@ -18692,7 +18705,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                         {{#rollTotal() activeDefense 1}}
                             {{#rollLess() effectiveSkill 1}}
 							<div style="color: red; margin-top: 6px;">
-								<span data-i18n="rolltemplate-warning-less-than-three-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
+								<span data-i18n="rolltemplate-warning-less-than-one-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
 							</div> 
                             {{/rollLess() effectiveSkill 1}}
                         {{/rollTotal() activeDefense 1}}
@@ -19165,9 +19178,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.11";
+	const version = "2.9.12";
 	
-	const latestChangesDate = "8/14/2023";
+	const latestChangesDate = "8/21/2023";
 	
 	let modCascade = true;
 	
@@ -20237,6 +20250,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 	
 		damageTable = generateDamageTable();
+
+		resetAllRollModifiers();
 	
 	});
 	
@@ -24433,6 +24448,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				"firing_size_mod": 0,
 				"firing_elevation": 0,
 				"firing_acc": 0,
+				"firing_braced": 0,
 				"firing_aiming_bonus": 0,
 				"firing_rof": 0,
 			}, null, callback);
@@ -24468,6 +24484,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			"firing_acc",
 			"firing_aiming_bonus",
 			"firing_rof",
+			"firing_braced",
 			"size"
 		];
 	
@@ -24489,6 +24506,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let acc = Number(values.firing_acc);
 	
 			let aiming = Number(values.firing_aiming_bonus);
+
+			let braced = Number(values.firing_braced);
 	
 			let rof = Number(values.firing_rof);
 	
@@ -24554,6 +24573,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 				}
 	
+				if (braced) {
+	
+					rangedRollModSummary += `+${braced} Braced\n`;
+	
+				}
+	
 				if (rofModifier) {
 	
 					rangedRollModSummary += `+${rofModifier} RoF\n`;
@@ -24587,6 +24612,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					target_size_modifier: sizeMod,
 					ranged_accuracy_bonus: acc,
 					ranged_aiming_bonus: aiming,
+					ranged_braced: braced,
 					ranged_rof: rof,
 					ranged_elevation: elevation,
 					ranged_range_speed: linearDistance + speed
@@ -28924,6 +28950,17 @@ B378
 		resetRollModifiersToolBox();
 	
 	});
+
+	// reset all roll modifiers 
+	function resetAllRollModifiers() {
+
+		["melee", "ranged", "spell", "skill", "technique", "defense"].forEach(section => {
+	
+			setAttrs({roll_modifier_types: section}, {select: false}, resetRollModifiersToolBox(applyRollModifiers));
+			
+		});
+
+	}
 	
 	/**
 	 * Resets the roll modifiers fields in the dialog box
