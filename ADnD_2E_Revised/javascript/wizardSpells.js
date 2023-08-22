@@ -1804,11 +1804,13 @@ wiz3['Clairaudience'] = {
     'saving-throw': 'None',
     'materials': 'A small horn of at least 100 gp value.',
     'reference': 'p. 190',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 144',
+    'errata': 'Sage Advice #265 p. 26\nDungeon Master Option: High-Level Campaigns p. 70',
     'book': 'PHB',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *clairaudience* spell enables the wizard to concentrate upon some locale and hear in his mind any noise within a 60-foot radius of that point. Distance is not a factor, but the locale must be known—a place familiar to the spellcaster or an obvious one (such as behind a door, around a corner, in a copse of trees, etc.). Only sounds that are normally detectable by the wizard can be heard by use of this spell. Lead sheeting or magical protections prevent the operation of the spell, and the wizard has some indication that the spell is so blocked. The spell creates an invisible sensor, similar to that created by a *crystal ball* spell, that can be dispelled. The spell functions only on the wizard’s current plane of existence.'
+    'effect': 'The *clairaudience* spell enables the wizard to concentrate upon some locale and hear in his mind any noise within a 60-foot radius of that point. Distance is not a factor, but the locale must be known—a place familiar to the spellcaster or an obvious one (such as behind a door, around a corner, in a copse of trees, etc.). Only sounds that are normally detectable by the wizard can be heard by use of this spell. Lead sheeting or magical protections prevent the operation of the spell, and the wizard has some indication that the spell is so blocked. The spell creates an invisible sensor, similar to that created by a *crystal ball* spell, that can be dispelled; once placed, the sensor is immobile. The spell functions only on the wizard’s current plane of existence.\n&emsp;When placing the sensor, the caster must be precise and state the location in terms he knows or are fairly obvious. For example, the caster cannot place the sensor six inches from Ren the wizard’s left ear if he has no idea where Ren is at the moment. He can place the sensor in the exact center of Ren’s laboratory if he has a reasonable idea where the laboratory is located. A general location for the sensor is permissible if the location is based on something known or obvious to the caster. For example, the caster could specify the exact center of the chamber beyond a closed door nearby.'
 };
 
 wiz3['Clairvoyance'] = {
@@ -1824,10 +1826,12 @@ wiz3['Clairvoyance'] = {
     'materials': 'A pinch of powdered pineal gland.',
     'reference': 'p. 190',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume One p. 144',
+    'errata': 'Sage Advice #269 p. 115\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Similar to the *clairaudience* spell, the *clairvoyance* spell empowers the wizard to see in his mind whatever is within sight range from the spell locale chosen. Distance from the wizard is not a factor, but the locale must be known—familiar or obvious. Furthermore, light is a factor, as the spell does not enable the use of infravision or magical enhancements. If the area is magically dark, only darkness is seen; if naturally pitch dark, only a 10-foot radius from the center of the spell’s area of effect can be seen. Otherwise, the seeing extends to the normal vision range according to the prevailing light. Lead sheeting or magical protection foils a *clairvoyance* spell, and the wizard has some indication that it is so blocked. The spell creates an invisible sensor, similar to that created by a *crystal ball* spell, that can be dispelled. The spell functions only on the wizard’s current plane of existence.'
+    'effect': 'Similar to the *clairaudience* spell, the *clairvoyance* spell empowers the wizard to see in his mind whatever is within sight range from the spell locale chosen. Distance from the wizard is not a factor, but the locale must be known—familiar or obvious. Furthermore, light is a factor, as the spell does not enable the use of infravision or magical enhancements. If the area is magically dark, only darkness is seen; if naturally pitch dark, only a 10-foot radius from the center of the spell’s area of effect can be seen. Otherwise, the seeing extends to the normal vision range according to the prevailing light. Lead sheeting or magical protection foils a *clairvoyance* spell, and the wizard has some indication that it is so blocked. The spell creates an invisible sensor, similar to that created by a *crystal ball* spell, that can be dispelled; once placed, the sensor is immobile. The spell functions only on the wizard’s current plane of existence.\n&emsp;When placing the sensor, the caster must be precise and state the location in terms he knows or are fairly obvious. For example, the caster cannot place the sensor six inches from Ren the wizard’s left ear if he has no idea where Ren is at the moment. He can place the sensor in the exact center of Ren’s laboratory if he has a reasonable idea where the laboratory is located. A general location for the sensor is permissible if the location is based on something known or obvious to the caster. For example, the caster could specify the exact center of the chamber beyond a closed door nearby.\n&emsp;*Clairvoyance* used to see on the other side of a door, cannot be used to cast a spell in the same location, without first opening the door.'
 };
 
 wiz3['Delude'] = {
