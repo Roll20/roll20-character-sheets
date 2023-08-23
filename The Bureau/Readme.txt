@@ -1,1 +1,2 @@
-First upload of the character sheet
+Updated visual
+Compatible with dark mode

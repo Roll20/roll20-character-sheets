@@ -1,0 +1,45 @@
+include ./container
+include ../../oracles/mixins/oracle-table
+
+mixin movePreviewFactory(move, options)
+  +container(move, options)
+    .rules-text !{move.Text}
+    if move.Oracle
+      .move-oracle-container
+        - let btnText = `Roll the ${move.Name} oracle`
+        - var moveOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
+        if moveOracle.Table
+          +oracleSingleButton(moveOracle, btnText)
+          +oracleTable(moveOracle)
+        else if moveOracle.Tables
+          +oracleMultiBtn(moveOracle)
+          +oracleMultiSubTable(moveOracle, btnText)
+
+mixin movePreview(move, options)
+  if options.no_title
+    div
+  else
+    div.move-title.move-preview=move.Name
+      if move['Progress Move']
+        span.move-progress-label='Progress Move'
+  - const statCheck = move.Triggers.find(trigger => { return trigger["Stat Options"] })
+  if move['Progress Move']
+    +rollLabel
+      +progressRoll(move, 'hide-element')
+  else if statCheck
+    +rollLabel
+      +movesRoll(move, 'hide-element')
+  .move-description
+    block
+  .oracle-footer.move-page-footer=move.page
+
+mixin container(move, options = false)
+  if options.visibility
+    div.move-visible.surface
+      +movePreview(move, options)
+        block
+  else
+    input(type='radio' name='attr_move_preview' class=`${move.id} hide-element` value=move.Name)
+    div(class=`${move.id} surface showhide`)
+      +movePreview(move, options)
+        block

@@ -1,0 +1,696 @@
+
+<script type="text/worker">function setActiveCharacterId(charId){
+    var oldAcid=getActiveCharacterId();
+    var ev = new CustomEvent("message");
+    ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+    self.dispatchEvent(ev); 
+    return oldAcid;
+}
+
+var _sIn=setInterval;
+setInterval=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sIn(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+
+var _sto=setTimeout
+setTimeout=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sto(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+
+function getAttrsAsync(props){
+    var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+    var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try{
+                getAttrs(props,(values)=>{  resolve(values); }); 
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+    });
+}
+
+//use the same pattern for each of the following...
+function setAttrsAsync(propObj, options){
+    var acid=getActiveCharacterId(); 
+    var prevAcid=null;               
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  
+            try{
+                setAttrs(propObj,options,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); 
+    });
+}on('clicked:menu', async (menu) => {
+    const data = menu.htmlAttributes.value;
+
+    await setAttrsAsync({ tab: data });
+});
+
+const qualite = ['costaud', 'malin', 'mignon'];
+
+qualite.forEach(stat => {
+    on(`clicked:${stat}`, async (base) => {
+        const listAttrs = [
+            `character_name`,
+            stat,
+            `jets`
+        ];
+        const attrs = await getAttrsAsync(listAttrs);
+        const name = attrs['character_name'];
+        const jet = attrs[`jets`];
+        const value = +attrs[stat];
+
+        let relance = '';
+
+        switch(stat) {
+            case 'costaud':
+                relance = 'relance_costaud';
+                break;
+
+            case 'malin':
+                relance = 'relance_malin';
+                break;
+
+            case 'mignon':
+                relance = 'relance_mignon';
+                break;
+        }
+
+        console.log(relance);
+
+        const finalRoll = await startRoll(`${jet} &{template:simple} {{name=${name}}} {{subname=${getTranslationByKey(stat)}}} {{type=[[?{Type ?|Jet Standard, 3|Jet avec Avantage, 4|Jet avec Désavantage, 2}]]}} {{roll=[[?{Type ?|Jet Standard, 3|Jet avec Avantage, 4|Jet avec Désavantage, 2}D6<${value}]]}} {{button=[${getTranslationByKey('relance')}](~${relance})}}`);
+
+        const computed = {};
+        finishRoll(finalRoll.rollId, computed);
+    });
+});
+
+const talents = [
+    'bougerpopotin', 'bricolertruc', 'connaitrelois', 'convaincrebaratiner', 'cueillirchasser', 'cuisiner', 'dessinerpeindre', 'fairemusique',
+    'fairepoches', 'feulermenacer', 'griffer', 'herboriser', 'lireecrire', 'lireciel', 'observerfouiller', 'restercalme',
+    'soccuperbetes', 'cacherombres', 'deplacerensilence', 'seduirecharmer', 'soignerblessures', 'trouverchemin', 'trouverinformation'
+];
+
+talents.forEach(talent => {
+    on(`clicked:${talent}`, async (base) => {
+        const listAttrs = [
+            `character_name`,
+            `${talent}_select`,
+            `jets`
+        ];
+        const attrs = await getAttrsAsync(listAttrs);
+        const name = attrs['character_name'];
+        const attribut = attrs[`${talent}_select`];
+        const jet = attrs[`jets`];
+        const value = await getAttrsAsync([attribut]);
+
+        let relance = '';
+
+        switch(attribut) {
+            case 'costaud':
+                relance = 'relance_costaud';
+                break;
+
+            case 'malin':
+                relance = 'relance_malin';
+                break;
+
+            case 'mignon':
+                relance = 'relance_mignon';
+                break;
+        }
+
+        const finalRoll = await startRoll(`${jet} &{template:simple} {{name=${name}}} {{subname=${getTranslationByKey(talent)} - ${getTranslationByKey(attribut)}}} {{roll=[[4D6<${value[attribut]}]]}} {{button=[${getTranslationByKey('relance')}](~${relance})}}`);
+
+        const computed = {};
+        finishRoll(finalRoll.rollId, computed);
+    });
+});
+
+const score = [
+    'amitie',
+    'coeur'
+];
+
+score.forEach(valeur => {
+    on(`change:${valeur} change:costaud change:malin change:mignon sheet:opened`, async (base) => {
+        const listAttrs = [
+            `${valeur}`,
+            'costaud',
+            'malin',
+            'mignon'
+        ];
+        const attrs = await getAttrsAsync(listAttrs);
+
+        const costaud = +attrs['costaud'];
+        const malin = +attrs['malin'];
+        const mignon = +attrs['mignon'];
+        const value = +attrs[`${valeur}`];
+
+        let max = 0;
+
+        switch(valeur) {
+            case 'amitie':
+                max = mignon;
+                break;
+
+            case 'coeur':
+                max = costaud+malin;
+                break;
+        }
+
+        const update = {};
+        update[`${valeur}_max`] = max;
+
+        if(value > max) update[`${valeur}`] = max;
+
+        await setAttrsAsync(update);
+    });
+});</script>
+<div class="content">
+  <button type="roll" style="display:none;" name="roll_relance_costaud" value="@{jets} &{template:simple} {{name=@{character_name} }} {{subname=^{relance} }} {{roll=[[1D6<@{costaud}]]}}" style="display:none;"/>
+<button type="roll" style="display:none;" name="roll_relance_malin" value="@{jets} &{template:simple} {{name=@{character_name} }} {{subname=^{relance} }} {{roll=[[1D6<@{malin}]]}}" style="display:none;"/>
+<button type="roll" style="display:none;" name="roll_relance_mignon" value="@{jets} &{template:simple} {{name=@{character_name} }} {{subname=^{relance} }} {{roll=[[1D6<@{mignon}]]}}" style="display:none;"/>
+
+<div class="header">
+    <div class="col">
+        <label class="name">
+            <span data-i18n="chaton">Chaton</span>
+            <input type="text" name="attr_character_name">
+        </label>
+
+        <div class="identite">
+            <label>
+                <span data-i18n="enfance">Enfance</span>
+                <input type="text" name="attr_enfance">
+            </label>
+            <label>
+                <span data-i18n="caractere">Caractère</span>
+                <input type="text" name="attr_caractere">
+            </label>
+        </div>
+    </div>
+
+    <div class="col">
+        <label class="config">
+            <input type="checkbox" name="attr_options"  value="1" />
+            <span></span>
+        </label>
+        <input type="hidden" name="attr_options" />
+        <div class="config">
+            <div class="full">
+                <label>
+                    <span data-i18n="jets">Les jets sont</span>
+                    <select name="attr_jets">
+                        <option value="" data-i18n="public">public</option>
+                        <option value="/w gm" data-i18n="prives">privés</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="don">
+            <span data-i18n="donDeNaissance">Don de naissance</span>
+            <div class="autoex autoex22">
+                <textarea name="attr_dondenaissance"></textarea>
+                <span name="attr_dondenaissance"></span>
+            </div>
+        </div>
+        <div class="experience">
+            <span data-i18n="experience">Expérience</span>
+            <div class="double">
+                <input type="number" name="attr_experience" value="0" min="0" />
+                <span class="separateur">/</span>
+                <input type="number" name="attr_experience_totale" value="0" min="0" />
+
+                <span class="absoluteL" data-i18n="actuelle">Actuelle</span>
+                <span class="absoluteR" data-i18n="totale">Totale</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="line">
+        <div class="qualites">
+            <h1 class="titre" data-i18n="qualites">Qualités</h1>
+            <div class="blockInput">
+                <div class="input">
+                    <img src="https://zupimages.net/up/22/47/7avx.png">
+                    <input type="number" name="attr_costaud" value="0" min="0">
+                </div>
+                <label>
+                    <button type="action" name="act_costaud" value="" class="rollDice" />
+                    <span class="subtitle costaud" data-i18n="costaud">Costaud</span>
+                </label>
+            </div>
+
+            <div class="blockInput">
+                <div class="input">
+                    <img src="https://zupimages.net/up/22/47/y7vl.png">
+                    <input type="number" name="attr_malin" value="0" min="0">
+                </div>
+                <label>
+                    <button type="action" name="act_malin" value="" class="rollDice" />
+                    <span class="subtitle malin" data-i18n="malin">Malin</span>
+                </label>
+            </div>
+
+            <div class="blockInput">
+                <div class="input">
+                    <img src="https://zupimages.net/up/22/47/vwnf.png">
+                    <input type="number" name="attr_mignon" value="0" min="0">
+                </div>
+                <label>
+                    <button type="action" name="act_mignon" value="" class="rollDice" />
+                    <span class="subtitle mignon" data-i18n="mignon">Mignon</span>
+                </label>
+            </div>
+        </div>
+        <div class="valeurs">
+            <div class="coeur">
+                <img src="https://zupimages.net/up/22/47/x9bl.png">
+                <div class="blockInput">
+                    <input type="number" name="attr_coeur" value="0" min="0">
+                    <span>/</span>
+                    <input type="number" name="attr_coeur_max" value="0" min="0" readonly>
+                </div>
+                <span class="subtitle coeur" data-i18n="coeur">Coeur</span>
+            </div>
+            <div class="amitie">
+                <img src="https://zupimages.net/up/22/47/mw97.png">
+                <div class="blockInput">
+                    <input type="number" name="attr_amitie" value="0" min="0">
+                    <span>/</span>
+                    <input type="number" name="attr_amitie_max" value="0" min="0" readonly>
+                </div>
+                <span class="subtitle amitie" data-i18n="amitie">Amitié</span>
+            </div>
+        </div>
+    </div>
+</div><div class="menu">
+	<input class="menu" type="hidden" name="attr_tab" value="1" />
+
+	<button type="action" name="act_menu" value="1">
+		<span data-i18n="talents">Talents</span>
+	</button>
+	<button type="action" name="act_menu" value="2">
+		<span data-i18n="grimoire">Grimoire</span>
+	</button>
+	<button type="action" name="act_menu" value="3">
+		<span data-i18n="sacDeVoyage">Sac de voyage</span>
+	</button>
+</div>
+  <input class="tabExtend" type="hidden" name="attr_tab" value="1"/><div class="body tab1">
+    <div class="col">
+        <div>
+            <label>
+                <input type="checkbox" name="attr_bougerpopotin" />
+                <span data-i18n="bougerpopotin">Bouger son popotin</span>
+            </label>
+            <input type="hidden" name="attr_bougerpopotin" />
+            <select name="attr_bougerpopotin_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_bougerpopotin" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_bricolertruc" />
+                <span data-i18n="bricolertruc">Bricoler des trucs et des machins</span>
+            </label>
+            <input type="hidden" name="attr_bricolertruc" />
+            <select name="attr_bricolertruc_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_bricolertruc" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_connaitrelois" />
+                <span data-i18n="connaitrelois">Connaître les lois et les légendes</span>
+            </label>
+            <input type="hidden" name="attr_connaitrelois" />
+            <select name="attr_connaitrelois_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_connaitrelois" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_convaincrebaratiner" />
+                <span data-i18n="convaincrebaratiner">Convaincre et baratiner</span>
+            </label>
+            <input type="hidden" name="attr_convaincrebaratiner" />
+            <select name="attr_convaincrebaratiner_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_convaincrebaratiner" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_cueillirchasser" />
+                <span data-i18n="cueillirchasser">Cueillir et chasser</span>
+            </label>
+            <input type="hidden" name="attr_cueillirchasser" />
+            <select name="attr_cueillirchasser_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_cueillirchasser" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_cuisiner" />
+                <span data-i18n="cuisiner">Cuisiner</span>
+            </label>
+            <input type="hidden" name="attr_cuisiner" />
+            <select name="attr_cuisiner_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_cuisiner" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_dessinerpeindre" />
+                <span data-i18n="dessinerpeindre">Dessiner et peindre</span>
+            </label>
+            <input type="hidden" name="attr_dessinerpeindre" />
+            <select name="attr_dessinerpeindre_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_dessinerpeindre" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_fairemusique" />
+                <span data-i18n="fairemusique">Faire de la musique</span>
+            </label>
+            <input type="hidden" name="attr_fairemusique" />
+            <select name="attr_fairemusique_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_fairemusique" value="" class="rollDice" />
+        </div>
+    </div>
+    <div class="col">
+        <div>
+            <label>
+                <input type="checkbox" name="attr_fairepoches" />
+                <span data-i18n="fairepoches">Faire les poches</span>
+            </label>
+            <input type="hidden" name="attr_fairepoches" />
+            <select name="attr_fairepoches_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_fairepoches" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_feulermenacer" />
+                <span data-i18n="feulermenacer">Feuler et menacer</span>
+            </label>
+            <input type="hidden" name="attr_feulermenacer" />
+            <select name="attr_feulermenacer_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_feulermenacer" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_griffer" />
+                <span data-i18n="griffer">Griffer</span>
+            </label>
+            <input type="hidden" name="attr_griffer" />
+            <select name="attr_griffer_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_griffer" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_herboriser" />
+                <span data-i18n="herboriser">Herboriser</span>
+            </label>
+            <input type="hidden" name="attr_herboriser" />
+            <select name="attr_herboriser_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_herboriser" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_lireecrire" />
+                <span data-i18n="lireecrire">Lire et écrire</span>
+            </label>
+            <input type="hidden" name="attr_lireecrire" />
+            <select name="attr_lireecrire_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_lireecrire" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_lireciel" />
+                <span data-i18n="lireciel">Lire le ciel et les étoiles</span>
+            </label>
+            <input type="hidden" name="attr_lireciel" />
+            <select name="attr_lireciel_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_lireciel" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_observerfouiller" />
+                <span data-i18n="observerfouiller">Observer et fouiller</span>
+            </label>
+            <input type="hidden" name="attr_observerfouiller" />
+            <select name="attr_observerfouiller_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_observerfouiller" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_restercalme" />
+                <span data-i18n="restercalme">Rester calme et impassible</span>
+            </label>
+            <input type="hidden" name="attr_restercalme" />
+            <select name="attr_restercalme_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_restercalme" value="" class="rollDice" />
+        </div>
+    </div>
+    <div class="col">
+        <div>
+            <label>
+                <input type="checkbox" name="attr_soccuperbetes" />
+                <span data-i18n="soccuperbetes">S'occuper des bêtes</span>
+            </label>
+            <input type="hidden" name="attr_soccuperbetes" />
+            <select name="attr_soccuperbetes_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_soccuperbetes" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_cacherombres" />
+                <span data-i18n="cacherombres">Se cacher dans les ombres</span>
+            </label>
+            <input type="hidden" name="attr_cacherombres" />
+            <select name="attr_cacherombres_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_cacherombres" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_deplacerensilence" />
+                <span data-i18n="deplacerensilence">Se déplacer en silence</span>
+            </label>
+            <input type="hidden" name="attr_deplacerensilence" />
+            <select name="attr_deplacerensilence_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_deplacerensilence" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_seduirecharmer" />
+                <span data-i18n="seduirecharmer">Séduire et charmer</span>
+            </label>
+            <input type="hidden" name="attr_seduirecharmer" />
+            <select name="attr_seduirecharmer_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_seduirecharmer" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_soignerblessures" />
+                <span data-i18n="soignerblessures">Soigner blessures et maladies</span>
+            </label>
+            <input type="hidden" name="attr_soignerblessures" />
+            <select name="attr_soignerblessures_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_soignerblessures" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_trouverchemin" />
+                <span data-i18n="trouverchemin">Trouver son chemin</span>
+            </label>
+            <input type="hidden" name="attr_trouverchemin" />
+            <select name="attr_trouverchemin_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_trouverchemin" value="" class="rollDice" />
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_trouverinformation" />
+                <span data-i18n="trouverinformation">Trouver une information</span>
+            </label>
+            <input type="hidden" name="attr_trouverinformation" />
+            <select name="attr_trouverinformation_select">
+                <option value=""></option>
+                <option value="costaud" data-i18n="costaud">Costaud</option>
+                <option value="malin" data-i18n="malin">Malin</option>
+                <option value="mignon" data-i18n="mignon">Mignon</option>
+            </select>
+            <button type="action" name="act_trouverinformation" value="" class="rollDice" />
+        </div>
+    </div>
+    <div class="full">
+        <p><b data-i18n="agir">Agir :</b> <span data-i18n="agirdetail">lancer 3d6, chaque résultat inférieur ou égal au score de la Qualité est un succès.</span></p>
+        <p><b data-i18n="seuildifficulte">Seuil de difficulté :</b> <span data-i18n="seuildifficultedetail">facile 1, moyen 2, difficile 3, légendaire 4.</span></p>
+        <p><b data-i18n="talent">Talent :</b> <span data-i18n="talentdetail">Donne un Avantage.</span> <b data-i18n="avantage">Avantage :</b> <span data-i18n="avantagedetail">Lancer 4d6.</span> <b data-i18n="desavantage">Désavantage :</b> <span data-i18n="desavantagedetail">Lancer 2d6.</span></p>
+        <p><b data-i18n="objets">Objets :</b> <span data-i18n="objetsdetail">Si utile, relancer 1d6 dont le résultat ne convient pas.</span></p>
+        <p><b data-i18n="caracterest">Caractère :</b> <span data-i18n="caracteredetail">Si positif, gagner 1 Avantage / Si négatif, offrir un point d'Amitié.</span></p>
+    </div>
+</div><div class="body tab2">
+    <fieldset class="repeating_grimoire">
+        <input type="text" name="attr_nom"/>
+        <div class="autoex autoex22">
+            <textarea name="attr_description"></textarea>
+            <span name="attr_description"></span>
+        </div>
+    </fieldset>
+</div><div class="body tab3">
+    <fieldset class="repeating_sac">
+        <div class="autoex autoex22">
+            <textarea name="attr_description"></textarea>
+            <span name="attr_description"></span>
+        </div>
+    </fieldset>
+
+    <div class="full">
+        <p data-i18n="contenusac">Une couverture en laine, un couteau de poche, une cuillère en bois, un petit caquelon de fonte, une grande gourde en cuir, un briquet à amadou, des morceaux de chandelle, un morceau de savon, une brosse, un paquet de croquette de route.</p>
+    </div>
+</div>
+</div><rolltemplate class="sheet-rolltemplate-simple">
+    <h1>{{name}}</h1>
+
+    <h2>{{subname}}</h2>
+
+    {{#rollTotal() type 3}}
+        <h2>Jet Standard</h2>
+    {{/rollTotal() type 3}}
+
+    {{#rollTotal() type 2}}
+        <h2>Jet Avec Désavantage</h2>
+    {{/rollTotal() type 2}}
+
+    {{#rollTotal() type 4}}
+        <h2>Jet Avec Avantage</h2>
+    {{/rollTotal() type 4}}
+
+    <div class="container">
+        <span data-i18n="succes">Succès</span>
+        <span>{{roll}} {{button}}</span>
+    </div>
+</rolltemplate>

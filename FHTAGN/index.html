@@ -82,14 +82,23 @@ buttonlist.forEach((button) => {
 // Handle sheet opening
 // -----------------------------------
 
-on('sheet:opened', e => {
-  getAttrs(['waffe-unbewaffnet-fert-wert', 'Waffenloser_Kampf-wert', 'Waffenloser_Kampf-basiswert'], values => {
-    if (!values['waffe-unbewaffnet-fert-wert']) {
-      setAttrs({
-        'waffe-unbewaffnet-fert-wert': values['Waffenloser_Kampf-wert'] || values['Waffenloser_Kampf-basiswert'],
-      })
+on("sheet:opened", (e) => {
+  getAttrs(
+    [
+      "waffe-unbewaffnet-fert-wert",
+      "Waffenloser_Kampf-wert",
+      "Waffenloser_Kampf-basiswert",
+    ],
+    (values) => {
+      if (!values["waffe-unbewaffnet-fert-wert"]) {
+        setAttrs({
+          "waffe-unbewaffnet-fert-wert":
+            values["Waffenloser_Kampf-wert"] ||
+            values["Waffenloser_Kampf-basiswert"],
+        });
+      }
     }
-  })
+  );
 });
 
 //
@@ -116,7 +125,7 @@ attributeList.forEach((attribute) => {
 // Trefferpunkte
 on(`change:staerke change:konstitution`, () => {
   getAttrs(["staerke", "konstitution", "trefferpunkte-aktuell"], (values) => {
-    const tp = Math.floor(
+    const tp = Math.ceil(
       (parseInt(values.staerke) + parseInt(values.konstitution)) / 2
     );
     const setObject = { "trefferpunkte-max": tp };
@@ -182,24 +191,33 @@ function createWeaponSkillHandler(skillname, skillnameClean) {
     const weaponSkillValues = weaponKeys.map(
       (index) => `waffe-${index}-fert-wert`
     );
-    const basiswertKey = e.sourceAttribute.replace('-wert', '-basiswert');
+    const basiswertKey = e.sourceAttribute.replace("-wert", "-basiswert");
     getAttrs([...weaponTypes, ...weaponSkillValues, basiswertKey], (values) => {
       weaponKeys.forEach((key) => {
         const currentWeaponType = values[`waffe-${key}-fert`];
         const currentWeaponValue = values[`waffe-${key}-fert-wert`];
 
         const isWeaponOfType = currentWeaponType === skillname;
-        const isUsingSkillValue = parseInt(currentWeaponValue) === parseInt(e.previousValue);
-        const isBothEmpty = currentWeaponValue === '' && typeof e.previousValue === 'undefined';
-        const isUsingBaseValue = parseInt(currentWeaponValue) === parseInt(values[basiswertKey]);
-        const isMatcheable = isWeaponOfType && (isUsingSkillValue || isBothEmpty || isUsingBaseValue);
+        const isUsingSkillValue =
+          parseInt(currentWeaponValue) === parseInt(e.previousValue);
+        const isBothEmpty =
+          currentWeaponValue === "" && typeof e.previousValue === "undefined";
+        const isUsingBaseValue =
+          parseInt(currentWeaponValue) === parseInt(values[basiswertKey]);
+        const isMatcheable =
+          isWeaponOfType &&
+          (isUsingSkillValue || isBothEmpty || isUsingBaseValue);
 
         if (isMatcheable) {
           console.log(`waffe-${key}-fert-wert`);
           console.log(e.newValue || values[basiswertKey]);
-          setAttrs({
-            [`waffe-${key}-fert-wert`]: e.newValue || values[basiswertKey],
-          }, {}, console.log);
+          setAttrs(
+            {
+              [`waffe-${key}-fert-wert`]: e.newValue || values[basiswertKey],
+            },
+            {},
+            console.log
+          );
         }
       });
     });
@@ -278,7 +296,10 @@ Object.keys(skills).forEach((skillname) => {
 [0, 1, 2, 3, "unbewaffnet"].forEach((key) => {
   on(`change:waffe-${key}-schaden`, (e) => {
     const templateObject = {
-      rollname: key === "unbewaffnet" ? "Unbewaffneter Schaden" : `Schaden mit @{waffe-${key}-name}`,
+      rollname:
+        key === "unbewaffnet"
+          ? "Unbewaffneter Schaden"
+          : `Schaden mit @{waffe-${key}-name}`,
       probe: `[[${e.newValue.replace("w", "d")}]]`,
     };
 

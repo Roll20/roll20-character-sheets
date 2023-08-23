@@ -1,0 +1,27 @@
+name: Charsheets Actions
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  charsheets-actions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v11.5
+        with:
+          since_last_remote_commit: true
+          separator: '::'
+      - name: Run sheet actions
+        uses: nick-invision/private-action-loader@v3
+        with:
+          pal-repo-name: Roll20/charsheets-actions
+          pal-repo-token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          file-list: ${{ steps.changed-files.outputs.all_modified_files }}
+          separator: '::'
+          credentials: ${{ secrets.SERVICE_ACCOUNT_KEY }}

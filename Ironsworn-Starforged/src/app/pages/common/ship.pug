@@ -1,0 +1,87 @@
+include ../../components/assets/asset-builder
+
+-
+  var
+    shipCategories = {
+      modules: {
+        "type": "checkbox",
+        "attribute": "ship-modules",
+        "translationId": "ship-modules",
+        "classes": "ship-btn"
+      },
+      'support-vehicles': {
+        "type": "checkbox",
+        "attribute": "ship-support-vehicles",
+        "translationId": "ship-support-vehicles",
+        "classes": "ship-btn"
+      },
+      crew: {
+        "type": "checkbox",
+        "attribute": "ship-crew",
+        "translationId": "ship-crew",
+        "classes": "ship-btn"
+      },
+      impacts: {
+        "type": "checkbox",
+        "attribute": "ship-impacts",
+        "translationId": "ship-impacts",
+        "classes": "ship-btn"
+      }
+    }
+
+mixin shipPage(sheetType)
+  div.page-container
+    input(type='radio' name=`attr_${sheetType}_page` class='ship hide-element' value='8')
+    div.ship.showhide
+      .ship-grid
+        .asset.surface
+          - const starship = assets.Assets.find(obj => { return obj.Name === 'Starship' })
+          +assetTemplate(starship, { classes: 'visible', standalone: true })
+        .ship-category-info.surface
+          if sheetType === 'character'
+            .boarded
+              +btn({
+                type: "checkbox",
+                attribute: "onboard_check_ship",
+                translationId: "ship-onboard",
+                classes: 'ship-onboard'
+              })
+          h3.i18n-text(data-i18n='resource-vehicle-integrity')=translation['resource-vehicle-integrity']
+          .info
+            +track(starship['Condition Meter'], `${sheetType}_ship`)
+          h3.i18n-text(data-i18n='impacts')=translation['impacts']
+          .info
+            - const shipImpacts = [impacts.find(obj => { return obj.title === 'ship' })]
+            +impacts(shipImpacts, {character: true, noContainer: true})
+          h3.i18n-text(data-i18n='passengers')=translation['passengers']
+          .info
+            fieldset.repeating_ship-passengers
+              input(
+                type='text'
+                name=`attr_passengers-member`
+                placeholder=translation['passengers']
+              )
+          h3.i18n-text(data-i18n='cargo')=translation['cargo']
+          .info
+            fieldset.repeating_ship-cargo
+              input(
+                type='text'
+                name=`attr_cargo`
+                placeholder=translation['cargo']
+              )
+
+        .ship-category-modules
+          h3.i18n-text(data-i18n='ship-modules')=translation['ship-modules']
+          fieldset.repeating_module-assets
+            - var assetsArray = assets.Assets.filter(obj => obj["Asset Type"] == 'Module' )
+            .asset.surface
+              +genericAssetBuilder(assetsArray, 'moduleList')
+              +customAssets
+
+        .ship-category-support-vehicles
+          h3.i18n-text(data-i18n='ship-support-vehicles')=translation['ship-support-vehicles']
+          fieldset.repeating_support-vehicle-assets
+            - var assetsArray = assets.Assets.filter(obj => obj["Asset Type"] == 'Support Vehicle' )
+            .asset.surface
+              +genericAssetBuilder(assetsArray, 'supportVehiclesList')
+              +customAssets

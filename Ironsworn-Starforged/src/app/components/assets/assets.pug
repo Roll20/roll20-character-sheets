@@ -1,0 +1,19 @@
+include ./asset-custom
+include ./asset-builder
+
+mixin assets()
+  - let onAssetsPage = ["Path", "Companion", "Deed"];
+  .assets
+    fieldset.repeating_assets.fixed-width
+      .asset.surface
+        - let assetsArray = assets.Assets.filter((asset) => onAssetsPage.includes(asset["Asset Type"]))
+        //- - let assetsArray = assets.Assets;
+        +genericAssetBuilder(assetsArray, 'assetList')
+        +customAssets
+    .hidden-fields.hide-element
+      each asset in assets.Assets
+        - let assetClassName = asset.id.replace(/asset-/i, "")
+        each ability, index in asset.Abilities
+          - let assetAbility = `'${asset.id}-ability-${index + 1}',`
+          //- - console.log(asset.id)
+        input(class=`hide-element` type='checkbox' name=`attr_${assetClassName}`)

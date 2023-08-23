@@ -39,6 +39,21 @@ on("change:FUE change:TAM", function() {
 	setAttrs({ "Damage-Bonus": damage_bonus});
   });
 });
+
+on("sheet:opened", function(eventInfo){
+    
+    setAttrs({
+        treatmentquery: getTranslationByKey("treatment-u"),
+        emergencymedicine: getTranslationByKey("emergency-u"),
+        weeklymedicine: getTranslationByKey("weekly-u"),
+        objectivegrapple: getTranslationByKey("objective-u"),
+        immobilisegrapple: getTranslationByKey("immobilise-u"),
+        knockdowngrapple: getTranslationByKey("knock-down-u"),
+        knockoutgrapple: getTranslationByKey("knock-out-u"),
+        disarmgrapple: getTranslationByKey("disarm-u")
+    });     
+    
+});
 </script>
 
 <div class='sheet-2colrow'>
@@ -622,7 +637,7 @@ on("change:FUE change:TAM", function() {
                     <td><input type="checkbox" name="attr_Success-Photography"  /></td>
                     <td data-i18n="photography-u">Fotograf&iacute;a (10%)</td>
                     <td><input type="number" name="attr_Photography" value="10"  /></td>
-                    <td><button type="roll" name="roll_Photography" value="&{template:default} {{name=^{history-u}}} {{^{roll-u}=[[1d100<@{History}]]}}" /></td>
+                    <td><button type="roll" name="roll_Photography" value="&{template:default} {{name=^{photography-u}}} {{^{roll-u}=[[1d100<@{Photography}]]}}" /></td>
                 </tr>
                 <tr data-i18n-list-item="geology">
                     <td><input type="checkbox" name="attr_Success-Geology"  /></td>
@@ -670,7 +685,7 @@ on("change:FUE change:TAM", function() {
                     <td><input type="checkbox" name="attr_Success-Medicine"  /></td>
                     <td data-i18n="medicine-u">Medicina (05%)</td>
                     <td><input type="number" name="attr_Medicine" value="5"  /></td>
-                    <td><button type="roll" name="roll_Medicine" value="&{template:default} {{name=^{medicine-u}}} {{^{roll-u}=[[1d100<@{Medicine}]]}} {{^{heal-u}=[[?{Tratamiento|Urgencia, 1d3|Semanal, 2d3}]]}}" /></td>
+                    <td><button type="roll" name="roll_Medicine" value="&{template:default} {{name=^{medicine-u}}} {{^{roll-u}=[[1d100<@{Medicine}]]}} {{^{heal-u}=[[?{@{treatmentquery}|@{emergencymedicine}, 1d3|@{weeklymedicine}, 2d3}]]}}" /></td>
                 </tr>
                 <tr data-i18n-list-item="cthulhu-mythos">
                     <td></td>
@@ -933,7 +948,7 @@ on("change:FUE change:TAM", function() {
                 <td><input type="number" name="attr_Grapple-ApR" /></td>
                 <td><input type="text" name="attr_Grapple-HP" style="width: 50px" /></td>
                 <td><button type="roll" name="roll_Grapple" value="&{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}}" /></td>
-				<td><button type="roll" name="roll_wgm-Grapple" value="/w gm &{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}} {{^{damage-u}= ?{^{objective-u}|Inmovilizar, [[1d100<((5*(@{STR}-@{target|STR})))+50]]|Derribar, [[1]]|Noquear, [[1]]|Desarmar, [[1d100<@{Grapple}]]}}}" /></td>
+				<td><button type="roll" name="roll_wgm-Grapple" value="/w gm &{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}} {{^{damage-u}= ?{@{objectivegrapple}|@{immobilisegrapple}, [[1d100<((5*(@{STR}-@{target|STR})))+50]]|@{knockdowngrapple}, [[1]]|@{knockoutgrapple}, [[1]]|@{disarmgrapple}, [[1d100<@{Grapple}]]}}}" /></td>
             </tr>
         </tbody>
     </table>
@@ -946,7 +961,7 @@ on("change:FUE change:TAM", function() {
                <td><input type="text" name="attr_Damage" style="width: 110px" /></td>
                <td><input type="number" name="attr_Attacks-Round" /></td>
                <td><input type="text" name="attr_HP" style="width: 50px" /></td>
-               <td><button type="roll" name="roll_Attack-Weapon" value="&{template:default} {{name=@{Attack-Weapon}}} {{^{attack-u}=[[1d100<@{Score}]]}} {{daño=[[@{Damage}+@{Damage-Bonus}]]}}" /></td>
+               <td><button type="roll" name="roll_Attack-Weapon" value="&{template:default} {{name=@{Attack-Weapon}}} {{^{attack-u}=[[1d100<@{Score}]]}} {{^{damage-u}=[[@{Damage}+@{Damage-Bonus}]]}}" /></td>
 			   <td><button type="roll" name="roll_wgm-Attack-Weapon" value="/w gm &{template:default} {{name=@{Attack-Weapon}}} {{^{attack-u}=[[1d100<@{Score}]]}} {{^{damage-u}=[[@{Damage}+@{Damage-Bonus}]]}}" /></td>
             </tr>
         </table>
@@ -979,8 +994,8 @@ on("change:FUE change:TAM", function() {
                 <td><input type="number" name="attr_Shots-in-Gun" /></td>
                 <td><input type="number" name="attr_Malfunc-Num" /></td>
                 <td><input type="text" name="attr_HP" style="width: 50px" /></td>
-				<td><button type="roll" name="roll_Firearm" value="&{template:default} {{name=@{Firearm}}} {{ataque=[[1d100<@{Score}]]}} {{daño=[[@{Damage}]]}}" /></td>
-				<td><button type="roll" name="roll_wgm-Firearm" value="/w gm &{template:default} {{name=@{Firearm}}} {{ataque=[[1d100<@{Score}]]}} {{daño=[[@{Damage}]]}}" /></td>
+				<td><button type="roll" name="roll_Firearm" value="&{template:default} {{name=@{Firearm}}} {{^{attack-u}=[[1d100<@{Score}]]}} {{^{damage-u}=[[@{Damage}]]}}" /></td>
+				<td><button type="roll" name="roll_wgm-Firearm" value="/w gm &{template:default} {{name=@{Firearm}}} {{^{attack-u}=[[1d100<@{Score}]]}} {{^{damage-u}=[[@{Damage}]]}}" /></td>
             </tr>
         </table>
     </fieldset>

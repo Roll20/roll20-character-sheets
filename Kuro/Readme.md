@@ -1,18 +1,17 @@
 Kuro Character sheet
 ====================
 
-First release of Kuro character sheet.
+Second Release of Kuro character sheet.
 
 Done:
-* *General design*: try to reproduce paper original design
-* *All characteristics*: only characteristics no generation guideline nor rolls
-* *Rolls* only characteristics
+* *Rolls* added for skills, initiative and weapon damage
+* *Roll template* added roll template that signals when 4's are rolled for ease of play
+* *Secondary characteristics generation*: secondary characteristics are now derived from primary characteristics
+* *Skills*: added skills area
+* *Gimikku*: added special rolls feature
 
 Todo:
-* *Secondary characteristics generation*: secondary characteristics will derived from primary characteristics
-* *Skills*: add skills area and co-dependency
-* *Specialisation*: add specialisation
-* *Gimuki*: add special rolls feature
-* *Rolls*
+* *Rolls*: add computed rolls so that 4's are automatically substracted from results according to the Shi rule
 
-Enjoy...
+Thank you
+Yui V.

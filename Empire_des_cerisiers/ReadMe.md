@@ -2,9 +2,26 @@
 Player sheet for L'Empire des cerisiers by Olivier Sanfilippo published by Arkhane Asylum in 2020. Sheet is based on 2020 Arkhane Asylum's designed player sheet.
 
 ## Current Version
-1.2
+1.2-3
 
 ### Change log
+
+### 1.2-3
+
+* Fix : incorrect helper stating 1 Gin equals 1000 mon instead of 100
+* Fix : Init bonus from field not updating on field level changed
+* Fix : Init mod from armor incorrect calculation 
+* Updated : renamed "number of attack per turn" to "number of action per turn"
+
+### 1.2-2
+
+* Fix : bug on rolltemplate when ritual bonus is not set.
+
+### 1.2-1
+
+* Fix : non working selector on ritual tab.
+* Updated : re styling of gmroll button.
+* Added : currencies.
 
 ### 1.2
 
