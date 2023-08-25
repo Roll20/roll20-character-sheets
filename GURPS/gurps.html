@@ -4363,6 +4363,7 @@
 				<ul>
 					<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
 					<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.</li>
+					<li>Grimoire Tab. Added a new custom spell modifier box, this covers special cases like taking a potion that raises IQ but not spell skill levels.</li>
 					<li>
 						List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
 					</li>
@@ -14330,6 +14331,17 @@ Select the indent level of the inventory item. This is handy to help show the it
 					<div class="cell margin-right">
 						<input type="number" name="attr_spell_maintained_penalty_total" value="0" title="Macro: @{NAME|spell_maintained_penalty_total}" readonly="readonly" />
 					</div>
+					<div class="cell">
+						<div class="popup"><span data-i18n="abbreviation-modifier-label">Mod</span></div>
+						<div class="tooltip">
+							<span data-i18n="spell-modifification-tooltip">
+								Enter a positive or negative value that affects the Effective Spell level of all spells. For example, you are wearing an enchanted item with Wisdom of 1 level - M135. This increases your IQ by 1. Spell levels are based on IQ, HOWEVER, that particular spell states "Raises the subject's IQ temporarily. This raises his ability with skills, <b>but not with spells!</b>.<br />Use the <i>notes</i> box above to keep track of the reason why there is a modifier." 
+							</span>
+						</div>
+					</div>
+					<div class="cell margin-right">
+						<input type="number" name="attr_spell_custom_modifier" value="0" title="Macro: @{NAME|spell_custom_modifier}" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -14548,6 +14560,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<div class="cell col4">
 							<!-- TODO: its possible that a character could have different types, maybe add drop-down for spell bonus -->
 							<input type="hidden" name="attr_bonus" value="0" title="Synced with attr_spell_bonus, reduces code" />
+							<input type="hidden" name="attr_custom_modifier" value="0" title="Synced with attr_custom_modifier, reduces code" />
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro: @{NAME|repeating_spells_$[row #]_spell_modifier}" />
 						</div>
 						<div class="cell col5">
@@ -14763,6 +14776,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<ul>
 				<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
 				<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.</li>
+				<li>Grimoire Tab. Added a new custom spell modifier box, this covers special cases like taking a potion that raises IQ but not spell skill levels.</li>
 				<li>
 					List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
 				</li>
@@ -21535,14 +21549,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// keep "spell based on:" and "Magery/PI/Bonus Level" synced with repeating fields
 	// this avoids having to do a lot of coding to get the id of the row
 	// NOTE: this will trigger updating the spell level. 
-	on("change:spell_base change:spell_bonus", event => {
+	on("change:spell_base change:spell_bonus change:spell_custom_modifier", event => {
 	
 		syncModsToRepeatingSpells(false);
 	
 	});
 	
 	// Update the spell level and update the total cost of spells 
-	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points change:repeating_spells:sync', (event) => {
+	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:custom_modifier change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points change:repeating_spells:sync', (event) => {
 	
 		// check if this is a valid sync
 		const isSync = String(event.sourceAttribute).endsWith("sync");
@@ -21574,6 +21588,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		let fieldValues = [
 			"repeating_spells_base",
 			"repeating_spells_bonus",
+			"repeating_spells_custom_modifier",
 			"repeating_spells_difficulty",
 			"repeating_spells_spell_modifier",
 			"repeating_spells_points",
@@ -21592,10 +21607,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let difficulty = Number(values.repeating_spells_difficulty);
 	
 			const bonus = Number(values.repeating_spells_bonus);
+
+			const customMod = Number(values.repeating_spells_custom_modifier);
 	
 			const modifier = Number(values.repeating_spells_spell_modifier);
 	
-			let totalModifier = bonus + modifier;
+			let totalModifier = bonus + modifier + customMod;
 	
 			if (isNaN(totalModifier)) {
 				totalModifier = 0;
@@ -27601,7 +27618,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 	
 	/**
-	 * Syncs `attr_spell_base` and `attr_spell_bonus` to 
+	 * Syncs `attr_spell_base` and `attr_spell_bonus` and `attr_spell_custom_modifier` to 
 	 * corresponding repeating_spells fields. This will
 	 * trigger updating the spell level at the same time.
 	 * 
@@ -27615,6 +27632,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		const fields = [
 			"spell_base",
 			"spell_bonus",
+			"spell_custom_modifier",
 			"strength",
 			"dexterity",
 			"intelligence",
@@ -27628,6 +27646,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			const baseLevel = String(values.spell_base);
 	
 			const bonus = Number(values.spell_bonus);
+
+			const customSpellMod = Number(values.spell_custom_modifier);
 	
 			const sectionName = "repeating_spells";
 	
@@ -27642,6 +27662,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				for (let i = 0; i < ids.length; i++) {
 					fieldsToUpdate[`${sectionName}_${ids[i]}_base`] = baseLevel;
 					fieldsToUpdate[`${sectionName}_${ids[i]}_bonus`] = bonus;
+					fieldsToUpdate[`${sectionName}_${ids[i]}_custom_modifier`] = customSpellMod;
 				}
 	
 				if (silent) {
@@ -27653,7 +27674,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 					// otherwise if base attribue or bonus changed, 
 					// this will fire the hook to update spells
-					// change:repeating_spells:base, change:repeating_spells:bonus
+					// change:repeating_spells:base, change:repeating_spells:bonus change:repeating_spells:custom_modifier
 					setAttrs(fieldsToUpdate, null, callback);
 	
 				}
