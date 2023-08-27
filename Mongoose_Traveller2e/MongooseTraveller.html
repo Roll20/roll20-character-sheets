@@ -6703,7 +6703,7 @@
                 }
 
 			    // Perform our index roll
-			    startRoll("/w gm &{template:trade-index} " + rollString, (results) => {
+			    startRoll("!" + rollString, (results) => {
 
                     // We now have 1, or 4 roll results, iterate again and process them
                     var rollString2 = "";
@@ -6727,7 +6727,7 @@
                         infoMsg += "[ " + classes[i] + " Passage: Index Roll: " + index + ", # Dice: " + numDice + "]\r\n";
                     }
 
-                    startRoll("/w gm &{template:trade-index} " + rollString2, (results2) => {
+                    startRoll("!" + rollString2, (results2) => {
 
                         for (let i = 0; i < classes.length; i++) {
 
@@ -6994,7 +6994,7 @@
 					if(cargoTypes[i] === "Mail")
 					{
 						// Do our roll, compare the value
-						startRoll("/w gm &{template:trade-index} {{cargoType=Mail}} {{numLots=[[1D6]]}} {{mailRoll=[[2D6+" + mailModifier + "]]}} {{costPerLot=[[0D6]]}} {{tonsPerLot=[[0D6]]}}", (results) => {
+						startRoll("!{{cargoType=Mail}} {{numLots=[[1D6]]}} {{mailRoll=[[2D6+" + mailModifier + "]]}} {{costPerLot=[[0D6]]}} {{tonsPerLot=[[0D6]]}}", (results) => {
 
 							var numLots = 0;
 							var costPerLot = 0;
@@ -7026,7 +7026,7 @@
 						});
 					}
 					else {
-						startRoll("/w gm &{template:trade-index} {{skill=" + cargoTypes[i] + "}} {{roll=[[2d6+" + modifier + "]]}}", (results) => {
+						startRoll("!{{skill=" + cargoTypes[i] + "}} {{roll=[[2d6+" + modifier + "]]}}", (results) => {
 
 							infoMsg += "[ Cargo Type: ";
 							var tonsPerLot = "";
@@ -7069,7 +7069,7 @@
 
 							finishRoll(results.rollId, {});
 
-							startRoll("/w gm &{template:trade-index} {{cargoType=" + cargoTypes[i] + "}} {{numLots=[[" + numDice + "]]}} {{indexRoll=" + total + "}} {{costPerTon=[[0D6]]}} {{costPerLot=[[0D6]]}} {{tonsPerLot=[[" + tonsPerLot + "]]}}", (results2) => {
+							startRoll("!{{cargoType=" + cargoTypes[i] + "}} {{numLots=[[" + numDice + "]]}} {{indexRoll=" + total + "}} {{costPerTon=[[0D6]]}} {{costPerLot=[[0D6]]}} {{tonsPerLot=[[" + tonsPerLot + "]]}}", (results2) => {
 
 								// Lookup cost
 								const costPerTon = passengerCost[value.freight_parsecs].Freight;
@@ -7198,7 +7198,7 @@
                     }
 
                     // Send a message to show monies received
-                    startRoll("/w gm &{template:trade-index} {{roll=[[1D6]]}} {{header=Freight Goods Delivered}}", (results) => {
+                    startRoll("!{{roll=[[1D6]]}} {{header=Freight Goods Delivered}}", (results) => {
 
                         var lateCharge = 0;
                         var origProfit = profit;
@@ -7296,7 +7296,7 @@
 						console.log("- Unknown broker type: " + info.triggerName);
 				}
 
-				startRoll("/w gm &{template:trade-index} {{skill=Speculative}} {{roll=[[2d6+" + modifier + "]]}} {{local=[[floor(2d6/3)]]}} {{time=[[1d6]]}}", (results) => {
+				startRoll("!{{skill=Speculative}} {{roll=[[2d6+" + modifier + "]]}} {{local=[[floor(2d6/3)]]}} {{time=[[1d6]]}}", (results) => {
 
 					var brokerResult = results.results.roll.result;
 					var time = results.results.time.result;
@@ -7995,7 +7995,7 @@
                     }
                 }
                 console.log("- Random goods dice roll: " + diceRoll);
-                startRoll("/w gm &{template:trade-index} {{skill=Speculative}} {{roll=[[" + diceRoll + "]]}}", (results) => {
+                startRoll("!{{skill=Speculative}} {{roll=[[" + diceRoll + "]]}}", (results) => {
 
                     console.log("- Random goods dice roll result: " + JSON.stringify(results));
 
@@ -8041,9 +8041,9 @@
                     });
 
                     // Roll the dice
-                    startRoll("/w gm &{template:trade-index} {{skill=Speculative}} {{roll=[[" + goodsDiceRoll + "]]}} {{priceroll=[[" + priceGoodsRoll + "]]}}", (qtyResults) => {
+                    startRoll("!{{skill=Speculative}} {{roll=[[" + goodsDiceRoll + "]]}} {{priceroll=[[" + priceGoodsRoll + "]]}}", (qtyResults) => {
 
-                        console.log("- Goods quantity tons roll: " + JSON.stringify(qtyResults));
+                        //console.log("- Goods quantity tons roll: " + JSON.stringify(qtyResults));
 
                         // Now dissect the rolls array, it's a little tricky as qtyResults.results.roll.rolls[n].results is an array so sometimes we have 1d6 and sometimes 2d6
                         var goodsSummary = {};
@@ -8438,7 +8438,7 @@
                     });
 
                     // Roll the dice
-                    startRoll("/w gm &{template:trade-index} {{skill=Speculative}} {{priceroll=[[" + priceGoodsRoll + "]]}}", (qtyResults) => {
+                    startRoll("!{{skill=Speculative}} {{priceroll=[[" + priceGoodsRoll + "]]}}", (qtyResults) => {
 
                         // Now we have the available goods and their quantities we move onto the purchase price
                         // For this we need the player's broker skill, or the local broker's skill and +2 (negotiation) modifier
@@ -8713,6 +8713,10 @@
 
             getAttrs(attrs, function(v) {
 
+                if(v.trade_sale_uwp) {
+                    applyUWP({triggerName: "clicked:trade-purchase-uwp"});
+                }
+
                 attrsToSet = {};
 
                 for(let i=0; i<attrs.length; i++) {
@@ -8725,7 +8729,12 @@
                         attrsToSet[attrs[i]] = "";
                     }
                 }
-                setAttrs(attrsToSet);
+                setAttrs(attrsToSet, null, function() {
+                    if(v.trade_sale_uwp) {
+                        applyUWP({triggerName: "clicked:trade-purchase-uwp"});
+                    }
+                });
+
             });
         });
 
@@ -8944,6 +8953,7 @@
                 speculative_purchase_supplier_skill: 2,
                 speculative_purchase_lawlevel: 0,
                 speculative_purchase_warning: "",
+                trade_purchase_uwp: "",
                 speculative_sale_blackmarket: "",
                 speculative_sale_broker_dm: "",
                 speculative_sale_broker_skill: "",
@@ -8961,6 +8971,7 @@
                 speculative_sale_supplier_skill: 2,
                 speculative_sale_lawlevel: 0,
                 speculative_sale_warning: "",
+                trade_sale_uwp: "",
         	},...tradeCodeResetObj});
 
             // Delete our sale and purchase rows and zero the totals etc.
@@ -9004,6 +9015,11 @@
 
         on("clicked:trade-purchase-uwp clicked:trade-sale-uwp", (info) => {
 
+            applyUWP(info);
+        });
+
+        function applyUWP(info) {
+
             console.log("MgT2E: Apply Sale/Purchase UWP" + JSON.stringify(info));
 
             var uwpAttr = "trade_purchase_uwp";
@@ -9039,7 +9055,7 @@
                 }
                 for(let i=1; i<bits.length; i++) {
 
-                    // There may be bases but we are going to do a match against our array for trade codes
+                    // There may be bases but we are going to do a match against our array for trade codes and discard anything else
                     console.log("- bits[i]: " + bits[i]);
                     var index = tradeCodesShort.findIndex(x => x.toLowerCase() === bits[i].toLowerCase());
                     console.log("- index: " + index);
@@ -9110,10 +9126,10 @@
                         attrs["freight_techlevel"] = "na";
                     }
                 }
-                console.log("- Setting attrs: " + JSON.stringify(attrs));
+                //console.log("- Setting attrs: " + JSON.stringify(attrs));
                 setAttrs(attrs);
             });
-        });
+        }
 
     </script>
 </div>
