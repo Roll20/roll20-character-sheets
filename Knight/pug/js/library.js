@@ -867,7 +867,18 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_excellenceCondition = getTranslationByKey("excellence-condition"),
     i18n_guidage = getTranslationByKey("guidage"),
     i18n_guidageInclus = getTranslationByKey("guidage-inclus"),
-    i18n_regularite = getTranslationByKey("regularite")
+    i18n_regularite = getTranslationByKey("regularite"),
+    i18n_ignoreCouvert = getTranslationByKey("ignore-couvert"),
+    i18n_nonLetal = getTranslationByKey("non-letal"),
+    i18n_cdf = getTranslationByKey("cdf"),
+    i18n_immobilisation = getTranslationByKey("immobilisation"),
+    i18n_intimidanteHumain = getTranslationByKey("intimidante-humain"),
+    i18n_intimidanteHumainCondition = getTranslationByKey("intimidante-humain-condition"),
+    i18n_intimidanteAnatheme = getTranslationByKey("intimidante-anatheme"),
+    i18n_intimidanteAnathemeCondition = getTranslationByKey("intimidante-anatheme-condition"),
+    i18n_retourFlamme = getTranslationByKey("retour-flamme"),
+    i18n_sansArmure = getTranslationByKey("sans-armure"),
+    i18n_boost = getTranslationByKey("boost")
     ;
 
 function maxCar(carac, score, aspect)
