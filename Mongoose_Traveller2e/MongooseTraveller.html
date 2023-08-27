@@ -15,20 +15,22 @@
         </div>
         <span data-i18n="rollbehaviour-u">Roll behaviour:</span>
         <span>
-                <select name="attr_ro_default">
-                    <option value="1" data-i18n="legacy-u">Legacy</option>
-                    <option value="2" data-i18n="prompt-u">Prompt</option>
-                    <option selected value="3" data-i18n="toggle-u">Toggle</option>
-                </select>
-            </span>
+            <select name="attr_ro_default">
+                <option value="1" data-i18n="legacy-u">Legacy</option>
+                <option value="2" data-i18n="prompt-u">Prompt</option>
+                <option selected value="3" data-i18n="toggle-u">Toggle</option>
+            </select>
+        </span>
         <span data-i18n="askmodifier-u">Ask for Modifier?</span>
         <span>
-                <select name="attr_mod_default">
-                    <option value="1" data-i18n="yes-u">Yes</option>
-                    <option value="2" data-i18n="no-u">No</option>
-                    <option selected value="3" data-i18n="toggle-u">Toggle</option>
-                </select>
-            </span>
+            <select name="attr_mod_default">
+                <option value="1" data-i18n="yes-u">Yes</option>
+                <option value="2" data-i18n="no-u">No</option>
+                <option selected value="3" data-i18n="toggle-u">Toggle</option>
+            </select>
+        </span>
+        <input type="checkbox" name="attr_initiative_effect" value="-8" class="sheet-button">
+        <span class="sheet-button" style="margin-left: 5px; font-weight: bold; font-size: 0.9em;">Initiative Effect</span>
     </div>
     <span>
             <input type="hidden" name="attr_ro_default" class="sheet-roll-switch">
@@ -3456,7 +3458,7 @@
                         </td>
                         <td>
                             <button data-i18n="initiativeroll-u" type="roll" name="roll_initiative"
-                                    value="@{whispertoggle}&{template:skill-general} {{skill= ^{initiative-u}}} {{character= @{character_name} }} @{ro_default_rolltype}+@{initiativeattribute}[Attribute Modifier]-8 @{ro_default_mod} &{tracker}]]}}"></button>
+                                    value="@{whispertoggle}&{template:skill-general} {{skill= ^{initiative-u}}} {{character= @{character_name} }} @{ro_default_rolltype}+@{initiativeattribute}[Attribute Modifier]+@{initiative_effect} @{ro_default_mod} &{tracker}]]}}"></button>
                         </td>
                     </tr>
                 </table>
@@ -4431,12 +4433,12 @@
         <button type="action" name="act_tradelog" class="sheet-type sheet-type-tradelog">Log</button>
     </div>
     <!--    Cargo Manifest-->
-        <span class="sheet-bold sheet-textright">Purchase UWP: </span>
-        <input class="" type="text" name="attr_trade_purchase_uwp" placeholder="CA6A643-9 N Ri Wa" style="height: 20px;margin-bottom: 3px;">
-        <button type="action" name="act_trade-purchase-uwp" class="sheet-type sheet-type-speculative sheet-manifest-button sheet-uwpbutton">Apply</button>
-        <span class="sheet-bold sheet-textright">Sale UWP: </span>
-        <input class="" type="text" name="attr_trade_sale_uwp" placeholder="CA6A643-9 N Ri Wa" style="height: 20px;margin-bottom: 3px;">
-        <button type="action" name="act_trade-sale-uwp" class="sheet-type sheet-type-speculative sheet-manifest-button sheet-uwpbutton">Apply</button>
+    <span class="sheet-bold sheet-textright">Purchase UWP: </span>
+    <input class="" type="text" name="attr_trade_purchase_uwp" placeholder="CA6A643-9 N Ri Wa" style="height: 20px;margin-bottom: 3px;">
+    <button type="action" name="act_trade-purchase-uwp" class="sheet-type sheet-type-speculative sheet-manifest-button sheet-uwpbutton">Apply</button>
+    <span class="sheet-bold sheet-textright">Sale UWP: </span>
+    <input class="" type="text" name="attr_trade_sale_uwp" placeholder="CA6A643-9 N Ri Wa" style="height: 20px;margin-bottom: 3px;">
+    <button type="action" name="act_trade-sale-uwp" class="sheet-type sheet-type-speculative sheet-manifest-button sheet-uwpbutton">Apply</button>
     <div class="sheet-speculative-subpanel sheet-hazard-border">
         <div style="margin-left: auto;display: flex;align-items: center;margin-right:0;">
             <h2 class="sheet-bold sheet-mod" style="width: 30%;">&nbsp;Cargo Manifest</h2>
@@ -5156,7 +5158,9 @@
                         </table>
                     </div>
                 </div>
-                <button type="action" name="act_determine-purchase-trade-goods" class="sheet-redborder sheet-bordered-width"><span class="sheet-speculativebutton">9&nbsp;</span>Determine Trade Goods & Prices</button>
+                <button type="action" name="act_determine-purchase-trade-goods" class="sheet-redborder sheet-bordered-width"><span
+                        class="sheet-speculativebutton">9&nbsp;</span>Determine Trade Goods & Prices
+                </button>
                 <input type="text" class="sheet-hidden" name="attr_speculative_purchase_warning">
                 <span class="sheet-warning" name="attr_speculative_purchase_warning"></span>
             </div>
@@ -5371,7 +5375,8 @@
                 </div>
             </div>
             <button type="action" name="act_sell-trade-goods" class="sheet-redborder sheet-bordered-width"><span class="sheet-speculativebutton">9&nbsp;</span>Sell Trade Goods</button>
-            <button type="action" name="act_copy-buyer-details" class="sheet-redborder sheet-bordered-width"><span class="sheet-speculativebutton">9&nbsp;</span>Copy Buyer Details Up To Supplier</button>
+            <button type="action" name="act_copy-buyer-details" class="sheet-redborder sheet-bordered-width"><span class="sheet-speculativebutton">9&nbsp;</span>Copy Buyer Details Up To Supplier
+            </button>
         </div>
     </div>
     <div class="sheet-tab-content sheet-tradelog">
@@ -6579,14 +6584,34 @@
             setAttrs();
         }
 
+        // We will keep a log of major operations for diagnostic purposes and blank this out on sheet:open
+        // We will keep this in a JS variable and then provide a button to show it, so we are not polluting
+        // setAttrs code with random log attrs, that's the idea any way!
+        // The attr is: attr_trade_log_messages
+        // 'Session' var below...should this be an array...for more strutured logging...?
+        var tradeLogMessages = "";
+
+        function addTradeLogMessage(msg, c) {
+
+            tradeLogMessages += msg + "\r\n";
+
+            if(c) {
+                console.log(msg);
+            }
+        }
+
+        on("clicked:show-trade-log-messages", (info) => {
+
+            setAttrs({trade_log_messages: tradeLogMessages});
+        });
+
 		function sgn(n) {
 			return (+n<=0 ? n: "+" + n)
 		}
 
         on("clicked:passengers-calculate", (info) => {
 
-            console.log("MgT2E: In Passenger Calculate");
-            addTradeLogMessage("Calculate Passengers");
+            addTradeLogMessage("MgT2E: In Passenger Calculate", true);
             var infoMsg = "";
 
             // Get all the attributes we need to calculate the overall modifier
@@ -6778,7 +6803,7 @@
 
         on("clicked:passengers-take", (info) => {
 
-            console.log("MgT2E: In Passenger Take: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: In Passenger Take: " + JSON.stringify(info), true);
 
             var attrs = [];
             var attrsToSet = {};
@@ -6810,7 +6835,7 @@
                 // Check we actually selected some passengers to take!
                 if(passengersTaken === 0) {
 
-                    console.log("- NO passengers taken");
+                    addTradeLogMessage("- NO passengers taken", true);
                     return
                 }
 
@@ -6850,7 +6875,7 @@
 
 		on("clicked:freight-calculate", (info) => {
 
-            console.log("MgT2E: In Freight Calculate: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: In Freight Calculate: " + JSON.stringify(info), true);
 
             var infoMsg = "";
 
@@ -6966,7 +6991,7 @@
 					}
 
 					if(value.freight_shiparmed === "on") {
-						console.log("- Ship armed: " + value.freight_shiparmed);
+						//console.log("- Ship armed: " + value.freight_shiparmed);
 						mailModifier += 2;
 						mailMsg += "Ship armed: +2, ";
 					}
@@ -7035,19 +7060,19 @@
 							var tonsPerLot = "";
 							switch(cargoTypes[i]) {
 								case "Incidental":
-									console.log("- Incidental: " + cargoTypes[i]);
+									//console.log("- Incidental: " + cargoTypes[i]);
 									modifier += 2;
 									tonsPerLot = "1D6";
 									infoMsg += "Incidental: +2, ";
 								break;
 								case "Major":
-									console.log("- Major: " + cargoTypes[i]);
+									//console.log("- Major: " + cargoTypes[i]);
 									modifier -= 4;
 									tonsPerLot = "1D6*10";
 									infoMsg += "Major: +1, ";
 								break;
 								case "Minor":
-									console.log("- Minor: " + cargoTypes[i]);
+									//console.log("- Minor: " + cargoTypes[i]);
 									tonsPerLot = "1D6*5";
 									infoMsg += "Minor: 0, ";
 								break;
@@ -7068,7 +7093,7 @@
 
 							infoMsg += " Index: " + total + ", #Dice: " + numDice + " ] ";
 							infoMsg += "\r\n";
-							console.log("- Rolling: " + numDice + " for index value of: " + total);
+							addTradeLogMessage("- Rolling: " + numDice + " for index value of: " + total, true);
 
 							finishRoll(results.rollId, {});
 
@@ -7078,7 +7103,7 @@
 								const costPerTon = passengerCost[value.freight_parsecs].Freight;
 								const costPerLot = costPerTon * results2.results.tonsPerLot.result;
 
-								console.log("- " + cargoTypes[i] + ": Cost: Roll: " + results2.results.numLots.result + " Parsecs: " + value.freight_parsecs + " Paid/Lot: " + costPerLot);
+								addTradeLogMessage("- " + cargoTypes[i] + ": Cost: Roll: " + results2.results.numLots.result + " Parsecs: " + value.freight_parsecs + " Paid/Lot: " + costPerLot, true);
 
 								finishRoll(
 									results2.rollId,
@@ -7107,7 +7132,7 @@
 
       	on("clicked:freight-take", (info) => {
 
-            console.log("MgT2E: In Freight Take: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: In Freight Take: " + JSON.stringify(info), true);
 
             var attrs = [];
             ["mail", "major", "minor", "incidental"].forEach((freightType, i) => {
@@ -7156,14 +7181,14 @@
 
         on("clicked:freight-deliver", (info) => {
 
-            console.log("MgT2E: In Freight Deliver: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: In Freight Deliver: " + JSON.stringify(info), true);
 
             // Iterate through the hold finding any rows with keys that start with "0"
             var keyAttrs = [];
             getSectionIDs("repeating_speculative-freight-goods", function(idArray) {
 
                 if(idArray.length === 0) {
-                    console.log("- NO freight has been taken");
+                    addTradeLogMessage("- NO freight has been taken", true);
                     return;
                 }
 
@@ -7205,11 +7230,11 @@
 
                         var lateCharge = 0;
                         var origProfit = profit;
-                        console.log("- Profit: " + profit + ", freight late: " + value.freight_late);
+                        addTradeLogMessage("- Profit: " + profit + ", freight late: " + value.freight_late, true);
                         if(value.freight_late === "on") {
                             lateCharge = (results.results.roll.result+4) * 10;
                             profit = Math.round((1-((results.results.roll.result+4)*0.1)) * profit);
-                            console.log("- Late delivery: late charge: " + lateCharge + "%, profit: " + profit);
+                            addTradeLogMessage("- Late delivery: late charge: " + lateCharge + "%, profit: " + profit, true);
                         }
                         updateGroupFunds(profit, +value.group_funds);
                         var msg = "Default";
@@ -7229,7 +7254,7 @@
         on("clicked:speculative-purchase-broker-find clicked:speculative-purchase-illegalbroker-find clicked:speculative-purchase-onlinebroker-find clicked:speculative-purchase-localbroker-skill "+
            "clicked:speculative-sale-broker-find clicked:speculative-sale-illegalbroker-find clicked:speculative-sale-onlinebroker-find clicked:speculative-sale-localbroker-skill", (info) => {
 
-            console.log("MgT2E: In Find Supplier/Broker|Local Broker: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: In Find Supplier/Broker|Local Broker: " + JSON.stringify(info), true);
 
             var infoMsg = "";
             var localBroker = false;
@@ -7296,7 +7321,7 @@
 						isPurchase = false;
 					break;
 					default:
-						console.log("- Unknown broker type: " + info.triggerName);
+						addTradeLogMessage("- Unknown broker type: " + info.triggerName, true);
 				}
 
 				startRoll("!{{skill=Speculative}} {{roll=[[2d6+" + modifier + "]]}} {{local=[[floor(2d6/3)]]}} {{time=[[1d6]]}}", (results) => {
@@ -7722,23 +7747,6 @@
             }
         };
 
-        // We will keep a log of major operations for diagnostic purposes and blank this out on sheet:open
-        // We will keep this in a JS variable and then provide a button to show it, so we are not polluting
-        // setAttrs code with random log attrs, that's the idea any way!
-        // The attr is: attr_trade_log_messages
-        // 'Session' var below...should this be an array...for more strutured logging...?
-        var tradeLogMessages = "";
-
-        function addTradeLogMessage(msg) {
-
-            tradeLogMessages += msg + "\r\n";
-        }
-
-        on("clicked:show-trade-log-messages", (info) => {
-
-            setAttrs({trade_log_messages: tradeLogMessages});
-        });
-
         const tradeCodeGoodsMapping = {};
         const tradeCodeGoodsIllegalMapping = {};
 
@@ -7914,7 +7922,7 @@
         // Here's where the most complex calculations are done to find goods available, quantities and prices by trade code for purchase
         on("clicked:determine-purchase-trade-goods", (info) => {
 
-            console.log("MgT2E: Determine Buyer Prices: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: Determine Buyer Prices: " + JSON.stringify(info), true);
 
             addTradeLogMessage("Determine Buyer Prices");
 
@@ -7926,7 +7934,7 @@
                       "speculative_purchase_lawlevel"].concat(purchaseTradeCodeAttrs), function(value) {
 
                 // Check player has found a supplier/broker
-                console.log("- speculative_purchase_broker_type: " + value.speculative_purchase_broker_type);
+                addTradeLogMessage("- speculative_purchase_broker_type: " + value.speculative_purchase_broker_type, true);
                 if(!value.speculative_purchase_broker_type) {
                     // Player hasn't gone through the broker selection process, set info message and return
                     setAttrs({ speculative_purchase_warning: "Error: Buyer/Broker must be found first!" });
@@ -7939,12 +7947,12 @@
                 // Are we going illegal?
                 var isIllegal = false;
                 if(value.speculative_purchase_broker_type_illegal === "3") {
-                    //console.log("- Purchasing illegal goods");
+                    addTradeLogMessage("- Purchasing illegal goods", true);
                     isIllegal = true;
                 }
 
                 populateSelectedPurchaseTradeCodes(value);
-                console.log("- Selected trade codes: " + JSON.stringify(selectedPurchaseTradeCodes));
+                addTradeLogMessage("- Selected trade codes: " + JSON.stringify(selectedPurchaseTradeCodes), true);
 
                 // We use population to adjust quantity if necessary
                 var qtyModifier = 0;
@@ -7970,7 +7978,7 @@
                         // Index into trade code array to get text of trade code, and grab from mapping
                         const keys = isIllegal ? tradeCodeGoodsIllegalMapping[tradeCodes[i]] : tradeCodeGoodsMapping[tradeCodes[i]];
                         // Keys should be a list of keys e.g. 11 23 34 etc.
-                        console.log("- Determine Trade Goods: Keys: " + tradeCodes[i] + ": " + keys);
+                        addTradeLogMessage("- Determine Trade Goods: Keys: " + tradeCodes[i] + ": " + keys, true);
                         if(keys !== undefined) {
                             // Concatenate into our unique array, mildly inefficient but our arrays are small
                             availableTradeGoodsKeys = availableTradeGoodsKeys.concat(keys);
@@ -7980,7 +7988,7 @@
 
                 // Uniquify our keys and sort them
                 availableTradeGoodsKeys = [...new Set(availableTradeGoodsKeys)].sort();
-                console.log("- Determine Trade Goods: All Unique Keys: " + availableTradeGoodsKeys);
+                addTradeLogMessage("- Determine Trade Goods: All Unique Keys: " + availableTradeGoodsKeys, true);
 
                 // We now have to add a random amount of goods equal to population. To do this we will roll 1D5 (1-5 as 6 is black market) and 1D6 to find our codes population value times.
                 // Duplicate codes double up on quantity
@@ -7997,10 +8005,10 @@
                         diceRoll += "1D5+1D6+";
                     }
                 }
-                console.log("- Random goods dice roll: " + diceRoll);
+                addTradeLogMessage("- Random goods dice roll: " + diceRoll, true);
                 startRoll("!{{skill=Speculative}} {{roll=[[" + diceRoll + "]]}}", (results) => {
 
-                    console.log("- Random goods dice roll result: " + JSON.stringify(results));
+                    addTradeLogMessage("- Random goods dice roll result: " + JSON.stringify(results), true);
 
                     // Now we take the first value from the dice array, and iterate over subsequent dice that many times
                     //results.results.roll.dice[0] + results.results.roll.dice[1]
@@ -8012,7 +8020,7 @@
                         randomGoodsKeys.push("" + firstResult + "" + results.results.roll.dice[counter++]);
                     }
 
-                    console.log("- Random goods keys: " + randomGoodsKeys);
+                    addTradeLogMessage("- Random goods keys: " + randomGoodsKeys, true);
 
                     // Switch our trade goods if illegal
                     var tg = isIllegal ? tradeGoodsIllegal : tradeGoods;
@@ -8046,7 +8054,7 @@
                     // Roll the dice
                     startRoll("!{{skill=Speculative}} {{roll=[[" + goodsDiceRoll + "]]}} {{priceroll=[[" + priceGoodsRoll + "]]}}", (qtyResults) => {
 
-                        //console.log("- Goods quantity tons roll: " + JSON.stringify(qtyResults));
+                        addTradeLogMessage("- Goods quantity tons roll: " + JSON.stringify(qtyResults), true);
 
                         // Now dissect the rolls array, it's a little tricky as qtyResults.results.roll.rolls[n].results is an array so sometimes we have 1d6 and sometimes 2d6
                         var goodsSummary = {};
@@ -8069,16 +8077,16 @@
                             }
                             if(goodsSummary[allGoodsKeys[i]] !== undefined) {
                                 // Doubling up
-                                console.log("- Available tons, adding to: " + allGoodsKeys[i] + " Tons: " + result);
+                                addTradeLogMessage("- Available tons, adding to: " + allGoodsKeys[i] + " Tons: " + result, true);
                                 goodsSummary[allGoodsKeys[i]].quantity += result;
                             }
                             else {
-                                console.log("- Available tons, setting: " + allGoodsKeys[i] + " Tons: " + result);
+                                addTradeLogMessage("- Available tons, setting: " + allGoodsKeys[i] + " Tons: " + result, true);
                                 goodsSummary[allGoodsKeys[i]] = { quantity: result };
                             }
                         });
 
-                        console.log("- Total tons for available goods: " + JSON.stringify(goodsSummary));
+                        addTradeLogMessage("- Total tons for available goods: " + JSON.stringify(goodsSummary), true);
 
                         // Now we have the available goods and their quantities we move onto the purchase price
                         // For this we need the player's broker skill, or the local broker's skill and +2 (negotiation) modifier
@@ -8090,10 +8098,10 @@
                         var pxModifier = +value.speculative_purchase_broker_skill;
                         if(value.speculative_purchase_localbroker_flag === "true") {
                             pxModifier = +value.speculative_purchase_localbroker_skill + +value.speculative_purchase_localbroker_negskill
-                            console.log("- Using local broker stats for prices");
+                            addTradeLogMessage("- Using local broker stats for prices", true);
                         }
                         else {
-                            console.log("- Using Traveller's broker stats for prices");
+                            addTradeLogMessage("- Using Traveller's broker stats for prices", true);
                         }
 
                         // Subtract supplier broker skill
@@ -8124,7 +8132,7 @@
                                 tradeCodeLabels.push(tradeCodes[i]);
                             }
                         }
-                        console.log("- Selected trade codes text: " + tradeCodeLabels);
+                        addTradeLogMessage("- Selected trade codes text: " + tradeCodeLabels, true);
 
                         // Iterate through our unique list of goods keys and grab and process the purchase/saleDM...
                         uniqueGoodsKeys.forEach((key, i) => {
@@ -8145,7 +8153,7 @@
                                 default:
                                     // 2 or more, find the highest modifier
                                     var highestKey = Object.keys(purchaseDM).reduce((a, b) => purchaseDM[a] > purchaseDM[b] ? a : b);
-                                    console.log("- Highest purchaseDM: Key: " + key + ", purchaseDM: " + JSON.stringify(purchaseDM) + ", highest: " + highestKey);
+                                    addTradeLogMessage("- Highest purchaseDM: Key: " + key + ", purchaseDM: " + JSON.stringify(purchaseDM) + ", highest: " + highestKey, true);
                                     currentPxModifier += purchaseDM[highestKey];
                             }
 
@@ -8213,7 +8221,7 @@
         // Purchase the selected goods, add to 'cargo manifest' and chat price paid
         on("clicked:purchase-trade-goods", (info) => {
 
-            console.log("MgT2E: Purchase Trade Goods");
+            addTradeLogMessage("MgT2E: Purchase Trade Goods", true);
 
             // For buying we want to iterate over the 'purchase goods' repeating section and add them into an equivalent buy goods repeating section, discarding any zero tons
             // This effectively becomes the manifest for the starships hold, as it were
@@ -8227,7 +8235,7 @@
             getSectionIDs("repeating_speculative-purchase-goods", function(idArray) {
 
                 if(idArray.length === 0) {
-                    console.log("- Buy Trade Goods: No goods selected");
+                    addTradeLogMessage("- Buy Trade Goods: No goods selected", true);
                     setAttrs({ speculative_purchase_warning: "Error: No goods selected!" });
                     return;
                 }
@@ -8251,20 +8259,20 @@
                 // Make our (single) getAttrs call, then loop through our IDs again to process
                 getAttrs(attrArray, function (value) {
 
-                    //console.log("- Buy Trade Goods: getAttr values: " + JSON.stringify(value));
+                    addTradeLogMessage("- Buy Trade Goods: getAttr values: " + JSON.stringify(value), true);
                     updateGroupFunds(+value.speculative_pg_price_total.replaceAll(",", "") * -1, +value.group_funds);
 
                     var newRowAttrs = {};
 
                     if(+value.speculative_pg_price_total === 0) {
-                        console.log("- Purchase Trade Goods: No tons selected");
+                        addTradeLogMessage("- Purchase Trade Goods: No tons selected", true);
                         setAttrs({ speculative_purchase_warning: "Error: No tons selected!" });
                         return;
                     }
 
                     for(var i=0; i < rowIdsArray.length; i++) {
 
-                        console.log("- Adding new row: " + i + ": " + rowIdsArray[i]);
+                        addTradeLogMessage("- Adding new row: " + i + ": " + rowIdsArray[i], true);
 
                         const id = rowIdsArray[i];
                         const key = "repeating_speculative-purchase-goods_" + id + "_speculative_pg_key";
@@ -8311,13 +8319,13 @@
         {
             if(info.triggerName === "clicked:clear-speculative-goods") {
 
-                console.log("MgT2E: Clearing hold goods");
+                addTradeLogMessage("MgT2E: Clearing hold goods", true);
                 deleteRepeatingRows("repeating_speculative-sale-goods");
                 repSpeculativeSaleGoodsChanged();
             }
             else {
                 getSectionIDs("repeating_speculative-sale-goods", function(idArray) {
-                    console.log("- Consolidating hold goods");
+                    addTradeLogMessage("- Consolidating hold goods", true);
                     var keyAttrs = [];
                     for(var i=0; i < idArray.length; i++) {
                         // Create attribute names for keys
@@ -8373,7 +8381,7 @@
         // For sale we just need the price modifiers to populate our 'Sell Goods' repeating row section
         on("clicked:determine-buyer-prices", (info) => {
 
-            console.log("MgT2E: Determine Buyer Prices: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: Determine Buyer Prices: " + JSON.stringify(info), true);
 
             var availableGoodsInfo = "";
 
@@ -8384,7 +8392,7 @@
             getSectionIDs("repeating_speculative-sale-goods", function(idArray) {
 
                 if(idArray.length === 0) {
-                    console.log("- Determine Buyer Prices: No goods available");
+                    addTradeLogMessage("- Determine Buyer Prices: No goods available", true);
                     setAttrs({ speculative_sale_warning: "Error: No goods available!" });
                     return;
                 }
@@ -8405,8 +8413,8 @@
                       "speculative_sale_lawlevel"].concat(saleTradeCodeAttrs).concat(keyAttrs), function(value) {
 
                     populateSelectedSaleTradeCodes(value);
-                    console.log("- Selected trade codes: " + JSON.stringify(selectedSaleTradeCodes));
-                    console.log("- Broker type: " + value.speculative_sale_broker_type);
+                    addTradeLogMessage("- Selected trade codes: " + JSON.stringify(selectedSaleTradeCodes), true);
+                    addTradeLogMessage("- Broker type: " + value.speculative_sale_broker_type, true);
 
                     // Check player has found a supplier/broker
                     if(!value.speculative_sale_broker_type) {
@@ -8433,7 +8441,7 @@
                     // to find the key, and then the unique row id corresponding to that key, ergh!
                     rowIdsArray = tmpRowIdsArray;
                     saleGoodsKeys = [...new Set(saleGoodsKeys)];
-                    console.log("- Unique trade code keys: " + JSON.stringify(saleGoodsKeys));
+                    addTradeLogMessage("- Unique trade code keys: " + JSON.stringify(saleGoodsKeys), true);
 
                     // We also will need to roll 3D6 for each UNIQUE goods key for price, may as well do it now and pluck off the rolls we need
                     var priceGoodsRoll = "";
@@ -8488,7 +8496,7 @@
                                 tradeCodeLabels.push(tradeCodes[i]);
                             }
                         }
-                        console.log("- Selected trade codes text: " + tradeCodeLabels);
+                        addTradeLogMessage("- Selected trade codes text: " + tradeCodeLabels, true);
                         var isIllegal = false;
                         if(value.speculative_sale_broker_type_illegal === "3") {
                             //console.log("- Purchasing illegal goods");
@@ -8537,10 +8545,10 @@
                             if(!isIllegal && value["repeating_speculative-sale-goods_" + rowIdsArray[i] + "_speculative_sg_illegal"] === "on")
                             {
                                 var key = value["repeating_speculative-sale-goods_" + rowIdsArray[i] + "_speculative_sg_key"];
-                                console.log("- Goods key: " + key + " marked as illegal");
+                                addTradeLogMessage("- Goods key: " + key + " marked as illegal", true);
 
                                 var lawDiff = +value["speculative_sale_lawlevel"] - +value["speculative_purchase_lawlevel"];
-                                console.log("- Goods key: " + key + " using saleDM: " + lawDiff + ", NOT: " + JSON.stringify(tg[key].saleDM));
+                                addTradeLogMessage("- Goods key: " + key + " using saleDM: " + lawDiff + ", NOT: " + JSON.stringify(tg[key].saleDM), true);
 
                                 currentPxModifier += lawDiff;
                             }
@@ -8593,14 +8601,14 @@
 
         on("clicked:sell-trade-goods", (info) => {
 
-            console.log("MgT2E: Sell Trade Goods: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: Sell Trade Goods: " + JSON.stringify(info), true);
 
             // Recalculate and reset the rows based on the user inputs and calculate the amount received from the sale. Simples!
             var attrArray = [];
             getSectionIDs("repeating_speculative-sale-goods", function(idArray) {
 
                 if(idArray.length === 0) {
-                    console.log("- Sell Trade Goods: NO goods selected");
+                    addTradeLogMessage("- Sell Trade Goods: NO goods selected", true);
                     setAttrs({speculative_sale_warning: "Error: No goods selected" });
                     return;
                 }
@@ -8631,7 +8639,7 @@
 
                     // Up front check that we have determined prices
                     if(+value.speculative_sg_price_buyertotal === 0) {
-                        console.log("- Sell Trade Goods: No prices or no tons selected");
+                        addTradeLogMessage("- Sell Trade Goods: No prices or no tons selected", true);
                         setAttrs({speculative_sale_warning: "Error: No prices or no tons selected" });
                         return;
                     }
@@ -8649,7 +8657,7 @@
                         // We may have a mixed hold of legal and illegal goods, so some entries will have blank prices, skip these
                         if(!+value[salePriceAttr]) {
 
-                            console.log("- Sell Trade Goods: Undefined price for: " + value[keyAttr] + ": " + +value[salePriceAttr]);
+                            addTradeLogMessage("- Sell Trade Goods: Undefined price for: " + value[keyAttr] + ": " + +value[salePriceAttr], true);
                             continue;
                         }
 
@@ -8686,7 +8694,7 @@
 
         on("clicked:copy-buyer-details", (info) => {
 
-            console.log("MgT2E: Copy Buyer Details: " + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: Copy Buyer Details: " + JSON.stringify(info), true);
 
             var attrs = [
                 "speculative_sale_starport_dm",
@@ -8925,7 +8933,7 @@
         // Reset everything on the speculative sheet
         on("clicked:speculative-reset", (info) => {
 
-        	console.log("MgT2E: Reset Speculative to Defaults");
+        	addTradeLogMessage("MgT2E: Reset Speculative to Defaults", true);
 
             var tradeCodeResetObj = {};
             purchaseTradeCodeAttrs.forEach((tc, i) => {
@@ -9024,7 +9032,7 @@
 
         function applyUWP(info) {
 
-            console.log("MgT2E: Apply Sale/Purchase UWP" + JSON.stringify(info));
+            addTradeLogMessage("MgT2E: Apply Sale/Purchase UWP" + JSON.stringify(info), true);
 
             var uwpAttr = "trade_purchase_uwp";
             var isSale = false;
@@ -9040,7 +9048,7 @@
 
                 // Try and dissect, do some checks first
                 if(bits[0].length !== 9) {
-                console.log("- Apply " + (isSale ? "Sale" : "Purchase") + " UWP: Cannot parse: " + v.trade_purchase_uwp.trim());
+                    addTradeLogMessage("- Apply " + (isSale ? "Sale" : "Purchase") + " UWP: Cannot parse: " + v.trade_purchase_uwp.trim(), true);
                     return;
                 }
                 var chars = bits[0].split('');
@@ -9060,9 +9068,9 @@
                 for(let i=1; i<bits.length; i++) {
 
                     // There may be bases but we are going to do a match against our array for trade codes and discard anything else
-                    console.log("- bits[i]: " + bits[i]);
+                    addTradeLogMessage("- bits[i]: " + bits[i], true);
                     var index = tradeCodesShort.findIndex(x => x.toLowerCase() === bits[i].toLowerCase());
-                    console.log("- index: " + index);
+                    addTradeLogMessage("- index: " + index, true);
                     if(index >= 0) {
                         // Got one, build our attribute name
                         attrs[(isSale ? "sale_tc_" : "purchase_tc_") + tradeCodesLong[index]] = index+1;
@@ -9134,6 +9142,7 @@
                 setAttrs(attrs);
             });
         }
+
 
     </script>
 </div>
