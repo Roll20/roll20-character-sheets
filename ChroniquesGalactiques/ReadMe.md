@@ -10,11 +10,25 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V4.2.0 [Screenshot](cog_v4.png)
+V4.3.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+## V4.3.0 (2023.08.31)
+
+- Fiche de personnage
+  - Gestion des modificateurs de situation
+  - Nouvelle option : demander le ND des jets
+  - Nouvelle option : cibler les jets d'attaque (DEF / DEP)
+  - Import de la liste d'équipement (Web App Export COMob)
+  - Import de la famille de profil (Web App Export COMob)
+  - Calcul PV, PC selon la famille de profil
+  - Ajout d'un bouton pour afficher un message de chat expliquant la syntaxe des buffs
+  - Ajout d'un bouton pour afficher un message de chat expliquant la syntaxe des propriétés d'équipement
+- Fiche de vaisseau et mécha
+  - Mention script MOD "COlib" remplacée par "COGCrew"
 
 ## V4.2.0 (2023.04.09)
 
