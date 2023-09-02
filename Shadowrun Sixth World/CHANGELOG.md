@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2023-09-04 ** v.85 Chuz (James Culp)
+	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.
+	Bugfix - GM Helper sheet, incrementing OS using the + button was doing strange things, this has been fixed.
 **2023-07-10 ** v.84 Chuz (James Culp)
 	Bugfix - AoE Spells weren't adding the right amount of drain for 12m and 14m
 	Bugfix - Attribute+Attribute selections were missing Strength
