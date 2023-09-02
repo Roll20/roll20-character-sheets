@@ -1,6 +1,7 @@
 Change Log
 ==============================================
 **2023-09-04 ** v.85 Chuz (James Culp)
+	New Feature - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
 	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.
 	Bugfix - GM Helper sheet, incrementing OS using the + button was doing strange things, this has been fixed.
 **2023-07-10 ** v.84 Chuz (James Culp)
