@@ -8,6 +8,9 @@ Roadmap/Unfinished
 - mighty deed resolution
 - optional API checkbox in case of DCC HELPER usage, change buttons to API compatible buttons
 
+8/31/23
+- switched out disabled attribute for readonly
+
 7/17/14
 - Added ranger, paladin, gnome, bard
 - fixed typos
