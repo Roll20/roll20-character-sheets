@@ -91,7 +91,6 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let exec = [];
     exec.push(roll);
 
-    let isConditionnelA = false;
     let isConditionnelD = false;
     let isConditionnelV = false;
 
@@ -106,9 +105,9 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     const baseViolence = dViolence;
 
     let diceDegats = baseDegats;
-    let diceViolence = baseDegats;
+    let diceViolence = baseViolence;
 
-    const bDegats = [];
+    let bDegats = [];
     const bViolence = [];
 
     let degats = [];
@@ -129,11 +128,15 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     listAttrs = listAttrs.concat(listBase);
     listAttrs = listAttrs.concat(listArmure);
     listAttrs = listAttrs.concat(listArmureLegende);
+    listAttrs = listAttrs.concat(listStyle);
 
     const attrs = await getAttrsAsync(listAttrs);
 
@@ -162,10 +165,12 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
-    let ODWarrior = [];
-    let ODMALWarrior = [];
+    const ODWarrior = [];
+    const ODMALWarrior = [];
 
     const vForce = +attrs.force;
     const oForce = +attrs[ODValue.force];
@@ -174,11 +179,18 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     const oTir = +attrs[ODValue.tir];
     const oCombat = +attrs[ODValue.combat];
 
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
+    let isSurprise = false;
+    let isTenebricide = false;
+
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
     let attaquesSurprisesCondition = '';
 
-    const autresEffets = [];
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    let autresEffets = [];
     if (hasArmure) { exec.push('{{OD=true}}'); }
 
     const C1Value = +attrs[C1Nom];
@@ -255,10 +267,10 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     // GESTION DU STYLE
     let getStyle;
 
-    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+    if (type.includes('&{template:combat} {{portee=^{portee-contact}}}')) {
       getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, hasArmure, oTir, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);
@@ -270,47 +282,37 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+    ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -325,6 +327,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);
@@ -340,9 +344,16 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     if (cBonus.length !== 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     exec.push(jet);
+    exec.push(baseJet);
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -353,6 +364,8 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+
+      isSurprise = true;
     }
 
     if (armure === 'berserk') {
@@ -362,35 +375,29 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}}`);
       exec.push(`{{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
 
-      let degatsTenebricide = [];
-      let ASTenebricide = [];
-      let ASValueTenebricide = [];
-
-      let violenceTenebricide = [];
-
-      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
-      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-      degatsTenebricide = degatsTenebricide.concat(bDegats);
-
-      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-      violenceTenebricide = violenceTenebricide.concat(bViolence);
-
-      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
+      exec.push('{{tenebricideValueD=[[0]]}}');
+      exec.push('{{tenebricideValueV=[[0]]}}');
 
       exec.push(`{{tenebricide=${i18n_tenebricide}}}`);
       exec.push(`{{tenebricideConditionD=${i18n_tenebricideConditionD}}}`);
       exec.push(`{{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
 
-      if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
+      isTenebricide = true;
 
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
+      if (attaquesSurprises.length > 0) {
+        exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+        exec.push('{{tenebricideASValue=[[0]]}}');
       }
+    }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
     }
 
     if (autresEffets.length > 0) {
@@ -398,37 +405,58 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
     }
 
-    if (isConditionnelA) { exec.push('{{succesConditionnel=true}}'); }
-
     if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
 
     if (isConditionnelV) { exec.push('{{violenceConditionnel=true}}'); }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    // ROLL
+    const finalRoll = await startRoll(exec.join(' '));
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isSurprise,
+      isTenebricide,
+    };
+
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 }

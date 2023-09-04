@@ -1,3 +1,23 @@
+### Version 2.44 (2022-08):
+- fix broken style at character sheet background
+
+### Version 2.43 (2022-04):
+- **PC sheet**
+	- added Action selector for number of actions per round which automatically applies appropriate modifiers for MAP
+	- added alternate character points field for character point tracker option
+	- **Weapon & Armor**
+		- Added field for parry skill and dice rolls to weapons
+		- Added field for dexterity penalty to armor 
+	- **Attributes & Skills:**
+  	- Edited rolls to account for MAP
+- **Force:** lightsaber combat added parry fields similar to weapons
+- **Starship:**
+	- Added Skill Dice locations and Dice buttons for: Pilot, Maneuverability, Sensors, Shields, Hull
+	-	Ship weapons added: ammo field and notes field, field for gunnery skill, buttons for skill roll, fire control roll, combined gunnery and fire control
+- **Settings**
+  - added sheet for vehicles which is a reduced version of the starship sheet
+
+
 ### Version 2.42 (2021-08):
 - **Attributes & Skills:**
   - added names to roll buttons (so they can be dragged to macro bar or called in chat)

@@ -1,0 +1,362 @@
+<div class="cell width-375">
+    <img src="logo.png"/>
+</div>
+
+<input type="text" name="attr_result" class="hidden"/>
+<input type="text" name="attr_resultOracle" class="hidden"/>
+
+<div class="line">
+
+
+    <div class="cell width-420">
+        <div class="line">
+            <div class="cell width-110"><label>NAME</label></div>
+            <div class="cell"><input type="text" name="attr_name" class="width-260"/></div>
+        </div>
+        
+        <div class="line">
+            <div class="cell width-110"><label>PRONOUNS</label></div>
+            <div class="cell width-170"><input type="text" name="attr_pronouns" class="width-160"/></div>
+            
+            <div class="cell"><label>AGE</label></div>
+            <div class="cell"><input type="number" name="attr_age" size=3/></div>
+        </div>
+
+    </div>
+
+    <div class="cell">
+        <div class="line"><button type="action" class="width-100" name="act_roll">ROLL</button>&nbsp;&nbsp;&nbsp;<button type= "action" name="act_pushRoll">push</button></div>
+        <div class="line"><button type="action" class="width-100" name="act_complication">COMPLICATION</button></div>
+        <div class="line"><button type="action" class="width-100" name="act_oracle">ORACLE</button>&nbsp;&nbsp;&nbsp;<button type= "action" name="act_pushOracle">push</button></div>
+        <div class="line"><button type="action" class="width-100" name="act_oracleQuick">QUICK ORACLE</button></div>
+    </div>
+</div>
+
+<hr>
+
+<div class="line">
+
+    <div class="cell width-260">
+        <label>GIFT</label>
+        <div class="cell width-240">
+            <fieldset class="repeating_gift">
+                <div class="line"><input type="text" name="attr_gift" class="width-240"></div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="cell width-260">
+        <label>UPBRINGING</label>
+        <div class="cell width-240">
+            <fieldset class="repeating_upbringing">
+                <div class="line"><input type="text" name="attr_upbringing" class="width-240"></div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="cell width-260">
+        <label>EXPERIENCE</label>
+        <div class="cell width-240">
+            <fieldset class="repeating_experience">
+                <div class="line"><input type="text" name="attr_experience" class="width-240"></div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+
+<div class="line">&nbsp;</div>
+<div class="line">&nbsp;</div>
+
+<div class="line">
+
+    <div class="cell width-260">
+        <label>MARK</label>
+        <div class="cell width-240">
+            <fieldset class="repeating_mark">
+                <div class="line"><input type="text" name="attr_mark" class="width-240"></div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="cell width-260">
+        <label>CHARM</label>
+        <div class="cell width-240">
+            <fieldset class="repeating_charm">
+                <div class="line"><input type="text" name="attr_charm" class="width-240"></div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="cell width-260">
+        <label>BOND</label>
+        <div class="cell width-240">
+            <fieldset class="repeating_bond">
+                <div class="line"><input type="text" name="attr_bond" class="width-240"></div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="line width-750">
+    <label>NOTES</label>
+    <textarea name="attr_notes"></textarea>
+</div>
+
+
+
+<rolltemplate class="sheet-rolltemplate-custom">
+    <div class="sheet-container sheet-color-{{color}}">
+        <div class="sheet-header">
+            {{#name}}{{#title}}<div class="sheet-title">{{name}} - {{title}}</div> {{/title}}{{/name}}
+        </div>
+        <div class="sheet-content sheet-color-text-{{colorText}}">
+            {{#allprops() title  color colorText name}}
+            <div class="sheet-desc">{{value}}</div>
+            {{/allprops() title  color colorText name}}
+        </div>
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-custom2">
+    <div class="sheet-container sheet-color-{{color}}">
+        <div class="sheet-header">
+            {{#name}}{{#title}}<div class="sheet-title">{{name}} - {{title}}</div> {{/title}}{{/name}}
+        </div>
+        <div class="sheet-content sheet-color-text-{{colorText}}">
+            <div class="sheet-key">DICE</div>
+            {{#dice}}<div class="sheet-value">{{dice}}</div>{{/dice}}
+
+            <div class="sheet-key">RESULT</div>
+            {{#result}}<div class="sheet-value">{{result}}</div>{{/result}}
+
+        </div>
+    </div>
+</rolltemplate>
+
+
+
+
+<script type="text/worker">
+
+
+    on("clicked:roll", function(eventInfo){
+
+        getAttrs(["name"], function(values){
+
+            let dado = randomInteger(6);
+            let result = "WEAK HIT";
+            let color = 'purple';
+
+            if (dado == 6 || dado == 5){
+                result = "STRONG HIT";
+                color = 'blue';
+            }
+            
+            sendMsg(color, color, values.name.toUpperCase(), "ACTION", result, dado);
+
+            setAttrs({
+                result: dado
+            });
+        });    
+    });
+
+
+    on("clicked:pushRoll", function(eventInfo){
+        getAttrs(["name", "result"], function(values){
+
+            let mod =  parseInt(values.result)||0;
+
+            if (mod == 0){
+                sendMsg("red", "red", "", "", ["You must roll ACTION first"], '');
+                return;
+            }
+            
+
+            let dado = randomInteger(6);
+            let total = dado + mod;
+            let diceDesc = total + " (" + mod + " + " + dado + ")"; 
+            let result = "";
+            let color = '';
+
+            switch(true){
+                case (total > 6):{
+                    result = "MISS";
+                    color = 'red';
+                    break;
+                }
+                case (total > 4):{
+                    result = "STRONG HIT";
+                    color = 'blue';
+                    break;
+                }
+                case (total < 5):{
+                    result = "WEAK HIT";
+                    color = 'purple';
+                    break;
+                }
+            }
+            
+            sendMsg(color, color, values.name.toUpperCase(), "PUSH ACTION", result, diceDesc);
+
+            setAttrs({
+                result: 0
+            });
+        });    
+    });
+
+
+    on("clicked:complication", function(eventInfo){
+
+        getAttrs(["name"], function(values){
+
+            
+            var comp = [];
+            
+            console.log(eventInfo);
+            
+            comp.push("A character is negatively affected (hurt, stressed, sick, afraid, sad)");
+            comp.push("A character is put in danger");
+            comp.push("A character loses/breaks an item/resource/opportunity");
+            comp.push("A current threat/obstacle is worsened/intensified");
+            comp.push("A new threat/obstacle appears");
+            comp.push("A twist or inconvenient truth is revealed");
+            
+            sendMsg("black", "black", values.name.toUpperCase(), "COMPLICATION", comp, '');
+        });
+
+    });
+
+
+    on("clicked:oracle", function(eventInfo){
+
+        getAttrs(["name"], function(values){
+
+            let dado = randomInteger(6);
+            let result = 'LIKELY';
+            let color = 'blue';
+
+            if (dado == 6 || dado == 5){
+                result = "UNLIKELY";
+                color = 'purple';
+            }
+            
+            sendMsg(color, color, values.name.toUpperCase(), "ORACLE", result, dado);
+
+            setAttrs({
+                resultOracle: dado
+            });
+        });    
+    });
+
+    on("clicked:pushOracle", function(eventInfo){
+        getAttrs(["name", "resultOracle"], function(values){
+
+            let mod =  parseInt(values.resultOracle)||0;
+
+            if (mod == 0){
+                sendMsg("red", "red", "", "", ["You must roll ORACLE first"], '');
+                return;
+            }
+            
+
+            let dado = randomInteger(6);
+            let total = dado + mod;
+            let diceDesc = total + " (" + mod + " + " + dado + ")"; 
+            let result = "";
+            let color = '';
+
+            switch(true){
+                case (total > 6):{
+                    result = "MISFORTUNE";
+                    color = 'red';
+                    break;
+                }
+                case (total > 4):{
+                    result = "UNLIKELY";
+                    color = 'purple';
+                    break;
+                }
+                case (total < 5):{
+                    result = "LIKELY";
+                    color = 'blue';
+                    break;
+                }
+            }
+            
+            sendMsg(color, color, values.name.toUpperCase(), "PUSH ORACLE", result, diceDesc);
+
+            setAttrs({
+                resultOracle: 0
+            });
+        });    
+    });
+
+    on("clicked:oracleQuick", function(eventInfo){
+
+        getAttrs(["name"], function(values){
+
+            let dado = randomInteger(6);
+            let result = 'NO';
+            let color = 'red';
+
+            if (dado > 3){
+                result = "YES";
+                color = 'blue';
+            }
+            
+            sendMsg(color, color, values.name.toUpperCase(), "QUICK ORACLE", result, dado);
+        });    
+    });
+
+
+
+
+    function sendMsg(cor, corText, name, titulo, campos, dados){
+
+        var mensagem = '';
+
+        console.log( ">>>>>>send msg<<<<<<<<");
+
+
+        if (dados != ''){
+
+            mensagem += "&{template:custom2} " + 
+                        "{{dice=" + dados + "}} " + 
+                        "{{result=" + campos + "}} ";
+    
+        }else{
+            mensagem += "&{template:custom} ";
+            for (let i=0 ; i < campos.length ; i++){
+                mensagem += "{{" + i + "=" + campos[i] + "}} "
+            }
+    
+        }
+
+        mensagem += "{{color="     + cor      + "}} " + 
+        "{{colorText=" + corText  + "}} " + 
+        "{{title="     + titulo   + "}} " +  
+        "{{name="      + name + "}} ";
+
+
+
+
+
+        console.log(mensagem);
+
+        startRoll(mensagem, (results) =>{
+            finishRoll(results.rollId);
+        });
+
+    }
+
+
+
+    function randomInteger(max){
+        return Math.floor(Math.random() * max) + 1;
+    }
+
+</script>
+

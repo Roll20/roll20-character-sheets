@@ -301,6 +301,10 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
+      'MADDjinnWraithActive',
     ];
 
     const arme = [];
@@ -323,6 +327,8 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const bonus = [];
 
     let OD = 0;
+
+    const wraith = attrs.MADDjinnWraithActive;
 
     const type = attrs.MAUtilisationArmeAI;
     const mod = +attrs.jetModifDes;
@@ -357,6 +363,12 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     const attaquesSurprises = [];
     const attaquesSurprisesValue = [];
     const attaquesSurprisesCondition = '';
+
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    let isSurprise = false;
 
     const autresEffets = [];
 
@@ -413,7 +425,7 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
       getStyle = getStyleContactMod(attrs, '', baseDegats, baseViolence, true, 0, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, true, 0, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, true, 0, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);
@@ -422,6 +434,14 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     diceViolence += getStyle.diceViolence;
 
     // FIN GESTION DU STYLE
+
+    if (wraith !== '0') {
+      cRoll.push(+attrs.discretion);
+      cBonus.push(+attrs[ODValue.discretion]);
+      bDegats.push(+attrs.discretion);
+      bDegats.push(+attrs[ODValue.discretion]);
+      exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+    }
 
     if (cRoll.length === 0) { cRoll.push(0); }
 
@@ -442,9 +462,16 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     cRoll.push(Number(attrs.mechaArmurePuissance));
     exec.push(`{{vPuissance=+${Number(attrs.mechaArmurePuissance)}D}}`);
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     exec.push(jet);
+    exec.push(baseJet);
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -458,6 +485,18 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+
+      isSurprise = true;
+    }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
     }
 
     if (autresEffets.length > 0) {
@@ -467,32 +506,53 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
 
     if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const finalRoll = await startRoll(exec.join(' '));
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+    const rDegats = finalRoll.results.degats.dice;
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+    const rViolence = finalRoll.results.violence.dice;
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isSurprise,
+    };
+
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
+
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 }
 
@@ -612,7 +672,14 @@ rollCombatArchangel.forEach((button) => {
 
     let bCarac;
 
+    let pairOrImpair;
+
+    let malusRoll;
+    let total;
+
     let jet;
+    let baseJet;
+
     let cRoll = [];
     const rollBonus = [];
     const cBase = [];
@@ -641,6 +708,9 @@ rollCombatArchangel.forEach((button) => {
           'canonMetatronCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -703,7 +773,7 @@ rollCombatArchangel.forEach((button) => {
 
         if (cBonus.length > 0) { exec.push(cBonus.join(' - ')); }
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -720,9 +790,16 @@ rollCombatArchangel.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -751,32 +828,66 @@ rollCombatArchangel.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
+
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+    };
+
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });
 
@@ -795,6 +906,14 @@ rollNephilim.forEach((button) => {
     let tours;
     let degats;
     let violence;
+
+    let devaste = false;
+    let bourreau = false;
+    let equilibre = false;
+
+    let isMeurtrier = false;
+    let isFureur = false;
+
     const effets = [];
 
     exec.push(base);
@@ -817,6 +936,16 @@ rollNephilim.forEach((button) => {
         break;
 
       case 'MANOGStationMissile':
+        attrs = await getAttrsAsync([
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+        ]);
+
+        devaste = +attrs.devasterAnatheme;
+        bourreau = +attrs.bourreauTenebres;
+        equilibre = +attrs.equilibreBalance;
+
         degats = roll[1];
         violence = roll[2];
 
@@ -828,8 +957,18 @@ rollNephilim.forEach((button) => {
         break;
 
       case 'MANOGStationRoquette':
+        attrs = await getAttrsAsync([
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+        ]);
+
         degats = roll[1];
         violence = roll[2];
+
+        devaste = +attrs.devasterAnatheme;
+        bourreau = +attrs.bourreauTenebres;
+        equilibre = +attrs.equilibreBalance;
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}}`);
         break;
@@ -838,6 +977,9 @@ rollNephilim.forEach((button) => {
         attrs = await getAttrsAsync([
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ]);
 
         degats = attrs[roll[1]];
@@ -848,15 +990,46 @@ rollNephilim.forEach((button) => {
         effets.push(i18n_briserResilience);
         effets.sort();
 
+        isMeurtrier = true;
+        isFureur = true;
+
         exec.push(`{{degats=[[${degats}]]}} {{degatsConditionnel=true}} {{meurtrier=${i18n_meurtrier}}} {{meurtrierValue=[[2D6]]}} {{meurtrierCondition=${i18n_meurtrierCondition}}} {{violence=[[${violence}]]}} {{violenceConditionnel=true}} {{fureur=${i18n_fureur}}} {{fureurValue=[[2D6]]}} {{fureurCondition=${i18n_fureurCondition}}} {{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}} {{effets=${effets.join(' / ')}}}`);
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      finishRoll(
-        results.rollId, {},
-      );
-    });
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    let computed = {};
+
+    if (button === 'MANOGStationMissile' || button === 'MANOGStationRoquette' || button === 'MANMJ') {
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
+
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
+
+      const conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+        isFureur,
+        isMeurtrier,
+      };
+
+      computed = updateRoll(finalRoll, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+    }
+
+    finishRoll(finalRoll.rollId, computed);
   });
 });
 
@@ -881,7 +1054,13 @@ rollCombatNephilim.forEach((button) => {
 
     let bCarac;
 
+    let pairOrImpair;
+
+    let malusRoll;
+    let total;
+
     let jet;
+    let baseJet;
     let cRoll = [];
     const rollBonus = [];
     const cBase = [];
@@ -892,6 +1071,8 @@ rollCombatNephilim.forEach((button) => {
     let bDegats;
     let violence;
     let bViolence;
+    let isFureur = false;
+    let isUltraviolence = false;
 
     let getStyle;
 
@@ -911,6 +1092,9 @@ rollCombatNephilim.forEach((button) => {
           'canonMagmaCaracteristique2',
           'canonMagmaCaracteristique3',
           'canonMagmaCaracteristique4',
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
@@ -919,6 +1103,8 @@ rollCombatNephilim.forEach((button) => {
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
+
+        isFureur = true;
 
         C1 = attrs.canonMagmaCaracteristique1;
         C2 = attrs.canonMagmaCaracteristique2;
@@ -969,7 +1155,7 @@ rollCombatNephilim.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -981,9 +1167,16 @@ rollCombatNephilim.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1022,11 +1215,16 @@ rollCombatNephilim.forEach((button) => {
           'MSurturCaracteristique2',
           'MSurturCaracteristique3',
           'MSurturCaracteristique4',
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        isUltraviolence = true;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1080,7 +1278,7 @@ rollCombatNephilim.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1097,9 +1295,16 @@ rollCombatNephilim.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1127,32 +1332,68 @@ rollCombatNephilim.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
+
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isFureur,
+      isUltraviolence,
+    };
+
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });
 
@@ -1167,8 +1408,12 @@ rollDemon.forEach((button) => {
 
     const base = roll[0];
 
+    let wraith;
+
     let degats;
     let violence;
+    let bDegats = 0;
+    let bViolence = 0;
 
     exec.push(base);
 
@@ -1178,10 +1423,27 @@ rollDemon.forEach((button) => {
         attrs = await getAttrsAsync([
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
+
+        bDegats = +degats.split('+')[1];
+        bViolence = +violence.split('+')[1];
+
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{effets=^{CDF-desactive-pendant} [[1D3]] ^{tours}}}`);
         break;
@@ -1190,20 +1452,64 @@ rollDemon.forEach((button) => {
         attrs = await getAttrsAsync([
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ]);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         degats = attrs[roll[1]];
         violence = attrs[roll[2]];
+
+        if (wraith !== '0') {
+          degats += `+${+attrs.discretion + +attrs[ODValue.discretion]}`;
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
 
         exec.push(`{{degats=[[${degats}]]}} {{violence=[[${violence}]]}} {{degatsConditionnel=true}} {{violenceConditionnel=true}} {{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}} {{effets=${i18n_antiVehicule}}}`);
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      finishRoll(
-        results.rollId, {},
-      );
-    });
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
+    }
+
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
+
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
+
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+    };
+
+    const computed = updateRoll(finalRoll, [], 0, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    finishRoll(finalRoll.rollId, computed);
   });
 });
 
@@ -1229,12 +1535,21 @@ rollCombatDemon.forEach((button) => {
     let attrs = [];
     let attrsCarac = [];
 
+    let pairOrImpair;
+
+    let malusRoll;
+    let total;
+
     let jet;
+    let baseJet;
+
     let cRoll = [];
     const rollBonus = [];
     const cBase = [];
     const cBonus = [];
     let cOD = 0;
+
+    let wraith;
 
     let degats;
     let bDegats;
@@ -1244,8 +1559,6 @@ rollCombatDemon.forEach((button) => {
     let getStyle;
 
     let autresEffets;
-
-    let active;
 
     exec.push(base);
 
@@ -1261,11 +1574,19 @@ rollCombatDemon.forEach((button) => {
           'DSouffleCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1319,7 +1640,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]]);
         bViolence = 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1331,9 +1652,24 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1370,11 +1706,14 @@ rollCombatDemon.forEach((button) => {
           'caracteristiqueWraith4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
         ];
 
         attrs = await getAttrsAsync(listAttrs);
 
-        active = attrs.MADDjinnWraithActive;
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1383,8 +1722,6 @@ rollCombatDemon.forEach((button) => {
         C2 = attrs.caracteristiqueWraith2;
         C3 = attrs.caracteristiqueWraith3;
         C4 = attrs.caracteristiqueWraith4;
-
-        if (active !== '0') { exec.push('{{special2=^{module-wraith} ^{active}}}'); }
 
         attrsCarac = await getCarac(bCarac, C1, C2, C3, C4);
 
@@ -1429,9 +1766,16 @@ rollCombatDemon.forEach((button) => {
 
         rollBonus.push(cOD);
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1455,11 +1799,19 @@ rollCombatDemon.forEach((button) => {
           'APoingsCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
 
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1513,7 +1865,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1525,9 +1877,24 @@ rollCombatDemon.forEach((button) => {
         degats += getStyle.diceDegats;
         violence += getStyle.diceViolence;
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (rollBonus.length === 0) { rollBonus.push(0); }
@@ -1563,10 +1930,18 @@ rollCombatDemon.forEach((button) => {
           'LCGCaracteristique4',
           roll[1],
           roll[2],
+          'devasterAnatheme',
+          'bourreauTenebres',
+          'equilibreBalance',
+          'MADDjinnWraithActive',
+          'discretion',
+          `${ODValue.discretion}`,
         ];
 
         listAttrs = listAttrs.concat(listStyle);
         attrs = await getAttrsAsync(listAttrs);
+
+        wraith = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
         mod = +attrs.jetModifDes;
@@ -1620,7 +1995,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -1637,9 +2012,24 @@ rollCombatDemon.forEach((button) => {
           exec.push(`{{mod=${mod}}}`);
         }
 
-        jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+        if (wraith !== '0') {
+          cRoll.push(+attrs.discretion);
+          rollBonus.push(+attrs[ODValue.discretion]);
+
+          bDegats += +attrs.discretion + +attrs[ODValue.discretion];
+          exec.push(`{{vWraithA=${+attrs.discretion}D6+${+attrs[ODValue.discretion]}}} {{vWraithD=[[${+attrs.discretion}+${+attrs[ODValue.discretion]}]]}}`);
+        }
+
+        pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+        malusRoll = 0;
+        total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+        jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+        baseJet = '{{basejet=[[0]]}}';
 
         exec.push(jet);
+        exec.push(baseJet);
         exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
         if (cOD.length === 0) { cOD.push(0); }
@@ -1668,31 +2058,81 @@ rollCombatDemon.forEach((button) => {
         break;
     }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    if (button !== 'MADjinnWraith') {
+      if (devaste || bourreau || equilibre) {
+        const herauts = [];
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-        },
-      );
+        if (devaste) { herauts.push(i18n_devasterAnatheme); }
+        if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+        if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
+        exec.push(`{{herauts=${herauts.join(' / ')}}}`);
       }
-    });
+    }
+
+    if (wraith !== '0') {
+      exec.push('{{special2=^{module-wraith} ^{active}}}');
+    }
+
+    const finalRoll = await startRoll(exec.join(' '));
+
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
+
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
+
+    let rDegats = [];
+    let tDegats = 0;
+
+    let rViolence = [];
+    let tViolence = 0;
+
+    let conditions = {};
+
+    if (button !== 'MADjinnWraith') {
+      rDegats = finalRoll.results.degats.dice;
+      rViolence = finalRoll.results.violence.dice;
+
+      tDegats = finalRoll.results.degats.result;
+      tViolence = finalRoll.results.violence.result;
+
+      conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+      };
+    }
+
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
+
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:mechaArmure} {{special1=@{mechaArmureNom}}} {{special1B=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });

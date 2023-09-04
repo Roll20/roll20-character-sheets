@@ -168,6 +168,9 @@ monkCeaRoll.forEach((button) => {
       ODValue.tir,
       ODValue.discretion,
       'discretion',
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     const attDegats = [];
@@ -197,6 +200,10 @@ monkCeaRoll.forEach((button) => {
     let isConditionnelD = false;
     let isConditionnelV = false;
 
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
+
     const mod = +attrs.jetModifDes;
     const hasBonus = +attrs.bonusCarac;
 
@@ -222,12 +229,9 @@ monkCeaRoll.forEach((button) => {
     let OD = 0;
 
     let ODMALBarbarian = [];
+    let ODMALRogue = [];
     let ODMALShaman = [];
-    let ODMALWarrior = [];
-
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
-    let attaquesSurprisesCondition = '';
+    const ODMALWarrior = [];
 
     let capaDgts = 0;
     let capaViolence = 0;
@@ -246,7 +250,16 @@ monkCeaRoll.forEach((button) => {
     let degats = [];
     let violence = [];
 
-    const autresEffets = [];
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    let isSurprise = false;
+    let isDestructeur = false;
+    let isMeurtrier = false;
+    let isUltraviolence = false;
+
+    let autresEffets = [];
 
     exec.push(roll);
     exec.push('{{OD=true}}');
@@ -299,26 +312,20 @@ monkCeaRoll.forEach((button) => {
       if (hasArmure) { OD += C4OD; }
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
-
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
     diceDegats += Number(MALBonus.diceDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // GESTION DES EFFETS DES DIFFERENTES ATTAQUES
 
@@ -330,6 +337,7 @@ monkCeaRoll.forEach((button) => {
 
       isConditionnelA = true;
       isConditionnelD = true;
+      isDestructeur = true;
 
       if (PG250 === 1) { exec.push(`{{parasitage=${i18n_parasitage} 4}}`); } else { exec.push(`{{parasitage=${i18n_parasitage} 2}}`); }
 
@@ -354,6 +362,8 @@ monkCeaRoll.forEach((button) => {
       isConditionnelA = true;
       isConditionnelD = true;
       isConditionnelV = true;
+      isMeurtrier = true;
+      isUltraviolence = true;
 
       exec.push(`{{parasitage=${i18n_parasitage} 1}}`);
       exec.push(`{{parasitageCondition=${i18n_parasitageCondition}}}`);
@@ -501,6 +511,7 @@ monkCeaRoll.forEach((button) => {
     bonus = bonus.concat(OD);
 
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODMALWarrior);
 
@@ -519,7 +530,17 @@ monkCeaRoll.forEach((button) => {
     violence = violence.concat(`${diceViolence}D6`);
     violence = violence.concat(bonusViolence);
 
-    exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+    const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
+
+    exec.push(jet);
+    exec.push(baseJet);
+
     exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
@@ -530,6 +551,17 @@ monkCeaRoll.forEach((button) => {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+      isSurprise = true;
+    }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
     }
 
     if (isConditionnelA === true) { exec.push('{{succesConditionnel=true}}'); }
@@ -540,37 +572,56 @@ monkCeaRoll.forEach((button) => {
 
     if (autresEffets.length > 0) { exec.push(`{{effets=${autresEffets.join(' / ')}}}`); }
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
-      const tBonus = results.results.tBonus.result;
-      const tExploit = results.results.Exploit.result;
+    // ROLL
+    const finalRoll = await startRoll(exec.join(' '));
 
-      const total = tJet + tBonus;
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
-      const tDegats = results.results.degats.result;
-      const tViolence = results.results.violence.result;
+    const tBonus = finalRoll.results.tBonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: total,
-          degats: tDegats,
-          violence: tViolence,
-        },
-      );
+    const rDegats = finalRoll.results.degats.dice;
+    const rViolence = finalRoll.results.violence.dice;
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+    const tDegats = finalRoll.results.degats.result;
+    const tViolence = finalRoll.results.violence.result;
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+    const conditions = {
+      bourreau,
+      devaste,
+      equilibre,
+      isDestructeur,
+      isMeurtrier,
+      isUltraviolence,
+      isSurprise,
+    };
+
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+
+    finishRoll(finalRoll.rollId, computed);
+
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });

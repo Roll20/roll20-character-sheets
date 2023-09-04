@@ -24,6 +24,11 @@ rollCombatDistance.forEach((button) => {
       `${ODValue.dexterite}`,
       'tir',
       `${ODValue.tir}`,
+      'aura',
+      `${ODValue.aura}`,
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     listAttrs = listAttrs.concat(listArmure, listArmureLegende, listStyle, listBase);
@@ -67,6 +72,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push('pScaracteristique3Equipement');
         listAttrs.push('pScaracteristique4Equipement');
         listAttrs.push('pSpilonnage');
+        listAttrs.push('pSpilonnageType');
 
         baseDegats = 2;
         baseViolence = 1;
@@ -97,6 +103,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push('mEcaracteristique3Equipement');
         listAttrs.push('mEcaracteristique4Equipement');
         listAttrs.push('mEpilonnage');
+        listAttrs.push('mEpilonnageType');
 
         baseDegats = 3;
         baseViolence = 3;
@@ -127,6 +134,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push(`${prefix}caracteristique3Equipement`);
         listAttrs.push(`${prefix}caracteristique4Equipement`);
         listAttrs.push(`${prefix}pilonnage`);
+        listAttrs.push(`${prefix}pilonnageType`);
 
         listAttrs.push(`${prefix}ArmeDist`);
         listAttrs.push(`${prefix}armeDistPortee`);
@@ -157,6 +165,7 @@ rollCombatDistance.forEach((button) => {
         listAttrs.push(`${prefix}caracteristique3Equipement`);
         listAttrs.push(`${prefix}caracteristique4Equipement`);
         listAttrs.push(`${prefix}pilonnage`);
+        listAttrs.push(`${prefix}pilonnageType`);
 
         listAttrs.push(`${prefix}ArmeDist`);
         listAttrs.push(`${prefix}armeDistPortee`);
@@ -222,6 +231,7 @@ rollCombatDistance.forEach((button) => {
     const C3 = attrs[`${prefix}caracteristique3Equipement`] || '0';
     const C4 = attrs[`${prefix}caracteristique4Equipement`] || '0';
     const vPilonnage = attrs[`${prefix}pilonnage`] || 0;
+    const vPilonnageType = attrs[`${prefix}pilonnageType`] || 0;
 
     if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
@@ -246,10 +256,12 @@ rollCombatDistance.forEach((button) => {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
-    let ODWarrior = [];
-    let ODMALWarrior = [];
+    const ODWarrior = [];
+    const ODMALWarrior = [];
 
     const vForce = +attrs.force;
     const vDiscretion = +attrs.discretion;
@@ -258,6 +270,8 @@ rollCombatDistance.forEach((button) => {
     const oDexterite = +attrs[`${ODValue.dexterite}`];
     const vTir = +attrs.tir;
     const oTir = +attrs[`${ODValue.tir}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -266,21 +280,22 @@ rollCombatDistance.forEach((button) => {
     let eASAssassin = '';
     let eASAssassinValue = 0;
 
+    let isSurprise = false;
     let isAssistantAttaque = false;
     let isAntiAnatheme = false;
     let isCadence = false;
-    let sCadence = 0;
     let vCadence = 0;
     let isDeuxMains = false;
     let isDestructeur = false;
     let vDestructeur = 0;
+    let isFureur = false;
     let isMeurtrier = false;
     let vMeurtrier = 0;
     let nowSilencieux = false;
     let isObliteration = false;
     let isTenebricide = false;
     let isTirRafale = false;
-    let isChambreDouble = false;
+    let isUltraviolence = false;
 
     let isELumiere = false;
     let lumiereValue = 0;
@@ -288,10 +303,25 @@ rollCombatDistance.forEach((button) => {
     let isEAkimbo = false;
     let isEAmbidextrie = false;
 
+    let isBourreau = false;
+    let isDevastation = false;
+    let isGuidage = false;
+    let isRegularite = false;
+
+    let eBourreauValue = 0;
+    let eDevastationValue = 0;
+
     let pasEnergie = false;
     let sEnergieText = '';
+    let hasEnergieRetiree = false;
+    let energieIsEspoir = false;
+    let vEnergieRetiree = 0;
     const energie = attrs.energiePJ;
     const espoir = attrs.espoir;
+
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
     let autresEffets = [];
     let autresAmeliorationsA = [];
@@ -371,7 +401,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DES EFFETS
 
-    const effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+    const effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
     bDegats = bDegats.concat(effets.bDegats);
     eASAssassin = effets.eASAssassin;
@@ -386,10 +416,10 @@ rollCombatDistance.forEach((button) => {
 
     isAntiAnatheme = effets.isAntiAnatheme;
 
+    isAssassin = effets.isAssassin;
     isAssistantAttaque = effets.isAssistantAttaque;
 
     isCadence = effets.isCadence;
-    sCadence = effets.sCadence;
     vCadence = effets.vCadence;
 
     isDestructeur = effets.isDestructeur;
@@ -405,6 +435,9 @@ rollCombatDistance.forEach((button) => {
 
     isTenebricide = effets.isTenebricide;
 
+    isFureur = effets.isFureur;
+    isUltraviolence = effets.isUltraviolence;
+
     isObliteration = effets.isObliteration;
     isTirRafale = effets.isTirRafale;
 
@@ -413,6 +446,14 @@ rollCombatDistance.forEach((button) => {
 
     isEAkimbo = effets.isAkimbo;
     isEAmbidextrie = effets.isAmbidextrie;
+
+    isBourreau = effets.isBourreau;
+    isDevastation = effets.isDevastation;
+    isGuidage = effets.isGuidage;
+    isRegularite = effets.isRegularite;
+
+    eBourreauValue = effets.vBourreau;
+    eDevastationValue = effets.vDevastation;
 
     if (effets.isConditionnelA) { isConditionnelA = true; }
 
@@ -444,9 +485,8 @@ rollCombatDistance.forEach((button) => {
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = ameliorationsA.attaquesSurprisesCondition; }
 
     if (ameliorationsA.isChambreDouble) {
-      isCadence = false;
-      isChambreDouble = ameliorationsA.isChambreDouble;
-      sCadence = ameliorationsA.rChambreDouble;
+      isCadence = true;
+      vCadence = ameliorationsA.vCadence;
     }
 
     if (ameliorationsA.isJAkimbo) { isEAkimbo = ameliorationsA.isJAkimbo; }
@@ -471,7 +511,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
+    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -506,15 +546,41 @@ rollCombatDistance.forEach((button) => {
       bViolence.push(sBonusViolenceFixe);
     }
 
+    if (isGuidage) {
+      if (armure === 'berserk') {
+        let sEspoirValue = Math.floor((5 / 2) - 1);
+
+        if (sEspoirValue < 1) { sEspoirValue = 1; }
+
+        hasEnergieRetiree = true;
+        energieIsEspoir = true;
+        vEnergieRetiree += sEspoirValue;
+      } else {
+        hasEnergieRetiree = true;
+        vEnergieRetiree += 5;
+      }
+    }
+
     if (sEnergie) {
       if (armure === 'berserk') {
         let sEspoirValue = Math.floor((Number(sEnergieValue) / 2) - 1);
 
         if (sEspoirValue < 1) { sEspoirValue = 1; }
 
-        autresSpecial.push(`${i18n_espoirRetire} (${sEspoirValue})`);
+        hasEnergieRetiree = true;
+        energieIsEspoir = true;
+        vEnergieRetiree += sEspoirValue;
+      } else {
+        hasEnergieRetiree = true;
+        vEnergieRetiree += +sEnergieValue;
+      }
+    }
 
-        newEnergie = Number(espoir) - Number(sEspoirValue);
+    if (hasEnergieRetiree) {
+      if (energieIsEspoir) {
+        newEnergie = Number(espoir) - Number(vEnergieRetiree);
+
+        autresSpecial.push(`${i18n_espoirRetire} (${vEnergieRetiree})`);
 
         if (newEnergie === 0) {
           sEnergieText = i18n_plusEspoir;
@@ -524,9 +590,9 @@ rollCombatDistance.forEach((button) => {
           pasEnergie = true;
         }
       } else {
-        autresSpecial.push(`${i18n_energieRetiree} (${sEnergieValue})`);
+        newEnergie = Number(energie) - Number(vEnergieRetiree);
 
-        newEnergie = Number(energie) - Number(sEnergieValue);
+        autresSpecial.push(`${i18n_energieRetiree} (${vEnergieRetiree})`);
 
         if (newEnergie === 0) {
           sEnergieText = i18n_plusEnergie;
@@ -544,47 +610,37 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = await getArmorBonus(attrs, armure, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets, false, true);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+    ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = await getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets, false, true);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -599,6 +655,8 @@ rollCombatDistance.forEach((button) => {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);
@@ -618,55 +676,21 @@ rollCombatDistance.forEach((button) => {
 
     if (cBonus.length !== 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}-${sCadence}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = isGuidage === true ? 'cs1cs3cs5cf2cf4cf6s' : 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = isCadence === true ? 3 : 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     firstExec.push(jet);
-    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    firstExec.push(baseJet);
+    exec.push(`{{Exploit=[[${total}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
     exec.push(`{{degats=[[${degats.join('+')}]]}}`);
     exec.push(`{{violence=[[${violence.join('+')}]]}}`);
-
-    if (isTenebricide) {
-      let degatsTenebricide = [];
-      let ASTenebricide = [];
-      let ASValueTenebricide = [];
-
-      let violenceTenebricide = [];
-
-      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
-      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-      degatsTenebricide = degatsTenebricide.concat(bDegats);
-
-      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-      violenceTenebricide = violenceTenebricide.concat(bViolence);
-
-      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
-
-      if (eASAssassinValue > 0) {
-        eAssassinTenebricideValue = Math.ceil(eASAssassinValue / 2);
-
-        ASTenebricide.unshift(eASAssassin);
-        ASValueTenebricide.unshift(`${eAssassinTenebricideValue}D6`);
-
-        if (attaquesSurprises.length > 0) {
-          ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-          ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-        }
-
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-      } else if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-      }
-    }
 
     if (isObliteration) {
       let ASObliteration = [];
@@ -706,16 +730,6 @@ rollCombatDistance.forEach((button) => {
       }
     }
 
-    if (isCadence) {
-      exec.push(`{{rCadence=${i18n_cadence} ${vCadence} ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
-    }
-
-    if (isChambreDouble) {
-      exec.push(`{{rCadence=${i18n_chambreDouble} (${i18n_cadence} 2) ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
-    }
-
     if (eASAssassinValue > 0) {
       attaquesSurprises.unshift(eASAssassin);
       attaquesSurprisesValue.unshift(`${eASAssassinValue}D6`);
@@ -725,9 +739,36 @@ rollCombatDistance.forEach((button) => {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+      isSurprise = true;
+    }
+
+    if (isTenebricide) {
+      exec.push(`{{tenebricide=${i18n_tenebricide}}} {{tenebricideConditionD=${i18n_tenebricideConditionD}}} {{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+      exec.push('{{tenebricideValueD=[[0]]}}');
+      exec.push('{{tenebricideValueV=[[0]]}}');
+
+      if (attaquesSurprises.length > 0) {
+        exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+        exec.push('{{tenebricideASValue=[[0]]}}');
+      }
+
+      if (isMeurtrier) { firstExec.push('{{tMeurtrierValue=[[0]]}}'); }
+      if (isDestructeur) { firstExec.push('{{tDestructeurValue=[[0]]}}'); }
+      if (isFureur) { firstExec.push('{{tFureurValue=[[0]]}}'); }
+      if (isUltraviolence) { firstExec.push('{{tUltraviolenceValue=[[0]]}}'); }
     }
 
     if (isELumiere) { autresEffets.push(`${i18n_lumiere} ${lumiereValue}`); }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
 
     if (autresEffets.length > 0) {
       autresEffets.sort();
@@ -756,90 +797,92 @@ rollCombatDistance.forEach((button) => {
 
     exec = firstExec.concat(exec);
 
+    // ROLL
+    let finalRoll;
+
     if (pasEnergie === false) {
-      startRoll(exec.join(' '), (results) => {
-        const tJet = results.results.jet.result;
+      if (isBourreau && !bourreau && !equilibre) { exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauValue} ${i18n_inclus}}}`); }
+      if (isDevastation && !devaste && !equilibre) { exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationValue} ${i18n_inclus}}}`); }
 
-        const tBonus = results.results.bonus.result;
-        const tExploit = results.results.Exploit.result;
+      finalRoll = await startRoll(exec.join(' '));
+      const tJet = finalRoll.results.jet.result;
+      const rJet = finalRoll.results.jet.dice;
 
-        const tMeurtrier = results.results.meurtrierValue;
-        let vTMeurtrier = 0;
+      const tBonus = finalRoll.results.bonus.result;
+      const tExploit = finalRoll.results.Exploit.result;
 
-        if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
 
-        const tDestructeur = results.results.destructeurValue;
-        let vTDestructeur = 0;
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
 
-        if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+      const conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+        isTenebricide,
+        isSurprise,
+        isDestructeur,
+        isFureur,
+        isMeurtrier,
+        isUltraviolence,
+        isBourreau,
+        isDevastation,
+        isRegularite,
+        isGuidage,
+      };
 
-        const tFureur = results.results.fureurValue;
-        let vTFureur = 0;
+      const conditionsValues = {
+        eBourreauValue,
+        eDevastationValue,
+      };
 
-        if (tFureur !== undefined) { vTFureur = tFureur.dice[0] + tFureur.dice[1]; }
+      const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions, conditionsValues);
 
-        const tUltraviolence = results.results.ultraviolenceValue;
+      finishRoll(finalRoll.rollId, computed);
 
-        let vTUltraviolence = 0;
+      if (tJet !== 0 && computed.basejet === tExploit) {
+        const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+        const rExploit = exploitRoll.results.jet.dice;
+        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
 
-        if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
+        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+          const vC = valeurCourante;
+          let nV = 0;
 
-        finishRoll(
-          results.rollId,
-          {
-            jet: tJet + tBonus,
-            meurtrierValue: vTMeurtrier,
-            destructeurValue: vTDestructeur,
-            fureurValue: vTFureur,
-            ultraviolenceValue: vTUltraviolence,
-          },
-        );
-
-        if (tJet !== 0 && tJet === tExploit) {
-          startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-            const tExploit2 = exploit.results.jet.result;
-
-            finishRoll(
-              exploit.rollId,
-              {
-                jet: tExploit2,
-              },
-            );
-          });
-        }
-
-        if (sEnergie !== false) {
-          if (armure === 'berserk') {
-            setAttrs({
-              espoir: newEnergie,
-            });
-          } else {
-            setAttrs({
-              energiePJ: newEnergie,
-            });
+          if (vC % 2 === exploitPairOrImpair) {
+            nV = 1;
           }
 
-          if (newEnergie === 0) {
-            startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${name}}} {{text=${sEnergieText}}}`, (exploit) => {
-              finishRoll(
-                exploit.rollId, {},
-              );
-            });
-          }
+          return accumulateur + nV;
+        }, 0);
+
+        const exploitComputed = {
+          jet: jetExploit,
+        };
+
+        finishRoll(exploitRoll.rollId, exploitComputed);
+      }
+
+      if (hasEnergieRetiree) {
+        if (energieIsEspoir) {
+          setAttrs({ espoir: newEnergie });
+        } else {
+          setAttrs({ energiePJ: newEnergie });
         }
-      });
+
+        if (newEnergie === 0) {
+          const noEnergieRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`);
+          finishRoll(noEnergieRoll.rollId, {});
+        }
+      }
     } else if (button === 'repeating_armeCaC:armecontact') {
-      startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${name}}} {{text=${sEnergieText}}}`, (text) => {
-        finishRoll(
-          text.rollId, {},
-        );
-      });
+      finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${name}}} {{text=${sEnergieText}}}`);
+      finishRoll(finalRoll.rollId, {});
     } else {
-      startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${name}}} {{text=${sEnergieText}}}`, (text) => {
-        finishRoll(
-          text.rollId, {},
-        );
-      });
+      finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${name}}} {{text=${sEnergieText}}}`);
+      finishRoll(finalRoll.rollId, {});
     }
   });
 });

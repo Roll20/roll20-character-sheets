@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
@@ -48,8 +49,13 @@ rollCombatContact.forEach((button) => {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'aura',
+      `${ODValue.aura}`,
       'energiePJ',
       'espoir',
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     listAttrs = listAttrs.concat(listArmure, listArmureLegende, listStyle, listBase);
@@ -279,10 +285,12 @@ rollCombatContact.forEach((button) => {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
-    let ODWarrior = [];
-    let ODMALWarrior = [];
+    const ODWarrior = [];
+    const ODMALWarrior = [];
 
     const vForce = +attrs.force;
     const oForce = +attrs[`${ODValue.force}`];
@@ -294,6 +302,8 @@ rollCombatContact.forEach((button) => {
     const oTir = +attrs[`${ODValue.tir}`];
     const vCombat = +attrs.combat;
     const oCombat = +attrs[`${ODValue.combat}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -302,24 +312,23 @@ rollCombatContact.forEach((button) => {
     let eASAssassin = '';
     let eASAssassinValue = 0;
 
+    let isSurprise = false;
     let isAssistantAttaque = false;
     let isAntiAnatheme = false;
     let isCadence = false;
-    let isChromee = false;
-    let sCadence = 0;
     let vCadence = 0;
     let isChoc = false;
     let isDestructeur = false;
     let vDestructeur = 0;
     let isLeste = false;
+    let isFureur = false;
     let isMeurtrier = false;
     let vMeurtrier = 0;
     let nowSilencieux = false;
     let isObliteration = false;
     let isOrfevrerie = false;
     let isTenebricide = false;
-
-    let ASTenebricide = [];
+    let isUltraviolence = false;
 
     let isCheneSculpte = false;
     let vCheneSculpte = 0;
@@ -350,10 +359,25 @@ rollCombatContact.forEach((button) => {
     let isAProtectrice = false;
     let isAAllegee = false;
 
+    let isBourreau = false;
+    let isDevastation = false;
+    let isGuidage = false;
+    let isRegularite = false;
+
+    let eBourreauValue = 0;
+    let eDevastationValue = 0;
+
     let pasEnergie = false;
     let sEnergieText = '';
+    let hasEnergieRetiree = false;
+    let energieIsEspoir = false;
+    let vEnergieRetiree = 0;
     const energie = attrs.energiePJ;
     const espoir = attrs.espoir;
+
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
 
     let autresEffets = [];
     let autresAmeliorationsS = [];
@@ -448,7 +472,7 @@ rollCombatContact.forEach((button) => {
     if (hasOptions) {
       // GESTION DES EFFETS
 
-      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
       bDegats = bDegats.concat(effets.bDegats);
       eASAssassin = effets.eASAssassin;
@@ -466,7 +490,6 @@ rollCombatContact.forEach((button) => {
       isAssistantAttaque = effets.isAssistantAttaque;
 
       isCadence = effets.isCadence;
-      sCadence = effets.sCadence;
       vCadence = effets.vCadence;
 
       isChoc = effets.isChoc;
@@ -490,12 +513,24 @@ rollCombatContact.forEach((button) => {
 
       isObliteration = effets.isObliteration;
 
+      isFureur = effets.isFureur;
+
+      isUltraviolence = effets.isUltraviolence;
+
       lumiere = effets.eLumiere;
       isELumiere = effets.isELumiere;
       lumiereValue = Number(effets.eLumiereValue);
 
       isEAkimbo = effets.isAkimbo;
       isEAmbidextrie = effets.isAmbidextrie;
+
+      isBourreau = effets.isBourreau;
+      isDevastation = effets.isDevastation;
+      isGuidage = effets.isGuidage;
+      isRegularite = effets.isRegularite;
+
+      eBourreauValue = effets.vBourreau;
+      eDevastationValue = effets.vDevastation;
 
       if (effets.isConditionnelA) { isConditionnelA = true; }
 
@@ -522,6 +557,8 @@ rollCombatContact.forEach((button) => {
       isAJumelle = ameliorationsS.isJumelle;
       isAAllegee = ameliorationsS.isAllegee;
 
+      if (!isMeurtrier) { isMeurtrier = ameliorationsS.isBarbelee; }
+
       if (lumiereValue >= ameliorationsS.aLumiereValue) { autresAmeliorationsS.push(ameliorationsS.aLumiere); } else if (ameliorationsS.aLumiereValue > 0) {
         lumiere = `${ameliorationsS.aLumiere} (${i18n_lumiere} ${ameliorationsS.aLumiereValue})`;
         lumiereValue = ameliorationsS.aLumiereValue;
@@ -544,11 +581,10 @@ rollCombatContact.forEach((button) => {
 
       // GESTION DES AMELIORATIONS ORNEMENTALES
 
-      ameliorationsO = getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, isAntiAnatheme);
+      ameliorationsO = getWeaponsContactAO(prefix, attrs, isCadence, vCadence, isObliteration, isAntiAnatheme);
 
       if (ameliorationsO.isChromee) {
-        sCadence = ameliorationsO.rCadence;
-        isChromee = ameliorationsO.isChromee;
+        isCadence = true;
         vCadence = ameliorationsO.vCadence;
       }
 
@@ -582,6 +618,7 @@ rollCombatContact.forEach((button) => {
       vRouagesCasses = ameliorationsO.vRouagesCasses;
 
       autresAmeliorationsO = autresAmeliorationsO.concat(ameliorationsO.autresAmeliorations);
+      autresAmeliorationsO = autresAmeliorationsO.filter((val) => val !== '');
 
       baseDegats += ameliorationsO.diceDegats;
       baseViolence += ameliorationsO.diceViolence;
@@ -591,6 +628,14 @@ rollCombatContact.forEach((button) => {
       diceViolence += ameliorationsO.diceViolence;
 
       // FIN GESTION DES AMELIORATIONS ORNEMENTALES
+    } else if (armure === 'berserk') {
+      isConditionnelD = true;
+      isConditionnelV = true;
+
+      exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
+
+      isAntiAnatheme = true;
+      isTenebricide = true;
     }
 
     // GESTION DU STYLE
@@ -634,15 +679,41 @@ rollCombatContact.forEach((button) => {
         bViolence.push(sBonusViolenceFixe);
       }
 
+      if (isGuidage) {
+        if (armure === 'berserk') {
+          let sEspoirValue = Math.floor((5 / 2) - 1);
+
+          if (sEspoirValue < 1) { sEspoirValue = 1; }
+
+          hasEnergieRetiree = true;
+          energieIsEspoir = true;
+          vEnergieRetiree += sEspoirValue;
+        } else {
+          hasEnergieRetiree = true;
+          vEnergieRetiree += 5;
+        }
+      }
+
       if (sEnergie) {
         if (armure === 'berserk') {
           let sEspoirValue = Math.floor((Number(sEnergieValue) / 2) - 1);
 
           if (sEspoirValue < 1) { sEspoirValue = 1; }
 
-          autresSpecial.push(`${i18n_espoirRetire} (${sEspoirValue})`);
+          hasEnergieRetiree = true;
+          energieIsEspoir = true;
+          vEnergieRetiree += sEspoirValue;
+        } else {
+          hasEnergieRetiree = true;
+          vEnergieRetiree += +sEnergieValue;
+        }
+      }
 
-          newEnergie = Number(espoir) - Number(sEspoirValue);
+      if (hasEnergieRetiree) {
+        if (energieIsEspoir) {
+          newEnergie = Number(espoir) - Number(vEnergieRetiree);
+
+          autresSpecial.push(`${i18n_espoirRetire} (${vEnergieRetiree})`);
 
           if (newEnergie === 0) {
             sEnergieText = i18n_plusEspoir;
@@ -652,9 +723,9 @@ rollCombatContact.forEach((button) => {
             pasEnergie = true;
           }
         } else {
-          autresSpecial.push(`${i18n_energieRetiree} (${sEnergieValue})`);
+          newEnergie = Number(energie) - Number(vEnergieRetiree);
 
-          newEnergie = Number(energie) - Number(sEnergieValue);
+          autresSpecial.push(`${i18n_energieRetiree} (${vEnergieRetiree})`);
 
           if (newEnergie === 0) {
             sEnergieText = i18n_plusEnergie;
@@ -673,47 +744,37 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = await getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+    ODWarrior.push(armorBonus.ODWarrior);
 
-    const MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
+
+    const MALBonus = await getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -728,6 +789,8 @@ rollCombatContact.forEach((button) => {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);
@@ -747,54 +810,21 @@ rollCombatContact.forEach((button) => {
 
     if (cBonus.length !== 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}-${sCadence}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = isGuidage === true ? 'cs1cs3cs5cf2cf4cf6s' : 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = isCadence === true ? 3 : 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     firstExec.push(jet);
-    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    firstExec.push(baseJet);
+    exec.push(`{{Exploit=[[${total}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
     exec.push(`{{degats=[[${degats.join('+')}]]}}`);
     exec.push(`{{violence=[[${violence.join('+')}]]}}`);
-
-    if (isTenebricide) {
-      let degatsTenebricide = [];
-      let ASValueTenebricide = [];
-
-      let violenceTenebricide = [];
-
-      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
-      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-      degatsTenebricide = degatsTenebricide.concat(bDegats);
-
-      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-      violenceTenebricide = violenceTenebricide.concat(bViolence);
-
-      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
-
-      if (eASAssassinValue > 0) {
-        eAssassinTenebricideValue = Math.ceil(eASAssassinValue / 2);
-
-        ASTenebricide.unshift(eASAssassin);
-        ASValueTenebricide.unshift(`${eAssassinTenebricideValue}D6`);
-
-        if (attaquesSurprises.length > 0) {
-          ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-          ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-        }
-
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-      } else if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-      }
-    }
 
     if (isObliteration) {
       let ASObliteration = [];
@@ -829,7 +859,7 @@ rollCombatContact.forEach((button) => {
         ASObliteration = ASObliteration.concat(attaquesSurprises);
         ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
 
-        exec.push(`{{obliterationAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{obliterationAS=${attaquesSurprises.join('\n+')}}}`);
         exec.push(`{{obliterationASValue=${_.reduce(ASValueObliteration, (n1, n2) => n1 + n2, 0)}}}`);
       }
 
@@ -846,16 +876,6 @@ rollCombatContact.forEach((button) => {
       if (isRouagesCasses) { exec.push(`{{obliterationRouagesCassesValue=${vRouagesCasses * 6}}}`); }
     }
 
-    if (isCadence) {
-      exec.push(`{{rCadence=${i18n_cadence} ${vCadence} ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
-    }
-
-    if (isChromee) {
-      exec.push(`{{rCadence=${i18n_chromee} (${i18n_cadence} ${vCadence}) ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
-    }
-
     if (eASAssassinValue > 0) {
       attaquesSurprises.unshift(eASAssassin);
       attaquesSurprisesValue.unshift(`${eASAssassinValue}D6`);
@@ -865,6 +885,24 @@ rollCombatContact.forEach((button) => {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+      isSurprise = true;
+    }
+
+    if (isTenebricide) {
+      exec.push(`{{tenebricide=${i18n_tenebricide}}} {{tenebricideConditionD=${i18n_tenebricideConditionD}}} {{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+      exec.push('{{tenebricideValueD=[[0]]}}');
+      exec.push('{{tenebricideValueV=[[0]]}}');
+
+      if (attaquesSurprises.length > 0) {
+        exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+        exec.push('{{tenebricideASValue=[[0]]}}');
+      }
+
+      if (isMeurtrier) { firstExec.push('{{tMeurtrierValue=[[0]]}}'); }
+      if (isDestructeur) { firstExec.push('{{tDestructeurValue=[[0]]}}'); }
+      if (isFureur) { firstExec.push('{{tFureurValue=[[0]]}}'); }
+      if (isUltraviolence) { firstExec.push('{{tUltraviolenceValue=[[0]]}}'); }
+      if (isCheneSculpte) { firstExec.push('{{tCheneSculpteValue=[[0]]}}'); }
     }
 
     if (isELumiere) { autresEffets.push(`${i18n_lumiere} ${lumiereValue}`); } else if (isASLumiere) { autresAmeliorationsS.push(lumiere); }
@@ -907,98 +945,112 @@ rollCombatContact.forEach((button) => {
       if (ameliorationsO.firstExec) { firstExec = firstExec.concat(ameliorationsO.firstExec); }
     }
 
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+    }
+
     exec = firstExec.concat(exec);
 
+    // ROLL
+    let finalRoll;
+
     if (pasEnergie === false) {
-      startRoll(exec.join(' '), (results) => {
-        const tJet = results.results.jet.result;
+      if (isBourreau && !bourreau && !equilibre) { exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauValue} ${i18n_inclus}}}`); }
+      if (isDevastation && !devaste && !equilibre) { exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationValue} ${i18n_inclus}}}`); }
 
-        const tBonus = results.results.bonus.result;
-        const tExploit = results.results.Exploit.result;
+      finalRoll = await startRoll(exec.join(' '));
 
-        const tMeurtrier = results.results.meurtrierValue;
-        let vTMeurtrier = 0;
+      const tJet = finalRoll.results.jet.result;
+      const rJet = finalRoll.results.jet.dice;
 
-        if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+      const rDegats = finalRoll.results.degats.dice;
+      const rViolence = finalRoll.results.violence.dice;
 
-        const tDestructeur = results.results.destructeurValue;
-        let vTDestructeur = 0;
+      const tBonus = finalRoll.results.bonus.result;
+      const tExploit = finalRoll.results.Exploit.result;
 
-        if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+      const tDegats = finalRoll.results.degats.result;
+      const tViolence = finalRoll.results.violence.result;
 
-        const tFureur = results.results.fureurValue;
-        let vTFureur = 0;
+      const conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+        isTenebricide,
+        isSurprise,
+        isDestructeur,
+        isFureur,
+        isMeurtrier,
+        isUltraviolence,
+        isArmeAzurine,
+        isArmeRougeSang,
+        isCheneSculpte,
+        isGriffureGravee,
+        isMasqueBrise,
+        isRouagesCasses,
+        isBourreau,
+        isDevastation,
+        isRegularite,
+        isGuidage,
+      };
 
-        if (tFureur !== undefined) { vTFureur = tFureur.dice[0] + tFureur.dice[1]; }
+      const conditionsValues = {
+        eBourreauValue,
+        eDevastationValue,
+      };
 
-        const tUltraviolence = results.results.ultraviolenceValue;
+      const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions, conditionsValues);
 
-        let vTUltraviolence = 0;
+      finishRoll(finalRoll.rollId, computed);
 
-        if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
+      if (tJet !== 0 && computed.basejet === tExploit) {
+        const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+        const rExploit = exploitRoll.results.jet.dice;
+        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
 
-        const tCheneSculpte = results.results.cheneSculpteValue;
-        let vTCheneSculpte = 0;
+        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+          const vC = valeurCourante;
+          let nV = 0;
 
-        if (tCheneSculpte !== undefined) { vTCheneSculpte = tCheneSculpte.dice[0]; }
-
-        finishRoll(
-          results.rollId,
-          {
-            jet: tJet + tBonus,
-            meurtrierValue: vTMeurtrier,
-            destructeurValue: vTDestructeur,
-            fureurValue: vTFureur,
-            ultraviolenceValue: vTUltraviolence,
-            cheneSculpteValue: vTCheneSculpte,
-          },
-        );
-
-        if (tJet !== 0 && tJet === tExploit) {
-          startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-            const tExploit2 = exploit.results.jet.result;
-
-            finishRoll(
-              exploit.rollId,
-              {
-                jet: tExploit2,
-              },
-            );
-          });
-        }
-
-        if (sEnergie !== false) {
-          if (armure === 'berserk') {
-            setAttrs({
-              espoir: newEnergie,
-            });
-          } else {
-            setAttrs({
-              energiePJ: newEnergie,
-            });
+          if (vC % 2 === exploitPairOrImpair) {
+            nV = 1;
           }
 
-          if (newEnergie === 0) {
-            startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`, (exploit) => {
-              finishRoll(
-                exploit.rollId, {},
-              );
-            });
-          }
+          return accumulateur + nV;
+        }, 0);
+
+        const exploitComputed = {
+          jet: jetExploit,
+        };
+
+        finishRoll(exploitRoll.rollId, exploitComputed);
+      }
+
+      if (hasEnergieRetiree) {
+        if (energieIsEspoir) {
+          setAttrs({ espoir: newEnergie });
+        } else {
+          setAttrs({ energiePJ: newEnergie });
         }
-      });
+
+        if (newEnergie === 0) {
+          const noEnergieRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`);
+          finishRoll(noEnergieRoll.rollId, {});
+        }
+      }
     } else if (button === 'repeating_armeCaC:armecontact') {
-      startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`, (text) => {
-        finishRoll(
-          text.rollId, {},
-        );
-      });
+      finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`);
+      finishRoll(finalRoll.rollId, {});
     } else {
-      startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`, (text) => {
-        finishRoll(
-          text.rollId, {},
-        );
-      });
+      finalRoll = await startRoll(`@{jetGM} &{template:simple} {{Nom=@{name}}} {{text=${sEnergieText}}}${name}`);
+      finishRoll(finalRoll.rollId, {});
     }
   });
+  // ROLL
 });

@@ -20,6 +20,9 @@ on('clicked:distanceWizardBorealis', async (info) => {
     'calODCom',
     'discretion',
     ODValue.discretion,
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(listBase, listStyle, listArmureLegende);
@@ -29,7 +32,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
   const armureL = attrs.armureLegende;
 
   let exec = [];
-  let isConditionnel = false;
+  let autresEffets = [];
 
   const typeAttaque = attrs.wizardBTypeAttaque;
 
@@ -62,8 +65,13 @@ on('clicked:distanceWizardBorealis', async (info) => {
   let bonus = [];
   let OD = 0;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  let ODMALRogue = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -118,16 +126,17 @@ on('clicked:distanceWizardBorealis', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
 
-  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
-
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALRogue = ODMALRogue.concat(MALBonus.ODMALRogue);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+  autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -158,7 +167,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'agressif':
@@ -167,7 +176,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_agressif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
 
     case 'akimbo':
@@ -189,7 +198,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
 
       break;
@@ -208,7 +217,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
         cRoll.push(-1);
       } else {
         exec.push(`{{vMStyleA=${modA}D}}`);
-        cRoll.push(modA);
+        cRoll.push(Number(modA));
       }
       break;
 
@@ -218,7 +227,7 @@ on('clicked:distanceWizardBorealis', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_defensif}}}`);
       exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(modA);
+      cRoll.push(Number(modA));
       break;
   }
 
@@ -231,10 +240,19 @@ on('clicked:distanceWizardBorealis', async (info) => {
   bonus.push(OD);
 
   bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALRogue);
   bonus = bonus.concat(ODMALWarrior);
   bonus = bonus.concat(ODMALShaman);
 
-  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+  const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0), 0);
+
+  const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+  const baseJet = '{{basejet=[[0]]}}';
+
+  exec.push(jet);
+  exec.push(baseJet);
   exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
   exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
@@ -248,40 +266,63 @@ on('clicked:distanceWizardBorealis', async (info) => {
   exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}}`);
   exec.push(`{{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
 
-  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
 
-  startRoll(exec.join(' '), (results) => {
-    const tJet = results.results.jet.result;
-    const tBonus = results.results.tBonus.result;
-    const tExploit = results.results.Exploit.result;
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
 
-    const tDegats = results.results.degats.result;
-    const tViolence = results.results.violence.result;
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+  }
 
-    const total = tJet + tBonus;
+  // ROLL
+  const finalRoll = await startRoll(exec.join(' '));
 
-    finishRoll(
-      results.rollId,
-      {
-        jet: total,
-        degats: tDegats,
-        violence: tViolence,
-      },
-    );
+  const tJet = finalRoll.results.jet.result;
+  const rJet = finalRoll.results.jet.dice;
 
-    if (tJet !== 0 && tJet === tExploit) {
-      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-        const tExploit2 = exploit.results.jet.result;
+  const tBonus = finalRoll.results.tBonus.result;
+  const tExploit = finalRoll.results.Exploit.result;
 
-        finishRoll(
-          exploit.rollId,
-          {
-            jet: tExploit2,
-          },
-        );
-      });
-    }
-  });
+  const rDegats = finalRoll.results.degats.dice;
+  const rViolence = finalRoll.results.violence.dice;
+
+  const tDegats = finalRoll.results.degats.result;
+  const tViolence = finalRoll.results.violence.result;
+
+  const conditions = {
+    bourreau,
+    devaste,
+    equilibre,
+  };
+
+  const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+
+  finishRoll(finalRoll.rollId, computed);
+
+  if (tJet !== 0 && computed.basejet === tExploit) {
+    const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+    const rExploit = exploitRoll.results.jet.dice;
+    const exploitPairOrImpair = 0;
+
+    const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+      const vC = valeurCourante;
+      let nV = 0;
+
+      if (vC % 2 === exploitPairOrImpair) {
+        nV = 1;
+      }
+
+      return accumulateur + nV;
+    }, 0);
+
+    const exploitComputed = {
+      jet: jetExploit,
+    };
+
+    finishRoll(exploitRoll.rollId, exploitComputed);
+  }
 });
 
 on('clicked:distanceWizardOriflamme', async (info) => {
@@ -291,8 +332,12 @@ on('clicked:distanceWizardOriflamme', async (info) => {
     'wizardODmg',
     'wizardOViolence',
     'wizardOPortee',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
+  attributs = attributs.concat(listBase);
   attributs = attributs.concat(listArmureLegende);
 
   const attrs = await getAttrsAsync(attributs);
@@ -303,6 +348,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
   const autresEffets = [];
 
   let MALGoliath;
+  let MALChangeling;
   let MALGhost;
   let MALTypeSoldier;
   let MALTypeHunter;
@@ -314,6 +360,10 @@ on('clicked:distanceWizardOriflamme', async (info) => {
   const violence = attrs.wizardOViolence;
   const portee = attrs.wizardOPortee;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   exec.push(roll);
 
   switch (armureL) {
@@ -321,6 +371,14 @@ on('clicked:distanceWizardOriflamme', async (info) => {
       MALGoliath = +attrs.MALBarbarianGoliath;
 
       if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
+
+    case 'bard':
+      MALChangeling = +attrs.MALBardChangeling;
+
+      if (MALChangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
+      }
       break;
 
     case 'rogue':
@@ -350,6 +408,7 @@ on('clicked:distanceWizardOriflamme', async (info) => {
     default:
       MALGoliath = 0;
       MALGhost = '';
+      MALChangeling = '';
       MALTypeSoldier = '';
       MALTypeHunter = '';
       MALTypeHerald = '';
@@ -374,18 +433,34 @@ on('clicked:distanceWizardOriflamme', async (info) => {
 
   exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
 
-  startRoll(exec.join(' '), (results) => {
-    const tDegats = results.results.degats.result;
-    const tViolence = results.results.violence.result;
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
 
-    finishRoll(
-      results.rollId,
-      {
-        degats: tDegats,
-        violence: tViolence,
-      },
-    );
-  });
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+  }
+
+  // ROLL
+  const finalRoll = await startRoll(exec.join(' '));
+
+  const rDegats = finalRoll.results.degats.dice;
+  const rViolence = finalRoll.results.violence.dice;
+
+  const tDegats = finalRoll.results.degats.result;
+  const tViolence = finalRoll.results.violence.result;
+
+  const conditions = {
+    bourreau,
+    devaste,
+    equilibre,
+  };
+
+  const computed = updateRoll(finalRoll, [], 0, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+
+  finishRoll(finalRoll.rollId, computed);
 });
 
 on('clicked:distanceMALWizardOriflamme', async (info) => {
@@ -395,6 +470,9 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
     'MALWizardODmg',
     'MALWizardOViolence',
     'MALWizardOPortee',
+    'devasterAnatheme',
+    'bourreauTenebres',
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(listArmureLegende);
@@ -409,9 +487,14 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
   const violence = attrs.MALWizardOViolence;
   const portee = attrs.MALWizardOPortee;
 
+  const devaste = +attrs.devasterAnatheme;
+  const bourreau = +attrs.bourreauTenebres;
+  const equilibre = +attrs.equilibreBalance;
+
   const autresEffets = [];
 
   let MALGoliath;
+  let MALChangeling;
   let MALGhost;
   let MALTypeSoldier;
   let MALTypeHunter;
@@ -426,6 +509,14 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
       MALGoliath = +attrs.MALBarbarianGoliath;
 
       if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
+
+    case 'bard':
+      MALChangeling = +attrs.MALBardChangeling;
+
+      if (MALChangeling !== 0) {
+        exec.push(`{{MALspecial2=${i18n_changelingActive}}}`);
+      }
       break;
 
     case 'rogue':
@@ -455,6 +546,7 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
     default:
       MALGoliath = 0;
       MALGhost = '';
+      MALChangeling = '';
       MALTypeSoldier = '';
       MALTypeHunter = '';
       MALTypeHerald = '';
@@ -476,18 +568,34 @@ on('clicked:distanceMALWizardOriflamme', async (info) => {
   exec.push(`{{affecteAnathemeD=${i18n_affecteAnatheme}}}`);
   exec.push(`{{affecteAnathemeV=${i18n_affecteAnatheme}}}`);
 
+  if (devaste || bourreau || equilibre) {
+    const herauts = [];
+
+    if (devaste) { herauts.push(i18n_devasterAnatheme); }
+    if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+    if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+    exec.push(`{{herauts=${herauts.join(' / ')}}}`);
+  }
+
   exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
 
-  startRoll(exec.join(' '), (results) => {
-    const tDegats = results.results.degats.result;
-    const tViolence = results.results.violence.result;
+  // ROLL
+  const finalRoll = await startRoll(exec.join(' '));
 
-    finishRoll(
-      results.rollId,
-      {
-        degats: tDegats,
-        violence: tViolence,
-      },
-    );
-  });
+  const rDegats = finalRoll.results.degats.dice;
+  const rViolence = finalRoll.results.violence.dice;
+
+  const tDegats = finalRoll.results.degats.result;
+  const tViolence = finalRoll.results.violence.result;
+
+  const conditions = {
+    bourreau,
+    devaste,
+    equilibre,
+  };
+
+  const computed = updateRoll(finalRoll, [], 0, tDegats, rDegats, [], tViolence, rViolence, [], conditions);
+
+  finishRoll(finalRoll.rollId, computed);
 });

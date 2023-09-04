@@ -3,7 +3,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-undef */
 
-const rollCombatGrenade = ['grenade1', 'grenade2', 'grenade3', 'grenade4', 'grenade5'];
+const rollCombatGrenade = ['grenade1', 'grenade2', 'grenade3', 'grenade4', 'grenade5', 'grenade6'];
 
 rollCombatGrenade.forEach((button) => {
   on(`clicked:${button}`, async (info) => {
@@ -37,7 +37,7 @@ rollCombatGrenade.forEach((button) => {
     let diceDegats = 3;
     let diceViolence = 3;
 
-    const bDegats = [];
+    let bDegats = [];
     const bViolence = [];
 
     let degats = [];
@@ -52,6 +52,9 @@ rollCombatGrenade.forEach((button) => {
       'discretion',
       `${ODValue.discretion}`,
       'tir',
+      'devasterAnatheme',
+      'bourreauTenebres',
+      'equilibreBalance',
     ];
 
     listAttrs = listAttrs.concat(listArmure, listArmureLegende, listStyle, listBase);
@@ -77,22 +80,32 @@ rollCombatGrenade.forEach((button) => {
 
     let ODBarbarian = [];
     let ODMALBarbarian = [];
+    let ODRogue = [];
+    let ODMALRogue = [];
     let ODShaman = [];
     let ODMALShaman = [];
-    let ODWarrior = [];
-    let ODMALWarrior = [];
+    const ODWarrior = [];
+    const ODMALWarrior = [];
 
     const vDiscretion = +attrs.discretion;
     const oDiscretion = +attrs[`${ODValue.discretion}`];
     const oTir = +attrs.tir;
 
-    let attaquesSurprises = [];
-    let attaquesSurprisesValue = [];
+    const attaquesSurprises = [];
+    const attaquesSurprisesValue = [];
     let attaquesSurprisesCondition = '';
 
     let isTenebricide = false;
+    let isDestructeur = false;
+    let isMeurtrier = false;
+    let isUltraviolence = false;
+    let isSurprise = false;
 
-    const autresEffets = [];
+    const devaste = +attrs.devasterAnatheme;
+    const bourreau = +attrs.bourreauTenebres;
+    const equilibre = +attrs.equilibreBalance;
+
+    let autresEffets = [];
 
     if (hasArmure) { exec.push('{{OD=true}}'); }
 
@@ -187,6 +200,9 @@ rollCombatGrenade.forEach((button) => {
 
         exec.push(`{{ultraviolence=${i18n_ultraviolence}}} {{ultraviolenceCondition=${i18n_ultraviolenceCondition}}} {{meurtrier=${i18n_meurtrier}}} {{meurtrierCondition=${i18n_meurtrierCondition}}}`);
         autresEffets.push(`${i18n_dispersion} 6`);
+
+        isMeurtrier = true;
+        isUltraviolence = true;
         break;
       case 'grenade2':
         isConditionnelA = true;
@@ -205,6 +221,8 @@ rollCombatGrenade.forEach((button) => {
         autresEffets.push(`${i18n_perceArmure} 20`);
         autresEffets.push(`${i18n_penetrant} 6`);
         autresEffets.push(`${i18n_dispersion} 6`);
+
+        isDestructeur = true;
         break;
       case 'grenade4':
         isConditionnelA = true;
@@ -220,6 +238,14 @@ rollCombatGrenade.forEach((button) => {
         autresEffets.push(i18n_antiVehicule);
         autresEffets.push(`${i18n_dispersion} 3`);
         break;
+      case 'grenade6':
+        isConditionnelA = true;
+
+        exec.push(`{{demoralisant=${i18n_demoralisant} 1}} {{demoralisantCondition=${i18n_demoralisantCondition}}}`);
+        autresEffets.push(i18n_ignoreCouvert);
+        autresEffets.push(i18n_nonLetal);
+        autresEffets.push(`${i18n_dispersion} 6`);
+        break;
       default:
         isConditionnelA = false;
         hasDgts = false;
@@ -230,7 +256,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', hasArmure, oTir, false, false, false, false);
+    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -241,26 +267,21 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DES BONUS D'ARMURE
 
-    const armorBonus = getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const armorBonus = await getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(armorBonus.exec);
     cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
-
-    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(armorBonus.diceDegats);
+    bDegats = bDegats.concat(armorBonus.bDegats);
     diceViolence += Number(armorBonus.diceViolence);
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODRogue = ODRogue.concat(armorBonus.ODRogue);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+    ODWarrior.push(armorBonus.ODWarrior);
+
+    autresEffets = autresEffets.concat(armorBonus.autresEffets);
 
     if (armure === 'berserk') {
       isTenebricide = true;
@@ -270,26 +291,21 @@ rollCombatGrenade.forEach((button) => {
       exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}} {{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
     }
 
-    const MALBonus = getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const MALBonus = await getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
     exec = exec.concat(MALBonus.exec);
     cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
-
-    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
-
-    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
-
-    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
-
     diceDegats += Number(MALBonus.diceDegats);
+    bDegats = bDegats.concat(MALBonus.bDegats);
     diceViolence += Number(MALBonus.diceViolence);
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALRogue = ODRogue.concat(MALBonus.ODMALRogue);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+    ODMALWarrior.push(MALBonus.ODMALWarrior);
+
+    autresEffets = autresEffets.concat(MALBonus.autresEffets);
 
     // FIN GESTION DES BONUS D'ARMURE
     OD -= armorBonus.ODWarrior;
@@ -304,6 +320,8 @@ rollCombatGrenade.forEach((button) => {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODBarbarian);
     bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODRogue);
+    bonus = bonus.concat(ODMALRogue);
     bonus = bonus.concat(ODShaman);
     bonus = bonus.concat(ODMALShaman);
     bonus = bonus.concat(ODWarrior);
@@ -328,44 +346,46 @@ rollCombatGrenade.forEach((button) => {
 
     if (cBonus.length !== 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     firstExec.push(jet);
+    firstExec.push(baseJet);
     exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
-
-    if (isTenebricide && hasDgts) {
-      let degatsTenebricide = [];
-      let ASTenebricide = [];
-      let ASValueTenebricide = [];
-
-      let violenceTenebricide = [];
-
-      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
-      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
-
-      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
-      degatsTenebricide = degatsTenebricide.concat(bDegats);
-
-      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
-      violenceTenebricide = violenceTenebricide.concat(bViolence);
-
-      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
-      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
-
-      if (attaquesSurprises.length > 0) {
-        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
-        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
-      }
-    }
 
     if (attaquesSurprises.length > 0 && hasDgts) {
       exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
       exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
       exec.push(attaquesSurprisesCondition);
+
+      isSurprise = true;
+    }
+
+    if (isTenebricide && hasDgts) {
+      exec.push(`{{tenebricide=${i18n_tenebricide}}} {{tenebricideConditionD=${i18n_tenebricideConditionD}}} {{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+      exec.push('{{tenebricideValueD=[[0]]}}');
+      exec.push('{{tenebricideValueV=[[0]]}}');
+
+      if (attaquesSurprises.length > 0) {
+        exec.push(`{{tenebricideAS=${attaquesSurprises.join('\n+')}}}`);
+        exec.push('{{tenebricideASValue=[[0]]}}');
+      }
+    }
+
+    if (devaste || bourreau || equilibre) {
+      const herauts = [];
+
+      if (devaste) { herauts.push(i18n_devasterAnatheme); }
+      if (bourreau) { herauts.push(i18n_bourreauTenebres); }
+      if (equilibre) { herauts.push(i18n_equilibrerBalance); }
+
+      exec.push(`{{herauts=${herauts.join(' / ')}}}`);
     }
 
     if (autresEffets.length > 0) {
@@ -381,50 +401,64 @@ rollCombatGrenade.forEach((button) => {
 
     exec = firstExec.concat(exec);
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
+    const finalRoll = await startRoll(exec.join(' '));
+    const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
+    const tBonus = finalRoll.results.bonus.result;
+    const tExploit = finalRoll.results.Exploit.result;
 
-      const tBonus = results.results.bonus.result;
-      const tExploit = results.results.Exploit.result;
+    let rDegats = [];
+    let rViolence = [];
 
-      const tMeurtrier = results.results.meurtrierValue;
-      let vTMeurtrier = 0;
+    let tDegats = 0;
+    let tViolence = 0;
 
-      if (tMeurtrier !== undefined) { vTMeurtrier = tMeurtrier.dice[0]; }
+    let conditions = {};
 
-      const tDestructeur = results.results.destructeurValue;
-      let vTDestructeur = 0;
+    if (hasDgts) {
+      rDegats = finalRoll.results.degats.dice;
+      rViolence = finalRoll.results.violence.dice;
 
-      if (tDestructeur !== undefined) { vTDestructeur = tDestructeur.dice[0]; }
+      tDegats = finalRoll.results.degats.result;
+      tViolence = finalRoll.results.violence.result;
 
-      const tUltraviolence = results.results.ultraviolenceValue;
+      conditions = {
+        bourreau,
+        devaste,
+        equilibre,
+        isTenebricide,
+        isSurprise,
+        isDestructeur,
+        isMeurtrier,
+        isUltraviolence,
+      };
+    }
 
-      let vTUltraviolence = 0;
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
 
-      if (tUltraviolence !== undefined) { vTUltraviolence = tUltraviolence.dice[0]; }
+    finishRoll(finalRoll.rollId, computed);
 
-      finishRoll(
-        results.rollId,
-        {
-          jet: tJet + tBonus,
-          meurtrierValue: vTMeurtrier,
-          destructeurValue: vTDestructeur,
-          ultraviolenceValue: vTUltraviolence,
-        },
-      );
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
 
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
 
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
-    });
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
+      const exploitComputed = {
+        jet: jetExploit,
+      };
+
+      finishRoll(exploitRoll.rollId, exploitComputed);
+    }
   });
 });

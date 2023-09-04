@@ -120,6 +120,25 @@ buttonCapaciteActive.forEach((button) => {
   });
 });
 
+// CAPACITES BARD
+const buttonBard = ['bardChangeling', 'MALBardChangeling'];
+
+buttonBard.forEach((button) => {
+  on(`clicked:${button}`, () => {
+    getAttrs([button], (value) => {
+      const active = value[button];
+      let newValue = '{{modeChangeling=Activé}}';
+
+      if (active === '{{modeChangeling=Activé}}') { newValue = ''; }
+
+      const newAttr = {};
+      newAttr[button] = newValue;
+
+      setAttrs(newAttr);
+    });
+  });
+});
+
 // CAPACITES BERSERK
 const buttonBerserk = ['berserkBlaze', 'berserkCandle', 'berserkBeacon', 'berserkTorch', 'berserkProjector', 'berserkLighthouse', 'berserkLantern', 'berserkIlluminationBeaconA', 'berserkIlluminationTorchA', 'berserkIlluminationProjectorA', 'berserkIlluminationLighthouseA', 'berserkIlluminationLanternA', 'berserkRageA'];
 
@@ -128,10 +147,14 @@ buttonBerserk.forEach((button) => {
     getAttrs([button], (value) => {
       const active = value[button];
       let newValue = 'on';
-
-      if (active === 'on') { newValue = ''; }
-
       const newAttr = {};
+
+      if (active === 'on') {
+        newValue = '';
+
+        if (button === 'berserkRageA') { newAttr.berserkNiveaux = 0; }
+      }
+
       newAttr[button] = newValue;
 
       setAttrs(newAttr);
@@ -145,7 +168,7 @@ buttonNiveauRage.forEach((button) => {
   on(`clicked:${button}`, () => {
     getAttrs(['berserkNiveaux'], (value) => {
       const niveauRage = parseInt(value.berserkNiveaux, 10) || 0;
-      let newValue = button.split('_')[1];
+      let newValue = +button.split('_')[1];
 
       if (niveauRage === newValue) { newValue = 0; }
 

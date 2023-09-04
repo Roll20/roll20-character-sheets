@@ -6,41 +6,50 @@
 <img src="http://3.bp.blogspot.com/_kKjrNsGlZbE/TS0i4FLtHFI/AAAAAAAAA5Y/4gPKe6M6tfo/s200/true20_logo.jpg" style="width: 100px;"></img>
 </td>
 <td rowspan="4">
-<h1 style="text-align: center; padding-left: 5px; padding-right: 5px; width: 175px;">True20 <br>Adveture <br>Roleplaying</h1>
+<h1 style="text-align: center; padding-left: 5px; padding-right: 5px; width: 175px;">True20 <br>Adventure <br>Roleplaying</h1>
         </td>
     </tr>
     <tr>
-        <td style="text-align:center;"><b>Background</b></td>
-        <td><select style="width: 100%;" name="attr_background">
-            <option>Human</option>
-            <option>Dwarf</option>
-            <option>Elf</option>
-            <option>Gnome</option>
-            <option>Half-Elf</option>
-            <option>Half-Orc</option>
-            <option>Halfling</option>
-            </select></td>
+        <td style="text-align:center;"><button type="action" class="sheet-toggle" name="act_background_toggle" title="Dropdown or Textbox"><b>Background</b></button></td>
+        <td>
+            <input type="hidden" name="attr_background_toggle" class="sheet-toggle" value="0" >
+            <select class="select" style="width: 100%;" name="attr_background">
+                <option>Unknown</option>
+                <option selected>Human</option>
+                <option>Dwarf</option>
+                <option>Elf</option>
+                <option>Gnome</option>
+                <option>Half-Elf</option>
+                <option>Half-Orc</option>
+                <option>Halfling</option>
+            </select>
+            <input class="input" type="text" name="attr_background" value="Human" style="width: 100%;" >
+        </td>
+            
     </tr>
     <tr>
-        <td style="text-align:center;"><b>Role</b></td>
-        <td><select style="width: 32.5%;" name="attr_roll1">
+        <td style="text-align:center;"><button type="action" class="sheet-toggle" name="act_role_toggle" title="Dropdown or Textbox"><b>Role</b></button></td>
+        <td>
+            <input type="hidden" name="attr_role_toggle" class="sheet-toggle" value="0">
+            <select class="select" style="width: 32.5%;" name="attr_roll1">
+            <option>&nbsp;</option>
+            <option>Adept</option>
+            <option>Expert</option>
+            <option>Warrior</option>
+            </select><select class="select" style="width: 32.5%;" name="attr_roll2">
+            <option>&nbsp;</option>
+            <option>Adept</option>
+            <option>Expert</option>
+            <option>Warrior</option>
+            </select><select class="select" style="width: 32.5%;" name="attr_roll3">
             <option>&nbsp;</option>
             <option>Adept</option>
             <option>Expert</option>
             <option>Warrior</option>
             </select>
-            <select style="width: 32.5%;" name="attr_roll2">
-            <option>&nbsp;</option>
-            <option>Adept</option>
-            <option>Expert</option>
-            <option>Warrior</option>
-            </select>
-            <select style="width: 32.5%;" name="attr_roll3">
-            <option>&nbsp;</option>
-            <option>Adept</option>
-            <option>Expert</option>
-            <option>Warrior</option>
-            </select>
+            <input class="input" type="text" name="attr_roll1" value="" style="width: 32.5%;" >
+            <input class="input" type="text" name="attr_roll2" value="" style="width: 32.5%;" >
+            <input class="input" type="text" name="attr_roll3" value="" style="width: 32.5%;" >
         </td>
     </tr>
     <tr>
@@ -109,12 +118,17 @@
   <td class="greymenu">Toughness
   </td>
   <td><input type="number" style="width:100%;" name="attr_toughness" value="0" /></input></td>
-  <td class="greymenu">Size</td>
-  <td><select style="width: 100%; font-size: 10.5px" name="attr_size">
+  <td class="greymenu"><button type="action" class="sheet-toggle" name="act_size_toggle" title="Dropdown or Textbox">Size</button></td>
+  <td>
+        <input type="hidden" name="attr_size_toggle" class="sheet-toggle" value="0">
+        <select class="select" style="width: 100%; font-size: 10.5px" name="attr_size">
+            <option>???</option>
             <option>Small</option>
             <option selected="selected">Medium</option>
             <option>Large</option>
-            </select></td>
+        </select>
+        <input class="input" type="text" name="attr_size" value="Medium" style="width: 100%;" >
+    </td>
  </tr>
  <tr>
   <td class="greymenu">Dexterity</td>
@@ -473,3 +487,18 @@
         </td>
     </tr>
 </table>
+<script type="text/worker">
+    const toggle_buttons = ["background", "role", "size"];
+    toggle_buttons.forEach(toggle => {
+        on(`clicked:${toggle}_toggle`,(e) => {
+            console.info(e);
+            getAttrs([`${toggle}_toggle`], v => {
+                console.info(v);
+                const score = +v[`${toggle}_toggle`] || 0;
+                setAttrs({
+                    [`${toggle}_toggle`]: 1- Math.min(1,Math.max(0,score))
+                });
+            })
+        })
+    });
+</script>

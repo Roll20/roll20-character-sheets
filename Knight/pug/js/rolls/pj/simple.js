@@ -55,11 +55,11 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
   let OD = 0;
   let ODBarbarian = [];
   let ODShaman = [];
-  let ODWarrior = [];
+  const ODWarrior = [];
 
   let ODMALBarbarian = [];
   let ODMALShaman = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
 
   exec.push(roll);
 
@@ -113,7 +113,7 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
 
   exec = exec.concat(armorBonus.exec);
   cRoll = cRoll.concat(armorBonus.cRoll);
@@ -122,9 +122,9 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
 
   ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
   ODShaman = ODShaman.concat(armorBonus.ODShaman);
-  ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+  ODWarrior.push(armorBonus.ODWarrior);
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, [], true);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -133,7 +133,7 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -243,7 +243,7 @@ on('clicked:simplePriest', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -299,7 +299,7 @@ on('clicked:simplePriest', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -308,7 +308,7 @@ on('clicked:simplePriest', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -413,7 +413,7 @@ on('clicked:simplePsionPuppet clicked:simplePsionDiscord', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -468,7 +468,7 @@ on('clicked:simplePsionPuppet clicked:simplePsionDiscord', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -477,7 +477,7 @@ on('clicked:simplePsionPuppet clicked:simplePsionDiscord', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -584,7 +584,7 @@ on('clicked:simpleRangerVision', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -639,7 +639,7 @@ on('clicked:simpleRangerVision', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -648,7 +648,7 @@ on('clicked:simpleRangerVision', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -752,7 +752,7 @@ on('clicked:simpleShamanImpregnation', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -807,7 +807,7 @@ on('clicked:simpleShamanImpregnation', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -816,7 +816,7 @@ on('clicked:simpleShamanImpregnation', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -915,7 +915,7 @@ on('clicked:simpleMALShamanImpregnation', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
 
   exec.push(roll);
 
@@ -969,7 +969,7 @@ on('clicked:simpleMALShamanImpregnation', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -977,7 +977,7 @@ on('clicked:simpleMALShamanImpregnation', async (info) => {
   if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -1076,7 +1076,7 @@ on('clicked:simpleSorcererEtirement', async (info) => {
   let OD = 0;
 
   let ODMALBarbarian = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
   let ODMALShaman = [];
 
   exec.push(roll);
@@ -1131,7 +1131,7 @@ on('clicked:simpleSorcererEtirement', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -1140,7 +1140,7 @@ on('clicked:simpleSorcererEtirement', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
@@ -1251,11 +1251,11 @@ on('clicked:pilotage', async (info) => {
 
   let ODBarbarian = [];
   let ODShaman = [];
-  let ODWarrior = [];
+  const ODWarrior = [];
 
   let ODMALBarbarian = [];
   let ODMALShaman = [];
-  let ODMALWarrior = [];
+  const ODMALWarrior = [];
 
   exec.push(roll);
 
@@ -1309,7 +1309,7 @@ on('clicked:pilotage', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(armorBonus.exec);
   cRoll = cRoll.concat(armorBonus.cRoll);
@@ -1318,9 +1318,9 @@ on('clicked:pilotage', async (info) => {
 
   ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
   ODShaman = ODShaman.concat(armorBonus.ODShaman);
-  ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
+  ODWarrior.push(armorBonus.ODWarrior);
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -1329,7 +1329,7 @@ on('clicked:pilotage', async (info) => {
 
   ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
   ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-  ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
+  ODMALWarrior.push(MALBonus.ODMALWarrior);
 
   exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 

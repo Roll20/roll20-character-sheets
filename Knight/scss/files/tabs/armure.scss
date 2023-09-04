@@ -20,6 +20,10 @@ div.tabArmure {
             display:flex;
         }
 
+        h1.titre {
+            text-transform:capitalize;
+        }
+
         input[type="number"] {
             width: 100%;
             border: 0px;
@@ -695,6 +699,54 @@ div.tabArmure {
         }
     }
 
+    div.herauts {
+        @include block($sombre);
+        @include titre($white);
+
+        h1.titre {
+            display:flex;
+        }
+
+        div {
+            display:flex;
+            width:100%;
+            background:$clair;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding-right:2px;
+            padding-left:2px;
+
+            button[type="action"] {
+                display:flex;
+                width:calc((100% / 2) - 5px);
+                background:$clair;
+                color:$black;
+                justify-content: center;
+                border:1px solid $black;
+                padding:0px;
+                margin-top:2px;
+                margin-bottom:2px;
+                font-weight:bold;
+                height: 25px;
+                line-height: 25px;
+
+                &:nth-of-type(3) {
+                    margin-left:auto;
+                    margin-right:auto;
+                }
+            }
+
+            input[type="hidden"] {
+                &.devasterAnatheme[value="1"] ~ button[type="action"].devasterAnatheme,
+                &.bourreauTenebres[value="1"] ~ button[type="action"].bourreauTenebres,
+                &.equilibreBalance[value="1"] ~ button[type="action"].equilibreBalance {
+                    background:$sombre;
+                    color:$white;
+                }
+            }
+        }
+    }
+
     div.barbarianGoliath {
         @include block($sombre);
         @include titre($white);
@@ -769,7 +821,8 @@ div.tabArmure {
     div.bardChangeling {
         $titre:(
             "titre":(
-                "hasButton":true
+                "hasButton":true,
+                "hasButtonActivate":true
             )
         );
 
@@ -780,6 +833,10 @@ div.tabArmure {
         div.titre,
         h1.titre {
             display:flex;
+        }
+
+        div.firstTitre {
+            border-bottom:1px solid $clair;
         }
 
         input[type="text"] {
@@ -833,6 +890,16 @@ div.tabArmure {
             &[value="on"] ~ label.bard250,
             &[value="on"] ~ input[type="text"].bard250 {
                 display:flex;
+            }
+        }
+
+        input[type="hidden"].active {
+            &[value^="{{modeChangeling"] {
+                & ~ div.titre {
+                    button[type="action"].active {
+                        box-shadow: 0px 0px 7px 0px $black inset;
+                    }
+                }
             }
         }
     }
@@ -4551,29 +4618,37 @@ div.tabArmure {
         }
 
         div.MALPsion {
+            flex-wrap: wrap;
+
             >div {
                 display:none;
+
+                &:not(:first-of-type) {
+                    border-top:5px double $clair;
+                }
+
+                &:first-of-type {
+                    border-top:0px;
+                }
             }
 
-            input[type="hidden"].legendeChoisie {
+            input[type="hidden"].legendeChoisie,
+            input[type="hidden"].legendeChoisie2 {
                 &[value="1"] {
                     & ~ div.psionPuppetMaster {
                         display:flex;
-                        border-top:0px;
                     }
                 }
 
                 &[value="2"] {
                     & ~ div.psionDiscord {
                         display:flex;
-                        border-top:0px;
                     }
                 }
 
                 &[value="3"] {
                     & ~ div.psionWindtalker {
                         display:flex;
-                        border-top:0px;
                     }
                 }
             }
@@ -5181,6 +5256,38 @@ div.tabArmure {
                 }
             }
 
+            input[type="hidden"] {
+                &.guidage {
+                    &:not([value="0"]) {
+                        & ~ div.bonus {
+                            display:flex;
+
+                            label.guidage {
+                                display:block;
+                            }
+                        }
+                    }
+                }
+
+                &.cadence {
+                    &:not([value="0"]) {
+                        & ~ div.bonus {
+                            display:flex;
+
+                            label.cadence {
+                                display:flex;
+                                padding-right:28px;
+                            }
+
+                            label.guidage {
+                                width:99px;
+                                margin-right:0px !important;
+                            }
+                        }
+                    }
+                }
+            }
+
             div.coups {
                 $subMenu: (
                     "color":$white,
@@ -5576,6 +5683,12 @@ div.tabArmure {
                     }
                 }
 
+                div.bonus {
+                    display:none;
+                    width:100%;
+                    justify-content: flex-end;
+                }
+
                 div.effets,
                 div.ameliorationsArmes,
                 div.special {
@@ -5758,6 +5871,123 @@ div.tabArmure {
                         & ~ div.special {
                             display:flex;
                         }
+                    }
+                }
+            }
+
+            div.bonus {
+                $fakeButton: (
+                    "label":(
+                        "width":100%,
+                        "height":23px
+                    ),
+                    "span": (
+                        "width":100%,
+                        "height":23px,
+                        "background":$sombre,
+                        "color":$white,
+                        "border":false
+                    ),
+                    "shadow":false
+                );
+    
+                @include fakeButton($fakeButton) {
+                    font-size:12px;
+                };
+
+                label.cadence {
+                    display:none;
+                    width:382px;
+                    background: $clair;
+                    justify-content: space-between;
+                    border-top:1px solid $sombre;
+                    border-left:1px solid $sombre;
+        
+                    span {
+                        width: 236px;
+                        padding-left: 2px;
+                        line-height: 27px;
+                        font-size: 14px;
+                        color: $black;
+                        font-weight: bold;
+                        
+                    }
+
+                    select {
+                        width:142px;
+                        border:0px;
+                        padding:0px;
+                        padding-left:15px;
+                        height:28px;
+                        text-align: center;
+                        border-left:1px solid $sombre;
+                        border-right:1px solid $sombre;
+                    }
+                }
+
+                label.guidage {
+                    display:none;
+                    margin-top:1px;
+                    width:140px;
+                    height:28px;
+                    margin:0px;
+                    margin-right:29px;
+                    border-right:1px solid $sombre;
+                    border:0px;
+                    background:$clair;
+
+                    span.actif,
+                    span.inactif {
+                        display:none;
+                        text-align: center;
+                        color:$black;
+                        height:28px;
+                        line-height: 28px;
+                        align-items:center;
+                        border-left:1px solid $sombre;
+
+                        &::before {
+                            height:28px;
+                            line-height: 28px;
+                            background:transparent;
+                            color:$black;
+                        }
+                    }
+
+                    span.actif {
+                        border-left:1px solid $clair;
+
+                        &::before {
+                            background:$sombre;
+                            color:$white;
+                            border-bottom:1px solid $clair;
+                        }
+                        
+                    }
+
+                    input[type="checkbox"] {
+                        height:28px;
+
+                        &:checked {
+                            & ~ span.actif {
+                                display:flex;
+                            }
+                        }
+
+                        &:not(:checked) {
+                            & ~ span.inactif {
+                                display:flex;
+                            }
+                        }
+                    }
+                }
+            }
+
+            input[type="hidden"].codexfm4 {
+                &[value="0"] {
+                    & ~ div div.codexfm4,
+                    & ~ div label.codexfm4 {
+                        display:none;
                     }
                 }
             }
@@ -7370,9 +7600,10 @@ div.tabArmure {
             }            
         }
 
-        div.bonus {
+        div.bonus {            
             width:100%;
             justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         div.bonusCarac {
@@ -7394,11 +7625,10 @@ div.tabArmure {
 
         label.pilonnage {
             display:none;
-            width: calc(((100% / 5) *2) - 1px);
+            width: calc(40%);
             background: $clair;
             justify-content: space-between;
             border-top:1px solid $sombre;
-            border-left:1px solid $sombre;
 
             span {
                 width: calc((100% / 2) - 2px);
@@ -7407,7 +7637,6 @@ div.tabArmure {
                 font-size: 14px;
                 color: $black;
                 font-weight: bold;
-                
             }
 
             input[type="number"] {
@@ -7419,6 +7648,63 @@ div.tabArmure {
                 border-left:1px solid $sombre;
             }
         }
+
+        label.pilonnageDetails {
+            display:none;
+            width:calc(60% - 1px);
+            border-left:1px solid $sombre;
+            background: $clair;
+            justify-content: space-between;
+            border-top:1px solid $sombre;
+
+            span {
+                width: max-content;
+                padding-left: 2px;
+                line-height: 27px;
+                font-size: 14px;
+                color: $black;
+                font-weight: bold;
+                
+            }
+
+            select {
+                width:calc((100% / 3) - 0.5px);
+                border:0px;
+                padding:0px;
+                height:28px;
+                text-align: center;
+                border-left:1px solid $sombre;
+                padding-left:15px;
+            }
+        }
+
+        label.cadence {
+            display:none;
+            width:calc(60% - 1px);
+            background: $clair;
+            justify-content: space-between;
+            border-top:1px solid $sombre;
+            border-left:1px solid $sombre;
+
+            span {
+                width: max-content;
+                padding-left: 2px;
+                line-height: 27px;
+                font-size: 14px;
+                color: $black;
+                font-weight: bold;
+            }
+
+            select {
+                width:calc((100% / 3) - 0.5px);
+                border:0px;
+                padding:0px;
+                padding-left:15px;
+                height:28px;
+                text-align: center;
+                border-left:1px solid $sombre;
+            }
+        };
 
         div.ameliorationsArmes,
         div.special {
@@ -7616,16 +7902,6 @@ div.tabArmure {
 
                 & ~ div.bonus {
                     display:flex;
-
-                    label.pilonnage {
-                        span {
-                            border-right:1px solid $sombre;
-                        }
-
-                        input[type="number"] {
-                            border-left:0px;
-                        }
-                    }
                 }
 
                 & ~ div div.bonusCarac {
@@ -7686,6 +7962,10 @@ div.tabArmure {
                 & ~ div label.pilonnage {
                     display:flex;
                 }
+
+                & ~ div label.pilonnageDetails {
+                    display:flex;
+                }
             }
         }
 
@@ -7727,6 +8007,20 @@ div.tabArmure {
                 & ~ .notPG100,
                 & ~ div .notPG100 {
                     display:none;
+                }
+            }
+        }
+
+        input[type="hidden"] {
+            &.cadence {
+                &:not([value="0"]) {
+                    & ~ div.bonus {
+                        display:flex;
+
+                        label.cadence {
+                            display:flex;
+                        }
+                    }
                 }
             }
         }

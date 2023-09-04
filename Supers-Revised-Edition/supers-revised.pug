@@ -1,0 +1,1184 @@
+- capitalize = (string)=>string.replace(/(?:^|\s+|\/)[a-z]/ig,(letter)=>letter.toUpperCase());
+input.section-control(type='hidden' name='attr_sheet_view' title='@{sheet_view}' value='settings')
+input(type='hidden' name='attr_template_start' title='@{template_start}' value='@{whisper}&{template:supers} {{character_name=@{character_name}}} {{character_id=@{character_id}}}')
+input(type='hidden' name='attr_version')
+input(type='hidden' name='attr_initiative_macro' value='@{template_start} {{name=Initiative check}} {{result=[[[[@{initiative}@{modifier_query}]]d6 &{tracker}]]}}')
+.main
+  nav.sheet-nav.toggle
+    button(type='action' name='act_nav-character' title="Open the character page" class='toggle__tab--character toggle__tab' value='character') Character
+    button(type='action' name='act_nav-mook' title="Open the mook page" class='toggle__tab--mook toggle__tab inactive' value='mook') Mook/Hazard
+    button(type='action' name='act_nav-vehicle' title="Open the vehicle page" class='toggle__tab--vehicle toggle__tab inactive' value='vehicle') Vehicle
+    button(type='action' name='act_nav-headquarters' title="Open the headquarters page" class='toggle__tab--headquarters toggle__tab inactive' value='headquarters') Base of Operations
+    button(type='action' name='act_nav-settings' title="Open the settings page" class='toggle__tab--settings toggle__tab active' style="font-family:pictos") y
+  //- logo
+  .section.logo
+  .section.version
+    h5 Sheet Version
+    span(name='attr_version')
+  .sheet-nav.automation
+    label.input-label
+      h4 Success Automation
+      select(name='attr_automation')
+        each value,index in ['off','non-combat','offense','defense','query']
+          -format;
+          -inputObj = {value};
+          if index === 0
+            -inputObj.selected = '';
+          option&attributes(inputObj) #{capitalize(value)}
+    label.input-label
+      h4 Roll Modifiers
+      select(name='attr_modifier_query')
+        option(value='+[[0?{+/- d6 Modifier|0}]]' selected='') On
+        option(value=' ') Off
+  //-
+    .nav.toggle
+      h5 Sheet Type
+      label.input-label
+        span Character
+        input(type='radio' name='attr_sheet_view' title='@{sheet_view}' value='character' checked='')
+      label.input-label
+        span Mook
+        input(type='radio' name='attr_sheet_view' title='@{sheet_view}' value='mook')
+      select.mook-type(name='attr_mook_type' title='@{mook_type}')
+        option(value='mook') Hazard
+        option(value='mook' selected='') Mook
+        option(value='citizen') Citizen
+        option(value='henchman') Henchman
+        option(value='supporting cast') Supporting Cast
+  
+  //- name
+  section.section.name.character.active
+    label.input-label
+      h6 Hero Name
+      input.bold(type='text' name='attr_character_name' title='@{character_name}')
+    label.input-label
+      h6 Real Name
+      input.bold(type='text' name='attr_real_name' title='@{real_name}')
+  
+  section.section.name.mook.vehicle.headquarters
+    label.input-label
+      h6 Name
+      input.bold(type='text' name='attr_character_name' title='@{character_name}')
+    label.input-label.description
+      h6 Description
+      input.bold(type="text" name='attr_character_description' title='@{character_description}')
+
+  section#settings.settings.active
+    label.input-label.whisper
+      h6 Whisper to GM
+      select(name="attr_whisper" class='boxed')
+        each obj in [{value:'',content:'Never',selected:true},{value:'/w gm ',content:'Always'}]
+          - let selectObj = {value:obj.value};
+          if obj.selected
+            -selectObj.selected = '';
+          option&attributes(selectObj) #{obj.content}
+      label(class=`input-label sheet-type`)
+        h6 Character is a
+        select(name='attr_sheet_type')
+          each sheetType,index in ['Character','Mook','Vehicle','Headquarters']
+            - let optObj = {value:sheetType.toLowerCase()};
+            if index === 0
+              - optObj.selected = '';
+            option&attributes(optObj) #{sheetType}
+
+  section#character.character
+    //- resistances
+    .section.resistances.border
+      .flex-row
+        h2 RESISTANCES
+      .res-grid
+        div
+          //- empty div placeholder
+        span.bold MAX
+        span.bold Current
+        div
+          //- empty div placeholder
+        span.small Notes
+        div
+          span.resistance.bold &nbsp;COMPOSURE&nbsp;&nbsp;
+        div
+          input.ref.bold(type='number' name='attr_composure_max' title='@{composure_max}')
+        div
+          input.ref.bold(type='number' name='attr_composure' title='@{composure}')
+        div
+          button.d6(type='action' name='act_compute-composure')
+        div
+          input.notes(type='text' name='attr_composurenotes' title='@{composurenotes}')
+        div
+          span.resistance.bold &nbsp;FORTITUDE
+        div
+          input.ref.bold(type='number' name='attr_fortitude_max' title='@{fortitude_max}')
+        div
+          input.ref.bold(type='number' name='attr_fortitude' title='@{fortitude}')
+        div
+          button.d6(type='action' name='act_compute-fortitude')
+        div
+          input.notes(type='text' name='attr_fortitudenotes' title='@{fortitudenotes}')
+        div
+          span.resistance.bold &nbsp;REACTION
+        div
+          input.ref.bold(type='number' name='attr_reaction_max' title='@{reaction_max}')
+        div
+          input.ref.bold(type='number' name='attr_reaction' title='@{reaction}')
+        div
+          button.d6(type='action' name='act_compute-reaction')
+        div
+          input.notes(type='text' name='attr_reactionnotes' title='@{reactionnotes}')
+        div
+          span.resistance.bold &nbsp;WILL
+        div
+          input.ref.bold(type='number' name='attr_will_max' title='@{will_max}')
+        div
+          input.ref.bold(type='number' name='attr_will' title='@{will}')
+        div
+          button.d6(type='action' name='act_compute-will')
+        div
+          input.notes(type='text' name='attr_willnotes' title='@{willnotes}')
+      .flex-row
+        h2 INITIATIVE
+      .initiative
+        input.ref.bold(type='number' name='attr_initiative' title='@{initiative}')
+        button.d6(name='roll_init' title='%{init}' type='roll' value='@{initiative_macro}')
+    //- aptitudes
+    .section.aptitudes.border
+      h2 APTITUDES
+      label.aptitudes
+        fieldset.repeating_aptitudes
+          input.medium.bold(type='text' name='attr_aptitudename' title='@{repeating_aptitudes_$X_aptitudename}')
+          input.ref.bold(type='number' name='attr_aptitude' title='@{repeating_aptitudes_$X_aptitude}')
+          button.d6(type='action' name='act_compute-aptitude')
+          input.longap(type='text' name='attr_aptitudenotes' title='@{aptitudenotes}')
+    //- advantages
+    .section.advantages.border
+      h2 ADVANTAGES
+      fieldset.repeating_advantages
+        input.mediumadv.bold(type='text' name='attr_advantage' title='@{repeating_advantages_$X_advantage}')
+        input.bold.ref(name='attr_advantage-rank' title='@{repeating_advantages_$X_advantage-rank}' type='number' value='1')
+        input.notes(type='text' name='attr_advantagenotes' title='@{repeating_advantages_$X_advantagenotes}')
+    //- disadvantages
+    .section.disadvantages.border
+      h2 DISADVANTAGES
+      fieldset.repeating_disadvantages
+        input.mediumdis.bold(type='text' name='attr_disadvantage' title='@{repeating_disadvantages_$X_disadvantage}')
+        input.bold.ref(name='attr_disadvantage-rank' title='@{repeating_disadvantages_$X_disadvantage-rank}' type='number' value='1')
+        input.notes(type='text' name='attr_disadvantagenotes' title='@{repeating_disadvantages_$X_disadvantagenotes}')
+    //- powers
+    .section.powers.border
+      h2 POWERS
+      label.powers
+        fieldset.repeating_powers
+          input.mediumpow.bold(type='text' name='attr_powername' title='@{repeating_powers_$X_powername}')
+          input.ref.bold(type='number' name='attr_power' title='@{repeating_powers_$X_power}')
+          button.d6(type='action' name='act_compute-power')
+          input.longpow(type='text' name='attr_powernotes' title='@{repeating_powers_$X_powernotes}')
+    //- tracker
+    .section.tracker
+      span Use Alternative tracker
+      input.tracker-switch(type='checkbox' name='attr_tracker_switch' title='@{tracker_switch}' value='1')
+      table.def-tracker.border
+        tr
+          th(colspan='10')
+            h5.cell-display Success Track
+        tr.track-row
+          td
+            .cell-display 1
+          td
+            .cell-display 7
+          td
+            .cell-display 13
+          td
+            .cell-display 19
+          td
+            .cell-display 25
+          td
+            .cell-display 31
+          td
+            .cell-display 37
+          td
+            .cell-display 43
+          td
+            .cell-display 49
+          td
+            .cell-display 55
+        tr.track-row
+          td
+            .cell-display 2
+          td
+            .cell-display 8
+          td
+            .cell-display 14
+          td
+            .cell-display 20
+          td
+            .cell-display 26
+          td
+            .cell-display 32
+          td
+            .cell-display 38
+          td
+            .cell-display 44
+          td
+            .cell-display 50
+          td
+            .cell-display 56
+        tr.track-row
+          td
+            .cell-display 3
+          td
+            .cell-display 9
+          td
+            .cell-display 15
+          td
+            .cell-display 21
+          td
+            .cell-display 27
+          td
+            .cell-display 33
+          td
+            .cell-display 39
+          td
+            .cell-display 45
+          td
+            .cell-display 51
+          td
+            .cell-display 57
+        tr.track-row
+          td
+            .cell-display 4
+          td
+            .cell-display 10
+          td
+            .cell-display 16
+          td
+            .cell-display 22
+          td
+            .cell-display 28
+          td
+            .cell-display 34
+          td
+            .cell-display 40
+          td
+            .cell-display 46
+          td
+            .cell-display 52
+          td
+            .cell-display 58
+        tr.track-row
+          td
+            .cell-display 5
+          td
+            .cell-display 11
+          td
+            .cell-display 17
+          td
+            .cell-display 23
+          td
+            .cell-display 29
+          td
+            .cell-display 35
+          td
+            .cell-display 41
+          td
+            .cell-display 47
+          td
+            .cell-display 53
+          td
+            .cell-display 59
+        tr.track-row
+          td
+            .cell-display 6
+          td
+            .cell-display 12
+          td
+            .cell-display 18
+          td
+            .cell-display 24
+          td
+            .cell-display 30
+          td
+            .cell-display 36
+          td
+            .cell-display 42
+          td
+            .cell-display 48
+          td
+            .cell-display 54
+          td
+            .cell-display 60
+      table.alt-tracker.border
+        tr
+          th
+            h5.cell-display Range of Success
+          th
+            h5.cell-display Damage/Effect
+        tr.track-row
+          td
+            .cell-display 0 - 5
+          td
+            .cell-display 1d6 / 1
+        tr.track-row
+          td
+            .cell-display 6 - 11
+          td
+            .cell-display 2d6 / 2
+        tr.track-row
+          td
+            .cell-display 12 - 17
+          td
+            .cell-display 3d6 / 3
+        tr.track-row
+          td
+            .cell-display 18 - 23
+          td
+            .cell-display 4d6 / 4
+        tr.track-row
+          td
+            .cell-display 24 - 29
+          td
+            .cell-display 5d6 / 5
+        tr.track-row
+          td
+            .cell-display 30 - 35
+          td
+            .cell-display 6d6 / 6
+    //- competency dice
+    .section.comp-dice.flex-down.flex-center.border
+      h2 COMPETENCY DICE
+      br
+      br
+      div
+        span.bold Competency Dice:
+        input.bold.ref(type='number' name='attr_comp' title='@{comp}')
+        | /
+        input.bold.ref(type='number' name='attr_comp_max' title='@{comp_max}')
+      div
+        span.bold Temp Comp Dice:
+        input.bold.ref(type='number' name='attr_temp_comp' title='@{temp_comp}')
+        | /
+        input.bold.ref(type='number' name='attr_temp_comp_max' title='@{temp_comp_max}')
+    //- alt tracker
+    //- cost
+    .section.cost.border
+      label
+        span.bold RESISTANCES
+        input.bold(type='number' class='ref bold' name='attr_resist-cost' title='@{resist-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold APTITUDES 
+        input.bold(type='number' class='ref bold' name='attr_apt-cost' title='@{apt-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold POWERS
+        input.bold(type='number' class='ref bold' name='attr_power-cost' title='@{power-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold ADVANTAGES
+        input.bold(type='number' class='ref bold' name='attr_adv-cost' title='@{adv-cost}' value='0')
+      label
+        span.arithmetic.bold -
+        span.bold DISADVANTAGES
+        input.bold(type='number' class='ref bold' name='attr_disadv-cost' title='@{disadv-cost}' value='0')
+      label
+        span.arithmetic.bold
+          |=
+        span.bold.total TOTAL COST
+        input.bold.ref.total-value(type='number' class='ref bold' name='attr_cost' title='@{cost}' value='@{resist-cost}+@{apt-cost}+@{power-cost}+@{adv-cost}-@{disadv-cost}' disabled='true')
+  
+  section#mook.mook
+    //- name
+    .section.rating.border
+      h2 RATING
+      button.rating.d6(type='action' name='act_compute-rating')
+      label.input-label.stacked.over.max
+        span.bold MAX
+        input.ref.bold.boxed(type='number' name='attr_rating_max' title='@{rating_max}' value='0')
+      label.input-label.stacked.over.current
+        span.bold CURRENT
+        input.ref.bold.boxed(type='number' name='attr_rating' title='@{rating}' value='0')
+      label.input-label.stacked.over.initiative
+        h2 INITIATIVE
+        input.ref.bold.boxed(type='number' name='attr_initiative' title='@{initiative}' value='0')
+        button.initiative-button.d6(name='roll_init' title='%{init}' type='roll' value='@{initiative_macro}')
+    .section.qualities.border
+      h2 QUALITIES
+      fieldset.repeating_quality
+        input(type='text' class='bold' name='attr_name' title='@{name}')
+        input(type='text' class='bold' name='attr_description' title='@{description}')
+    .section.exceptional.border
+      h2 EXCEPTIONAL QUALITIES
+      fieldset.repeating_exceptional
+        input(type='text' class='bold' name='attr_exceptionalname' title='@{exceptionalname}')
+        input(type='number' class='ref bold' name='attr_exceptional' title='@{exceptional}' value='0')
+        button.d6(type='action' name='act_compute-exceptional')
+        input(type='text' class='bold' name='attr_description' title='@{exceptionalnotes}')
+    //- tracker
+    .section.tracker
+      span Use Alternative tracker
+      input.tracker-switch(type='checkbox' name='attr_tracker_switch' title='@{tracker_switch}' value='1')
+      table.def-tracker.border
+        tr
+          th(colspan='10')
+            h5.cell-display Success Track
+        tr.track-row
+          td
+            .cell-display 1
+          td
+            .cell-display 7
+          td
+            .cell-display 13
+          td
+            .cell-display 19
+          td
+            .cell-display 25
+          td
+            .cell-display 31
+          td
+            .cell-display 37
+          td
+            .cell-display 43
+          td
+            .cell-display 49
+          td
+            .cell-display 55
+        tr.track-row
+          td
+            .cell-display 2
+          td
+            .cell-display 8
+          td
+            .cell-display 14
+          td
+            .cell-display 20
+          td
+            .cell-display 26
+          td
+            .cell-display 32
+          td
+            .cell-display 38
+          td
+            .cell-display 44
+          td
+            .cell-display 50
+          td
+            .cell-display 56
+        tr.track-row
+          td
+            .cell-display 3
+          td
+            .cell-display 9
+          td
+            .cell-display 15
+          td
+            .cell-display 21
+          td
+            .cell-display 27
+          td
+            .cell-display 33
+          td
+            .cell-display 39
+          td
+            .cell-display 45
+          td
+            .cell-display 51
+          td
+            .cell-display 57
+        tr.track-row
+          td
+            .cell-display 4
+          td
+            .cell-display 10
+          td
+            .cell-display 16
+          td
+            .cell-display 22
+          td
+            .cell-display 28
+          td
+            .cell-display 34
+          td
+            .cell-display 40
+          td
+            .cell-display 46
+          td
+            .cell-display 52
+          td
+            .cell-display 58
+        tr.track-row
+          td
+            .cell-display 5
+          td
+            .cell-display 11
+          td
+            .cell-display 17
+          td
+            .cell-display 23
+          td
+            .cell-display 29
+          td
+            .cell-display 35
+          td
+            .cell-display 41
+          td
+            .cell-display 47
+          td
+            .cell-display 53
+          td
+            .cell-display 59
+        tr.track-row
+          td
+            .cell-display 6
+          td
+            .cell-display 12
+          td
+            .cell-display 18
+          td
+            .cell-display 24
+          td
+            .cell-display 30
+          td
+            .cell-display 36
+          td
+            .cell-display 42
+          td
+            .cell-display 48
+          td
+            .cell-display 54
+          td
+            .cell-display 60
+      table.alt-tracker.border
+        tr
+          th
+            h5.cell-display Range of Success
+          th
+            h5.cell-display Damage/Effect
+        tr.track-row
+          td
+            .cell-display 0 - 5
+          td
+            .cell-display 1d6 / 1
+        tr.track-row
+          td
+            .cell-display 6 - 11
+          td
+            .cell-display 2d6 / 2
+        tr.track-row
+          td
+            .cell-display 12 - 17
+          td
+            .cell-display 3d6 / 3
+        tr.track-row
+          td
+            .cell-display 18 - 23
+          td
+            .cell-display 4d6 / 4
+        tr.track-row
+          td
+            .cell-display 24 - 29
+          td
+            .cell-display 5d6 / 5
+        tr.track-row
+          td
+            .cell-display 30 - 35
+          td
+            .cell-display 6d6 / 6
+  
+  section#vehicle.vehicle
+    //- resistances
+    .section.resistances.border
+      .flex-row
+        h2 RESISTANCES
+      .res-grid
+        div
+          //- empty div placeholder
+        span.bold MAX
+        span.bold Current
+        div
+          //- empty div placeholder
+        span.small Notes
+        div
+          span.resistance.bold &nbsp;COMPOSURE&nbsp;&nbsp;
+        div
+          input.ref.bold(type='number' name='attr_composure_max' title='@{composure_max}')
+        div
+          input.ref.bold(type='number' name='attr_composure' title='@{composure}')
+        div
+          button.d6(type='action' name='act_compute-composure')
+        div
+          input.notes(type='text' name='attr_composurenotes' title='@{composurenotes}')
+        div
+          span.resistance.bold &nbsp;FORTITUDE
+        div
+          input.ref.bold(type='number' name='attr_fortitude_max' title='@{fortitude_max}')
+        div
+          input.ref.bold(type='number' name='attr_fortitude' title='@{fortitude}')
+        div
+          button.d6(type='action' name='act_compute-fortitude')
+        div
+          input.notes(type='text' name='attr_fortitudenotes' title='@{fortitudenotes}')
+        div
+          span.resistance.bold &nbsp;REACTION
+        div
+          input.ref.bold(type='number' name='attr_reaction_max' title='@{reaction_max}')
+        div
+          input.ref.bold(type='number' name='attr_reaction' title='@{reaction}')
+        div
+          button.d6(type='action' name='act_compute-reaction')
+        div
+          input.notes(type='text' name='attr_reactionnotes' title='@{reactionnotes}')
+        div
+          span.resistance.bold &nbsp;WILL
+        div
+          input.ref.bold(type='number' name='attr_will_max' title='@{will_max}')
+        div
+          input.ref.bold(type='number' name='attr_will' title='@{will}')
+        div
+          button.d6(type='action' name='act_compute-will')
+        div
+          input.notes(type='text' name='attr_willnotes' title='@{willnotes}')
+      .flex-row
+        h2 INITIATIVE
+      .initiative
+        input.ref.bold(type='number' name='attr_initiative' title='@{initiative}')
+        button.d6(name='roll_init' title='%{init}' type='roll' value='@{initiative_macro}')
+    //- aptitudes
+    .section.aptitudes.border
+      h2 APTITUDES
+      label.aptitudes
+        fieldset.repeating_aptitudes
+          input.medium.bold(type='text' name='attr_aptitudename' title='@{repeating_aptitudes_$X_aptitudename}')
+          input.ref.bold(type='number' name='attr_aptitude' title='@{repeating_aptitudes_$X_aptitude}')
+          button.d6(type='action' name='act_compute-aptitude')
+          input.longap(type='text' name='attr_aptitudenotes' title='@{aptitudenotes}')
+    //- advantages
+    .section.advantages.border
+      h2 ADVANTAGES
+      fieldset.repeating_advantages
+        input.mediumadv.bold(type='text' name='attr_advantage' title='@{repeating_advantages_$X_advantage}')
+        input.bold.ref(name='attr_advantage-rank' title='@{repeating_advantages_$X_advantage-rank}' type='number' value='1')
+        input.notes(type='text' name='attr_advantagenotes' title='@{repeating_advantages_$X_advantagenotes}')
+    //- disadvantages
+    .section.disadvantages.border
+      h2 DISADVANTAGES
+      fieldset.repeating_disadvantages
+        input.mediumdis.bold(type='text' name='attr_disadvantage' title='@{repeating_disadvantages_$X_disadvantage}')
+        input.bold.ref(name='attr_disadvantage-rank' title='@{repeating_disadvantages_$X_disadvantage-rank}' type='number' value='1')
+        input.notes(type='text' name='attr_disadvantagenotes' title='@{repeating_disadvantages_$X_disadvantagenotes}')
+    //- powers
+    .section.powers.border
+      h2 POWERS
+      label.powers
+        fieldset.repeating_powers
+          input.mediumpow.bold(type='text' name='attr_powername' title='@{repeating_powers_$X_powername}')
+          input.ref.bold(type='number' name='attr_power' title='@{repeating_powers_$X_power}')
+          button.d6(type='action' name='act_compute-power')
+          input.longpow(type='text' name='attr_powernotes' title='@{repeating_powers_$X_powernotes}')
+    //- tracker
+    .section.tracker
+      span Use Alternative tracker
+      input.tracker-switch(type='checkbox' name='attr_tracker_switch' title='@{tracker_switch}' value='1')
+      table.def-tracker.border
+        tr
+          th(colspan='10')
+            h5.cell-display Success Track
+        tr.track-row
+          td
+            .cell-display 1
+          td
+            .cell-display 7
+          td
+            .cell-display 13
+          td
+            .cell-display 19
+          td
+            .cell-display 25
+          td
+            .cell-display 31
+          td
+            .cell-display 37
+          td
+            .cell-display 43
+          td
+            .cell-display 49
+          td
+            .cell-display 55
+        tr.track-row
+          td
+            .cell-display 2
+          td
+            .cell-display 8
+          td
+            .cell-display 14
+          td
+            .cell-display 20
+          td
+            .cell-display 26
+          td
+            .cell-display 32
+          td
+            .cell-display 38
+          td
+            .cell-display 44
+          td
+            .cell-display 50
+          td
+            .cell-display 56
+        tr.track-row
+          td
+            .cell-display 3
+          td
+            .cell-display 9
+          td
+            .cell-display 15
+          td
+            .cell-display 21
+          td
+            .cell-display 27
+          td
+            .cell-display 33
+          td
+            .cell-display 39
+          td
+            .cell-display 45
+          td
+            .cell-display 51
+          td
+            .cell-display 57
+        tr.track-row
+          td
+            .cell-display 4
+          td
+            .cell-display 10
+          td
+            .cell-display 16
+          td
+            .cell-display 22
+          td
+            .cell-display 28
+          td
+            .cell-display 34
+          td
+            .cell-display 40
+          td
+            .cell-display 46
+          td
+            .cell-display 52
+          td
+            .cell-display 58
+        tr.track-row
+          td
+            .cell-display 5
+          td
+            .cell-display 11
+          td
+            .cell-display 17
+          td
+            .cell-display 23
+          td
+            .cell-display 29
+          td
+            .cell-display 35
+          td
+            .cell-display 41
+          td
+            .cell-display 47
+          td
+            .cell-display 53
+          td
+            .cell-display 59
+        tr.track-row
+          td
+            .cell-display 6
+          td
+            .cell-display 12
+          td
+            .cell-display 18
+          td
+            .cell-display 24
+          td
+            .cell-display 30
+          td
+            .cell-display 36
+          td
+            .cell-display 42
+          td
+            .cell-display 48
+          td
+            .cell-display 54
+          td
+            .cell-display 60
+      table.alt-tracker.border
+        tr
+          th
+            h5.cell-display Range of Success
+          th
+            h5.cell-display Damage/Effect
+        tr.track-row
+          td
+            .cell-display 0 - 5
+          td
+            .cell-display 1d6 / 1
+        tr.track-row
+          td
+            .cell-display 6 - 11
+          td
+            .cell-display 2d6 / 2
+        tr.track-row
+          td
+            .cell-display 12 - 17
+          td
+            .cell-display 3d6 / 3
+        tr.track-row
+          td
+            .cell-display 18 - 23
+          td
+            .cell-display 4d6 / 4
+        tr.track-row
+          td
+            .cell-display 24 - 29
+          td
+            .cell-display 5d6 / 5
+        tr.track-row
+          td
+            .cell-display 30 - 35
+          td
+            .cell-display 6d6 / 6
+    //- alt tracker
+    //- cost
+    .section.cost.border
+      label
+        span.bold RESISTANCES
+        input.bold(type='number' class='ref bold' name='attr_resist-cost' title='@{resist-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold APTITUDES 
+        input.bold(type='number' class='ref bold' name='attr_apt-cost' title='@{apt-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold POWERS
+        input.bold(type='number' class='ref bold' name='attr_power-cost' title='@{power-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold ADVANTAGES
+        input.bold(type='number' class='ref bold' name='attr_adv-cost' title='@{adv-cost}' value='0')
+      label
+        span.arithmetic.bold -
+        span.bold DISADVANTAGES
+        input.bold(type='number' class='ref bold' name='attr_disadv-cost' title='@{disadv-cost}' value='0')
+      label
+        span.arithmetic.bold
+          |=
+        span.bold.total TOTAL COST
+        input.bold.ref.total-value(type='number' class='ref bold' name='attr_cost' title='@{cost}' value='@{resist-cost}+@{apt-cost}+@{power-cost}+@{adv-cost}-@{disadv-cost}' disabled='true')
+  
+  section#headquarters.headquarters
+    .section.resistances.border
+      .flex-row
+        h2 BASE STATISTICS
+      .res-grid
+        div
+          //- empty div placeholder
+        span.bold MAX
+        span.bold Current
+        div
+          //- empty div placeholder
+        span.small Notes
+        div
+          span.resistance.bold &nbsp;MATERIAL&nbsp;&nbsp;
+        div
+          input.ref.bold(type='number' name='attr_material_strength_max' title='@{material_strength_max}')
+        div
+          input.ref.bold(type='number' name='attr_material_strength' title='@{material_strength}')
+        div
+          button.d6(type='action' name='act_compute-material-strength')
+        div
+          input.notes(type='text' name='attr_material_strengthnotes' title='@{material_strengthnotes}')
+        div
+          span.resistance.bold &nbsp;SECURITY
+        div
+          input.ref.bold(type='number' name='attr_security_max' title='@{security_max}')
+        div
+          input.ref.bold(type='number' name='attr_security' title='@{security}')
+        div
+          button.d6(type='action' name='act_compute-security')
+        div
+          input.notes(type='text' name='attr_securitynotes' title='@{securitynotes}')
+      .flex-row
+        h2 INITIATIVE
+      .initiative
+        input.ref.bold(type='number' name='attr_initiative' title='@{initiative}')
+        button.d6(name='roll_init' title='%{init}' type='roll' value='@{initiative_macro}')
+    .section.aptitudes.border
+      h2 APTITUDES
+      label.aptitudes
+        fieldset.repeating_aptitudes
+          input.medium.bold(type='text' name='attr_aptitudename' title='@{repeating_aptitudes_$X_aptitudename}')
+          input.ref.bold(type='number' name='attr_aptitude' title='@{repeating_aptitudes_$X_aptitude}')
+          button.d6(type='action' name='act_compute-aptitude')
+          input.longap(type='text' name='attr_aptitudenotes' title='@{aptitudenotes}')
+    //- advantages
+    .section.advantages.border
+      h2 ADVANTAGES
+      fieldset.repeating_advantages
+        input.mediumadv.bold(type='text' name='attr_advantage' title='@{repeating_advantages_$X_advantage}')
+        input.bold.ref(name='attr_advantage-rank' title='@{repeating_advantages_$X_advantage-rank}' type='number' value='1')
+        input.notes(type='text' name='attr_advantagenotes' title='@{repeating_advantages_$X_advantagenotes}')
+    //- disadvantages
+    .section.disadvantages.border
+      h2 DISADVANTAGES
+      fieldset.repeating_disadvantages
+        input.mediumdis.bold(type='text' name='attr_disadvantage' title='@{repeating_disadvantages_$X_disadvantage}')
+        input.bold.ref(name='attr_disadvantage-rank' title='@{repeating_disadvantages_$X_disadvantage-rank}' type='number' value='1')
+        input.notes(type='text' name='attr_disadvantagenotes' title='@{repeating_disadvantages_$X_disadvantagenotes}')
+    //- powers
+    .section.powers.border
+      h2 POWERS
+      label.powers
+        fieldset.repeating_powers
+          input.mediumpow.bold(type='text' name='attr_powername' title='@{repeating_powers_$X_powername}')
+          input.ref.bold(type='number' name='attr_power' title='@{repeating_powers_$X_power}')
+          button.d6(type='action' name='act_compute-power')
+          input.longpow(type='text' name='attr_powernotes' title='@{repeating_powers_$X_powernotes}')
+    //- tracker
+    .section.tracker
+      span Use Alternative tracker
+      input.tracker-switch(type='checkbox' name='attr_tracker_switch' title='@{tracker_switch}' value='1')
+      table.def-tracker.border
+        tr
+          th(colspan='10')
+            h5.cell-display Success Track
+        tr.track-row
+          td
+            .cell-display 1
+          td
+            .cell-display 7
+          td
+            .cell-display 13
+          td
+            .cell-display 19
+          td
+            .cell-display 25
+          td
+            .cell-display 31
+          td
+            .cell-display 37
+          td
+            .cell-display 43
+          td
+            .cell-display 49
+          td
+            .cell-display 55
+        tr.track-row
+          td
+            .cell-display 2
+          td
+            .cell-display 8
+          td
+            .cell-display 14
+          td
+            .cell-display 20
+          td
+            .cell-display 26
+          td
+            .cell-display 32
+          td
+            .cell-display 38
+          td
+            .cell-display 44
+          td
+            .cell-display 50
+          td
+            .cell-display 56
+        tr.track-row
+          td
+            .cell-display 3
+          td
+            .cell-display 9
+          td
+            .cell-display 15
+          td
+            .cell-display 21
+          td
+            .cell-display 27
+          td
+            .cell-display 33
+          td
+            .cell-display 39
+          td
+            .cell-display 45
+          td
+            .cell-display 51
+          td
+            .cell-display 57
+        tr.track-row
+          td
+            .cell-display 4
+          td
+            .cell-display 10
+          td
+            .cell-display 16
+          td
+            .cell-display 22
+          td
+            .cell-display 28
+          td
+            .cell-display 34
+          td
+            .cell-display 40
+          td
+            .cell-display 46
+          td
+            .cell-display 52
+          td
+            .cell-display 58
+        tr.track-row
+          td
+            .cell-display 5
+          td
+            .cell-display 11
+          td
+            .cell-display 17
+          td
+            .cell-display 23
+          td
+            .cell-display 29
+          td
+            .cell-display 35
+          td
+            .cell-display 41
+          td
+            .cell-display 47
+          td
+            .cell-display 53
+          td
+            .cell-display 59
+        tr.track-row
+          td
+            .cell-display 6
+          td
+            .cell-display 12
+          td
+            .cell-display 18
+          td
+            .cell-display 24
+          td
+            .cell-display 30
+          td
+            .cell-display 36
+          td
+            .cell-display 42
+          td
+            .cell-display 48
+          td
+            .cell-display 54
+          td
+            .cell-display 60
+      table.alt-tracker.border
+        tr
+          th
+            h5.cell-display Range of Success
+          th
+            h5.cell-display Damage/Effect
+        tr.track-row
+          td
+            .cell-display 0 - 5
+          td
+            .cell-display 1d6 / 1
+        tr.track-row
+          td
+            .cell-display 6 - 11
+          td
+            .cell-display 2d6 / 2
+        tr.track-row
+          td
+            .cell-display 12 - 17
+          td
+            .cell-display 3d6 / 3
+        tr.track-row
+          td
+            .cell-display 18 - 23
+          td
+            .cell-display 4d6 / 4
+        tr.track-row
+          td
+            .cell-display 24 - 29
+          td
+            .cell-display 5d6 / 5
+        tr.track-row
+          td
+            .cell-display 30 - 35
+          td
+            .cell-display 6d6 / 6
+    //- alt tracker
+    //- cost
+    .section.cost.border
+      label
+        span.bold RESISTANCES
+        input.bold(type='number' class='ref bold' name='attr_resist-cost' title='@{resist-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold APTITUDES 
+        input.bold(type='number' class='ref bold' name='attr_apt-cost' title='@{apt-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold POWERS
+        input.bold(type='number' class='ref bold' name='attr_power-cost' title='@{power-cost}' value='0')
+      label
+        span.arithmetic.bold +
+        span.bold ADVANTAGES
+        input.bold(type='number' class='ref bold' name='attr_adv-cost' title='@{adv-cost}' value='0')
+      label
+        span.arithmetic.bold -
+        span.bold DISADVANTAGES
+        input.bold(type='number' class='ref bold' name='attr_disadv-cost' title='@{disadv-cost}' value='0')
+      label
+        span.arithmetic.bold
+          |=
+        span.bold.total TOTAL COST
+        input.bold.ref.total-value(type='number' class='ref bold' name='attr_cost' title='@{cost}' value='@{resist-cost}+@{apt-cost}+@{power-cost}+@{adv-cost}-@{disadv-cost}' disabled='true')
+    
+//- ROLL TEMPLATE
+rolltemplate.sheet-rolltemplate-supers
+  .template-container
+    .header
+      |{{#name}}
+      h4 {{name}}
+      |{{/name}}
+      |{{#character_name}}
+      |{{#character_id}}
+      |[{{character_name}}](http://-journal.roll20.net/character/{{character_id}})
+      |{{/character_id}}{{^character_id}}
+      |{{character_name}}
+      |{{/character_id}}
+      |{{/character_name}}
+    |{{#target}}
+    div
+      h5 Result
+      |{{#target_label}}
+      h5 {{target_label}}
+      |{{/target_label}}
+      |{{^target_label}}
+      h5 Target Number
+      |{{/target_label}}
+    div
+      span {{result}}
+      span {{target}}
+    div
+      span.successes {{computed::result}}
+    |{{/target}}
+    |{{^target}}
+    |{{#result}}
+    div
+      h5 Result
+      span {{result}}
+    |{{/result}}
+    |{{/target}}
+    |{{#allprops() result target character_name character_id damageRoll target_label}}
+    div
+      span {{key}}
+      span {{value}}
+    |{{/allprops() result target character_name character_id damageRoll target_label}}
+script(type='text/worker')
+  include javascript/variables.js
+  include javascript/utility.js
+  include javascript/supers-revised.js
+  include javascript/listeners.js

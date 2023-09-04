@@ -30,6 +30,8 @@ No temporary stat modifiers or wounds are applied.
 Wound effects are honoured for Attack/Parry/Long Range base values. No temporary stat modifiers are applied.
 
 ## 3d20 Checks
+In most cases (talents, spells), Custom Roll Parsing is used, so that all rolls are accurately evaluated according to the rules. Currently, gifts, meta-talents and liturgies still use the old way, which is described in detail in the following paragraphs.
+
 Four cases have to be distinguished in order to determine the result of a roll:
 
 * Automatic Success: At least two dice show a 1.
@@ -39,7 +41,7 @@ Four cases have to be distinguished in order to determine the result of a roll:
 
 Three 1s or three 20s do not per se have any further influence on the roll, it is up to the GM to decide the effects in such cases.
 
-The complete algorithm to determine the exact result of a roll cannot be adequately implemented using Roll20 rolls. Also, certain special skills affect the outcome as well such as Misfortune Magnet (Pechmagnet) or Fixed Matrix (Feste Matrix). Therefore, the currently used formula has some limitations.
+The complete algorithm to determine the exact result of a roll cannot be adequately implemented using just Roll20 rolls. Also, certain advantages/disadvantages may influence the roll evaluation. Therefore, the currently used formula has some limitations.
 
 `[[ { [[{0d1 + @{skill} - (?{mod|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{mod|0}) - @{skill}, 0d1}kh1]] - @{stat1}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{mod|0}) - @{skill}, 0d1}kh1]] - @{stat2}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{mod|0}) - @{skill}, 0d1}kh1]] - @{stat3}, 0d1}kh1, 0d1 + @{skill}}dh1]]`
 
@@ -71,9 +73,6 @@ Number-to-roll conversion to cap the check result at the skill level.
 
 ### Specializations
 For specializations, whenever `@{skill}` is mentioned, a ` + 2` was added, because the effective skill value is higher when using the specialization.
-
-### Automatic Failure and Automatic Success
-These two conditions cannot be caught with Roll20 rolls at present. Roll templates check for `WasCrit` and `WasFumble`, but this is just a boolean and does not give the number of 1s and 20s. Therefore, an info is printed in rolls with at least one 1 or one 20.
 
 ## Sources
 WdS: Wege des Schwerts
