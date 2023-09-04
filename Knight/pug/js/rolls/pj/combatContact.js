@@ -49,6 +49,8 @@ rollCombatContact.forEach((button) => {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'aura',
+      `${ODValue.aura}`,
       'energiePJ',
       'espoir',
       'devasterAnatheme',
@@ -300,6 +302,8 @@ rollCombatContact.forEach((button) => {
     const oTir = +attrs[`${ODValue.tir}`];
     const vCombat = +attrs.combat;
     const oCombat = +attrs[`${ODValue.combat}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -468,7 +472,7 @@ rollCombatContact.forEach((button) => {
     if (hasOptions) {
       // GESTION DES EFFETS
 
-      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
       bDegats = bDegats.concat(effets.bDegats);
       eASAssassin = effets.eASAssassin;
