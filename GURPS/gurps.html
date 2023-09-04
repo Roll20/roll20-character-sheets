@@ -3059,48 +3059,6 @@
 								<div class="block">
 									<label>
 										<div>
-											<input type="number" name="attr_spell_on_penalty_total" value="0" title="Macro: @{NAME|spell_on_penalty_total}" readonly="readonly">
-										</div>
-										<div>
-											<div class="tooltip">
-												<span data-formula="spells-on-label">Spells On</span>
-												<span class="tooltiptext">
-													<span data-formula="spell-on-penalty-tooltip">
-														Spell skill penalty based on number of <b>ON</b> spells.<br />
-														<input type="hidden" name="attr_spell_on_count" value="0" />
-														Number of spells <b>ON:</b> <span name="attr_spell_on_count"></span>.<br />
-														<i>NOTE:</i> Use the options tab to adjust the penalty per spell <b>ON</b>.
-													</span>
-												</span>
-											</div>
-										</div>
-									</label>
-								</div>
-								
-								<div class="block">
-									<label>
-										<div>
-											<input type="number" name="attr_spell_maintained_penalty_total" value="0" title="Macro: @{NAME|spell_maintained_penalty_total}" readonly="readonly">
-										</div>
-										<div>
-											<div class="tooltip">
-												<span data-i18n="concentration-label">Concentration</span>
-												<span class="tooltiptext">
-													<span data-i18n="cocentration-penalty-tooltip">
-														<b>Concentration</b> spell penalty<br>
-														<input type="hidden" name="attr_spell_maintained_count" value="0" />
-														Number of spells: <span name="attr_spell_maintained_count">0</span>.<br>
-														<i>NOTE:</i> Use options tab to adjust the penalty.
-													</span>
-												</span>
-											</div>
-										</div>
-									</label>
-								</div>
-
-								<div class="block">
-									<label>
-										<div>
 											<input type="checkbox" name="attr_spells_low_mana" value="1" title="Macro: @{NAME|spells_low_mana}" />
 										</div>
 										<div>
@@ -4359,14 +4317,23 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.8 -->
+				<!-- current version notes: 2.9.12 -->
 				<ul>
-					<li>
-						Inventory Tab. Added a <b>Sort & Indent</b> button. The button will sort the inventory alphabetically and then update 
-						the indent level of a child item.
+					<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
+					<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.
+						<ul>
+							<li>Recent incorrect translation for the title caused display issue, made updates to prevent display issue.</li>
+						</ul>
+					</li>
+					<li>Roll modifier tools. Style update to move roll modifiers tools above the repeating tables to allow for additional updates later.</li>
+					<li>Grimoire Tab. 
+						<ul>
+							<li>The modifiers for <b>On Penalty</b> and <b>Concentration Penalty</b> are now automatically applied to spell skill levels.</li>
+							<li>Added a new custom spell modifier box, this covers special cases like taking a potion that raises IQ but not spell skill levels.</li>
+						</ul>
 					</li>
 					<li>
-						Import GCA5. Added a button to delete repeating sections/tables before importing a character.
+						List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
 					</li>
 				</ul>
 					
@@ -7355,7 +7322,7 @@ PC in Character Points (spent and unspent combined).
 							<input type="number" step="1" name="attr_written_mod_points" value="0" title="Macro: @{NAME|repeating_languages_$[row #]_written_mod_points}" />
 						</div>
 						<div class="cell col3">
-							<input type="text" name="attr_points" value="@{spoken_points} + @{spoken_mod_points} + @{written_points} + @{written_mod_points}" disabled="disabled" title="Macro: @{NAME|repeating_languages_$[row #]_points}" />
+							<input type="text" name="attr_points" value="@{spoken_points} + @{written_points}" disabled="disabled" title="Macro: @{NAME|repeating_languages_$[row #]_points}" />
 						</div>
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_languages -->
@@ -8512,6 +8479,129 @@ Engineering: Back to School.
 		<!-- _____ _____ SKILLS BOX _____ _____ -->
 
 		<div class="box skills">
+
+			<div class="roll-modifiers-table">
+
+				<div class="modifier-caption header">
+					<div class="popup">
+						<span data-i18n="skill-modifiers-label">Skill Roll Modifiers</span>
+					</div>
+					<div class="tooltip">
+						<span data-i18n="skill-modifiers-tooltip">These modifiers affect all skill rolls, use the reset button to clear modifiers. These modifiers will be cleared the next time you load your character sheet.</span>
+					</div>
+				</div>
+
+				<div class="modifier-row">
+
+					<div class="modifier-cell modifier-align-top">
+						<button type="action" name="act_show_roll_modifiers_for_skill" class="btn modifier-line-height-fix" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="summary-group">
+							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
+							<div class="summary" style="width:250px">
+								<div class="roll-traits">
+									<b>Traits:</b>
+									<div>
+										<textarea name="attr_skill_roll_trait_summary" class="trait-summary" readonly></textarea>
+									</div>
+								</div>
+								<div class="roll-summary">
+									<b>Summary:</b>
+									<div>
+										<textarea name="attr_skill_roll_modifier_summary" class="roll-summary" readonly></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup label">
+							<span data-i18n="modifier-label">Modifier:</span>
+						</div>
+						<div class="tooltip">
+							<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<input type="number" value="0" step="1" name="attr_skill_custom_roll_modifier" />	
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup label">
+							<span data-i18n="reason-label">Reason</span>:
+						</div>
+						<div class="tooltip">
+							<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<textarea class="reason-textarea" name="attr_skill_custom_roll_modifier_reason"></textarea>
+					</div>
+
+					<div class="modifier-cell">
+						<input type="checkbox" name="attr_skill_roll_max_nine" value="1" title="Macro: @{NAME|skill_roll_max_nine}" />
+						<input type="hidden" name="attr_skill_roll_max_nine_value" value="100" />
+					</div>	
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup">
+							<b><span data-i18n="max-skill-9-label">Max skill of 9</span></b>
+						</div>
+						<div class="tooltip max-skill-9">
+							<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell">
+						<input type="checkbox" name="attr_skill_roll_apply_encumbrance" value="1" title="Macro: @{NAME|skill_roll_apply_encumbrance}" />
+					</div>	
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup">
+							<b><span data-i18n="encumbrance-label">Encumbrance</span></b>
+						</div>
+						<div class="tooltip max-skill-9">
+							<span data-i18n="apply-encumbrance-tooltip">Apply encumbrance penalty.</span>
+							<b style="color:red;"><span name="attr_encumbrance_level"></span></b>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup label">
+							<span data-i18n="final-modifier-label">Final Modifier</span>:
+						</div>
+						<div class="tooltip">
+							<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="number-input">
+							<input type="hidden" name="attr_skill_roll_modifier_status" value="neutral" class="modifier-status" />
+							<input type="number" value="0" step="1" name="attr_skill_roll_modifier" class="final-modifier" readonly />
+							<input type="hidden" value="" name="attr_skill_roll_modifier_summary" />
+							<input type="hidden" value="" name="attr_skill_roll_trait_summary" />
+							<input type="hidden" value="" name="attr_skill_roll_hit_location" />
+							<input type="hidden" value="" name="attr_skill_roll_maneuver" />
+							<input type="hidden" value="" name="attr_skill_roll_allout_attack" />
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<button type="action" name="act_skill_roll_reset" class="btn tool-modifier-reset modifier-line-height-fix" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
+					</div>
+
+					<div class="modifier-cell modifier-fill-cell-10">&nbsp;</div>
+
+				</div><!-- end row -->
+
+			</div>
+
 			<div class="table">
 				
 				<div class="header">
@@ -8583,96 +8673,6 @@ PU2:126 = Power-Ups 2. Page 126
 					</div>
 				</div> <!-- .header -->
 
-				<div class="row roll-modifiers">
-					<div class="cell">
-						<button type="action" name="act_show_roll_modifiers_for_skill" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
-					</div>
-					<div class="cell">
-						<div class="summary-group">
-							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
-							<div class="summary" style="width:250px">
-								<div class="roll-traits">
-									<b>Traits:</b>
-									<div>
-										<textarea name="attr_skill_roll_trait_summary" class="trait-summary" readonly></textarea>
-									</div>
-								</div>
-								<div class="roll-summary">
-									<b>Summary:</b>
-									<div>
-										<textarea name="attr_skill_roll_modifier_summary" class="roll-summary" readonly></textarea>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="cell label">
-						<div class="popup">
-							<span data-i18n="modifier-label">Modifier:</span>
-						</div>
-						<div class="tooltip">
-							<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
-						</div>
-					</div>
-					<div  class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_skill_custom_roll_modifier" />
-					</div>
-					<div class="cell">
-						<span>Reason:</span>
-					</div>
-					<div class="cell">
-						<textarea style="height: 36px;width:150px;" name="attr_skill_custom_roll_modifier_reason"></textarea>
-					</div>
-					<div class="cell cell-popup">
-						<div>
-							<input type="checkbox" name="attr_skill_roll_max_nine" value="1" title="Macro: @{NAME|skill_roll_max_nine}" />
-							<input type="hidden" name="attr_skill_roll_max_nine_value" value="100" />
-						</div>
-						<div>
-							<div class="popup">
-								<span data-i18n="max-skill-9-label">Max skill of 9</span>
-							</div>
-							<div class="tooltip max-skill-9">
-								<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
-							</div>
-						</div>
-					</div>
-					<div class="cell cell-popup" style="margin-left:5px;">
-						<div>
-							<input type="checkbox" name="attr_skill_roll_apply_encumbrance" value="1" title="Macro: @{NAME|skill_roll_apply_encumbrance}" />
-						</div>
-						<div>
-							<div class="popup">
-								<span data-i18n="encumbrance-label">Encumbrance</span>
-							</div>
-							<div class="tooltip max-skill-9">
-								<span data-i18n="apply-encumbrance-tooltip">Apply encumbrance penalty.</span>
-								<b style="color:red;"><span name="attr_encumbrance_level"></span></b>
-							</div>
-						</div>
-					</div>
-					<div class="cell" style="margin-left: 5px;">
-						<div class="popup">
-							<span data-i18n="final-modifier-label">Final Modifier</span>:
-						</div>
-						<div class="tooltip">
-							<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
-						</div>
-					</div>
-					<div class="cell number-input">
-						<input type="hidden" name="attr_skill_roll_modifier_status" value="neutral" class="modifier-status" />
-						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" class="final-modifier" readonly />
-						<input type="hidden" value="" name="attr_skill_roll_modifier_summary" />
-						<input type="hidden" value="" name="attr_skill_roll_trait_summary" />
-						<input type="hidden" value="" name="attr_skill_roll_hit_location" />
-						<input type="hidden" value="" name="attr_skill_roll_maneuver" />
-						<input type="hidden" value="" name="attr_skill_roll_allout_attack" />
-					</div>
-					<div class="cell">
-						<button type="action" name="act_skill_roll_reset" class="btn tool-modifier-reset" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
-					</div>
-				</div>
-				
 				<fieldset class="repeating_skills">
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_skill_toggle_notes" />
@@ -8688,7 +8688,7 @@ PU2:126 = Power-Ups 2. Page 126
 							</span>
 						</div>
 						<div class="cell col1">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{isRepeatingSkill=[[1]]}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=[[@{show_skill_mod_notes}]]}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}} {{noteBoxTwoShow=[[@{show_skill_conditionals}]]}} {{noteBoxTwoLabel=Conditionals}} {{noteBoxTwoContent=@{skill_conditional_notes}}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{isRepeatingSkill=[[1]]}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{skillNameTechLevel=@{tl}}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[{@{level} + @{modifier} + @{skill_roll_modifier}, @{skill_roll_max_nine_value} }kl1]]}} {{maxNine=[[@{skill_roll_max_nine}]]}} {{rollModifier=[[@{skill_roll_modifier}]]}} {{rollModifierSummary=@{skill_roll_modifier_summary}}} {{rollTraitSummary=@{skill_roll_trait_summary}}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}} {{noteBoxOneShow=[[@{show_skill_mod_notes}]]}} {{noteBoxOneLabel=Skill Modifiers}} {{noteBoxOneContent=@{skill_mod_description_notes}}} {{noteBoxTwoShow=[[@{show_skill_conditionals}]]}} {{noteBoxTwoLabel=Conditionals}} {{noteBoxTwoContent=@{skill_conditional_notes}}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsSL" />
 						</div>
 						<div class="cell col2">
 							<input type="text" name="attr_tl" title="Macro: @{NAME|repeating_skills_$[row #]_tl}" />
@@ -8757,6 +8757,9 @@ This example would represent the skill level on that row.
 							<div class="cell">
 								<input type="text" name="attr_skill_misc" title="Macro: @{NAME|repeating_skills_$[row #]_skill_misc}" />
 							</div>
+						</div> <!-- .row -->
+
+						<div class="row">
 							<div class="cell label">
 								<div class="popup">
 									<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
@@ -8770,10 +8773,10 @@ Examples:<br />
 										</span>
 									</span>
 							</div>
-							<div class="cell">
+							<div class="cell reason-for-mod">
 								<input type="text" name="attr_skill_mod_notes" title="Macro: @{NAME|repeating_skills_$[row #]_skill_mod_notes}" />
 							</div>
-						</div> <!-- .row -->
+						</div>
 
 						<div class="col-notebox">
 							<div class="show-notes">
@@ -11164,7 +11167,7 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill_final" value="@{skill} + @{skill_mod} + @{defense_combat_reflexes_bonus}" disabled="disabled" title="Macro: @{NAME|repeating_defense_$[row #]_skill_final}" />
 									</div>
 									<div class="cell col4">
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[{@{skill_final} + @{modifier} + @{defense_roll_modifier}, @{defense_roll_max_nine_value} }kl1]]}} {{isSkillRoll=[[1]]}} {{useModTool=[[1]]}} {{maxNine=[[@{defense_roll_max_nine}]]}} {{rollModifier=[[@{defense_roll_modifier}]]}} {{rollModifierSummary=@{defense_roll_modifier_summary}}} {{rollTraitSummary=@{defense_roll_trait_summary}}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_success_note}}} {{rawCriticalSuccessNote=@{raw_critical_success_note}}} {{rawFailNote=@{raw_fail_note}}} {{rawCriticalFailNote=@{raw_critical_fail_note}}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsSL" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{type}}} {{subSkillName=using @{name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[{@{skill_final} + @{modifier} + @{defense_roll_modifier}, @{defense_roll_max_nine_value} }kl1]]}} {{isSkillRoll=[[1]]}} {{useModTool=[[1]]}} {{maxNine=[[@{defense_roll_max_nine}]]}} {{rollModifier=[[@{defense_roll_modifier}]]}} {{rollModifierSummary=@{defense_roll_modifier_summary}}} {{rollTraitSummary=@{defense_roll_trait_summary}}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_success_note}}} {{rawCriticalSuccessNote=@{raw_critical_success_note}}} {{rawFailNote=@{raw_fail_note}}} {{rawCriticalFailNote=@{raw_critical_fail_note}}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{showDBNotes=[[@{show_db_notes}]]}} {{DBNotes=@{defense_bonus_notes}}} " name="roll_vsSL" />
 									</div>
 								</div> <!-- .row -->
 								
@@ -11522,6 +11525,144 @@ visualize what it will look like in chat.
 						
 					</div>
 
+					<!-- MELEE MODIFIERS BOX -->
+					<div class="box melee-modifiers">
+
+						<div class="roll-modifiers-table">
+
+							<div class="modifier-caption header">
+								<div class="popup">
+									<span data-i18n="melee-attack-modifiers-label">Melee Attack Modifiers</span>
+								</div>
+								<div class="tooltip">
+									<span data-i18n="melee-attack-modifiers-tooltip">These modifiers affect all melee attack rolls, use the reset button to clear modifiers. These modifiers will be cleared the next time you load your character sheet.</span>
+								</div>
+							</div>
+
+							<div class="modifier-row">
+
+								<div class="modifier-cell modifier-align-top">
+									<button type="action" name="act_show_roll_modifiers_for_melee" class="btn modifier-line-height-fix" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="summary-group">
+										<div class="icon"><span data-i18n="notes-label">Notes</span></div>
+										<div class="summary">
+											<div class="roll-maneuver">
+												<b>Maneuver:</b>
+												<div>
+													<textarea name="attr_melee_roll_maneuver" class="maneuver-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-all-out-attack">
+												<b>All-Out Attack:</b>
+												<div>
+													<textarea name="attr_melee_roll_allout_attack" class="all-out-attack-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-hit-location">
+												<b>Hit Location:</b>
+												<div>
+													<textarea name="attr_melee_roll_hit_location" class="hit-location-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-traits">
+												<b>Traits:</b>
+												<div>
+													<textarea name="attr_melee_roll_trait_summary" class="trait-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-summary">
+												<b>Summary:</b>
+												<div>
+													<textarea name="attr_melee_roll_modifier_summary" class="roll-summary" readonly></textarea>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup label">
+										<span data-i18n="modifier-label">Modifier:</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<input type="number" value="0" step="1" name="attr_melee_custom_roll_modifier" />	
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup label">
+										<span data-i18n="reason-label">Reason</span>:
+									</div>
+									<div class="tooltip">
+										<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<textarea class="reason-textarea" name="attr_melee_custom_roll_modifier_reason"></textarea>
+								</div>
+
+								<div class="modifier-cell">
+									<input type="checkbox" name="attr_melee_roll_max_nine" value="1" title="Macro: @{NAME|melee_roll_max_nine}" />
+									<input type="hidden" name="attr_melee_roll_max_nine_value" value="100" />
+								</div>	
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup">
+										<b><span data-i18n="max-skill-9-label">Max skill of 9</span></b>
+									</div>
+									<div class="tooltip max-skill-9">
+										<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup label">
+										<span data-i18n="final-modifier-label">Final Modifier</span>:
+									</div>
+									<div class="tooltip">
+										<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="number-input">
+										<input type="hidden" name="attr_melee_roll_modifier_status" value="neutral" class="modifier-status" />
+										<input type="number" value="0" step="1" name="attr_melee_roll_modifier" class="final-modifier" readonly />
+										<input type="hidden" value="" name="attr_melee_roll_modifier_summary" />
+										<input type="hidden" value="" name="attr_melee_roll_trait_summary" />
+										<input type="hidden" value="" name="attr_melee_roll_hit_location" />
+										<input type="hidden" value="" name="attr_melee_roll_maneuver" />
+										<input type="hidden" value="" name="attr_melee_roll_allout_attack" />
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<button type="action" name="act_melee_roll_reset" class="btn tool-modifier-reset modifier-line-height-fix" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
+								</div>
+
+							</div><!-- end row -->
+
+						</div>
+
+					</div>
+
+					<!-- MELEE MODIFIERS BOX -->
+					<div class="box melee-modifiers" style="display: none;">
+						
+						<div>
+							Melee quick mods here
+						</div>
+
+					</div>
+
 					<!-- _____ _____ MELEE ATTACKS BOX _____ _____ -->
 					<div class="box melee-attacks">
 						<div class="table">
@@ -11595,100 +11736,6 @@ visualize what it will look like in chat.
 								</div>
 
 							</div> <!-- .header -->
-
-							<div class="row roll-modifiers">
-								<div class="cell">
-									<button type="action" name="act_show_roll_modifiers_for_melee" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
-								</div>
-								<div class="cell">
-									<div class="summary-group">
-										<div class="icon"><span data-i18n="notes-label">Notes</span></div>
-										<div class="summary">
-											<div class="roll-maneuver">
-												<b>Maneuver:</b>
-												<div>
-													<textarea name="attr_melee_roll_maneuver" class="maneuver-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-all-out-attack">
-												<b>All-Out Attack:</b>
-												<div>
-													<textarea name="attr_melee_roll_allout_attack" class="all-out-attack-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-hit-location">
-												<b>Hit Location:</b>
-												<div>
-													<textarea name="attr_melee_roll_hit_location" class="hit-location-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-traits">
-												<b>Traits:</b>
-												<div>
-													<textarea name="attr_melee_roll_trait_summary" class="trait-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-summary">
-												<b>Summary:</b>
-												<div>
-													<textarea name="attr_melee_roll_modifier_summary" class="roll-summary" readonly></textarea>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="cell label">
-									<div class="popup">
-										<span data-i18n="modifier-label">Modifier:</span>
-									</div>
-									<div class="tooltip">
-										<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
-									</div>
-								</div>
-								<div  class="cell number-input">
-									<input type="number" value="0" step="1" name="attr_melee_custom_roll_modifier" />
-								</div>
-								<div class="cell">
-									<span>Reason:</span>
-								</div>
-								<div class="cell">
-									<textarea style="height: 36px;width:150px;" name="attr_melee_custom_roll_modifier_reason"></textarea>
-								</div>
-								<div class="cell cell-popup">
-									<div>
-										<input type="checkbox" name="attr_melee_roll_max_nine" value="1" title="Macro: @{NAME|melee_roll_max_nine}" />
-										<input type="hidden" name="attr_melee_roll_max_nine_value" value="100" />
-									</div>
-									<div>
-										<div class="popup">
-											<span data-i18n="max-skill-9-label">Max skill of 9</span>
-										</div>
-										<div class="tooltip max-skill-9">
-											<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
-										</div>
-									</div>
-								</div>
-								<div class="cell" style="margin-left: 5px;">
-									<div class="popup">
-										<span data-i18n="final-modifier-label">Final Modifier</span>:
-									</div>
-									<div class="tooltip">
-										<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
-									</div>
-								</div>
-								<div class="cell number-input">
-									<input type="hidden" name="attr_melee_roll_modifier_status" value="neutral" class="modifier-status" />
-									<input type="number" value="0" step="1" name="attr_melee_roll_modifier" class="final-modifier" readonly />
-									<input type="hidden" value="" name="attr_melee_roll_modifier_summary" />
-									<input type="hidden" value="" name="attr_melee_roll_trait_summary" />
-									<input type="hidden" value="" name="attr_melee_roll_hit_location" />
-									<input type="hidden" value="" name="attr_melee_roll_maneuver" />
-									<input type="hidden" value="" name="attr_melee_roll_allout_attack" />
-								</div>
-								<div class="cell">
-									<button type="action" name="act_melee_roll_reset" class="btn tool-modifier-reset" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
-								</div>
-							</div>
 
 							<!-- RAW notes for melee and ranged attacked -->
 							<input type="hidden" name="attr_raw_critical_hit_notes" value="" />
@@ -12027,6 +12074,125 @@ visualize what it will look like in chat.
 					
 					<!-- _____ _____ RANGED ATTACKS BOX _____ _____ -->
 					<div class="box ranged-attacks">
+
+						<div class="roll-modifiers-table">
+
+							<div class="modifier-caption header">
+								<div class="popup">
+									<span data-i18n="ranged-attack-modifiers-label">Ranged Attack Modifiers</span>
+								</div>
+								<div class="tooltip">
+									<span data-i18n="ranged-attack-modifiers-tooltip">These modifiers affect all ranged attack rolls, use the reset button to clear modifiers. These modifiers will be cleared the next time you load your character sheet.</span>
+								</div>
+							</div>
+
+							<div class="modifier-row">
+
+								<div class="modifier-cell modifier-align-top">
+									<button type="action" name="act_show_roll_modifiers_for_ranged" class="btn modifier-line-height-fix" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="summary-group">
+										<div class="icon"><span data-i18n="notes-label">Notes</span></div>
+										<div class="summary">
+											<div class="roll-maneuver">
+												<b>Hit Location:</b>
+												<div>
+													<textarea name="attr_ranged_roll_maneuver" class="maneuver-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-maneuver">
+												<b>Maneuver:</b>
+												<div>
+													<textarea name="attr_ranged_roll_hit_location" class="hit-location-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-traits">
+												<b>Traits:</b>
+												<div>
+													<textarea name="attr_ranged_roll_trait_summary" class="trait-summary" readonly></textarea>
+												</div>
+											</div>
+											<div class="roll-summary">
+												<b>Summary:</b>
+												<div>
+													<textarea name="attr_ranged_roll_modifier_summary" class="roll-summary" readonly></textarea>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup label">
+										<span data-i18n="modifier-label">Modifier:</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<input type="number" value="0" step="1" name="attr_ranged_custom_roll_modifier" />
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup label">
+										<span data-i18n="reason-label">Reason</span>:
+									</div>
+									<div class="tooltip">
+										<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<textarea class="reason-textarea" name="attr_ranged_custom_roll_modifier_reason"></textarea>
+								</div>
+
+								<div class="modifier-cell">
+									<input type="checkbox" name="attr_ranged_roll_max_nine" value="1" title="Macro: @{NAME|ranged_roll_max_nine}" />
+									<input type="hidden" name="attr_ranged_roll_max_nine_value" value="100" />
+								</div>	
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup">
+										<b><span data-i18n="max-skill-9-label">Max skill of 9</span></b>
+									</div>
+									<div class="tooltip max-skill-9">
+										<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="popup label">
+										<span data-i18n="final-modifier-label">Final Modifier</span>:
+									</div>
+									<div class="tooltip">
+										<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<div class="number-input">
+										<input type="hidden" name="attr_ranged_roll_modifier_status" value="neutral" class="modifier-status" />
+										<input type="number" value="0" step="1" name="attr_ranged_roll_modifier" class="final-modifier" readonly />
+										<input type="hidden" value="" name="attr_ranged_roll_modifier_summary" />
+										<input type="hidden" value="" name="attr_ranged_roll_trait_summary" />
+										<input type="hidden" value="" name="attr_ranged_roll_hit_location" />
+										<input type="hidden" value="" name="attr_ranged_roll_maneuver" />
+										<input type="hidden" value="" name="attr_ranged_roll_allout_attack" />
+									</div>
+								</div>
+
+								<div class="modifier-cell modifier-align-top">
+									<button type="action" name="act_ranged_roll_reset" class="btn tool-modifier-reset modifier-line-height-fix" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
+								</div>
+
+							</div><!-- end row -->
+
+						</div>
+						
 						<div class="table">
 							<div class="header">
 								<div class="cell col0">
@@ -12166,94 +12332,6 @@ visualize what it will look like in chat.
 								</div>
 							</div> <!-- .header -->
 
-							<div class="row roll-modifiers">
-								<div class="cell">
-									<button type="action" name="act_show_roll_modifiers_for_ranged" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
-								</div>
-								<div class="cell">
-									<div class="summary-group">
-										<div class="icon"><span data-i18n="notes-label">Notes</span></div>
-										<div class="summary">
-											<div class="roll-maneuver">
-												<b>Hit Location:</b>
-												<div>
-													<textarea name="attr_ranged_roll_maneuver" class="maneuver-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-maneuver">
-												<b>Maneuver:</b>
-												<div>
-													<textarea name="attr_ranged_roll_hit_location" class="hit-location-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-traits">
-												<b>Traits:</b>
-												<div>
-													<textarea name="attr_ranged_roll_trait_summary" class="trait-summary" readonly></textarea>
-												</div>
-											</div>
-											<div class="roll-summary">
-												<b>Summary:</b>
-												<div>
-													<textarea name="attr_ranged_roll_modifier_summary" class="roll-summary" readonly></textarea>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="cell label">
-									<div class="popup">
-										<span data-i18n="modifier-label">Modifier:</span>
-									</div>
-									<div class="tooltip" style="margin-left: -50px;">
-										<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
-									</div>
-								</div>
-								<div  class="cell number-input">
-									<input type="number" value="0" step="1" name="attr_ranged_custom_roll_modifier" />
-								</div>
-								<div class="cell">
-									<span>Reason:</span>
-								</div>
-								<div class="cell">
-									<textarea style="height: 36px;width:150px;" name="attr_ranged_custom_roll_modifier_reason"></textarea>
-								</div>
-								<div class="cell cell-popup margin-left-small">
-									<div>
-										<input type="checkbox" name="attr_ranged_roll_max_nine" value="1" title="Macro: @{NAME|ranged_roll_max_nine}" />
-										<input type="hidden" name="attr_ranged_roll_max_nine_value" value="100" />
-									</div>
-									<div>
-										<div class="popup">
-											<span data-i18n="max-skill-9-label">Max skill of 9</span>
-										</div>
-										<div class="tooltip max-skill-9">
-											<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
-										</div>
-									</div>
-								</div>
-								<div class="cell" style="margin-left: 5px;">
-									<div class="popup">
-										<span data-i18n="final-modifier-label">Final Modifier</span>:
-									</div>
-									<div class="tooltip">
-										<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
-									</div>
-								</div>
-								<div class="cell number-input">
-									<input type="hidden" name="attr_ranged_roll_modifier_status" value="neutral" class="modifier-status" />
-									<input type="number" value="0" step="1" name="attr_ranged_roll_modifier" class="final-modifier" readonly />
-									<input type="hidden" value="" name="attr_ranged_roll_modifier_summary" />
-									<input type="hidden" value="" name="attr_ranged_roll_trait_summary" />
-									<input type="hidden" value="" name="attr_ranged_roll_hit_location" />
-									<input type="hidden" value="" name="attr_ranged_roll_maneuver" />
-									<input type="hidden" value="" name="attr_ranged_roll_allout_attack" />
-								</div>
-								<div class="cell">
-									<button type="action" name="act_ranged_roll_reset" class="btn tool-modifier-reset" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
-								</div>
-							</div>
-							
 							<input type="hidden" name="attr_use_malfunction" value="0" />
 							<fieldset class="repeating_ranged">
 								<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
@@ -12446,8 +12524,18 @@ visualize what it will look like in chat.
 											<input type="checkbox" name="attr_malfunction_very_reliable" value="1" class="inline" title="Macro: @{NAME|repeating_ranged_$[row #]_malfunction_very_reliable}" />
 										</div>
 
-										<div class="cell col-setting-text">
-											<div data-i18n="optional-malfunction-description">(Optional: See Settings TAB, <i>Use Malfunction</i>)</div>
+										<div class="col-setting-text cell">
+											
+											<span class="show-enabled-label">
+												[<span data-i18n="label-enabled">Enabled</span>]
+											</span>
+											<span class="show-disabled-label">
+												[<span data-i18n="label-disabled">Disabled</span>]
+											</span>
+											
+											<i>
+												(<span data-i18n="optional-malfunction-description">See Settings TAB, <b>Use Malfunction</b></span>)
+											</i>
 										</div>
 									
 									</div> <!-- .row -->
@@ -12852,8 +12940,12 @@ visualize what it will look like in chat.
 					<div class="box firing-up-down">
 						<div class="table">
 							<div class="row title">
-								<div class="cell">
+								
+								<div class="cell range-calculator-title">
 									<span data-i18n="range-calculator-label">Range Calculator</span>
+								</div>
+								<div class="cell reset range-calculator-reset">
+									<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
 								</div>
 							</div>
 							<div class="header">
@@ -12933,10 +13025,15 @@ visualize what it will look like in chat.
 								<div class="cell hit-mod">
 									<span data-i18n="abbreviation-hit-modifier-label">Hit Mod</span>
 								</div>
-								<div class="cell reset">
-									&nbsp;
+								<div class="cell braced">
+									<div class="popup">
+										<span data-i18n="braced-title">Braced</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="braced-title-tooltip">If you brace a firearm or crossbow, you get an extra +1 to Acc. See B364.</span>
+									</span>
 								</div>
-								<div class="cell reset apply-button">
+								<div class="cell braced apply-button">
 									<div class="popup">
 										<span data-i18n="help-label">Help</span>
 									</div>
@@ -12956,7 +13053,7 @@ visualize what it will look like in chat.
 										<input type="number" step="1" value="0" min="0" name="attr_firing_speed_difference" title="Macro: @{NAME|firing_speed_difference}" />
 									</div>
 									<div class="cell fire-up-dwn-distance">
-										<input type="number" step="1" value="0" min="0" name="attr_firing_elevation" title="Macro: @{NAME|firing_elevation}" />
+										<input type="number" step="1" value="0" name="attr_firing_elevation" title="Macro: @{NAME|firing_elevation}" />
 									</div>
 									<div class="cell new-range">
 										<input type="number" step="1" value="0" min="0" name="attr_firing_new_range" readonly="readonly" title="Macro: @{NAME|firing_new_range}" />
@@ -12972,7 +13069,7 @@ visualize what it will look like in chat.
 										</select>
 									</div>
 									<div class="cell rof">
-										<input type="number" step="1" value="0" min="1" name="attr_firing_rof" title="Macro: @{NAME|firing_acc}" />
+										<input type="number" step="1" value="1" min="1" name="attr_firing_rof" title="Macro: @{NAME|firing_acc}" />
 									</div>
 									<div class="cell size">
 										<input type="number" step="1" value="0" name="attr_firing_size_mod" title="Macro: @{NAME|firing_size_mod}" />
@@ -12980,10 +13077,10 @@ visualize what it will look like in chat.
 									<div class="cell hit-mod">
 										<input type="number" step="1" value="0" name="attr_firing_hit_mod" readonly="readonly" title="Macro: @{NAME|firing_hit_mod}" />
 									</div>
-									<div class="cell reset">
-										<button type="action" name="act_range_calc_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
+									<div class="cell braced roll-modifiers centered">
+										<input type="checkbox" name="attr_firing_braced" value="1" title="Macro: @{NAME|firing_braced}">
 									</div>
-									<div class="cell reset apply-button">
+									<div class="cell braced reset apply-button">
 										<button type="action" name="act_apply_firing_modifiers" class="reset"><span data-i18n="apply-label">Apply</span></button>
 									</div>
 								</div>
@@ -12998,7 +13095,11 @@ visualize what it will look like in chat.
 							
 							<div class="row title">
 								<div class="cell">
-									<span data-i18n="close-range-shotgun-label">Close Range Shotgun Damage Tool</span>
+									<div class="popup">
+										<span data-i18n="close-range-shotgun-label">Close Range Shotgun & Multiple Projectile Damage Tool</span></div>
+									<div class="tooltip">
+										<span data-i18n="close-range-shotgun-label-tooltip">Used for extremely close combat at a range of 10% of the ½D Range or less. See Shotguns and Multiple Projectiles for more details.</span>
+									</div>
 								</div>
 							</div>
 							
@@ -13025,7 +13126,7 @@ visualize what it will look like in chat.
 										<span data-i18n="close-label">Close</span>
 									</div>
 									<div class="tooltip">
-										<span data-i18n="shotgun-close-range-tooltip">Close range.</span>
+										<span data-i18n="shotgun-close-range-tooltip">This value is 10% of the ½D Range of the weapon. This is the maximum range this tool is used for.</span>
 									</div>
 								</div>
 								<div class="cell close-rof">
@@ -13109,7 +13210,7 @@ visualize what it will look like in chat.
 			Damage x1
 			Vitals Damage x3
 			Skull Damage x4" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{shotgun_dr_multiplier_notes}}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{drMultiplier=@{shotgun_dr_multiplier}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_shotgun_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14147,6 +14248,8 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<option>2</option>
 									<option>3</option>
 									<option>4</option>
+									<option>5</option>
+									<option>6</option>									
 								</select>
 							</div>
 						</div> <!-- .row -->
@@ -14165,6 +14268,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 				</fieldset> <!-- .repeating_item -->
 				<div class="sort-control">
 					<button type="action" name="act_sort_inventory" class="btn sort">Sort & Indent</button>
+					<div>
+						<i>After sorting, please open/close the notes for one item. This will fix the weirdness caused by the Roll20 sorter.</i>
+					</div>
 				</div>
 				<div class="row row-totals">
 					<div class="cell col0">
@@ -14274,10 +14380,11 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<input type="number" name="attr_spell_bonus" value="0" title="Macro: @{NAME|spell_bonus}" />
 					</div>
 					<div class="cell">
-						<div class="popup"><span data-formula="on-penalty-label">On Penalty</span></div>
+						<div class="popup"><span data-i18n="on-penalty-label">On Penalty</span></div>
 						<div class="tooltip">
-							<span data-formula="spell-on-penalty-tooltip">
+							<span data-i18n="spell-on-penalty-tooltip">
 								Total Spell Skill Penalty based on number of <b>ON</b> spells.<br />
+								Penalty will automatically be applied to the spell skill level.<br />
 								<input type="hidden" name="attr_spell_on_count" value="0" />
 								Number of spells <b>ON:</b> <span name="attr_spell_on_count"></span>.<br />
 								<i>NOTE:</i> Use the options tab to adjust the penalty per spell <b>ON</b>.
@@ -14301,6 +14408,17 @@ Select the indent level of the inventory item. This is handy to help show the it
 					<div class="cell margin-right">
 						<input type="number" name="attr_spell_maintained_penalty_total" value="0" title="Macro: @{NAME|spell_maintained_penalty_total}" readonly="readonly" />
 					</div>
+					<div class="cell">
+						<div class="popup"><span data-i18n="abbreviation-modifier-label">Mod</span></div>
+						<div class="tooltip">
+							<span data-i18n="spell-modifification-tooltip">
+								Enter a positive or negative value that affects the Effective Spell level of all spells. For example, you are wearing an enchanted item with Wisdom of 1 level - M135. This increases your IQ by 1. Spell levels are based on IQ, HOWEVER, that particular spell states "Raises the subject's IQ temporarily. This raises his ability with skills, <b>but not with spells!</b>.<br />Use the <i>notes</i> box above to keep track of the reason why there is a modifier." 
+							</span>
+						</div>
+					</div>
+					<div class="cell margin-right">
+						<input type="number" name="attr_spell_custom_modifier" value="0" title="Macro: @{NAME|spell_custom_modifier}" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -14309,6 +14427,115 @@ Select the indent level of the inventory item. This is handy to help show the it
 		<!-- _____ _____ SPELLS BOX _____ _____ -->
 
 		<div class="box spells">
+
+			<div class="roll-modifiers-table">
+
+				<div class="modifier-caption header">
+					<div class="popup">
+						<span data-i18n="spell-modifiers-label">Spell Roll Modifiers</span>
+					</div>
+					<div class="tooltip">
+						<span data-i18n="spell-modifiers-tooltip">These modifiers affect all spell rolls, use the reset button to clear modifiers. These modifiers will be cleared the next time you load your character sheet.</span>
+					</div>
+				</div>
+
+				<div class="modifier-row">
+
+					<div class="modifier-cell modifier-align-top">
+						<button type="action" name="act_show_roll_modifiers_for_spell" class="btn modifier-line-height-fix" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="summary-group">
+							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
+							<div class="summary">
+								<div class="roll-traits">
+									<b>Traits:</b>
+									<div>
+										<textarea name="attr_spell_roll_trait_summary" class="trait-summary" readonly></textarea>
+									</div>
+								</div>
+								<div class="roll-summary">
+									<b>Summary:</b>
+									<div>
+										<textarea name="attr_spell_roll_modifier_summary" class="roll-summary" readonly></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup label">
+							<span data-i18n="modifier-label">Modifier:</span>
+						</div>
+						<div class="tooltip">
+							<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<input type="number" value="0" step="1" name="attr_spell_custom_roll_modifier" />
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup label">
+							<span data-i18n="reason-label">Reason</span>:
+						</div>
+						<div class="tooltip">
+							<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<textarea class="reason-textarea" name="attr_spell_custom_roll_modifier_reason"></textarea>
+					</div>
+
+					<div class="modifier-cell">
+						<input type="checkbox" name="attr_spell_roll_max_nine" value="1" title="Macro: @{NAME|spell_roll_max_nine}" />
+						<input type="hidden" name="attr_spell_roll_max_nine_value" value="100" />
+					</div>	
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup">
+							<b><span data-i18n="max-skill-9-label">Max skill of 9</span></b>
+						</div>
+						<div class="tooltip max-skill-9">
+							<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="popup label">
+							<span data-i18n="final-modifier-label">Final Modifier</span>:
+						</div>
+						<div class="tooltip">
+							<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<div class="number-input">
+							<input type="hidden" name="attr_spell_roll_modifier_status" value="neutral" class="modifier-status" />
+							<input type="number" value="0" step="1" name="attr_spell_roll_modifier" class="final-modifier" readonly />
+							<input type="hidden" value="" name="attr_spell_roll_modifier_summary" />
+							<input type="hidden" value="" name="attr_spell_roll_trait_summary" />
+							<input type="hidden" value="" name="attr_spell_roll_hit_location" />
+							<input type="hidden" value="" name="attr_spell_roll_maneuver" />
+							<input type="hidden" value="" name="attr_spell_roll_allout_attack" />
+						</div>
+					</div>
+
+					<div class="modifier-cell modifier-align-top">
+						<button type="action" name="act_spell_roll_reset" class="btn tool-modifier-reset modifier-line-height-fix" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
+					</div>
+
+					<div class="modifier-cell modifier-fill-cell-20">&nbsp;</div>
+
+				</div><!-- end row -->
+
+			</div>
+
 			<div class="table">
 				<div class="header">
 					<div class="cell col0">
@@ -14414,82 +14641,6 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 				</div> <!-- .header -->
 
-				<div class="row roll-modifiers">
-					<div class="cell">
-						<button type="action" name="act_show_roll_modifiers_for_spell" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
-					</div>
-					<div class="cell">
-						<div class="summary-group">
-							<div class="icon"><span data-i18n="notes-label">Notes</span></div>
-							<div class="summary">
-								<div class="roll-traits">
-									<b>Traits:</b>
-									<div>
-										<textarea name="attr_spell_roll_trait_summary" class="trait-summary" readonly></textarea>
-									</div>
-								</div>
-								<div class="roll-summary">
-									<b>Summary:</b>
-									<div>
-										<textarea name="attr_spell_roll_modifier_summary" class="roll-summary" readonly></textarea>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="cell label">
-						<div class="popup">
-							<span data-i18n="modifier-label">Modifier:</span>
-						</div>
-						<div class="tooltip">
-							<span data-i18n="modifier-dialog-tooltip">Enter a custom modifier and optional reason to apply to any rolls on the this table.</span>
-						</div>
-					</div>
-					<div  class="cell number-input">
-						<input type="number" value="0" step="1" name="attr_spell_custom_roll_modifier" />
-					</div>
-					<div class="cell">
-						<span>Reason:</span>
-					</div>
-					<div class="cell">
-						<textarea style="height: 36px;width:150px;" name="attr_spell_custom_roll_modifier_reason"></textarea>
-					</div>
-					<div class="cell cell-popup">
-						<div>
-							<input type="checkbox" name="attr_spell_roll_max_nine" value="1" title="Macro: @{NAME|spell_roll_max_nine}" />
-							<input type="hidden" name="attr_spell_roll_max_nine_value" value="100" />
-						</div>
-						<div>
-							<div class="popup">
-								<span data-i18n="max-skill-9-label">Max skill of 9</span>
-							</div>
-							<div class="tooltip max-skill-9">
-								<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
-							</div>
-						</div>
-					</div>
-					<div class="cell" style="margin-left: 5px;">
-						<div class="popup">
-							<span data-i18n="final-modifier-label">Final Modifier</span>:
-						</div>
-						<div class="tooltip">
-							<span data-i18n="final-modifier-dialog-tooltip">The final modifier that will be applied to the effective skill level.</span>
-						</div>
-					</div>
-					<div class="cell number-input">
-						<input type="hidden" name="attr_spell_roll_modifier_status" value="neutral" class="modifier-status" />
-						<input type="number" value="0" step="1" name="attr_spell_roll_modifier" class="final-modifier" readonly />
-						<input type="hidden" value="" name="attr_spell_roll_modifier_summary" />
-						<input type="hidden" value="" name="attr_spell_roll_trait_summary" />
-						<input type="hidden" value="" name="attr_spell_roll_hit_location" />
-						<input type="hidden" value="" name="attr_spell_roll_maneuver" />
-						<input type="hidden" value="" name="attr_spell_roll_allout_attack" />
-					</div>
-					<div class="cell">
-						<button type="action" name="act_spell_roll_reset" class="btn tool-modifier-reset" title="Reset Skill Modifiers"><span data-i18n="reset-label">Reset</span></button>
-					</div>
-				</div>
-
 				<fieldset class="repeating_spells">
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_spell_toggle_notes" />
@@ -14519,6 +14670,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<div class="cell col4">
 							<!-- TODO: its possible that a character could have different types, maybe add drop-down for spell bonus -->
 							<input type="hidden" name="attr_bonus" value="0" title="Synced with attr_spell_bonus, reduces code" />
+							<input type="hidden" name="attr_custom_modifier" value="0" title="Synced with attr_custom_modifier, reduces code" />
+							<input type="hidden" name="attr_on_penalty" value="0" title="Synced with attr_on_penalty, reduces code" />
+							<input type="hidden" name="attr_maintained_penalty" value="0" title="Synced with attr_maintained_penalty, reduces code" />
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro: @{NAME|repeating_spells_$[row #]_spell_modifier}" />
 						</div>
 						<div class="cell col5">
@@ -14714,7 +14868,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 			
 			<ul>
 				<p>Please note: I, Mike W, and MadCoder are not one of the original authors of this sheet. All we have done is to fix a number of small issues, changed some formatting, and implemented some suggested changes. The basic functionality of the sheet has remained the same.</p>
-						
+				
+				<p>The original authors are Devindra Payment (@Ardnived), Joseph Mason (@sdJasper).</p>
+
 				<p>To report any Issues or a Suggestion, please use the Roll20 forum under Character Sheets & Compendium. I have created a thread named: [GURPS] - Sheet #1 - Thread 2 (that seems to be similar to the naming convention used by other sheets).</p>
 				
 				<p>https://app.roll20.net/forum/post/10667695/gurps-sheet-number-1-thread-2</p>
@@ -14728,7 +14884,80 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.8 -->
+			<!-- current version notes: 2.9.12 -->
+			<ul>
+				<li>On character load. The roll modifier toolbox for each section is cleared out, ready for a clean start.</li>
+				<li>Ranged Calculator Tool. Added a checkbox for Bracing your weapon.
+					<ul>
+						<li>Recent incorrect translation for the title caused display issue, made updates to prevent display issue.</li>
+					</ul>
+				</li>
+				<li>Roll modifier tools. Style update to move roll modifiers tools above the repeating tables to allow for additional updates later.</li>
+				<li>Grimoire Tab. 
+					<ul>
+						<li>The modifiers for <b>On Penalty</b> and <b>Concentration Penalty</b> are now automatically applied to spell skill levels.</li>
+						<li>Added a new custom spell modifier box, this covers special cases like taking a potion that raises IQ but not spell skill levels.</li>
+					</ul>
+				</li>
+				<li>
+					List of minor changes: success/fail notes in chat updated to use correct font. Updated warning text for effective Defense Score of 0 or less.<br />
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.11</h4>
+			<p>Pull Request: 8/14/2023</p>
+			<ul>
+				<li>
+					Shotgun Damage Tool. Changed the title, added some additional tooltips, and moved the DR multiplier note next to the damage roll.
+				</li>
+				<li>
+					Spell Roll Chat Log. Streamlined some of the content so spells take up a little less space.
+				</li>
+				<li>
+					List of minor changes: roll results notes font size changed from 13px to 12px.<br />
+					Moved the custom success/fail messages for spells just below the roll result in chat dialog.<br />
+					Fixed bug where repeating languages were not calculating correctly.<br />
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.10</h4>
+			<p>Pull Requst: 7/31/2023</p>
+			<ul>
+				<li>
+					Traits Tab. Improve ability to drag/drop repeating culture items.
+				</li>
+				<li>
+					Skills Tab. Moved the field <b>Reason for MOD (Modifier):</b> to it's own line and expanded the input field.
+				</li>
+				<li>
+					Active Defense Rolls. Updated title of roll template to be [type of defense] using [defensive name]. Example, <b>Unarmed Parry</b> using punch.
+				</li>
+				<li>Several small changes to text information; Active Defense notes for <b>INFO</b> field updated to show page 269 instead of 208.</li>
+				<li>
+					Several small changes to text information; Active Defense notes for <b>INFO</b> field updated to show page 269 instead of 208. 
+					Added some additional help text show if malfunction is enabled or disabled.
+				</li>
+				<li>
+					Repeating Skill Chat Log Roll. If there's a Tech Level associated with the skill, it will be appended to the name.
+				</li>
+				<li>
+					Melee Tab - Max skill of 9 checkbox. Fixed bug where the summary would show "Mighty Blow 1 FP per attack. +2 Damage or +1 per die!". 
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.9</h4>
+			<p>Pull Requst: 7/17/2023</p>
+			<ul>
+				<li>
+					Inventory Tab. Increased the indent level of child items and increased the number of indents to 6 and other code improvements to prevent bugs.
+				</li>
+				<li>
+					Combat -> Defense Tab. Updated repeating active defenses to show DB notes.
+				</li>
+			</ul>
+
+			<h4>Version: 2.9.8</h4>
+			<p>Pull Request: 4/18/2023</p>
 			<ul>
 				<li>
 					Inventory Tab. Added a <b>Sort & Indent</b> button. The button will sort the inventory alphabetically and then update 
@@ -15299,7 +15528,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 					Chat Roll Options. Added a campaign setting and sheet option to display <b>Public</b> and <b>Private</b> roll options in the header. Added an optional <b>Custom</b> roll options.
 					<ul>
 						<li><b>Note:</b> The custom option requires an API script that can intercept the roll template.</li>
-						<li>For an example, see the <b>Blind Roll</b> API script, https://app.roll20.net/forum/permalink/5064809/</li>
+						<li>For an example, see the <b>Blind Roll</b> API script, https://gist.github.com/anonymous/7229593</li>
 					</ul>
 				</li>
 			</ul>
@@ -16042,7 +16271,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 								There are two more read-only fields that provide feedback on spell penalties. The <b>ON PENALTY</b>
 								field shows the total skill roll penalty for having one or more spells "on", the <b>CONCENTRATION PENALTY</b> field shows the total 
 								skill roll penalty if you are concentrating on one or more spells. <b>Important</b> the penalties will be automatically added to your 
-								effective spell skill level. You will need to remember to add them manually when you make the roll.
+								effective spell skill level.
 							</p>
 						</div>
 					</div>
@@ -16132,7 +16361,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 
 					<div class="option-container">
-						<h4>Import</h4>
+						<h4>Import GCA5</h4>
 						<div>
 							<p>
 								This is a generic tool for importing characters from GCA5. It uses a generic data structure; this allows a 
@@ -16154,11 +16383,11 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<h4>Roll Template for Skill Rolls</h4>
 						<div>
 							<p>
-								Most skill and damage rolls use the same template. Below is a link to a file to help explain they work, in 
-								case you want to try make your own macro for skill and damage rolls.
+								Most skill and damage rolls use the same template. Below is a link to a file to help explain how they work, 
+								in case you want to try to make your own macro for skill and damage rolls.
 							</p>
 							<div class="control">
-								<button type="roll" class="no-decoration" name="roll_blank" value="https://github.com/MadCoder253/roll20-character-sheets/raw/gurps-2.9.5/GURPS/Docs/Roll20-GURPS-4E-Roll-Template.pdf" title="Show link in chat. NOTE: Right-click to open in new window">
+								<button type="roll" class="no-decoration" name="roll_blank" value="https://github.com/Roll20/roll20-character-sheets/blob/master/GURPS/Docs/Roll20-GURPS-4E-Roll-Template.pdf" title="Show link in chat. NOTE: Right-click to open in new window">
 									<span data-i18n="gurps-4th-edition-roll-template-button">Roll20 GURPS 4E Roll Template</span>
 								</button>
 							</div>
@@ -16348,7 +16577,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 							<span data-i18n="custom-rolls-label">Custom Rolls</span>
 						</span>
 						<span class="tooltip">
-							<span data-i18n="custom-rolls-tooltip">Use this option to use a custom macro with the Roll Template.<br><br><b style="color:red;">Important:</b> When entering the macro, be sure to add a <i>space</i> character to the end!<br><br>Add a <b>Button Label</b> to display a button in the header.<br><br>For example, the Private Rolls option adds <i style="color:gray;">/w gm</i> to the beginning of the roll, which means whisper to GM.<br><br>Another example is adding a blind roll option, where <b>only</b> the GM sees the roll. This example uses the <i>Blind Roll</i> API script, see https://app.roll20.net/forum/permalink/5064809/.<br>Set Label = <b>Blind Roll</b>, set Macro = <b>!broll</b></span>
+							<span data-i18n="custom-rolls-tooltip">Use this option to use a custom macro with the Roll Template.<br><br><b style="color:red;">Important:</b> When entering the macro, be sure to add a <i>space</i> character to the end!<br><br>Add a <b>Button Label</b> to display a button in the header.<br><br>For example, the Private Rolls option adds <i style="color:gray;">/w gm</i> to the beginning of the roll, which means whisper to GM.</span>
 						</span>
 
 						<div>
@@ -16363,7 +16592,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<span data-i18n="macro-label">Macro</span>
 								</span>
 								<span class="tooltip">
-									<span data-i18n="macro-label-tooltip"><b>NOTE:</b> In order to use this option, you will need an API script that can intercept the data for the roll and then send a message to the GM.<br /><br />For an example, see the <b>Blind Roll</b> API script, https://app.roll20.net/forum/permalink/5064809/</span>
+									<span data-i18n="macro-label-tooltip"><b>NOTE:</b> In order to use this option, you will need an API script that can intercept the data for the roll and then send a message to the GM.</span>
 								</span>
 								<br />
 								<input type="text" name="attr_custom_roll_macro" value="">
@@ -17296,6 +17525,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				<span data-i18n="gurps-sheet-thread-link-button">Roll20 Forum - [GURPS] - Sheet #1 - Thread 2</span>
 			</button>
 		</div>
+
+		<div>
+			<p>
+				Come join at our dedicated GURPS discord channel at GURPS R20-CS
+			</p>
+		</div>
 	
 	</div>
 	
@@ -17314,7 +17549,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                 </tr>
 				
 				<tr>
-					<td colspan="2" class="subhead">{{skillName}}</td>
+					<td colspan="2" class="subhead">{{skillName}}
+						{{#subSkillName}}
+							<span class="normal">{{subSkillName}}</span>
+						{{/subSkillName}}
+						{{#skillNameTechLevel}}
+							<span>{{skillNameTechLevel}}</span> <span>(see B168)</span>
+						{{/skillNameTechLevel}}
+					</td>
 				</tr>
 
                 <tr>
@@ -17347,6 +17589,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 						{{#parentName}}
 							<br />Parent: <i style="font-weight:normal;">{{parentName}}</i>
 						{{/parentName}}
+						{{#subSkillName}}
+							<span class="normal">{{subSkillName}}</span>
+						{{/subSkillName}}
+						{{#skillNameTechLevel}}
+							<span>/TL{{skillNameTechLevel}}</span> <span>(see B168)</span>
+						{{/skillNameTechLevel}}
 					</td>
 				</tr>				
                 {{#type}}
@@ -17369,9 +17617,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                 </tr>
                 {{/selected}}
                 {{#rollResult}}
-                <tr>
-                    <td class="label"><span data-i18n="roll-label">Roll:</span></td>
-                    <td>
                         
                         <!-- WARNING THIS IS GOING TO GET UGLY AND HARD TO FOLLOW -->
                         
@@ -17379,14 +17624,22 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                         <!-- a roll of 3 or 4 is always a success, while a roll of 17 or 18 is always a failure. -->
                         
                         <!-- Roll of 18 is always critical failure -->
-                        {{#rollTotal() rollResult 18}}
-                            <span class="failure">
-                                {{rollResult}}
-                                <span class="failure-text">
-                                    {{#showHitLabel}}Critical Miss{{/showHitLabel}}
-                                    {{#showSuccessLabel}}Critical Failure{{/showSuccessLabel}}
-                                </span>
+						{{#rollTotal() rollResult 18}}
+                        <tr>
+							<td class="label"><span data-i18n="roll-label">Roll:</span></td>
+							<td>
+								<span class="failure">
+									{{rollResult}}
+									<span class="failure-text">
+										{{#showHitLabel}}Critical Miss{{/showHitLabel}}
+										{{#showSuccessLabel}}Critical Failure{{/showSuccessLabel}}
+									</span>
+								</span>
+							</td>
+						</tr>
                                 
+						<tr>
+							<td colspan="2">
                                 <!-- raw & custom critical failure note -->
 								{{#rollTotal() showRawDefenseNotes 1}}
 								{{#rawCriticalFailNote}}
@@ -17426,23 +17679,32 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 								{{/customCriticalFailNote}}
 								{{/rollTotal() isRepeatingSkill 1}}
                                     
-                            </span>
+							</td>
+						</tr> 
                         {{/rollTotal() rollResult 18}}
                         
                         <!-- Roll of 17 is always a failure -->
                         {{#rollTotal() rollResult 17}}
-                            <span class="failure">
-                                {{rollResult}}
-                                <span class="failure-text">
-                                    
-                                    <!-- skill of 15 or less is critical -->
-                                    {{#rollLess() effectiveSkill 16}}Critical{{/rollLess() effectiveSkill 16}}
-                                    
-                                    {{#showHitLabel}}Miss{{/showHitLabel}}
-                                    {{#showSuccessLabel}}Failure{{/showSuccessLabel}}
-                                    
-                                </span>
+						<tr>
+							<td class="label"><span data-i18n="roll-label">Roll:</span></td>
+							<td>
+								<span class="failure">
+									{{rollResult}}
+									<span class="failure-text">
+										
+										<!-- skill of 15 or less is critical -->
+										{{#rollLess() effectiveSkill 16}}Critical{{/rollLess() effectiveSkill 16}}
+										
+										{{#showHitLabel}}Miss{{/showHitLabel}}
+										{{#showSuccessLabel}}Failure{{/showSuccessLabel}}
+										
+									</span>
+								</span>
+							</td>
+						</tr>
                                 
+						<tr>
+							<td colspan="2">
                                 <!-- skill of 16 or higher is normal failure, add helper text -->
                                 {{#rollGreater() effectiveSkill 15}}
                                 
@@ -17501,22 +17763,31 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 									
                                 {{/rollLess() effectiveSkill 16}}
                                 
-                            </span>
+                            </td>
+						</tr>
                         {{/rollTotal() rollResult 17}}
                         
                         <!-- A roll of 3 or 4 always succeeds -->
                         {{#rollBetween() rollResult 3 4}}
-                            <span class="success">
-                                {{rollResult}}
-                                <span class="success-text">
-                                    
-                                    <!-- if critical success is turned on, show text -->
-                                    {{#rollLess() useCriticalPlusTen 2}}Critical{{/rollLess() useCriticalPlusTen 2}}
-                                    
-                                    {{#showHitLabel}}Hit{{/showHitLabel}}
-                                    {{#showSuccessLabel}}Success{{/showSuccessLabel}}
-                                </span>
+						<tr>
+							<td class="label"><span data-i18n="roll-label">Roll:</span></td>
+							<td>
+								<span class="success">
+									{{rollResult}}
+									<span class="success-text">
+										
+										<!-- if critical success is turned on, show text -->
+										{{#rollLess() useCriticalPlusTen 2}}Critical{{/rollLess() useCriticalPlusTen 2}}
+										
+										{{#showHitLabel}}Hit{{/showHitLabel}}
+										{{#showSuccessLabel}}Success{{/showSuccessLabel}}
+									</span>
+								</span>
+							</td>	
+						</tr>
                                 
+						<tr>
+							<td colspan="2">
                                 <!-- normal success area -->
                                 {{#rollTotal() useCriticalPlusTen 2}}
                                 
@@ -17556,7 +17827,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 									
                                 {{/rollLess() useCriticalPlusTen 2}}
                                                     
-                            </span>
+                            </td>
+						</tr>
                         {{/rollBetween() rollResult 3 4}}
                         
                         <!-- Roll from 5 to 16 means we have a chance at hit or miss -->
@@ -17564,7 +17836,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                         {{#rollBetween() rollResult 5 16}}
 
                             <!-- Check for failure, where roll is greater than effective skill -->
-                            {{#rollGreater() rollResult effectiveSkill}}
+							{{#rollGreater() rollResult effectiveSkill}}
+							<tr>
+								<td class="label"><span data-i18n="roll-label">Roll:</span></td>
+								<td>                            
                                 <span class="failure">
                                     {{rollResult}}
                                     <span class="failure-text">
@@ -17611,7 +17886,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 										{{#showSuccessLabel}}Failure{{/showSuccessLabel}}
 										
                                     </span>
-									
+								</span>
+								</td>
+							</tr>
+
+							<tr>
+								<td colspan="2">
 									<!-- if ranged attack, show additional note about 10 or more not applied to ranged attacks -->
 									{{#rangedAttack}}
 									{{#rollLess() effectiveSkill 4}}
@@ -18063,44 +18343,51 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                                         {{/rollGreater() rollResult 16}}
                                         
                                     {{/rollBetween() effectiveSkill 7 15}}
-                                        
-                                </span>
+                                
+								</td>
+							</tr>
                             {{/rollGreater() rollResult effectiveSkill}}
 
                             <!-- check for success, roll from 5 to effective skill -->
                             <!-- NOTE: roll 3 or 4 has already been handled -->
                             {{#rollBetween() rollResult 5 effectiveSkill}}
+							<tr>
+								<td class="label"><span data-i18n="roll-label">Roll:</span></td>
+								<td>
+									<span class="success">
+										{{rollResult}}
+										<span class="success-text">
+											
+											<!-- Check if Critical Success was turned on -->
+											<!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
+											{{#rollLess() useCriticalPlusTen 2}}
+											
+												<!-- If rules as written -->
+												{{#rollTotal() useCriticalPlusTen 1}}
+												
+													<!-- if effective skill is 16 or higher, check for critical success on a 6 -->
+													{{#rollGreater() effectiveSkill 15}}
+														{{#rollTotal() rollResult 6}}Critical{{/rollTotal() rollResult 6}}
+														{{#rollTotal() rollResult 5}}Critical{{/rollTotal() rollResult 5}}
+													{{/rollGreater() effectiveSkill 15}}
 
-                                <span class="success">
-                                    {{rollResult}}
-                                    <span class="success-text">
-                                        
-                                        <!-- Check if Critical Success was turned on -->
-                                        <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
-                                        {{#rollLess() useCriticalPlusTen 2}}
-                                        
-                                            <!-- If rules as written -->
-                                            {{#rollTotal() useCriticalPlusTen 1}}
-                                            
-                                                <!-- if effective skill is 16 or higher, check for critical success on a 6 -->
-                                                {{#rollGreater() effectiveSkill 15}}
-                                                    {{#rollTotal() rollResult 6}}Critical{{/rollTotal() rollResult 6}}
-                                                    {{#rollTotal() rollResult 5}}Critical{{/rollTotal() rollResult 5}}
-                                                {{/rollGreater() effectiveSkill 15}}
+													<!-- If rules as written and if effectiveSkill is 15, check for critical success on a 5 -->
+													{{#rollTotal() effectiveSkill 15}}
+														{{#rollTotal() rollResult 5}}Critical{{/rollTotal() rollResult 5}}
+													{{/rollTotal() effectiveSkill 15}}
 
-                                                <!-- If rules as written and if effectiveSkill is 15, check for critical success on a 5 -->
-                                                {{#rollTotal() effectiveSkill 15}}
-                                                    {{#rollTotal() rollResult 5}}Critical{{/rollTotal() rollResult 5}}
-                                                {{/rollTotal() effectiveSkill 15}}
+												{{/rollTotal() useCriticalPlusTen 1}}
 
-                                            {{/rollTotal() useCriticalPlusTen 1}}
-
-                                        {{/rollLess() useCriticalPlusTen 2}}
-                                        
-                                        {{#showHitLabel}}Hit{{/showHitLabel}}
-                                        {{#showSuccessLabel}}Success{{/showSuccessLabel}}
-                                    </span>
-                                    
+											{{/rollLess() useCriticalPlusTen 2}}
+											
+											{{#showHitLabel}}Hit{{/showHitLabel}}
+											{{#showSuccessLabel}}Success{{/showSuccessLabel}}
+										</span>
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
                                     <!-- check if critical success is off -->
                                     <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
                                     {{#rollTotal() useCriticalPlusTen 2}}
@@ -18236,6 +18523,306 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                     </td>
                 </tr>
                 {{/rollResult}}
+
+				<!-- NOTE: Need to replicate the complicated success/fail checks to display spell notes. -->
+                {{#rollResult}}
+                {{#spellRoll}}
+                
+                        <!-- WARNING THIS IS GOING TO GET UGLY AND HARD TO FOLLOW -->
+                        
+                        <!-- NOTE: Regardless of the score you are rolling against, -->
+                        <!-- a roll of 3 or 4 is always a success, while a roll of 17 or 18 is always a failure. -->
+                        
+                        <!-- Roll of 18 is always critical failure -->
+                        {{#rollTotal() rollResult 18}}
+						<tr class="rollResult">
+							<td colspan="2">
+                            {{spellCriticalFailureNote}}
+							</td>
+						</tr>
+                        {{/rollTotal() rollResult 18}}
+                        
+                        <!-- Roll of 17 is always a failure -->
+                        {{#rollTotal() rollResult 17}}
+                        
+                            <!-- skill of 15 or less is critical -->
+                            {{#rollLess() effectiveSkill 16}}
+							<tr class="rollResult">
+								<td colspan="2">							
+                                {{spellCriticalFailureNote}}
+								</td>
+							</tr>
+                            {{/rollLess() effectiveSkill 16}}
+                               
+                             <!-- skill of 16 or higher is normal failure, add helper text -->
+                            {{#rollGreater() effectiveSkill 15}}
+							<tr class="rollResult">
+								<td colspan="2">
+                                {{spellFailNote}}
+								</td>
+							</tr>
+                            {{/rollGreater() effectiveSkill 15}}
+                            
+                        {{/rollTotal() rollResult 17}}
+                        
+                        <!-- A roll of 3 or 4 always succeeds -->
+                        {{#rollBetween() rollResult 3 4}}
+                        
+                            <!-- if critical success is turned on, show text -->
+                            {{#rollLess() useCriticalPlusTen 2}}
+							<tr class="rollResult">
+								<td colspan="2">
+								{{spellCriticalSuccessNote}}
+								</td>
+							</tr>
+                            {{/rollLess() useCriticalPlusTen 2}}
+                                
+                            <!-- normal success area -->
+                            {{#rollTotal() useCriticalPlusTen 2}}
+                                <!-- block custom success note -->
+                            {{/rollTotal() useCriticalPlusTen 2}}
+                                
+                        {{/rollBetween() rollResult 3 4}}
+                        
+                        <!-- Roll from 5 to 16 means we have a chance at hit or miss -->
+                        <!-- NOTE: A roll of 3 or 4 always succeeds, handled above -->
+                        {{#rollBetween() rollResult 5 16}}
+
+                            <!-- Check for failure, where roll is greater than effective skill -->
+                            {{#rollGreater() rollResult effectiveSkill}}
+                            
+                                <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
+                                {{#rollLess() effectiveSkill 4}}
+                                    {{#rollGreater() rollResult 12}}
+									<tr class="rollResult">
+										<td colspan="2">
+                                        {{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 12}}
+                                {{/rollLess() effectiveSkill 4}}
+                                
+                                <!-- if effective skill is 4, critical failure is 14 or higher -->
+                                {{#rollTotal() effectiveSkill 4}}
+                                    {{#rollGreater() rollResult 13}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 13}}
+                                {{/rollTotal() effectiveSkill 4}}
+                                
+                                <!-- if effective skill is 5, critical failure is 15 or higher -->
+                                {{#rollTotal() effectiveSkill 5}}
+                                    {{#rollGreater() rollResult 14}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 14}}
+                                {{/rollTotal() effectiveSkill 5}}
+                                
+                                <!-- if effective skill is 6, critical failure is 16 or higher -->
+                                {{#rollTotal() effectiveSkill 6}}
+                                    {{#rollGreater() rollResult 15}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 15}}
+                                {{/rollTotal() effectiveSkill 6}}
+                                
+                                <!-- if effective skill is 7 to 15, critical failure is 17 or 18 -->
+                                {{#rollBetween() effectiveSkill 7 15}}
+                                    {{#rollGreater() rollResult 16}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 16}}
+                                {{/rollBetween() effectiveSkill 7 15}}
+                                
+                                <!-- NOTE: Roll of 18 check has already been made -->
+                                  
+                                <!-- additional critical failure text -->
+                                <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
+                                {{#rollLess() effectiveSkill 4}}
+                                    
+                                    <!-- normal failure -->
+									{{#rollLess() rollResult 13}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellFailNote}}
+										</td>
+									</tr>
+                                    {{/rollLess() rollResult 13}}
+                                    
+                                    <!-- critical failure -->
+                                    {{#rollGreater() rollResult 12}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 12}}
+                                    
+                                {{/rollLess() effectiveSkill 4}}
+                                
+                                <!-- if effective skill is 4, critical failure is 14 or higher -->
+                                {{#rollTotal() effectiveSkill 4}}
+                                    
+                                    <!-- normal failure -->
+                                    {{#rollLess() rollResult 15}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellFailNote}}
+										</td>
+									</tr>
+                                    {{/rollLess() rollResult 15}}
+                                    
+                                    <!-- critical failure -->
+                                    {{#rollGreater() rollResult 13}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 13}}
+                                    
+                                {{/rollTotal() effectiveSkill 4}}
+                                
+                                <!-- if effective skill is 5, critical failure is 15 or higher -->
+                                {{#rollTotal() effectiveSkill 5}}
+                                    
+                                    <!-- normal failure -->
+                                    {{#rollLess() rollResult 15}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellFailNote}}
+										</td>
+									</tr>
+                                    {{/rollLess() rollResult 15}}
+                                    
+                                    <!-- critical failure -->
+                                    {{#rollGreater() rollResult 14}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 14}}
+                                    
+                                {{/rollTotal() effectiveSkill 5}}
+                                
+                                <!-- if effective skill is 6, critical failure is 16 or higher -->
+                                {{#rollTotal() effectiveSkill 6}}
+                                    
+                                    <!-- normal failure -->
+                                    {{#rollLess() rollResult 16}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellFailNote}}
+										</td>
+									</tr>
+                                    {{/rollLess() rollResult 16}}
+                                    
+                                    <!-- critical failure -->
+                                    {{#rollGreater() rollResult 15}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 15}}
+                                    
+                                {{/rollTotal() effectiveSkill 6}}
+                                
+                                <!-- if effective skill is 7 to 15, critical failure is 17 or 18 -->
+                                {{#rollBetween() effectiveSkill 7 15}}
+                                    
+                                    <!-- normal failure -->
+                                    {{#rollLess() rollResult 17}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellFailNote}}
+										</td>
+									</tr>
+                                    {{/rollLess() rollResult 17}}
+                                    
+                                    <!-- critical failure -->
+                                    {{#rollGreater() rollResult 16}}
+									<tr class="rollResult">
+										<td colspan="2">
+										{{spellCriticalFailureNote}}
+										</td>
+									</tr>
+                                    {{/rollGreater() rollResult 16}}
+                                    
+                                {{/rollBetween() effectiveSkill 7 15}}
+                                
+                            {{/rollGreater() rollResult effectiveSkill}}
+
+                            <!-- check for success, roll from 5 to effective skill -->
+                            <!-- NOTE: roll 3 or 4 has already been handled -->
+                            {{#rollBetween() rollResult 5 effectiveSkill}}
+
+                                <!-- Check if Critical Success was turned on -->
+                                <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
+                                <!-- NOTE: 3 or 4 has already been handled at the beginning -->
+                                {{#rollLess() useCriticalPlusTen 2}}
+                                
+                                    <!-- If rules as written -->
+                                    {{#rollTotal() useCriticalPlusTen 1}}
+                                    
+                                        <!-- normal success -->
+                                        {{#rollGreater() rollResult 6}}
+                                            <!-- block custom success note -->
+                                        {{/rollGreater() rollResult 6}}
+                                            
+                                        <!-- if effective skill is 16 or higher, check for critical success on a 5 or 6 -->
+                                        {{#rollGreater() effectiveSkill 15}}
+                                            {{#rollBetween() rollResult 5 6}}
+											<tr class="rollResult">
+												<td colspan="2">
+												{{spellCriticalSuccessNote}}
+												</td>
+											</tr>
+                                            {{/rollBetween() rollResult 5 6}}
+                                        {{/rollGreater() effectiveSkill 15}}
+
+                                        <!-- If rules as written and if effectiveSkill is 15, check for critical success on a 5 -->
+                                        {{#rollTotal() effectiveSkill 15}}
+                                            {{#rollTotal() rollResult 5}}
+											<tr class="rollResult">
+												<td colspan="2">
+												{{spellCriticalSuccessNote}}
+												</td>
+											</tr>
+                                            {{/rollTotal() rollResult 5}}
+                                        {{/rollTotal() effectiveSkill 15}}
+
+                                    {{/rollTotal() useCriticalPlusTen 1}}
+
+                                {{/rollLess() useCriticalPlusTen 2}}
+                                
+                                <!-- check if critical success is off -->
+                                <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
+                                {{#rollTotal() useCriticalPlusTen 2}}
+                                    <!-- block custom success note -->
+                                {{/rollTotal() useCriticalPlusTen 2}}
+                                                          
+                            {{/rollBetween() rollResult 5 effectiveSkill}}
+
+                        {{/rollBetween() rollResult 5 16}}
+                    
+                    </td>
+                </tr>
+                {{/spellRoll}}
+                {{/rollResult}}
                 
                 {{#effectiveSkill}}
                 <tr>
@@ -18254,7 +18841,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                         {{#rollTotal() activeDefense 1}}
                             {{#rollLess() effectiveSkill 1}}
 							<div style="color: red; margin-top: 6px;">
-								<span data-i18n="rolltemplate-warning-less-than-three-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
+								<span data-i18n="rolltemplate-warning-less-than-one-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
 							</div> 
                             {{/rollLess() effectiveSkill 1}}
                         {{/rollTotal() activeDefense 1}}
@@ -18392,223 +18979,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				
 				{{/rollTotal() useModTool 1}}
 				
-                <!-- NOTE: Need to replicate the complicated success/fail checks to display spell notes. -->
-                {{#rollResult}}
-                {{#spellRoll}}
-                <tr class="rollResult">
-                    <td colspan="2">
-                            <!-- WARNING THIS IS GOING TO GET UGLY AND HARD TO FOLLOW -->
-                        
-                        <!-- NOTE: Regardless of the score you are rolling against, -->
-                        <!-- a roll of 3 or 4 is always a success, while a roll of 17 or 18 is always a failure. -->
-                        
-                        <!-- Roll of 18 is always critical failure -->
-                        {{#rollTotal() rollResult 18}}
-                            {{spellCriticalFailureNote}}
-                        {{/rollTotal() rollResult 18}}
-                        
-                        <!-- Roll of 17 is always a failure -->
-                        {{#rollTotal() rollResult 17}}
-                        
-                            <!-- skill of 15 or less is critical -->
-                            {{#rollLess() effectiveSkill 16}}
-                                {{spellCriticalFailureNote}}
-                            {{/rollLess() effectiveSkill 16}}
-                               
-                             <!-- skill of 16 or higher is normal failure, add helper text -->
-                            {{#rollGreater() effectiveSkill 15}}
-                                {{spellFailNote}}
-                            {{/rollGreater() effectiveSkill 15}}
-                            
-                        {{/rollTotal() rollResult 17}}
-                        
-                        <!-- A roll of 3 or 4 always succeeds -->
-                        {{#rollBetween() rollResult 3 4}}
-                        
-                            <!-- if critical success is turned on, show text -->
-                            {{#rollLess() useCriticalPlusTen 2}}
-                                {{spellCriticalSuccessNote}}
-                            {{/rollLess() useCriticalPlusTen 2}}
-                                
-                            <!-- normal success area -->
-                            {{#rollTotal() useCriticalPlusTen 2}}
-                                <!-- block custom success note -->
-                            {{/rollTotal() useCriticalPlusTen 2}}
-                                
-                        {{/rollBetween() rollResult 3 4}}
-                        
-                        <!-- Roll from 5 to 16 means we have a chance at hit or miss -->
-                        <!-- NOTE: A roll of 3 or 4 always succeeds, handled above -->
-                        {{#rollBetween() rollResult 5 16}}
-
-                            <!-- Check for failure, where roll is greater than effective skill -->
-                            {{#rollGreater() rollResult effectiveSkill}}
-                            
-                                <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
-                                {{#rollLess() effectiveSkill 4}}
-                                    {{#rollGreater() rollResult 12}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 12}}
-                                {{/rollLess() effectiveSkill 4}}
-                                
-                                <!-- if effective skill is 4, critical failure is 14 or higher -->
-                                {{#rollTotal() effectiveSkill 4}}
-                                    {{#rollGreater() rollResult 13}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 13}}
-                                {{/rollTotal() effectiveSkill 4}}
-                                
-                                <!-- if effective skill is 5, critical failure is 15 or higher -->
-                                {{#rollTotal() effectiveSkill 5}}
-                                    {{#rollGreater() rollResult 14}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 14}}
-                                {{/rollTotal() effectiveSkill 5}}
-                                
-                                <!-- if effective skill is 6, critical failure is 16 or higher -->
-                                {{#rollTotal() effectiveSkill 6}}
-                                    {{#rollGreater() rollResult 15}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 15}}
-                                {{/rollTotal() effectiveSkill 6}}
-                                
-                                <!-- if effective skill is 7 to 15, critical failure is 17 or 18 -->
-                                {{#rollBetween() effectiveSkill 7 15}}
-                                    {{#rollGreater() rollResult 16}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 16}}
-                                {{/rollBetween() effectiveSkill 7 15}}
-                                
-                                <!-- NOTE: Roll of 18 check has already been made -->
-                                  
-                                <!-- additional critical failure text -->
-                                <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
-                                {{#rollLess() effectiveSkill 4}}
-                                    
-                                    <!-- normal failure -->
-									{{#rollLess() rollResult 13}}
-                                        {{spellFailNote}}
-                                    {{/rollLess() rollResult 13}}
-                                    
-                                    <!-- critical failure -->
-                                    {{#rollGreater() rollResult 12}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 12}}
-                                    
-                                {{/rollLess() effectiveSkill 4}}
-                                
-                                <!-- if effective skill is 4, critical failure is 14 or higher -->
-                                {{#rollTotal() effectiveSkill 4}}
-                                    
-                                    <!-- normal failure -->
-                                    {{#rollLess() rollResult 15}}
-                                        {{spellFailNote}}
-                                    {{/rollLess() rollResult 15}}
-                                    
-                                    <!-- critical failure -->
-                                    {{#rollGreater() rollResult 13}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 13}}
-                                    
-                                {{/rollTotal() effectiveSkill 4}}
-                                
-                                <!-- if effective skill is 5, critical failure is 15 or higher -->
-                                {{#rollTotal() effectiveSkill 5}}
-                                    
-                                    <!-- normal failure -->
-                                    {{#rollLess() rollResult 15}}
-                                        {{spellFailNote}}
-                                    {{/rollLess() rollResult 15}}
-                                    
-                                    <!-- critical failure -->
-                                    {{#rollGreater() rollResult 14}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 14}}
-                                    
-                                {{/rollTotal() effectiveSkill 5}}
-                                
-                                <!-- if effective skill is 6, critical failure is 16 or higher -->
-                                {{#rollTotal() effectiveSkill 6}}
-                                    
-                                    <!-- normal failure -->
-                                    {{#rollLess() rollResult 16}}
-                                        {{spellFailNote}}
-                                    {{/rollLess() rollResult 16}}
-                                    
-                                    <!-- critical failure -->
-                                    {{#rollGreater() rollResult 15}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 15}}
-                                    
-                                {{/rollTotal() effectiveSkill 6}}
-                                
-                                <!-- if effective skill is 7 to 15, critical failure is 17 or 18 -->
-                                {{#rollBetween() effectiveSkill 7 15}}
-                                    
-                                    <!-- normal failure -->
-                                    {{#rollLess() rollResult 17}}
-                                        {{spellFailNote}}
-                                    {{/rollLess() rollResult 17}}
-                                    
-                                    <!-- critical failure -->
-                                    {{#rollGreater() rollResult 16}}
-                                        {{spellCriticalFailureNote}}
-                                    {{/rollGreater() rollResult 16}}
-                                    
-                                {{/rollBetween() effectiveSkill 7 15}}
-                                
-                            {{/rollGreater() rollResult effectiveSkill}}
-
-                            <!-- check for success, roll from 5 to effective skill -->
-                            <!-- NOTE: roll 3 or 4 has already been handled -->
-                            {{#rollBetween() rollResult 5 effectiveSkill}}
-
-                                <!-- Check if Critical Success was turned on -->
-                                <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
-                                <!-- NOTE: 3 or 4 has already been handled at the beginning -->
-                                {{#rollLess() useCriticalPlusTen 2}}
-                                
-                                    <!-- If rules as written -->
-                                    {{#rollTotal() useCriticalPlusTen 1}}
-                                    
-                                        <!-- normal success -->
-                                        {{#rollGreater() rollResult 6}}
-                                            <!-- block custom success note -->
-                                        {{/rollGreater() rollResult 6}}
-                                            
-                                        <!-- if effective skill is 16 or higher, check for critical success on a 5 or 6 -->
-                                        {{#rollGreater() effectiveSkill 15}}
-                                            {{#rollBetween() rollResult 5 6}}
-                                                {{spellCriticalSuccessNote}}
-                                            {{/rollBetween() rollResult 5 6}}
-                                        {{/rollGreater() effectiveSkill 15}}
-
-                                        <!-- If rules as written and if effectiveSkill is 15, check for critical success on a 5 -->
-                                        {{#rollTotal() effectiveSkill 15}}
-                                            {{#rollTotal() rollResult 5}}
-                                                {{spellCriticalSuccessNote}}
-                                            {{/rollTotal() rollResult 5}}
-                                        {{/rollTotal() effectiveSkill 15}}
-
-                                    {{/rollTotal() useCriticalPlusTen 1}}
-
-                                {{/rollLess() useCriticalPlusTen 2}}
-                                
-                                <!-- check if critical success is off -->
-                                <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
-                                {{#rollTotal() useCriticalPlusTen 2}}
-                                    <!-- block custom success note -->
-                                {{/rollTotal() useCriticalPlusTen 2}}
-                                                          
-                            {{/rollBetween() rollResult 5 effectiveSkill}}
-
-                        {{/rollBetween() rollResult 5 16}}
-                    
-                    </td>
-                </tr>
-                {{/spellRoll}}
-                {{/rollResult}}
-                
                 {{#rollTotal() useMalfunction 1}}
 					{{#malfunction}}
 						{{#rollGreater() malfunction 0}}
@@ -18649,6 +19019,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					</td>
                     <td class="damage-roll">
                         {{damageRoll}} <span class="damageType">{{damageType}}</span>
+						{{#drMultiplier}}
+							<span>DR Multiplier: {{drMultiplier}}</span>
+						{{/drMultiplier}}
                     </td>
 				</tr>
 				{{#rollTotal() showMinimumDmgNote 1}}
@@ -18717,6 +19090,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					<tr>
 						<td colspan="2" class="tool-modifier-title">
 							<span data-i18n="spell-summary-label">Spell Summary</span>
+							{{#castingClass}}
+								(<span data-i18n="class-label">Class</span>: {{castingClass}})
+							{{/castingClass}}
 						</td>
 					</tr>
                 
@@ -18731,41 +19107,27 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					{{/spellNotes}}
 					{{/rollTotal() showSpellNotes 1}}
 					
-					{{#castingTime}}
 					<tr>
-						<td class="label">
-							<span data-i18n="time-label">Time</span>:
+						<td colspan="2">
+							<div class="rolltemplate-spell-grid">
+								<div class="label"><span data-i18n="time-label">Time</span>:</div>
+								<div>{{castingTime}}</div>
+								<div class="label"><span data-i18n="duration-abbreviated-label">Dur.</span>:</div>
+								<div>{{castingDuration}}</div>
+							</div>
 						</td>
-						<td>{{castingTime}}</td>
 					</tr>
-					{{/castingTime}}
 					
-					{{#castingDuration}}
 					<tr>
-						<td class="label">
-							<span data-i18n="duration-label">Duration</span>:
+						<td colspan="2">
+							<div class="rolltemplate-spell-grid">
+								<div class="label"><span data-i18n="cost-label">Cost</span>:</div>
+								<div>{{castingCost}}</div>
+								<div class="label"><span data-i18n="maintain-abbreviated-label">Maint.</span>:</div>
+								<div>{{castingMaintain}}</div>
+							</div>
 						</td>
-						<td>{{castingDuration}}</td>
 					</tr>
-					{{/castingDuration}}
-					
-					{{#castingCost}}
-					<tr>
-						<td class="label">
-							<span data-i18n="cost-label">Cost</span>:
-						</td>
-						<td>{{castingCost}}</td>
-					</tr>
-					{{/castingCost}}
-					
-					{{#castingMaintain}}
-					<tr>
-						<td class="label">
-							<span data-i18n="maintain-label">Maintain</span>:
-						</td>
-						<td>{{castingMaintain}}</td>
-					</tr>
-					{{/castingMaintain}}				
 					
 					{{#castingResist}}
 					<tr>
@@ -18774,14 +19136,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					</tr>
 					{{/castingResist}}
 					
-					{{#castingClass}}
-					<tr>
-						<td class="label">
-							<span data-i18n="class-label">Class</span>:
-						</td>
-						<td>{{castingClass}}</td>
-					</tr>
-					{{/castingClass}}
 				{{/rollTotal() showCastingDetails 1}}
 				
                 
@@ -18960,9 +19314,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.8";
+	const version = "2.9.12";
 	
-	const latestChangesDate = "4/18/2023";
+	const latestChangesDate = "8/21/2023";
 	
 	let modCascade = true;
 	
@@ -19167,8 +19521,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		["defense_distraction", { modifier: 0, description: "Distraction", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["defense_grappled_dodge", { modifier: -1, description: "Grappled dodge penalty", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["defense_grappled_block", { modifier: -2, description: "Grappled block/parry penalty", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
-		["spell_on_penalty_total", { modifier: 0, description: "Spells On penalty", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
-		["spell_maintained_penalty_total", { modifier: 0, description: "Spells Concentration penalty", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["spells_low_mana", { modifier: -5, description: "Low Mana", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["spell_burn_hit_points", { modifier: 0, description: "Spell Burn HP", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["spell_ceremonial_bonus", { modifier: 0, description: "Spell Ceremonial Bonus", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
@@ -19485,8 +19837,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"shield_close_combat_penalty",
 		"grappled",
 		"holding_large_shield",
-		"spell_on_penalty_total",
-		"spell_maintained_penalty_total",
 		"spells_low_mana",
 		"spell_burn_hit_points",
 		"spell_ceremonial_bonus",
@@ -19916,6 +20266,20 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
         });
     }
 
+	function setSectionOrderAsync(sectionName, rowIds) {
+		var acid = getActiveCharacterId();
+        var prevAcid = null;
+        return new Promise((resolve, reject) => {
+            prevAcid = setActiveCharacterId(acid);
+            try {
+                setSectionOrder(sectionName, rowIds, (values) => { resolve(values[prop]); });
+            }
+            catch { reject(); }
+        }).finally(() => {
+            setActiveCharacterId(prevAcid);
+        });
+	}
+
 	/**
 	 * Async foreach.
 	 * see: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
@@ -20018,6 +20382,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 	
 		damageTable = generateDamageTable();
+
+		resetAllRollModifiers();
 	
 	});
 	
@@ -20975,14 +21341,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	});
 
 	// check for changes to repeating language drop-downs	
-	on("change:repeating_languages:spoken change:repeating_languages:spoken_talent change:repeating_languages:written change:repeating_languages:written_talent", (event) => {
+	on("change:repeating_languages:spoken change:repeating_languages:spoken_talent change:repeating_languages:spoken_mod_points change:repeating_languages:written change:repeating_languages:written_talent change:repeating_languages:written_mod_points", (event) => {
 
 		const fields = [
 			"has_language_talent",
 			"repeating_languages_spoken",
 			"repeating_languages_spoken_talent",
+			"repeating_languages_spoken_mod_points",
 			"repeating_languages_written",
-			"repeating_languages_written_talent"
+			"repeating_languages_written_talent",
+			"repeating_languages_written_mod_points",
 		];
 
 		getAttrs(fields, values => {
@@ -20991,7 +21359,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 			let spokenPoints = Number(values.repeating_languages_spoken);
 
+			let spokenModPoints = Number(values.repeating_languages_spoken_mod_points);
+
 			let writtenPoints = Number(values.repeating_languages_written);
+
+			let writtenModPoints = Number(values.repeating_languages_written_mod_points);
 
 			let totalPoints = 0;
 
@@ -21001,6 +21373,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 				writtenPoints = Number(values.repeating_languages_written_talent);
 			}
+
+			// factor in modifiers
+			spokenPoints = spokenPoints + spokenModPoints;
+
+			writtenPoints = writtenPoints + writtenModPoints;
 
 			totalPoints = spokenPoints + writtenPoints;
 
@@ -21290,14 +21667,14 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	// keep "spell based on:" and "Magery/PI/Bonus Level" synced with repeating fields
 	// this avoids having to do a lot of coding to get the id of the row
 	// NOTE: this will trigger updating the spell level. 
-	on("change:spell_base change:spell_bonus", event => {
+	on("change:spell_base change:spell_bonus change:spell_custom_modifier change:spell_on_penalty_total change:spell_maintained_penalty_total", event => {
 	
 		syncModsToRepeatingSpells(false);
 	
 	});
 	
 	// Update the spell level and update the total cost of spells 
-	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points change:repeating_spells:sync', (event) => {
+	on('change:repeating_spells:base change:repeating_spells:bonus change:repeating_spells:custom_modifier change:repeating_spells:on_penalty change:repeating_spells:maintained_penalty change:repeating_spells:difficulty change:repeating_spells:spell_modifier change:repeating_spells:points change:repeating_spells:sync', (event) => {
 	
 		// check if this is a valid sync
 		const isSync = String(event.sourceAttribute).endsWith("sync");
@@ -21329,6 +21706,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		let fieldValues = [
 			"repeating_spells_base",
 			"repeating_spells_bonus",
+			"repeating_spells_custom_modifier",
+			"repeating_spells_on_penalty",
+			"repeating_spells_maintained_penalty",
 			"repeating_spells_difficulty",
 			"repeating_spells_spell_modifier",
 			"repeating_spells_points",
@@ -21347,10 +21727,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let difficulty = Number(values.repeating_spells_difficulty);
 	
 			const bonus = Number(values.repeating_spells_bonus);
+
+			const customMod = Number(values.repeating_spells_custom_modifier);
+
+			const onPenalty = Number(values.repeating_spells_on_penalty);
+
+			const maintainedPenalty = Number(values.repeating_spells_maintained_penalty);
 	
 			const modifier = Number(values.repeating_spells_spell_modifier);
 	
-			let totalModifier = bonus + modifier;
+			let totalModifier = bonus + modifier + customMod + onPenalty + maintainedPenalty;
 	
 			if (isNaN(totalModifier)) {
 				totalModifier = 0;
@@ -21486,12 +21872,143 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 	});
 	
+
+	// check to see if the inventory item parent name changed
+	// update any children's location
+	on("change:repeating_item:name", event => {
+
+		let updatedRowId = getRowIdFromEventInfo(event, "repeating_item");
+
+		let newParentName = event.newValue ?? "";
+
+		updateInventoryItemChildLocations(updatedRowId, newParentName);
+
+
+	});
+
+	/**
+	 * Update the location name of children if a parent name changed.
+	 * 
+	 */
+	function updateInventoryItemChildLocations(updatedRowId, newParentName) {
+
+		getSectionIDs("item", (ids) => {
+
+			if (ids.length === 0) return;
+
+			let fieldArray = [];
+
+			ids.forEach(id => fieldArray.push(
+				`repeating_item_${id}_parent_id`
+			));
+
+			let doUpdate = false;
+
+			getAttrs(fieldArray, (values) => {
+
+				let items = {};
+
+				ids.forEach(id => {
+
+					const parentFieldName = `repeating_item_${id}_parent_id`;
+
+					const locationFieldName = `repeating_item_${id}_location`;
+
+					if (values[parentFieldName] === updatedRowId) {
+
+						doUpdate = true;
+
+						items[locationFieldName] = newParentName;	
+					}
+
+				});
+
+				if (doUpdate) {
+					setAttrs(items);
+				}
+				
+			});
+
+		});
+
+	}
+
 	// Update the total weight of all carried items.
 	on('change:repeating_item:weighttotal remove:repeating_item', function (e) {
+
+		let removeTrigger = e.triggerName ?? "";
+
+		if (removeTrigger === "remove:repeating_item") {
+
+			let deletedRowId = getRowIdFromEventInfo(e, "repeating_item");
+
+			clearInventoryParentValueFromChildren(deletedRowId, sumInventory);
+
+		} else {
+
+			sumInventory();
+
+		}
+		
+	});
+
+	/**
+	 * If a item was deleted, we have to make sure any children related to that 
+	 * item parent item has it's parent_id value cleared. fixing orphaned child items.
+	 */
+	function clearInventoryParentValueFromChildren(deletedRowId, callback) {
+
+		callback = callback || noop;
+
+		getSectionIDs("item", (ids) => {
+
+			if (ids.length === 0) return;
+
+			let fieldArray = [];
+
+			ids.forEach(id => fieldArray.push(
+				`repeating_item_${id}_parent_id`
+			));
+
+			getAttrs(fieldArray, (values) => {
+
+				let items = {};
+
+				let doUpdate = false;
+
+				ids.forEach(id => {
+
+					const parentFieldName = `repeating_item_${id}_parent_id`;
+
+					const locationFieldName = `repeating_item_${id}_location`;
+
+					if (values[parentFieldName] === deletedRowId) {
+
+						// clear the parent id
+						items[parentFieldName] = "";
+
+						items[locationFieldName] = "";	
+					}
+
+				});
+
+				if (doUpdate) {
+					setAttrs(items, null, callback);
+				}
+				
+			});
+
+		});
+
+	}
+
+	function sumInventory() {
+
 		sumRepeating('repeating_item', 'weighttotal', function (v) {
 			setAttrs({ total_weight: Number(Math.round(v * 1000) / 1000).toFixed(3) });
 		});
-	});
+
+	}
 	
 	// Update the line Format for existing inventory weight and cost - Script provided by GiGs ID:157788 (Roll20)
 	on('change:inventory_fixed_digits', function () {
@@ -24072,6 +24589,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				"firing_size_mod": 0,
 				"firing_elevation": 0,
 				"firing_acc": 0,
+				"firing_braced": 0,
 				"firing_aiming_bonus": 0,
 				"firing_rof": 0,
 			}, null, callback);
@@ -24107,6 +24625,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			"firing_acc",
 			"firing_aiming_bonus",
 			"firing_rof",
+			"firing_braced",
 			"size"
 		];
 	
@@ -24128,6 +24647,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let acc = Number(values.firing_acc);
 	
 			let aiming = Number(values.firing_aiming_bonus);
+
+			let braced = Number(values.firing_braced);
 	
 			let rof = Number(values.firing_rof);
 	
@@ -24193,6 +24714,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 				}
 	
+				if (braced) {
+	
+					rangedRollModSummary += `+${braced} Braced\n`;
+	
+				}
+	
 				if (rofModifier) {
 	
 					rangedRollModSummary += `+${rofModifier} RoF\n`;
@@ -24226,6 +24753,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					target_size_modifier: sizeMod,
 					ranged_accuracy_bonus: acc,
 					ranged_aiming_bonus: aiming,
+					ranged_braced: braced,
 					ranged_rof: rof,
 					ranged_elevation: elevation,
 					ranged_range_speed: linearDistance + speed
@@ -25067,11 +25595,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			switch (defenseInfo.toLowerCase()) {
 	
 				case "u":
-					note = "Info: U\nThe weapon is unbalanced. You cannot use it to parry if you've already attacked with it this turn.\nSee B208";
+					note = "Info: U\nThe weapon is unbalanced. You cannot use it to parry if you've already attacked with it this turn. See B269";
 					break;
 	
 				case "f":
-					note = "Info: F\nThis is a fencing weapon. +3 to retreat, instead of +1. -2 for each additional parry for the round.\nSee B208";
+					note = "Info: F\nThis is a fencing weapon. +3 to retreat, instead of +1. -2 for each additional parry for the round. See B269";
 					break;
 	
 			}
@@ -25394,10 +25922,10 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		// is the base of the tree but not used.
 		const inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree({}, inventoryTree, -1);
 
-		setSectionOrder("item", inventoryRowIds);
-
 		// now update the indent levels
-		setAttrs(inventoryItemIndentLevels);
+		await setAttrsAsync(inventoryItemIndentLevels);
+
+		setSectionOrder("item", inventoryRowIds);
 
 	};
 
@@ -25409,7 +25937,21 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 */
 	let getInventoryTreeData = async () => {
 
+		// this is our root of our tree. They key is setting parentId = null
+		let baseRoot = {
+			id: "root",
+			name: "root",
+			parentId: null,
+			children: []
+		};
+
+		let treeData = [baseRoot];
+
 		let ids = await getSectionIDsAsync("repeating_item");
+
+		if (ids === undefined || ids.length == 0) {
+			return treeData;
+		}
 
 		// index will correspond with indexes for ids!
 		let fieldsToGet = [];
@@ -25427,16 +25969,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 
 		let values = await getAttrsAsync(fieldsToGet);
-
-		// this is our root of our tree. They key is setting parentId = null
-		let baseRoot = {
-			id: "root",
-			name: "root",
-			parentId: null,
-			children: []
-		};
-
-		let treeData = [baseRoot];
 
 		// now we can loop through ids again and find the values we need.
 		ids.forEach( id => {
@@ -25487,7 +26019,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		treeData.forEach((el) => {
 
 			// Handle the root element
-			if (el.parentId === null) {
+			if (el.id == "root") {
 				root = el;
 				return;
 			}
@@ -25495,9 +26027,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			// Use our mapping to locate the parent element in our data array
 			const parentEl = treeData[idMapping[el.parentId]];
 		
-			// Add our current el to its parent's `children` array
-			parentEl.children = [...(parentEl.children || []), el];
-		
+			if (parentEl && parentEl.children !== undefined) {
+				// Add our current el to its parent's `children` array
+				parentEl.children = [...(parentEl.children || []), el];
+			}
+				
 		});
 
 		return root;
@@ -25514,7 +26048,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
         
 			return node;
      
-		} else if (node.children.length > 0) {
+		} else if (node.children !== undefined && node.children.length > 0) {
         
 			let foundNode = null;
           
@@ -25540,15 +26074,19 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			ids = [];
 		}
 
-		parentNode.children.forEach(childNode => {
+		if (parentNode.children !== undefined && parentNode.children.length > 0) {
 
-			ids.push(childNode.id);
+			parentNode.children.forEach(childNode => {
 
-			if (childNode.children.length > 0) {
-				ids = getDescendantIdsFromParent(childNode, ids);
-			}
+				ids.push(childNode.id);
 
-		});
+				if (childNode.children !== undefined && childNode.children.length > 0) {
+					ids = getDescendantIdsFromParent(childNode, ids);
+				}
+
+			});
+
+		}
 
 		return ids;
 
@@ -25663,13 +26201,16 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		// get child items
 		// now add any children
-		itemNode.children.forEach(childNode => {
+		if (itemNode.children !== undefined && itemNode.children.length > 0) {
 
-			tableItems = getInventoryTableItems(tableItems, childNode, indentLevel + 1, inventoryItems);
+			itemNode.children.forEach(childNode => {
 
-		});
+				tableItems = getInventoryTableItems(tableItems, childNode, indentLevel + 1, inventoryItems);
 
+			});
 
+		}
+		
 		return tableItems;
 		
 	}
@@ -25685,11 +26226,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		// get child items
 		// now add any children
-		itemNode.children.forEach(childNode => {
+		if (itemNode.children !== undefined && itemNode.children.length > 0) {
+			
+			itemNode.children.forEach(childNode => {
 
-			rowIds = getInventoryRowIdsUsingTree(rowIds, childNode);
+				rowIds = getInventoryRowIdsUsingTree(rowIds, childNode);
 
-		});
+			});
+
+		}
 
 		return rowIds;
 	}
@@ -25706,11 +26251,15 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 		// get child items
 		// now add any children
-		itemNode.children.forEach(childNode => {
+		if (itemNode.children != undefined && itemNode.children.length > 0) {
+	
+			itemNode.children.forEach(childNode => {
 
-			inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree(inventoryItemIndentLevels, childNode, indentLevel + 1);
+				inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree(inventoryItemIndentLevels, childNode, indentLevel + 1);
 
-		});
+			});
+
+		}
 
 		return inventoryItemIndentLevels;
 
@@ -27193,7 +27742,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	}
 	
 	/**
-	 * Syncs `attr_spell_base` and `attr_spell_bonus` to 
+	 * Syncs `attr_spell_base`, `attr_spell_bonus`, `attr_spell_custom_modifier`, `spell_on_penalty_total`, and `spell_maintained_penalty_total` to 
 	 * corresponding repeating_spells fields. This will
 	 * trigger updating the spell level at the same time.
 	 * 
@@ -27207,6 +27756,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		const fields = [
 			"spell_base",
 			"spell_bonus",
+			"spell_custom_modifier",
+			"spell_on_penalty_total",
+			"spell_maintained_penalty_total",
 			"strength",
 			"dexterity",
 			"intelligence",
@@ -27220,6 +27772,12 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			const baseLevel = String(values.spell_base);
 	
 			const bonus = Number(values.spell_bonus);
+
+			const customSpellMod = Number(values.spell_custom_modifier);
+
+			const onPenalty = Number(values.spell_on_penalty_total);
+
+			const maintainedPenalty = Number(values.spell_maintained_penalty_total);
 	
 			const sectionName = "repeating_spells";
 	
@@ -27234,6 +27792,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				for (let i = 0; i < ids.length; i++) {
 					fieldsToUpdate[`${sectionName}_${ids[i]}_base`] = baseLevel;
 					fieldsToUpdate[`${sectionName}_${ids[i]}_bonus`] = bonus;
+					fieldsToUpdate[`${sectionName}_${ids[i]}_custom_modifier`] = customSpellMod;
+					fieldsToUpdate[`${sectionName}_${ids[i]}_on_penalty`] = onPenalty;
+					fieldsToUpdate[`${sectionName}_${ids[i]}_maintained_penalty`] = maintainedPenalty;
 				}
 	
 				if (silent) {
@@ -27245,7 +27806,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 					// otherwise if base attribue or bonus changed, 
 					// this will fire the hook to update spells
-					// change:repeating_spells:base, change:repeating_spells:bonus
+					// change:repeating_spells:base, change:repeating_spells:bonus change:repeating_spells:custom_modifier change:spell_on_penalty_total change:spell_maintained_penalty_total
 					setAttrs(fieldsToUpdate, null, callback);
 	
 				}
@@ -28103,7 +28664,7 @@ B378
 			shotgun_close_range: "5",
 			shotgun_close_rof: "2",
 			shotgun_close_damage: "4d6+4",
-			shotgun_dr_multiplier: "DR x 4",
+			shotgun_dr_multiplier: "x4",
 			shotgun_dr_multiplier_notes: "Multiply targets DR by 4."
 		};
 	
@@ -28207,7 +28768,7 @@ B378
 	
 			}
 	
-			let drMultiplier = `DR x ${modifier}`;
+			let drMultiplier = `x${modifier}`;
 
 			let multiplierNote = `Multiply Targets DR by ${modifier}`;
 	
@@ -28242,7 +28803,7 @@ B378
 			rateOfFire = "1x9";
 		}
 	
-		// rateOfFire = shotes x Mulitplier
+		// rateOfFire = shotes x Multiplier
 		// example: 2 x 9
 		let arrRof = String(rateOfFire).toLowerCase().split("x");
 	
@@ -28542,6 +29103,17 @@ B378
 		resetRollModifiersToolBox();
 	
 	});
+
+	// reset all roll modifiers 
+	function resetAllRollModifiers() {
+
+		["melee", "ranged", "spell", "skill", "technique", "defense"].forEach(section => {
+	
+			setAttrs({roll_modifier_types: section}, {select: false}, resetRollModifiersToolBox(applyRollModifiers));
+			
+		});
+
+	}
 	
 	/**
 	 * Resets the roll modifiers fields in the dialog box
@@ -28552,7 +29124,7 @@ B378
 		// make sure we have a valid function
 		callback = callback || noop;
 
-		getAttrs(["roll_modifier_types", "spell_on_penalty_total", "spell_maintained_penalty_total"], values => {
+		getAttrs(["roll_modifier_types"], values => {
 	
 			let modType = values.roll_modifier_types;
 	
@@ -28565,28 +29137,6 @@ B378
 			let rollModifier = 0;
 	
 			let rollSummary = "";
-	
-			if (modType == "spell") {
-	
-				let onPenalty = parseInt(values.spell_on_penalty_total);
-	
-				let concentrationPenalty = parseInt(values.spell_maintained_penalty_total);
-	
-				if (onPenalty < 0) {
-	
-					rollModifier += onPenalty;
-	
-					rollSummary = `${onPenalty} Spells On penalty.\n`;
-				}
-	
-				if (concentrationPenalty < 0) {
-	
-					rollModifier += concentrationPenalty;
-	
-					rollSummary = `${concentrationPenalty} Spells Concentration penalty.\n`;
-				}
-	
-			}
 	
 			let updateFields = {
 				roll_modifier: rollModifier,
@@ -28838,8 +29388,6 @@ B378
 		"change:defense_distraction",
 		"change:defense_grappled_dodge",
 		"change:defense_grappled_block",
-		"change:spell_on_penalty_total",
-		"change:spell_maintained_penalty_total",
 		"change:spells_low_mana",
 		"change:spell_burn_hit_points",
 		"change:spell_ceremonial_bonus",
@@ -29288,7 +29836,7 @@ B378
 					if (field.isMax9) {
 						max9 = true;
 					}
-				} else if (key == "mighty_blow" && values.mighty_blow) {
+				} else if (key == "mighty_blow" && values.mighty_blow > 0) {
 	
 					summary.set(key, description);
 	

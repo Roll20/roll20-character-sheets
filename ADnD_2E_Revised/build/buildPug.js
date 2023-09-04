@@ -60,6 +60,7 @@ const nonWeaponProfsJs = require(path.join(jsFolder, 'nonweaponProficiencies.js'
 const talentsJs = require(path.join(jsFolder,'players-option-talents.js'));
 const traitsJs = require(path.join(jsFolder,'players-option-traits.js'));
 const disadvantagesJs = require(path.join(jsFolder,'players-option-disadvantages.js'));
+const dexterityModifier = require(path.join(jsFolder,'abilityScores.js'))
 
 console.log('---- Generating HTML files ----');
 writeFile(miscFolder, 'schools-overview.html',
@@ -79,6 +80,9 @@ writeFile(path.join(htmlFolder,'shared'), 'wizard-spell-template.html',
 );
 writeFile(path.join(htmlFolder,'shared'), 'priest-spell-template.html',
     pug.renderFile(path.join(pugFolder, 'spellTemplate.pug'), {pretty: true, isPriest: true})
+);
+writeFile(path.join(htmlFolder,'tabs','character-tab','rogue-tab'), 'thieving-skills-dexterity-adjustments.html',
+    pug.renderFile(path.join(pugFolder, 'thievingSkillsDexterityAdjustments.pug'), {pretty: true, data: dexterityModifier})
 );
 
 let datalistHtml = '';

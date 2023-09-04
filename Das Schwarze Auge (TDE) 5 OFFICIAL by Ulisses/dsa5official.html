@@ -21467,6 +21467,17 @@
 
     <div class="section optnsub2 filterBorder" style="margin: 40px 0;">
 <div  style="margin-top: 40px;">
+  <h3>v1.5.9 (08/23/2023)</h3>
+  <ul>
+    <li>Fixed AP cost payment for some special abilities</li>
+    <li>Changed default language translation file to en in respect to roll20 new translation system.</li>
+    <li>Adjusted some more issues with combat special abilities</li>
+  </ul>
+  <h3>v1.5.8 (07/10/2023)</h3>
+  <ul>
+    <li>Fixes inured to encumbrance</li>
+    <li>Change behaviour of passive combat skill bonuses to always apply their effect</li>
+  </ul>
   <h3>v1.5.5 (03/20/2023)</h3>
   <ul>
     <li>Preview ranged attack roll final die</li>
@@ -29118,9 +29129,9 @@
       const az = Armorzones.calcEncumbrance(beSum)
       be = Math.max(0, az.be + Math.max(...armorEncumbranceModifiers) - belastungsgewoehnung_mod)
       ini = az.ini
-    }else{
-      be = Math.max(0, [0, 0, 1, 1, 2, 2, 3, 3][Math.min(beSum, 7)] - belastungsgewoehnung_mod);
-      ini = beSum % 2;
+    }else{      
+      be = Math.max(0, [0, 0, 1, 1, 2, 2, 3, 3][Math.min(beSum, 7)] - (belastungsgewoehnung_mod ));
+      ini = Math.max(0, Math.min(beSum, 7) - (belastungsgewoehnung_mod * 2)) % 2
     }
     rs_be_mod += be
     be_gs_mod += ini
@@ -29282,7 +29293,8 @@
     const waffe_typ = values[`repeating_meleeweapon_${nkwaffe}_waffe_typ`] || "raufen";
     //let waffe_leiteigenschaft = values[`waffe_leiteigenschaft_${nk_waffe}`];
     //let waffe_leiteigenschaft_input = parseInt(values[`waffe_leiteigenschaft_input_${nk_waffe}`]) || 0;
-    const waffe_tp_bonus = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_bonus`]) || 0;
+    let waffe_tp_bonus = values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_bonus`] ?? dsa5helpers.getLeitwert("GE/KK", values, "14");
+    waffe_tp_bonus = waffe_tp_bonus != undefined ? parseInt(waffe_tp_bonus) : dsa5helpers.getLeitwert("GE/KK", values, "14");
     const waffe_tp_anz_wuerfel = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_anz_wuerfel`]) || 1;
     const waffe_tp_wert = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_wert`]) || 0;
     const waffe_at = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_at`]) || 0;
@@ -29455,7 +29467,8 @@
     let schild_typ = values[`repeating_meleeweapon_${nkwaffe}_waffe_typ`] || "raufen";
     //let schild_leiteigenschaft = values.schild_leiteigenschaft_1;
     //let schild_leiteigenschaft_input = parseInt(values.schild_leiteigenschaft_input_1) || 0;
-    let schild_tp_bonus = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_bonus`]) || 0;
+    let schild_tp_bonus = values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_bonus`] ?? dsa5helpers.getLeitwert("GE/KK", values, "14");
+    schild_tp_bonus = schild_tp_bonus != undefined ? parseInt(schild_tp_bonus) : dsa5helpers.getLeitwert("GE/KK", values, "14");
     let schild_tp_anz_wuerfel = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_anz_wuerfel`]) || 1;
     let schild_tp_wert = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_tp_wert`]) || 0;
     let schild_at = parseInt(values[`repeating_meleeweapon_${nkwaffe}_waffe_at`]) || 0;
@@ -29621,7 +29634,9 @@
       "vw_grundwert",
       "vw_modifikator",
       "eingeengt",
-      "nk_hitzone"
+      "nk_hitzone",
+      "koerperkraft_gesamt",
+      "gewandheit_gesamt"
     );
 
     for (const id of ids) {
@@ -29755,6 +29770,7 @@
         `repeating_sonderfertigkeit_${id}_sonderfertigkeit_stufe`,
         `repeating_sonderfertigkeit_${id}_selectedLevel`,
         `repeating_sonderfertigkeit_${id}_sonderfertigkeittyp`,
+        `repeating_sonderfertigkeit_${id}_sonderfertigkeitkampftyp`,
         ...dsa5Module().dsa5.modifiers.map((x) => `repeating_sonderfertigkeit_${id}_sonderfertigkeit_auswahl${x}`),
         ...dsa5Module().dsa5.modifiers.map((x) => `repeating_sonderfertigkeit_${id}_sonderfertigkeit_mod${x}`)
       );
@@ -31273,11 +31289,11 @@ on('clicked:repeating_armor:setarmor', (info) => {
         const mageLevel = data["data-mageLevel"] || "Weltliche"
         switch (mageLevel) {
             case "Geweihte":
-                update["glaube-tradition"] = data["data-tradition"]
+                update["glaube_tradition"] = data["data-tradition"]
                 update["leiteigenschaft_ke"] = data["data-guidevalue"].toUpperCase()
                 break
             case "Zauberer":
-                update["magie-tradition"] = data["data-tradition"]
+                update["magie_tradition"] = data["data-tradition"]
                 update["leiteigenschaft_ae"] = data["data-guidevalue"].toUpperCase()
                 update["ae_faktor"] = Number(data["data-energyfactor"]) || 1.0
                 break
@@ -31609,11 +31625,15 @@ on('clicked:repeating_armor:setarmor', (info) => {
             if (data["data-guideValueMagical"]) {
                 update["leiteigenschaft_ae"] = data["data-guideValueMagical"].toUpperCase()
                 update["ae"] = 20 + update[dsa5Module().dsa5.attributes[update["leiteigenschaft_ae"]]]
+                update["magie_tradition"] = data["data-tradition"] || ""
+                update["ae_faktor"] = Number(data["data-energyfactor"]) || 1.0
             }
             if (data["data-guideValueClerical"]) {
                 update["leiteigenschaft_ke"] = data["data-guideValueClerical"].toUpperCase()
+                update["glaube_tradition"] = data["data-tradition"] || ""
                 update["ke"] = 20 + update[dsa5Module().dsa5.attributes[update["leiteigenschaft_ke"]]]
             }
+
 
             update["linkToToken"] = "on"
 
@@ -31896,7 +31916,7 @@ on('clicked:repeating_armor:setarmor', (info) => {
     }
 
     const createAttack = (data, last_id = "") => {
-        data.stat = data.stat.replace(/[\u00A0\u25A0\u00A0\s]+/g, ' ').trim()
+        data.stat = data.stat.replace(/[\u00A0\u25A0\s\u00a0]+/g, ' ').trim()
         const rangeAttack = /(FK| LZ) \d/.test(data.stat)
         const category = rangeAttack ? "npcfkkampf" : "npcnahkampf"
         const { update, row } = prefabdata(category, last_id)
@@ -32546,7 +32566,7 @@ const threeDiceRoll = async({ template = "DSA-Talente", attributes, contingents,
     }
 
     const specCost = (apvalue, stufe) => {
-        const splits = apvalue.split(/[\/;]+/)
+        const splits = apvalue.replace(/ (AP|Abenteuerpunkte|Adventure points|Adventure Points)$/, "").split(/[\/;]+/)
         return Number(splits[stufe] || splits[0]) || 0
     }
 
