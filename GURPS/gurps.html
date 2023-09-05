@@ -61,7 +61,7 @@
 	<input type="hidden" name="attr_roll_hit_location" value="" />
 	<input type="hidden" name="attr_roll_maneuver" value=""  />
 	<input type="hidden" name="attr_roll_allout_attack" value=""  />
-	<input type="hidden" name="attr_roll" value=""  />
+	<input type="hidden" name="attr_roll" value="" />
 	<input type="hidden" name="attr_modifier" value="[[?{Modifier|0}]]" />
 	<input type="hidden" name="attr_popup_modifier" value="@{Modifier}" />
 	<div class="modal">
@@ -4320,6 +4320,7 @@
 				<!-- current version notes: 2.9.13 -->
 				<ul>
 					<li>Combat Tab. Melee and Ranged attack tables. Added a <b>Duplicate</b> button. Click the button to duplicate the attack, useful for quickly creating alternate attacks based on ammo type or something similar.</li>
+					<li>Traits Tab. Disadvantages table. Added a checkbox labeled <b>Check to make the results a whisper to GM only.</b>. If checked, the control roll will be whispered to you and the GM.</li>
 				</ul>
 					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -7804,7 +7805,8 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="number" min="0" step="1" name="attr_control_rating" title="Macro: @{NAME|repeating_disadvantages_$[row #]_control_rating}" />
 						</div>
 						<div class="cell col2">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsDSCR" />
+							<input type="hidden" name="attr_disadvantage_roll" value="@{roll}" />
+							<button type="roll" value="@{disadvantage_roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{success_notes}}} {{customCriticalSuccessNote=@{critical_success_notes}}} {{customFailNote=@{fail_notes}}} {{customCriticalFailNote=@{critical_fail_notes}}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsDSCR" />
 						</div>
 						<div class="cell col3">
 							<input type="number" name="attr_points" title="Macro: @{NAME|repeating_disadvantages_$[row #]_points}" />
@@ -7818,11 +7820,19 @@ PU2:126 = Power-Ups 2. Page 126
 						
 						<div class="row">
 							<div class="cell label full-width-margin-right-sm">
-								<div class="show-notes">
-									<input type="checkbox" name="attr_show_notes" value="1" />
-									<span class="label">
-										<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
-									</span> 	
+								<div>
+									<div class="show-notes">
+										<input type="checkbox" name="attr_show_notes" value="1" />
+										<span class="label">
+											<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
+										</span> 	
+									</div>
+									<div class="show-notes">
+										<input type="checkbox" name="attr_whisper_mode" value="1" />
+										<span class="label">
+											<span data-i18n="whisper-mode-label">Check to make the results a whisper to GM only.</span>
+										</span> 	
+									</div>
 								</div>
 								<textarea class="text-left full-width-margin-zero texbox-height-medium" name="attr_notes" title="Macro: @{NAME|repeating_disadvantages_$[row #]_notes}"></textarea>
 							</div>
@@ -14884,6 +14894,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<!-- current version notes: 2.9.13 -->
 			<ul>
 				<li>Combat Tab. Melee and Ranged attack tables. Added a <b>Duplicate</b> button. Click the button to duplicate the attack, useful for quickly creating alternate attacks based on ammo type or something similar.</li>
+				<li>Traits Tab. Disadvantages table. Added a checkbox labeled <b>Check to make the results a whisper to GM only.</b>. If checked, the control roll will be whispered to you and the GM.</li>
 			</ul>
 			
 			<h4>Version: 2.9.12</h4>
@@ -38034,5 +38045,30 @@ B378
 		});
 
 	}
+
+	on("change:repeating_disadvantages:whisper_mode", event => {
+
+		const newValue = Number(event.newValue);
+
+		const isChecked = newValue === 1;
+
+		getAttrs(["roll"], values => {
+
+			let rollMacro = "/w gm";
+
+			// if "unchecked"
+			if (!isChecked) {
+
+				// use the current roll prompt
+				rollMacro = values.roll;
+
+			} 
+
+			setAttrs({repeating_disadvantages_disadvantage_roll: rollMacro});
+
+		});
+		
+
+	});
 
 </script>
