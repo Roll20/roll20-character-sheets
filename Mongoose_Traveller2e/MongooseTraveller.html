@@ -6718,6 +6718,48 @@
             });
         });
 
+        on("change:repeating_speculative-sale-goods:speculative_sg_tons", (info) => {
+
+            console.log("MgT2E: Sale Ton Change: " + JSON.stringify(info));
+            const rowid = info.sourceAttribute.split('_')[2];
+
+            var keyAttrs = [
+                "repeating_speculative-sale-goods_" + rowid + "_speculative_sg_sale_multiplier",
+                "repeating_speculative-sale-goods_" + rowid + "_speculative_pg_price",
+                "repeating_speculative-sale-goods_" + rowid + "_speculative_sg_baseprice",
+                "repeating_speculative-sale-goods_" + rowid + "_speculative_sg_tons"
+            ]
+
+            getAttrs(keyAttrs, function (value) {
+
+                addTradeLogMessage("- P/L Attrs: " + JSON.stringify(value), true);
+
+                var priceAttrs = {};
+                var bprice = +value["repeating_speculative-sale-goods_" + rowid + "_speculative_pg_price"];
+                var btons = +value["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_tons"];
+                var bought = bprice * btons;
+                console.log("- Bought: " + bought + ", price: " + bprice + ", tons: " + btons);
+                var sprice = +value["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_sale_multiplier"]/100;
+                var stons = +value["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_tons"]
+                var sbase = +value["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_baseprice"]
+                var sold = sprice * stons * sbase;
+                console.log("- Sold: " + sold + ", price: " + sprice + ", tons: " + stons + ", base: " + sbase);
+                var pl = Math.round(sold - bought);
+                console.log("- P/L: " + rowid + ": " + pl);
+
+                if(pl < 0) {
+                    priceAttrs["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_pl_neg"] = pl;
+                    priceAttrs["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_pl"] = "    ";
+                }
+                else {
+                    priceAttrs["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_pl_neg"] = "    ";
+                    priceAttrs["repeating_speculative-sale-goods_" + rowid + "_speculative_sg_pl"] = pl;
+                }
+
+                setAttrs(priceAttrs);
+            });
+        });
+
         on("clicked:sell-trade-goods", (info) => {
 
             addTradeLogMessage("MgT2E: Sell Trade Goods: " + JSON.stringify(info), true);
