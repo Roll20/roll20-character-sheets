@@ -151,7 +151,14 @@
 
 						<!-- Row 1 -->
 						<div class="item item1-5 full-width">
-							<h4>Traits</h4>
+							<div class="tooltip">
+								<h4 class="font-color-red">
+									<span data-i18n="traits-label">Traits</span>
+								</h4>
+								<span class="tooltiptext">
+									<span data-i18n="roll-modifier-traits-tooltip">These refer to character traits that rarely change, they will not be cleared when the reset button is used.</span>
+								</span>
+							</div>
 						</div>
 
 						<!-- Row 2 -->
@@ -247,6 +254,51 @@
 						</div>
 
 					</div>
+
+					<div class="container">
+
+						<!-- Row 1 -->
+						<div class="item item1-5 full-width">
+							<div class="tooltip">
+								<h4 class="font-color-red">
+									<span data-i18n="temporary-traits-label">Temporary Traits</span>
+								</h4>
+								<span class="tooltiptext">
+									<span data-i18n="roll-modifier-temporary-traits-tooltip">These refer to temporary traits that affect the character for a short, such as magic spells, potions, goggles, etc. They will be cleared when the reset button is used.</span>
+								</span>
+							</div>
+						</div>
+
+						<!-- Row 2 -->
+						<div class="item item1">
+							<label>
+								<div>
+									<select name="attr_temporary_night_vision" class="number-only-width" title="Macro: @{NAME|temporary_night_vision}">
+										<option>0</option>
+										<option>1</option>
+										<option>2</option>
+										<option>3</option>
+										<option>4</option>
+										<option>5</option>
+										<option>6</option>
+										<option>7</option>
+										<option>8</option>
+										<option>9</option>
+									</select>
+								</div>
+								<div>
+									<div class="tooltip">
+										<span data-i18n="night-vision-label">Night Vision</span>
+										<span class="tooltiptext">
+											<span data-i18n="temporary-night-vision-tooltip">This value negates darkness penalties and is ADDED to the night vision listed above, except for total darkness. See B71.</span>
+										</span>
+									</div>
+								</div>
+							</label>
+						</div>
+
+					</div>
+
 				</div><!-- end .modal-sub-header -->
 				
 				<hr />
@@ -4317,10 +4369,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.13 -->
+				<!-- current version notes: 2.9.14 -->
 				<ul>
-					<li>Combat Tab. Melee and Ranged attack tables. Added a <b>Duplicate</b> button. Click the button to duplicate the attack, useful for quickly creating alternate attacks based on ammo type or something similar.</li>
-					<li>Traits Tab. Disadvantages table. Added a checkbox labeled <b>Check to make the results a whisper to GM only.</b> If checked, the control roll will be whispered to you and the GM.</li>
+					<li>Melee tab, roll modifier tool dialog box. Fixed bug where selecting the posture doesn't update the modifiers. Reported by valkray</li>
+					<li>Roll Modifier Dialog Box. Added tooltip for the Traits heading and added a section titled Temporary Traits, which will cover cases such as spells and other mitigators.</li>
 				</ul>
 					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -14891,7 +14943,15 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.13 -->
+			<!-- current version notes: 2.9.14 -->
+			<ul>
+				<li>Melee tab, roll modifier tool dialog box. Fixed bug where selecting the posture doesn't update the modifiers. Reported by valkray</li>
+				<li>Roll Modifier Dialog Box. Added tooltip for the Traits heading and added a section titled Temporary Traits, which will cover cases such as spells and other mitigators.</li>
+			</ul>
+			
+			<h4>Version: 2.9.13</h4>
+			<p>Pull Request: 9/5/2023</p>
+			
 			<ul>
 				<li>Combat Tab. Melee and Ranged attack tables. Added a <b>Duplicate</b> button. Click the button to duplicate the attack, useful for quickly creating alternate attacks based on ammo type or something similar.</li>
 				<li>Traits Tab. Disadvantages table. Added a checkbox labeled <b>Check to make the results a whisper to GM only</b>. If checked, the control roll will be whispered to you and the GM.</li>
@@ -19115,9 +19175,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.13";
+	const version = "2.9.14";
 	
-	const latestChangesDate = "9/5/2023";
+	const latestChangesDate = "9/11/2023";
 	
 	let modCascade = true;
 	
@@ -19198,6 +19258,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 */
 	const rollModifiers = new Map([
 		["night_vision", { modifier: 0, description: "Night Vision", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: true, checkPain: false }],
+		["temporary_night_vision", { modifier: 0, description: "Temporary Night Vision", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: true, checkPain: false }],
 		["has_dark_vision", { modifier: 0, description: "Dark Vision", affectsVisibility: true, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
 		["is_used_to_blindness", { modifier: 0, description: "Used to blindness", affectsVisibility: true, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
 		["has_high_pain_threshold", { modifier: 0, description: "High Pain Threshold", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
@@ -19245,7 +19306,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		["rapid_strike_master", { modifier: -3, description: "Rapid Strike (master)", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["attack_from_above", { modifier: -2, description: "Attack from above", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["mighty_blow", { modifier: 0, description: "Mighty Blow 1 FP per attack. +2 Damage or +1 per die!", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
-		["posture", { modifier: 0, description: "From a function", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
+		["posture", { modifier: 0, description: "From a function", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["melee_height_difference", { modifier: 0, description: "From a function", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["improvised_weapon", { modifier: 0, description: "Improvised Weapon", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["tactics", { modifier: 0, description: "Tactics", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
@@ -19352,6 +19413,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19397,6 +19459,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19442,6 +19505,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19499,6 +19563,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19559,6 +19624,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19621,6 +19687,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -29057,6 +29124,7 @@ B378
 		"change:dialog_custom_roll_modifier",
 		"change:dialog_custom_roll_modifier_reason",
 		"change:night_vision",
+		"change:temporary_night_vision",
 		"change:has_dark_vision",
 		"change:has_high_pain_threshold",
 		"change:has_low_pain_threshold",
@@ -29096,7 +29164,6 @@ B378
 		"change:hit_location",
 		"change:melee_maneuver",
 		"change:melee_all_out_attack",
-		"change:posture",
 		"change:deceptive_strike",
 		"change:evaluate",
 		"change:rapid_strike",
@@ -29119,6 +29186,7 @@ B378
 		"change:mounted_skill_difference",
 		"change:mount_attacked",
 		"change:mount_has_velocity",
+		"change:posture",
 		"change:wild_swing",
 		"change:ranged_weapon_hand",
 		"change:ranged_off_hand_training",
@@ -29359,6 +29427,8 @@ B378
 	
 		let nightVision = parseInt(values.night_vision) || 0;
 	
+		let tempNightVision = parseInt(values.temporary_night_vision) || 0;
+		
 		let adjustedDarknessPenalty = 0;
 	
 		let hasDarkVision = parseInt(values.has_dark_vision) || 0;
@@ -29404,10 +29474,10 @@ B378
 				break;
 		}
 	
-		// add darkness penalty, offset by nightvision
+		// add darkness penalty, offset by nightvision and tempNightVision
 		if (!hasDarkVision && darknessPenalty) {
 	
-			adjustedDarknessPenalty = darknessPenalty + nightVision;
+			adjustedDarknessPenalty = darknessPenalty + nightVision + tempNightVision;
 	
 			if (adjustedDarknessPenalty > 0) {
 				adjustedDarknessPenalty = 0;
