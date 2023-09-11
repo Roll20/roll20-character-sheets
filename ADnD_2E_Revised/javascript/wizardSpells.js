@@ -1887,10 +1887,11 @@ wiz3['Explosive Runes'] = {
     'materials': '',
     'reference': 'p. 191',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 332',
     'damage': '[[6d4+6]]',
     'damage-type': 'Fire',
     'healing': '',
-    'effect': 'By tracing these mystic runes upon a book, map, scroll, or similar object bearing written information, the wizard prevents unauthorized persons from reading his material. The explosive runes are difficult to detect—5% chance per level of magic use experience of the reader; thieves have only a 5% chance. But trap detection by spell or magical device always finds these runes.\n&emsp;When read, the explosive runes detonate, delivering 6d4+6 points of damage to the reader, who gets no saving throw. A like amount, or half that if saving throws are made, is suffered by each creature within the blast radius. The wizard who cast the spell, as well as any he instructs, can read the protected writing without triggering the runes. Likewise, the wizard can remove the runes whenever desired. Others can remove them only with a successful *dispel magic* or *erase* spell. Explosive runes otherwise last until the spell is triggered. The item upon which the runes are placed is destroyed when the explosion takes place, unless it is not normally subject to destruction by magical fire (see the item saving throws in Chapter 6 of the *DUNGEON MASTER Guide*).'
+    'effect': 'By tracing these mystic runes upon a book, map, scroll, or similar object bearing written information, the wizard prevents unauthorized persons from reading his material. The explosive runes are difficult to detect: 5% chance per level of magic-user experience of the reader; thieves have only a 5% chance. Trap detection by spell or magical device always finds these runes.\n&emsp;When read, the explosive runes detonate, delivering 6d4+6 points of damage to the reader, who gets no saving throw. A like amount, or half that if saving throws are made, is suffered by each creature within the blast radius. The wizard who cast the spell, as well as any he instructs, can read the protected writing without triggering the runes. Likewise, the wizard can remove the runes whenever desired. Others can remove them only with a successful *dispel magic* or *erase* spell. Explosive runes otherwise last until the spell is triggered. The item upon which the runes are placed is destroyed when the explosion takes place, unless it is not normally subject to destruction by magical fire (see the item saving throws in Chapter 6 of the *DUNGEON MASTER Guide*).'
 };
 
 wiz3['Feign Death'] = {
@@ -1905,10 +1906,12 @@ wiz3['Feign Death'] = {
     'materials': '',
     'reference': 'p. 191',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 349',
+    'errata': 'Sage Advice #230 p. 94',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster (or any other creature whose levels of experience or Hit Dice do not exceed the wizard’s own level) can be put into a cataleptic state that is impossible to distinguish from death. Although the person or creature affected by the *feign death* spell can smell, hear, and know what is going on, no feeling or sight of any sort is possible. Thus, any wounding or mistreatment of the body is not felt and no reaction occurs; damage is only half normal. In addition, paralysis, poison, and energy-level drain cannot affect an individual under the influence of this spell. Poison injected or otherwise introduced into the body takes effect when the spell recipient is no longer under the influence of this spell, although a saving throw is permitted.\n&emsp;Note that only a willing individual can be affected by a *feign death* spell. The spellcaster can end the spell effects at any time desired, as will a successful dispel, but a full round is required for bodily functions to begin again.'
+    'effect': 'By means of this spell, the caster (or any other creature whose levels of experience or Hit Dice do not exceed the wizard’s own level, currently level [[@{level-wizard}]] and below) can be put into a cataleptic state that is impossible to distinguish from death. Although the person or creature affected by the *feign death* spell can smell, hear, and know what is going on, no feeling or sight of any sort is possible. Thus, any wounding or mistreatment of the body is not felt and no reaction occurs; damage is only half normal. In addition, paralysis, poison, and energy-level drain cannot affect an individual under the influence of this spell. Poison injected or otherwise introduced into the body takes effect when the spell recipient is no longer under the influence of this spell, although a saving throw is permitted. However, the spell offers no protection from causes of certain death—being crushed under a landslide, etc.\n&emsp;Note that only a willing individual can be affected by a *feign death* spell. The spellcaster can end the spell effects at any time desired, as will a successful *dispel*, but a full round is required for bodily functions to begin again.'
 };
 
 wiz3['Fireball'] = {
