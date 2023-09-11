@@ -105,10 +105,10 @@
     </div>
 
     <!-- Items -->
-    <div class="flex-container list">
-        <div class="flex-container">
+    <div class="flex-container column">
+        <div class="flex-container bottom">
             <h2 data-i18n="inventory"></h2>
-            <span name="attr_inventory_slots"></span>/10
+            <p class="push"><span name="attr_inventory_slots"></span>/10</p>
         </div>
         <div class="grid-inventory">
             <label data-i18n="item"></label>
@@ -199,27 +199,51 @@
 
     inventory_slot.forEach(function (inventory_slot) {
         on(`change:fatigue_${inventory_slot}`, () => {
-            getAttrs(["inventory_slots", `item_${inventory_slot}`, `fatigue_${inventory_slot}`], values => {
+            getAttrs(["inventory_slots", "hit_protection", `item_${inventory_slot}`, `fatigue_${inventory_slot}`], values => {
                 let item = values[`item_${inventory_slot}`];
                 let fatigue = values[`fatigue_${inventory_slot}`];
                 let inventory_slots = parseInt(values["inventory_slots"]) || 0;
+                let hp = parseInt(values["hit_protection"]) || 0;
                 
-                if (fatigue === "on") {
-                    if (item === "" || item === undefined) {
+                if (item === "" || item === undefined) {
+                    if (fatigue === "on") {
                         inventory_slots++;
+                    } else {
+                        inventory_slots--;
                     }
-                    setAttrs({
-                        [`item_${inventory_slot}`]: "",
-                        [`item_qty_${inventory_slot}`]: 0,
-                        ["inventory_slots"]: inventory_slots
-                    });
-                } else {
-                    inventory_slots--;
-                    setAttrs({
-                        [`item_${inventory_slot}`]: "",
-                        ["inventory_slots"]: inventory_slots
-                    });
                 }
+
+                hp = inventory_slots >= 10 ? 0 : hp;
+
+                setAttrs({
+                    ["inventory_slots"]: inventory_slots,
+                    ["hit_protection"]: hp
+                });
+            });
+        });
+
+        on(`change:item_${inventory_slot}`, eventInfo => {
+            getAttrs(["inventory_slots", "hit_protection", `item_${inventory_slot}`, `fatigue_${inventory_slot}`], values => {
+                let previousValue = eventInfo.previousValue;
+                let newValue = eventInfo.newValue;
+                let fatigue = values[`fatigue_${inventory_slot}`];
+                let inventory_slots = parseInt(values["inventory_slots"]) || 0;
+                let hp = parseInt(values["hit_protection"]) || 0;
+                
+                if (fatigue !== "on") {
+                    if ((previousValue === "" || previousValue === undefined) && newValue !== "" && newValue !== undefined) {
+                        inventory_slots++;
+                    } else if (previousValue !== "" && previousValue !== undefined && (newValue === "" || newValue === undefined)) {
+                        inventory_slots--;
+                    }
+                }
+
+                hp = inventory_slots >= 10 ? 0 : hp;
+
+                setAttrs({
+                    ["inventory_slots"]: inventory_slots,
+                    ["hit_protection"]: hp
+                });
             });
         });
     });
