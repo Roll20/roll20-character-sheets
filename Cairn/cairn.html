@@ -108,6 +108,7 @@
     <div class="flex-container list">
         <div class="flex-container">
             <h2 data-i18n="inventory"></h2>
+            <span name="attr_inventory_slots"></span>/10
         </div>
         <div class="grid-inventory">
             <label data-i18n="item"></label>
@@ -192,3 +193,34 @@
         </div>
     </div>
 </rolltemplate>
+
+<script type="text/worker">
+    const inventory_slot = [1,2,3,4,5,6,7,8,9,10]
+
+    inventory_slot.forEach(function (inventory_slot) {
+        on(`change:fatigue_${inventory_slot}`, () => {
+            getAttrs(["inventory_slots", `item_${inventory_slot}`, `fatigue_${inventory_slot}`], values => {
+                let item = values[`item_${inventory_slot}`];
+                let fatigue = values[`fatigue_${inventory_slot}`];
+                let inventory_slots = parseInt(values["inventory_slots"]) || 0;
+                
+                if (fatigue === "on") {
+                    if (item === "" || item === undefined) {
+                        inventory_slots++;
+                    }
+                    setAttrs({
+                        [`item_${inventory_slot}`]: "",
+                        [`item_qty_${inventory_slot}`]: 0,
+                        ["inventory_slots"]: inventory_slots
+                    });
+                } else {
+                    inventory_slots--;
+                    setAttrs({
+                        [`item_${inventory_slot}`]: "",
+                        ["inventory_slots"]: inventory_slots
+                    });
+                }
+            });
+        });
+    });
+</script>
