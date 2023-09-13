@@ -1967,10 +1967,12 @@ wiz3['Fly'] = {
     'materials': 'A wing feather from any bird.',
     'reference': 'p. 192',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 382',
+    'errata': 'Sage Advice #150 p. 10\nSage Advice #154 p. 7\nSage Advice #168 p. 56\nSage Advice #171 p. 90\nDungeon Master Option: High-Level Campaigns p. 71',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to bestow the power of magical flight. The creature affected is able to move vertically and horizontally at a rate of 18 (half that if ascending, twice that if descending in a dive). The maneuverability class of the creature is B. Using the fly spell requires as much concentration as walking, so most spells can be cast while hovering or moving slowly (movement of 3). Possible combat penalties while flying are known to the DM (found in the “Aerial Combat” section of Chapter 9 of the DMG). The exact duration of the spell is always unknown to the spellcaster, as the variable addition is determined secretly by the DM.'
+    'effect': 'This spell enables the wizard to bestow the power of magical flight. The creature affected is able to move vertically and horizontally at a rate of 18 (half that if ascending, twice that if descending in a dive). A *haste* spell does not double the movement rate of *fly*. The maneuverability class of the creature is B (180 degrees or less of turning in a round). Using the *fly* spell requires as much concentration as walking, so most spells can be cast while hovering or moving slowly (movement of 3). Using *fly* requires only mental concentration and no muscle movement and can therefore be used while paralyzed. Possible combat penalties while flying are known to the DM (found in the “Aerial Combat” section of Chapter 9 of the *DMG*). The exact duration of the spell is always unknown to the spellcaster, as the variable addition is determined secretly by the DM.'
 };
 
 wiz3['Gust of Wind'] = {
@@ -1979,35 +1981,38 @@ wiz3['Gust of Wind'] = {
     'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '0',
     'duration': '1 round',
-    'aoe': '10 feet x [[10*[[@{level-wizard}]] ]] yards',
+    'aoe': '10 feet wide ✕ [[10*[[@{level-wizard}]] ]] yards long',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
     'materials': 'A legume seed.',
     'reference': 'p. 192',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 419',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, a strong puff of air originates from the wizard and moves in the direction he is facing. The force of this gust of wind (about 30 m.p.h.) is sufficient to extinguish candles, torches, and similar unprotected flames. It causes protected flames—such as those of lanterns—to dance wildly and has a 5% chance per level of experience of the spellcaster to extinguish even such lights. Currently [[5*[[@{level-wizard}]] ]]%. It also fans large fires outward 1d6 feet in the direction of the wind’s movement. It forces back small flying creatures 1d6 x 10 yards and causes man-sized beings to be held motionless if attempting to move against its force. It slows larger-than-man-sized flying creatures by 50% for one round. It blows over light objects, disperses most vapors, and forces away gaseous or unsecured levitating creatures. Its path is a constant 10 feet wide, by 10 yards long per level of experience of the caster (for example, an 8th-level wizard causes a gust of wind that travels 80 yards).'
+    'effect': 'When this spell is cast, a strong puff of air originates from the wizard and moves in the direction he is facing. The force of this gust of wind (about 30 m.p.h.) is sufficient to extinguish candles, torches, and similar unprotected flames. It causes protected flames—such as those of lanterns—to dance wildly and has a 5% chance per level of experience of the spellcaster to extinguish even such lights. Currently [[{5*[[@{level-wizard}]],100}kl1]]%. It also fans large fires outward 1d6 feet in the direction of the wind’s movement. It forces back small flying creatures 1d6 ✕ 10 yards and causes man-sized beings to be held motionless if attempting to move against its force. It slows larger-than-man-sized flying creatures by 50% for one round. It blows over light objects, disperses most vapors, and forces away gaseous or unsecured levitating creatures. Its path is a constant 10 feet wide, by 10 yards long per level of experience of the caster (for example, an 8th-level wizard causes a *gust of wind* that travels 80 yards).'
 };
 
 wiz3['Haste'] = {
     'level': '3',
     'school': 'Alteration',
-    'range': '60 yards.',
+    'range': '60 yards',
     'duration': '[[3+[[@{level-wizard}]] ]] rounds',
     'aoe': '40-foot cube, [[@{level-wizard}]] creatures',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
     'materials': 'A shaving of licorice root.',
-    'reference': '',
+    'reference': '192',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 425',
+    'errata': 'Player’s Handbook p. 33\nSage Advice #154 p. 7\nSage Advice #249 p. 20\nSage Advice #258 p. 22-23\nDungeon Master Option: High-Level Campaigns p. 71-72',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a -2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number  of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by haste must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell ages the recipient by one year, because of sped-up metabolic processes. This spell is not cumulative with itself or with other similar magic.'
+    'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a –2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number  of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by *haste* must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell instantly ages the recipient by one year, the moment they receive the spell (i.e. during the first round of the spell’s effect), because of sped-up metabolic processes (like all magical aging, this requires a system shock roll). This spell is not cumulative with itself. If multiple *haste* effects are cast, only the best take effect and aging only happens once, unless the effects overlap, then aging happens again when the first effect expires and the next take effect. A *haste* never magnifies the effect of magical items or similar magic (including *boots of speed*, *potion of speed*, *broom of flying* or *carpet of flying*). A *Haste* spell does not increase the movement rate of a *fly* spell.\n&emsp;Aging from *haste* does not affect other spell durations, poisons, wounds, bleeding, mummy rot, healing, hair or fingernail length.}}{{aging=1'
 };
 
 wiz3['Hold Person'] = {
