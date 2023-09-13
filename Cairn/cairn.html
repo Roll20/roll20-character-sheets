@@ -197,7 +197,42 @@
 <script type="text/worker">
     const inventory_slot = [1,2,3,4,5,6,7,8,9,10]
 
-    inventory_slot.forEach(function (inventory_slot) {
+    function createItemName(inventory_slot) {
+        return `item_${inventory_slot}`;
+    }
+
+    function createFatigueName(inventory_slot) {
+        return `fatigue_${inventory_slot}`;
+    }
+
+    on("sheet:opened", () => {
+        let inventory_slots = 0;
+        let attribute_names = inventory_slot.map(createItemName).concat(inventory_slot.map(createFatigueName));
+
+        getAttrs(attribute_names, values => {
+            inventory_slot.forEach(inventory_slot => {
+
+                let item = values[`item_${inventory_slot}`];
+                let fatigue = values[`fatigue_${inventory_slot}`];
+
+                if ((item !== undefined && item !== "") || fatigue === "on") {
+                    inventory_slots++;
+                };
+
+                if ((item === undefined || item === "") && fatigue !== "on") {
+                    setAttrs({
+                        [`item_${inventory_slot}`]: ""
+                    });
+                };
+            });
+
+            setAttrs({
+                ["inventory_slots"]: inventory_slots
+            });
+        });
+    });
+
+    inventory_slot.forEach(inventory_slot => {
         on(`change:fatigue_${inventory_slot}`, () => {
             getAttrs(["inventory_slots", "hit_protection", `item_${inventory_slot}`, `fatigue_${inventory_slot}`], values => {
                 let item = values[`item_${inventory_slot}`];
@@ -205,7 +240,7 @@
                 let inventory_slots = parseInt(values["inventory_slots"]) || 0;
                 let hp = parseInt(values["hit_protection"]) || 0;
                 
-                if (item === "" || item === undefined) {
+                if (item === undefined || item === "") {
                     if (fatigue === "on") {
                         inventory_slots++;
                     } else {
@@ -231,9 +266,9 @@
                 let hp = parseInt(values["hit_protection"]) || 0;
                 
                 if (fatigue !== "on") {
-                    if ((previousValue === "" || previousValue === undefined) && newValue !== "" && newValue !== undefined) {
+                    if ((previousValue === undefined || previousValue === "") && newValue !== undefined && newValue !== "") {
                         inventory_slots++;
-                    } else if (previousValue !== "" && previousValue !== undefined && (newValue === "" || newValue === undefined)) {
+                    } else if (previousValue !== undefined && previousValue !== "" && (newValue === undefined || newValue === "")) {
                         inventory_slots--;
                     }
                 }
