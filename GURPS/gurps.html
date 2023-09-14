@@ -151,7 +151,14 @@
 
 						<!-- Row 1 -->
 						<div class="item item1-5 full-width">
-							<h4>Traits</h4>
+							<div class="tooltip">
+								<h4 class="font-color-red">
+									<span data-i18n="traits-label">Traits</span>
+								</h4>
+								<span class="tooltiptext">
+									<span data-i18n="roll-modifier-traits-tooltip">These refer to character traits that rarely change, they will not be cleared when the reset button is used.</span>
+								</span>
+							</div>
 						</div>
 
 						<!-- Row 2 -->
@@ -247,6 +254,51 @@
 						</div>
 
 					</div>
+
+					<div class="container">
+
+						<!-- Row 1 -->
+						<div class="item item1-5 full-width">
+							<div class="tooltip">
+								<h4 class="font-color-red">
+									<span data-i18n="temporary-traits-label">Temporary Traits</span>
+								</h4>
+								<span class="tooltiptext">
+									<span data-i18n="roll-modifier-temporary-traits-tooltip">These refer to temporary traits that affect the character for a short, such as magic spells, potions, goggles, etc. They will be cleared when the reset button is used.</span>
+								</span>
+							</div>
+						</div>
+
+						<!-- Row 2 -->
+						<div class="item item1">
+							<label>
+								<div>
+									<select name="attr_temporary_night_vision" class="number-only-width" title="Macro: @{NAME|temporary_night_vision}">
+										<option>0</option>
+										<option>1</option>
+										<option>2</option>
+										<option>3</option>
+										<option>4</option>
+										<option>5</option>
+										<option>6</option>
+										<option>7</option>
+										<option>8</option>
+										<option>9</option>
+									</select>
+								</div>
+								<div>
+									<div class="tooltip">
+										<span data-i18n="night-vision-label">Night Vision</span>
+										<span class="tooltiptext">
+											<span data-i18n="temporary-night-vision-tooltip">This value negates darkness penalties and is ADDED to the night vision listed above, except for total darkness. See B71.</span>
+										</span>
+									</div>
+								</div>
+							</label>
+						</div>
+
+					</div>
+
 				</div><!-- end .modal-sub-header -->
 				
 				<hr />
@@ -4317,10 +4369,16 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.9.13 -->
+				<!-- current version notes: 2.9.14 -->
 				<ul>
-					<li>Combat Tab. Melee and Ranged attack tables. Added a <b>Duplicate</b> button. Click the button to duplicate the attack, useful for quickly creating alternate attacks based on ammo type or something similar.</li>
-					<li>Traits Tab. Disadvantages table. Added a checkbox labeled <b>Check to make the results a whisper to GM only.</b> If checked, the control roll will be whispered to you and the GM.</li>
+					<li>
+						Added a toggle for ST, DX, IQ, Per, and Will attributes. Clicking the toggle will show/hide a reason for modifier box.
+						<ul>
+							<li>CSS fix to allow entering values for these attributes.</li>
+						</ul>
+					</li>
+					<li>Melee tab, roll modifier tool dialog box. Fixed bug where selecting the posture doesn't update the modifiers. Reported by valkray</li>
+					<li>Roll Modifier Dialog Box. Added tooltip for the Traits heading and added a section titled Temporary Traits, which will cover cases such as spells and other mitigators.</li>
 				</ul>
 					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -4403,7 +4461,12 @@ affect direct attribute rolls and skill rolls.
 					</div>
 				</div> <!-- .header -->
 				<div class="main-attribute">
+
 					<div class="row row-strength">
+						<div class="cell col-button">
+							<input type="checkbox" name="attr_toggle_strength_reason_modifier" class="toggle toggle-attribute-reason" title="View reason modifiers" value="1" />
+							<span class="checkbox checkbox-attribute-reason"></span>
+						</div>
 						<div class="cell col0 label">
 							<div class="popup">
 								<span data-i18n="abbreviation-strength">ST</span>
@@ -4431,7 +4494,29 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{strength_display} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsST" />
 						</div>
 					</div> <!-- .row -->
+
+					<input type="hidden" name="attr_toggle_strength_reason_modifier" value="0" />
+					<div class="display-attribute-reasons">
+						<div class="row row-strength strength-reasons">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="reason-label">Reason</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+								</span>
+							</div>
+							<div class="cell">
+								<input type="text" class="inline width-125 text-left" name="attr_strength_modifier_reason" value="" />
+							</div>
+						</div>
+					</div>
+
 					<div class="row row-dexterity">
+						<div class="cell col-button">
+							<input type="checkbox" name="attr_toggle_dex_reason_modifier" class="toggle toggle-attribute-reason" title="View reason modifiers" value="1" />
+							<span class="checkbox checkbox-attribute-reason"></span>
+						</div>
 						<div class="cell col0 label">
 							<div class="popup">
 								<span data-i18n="abbreviation-dexterity">DX</span>
@@ -4454,7 +4539,29 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dexterity Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{dexterity} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsDX" />
 						</div>
 					</div> <!-- .row -->
+
+					<input type="hidden" name="attr_toggle_dex_reason_modifier" value="0" />
+					<div class="display-attribute-reasons">
+						<div class="row row-dexterity dexterity-reasons">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="reason-label">Reason</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+								</span>
+							</div>
+							<div class="cell">
+								<input type="text" class="inline width-125 text-left" name="attr_dexterity_modifier_reason" value="" />
+							</div>
+						</div>
+					</div>
+
 					<div class="row row-intelligence">
+						<div class="cell col-button">
+							<input type="checkbox" name="attr_toggle_int_reason_modifier" class="toggle toggle-attribute-reason" title="View reason modifiers" value="1" />
+							<span class="checkbox checkbox-attribute-reason"></span>
+						</div>
 						<div class="cell col0 label">
 							<div class="popup">
 								<span data-i18n="abbreviation-intelligence">IQ</span>
@@ -4477,7 +4584,29 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Intelligence Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{intelligence} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsIQ" />
 						</div>
 					</div> <!-- .row -->
+
+					<input type="hidden" name="attr_toggle_int_reason_modifier" value="0" />
+					<div class="display-attribute-reasons">
+						<div class="row row-intelligence intelligence-reasons">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="reason-label">Reason</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+								</span>
+							</div>
+							<div class="cell">
+								<input type="text" class="inline width-125 text-left" name="attr_int_modifier_reason" value="" />
+							</div>
+						</div>
+					</div>					
+
 					<div class="row row-health">
+						<div class="cell col-button">
+							<input type="checkbox" name="attr_toggle_health_reason_modifier" class="toggle toggle-attribute-reason" title="View reason modifiers" value="1" />
+							<span class="checkbox checkbox-attribute-reason"></span>
+						</div>
 						<div class="cell col0 label">
 							<div class="popup">
 								<span data-i18n="abbreviation-health">HT</span>
@@ -4500,8 +4629,31 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Health Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{health} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsHT" />
 						</div>
 					</div> <!-- .row -->
+
+					<input type="hidden" name="attr_toggle_health_reason_modifier" value="0" />
+					<div class="display-attribute-reasons">
+						<div class="row row-health health-reasons">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="reason-label">Reason</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+								</span>
+							</div>
+							<div class="cell">
+								<input type="text" class="inline width-125 text-left" name="attr_health_modifier_reason" value="" />
+							</div>
+						</div>
+					</div>
+					
 				</div>
+
 				<div class="row row-perception hr">
+					<div class="cell col-button">
+						<input type="checkbox" name="attr_toggle_perception_reason_modifier" class="toggle toggle-attribute-reason" title="View reason modifiers" value="1" />
+						<span class="checkbox checkbox-attribute-reason"></span>
+					</div>
 					<div class="cell col0 label">
 						<div class="whisper-box">
 							<div class="whisper-title">
@@ -4532,7 +4684,26 @@ Unmodified: <span name="attr_perception_base"></span>
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Perception Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{perception} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsPer" />
 					</div>
 				</div> <!-- .row -->
+
+				<input type="hidden" name="attr_toggle_perception_reason_modifier" value="0" />
+				<div class="display-attribute-reasons">
+					<div class="row row-perception perception-reasons">
+						<div class="cell label">
+							<div class="popup">
+								<span data-i18n="reason-label">Reason</span>:
+							</div>
+							<span class="tooltip">
+								<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+							</span>
+						</div>
+						<div class="cell">
+							<input type="text" class="inline width-125 text-left" name="attr_perception_modifier_reason" value="" />
+						</div>
+					</div>
+				</div>
+
 				<div class="row sub-row row-vision">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-vision">Vision</span>
@@ -4559,7 +4730,9 @@ Unmodified: <span name="attr_vision_base"></span>
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Vision Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{vision} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsVision" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row sub-row row-hearing">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-hearing">Hearing</span>
@@ -4586,7 +4759,9 @@ Unmodified: <span name="attr_hearing_base"></span>
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Hearing Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{hearing} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsHearing" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row sub-row row-taste-smell">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-smell">Smell</span>
@@ -4613,7 +4788,9 @@ Unmodified: <span name="attr_taste_smell_base"></span>
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Taste/Smell Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{taste_smell} + @{modifier}]]}} {{useCriticalPlusTen=[[0]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsTasteSmell" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row sub-row margin-bottom row-touch">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-touch">Touch</span>
@@ -4640,7 +4817,12 @@ Unmodified: <span name="attr_touch_base"></span>
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Touch Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{touch} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsTouch" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-willpower hr">
+					<div class="cell col-button">
+						<input type="checkbox" name="attr_toggle_will_reason_modifier" class="toggle toggle-attribute-reason" title="View reason modifiers" value="1" />
+						<span class="checkbox checkbox-attribute-reason"></span>
+					</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-will">Will</span>
@@ -4667,7 +4849,26 @@ Unmodified: <span name="attr_willpower_base"></span>
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Will Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{willpower} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsWill" />
 					</div>
 				</div> <!-- .row -->
+
+				<input type="hidden" name="attr_toggle_will_reason_modifier" value="0" />
+				<div class="display-attribute-reasons">
+					<div class="row row-will will-reasons">
+						<div class="cell label">
+							<div class="popup">
+								<span data-i18n="reason-label">Reason</span>:
+							</div>
+							<span class="tooltip">
+								<span data-i18n="roll-modifier-reason-tooltip">Describe the reasons why you entered the custom modifier.</span>
+							</span>
+						</div>
+						<div class="cell">
+							<input type="text" class="inline width-125 text-left" name="attr_will_modifier_reason" value="" />
+						</div>
+					</div>
+				</div>
+
 				<div class="row sub-row margin-bottom row-fear">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-fright">Fright</span>
@@ -4699,7 +4900,9 @@ See extensive list of Modifiers B360 & GURPS Horror p139-142.
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fright Check}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[ ( {@{fear_check} + @{modifier}, @{fright_check_threshold}}kl1) ]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useFrightLabel=[[1]]}} {{showNotes=[[1]]}} {{notes= **On a failure**, Roll 3d6, add your margin of failure on the Fright Check, compare result to the Fright Check Table B360.}}  {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsFearCheck" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row sub-row margin-bottom row-fear">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-threshold">Thresh</span>
@@ -4727,7 +4930,9 @@ Confusion Check Table for failures. (Powers p85).
 						<i><span data-i18n="fright-check-label">Fright Check</span></i>
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row sub-row hr">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-unstun">Unstun</span>
@@ -4752,7 +4957,9 @@ Roll at the end of your turn after Do Nothing
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Unstun Check (Recovering from Stun)}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{stun_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes= **On a failure**, you remain stunned; your next maneuver must also be Do Nothing, but you get another roll at the end of that turn . . . and so on, until you recover from stun. You are also -4 to defenses, no retreat.\n<br /> **On a success**, you recover from stun and can act normally on subsequent turns. B420}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}"  name="roll_vsUnstun" />
 					</div>	
 				</div> <!-- .row -->
+
 				<div class="row sub-row row-condition-knockdown">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-knock-down">K Down</span>
@@ -4788,7 +4995,9 @@ Roll <span style="font-style: italic; font-weight: bold; text-decoration: underl
 					</div>
 
 				</div> <!-- .row -->
+
 				<div class="row sub-row row-unconscious">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-unconscious">Unc.</span>
@@ -4816,7 +5025,9 @@ Fit +1 to Unc. Check . Very Fit +2 to Unc. Check
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Unconscious Check}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{unconscious_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes=** If you fail:**  you fall unconscious.  See 'Recovering from Unconsciousness' B423 . \n<br />**Success:** means you can act normally, but must roll again at the beginning of every turn to continue functioning (If your HP is 0 or less). Exception: If you choose Do Nothing on your turn, then no roll needed. B419}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsUnconsciousCheck" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row sub-row margin-bottom row-death">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-death-check">Death</span>
@@ -4847,7 +5058,9 @@ Fit +1 to Death Check . Very Fit +2 to Death Check
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Death Check}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{unconscious_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes= **On a failure of 1 or 2**, You receive a Mortal Wound – See Mortal Wounds B423 \n<br /> **On a failure of 3+** ***YOU DIE*** – See Death B423.}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsDeathCheck" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-basic-speed hr">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="speed-label">Speed</span>
@@ -4874,7 +5087,9 @@ Unmodified: <span name="attr_basic_speed_base" value="10"></span>
 						<button title="Reminder: You must select your Token first.&#013;This will add the Token's Speed plus DX&#013;as a single number in the Turn Order.&#013;DX was added to Speed to help break ties. (B363)" class="roll-tracker" type="roll" value="@{speed_tracker} [[[[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] &{tracker:=}]] &{template:addToTracker} {{characterName=@{character_name}}} {{skillName=Added to the Turn Order as [[ [[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] ]]}} {{basicSpeed=Speed: @{selected|Basic_Speed} &nbsp;&nbsp; DX: @{selected|dexterity}}}" name="roll_init" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-basic-move">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-move">Move</span>
@@ -4896,7 +5111,9 @@ Note: The Move score automatically adjusts for Encumbrance and for HP and/or FP 
 						<input type="number" name="attr_basic_move_points" value="0" step="5" title="Macro: @{NAME|basic_move_points}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-basic-move">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-enhanced">Enhncd</span>
@@ -4921,7 +5138,9 @@ Level: <span name="attr_enhanced_ground_move_multiple" value="0"></span>
 						<input type="number" name="attr_enhanced_ground_move_points" value="0" step="10" class="editable" title="Macro: @{NAME|enhanced_ground_move_points}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row margin-bottom row-dodge">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-dodge">Dodge</span>
@@ -4942,7 +5161,9 @@ Note: The Dodge score automatically adjusts for HP and/or FP loss below 1/3. (B4
 						<input type="hidden" name="attr_combat_reflexes_dodge_mod" value="-1" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-lift-st hr">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-lifting-strength">Lift ST</span>
@@ -4966,7 +5187,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_lift_st_base" r
 						<input type="number" name="attr_lift_st_points" value="0" step="3" title="Macro: @{NAME|lift_st_points}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row margin-bottom row-basic-lift">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-lift">Lift</span>
@@ -4979,7 +5202,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_lift_st_base" r
 						<input type="number" name="attr_basic_lift" value="0" readonly="readonly" title="Macro: @{NAME|basic_lift}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-strike-st hr">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-striking">Striking</span>
@@ -5004,7 +5229,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 						<input type="number" name="attr_striking_st_points" value="0" step="5" title="Macro: @{NAME|striking_st_points}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-thrust-damage">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-thrust">Thrust</span>
@@ -5060,7 +5287,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Thrust Damage}} {{damageRoll=[[@{thrust}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgThrust" class="roll_damage" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row margin-bottom row-swing-damage">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-swing">Swing</span>
@@ -5116,7 +5345,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Swing Damage}} {{damageRoll=[[@{swing}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgSwing" class="roll_damage" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-stress hr">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						&nbsp;
 					</div>
@@ -5130,7 +5361,9 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 						<span data-i18n="current-label">Current</span>
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-stress">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="attribute-stress">Stress</span>
@@ -5151,7 +5384,9 @@ Stress level from GURPS Fourth Edition Edition.pdf page 141-142. When failing a 
 						<input type="number" name="attr_stress_level" value="0" max="0" step="1" title="Macro: @{NAME|stress_level}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-derangement">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="abbreviation-derangement">Derange</span>
@@ -5172,7 +5407,9 @@ Derangement level from GURPS Fourth Edition Edition.pdf page 141-142. When going
 						<input type="number" name="attr_derangement_level" value="0" max="0" step="1" title="Macro: @{NAME|derangement_level}" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-stress-derangement-penalty">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 					    <div class="popup">
 							<span data-i18n="abbreviation-penalty-label">Pen</span>
@@ -5193,7 +5430,9 @@ The Fright Check Penalty, which is (Stess + Derangement)/2. This will automatica
 						&nbsp;
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row row-stress-derangement-penalty">
+					<div class="cell col-button">&nbsp;</div>
 					<div class="cell col0 label">
 					    <div class="popup">
 							<span data-i18n="abbreviation-disadvantages-label">Disadv.</span>
@@ -5214,6 +5453,7 @@ The amount of disadvantage points acrued due to derangement. At a certain point,
 						&nbsp;
 					</div>
 				</div> <!-- .row -->
+
 			</div> <!-- .table -->
 		</div> <!-- .box .attributes -->
 
@@ -14891,7 +15131,21 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.9.13 -->
+			<!-- current version notes: 2.9.14 -->
+			<ul>
+				<li>
+					Added a toggle for ST, DX, IQ, Per, and Will attributes. Clicking the toggle will show/hide a reason for modifier box.
+					<ul>
+						<li>CSS fix to allow entering values for these attributes.</li>
+					</ul>
+				</li>
+				<li>Melee tab, roll modifier tool dialog box. Fixed bug where selecting the posture doesn't update the modifiers. Reported by valkray</li>
+				<li>Roll Modifier Dialog Box. Added tooltip for the Traits heading and added a section titled Temporary Traits, which will cover cases such as spells and other mitigators.</li>
+			</ul>
+			
+			<h4>Version: 2.9.13</h4>
+			<p>Pull Request: 9/5/2023</p>
+			
 			<ul>
 				<li>Combat Tab. Melee and Ranged attack tables. Added a <b>Duplicate</b> button. Click the button to duplicate the attack, useful for quickly creating alternate attacks based on ammo type or something similar.</li>
 				<li>Traits Tab. Disadvantages table. Added a checkbox labeled <b>Check to make the results a whisper to GM only</b>. If checked, the control roll will be whispered to you and the GM.</li>
@@ -19115,9 +19369,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.9.13";
+	const version = "2.9.14";
 	
-	const latestChangesDate = "9/5/2023";
+	const latestChangesDate = "9/11/2023";
 	
 	let modCascade = true;
 	
@@ -19198,6 +19452,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	 */
 	const rollModifiers = new Map([
 		["night_vision", { modifier: 0, description: "Night Vision", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: true, checkPain: false }],
+		["temporary_night_vision", { modifier: 0, description: "Temporary Night Vision", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: true, checkPain: false }],
 		["has_dark_vision", { modifier: 0, description: "Dark Vision", affectsVisibility: true, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
 		["is_used_to_blindness", { modifier: 0, description: "Used to blindness", affectsVisibility: true, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
 		["has_high_pain_threshold", { modifier: 0, description: "High Pain Threshold", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
@@ -19245,7 +19500,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		["rapid_strike_master", { modifier: -3, description: "Rapid Strike (master)", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["attack_from_above", { modifier: -2, description: "Attack from above", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["mighty_blow", { modifier: 0, description: "Mighty Blow 1 FP per attack. +2 Damage or +1 per die!", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
-		["posture", { modifier: 0, description: "From a function", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: true, checkPain: false }],
+		["posture", { modifier: 0, description: "From a function", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false }],
 		["melee_height_difference", { modifier: 0, description: "From a function", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["improvised_weapon", { modifier: 0, description: "Improvised Weapon", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
 		["tactics", { modifier: 0, description: "Tactics", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false }],
@@ -19352,6 +19607,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19397,6 +19653,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19442,6 +19699,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19499,6 +19757,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19559,6 +19818,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -19621,6 +19881,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		"dialog_custom_roll_modifier",
 		"dialog_custom_roll_modifier_reason",
 		"night_vision",
+		"temporary_night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
 		"has_low_pain_threshold",
@@ -29057,6 +29318,7 @@ B378
 		"change:dialog_custom_roll_modifier",
 		"change:dialog_custom_roll_modifier_reason",
 		"change:night_vision",
+		"change:temporary_night_vision",
 		"change:has_dark_vision",
 		"change:has_high_pain_threshold",
 		"change:has_low_pain_threshold",
@@ -29096,7 +29358,6 @@ B378
 		"change:hit_location",
 		"change:melee_maneuver",
 		"change:melee_all_out_attack",
-		"change:posture",
 		"change:deceptive_strike",
 		"change:evaluate",
 		"change:rapid_strike",
@@ -29119,6 +29380,7 @@ B378
 		"change:mounted_skill_difference",
 		"change:mount_attacked",
 		"change:mount_has_velocity",
+		"change:posture",
 		"change:wild_swing",
 		"change:ranged_weapon_hand",
 		"change:ranged_off_hand_training",
@@ -29359,6 +29621,8 @@ B378
 	
 		let nightVision = parseInt(values.night_vision) || 0;
 	
+		let tempNightVision = parseInt(values.temporary_night_vision) || 0;
+		
 		let adjustedDarknessPenalty = 0;
 	
 		let hasDarkVision = parseInt(values.has_dark_vision) || 0;
@@ -29404,10 +29668,10 @@ B378
 				break;
 		}
 	
-		// add darkness penalty, offset by nightvision
+		// add darkness penalty, offset by nightvision and tempNightVision
 		if (!hasDarkVision && darknessPenalty) {
 	
-			adjustedDarknessPenalty = darknessPenalty + nightVision;
+			adjustedDarknessPenalty = darknessPenalty + nightVision + tempNightVision;
 	
 			if (adjustedDarknessPenalty > 0) {
 				adjustedDarknessPenalty = 0;
