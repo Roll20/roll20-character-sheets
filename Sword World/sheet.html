@@ -5,6 +5,16 @@
 <input class="toggle-fautocalc" type="hidden" name="attr_fellow_autocalc" value="0" />
 <input class="toggle-tabs" type="hidden" name="attr_tab" value="page1"  />
 <input class="adventurer-level" type="hidden" name="attr_adventurer_level" />
+<input type="hidden" name="attr_storage_initiative" />
+<input type="hidden" name="attr_storage_fortitude" />
+<input type="hidden" name="attr_storage_willpower" />
+<input type="hidden" name="attr_storage_monster_initiative" />
+<input type="hidden" name="attr_storage_monster_fortitude" />
+<input type="hidden" name="attr_storage_monster_willpower" />
+
+<button type="roll" class="tokenaction hidden" name="roll_roll" value="@{roll_action}" />
+<button class="hidden" type="action" name="act_roll-action" />
+<input type="hidden" name="attr_roll_action" value="">
 
 <div class="tabs">
     <div class="tab-page1"><button type="action"
@@ -18,9 +28,9 @@
     <div class="tab-settings"><button type="action"
         name="act_settings">Settings</button></div>
     <div class="roller">
-        <button type="roll" name="roll_roll" value="@{roll_action}" />
-        <button class="hidden" type="action" name="act_roll-action" />
-        <input type="hidden" name="attr_roll_action" value="">
+        <button type="roll" name="roll_class" value="@{class_action}" />
+        <button class="hidden" type="action" name="act_class-action" />
+        <input type="hidden" name="attr_class_action" value="">
     </div>
 </div>
 
@@ -650,7 +660,7 @@
             <div>Agility Modifier</div>
             <div class="grid">
                 <button class="input lrg" type="roll" name="roll_initiative"
-                    value="&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~initiative)}} {{name=@{character_name}}} {{skill=Initiative}} {{class=@{initiative_class}}} {{level=@{initiative_class_level}}} {{ability=Agility}} {{modifier=@{agility_modifier}}} {{result=[[[[2d6]]+@{initiative} &{tracker}]]}} {{raw=$[[0]]}}" />
+                    value="@{storage_initiative}" />
                 <label class="refmark">Initiative</label>
                 <input type="hidden" name="attr_initiative_class" />
                 <input type="hidden" name="attr_initiative_class_level" />
@@ -1147,7 +1157,7 @@
                 <input type="number" name="attr_fortitude_mod" value="0" />
             </div>
             <button class="input lrg" type="roll" name="roll_fortitude"
-                value="&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~fortitude)}} {{name=@{character_name}}} {{skill=Fortitude}} {{result=[[[[2d6]]+@{fortitude}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{fortitude}]]}}" />
+                value="@{storage_fortitude}" />
             <label>Fortitude</label>
             <input type="hidden" name="attr_fortitude" />
             <span class="input lrg" name="attr_fortitude" />
@@ -1160,7 +1170,7 @@
                 <input type="number" name="attr_willpower_mod" value="0" />
             </div>
             <button class="input lrg" type="roll" name="roll_willpower"
-                value="&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~willpower)}} {{name=@{character_name}}} {{skill=Willpower}} {{result=[[[[2d6]]+@{willpower}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{willpower}]]}}" />
+                value="@{storage_willpower}" />
             <label>Willpower</label>
             <input type="hidden" name="attr_willpower" />
             <span class="input lrg" name="attr_willpower" />
@@ -1595,7 +1605,7 @@
             <div class="grid col2 nogap">
                 <input type="number" name="attr_monster_initiative" />
                 <button type="roll" name="roll_monster_initiative"
-                    value="&{template:swskill} @{roll_template_token} {{monster=1}} {{name=@{character_name}}} {{skill=Initiative}} {{result=[[@{monster_initiative} &{tracker}]]}}" />
+                    value="@{storage_monster_initiative}" />
             </div>
             <label>Movement Speed:</label>
             <input type="text" spellcheck="false" name="attr_monster_movement" />
@@ -1603,7 +1613,7 @@
             <div class="grid col4 nogap">
                 <input type="number" name="attr_monster_fortitude" value="0" />
                 <button type="roll" name="roll_monster_fortitude"
-                    value="&{template:swskill} @{roll_template_token} {{monster=1}} {{reroll=[Reroll](~monster_fortitude)}} {{name=@{character_name}}} {{skill=Fortitude}} {{result=[[[[2d6]]+@{monster_fortitude}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{monster_fortitude}]]}}" />
+                    value="@{storage_monster_fortitude}" />
                 <input type="hidden" name="attr_monster_fortitude_fixed" value="7" />
                 <span class="input" name="attr_monster_fortitude_fixed" />
                 <button type="roll" name="roll_monster_fortitude2"
@@ -1612,7 +1622,7 @@
             <label>Willpower:</label>
             <div class="grid col4 nogap">
                 <button type="roll" name="roll_monster_willpower"
-                    value="&{template:swskill} @{roll_template_token} {{monster=1}} {{reroll=[Reroll](~monster_willpower)}} {{name=@{character_name}}} {{skill=Willpower}} {{result=[[[[2d6]]+@{monster_willpower}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{monster_willpower}]]}}" />
+                    value="@{storage_monster_willpower}" />
                 <input type="number" name="attr_monster_willpower" value="0" />
                 <input type="hidden" name="attr_monster_willpower_fixed" value="7" />
                 <span class="input" name="attr_monster_willpower_fixed" />
@@ -2172,6 +2182,14 @@
 
 <script type="text/worker">
 
+    const storage = {
+        initiative: "&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~initiative)}} {{name=@{character_name}}} {{skill=Initiative}} {{class=@{initiative_class}}} {{level=@{initiative_class_level}}} {{ability=Agility}} {{modifier=@{agility_modifier}}} {{result=[[[[2d6]]+@{initiative} &{tracker}]]}} {{raw=$[[0]]}}",
+        fortitude: "&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~fortitude)}} {{name=@{character_name}}} {{skill=Fortitude}} {{result=[[[[2d6]]+@{fortitude}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{fortitude}]]}}",
+        willpower: "&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~willpower)}} {{name=@{character_name}}} {{skill=Willpower}} {{result=[[[[2d6]]+@{willpower}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{willpower}]]}}",
+        monster_initiative: "&{template:swskill} @{roll_template_token} {{monster=1}} {{name=@{character_name}}} {{skill=Initiative}} {{result=[[@{monster_initiative} &{tracker}]]}}",
+        monster_fortitude: "&{template:swskill} @{roll_template_token} {{monster=1}} {{reroll=[Reroll](~monster_fortitude)}} {{name=@{character_name}}} {{skill=Fortitude}} {{result=[[[[2d6]]+@{monster_fortitude}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{monster_fortitude}]]}}",
+        monster_willpower: "&{template:swskill} @{roll_template_token} {{monster=1}} {{reroll=[Reroll](~monster_willpower)}} {{name=@{character_name}}} {{skill=Willpower}} {{result=[[[[2d6]]+@{monster_willpower}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{monster_willpower}]]}}"
+    };
     const tab_list = ["page1","page2","monster","fellow","settings"];
     const base_list = ["skill","body","mind"];
     const ability_data = {
@@ -2313,6 +2331,12 @@
     });
 
     on("sheet:opened change:character_token", function(eventInfo) {
+        let update = {
+            roll_template_token: "",
+            display_token: 0,
+            storage_initiative: storage["initiative"],
+            storage_monster_initiative: storage["monster_initiative"]
+        };
         getAttrs(["character_token"], function(values) {
             let character_token = values.character_token;
 
@@ -2322,16 +2346,10 @@
                 character_token += ".png";
                 let roll_template_token = `{{token=[x](${character_token})}}`;
 
-                setAttrs({
-                    roll_template_token: roll_template_token,
-                    display_token: 1
-                });
-            } else {
-                setAttrs({
-                    roll_template_token: "",
-                    display_token: 0
-                });
+                update["roll_template_token"] = roll_template_token;
+                update["display_token"] = 1;
             }
+            setAttrs(update);
         });
     });
 
@@ -2597,7 +2615,33 @@
         });
     });
 
-    on("clicked:roll-action clicked:repeating_workskills:workskill-action", function(eventInfo) {
+    on("clicked:roll-action", function(eventInfo) {
+        getAttrs(["monster"], function(values) {
+            let monster_type = parseInt(values["monster"])||0;
+            let roll = "?{Action|Initiative,0[initiative]|Fortitude,1[fortitude]|Willpower,2[willpower]}";
+            if (monster_type == 1) { // monster
+                roll = "?{Action|Initiative,0[monster_initiative]|Fortitude,1[monster_fortitude]|Willpower,2[monster_willpower]}";
+            } else if (monster_type == 2) { // fellow
+                roll = "0";
+            }
+
+            startRoll(`&{template:swempty} {{rolltype=[[${roll}]]}} {{raw=[[2d6]]}}`, (results) => {
+                finishRoll(results.rollId, {});
+
+                if (monster_type == 2) { // fellow
+                    triggerFellow(eventInfo);
+                } else {
+                    let rolltype = results.results.rolltype.expression.slice(2, -1);
+                    let final_roll = storage[rolltype];
+                    startRoll(final_roll, (results2) => {
+                        finishRoll(results2.rollId, {});
+                    });
+                }
+            });
+        });
+    });
+
+    on("clicked:class-action clicked:repeating_workskills:workskill-action", function(eventInfo) {
         const source = eventInfo["sourceAttribute"] ? eventInfo["sourceAttribute"] : "";
         const rowid = source ? source.split('_')[2] : "";
         getAttrs(class_level_list.concat(ability_modifier_list), function(values) {
@@ -2791,6 +2835,9 @@
         6: 7
     };
     on(fellow_triggers, function(eventInfo) {
+        triggerFellow(eventInfo);
+    });
+    const triggerFellow = function(eventInfo) {
         let trigger = eventInfo["triggerName"];
         let choice = 0;
         if (trigger && trigger.indexOf("choice") > 0) {
@@ -2826,7 +2873,7 @@
                 );
             });
         });
-    });
+    };
 
     const fixed_data = {
         "global": ["monster_fortitude","monster_willpower",
@@ -2899,7 +2946,7 @@
     const action_refs = ["power0_action","power5_action","power10_action",
         "power15_action","power20_action","power25_action","power30_action",
         "power35_action","power40_action","power45_action","power50_action",
-        "roll_action"]; // non-repeating buttons
+        "class_action", "roll_action"]; // non-repeating buttons
     const actionCallUpdate = function() {
         getAllAttrs(["character_name", ...action_refs], repeating_sections, (attributes, sections) => {
             let actions = Object.keys(attributes).filter((key) => key !== "character_name");
@@ -3375,4 +3422,7 @@
             {{reroll}}
         </div>
     </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-swempty">
 </rolltemplate>
