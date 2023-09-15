@@ -333,6 +333,9 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     'druidLionMasqueBase',
     'druidLionMasqueEvol',
     'druidLionMasqueAE',
+    'druidLionDameBase',
+    'druidLionDameEvol',
+    'druidLionDameAE',
   ];
 
   const wpn = [
@@ -408,6 +411,16 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     'repeating_armeDruidLion_tirRafale',
     'repeating_armeDruidLion_tirSecurite',
     'repeating_armeDruidLion_ultraViolence',
+    'repeating_armeDruidLion_boost',
+    'repeating_armeDruidLion_boostValue',
+    'repeating_armeDruidLion_cdf',
+    'repeating_armeDruidLion_cdfValue',
+    'repeating_armeDruidLion_immobilisation',
+    'repeating_armeDruidLion_immobilisationValue',
+    'repeating_armeDruidLion_intimidanteAnatheme',
+    'repeating_armeDruidLion_intimidanteHumain',
+    'repeating_armeDruidLion_retourFlamme',
+    'repeating_armeDruidLion_sansArmure',
   ];
 
   const ameliorations = [
@@ -507,6 +520,9 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
 
   const vMasque = totalADruid(attrs, 'druidLionMasque');
   const vAEMasque = +attrs.druidLionMasqueAE;
+
+  const vDame = totalADruid(attrs, 'druidLionDame');
+  const vAEDame = +attrs.druidLionDameAE;
 
   const devaste = +attrs.devasterAnatheme;
   const bourreau = +attrs.bourreauTenebres;
@@ -634,6 +650,16 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   const eTirSecurite = attrs.repeating_armeDruidLion_tirSecurite;
   const eUltraviolence = attrs.repeating_armeDruidLion_ultraViolence;
   const eUltraviolenceV = 2;
+  const eCdF = attrs.repeating_armeDruidLion_cdf;
+  const eCdFV = attrs.repeating_armeDruidLion_cdfValue;
+  const eImmobilisation = attrs.repeating_armeDruidLion_immobilisation;
+  const eImmobilisationV = attrs.repeating_armeDruidLion_immobilisationValue;
+  const eIntimidanteHumain = attrs.repeating_armeDruidLion_intimidanteHumain;
+  const eIntimidanteAnatheme = attrs.repeating_armeDruidLion_intimidanteAnatheme;
+  const eRetourFlamme = attrs.repeating_armeDruidLion_retourFlamme;
+  const eSansArmure = attrs.repeating_armeDruidLion_sansArmure;
+  const eBoost = attrs.repeating_armeDruidLion_boost;
+  const eBoostV = attrs.repeating_armeDruidLion_boostValue;
 
   if (eAntiAnatheme !== '0') {
     isConditionnelD = true;
@@ -867,6 +893,32 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   if (eReaction !== '0') { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
   if (eTirSecurite !== '0') { autresEffets.push(i18n_tirSecurite); }
+
+  if (eCdF !== '0') { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
+
+  if (eImmobilisation !== '0') { autresEffets.push(`${i18n_immobilisation} ${eImmobilisationV}`); }
+
+  if (eIntimidanteAnatheme !== '0') {
+    isConditionnelV = true;
+    let vIntimidanteAnatheme = Math.ceil(+vDame / 2);
+    vIntimidanteAnatheme += +vAEDame;
+
+    exec.push(`{{intimidanteAnatheme=${i18n_intimidanteAnatheme}}} {{intimidanteAnathemeCondition=${i18n_intimidanteAnathemeCondition}}} {{intimidanteAnathemeValue=${vIntimidanteAnatheme}}}`);
+  }
+
+  if (eIntimidanteHumain !== '0') {
+    isConditionnelV = true;
+    let vIntimidanteHumain = Math.ceil(+vDame / 2);
+    vIntimidanteHumain += +vAEDame;
+
+    exec.push(`{{intimidanteHumain=${i18n_intimidanteHumain}}} {{intimidanteHumainCondition=${i18n_intimidanteHumainCondition}}} {{intimidanteHumainValue=${vIntimidanteHumain}}}`);
+  }
+
+  if (eRetourFlamme !== '0') { autresEffets.push(`${i18n_retourFlamme}`); }
+
+  if (eSansArmure !== '0') { autresEffets.push(`${i18n_sansArmure}`); }
+
+  if (eBoost !== '0') { autresEffets.push(`${i18n_boost} ${eBoostV}`); }
 
   // FIN GESTION DES EFFETS
 
@@ -1595,6 +1647,9 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     'MALDruidLionMasqueBase',
     'MALDruidLionMasqueEvol',
     'MALDruidLionMasqueAE',
+    'MALDruidLionDameBase',
+    'MALDruidLionDameEvol',
+    'MALDruidLionDameAE',
   ];
 
   const wpn = [
@@ -1670,6 +1725,16 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     'repeating_armeMALDruidLion_tirRafale',
     'repeating_armeMALDruidLion_tirSecurite',
     'repeating_armeMALDruidLion_ultraViolence',
+    'repeating_armeMALDruidLion_boost',
+    'repeating_armeMALDruidLion_boostValue',
+    'repeating_armeMALDruidLion_cdf',
+    'repeating_armeMALDruidLion_cdfValue',
+    'repeating_armeMALDruidLion_immobilisation',
+    'repeating_armeMALDruidLion_immobilisationValue',
+    'repeating_armeMALDruidLion_intimidanteAnatheme',
+    'repeating_armeMALDruidLion_intimidanteHumain',
+    'repeating_armeMALDruidLion_retourFlamme',
+    'repeating_armeMALDruidLion_sansArmure',
   ];
 
   const ameliorations = [
@@ -1769,6 +1834,9 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
 
   const vMasque = totalADruid(attrs, 'MALDruidLionMasque');
   const vAEMasque = +attrs.MALDruidLionMasqueAE;
+
+  const vDame = totalADruid(attrs, 'MALDruidLionDame');
+  const vAEDame = +attrs.MALDruidLionDameAE;
 
   const devaste = +attrs.devasterAnatheme;
   const bourreau = +attrs.bourreauTenebres;
@@ -1896,6 +1964,16 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   const eTirSecurite = attrs.repeating_armeMALDruidLion_tirSecurite;
   const eUltraviolence = attrs.repeating_armeMALDruidLion_ultraViolence;
   const eUltraviolenceV = 2;
+  const eCdF = attrs.repeating_armeMALDruidLion_cdf;
+  const eCdFV = attrs.repeating_armeMALDruidLion_cdfValue;
+  const eImmobilisation = attrs.repeating_armeMALDruidLion_immobilisation;
+  const eImmobilisationV = attrs.repeating_armeMALDruidLion_immobilisationValue;
+  const eIntimidanteHumain = attrs.repeating_armeMALDruidLion_intimidanteHumain;
+  const eIntimidanteAnatheme = attrs.repeating_armeMALDruidLion_intimidanteAnatheme;
+  const eRetourFlamme = attrs.repeating_armeMALDruidLion_retourFlamme;
+  const eSansArmure = attrs.repeating_armeMALDruidLion_sansArmure;
+  const eBoost = attrs.repeating_armeMALDruidLion_boost;
+  const eBoostV = attrs.repeating_armeMALDruidLion_boostValue;
 
   if (eAntiAnatheme !== '0') {
     isConditionnelD = true;
@@ -1925,7 +2003,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`; }
   }
 
-  if (eBourreau) {
+  if (eBourreau !== '0') {
     isBourreau = true;
     eBourreauValue = eBourreauV;
     exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauV} ${i18n_inclus}}}`);
@@ -1944,7 +2022,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{chocCondition=${i18n_chocCondition}}}`);
   }
 
-  if (eConviction !== 0) {
+  if (eConviction !== '0') {
     autresEffets.push(i18n_conviction);
   }
 
@@ -1962,7 +2040,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{destructeurCondition=${i18n_destructeurCondition}}}`);
   }
 
-  if (eDevastation) {
+  if (eDevastation !== '0') {
     isDevastation = true;
     eDevastationValue = eDevastationV;
     exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationV} ${i18n_inclus}}}`);
@@ -1982,7 +2060,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
-  if (eExcellence) {
+  if (eExcellence !== '0') {
     isConditionnelD = true;
     isConditionnelV = true;
 
@@ -2046,7 +2124,7 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{vPrecision=${vPrecision}}}`);
   }
 
-  if (eRegularite) {
+  if (eRegularite !== '0') {
     isRegularite = true;
     exec.push('{{vRegularite=[[0]]}}');
   }
@@ -2127,6 +2205,32 @@ on('clicked:repeating_armeMALDruidLion:combatdruidroll', async (info) => {
   if (eReaction !== '0') { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
   if (eTirSecurite !== '0') { autresEffets.push(i18n_tirSecurite); }
+
+  if (eCdF !== '0') { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
+
+  if (eImmobilisation !== '0') { autresEffets.push(`${i18n_immobilisation} ${eImmobilisationV}`); }
+
+  if (eIntimidanteAnatheme !== '0') {
+    isConditionnelV = true;
+    let vIntimidanteAnatheme = Math.ceil(+vDame / 2);
+    vIntimidanteAnatheme += +vAEDame;
+
+    exec.push(`{{intimidanteAnatheme=${i18n_intimidanteAnatheme}}} {{intimidanteAnathemeCondition=${i18n_intimidanteAnathemeCondition}}} {{intimidanteAnathemeValue=${vIntimidanteAnatheme}}}`);
+  }
+
+  if (eIntimidanteHumain !== '0') {
+    isConditionnelV = true;
+    let vIntimidanteHumain = Math.ceil(+vDame / 2);
+    vIntimidanteHumain += +vAEDame;
+
+    exec.push(`{{intimidanteHumain=${i18n_intimidanteHumain}}} {{intimidanteHumainCondition=${i18n_intimidanteHumainCondition}}} {{intimidanteHumainValue=${vIntimidanteHumain}}}`);
+  }
+
+  if (eRetourFlamme !== '0') { autresEffets.push(`${i18n_retourFlamme}`); }
+
+  if (eSansArmure !== '0') { autresEffets.push(`${i18n_sansArmure}`); }
+
+  if (eBoost !== '0') { autresEffets.push(`${i18n_boost} ${eBoostV}`); }
 
   // FIN GESTION DES EFFETS
 

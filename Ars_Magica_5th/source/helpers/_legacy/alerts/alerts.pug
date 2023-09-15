@@ -1,0 +1,34 @@
+
+
+- arm5.pug.sheet_data.alerts = [];
+// Attribute used to store the display state of alerts
+// Stored as a JSON string
++hidden({name:"arm5_sheet_alerts_states", value: "{}"})
+
+mixin alert({name, level="info", container="div", closeTrigger="arm5.sheet.alerts.close"})
+    //- Check and sanitize arguments using k-scaffold functions
+    //- We use action button sanitization, because the name is later used as CSS classes
+    - name = actionButtonName(replaceProblems(name));
+    -
+        const levels = ["info", "warning"];
+        if (levels.indexOf(level) === -1 ) {
+            throw new Error(`Invalid alert level '${level}', expected one of ${levels}.`);
+        }
+        if (arm5.pug.sheet_data.alerts.indexOf(id) > -1 ) {
+            throw new Error(`Alert '${id}' is already registered.`);
+        }
+    
+    div(class=`alert alert-level__${level} alert--${name} hidden`)
+        +action({name: `alert-close-${name}`, trigger:{triggeredFuncs:[closeTrigger]}})(data-alert-name=name, class=`alert--${name} alert__close alert--${name}__close`)
+        //- Inject the default classes into container
+        - attributes.class = attributes.class ? ` ${replaceProblems(attributes.class)}` : '';
+        - attributes.class = `alert__content alert--${name}${attributes.class}__content `;
+        #{container}&attributes(attributes)
+            block
+    
+    - arm5.pug.sheet_data.alerts.push(name);
+
+mixin sheetworker_helpers_alerts()
+    | 
+    | 
+    include alerts.sheetworker.js

@@ -930,9 +930,9 @@ on('change:fichePNJ change:armure change:tir change:savoir change:technique chan
 
   if (fiche !== 0) { return; }
 
-  const armure = +attrs.armure;
+  const armure = attrs.armure;
 
-  const aspect = +attrs.machine;
+  const aspect = attrs.machine;
 
   const car1 = +attrs.tir;
   const car2 = +attrs.savoir;
@@ -3743,4 +3743,68 @@ on('change:chevaliersHerauts', () => {
   update.equilibreBalance = 0;
 
   setAttrsAsync(update);
+});
+
+on('change:codexFM4', async (eventInfo) => {
+  if (eventInfo.newValue !== '0') return;
+
+  const update = {};
+  const listEffect = ['boost', 'cdf', 'immobilisation', 'intimidanteHumain', 'intimidanteAnatheme', 'retourFlamme', 'sansArmure'];
+  const listPrefix = ['pS', 'pSC', 'mE', 'mEC'];
+
+  for (const p of listPrefix) {
+    listEffect.forEach((e) => {
+      update[`${p}${e}`] = 0;
+    });
+  }
+
+  await getSectionIDs('repeating_armeCaC', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeCaC_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeDist', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeDist_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeDistVehicule', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeDistVehicule_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeDruidLion', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeDruidLion_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeMALDruidLion', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeMALDruidLion_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeAutre', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeAutre_${currentID}_${e}`] = 0;
+      });
+    });
+
+    setAttrsAsync(update);
+  });
 });

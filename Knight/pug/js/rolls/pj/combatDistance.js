@@ -24,6 +24,8 @@ rollCombatDistance.forEach((button) => {
       `${ODValue.dexterite}`,
       'tir',
       `${ODValue.tir}`,
+      'aura',
+      `${ODValue.aura}`,
       'devasterAnatheme',
       'bourreauTenebres',
       'equilibreBalance',
@@ -268,6 +270,8 @@ rollCombatDistance.forEach((button) => {
     const oDexterite = +attrs[`${ODValue.dexterite}`];
     const vTir = +attrs.tir;
     const oTir = +attrs[`${ODValue.tir}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -397,7 +401,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DES EFFETS
 
-    const effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+    const effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
     bDegats = bDegats.concat(effets.bDegats);
     eASAssassin = effets.eASAssassin;

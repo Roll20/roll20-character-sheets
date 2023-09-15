@@ -1,51 +1,90 @@
 <div class="wrapper">
-    <input type="hidden" class="tabstoggle" name="attr_sheetTab" value="pilot"/>
+    <input type="hidden" class="tabstoggle" name="attr_sheetTab" value="settings"/>
     <div>
-        <button type="action" name="act_pilot" class="tabs">Pilot</button>
-        <button type="action" name="act_mech" class="tabs">Mech</button>
+        <input class="show-pilot" name="attr_is-pilot" type="checkbox" hidden/>
+        <button type="action" name="act_pilot" class="tabs pilot-button">Pilot</button>
+
+        <input class="show-mech" name="attr_is-mech" type="checkbox" hidden/>
+        <button type="action" name="act_mech" class="tabs mech-button">Mech</button>
+
+        <input class="show-crawler" name="attr_is-crawler" type="checkbox" hidden/>
+        <button type="action" name="act_crawler" class="tabs crawler-button">Union Crawler</button>
+
+        <input class="show-denizen" name="attr_is-denizen" type="checkbox" hidden/>
+        <button type="action" name="act_denizen" class="tabs denizen-button">Denizen</button>
+
+        <input class="show-notes" name="attr_show-notes-tab" type="checkbox" hidden/>
+        <button type="action" name="act_notes" class="tabs notes-button">Notes</button>
+
+        <button type="action" name="act_settings" class="tabs">Settings</button>
     </div>
 
     <div class="pilot">
-        <h2>Pilot <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button></h2>
-        <div style="display: flex;">
+        <h2>Pilot
+            <button type="action" name="act_roll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+        </h2>
+        <div style="display:flex">
             <div class="twocolumns">
-                <div class="labels">
-                    <label>Callsign</label>
-                    <label>Background </label>
-                    <label>Ideal </label>
-                    <label>Flaw </label>
-                    <label>Keepsake </label>
-                    <label>Motto </label>
+                <div class="descValuePair">
+                    <label for="name">Callsign</label>
+                    <input id="name" type="text" class="checkboxSpacer" name="attr_character_name">
                 </div>
-                <div class="valuecolumn">
-                    <input type="text" name="attr_character_name">
-                    <input type="text" name="attr_background">
-                    <input type="text" name="attr_ideal">
-                    <input type="text" name="attr_flaw">
-                    <input type="text" name="attr_keepsake">
-                    <input type="text" name="attr_motto">
-                </div>
+                <details>
+                    <summary>
+                        <span class="descValuePair">
+                            <label for="class">Class</label>
+                            <input id="class" type="text" class="checkboxSpacer" name="attr_character_class">
+                        </span>
+                    </summary>
+                    <span class="descValuePair">
+                        <label for="skillpoints">Skillpoints available</label>
+                        <input id="skillpoints" type="text" class="checkboxSpacer" name="attr_skillpoints">
+                    </span>
+                </details>
+                <details>
+                    <summary>
+                            <span class="descValuePair">
+                                <label>Background</label>
+                                <input type="text" name="attr_background">
+                                <input type="checkbox" name="attr_backgroundUsed">
+                            </span>
+                    </summary>
+                    <textarea name="attr_backgroundDetails"></textarea>
+                </details>
+                <details>
+                    <summary>
+                            <span class="descValuePair">
+                                <label>Keepsake </label>
+                                <input type="text" name="attr_keepsake">
+                                <input type="checkbox" name="attr_keepsakeUsed">
+                            </span>
+                    </summary>
+                    <textarea name="attr_keepsakeDetails"></textarea>
+                </details>
+                <details>
+                    <summary>
+                            <span class="descValuePair">
+                                <label>Motto </label>
+                                <input type="text" name="attr_motto">
+                                <input type="checkbox" name="attr_mottoUsed">
+                            </span>
+                    </summary>
+                    <textarea name="attr_mottoDetails"></textarea>
+                </details>
             </div>
 
-            <div class="marginleft">
-                <h3>Stats</h3>
-                <div class="twocolumns">
-                    <div class="labels">
-                        <label>Health</label>
-                        <label>Ability Pts </label>
-                        <label>Stress </label>
-                    </div>
-                    <div class="valuecolumn">
-                        <input type="number" min="0" max="10" name="attr_health" value="10">
-                        <input type="number" min="0" max="5" name="attr_abilitypts" value="5">
-                        <input type="number" min="0" max="10" name="attr_stress" value="0">
-                    </div>
-                    <div>
-                        <label> of 10</label>
-                        <label> of 5</label>
-                        <label> of 10 </label>
-                    </div>
+            <div class="marginleft twocolumns">
+                <div class="descValuePair">
+                    <button type="roll" class="textbutton" value="&{template:criticalinjury}{{name=@{character_name}}}{{roll=[[1d20]]}}">Health</button>
+                    <input id="health" type="number" min="0" name="attr_health" value="10">
+                    <label> of <input type="number" min="0" name="attr_health_max" value="10"></label>
                 </div>
+                <div class="descValuePair">
+                    <label for="abilityPts">Ability Pts </label>
+                    <input id="abilityPts" type="number" min="0" name="attr_abilitypts" value="5">
+                    <label> of <input type="number" min="5" name="attr_abilitypts_max" value="5"></label>
+                </div>
+                <button type="action" class="textbutton" name="act_downtime">Start Downtime</button>
             </div>
         </div>
 
@@ -57,74 +96,448 @@
         </div>
         <div>
             <fieldset class="repeating_weapons">
-                <div class="weapon">
-                    <input type="text" name="attr_weaponname" title="Name of the Weapon">
-                    <input type="text" name="attr_range" title="Range">
-                    <input type="text" name="attr_damage" title="Damage">
-                    <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
-                    </button>
-                </div>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_name" title="Name of the Weapon">
+                        <input type="text" name="attr_range" title="Range">
+                        <input type="text" name="attr_damage" title="Damage">
+                        <button type="action" name="act_roll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{roll=[[1d20]]}}{{damage=@{prefix-damage}}}{{traits=@{prefix-traits}}}">
+                        </button>
+                    </summary>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
+                </details>
             </fieldset>
         </div>
 
         <h3>Inventory</h3>
-        <div>
-            <input type="text" name="attr_itemname1">
-            <input type="text" name="attr_itemname2">
-            <input type="text" name="attr_itemname3">
-            <input type="text" name="attr_itemname4">
-            <input type="text" name="attr_itemname5">
-            <input type="text" name="attr_itemname6">
+        <div class="inventory">
+            <details>
+                <summary>
+                    <input type="text" name="attr_itemname1">
+                </summary>
+                <textarea name="attr_itemDetails1"></textarea>
+            </details>
+            <details>
+                <summary>
+                    <input type="text" name="attr_itemname2">
+                </summary>
+                <textarea name="attr_itemDetails2"></textarea>
+            </details>
+            <details>
+                <summary>
+                    <input type="text" name="attr_itemname3">
+                </summary>
+                <textarea name="attr_itemDetails3"></textarea>
+            </details>
+            <details>
+                <summary>
+                    <input type="text" name="attr_itemname4">
+                </summary>
+                <textarea name="attr_itemDetails4"></textarea>
+            </details>
+            <details>
+                <summary>
+                    <input type="text" name="attr_itemname5">
+                </summary>
+                <textarea name="attr_itemDetails5"></textarea>
+            </details>
+            <details>
+                <summary>
+                    <input type="text" name="attr_itemname6">
+                </summary>
+                <textarea name="attr_itemDetails6"></textarea>
+            </details>
+            <input class="nojobtobig" name="attr_nojobtobig" type="checkbox" hidden/>
+            <span class="nojobtobig">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_nojobtobig2">
+                    </summary>
+                <textarea name="attr_nojobtobigDetails2"></textarea>
+                </details>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_nojobtobig1">
+                    </summary>
+                    <textarea name="attr_nojobtobigDetails1"></textarea>
+                </details>
+            </span>
+            <input class="beefcake" name="attr_beefcake" type="checkbox" hidden/>
+            <span class="beefcake">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_beefcake1">
+                    </summary>
+                <textarea name="attr_beefackeDetails1"></textarea>
+                </details>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_beefcake2">
+                    </summary>
+                    <textarea name="attr_beefackeDetails2"></textarea>
+                </details>
+            </span>
         </div>
 
         <h3>Equipment</h3>
+        <div class="equipment">
+            <label>Name</label>
+            <label>AP/Uses</label>
+            <label>Range</label>
+            <label>Action</label>
+        </div>
         <fieldset class="repeating_equipment">
-            <textarea name="attr_equipment" class="textarea"></textarea>
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Equipment">
+                    <input type="text" name="attr_cost" title="AP/Uses">
+                    <input type="text" name="attr_range" title="Range">
+                    <input type="text" name="attr_action" title="Action">
+                </summary>
+                <div>
+                    <div class="textarea-with-controls">
+                        <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                        <textarea name="attr_details" class="textarea"></textarea>
+                        <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                    </div>
+                </div>
+            </details>
         </fieldset>
 
         <h3>Abilities</h3>
+        <div class="equipment">
+            <label>Name</label>
+            <label>AP</label>
+            <label>Range</label>
+            <label>Action</label>
+        </div>
         <fieldset class="repeating_abilities">
-            <textarea name="attr_ability" class="textarea"></textarea>
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Ability">
+                    <input type="text" name="attr_cost" title="AP">
+                    <input type="text" name="attr_range" title="Range">
+                    <input type="text" name="attr_action" title="Action">
+                </summary>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_ability" class="textarea"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{ability}}}">w</button>
+                </div>
+            </details>
         </fieldset>
-
     </div>
 
     <div class="mech">
-        <h2>Mech <button type="roll" value="&{template:roll}{{name=@{mechname}}}{{roll=[[1d20]]}}"></button></h2>
-        <div style="display: flex;">
+        <h2>Mech
+            <button type="action" name="act_mechroll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+        </h2>
+        <div style="display:flex">
             <div class="twocolumns">
-                <div class="labels">
-                    <label>Name</label>
-                    <label>System Slots </label>
-                    <label>Module Slots </label>
-                    <label>Chassis Type </label>
+                <div class="descValuePair">
+                    <label for="mechname">Name</label>
+                    <input id="mechname" type="text" name="attr_character_name">
                 </div>
-                <div class="valuecolumn">
-                    <input type="text" name="attr_mechname">
-                    <input type="text" name="attr_system">
-                    <input type="text" name="attr_module">
-                    <input type="text" name="attr_chassis">
+                <div class="descValuePair">
+                    <label>System Slots </label>
+                    <span style="display: flex">
+                        <input type="number" name="attr_systems" value="@{systems_used}" disabled>
+                        <label> of </label>
+                        <input type="number" name="attr_systems_max">
+                    </span>
+                </div>
+                <div class="descValuePair">
+                    <label>Module Slots </label>
+                    <span style="display: flex">
+                        <input type="number" name="attr_modules" value="@{modules_used}" disabled>
+                        <label> of</label>
+                        <input type="number" name="attr_modules_max">
+                    </span>
+                </div>
+                <details>
+                    <summary>
+                            <span class="descValuePair">
+                                <label for="chassis">Chassis Type </label>
+                                <input id="chassis" type="text" name="attr_chassis">
+                            </span>
+                    </summary>
+                    <div>
+                        <div class="descValuePair">
+                            <label for="chassiscost">Cost</label>
+                            <input id="chassiscost" type="text" name="attr_chassis_cost">
+                        </div>
+                        <textarea name="attr_chassisDetails"></textarea>
+                    </div>
+                </details>
+            </div>
+
+            <div class="marginleft twocolumns">
+                <div class="descValuePair">
+                    <button type="roll" class="textbutton" value="&{template:criticaldamage}{{name=@{character_name}}}{{roll=[[1d20]]}}">Structure</button>
+                    <input type="number" id="structure" min="0" name="attr_structure" value="10">
+                    <label> of <input type="number" min="0" name="attr_structure_max" value="10"></label>
+                </div>
+                <input class="show-shield" name="attr_show-shield" type="checkbox" hidden/>
+                <div class="descValuePair shield">
+                    <label for="shield">Shield <input type="number" id="shield" min="0" name="attr_shield" value="0"></label>
+
+                </div>
+                <div class="descValuePair">
+                    <label for="energyPts">Energy Pts </label>
+                    <input type="number" id="energyPts" min="0" name="attr_energy" value="10">
+                    <label> of <input type="number" min="0" name="attr_energy_max" value="10"></label>
+                </div>
+                <div class="descValuePair">
+                    <button type="action" name="act_roll" class="textbutton" value="&{template:roll}{{name=@{character_name}}}{{mech=1}}{{heatroll=[[1d20]]}}{{heat=[[@{heat}]]}}">Heat</button>
+                    <input type="number" min="0" max="@{heat_max}" name="attr_heat" value="0">
+                    <label> of <input type="number" min="0" name="attr_heat_max" value="10"> </label>
+                </div>
+                <button type="action" class="textbutton" name="act_downtime">Start Downtime</button>
+            </div>
+        </div>
+
+        <h3>Weapons</h3>
+        <div class="weapon">
+            <label>Name</label>
+            <label>Range</label>
+            <label>Damage</label>
+        </div>
+        <div>
+            <fieldset class="repeating_mechweapons">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_name" title="Name of the Weapon">
+                        <input type="text" name="attr_range" title="Range">
+                        <input type="text" name="attr_damage" title="Damage">
+                        <button type="action" name="act_mechroll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{traits=@{prefix-traits}}}">
+                        </button>
+                    </summary>
+                    <details>
+                        <summary>
+                            <h4>Settings</h4>
+                        </summary>
+                        <details>
+                            <summary><h4>Cost</h4></summary>
+                            <div class="descValuePair">
+                                <label>Cost</label>
+                                <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Slots</label>
+                                <input type="number" name="attr_slots" value="1">
+                            </div>
+                        </details>
+                        <details>
+                            <summary><h4>Heat</h4></summary>
+                            <div class="descValuePair">
+                                <label>Heat produced</label>
+                                <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
+                            </div>
+                        </details>
+                    </details>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
+                </details>
+            </fieldset>
+        </div>
+
+        <h3>Cargo <input type="text" name="attr_cargo" title="Actual cargo capacity" style="max-width: 30px;"> / <input type="text" name="attr_maxcargo" title="Maximum cargo capacity" style="max-width: 30px;"></h3>
+        <fieldset class="repeating_cargo">
+            <details>
+                <summary>
+                    <input type="text" name="attr_cargoname">
+                </summary>
+                <textarea class="textarea" name="attr_cargo"></textarea>
+            </details>
+
+        </fieldset>
+
+        <h3>Modules</h3>
+        <div class="equipment">
+            <label>Name</label>
+            <label>EP/Uses</label>
+            <label>Range</label>
+            <label>Action</label>
+        </div>
+        <fieldset class="repeating_modules">
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Equipment">
+                    <input type="text" name="attr_cost" title="EP/Uses">
+                    <input type="text" name="attr_range" title="Range">
+                    <input type="text" name="attr_action" title="Action">
+                    <input type="checkbox" name="attr_is-passive" class="passiv-hide" hidden>
+                    <button type="action" class="textbutton passiv-hide" name="act_use-module">Use</button>
+                    <input type="checkbox" class="show-active" name="attr_has-active" hidden>
+                    <input type="checkbox" class="active" name="attr_active" title="Active">
+                </summary>
+                <details>
+                    <summary>
+                        <h4>Settings</h4>
+                    </summary>
+                    <details>
+                        <summary><h4>Cost</h4></summary>
+                        <div class="descValuePair">
+                            <label>Cost</label>
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Slots</label>
+                            <input type="number" name="attr_slots" value="0">
+                        </div>
+                    </details>
+                    <details>
+                        <summary><h4>Heat</h4></summary>
+                        <div class="descValuePair">
+                            <label>Heat produced</label>
+                            <input type="number" name="attr_heat" value="0" min="0">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Heat Spike</label>
+                            <input type="checkbox" name="attr_heatspike">
+                        </div>
+                    </details>
+                    <div class="descValuePair">
+                        <label>Is passive</label>
+                        <input type="checkbox" name="attr_is-passive">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has active effect</label>
+                        <input type="checkbox" name="attr_has-active">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has Uses instead of EP cost</label>
+                        <input type="checkbox" name="attr_has-uses">
+                    </div>
+                </details>
+                <div class="textarea-with-controls">
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                    <textarea name="attr_details" class="textarea"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+
+            </details>
+        </fieldset>
+
+        <h3>Systems</h3>
+        <div class="equipment">
+            <label>Name</label>
+            <label>EP/Uses</label>
+            <label>Range</label>
+            <label>Action</label>
+        </div>
+        <fieldset class="repeating_systems">
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Equipment">
+                    <input type="text" name="attr_cost" title="EP/Uses">
+                    <input type="text" name="attr_range" title="Range">
+                    <input type="text" name="attr_action" title="Action">
+                    <input type="checkbox" name="attr_is-passive" class="passiv-hide" hidden>
+                    <button type="action" class="textbutton passiv-hide" name="act_use-system">Use</button>
+                    <input type="checkbox" class="show-active" name="attr_has-active" hidden>
+                    <input type="checkbox" class="active" name="attr_active" title="Active">
+                </summary>
+                <details>
+                    <summary>
+                        <h4>Settings</h4>
+                    </summary>
+                    <details>
+                        <summary><h4>Cost</h4></summary>
+                        <div class="descValuePair">
+                            <label>Cost</label>
+                            <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Slots</label>
+                            <input type="number" name="attr_slots" value="0">
+                        </div>
+                    </details>
+                    <details>
+                        <summary><h4>Heat</h4></summary>
+                        <div class="descValuePair">
+                            <label>Heat produced</label>
+                            <input type="number" name="attr_heat" value="0" min="0">
+                        </div>
+                        <div class="descValuePair">
+                            <label>Heat Spike</label>
+                            <input type="checkbox" name="attr_heatspike">
+                        </div>
+                    </details>
+                    <div class="descValuePair">
+                        <label>Is passive</label>
+                        <input type="checkbox" name="attr_is-passive">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has active effect</label>
+                        <input type="checkbox" name="attr_has-active">
+                    </div>
+                    <div class="descValuePair">
+                        <label>Has Uses instead of EP cost</label>
+                        <input type="checkbox" name="attr_has-uses">
+                    </div>
+                </details>
+                <div class="textarea-with-controls">
+                    <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                    <textarea name="attr_details" class="textarea"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+            </details>
+        </fieldset>
+    </div>
+
+    <div class="crawler">
+        <h2>Crawler
+            <button type="action" name="act_roll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+        </h2>
+        <div style="display:flex">
+            <div class="twocolumns">
+                <div class="descValuePair">
+                    <label for="crawlername">Name</label>
+                    <input id="crawlername" type="text" name="attr_character_name">
+                </div>
+                <details>
+                    <summary>
+                            <span class="descValuePair">
+                                <label for="type">Crawler Type</label>
+                                <input id="type" type="text" name="attr_crawlertype">
+                            </span>
+                    </summary>
+                    <textarea name="attr_typeDetails"></textarea>
+                </details>
+                <div class="descValuePair">
+                    <label for="techlevel">Tech Level</label>
+                    <input id="techlevel" type="text" name="attr_techlevel">
+                </div>
+                <div class="descValuePair">
+                    <label for="upgrade">Upgrade</label>
+                    <input id="upgrade" type="text" name="attr_upgrade">
                 </div>
             </div>
 
-            <div class="marginleft">
-                <h3>Stats</h3>
-                <div class="twocolumns">
-                    <div class="labels">
-                        <label>Structure</label>
-                        <label>Energy Pts </label>
-                        <label>Heat </label>
-                    </div>
-                    <div class="valuecolumn">
-                        <input type="number" min="0" name="attr_structure" value="10">
-                        <input type="number" min="0" name="attr_energy" value="10">
-                        <input type="number" min="0" max="10" name="attr_heat" value="0">
-                    </div>
-                    <div>
-                        <label> of  <input type="number" min="0" name="attr_structure_max" value="10"></label>
-                        <label> of  <input type="number" min="0" name="attr_energy_max" value="10"></label>
-                        <label> of  <input type="number" min="0" name="attr_heat_max" value="10"> </label>
-                    </div>
+            <div class="marginleft twocolumns">
+                <div class="descValuePair">
+                    <label for="crawlerstructure">Structure</label>
+                    <input type="number" id="crawlerstructure" min="0" name="attr_structure" value="20">
+                    <label> of <input type="number" min="0" name="attr_structure_max" value="20"></label>
+                </div>
+                <div class="descValuePair">
+                    <label for="population">Population</label>
+                    <input type="text" id="population" name="attr_population" value="100">
                 </div>
             </div>
         </div>
@@ -137,36 +550,524 @@
         </div>
         <div>
             <fieldset class="repeating_mechweapons">
-                <div class="weapon">
-                    <input type="text" name="attr_weaponname" title="Name of the Weapon">
-                    <input type="text" name="attr_range" title="Range">
-                    <input type="text" name="attr_damage" title="Damage">
-                    <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{mechname}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
-                    </button>
-                </div>
+                <details>
+                    <summary>
+                        <input type="text" name="attr_name" title="Name of the Weapon">
+                        <input type="text" name="attr_range" title="Range">
+                        <input type="text" name="attr_damage" title="Damage">
+                        <button type="action" name="act_roll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{traits=@{prefix-traits}}}">
+                        </button>
+                    </summary>
+                    <details>
+                        <summary>
+                            <h4>Settings</h4>
+                        </summary>
+                        <details>
+                            <summary><h4>Cost</h4></summary>
+                            <div class="descValuePair">
+                                <label>Cost</label>
+                                <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Slots</label>
+                                <input type="number" name="attr_slots" value="1">
+                            </div>
+                        </details>
+                        <details>
+                            <summary><h4>Heat</h4></summary>
+                            <div class="descValuePair">
+                                <label>Heat produced</label>
+                                <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
+                            </div>
+                        </details>
+                    </details>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
+                </details>
             </fieldset>
         </div>
+
+        <h3>Crew</h3>
+        <div class="equipment">
+            <label>Name</label>
+            <label>Role</label>
+        </div>
+        <fieldset class="repeating_crew">
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Crew">
+                    <input type="text" name="attr_role" title="Role of the Crew">
+                </summary>
+                <textarea name="attr_details" class="textarea"></textarea>
+            </details>
+        </fieldset>
 
         <h3>Cargo</h3>
         <fieldset class="repeating_cargo">
             <textarea name="attr_cargo" class="textarea"></textarea>
         </fieldset>
 
-        <h3>Modules</h3>
-        <fieldset class="repeating_modules">
-            <textarea name="attr_module" class="textarea"></textarea>
-        </fieldset>
-
-        <h3>Systems</h3>
-        <fieldset class="repeating_systems">
-            <textarea name="attr_system" class="textarea"></textarea>
+        <h3>Bays</h3>
+        <fieldset class="repeating_bays">
+            <details>
+                <summary>
+                    <input type="text" name="attr_name" class="fullsize" title="Name of the Bay">
+                </summary>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_details"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+            </details>
         </fieldset>
     </div>
+
+    <div class="denizen">
+        <h2>Denizen
+            <button type="action" name="act_roll" class="rollButton" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button>
+        </h2>
+        <div style="display:flex">
+            <div class="twocolumns">
+                <div class="descValuePair">
+                    <label for="denizenname">Name</label>
+                    <input id="denizenname" type="text" name="attr_character_name">
+                </div>
+
+                <div class="descValuePair">
+                    <label for="denzientechlevel">Tech Level</label>
+                    <input id="denzientechlevel" type="text" name="attr_techlevel">
+                </div>
+                <div class="descValuePair">
+                    <label for="denizenscrap">Scrap</label>
+                    <input id="denizenscrap" type="number" name="attr_scrapvalue">
+                </div>
+                <textarea name="attr_typeDetails"></textarea>
+            </div>
+
+            <div class="marginleft twocolumns">
+                <div class="descValuePair">
+                    <label for="denizenhealth">HP</label>
+                    <input type="number" id="denizenhealth" min="0" name="attr_health" value="0">
+                    <label> of <input type="number" min="0" name="attr_health_max" value="0"></label>
+                </div>
+                <div class="descValuePair">
+                    <label for="denizenstructure">SP</label>
+                    <input type="number" id="denizenstructure" min="0" name="attr_structure" value="0">
+                    <label> of <input type="number" min="0" name="attr_structure_max" value="0"></label>
+                </div>
+            </div>
+        </div>
+
+        <h3>Weapons</h3>
+        <div class="weapon">
+            <label>Name</label>
+            <label>Range</label>
+            <label>Damage</label>
+        </div>
+        <div>
+            <fieldset class="repeating_mechweapons">
+                <details>
+                    <summary>
+                        <input type="text" name="attr_name" title="Name of the Weapon">
+                        <input type="text" name="attr_range" title="Range">
+                        <input type="text" name="attr_damage" title="Damage">
+                        <button type="action" name="act_roll" class="rollButton" title="Fire the Weapon" value="&{template:weapon}{{name=@{character_name}}}{{roll=[[1d20]]}}{{range=@{prefix-range}}}{{weapon_name=@{prefix-name}}}{{damage=@{prefix-damage}}}{{weaponheat=[[@{prefix-heat}]]}}{{traits=@{prefix-traits}}}">
+                        </button>
+                    </summary>
+                    <details>
+                        <summary>
+                            <h4>Settings</h4>
+                        </summary>
+                        <details>
+                            <summary><h4>Cost</h4></summary>
+                            <div class="descValuePair">
+                                <label>Cost</label>
+                                <input type="text" name="attr_scrap" placeholder="1 T1 Scrap">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Slots</label>
+                                <input type="number" name="attr_slots" value="1">
+                            </div>
+                        </details>
+                        <details>
+                            <summary><h4>Heat</h4></summary>
+                            <div class="descValuePair">
+                                <label>Heat produced</label>
+                                <input type="number" name="attr_heat" value="0" min="0">
+                            </div>
+                            <div class="descValuePair">
+                                <label>Heat Spike</label>
+                                <input type="checkbox" name="attr_heatspike">
+                            </div>
+                        </details>
+                    </details>
+                    <div>
+                        <div class="textarea-with-controls">
+                            <input type="text" name="attr_traits" class="fullsize" title="Traits">
+                            <textarea name="attr_details"></textarea>
+                            <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{traits} \n @{details}}}">w</button>
+                        </div>
+                    </div>
+                </details>
+            </fieldset>
+        </div>
+
+        <h3>Traits</h3>
+        <fieldset class="repeating_traits">
+            <details>
+                <summary>
+                    <input type="text" name="attr_name" class="fullsize" title="Name of the Trait">
+                </summary>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_details"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+            </details>
+        </fieldset>
+    </div>
+
+    <div class="notes">
+        <h2>Notes </h2>
+        <fieldset class="repeating_notes">
+            <details class="equipment">
+                <summary>
+                    <input type="text" name="attr_name" title="Name of the Note">
+                </summary>
+                <div class="textarea-with-controls">
+                    <textarea name="attr_details"></textarea>
+                    <button type="roll" class="control-to-chat" value="&{template:info}{{info=@{name} \n @{details}}}">w</button>
+                </div>
+            </details>
+        </fieldset>
+    </div>
+
+    <div class="settings">
+        <details>
+            <summary>
+                <span>Pilot Settings</span>
+            </summary>
+            <div>
+                <label for="isPilot" class="settings-checkbox">
+                    <span>Is Pilot</span>
+                    <input id="isPilot" name="attr_is-pilot" type="checkbox"/>
+                </label>
+                <details>
+                    <summary>Importer</summary>
+                    <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line."></textarea>
+                    <button type="action" class="textbutton" name="act_import-equipment">Import Equipment</button>
+                    <button type="action" class="textbutton" name="act_import-weapon">Import Weapon</button>
+                </details>
+            </div>
+        </details>
+
+        <details>
+            <summary>
+                <span>Mech Settings</span>
+            </summary>
+            <div>
+                <label for="isMech" class="settings-checkbox">
+                    <span>Is Mech</span>
+                    <input id="isMech" name="attr_is-mech" type="checkbox"/>
+                </label>
+                <label for="countWeapons" class="settings-checkbox">
+                    <span>Count Weapons as Systems</span>
+                    <input id="countWeapons" name="attr_count-weapons" type="checkbox"/>
+                </label>
+                <label for="showShield" class="settings-checkbox">
+                    <span>Show Shield</span>
+                    <input id="showShield" name="attr_show-shield" type="checkbox"/>
+                </label>
+                <details>
+                    <summary>Importer</summary>
+                    <details>
+                        <summary>Text Importer</summary>
+                        <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. Names have to be on one line. Hot(x) has to be replaced with the number."></textarea>
+                        <button type="action" class="textbutton" name="act_import-mech-stats">Import Stats</button>
+                        <button type="action" class="textbutton" name="act_import-mech-weapon">Import Weapon</button>
+                        <button type="action" class="textbutton" name="act_import-mech-system">Import System</button>
+                        <button type="action" class="textbutton" name="act_import-mech-module">Import Module</button>
+                    </details>
+                    <details>
+                        <summary>Weapon Importer</summary>
+                        <div>
+                            <select name="attr_selectedweapon">
+                                <optgroup label="Tech1">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 1</option>
+                                    <option value="fiftyCalMachineGun">.50 cal Machine Gun</option>
+                                </optgroup>
+                                <optgroup label="Tech2">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 2</option>
+                                    <option value="M2XMauler">M2-X Mauler</option>
+                                </optgroup>
+                                <optgroup label="Tech3">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 3</option>
+                                    <option value="RailRifle">Rail Rifle</option>
+                                    <option value="LongBarrelledGreenLaser">Long Barrelled Green Laser</option>
+                                    <option value="MissilePod">Missile Pod</option>
+                                    <option value="RedPulseLaser">Red Pulse Laser</option>
+                                </optgroup>
+                                <optgroup label="Tech4">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 4</option>
+                                </optgroup>
+                                <optgroup label="Tech5">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 5</option>
+                                </optgroup>
+                                <optgroup label="Tech6">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 6</option>
+                                </optgroup>
+                            </select>
+                            <button type="action" class="textbutton" name="act_import-weapondropdown">Import Weapon</button>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>System Importer</summary>
+                        <div>
+                            <select name="attr_selectedsystem">
+                                <optgroup label="Tech1">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 1</option>
+                                    <option value="LocomotionSystem">Locomotion System</option>
+                                    <option value="RiggingArm">Rigging Arm</option>
+                                </optgroup>
+                                <optgroup label="Tech2">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 2</option>
+                                    <option value="ChaffLauncher">Chaff Launcher</option>
+                                    <option value="HighGainAntenna">High Gain Antenna</option>
+                                    <option value="ModuleSwitch">Module Switch</option>
+                                </optgroup>
+                                <optgroup label="Tech3">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 3</option>
+                                    <option value="AFFCoolantFoam">AFF Coolant Foam</option>
+                                    <option value="CapacitanceBank">Capacitance Bank</option>
+                                    <option value="CompositeArmour">Composite Armour</option>
+                                    <option value="EjectionSystem">Ejection System</option>
+                                </optgroup>
+                                <optgroup label="Tech4">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 4</option>
+                                </optgroup>
+                                <optgroup label="Tech5">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 5</option>
+                                </optgroup>
+                                <optgroup label="Tech6">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 6</option>
+                                </optgroup>
+                            </select>
+                            <button type="action" class="textbutton" name="act_import-systemdropdown">Import System</button>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Module Importer</summary>
+                        <div>
+                            <select name="attr_selectedmodule">
+                                <optgroup label="Tech1">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 1</option>
+                                    <option value="CommsModule">Comms Module</option>
+                                    <option value="EquipmentLocker">Equipment Locker</option>
+                                    <option value="Firewall">Firewall</option>
+                                    <option value="PersonalRecreationDevice">Personal Recreation Device</option>
+                                    <option value="SurveyScanner">Survey Scanner</option>
+                                    <option value="WeaponLink">Weapon Link</option>
+                                    <option value="ZoomOptics">Zoom Optics</option>
+                                </optgroup>
+                                <optgroup label="Tech2">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 2</option>
+                                    <option value="BarometricSensor">Barometric Sensor</option>
+                                    <option value="DamageAssessor">Damage Assessor</option>
+                                    <option value="DeepSurveyScanner">Deep Survey Scanner</option>
+                                    <option value="EnergyCell">Energy Cell</option>
+                                    <option value="EvasionProtocols">Evasion Protocols</option>
+                                    <option value="ReactorSafetyProtocols">Reactor Safety Protocols</option>
+                                </optgroup>
+                                <optgroup label="Tech3">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 3</option>
+                                    <option value="AdvancedWeaponLink">Advanced Weapon Link</option>
+                                    <option value="ECMTransmitter">ECM Transmitter</option>
+                                    <option value="EmergencyPowerConduit">Emergency Power Conduit</option>
+                                    <option value="MultiTargeter">Multi Targeter</option>
+                                    <option value="OffensiveProtocols">Offensive Protocols</option>
+                                </optgroup>
+                                <optgroup label="Tech4">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 4</option>
+                                </optgroup>
+                                <optgroup label="Tech5">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 5</option>
+                                </optgroup>
+                                <optgroup label="Tech6">
+                                    <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Tech 6</option>
+                                </optgroup>
+                            </select>
+                            <button type="action" class="textbutton" name="act_import-moduledropdown">Import Module</button>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>Importer Info</summary>
+                        <div>
+                            Are you missing a system or module? You can help adding it. Check below for an example and create a GitHub Issue (https://github.com/Roll20/roll20-character-sheets) adding it.
+                            <details>
+                                <summary>Weapons</summary>
+                                <pre>
+                                    WeaponName= {
+                                        name: "weapon name",
+                                        scrap: "5 T1",
+                                        slots: 2,
+                                        traits: "all traits separated with // that are not heat or heatspike",
+                                        range: "Close",
+                                        damage: "5SP" or when dice "[[1d20]]",
+                                        heat: 0,
+                                        heatspike: "on" only add if present,
+                                        details: "description of the weapon"
+                                    }
+                                </pre>
+                            </details>
+                            <details>
+                                <summary>System/Module</summary>
+                                <pre>
+                                    systemModuleName = {
+                                    name: "system or modul Name",
+                                    scrap: "5 T1",
+                                    slots: 2,
+                                    traits: "all traits separated with // that are not heat, heatspike or passive",
+                                    cost: "5 EP or 3 Uses",
+                                    action: "Reaction",
+                                    range: "Close",
+                                    "is-passive": "on" if it is passive,
+                                    heat: 0,
+                                    heatspike: "on" only add if present,
+                                    details: "description of the system/module"
+                                    }
+                                </pre>
+                            </details>
+                        </div>
+                    </details>
+                </details>
+            </div>
+        </details>
+
+        <details>
+            <summary>
+                <span>Crawler Settings</span>
+            </summary>
+            <div>
+                <label for="isCrawler" class="settings-checkbox">
+                    <span>Is Crawler</span>
+                    <input id="isCrawler" name="attr_is-crawler" type="checkbox"/>
+                </label>
+            </div>
+        </details>
+
+        <details>
+            <summary>
+                <span>Mediator Settings</span>
+            </summary>
+            <div>
+                <label for="isDenizen" class="settings-checkbox">
+                    <span>Is Denizen</span>
+                    <input id="isDenizen" name="attr_is-denizen" type="checkbox"/>
+                </label>
+                <details>
+                    <summary>Importer</summary>
+                    <textarea name="attr_importerText" class="textarea" placeholder="To use the importer copy the text from the rulebook and paste it into this window. For Bio-Titans copy everything without the orange boxes and import the orange boxes separately. Multiple orange boxes can be imported at once."></textarea>
+                    <button type="action" class="textbutton" name="act_import-biotitan">Import Biotitan</button>
+                    <button type="action" class="textbutton" name="act_import-biotitan-orangebox">Import Biotitan orange box</button>
+
+                    <div>
+                        <select name="attr_selecteddenizen">
+                            <optgroup label="BioTitan">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Bio-Titan</option>
+                                <option value="Scylla">Scylla</option>
+                                <option value="Typhon">Typhon</option>
+                            </optgroup>
+                            <optgroup label="Meld">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Meld</option>
+                                <option value="drone">Drone</option>
+                                <option value="droneswarm">Drone Swarm</option>
+                                <option value="nanoid">Nanoid</option>
+                                <option value="splitter">Splitter</option>
+                                <option value="behemoth">Behemoth</option>
+                            </optgroup>
+                            <optgroup label="Vehicles">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Vehicles</option>
+                                <option value="powerloader">Power Loader</option>
+                                <option value="boxwheel">Box Wheel</option>
+                                <option value="FightingBoxWheel">Fighting Box Wheel</option>
+                                <option value="MachineGunTurret">Machine Gun Turret</option>
+                                <option value="ArmouredBoxWheel">Armoured Box Wheel</option>
+                                <option value="Tank">Tank</option>
+                                <option value="Rotorcraft">Rotorcraft</option>
+                            </optgroup>
+                            <optgroup label="Drones">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Drones</option>
+                                <option value="DefacerDrone">Defacer Drone</option>
+                                <option value="SurveyDrone">Survey Drone</option>
+                                <option value="SalvoDrone">Salvo Drone</option>
+                                <option value="CombatDrone">Combat Drone</option>
+                                <option value="HeavyCombatDrone">Heavy Combat Drone</option>
+                                <option value="WalkerDrone">Walker Drone</option>
+                                <option value="PestDrone">Pest Drone</option>
+                                <option value="HoverDrone">Hover Drone</option>
+                                <option value="NeedleDrone">Needle Drone</option>
+                            </optgroup>
+                            <optgroup label="Creatures">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Creatures</option>
+                                <option value="scorpion" selected>Irradiated Scorpion</option>
+                                <option value="Artl">Artl</option>
+                                <option value="Chimeripede">Chimeripede</option>
+                                <option value="bear">Wasteland Bear</option>
+                                <option value="bird">Carrion Bird</option>
+                                <option value="Molebear">Molebear</option>
+                            </optgroup>
+                            <optgroup label="People">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; People</option>
+                                <option value="Wastelander">Wastelander</option>
+                                <option value="Raider">Raider</option>
+                                <option value="Trooper">Trooper</option>
+                                <option value="Veteran">Veteran</option>
+                                <option value="CombatPilot">Combat Pilot</option>
+                                <option value="Ace">Ace</option>
+                            </optgroup>
+                            <optgroup label="Squads">
+                                <option disabled style="background:gray;font-weight:bold;color:white;">&nbsp;&nbsp;&nbsp;&nbsp; Squads</option>
+                                <option value="WasterMob">Waster Mob</option>
+                                <option value="RaiderBand">Raider Band</option>
+                                <option value="RifleSquad">Rifle Squad</option>
+                                <option value="MachineGunSquad">Machine Gun Squad</option>
+                                <option value="MissileSquad">Missile Squad</option>
+                                <option value="EliteBladeSquad">Elite Blade Squad</option>
+                                <option value="WastelandHerd">Wasteland Herd</option>
+                                <option value="EliteBeamSquad">Elite Beam Squad</option>
+                                <option value="DroneSquadron">Drone Squadron</option>
+                            </optgroup>
+                        </select>
+                        <button type="action" class="textbutton" name="act_import-denizendropdown">Import Denizen</button>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <label for="showNotesTab" class="settings-checkbox">
+            <span>Show Notes Tab</span>
+            <input id="showNotesTab" name="attr_show-notes-tab" type="checkbox"/>
+        </label>
+    </div>
+</div>
+
+<!--     Buttons used for reaction rolls-->
+<div class="hidden-section" style="display:none">
+    <button type="action" name="act_reactPush"></button>
+    <button type="action" name="act_reactPushWeapon"></button>
+    <button type="action" name="act_reactOverload"></button>
 </div>
 
 
 <script type="text/worker">
-    const buttonlist = ["pilot","mech"];
+const buttonlist = ["pilot","mech","crawler", "denizen", "notes","settings"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -174,13 +1075,2590 @@
             });
         });
     });
+
+on("sheet:opened", (eventInfo) => {
+	getAttrs(['character_name'], (v) => {
+		set_display_name(v.character_name);
+	});
+});
+
+on("change:character_name", (eventInfo) => {
+	set_display_name(eventInfo.newValue);
+});
+
+var set_display_name = (name) => {
+	character_name = name.replace(/\(/g, '\[').replace(/\)/g, '\]').replace(/\"/g, '\'');
+	setAttrs({
+		character_name: character_name
+	});
+};
+
+
+on('change:repeating_modules remove:repeating_modules sheet:opened', function() {
+    repeatingSum("modules_used", "slots", "repeating_modules");
+});
+
+on('change:repeating_systems remove:repeating_systems change:repeating_mechweapons remove:repeating_mechweapons sheet:opened', async function() {
+    let countWeapons = (await asw.getAttrs(["count-weapons"]))["count-weapons"];
+
+    if(countWeapons == 'on') {
+        repeatingSum("systems_used", "slots", "repeating_systems", "repeating_mechweapons");
+    }
+    else {
+        repeatingSum("systems_used", "slots", "repeating_systems");
+    }
+
+});
+
+////////////////////////////
+//  ROLL AUTOMATION     ////
+///////////////////////////
+
+on('clicked:roll', async (event) => {
+
+    let rollPart = event.htmlAttributes.value;
+    let results = await startRoll(rollPart + '{{toMuchHeat=[[0]]}}');
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:repeating_weapons:roll clicked:repeating_mechweapons:roll',
+     async (event) => {
+	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var prefix = event.sourceAttribute.split('_').slice(0,3).join('_') + '_'
+
+	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
+	let results = await startRoll(rollPart + '{{toMuchHeat=[[0]]}}');
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:mechroll', async (event) => {
+
+	let overheat = await overheatCheck(0, 0);
+
+    let rollPart = event.htmlAttributes.value;
+	let mechPart = '{{mech=1}}{{pushable=[[0]]}}';
+    let results = await startRoll(rollPart + mechPart + overheat.queryMod);
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:repeating_mechweapons:mechroll',
+     async (event) => {
+	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var prefix = event.sourceAttribute.split('_').slice(0,3).join('_') + '_'
+
+	let attrs = await asw.getAttrs([prefix+'heat', prefix+'heatspike']);
+	let overheat = await overheatCheck( attrs[prefix+'heat'],  attrs[prefix+'heatspike']);
+
+	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
+	let mechPart = '{{mech=1}}{{pushable=[[0]]}}';
+    let results = await startRoll(rollPart + mechPart + overheat.queryMod);
+
+    asw.setAttrs({
+		heat: overheat.resultingHeat
+	});
+
+    finishRoll(
+		  	results.rollId,
+		  	{}
+	  	);
+});
+
+on('clicked:repeating_modules:use-module clicked:repeating_systems:use-system', async (event) => {
+
+    // prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
+	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
+	var prefix = trigger.split('_').slice(0,3).join('_') + '_'
+
+	let attrs = await asw.getAttrs(['character_name', 'energy', 'heat', prefix+'name', prefix+'cost', prefix+'heat', prefix+'heatspike', prefix+'has-uses']);
+	let cost = parseInt(attrs[prefix+'cost']);
+	let heat = parseInt(attrs[prefix+'heat']);
+	let heatspike = attrs[prefix+'heatspike'];
+
+	let overheat = await overheatCheck(heat, heatspike);
+
+	if(overheat.queryMod.includes("{{toMuchHeat=[[1]]}}")) {
+	    let rollBase = `/w ${attrs.character_name} &{template:info}{{info= You have to much heat to use ${attrs[prefix+'name']} }}`;
+	    let roll = await startRoll(rollBase);
+        finishRoll(roll.rollId, {});
+        return;
+	}
+
+    let toSet = {}
+
+    let rollBase = `/w ${attrs.character_name} &{template:info}{{name=${attrs.character_name}}}{{info= You activated  ${attrs[prefix+'name']} for `;
+    if(heat !== 0) {
+        rollBase += `${heat} heat and `
+        toSet.heat = overheat.resultingHeat;
+    }
+    if(attrs[prefix+'has-uses'] !== 'on') {
+        toSet.energy = attrs['energy'] - cost;
+        rollBase += `${cost} EP. ${toSet.energy} Energy remaining}}`
+    }
+    else {
+        toSet[prefix+'cost'] = cost-1;
+        rollBase += `1 use. ${toSet[prefix+'cost']} Uses remaining}}`
+    }
+
+    toSet[prefix+'active'] = 'on';
+
+	asw.setAttrs(toSet);
+
+    let roll = await startRoll(rollBase + overheat.queryMod);
+    finishRoll(roll.rollId, {});
+});
+
+on('clicked:reactPush', async (ev) => {
+    await push(ev, 'roll');
+});
+
+on('clicked:reactPushWeapon', async (ev) => {
+    await push(ev, 'weapon');
+});
+
+const push = async (ev, template) => {
+
+    let attrs = await asw.getAttrs(['character_name']);
+
+    let overheat = await overheatCheck(2);
+
+    let rollBase = `&{template:${template}}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}{{mech=1}}` + overheat.queryMod ;
+    let roll = await startRoll(rollBase);
+
+    await asw.setAttrs({
+		heat: overheat.resultingHeat
+	});
+
+    finishRoll(roll.rollId, {
+
+    });
+}
+
+const overheatCheck = async (heatchange, heatspike) => {
+
+    let attrs = await asw.getAttrs(['heat', 'heat_max']);
+    let resultingHeat = parseInt(attrs.heat) + parseInt(heatchange);
+
+    let queryMod = '';
+
+    if(heatspike === 'on') {
+        queryMod = `{{heat=[[${resultingHeat}[Heat]]]}}{{heatspike=[[1d20[Heat Check]]]}}`;
+    }
+
+    if(resultingHeat > parseInt(attrs.heat_max)) {
+        return {
+            resultingHeat: parseInt(attrs.heat),
+            queryMod: queryMod + '{{toMuchHeat=[[1]]}}'
+        }
+    }
+
+    if(resultingHeat === parseInt(attrs.heat_max)) {
+        return {
+            resultingHeat: resultingHeat,
+            queryMod: queryMod + `{{heat=[[${resultingHeat}[Heat]]]}}{{heatroll=[[1d20[Heat Check]]]}}{{toMuchHeat=[[0]]}}`,
+
+        }
+    }
+
+    return {
+            resultingHeat: resultingHeat,
+            queryMod: queryMod +'{{toMuchHeat=[[0]]}}',
+        }
+}
+
+on('clicked:reactOverload', async (ev) => {
+    await reactOverload(ev);
+});
+
+const reactOverload = async (ev) => {
+
+    let attrs = await asw.getAttrs(['character_name']);
+
+    let rollBase = `&{template:overload}{{name=${attrs.character_name}}}{{roll=[[1d20]]}}`;
+    let roll = await startRoll(rollBase);
+
+    finishRoll(roll.rollId, {});
+}
+
+on('clicked:downtime', async (ev) => {
+    let attrs = await asw.getAttrs(['health_max', 'abilitypts_max', 'structure_max', 'energy_max']);
+
+    asw.setAttrs({
+		health: attrs['health_max'],
+		abilitypts: attrs['abilitypts_max'],
+		structure: attrs['structure_max'],
+		energy: parseInt(attrs['energy_max']),
+		heat: 0,
+	});
+});
+
+///////////////////////
+//  PILOT IMPORTER  ///
+///////////////////////
+
+on('clicked:import-weapon', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    let weapon = {};
+    var row = "repeating_weapons_" + generateRowID() + "_";
+    await importWeapon(toImport, weapon, row);
+    weapon.importerText = 'Values imported';
+
+    asw.setAttrs(weapon);
+});
+
+on('clicked:import-equipment', async (ev) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    importEquipment(toImport);
+});
+
+const importEquipment = async (toImport) => {
+    let row = "repeating_equipment_" + generateRowID() + "_";
+    let object = {};
+
+    if(checkForMultipleAP(toImport)) {
+        importMultipleAp(toImport);
+        return;
+    }
+
+    toImport = importName(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importAp(rules, object, row);
+
+    rules = importAction(rules, object, row);
+    rules = importRange(rules, object, row);
+
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
+        rules = rules.split('//').slice(1).join('//').trim()
+    }
+
+    importEquipmentTraits(rules, object, row);
+    importDetails(toImport, object, row);
+
+    object.importerText = "Values imported";
+
+    asw.setAttrs(object);
+}
+
+///////////////////////
+//  MECH IMPORTER  ////
+///////////////////////
+
+on('clicked:import-mech-stats', async (ev) => {
+
+    let mech = {};
+
+    let toImport = (await asw.getAttrs(['importerText'])).importerText;
+    let stats = toImport.replaceAll(/[a-zA-Z]/g, '').replaceAll(/\./g, '').replaceAll(/^\s*[\r\n]/gm, '').trim().split(/\r?\n|\s+/);
+
+    if(stats.length < 6) {
+        asw.setAttrs({
+            importerText: 'Could not parse input: Not enough values'
+        });
+        return;
+    }
+
+    if(!toImport.startsWith(' ') && !/^\d+/g.test(toImport)) {
+        let name = toImport.split(/\r?\n/)[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+        mech.chassis = name;
+    }
+
+    if(/CHASSIS\s*ABILITY/.test(toImport)) {
+       mech.chassisDetails = toImport.split(/CHASSIS\s*ABILITY/)[1].replaceAll(/[\r\n]/gm, '').trim();
+    }
+
+    mech.structure = stats[0];
+    mech.structure_max = stats[0];
+    mech.energy = stats[1];
+    mech.energy_max = stats[1];
+    mech.heat_max = stats[2];
+    mech.systems_max = stats[3];
+    mech.modules_max = stats[4];
+    mech.maxcargo = stats[5];
+    mech.chassis_cost = stats[7] + " Tech " + stats[6];
+    mech.importerText = "Values imported";
+
+    await asw.setAttrs(mech);
+});
+
+on('clicked:import-mech-weapon', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    let weapon = {};
+
+    await importMechWeapon(toImport, weapon);
+    weapon.importerText = 'Values imported';
+
+    asw.setAttrs(weapon);
+});
+
+const importMechWeapon = async (toImport, object) => {
+    var row = "repeating_mechweapons_" + generateRowID() + "_";
+    importWeapon(toImport, object, row);
+}
+
+on('clicked:import-weapondropdown', async (ev) => {
+
+    let importKey = (await asw.getAttrs(['selectedweapon']))['selectedweapon']
+    let mechpart = weapons[importKey];
+    var row = "repeating_mechweapons_" + generateRowID() + "_";
+
+    let toImport = {};
+    Object.keys(mechpart).forEach(key => {
+      toImport[row + key] = mechpart[key];
+    });
+
+    asw.setAttrs(toImport);
+});
+
+let fiftyCalMachineGun = {
+	name: ".50 cal Machine Gun",
+	scrap: "2 T1",
+	slots: 2,
+	traits: "Ballistic // Jamming // Pinning",
+	range: "Close",
+	damage: "2 SP",
+	heat: 0,
+	details: "This simple ballistic weapon of the Opus Institute design fires solid, high calibre rounds that can puncture a Mech hull and shred through infantry. It has been a mainstay of battlefields for as long as anyone remembers and remains ubiquitous today"
+}
+
+// Tech 2
+M2XMauler= {
+    name: "M2-X Mauler",
+    scrap: "2 T2",
+    slots: 3,
+    traits: "Ballistic",
+    range: "Close",
+    damage: "3 SP",
+    heat: 0,
+    details: "Fires a blast of grapeshot which rips through multiple targets at close quarters. The dirt cheap salvage cost of these made them a favourite of salvagers during the Reclamation of the Wastes, when the remnants of corpo-owned industry were swept away under a hail of shrapnel. When you hit with this weapon one other target of your choice in Close Range takes 2 SP damage."
+}
+
+// Tech 3
+RailRifle= {
+    name: "Rail Rifle",
+    scrap: "4 T3",
+    slots: 7,
+    traits: "Ballistic",
+    range: "Far",
+    damage: "5 SP",
+    heat: 1,
+    details: "Developed by Sakura Futures for use in wetwork against heavily protected targets such as Consul Mechs, this lightweight railgun was reverse engineered from an original Evantis design. It fires an electro-magnetic ballistic charge at a phenomenal Range."
+}
+
+LongBarrelledGreenLaser= {
+    name: "Long Barrelled Green Laser",
+    scrap: "2 T3",
+    slots: 5,
+    traits: " Energy",
+    range: "Long",
+    damage: "4 SP",
+    heat: 1,
+    details: "A Green Laser with an extended beam mount and heat sink allowing it to fire over a longer distance, whilst reducing its heat load. Salvagers adapted this tech from the original Opus Institute design and used them effectively in the Second Corpo War to take control of the great spires of the Aeon home arco in the Verdant Crescent."
+}
+
+MissilePod= {
+    name: "Missile Pod",
+    scrap: "5 T3",
+    slots: 7,
+    traits: " Explosive (2) // Missile",
+    range: "Long",
+    damage: "8 SP",
+    heat: 1,
+    details: "Missile Pods fire a heavy salvo of unguided, rocket propelled explosives over a wide area of terrain. The Contour Aerospace execs were so proud of this design that when Aegean Dynamics surrendered to them they decided to shell their home arco to oblivion anyway and chalk the cost up as research and development."
+}
+
+RedPulseLaser= {
+    name: "Red Pulse Laser",
+    scrap: "3 T3",
+    slots: 5,
+    traits: "Energy",
+    range: "Close",
+    damage: "5 SP",
+    heat: 1,
+    details: "Shoots a hail of red lasers at a target sacrificing some range for increased firepower. Djinn Mechs mounted with these were effective in the retaking of the Aeon home arco in the Verdant Crescent from TDA rebels following Impact Day."
+}
+
+
+
+let weapons = {
+    //tech 1
+    fiftyCalMachineGun,
+
+    //tech 2
+    M2XMauler,
+
+    //tech 3
+    RailRifle,
+    LongBarrelledGreenLaser,
+    MissilePod,
+    RedPulseLaser,
+
+    //tech 4
+
+    //tech 5
+
+    //tech 6
+}
+
+on('clicked:import-mech-system', async (ev) => {
+    importFromImporter("systems");
+});
+
+on('clicked:import-mech-module', async (ev) => {
+    importFromImporter("modules");
+});
+
+const importFromImporter = async(type) => {
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+    await importModuleSystem(type, toImport);
+    asw.setAttrs({
+		    importerText: 'Values imported'
+	    });
+}
+
+const importModuleSystem = async (type, toImport) => {
+
+    let row = "repeating_" + type + "_" + generateRowID() + "_";
+    let object = {};
+
+    if(checkForMultipleEP(toImport)) {
+        importMultipleEp(type, toImport);
+        return;
+    }
+
+    toImport = importName(toImport, object, row);
+    toImport = importCost(toImport, object, row);
+
+    toImport = importEp(toImport, object, row);
+    let rules = toImport.split(/\r?\n/)[0].trim();
+
+    rules = importAction(rules, object, row);
+    rules = importRange(rules, object, row);
+
+    if(rules.includes("Passive")) {
+        object[row + "is-passive"] = "on";
+        rules = rules.split('//').slice(1).map(s => s.trim()).join(' // ').trim()
+    }
+
+    rules = importHeat(rules, object, row);
+    importMechWeaponTraits(rules, object, row);
+    importDetails(toImport, object, row);
+
+    asw.setAttrs(object);
+};
+
+const importMultipleEp = async (type, toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+    //remove cost
+    toImport = importCost(toImport, template, '');
+
+    let splitByEp = toImport.split(/(?=^\dEP|XEP)/gm).slice(1);
+
+    for (const ability of splitByEp) {
+       let perLine = ability.split(/\r?\n/g);
+        let firstLine = perLine[0].split(/\s+/g);
+        let importerText = template.name + " "+ firstLine[1] + "\n" + firstLine[0] + "\n" + perLine.slice(1).join("\n");
+        await importModuleSystem(type, importerText);
+    }
+}
+
+on('clicked:import-systemdropdown', async (ev) => {
+
+    let importKey = (await asw.getAttrs(['selectedsystem']))['selectedsystem']
+    let mechpart = systems[importKey];
+    var row = "repeating_systems_" + generateRowID() + "_";
+
+    let toImport = {};
+    Object.keys(mechpart).forEach(key => {
+      toImport[row + key] = mechpart[key];
+    });
+
+    asw.setAttrs(toImport);
+});
+
+
+// Tech 1
+LocomotionSystem = {
+    name: "Locomotion System",
+    scrap: "2 T1",
+    slots: 2,
+    traits: "Recommended System",
+    "is-passive": "on",
+    heat: 0,
+    details: "A sturdy and dependable Locomotion System allowing a Mech to traverse most standard terrain types and adaptable to fit on most Chassis. Locomotion Systems vary widely from bipedal to quadrupedal, and beyond. Some esoteric designs are known to have as many as eight legs! A Locomotion System allows a Mech to move normally. If a Mech does not have a Locomotion System or it is damaged or destroyed the Mech cannot move."
+}
+
+RiggingArm = {
+    name: "Rigging Arm",
+    scrap: "2 T1",
+    slots: 2,
+    traits: "Rigging",
+    range: "Close",
+    heat: 0,
+    details: "This standard rigging arm designed for industrial use allows a Mech to pick up and manipulate objects. To avoid embarrassment in the field it is worth reminding Pilots that many Mechs are not fitted with arms or hands as standard and therefore incapable of picking items up. If your Mech lacks arms and you do not mount a Rigging Arm or equivalent, your Mech cannot pick things up."
+}
+
+// Tech 2
+ChaffLauncher = {
+    name: "Chaff Launcher",
+    scrap: "1 T2",
+    slots: 1,
+    cost: "2 Uses",
+    action: "Reaction",
+    heat: 0,
+    details: "This System fires a metallic cloud of chaff, made of strips of aluminium and zinc, from your Mech which can detonate missiles harmlessly in flight or scramble targeting systems. If you or an Ally in Close Range are hit by a weapon with the Missile Trait or any attack with the Targeter Trait, you may activate the Chaff Launcher. The attack misses, dealing no damage and having no other effect. "
+}
+
+HighGainAntenna = {
+    name: "High Gain Antenna",
+    scrap: "1 T2",
+    slots: 2,
+    "is-passive": "on",
+    heat: 0,
+    details: "A simple, scrap-built, extendable antenna that helps pierce through the atomic background noise. This increases the Range band of any of your installed Modules or Pilot Abilities with the Communicator, Hacking, and Scanner Trait by 1. For example, increasing the range of a Comms Module from Long Range to Far Range."
+}
+
+ModuleSwitch = {
+    name: "Module Switch",
+    scrap: "1 T2",
+    slots: 4,
+    "is-passive": "on",
+    heat: 0,
+    details: "A complex adaptation port that lets you install additional Modules onto your Mech. This System increases your Mech’s Module Capacity by 1."
+}
+
+// Tech 3
+AFFCoolantFoam = {
+    name: "AFF Coolant Foam",
+    scrap: "2 T3",
+    slots: 2,
+    cost: "3 EP",
+    action: "Turn Action",
+    range: "Close",
+    heat: 0,
+    details: "This device sprays highly pressurised Aqueous Film Forming Coolant Foam on a Mech, rapidly reducing their Heat levels. It can also be used to quench blazing fires. Reduces the Heat of a target Mech in Range to 0."
+}
+
+CapacitanceBank = {
+    name: "Capacitance Bank",
+    scrap: "2 T3",
+    slots: 4,
+    "is-passive": "on",
+    heat: 0,
+    details: "Using Opus developed supercapacitors this hefty capacitor bank is attached externally and connected to a Mech’s reactor. Storing excess produced energy it is also capable of rapidly discharging that energy when needed. This System increases your Mech’s Maximum EP by 2 for each bank installed."
+}
+
+CompositeArmour = {
+    name: "Composite Armour",
+    scrap: "1 T3",
+    slots: 3,
+    "is-passive": "on",
+    heat: 0,
+    details: "Layered plates of highly resilient metals, plastics, and ceramics that provide additional protection to your Mech. This System increases your Mech’s Max SP by 5 for each Composite Armour Module you have installed. If this System is Damaged or Destroyed reduce your Max SP by 5 and reduce your current SP to match your new Max SP."
+}
+
+EjectionSystem = {
+    name: "Ejection System",
+    scrap: "2 T3",
+    slots: 2,
+    traits: "Escape",
+    action: "Reaction",
+    heat: 0,
+    details: "An Ejection System propels a Pilot from their Mech’s cockpit to a safe distance, where they land with the aid of a parachute. This allows you to escape your Mech in the event it suffers critical damage, is destroyed, or you find yourself in a tight spot.\nROLL THE DIE:\n20: You eject perfectly from the Mech and land in any location up to Far Range of your Mech.\n11 - 19: You eject safely from the Mech and land unharmed within Long Range of your Mech.\n6 - 10: You eject, but suffer injury in the process. You land within Medium Range of your Mech and must roll on the Critical Injury Table for your Pilot.\n2 - 5: The Ejection System fails to trigger and is damaged in the process.\n1: The Ejection System severely malfunctions, harming you inside your cockpit. The Ejection System is destroyed and your Pilot must roll on the Critical Injury Table."
+}
+
+
+let systems = {
+    //tech 1
+    LocomotionSystem,
+    RiggingArm,
+
+    //tech 2
+    ChaffLauncher,
+    HighGainAntenna,
+    ModuleSwitch,
+
+    //tech 3
+    AFFCoolantFoam,
+    CapacitanceBank,
+    CompositeArmour,
+    EjectionSystem
+
+    //tech 4
+
+    //tech 5
+
+    //tech 6
+}
+
+on('clicked:import-moduledropdown', async (ev) => {
+
+    let importKey = (await asw.getAttrs(['selectedmodule']))['selectedmodule']
+    let mechpart = modules[importKey];
+    var row = "repeating_modules_" + generateRowID() + "_";
+
+    let toImport = {};
+    Object.keys(mechpart).forEach(key => {
+      toImport[row + key] = mechpart[key];
+    });
+
+    asw.setAttrs(toImport);
+});
+
+let CommsModule = {
+    name: "Comms Module",
+    scrap: "1 T1",
+    slots: 1,
+    traits: "Communicator // Recommended Module",
+    action: "Free Action",
+    range: "Long",
+    heat: 0,
+    details: "This Opus Institute-developed array of telecommunications wires and receivers allows communication with anything with the Communicator Trait in Range. This allows for both voice and text communications via your Mech’s HUD. You may also use your Comms Module to send and receive images and data, such as data you gather when using a Scanner. If the Mech does not have a Comms Module or equivalent with the Communicator Trait you cannot talk to your Allies from their Mech whilst out in the field."
+}
+
+let EquipmentLocker = {
+    name: "Equipment Locker",
+    scrap: "1 T1",
+    slots: 1,
+    "is-passive": "on",
+    heat: 0,
+    details: "This Module is installed directly into your Mech’s Cockpit and allows storage of up to 10 pieces of Pilot Equipment within it, allowing easy access when in the field."
+}
+
+let Firewall = {
+    name: "Firewall",
+    scrap: "2 T1",
+    slots: 1,
+    traits: "Hacking",
+    cost: "2 EP",
+    action: "Reaction",
+    range: "Medium",
+    heat: 0,
+    details: "This Firewall, made open source by the Opus Institute, is designed to block hacking attempts. If you or an Ally in Range are the target of any System, Module, or Ability with the Hacking Trait you may attempt to block the hack with your Firewall as a Reaction.\nROLL THE DIE:\n20: You successfully block the hack and you and your Allies cannot be affected by anything with the Hacking Trait for the next 10 minutes.\n11 - 19: You successfully block the hack and entirely nullify all of its effects.\n6 - 10: The Mediator offers you a Tough Choice in relation to the hack. This could be partially nullifying its effects, an additional EP cost, or damage to your Module.\n2 - 5: You fail to block the hack, and it has full effect.\n1: You fail to block the hack, and your Firewall is breached, it becomes damaged and cannot be used until repaired to the Intact Condition."
+}
+
+let PersonalRecreationDevice = {
+    name: "Personal Recreation Device",
+    scrap: "1 T1",
+    slots: 1,
+    cost: "1 EP",
+    action: "Short Action",
+    heat: 0,
+    details: "Your Mech is installed with a Personal Recreation Device of your choice. This could be an entertainment box, foot massager, or drinks dispenser, because sometimes a salvager just needs a break. When activated, a single Pilot may use the Personal Recreation Device to relax and get themselves into a flow state. The next time they or a Mech they are controlling roll the die, they may re-roll it. They must accept the result of the second roll. It is against Union Regulation to install a Mech with a Personal Recreation Device designed to do what you’re thinking."
+}
+
+let SurveyScanner = {
+    name: "Survey Scanner",
+    scrap: "3 T1",
+    slots: 1,
+    traits: "Scanner",
+    cost: "2 EP",
+    action: "Short Action",
+    range: "Long",
+    heat: 0,
+    details: "When activated, a Survey Scanner allows you to scan a specific point of interest within Range. This can be a single point on the Region Map or a specific feature in the world such as a ruin, unique area of terrain, settlement, or base. If a point is not worth scanning because it holds nothing of interest or you have all of the relevant information on it, the Mediator must tell you before you make your scan.\nROLL THE DIE:\n20: You make a thorough scan of the area and may ask the Mediator 5 questions about it. The answers they give must be true.\n11 - 19: Your scan is successful and you may ask the Mediator 3 questions about the scanned area. The answers they give must be true.\n6 - 10: You partially scan the area and return messy results. You may ask the Mediator 2 questions about the area. One of the answers they give must be true, but the other answer contains false information as decided by the Mediator.\n2 - 5: Your scan fails to find any useful information about the area.\n1: Your scan returns inaccurate data. You may ask the Mediator 2 questions about the area and both answers will contain false information which you believe to be true."
+}
+
+let WeaponLink = {
+    name: "Weapon Link",
+    scrap: "3 T1",
+    slots: 1,
+    action: "Turn Action",
+    heat: 0,
+    heatspike: "on",
+    details: "A Weapons Link Module allows you to connect any number of identical Weapons Systems together. These must be the same Weapons System. For example: you may link two Green Lasers or three 30mm Autocannons. Once you link weapons, this is permanent and they cannot be fired separately via any means until this Module is uninstalled.\nYou make an attack with all weapons linked together with this Module against a single target in Range of your choice. Make and resolve each attack separately. You gain 1 Heat for each linked weapon you attack with and must make a Heat Check after the attacks have been resolved."
+}
+
+let ZoomOptics = {
+    name: "Zoom Optics",
+    scrap: "2 T1",
+    slots: 1,
+    traits: "Optics",
+    cost: "1 EP",
+    action: "Free Action",
+    heat: 0,
+    details: "When activated, this optical array extends the Range of any single Ranged Weapons System mounted on your Mech by one band, to a maximum of Long Range. For example, from Medium Range to Long Range or Close Range to Medium Range. It further allows you to zoom in and see one Range Band further than you currently are. For example, if you are in Medium Range, you can see a target as though it was in Close Range and pick out finer details about it. This effect lasts for 1 hour. "
+}
+
+// Tech 2
+BarometricSensor = {
+    name: "Barometric Sensor",
+    scrap: "1 T2",
+    slots: 1,
+    traits: " Scanner",
+    "is-passive": "on",
+    heat: 0,
+    details: "Developed by Kombu Tech to detect atmospheric conditions in the vast algae farms of The Great Cape, this Module can quite literally predict the weather. This device constantly measures and analyses air pressure, wind speed, temperature, and humidity. When entering an area you are able to get an up to date report on the weather of that area and any potential hazardous environmental conditions. In addition, the Module alerts you when a shift in weather patterns is occurring, giving you advance warning of severe weather such as radiation storms, acid rain, hail, hurricanes, and tornadoes. You also learn all potential negative effects of the current and predicted weather conditions, including mechanical effects."
+}
+
+DamageAssessor = {
+    name: "Damage Assessor",
+    scrap: "1 T2",
+    slots: 1,
+    traits: "Scanner",
+    cost: "1 EP",
+    action: "Turn Action",
+    range: "Medium",
+    heat: 0,
+    details: "Used by Osiris insurance teams as a means to assess damage and reduce liability following a series of catastrophic industrial accidents and worker deaths in the last attempt to build a space elevator. When activated, you scan a Mech or Vehicle in Range to get a full report on it. You learn its Chassis, Systems and Modules, its current and Max Structure Points, Heat, and Energy, and the Condition (Intact, Damaged, Destroyed) of its Chassis, Systems, and Modules."
+}
+
+DeepSurveyScanner = {
+    name: "Deep Survey Scanner",
+    scrap: "2 T2",
+    slots: 1,
+    traits: "Scanner",
+    cost: "2 EP",
+    action: "Short Action",
+    range: " Long",
+    heat: 0,
+    details: "A scanner designed by Thatcher Steel to analyse underground areas prior to mining excavations. When activated, you scan a point within Range to detect the presence of any underground structures, cave networks, ruins, or bases. This can be a specific terrain feature or location such as a mountain range, military complex, settlement, or area in the landscape. If a point is not worth scanning because it holds nothing of interest, the Mediator must tell you before you make your scan. The scan returns a basic datamap of the underground area, including its size as well as the first three main sections as well as any passageways between those sections. The Mediator will draw you a rudimentary map noting any major features such as bridges, columns, or crevasses, and lets you know if the area can fit Mechs or Pilots."
+}
+
+EnergyCell = {
+    name: "Energy Cell",
+    scrap: "1 T2",
+    slots: 1,
+    action: "Reaction",
+    heat: 0,
+    details: "For when you need that extra boost of energy on a long haul. This nuclear powered conduit can be drained of energy to provide your Mech’s reactor with a temporary boost. When activated, your Mech regains 3 EP and the Energy Cell Module is destroyed."
+}
+
+EvasionProtocols = {
+    name: "Evasion Protocols",
+    scrap: "1 T2",
+    slots: 1,
+    action: "Reaction",
+    heat: 2,
+    heatspike: "on",
+    details: "This Module enables a Mech to make a series of rapid movements in an attempt to avoid damage from an attack or hazard. The infamous ‘Devils Run’ Pilot training route in the Arid Steppes contains a gauntlet of hazards that the Evasion Protocols Module has proved crucial in avoiding.\nIf an attack hits your Mech, you may activate the Evasion Protocols as a Reaction to force the attacker to re-roll the attack and choose the lower result."
+}
+
+ReactorSafetyProtocols = {
+    name: "Reactor Safety Protocols",
+    scrap: "2 T2",
+    slots: 1,
+    "is-passive": "on",
+    heat: 0,
+    details: "This Module increases the efficiency and cooling capability of your Mech’s reactor, mitigating damage in the event of an overload. When your Mech rolls on the Reactor Overload Table you may roll on this table instead.\nROLL THE DIE:\n20: Reactor Stabilisation: Your Mech’s reactor stabilises and its Heat is reduced to 0.\n11 - 19: Reactor Overheat: Your Mech has overheated. It shuts down and gains the Vulnerable Trait. Your Mech will re-activate at the end of your next turn. In addition, your Mech takes SP damage equal to half your current Heat level. Your Mech then reduces its Heat by 2.\n6 - 10: Module Overheat: One of the Modules on your Mech, chosen at random or by the Mediator, has overheated and is damaged.\n2 - 5: System Overheat: One of the Systems on your Mech, chosen at random or by the Mediator, has overheated and is damaged.\n1: Reactor Damage: The Chassis of your Mech becomes damaged as your reactor wildly overheats."
+}
+
+//Tech 3
+AdvancedWeaponLink = {
+    name: "Advanced Weapon Link",
+    scrap: "3 T3",
+    slots: 2,
+    action: "Turn Action ",
+    heat: 0,
+    heatspike: "on",
+    details: "An Advanced Weapons Link Module allows you to connect any number of different Weapons Systems together. For example, you may link a Green Laser, a 30mm Autocannon, and a Red Laser. Once you link weapons this is permanent and they cannot be fired separately via any means until you uninstall this Module. You make an attack with all weapons linked together with this Module against a single target in Range of all linked weapons. Make and resolve each attack separately. You gain 1 Heat for each linked weapon you attack with and must make a Heat Check after the attacks have been resolved. "
+}
+
+ECMTransmitter = {
+    name: "ECM Transmitter",
+    scrap: "3 T3",
+    slots: 1,
+    cost: "3 EP",
+    action: "Turn Action",
+    range: "Long",
+    heat: 0,
+    details: "This Electronic Countermeasure device developed by Stefanus nullifies electronics within a radius, preventing them from being used temporarily, jamming comms, shields, and nullifying Targeters and hacking attempts. When activated, all enemy Pilots, Mechs, and Vehicles within Range cannot activate or use any Pilot Equipment, Systems, Modules, or Abilities that have the Targeter, Hacking, Shield or Communicator Trait. This effect lasts for 10 minutes."
+}
+
+EmergencyPowerConduit = {
+    name: "Emergency Power Conduit",
+    scrap: "3 T3",
+    slots: 2,
+    "is-passive": "on",
+    heat: 0,
+    details: "In the event that your Mech is shutdown, this Module can reroute reactor power to keep basic functions active. If your Mech is shut down, either voluntarily or involuntarily, the Emergency Power Conduit activates automatically. Whilst the Emergency Power Conduit is active your Mech can move and your Pilot is protected internally via any life support systems. It also does not have the Vulnerable Trait. However, your Mech cannot attack or activate any Systems, Modules, or Abilities whilst the Emergency Power Conduit is active, and its Heat will not reduce as it would if it were fully shutdown."
+}
+
+MultiTargeter = {
+    name: "Multi-Targeter",
+    scrap: "3 T3",
+    slots: 1,
+    traits: "Targeter",
+    cost: "X EP",
+    action: "Turn Action",
+    heat: 0,
+    details: "When activated, you may attack with any number of Weapons Systems mounted on your Mech. Each attack must have a different target, which you must choose before you make any attacks. Make and resolve each attack separately. This Ability costs 1 EP per weapon you attack with."
+}
+
+OffensiveProtocols = {
+    name: "Offensive Protocols",
+    scrap: "2 T3",
+    slots: 1,
+    action: "Free Action",
+    heat: 2,
+    heatspike: "on",
+    details: "Designed by salvager engineers, this module pushes your reactor to reroute energy towards your Weapons Systems, increasing their potency. When you activate this Module, choose a Weapons System mounted on your Mech. The next time you make an attack with this Weapons System, it deals an additional amount of SP damage equal to its Tech Level. For example, a Tech 3 Missile Pod System would deal 3 SP additional damage.\nWhen activated, your Mech gains 2 Heat and must make a Heat Check. You may activate this Ability on multiple different Weapons Systems on the same turn, but cannot apply it to the same Weapons System more than once."
+}
+
+let modules = {
+    //tech 1
+    CommsModule,
+    EquipmentLocker,
+    Firewall,
+    PersonalRecreationDevice,
+    SurveyScanner,
+    WeaponLink,
+    ZoomOptics,
+
+    //tech 2
+    BarometricSensor,
+    DamageAssessor,
+    DeepSurveyScanner,
+    EnergyCell,
+    EvasionProtocols,
+    ReactorSafetyProtocols,
+
+    //tech 3
+    AdvancedWeaponLink,
+    ECMTransmitter,
+    EmergencyPowerConduit,
+    MultiTargeter,
+    OffensiveProtocols,
+
+    //tech 4
+
+    //tech 5
+
+    //tech 6
+}
+
+const importMultipleAp = async (toImport) => {
+    let template = {};
+    let name = importName(toImport, template, '');
+
+    let searchBlocks = toImport.split(/\r?\n/g).slice(1);
+    let splitByAp = [];
+
+    while(searchBlocks.length !== 0) {
+        if(searchBlocks[1].includes("AP")) {
+            let blockName = template.name + " " + searchBlocks.shift();
+            let blockRules = searchBlocks.shift();
+            let blockDescription = "";
+
+            //gather description
+            while(searchBlocks.length > 2 && !searchBlocks[1].includes("AP")) {
+                blockDescription = blockDescription + searchBlocks.shift();
+            }
+
+            if(searchBlocks.length <= 2) {
+               blockDescription = blockDescription + searchBlocks.join('');
+               searchBlocks = [];
+            }
+
+            //no separate title for next block
+            else if(searchBlocks[0].includes(".")) {
+                blockDescription = blockDescription + searchBlocks[0];
+                searchBlocks[0] = blockName.split(" ").pop();
+            }
+
+            splitByAp.push(blockName + "\n" + blockRules + "\n" + blockDescription);
+        }
+        else {
+            searchBlocks.shift();
+        }
+    }
+
+    for (const ability of splitByAp) {
+        await importEquipment(ability);
+    }
+}
+
+const checkForMultipleEP = (toImport) => {
+   return (toImport.match(/^\dEP|XEP/gm) || []).length > 1;
+}
+
+const checkForMultipleAP = (toImport) => {
+   return (toImport.match(/.*\d\s(AP|XAP).*/gm) || []).length > 1;
+}
+
+/////////////////////////
+//  DENIZEN IMPORTER  ///
+/////////////////////////
+
+on('clicked:import-biotitan', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let biotitan = {};
+    biotitan.techlevel = "Tech 1 / Bio-Salvage";
+
+    toImport = toImport.split('\n');
+
+    biotitan.structure = toImport.pop().replaceAll(/[a-zA-Z.]/g, '').trim();
+    biotitan.structure_max = biotitan.structure;
+    biotitan.scrapvalue = biotitan.structure;
+
+    //look for name (all caps)
+    let typeDetails = "";
+    while(toImport[toImport.length-1] !== toImport[toImport.length-1].toUpperCase()) {
+        typeDetails = toImport.pop().trim() + " " + typeDetails;
+    }
+    typeDetails = typeDetails.replaceAll(/(?=•)/g, '\n');
+    biotitan.typeDetails =typeDetails;
+
+    biotitan.character_name = toImport.pop().trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+    biotitan["importerText"] = 'Values imported';
+    asw.setAttrs(biotitan);
+});
+
+on('clicked:import-biotitan-orangebox', async (ev) => {
+
+    let toImport = formatImporterText((await asw.getAttrs(['importerText'])).importerText);
+
+    if(!toImport.includes(".")) {
+        asw.setAttrs({
+		    importerText: 'No \".\" found. Add one at the end of the description \n\n' + toImport
+	    });
+    }
+
+    let biotitan = {};
+    biotitan.techlevel = "Tech 1 / Bio-Salvage";
+
+    toImport = toImport.split('\n');
+
+     while(toImport.length !== 0) {
+        let name = toImport.shift().trim();
+        let rules = toImport.shift().trim();
+        let details = "";
+
+        while(toImport.length > 3 && !toImport[2].includes("//") && !toImport[2].includes("Passive")) {
+            details = details + toImport.shift();
+        }
+        details = details + toImport.shift();
+        if(toImport.length < 3) {
+            details = details + toImport.map(s => s.trim()).join(' ');
+            //exit loop
+            toImport = [];
+        }
+        details = details.replaceAll("  ", " ");
+
+        if(rules.includes("//")) {
+            await importMechWeapon(name + "\n" + rules + "\n" + details, biotitan);
+        }
+
+        if(rules.includes("Passive")) {
+            let row = "repeating_traits_" + generateRowID();
+            biotitan[row + "_name"] = name;
+            biotitan[row + "_details"] = rules + "\n" + details;
+        }
+     }
+
+    biotitan["importerText"] = 'Values imported';
+    asw.setAttrs(biotitan);
+});
+
+on('clicked:import-denizendropdown', async (ev) => {
+
+    let importKey = (await asw.getAttrs(['selecteddenizen']))['selecteddenizen']
+    let toImport = denizen[importKey];
+
+    await clearMechWeapons();
+    await clearTraits();
+
+    toImport.weapons?.forEach(weapon => {
+        var row = "repeating_mechweapons_" + generateRowID() + "_";
+        creatureWeapon = {};
+        creatureWeapon[row + "name"] = weapon.name;
+        creatureWeapon[row + "range"] = weapon.range;
+        creatureWeapon[row + "damage"] = weapon.damage;
+        creatureWeapon[row + "traits"] = weapon.traits;
+        asw.setAttrs(creatureWeapon);
+    });
+
+    toImport.traits?.forEach(trait => {
+        var row = "repeating_traits_" + generateRowID() + "_";
+        creatureTrait = {};
+        creatureTrait[row + "name"] = trait.name;
+        creatureTrait[row + "details"] = trait.details;
+        asw.setAttrs(creatureTrait);
+    });
+
+    asw.setAttrs(toImport);
+});
+
+let Scylla = {
+    character_name: "Scylla",
+    health: 0,
+    health_max: 0,
+    structure: 39,
+    structure_max: 39,
+    scrapvalue: 39,
+    techlevel: "Bio-Titan",
+    typeDetails: "Titanic Actions \nScylla can take three Titanic Actions, choosing from the options below. Only one Titanic Action may be chosen at a time and only at the end of another Pilot’s or NPC’s turn. Scylla regains spent Titanic Actions at the start of their turn. \n• Scylla moves one Range Band. \n• Scylla makes a single Scythe Attack. This does not have the Multi-Attack Trait. \n• Scylla makes a Tail Sweep Attack (Costs 2 Titanic Actions).",
+
+    weapons: [
+        {
+            name: "Scythe Attack",
+            range: "Close",
+            damage: "4 SP",
+            traits: "Melee // Multi-Attack (2)"
+        },
+        {
+            name: "Tail Sweep (Roll for each target)",
+            range: "Medium",
+            damage: "3 SP",
+            traits: "Melee // Targets hit are knocked Prone and gain the Vulnerable Trait."
+        }
+    ],
+
+    traits: [
+        {
+            name: "Ambush Predator",
+            details: "Passive\nUnless detected, Scylla always acts first in combat"
+        },
+        {
+            name: "Armour Plating x 3",
+            details: "Passive\nWhen Scylla takes damage they may remove a layer of Armour Plating as a Reaction and instead take no damage."
+        },
+        {
+            name: "Climb",
+            details: "Passive\nScylla can effortlessly climb over difficult and vertical terrain, rocky surfaces, and other obstacles."
+        },
+        {
+            name: "Tail Sweep",
+            details: "Turn Action // Melee\nScylla makes one giant sweeping attack with their tail. This hits every target within Medium Range, dealing 3 SP damage on a hit. Targets hit are knocked Prone and gain the Vulnerable Trait."
+        }
+    ]
+}
+
+let Typhon = {
+    character_name: "Typhon",
+    health: 0,
+    health_max: 0,
+    structure: 67,
+    structure_max: 67,
+    scrapvalue: 67,
+    techlevel: "Bio-Titan",
+    typeDetails: "Titanic Actions\nTyphon can take three Titanic Actions, choosing from the options below. Only one Titanic Action may be chosen at a time and only at the end of another Pilot’s or NPC’s turn. Typhon regains spent Titanic Actions at the start of their turn.\n• Typhon uses their Burrower Ability to either burrow or unburrow.\n• Typhon moves one Range Band.\n• Typhon makes a Swallow Whole Attack (Costs three Titanic Actions).",
+
+    weapons: [
+        {
+            name: "Swallow Whole",
+            range: "Close",
+            damage: "See trait",
+            traits: "Melee"
+        }
+    ],
+
+    traits: [
+        {
+            name: "Armour Plating x 2",
+            details: "Passive\nWhen Typhon takes damage they may remove a layer of Armour Plating as a Reaction and instead take no damage."
+        },
+        {
+            name: "Burrower",
+            details: "Passive\nTyphon can move freely on land and traverse underground through earth, even through the hardest of rock deposits. \nIt can burrow into the earth as a Turn Action and unburrow as a Free Action. Whilst burrowed, it cannot be seen or targeted by anything on the ground, but can be spotted via the huge amounts of earth it kicks up."
+        },
+        {
+            name: "Spiked Carapace",
+            details: "Passive\nWhen Typhon unborrows all targets within Close Range of the area it unburrows up to take 5 SP damage from its spiked carapace. \nIn addition, any target that attacks Typhon with an attack that has the Melee Trait takes 3 SP damage on a hit"
+        },
+        {
+            name: "Swallow Whole",
+            details: "Turn Action // Range: Close // Melee\nTyphon attempts to swallow a target into its humongous maw. Typhon may have multiple targets swallowed at once.\n\n20: The target is swallowed whole and entirely mulched in the jaws of Typhon. A Mech or Vehicle is destroyed, a creature is killed.\n11 - 19: Typhon swallows the target whole. The target takes 10 SP damage as it enters the Bio-Titan’s gullet. Whilst swallowed, the target takes 5 SP damage at the end of their turn, and cannot move. They can attempt to use a Turn Action to escape. If Typhon takes 25 or more SP damage in one round it will regurgitate whatever it has swallowed.\n6 - 10: Typhon chews through the target. A random System on the target is destroyed and the target takes 5 SP damage.\n2 - 5: Typhon misses the target.\n1: Typhon misses the target and its jaws become locked. It cannot use its Swallow Whole attack for one turn."
+        }
+    ]
+}
+
+let drone = {
+    character_name: "Meld Drone",
+    health: 3,
+    health_max: 3,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 1,
+    techlevel: "N",
+    typeDetails: "Meld when they take over a biological organism, around the size of a human. The brain is sludged, only the stem remains, they become a peon of the swarm.",
+
+    weapons: [
+        {
+            name: "Bite",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee // Meld Infection"
+        }
+    ]
+}
+
+let droneswarm = {
+    character_name: "Meld Drone Swarm",
+    health: 0,
+    health_max: 0,
+    structure: 3,
+    structure_max: 3,
+    scrapvalue: 1,
+    techlevel: "N",
+    typeDetails: "A swarm of multiple zombie-like Meld Drones",
+
+    weapons: [
+        {
+            name: "Devour",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee // Meld Infection // Multiattack (3)"
+        }
+    ],
+}
+
+let nanoid = {
+    character_name: "Meld Drone",
+    health: 0,
+    health_max: 0,
+    structure: 5,
+    structure_max: 5,
+    scrapvalue: 5,
+    techlevel: "N",
+    typeDetails: "Meld in a small, swift form, about the size of a large wolf with lashing tendrils.",
+
+    weapons: [
+        {
+            name: "Nanoid Tendrils",
+            range: "Close",
+            damage: "3 SP",
+            traits: "Melee // Meld Infection"
+        }
+    ],
+    traits: [
+        {
+            name: "Fast",
+            details: ""
+        }
+    ]
+}
+
+let splitter = {
+    character_name: "Meld Splitter",
+    health: 0,
+    health_max: 0,
+    structure: 10,
+    structure_max: 10,
+    scrapvalue: 10,
+    techlevel: "N",
+    typeDetails: "Formless inky darkness, Meld Splitters are around the height of a Mech and made of boundless swarms of coagulated meld.",
+
+    weapons: [
+        {
+            name: "Splitter Tendrils",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Melee // Meld Infection // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Split",
+            details: "When a Meld Splitter is reduced to 0 SP it turns into 2 Meld Nanoids. These act at the start of the next round"
+        }
+    ]
+}
+
+let behemoth = {
+    character_name: "Behemoth (Titanic)",
+    health: 0,
+    health_max: 0,
+    structure: 60,
+    structure_max: 60,
+    scrapvalue: 60,
+    techlevel: "N",
+    typeDetails: "Titanic Actions \nThe Meld Behemoth can take three Titanic Actions, choosing from the options below. Only one Titanic Action may be chosen at a time and only at the end of another Pilot’s or NPC’s turn. Meld Behemoth regains spent Titanic Actions at the start of their turn. \n• The Meld Behemoth moves one Range Band. \n• The Meld Behemoth makes a single Behemoth Tendrils Attack. This does not have the Multi-Attack Trait. \n• The Meld Behemoth uses the Behemoth Assimilation Ability",
+
+    weapons: [
+        {
+            name: "Behemoth Tendrils",
+            range: "Medium",
+            damage: "6 SP",
+            traits: "Melee // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Assimilation",
+            details: "Passive \nA Meld Behemoth does not infect, instead it absorbs everything it destroys into its mammoth, ever expanding form. \nWhen the Meld Behemoth uses this Ability a target Mech or Vehicle in Close Range that is damaged or on 0 SP becomes assimilated into its bulk. \nThe Meld Behemoth gains an amount of SP equal to the target’s Max SP. If this would increase the Meld Behemoth’s current SP beyond its Max SP, increase its Max SP by that amount as well. For example, if the Meld Behemoth has 60 SP and gained 10 SP it would now have 70 SP with a Max SP of 70."
+        }
+    ]
+}
+
+let powerloader = {
+    character_name: "Power Loader",
+    health: 0,
+    health_max: 0,
+    structure: 1,
+    structure_max: 1,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "A pneumatically powered heavy loader for moving cargo",
+
+    weapons: [
+        {
+            name: "Rigging Arm",
+            range: "Close",
+            damage: "1 SP",
+            traits: "Melee // Load"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        }
+    ]
+}
+
+let boxwheel = {
+    character_name: "Box Wheel",
+    health: 0,
+    health_max: 0,
+    structure: 1,
+    structure_max: 1,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "A four seater box wheel vehicle designed for recreational driving. Not a lot of these nowadays.",
+
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Personnel Capacity (4)",
+        },
+        {
+            name: "Wheeled",
+        },
+    ]
+}
+
+let FightingBoxWheel = {
+    character_name: "Fighting Box Wheel",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 2,
+    techlevel: "T1",
+    typeDetails: "An improvised fighting vehicle, modified to carry heavy weaponry",
+
+    weapons: [
+        {
+            name: ".50 Cal Machine Gun",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Ballistic // Jamming // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Personnel Capacity (6)",
+        },
+        {
+            name: "Wheeled",
+        },
+    ]
+}
+
+let MachineGunTurret = {
+    character_name: "Machine Gun Turret",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 2,
+    techlevel: "T1",
+    typeDetails: "A static gun emplacement",
+
+    weapons: [
+        {
+            name: ".50 Cal Machine Gun",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Ballistic // Jamming // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Immobile",
+        },
+    ]
+}
+
+let ArmouredBoxWheel = {
+    character_name: "Armoured Box Wheel",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 3,
+    techlevel: "T2",
+    typeDetails: "An armoured, wheeled vehicle that carries personnel and provides fire support",
+
+    weapons: [
+        {
+            name: "30mm Autocannon",
+            range: "Close",
+            damage: "4 SP",
+            traits: "Ballistic // Jamming"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Personnel Capacity (18)",
+        },
+        {
+            name: "Wheeled",
+        },
+    ]
+}
+
+let Tank = {
+    character_name: "Tank",
+    health: 0,
+    health_max: 0,
+    structure: 6,
+    structure_max: 6,
+    scrapvalue: 4,
+    techlevel: "T3",
+    typeDetails: "A conventional tracked, armoured battle vehicle",
+
+    weapons: [
+        {
+            name: "120mm Autocannon",
+            range: "Long",
+            damage: "6 SP",
+            traits: "Ballistic // Explosive (1)"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+    ]
+}
+
+let Rotorcraft = {
+    character_name: "Rotorcraft",
+    health: 0,
+    health_max: 0,
+    structure: 3,
+    structure_max: 3,
+    scrapvalue: 3,
+    techlevel: "T4",
+    typeDetails: "A flying vehicle that can hover over terrain.",
+
+    weapons: [
+        {
+            name: "Rotary Mini Gun",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Ballistic // Hot (1) // Jamming // Multiattack (2) // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let DefacerDrone = {
+    character_name: "Defacer Drone",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "Used for salvaging and crowd control, their distinctive buzzsaw sound has struck fear into many protesters.",
+
+    weapons: [
+        {
+            name: "Chainsaw Arm",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Melee // Salvaging"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let SurveyDrone = {
+    character_name: "Survey Drone",
+    health: 0,
+    health_max: 0,
+    structure: 1,
+    structure_max: 1,
+    scrapvalue: 1,
+    techlevel: "T1",
+    typeDetails: "An unarmed drone used as a reconnaissance tool",
+
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+        {
+            name: "Survey Scanner",
+        },
+    ]
+}
+
+let SalvoDrone = {
+    character_name: "Salvo Drone",
+    health: 0,
+    health_max: 0,
+    structure: 3,
+    structure_max: 3,
+    scrapvalue: 2,
+    techlevel: "T1",
+    typeDetails: "A simple machine gun drone often used to defend areas of strategic importance.",
+
+    weapons: [
+        {
+            name: ".50 Cal Machine Gun",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Ballistic // Jamming // Pinning"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let CombatDrone = {
+    character_name: "Combat Drone",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 2,
+    techlevel: "T2",
+    typeDetails: "A laser armed drone used in a defensive capacity",
+
+    weapons: [
+        {
+            name: "Red Laser",
+            range: "Medium",
+            damage: "3 SP",
+            traits: "Energy // Hot (1)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let HeavyCombatDrone = {
+    character_name: "Heavy Combat Drone",
+    health: 0,
+    health_max: 0,
+    structure: 5,
+    structure_max: 5,
+    scrapvalue: 2,
+    techlevel: "T3",
+    typeDetails: "A heavily armoured drone designed for battlefield use",
+
+    weapons: [
+        {
+            name: "30mm Autocannon",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Ballistic // Jamming"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let WalkerDrone = {
+    character_name: "Walker Drone",
+    health: 0,
+    health_max: 0,
+    structure: 6,
+    structure_max: 6,
+    scrapvalue: 3,
+    techlevel: "T2",
+    typeDetails: "An anthropomorphic, Mech-like drone.",
+
+    weapons: [
+        {
+            name: "Green Laser",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Energy // Hot (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Locomotion System",
+        },
+        {
+            name: "Articulated Rigging Arm",
+        },
+    ]
+}
+
+let PestDrone = {
+    character_name: "Pest Drone",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 3,
+    techlevel: "T3",
+    typeDetails: "A versatile multi-legged drone armed with a flamethrower for ‘industrial’ use",
+
+    weapons: [
+        {
+            name: "FM-3 Flamethrower",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Anti-Organic // Multi-Attack (2) // Overheat"
+        },
+        {
+            name: "FM-3 Flamethrower",
+            range: "Close",
+            damage: "2 SP",
+            traits: "Anti-Organic // Multi-Attack (2) // Overheat"
+        }
+    ],
+    traits: [
+        {
+            name: "Spider Locomotion System",
+        },
+    ]
+}
+
+let HoverDrone = {
+    character_name: "Hover Drone",
+    health: 0,
+    health_max: 0,
+    structure: 4,
+    structure_max: 4,
+    scrapvalue: 3,
+    techlevel: "T4",
+    typeDetails: "A highly mobile missile platform used in offensive and defensive roles.",
+
+    weapons: [
+        {
+            name: "Missile Pod",
+            range: "Long",
+            damage: "8 SP",
+            traits: "Missile // Explosive (2) // Hot (1) // Uses (6)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+    ]
+}
+
+let NeedleDrone = {
+    character_name: "Needle Drone",
+    health: 0,
+    health_max: 0,
+    structure: 2,
+    structure_max: 2,
+    scrapvalue: 3,
+    techlevel: "T4",
+    typeDetails: "A miniaturised corpo stealth drone developed for black ops and wetwork",
+
+    weapons: [
+        {
+            name: "Needler",
+            range: "Close",
+            damage: "1 SP",
+            traits: "Poison // Deadly (Creatures Only)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        },
+        {
+            name: "Polycarbonate Stealth Chassis",
+            details: "The Needle Drone cannot be targeted with anything that uses the Targeter Trait such as targeting Modules. It also cannot be seen by anything with the Optics Trait or Scanner Trait. It does not appear on sensors, radar systems, or scanners and needs direct visual confirmation to be spotted"
+        },
+    ]
+}
+
+let scorpion = {
+    character_name: "Irradiated Scorpion",
+    health: 4,
+    health_max: 4,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Mutated beyond their usual size, they have been known to kill entire camps of wasters.",
+
+    weapons: [
+        {
+            name: "Stinger",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee // Poison // Deadly (Creatures Only)"
+        }
+    ],
+}
+
+let Artl = {
+    character_name: "Artl",
+    health: 2,
+    health_max: 2,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Burrowing, ambush predators that liquify their prey for easier digestion.",
+
+    weapons: [
+        {
+            name: "Acid Spit",
+            range: "Medium",
+            damage: "2 HP",
+            traits: "Burn (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Corrosive Skin Glands",
+            details: "When hit by a melee attack, the attacker takes 2 HP damage."
+        }
+    ]
+}
+
+let Chimeripede = {
+    character_name: "Chimeripede",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A mutated, radiation scarred amalgamation of flesh.",
+
+    weapons: [
+        {
+            name: "Barbed Tentacles",
+            range: "Close",
+            damage: "3 HP",
+            traits: "Melee // Pinning // Poison // Multiattack (3)"
+        }
+    ],
+}
+
+let bear = {
+    character_name: "Wasteland Bear",
+    health: 5,
+    health_max: 5,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Large, hungry, and ferocious, these bears are not just after your picnic basket.",
+
+    weapons: [
+        {
+            name: "Bear Carnage",
+            range: "Close",
+            damage: "4 HP",
+            traits: "Melee"
+        }
+    ],
+}
+
+let bird = {
+    character_name: "Carrion Bird",
+    health: 3,
+    health_max: 3,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Large flying scavengers that feast on flesh and bone.",
+
+    weapons: [
+        {
+            name: "Talons",
+            range: "Close",
+            damage: "3 HP",
+            traits: ""
+        }
+    ],
+    traits: [
+        {
+            name: "Fly",
+            details: "Anything with this Trait can fly, allowing them to move in the air over obstacles and terrain. Anything attacking a target with this Trait treats it as though it is in Long Range unless it also has the Fly or Hover Trait"
+        }
+    ]
+}
+
+let Molebear = {
+    character_name: "Molebear",
+    health: 12,
+    health_max: 12,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Terrifying, huge burrowing predators known to rend through metal.",
+
+    weapons: [
+        {
+            name: "Iron Claw",
+            range: "Close",
+            damage: "4 SP",
+            traits: "Melee "
+        }
+    ],
+    traits: [
+        {
+            name: "Burrower",
+            details: "This Trait allows for movement underneath the ground. Something with this Trait can burrow into the ground as a Turn Action and unburrow as a Free Action. Whilst burrowed, it cannot be directly seen or targeted by anything on the ground, but may be spotted by other signs such as mounds of earth"
+        }
+    ]
+}
+
+let Wastelander = {
+    character_name: "Wastelander",
+    health: 2,
+    health_max: 2,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Represents the myriad of common denizens of the wastelands",
+
+    weapons: [
+        {
+            name: "Improvised Melee Weapon",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Melee "
+        }
+    ],
+    traits: [
+        {
+            name: "Salvaging Tools",
+        }
+    ]
+}
+
+let Raider = {
+    character_name: "Raider",
+    health: 3,
+    health_max: 3,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Wastelanders who take what they need by force",
+
+    weapons: [
+        {
+            name: "Improvised Firearm",
+            range: "Close",
+            damage: "2 HP",
+            traits: "Ballistic // Unwieldy "
+        }
+    ],
+}
+
+let Trooper = {
+    character_name: "Trooper",
+    health: 5,
+    health_max: 5,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Combat trained troops deployed in a wide range of roles",
+
+    weapons: [
+        {
+            name: "Rifle",
+            range: "Medium",
+            damage: "5 HP",
+            traits: "Ballistic"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let Veteran = {
+    character_name: "Veteran",
+    health: 9,
+    health_max: 9,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A well trained and seasoned soldier deployed on difficult operations.",
+
+    weapons: [
+        {
+            name: "Green Laser Rifle",
+            range: "Medium",
+            damage: "5 HP",
+            traits: "Energy "
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let CombatPilot = {
+    character_name: "Combat Pilot",
+    health: 2,
+    health_max: 2,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A combat trained Mech Pilot, such as a Union Salvager.",
+
+    weapons: [
+        {
+            name: "Pistol",
+            range: "Close",
+            damage: "3 HP",
+            traits: "Ballistic "
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let Ace = {
+    character_name: "Ace",
+    health: 16,
+    health_max: 16,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A veteran Mech Pilot, usually with Corpo training.",
+
+    weapons: [
+        {
+            name: "Sniper Rifle",
+            range: "Long",
+            damage: "6 HP",
+            traits: "Ballistic "
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let WasterMob = {
+    character_name: "Waster Mob",
+    health: 4,
+    health_max: 4,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A mob of wastelanders with improvised weapons",
+
+    weapons: [
+        {
+            name: "Improvised Weapons",
+            range: "Close",
+            damage: "4 HP",
+            traits: "Melee // Multiattack (2) "
+        }
+    ],
+    traits: [
+        {
+            name: "Salvaging Tools",
+        }
+    ]
+}
+
+let RaiderBand = {
+    character_name: "Raider Band",
+    health: 6,
+    health_max: 6,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A band of raiders hungry for scrap.",
+
+    weapons: [
+        {
+            name: "Improvised Firearms",
+            range: "Close",
+            damage: "4 HP",
+            traits: "Ballistic // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "High Tensile Wire",
+        }
+    ]
+}
+
+let RifleSquad = {
+    character_name: "Rifle Squad",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A group of grunts armed with rifles.",
+
+    weapons: [
+        {
+            name: "Rifles",
+            range: "Close",
+            damage: "6 HP",
+            traits: "Ballistic // Jamming // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        }
+    ]
+}
+
+let MachineGunSquad = {
+    character_name: "Machine Gun Squad",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Combat trained troops armed with a mobile heavy machine gun.",
+
+    weapons: [
+        {
+            name: "Improvised Weapons",
+            range: "Close",
+            damage: "3 SP",
+            traits: "Ballistic // Jamming // Pinning // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "First Aid Kit",
+        }
+    ]
+}
+
+let MissileSquad = {
+    character_name: "Missile Squad",
+    health: 10,
+    health_max: 10,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Combat trained troops armed with a mobile missile launcher.",
+
+    weapons: [
+        {
+            name: "Rocket Launcher",
+            range: "Long",
+            damage: "6 SP",
+            traits: "Missile // Explosive (1) // Multiattack (2) // Uses (3)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "First Aid Kit",
+        }
+    ]
+}
+
+let EliteBladeSquad = {
+    character_name: "Elite Blade Squad",
+    health: 20,
+    health_max: 20,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Heavy assault troops armed with energised blades",
+
+    weapons: [
+        {
+            name: "Monomolecular Katana",
+            range: "Close",
+            damage: "6 SP",
+            traits: "Melee // Deadly // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "Electro Grappling Hook",
+        }
+    ]
+}
+
+let WastelandHerd = {
+    character_name: "Wasteland Herd",
+    health: 4,
+    health_max: 4,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "A herd of wasteland creatures",
+
+    weapons: [
+        {
+            name: "Stampede",
+            range: "Close",
+            damage: "3 HP",
+            traits: "Melee // Multiattack (2) // Creatures hit by this attack are knocked prone"
+        }
+    ],
+}
+
+let EliteBeamSquad = {
+    character_name: "Elite Beam Squad",
+    health: 20,
+    health_max: 20,
+    structure: 0,
+    structure_max: 0,
+    scrapvalue: 0,
+    techlevel: "0",
+    typeDetails: "Apex troops in heavy armour armed with a big ol’ gun",
+
+    weapons: [
+        {
+            name: "Beta Fission Gun",
+            range: "Long",
+            damage: "9 SP",
+            traits: "Burn (2) // Energy // Explosive (1) // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Portable Comms Unit",
+        },
+        {
+            name: "Night Vision Optics",
+        }
+    ]
+}
+
+let DroneSquadron = {
+    character_name: "Drone Squadron",
+    health: 0,
+    health_max: 0,
+    structure: 8,
+    structure_max: 8,
+    scrapvalue: 4,
+    techlevel: "T2",
+    typeDetails: "A swarm of Combat Drones flying in sync.",
+
+    weapons: [
+        {
+            name: "Red Laser",
+            range: "Medium",
+            damage: "4 SP",
+            traits: "Energy // Hot (1) // Multiattack (2)"
+        }
+    ],
+    traits: [
+        {
+            name: "Hover Locomotion System",
+        }
+    ]
+}
+
+let denizen = {
+    //biotitans
+    Scylla,
+    Typhon,
+
+    //meld
+    drone,
+    droneswarm,
+    nanoid,
+    splitter,
+    behemoth,
+
+    //vehicles
+    powerloader,
+    boxwheel,
+    FightingBoxWheel,
+    MachineGunTurret,
+    ArmouredBoxWheel,
+    Tank,
+    Rotorcraft,
+
+    //drones
+    DefacerDrone,
+    SurveyDrone,
+    SalvoDrone,
+    CombatDrone,
+    HeavyCombatDrone,
+    WalkerDrone,
+    PestDrone,
+    HoverDrone,
+    NeedleDrone,
+
+    //creatures
+    scorpion,
+    Artl,
+    Chimeripede,
+    bear,
+    bird,
+    Molebear,
+
+    //people
+    Wastelander,
+    Raider,
+    Trooper,
+    Veteran,
+    CombatPilot,
+    Ace,
+
+    //squads
+    WasterMob,
+    RaiderBand,
+    RifleSquad,
+    MachineGunSquad,
+    MissileSquad,
+    EliteBladeSquad,
+    WastelandHerd,
+    EliteBeamSquad,
+    DroneSquadron
+}
+
+///////////////////////
+//  IMPORT HELPER  ////
+///////////////////////
+
+const formatImporterText = (toImport) => {
+    let formatted = toImport.replaceAll(/\/\/\s*[\r\n]/gm, '// ').replaceAll(/[\r\n]/gm, '#').replaceAll(/#\/\//g, '//').replaceAll(/#/g, '\n').replaceAll(/^\s*\n/gm,'').replaceAll(/\n(\(\d\))/gm, "$1").trim();
+
+    let multilineName = formatted.split(/\r?\n/);
+    if(multilineName[2].includes("Range") || multilineName[2].includes("Passive") || multilineName[2].includes("EP") || multilineName[2].includes("AP")) {
+        formatted = multilineName.slice(0,2).join('') + "\n" + multilineName.slice(2).join("\n");
+    }
+
+    let multilineRules = formatted.split(/\r?\n/);
+    if(multilineRules[2].includes("//") && !multilineRules[1].includes("EP")) {
+        formatted = multilineRules[0] + "\n" + multilineRules.slice(1,3).join('') + "\n" + multilineRules.slice(3).join("\n");
+    }
+
+    return formatted;
+};
+
+const importWeapon = async (toImport, object, row) => {
+    toImport = importName(toImport, object, row);
+    toImport = importCost(toImport, object, row);
+
+    let rules = toImport.split(/\r?\n/)[0].trim();
+    rules = importRange(rules, object, row);
+    rules = importDamage(rules, object, row);
+
+    rules = importHeat(rules, object, row);
+    importMechWeaponTraits(rules, object, row);
+    importDetails(toImport, object, row);
+}
+
+const clearMechWeapons = async () => {
+    getSectionIDs("repeating_mechweapons", function(idarray) {
+        for(var i=0; i < idarray.length; i++) {
+            removeRepeatingRow("repeating_mechweapons_"+idarray[i]);
+        }
+    });
+}
+
+const clearTraits = async () => {
+    getSectionIDs("repeating_traits", function(idarray) {
+        for(var i=0; i < idarray.length; i++) {
+            removeRepeatingRow("repeating_traits_"+idarray[i]);
+        }
+    });
+}
+
+const importName = (toImport, object, row) => {
+   let textSplits = toImport.split(/\r?\n/);
+   object[row + "name"] = textSplits[0].trim().replace(/(\w)(\w*)/g, (_, firstChar, rest) => firstChar + rest.toLowerCase());
+
+   return textSplits.slice(1).join('\n');
+};
+
+const importCost = (toImport, object, row) => {
+    if(/T\d/.test(toImport)) {
+       let tier = toImport.match(/T\d/).pop();
+
+       let associatedCost = toImport.split(/T\d/)[1].trim().split(/\r?\n|\s+/)
+       object[row + "scrap"] = associatedCost[1] + " " + tier;
+       object[row + "slots"] = parseInt(associatedCost[0]);
+
+       return toImport.split(/T\d/)[0].trim()
+    }
+
+    return toImport;
+}
+
+const importEp = (toImport, object, row) => {
+
+    if(toImport.split(/\r?\n/)[0].includes("EP")) {
+        object[row + "cost"] = toImport.split(/\r?\n/)[0].trim();
+        return toImport.split(/\r?\n/).slice(1).join("\n");
+    }
+    return toImport;
+}
+
+const importAp = (rules, object, row) => {
+
+    if(rules.includes("AP")) {
+        object[row + "cost"] =  rules.match(/\d+\s*AP/g).pop();
+        let index = rules.split(' // ').indexOf(object[row + "cost"]);
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+
+        return rules.join(' // ').trim()
+    }
+    return rules;
+}
+
+const importRange = (rules, object, row) => {
+    if(rules.includes("Range:")) {
+        object[row + "range"] = rules.split('Range:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim()
+        let index = rules.split(' // ').indexOf('Range: '+ object[row + "range"]);
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+        return rules.map(s => s.trim()).join(' // ').trim()
+    }
+
+    return rules;
+}
+
+const importDamage = (rules, object, row) => {
+    if(rules.includes("Damage:")) {
+        let damage = rules.split('Damage:')[1].split('//')[0].replaceAll(/[a-zA-Z]*:/g, '').trim();
+        if(damage.match(/\d+[d]\d+/g)) {
+           damage = "[[" + damage + "]]";
+        }
+        object[row + "damage"] = damage;
+        return rules.split('//').slice(1).map(s => s.trim()).join(' // ').trim()
+    }
+
+    return rules;
+}
+
+const importAction = (rules, object, row) => {
+
+    if(rules.includes("Reaction")) {
+        object[row + "action"] = "Reaction";
+        return rules.replaceAll("Reaction //", '').replaceAll("Reaction", '').trim();
+   }
+
+       if(rules.includes("Free Action")) {
+        object[row + "action"] = "Free Action";
+        return rules.replaceAll("Free Action //", '').replaceAll("Free Action", '').trim();
+   }
+
+   if(rules.includes("Turn Action")) {
+        object[row + "action"] = "Turn Action";
+        return rules.replaceAll("Turn Action //", '').replaceAll("Turn Action", '').trim();
+   }
+
+  if(rules.includes("Short Action")) {
+        object[row + "action"] = "Short Action";
+        return rules.replaceAll("Short Action //", '').replaceAll("Short Action", '').trim();
+   }
+
+  if(rules.includes("Long Action")) {
+        object[row + "action"] = "Long Action";
+        return rules.replaceAll("Long Action //", '').replaceAll("Long Action", '').trim();
+   }
+
+   return rules;
+}
+
+const importHeat = (rules, object, row) => {
+
+     if(rules.includes("Hot (")) {
+        object[row + "heat"] = rules.match(/Hot \(\d\)/g).pop().match(/\d+/).pop();
+        let index = rules.split(' // ').indexOf('Hot ('+ object[row + "heat"]+')');
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+        rules = rules.map(s => s.trim()).join(' // ').trim()
+    }
+    else {
+        object[row + "heat"] = 0;
+    }
+
+    if(rules.includes("Heat Spike")) {
+        object[row + "heatspike"] = "on";
+        let index = rules.split(' // ').indexOf('Heat Spike');
+        rules = rules.split(' // ');
+        rules.splice(index, 1);
+        rules = rules.map(s => s.trim()).join(' // ').trim()
+    }
+
+    return rules;
+}
+
+const importMechWeaponTraits = (rules, object, row) => {
+    object[row + "traits"] = rules.trim();
+}
+
+const importEquipmentTraits = (rules, object, row) => {
+    object[row + "traits"] = rules.trim();
+}
+
+const importDetails = (toImport, object, row) => {
+    object[row + "details"] = toImport.split('\n').slice(1).map(s => s.trim()).join(' ').trim();
+}
+
+const importTraits = (traits, object) => {
+
+    traits.forEach(trait => {
+        if(trait.trim() !== "") {
+            let row = "repeating_traits_" + generateRowID() + "_name";
+            object[row] = trait.trim();
+        }
+    })
+}
+
+///////////////////
+//  HELPER     ////
+///////////////////
+
+async function repeatingSum (destination, fieldsum, ...sections){
+    // destination = the name of the attribute that stores the total
+    // fieldsum = the name of the field to be summed
+    // sections = name for/of repeating fieldset, without the repeating_
+
+    let attrs = [];
+
+    await Promise.all(sections.map(async (section) => {
+        let ids = await asw.getSectionIDs(section);
+        var sumFields = [];
+        for (var a=0; a< ids.length; a++) {
+            sumFields[sumFields.length] = section + "_" + ids[a] + "_" + fieldsum;
+        }
+        attrs.push(...sumFields);
+    }
+    ));
+
+    let values = await asw.getAttrs(attrs);
+
+    let sumTotal = 0;
+    let tempSum = 0;
+    for(a=0; a < attrs.length; a++){
+        tempSum = parseFloat(values[attrs[a]],10) || 0;
+        sumTotal += tempSum;
+    }
+    var setSumValue = {};
+    setSumValue[destination] = sumTotal;
+    asw.setAttrs(setSumValue);
+}
+
+const asw = (() => {
+    const setActiveCharacterId = function(charId){
+        let oldAcid=getActiveCharacterId();
+        let ev = new CustomEvent("message");
+        ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+        self.dispatchEvent(ev);
+        return oldAcid;
+    };
+    const promisifyWorker = (worker, parameters) => {
+        let acid=getActiveCharacterId();
+        let prevAcid=null;
+        return new Promise((res,rej)=>{
+            prevAcid=setActiveCharacterId(acid);
+            try {if (worker===0) getAttrs(parameters[0]||[],(v)=>res(v));
+                else if (worker===1) setAttrs(parameters[0]||{}, parameters[1]||{},(v)=>res(v));
+                else if (worker===2) getSectionIDs(parameters[0]||'',(v)=>res(v));
+            } catch(err) {rej(console.error(err))}
+        }).finally(()=>setActiveCharacterId(prevAcid));
+    }
+    return {
+        getAttrs(attrArray) {return promisifyWorker(0, [attrArray])},
+        setAttrs(attrObj, options) {return promisifyWorker(1, [attrObj, options])},
+        getSectionIDs(section) {return promisifyWorker(2, [section])},
+        setActiveCharacterId,
+    }
+})();
 </script>
+
+<rolltemplate class="sheet-rolltemplate-roll">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+
+        {{#rollTotal() toMuchHeat 1}}
+        <tr>
+            <td>
+                You cannot make this roll due to heat.
+            </td>
+        </tr>
+        {{/rollTotal() toMuchHeat 1}}
+
+        {{#rollTotal() toMuchHeat 0}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{#rollWasCrit() roll}}
+                    <strong>Nailed it</strong> ({{roll}}) <br>
+                    You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                    {{/rollWasCrit() roll}}
+
+                    {{#^rollWasCrit() roll}}
+                        {{#rollBetween() roll 11 19}}
+                        Success ({{roll}}) - You’ve achieved your goal without any compromises.
+                        {{/rollBetween() roll 11 19}}
+
+                        {{#rollBetween() roll 6 10}}
+                        Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence.
+                        {{/rollBetween() roll 6 10}}
+
+                        {{#rollBetween() roll 2 5}}
+                        Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice.
+                        {{/rollBetween() roll 2 5}}
+
+                        {{#rollBetween() roll 1 1}}
+                        Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice.
+                        {{/rollBetween() roll 1 1}}
+                    {{/^rollWasCrit() roll}}
+                </td>
+            </tr>
+            {{#heatroll}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Check: {{heat}} vs {{heatroll}}
+                </td>
+            </tr>
+            {{/heatroll}}
+            {{#heatspike}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Spike: {{heat}} vs {{heatspike}}
+                </td>
+            </tr>
+            {{/heatspike}}
+        {{/rollTotal() toMuchHeat 0}}
+    </table>
+    {{#mech}}
+    <div class="sheet-rolltemplate-button-row">
+        {{#rollTotal() toMuchHeat 0}}
+            {{#pushable}}
+            <div class="sheet-rolltemplate-button">
+                [Push](~{{name}}|reactPushWeapon)
+            </div>
+            {{/pushable}}
+
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Reactor Overload](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
+
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Heat Spike](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
+        {{/rollTotal() toMuchHeat 0}}
+    </div>
+    {{/mech}}
+</rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-weapon">
     <table>
         <tr>
             <th>
-                {{callsign}} rolls an attack on range {{range}} with {{weapon_name}}
+                {{name}} rolls an attack on range {{range}} with {{weapon_name}}
             </th>
         </tr>
         <tr>
@@ -188,46 +3666,124 @@
                 <div class="sheet-rolltemplate-spacer"></div>
             </td>
         </tr>
+        {{#rollTotal() toMuchHeat 1}}
         <tr>
             <td>
-                {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
-                {{/rollBetween() roll 20 20}}
-
-                {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises. When attacking you hit the target and deal standard damage
-                {{/rollBetween() roll 11 19}}
-
-                {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. When attacking you hit but something has
-                gone wrong.
-                {{/rollBetween() roll 6 10}}
-
-                {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice. When attacking you miss the target.
-                {{/rollBetween() roll 2 5}}
-
-                {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice. When attacking you miss the
-                target and something has gone wrong.
-                {{/rollBetween() roll 1 1}}
+                You cannot make this roll due to heat.
             </td>
         </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Weapondamage: {{damage}}
-            </td>
-        </tr>
+        {{/rollTotal() toMuchHeat 1}}
+        {{#rollTotal() toMuchHeat 0}}
+            <tr>
+                <td>
+                    {{#rollWasCrit() roll}}
+                    <strong>Nailed it</strong> ({{roll}}) <br>
+                    You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action e.g. double the damage.
+                    {{/rollWasCrit() roll}}
+
+                    {{#^rollWasCrit() roll}}
+                        {{#rollBetween() roll 11 19}}
+                        Success ({{roll}}) - You hit the target and deal standard damage
+                        {{/rollBetween() roll 11 19}}
+
+                        {{#rollBetween() roll 6 10}}
+                        Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. You hit but something has
+                        gone wrong.
+                        {{/rollBetween() roll 6 10}}
+
+                        {{#rollBetween() roll 2 5}}
+                        Failure ({{roll}}) - You miss the target.
+                        {{/rollBetween() roll 2 5}}
+
+                        {{#rollBetween() roll 1 1}}
+                        Cascade Failure ({{roll}}) - You miss the target and something has gone wrong.
+                        {{/rollBetween() roll 1 1}}
+                    {{/^rollWasCrit() roll}}
+                </td>
+            </tr>
+            {{#damage}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Weapondamage: {{damage}}
+                </td>
+            </tr>
+            {{/damage}}
+            {{#^rollTotal() weaponheat 0}}
+            <tr>
+                <td>
+                    Weaponheat: {{weaponheat}}
+                </td>
+            </tr>
+            {{/^rollTotal() weaponheat 0}}
+            {{#heatroll}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Check: {{heat}} vs {{heatroll}}
+                </td>
+            </tr>
+            {{/heatroll}}
+            {{#heatspike}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Heat Spike: {{heat}} vs {{heatspike}}
+                </td>
+            </tr>
+            {{/heatspike}}
+            {{#traits}}
+            <tr>
+                <td>
+                    <div class="sheet-rolltemplate-spacer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Traits: {{traits}}
+                </td>
+            </tr>
+            {{/traits}}
+        {{/rollTotal() toMuchHeat 0}}
     </table>
+    {{#mech}}
+    <div class="sheet-rolltemplate-button-row">
+        {{#rollTotal() toMuchHeat 0}}
+            {{#pushable}}
+            <div class="sheet-rolltemplate-button">
+                [Push](~{{name}}|reactPush)
+            </div>
+            {{/pushable}}
+
+            {{#^rollGreater() heatroll heat}}
+            <div class="sheet-rolltemplate-button">
+                [Reactor Overload](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatroll heat}}
+
+            {{#^rollGreater() heatspike heat}}
+            <div class="sheet-rolltemplate-button">
+                [Heat Spike](~{{name}}|reactOverload)
+            </div>
+            {{/^rollGreater() heatspike heat}}
+        {{/rollTotal() toMuchHeat 0}}
+    </div>
+    {{/mech}}
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-roll">
+<rolltemplate class="sheet-rolltemplate-criticalinjury">
     <table>
         <tr>
             <th>
@@ -242,28 +3798,135 @@
         <tr>
             <td>
                 {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
+                <strong>Miraculous Survival</strong> ({{roll}}) <br>
+                You survive against the odds. You have 1 HP, remain conscious and can act normally.
                 {{/rollBetween() roll 20 20}}
 
                 {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises. When attacking you hit the target and deal standard damage
+                Unconscious ({{roll}}): You are stable at 0 HP, but unconscious and cannot move or take actions until you gain at least 1 HP. You will regain consciousness naturally in 1 hour and get back up with 1 HP.
                 {{/rollBetween() roll 11 19}}
 
                 {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. When attacking you hit but something has
-                gone wrong.
+                Minor Injury ({{roll}}): You suffer a Minor Injury such as a sprain, burns, or minor concussion. Your Max HP are reduced by 1 until healed in a Tech 3 - 4 MedBay. In addition, you are Unconscious. Apply the result of 11 - 19.
                 {{/rollBetween() roll 6 10}}
 
                 {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice. When attacking you miss the target.
+                Major Injury ({{roll}}): You suffer a Major Injury such as permanent scarring, broken ribs, or internal injuries. Your Max HP is reduced by 2 until healed in a Tech 5 - 6 MedBay. In addition, you are Unconscious. Apply the result of 11-19.
                 {{/rollBetween() roll 2 5}}
 
                 {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice. When attacking you miss the
-                target and something has gone wrong.
+                Fatal Injury ({{roll}}): Your Pilot suffers a fatal injury and dies.
                 {{/rollBetween() roll 1 1}}
             </td>
         </tr>
     </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-overload">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong>Reactor Overdrive</strong> ({{roll}}) <br>
+                Your Mech’s reactor goes into overdrive. Your Mech can take any additional action this turn or Push their next roll within 10 minutes for free.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Reactor Overheat ({{roll}}) - Your Mech’s reactor has overheated. Your Mech shuts down and gains the Vulnerable Trait. Your Mech will re-activate at the end of your next turn. In addition, your Mech takes {{heat}} of SP damage.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Module Overload ({{roll}}) - One of your Mech’s Modules chosen at random or by the Mediator is destroyed.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                System Overload ({{roll}}) - One of your Mech’s Systems chosen at random or by the Mediator is destroyed.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Reactor Overload ({{roll}}) - Your Mech’s reactor goes into full meltdown and explodes. Your Mech, as well as any mounted Systems, Modules, and all Cargo, is destroyed in the explosion. Everything in Close Range of your Mech takes {{maxheat}} SP damage. They may take any Turn Action or Reaction in response to try to avoid this. Your Pilot dies unless they have a means to escape. The area your Mech was in becomes irradiated.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-criticaldamage">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div class="sheet-rolltemplate-spacer"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                {{#rollBetween() roll 20 20}}
+                <strong> Miraculous Survival</strong> ({{roll}}) <br>
+                Your Mech is somehow Intact. It has 1 SP and is still fully operational. Your Pilot is unharmed.
+                {{/rollBetween() roll 20 20}}
+
+                {{#rollBetween() roll 11 19}}
+                Core Damage ({{roll}}): Your Mech Chassis is damaged and inoperable until repaired. All mounted Systems and Modules remain Intact. Your Pilot is reduced to 0 HP unless they have some means to escape the Mech.
+                {{/rollBetween() roll 11 19}}
+
+                {{#rollBetween() roll 6 10}}
+                Module Destruction ({{roll}}): A Module mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.
+                {{/rollBetween() roll 6 10}}
+
+                {{#rollBetween() roll 2 5}}
+                System Destruction ({{roll}}): A System mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.
+                {{/rollBetween() roll 2 5}}
+
+                {{#rollBetween() roll 1 1}}
+                Catastrophic Damage ({{roll}}): The Mech, as well as any mounted Systems and Modules as well as all Cargo, is destroyed. Your Pilot dies unless they have a means to escape the Mech.
+                {{/rollBetween() roll 1 1}}
+            </td>
+        </tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-info">
+    <div>
+        {{info}}
+        {{#heatroll}}
+        <br>
+        <br>
+                Heat Check: {{heat}} vs {{heatroll}}
+        {{/heatroll}}
+        {{#heatspike}}
+        <br>
+                Heat Spike: {{heat}} vs {{heatspike}}
+        {{/heatspike}}
+        <br><br>
+        <div class="sheet-rolltemplate-button-row">
+            {{#rollTotal() toMuchHeat 0}}
+                {{#^rollGreater() heatroll heat}}
+                <div class="sheet-rolltemplate-button">
+                    [Reactor Overload](~{{name}}|reactOverload)
+                </div>
+                {{/^rollGreater() heatroll heat}}
+
+                {{#^rollGreater() heatspike heat}}
+                <div class="sheet-rolltemplate-button">
+                    [Heat Spike](~{{name}}|reactOverload)
+                </div>
+                {{/^rollGreater() heatspike heat}}
+            {{/rollTotal() toMuchHeat 0}}
+        </div>
+    </div>
 </rolltemplate>

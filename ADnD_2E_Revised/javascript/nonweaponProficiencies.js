@@ -571,7 +571,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Begging'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Begging'].push({
     'slots': 1,
     'abilityScore': '@{Charisma}',
-    'modifier': '?{Current Locale?|Uninhabited/Wilderness,-99|Countryside,-7|Hamlet/Village,-5|Town,-0,City,0}',
+    'modifier': '?{Locale modifier?|-99 [Uninhabited/Wilderness]|-7 [Countryside]|-5 [Hamlet/Village]|-2 [Town]|0 [City]}',
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Humanoids']
 });
@@ -610,8 +610,8 @@ NONWEAPON_PROFICIENCIES_TABLE['Information Gathering'].push({
 NONWEAPON_PROFICIENCIES_TABLE['Intimidation'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Intimidation'].push({
     'slots': 1,
-    'abilityScore': '?{Intimidation with?|@{Strength}|@{Charisma}}',
-    'modifier': '',
+    'abilityScore': '?{Intimidation with?|Strength,@{Strength}|Charisma,@{Charisma}}',
+    'modifier': 0,
     'classes': '',
     'book': ['The Complete Thief\'s Handbook','The Complete Book of Dwarves','The Complete Book of Humanoids']
 });
@@ -719,7 +719,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Dwarf Runes (Dwarf)'].push({
 });
 NONWEAPON_PROFICIENCIES_TABLE['Endurance (Dwarf)'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Endurance (Dwarf)'].push({
-    'slots': 1,
+    'slots': 0,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': '',
@@ -977,7 +977,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Lip Reading (Dwarf)'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Lip Reading (Dwarf)'].push({
     'slots': 1,
     'abilityScore': '@{Intelligence}',
-    'modifier': 0,
+    'modifier': -2,
     'classes': 'Thief',
     'book': ['The Complete Book of Dwarves']
 });
@@ -1139,6 +1139,13 @@ NONWEAPON_PROFICIENCIES_TABLE['Cheesemaking'].push({
     'classes': '',
     'book': ['The Complete Book of Humanoids']
 });
+NONWEAPON_PROFICIENCIES_TABLE['Crowd Working'].push({
+    'slots': 1,
+    'abilityScore': '@{Charisma}',
+    'modifier': +2,
+    'classes': '',
+    'book': ['The Complete Book of Humanoids']
+});
 NONWEAPON_PROFICIENCIES_TABLE['Danger Sense'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Danger Sense'].push({
     'slots': 2,
@@ -1209,8 +1216,8 @@ NONWEAPON_PROFICIENCIES_TABLE['Wild Fighting'].push({
 NONWEAPON_PROFICIENCIES_TABLE['Cartography'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Cartography'].push({
     'slots': 1,
-    'abilityScore': '@{Wisdom}',
-    'modifier': 0,
+    'abilityScore': '@{Intelligence}',
+    'modifier': -2,
     'classes': '',
     'book': ['The Complete Ranger\'s Handbook']
 });
@@ -1364,6 +1371,30 @@ NONWEAPON_PROFICIENCIES_TABLE['Clothesmaking, Crude'].push({
     'classes': '',
     'book': ['The Complete Barbarian\'s Handbook']
 });
+NONWEAPON_PROFICIENCIES_TABLE['Jumping (Barbarian)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Jumping (Barbarian)'].push({
+    'slots': "-",
+    'abilityScore': '@{Strength}',
+    'modifier': 0,
+    'classes': 'Rogue',
+    'book': ['PHB']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Tightrope Walking (Barbarian)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tightrope Walking (Barbarian)'].push({
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': '',
+    'book': ['The Complete Barbarian\'s Handbook']
+});
+NONWEAPON_PROFICIENCIES_TABLE['Tumbling (Barbarian)'] = [];
+NONWEAPON_PROFICIENCIES_TABLE['Tumbling (Barbarian)'].push({
+    'slots': 2,
+    'abilityScore': '@{Dexterity}',
+    'modifier': 0,
+    'classes': '',
+    'book': ['The Complete Barbarian\'s Handbook']
+});
 NONWEAPON_PROFICIENCIES_TABLE['Animal Rending'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Animal Rending'].push({
     'slots': 1,
@@ -1400,7 +1431,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Horde Summoning'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Horde Summoning'].push({
     'slots': 2,
     'abilityScore': '@{Charisma}',
-    'modifier': 0,
+    'modifier': -2,
     'classes': 'Warrior',
     'book': ['The Complete Barbarian\'s Handbook']
 });
@@ -1422,7 +1453,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Light Sleeping'].push({
 });
 NONWEAPON_PROFICIENCIES_TABLE['Sign Language'].push({
     'slots': 1,
-    'abilityScore': '@{Charisma}',
+    'abilityScore': '@{Dexterity}',
     'modifier': 0,
     'classes': '',
     'book': ['The Complete Barbarian\'s Handbook']

@@ -81,6 +81,73 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+July 8th 2023 v1.66a
+
+- Fixed Legs plate amror penalty when modified with pracitcal quality. It will now reduce the -20 pen to stealth to -10, instead of to 0.
+
+
+June 30nd 2023 v1.66
+
+- Added Practical Quality option tick box to all Mail/Plate Armor, this will reduce all penalties by -10 on the given armor piece and update the penalties boxes accordingly.
+- Corrected issue on Armor Tab where Shield Durability was adding to AP on the hit locations display to the right.
+
+
+June 22nd 2023 v1.65c
+
+- Added the Norse Race (Sea of Claws), same attribute as humans with default size average.
+- Fixed some rolls not working under certain conditions.
+- Fixed some failed roll Talent modifier text not displaying correctly. eg - You may Reverse Dice
+
+
+February 28th 2023 v1.65b
+
+- Fixed Talent Nobleblood test +SL text during leadership rolls, now correctly dislays as situational bonus SL.
+
+
+February 14th 2023 v1.65a
+
+- Fixed some skill rolls not always working due to new Besmirched condition bug
+- Fixed NPC fumble/crit not working from the combat text clicky
+- Fixed Talent integration description il8n tags
+- Fixed Channelling so no long removes SL from the Ext Accu SL pool when failing the roll
+
+
+December 20th 2022 v1.65
+
+- Added Ranged Weapons to be equipable in Mainhand/Offhand. This allows ranged offhand, and mixing with Melee inclding Dualwield Ranged.
+- Ranged weapons now have Two-handed weapon option to support full Main/Off hand functionality.
+- Added a new quick weapon selector at the bottom of Combat actions section for all Mainhand/Offhand and Rangd weapons. Once Weapons are added in the Weapons tab they will show on the selector.
+- Added "Master And Commander" Talent (from C7 Sea of Claws) to the Talent list, with integrated Leadrship SL bonus support.
+- Implemented Besmirched Condition effects, when besmirched Characters will get -2 SL to tests rolled with Fellowship Skill.
+- Added Warpstone & ZZAP! Weapon Qualities for skaven weapons (from C7 Horned Rat Companion) to both Melee and Ranged Weapons, and apporpriate effects in roll output for Main PC & NPCs.
+- Various bug fixes
+
+
+December 12th 2022 v1.64a
+
+- Fixed Blather talent not adding to AutoXP.
+- Fixed VsSize Melee modifier not adding +10 to Melee attack Modifiers when vs larger targets then yourself.
+
+
+November 4th 2022 v1.64
+
+- Added Spell/Pray (Magic) Drop-down Assist: this is similar to the Melee/Ranged ones. Its shows all learned spells Petty/Arcance from the spellbook, or blessings/miracles, in a collapsable menu with lore  channeling, Accu SL and Cast buttons for Quick access to those buttons under Combat actions.
+
+- Fix Accurate Mod reset
+- Fix Deadeye shot bonus not applying
+- Fix Characteristics Auto XP bug
+- Optimized NPC weapon switch code
+- Added visable RT Overcast popup info list when casting non-damage spells
+
+
+October 31st 2022 v1.63
+
+- New setting switch for Optional Fumble/Oops Rules by FighterChimp on Ratcatcher Guild Discord @ https://discord.com/channels/449845411344154634/449846068356710412/611069939654066177. These are somewhat similar to Core, but with better descriptions which are more adaptable to melee/ranged/magic. Matter of preference for GM.
+
+- Fixed Fast Shot not showing in Ranged assist drop-down window when above LVL 1.
+- Fixed XP not adding for Fast Shot Talent.
+
+
 October 8th 2022 v1.62
 
 - NPC Tab - Weapon Qualities & Combat Talent support added. Similar to PC weapons, it adds cog setting button next to NPC weapons to configure qualities. A limited set of optional talents have been added and will add SL modifiers. Also adds offhand penalty on the Opp Weapon if it not the same as the Atk Weapon, modified by Melee Parry/Ambidextrous as appropriate. Changes do slow down this Tab a little, recommend configuring NPC then minimize and use minibutton for combat.
@@ -88,7 +155,7 @@ October 8th 2022 v1.62
 - Added mouse over popup Overcast Table in the roll output for Spell cast rolls next the "SL Effect".
 - Fixed Aethyric Attunement and Wizard robes +SL not adding to Channelling roll when rolled from the Skill Tab.
 - Fixed Furious Assault +SL not adding to the final result in the roll outcome when initiated from the Furious Assault roll template mini button.
-
+- Fixed issue with Melee Bonus re-applying after a hit in certain circumstances. Bonus Value was not being cleared from the Weapons Tab.
 
 September 24th 2022 v1.61
 
@@ -547,9 +614,6 @@ Dec 24 2019
  
 Future release wish list : 
 
-
-- NPC tab update - Quailities
-- Integrate Besmirched condition
-
+- TBA
 
 Enjoy. 

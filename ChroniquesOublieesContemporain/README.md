@@ -10,9 +10,34 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.11.0 [Screenshot](coc_v2.png)
+v3.15.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.15.0 (2023-04-30)
+
+- Suppression du calcul automatique des PV par niveau
+- Ajout onglet Version avec notes et log
+- Améliorations cosmétiques mineures
+
+## v3.14.0 (2023-02-11)
+
+- Ajout des compteurs génériques 2 & 3
+
+  Les valeurs des compteurs sont chargées dans des attributs nommés 'cptr_xxx' ou 'xxx' est l'abréviation du compteur
+
+## v3.13.0 (2022-10-31)
+
+- Ajout d'une section Notes de Version sur l'onglet Configuration
+- Modification cosmétique des boutons +Add, Modify et Done des sections répétables
+
+## v3.12.0 (2022-04-10)
+
+Modification cosmétique
+
+Un bug de "sanitization" de Roll20 élimine les éléments HTML optgroup permettant de séparer les options par types dans les listes dépliantes (élements HTML select). Une solution de contournement a été implémentée en utilisant une option 'disabled' avec un style CSS.
+
+Ces séparateurs d'options sont par exemple utilisés dans les listes dépliantes des dés de dommages pour distinguer les DM normaux des DM sans limites.
 
 ## v3.11.0 (2022-01-16)
 
