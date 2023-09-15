@@ -7,6 +7,7 @@ const path = require('path');
 const axios = require('axios');
 const merge = require('gulp-merge-json');
 const { starforged } = require('dataforged')
+const { buildAssetTranslations } = require('./buildTranslations')
 
 axios.defaults.baseURL = 'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
 
@@ -31,7 +32,7 @@ gulp.task('dataforge', async function() {
   };
 
   const translationData = {
-    'translation-assets': await axios.get('/translation-assets.json'),
+    'translation-assets': buildAssetTranslations(),
   };
 
   for (let key in rawData) {
@@ -41,7 +42,7 @@ gulp.task('dataforge', async function() {
   }
 
   for (let key in translationData) {
-    const data = translationData[key].data;
+    const data = translationData[key]
     const fileName = path.join(__dirname, `./app/translations/${key}.json`);
     console.log(fileName);
     fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
