@@ -14,13 +14,30 @@ mixin ability(asset, ability, number, name)
       )
     - var translationAbility = `asset-${name}-ability-${number}`
     - var assetBodyPlaceholder=translation[translationAbility]
-    .asset-ability
-      div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
-      if ability.Inputs
-        each field in ability.Inputs
-          - var translationAbilityField = `asset-${name}-ability-${number}-${_.kebabCase(field.Name)}`
-          span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
-          input.border-bottom.no-border(type='text' name=`attr_ability_field${_.kebabCase(field.Name)}` value='')
+    - var hasClock = ability.Inputs?.find((field) => {  return field['Input Type'] === 'Clock' })
+    if hasClock
+      .asset-ability.flex
+        +ability-inputs(asset, ability, number, name, translationAbility, assetBodyPlaceholder)
+    else
+      .asset-ability
+        +ability-inputs(asset, ability, number, name, translationAbility, assetBodyPlaceholder)
+
+
+mixin ability-inputs(asset, ability, number, name, translationAbility, assetBodyPlaceholder)
+  div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
+  if ability.Inputs
+    each field in ability.Inputs
+      if field['Input Type'] === 'Text'
+        - var translationAbilityField = `asset-${name}-ability-${number}-${_.kebabCase(field.Name)}`
+        span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
+        input.border-bottom.no-border(type='text' name=`attr_ability_field${_.kebabCase(field.Name)}` value='')
+      if field['Input Type'] === 'Clock'
+        +clock(field, name)
+      if field['Input Type'] === 'Number'
+        //- +number(field, name)
+        - var translationAbilityField = `asset-${name}-ability-${number}-${_.kebabCase(field.Name)}`
+        span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
+        input.border-bottom.no-border(type='text' name=`attr_ability_field${_.kebabCase(field.Name)}` value='')
 
 mixin requirement(asset, key)
   .asset-requirement
@@ -28,6 +45,33 @@ mixin requirement(asset, key)
     .asset-requirement-text(data-i18n=translationDesc) !{translation[translationDesc]}
 
 mixin field(field, assetName)
+  .write-in-container
+    .i18n-text.asset-write-in.asset-name(
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`]
+    input.border-bottom.no-border(type='text' name=`attr_field-${_.kebabCase(field.Name)}` value='')
+
+mixin clock(field, assetName)
+  .harm-section
+    if field.Segments === 4
+      .spoke-0.all
+      .spoke-90.4clock
+    if field.Segments === 6
+      .spoke-0.all
+      .spoke-60.6clock
+      .spoke-120.6clock
+
+    input(type="radio" value="0" name="attr_harm" class=`harm-checkbox harm-0 total-segment-${field.Segments}` checked)
+    | 0
+    - segment = 0
+    while segment < field.Segments
+      - segment++
+      input(type="radio" value=`${segment}` name="attr_harm" class=`harm-checkbox harm-${segment} total-segment-${field.Segments}`)
+      =segment
+    <div class="clock"></div>
+
+//- TODO: Turn into number field
+mixin number(field, assetName)
   .write-in-container
     .i18n-text.asset-write-in.asset-name(
       data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`
