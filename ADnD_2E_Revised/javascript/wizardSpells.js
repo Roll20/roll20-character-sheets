@@ -2048,10 +2048,11 @@ wiz3['Hold Undead'] = {
     'materials': 'A pinch of sulphur and powdered garlic.',
     'reference': 'p. 193',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 434',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When cast, this spell renders immobile 1d3 undead creatures whose total Hit Dice are equal to or less than the caster’s level. No more than three undead can be affected by a single spell. To cast, the wizard aims the spell at a point within range and the three undead closest to this are considered to be in the area of effect, provided all are within the field of vision and spell range of the caster. Undead of a mindless nature (skeletons, zombies, or ghouls) are automatically affected. Other forms of undead are allowed a saving throw to negate the effect. If the spell is successful, it renders the undead immobile for the duration of the spell.'
+    'effect': 'When cast, this spell renders immobile 1d3 undead creatures whose total Hit Dice are equal to or less than the caster’s level. Currently equal or less than [[@{level-wizard}]] Hit Dice. No more than three undead can be affected by a single spell. To cast, the wizard aims the spell at a point within range and the three undead closest to this are considered to be in the area of effect, provided all are within the field of vision and spell range of the caster. Undead of less than three Hit Dice are automatically affected. Other undead are allowed a saving throw vs. spell to negate the effect. If the spell is successful, it renders the undead immobile for the duration of the spell.'
 };
 
 wiz3['Illusionary Script'] = {
@@ -2066,10 +2067,11 @@ wiz3['Illusionary Script'] = {
     'materials': 'A lead-based ink that requires special manufacture by an alchemist, at a cost of not less than 300 gp per usage.',
     'reference': 'p. 193',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 447',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to write instructions or other information on parchment, paper, etc. The illusionary script appears to be some form of foreign or magical writing. Only the person (or people) who the wizard desires to read the writing can do so. An illusionist recognizes it for illusionary script.\n&emsp;Unauthorized creatures glancing at the script must roll saving throws vs. spell. A successful save means the creature can look away with only a mild sense of disorientation. Failure means the creature is subject to a suggestion implanted in the script by the caster at the time the *illusionary script* spell was cast. The suggestion cannot require more than three turns to carry out. The suggestion could be to close the book and leave, or to forget the existence of the book, for example. A successful dispel magic spell will remove the illusionary script, but an unsuccessful attempt erases all of the writing. The hidden writings can be read by a combination of the *true seeing* spell and either the *read magic* or *comprehend languages* spell, as applicable.'
+    'effect': 'This spell enables the wizard to write instructions or other information on parchment, paper, etc. The illusionary script appears to be some form of foreign or magical writing. Only the person (or people) who the wizard desires to read the writing can do so. An illusionist recognizes it for *illusionary script*.\n&emsp;An unauthorized creatures glancing at the script must roll saving throws vs. spell. A successful save means the creature can look away with only a mild sense of disorientation. Failure means the creature is subject to a *suggestion* implanted in the script by the caster at the time the *illusionary script* spell was cast. The suggestion cannot require more than three turns to carry out. The suggestion could be to close the book and leave, or to forget the existence of the book, for example. A successful *dispel magic* spell will remove the *illusionary script*, but an unsuccessful attempt erases all of the writing. The hidden writings can be read by a combination of the *true seeing* spell and either the *read magic* or *comprehend languages* spell, as applicable.'
 };
 
 wiz3['Infravision'] = {
@@ -2084,10 +2086,12 @@ wiz3['Infravision'] = {
     'materials': 'Either a pinch of dried carrot or an agate.',
     'reference': 'p. 193',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 460',
+    'errata': 'Sage Advice #176 p. 93',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard enables the recipient to see in normal darkness up to 60 feet without light. Note that strong sources of light (fire, lanterns, torches, etc. tend to blind this vision, so infravision does not function efficiently in the presence of such light sources. Invisible creatures are not detectable by infravision.'
+    'effect': 'By means of this spell, the wizard enables the recipient to see in normal darkness up to 60 feet without light. Note that strong sources of light (fire, lanterns, torches, etc.) tend to blind this vision, so infravision does not function efficiently in the presence of such light sources. Invisible creatures are not detectable by infravision.'
 };
 
 wiz3['Invisibility, 10\' Radius'] = {
@@ -2102,6 +2106,7 @@ wiz3['Invisibility, 10\' Radius'] = {
     'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter.',
     'reference': 'p. 193',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 464',
     'damage': '',
     'damage-type': '',
     'healing': '',
