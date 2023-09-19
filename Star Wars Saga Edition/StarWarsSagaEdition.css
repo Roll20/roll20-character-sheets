@@ -10,7 +10,7 @@
   --sheet-text: #000;
   --input-border: #222;
   --input-border-top: #ccc;
-  --input-disabled-bg:#e7e7e7;
+  --input-disabled-bg:#e3e3e3;
   --input-disabled-border:#444;
   --input-disabled-border-top:#999;
   --header-bg: #000;
@@ -64,6 +64,7 @@
     text-align: right;
     font-size:14px;     
     width: auto;
+	margin-bottom: 0px;
 }
  
 .long {
@@ -88,6 +89,14 @@
 	text-align: center;
 	background-color: var(--input-disabled-bg);
 	outline: none;
+}
+
+.charsheet input[disabled]::-webkit-outer-spin-button,
+.charsheet input[disabled]::-webkit-inner-spin-button,
+.charsheet input[readonly]::-webkit-outer-spin-button,
+.charsheet input[readonly]::-webkit-inner-spin-button {
+	/* This is necessary for Chrome, since the spin buttons still take up space in disabled input boxes, even while invisible. */
+	display:none;
 }
  
 .charsheet input.header {   
@@ -185,6 +194,19 @@
 .repcontainer[data-groupname="repeating_organization"] > .repitem {
     display: inline-block;
 }
+
+/* These next three lines are to set the width of the left and right sides equally, with space in-between. */
+.repcontainer[data-groupname="repeating_organization"] > .repitem:nth-child(odd) {
+	width: calc(50% + 5px);
+}
+
+.repcontainer[data-groupname="repeating_organization"] > .repitem:nth-child(even) {
+	width: calc(50% - 5px);
+}
+
+.repcontainer[data-groupname="repeating_organization"] > .repitem:nth-child(odd) {
+	padding-right:10px;
+} 
 
 .charsheet div.repitem:last-child hr {
 	display:none;
@@ -306,10 +328,11 @@
 .athleticsShow:checked ~ .noathleticsBody,
 .pilotSkillShow:not(:checked) ~ .pilotBody,
 .sectAttack-show:checked ~ .sectAttack,
-.sect-show:not(:checked) ~ .sect {
+.sect-show:not(:checked) ~ .sect,
+.SkillShow:not(:checked) + .SkillBody {
     display: none;
 }
- 
+
 .sheet-hidden {
     display: none !important;       
 }
@@ -327,7 +350,7 @@
     display: inline-block;
     vertical-align: middle;
     content: "[show]";
-    width: 14px;
+    width: 25px;
     height: 14px;
     font-size: 12px;
 }
@@ -396,19 +419,27 @@
 /* ******** Start code for tabs ******** */
 .charsheet div.sheet-tab-content
 { display: none; }
- 
+
 .charsheet input.tab1:checked ~ div.tab1,
 .charsheet input.tab2:checked ~ div.tab2,
 .charsheet input.tab3:checked ~ div.tab3,
 .charsheet input.tab4:checked ~ div.tab4 {
     display: block;
 }
+
+.rule-sections {
+	border: 1px solid #777;
+	border-radius: 5px;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
 .charsheet input.tab {
     width: 150px;
     height: 20px;
     position: relative;
     left: 6px; 
-    margin: 0px -1.5px;
+    margin: 0px -1px;
     cursor: pointer;
     z-index: 1;
 	border:none;
@@ -554,6 +585,7 @@
 	/* Dark mode colors*/
   --dm-input-bg: #3f3f50;
   --dm-input-text: #f5f5f5;
+  --dm-placeholder-text: #a1a1a9;
   --dm-scrollbar1-thumb: #5c5c84;
   --dm-scrollbar1-shaft: #2e2e40;
   --dm-scrollbar2-thumb: #1e1e44;
@@ -606,6 +638,16 @@
 	border-top-color: var(--dm-input-border-top);
 }
 
+.sheet-darkmode .charsheet input::placeholder,
+.sheet-darkmode .charsheet textarea::placeholder {
+	color: var(--dm-placeholder-text);
+}
+
+.sheet-darkmode .charsheet input::-moz-placeholder,
+.sheet-darkmode .charsheet textarea::-moz-placeholder {
+	color: var(--dark-primarytext);
+}
+
 .sheet-darkmode .charsheet input[type=radio],
 .sheet-darkmode .charsheet input[type=checkbox] {
 	accent-color: var(--dm-checkbox-accent);
@@ -643,6 +685,7 @@
 	box-shadow: 0 1px 0 var(--dm-persistent-checked-inset) inset;
 	border: 1px solid var(--dm-persistent-checked-border);
 }
+
 /* This doesn't work right now, but hopefully it can be fixed eventually. */
 /*.sheet-darkmode .charsheet input::part(-webkit-outer-spin-button):hover,
 .sheet-darkmode .charsheet input[type=number]::part(-webkit-outer-spin-button) {
@@ -915,6 +958,15 @@
  {
     background-color: var(--dark-surface2); 
 	/* This uses the default Roll20 color variable to prevent colored rectangles from poking through in the rounded corners. */
+}
+
+.sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode table,
+.sheet-rolltemplate-attack.sheet-rolltemplate-darkmode table,
+.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode table,
+.sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode table,
+.sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode table,
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode table {
+	background-color: transparent;
 }
 
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode th,
