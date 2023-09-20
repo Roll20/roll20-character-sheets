@@ -5877,6 +5877,19 @@
             });
         });
 
+        on("change:freight_major_lots_to_take change:freight_minor_lots_to_take change:freight_incidental_lots_to_take change:freight_mail_lots_to_take", (info) => {
+
+            // Do over max
+            const attr = info.sourceAttribute.replace("to_take", "available");
+            getAttrs([attr], function(v) {
+                if(+info.newValue > +v[attr]) {
+                    setAttrs({
+                        [info.sourceAttribute]: v[attr]
+                    });
+                }
+            });
+        });
+
       	on("clicked:freight-take", (info) => {
 
             addTradeLogMessage("MgT2E: In Freight Take: " + JSON.stringify(info), true);
