@@ -293,17 +293,18 @@
         <span><input name="attr_powerslots2" type="text" list="power_slots" style="width: auto;"></select></span>
         <span><input name="attr_powerslots3" type="text" list="power_slots" style="width: auto;"></select></span></div>
         <fieldset class="repeating_powers">
-        <input type="checkbox" class="sheet-toggle-show" >
-        <button type="roll" name="roll_power" value="&{template:default} {{title=@{powername}}} {{Type=@{powertype}}} {{Action=@{poweraction}}} {{Range=@{powerrange}}} {{Tags=@{powertagslong}}} {{To Hit= [[1d20+@{grit} +?{Accuracy/Difficulty|0}d6k1]]}} {{Damage=[[@{powerdamage}]] @{powerdamagetype}}} {{Effect=@{powereffects}}}" > </button>
-        <input type="text" class=resizedTextbox name="attr_powername" value="0" placeholder="{Power goes here}"><br>
-        <div class="sheet-body">
-        <span>Type<input type="text" class=text40 name="attr_powertype" value=" "style="width:28%"></span><span>Action<input type="text" class=text80 Textbox name="attr_poweraction" value=" " style="width:28%"></span><br><span>Range<input type="text" class="text105" name="attr_powerrange" value=" " style="width:95%"></span><br>
-		<span>Damage<input type="text" name="attr_powerdamage" value=" " style="width:95%"></span><span hidden>DmgType<input type="text" name="attr_powerdamagetype" value="" style="width:95%"></span><br>
-        <span>Tags<input type="text" name="attr_powertags" value=" " style="width:95%"></span><br>
-		<span hidden>TagsLong<input type="text" name="attr_powertagslong" value="" style="width:95%"></span>
-        <span>Description<textarea name="attr_powereffects" style="width:95%"></textarea></span>
-        </div>
-    </fieldset>
+			<input type="checkbox" class="sheet-toggle-show" >
+			<button type="roll" name="roll_power" value="&{template:default} {{title=@{powername}}} {{Type=@{powertype}}} {{Action=@{poweraction}}} {{Range=@{powerrange}}} {{Tags=@{powertagslong}}} {{To Hit= [[1d20+@{grit} +?{Accuracy/Difficulty|0}d6k1]]}} {{Damage=[[@{powerdamage}]] @{powerdamagetype}}} {{Effect=@{powereffects}}}" > </button>
+			<input type="text" class=resizedTextbox name="attr_powername" value="0" placeholder="{Power goes here}"><br>
+			<div class="sheet-body">
+			<span>Type<input type="text" class=text40 name="attr_powertype" value=" "style="width:28%"></span><span>Action<input type="text" class=text80 Textbox name="attr_poweraction" value=" " style="width:28%"></span><br><span>Range<input type="text" class="text105" name="attr_powerrange" value=" " style="width:95%"></span><br>
+			<span>Damage<input type="text" name="attr_powerdamage" value=" " style="width:95%"></span><span hidden>DmgType<input type="text" name="attr_powerdamagetype" value="" style="width:95%"></span><br>
+			<span>Tags<input type="text" name="attr_powertags" value=" " style="width:95%"></span><br>
+			<span hidden>TagsLong<input type="text" name="attr_powertagslong" value="" style="width:95%"></span>
+			<span hidden>Mods<input type="text" name="attr_powermods" value="" style="width:95%"></span>
+			<span>Description<textarea name="attr_powereffects" style="width:95%"></textarea></span>
+			</div>
+		</fieldset>
   </section>
 
 <section class="inv">
@@ -320,6 +321,7 @@
 		<span hidden>TagsLong<input type="text" name="attr_supporttagslong" value="" style="width:95%"></span>
         <span>Type<input type="text" name="attr_supporttype" style="width: 20%" value=" "></span>
         <span>Tags<input type="text" name="attr_supporttags" style="width: 60%" value=" "></span>
+		<span hidden>Mods<input type="text" name="attr_supportmods" value="" style="width:95%"></span>
         <textarea name="attr_supporteffects" style="resize: none; width: 95%; height: 60px; margin-bottom: -5px;"></textarea>
         </div>
     </fieldset>
@@ -343,8 +345,9 @@
     <input type="checkbox" class="sheet-toggle-show">
     <button type="roll" name="roll_anc" value="&{template:default} {{title=@{anc_trait_name}}} {{Description=@{anc_trait_info}}}"></button>
     <label>Trait<input type=text class=text160 name="attr_anc_trait_name"></label>
+	<span hidden>Mods<input type="text" name="attr_anc_trait_mods" value="" style="width:95%"></span>
     <div class="sheet-body">
-        <textarea name="attr_anctrait_info" style="resize: none; width: 95%; height: 40px; margin-bottom: -25px;"></textarea>
+        <textarea name="attr_anc_trait_info" style="resize: none; width: 95%; height: 40px; margin-bottom: -25px;"></textarea>
     </div>
     <br>
     <h3>Job</h3>
@@ -790,10 +793,155 @@
 	var unlock_techniques_data = [];
 	var loot_techniques_data = [];
 	var talents_data = [];
+	var statmod_dict = {};
 	
+	
+	var finalmanaMod = 0;
+	var finalspeedMod = 0;
+	var finalarmorMod = 0;
+	var finaldodgeMod = 0;
+	var finalHPMod = 0;
+	var finalsaveMod = 0;
+	
+	const wpnSlots = ["1","2","3","4","5","6","7","8"];
+	
+
 	function gen_long_tag_string(stringy, tag_data){
 		return '[' + stringy + '](#"class="showtip" title="' + tag_data.description.replace('{VAL}', 'X').replace('(', '{').replace(')', '}') + ')';
 	}
+	
+	
+	on("change:repeating_powers:powertags", function(v){
+		row_string = v.sourceAttribute.replace("_powertags","_");
+        long_tag_string = "";
+		tagz = v.newValue.split(",");
+		for (i in tagz)
+		{
+		
+			tag = tagz[i].toUpperCase().trim()
+			tag_parts = tag.split(/(\d+)/g);
+			var wp_tag_data = 0;
+			if (tag_parts.length > 1)
+			{
+				wp_tag_data = tags_data.find(x => x.name === tag_parts[0]+ "{VAL}");
+			}
+			else
+			{
+				wp_tag_data = tags_data.find(x => x.name === tag_parts[0]);
+			}
+			if (!wp_tag_data){
+				console.log("Found nothing");
+				return;
+			}
+			let stringy = wp_tag_data.name;
+			if (tag_parts.length > 1)
+			{
+				stringy = stringy.replace("{VAL}", tag_parts[1]);
+			}
+			long_stringy = gen_long_tag_string(stringy, wp_tag_data);
+			if (i > 0){
+				stringy = ", " + stringy;
+				long_stringy = " , " + long_stringy;
+			}
+			long_tag_string += long_stringy;
+		}
+		if(long_tag_string === ""){
+			long_tag_string = v.newValue
+		}
+		setAttrs({
+			[row_string+"powertagslong"]: long_tag_string
+		});
+	});
+	
+	on("change:repeating_support:supporttags", function(v){
+        row_string = v.sourceAttribute.replace("_supportname","_");
+        long_tag_string = "";
+		tagz = v.newValue.split(",");
+		for (i in tagz)
+		{
+		
+			tag = tagz[i].toUpperCase().trim()
+			tag_parts = tag.split(/(\d+)/g);
+			var wp_tag_data = 0;
+			if (tag_parts.length > 1)
+			{
+				wp_tag_data = tags_data.find(x => x.name === tag_parts[0]+ "{VAL}");
+			}
+			else
+			{
+				wp_tag_data = tags_data.find(x => x.name === tag_parts[0]);
+			}
+			if (!wp_tag_data){
+				console.log("Found nothing");
+				return;
+			}
+			let stringy = wp_tag_data.name;
+			if (tag_parts.length > 1)
+			{
+				stringy = stringy.replace("{VAL}", tag_parts[1]);
+			}
+			long_stringy = gen_long_tag_string(stringy, wp_tag_data);
+			if (i > 0){
+				stringy = ", " + stringy;
+				long_stringy = " , " + long_stringy;
+			}
+			long_tag_string += long_stringy;
+		}
+		if(long_tag_string === ""){
+			long_tag_string = v.newValue
+		}
+        setAttrs({
+			[row_string + "supporttagslong"]: long_tag_string
+		});
+    });
+
+	wpnSlots.forEach(function (num)
+	{
+		console.log("Changing tags");
+		on("change:attacktags"+num, function(v){
+		long_tag_string = "";
+		tagz = v.newValue.split(",");
+		for (i in tagz)
+		{
+		
+			tag = tagz[i].toUpperCase().trim()
+			tag_parts = tag.split(/(\d+)/g);
+			console.log(tag_parts);
+			var wp_tag_data = 0;
+			if (tag_parts.length > 1)
+			{
+				wp_tag_data = tags_data.find(x => x.name === tag_parts[0]+ "{VAL}");
+			}
+			else
+			{
+				wp_tag_data = tags_data.find(x => x.name === tag_parts[0]);
+			}
+			if (!wp_tag_data){
+				console.log("Found nothing");
+				return;
+			}
+			let stringy = wp_tag_data.name;
+			if (tag_parts.length > 1)
+			{
+				stringy = stringy.replace("{VAL}", tag_parts[1]);
+			}
+			long_stringy = gen_long_tag_string(stringy, wp_tag_data);
+			if (i > 0){
+				stringy = ", " + stringy;
+				long_stringy = " , " + long_stringy;
+			}
+			long_tag_string += long_stringy;
+		}
+		if(long_tag_string === ""){
+			long_tag_string = v.newValue
+		}
+		setAttrs({
+			["attacktagslong"+ num]: long_tag_string
+		});
+		
+	});
+	});
+	
 	
 	on("change:repeating_attacks:attackname", function(v){
 		getAttrs(["tier"], function(t){
@@ -1087,8 +1235,11 @@
 			[row_string+"supporttags"]: tag_string,
 			[row_string+"supporttagslong"]: long_tag_string,
 			[row_string+"supporteffects"]: sup_data.effect,
+			[row_stirng+"supportmods"]: sup_data.stat_effects,
 		});
 	});
+
+
 	
 	
 	const ancestryTraitSlots = ["1", "2"]
@@ -1100,12 +1251,18 @@
 				for (curr_ancestry of ancestry_data){
 					for (i in curr_ancestry.traits){
 					if (curr_ancestry.traits[i].name.toUpperCase().replace(/\s+/g, '') === v.newValue.toUpperCase().replace(/\s+/g, '')){
-						setAttrs({anctrait_info: curr_ancestry.traits[i].desc});
+						setAttrs({
+							anc_trait_info: curr_ancestry.traits[i].desc,
+							anc_trait_mods: {"armor": curr_ancestry.traits[i].armor, "HP": curr_ancestry.traits[i].HP, "speed": curr_ancestry.traits[i].speed}
+						});	
 						return;
 						}
 					}
 				}
-				setAttrs({anctrait_info: "Invalid ancestry trait."});
+				setAttrs({
+					anc_trait_info: "Invalid ancestry trait.",
+					anc_trait_mods: false
+				});
 			});
 		});
 	});
@@ -1178,13 +1335,14 @@
 			[row_string+"powerdamagetype"]: dmg_type,
 			[row_string+"powertags"]: tag_string,
 			[row_string+"powertagslong"]: long_tag_string,
-			[row_string+"powereffects"]: tech_data.effects
+			[row_string+"powereffects"]: tech_data.effects,
+			[row_string+"powermods"]: tech_data.stat_effects
 		});
 		});
 	});
 
 	
-	const wpnSlots = ["1","2","3","4","5","6","7","8"];
+	
 	wpnSlots.forEach(function (num){
 		on("change:slots"+num, function(v){
 			console.log("changing stuff in slot "+ num);
@@ -1281,7 +1439,73 @@
 		currLevel = parseInt(v.newValue);
 		setAttrs({grit: Math.floor(currLevel/2)});
 	});
+	
+	
+	var base_mana_max;
+	var base_save_max;
+	var base_hp_max;
+	var base_dodge_max;
+	var base_speed_max;
+	var base_armor_max;
+	
+	function conf_mod_base_stats(){
+		setAttrs({ hp_max: (base_hp_max + finalHPMod).toString()});
+		setAttrs({ dodge_max: (base_dodge_max+ finaldodgeMod).toString()});
+		setAttrs({ mana_max: (base_mana_max + finalmanaMod}).toString());
+		setAttrs({save_max: (base_save_max + finalsaveMod).toString()});
+	}
+	
+	on("sheet:opened change:repeating_support:supportmods change:repeating_powers:powermods change:anc_trait_mods remove:repeating_support remove:repeating_powers", function(v) {
+		finalarmorMod = 0;
+		finalHPMod = 0;
+		finaldodgeMod = 0;
+		finalsaveMod = 0;
+		finalspeedMod = 0;
+		finalmanaMod = 0;
+		getSectionIDs(`repeating_support`, idArray => {
+		    let fields = ['supportmods'];
+			const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_support_${id}_${field}`))], []);
+			getAttrs([...attrArray], v => {
+				if(v)
+				{
+					finalarmorMod += parseInt(v.armor);
+					finalsaveMod += parseInt(v.save_target);
+					finaldodgeMod += parseInt(v.dodge);
+					finalspeedMod += parseInt(v.speed);
+				}
+			})
+		});
+		
+		getSectionIDs(`repeating_powers`, idArray => {
+			let fields = ['powermods'];
+			const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_powers_${id}_${field}`))], []);
+			getAttrs([...attrArray], v => {
+				if(v)
+				{
+					finalarmorMod += parseInt(v.armor);
+					finalHPMod += parseInt(v.hp);
+					finaldodgeMod += parseInt(v.dodge);
+					finalspeedMod += parseInt(v.speed);
+					finalmanaMod += parseInt(v.mana);
+				}
+			})
+		});
+		
+		getAttrs('anc_trait_mods', v => {
+			if(v)
+			{
+				finalarmorMod += parseInt(v.armor);
+				finalHPMod += parseInt(v.HP);
+				finalspeedMod += parseInt(v.speed);
+			}
+		})
+		
+		setAttrs({armor: finalarmorMod});
+		conf_mod_base_stats()
+	});
+	
 
+	
 	
     on("change:bulk change:agility change:mind change:magic change:grit", function(v) {
 	console.log(v.sourceAttribute);
@@ -1295,15 +1519,13 @@
         switch (v.sourceAttribute.toString()) {
             
             case "bulk":
-				setAttrs({ hp_max: parseInt(curr_class_data.HP) + Math.floor(new_value * 2) + current_grit});
+				base_hp_max = parseInt(curr_class_data.HP) + Math.floor(new_value * 2) + current_grit;
 				const new_recoveries_max = parseInt(curr_class_data.recoveries) + Math.floor(new_value / 2);
 				setAttrs({recoveries_max: new_recoveries_max.toString()});
 				break;
 
             case "agility":
-				const total_dodge_max = parseInt(curr_class_data.dodge) + new_value;
-				console.log(total_dodge_max);
-				setAttrs({dodge_max: total_dodge_max.toString()});
+				base_dodge_max = parseInt(curr_class_data.dodge) + new_value;
 				const total_speed_max = parseInt(curr_class_data.speed) + Math.floor(new_value / 2);
 				setAttrs({speed_max: total_speed_max.toString()});
 				break;
@@ -1318,26 +1540,23 @@
 			case "magic":
 				const total_adef_max = parseInt(curr_class_data.adef) + new_value;
 				setAttrs({a_def: total_adef_max});
-				const total_mana_max = parseInt(curr_class_data.mana) + Math.floor(new_value / 2);
-				setAttrs({mana_max: total_mana_max});
+				base_mana_max = parseInt(curr_class_data.mana) + Math.floor(new_value / 2);
 				break;
 
             case "grit":
 				const current_bulk = parseInt(t.bulk);
-                let total_hp_max = parseInt(curr_class_data.HP) + (current_bulk * 2) + new_value;
-                setAttrs({hp_max: total_hp_max});
+                base_hp_max = parseInt(curr_class_data.HP) + (current_bulk * 2) + new_value;
 
                 const current_mind = parseInt(t.mind);
                 const total_memory_max = parseInt(curr_class_data.memory) + Math.floor(current_mind / 2) + new_value;
                 setAttrs({memory_max: total_memory_max});
 
-                const total_save_max = parseInt(curr_class_data.save_target) + new_value;
-                setAttrs({save_max: total_save_max});
-
+                base_save_max = parseInt(curr_class_data.save_target) + new_value;
 				break;
-
             default:
-            }
+        }
+			
+		conf_mod_base_stats()
 			});
         });  
 
