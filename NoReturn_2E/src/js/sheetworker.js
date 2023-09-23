@@ -1,11 +1,10 @@
 /*
     CREATED by          Gorthian
-    Letzte Änderung		2023-09-06
+    Letzte Änderung		2023-09-13
 */
 
-
 /* TAB MENU */
-const buttonlist = ["page-one","page-two"]; //Bei Änderungen auch die globale Variable in noreturn.pug anpassen
+const buttonlist = ["page-one","page-two","page-three",,"page-four"]; //Bei Änderungen auch die globale Variable in noreturn.pug anpassen
 buttonlist.forEach(button => {
     on(`clicked:${button}`, function() {
         console.log(button);
@@ -87,14 +86,8 @@ const skilllist = [
 /* Hilfsfunktionen */
 
 //Befüllen des Dicebots
-function setDicebot(skill,attribut,summe,skillNotiz,hazard=1,biomechanik=0,mods=0) {
+function setDicebot(skill,attribut,summe,skillNotiz,hazard=1,biomechanik=0) {
     if (summe < 1) {summe = 1} // Man hat immer mindestens einen Würfel
-
-    // Keine Ahnung weshalb, aber eine 0 aktiviert die Checkboxen, jeder String deaktiviert sie
-    mod1="-";
-    mod2="-";
-    if (mods > 0) {mod1=0}
-    if (mods > 1) {mod2=0}    
 
     setAttrs({
         "probe_skill"                       : skill,
@@ -107,9 +100,7 @@ function setDicebot(skill,attribut,summe,skillNotiz,hazard=1,biomechanik=0,mods=
         "probe_standard_wuerfel"            : summe-hazard,               
         "probe_bonus_wuerfel"               : 0,
         "probe_bonus"                       : 0,
-        "probe_biomechanik"                 : biomechanik,
-        "probe_modifikator1"                : mod1,
-        "probe_modifikator2"                : mod2
+        "probe_biomechanik"                 : biomechanik,        
     });
 }
 
@@ -154,7 +145,7 @@ function setzeSprachprobe(name, stufe) {
     let summe = stufe;
 
     if (stufe==0) {summe = summe -2} //Ist die Fertigkeitsstufe 0, bekommt die Probe einen Malus von 2
-    setDicebot(name,getTranslationByKey("sprachprobe"),summe,"",hazard,0,0);
+    setDicebot(name,getTranslationByKey("sprachprobe"),summe,"",hazard,0);
 }
 
 // DMG Schwellwert setzen
@@ -177,7 +168,7 @@ skilllist.forEach(skills => {
     let skill = skills[0];
     let attribut = skills[1];
     on(`clicked:probe-${skill}-${attribut}`, function() {        
-        getAttrs([skill, skill+"_mod", skill+"_biomechanik", skill+"_modifikatoren", attribut, attribut+"-mod1", attribut+"-mod2", attribut+"-biomechanik"], function(values) {
+        getAttrs([skill, skill+"_mod", skill+"_biomechanik",  attribut, attribut+"-mod1", attribut+"-mod2", attribut+"-biomechanik"], function(values) {
             let summeSkill = 0;
             let summeAttribut = 0;
             let summe = 0;
@@ -185,20 +176,12 @@ skilllist.forEach(skills => {
             let skillNotiz = values[skill+"_mod"];
             let biomechanik_skill = parseInt(values[skill+"_biomechanik"]||0);
             let biomechanik_attribut = parseInt(values[attribut+"-biomechanik"]||0);
-            let modifikatoren = parseInt(values[skill+"_modifikatoren"]||0);
             let attributWert = parseInt(values[attribut]||0);
             let attributMod1 = parseInt(values[attribut+"-mod1"]||0);
             let attributMod2 = parseInt(values[attribut+"-mod2"]||0);
-            let mods=0;         
     
             summeSkill = parseInt(values[skill]);
-            if (modifikatoren==0) { //Prüfen ob die Attributsmodifikatoren automatisch mit eingerechnet werden sollen
-                summeAttribut = attributWert;
-                mods;
-            } else {
-                summeAttribut = attributWert + attributMod1 + attributMod2;
-                mods=2;
-            }            
+            summeAttribut = attributWert;
             summe = summeSkill + summeAttribut;
 
             if (summeSkill==0) {summe = summe -2} //Ist die Fertigkeitsstufe 0, bekommt die Probe einen Malus von 2
@@ -213,54 +196,12 @@ skilllist.forEach(skills => {
                 hazard=1;
             }
 
-            setDicebot(getTranslationByKey(skill),getTranslationByKey(attribut),summe,skillNotiz,hazard,biomechanik_skill||biomechanik_attribut,mods);
+            setDicebot(getTranslationByKey(skill),getTranslationByKey(attribut),summe,skillNotiz,hazard,biomechanik_skill||biomechanik_attribut);
         });
     });
 });
 
 // Attributsproben
-// ...mit allen Modifikatoren
-attributeslist.forEach(attribut => {    
-    on(`clicked:probe-komplett-${attribut}`, function() {        
-        getAttrs([attribut, attribut+"-mod1", attribut+"-mod2", attribut+"-biomechanik"], function(values) {
-            let summe = 0;
-            let hazard = 0;
-            let biomechanik = parseInt(values[attribut+"-biomechanik"]||0);
-            let wert = parseInt(values[attribut]||0);
-            let mod1 = parseInt(values[attribut+"-mod1"]||0);
-            let mod2 = parseInt(values[attribut+"-mod2"]||0);
-            console.log(getTranslationByKey("attributsprobe") + ":" + wert + "/" + mod1 + "/" + mod2);
-            
-            summe = wert + mod1 + mod2;
-            if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
-                hazard = summe;
-            }
-            setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard,0,2);
-        });
-    });
-});
-
-// ...mit dem ersten Modifikator
-attributeslist.forEach(attribut => {    
-    on(`clicked:probe-mit-mod1-${attribut}`, function() {        
-        getAttrs([attribut, attribut+"-mod1", attribut+"-biomechanik"], function(values) {
-            let summe = 0;
-            let hazard = 0;
-            let biomechanik = parseInt(values[attribut+"-biomechanik"]||0);
-            let wert = parseInt(values[attribut]||0);
-            let mod1 = parseInt(values[attribut+"-mod1"]||0);
-            console.log(getTranslationByKey("attributsprobe") + ":" + wert + "/" + mod1);
-            
-            summe = wert + mod1;
-            if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
-                hazard = summe;
-            }
-            setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard,0,1);
-        });
-    });
-});
-
-
 // ...ohne Modifikatoren
 attributeslist.forEach(attribut => {    
     on(`clicked:probe-ohne-mod-${attribut}`, function() {        
@@ -272,11 +213,10 @@ attributeslist.forEach(attribut => {
             if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
                 hazard = summe;
             }
-            setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard, 0);
+            setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard);
         });
     });
 });
-
 
 // Proben auf Besondere Fertigkeiten
 on("clicked:repeating_besondere-fertigkeiten:probe", function(eventInfo) {
@@ -361,7 +301,6 @@ on("clicked:sprachprobe_babel", function(eventInfo) {
         setzeSprachprobe(spracheName,spracheStufe);
     });
 });
-
 
 on("clicked:wirf-probe",function(){
     getAttrs(["character_name","probe_summe_wuerfel","probe_standard_wuerfel","probe_original_standard_wuerfel","probe_hazard_wuerfel","probe_original_hazard_wuerfel","probe_bonus_wuerfel","probe_bonus","probe_skill","probe_attribut","probe_biomechanik"], function(values) {
@@ -450,90 +389,6 @@ on("clicked:wirf-probe",function(){
             );                
         });
     });        
-});
-
-on("clicked:wirf-manuelle-probe",function(){
-    getAttrs(["character_name","manuelle_probe_standard_wuerfel","manuelle_probe_hazard_wuerfel","manuelle_probe_bonus_wuerfel","manuelle_probe_bonus"], function(values) {
-        let standard = parseInt(values["manuelle_probe_standard_wuerfel"]||0);
-        let hazard = parseInt(values["manuelle_probe_hazard_wuerfel"]||0);        
-        let bonuswuerfel = parseInt(values["manuelle_probe_bonus_wuerfel"]||0);
-        let bonus = parseInt(values["manuelle_probe_bonus"]||0);
-        let charaktername = values["character_name"];
-        let roll = ""
-        let summe = hazard + standard + bonuswuerfel;
-
-        //Bei negativen Bonuswürfeln die Anzahl an Würfeln reduzieren
-        if (bonuswuerfel <0)
-        {
-            //Bei negativen Bonuswürfeln zunächst die Standard-Würfel und dann die Hazard-Würfel reduzieren
-            standard = standard + bonuswuerfel;
-            if(standard <0)
-            {
-                hazard = hazard + standard;
-                standard = 0;
-            }                
-            if (hazard<1) {hazard=0} //Bei manuellen Proben sind acuh Würde ohne Hazard-Di möglich
-        }
-
-        roll = "&{template:probe_offen}"; //Das Rolltemplate festlegen
-        roll = roll + "{{charaktername="+charaktername+"}}"; //Den Charakternamen mitgeben
-        roll = roll + "{{fertigkeit="+getTranslationByKey("manuelle_probe")+"}}"; //Die Fertigkeit auf die gewürfelt wird
-        roll = roll + "{{hazard=[["+hazard+"d6!6]]}}"; //Der Hazard-Wurf            
-        roll = roll + "{{wurf=[["+standard+"d6]]}}"; //Der normale Wurf
-        roll = roll + "{{bonuswurf=[["+bonuswuerfel+"d6]]}}"; //Die Bonuswürfel
-        roll = roll + "{{bonus=[["+bonus+"]]}}"; //Bonus abfragen
-        roll = roll + "{{summe=[["+summe+"]]}}"; //Platzhalter für die Summe
-
-        startRoll(roll, (results) => {
-            const hazard = parseInt(results.results.hazard.result);                
-            const wurf = parseInt(results.results.wurf.result);  
-            const bonuswurf = parseInt(results.results.bonuswurf.result);              
-            const bonus = parseInt(results.results.bonus.result);
-            let summe = 0;
-
-            console.log(bonuswurf);
-            if(bonuswurf<1)
-            {
-                summe = hazard+wurf+bonus;
-            } else {
-                summe = hazard+wurf+bonuswurf+bonus;
-            }
-
-            let hazard_wuerfel = "";
-            for (const n of results.results.hazard.dice) {
-                hazard_wuerfel = hazard_wuerfel + ""+n+"";
-            }
-
-            let wurf_wuerfel = "";
-            for (const n of results.results.wurf.dice) {
-                wurf_wuerfel = wurf_wuerfel + ""+n+"";
-            }
-
-            let wurf_bonus = "";
-            for (const n of results.results.bonuswurf.dice) {
-                wurf_bonus = wurf_bonus + ""+n+"";
-            }
-
-            finishRoll(
-                results.rollId,
-                {
-                    summe: summe,
-                    hazard: hazard_wuerfel,                
-                    wurf: wurf_wuerfel,
-                    bonuswurf: wurf_bonus
-                }
-            );                
-        });
-    });        
-});
-
-on("clicked:reset-manuelle-probe",function(){
-    setAttrs({
-        "manuelle_probe_hazard_wuerfel"     : 0,
-        "manuelle_probe_standard_wuerfel"   : 0,
-        "manuelle_probe_bonus_wuerfel"      : 0,
-        "manuelle_probe_bonus"              : 0
-    });
 });
 
 on("clicked:trefferzone",function(){
