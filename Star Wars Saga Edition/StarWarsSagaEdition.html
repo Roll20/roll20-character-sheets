@@ -18,13 +18,15 @@
 				<input type="checkbox" value="1" name="attr_FocusHouseRule" title="Skill Focus will increase a skill's modifier at odd levels. (This may not work if you have modified the skill formulas.)"/>&nbsp;<span class="not-show">Skill Focus as 1/2 level house rule</span><br/>
 				</div>
 				<div class="sheet-table-data">
-				<input type="checkbox" value="1" name="attr_QuerySkillModifier" checked title="When rolling a check, ask if there are any other modifiers. (This may not work if you have modified the skill formulas.)"/>&nbsp;<span class="not-show">No "Other Modifiers" prompt for skills</span><br/>
-				<input type="checkbox" value="1" name="attr_QueryAttackModifier" checked title="When rolling an attack, ask if there are any other modifiers. (This may not work if you have modified the attack formulas.)"/>&nbsp;<span class="not-show">No "Other Modifiers" prompt for attacks (nonfunctional)</span><br/>
+				<!--In some cases, a sheetworker changes the formula to remove the "Other Modifiers" prompt. In other cases, there is a duplicate button which is hidden.-->
+				<input type="checkbox" value="1" name="attr_QuerySkillModifier" checked title="When rolling a check, ask if there are any other modifiers. (This may not work if you have modified the skill formulas.) If you add a custom skill, you must re-check this box."/>&nbsp;<span class="not-show">"Other Modifiers" prompt on skill checks</span><br/>
+				<input type="checkbox" value="1" name="attr_QueryAttackModifier" checked title="When rolling an attack, ask if there are any other modifiers. (This may not work if you have modified the attack formulas.) If you add an attack, you must re-check this box."/>&nbsp;<span class="not-show">"Other Modifiers" prompt on attack rolls</span><br/>
 				<input type="checkbox" value="1" name="attr_SpeedExtra-show" title="Speed Notes" />&nbsp;<span class="not-show">Speed notes</span><br/>
 				<input type="checkbox" value="1" name="attr_DR-Show" title="Show/Hide Damage Reduction" />&nbsp;<span class="not-show">Damage Reduction</span><br/>
 				<input type="checkbox" value="1" name="attr_SR-Show" title="Show/Hide Shield Rating" />&nbsp;<span class="not-show">Shield Rating</span><br/>
 				<input type="checkbox" value="1" name="attr_immune-Show" title="Show/Hide Immunities" />&nbsp;<span class="not-show">Immunities</span><br/>
-<!--				<span>&nbsp;</span>-->
+				<!--The line below should be included if the number of settings in the left and right sheet-table-data are different.-->
+<!--				<span>&nbsp;</span>--> 
 				</div>
 				</div>
 			</div>
@@ -44,6 +46,11 @@
 					<div class="rule-sections">
 						<span>Choose individual skills</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" value="1" name="attr_reveal-skill-options" class="sect-show showhidetoggle" title="Show skill options" /><span /><br/>
 						<div class="sect rule-sections" style="margin-bottom:0px;">
+							<div>
+								<input type="checkbox" name="attr_NoneNPCSkills" class="sheet-hidden" id="NPCSkills1"/><label for="NPCSkills1"><span class="sheet-small">[none]</span></label>
+								<input type="checkbox" name="attr_CrucialNPCSkills" class="sheet-hidden" id="NPCSkills2"/><label for="NPCSkills2"><span class="sheet-small">[crucial]</span></label>
+								<input type="checkbox" name="attr_StandardNPCSkills" class="sheet-hidden" id="NPCSkills3"/><label for="NPCSkills3"><span class="sheet-small">[standard]</span></label>
+							</div>
 							<input type="checkbox" value="1" checked name="attr_show-Acrobatics" title="Show Acrobatics skill?" />&nbsp;<span class="not-show">Acrobatics</span><br/>
 							<input type="checkbox" value="1" name="attr_show-Athletics" title="Show Athletics skill?" />&nbsp;<span class="not-show">Athletics (house rule)</span><br/>
 							<input type="checkbox" value="1" name="attr_show-Climb" title="Show Climb skill?" />&nbsp;<span class="not-show">Climb</span><br/>
@@ -79,8 +86,8 @@
 		<div class="sheet-col" style="width:33%">
 			<div class="sheet-textHead" >Vehicles</div>
 			<div class="rule-sections">
-				<input type="checkbox" name="attr_vehicle-AttackModifierPrompt" value="1" />&nbsp;<span class="not-show">No "Other Modifiers" prompt for attacks</span> <br/>
-				<input type="checkbox" name="attr_vehicle-SkillModifierPrompt" value="1" />&nbsp;<span class="not-show">No "Other Modifiers" prompt for skills</span> <br/>
+				<input type="checkbox" name="attr_vehicle-AttackModifierPrompt" checked value="1" />&nbsp;<span class="not-show">"Other Modifiers" prompt for attacks</span> <br/>
+				<input type="checkbox" name="attr_vehicle-SkillModifierPrompt" checked value="1" />&nbsp;<span class="not-show">"Other Modifiers" prompt for skills</span> <br/>
 				<input type="checkbox" name="attr_vehicle-CON-show" value="1" />&nbsp;<span class="not-show">Constitution score (for Yuuzhan Vong vehicles)</span> <br/>
 				<input type="checkbox" name="attr_vehicle-CapitalGrapple" value="1" />&nbsp;<span class="not-show">Grapple modifier increases beyond Colossal size</span> <br/>
 			</div>
@@ -295,7 +302,9 @@
 				</div>	
 				<div class="sheet-table-row">
 					<span class="sheet-table-data">	
-						<button type="roll" name="roll_InitiativeTurn" value="&{template:skill} {{name=Rolling for Turn Order}} {{skill=[[1d20+@{Initiative}+@{InitiativeDecimal}[Initiative Decimal]+?{Other Modifiers|0}[Other] &{tracker}]]}} {{notes=@{Initiative|max}}}" title="Roll Initiative to Turn Order window %{InitiativeTurn}" ></button>		
+						<input type="checkbox" value="1" name="attr_QuerySkillModifier" checked class="sheet-hidden other-mod-toggle"/>
+						<button type="roll" name="roll_InitiativeTurn" class="other-mod-on" value="&{template:skill} {{name=Rolling for Turn Order}} {{skill=[[1d20+@{Initiative}+@{InitiativeDecimal}[Initiative Decimal]+?{Other Modifiers|0}[Other] &{tracker}]]}} {{notes=@{Initiative|max}}}" title="Roll Initiative to Turn Order window %{InitiativeTurn}" ></button>		
+						<button type="roll" name="roll_InitiativeTurn" class="other-mod-off" value="&{template:skill} {{name=Rolling for Turn Order}} {{skill=[[1d20+@{Initiative}+@{InitiativeDecimal}[Initiative Decimal] &{tracker}]]}} {{notes=@{Initiative|max}}}" title="Roll Initiative to Turn Order window %{InitiativeTurn}" ></button>		
 						<label><span data-i18n="initiative">Initiative</span></label>	 <span class="sheet-small" style="margin-left:10px;"><input type="checkbox" value="[[0.01 * (@{Initiative})]]" name="attr_InitiativeDecimal" title="Add Initiative Modifier to roll as a decimal for easier sorting @{InitiativeDecimal}" checked />&nbsp;<span data-i18n="init_decimal" class="not-show">Initiative as Decimal</span></span>
 					</span>
 				</div>
@@ -2204,7 +2213,9 @@
 			<button type="roll" name="roll_PerceptionCheck" value="@{PerceptionFormula|max}" title="Roll Perception %{PerceptionCheck}"></button>
 				<label data-i18n="perception">Perception </label>		
 			<br />
-			<button type="roll" name="roll_InitiativeTurn" value="&{template:skill} {{name=Rolling for Turn Order}} {{skill=[[1d20+@{Initiative}+@{InitiativeDecimal}[Initiative Decimal]+?{Other Modifiers|0}[Other] &{tracker}]]}} {{notes=@{Initiative|max}}}" title="Roll Initiative to Turn Order window %{InitiativeTurn}" ></button>		
+			<input type="checkbox" value="1" name="attr_QuerySkillModifier" checked class="sheet-hidden other-mod-toggle"/>
+			<button type="roll" name="roll_InitiativeTurn" class="other-mod-on" value="&{template:skill} {{name=Rolling for Turn Order}} {{skill=[[1d20+@{Initiative}+@{InitiativeDecimal}[Initiative Decimal]+?{Other Modifiers|0}[Other] &{tracker}]]}} {{notes=@{Initiative|max}}}" title="Roll Initiative to Turn Order window %{InitiativeTurn}" ></button>		
+			<button type="roll" name="roll_InitiativeTurn" class="other-mod-off" value="&{template:skill} {{name=Rolling for Turn Order}} {{skill=[[1d20+@{Initiative}+@{InitiativeDecimal}[Initiative Decimal] &{tracker}]]}} {{notes=@{Initiative|max}}}" title="Roll Initiative to Turn Order window %{InitiativeTurn}" ></button>		
 				<label data-i18n="initiative">Initiative</label>	 <span class="sheet-small" style="margin-left:10px;"><input type="checkbox" value="[[0.01 * (@{Initiative})]]" name="attr_InitiativeDecimal" title="Add Initiative Modifier to roll as a decimal for easier sorting @{InitiativeDecimal}" checked />&nbsp;<span data-i18n="init_decimal" class="not-show">Initiative as Decimal</span></span>
 			<table>
 				<tr>
@@ -4249,7 +4260,7 @@
 <!-- start help section --> 
 <div> 
 For help, please see the wiki page. <input type="text" disabled="true" name="wiki_URL" style="width:30em" title="Wiki URL" value="https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet"/> <br/>
-<b><span data-i18n="last_updated">Last updated</span>:</b> 19 September 2023
+<b><span data-i18n="last_updated">Last updated</span>:</b> 23 September 2023
 </div>
 <!-- start roll templates --> 
 <body>
@@ -5199,6 +5210,94 @@ on("change:NoConstitution", function() {
 		});
 	});
 });
+on("change:NoneNPCSkills",function() {
+	setAttrs({
+		"show-Acrobatics":0,
+		"show-Athletics":0,
+		"show-Climb":0,
+		"show-Deception":0,
+		"show-Endurance":0,
+		"show-GatherInformation":0,
+		"show-Initiative":0,
+		"show-Jump":0,
+		"show-KnowledgeBureaucracy":0,
+		"show-KnowledgeGalacticLore":0,
+		"show-KnowledgeLifeSciences":0,
+		"show-KnowledgePhysicalSciences":0,
+		"show-KnowledgeSocialSciences":0,
+		"show-KnowledgeTactics":0,
+		"show-KnowledgeTechnology":0,
+		"show-Mechanics":0,
+		"show-Perception":0,
+		"show-Persuasion":0,
+		"show-Pilot":0,
+		"show-Ride":0,
+		"show-Stealth":0,
+		"show-Survival":0,
+		"show-Swim":0,
+		"show-TreatInjury":0,
+		"show-UseComputer":0,
+		"show-UsetheForce":0
+	});	
+});
+on("change:CrucialNPCSkills",function() {
+	setAttrs({
+		"show-Acrobatics":1,
+		"show-Athletics":0,
+		"show-Climb":0,
+		"show-Deception":1,
+		"show-Endurance":0,
+		"show-GatherInformation":0,
+		"show-Initiative":1,
+		"show-Jump":0,
+		"show-KnowledgeBureaucracy":0,
+		"show-KnowledgeGalacticLore":0,
+		"show-KnowledgeLifeSciences":0,
+		"show-KnowledgePhysicalSciences":0,
+		"show-KnowledgeSocialSciences":0,
+		"show-KnowledgeTactics":0,
+		"show-KnowledgeTechnology":0,
+		"show-Mechanics":0,
+		"show-Perception":1,
+		"show-Persuasion":1,
+		"show-Pilot":0,
+		"show-Ride":0,
+		"show-Stealth":1,
+		"show-Survival":0,
+		"show-Swim":0,
+		"show-TreatInjury":0,
+		"show-UseComputer":0
+	});	
+});
+on("change:StandardNPCSkills",function() {
+	setAttrs({
+		"show-Acrobatics":1,
+		"show-Athletics":0,
+		"show-Climb":1,
+		"show-Deception":1,
+		"show-Endurance":1,
+		"show-GatherInformation":1,
+		"show-Initiative":1,
+		"show-Jump":1,
+		"show-KnowledgeBureaucracy":1,
+		"show-KnowledgeGalacticLore":1,
+		"show-KnowledgeLifeSciences":1,
+		"show-KnowledgePhysicalSciences":1,
+		"show-KnowledgeSocialSciences":1,
+		"show-KnowledgeTactics":1,
+		"show-KnowledgeTechnology":1,
+		"show-Mechanics":1,
+		"show-Perception":1,
+		"show-Persuasion":1,
+		"show-Pilot":1,
+		"show-Ride":1,
+		"show-Stealth":1,
+		"show-Survival":1,
+		"show-Swim":1,
+		"show-TreatInjury":1,
+		"show-UseComputer":1
+	});	
+});
 on("clicked:SecondWind", function() {
       getAttrs(["hp_max","hp", "Second_Wind", "Second_Wind_Count", "hidden_second_wind"], function(values) {
         // get the hp, hp_max, second wind stat, and coerce into a numerical values.
@@ -5267,19 +5366,57 @@ on("change:IncludeSR", function() {
 		setAttrs({"Status": status});
 	});
 });
-
-on('change:QueryAttackModifier', () => {
-    const section = 'attack';
-    repeatingSectionIds(`repeating_${section}`, idarray => {
-        const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_${section}_${id}_vehicle-AttackModifierCheckbox`], '');
-        getAttrs(['vehicle-AttackModifierCheckbox', ...fieldnames], v => {
-            const output = {};
-            idarray.forEach(id => {
-                output[`repeating_${section}_${id}_vehicle-AttackModifierCheckbox`] = v['vehicle-AttackModifierPrompt'];
-            });
-            setAttrs(output);
-        });
+on('change:QueryAttackModifier',()=>{
+  getSectionIDs('repeating_attack',(idArray)=>{
+    // create an array of all the repeating section attribute names we want to get the values of.
+    const getArr = idArray.map(id => `repeating_attack_${id}_WeaponAttack`);
+    getAttrs(['QueryAttackModifier',...getArr],(attributes) => {
+      // An object to store our changes in
+      const setObj = {};
+      //Assuming that QueryAttackModifier is 1 when it should be the query and 0 when it should be just the 0[Other]
+      let replaceRx;
+      let replaceContent;
+      if(+attributes.QueryAttackModifier){
+        replaceRx = /0\[other\]/gi;
+        replaceContent = '?{Other Modifiers (Attack)|0}[Other]'
+      }else{
+        replaceRx = /\?\{Other Modifiers \(Attack\)\|0\}\[Other\]/gi;
+        replaceContent = '0[Other]';
+      }
+      idArray.forEach(id => {
+        const attrName = `repeating_attack_${id}_WeaponAttack`;
+        setObj[attrName] = attributes[attrName].replace(replaceRx,replaceContent);
+      });
+      // Apply our changes
+      setAttrs(setObj,{silent:true});
     });
+  });
+});
+on('change:QuerySkillModifier change:repeating_npc-skill',()=>{
+  getSectionIDs('repeating_npc-skill',(idArray)=>{
+    // create an array of all the repeating section attribute names we want to get the values of.
+    const getArr = idArray.map(id => `repeating_npc-skill_${id}_Formula`);
+    getAttrs(['QuerySkillModifier',...getArr],(attributes) => {
+      // An object to store our changes in
+      const setObj = {};
+      //Assuming that QuerySkillModifier is 1 when it should be the query and 0 when it should be just the 0[Other]
+      let replaceRx;
+      let replaceContent;
+      if(+attributes.QuerySkillModifier){
+        replaceRx = /0\[other\]/gi;
+        replaceContent = '?{Other Modifiers|0}[Other]'
+      }else{
+        replaceRx = /\?\{Other Modifiers\|0\}\[Other\]/gi;
+        replaceContent = '0[Other]';
+      }
+      idArray.forEach(id => {
+        const attrName = `repeating_npc-skill_${id}_Formula`;
+        setObj[attrName] = attributes[attrName].replace(replaceRx,replaceContent);
+      });
+      // Apply our changes
+      setAttrs(setObj,{silent:true});
+    });
+  });
 });
 
 on("change:FocusHouseRule", function() {
@@ -5591,7 +5728,6 @@ on("change:inventoryrunningsummary change:ArmorWorn",function(){
 		setAttrs({"inventory": summary});
 	});
 });
-
 on("change:repeating_organization remove:repeating_organization", function() {
 	console.log("Changing org score");
 	repeatingSum("OrganizationScore","organization","criteria_max");
@@ -5613,38 +5749,6 @@ on("change:repeating_attack:vehicle-WeaponPosition_max",function() {
 		setAttrs({"repeating_attack_vehicle-WeaponPosition":weaponposition});
 	});
 });
-/* THIS SECTION IS NO LONGER NEEDED, BUT SOMETHING LIKE IT WILL BE NECESSARY FOR replace IN THE REPEATING ATTACKS
-on("change:vehicle-AttackModifierPrompt", function(v) {
-	getAttrs(["vehicle-AttackModifierPrompt"], function(v) {
-		let VehicleAttackModPrompt = v["vehicle-AttackModifierPrompt"];
-		console.log("Checkbox: " + VehicleAttackModPrompt);
-		getSectionIDs("repeating_attack", function(IDArray) {
-			var fieldNames = [];
-			var output = [];
-			for (var i=0; i < IDArray.length; i++) {
-				fieldNames.push("repeating_attack_" + IDArray[i] + "_vehicle-AttackModifierCheckbox");
-				output.push("repeating_attack_" + IDArray[i] + "_vehicle-AttackModifierCheckbox" + ":" + VehicleAttackModPrompt);
-			}
-			console.log(output);
-			setAttrs({output});
-		});
-	});
-});
-
-on('change:vehicle-AttackModifierPrompt', () => {
-    const section = 'attack';
-    repeatingSectionIds(`repeating_${section}`, idarray => {
-        const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_${section}_${id}_vehicle-AttackModifierCheckbox`], '');
-        getAttrs(['vehicle-AttackModifierCheckbox', ...fieldnames], v => {
-            const output = {};
-            idarray.forEach(id => {
-                output[`repeating_${section}_${id}_vehicle-AttackModifierCheckbox`] = v['vehicle-AttackModifierPrompt'];
-            });
-            setAttrs(output);
-        });
-    });
-});
-*/
 
 // ====== Functions ====== \\
 var ArmorPerception = function() {
