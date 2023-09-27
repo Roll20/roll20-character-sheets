@@ -1,0 +1,38 @@
+name: Processes changed character-sheets and updates CDN bucket and/or sheet-http database as needed
+
+on:
+  push:
+    branches: ['team/csc']
+    paths: '**/sheet.json'
+
+jobs:
+    handle-changed-files:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: dorny/paths-filter@v2
+          id: filter
+          with:
+            # Enable listing of files matching each filter.
+            # Paths to files will be available in `${FILTER_NAME}_files` output variable.
+            # Paths will be escaped and space-delimited.
+            # Output is usable as command-line argument list in Linux shell
+            list-files: shell
+            filters: |
+              sheet:
+                - added|modified: '**/*/sheet.json'
+    
+    process-character-sheets:
+      name: Process character-sheet HTML/CSS
+      needs: handle-changed-files
+      if: ${{ needs.handle-changed-files.outputs.sheet == 'true' }}
+      runs-on: ubuntu-latest
+      env:
+        NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+      steps:
+        - uses: actions/checkout@v3
+        - uses: oven-sh/setup-bun@v1
+  
+        # run any `bun` or `bunx` command
+        - run: bun install
+          working-directory: contrib/sheet-pixie
+        - run: bun run contrib/sheet-pixie/index.ts ${{ steps.filter.outputs.sheet_files }}
