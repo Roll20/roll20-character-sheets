@@ -10,5 +10,3 @@ config:
 	fd . --exclude contrib --type d --max-depth 1 --exec cp $(DEFAULT_RELEASE_SCRIPT)/release-ci.sh {} \; || true
 	fd . --exclude contrib --type d --max-depth 1 --exec cp $(DEFAULT_RELEASE_SCRIPT)/Makefile {} \; || true
 
-all:
-	./bump-versions.sh
