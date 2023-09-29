@@ -110,7 +110,7 @@ cd 5eShaped # Change this to your desired sheet directory
 cat sheet.json|  jq ". += {\"version\":\"$(date +%s)\"}" | tee sheet.json # This will bump the version field in sheet.json
 ```
 
-Commit the change to sheet.json and watch CircleCI for the branch to which you pushed. The supported branches:
+Commit the change to sheet.json, push your changes to one of the supported branches and watch CircleCI for the branch to which you pushed. The supported branches are:
 
 - master
 - staging
