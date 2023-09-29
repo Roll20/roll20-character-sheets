@@ -1,50 +1,1196 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
-executors:
-  update-executor:
-    docker:
-      - image: 'cimg/base:stable'
-
-jobs:
-  get_commit_hash:
-    executor: update-executor
-    steps:
-      - run:
-          name: Install jq
-          command: sudo apt-get update && sudo apt-get install jq
-      - run: mkdir -p /home/circleci/project/circleci-workspace/persist
-      - run: echo $(curl -Ss -u "${CIRCLECI_CHARSHEETS_API_KEY}:" "https://circleci.com/api/v1.1/project/github/Roll20/roll20-character-sheets?filter=completed&limit=1" | jq -r '.[0]["vcs_revision"]') > /home/circleci/project/circleci-workspace/persist/last-commit
-      - persist_to_workspace:
-          root: /home/circleci/project/circleci-workspace/persist
-          paths:
-            - last-commit
-  update_sheet:
-    executor: update-executor
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/project/circleci-workspace/persist
-      - run:
-          name: Update Character Sheets
-          command: |
-              .circleci/update_sheets.sh
-# Orchestrate or schedule a set of jobs
+setup: true
+orbs:
+  path-filtering: circleci/path-filtering@0.1.3
 workflows:
   version: 2
-  update_sheets_staging:
+  always_run:
     jobs:
-      - get_commit_hash:
-          context: char-sheet-app-staging
-          filters:
-            branches:
-              only:
-                - master
-      - update_sheet:
-          requires:
-            - get_commit_hash
-          context: char-sheet-app-dev
-          filters:
-            branches:
-              only:
-                - master
+      - path-filtering/filter:
+          name: Check updated files
+          mapping: |
+            13th_Age/.* update-sheet-0 true
+            13th Age by Roll20/.* update-sheet-1 true
+            13th Age Glorantha/.* update-sheet-2 true
+            13th_Age-neovatar/.* update-sheet-3 true
+            1800 El ocaso de la humanidad/.* update-sheet-4 true
+            24XX/.* update-sheet-5 true
+            3DeT_ALPHA/.* update-sheet-6 true
+            3DeT_VICTORY/.* update-sheet-7 true
+            3D&T_ALPHA/.* update-sheet-8 true
+            3DX/.* update-sheet-9 true
+            5e Darker Dungeons/.* update-sheet-10 true
+            5eShaped/.* update-sheet-11 true
+            5eShaped_legacy/.* update-sheet-12 true
+            7th Sea/.* update-sheet-13 true
+            7th Sea 2e/.* update-sheet-14 true
+            Ablaneda/.* update-sheet-15 true
+            Aborea/.* update-sheet-16 true
+            Aborea_new/.* update-sheet-17 true
+            Abstract Dungeon (FR base)/.* update-sheet-18 true
+            Aces and Eights (Shattered Frontier)/.* update-sheet-19 true
+            Aces-In-Space/.* update-sheet-20 true
+            Achtung! Cthulhu/.* update-sheet-21 true
+            Achtung!_Cthulhu_2d20/.* update-sheet-22 true
+            ACKS/.* update-sheet-23 true
+            ACPD/.* update-sheet-24 true
+            Action Movie World/.* update-sheet-25 true
+            AD&D_2E/.* update-sheet-26 true
+            ADnD_1E/.* update-sheet-27 true
+            ADnD_2E_Revised/.* update-sheet-28 true
+            Adventure!/.* update-sheet-29 true
+            Adventure Pack/.* update-sheet-30 true
+            Adventurers Revised Edition (hbCyber)/.* update-sheet-31 true
+            Adventures in Middle Earth/.* update-sheet-32 true
+            Adventures on a Dime/.* update-sheet-33 true
+            AdventureTime/.* update-sheet-34 true
+            AEON-Aberrant/.* update-sheet-35 true
+            A Fistful of Darkness/.* update-sheet-36 true
+            AgainstTheDarkMaster/.* update-sheet-37 true
+            Against-The-Darkmaster-CoreRules/.* update-sheet-38 true
+            Against the Dark Yogi/.* update-sheet-39 true
+            Age of Ambition/.* update-sheet-40 true
+            Age-of-Sigmar-Soulbound/.* update-sheet-41 true
+            AGE System/.* update-sheet-42 true
+            Agon/.* update-sheet-43 true
+            Agone-(french)/.* update-sheet-44 true
+            Agon Official/.* update-sheet-45 true
+            Alas For The Awful Sea/.* update-sheet-46 true
+            Alice Is Missing/.* update-sheet-47 true
+            Alien Roleplaying Game/.* update-sheet-48 true
+            alien_rpg/.* update-sheet-49 true
+            Aliens/.* update-sheet-50 true
+            AllforOne/.* update-sheet-51 true
+            Altered Carbon Official/.* update-sheet-52 true
+            Alternity-2018/.* update-sheet-53 true
+            Alternity-RPG/.* update-sheet-54 true
+            Ambition_Avarice/.* update-sheet-55 true
+            Anima-Beyond-Fantasy/.* update-sheet-56 true
+            Anima-Beyond-Fantasy-French/.* update-sheet-57 true
+            Anima-Beyond-Fantasy-Spanish/.* update-sheet-58 true
+            Anime Campaign/.* update-sheet-59 true
+            AnimeWasAMistake/.* update-sheet-60 true
+            Anneau Unique/.* update-sheet-61 true
+            Anos20/.* update-sheet-62 true
+            Antika/.* update-sheet-63 true
+            APOCALYPSE FRAME/.* update-sheet-64 true
+            Apocalypse Keys/.* update-sheet-65 true
+            APOCTHULHU/.* update-sheet-66 true
+            Aquablue/.* update-sheet-67 true
+            Aquelarre/.* update-sheet-68 true
+            Arask/.* update-sheet-69 true
+            ARC/.* update-sheet-70 true
+            Arcanas&Ancestrais/.* update-sheet-71 true
+            ArcaneCodex/.* update-sheet-72 true
+            Aria/.* update-sheet-73 true
+            Arianrhod2/.* update-sheet-74 true
+            Arkana-RPG by Pktome/.* update-sheet-75 true
+            Arkham Horror/.* update-sheet-76 true
+            Ars_Magica_5th/.* update-sheet-77 true
+            Ashen_Stars/.* update-sheet-78 true
+            A Song of Ice and Fire/.* update-sheet-79 true
+            AS&SH/.* update-sheet-80 true
+            Atomic Highway/.* update-sheet-81 true
+            AvatarLegends/.* update-sheet-82 true
+            AvatarLegendsMagpie/.* update-sheet-83 true
+            Aventures/.* update-sheet-84 true
+            AW/.* update-sheet-85 true
+            AW2E/.* update-sheet-86 true
+            AW2E-Burned-Over/.* update-sheet-87 true
+            Awaken/.* update-sheet-88 true
+            Awakening_RPG/.* update-sheet-89 true
+            Awfully Cheerful Engine!/.* update-sheet-90 true
+            Babylon 5/.* update-sheet-91 true
+            backbone/.* update-sheet-92 true
+            BakerStreet/.* update-sheet-93 true
+            Band of Blades/.* update-sheet-94 true
+            Band of Blades Official/.* update-sheet-95 true
+            Barbarians Of Lemuria - Mythic/.* update-sheet-96 true
+            Barbaric/.* update-sheet-97 true
+            Barebones Fantasy RPG (00lite)/.* update-sheet-98 true
+            BASH Ultimate Edition/.* update-sheet-99 true
+            Basic Fantasy RPG/.* update-sheet-100 true
+            Basic Fantasy RPG - Expanded/.* update-sheet-101 true
+            Basic_Roleplaying/.* update-sheet-102 true
+            Battle Century G/.* update-sheet-103 true
+            BattleTech-A-Time-of-War/.* update-sheet-104 true
+            Beacon/.* update-sheet-105 true
+            Beacon by PGG/.* update-sheet-106 true
+            BESM2revised/.* update-sheet-107 true
+            BESM-3e/.* update-sheet-108 true
+            BESM3rd/.* update-sheet-109 true
+            BESM4eExtras/.* update-sheet-110 true
+            Best Left Buried/.* update-sheet-111 true
+            Better-Angels/.* update-sheet-112 true
+            Beyond the Wall and Other Adventures/.* update-sheet-113 true
+            Bite-Marks/.* update-sheet-114 true
+            Black_Crusade/.* update-sheet-115 true
+            Black Crusade Advanced API/.* update-sheet-116 true
+            Black Hack/.* update-sheet-117 true
+            Black-Hack-Mecha-Hack/.* update-sheet-118 true
+            Black-Seven/.* update-sheet-119 true
+            Black Void by Penny for a Tale/.* update-sheet-120 true
+            blade_runner_rpg/.* update-sheet-121 true
+            Blades in the Dark/.* update-sheet-122 true
+            Blades-in-the-Dark/.* update-sheet-123 true
+            Blightburg/.* update-sheet-124 true
+            Blood_and_Doom_by_Dicetale_Games/.* update-sheet-125 true
+            Blood and Gold/.* update-sheet-126 true
+            Bluebeard's Bride/.* update-sheet-127 true
+            Blue Planet V2/.* update-sheet-128 true
+            Blue Rose/.* update-sheet-129 true
+            Brancalonia Official/.* update-sheet-130 true
+            Breakfast Cult/.* update-sheet-131 true
+            Brigandyne/.* update-sheet-132 true
+            Brigandyne-V2/.* update-sheet-133 true
+            Brindlewood Bay/.* update-sheet-134 true
+            Broken Compass/.* update-sheet-135 true
+            Bubblegumshoe/.* update-sheet-136 true
+            Bulletproof Blues/.* update-sheet-137 true
+            Bunkers&Badasses/.* update-sheet-138 true
+            Buried Secrets/.* update-sheet-139 true
+            Buried Treasures/.* update-sheet-140 true
+            Burn Bryte by Roll20/.* update-sheet-141 true
+            Burning Wheel/.* update-sheet-142 true
+            ButterflyAspect/.* update-sheet-143 true
+            CahiersDuVastemonde/.* update-sheet-144 true
+            Cairn/.* update-sheet-145 true
+            CakebreadWaltonRenaissance/.* update-sheet-146 true
+            Call_of_Cthulhu/.* update-sheet-147 true
+            Call_of_Cthulhu_2th_Ed_French/.* update-sheet-148 true
+            Call_of_Cthulhu_6th_Ed/.* update-sheet-149 true
+            Call_of_Cthulhu_6th_Ed_French/.* update-sheet-150 true
+            Call_of_Cthulhu_7th_Ed/.* update-sheet-151 true
+            Call_of_Cthulhu_7th_Ed_Chinese_Traditional/.* update-sheet-152 true
+            Call_of_Cthulhu_7th_Ed_French/.* update-sheet-153 true
+            Call_of_Cthulhu_7th_Ed - German/.* update-sheet-154 true
+            Call_of_Cthulhu_DA/.* update-sheet-155 true
+            Call_of_Cthulhu_Spanish/.* update-sheet-156 true
+            Call_of_Katzulhu_7th_Ed - German/.* update-sheet-157 true
+            Capes, Cowls & Villains Foul/.* update-sheet-158 true
+            Capharnaum/.* update-sheet-159 true
+            Capitaine Vaudou/.* update-sheet-160 true
+            Carbon-2185/.* update-sheet-161 true
+            carbon-2185-quickstart/.* update-sheet-162 true
+            cartel/.* update-sheet-163 true
+            Castle Falkenstein/.* update-sheet-164 true
+            Castles&Crusades/.* update-sheet-165 true
+            CdB Engine/.* update-sheet-166 true
+            CDMG/.* update-sheet-167 true
+            CDR/.* update-sheet-168 true
+            Celerity/.* update-sheet-169 true
+            Celerity Lite/.* update-sheet-170 true
+            cepheus-atom/.* update-sheet-171 true
+            Cepheus_Deluxe/.* update-sheet-172 true
+            Cepheus Engine/.* update-sheet-173 true
+            Cerbere/.* update-sheet-174 true
+            Champions Now/.* update-sheet-175 true
+            Changed Stars/.* update-sheet-176 true
+            channel fear/.* update-sheet-177 true
+            Chaos 6010/.* update-sheet-178 true
+            Chasing Adventure/.* update-sheet-179 true
+            ChrisPerrinsMecha/.* update-sheet-180 true
+            Chronica Feudalis/.* update-sheet-181 true
+            Chronicles of Darkness/.* update-sheet-182 true
+            Chronicles of Darkness by Roll20/.* update-sheet-183 true
+            Chroniques_De_L_Etrange/.* update-sheet-184 true
+            Chroniques des Feals/.* update-sheet-185 true
+            ChroniquesGalactiques/.* update-sheet-186 true
+            ChroniquesOubliees/.* update-sheet-187 true
+            ChroniquesOublieesContemporain/.* update-sheet-188 true
+            City-of-Mist/.* update-sheet-189 true
+            City Of Mist Official/.* update-sheet-190 true
+            Classic_Traveller/.* update-sheet-191 true
+            Classified/.* update-sheet-192 true
+            Cle en main/.* update-sheet-193 true
+            CoeursVaillants/.* update-sheet-194 true
+            CoeursVaillants-2/.* update-sheet-195 true
+            conan-2d20/.* update-sheet-196 true
+            Conan_2d20_Adventures_In_An_Age_Undreamed_Of/.* update-sheet-197 true
+            Conan-2nd-Ed/.* update-sheet-198 true
+            Connected_stories/.* update-sheet-199 true
+            ConspiracyX/.* update-sheet-200 true
+            Continuum/.* update-sheet-201 true
+            COPS/.* update-sheet-202 true
+            Coriolis/.* update-sheet-203 true
+            Coriolis Alternative/.* update-sheet-204 true
+            Cortex Plus Heroic/.* update-sheet-205 true
+            CortexPrime-Exiles/.* update-sheet-206 true
+            CortexPrime-Hammerheads/.* update-sheet-207 true
+            CortexPrime-Tales-of-Xadia-Playtest/.* update-sheet-208 true
+            Court Of Blades/.* update-sheet-209 true
+            CP-Unofficial-Persona-TTRPG/.* update-sheet-210 true
+            Crescent/.* update-sheet-211 true
+            CriancasEnxeridas/.* update-sheet-212 true
+            Cronicas-RPG/.* update-sheet-213 true
+            Crossed-Fates/.* update-sheet-214 true
+            Cthulhu Awakens/.* update-sheet-215 true
+            Cthulhu D100/.* update-sheet-216 true
+            Cthulhu Dark/.* update-sheet-217 true
+            Cthulhu Eternal/.* update-sheet-218 true
+            CthulhuTech_1ed/.* update-sheet-219 true
+            Cuentos de Ánimas/.* update-sheet-220 true
+            Cultos-innombrables-hitos/.* update-sheet-221 true
+            CWOD-C20/.* update-sheet-222 true
+            CWOD-Changeling/.* update-sheet-223 true
+            CWOD-DAV20/.* update-sheet-224 true
+            CWOD-Demon/.* update-sheet-225 true
+            CWOD-Exalted/.* update-sheet-226 true
+            CWOD-Hunter/.* update-sheet-227 true
+            CWOD-M20/.* update-sheet-228 true
+            CWOD-Mage/.* update-sheet-229 true
+            CWOD-Technocracy/.* update-sheet-230 true
+            CWOD-V20/.* update-sheet-231 true
+            CWOD-Vampire/.* update-sheet-232 true
+            CWOD-W20/.* update-sheet-233 true
+            CWOD-Werewolf/.* update-sheet-234 true
+            CWOD-Werewolf-Rokea/.* update-sheet-235 true
+            CWOD-Wr20/.* update-sheet-236 true
+            CWorldofDarkness/.* update-sheet-237 true
+            Cyberpunk 2020/.* update-sheet-238 true
+            Cyberpunk 2k20/.* update-sheet-239 true
+            Cyberpunk2k20_v2/.* update-sheet-240 true
+            Cyberpunk Red/.* update-sheet-241 true
+            CyberpunkRED_Gerdofal/.* update-sheet-242 true
+            CyberpunkRED_raycw/.* update-sheet-243 true
+            Cyberpunk Red Tabbed/.* update-sheet-244 true
+            Cyberpunk Vieja Escuela ES/.* update-sheet-245 true
+            Cyberrats/.* update-sheet-246 true
+            Cybersalles/.* update-sheet-247 true
+            Cyberspace/.* update-sheet-248 true
+            Cy_Borg/.* update-sheet-249 true
+            CypherSystem/.* update-sheet-250 true
+            CypherSystemFrench/.* update-sheet-251 true
+            Cypher Systems by Roll20/.* update-sheet-252 true
+            d20 Modern/.* update-sheet-253 true
+            D6_Adventure/.* update-sheet-254 true
+            D6_Fantasy/.* update-sheet-255 true
+            D6_Space/.* update-sheet-256 true
+            D6StarWars/.* update-sheet-257 true
+            Daemon/.* update-sheet-258 true
+            Daemon 3e/.* update-sheet-259 true
+            Daemon Exilia/.* update-sheet-260 true
+            DangerousJourneys-Mythus/.* update-sheet-261 true
+            Dark_Heresy/.* update-sheet-262 true
+            Dark_Heresy_2ed/.* update-sheet-263 true
+            Dark Heresy Advanced 2nd Edition/.* update-sheet-264 true
+            Das_Schwarze_Auge_4-1/.* update-sheet-265 true
+            Das_Schwarze_Auge_5/.* update-sheet-266 true
+            Das_Schwarze_Auge_5_Tsa_Edition/.* update-sheet-267 true
+            Das_Schwarze_Auge_Ilaris/.* update-sheet-268 true
+            Das Schwarze Auge (TDE) 5 OFFICIAL by Ulisses/.* update-sheet-269 true
+            DCC/.* update-sheet-270 true
+            DCC_Tabbed_Sheet/.* update-sheet-271 true
+            DC_Heroes_MEGS/.* update-sheet-272 true
+            D&D_3-5/.* update-sheet-273 true
+            D&D_3-5-CN/.* update-sheet-274 true
+            D&D_3-5-fr/.* update-sheet-275 true
+            D&D_3-5-pt-br/.* update-sheet-276 true
+            D&D_3-5 SPANISH/.* update-sheet-277 true
+            D&D_4E/.* update-sheet-278 true
+            DD5thEditionLegacy/.* update-sheet-279 true
+            D&D_BECM/.* update-sheet-280 true
+            D&D_OED/.* update-sheet-281 true
+            Deadlands Classic/.* update-sheet-282 true
+            Deadlands Classic Anniversary/.* update-sheet-283 true
+            Deadlands Classic Anniversary - Improved/.* update-sheet-284 true
+            Dead-of-Night/.* update-sheet-285 true
+            Deathbringer_1.4/.* update-sheet-286 true
+            DEATH IN SPACE/.* update-sheet-287 true
+            Deathwatch/.* update-sheet-288 true
+            Degenesis/.* update-sheet-289 true
+            Degenesis-henry4k/.* update-sheet-290 true
+            Delta Green/.* update-sheet-291 true
+            Delta Green 2/.* update-sheet-292 true
+            DeltaGreenRPG/.* update-sheet-293 true
+            Delve/.* update-sheet-294 true
+            Demon Gate/.* update-sheet-295 true
+            Demon Gate Scripted/.* update-sheet-296 true
+            Demon Hunters Beta/.* update-sheet-297 true
+            DemonTheDescent/.* update-sheet-298 true
+            Derby_Drama/.* update-sheet-299 true
+            Der Eine Ring/.* update-sheet-300 true
+            Descent into Midnight/.* update-sheet-301 true
+            DeusVault/.* update-sheet-302 true
+            Devastra/.* update-sheet-303 true
+            DFRPG/.* update-sheet-304 true
+            Diaspora/.* update-sheet-305 true
+            Die_Schwarze_Katze/.* update-sheet-306 true
+            Digital Shades/.* update-sheet-307 true
+            Dime Adventures/.* update-sheet-308 true
+            Dishonored/.* update-sheet-309 true
+            DnD_5e/.* update-sheet-310 true
+            DnD5E Character Scrolls/.* update-sheet-311 true
+            DnD_5e_Chinese_Traditional/.* update-sheet-312 true
+            DnD_Moldvay_AmandatheAmazon/.* update-sheet-313 true
+            DnDNext_Actoba/.* update-sheet-314 true
+            DnD_Original_DnD/.* update-sheet-315 true
+            Doctor Who Adventures in Time and Space/.* update-sheet-316 true
+            Dogs-in-the-Vineyard/.* update-sheet-317 true
+            Dominion/.* update-sheet-318 true
+            DonjonsEtChatons/.* update-sheet-319 true
+            Don't Rest Your Head/.* update-sheet-320 true
+            DoubleCross3rd/.* update-sheet-321 true
+            Draci doupe II/.* update-sheet-322 true
+            Draci_Doupe_PPP/.* update-sheet-323 true
+            Draci Hlidka/.* update-sheet-324 true
+            Dragon Age RPG/.* update-sheet-325 true
+            Dragon-Age-RPG-PT-BR/.* update-sheet-326 true
+            Dragon Ball Universe/.* update-sheet-327 true
+            dragonbane/.* update-sheet-328 true
+            Dragoncry/.* update-sheet-329 true
+            Dragon De Poche 2/.* update-sheet-330 true
+            Dragonlance 5th Age/.* update-sheet-331 true
+            Dragon-Prince-fanmade/.* update-sheet-332 true
+            DragonQuest/.* update-sheet-333 true
+            Dragon Warriors/.* update-sheet-334 true
+            Drakar och Demoner 6.0/.* update-sheet-335 true
+            Drakar_och_Demoner-91/.* update-sheet-336 true
+            Dramasystem/.* update-sheet-337 true
+            Dreamchaser/.* update-sheet-338 true
+            DresdenFilesAccelerated/.* update-sheet-339 true
+            Dresden Files Role-Playing Game/.* update-sheet-340 true
+            Duels of Dreams - DODAS/.* update-sheet-341 true
+            Dungeons and Delvers/.* update-sheet-342 true
+            Dungeonslayers-4/.* update-sheet-343 true
+            DungeonSquad/.* update-sheet-344 true
+            Dungeons the Dragoning 40000 7th Edition/.* update-sheet-345 true
+            DungeonWorld/.* update-sheet-346 true
+            Dungeon World by Roll20/.* update-sheet-347 true
+            DungeonWorldChinese/.* update-sheet-348 true
+            DungeonWorldFrench/.* update-sheet-349 true
+            Dungeon World Português/.* update-sheet-350 true
+            DungeonWorldSpanish/.* update-sheet-351 true
+            DutyandHonourBeattoQuarters/.* update-sheet-352 true
+            Earthdawn-4E/.* update-sheet-353 true
+            Earthdawn (FASA Official)/.* update-sheet-354 true
+            Eclipse/.* update-sheet-355 true
+            Eclipse Phase/.* update-sheet-356 true
+            Eclipse Phase Alternate/.* update-sheet-357 true
+            Eclipse Phase FATE - Transhumanity's FATE/.* update-sheet-358 true
+            Eclipse Phase V2/.* update-sheet-359 true
+            Edge of the Verse/.* update-sheet-360 true
+            Eirendor/.* update-sheet-361 true
+            Electric Bastionland/.* update-sheet-362 true
+            Elemental/.* update-sheet-363 true
+            Elite Dangerous Role Playing Game/.* update-sheet-364 true
+            Ellipses/.* update-sheet-365 true
+            El Resurgir del Dragón/.* update-sheet-366 true
+            Elric/.* update-sheet-367 true
+            Emberwind/.* update-sheet-368 true
+            Empire_des_cerisiers/.* update-sheet-369 true
+            Empire-of-the_Petal_Throne/.* update-sheet-370 true
+            Emysfer/.* update-sheet-371 true
+            End All Be All RPG - Roleplaying without Limits/.* update-sheet-372 true
+            EnGarde/.* update-sheet-373 true
+            EngineHeart/.* update-sheet-374 true
+            Epyllion/.* update-sheet-375 true
+            EratheConsortium/.* update-sheet-376 true
+            Escape from Dino Island/.* update-sheet-377 true
+            Esoterroristas/.* update-sheet-378 true
+            Esper_Genesis_5E/.* update-sheet-379 true
+            EtherealWinds-playtest/.* update-sheet-380 true
+            etoiles/.* update-sheet-381 true
+            everyday_heroes/.* update-sheet-382 true
+            Everyone Is John/.* update-sheet-383 true
+            Exalted2e/.* update-sheet-384 true
+            Exalted 3/.* update-sheet-385 true
+            Excellents/.* update-sheet-386 true
+            Exo 2933/.* update-sheet-387 true
+            EZD6/.* update-sheet-388 true
+            Fabula Ultima/.* update-sheet-389 true
+            FACES (French)/.* update-sheet-390 true
+            Fading Suns 2nd Edition Revised/.* update-sheet-391 true
+            Fading Suns 4th Edition - Pax Alexius/.* update-sheet-392 true
+            Fairytail/.* update-sheet-393 true
+            FAITH/.* update-sheet-394 true
+            Fallout/.* update-sheet-395 true
+            Fallout 2d20/.* update-sheet-396 true
+            Fallout 3.5/.* update-sheet-397 true
+            Fallout (classic_pnp 2)/.* update-sheet-398 true
+            Fallout PnP 4.0/.* update-sheet-399 true
+            Fallout-Vaults-and-Deathclaws/.* update-sheet-400 true
+            Fantastic Heros & Witchery/.* update-sheet-401 true
+            Fantasy Age/.* update-sheet-402 true
+            Fantasy_Craft/.* update-sheet-403 true
+            Farsight RPG Community Edition/.* update-sheet-404 true
+            FarWest_LaLeyenda/.* update-sheet-405 true
+            FASATrek/.* update-sheet-406 true
+            Fate/.* update-sheet-407 true
+            Fate_Accelerated/.* update-sheet-408 true
+            Fate_Accelerated_Berlin_VIII_FR/.* update-sheet-409 true
+            Fate_Accelerated_ES/.* update-sheet-410 true
+            Fate_Accelerated_Kor/.* update-sheet-411 true
+            Fate_Accelerated_Kor_Overman_Alliance/.* update-sheet-412 true
+            Fate_Accelerated_No_Approaches/.* update-sheet-413 true
+            Fate Acelerado BR/.* update-sheet-414 true
+            Fate Básico BR/.* update-sheet-415 true
+            Fate_Core/.* update-sheet-416 true
+            Fate_Core_Chinese_Traditional/.* update-sheet-417 true
+            Fate Core v2/.* update-sheet-418 true
+            fate_core_with_rolls/.* update-sheet-419 true
+            Fate Core with rolls Deutsch/.* update-sheet-420 true
+            fate_core_with_rolls_VF/.* update-sheet-421 true
+            Fate_Freeport/.* update-sheet-422 true
+            Fate_Jadepunk/.* update-sheet-423 true
+            Fate Jadepunk BR/.* update-sheet-424 true
+            Fate Turbo with rolls Deutsch/.* update-sheet-425 true
+            Fear Itself/.* update-sheet-426 true
+            Fearsome Wilderness/.* update-sheet-427 true
+            Feast_of_Legends/.* update-sheet-428 true
+            Fellowship/.* update-sheet-429 true
+            Feng Shui/.* update-sheet-430 true
+            Feng-Shui-2/.* update-sheet-431 true
+            FF4e/.* update-sheet-432 true
+            FFD20/.* update-sheet-433 true
+            FFG_End-of-the-World/.* update-sheet-434 true
+            FFRPG Third Edition/.* update-sheet-435 true
+            FHTAGN/.* update-sheet-436 true
+            Fifth Season/.* update-sheet-437 true
+            FightingFantasy/.* update-sheet-438 true
+            Firefly/.* update-sheet-439 true
+            Five Torches Deep (FR version)/.* update-sheet-440 true
+            FLAGS_Custom/.* update-sheet-441 true
+            Flashing_Blades/.* update-sheet-442 true
+            Folknuckle/.* update-sheet-443 true
+            Forbidden_Lands/.* update-sheet-444 true
+            For Coin and blood/.* update-sheet-445 true
+            Forge/.* update-sheet-446 true
+            forgedInDungeon/.* update-sheet-447 true
+            FotN/.* update-sheet-448 true
+            Fragged-Empire/.* update-sheet-449 true
+            Fragmentos/.* update-sheet-450 true
+            FreeSpacer/.* update-sheet-451 true
+            Friponnes RPG/.* update-sheet-452 true
+            Frontier Scum/.* update-sheet-453 true
+            Fugue/.* update-sheet-454 true
+            Fuzion/.* update-sheet-455 true
+            GammaWorld1e/.* update-sheet-456 true
+            GammaWorld2e/.* update-sheet-457 true
+            GammaWorld3e/.* update-sheet-458 true
+            GammaWorld4e/.* update-sheet-459 true
+            GammaWorld7e/.* update-sheet-460 true
+            gaslands/.* update-sheet-461 true
+            Genefunk 2090/.* update-sheet-462 true
+            Generation/.* update-sheet-463 true
+            Genesys-RPG/.* update-sheet-464 true
+            Genesys-RPG-nonAPI/.* update-sheet-465 true
+            Genesys-RPG-ShadowOfTheBeanstalk/.* update-sheet-466 true
+            Ghostbusters/.* update-sheet-467 true
+            Ghostbusters Expanded Spanish/.* update-sheet-468 true
+            GhostLines/.* update-sheet-469 true
+            Ghost-Ops-RPG/.* update-sheet-470 true
+            Girl By Moonlight/.* update-sheet-471 true
+            Glaive/.* update-sheet-472 true
+            Glitter Hearts/.* update-sheet-473 true
+            goblin quest/.* update-sheet-474 true
+            Godbound/.* update-sheet-475 true
+            GoddessSaveTheQueen/.* update-sheet-476 true
+            Godlike/.* update-sheet-477 true
+            Godsend/.* update-sheet-478 true
+            GODSEND-Agenda/.* update-sheet-479 true
+            Golden Sky Stories/.* update-sheet-480 true
+            Grimoire of the Heart/.* update-sheet-481 true
+            Guildes QdO/.* update-sheet-482 true
+            Gumshoe by Roll20/.* update-sheet-483 true
+            Gumshoe_TrailOfCthulhu/.* update-sheet-484 true
+            GURPS/.* update-sheet-485 true
+            GURPS_Mutonized/.* update-sheet-486 true
+            HackMaster_4E/.* update-sheet-487 true
+            HackMaster_5E/.* update-sheet-488 true
+            Hack The Planet/.* update-sheet-489 true
+            Hakai Kousen/.* update-sheet-490 true
+            Halo_Mythic/.* update-sheet-491 true
+            Halo_Mythic_3dot5/.* update-sheet-492 true
+            Hardboiled/.* update-sheet-493 true
+            Hard Wired Island/.* update-sheet-494 true
+            harnmaster/.* update-sheet-495 true
+            HarnMaster3/.* update-sheet-496 true
+            Harn Master Gold/.* update-sheet-497 true
+            HARP/.* update-sheet-498 true
+            Harry Potter/.* update-sheet-499 true
+            Harry Potter JDR/.* update-sheet-500 true
+            Haunted-House_Spanish/.* update-sheet-501 true
+            Haunted-West-Character-Sheet/.* update-sheet-502 true
+            Hawkmoon/.* update-sheet-503 true
+            Hawkmoon_mongoose/.* update-sheet-504 true
+            Hc Svnt Dracones/.* update-sheet-505 true
+            Hc Svnt Dracones Second Edition/.* update-sheet-506 true
+            H&D/.* update-sheet-507 true
+            Heartbeats/.* update-sheet-508 true
+            Heart-the-City-Beneath/.* update-sheet-509 true
+            Heart-the-City-Beneath-mk2/.* update-sheet-510 true
+            Heavy Gear 4e/.* update-sheet-511 true
+            Hellywood/.* update-sheet-512 true
+            Hermanos-de-sangre/.* update-sheet-513 true
+            Heroclix/.* update-sheet-514 true
+            Heroes and Hardships/.* update-sheet-515 true
+            HeroesOfElectrum/.* update-sheet-516 true
+            Heroes-Unlimited-2E/.* update-sheet-517 true
+            Hero Games 6e/.* update-sheet-518 true
+            Hero Kids/.* update-sheet-519 true
+            HeroQuest/.* update-sheet-520 true
+            Heroquest_Glorantha/.* update-sheet-521 true
+            Hero System 5R/.* update-sheet-522 true
+            HeroSystem6e/.* update-sheet-523 true
+            HeroSystem6eHeroic/.* update-sheet-524 true
+            HeXXen1733/.* update-sheet-525 true
+            Hexxen-1733-Ulisses-Spiele(Official)/.* update-sheet-526 true
+            Hitos/.* update-sheet-527 true
+            HollowEarthExpedition/.* update-sheet-528 true
+            Honey Heist - Simple/.* update-sheet-529 true
+            Horror Movie World/.* update-sheet-530 true
+            Hyperborea/.* update-sheet-531 true
+            IAS-Freude-schoener-Goetterfunken/.* update-sheet-532 true
+            ICON RPG [MassifPress]/.* update-sheet-533 true
+            Icons Assembled/.* update-sheet-534 true
+            Icons French/.* update-sheet-535 true
+            ICRPG/.* update-sheet-536 true
+            ICRPG extended/.* update-sheet-537 true
+            ICRPG-MasterEdition/.* update-sheet-538 true
+            ICRPG (Warp Shell)/.* update-sheet-539 true
+            Imperator/.* update-sheet-540 true
+            Império De Jade/.* update-sheet-541 true
+            ImperiumMaledictum/.* update-sheet-542 true
+            Impulse_Drive/.* update-sheet-543 true
+            Imserso_ToTheLimit/.* update-sheet-544 true
+            Infected!/.* update-sheet-545 true
+            Infinity-2d20/.* update-sheet-546 true
+            In-Nomine-Char-Sheet/.* update-sheet-547 true
+            inSANe auto cal/.* update-sheet-548 true
+            Insectopia/.* update-sheet-549 true
+            INS-MV_3E/.* update-sheet-550 true
+            INS-MV_4E/.* update-sheet-551 true
+            INS-MV_5E/.* update-sheet-552 true
+            INS-MV_apero/.* update-sheet-553 true
+            Inspectress-Inc/.* update-sheet-554 true
+            Into The Dark/.* update-sheet-555 true
+            Into the Odd/.* update-sheet-556 true
+            Invisible Sun/.* update-sheet-557 true
+            In Which We Live And Breathe/.* update-sheet-558 true
+            Ironclaw/.* update-sheet-559 true
+            Ironcrunch/.* update-sheet-560 true
+            Ironhedge/.* update-sheet-561 true
+            Iron Kingdoms RPG/.* update-sheet-562 true
+            Ironsworn/.* update-sheet-563 true
+            Ironsworn-Starforged/.* update-sheet-564 true
+            ItrasBy/.* update-sheet-565 true
+            Jackals/.* update-sheet-566 true
+            John Carter of Mars/.* update-sheet-567 true
+            Jojo's Bizarre Tabletop/.* update-sheet-568 true
+            Kagegami High/.* update-sheet-569 true
+            Kalymba/.* update-sheet-570 true
+            Kamigakari/.* update-sheet-571 true
+            Karyu Densetsu/.* update-sheet-572 true
+            keluranFabula/.* update-sheet-573 true
+            Kemi/.* update-sheet-574 true
+            Kids-on-Bikes/.* update-sheet-575 true
+            Kids on Bikes Official/.* update-sheet-576 true
+            Kids on Brooms Official/.* update-sheet-577 true
+            kitchensink/.* update-sheet-578 true
+            kizunabullet/.* update-sheet-579 true
+            Knave/.* update-sheet-580 true
+            Knight/.* update-sheet-581 true
+            Kobolds Ate My Baby/.* update-sheet-582 true
+            Kromore/.* update-sheet-583 true
+            Krystal (FR)/.* update-sheet-584 true
+            Kult/.* update-sheet-585 true
+            Kult Divinity Lost/.* update-sheet-586 true
+            Kuro/.* update-sheet-587 true
+            L5R/.* update-sheet-588 true
+            L5R 5th Edition Unofficial/.* update-sheet-589 true
+            L5R Advanced/.* update-sheet-590 true
+            L5R Fantasy Flight Games/.* update-sheet-591 true
+            Labyrinth-Lord/.* update-sheet-592 true
+            Lady Blackbird/.* update-sheet-593 true
+            Lames du Cardinal/.* update-sheet-594 true
+            LANCER RPG/.* update-sheet-595 true
+            LANCER RPG (1.8)/.* update-sheet-596 true
+            LaPuertaDeIshtar/.* update-sheet-597 true
+            Lasers and Feelings/.* update-sheet-598 true
+            LeaguesOfAdventures-fr/.* update-sheet-599 true
+            Legacy - Life Among the Ruins/.* update-sheet-600 true
+            Legend-of-the-Elements/.* update-sheet-601 true
+            Les Chants de Loss/.* update-sheet-602 true
+            Les-Oublies/.* update-sheet-603 true
+            Les Royaumes de Midgard/.* update-sheet-604 true
+            Level Up - Advanced 5th Edition/.* update-sheet-605 true
+            Leverage/.* update-sheet-606 true
+            Lex Arcana/.* update-sheet-607 true
+            Librete/.* update-sheet-608 true
+            Liminal/.* update-sheet-609 true
+            Liminal Horror/.* update-sheet-610 true
+            Lion & Dragon/.* update-sheet-611 true
+            Little-Fears-Nightmare-Edition/.* update-sheet-612 true
+            LME_sheet/.* update-sheet-613 true
+            LND/.* update-sheet-614 true
+            Locus/.* update-sheet-615 true
+            Log Horizon TRPG/.* update-sheet-616 true
+            Lords-Of-Gossamer-And-Shadow/.* update-sheet-617 true
+            Lot5/.* update-sheet-618 true
+            Lotfp/.* update-sheet-619 true
+            Low Fantasy Gaming/.* update-sheet-620 true
+            Lowlife 2090/.* update-sheet-621 true
+            Ludosystem/.* update-sheet-622 true
+            Lyceennes/.* update-sheet-623 true
+            Macchiato Monsters/.* update-sheet-624 true
+            Magical_Fury/.* update-sheet-625 true
+            Magical-Kitties/.* update-sheet-626 true
+            Magical Land of Yeld/.* update-sheet-627 true
+            Magica_Logia/.* update-sheet-628 true
+            Magic_World/.* update-sheet-629 true
+            MAGUS_ETK/.* update-sheet-630 true
+            MAGUS_UTK/.* update-sheet-631 true
+            Maid/.* update-sheet-632 true
+            Maid RPG/.* update-sheet-633 true
+            Malefices/.* update-sheet-634 true
+            Malefices 4e ed/.* update-sheet-635 true
+            Malmsturm/.* update-sheet-636 true
+            Mantel dAcier/.* update-sheet-637 true
+            MAP/.* update-sheet-638 true
+            Marvel Heroic Roleplaying/.* update-sheet-639 true
+            Marvel_Saga/.* update-sheet-640 true
+            MarvelSH/.* update-sheet-641 true
+            MascarasDelImperio/.* update-sheet-642 true
+            Masks - A New Generation/.* update-sheet-643 true
+            Mass Effect/.* update-sheet-644 true
+            MassEffect_5e/.* update-sheet-645 true
+            MatronsOfMystery/.* update-sheet-646 true
+            Maximum Apocalypse/.* update-sheet-647 true
+            Mazes/.* update-sheet-648 true
+            Mazes FRP/.* update-sheet-649 true
+            MCC_Tabbed_Sheet/.* update-sheet-650 true
+            MechaAndMonsters/.* update-sheet-651 true
+            MechWarrior Destiny/.* update-sheet-652 true
+            MEGALOS/.* update-sheet-653 true
+            Mekton Z/.* update-sheet-654 true
+            MERP/.* update-sheet-655 true
+            Metal Adventures/.* update-sheet-656 true
+            Metallic Guardian/.* update-sheet-657 true
+            MetamorphosisAlpha_1e/.* update-sheet-658 true
+            Meute/.* update-sheet-659 true
+            Michtim Fluffy Adventures/.* update-sheet-660 true
+            Microlite20/.* update-sheet-661 true
+            microluxe20/.* update-sheet-662 true
+            Midgard German RPG/.* update-sheet-663 true
+            Midnight-FFG/.* update-sheet-664 true
+            Mindjammer/.* update-sheet-665 true
+            Miseries & Misfortunes/.* update-sheet-666 true
+            Mistborn/.* update-sheet-667 true
+            MonarchiesOfMau/.* update-sheet-668 true
+            Mongoose_Traveller/.* update-sheet-669 true
+            Mongoose_Traveller2e/.* update-sheet-670 true
+            Monsterhearts-2/.* update-sheet-671 true
+            Monsterhearts-Simple/.* update-sheet-672 true
+            Monster of the Week/.* update-sheet-673 true
+            Monster of the Week Official/.* update-sheet-674 true
+            Monsters and Other Childish Things/.* update-sheet-675 true
+            Moon Punk/.* update-sheet-676 true
+            Mordiou/.* update-sheet-677 true
+            Mork Borg/.* update-sheet-678 true
+            MorrowProject4e/.* update-sheet-679 true
+            Mortally Bankrupt/.* update-sheet-680 true
+            Mothership/.* update-sheet-681 true
+            Mothership Official/.* update-sheet-682 true
+            MouseGuard/.* update-sheet-683 true
+            MouseGuard2E/.* update-sheet-684 true
+            M-Space/.* update-sheet-685 true
+            Multiverse/.* update-sheet-686 true
+            Mutacao/.* update-sheet-687 true
+            Mutant(1984)/.* update-sheet-688 true
+            mutant_cronicles_3/.* update-sheet-689 true
+            mutants-and-masterminds-2e-master/.* update-sheet-690 true
+            Mutants and Masterminds 3E/.* update-sheet-691 true
+            Mutants and Masterminds 3E Official/.* update-sheet-692 true
+            Mutant Year Zero/.* update-sheet-693 true
+            Mutant-year-zero/.* update-sheet-694 true
+            Mutant Year Zero Alternative/.* update-sheet-695 true
+            Myriad Song/.* update-sheet-696 true
+            Mystery-of-the-Abbey/.* update-sheet-697 true
+            MythicD6/.* update-sheet-698 true
+            Mythras/.* update-sheet-699 true
+            Naheulbeuk/.* update-sheet-700 true
+            Nahual/.* update-sheet-701 true
+            Nahui Ollin/.* update-sheet-702 true
+            Nanochrome/.* update-sheet-703 true
+            NarrativesUnlimitedD10/.* update-sheet-704 true
+            Naruto d20 Modern/.* update-sheet-705 true
+            Nautilus/.* update-sheet-706 true
+            nechronica/.* update-sheet-707 true
+            Nemesis/.* update-sheet-708 true
+            Neon City Overdrive/.* update-sheet-709 true
+            NeonSolitude/.* update-sheet-710 true
+            Nephilim-Legende/.* update-sheet-711 true
+            Nephilim-Legende-Selenim/.* update-sheet-712 true
+            nephilimV5-vf/.* update-sheet-713 true
+            Neuroshima/.* update-sheet-714 true
+            Never Going Home/.* update-sheet-715 true
+            NHKS/.* update-sheet-716 true
+            Night Black Agents gumshoe/.* update-sheet-717 true
+            NightLife/.* update-sheet-718 true
+            Nightshade Academy/.* update-sheet-719 true
+            Night Witches/.* update-sheet-720 true
+            NOC/.* update-sheet-721 true
+            NoReturn/.* update-sheet-722 true
+            NoReturn_2E/.* update-sheet-723 true
+            No Stone Unturned/.* update-sheet-724 true
+            notequest/.* update-sheet-725 true
+            No Thank You Evil/.* update-sheet-726 true
+            Nuestro-ultimo-verano/.* update-sheet-727 true
+            Numenera/.* update-sheet-728 true
+            Numenera_NathasNumenera_English/.* update-sheet-729 true
+            Numenera_NathasNumenera_French/.* update-sheet-730 true
+            NWOD-Changeling/.* update-sheet-731 true
+            NWOD-Demon/.* update-sheet-732 true
+            NWOD-Hunter The Vigil/.* update-sheet-733 true
+            NWOD-Mage/.* update-sheet-734 true
+            NWOD-Mage2e/.* update-sheet-735 true
+            NWOD-Werewolf/.* update-sheet-736 true
+            Odyssey Aquatica/.* update-sheet-737 true
+            Official_100DOS_Mythic_by_100DOS/.* update-sheet-738 true
+            Official Savage Worlds/.* update-sheet-739 true
+            Offworlders/.* update-sheet-740 true
+            OHET/.* update-sheet-741 true
+            OldDragon/.* update-sheet-742 true
+            Old Dragon - Aprimorado/.* update-sheet-743 true
+            Old School Essentials/.* update-sheet-744 true
+            Old School Essentials - AAC/.* update-sheet-745 true
+            O Legado/.* update-sheet-746 true
+            Oltree-FR/.* update-sheet-747 true
+            Omegaverse_Trpg/.* update-sheet-748 true
+            Omerta/.* update-sheet-749 true
+            OneDice/.* update-sheet-750 true
+            OnePiece_d20/.* update-sheet-751 true
+            Only War/.* update-sheet-752 true
+            Only-War-Enhanced/.* update-sheet-753 true
+            on-mighty-thews/.* update-sheet-754 true
+            Open Legend/.* update-sheet-755 true
+            OpenLegend_Minimalist/.* update-sheet-756 true
+            OperaRPG/.* update-sheet-757 true
+            orbital-blues/.* update-sheet-758 true
+            Ordem Paranormal/.* update-sheet-759 true
+            Ordem Paranormal - Oficial Jambo Editora/.* update-sheet-760 true
+            Oreste/.* update-sheet-761 true
+            Other_Dust/.* update-sheet-762 true
+            Our Last Best Hope/.* update-sheet-763 true
+            Outbreak/.* update-sheet-764 true
+            Out Of The Ashes/.* update-sheet-765 true
+            OVA/.* update-sheet-766 true
+            OverArms/.* update-sheet-767 true
+            Over the Edge 2e/.* update-sheet-768 true
+            P10/.* update-sheet-769 true
+            Paladin/.* update-sheet-770 true
+            Palladium Fantasy 1E/.* update-sheet-771 true
+            Palladium Fantasy 2E Sheet/.* update-sheet-772 true
+            Palladium Megaverse/.* update-sheet-773 true
+            Palladium-Rifts/.* update-sheet-774 true
+            Palladium Rifts by Grinning Gecko/.* update-sheet-775 true
+            Paradigm's RWBY TTRPG V1.0/.* update-sheet-776 true
+            Paranoia/.* update-sheet-777 true
+            PARANOIA 25th Anniversary Edition/.* update-sheet-778 true
+            Paranoia_Mongoose/.* update-sheet-779 true
+            Paranoia_Mongoose_oneclick/.* update-sheet-780 true
+            Pasts_Personas_Prophecies/.* update-sheet-781 true
+            Pathfinder 2 Playtest by Roll20/.* update-sheet-782 true
+            Pathfinder by Roll20/.* update-sheet-783 true
+            Pathfinder_Cazra/.* update-sheet-784 true
+            Pathfinder Community/.* update-sheet-785 true
+            Pathfinder-DE/.* update-sheet-786 true
+            Pathfinder-FR/.* update-sheet-787 true
+            Pathfinder (Old)/.* update-sheet-788 true
+            Pathfinder Second Edition by Roll20/.* update-sheet-789 true
+            pathfinder_simple/.* update-sheet-790 true
+            Pathfinder (Spanish)/.* update-sheet-791 true
+            Path of Paper/.* update-sheet-792 true
+            Patient 13/.* update-sheet-793 true
+            Pavillon Noir 2/.* update-sheet-794 true
+            Pendragon/.* update-sheet-795 true
+            Pendragon5thEdition/.* update-sheet-796 true
+            Pendragon6thEdition/.* update-sheet-797 true
+            Pendragon-french/.* update-sheet-798 true
+            P.I.R.A.T.E.S/.* update-sheet-799 true
+            Planet_Mercenary/.* update-sheet-800 true
+            Plusch_Power_Plunder/.* update-sheet-801 true
+            PokemonTabletopAdventures/.* update-sheet-802 true
+            PokemonTabletopAdventures - Sun & Moon/.* update-sheet-803 true
+            PokemonTabletopAdventures_v3/.* update-sheet-804 true
+            PokemonTabletopUnited/.* update-sheet-805 true
+            PokemonTabletopUnited_v2/.* update-sheet-806 true
+            Pokerole/.* update-sheet-807 true
+            Pokerole 1e/.* update-sheet-808 true
+            Pokerole_v2/.* update-sheet-809 true
+            Pokeymanz/.* update-sheet-810 true
+            Polaris/.* update-sheet-811 true
+            PonytalesSheet/.* update-sheet-812 true
+            PortesMonstresTresors/.* update-sheet-813 true
+            Primal Quest/.* update-sheet-814 true
+            ProjectMoonTRPG/.* update-sheet-815 true
+            Prophecy 2/.* update-sheet-816 true
+            Prose Descriptive Qualities (hbCyber)/.* update-sheet-817 true
+            Prowlers-n-Paragons/.* update-sheet-818 true
+            Psi-Punk/.* update-sheet-819 true
+            psirun/.* update-sheet-820 true
+            Public Access/.* update-sheet-821 true
+            Pugmire/.* update-sheet-822 true
+            push/.* update-sheet-823 true
+            Qin Warring States/.* update-sheet-824 true
+            Quantum Black/.* update-sheet-825 true
+            QUARTS/.* update-sheet-826 true
+            Quest-boardgame/.* update-sheet-827 true
+            Quest-rpg/.* update-sheet-828 true
+            Radiance/.* update-sheet-829 true
+            Ragnarok 3e/.* update-sheet-830 true
+            Rangers of Shadow Deep/.* update-sheet-831 true
+            rapidfire_system/.* update-sheet-832 true
+            Raspberry Heaven/.* update-sheet-833 true
+            RatasEnLasParedes/.* update-sheet-834 true
+            Rats in the Walls/.* update-sheet-835 true
+            Ratten/.* update-sheet-836 true
+            ReachofTitan/.* update-sheet-837 true
+            Reboot The Future/.* update-sheet-838 true
+            Red Giant/.* update-sheet-839 true
+            Red Markets/.* update-sheet-840 true
+            Redsky/.* update-sheet-841 true
+            Reign1E/.* update-sheet-842 true
+            Relics by Tin Star Games/.* update-sheet-843 true
+            Remnants/.* update-sheet-844 true
+            Reve de Dragon - 2021 - (FR)/.* update-sheet-845 true
+            Reve de Dragon - french/.* update-sheet-846 true
+            revolutiond100/.* update-sheet-847 true
+            Rhapsody of Blood/.* update-sheet-848 true
+            Risus Space Opera/.* update-sheet-849 true
+            Robotech The Macross Saga (SMG)/.* update-sheet-850 true
+            Robotta/.* update-sheet-851 true
+            Rogue_Trader/.* update-sheet-852 true
+            Rogue_Trader_fr/.* update-sheet-853 true
+            Rogue Trader Improved/.* update-sheet-854 true
+            Rolemaster_1E/.* update-sheet-855 true
+            Rolemaster_2E/.* update-sheet-856 true
+            Rolemaster 2nd-classic/.* update-sheet-857 true
+            Rolemaster-Standard-System/.* update-sheet-858 true
+            RolemasterUnified/.* update-sheet-859 true
+            RoleplayingIsMagic_4E/.* update-sheet-860 true
+            Romance of the Perilous Land/.* update-sheet-861 true
+            root/.* update-sheet-862 true
+            Rotted Capes/.* update-sheet-863 true
+            Runecairn/.* update-sheet-864 true
+            Runequest3/.* update-sheet-865 true
+            Runequest_6/.* update-sheet-866 true
+            Runequest_6_ES/.* update-sheet-867 true
+            Runequest_6_FR/.* update-sheet-868 true
+            RunequestGQS/.* update-sheet-869 true
+            Runeterra-by-guthmensch/.* update-sheet-870 true
+            RWBY_RoC-Unofficial_Tabletop_RPG/.* update-sheet-871 true
+            RyF (Rapido y Facil)/.* update-sheet-872 true
+            Ryuutama/.* update-sheet-873 true
+            SagaBorn/.* update-sheet-874 true
+            Sagas_Of_The_Icelanders/.* update-sheet-875 true
+            SalvageUnion/.* update-sheet-876 true
+            SavageWorlds/.* update-sheet-877 true
+            SavageWorlds - Fallout fan conversion/.* update-sheet-878 true
+            SavageWorldsFrench/.* update-sheet-879 true
+            Savage Worlds - Graph Paper/.* update-sheet-880 true
+            SavageWorlds-Tabbed/.* update-sheet-881 true
+            Scarlet Heros/.* update-sheet-882 true
+            Scion/.* update-sheet-883 true
+            Scion2e/.* update-sheet-884 true
+            SCP The Tabletop Roleplaying Game/.* update-sheet-885 true
+            Scum - Villainy/.* update-sheet-886 true
+            SCUP/.* update-sheet-887 true
+            See You In Hell/.* update-sheet-888 true
+            Seigneurs Des Arcanes/.* update-sheet-889 true
+            Sengoku/.* update-sheet-890 true
+            Sentinel Comics Roleplaying Game/.* update-sheet-891 true
+            Sentinel Comics RPG/.* update-sheet-892 true
+            Serenity/.* update-sheet-893 true
+            Seven Deadly Sins/.* update-sheet-894 true
+            Shaan/.* update-sheet-895 true
+            Shaan (tabbed)/.* update-sheet-896 true
+            ShadowbaneInquisition/.* update-sheet-897 true
+            Shadow of the Demon Lord/.* update-sheet-898 true
+            Shadowrun2e/.* update-sheet-899 true
+            Shadowrun3e/.* update-sheet-900 true
+            Shadowrun4thEdition/.* update-sheet-901 true
+            Shadowrun5D-german/.* update-sheet-902 true
+            Shadowrun5e/.* update-sheet-903 true
+            Shadowrun5e-Gerdofal/.* update-sheet-904 true
+            Shadowrun5th/.* update-sheet-905 true
+            Shadowrun5thEdition/.* update-sheet-906 true
+            Shadowrun6th-German/.* update-sheet-907 true
+            Shadowrun-Anarchy/.* update-sheet-908 true
+            ShadowrunAnarchy/.* update-sheet-909 true
+            Shadowrun Sixth World/.* update-sheet-910 true
+            Shadows of Esteren/.* update-sheet-911 true
+            Shadows Over Sol/.* update-sheet-912 true
+            SharpSwordsAndSinisterSpells/.* update-sheet-913 true
+            Shinobi_Gami_Chinese_Traditional/.* update-sheet-914 true
+            SIG/.* update-sheet-915 true
+            Sig City of Blades/.* update-sheet-916 true
+            Sigil-Shadow/.* update-sheet-917 true
+            Silent Legions/.* update-sheet-918 true
+            Silhouette_Core/.* update-sheet-919 true
+            Simple System/.* update-sheet-920 true
+            Simulacres v8 base/.* update-sheet-921 true
+            Singularity/.* update-sheet-922 true
+            Skeleton 1st Edition/.* update-sheet-923 true
+            SkyfallRPG/.* update-sheet-924 true
+            Skyfarer_Roll20/.* update-sheet-925 true
+            SLA Industries 2ed/.* update-sheet-926 true
+            Slowianie/.* update-sheet-927 true
+            Snice/.* update-sheet-928 true
+            Solar Echoes/.* update-sheet-929 true
+            Solipstry/.* update-sheet-930 true
+            Song of Ice and Fire Roleplaying/.* update-sheet-931 true
+            Song_of_Swords/.* update-sheet-932 true
+            Songs for the Dusk/.* update-sheet-933 true
+            Sorcerer/.* update-sheet-934 true
+            So there's a plague on/.* update-sheet-935 true
+            SotS/.* update-sheet-936 true
+            Space1889/.* update-sheet-937 true
+            spacedragon/.* update-sheet-938 true
+            SpaceNinjaCyberCrisis/.* update-sheet-939 true
+            Spell_the_RPG/.* update-sheet-940 true
+            Spire/.* update-sheet-941 true
+            Spire - The City Must Fall/.* update-sheet-942 true
+            Spirit_of_77/.* update-sheet-943 true
+            Splittermond/.* update-sheet-944 true
+            Sports Brawl by Lost West Media/.* update-sheet-945 true
+            Spycraft_2.0/.* update-sheet-946 true
+            Spylite/.* update-sheet-947 true
+            Stalker/.* update-sheet-948 true
+            Stalker - The SciFi Roleplaying Game/.* update-sheet-949 true
+            Starcraft RPG/.* update-sheet-950 true
+            Starfinder by Roll20/.* update-sheet-951 true
+            Starfinder HUD/.* update-sheet-952 true
+            Starfinder (simple)/.* update-sheet-953 true
+            Star Frontiers/.* update-sheet-954 true
+            Star Frontiers 2/.* update-sheet-955 true
+            Stargate Coalition/.* update-sheet-956 true
+            Stargate-RPG/.* update-sheet-957 true
+            StargateSG-1/.* update-sheet-958 true
+            Star Marx/.* update-sheet-959 true
+            Stars/.* update-sheet-960 true
+            Stars_Without_Number/.* update-sheet-961 true
+            Stars_Without_Number_Revised/.* update-sheet-962 true
+            Star Trek Adventures 2d20/.* update-sheet-963 true
+            Star Trek Adventures by Roll20/.* update-sheet-964 true
+            Star Trek Last Unicorn/.* update-sheet-965 true
+            Star Wars 30th Anniversary Edition/.* update-sheet-966 true
+            StarWars5E/.* update-sheet-967 true
+            Star Wars Edge of the Empire/.* update-sheet-968 true
+            StarWarsEdgeOfTheEmpire_Dice/.* update-sheet-969 true
+            Star Wars EotEmpire_Dice - FR/.* update-sheet-970 true
+            Star Wars FFG Alternate/.* update-sheet-971 true
+            Star Wars FFG API-Compatible/.* update-sheet-972 true
+            Star Wars Revised RPG/.* update-sheet-973 true
+            Star Wars Saga Edition/.* update-sheet-974 true
+            stickstation13/.* update-sheet-975 true
+            Stories Untold/.* update-sheet-976 true
+            Stormbringer/.* update-sheet-977 true
+            Storm-Furies/.* update-sheet-978 true
+            Storypath/.* update-sheet-979 true
+            StraightToVHS/.* update-sheet-980 true
+            Strain/.* update-sheet-981 true
+            Strato Shout/.* update-sheet-982 true
+            Street_Fighter-neovatar/.* update-sheet-983 true
+            Streets_of_Marienburg/.* update-sheet-984 true
+            Strike!/.* update-sheet-985 true
+            Supersix/.* update-sheet-986 true
+            Supers-Revised-Edition/.* update-sheet-987 true
+            SvardOchSvartkonst/.* update-sheet-988 true
+            Svavelvinter/.* update-sheet-989 true
+            Swordpoint/.* update-sheet-990 true
+            swords-and-wizardry/.* update-sheet-991 true
+            Sword & Scoundrel/.* update-sheet-992 true
+            Swords_&_Wizardry Spanish/.* update-sheet-993 true
+            Sword World/.* update-sheet-994 true
+            Symbaroum/.* update-sheet-995 true
+            Synthicide/.* update-sheet-996 true
+            T2K 4e/.* update-sheet-997 true
+            Tagmar/.* update-sheet-998 true
+            TailsOfEquestria/.* update-sheet-999 true
+            Tales from the Loop/.* update-sheet-1000 true
+            Tales from the Loop Official/.* update-sheet-1001 true
+            Talessya/.* update-sheet-1002 true
+            TalismanRPG/.* update-sheet-1003 true
+            Taura/.* update-sheet-1004 true
+            Tavern-Tales/.* update-sheet-1005 true
+            TeamSherlock/.* update-sheet-1006 true
+            Technoir/.* update-sheet-1007 true
+            Teens in Space Official/.* update-sheet-1008 true
+            Tenra Bansho Zero/.* update-sheet-1009 true
+            TenraBanshoZero-Spanish/.* update-sheet-1010 true
+            Tephra/.* update-sheet-1011 true
+            Terminator RPG/.* update-sheet-1012 true
+            TerraDevastada/.* update-sheet-1013 true
+            Terra-X/.* update-sheet-1014 true
+            Terre 2/.* update-sheet-1015 true
+            Terror Infinity/.* update-sheet-1016 true
+            Terror Infinity - (FX)/.* update-sheet-1017 true
+            Tesoro-y-Gloria-1E/.* update-sheet-1018 true
+            Tesoro-y-Gloria-2E/.* update-sheet-1019 true
+            Tetra/.* update-sheet-1020 true
+            The ADVANCED Pandemonium/.* update-sheet-1021 true
+            The Between/.* update-sheet-1022 true
+            The Black Company/.* update-sheet-1023 true
+            The Bureau/.* update-sheet-1024 true
+            The Cthulhu Hack/.* update-sheet-1025 true
+            The_Dee_Sanction/.* update-sheet-1026 true
+            TheElephantAndMacawBanner/.* update-sheet-1027 true
+            The Expanse RPG (AGE System)/.* update-sheet-1028 true
+            The-Fade-Tabletop/.* update-sheet-1029 true
+            The Fade Tabletop 2e Sheet/.* update-sheet-1030 true
+            The Fantasy Trip/.* update-sheet-1031 true
+            The God Machine Chronicle (nWoD)/.* update-sheet-1032 true
+            The Laundry/.* update-sheet-1033 true
+            The Legend of Zelda Reclaim the Wild/.* update-sheet-1034 true
+            The Mutant Epoch/.* update-sheet-1035 true
+            The One Ring/.* update-sheet-1036 true
+            The One Ring 2e/.* update-sheet-1037 true
+            The One Ring Second Edition (Basic)/.* update-sheet-1038 true
+            The Sprawl/.* update-sheet-1039 true
+            The_Sprawl/.* update-sheet-1040 true
+            The Sprawl (Darkening Alley, Touched Prime)/.* update-sheet-1041 true
+            The Strange/.* update-sheet-1042 true
+            TheStrangeMultiRecursion/.* update-sheet-1043 true
+            The Troubleshooters/.* update-sheet-1044 true
+            The Veil/.* update-sheet-1045 true
+            The Villainy/.* update-sheet-1046 true
+            the-void/.* update-sheet-1047 true
+            TheWell/.* update-sheet-1048 true
+            The Witcher/.* update-sheet-1049 true
+            TheWitcher/.* update-sheet-1050 true
+            they_came_from/.* update-sheet-1051 true
+            TheyCameFromBeneathTheSea/.* update-sheet-1052 true
+            TheyCameFromBeyondTheGrave/.* update-sheet-1053 true
+            they-stirred/.* update-sheet-1054 true
+            Thirsty Sword Lesbians/.* update-sheet-1055 true
+            This_Is_Not_A_Test/.* update-sheet-1056 true
+            thordezilhas/.* update-sheet-1057 true
+            Thorg/.* update-sheet-1058 true
+            Through The Breach/.* update-sheet-1059 true
+            Tierras Quebradas/.* update-sheet-1060 true
+            tigres_volants/.* update-sheet-1061 true
+            TIH/.* update-sheet-1062 true
+            TimeWatch/.* update-sheet-1063 true
+            Tiny/.* update-sheet-1064 true
+            Tiny D6 Games/.* update-sheet-1065 true
+            Tiny Supers (hbCyber)/.* update-sheet-1066 true
+            Titansgrave/.* update-sheet-1067 true
+            Titan_World-Unofficial_Attack_on_Titan_RPG/.* update-sheet-1068 true
+            To Change/.* update-sheet-1069 true
+            TOMOE genesis (ex redpoint genesis)/.* update-sheet-1070 true
+            Toon/.* update-sheet-1071 true
+            Top Secret/.* update-sheet-1072 true
+            Torchbearer/.* update-sheet-1073 true
+            Torchbearer 2E/.* update-sheet-1074 true
+            Torg/.* update-sheet-1075 true
+            Torg Eternity/.* update-sheet-1076 true
+            Tormenta20/.* update-sheet-1077 true
+            Tormenta20 - Jogo do Ano/.* update-sheet-1078 true
+            TormentaRPG/.* update-sheet-1079 true
+            TormentaRPG-PDF_Based/.* update-sheet-1080 true
+            TormentaRPG_Tabbed/.* update-sheet-1081 true
+            Totality_of_Ygg/.* update-sheet-1082 true
+            Trail of Cthulhu/.* update-sheet-1083 true
+            Trail of Cthulhu_french/.* update-sheet-1084 true
+            Trail of Cthulhu (spanish)/.* update-sheet-1085 true
+            Transdimensional Adventures/.* update-sheet-1086 true
+            Tremulus/.* update-sheet-1087 true
+            Tribes in the Dark/.* update-sheet-1088 true
+            Trinites/.* update-sheet-1089 true
+            Trinity_Continuum_2ed/.* update-sheet-1090 true
+            Tri-Stat/.* update-sheet-1091 true
+            Triumphant/.* update-sheet-1092 true
+            Troika/.* update-sheet-1093 true
+            Trollbabe/.* update-sheet-1094 true
+            Trophy Gold/.* update-sheet-1095 true
+            Trudvang Chronicles/.* update-sheet-1096 true
+            True20/.* update-sheet-1097 true
+            Twilight-2000-v2.2/.* update-sheet-1098 true
+            Tylestel/.* update-sheet-1099 true
+            UltimaBomba/.* update-sheet-1100 true
+            Ultima Bomba - Pagina Singola/.* update-sheet-1101 true
+            UltimaTorcia/.* update-sheet-1102 true
+            Ultima Torcia - Pagina Singola/.* update-sheet-1103 true
+            Uncharted Worlds/.* update-sheet-1104 true
+            under_the_neighborhood/.* update-sheet-1105 true
+            Undying/.* update-sheet-1106 true
+            Unisystem-All Flesh Must Be Eaten/.* update-sheet-1107 true
+            Unisystem-Buffy or Angel/.* update-sheet-1108 true
+            UnknownArmies/.* update-sheet-1109 true
+            Unknown Armies 3e/.* update-sheet-1110 true
+            UnknownPonies/.* update-sheet-1111 true
+            Unofficial Elder Scrolls RPG/.* update-sheet-1112 true
+            UnofficialElderScrollsRPG/.* update-sheet-1113 true
+            unwritten/.* update-sheet-1114 true
+            urbanheroes/.* update-sheet-1115 true
+            Urban-Jungle/.* update-sheet-1116 true
+            Urban_Shadows/.* update-sheet-1117 true
+            Usagi-Yojimbo-RPG/.* update-sheet-1118 true
+            UVG/.* update-sheet-1119 true
+            VadeMecum/.* update-sheet-1120 true
+            Vaesen/.* update-sheet-1121 true
+            Vaesen-dodgepong/.* update-sheet-1122 true
+            Valor/.* update-sheet-1123 true
+            Vampire the Requiem/.* update-sheet-1124 true
+            vampire-v5/.* update-sheet-1125 true
+            Vast Grimm/.* update-sheet-1126 true
+            Vermine 2047/.* update-sheet-1127 true
+            Victoriana 2ed/.* update-sheet-1128 true
+            Vieja-escuela/.* update-sheet-1129 true
+            Vieja-Estrella/.* update-sheet-1130 true
+            Villains and Vigilantes/.* update-sheet-1131 true
+            Vulcania/.* update-sheet-1132 true
+            Warhammer40k-WrathandGlory/.* update-sheet-1133 true
+            Warhammer 4e Character Sheet/.* update-sheet-1134 true
+            Warhammer-Fantasy-Roleplay-2nd-Edition/.* update-sheet-1135 true
+            Warhammer Fantasy Roleplay 4e Official/.* update-sheet-1136 true
+            Warhammer_v2_french/.* update-sheet-1137 true
+            WarlockOSR/.* update-sheet-1138 true
+            Warlock Polish Edition/.* update-sheet-1139 true
+            Warpland/.* update-sheet-1140 true
+            Weaverdice/.* update-sheet-1141 true
+            WeirdFrontiers/.* update-sheet-1142 true
+            WerewolftheForsaken1e/.* update-sheet-1143 true
+            WerewolfTheForsaken2e/.* update-sheet-1144 true
+            WFRP2E-Havoc/.* update-sheet-1145 true
+            WFRP-2nd-Ed/.* update-sheet-1146 true
+            wfrp3e/.* update-sheet-1147 true
+            wfrp3e-French/.* update-sheet-1148 true
+            WFRP4CharSheet/.* update-sheet-1149 true
+            whitehack/.* update-sheet-1150 true
+            WhiteLies/.* update-sheet-1151 true
+            White Star/.* update-sheet-1152 true
+            Who Is The BADDEST/.* update-sheet-1153 true
+            Wicked Ones/.* update-sheet-1154 true
+            Wildsea/.* update-sheet-1155 true
+            Wild Talents 2nd Edition/.* update-sheet-1156 true
+            Windrose/.* update-sheet-1157 true
+            Witch_Hunter_2e/.* update-sheet-1158 true
+            WIthin/.* update-sheet-1159 true
+            WODVtM5eAlpha/.* update-sheet-1160 true
+            WOIN/.* update-sheet-1161 true
+            World-of-Dungeons/.* update-sheet-1162 true
+            World of Fantasy/.* update-sheet-1163 true
+            WorldOfLies/.* update-sheet-1164 true
+            World-of-the-Storytellers-WoS/.* update-sheet-1165 true
+            Worlds in Peril/.* update-sheet-1166 true
+            World Wide Wrestling 2nd Ed/.* update-sheet-1167 true
+            Wrath and Glory API/.* update-sheet-1168 true
+            Wurm/.* update-sheet-1169 true
+            WWN/.* update-sheet-1170 true
+            Wyrd/.* update-sheet-1171 true
+            xenoscape/.* update-sheet-1172 true
+            Xeohelios' Fire Emblem Tabletop/.* update-sheet-1173 true
+            Yatzoid/.* update-sheet-1174 true
+            YellowKing/.* update-sheet-1175 true
+            YnnPryddein/.* update-sheet-1176 true
+            Yogsquest/.* update-sheet-1177 true
+            Ysystem/.* update-sheet-1178 true
+            Zafir/.* update-sheet-1179 true
+            Zelda BOTW/.* update-sheet-1180 true
+            Zoo Mafia/.* update-sheet-1181 true
+            Zweihänder Grim & Perilous/.* update-sheet-1182 true
+          base-revision: << pipeline.git.branch >><<pipeline.git.tag>>
+          config-path: .circleci/build.yml

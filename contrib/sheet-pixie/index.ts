@@ -11,30 +11,50 @@ async function tryHtml(file: BunFile, legacySanitization: boolean) {
 
 async function tryCss(file: BunFile, advanced: boolean | null) {
   const input = await file.text();
-  return processLegacyCss(input, !!advanced);
+  return { css: processLegacyCss(input, !!advanced), rawCss: input };
 }
 
-async function handleChangedSheet(sheetDir: string) {
+async function onSheetChange(sheetDir: string) {
   const sheetMetadataFile = Bun.file(`${sheetDir}/sheet.json`);
 
-  console.log("Sheet change detected: " + sheetDir);
-
   const sheet = await sheetMetadataFile.json();
-  const { html, css, legacy: legacySanitization, advanced } = sheet;
+  const {
+    html: htmlPath,
+    css: cssPath,
+    legacy: legacySanitization,
+    advanced,
+  } = sheet;
 
   const htmlRes = await tryHtml(
-    Bun.file(`${sheetDir}/${html}`),
+    Bun.file(`${sheetDir}/${htmlPath}`),
     legacySanitization
   );
-  console.log("Parsed HTML successfully: ", { [sheetDir]: Object.keys(htmlRes) });
+  const {
+    html,
+    workers: sheetworkers,
+    rollTemplates: rolltemplates,
+    mancer: mancertemplates,
+  } = htmlRes;
 
-  const cssRes = await tryCss(Bun.file(`${sheetDir}/${css}`), advanced);
-  console.log(`Parsed CSS successfully (length=${cssRes.length})`);
+  const cssRes = await tryCss(Bun.file(`${sheetDir}/${cssPath}`), advanced);
+  const { css, rawCss } = cssRes;
+
+  const data = {
+    characterSheet: {
+      css,
+      rawCss,
+      html,
+      mancertemplates,
+      rolltemplates,
+      sheetworkers,
+    },
+  };
+  await Bun.write(Bun.stdout, JSON.stringify(data));
 }
 
 async function main(args: string[]) {
   return Promise.all(
-    args.map((path) => handleChangedSheet(path.split("/sheet.json")[0]))
+    args.map((path) => onSheetChange(path.split("/sheet.json")[0]))
   );
 }
 
@@ -46,6 +66,5 @@ main(Bun.argv.slice(2))
     jobStatus = 1;
   })
   .finally(() => {
-    console.log("Job finished: " + jobStatus);
     process.exit(jobStatus);
   });
