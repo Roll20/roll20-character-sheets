@@ -14,6 +14,8 @@ jobs:
         default: ""
     docker:
       - image: cimg/node:18.13.0
+    environment:
+      CIRCLE_SHEET_DIR: << parameters.sheet >>
     steps:
       - run:
           name: set environment
@@ -51,14 +53,15 @@ jobs:
       - run:
           working_directory: "~/custom-sheets/contrib/sheet-pixie"
           name: build sheet
-          command: bun run index.ts "../../<< parameters.sheet >>/sheet.json"
+          command:
+            bun run index.ts "../../$SHEET_DIR/sheet.json"
       - run:
           working_directory: "~/custom-sheets/<< parameters.sheet >>"
           name: run ci deploy script
           command: bash release-ci.sh
 workflows:
   update-sheet-11:
-    when: << pipeline.parameters.update-sheet-11
+    when: << pipeline.parameters.update-sheet-11 >>
     jobs:
       - build-and-deploy:
           sheet: "5eShaped"
