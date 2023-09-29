@@ -3,6 +3,8 @@ import {
   processLegacyHtml,
 } from "@roll20/charsheet-relay-sdk";
 import { BunFile } from "bun";
+import { mkdirSync, rmSync } from "fs";
+import { saveToFile } from "./save";
 
 async function tryHtml(file: BunFile, legacySanitization: boolean) {
   const input = await file.text();
@@ -27,7 +29,7 @@ async function onSheetChange(sheetDir: string) {
 
   const htmlRes = await tryHtml(
     Bun.file(`${sheetDir}/${htmlPath}`),
-    legacySanitization
+    legacySanitization,
   );
   const {
     html,
@@ -49,12 +51,26 @@ async function onSheetChange(sheetDir: string) {
       sheetworkers,
     },
   };
-  await Bun.write(Bun.stdout, JSON.stringify(data));
+
+  const distDir = `${sheetDir}/dist`;
+  rmSync(distDir, { recursive: true, force: true });
+  mkdirSync(distDir);
+  await Promise.all([
+    saveToFile(`${distDir}/index.html`, html),
+    saveToFile(`${distDir}/index.css`, css),
+    saveToFile(`${distDir}/index.raw.css`, rawCss),
+    saveToFile(
+      `${distDir}/mancertemplates.json`,
+      JSON.stringify(mancertemplates),
+    ),
+    saveToFile(`${distDir}/rolltemplates.json`, JSON.stringify(rolltemplates)),
+    saveToFile(`${distDir}/sheetworkers.json`, JSON.stringify(sheetworkers)),
+  ]);
 }
 
 async function main(args: string[]) {
   return Promise.all(
-    args.map((path) => onSheetChange(path.split("/sheet.json")[0]))
+    args.map((path) => onSheetChange(path.split("/sheet.json")[0])),
   );
 }
 
@@ -62,9 +78,11 @@ let jobStatus = 0;
 
 main(Bun.argv.slice(2))
   .then()
-  .catch(() => {
+  .catch((err) => {
+    console.error(err);
     jobStatus = 1;
   })
   .finally(() => {
+    console.log({ jobStatus });
     process.exit(jobStatus);
   });
