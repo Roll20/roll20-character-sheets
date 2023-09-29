@@ -1,5 +1,6 @@
 #!/bin/bash
 
+alias fd="fdfind";
 rm -rf sync_sheets.sh
 touch sync_sheets.sh
 echo '#!/bin/bash' > sync_sheets.sh
