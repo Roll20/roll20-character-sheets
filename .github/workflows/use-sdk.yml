@@ -46,10 +46,17 @@ jobs:
         run: 'gcloud info'
       - uses: oven-sh/setup-bun@v1
 
+      - run: sudo apt-get -y update && sudo apt-get -y install build-essential
       # run any `bun` or `bunx` command
       - run: bun install
         working-directory: contrib/sheet-pixie
-      - run: bun install -g fd-find 
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: fd-find
       - run: make clean
       - run: bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet_files }}
       - run: bash update.sh
