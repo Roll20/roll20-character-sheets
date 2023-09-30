@@ -10,11 +10,25 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V4.3.0 [Screenshot](cog_v4.png)
+V4.4.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+## V4.4.0 (2023.09.30)
+
+- Fiche de personnage
+  - Correction d'un bug sur les boutons de jets de caractéristiques
+    
+    Pour les fiches existantes, sélectionner temporairement un modificateur de situation différent de 0 corrige le problème
+  - Gestion dynamique des compétences
+    
+    Une liste standard est chargée dans l'onglet Configuration mais peut être adaptée à l'univers de jeu
+    
+    Indiquer une compétence par ligne dans le format Nom|CAR|Notes (optionnel)
+    
+    Cette liste est utilisée par le  bouton +Compétences pour les ajouter dans la liste des jets de capacités
 
 ## V4.3.0 (2023.08.31)
 
