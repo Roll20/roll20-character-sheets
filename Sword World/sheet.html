@@ -1450,7 +1450,7 @@
                         <textarea spellcheck="false" name="attr_items"></textarea>
                     </div>
 
-                    <input class="toggle-cards" type="hidden" name="attr_alchemist_level" value="" />
+                    <input class="toggle-cards" type="hidden" name="attr_alchemist_level" value="0" />
                     <div class="grid nogap">
                         <div>Material Cards in Possession</div>
                         <div class="grid nogap lined cards">
@@ -2335,7 +2335,11 @@
             roll_template_token: "",
             display_token: 0,
             storage_initiative: storage["initiative"],
-            storage_monster_initiative: storage["monster_initiative"]
+            storage_fortitude: storage["fortitude"],
+            storage_willpower: storage["willpower"],
+            storage_monster_initiative: storage["monster_initiative"],
+            storage_monster_fortitude: storage["monster_fortitude"],
+            storage_monster_willpower: storage["monster_willpower"]
         };
         getAttrs(["character_token"], function(values) {
             let character_token = values.character_token;
@@ -2351,40 +2355,44 @@
             }
             setAttrs(update);
         });
+        triggerAbility(eventInfo);
     });
 
     total_list.forEach(trigger => {
-        on(`change:${trigger}`, function() {
-            getAttrs(total_list, function(values) {
-                let update = {};
-                let counter = 0;
-                let move_mod = parseInt(values["movement_enhancements_modifier"])||0;
-                base_list.forEach(base => {
-                    let base_value = parseInt(values[`${base}`])||0;
-                    for (let i = 0; i < 2; i++) {
-                        let correction = correction_list[counter];
-                        let correction_value = parseInt(values[`ability_${correction}`])||0;
-                        let growth = counter + 1;
-                        let growth_value = parseInt(values[`growth_${growth}`])||0;
-                        let ability = ability_list[counter];
-                        let mod = parseInt(values[`${ability}_mod`])||0;
-                        let rawscore = base_value + correction_value + growth_value;
-                        let score = rawscore + mod;
-                        let modifier = Math.floor(score / 6);
-                        update[`${ability}`] = score;
-                        update[`${ability}_raw`] = rawscore;
-                        update[`${ability}_modifier`] = modifier;
-                        if (ability == "agility") {
-                            update["normal_move"] = score + move_mod;
-                            update["full_move"] = (score + move_mod) * 3;
-                        }
-                        counter++;
-                    }
-                });
-                setAttrs(update);
-            });
+        on(`change:${trigger}`, function(eventInfo) {
+            triggerAbility(eventInfo);
         });
     });
+    const triggerAbility = function(eventInfo) {
+        getAttrs(total_list, function(values) {
+            let update = {};
+            let counter = 0;
+            let move_mod = parseInt(values["movement_enhancements_modifier"])||0;
+            base_list.forEach(base => {
+                let base_value = parseInt(values[`${base}`])||0;
+                for (let i = 0; i < 2; i++) {
+                    let correction = correction_list[counter];
+                    let correction_value = parseInt(values[`ability_${correction}`])||0;
+                    let growth = counter + 1;
+                    let growth_value = parseInt(values[`growth_${growth}`])||0;
+                    let ability = ability_list[counter];
+                    let mod = parseInt(values[`${ability}_mod`])||0;
+                    let rawscore = base_value + correction_value + growth_value;
+                    let score = rawscore + mod;
+                    let modifier = Math.floor(score / 6);
+                    update[`${ability}`] = score;
+                    update[`${ability}_raw`] = rawscore;
+                    update[`${ability}_modifier`] = modifier;
+                    if (ability == "agility") {
+                        update["normal_move"] = score + move_mod;
+                        update["full_move"] = (score + move_mod) * 3;
+                    }
+                    counter++;
+                }
+            });
+            setAttrs(update);
+        });
+    };
 
     ability_list.concat(class_level_list).concat(class_power_list).concat(modifier_list).forEach(trigger => {
         on(`change:${trigger} change:race`, function() {
@@ -3013,11 +3021,12 @@
     {{/rollTotal() raw 2}}
     <div class="container">
         {{#token}}{{token}}{{/token}}
+        {{#choice}}
+            <h1>{{name}} acts:</h1>
+        {{/choice}}
         {{^choice}}
             <h1>
-                {{#fellow}}
-                    {{#computed::quote}}<p><em>{{computed::quote}}</em></p>{{/computed::quote}}
-                {{/fellow}}
+                {{#fellow}}{{name}} says, {{computed::quote}}{{/fellow}}
                 {{^fellow}}
                     {{name}}
                     {{#skillverb}}{{skillverb}}{{/skillverb}}
