@@ -4,9 +4,11 @@ _A french Scifi RPG based on the D20 system / OGL 3.5._
 
 Chroniques Galactiques est un jeu de r&ocirc;le futuriste complet bas&eacute; sur le syst&egrave;me d20/OGL 3.5.
 
-Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
+Cette feuille de personnage inclut des fiches pour les personnages, pour les PNJ, pour les vaisseaux et pour les m&eacute;chas.
 
-Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
+Ces fiches comportent de nombreux jets de dés et permettent de mettre en oeuvre des r&egrave;gles optionnelles param&eacute;trables.
+
+Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données techniques pour tous les types de fiches.
 
 # Version courante
 
