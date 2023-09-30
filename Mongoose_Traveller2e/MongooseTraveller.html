@@ -2345,9 +2345,12 @@
     <div class="sheet-redborder sheet-laf-centredgrid sheet-laf-animal-sub">
         <span class="sheet-bold">Attacks</span>
         <fieldset class="repeating_animalattacks">
-            <div class="sheet-laf-centredgrid sheet-laf-animal-cols sheet-laf-animal-detail">
-                <input class="sheet-laf-wauto" type="text" name="attr_name"/>
-                <input class="sheet-laf-wnum" type="text" name="attr_damage"/>
+            <div class="sheet-laf-centredgrid sheet-laf-animal-weapon">
+                <input type="text" name="attr_name"/>
+                <span class="sheet-bold sheet-textright">Skill Total:</span>
+                <input class="sheet-laf-wnum" type="number" value="0" name="attr_attackmod"/>
+                <span class="sheet-bold sheet-textright">Damage:</span>
+                <input class="sheet-laf-wnum2" type="text" name="attr_damage"/>
                 <button class="sheet-weaponroll" name="act_animalattack" type="action">
                     <span class="sheet-weaponrollbutton">b</span>
                 </button>
@@ -8313,13 +8316,33 @@
 
             const rowId = info.sourceAttribute.split('_')[2];
             const name   = "repeating_animalattack" + rowId + "_name";
+            const attackMod   = "repeating_animalattack" + rowId + "_attackmod";
             const damage = "repeating_animalattack" + rowId + "_damage";
 
-            getAttrs([name, damage, "animal_name"], function(v) {
+            getAttrs([name, attackMod, damage, "animal_name"], function(v) {
                 console.log("- Attrs: " + JSON.stringify(v));
-                startRoll("@{whispertoggle}&{template:skill-attrib} {{skill=" + v.animal_name + ": " + v[name] + "}} {{character= @{character_name} }} {{roll=[[" + v[damage] + "]]}}  }}", (results) => {
-                    finishRoll(results.rollId, {});
+
+                startRoll("@{whispertoggle}&{template:range} {{character=" + v[name] + "}} {{weapon=" + v.animal_name + "}}  @{ro_default_rolltype} + " + v[attackMod] + " @{ro_default_mod}]]}}  {{damage=[[" + v[damage] + "]]}}", (results) => {
+                    const toHit = results.results.roll.result;
+                    var damage = results.results.damage.result
+                    if(toHit > 8) {
+                        damage += (toHit - 8);
+                    }
+
+                    finishRoll(
+                        results.rollId,
+                        {
+                            roll: toHit,
+                            damage: damage
+                        }
+                    );
                 });
+
+
+
+                //startRoll("@{whispertoggle}&{template:skill-attrib} {{skill=" + v.animal_name + ": " + v[name] + "}} {{character= @{character_name} }} {{roll=[[" + v[damage] + "]]}}  }}", (results) => {
+                //    finishRoll(results.rollId, {});
+                //});
             });
         });
 
@@ -8485,7 +8508,7 @@
 
             setAttrs({
                 hullpoints_max: Math.round(+info.newValue/2.5),
-                ship_numhardpoints: Math.round(+info.newValue/100)
+                ship_numhardpoints: Math.floor(+info.newValue/100)
             });
         });
 
