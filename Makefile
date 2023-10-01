@@ -14,4 +14,4 @@ clean:
 	rm -rf **/*/dist
 
 all:
-	fd . --exclude contrib --exclude "Zelda BOTW" --type d --max-depth 1 --exec bun run contrib/sheet-pixie/index.ts "{}/sheet.json" \;
+	fd . --strip-cwd-prefix --exclude contrib --exclude "Zelda BOTW" --type d --max-depth 1 --exec bun run contrib/sheet-pixie/index.ts "{}/sheet.json" \;
