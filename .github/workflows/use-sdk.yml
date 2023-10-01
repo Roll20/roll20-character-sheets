@@ -11,6 +11,7 @@ jobs:
     outputs:
       sheet: ${{ steps.filter.outputs.sheet }}
       sheet_files: ${{ steps.filter.outputs.sheet_files }}
+      force_update: ${{ steps.filter.outputs.force-update }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -30,7 +31,7 @@ jobs:
   process-character-sheets:
     name: Process character-sheet HTML/CSS
     needs: changes
-    if: ${{ needs.changes.outputs.sheet == 'true'}}
+    if: ${{ needs.changes.outputs.sheet == 'true' }}
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -68,7 +69,7 @@ jobs:
   force-update:
     name: Process HTML/CSS for all character sheets (force-update)
     needs: changes
-    if: ${{ needs.changes.outputs.force-update == 'true'}}
+    if: ${{ needs.changes.outputs.sheet != 'true' && needs.changes.outputs.force_update == 'true'}}
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
