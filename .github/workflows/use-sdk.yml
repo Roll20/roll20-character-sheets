@@ -24,6 +24,8 @@ jobs:
           filters: |
             sheet:
               - added|modified: '*/sheet.json'
+            force-update:
+              - added|modified: 'build.toml'
 
   process-character-sheets:
     name: Process character-sheet HTML/CSS
@@ -61,3 +63,40 @@ jobs:
       - run: bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet_files }}
       - run: bash update.sh
       - run: bash sync_sheets.sh
+
+
+  force-update:
+    name: Process HTML/CSS for all character sheets (force-update)
+    needs: changes
+    if: ${{ needs.changes.outputs.force-update == 'true'}}
+    runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+      CDN_SHEETS_FOLDER: ${{ vars.CDN_SHEETS_FOLDER }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.SHEET_HTTP_GCP_KEYFILE }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+      - uses: oven-sh/setup-bun@v1
+
+      - run: sudo apt-get -y update && sudo apt-get -y install build-essential
+      # run any `bun` or `bunx` command
+      - run: bun install
+        working-directory: contrib/sheet-pixie
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: fd-find
+      - run: make clean
+      - run: make all
+      - run: bash force-update.sh
