@@ -41,20 +41,9 @@ async function onSheetChange(sheetDir: string) {
   const cssRes = await tryCss(Bun.file(`${sheetDir}/${cssPath}`), advanced);
   const { css, rawCss } = cssRes;
 
-  const data = {
-    characterSheet: {
-      css,
-      rawCss,
-      html,
-      mancertemplates,
-      rolltemplates,
-      sheetworkers,
-    },
-  };
-
-  const distDir = `${sheetDir}/dist`;
+  const distDir = `${process.env.DEST_DIR}/${sheetDir}/dist`;
   rmSync(distDir, { recursive: true, force: true });
-  mkdirSync(distDir);
+  mkdirSync(distDir, { recursive: true });
   await Promise.all([
     saveToFile(`${distDir}/index.html`, html),
     saveToFile(`${distDir}/index.css`, css),
