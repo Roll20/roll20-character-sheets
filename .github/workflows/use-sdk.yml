@@ -10,8 +10,8 @@ jobs:
     # Set job outputs to values from filter step
     outputs:
       sheet: ${{ steps.filter.outputs.sheet }}
-      sheet_files: ${{ steps.filter.outputs.sheet_files }}
-      force_update: ${{ steps.filter.outputs.force-update }}
+      sheet-json: ${{ steps.filter.outputs.sheet_files }}
+      force-update: ${{ steps.filter.outputs.force-update }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -61,7 +61,7 @@ jobs:
           command: install
           args: fd-find
       - run: make clean
-      - run: bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet_files }}
+      - run: bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet-json }}
       - run: bash update.sh
       - run: bash sync_sheets.sh
 
@@ -69,7 +69,7 @@ jobs:
   force-update:
     name: Process HTML/CSS for all character sheets (force-update)
     needs: changes
-    if: ${{ needs.changes.outputs.sheet != 'true' && needs.changes.outputs.force_update == 'true'}}
+    if: ${{ needs.changes.outputs.sheet != 'true' && needs.changes.outputs.force-update == 'true'}}
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
