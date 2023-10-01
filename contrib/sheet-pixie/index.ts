@@ -64,14 +64,14 @@ async function main(args: string[]) {
 }
 
 let jobStatus = 0;
+const args = Bun.argv.slice(2);
 
-main(Bun.argv.slice(2))
+main(args)
   .then()
   .catch((err) => {
-    console.error(err);
+    console.error(Bun.stderr, `${err} (args=${args})`);
     jobStatus = 1;
   })
   .finally(() => {
-    console.log({ jobStatus });
     process.exit(jobStatus);
   });
