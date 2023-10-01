@@ -41,7 +41,7 @@ async function onSheetChange(sheetDir: string) {
   const cssRes = await tryCss(Bun.file(`${sheetDir}/${cssPath}`), advanced);
   const { css, rawCss } = cssRes;
 
-  const distDir = `${process.env.DEST_DIR}/${sheetDir}/dist`;
+  const distDir = `${process.env.DEST_DIR || ''}/${sheetDir}/dist`;
   rmSync(distDir, { recursive: true, force: true });
   mkdirSync(distDir, { recursive: true });
   await Promise.all([
