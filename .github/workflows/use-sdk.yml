@@ -36,7 +36,6 @@ jobs:
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       CDN_SHEETS_FOLDER: ${{ vars.CDN_SHEETS_FOLDER }}
-      DEST_DIR: /tmp
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
@@ -62,7 +61,7 @@ jobs:
           command: install
           args: fd-find
       - run: make clean
-      - run: DEST_DIR=$RUNNER_TEMP bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet-json }}
+      - run: bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet-json }}
       - run: bash update.sh
       - run: bash sync_sheets.sh
 
@@ -74,7 +73,6 @@ jobs:
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       CDN_SHEETS_FOLDER: ${{ vars.CDN_SHEETS_FOLDER }}
-      DEST_DIR: /tmp
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
@@ -101,4 +99,4 @@ jobs:
           args: fd-find
       - run: make clean
       - run: make all
-      - run: bash force-update.sh "$DEST_DIR"
+      - run: bash force-update.sh "$RUNNER_TEMP"
