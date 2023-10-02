@@ -39,47 +39,32 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
+        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.SHEET_HTTP_GCP_KEYFILE }}'
       - name: 'Set up Cloud SDK'
+        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
         uses: 'google-github-actions/setup-gcloud@v1'
 
       - name: 'Use gcloud CLI'
+        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
         run: 'gcloud info'
       - uses: oven-sh/setup-bun@v1
+        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
 
-      - run: sudo apt-get -y update && sudo apt-get -y install build-essential
-      # run any `bun` or `bunx` command
       - run: bun install
+        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
         working-directory: contrib/sheet-pixie
+
+      # Handles when sheets have been updated individually
       - run: DEST_DIR=${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet-json }}
+        if: steps.filter.outputs.sheet == 'true'
       - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} gs://roll20-cdn/${{ env.CDN_SHEETS_FOLDER }} --cache-control='no-cache' --recursive
+        if: steps.filter.outputs.sheet == 'true'
 
-  force-update:
-    name: Process HTML/CSS for all character sheets (force-update)
-    needs: changes
-    if: ${{ needs.changes.outputs.sheet != 'true' && needs.changes.outputs.force-update == 'true'}}
-    runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
-      CDN_SHEETS_FOLDER: ${{ vars.CDN_SHEETS_FOLDER }}
-    steps:
-      - uses: actions/checkout@v3
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          credentials_json: '${{ secrets.SHEET_HTTP_GCP_KEYFILE }}'
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-
-      - name: 'Use gcloud CLI'
-        run: 'gcloud info'
-      - uses: oven-sh/setup-bun@v1
-
-      - run: sudo apt-get -y update && sudo apt-get -y install build-essential
-      # run any `bun` or `bunx` command
-      - run: bun install
-        working-directory: contrib/sheet-pixie
+      # Handles when a force-update has been requested (meaning all sheets will be re-built and deployed)
       - run: make all
+        if: steps.filter.outputs.force-update == 'true'
       - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} gs://roll20-cdn/${{ env.CDN_SHEETS_FOLDER }} --delete-unmatched-destination-objects --cache-control='no-cache' --recursive
+        if: steps.filter.outputs.force-update == 'true'
