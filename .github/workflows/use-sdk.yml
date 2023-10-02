@@ -1,11 +1,14 @@
 name: Processes changed character-sheets and updates CDN bucket and/or sheet-http database as needed
 
-on:
-  push:
-    branches: ["staging"]
+on: push
+
+env:
+  NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
 
 jobs:
-  changes:
+  staging-deployment:
+    if: github.ref == 'refs/heads/staging'
+    environment: staging
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
@@ -28,16 +31,6 @@ jobs:
             force-update:
               - added|modified: 'build.toml'
 
-  process-character-sheets:
-    name: Process character-sheet HTML/CSS
-    needs: changes
-    if: ${{ needs.changes.outputs.sheet == 'true' }}
-    runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
-      CDN_SHEETS_FOLDER: ${{ vars.CDN_SHEETS_FOLDER }}
-    steps:
-      - uses: actions/checkout@v3
       - id: 'auth'
         if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
         uses: 'google-github-actions/auth@v1'
