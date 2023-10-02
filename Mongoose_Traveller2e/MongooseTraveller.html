@@ -59,7 +59,9 @@
 </div><!--    Top Bar -->
 <div class="sheet-topbar">
     <div class="sheet-laf-characteristics">
-        <span></span>
+        <span>
+            <button type="action" class="sheet-tight_button sheet-roll_stats" name="act_roll-stats">&#9860;&#9860;</button>
+        </span>
         <span data-i18n="rating-u">Rating</span>
         <span data-i18n="temp-u">Temp</span>
         <span data-i18n="mod-u">Mod</span>
@@ -8676,9 +8678,37 @@
             });
         });
 
+        /*
+         * Charactermancer stuff
+         */
 
+        on('sheet:opened', function(eventInfo) {
+            exposeCharmancer();
+        });
 
+        on('clicked:roll-stats', function(eventInfo) {
+console.log('clicked:roll-stats');
+            // set age to 18
 
+        });
+
+        stats.forEach(stat => {
+            on(`change:base-${stat.toLowerCase()}`, exposeCharmancer);
+        });
+
+        function exposeCharmancer() {
+            const baseStats = stats.map(stat => `base-${stat}`);
+            getAttrs(baseStats, hash => {
+                const sum     = Object.values(hash).reduce((a,b) => parseInt(a)+parseInt(b));
+                const element = $20("button.sheet-roll_stats");
+                if(sum == 0) {
+                    element.removeClass('sheet-hidden');
+                } else {
+                    element.addClass('sheet-hidden');
+                }
+
+            });
+        }
 
 
 
