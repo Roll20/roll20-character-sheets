@@ -16,7 +16,6 @@ jobs:
     outputs:
       sheet: ${{ steps.filter.outputs.sheet }}
       sheet-json: ${{ steps.filter.outputs.sheet_files }}
-      force-update: ${{ steps.filter.outputs.force-update }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -30,52 +29,36 @@ jobs:
           filters: |
             sheet:
               - added|modified: '*/sheet.json'
-            force-update:
-              - added|modified: 'build.toml'
 
       - id: 'auth'
-        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.SHEET_HTTP_GCP_KEYFILE }}'
       - name: 'Set up Cloud SDK'
-        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         uses: 'google-github-actions/setup-gcloud@v1'
 
       - name: 'Use gcloud CLI'
-        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         run: 'gcloud info'
       - uses: oven-sh/setup-bun@v1
-        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.sheet == 'true'
 
       - run: bun install
-        if: steps.filter.outputs.sheet == 'true' || steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         working-directory: contrib/sheet-pixie
 
       # Handles when sheets have been updated individually
       - run: bun run contrib/sheet-pixie/index.ts ${{ steps.filter.outputs.sheet_files }}
-        if: steps.filter.outputs.force-update != 'true' && steps.filter.outputs.sheet == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         env:
           DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
       - run: find ${{ env.DEST_DIR }} -maxdepth 1 -type d -exec sh -c 'cp -R --verbose "$(basename "{}")/translations" "{}/"' 2>/dev/null \;
-        if: steps.filter.outputs.force-update != 'true' && steps.filter.outputs.sheet == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         env:
           DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
       - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} gs://roll20-cdn/${{ env.CDN_SHEETS_FOLDER }} --cache-control='no-cache' --recursive
-        if: steps.filter.outputs.force-update != 'true' && steps.filter.outputs.sheet == 'true'
-        env:
-          DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
-
-      # Handles when a force-update has been requested (meaning all sheets will be re-built and deployed)
-      - run: make all
-        if: steps.filter.outputs.force-update == 'true'
-        env:
-          DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
-      - run: find ${{ env.DEST_DIR }} -maxdepth 1 -type d -exec sh -c 'cp -R --verbose "$(basename "{}")/translations" "{}/"' 2>/dev/null \;
-        if: steps.filter.outputs.force-update == 'true'
-        env:
-          DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
-      - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} gs://roll20-cdn/${{ env.CDN_SHEETS_FOLDER }} --delete-unmatched-destination-objects --cache-control='no-cache' --recursive
-        if: steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.sheet == 'true'
         env:
           DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
