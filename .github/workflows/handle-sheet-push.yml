@@ -58,7 +58,7 @@ jobs:
         env:
           DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
       - run: find ${{ env.DEST_DIR }} -maxdepth 1 -type d -exec sh -c 'cp -R --verbose "$(basename "{}")/translations" "{}/"' 2>/dev/null \;
-        if: steps.filter.outputs.force-update == 'true'
+        if: steps.filter.outputs.force-update != 'true' && steps.filter.outputs.sheet == 'true'
         env:
           DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
       - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} gs://roll20-cdn/${{ env.CDN_SHEETS_FOLDER }} --cache-control='no-cache' --recursive
