@@ -31,7 +31,7 @@ jobs:
   process-character-sheets:
     name: Process character-sheet HTML/CSS
     needs: changes
-    if: ${{ needs.changes.outputs.force-update != 'true' && needs.changes.outputs.sheet == 'true' }}
+    if: ${{ needs.changes.outputs.sheet == 'true' }}
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
   force-update:
     name: Process HTML/CSS for all character sheets (force-update)
     needs: changes
-    if: ${{ needs.changes.outputs.force-update == 'true'}}
+    if: ${{ needs.changes.outputs.sheet != 'true' && needs.changes.outputs.force-update == 'true'}}
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -99,4 +99,4 @@ jobs:
           args: fd-find
       - run: make clean
       - run: make all
-      - run: bash force-update.sh ${{ runner.temp }}
+      - run: bash force-update.sh "$RUNNER_TEMP"
