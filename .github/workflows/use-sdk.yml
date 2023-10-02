@@ -53,17 +53,8 @@ jobs:
       # run any `bun` or `bunx` command
       - run: bun install
         working-directory: contrib/sheet-pixie
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: fd-find
-      - run: make clean
       - run: bun run contrib/sheet-pixie/index.ts ${{ needs.changes.outputs.sheet-json }}
-      - run: bash update.sh ${{ runner.temp }}
-      - run: bash sync_sheets.sh
+      - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }} "gs://roll20-cdn/$CDN_SHEETS_FOLDER" --cache-control='no-cache' --recursive
 
   force-update:
     name: Process HTML/CSS for all character sheets (force-update)
@@ -90,13 +81,5 @@ jobs:
       # run any `bun` or `bunx` command
       - run: bun install
         working-directory: contrib/sheet-pixie
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: fd-find
-      - run: make clean
       - run: make all
-      - run: bash force-update.sh "$RUNNER_TEMP"
+      - run: bash force-update.sh ${{ runner.temp }}
