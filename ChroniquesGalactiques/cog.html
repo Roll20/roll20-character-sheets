@@ -1,8 +1,8 @@
 <div class="sheet-mainBg">
   <!-- FDP -->
   <!-- INPUT HIDDEN Version FdP -->
-  <input type="hidden" name="attr_VERFDP" value="4.3.0" />
-  <input type="hidden" name="attr_VERSION" value="4.3.0" />
+  <input type="hidden" name="attr_VERFDP" value="4.4.0" />
+  <input type="hidden" name="attr_VERSION" value="4.4.0" />
   <!-- INPUT HIDDEN Univers (COF, COG, COC) -->
   <input type="hidden" name="attr_UNIVERS" value="COG" />
   <input type="hidden" name="attr_token_url" value="" />
@@ -106,12 +106,12 @@
     value="@{target|pnj_dep}"
   />
   <!-- INPUT HIDDEN Mod Situation  -->
-  <input type="hidden" name="attr_MODSIT_FOR" value="">
-  <input type="hidden" name="attr_MODSIT_DEX" value="">
-  <input type="hidden" name="attr_MODSIT_CON" value="">
-  <input type="hidden" name="attr_MODSIT_INT" value="">
-  <input type="hidden" name="attr_MODSIT_PER" value="">
-  <input type="hidden" name="attr_MODSIT_CHA" value="">
+  <input type="hidden" name="attr_MODSIT_FOR" value="0">
+  <input type="hidden" name="attr_MODSIT_DEX" value="0">
+  <input type="hidden" name="attr_MODSIT_CON" value="0">
+  <input type="hidden" name="attr_MODSIT_INT" value="0">
+  <input type="hidden" name="attr_MODSIT_PER" value="0">
+  <input type="hidden" name="attr_MODSIT_CHA" value="0">
   <!-- INPUT HIDDEN Postes de combat vaisseaux -->
   <input type="hidden" name="attr_POSTE_PIL" value="" />
   <input type="hidden" name="attr_POSTE_MOT" value="" />
@@ -156,7 +156,7 @@
     <div style="width: 420px; vertical-align: middle; text-align: center">
       <img
         width="320px"
-        title="Version 4.3.0 - 31/08/2023"
+        title="Version 4.4.0 - 30/09/2023"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog2_logo.png"
       />
       <img width="90px" height="90px" name="attr_character_token" />
@@ -362,7 +362,7 @@
       src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
     />
     <div class="sheet-2colrow">
-      <input type="hidden" name="attr_rof4" value="" />
+      <input type="hidden" name="attr_rof4" value="+ 0" />
       <div class="sheet-col" style="text-align: center">
         Situation :&nbsp;
         <select
@@ -5172,10 +5172,17 @@
           </ul>
         </div>
         <!-- Custom attributes -->
-        <div class="sheet-col"> <!--
+        <div class="sheet-col">
           <div>
-            <span class="sheet-textfatleft">ATTRIBUTS PERSONNALISES</span>
+            <span class="sheet-textfatleft">COMPETENCES</span>
           </div>
+          <textarea 
+            class="sheet-statblock" 
+            name="attr_skills"
+            placeholder="Nom|CAR|Description (une compétence par ligne)"
+            title="@{skills} Liste des compétences"
+          ></textarea>
+          <!--
           <textarea 
             class="sheet-statblock" 
             name="attr_custom" 
@@ -5241,6 +5248,22 @@
           </div>
           <div class="sheet-scroll-300">
             <ul>
+              <li>
+                <strong>Version 4.4.0</strong> (2023.09.30)
+                <ul>
+                  <em>Fiche de personnage</em>
+                  <li>
+                    Correction d'un bug sur les boutons de jets de caractéristiques<br>
+                    Pour les fiches existantes, sélectionner temporairement un modificateur de situation différent de 0 corrige le problème
+                  </li>
+                  <li>
+                    Gestion dynamique des compétences<br>
+                    Une liste standard est chargée dans l'onglet Configuration mais peut être adaptée à l'univers de jeu <br>
+                    Indiquer une compétence par ligne dans le format Nom|CAR|Notes (optionnel)<br>
+                    Cette liste est utilisée par le  bouton +Compétences pour les ajouter dans la liste des jets de capacités
+                  </li>
+                </ul>
+              </li>
               <li>
                 <strong>Version 4.3.0</strong> (2023.08.31)
                 <ul>
@@ -10868,6 +10891,12 @@ on("sheet:opened", function () {
       });
     }
   });
+  // liste des compétences
+  getAttrs(["skills"], function (v) {
+    if (stringOrDefault(v.skills) === "") {
+      loadSkills();
+    }
+  })
   // rebuild all
   rebuildAll();
 });
@@ -13418,6 +13447,18 @@ on(
   }
 );
 
+function loadSkills() {
+  let skills = "";
+
+  for (const carac in SKILLS) {
+    SKILLS[carac].forEach(skill => {
+      skills += `${skill.name}|${carac}|${skill.focus || ""}\n`;
+    });
+  }
+
+  setAttrs({ skills });
+}
+
 /**
 * Adjust starship total hit points
 */
@@ -13803,6 +13844,20 @@ on(
 * create skill list
 */
 function createSkillList() {
+  getAttrs(["skills"], function (v) {
+    const skillRows = {};
+    const skills = v.split('\n');
+    skills.forEach(skill => {
+      const [ name, ability, focus ] = skill.split("|");
+      const skillRowID = "repeating_jetcapas_" + generateRowID();
+      skillRows[`${skillRowID}_jetcapanom`] = "Compétence";
+      skillRows[`${skillRowID}_jetcapacarac`] = `@{${ability}_TEST}`;
+      skillRows[`${skillRowID}_jetcapatitre`] = `${name} (${ability})`;
+      skillRows[`${skillRowID}_jetcapadesc`] = focus || "";
+    });
+    setAttrs(skillRows);
+  });
+  /*
   const abilities = Object.keys(SKILLS);
   const skillRows = {};
   abilities.forEach((ability) => {
@@ -13814,7 +13869,7 @@ function createSkillList() {
       skillRows[`${skillRowID}_jetcapadesc`] = skill.focus || "";
     });
   });
-  setAttrs(skillRows);
+  setAttrs(skillRows); */
 }
 
 on("clicked:addskills", function () {
@@ -13822,6 +13877,28 @@ on("clicked:addskills", function () {
 });
 
 //'[Chance](~jet_pc" style="border: none; padding: 0px; background-color: transparent; color: red; font-size: 1em; font-weight: bold; text-decoration: underline;'
+
+function rebuildCustom() {
+  getAttrs(["custom"], function (v) {
+    const custom = stringOrDefault(v.custom).split("\n");
+    if (custom.length === 0) return;
+    const customAttrs = {};
+    custom.forEach(row => {
+      if (row.startsWith("//")) return;
+      let sepChar;
+      if (row.indexOf("::") !== -1) sepChar = "::";
+      else sepChar = ":";
+      const [ name, value ] = row.split(sepChar).map(data => data.trim());
+      if (name !== "" && value !== "") customAttrs[`custom_${name}`] = value;
+    });
+    setAttrs(customAttrs);
+  });
+}
+
+/*
+on("change:custom", function() {
+  rebuildCustom();
+});
 
 </script>
 <!-- FIN SCRIPTS / SHEET WORKERS -->

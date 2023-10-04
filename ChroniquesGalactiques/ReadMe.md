@@ -4,17 +4,33 @@ _A french Scifi RPG based on the D20 system / OGL 3.5._
 
 Chroniques Galactiques est un jeu de r&ocirc;le futuriste complet bas&eacute; sur le syst&egrave;me d20/OGL 3.5.
 
-Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
+Cette feuille de personnage inclut des fiches pour les personnages, pour les PNJ, pour les vaisseaux et pour les m&eacute;chas.
 
-Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
+Ces fiches comportent de nombreux jets de dés et permettent de mettre en oeuvre des r&egrave;gles optionnelles param&eacute;trables.
+
+Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données techniques pour tous les types de fiches.
 
 # Version courante
 
-V4.3.0 [Screenshot](cog_v4.png)
+V4.4.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+## V4.4.0 (2023.09.30)
+
+- Fiche de personnage
+  - Correction d'un bug sur les boutons de jets de caractéristiques
+    
+    Pour les fiches existantes, sélectionner temporairement un modificateur de situation différent de 0 corrige le problème
+  - Gestion dynamique des compétences
+    
+    Une liste standard est chargée dans l'onglet Configuration mais peut être adaptée à l'univers de jeu
+    
+    Indiquer une compétence par ligne dans le format Nom|CAR|Notes (optionnel)
+    
+    Cette liste est utilisée par le  bouton +Compétences pour les ajouter dans la liste des jets de capacités
 
 ## V4.3.0 (2023.08.31)
 
