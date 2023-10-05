@@ -13,6 +13,11 @@ https://www.mannifest-games.com/
 
 # Release Notes
 
+**2023-10-05 v1.1 HF1**
+
+* Bugfixes
+  * Aufklappen von Fertigkeiten korrigiert
+
 **2023-09-23 v1.1 released**
 
 * Redesign
