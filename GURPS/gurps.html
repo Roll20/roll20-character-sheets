@@ -4372,7 +4372,10 @@
 				<!-- current version notes: 2.9.17 -->
 				<ul>
 					<li>
-						Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
+						<b>NEW</b> Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
+					</li>
+					<li>
+						<b>ENHANCEMENT</b> On the Option Rules tab, added a <b>Reset Spell Notes</b> button. If clicked, the existing notes are replaced with the original notes.
 					</li>
 				</ul>
 					
@@ -15698,7 +15701,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<!-- current version notes: 2.9.17 -->
 			<ul>
-				<li>Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.</li>
+				<li>
+					<b>NEW</b> Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
+				</li>
+				<li>
+					<b>ENHANCEMENT</b> On the Option Rules tab, added a <b>Reset Spell Notes</b> button. If clicked, the existing notes are replaced with the original notes.
+				</li>
 			</ul>
 			
 			<h4>Version: 2.9.16</h4>
@@ -17648,6 +17656,11 @@ Select the indent level of the inventory item. This is handy to help show the it
 				<div class="option-column">
 					
 					<div class="option-container collision-falling-options">
+						<div>
+							<button type="action" name="act_spell_notes_reset" class="sheet-btn">Reset Spell Notes</button>
+							<br />
+							<span data-i18n="spell-notes-button-description">If you modified a note, you will not see the most recent rule updates. Press the button to get the recent rules. <b>NOTE:</b> this will replace any notes you made.</span>
+						</div>
 						<h4>
 							<span data-i18n="spell-critical-success-notes-label">Spell Critical Success Notes</span>
 						</h4>
@@ -20846,7 +20859,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		]],
 	]);
 	
-	let rawDefenseNotes = {};
+	let rawRollNotes = {};
 
 	
 	/* -------- async functions -------- */
@@ -20989,7 +21002,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		console.log('********* Sheet Opened *********');
 	
-		rawDefenseNotes = getRawNotes();
+		rawRollNotes = getRawNotes();
 
 		syncRollOptions();
 	
@@ -29260,6 +29273,18 @@ B378
 **Diffuse:** Max 2HP Knockback (Exception: Area-effect, cone, and explosion attacks cause normal injury.)
 (Additional Ref: B380)`;
 
+		const spellCriticalSuccessNotes = `The spell works especially well. **Details are up to the GM**, who should be both generous and creative. Whatever else occurs, there is never an energy cost if you get a critical success when you cast a spell. B235, M7`;
+
+		const spellFailNotes = `The spell does not work. If success would have cost energy, you lose one energy point; otherwise, you lose nothing. (Exception: You must pay the full energy cost even on a failure for an Information spell; see Information Spells. B235, M7.
+						
+**In Very High Mana Areas**, all Failures are treated as Critical Failures. M6.`;
+
+		const spellCriticalFailureNotes = `You must spend the full energy cost and the spell fails . . . badly! **The GM may** use the Critical Spell Failure Table on B236 or, M7, or improvise some other “backfire” he finds amusing. (B235, M7.)
+					
+**In Very High Mana Areas**, all actual Critical Failures produce spectacular disasters! (M6)
+
+**In Low Mana Areas**, Critical Failures have mild effects or no effect at all. (M6)`;
+
 	    const notes = [
 			{ code: "dodge_success_notes", value: dodgeSuccessNotes },
 			{ code: "dodge_critical_success_notes", value: dodgeCriticalSuccessNotes },
@@ -29296,7 +29321,10 @@ B378
 			{ code: "wound_notes_fatigue", value: woundNotesFatigue },
 			{ code: "wound_notes_toxic", value: woundNotesToxic },
 			{ code: "wound_notes_special", value: woundNotesSpecial }, 
-			{ code: "wound_notes_knockback", value: woundNotesKnockback }
+			{ code: "wound_notes_knockback", value: woundNotesKnockback }, 
+			{ code: "spell_critical_success_notes", value: spellCriticalSuccessNotes }, 
+			{ code: "spell_fail_notes", value: spellFailNotes }, 
+			{ code: "spell_critical_failure_notes", value: spellCriticalFailureNotes }
 		];
 	
 		return notes;
@@ -29315,7 +29343,7 @@ B378
 	 */
 	const getNotesByCode = (code) => {
 	
-		let entry = rawDefenseNotes.find((notes) => notes.code === code);
+		let entry = rawRollNotes.find((notes) => notes.code === code);
 	
 		// if no matches, return no string
 		return (entry != undefined ? entry.value : "");
@@ -37420,6 +37448,32 @@ B378
 
 		setAttrs(attribs);
 
+	}
+
+	// reset success/fail notes for spells
+	// when button is clicked, show the updates tab
+	on("clicked:spell_notes_reset", event => {
+
+		resetSpellRollNotes();
+
+	});
+
+	const resetSpellRollNotes = () => {
+
+		const spellCriticalSuccessNotes = getNotesByCode("spell_critical_success_notes");
+
+		const spellFailNotes = getNotesByCode("spell_fail_notes");
+
+		const spellCriticalFailureNotes = getNotesByCode("spell_critical_failure_notes");
+
+		const notesToUpdate = {
+			spell_critical_success_notes: spellCriticalSuccessNotes,
+			spell_fail_notes: spellFailNotes,
+			spell_critical_failure_notes: spellCriticalFailureNotes
+		}
+
+		setAttrs(notesToUpdate);
+		
 	}
 
 	// resync character sheet
