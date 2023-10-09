@@ -4372,13 +4372,19 @@
 				<!-- current version notes: 2.9.17 -->
 				<ul>
 					<li>
-						<b>NEW</b> Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
+						<b>NEW:</b> Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
 					</li>
 					<li>
-						<b>ENHANCEMENT</b> On the Option Rules tab, added a <b>Reset Spell Notes</b> button. If clicked, the existing notes are replaced with the original notes.
+						<b>ENHANCEMENT:</b> On the Option Rules tab, added a <b>Reset Spell Notes</b> button. If clicked, the existing notes are replaced with the original notes.
 					</li>
 					<li>
-						<b>ENHANCEMENT</b> Under Sheet Options\Rules, added text entries for the Success\Fail\Crit Success\Crit Fail text for Fright Check, Unstun, Knockdown and Stunning, and Unconsciousness.
+						<b>ENHANCEMENT:</b> Under Sheet Options\Rules, added text entries for the Success\Fail\Crit Success\Crit Fail text for Fright Check, Unstun, Knockdown and Stunning, and Unconsciousness.
+					</li>
+					<li>
+						<b>ENHANCEMENT:</b> Under the General Page for HT, updated the ToolTip.
+					</li>
+					<li>
+						<b>FIX:</b> Under Combat\Ranged for the Ranged Calculator Tool, fixed a synchronization issue with the <b>Reset</b> button that wasn't applying the updates to modifier tool.
 					</li>
 				</ul>
 					
@@ -4615,7 +4621,9 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							</div>
 							<span class="tooltip">
 								<span data-i18n="attributes-health-tooltip">Health 10pts/level - Unmodified:</span> 
-								<span name="attr_health_base"></span>
+								<span name="attr_health_base"></span><br />
+								<span data-i18n="attributes-health-detailed-tooltip"></span>
+
 							</span>
 						</div>
 						<div class="cell col1">
@@ -15705,13 +15713,19 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<!-- current version notes: 2.9.17 -->
 			<ul>
 				<li>
-					<b>NEW</b> Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
+					<b>NEW:</b> Added custom macro text boxes for Skills, Defense, Melee, Ranged, and Spell rolls. To view the custom macros, expand the notes section at the top of each section.
 				</li>
 				<li>
-					<b>ENHANCEMENT</b> On the Option Rules tab, added a <b>Reset Spell Notes</b> button. If clicked, the existing notes are replaced with the original notes.
+					<b>ENHANCEMENT:</b> On the Option Rules tab, added a <b>Reset Spell Notes</b> button. If clicked, the existing notes are replaced with the original notes.
 				</li>
 				<li>
-					<b>ENHANCEMENT</b> Under Sheet Options\Rules, added text entries for the Success\Fail\Crit Success\Crit Fail text for Fright Check, Unstun, Knockdown and Stunning, and Unconsciousness.
+					<b>ENHANCEMENT:</b> Under Sheet Options\Rules, added text entries for the Success\Fail\Crit Success\Crit Fail text for Fright Check, Unstun, Knockdown and Stunning, and Unconsciousness.
+				</li>
+				<li>
+					<b>ENHANCEMENT:</b> Under the General Page for HT, updated the ToolTip.
+				</li>
+				<li>
+					<b>FIX:</b> Under Combat\Ranged for the Ranged Calculator Tool, fixed a synchronization issue with the <b>Reset</b> button that wasn't applying the updates to modifier tool.
 				</li>
 			</ul>
 			
@@ -25437,19 +25451,20 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 	}
 	
-	on("clicked:range_calc_reset", function () {
+	on("clicked:range_calc_reset", async () => {
 
-		resetRangeCalculator(() => {
-			setAttrs({roll_modifier_types: "range"}, {select: false}, resetRollModifiersToolBox(applyRollModifiers));
-		});
+		await resetRangeCalculator();
+
+		await setAttrsAsync({roll_modifier_types: "ranged"});
+
+		resetRollModifiersToolBox(applyRollModifiers);
+
 	
 	});
 	
-	function resetRangeCalculator(callback) {
+	resetRangeCalculator = async () => {
 	
-		callback = callback || noop;
-	
-		setAttrs(
+		await setAttrsAsync(
 			{
 				"firing_distance": 0,
 				"firing_speed_difference": 0,
@@ -25459,7 +25474,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 				"firing_braced": 0,
 				"firing_aiming_bonus": 0,
 				"firing_rof": 0,
-			}, null, callback);
+			});
 	
 	}
 	
@@ -30042,7 +30057,7 @@ B378
 
 		["melee", "ranged", "spell", "skill", "technique", "defense"].forEach(section => {
 	
-			setAttrs({roll_modifier_types: section}, {select: false}, resetRollModifiersToolBox(applyRollModifiers));
+			setAttrs({roll_modifier_types: section}, null, resetRollModifiersToolBox(applyRollModifiers));
 			
 		});
 
