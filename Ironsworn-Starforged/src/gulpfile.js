@@ -104,7 +104,7 @@ gulp.task('html', () => {
 
 gulp.task(
   'watch',
-  gulp.series(['dataforge', 'css', 'data', 'html'], () => {
+  gulp.series(['dataforge', 'mergeTranslation', 'data', 'css', 'html'], () => {
     gulp.watch('./app/**/*.styl', gulp.series(['css']));
     gulp.watch(['./app/**/*.pug', './app/**/*.js'], gulp.series(['html']));
   })

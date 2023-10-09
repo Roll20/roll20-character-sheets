@@ -1497,13 +1497,24 @@
                             <div class="asset-ability flex">
                                 <div class="i18n-text" data-i18n="asset-fugitive-ability-1"><p>You are hunted by a power or authority. When you make a move, you may improve the result to a strong hit. If you do, fill one segment of a four-segment clock to represent hunters closing in. When the clock is filled, a notable foe or force has tracked you down. If you overcome them or escape, reset the clock and mark 1 tick on your quests legacy track.</p></div>
                                   <div class="harm-section">
-                                    <div class="spoke-0 all"></div>
-                                    <div class="spoke-90 4clock"></div>
-                                    <input class="harm-checkbox harm-0 total-segment-4" type="radio" value="0" name="attr_harm" checked="checked"/>0
-                                    <input class="harm-checkbox harm-1 total-segment-4" type="radio" value="1" name="attr_harm"/>1
-                                    <input class="harm-checkbox harm-2 total-segment-4" type="radio" value="2" name="attr_harm"/>2
-                                    <input class="harm-checkbox harm-3 total-segment-4" type="radio" value="3" name="attr_harm"/>3
-                                    <input class="harm-checkbox harm-4 total-segment-4" type="radio" value="4" name="attr_harm"/>4<div class="clock"></div>
+                                    <div class="grid-4">
+                                      <label class="segment-grid segment-1">
+                                        <input class="hide-element segment-input segment-input-1" type="checkbox" name="attr_clock_1"/>
+                                        <div class="segment-background segment-background-1"></div>
+                                      </label>
+                                      <label class="segment-grid segment-2">
+                                        <input class="hide-element segment-input segment-input-2" type="checkbox" name="attr_clock_2"/>
+                                        <div class="segment-background segment-background-2"></div>
+                                      </label>
+                                      <label class="segment-grid segment-3">
+                                        <input class="hide-element segment-input segment-input-3" type="checkbox" name="attr_clock_3"/>
+                                        <div class="segment-background segment-background-3"></div>
+                                      </label>
+                                      <label class="segment-grid segment-4">
+                                        <input class="hide-element segment-input segment-input-4" type="checkbox" name="attr_clock_4"/>
+                                        <div class="segment-background segment-background-4"></div>
+                                      </label>
+                                    </div>
                                   </div>
                             </div>
                           </div>
@@ -3104,16 +3115,37 @@ On a strong hit with a match, you charted a new path during the journey; mark 1 
                             <div class="asset-ability flex">
                                 <div class="i18n-text" data-i18n="asset-marked-ability-2"><p>When you risk your reputation to overcome a miss, reroll any dice. If you score a miss again, fill one segment of a six-segment clock to represent the stain on your reputation. When the clock is filled, discard this asset.</p></div>
                                   <div class="harm-section">
-                                    <div class="spoke-0 all"></div>
-                                    <div class="spoke-60 6clock"></div>
-                                    <div class="spoke-120 6clock"></div>
-                                    <input class="harm-checkbox harm-0 total-segment-6" type="radio" value="0" name="attr_harm" checked="checked"/>0
-                                    <input class="harm-checkbox harm-1 total-segment-6" type="radio" value="1" name="attr_harm"/>1
-                                    <input class="harm-checkbox harm-2 total-segment-6" type="radio" value="2" name="attr_harm"/>2
-                                    <input class="harm-checkbox harm-3 total-segment-6" type="radio" value="3" name="attr_harm"/>3
-                                    <input class="harm-checkbox harm-4 total-segment-6" type="radio" value="4" name="attr_harm"/>4
-                                    <input class="harm-checkbox harm-5 total-segment-6" type="radio" value="5" name="attr_harm"/>5
-                                    <input class="harm-checkbox harm-6 total-segment-6" type="radio" value="6" name="attr_harm"/>6<div class="clock"></div>
+                                    <div class="clock">
+                                      <div class="hex-container-6">
+                                        <label class="segment-hex segment-1">
+                                          <input class="hide-element hex-input hex-input-1" type="checkbox" name="attr_clock_6"/>
+                                          <div class="hex-background hex-background-1"></div>
+                                        </label>
+                                        <label class="segment-hex segment-2">
+                                          <input class="hide-element hex-input hex-input-2" type="checkbox" name="attr_clock_1"/>
+                                          <div class="hex-background hex-background-2"></div>
+                                        </label>
+                                        <label class="segment-hex segment-3">
+                                          <input class="hide-element hex-input hex-input-3" type="checkbox" name="attr_clock_5"/>
+                                          <div class="hex-background hex-background-3"></div>
+                                        </label>
+                                        <label class="segment-hex segment-0">
+                                          <div class="hex-background hex-background-0"></div>
+                                        </label>
+                                        <label class="segment-hex segment-4">
+                                          <input class="hide-element hex-input hex-input-4" type="checkbox" name="attr_clock_2"/>
+                                          <div class="hex-background hex-background-4"></div>
+                                        </label>
+                                        <label class="segment-hex segment-5">
+                                          <input class="hide-element hex-input hex-input-5" type="checkbox" name="attr_clock_4"/>
+                                          <div class="hex-background hex-background-5"></div>
+                                        </label>
+                                        <label class="segment-hex segment-6">
+                                          <input class="hide-element hex-input hex-input-6" type="checkbox" name="attr_clock_3"/>
+                                          <div class="hex-background hex-background-6"></div>
+                                        </label>
+                                      </div>
+                                    </div>
                                   </div>
                             </div>
                           </div>
@@ -46158,5 +46190,27 @@ on(`${buildImpactEvents(impactsAttrs)} ${buildImpactEvents(shipImpactAttrs)} cha
   setAttrs({
     [`${type}`]: eventinfo.newValue
   });
+});const maxSegements = 6
+function getClockChangeString () {
+  let clockArray = []
+  for(let index = 1; index <= maxSegements; index++) {
+    clockArray.push(`change:repeating_assets:clock_${index}`)
+  }
+  return clockArray.join(' ')
+}
+
+on(getClockChangeString(), function(eventinfo) {
+  const clockNumber = eventinfo.sourceAttribute.match(/(\d+)[^\d]*$/)[1]
+  let attrs = {}
+  if (eventinfo.newValue === 'on') {
+    for(let index = clockNumber; index >= 1; index--) {
+      attrs[`repeating_assets_clock_${index}`] = 'on'
+    }
+  } else {
+    for(let index = clockNumber; index <= maxSegements; index++) {
+      attrs[`repeating_assets_clock_${index}`] = 'off'
+    }
+  }
+  setAttrs(attrs);
 });
 </script>
