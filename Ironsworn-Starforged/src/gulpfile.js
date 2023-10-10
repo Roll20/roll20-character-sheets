@@ -7,7 +7,7 @@ const path = require('path');
 const axios = require('axios');
 const merge = require('gulp-merge-json');
 const { starforged } = require('dataforged')
-const { buildAssetTranslations } = require('./buildTranslations')
+const { buildAssetTranslations, buildOracleTranslations } = require('./buildTranslations')
 
 axios.defaults.baseURL = 'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
 
@@ -20,8 +20,8 @@ gulp.task('dataforge', async function() {
   }
 
   const rawData = {
-    oracles: apiData.oracles.data,
-    // oracles: starforged['Oracle Categories'],
+    // oracles: apiData.oracles.data,
+    oracles: starforged['Oracle Categories'],
     assets: starforged['Asset Types'],
     moves: apiData.moves.data,
     // moves: starforged['Move Categories'],
@@ -33,6 +33,7 @@ gulp.task('dataforge', async function() {
 
   const translationData = {
     'translation-assets': buildAssetTranslations(),
+    'translation-oracles': buildOracleTranslations()
   };
 
   for (let key in rawData) {

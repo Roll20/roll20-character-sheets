@@ -54,4 +54,58 @@ function buildAssetTranslations () {
   return assetTranslations
 }
 
-module.exports = { buildAssetTranslations }
+function buildOracleTranslations () {
+  let oracleTranslations = {}
+  const oracleCategories = starforged['Oracle Categories']
+  console.log(`Building ${oracleCategories.length} oracle translations...`)
+
+  oracleCategories.forEach((oracleCategory) => {
+
+    const categoryId = oracleCategory.$id
+
+    oracleTranslations[`${categoryId}-name`] = oracleCategory.Name
+    if (oracleCategory.Description) {
+      oracleTranslations[`${categoryId}-description`] = convertToHtml(oracleCategory.Description, false)
+    }
+    
+    oracleCategory.Oracles.forEach((oracle) => {
+      
+      const oracleId = oracle.$id
+
+      oracleTranslations[`${oracleId}-name`] = oracle.Name
+      if (oracle.Description) {
+        oracleTranslations[`${oracleId}-description`] = convertToHtml(oracle.Description, false)
+      }
+
+      if (oracle.Oracles) {
+        oracle.Oracles.forEach((subOracle) => {
+          subOracle.Table.forEach((row) => {
+            if(row.Result.includes('⏵') && row.Summary) {
+              oracleTranslations[row.$id] = row.Summary
+            } else if (row.Result.includes('⏵')) {
+              oracleTranslations[row.$id] = convertToHtml(row.Result, false)
+            } else {
+              oracleTranslations[row.$id] = row.Result
+            }
+          })
+        })
+      } else if (oracle.Table) {
+        oracle.Table.forEach((row) => {
+          if(row.Result.includes('⏵') && row.Summary) {
+            oracleTranslations[row.$id] = row.Summary
+          } else if (row.Result.includes('⏵')) {
+            oracleTranslations[row.$id] = convertToHtml(row.Result, false)
+          } else {
+            oracleTranslations[row.$id] = row.Result
+          }
+        })
+      } else {
+        throw new Error('Oracle is not supported');
+      }
+    })
+  })
+  console.log(`Oracle translations built.`)
+  return oracleTranslations
+}
+
+module.exports = { buildAssetTranslations, buildOracleTranslations }
