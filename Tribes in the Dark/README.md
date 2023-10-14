@@ -13,3 +13,8 @@ Any questions or issues with this sheet can be directed to @rivetgeek on Twitter
 ### August, 2022
 * v1.3
 * Error fixes
+* ### Oct 14, 2023
+* v2
+* Updated to match final rules.
+* Cosmetic changes
+* Functionality fixes
