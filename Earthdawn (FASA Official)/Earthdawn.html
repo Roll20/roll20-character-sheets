@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.17 released 23 09 27
+v3.18 released 23 10 XX
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
 Largerly using material from the work on the Official FASA version of Chris Dickey
@@ -877,6 +877,93 @@ Comments JBF@CD are action/reminders to Chris
       <div class="sheet-small sheet-Creation">In this mode you can easily modify all attributes / characteristics of your PC/NPC. Follow the step by step creation, or modify the values directly, and exit this mode with the buttons at the end of the page.</div>
     </div>
 
+    <!-- **********************************************LP Tracking Header*****************************-->
+    <div>
+    <input   type="hidden" value="0" name="attr_TransacQueueLength">
+
+    <input  class="sheet-testNum" type="hidden" value="0" name="attr_TransacQueueLength">
+    <div class="sheet-HideIfZero">
+      <div class="sheet-headerbar"> Legend and Silver Transaction Queue </div>
+
+      <div class="sheet-HideIfPrint sheet-HideIfOverviewNoEdit sheet-HideIfCombatNoEdit sheet-HideIfNotEditMode sheet-NotCreation sheet-HideIfCreature" style="width: 95%" >
+        <span class="sheet-nowrap1 sheet-label">Current Legend Points : </span>
+        <input type="checkbox" name="attr_legend-calc-mode" class="sheet-hidden sheet-testCloseChecked" checked value="1" title="@{legend-calc-mode} : Toggle to display CALCULATED Mode LP Tracking. In the CALCULATED MODE, you only have to record your Career Legend Points @{Career-LP}. Based on all your Rank values and Attribute improvements, the system will fill your Calculated Current Legend Points @{LP-Current-Calc}. Note that the system needs to know the ranks you spent for free at creation. Refer to the info in the CALCULATED MODE for more information.">
+        <span class="sheet-HideIfNotCloseChecked">
+          <span class="sheet-nowrap1 sheet-label" title="@{LP-Current-Calc}: Automatically calculated total of all legend points taking into account all the purchased ranks as per the rules, current LPs, and offset for the creation. If you initialized the LP-Creation correctly, and always recorded your talents, this should always show your current career total">
+            Calc :
+            <input name="attr_LP-Current-Calc" type="number" value="0" class="sheet-selShort" readonly >
+          </span>
+        </span>    <!-- end Record - Calculated Mode -->
+        <!-- Record - Transaction Mode -->
+        <input type="checkbox" name="attr_legend-transaction-mode" class="sheet-hidden sheet-testCloseChecked" checked value="1" title="@{legend-calc-mode} : Toggle to display CALCULATED Mode LP Tracking. In the CALCULATED MODE, you only have to record your Career Legend Points @{Career-LP}. Based on all your Rank values and Attribute improvements, the system will fill your Calculated Current Legend Points @{LP-Current-Calc}. Note that the system needs to know the ranks you spent for free at creation. Refer to the info in the CALCULATED MODE for more information.">
+        <span class="sheet-HideIfNotCloseChecked">
+          <span class="sheet-nowrap1 sheet-label"  title="@{LP-Current}:   Unspent Legend Points.">Transac:
+            <input name="attr_LP-Current" readonly type="number" value="0" class="sheet-selShort"  >
+          </span>
+        </span>    <!-- end Record - Transaction Mode -->
+        <span class="sheet-nowrap" >
+          <span class="sheet-iconstatic sheet-icon-coin-gold" title="@{Wealth_Gold}:   Number of Gold pieces owned. 1 Gold is worth 10 silvers"></span>:
+          <input name="attr_Wealth_Gold" readonly  type="number" value="0" min="0" class="sheet-numLong sheet-HideSpinners" title="@{Wealth_Gold}:   Number of Gold pieces owned. 1 Gold is worth 10 silvers">
+          <span class="sheet-iconstatic sheet-icon-coin-silver" title="@{Wealth_Silver}:   Number of Silver pieces owned. 1 Silver is worth 10 coppers"></span>:
+          <input name="attr_Wealth_Silver"  readonly type="number" value="100" min="0" class="sheet-numLong sheet-HideSpinners" title="@{Wealth_Silver}:   Number of Silver pieces owned. 1 Silver is worth 10 coppers. New Characters start with 100.">
+          <span class="sheet-iconstatic sheet-icon-coin-copper" title="@{Wealth_Copper}:   Number of Copper pieces owned."></span>:
+          <input name="attr_Wealth_Copper" readonly type="number" value="0" min="0" class="sheet-numLong sheet-HideSpinners" title="@{Wealth_Copper}:   Number of Copper pieces owned.">
+        </span>
+        <button class="sheet-text-button sheet-button-nodice" name="act_transacupdateall" type="action" title="Post all transaction">Post all</button>
+        <button class="sheet-text-button sheet-button-nodice" name="act_transacignoreall" type="action" title="Ignore all transaction">Ignore all</button>
+
+      </div>
+
+      <input value="1" class="sheet-hidden sheet-testRepEditMode" type="checkbox">
+      <fieldset class="repeating_transaction">
+        <!-- <b class="sheet-label">Transaction</b> -->
+        <span class="sheet-nowrap" title="@{repeating_transaction_TR_record-type}  Are we journaling a gain or a expenditure?">
+          <select name="attr_TR_record-type" class="sheet-selShort">
+            <!-- <option value="Gain"  title="Gain. For LP will apply to both Career and Current."> Gain</option> -->
+            <option value="Spend"    selected     title="Spend. For LP will apply only to Current without affecting Career."> Spend</option>
+            <!-- <option value="Decrease"      title="Decrease: Use this to undo a mistaken Gain .For LP will apply to both Career and Current."> Decrease</option> -->
+            <option value="Refund"        title="Refund: Use this to undo a mistaken Spend.For LP will apply only to Current without affecting Career."> Refund</option>
+          </select>
+        </span>
+        <!-- <span class="sheet-nowrap" title="@{record-item}  Are we journaling a silver or LP transaction?">
+          <select name="attr_record-item" class="sheet-selShort">
+            <option value="LPSP" selected title="Legend Points and Silver Pieces at the same time."> LP&amp;SP</option>
+            <option value="LP" title="Legend Points."> LP</option>
+            <option value="SP" title="Silver Pieces."> SP</option>
+            <option value="Other" title="Other."> Other</option>
+          </select>
+        </span> -->
+        <!-- <b class="sheet-HideIfOther sheet-label">Amount :</b> -->
+        <span class="sheet-nowrap sheet-label" title="@{repeating_transaction_TR_record-amount-LP}:   Amount of Legend Points in this transaction.">LP:
+          <input name="attr_TR_record-amount-LP" type="number" value="0" class="sheet-numLong" >
+        </span>
+        <span class="sheet-nowrap sheet-label" title="@{repeating_transaction_TR_record-amount-SP}:   Amount of Silver Pieces in this transaction.">SP:
+          <input name="attr_TR_record-amount-SP" type="number" value="0" class="sheet-numLong" >
+        </span>
+
+        <span class="sheet-nowrap sheet-label" title="@{repeating_transaction_TR_record-amount-days}:   Downtime days in this transaction.">days:
+          <input name="attr_TR_record-amount-days" type="number" value="0" class="sheet-numShort" >
+        </span>
+
+        <span class="sheet-nowrap2">
+          <input name="attr_TR_record-reason" type="text" style="width:25em;" class="sheet-text-left"
+          title="@{repeating_transaction_TR_record-reason}:   Detailed description of the transaction."
+          placeholder="Description of transaction or other notes." >
+        </span>
+
+
+        <button class="sheet-text-button sheet-button-nodice" name="act_transacupdate" type="action" title="Post a transaction">Post</button>
+        <button class="sheet-text-button sheet-button-nodice" name="act_transacignore" type="action" title="Ignore a transaction">Ignore</button>
+
+      </fieldset>
+    </div>
+    </div>
+
+    <!-- **********************************************End of LP Tracking Header*****************************-->
+
+
+
+
     <div class="sheet-ShowIfObject">
     <div class="sheet-HideIfPrint">
     <input type="checkbox" name="attr_tab" class="sheet-tabMain" value="1" title="Overview" checked> <button type="action" name="act_tab" value="1" >Overview</button>
@@ -899,6 +986,8 @@ Comments JBF@CD are action/reminders to Chris
     <input type="checkbox" name="attr_tab" class="sheet-tabMain" value="11" title="Adjustments">      <button type="action" name="act_tab" value="11">Parameters</button>
   </div>
 </div>
+
+
 
 
 
@@ -3252,38 +3341,38 @@ Comments JBF@CD are action/reminders to Chris
 
               <datalist id="discipline">
                 <option disabled> Discipline</option>
-                <option value="Air Sailor"         title="Air Sailor Durability 5"       >Discipline</option>
-                <option value="Archer"             title="Archer Durability 5"           >Discipline</option>
-                <option value="Beastmaster"        title="Beastmaster Durability 7"      >Discipline</option>
-                <option value="Boatman"            title="Boatman Durability 5"          >Discipline</option>
-                <option value="Cavalryman"         title="Cavalryman Durability 7"       >Discipline</option>
-                <option value="Elementalist"       title="Elementalist Durability 3"     >Discipline</option>
-                <option value="Gauntlet"           title="Gauntlet Durability 7"         >Discipline</option>
-                <option value="Illusionist"        title="Illusionist Durability 3"      >Discipline</option>
-                <option value="Nethermancer"       title="Nethermancer Durability 3"     >Discipline</option>
-                <option value="Sailor"             title="Sailor Durability 5"           >Discipline</option>
-                <option value="Scout"              title="Scout Durability 5"            >Discipline</option>
-                <option value="Shaman"             title="Shaman Durability 3"           >Discipline</option>
-                <option value="Sky Raider"         title="Sky Raider Durability 7"       >Discipline</option>
-                <option value="Swordmaster"        title="Swordmaster  Durability 7"      >Discipline</option>
-                <option value="Thief"              title="Thief  Durability 5"            >Discipline</option>
-                <option value="Troubadour"         title="Troubadour  Durability 5"       >Discipline</option>
-                <option value="Warrior"            title="Warrior  Durability 7"          >Discipline</option>
-                <option value="Weaponsmith"        title="Weaponsmith  Durability 5"      >Discipline</option>
-                <option value="Wizard"             title="Wizard  Durability 3"           >Discipline</option>
+                <option value="Air Sailor"         title="Air Sailor Durability 5"       >Air Sailor</option>
+                <option value="Archer"             title="Archer Durability 5"           >Archer</option>
+                <option value="Beastmaster"        title="Beastmaster Durability 7"      >Beastmaster</option>
+                <option value="Boatman"            title="Boatman Durability 5"          >Boatman</option>
+                <option value="Cavalryman"         title="Cavalryman Durability 7"       >Cavalryman </option>
+                <option value="Elementalist"       title="Elementalist Durability 3"     >Elementalist </option>
+                <option value="Gauntlet"           title="Gauntlet Durability 7"         >Gauntlet</option>
+                <option value="Illusionist"        title="Illusionist Durability 3"      >Illusionist </option>
+                <option value="Nethermancer"       title="Nethermancer Durability 3"     >Nethermancer </option>
+                <option value="Sailor"             title="Sailor Durability 5"           >Sailor</option>
+                <option value="Scout"              title="Scout Durability 5"            >Scout </option>
+                <option value="Shaman"             title="Shaman Durability 3"           >Shaman</option>
+                <option value="Sky Raider"         title="Sky Raider Durability 7"       >Sky Raider </option>
+                <option value="Swordmaster"        title="Swordmaster  Durability 7"      >Swordmaster </option>
+                <option value="Thief"              title="Thief  Durability 5"            >Thief </option>
+                <option value="Troubadour"         title="Troubadour  Durability 5"       >Troubadour </option>
+                <option value="Warrior"            title="Warrior  Durability 7"          >Warrior </option>
+                <option value="Weaponsmith"        title="Weaponsmith  Durability 5"      >Weaponsmith </option>
+                <option value="Wizard"             title="Wizard  Durability 3"           >Wizard </option>
                 <option disabled> Path</option>
-                <option value="Brother of Stone"   title="Path Brother of Stone"         >Path</option>
-                <option value="Fire Eater"         title="Path Fire Eater"               >Path</option>
-                <option value="Horror Stalker"     title="Path Horror Stalker"           >Path</option>
-                <option value="Journeyman"         title="Path Journeyman"               >Path</option>
-                <option value="Liberator"          title="Path Liberator"                >Path</option>
-                <option value="Messenger"          title="Path Messenger"                >Path</option>
-                <option value="Outcast"            title="Path Outcast"                  >Path</option>
-                <option value="Purifier"           title="Path Purifier"                 >Path</option>
-                <option value="Scholar"            title="Path Scholar"                  >Path</option>
-                <option value="Tail Dancer"        title="Path Tail Dancer"              >Path</option>
-                <option value="Windmaster"         title="Path Windmaster"               >Path</option>
-                <option value="Woodsmen"           title="Path Woodsmen"                 >Path</option>
+                <option value="Brother of Stone"   title="Path Brother of Stone"         >Brother of Stone</option>
+                <option value="Fire Eater"         title="Path Fire Eater"               >Fire Eater</option>
+                <option value="Horror Stalker"     title="Path Horror Stalker"           >Horror Stalker</option>
+                <option value="Journeyman"         title="Path Journeyman"               >Journeyman</option>
+                <option value="Liberator"          title="Path Liberator"                >Liberator</option>
+                <option value="Messenger"          title="Path Messenger"                >Messenger</option>
+                <option value="Outcast"            title="Path Outcast"                  >Outcast</option>
+                <option value="Purifier"           title="Path Purifier"                 >Purifier</option>
+                <option value="Scholar"            title="Path Scholar"                  >Scholar</option>
+                <option value="Tail Dancer"        title="Path Tail Dancer"              >Tail Dancer</option>
+                <option value="Windmaster"         title="Path Windmaster"               >Windmaster</option>
+                <option value="Woodsmen"           title="Path Woodsmen"                 >Woodsmen</option>
                 <option disabled> Questor</option>
                 <option value="Questor-Astendar"   title="Astendar - Love, Arts, Music."></option>
                 <option value="Questor-Chorrolis"  title="Chorrolis - Wealth, Trade, Envy, Desire."></option>
@@ -3298,8 +3387,8 @@ Comments JBF@CD are action/reminders to Chris
                 <option value="Questor-Upandal"    title="Upandal - Building, Construction, Planning."></option>
                 <option value="Questor-Vestrial"   title="Vestrial - Manipulation, Deceit. (Mad version of Trickster Prankster)"></option>
                 <option disabled> Others</option>
-                <option value="Spirit"       title="Use Circle to record Spirit Rating.">Other</option>
-                <option value="Creature"     title="Use Circle to record Challenge Rating.">Other</option>
+                <option value="Spirit"       title="Use Circle to record Spirit Rating."></option>
+                <option value="Creature"     title="Use Circle to record Challenge Rating."></option>
               </datalist>
 
               <!--Section Core - First fieldset-->
@@ -10139,240 +10228,240 @@ Comments JBF@CD are action/reminders to Chris
 
                     <div class="sheet-HideIfNotChecked sheet-HideIfLessThan1">
                       <div>
-                        <span class="sheet-fixed-width sheet-numShorter" >
-                        </span>
+
                         <b class="sheet-heading sheet-fixed-width sheet-numShorter sheet-text-center sheet-titlespan">#</b>
                         <b class="sheet-heading sheet-fixed-width sheet-txtLong sheet-text-center sheet-titlespan">Key/Test Knowledge</b>
-                        <b class="sheet-heading sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan">Done</b>
-                        <b class="sheet-heading sheet-fixed-width sheet-txtLong sheet-text-center sheet-titlespan">Rank Effect</b>
+                        <b class="sheet-heading sheet-fixed-width sheet-txtLonger sheet-text-center sheet-titlespan">Rank Effect</b>
                         <br>
                       </div>
 
                             <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                       <div>
-                        <span class="sheet-fixed-width sheet-numShorter">
-                          <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf1"></span>
+                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                           <span class="sheet-hidden sheet-UnhideIf1 sheet-iconstatic sheet-icon-weave"></span>
+                           <span class="sheet-Hide2If1">1-</span>
                         </span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">1-</span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank1TestKnowledge} - Test Knowledge for this Rank">
-                          <textarea name="attr_TI_Rank1TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                          <textarea name="attr_TI_Rank1TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank1TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                          <br>
+                          <textarea name="attr_TI_Rank1TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank1TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                         </span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank1KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                          <input name="attr_TI_Rank1KeyKnowledgeComplete" type="checkbox" value="1">
-                        </span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank1Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                          <textarea name="attr_TI_Rank1Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank1Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                          <textarea name="attr_TI_Rank1Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                         </span>
                       </div>
+
                             <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                       <div class="sheet-HideIfLessThan2">
-                        <span class="sheet-fixed-width sheet-numShorter">
-                          <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf2"></span>
+
+                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                           <span class="sheet-hidden sheet-UnhideIf2 sheet-iconstatic sheet-icon-weave"></span>
+                           <span class="sheet-Hide2If2">2-</span>
                         </span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">2-</span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank2TestKnowledge} - Test Knowledge for this Rank">
-                          <textarea name="attr_TI_Rank2TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                          <textarea name="attr_TI_Rank2TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank2TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                          <br>
+                          <textarea name="attr_TI_Rank2TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank2TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                         </span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank2KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                          <input name="attr_TI_Rank2KeyKnowledgeComplete" type="checkbox" value="2">
-                        </span>
-                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank2Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                          <textarea name="attr_TI_Rank2Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank2Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                          <textarea name="attr_TI_Rank2Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                         </span>
                         <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                         <div class="sheet-HideIfLessThan3">
-                          <span class="sheet-fixed-width sheet-numShorter">
-                            <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf3"></span>
+                          <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                             <span class="sheet-hidden sheet-UnhideIf3 sheet-iconstatic sheet-icon-weave"></span>
+                             <span class="sheet-Hide2If3">3-</span>
                           </span>
-                          <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">3-</span>
-                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank3TestKnowledge} - Test Knowledge for this Rank">
-                            <textarea name="attr_TI_Rank3TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                            <textarea name="attr_TI_Rank3TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank3TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                            <br>
+                            <textarea name="attr_TI_Rank3TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank3TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                           </span>
-                          <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank3KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                            <input name="attr_TI_Rank3KeyKnowledgeComplete" type="checkbox" value="3">
-                          </span>
-                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank3Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                            <textarea name="attr_TI_Rank3Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank3Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                            <textarea name="attr_TI_Rank3Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                           </span>
                           <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                           <div class="sheet-HideIfLessThan4">
-                            <span class="sheet-fixed-width sheet-numShorter">
-                              <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf4"></span>
+                            <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                               <span class="sheet-hidden sheet-UnhideIf4 sheet-iconstatic sheet-icon-weave"></span>
+                               <span class="sheet-Hide2If4">4-</span>
                             </span>
-                            <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">4-</span>
-                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank4TestKnowledge} - Test Knowledge for this Rank">
-                              <textarea name="attr_TI_Rank4TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                              <textarea name="attr_TI_Rank4TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank4TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                              <br>
+                              <textarea name="attr_TI_Rank4TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank4TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                             </span>
-                            <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank4KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                              <input name="attr_TI_Rank4KeyKnowledgeComplete" type="checkbox" value="4">
-                            </span>
-                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank4Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                              <textarea name="attr_TI_Rank4Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank4Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                              <textarea name="attr_TI_Rank4Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                             </span>
                             <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                             <div class="sheet-HideIfLessThan5">
-                              <span class="sheet-fixed-width sheet-numShorter">
-                                <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf5"></span>
+                              <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                 <span class="sheet-hidden sheet-UnhideIf5 sheet-iconstatic sheet-icon-weave"></span>
+                                 <span class="sheet-Hide2If5">5-</span>
                               </span>
-                              <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">5-</span>
-                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank5TestKnowledge} - Test Knowledge for this Rank">
-                                <textarea name="attr_TI_Rank5TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                <textarea name="attr_TI_Rank5TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank5TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                <br>
+                                <textarea name="attr_TI_Rank5TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank5TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                               </span>
-                              <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank5KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                <input name="attr_TI_Rank5KeyKnowledgeComplete" type="checkbox" value="5">
-                              </span>
-                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank5Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                <textarea name="attr_TI_Rank5Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank5Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                <textarea name="attr_TI_Rank5Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                               </span>
                               <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                               <div class="sheet-HideIfLessThan6">
-                                <span class="sheet-fixed-width sheet-numShorter">
-                                  <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf6"></span>
+                                <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                   <span class="sheet-hidden sheet-UnhideIf6 sheet-iconstatic sheet-icon-weave"></span>
+                                   <span class="sheet-Hide2If6">6-</span>
                                 </span>
-                                <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">6-</span>
-                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank6TestKnowledge} - Test Knowledge for this Rank">
-                                  <textarea name="attr_TI_Rank6TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                  <textarea name="attr_TI_Rank6TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank6TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                  <br>
+                                  <textarea name="attr_TI_Rank6TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank6TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                 </span>
-                                <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank6KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                  <input name="attr_TI_Rank6KeyKnowledgeComplete" type="checkbox" value="6">
-                                </span>
-                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank6Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                  <textarea name="attr_TI_Rank6Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank6Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                  <textarea name="attr_TI_Rank6Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                 </span>
                                 <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                 <div class="sheet-HideIfLessThan7">
-                                  <span class="sheet-fixed-width sheet-numShorter">
-                                    <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf7"></span>
+                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                     <span class="sheet-hidden sheet-UnhideIf7 sheet-iconstatic sheet-icon-weave"></span>
+                                     <span class="sheet-Hide2If7">7-</span>
                                   </span>
-                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">7-</span>
-                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank7TestKnowledge} - Test Knowledge for this Rank">
-                                    <textarea name="attr_TI_Rank7TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                    <textarea name="attr_TI_Rank7TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank7TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                    <br>
+                                    <textarea name="attr_TI_Rank7TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank7TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                   </span>
-                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank7KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                    <input name="attr_TI_Rank7KeyKnowledgeComplete" type="checkbox" value="7">
-                                  </span>
-                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank7Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                    <textarea name="attr_TI_Rank7Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank7Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                    <textarea name="attr_TI_Rank7Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                   </span>
                                   <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                   <div class="sheet-HideIfLessThan8">
-                                    <span class="sheet-fixed-width sheet-numShorter">
-                                      <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf8"></span>
+                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                       <span class="sheet-hidden sheet-UnhideIf8 sheet-iconstatic sheet-icon-weave"></span>
+                                       <span class="sheet-Hide2If8">8-</span>
                                     </span>
-                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">8-</span>
-                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank8TestKnowledge} - Test Knowledge for this Rank">
-                                      <textarea name="attr_TI_Rank8TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                      <textarea name="attr_TI_Rank8TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank8TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                      <br>
+                                      <textarea name="attr_TI_Rank8TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank8TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                     </span>
-                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank8KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                      <input name="attr_TI_Rank8KeyKnowledgeComplete" type="checkbox" value="8">
-                                    </span>
-                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank8Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                      <textarea name="attr_TI_Rank8Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                    <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank8Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                      <textarea name="attr_TI_Rank8Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                     </span>
                                     <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                     <div class="sheet-HideIfLessThan9">
-                                      <span class="sheet-fixed-width sheet-numShorter">
-                                        <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf9"></span>
+                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                         <span class="sheet-hidden sheet-UnhideIf9 sheet-iconstatic sheet-icon-weave"></span>
+                                         <span class="sheet-Hide2If9">9-</span>
                                       </span>
-                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">9-</span>
-                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank9TestKnowledge} - Test Knowledge for this Rank">
-                                        <textarea name="attr_TI_Rank9TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                        <textarea name="attr_TI_Rank9TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank9TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                        <br>
+                                        <textarea name="attr_TI_Rank9TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank9TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                       </span>
-                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank9KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                        <input name="attr_TI_Rank9KeyKnowledgeComplete" type="checkbox" value="9">
-                                      </span>
-                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank9Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                        <textarea name="attr_TI_Rank9Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                      <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank9Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                        <textarea name="attr_TI_Rank9Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                       </span>
                                       <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                       <div class="sheet-HideIfLessThan10">
-                                        <span class="sheet-fixed-width sheet-numShorter">
-                                          <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf10"></span>
+                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                           <span class="sheet-hidden sheet-UnhideIf10 sheet-iconstatic sheet-icon-weave"></span>
+                                           <span class="sheet-Hide2If10">10-</span>
                                         </span>
-                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">10-</span>
-                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank10TestKnowledge} - Test Knowledge for this Rank">
-                                          <textarea name="attr_TI_Rank10TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                          <textarea name="attr_TI_Rank10TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank10TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                          <br>
+                                          <textarea name="attr_TI_Rank10TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank10TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                         </span>
-                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank10KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                          <input name="attr_TI_Rank10KeyKnowledgeComplete" type="checkbox" value="10">
-                                        </span>
-                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank10Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                          <textarea name="attr_TI_Rank10Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                        <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank10Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                          <textarea name="attr_TI_Rank10Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                         </span>
                                         <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                         <div class="sheet-HideIfLessThan11">
-                                          <span class="sheet-fixed-width sheet-numShorter">
-                                            <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf11"></span>
+                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                             <span class="sheet-hidden sheet-UnhideIf11 sheet-iconstatic sheet-icon-weave"></span>
+                                             <span class="sheet-Hide2If11">11-</span>
                                           </span>
-                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">11-</span>
-                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank11TestKnowledge} - Test Knowledge for this Rank">
-                                            <textarea name="attr_TI_Rank11TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                            <textarea name="attr_TI_Rank11TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank11TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                            <br>
+                                            <textarea name="attr_TI_Rank11TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank11TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                           </span>
-                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank11KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                            <input name="attr_TI_Rank11KeyKnowledgeComplete" type="checkbox" value="11">
-                                          </span>
-                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank11Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                            <textarea name="attr_TI_Rank11Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                          <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank11Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                            <textarea name="attr_TI_Rank11Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                           </span>
                                           <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                           <div class="sheet-HideIfLessThan12">
-                                            <span class="sheet-fixed-width sheet-numShorter">
-                                              <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf12"></span>
+                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                               <span class="sheet-hidden sheet-UnhideIf12 sheet-iconstatic sheet-icon-weave"></span>
+                                               <span class="sheet-Hide2If12">12-</span>
                                             </span>
-                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">12-</span>
-                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank12TestKnowledge} - Test Knowledge for this Rank">
-                                              <textarea name="attr_TI_Rank12TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                              <textarea name="attr_TI_Rank12TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank12TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                              <br>
+                                              <textarea name="attr_TI_Rank12TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank12TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                             </span>
-                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank12KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                              <input name="attr_TI_Rank12KeyKnowledgeComplete" type="checkbox" value="12">
-                                            </span>
-                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank12Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                              <textarea name="attr_TI_Rank12Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                            <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank12Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                              <textarea name="attr_TI_Rank12Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                             </span>
                                             <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                             <div class="sheet-HideIfLessThan13">
-                                              <span class="sheet-fixed-width sheet-numShorter">
-                                                <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf13"></span>
+                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                                 <span class="sheet-hidden sheet-UnhideIf13 sheet-iconstatic sheet-icon-weave"></span>
+                                                 <span class="sheet-Hide2If13">13-</span>
                                               </span>
-                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">13-</span>
-                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank13TestKnowledge} - Test Knowledge for this Rank">
-                                                <textarea name="attr_TI_Rank13TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                                <textarea name="attr_TI_Rank13TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank13TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                                <br>
+                                                <textarea name="attr_TI_Rank13TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank13TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                               </span>
-                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank13KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                                <input name="attr_TI_Rank13KeyKnowledgeComplete" type="checkbox" value="13">
-                                              </span>
-                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank13Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                                <textarea name="attr_TI_Rank13Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                              <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank13Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                                <textarea name="attr_TI_Rank13Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                               </span>
                                               <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                               <div class="sheet-HideIfLessThan14">
-                                                <span class="sheet-fixed-width sheet-numShorter">
-                                                  <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf14"></span>
+                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                                   <span class="sheet-hidden sheet-UnhideIf14 sheet-iconstatic sheet-icon-weave"></span>
+                                                   <span class="sheet-Hide2If14">14-</span>
                                                 </span>
-                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">14-</span>
-                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank14TestKnowledge} - Test Knowledge for this Rank">
-                                                  <textarea name="attr_TI_Rank14TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                                  <textarea name="attr_TI_Rank14TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank14TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                                  <br>
+                                                  <textarea name="attr_TI_Rank14TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank14TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                                 </span>
-                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank14KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                                  <input name="attr_TI_Rank14KeyKnowledgeComplete" type="checkbox" value="14">
-                                                </span>
-                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank14Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                                  <textarea name="attr_TI_Rank14Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                                <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank14Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                                  <textarea name="attr_TI_Rank14Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                                 </span>
                                                 <!--Start Rank. Ranks are in a cascade of div for comparison need-->
                                                 <div class="sheet-HideIfLessThan15">
-                                                  <span class="sheet-fixed-width sheet-numShorter">
-                                                    <span class="sheet-iconstatic sheet-icon-weave sheet-hidden sheet-UnhideIf15"></span>
+                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">
+                                                     <span class="sheet-hidden sheet-UnhideIf15 sheet-iconstatic sheet-icon-weave"></span>
+                                                     <span class="sheet-Hide2If15">15-</span>
                                                   </span>
-                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-numShorter sheet-text-center">15-</span>
-                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank15TestKnowledge} - Test Knowledge for this Rank">
-                                                    <textarea name="attr_TI_Rank15TestKnowledge" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" >
+                                                    <textarea name="attr_TI_Rank15TestKnowledge" placeholder="Test Knowledge" class="sheet-testPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank15TestKnowledge} - Test Knowledge for this Rank"></textarea>
+                                                    <br>
+                                                    <textarea name="attr_TI_Rank15TestKnowledge_max" placeholder="Key Knowledge" class="sheet-hideIfPlaceholder sheet-details-oneline sheet-text-left sheet-txtLong sheet-LockIfNotEditMode" title="@{repeating_threads_TI_Rank15TestKnowledge_max} - Key Knowledge for this Rank"></textarea>
                                                   </span>
-                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort sheet-text-center sheet-titlespan" title="@{repeating_threads_TI_Rank15KeyKnowledgeComplete} - Check to keep track of completion of Key Knowledge/Deed">
-                                                    <input name="attr_TI_Rank15KeyKnowledgeComplete" type="checkbox" value="15">
-                                                  </span>
-                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLong sheet-titlespan" title="@{repeating_threads_TI_Rank15Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
-                                                    <textarea name="attr_TI_Rank15Effect" class="sheet-details-small sheet-text-left sheet-txtLong sheet-LockIfNotEditMode"></textarea>
+
+                                                  <span class="sheet-nowrap0 sheet-fixed-width sheet-txtLonger sheet-titlespan" title="@{repeating_threads_TI_Rank15Effect} - Record here the Effect of this Rank - Prefer short text with all ranks effect, as this text will also be displayed in the Summary">
+                                                    <textarea name="attr_TI_Rank15Effect" class="sheet-details-small sheet-text-left sheet-txtLonger sheet-LockIfNotEditMode"></textarea>
                                                   </span>
                                                 </div>
                                                 <!--End Rank-->
@@ -10422,8 +10511,8 @@ Comments JBF@CD are action/reminders to Chris
                   </div>
                   <div class="sheet-content">
                     <input type="checkbox" name="attr_blood-edit-mode" value="1" hidden class="sheet-testRepEditMode">
-                    <b class="sheet-heading sheet-fixed-width sheet-txtShort sheet-text-center">&nbsp;Items&nbsp;</b>&nbsp;&nbsp;&nbsp;
-                    <b class="sheet-heading sheet-fixed-width sheet-numShort sheet-text-center">&nbsp;Dmg&nbsp;</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <b class="sheet-heading sheet-fixed-width sheet-txtShort sheet-text-center">&nbsp;Items&nbsp;</b>
+                    <b class="sheet-heading sheet-fixed-width sheet-numShort sheet-text-center">&nbsp;Dmg&nbsp;</b>
                     <b class="sheet-heading sheet-fixed-width sheet-txtEvenLonger sheet-text-center">&nbsp;Effects&nbsp;</b>
 
                     <datalist id="blood">
@@ -10446,13 +10535,14 @@ Comments JBF@CD are action/reminders to Chris
 
                     <fieldset class="repeating_blood">
                       <input name="attr_BL_RowID" type="hidden" class="sheet-testRowID" value=""><span></span>
-                      <span class="sheet-nowrap">
+                      <span class="sheet-fixed-width sheet-txtShort">
                         <input name="attr_BL_Name" list="blood" type="text" class="sheet-txtShort sheet-LockIfNotEditMode" title="@{repeating_blood_X_BL_Name}:   Name of Blood Charm." placeholder="Item" >
                       </span>
-                    <span class="sheet-nowrap">
-                      <input name="attr_BL_Damage-Blood-Magic" type="number" value="0" min="0" class="sheet-numShort sheet-LockIfNotEditMode" title="@{repeating_blood_X_BL_Damage-Blood-Magic}:   Number of Blood Damage" ></span>
+                    <span class="sheet-nowrap0 sheet-fixed-width sheet-numShort">
+                      <input name="attr_BL_Damage-Blood-Magic" type="number" value="0" min="0" class="sheet-numShort sheet-LockIfNotEditMode" title="@{repeating_blood_X_BL_Damage-Blood-Magic}:   Number of Blood Damage" >
+                    </span>
                       <input type="checkbox" name="attr_BL_ShowNotes" value="1" class="sheet-hidden sheet-testChecked">
-                      <span class="sheet-nowrap sheet-fixed-width sheet-txtEvenLonger" style="height:25px; vertical-align:middle;">
+                      <span class="sheet-nowrap0 sheet-fixed-width sheet-txtEvenLonger" style="height:25px; vertical-align:middle;">
                         <textarea name="attr_BL_Effects" class="sheet-details-oneline sheet-bordered-bottom sheet-txtEvenLonger sheet-HideIfChecked" title="@{repeating_blood_X_BL_Effects}:   Charm Effects." ></textarea>
                       </span>
                       <label title="@{repeating_blood_X_BL_ShowNotes}   Show or Hide the details of item">
@@ -11491,7 +11581,7 @@ Comments JBF@CD are action/reminders to Chris
                 </select>
               </span>
               <span class="sheet-nowrap" title="@{CreationMode} To be unchecked at the end of creation to hide fields that are only used during PC creation. Check back to revert to creation Mode">
-                <select name="attr_CreationMode" class="sheet-txtLong" title="Is Creation Mode Active">
+                <select name="attr_CreationMode" class="sheet-txtLong" title="@{CreationMode} Is Creation Mode Active">
                   <option selected value="0" title="Sheet is running in normal mode"> Creation Mode - Off</option>
                   <option value="1" title="Sheet is running in Creation Mode - Tips for Character Creation will be shown"> Creation Mode - On</option>
                 </select>
@@ -11930,7 +12020,7 @@ Comments JBF@CD are action/reminders to Chris
 <!-- WORKERS -->
 <script type="text/worker">
 
-var SheetVersion=3.17;
+var SheetVersion=3.18;
 
 // This is Test code to see if worker threads are active (working).   If wt-test1 changes, change wt-test2. if wt-test2 does not update, sheetworkers are not working.
 on("change:wt-test1", function ocwttest1() {
@@ -12146,6 +12236,7 @@ var buildPre = function ( code, rowID ) {
       case "MSK": ret = "repeating_masks_"      + rowID + "_" + code + "_"; break;
       case "PER": ret = "repeating_personality_"      + rowID + "_" + code + "_"; break;
       case "MSG": ret = "repeating_message_"      + rowID + "_" + code + "_"; break;
+      case "TR": ret = "repeating_transaction_"      + rowID + "_" + code + "_"; break;
 
       default: log("Earthdawn:buildPre() error. Unknown code: " + code + "   RowID: " + rowID );
     }
@@ -12633,7 +12724,7 @@ var updateAttribFinal = function fnUpdateAttribFinal( base ) {    //calculate Ac
     vals[ efct ] = e;
     if( a != getInt( values, bs) )
     vals[ bs ] = a;
-    if( _.size( vals ) > 0 )
+    if( Object.keys(vals).length > 0 )
     setAttrsLog( vals );
   });
   } catch(err) {
@@ -14561,9 +14652,7 @@ on("change:repeating_discipline:dsp_name change:repeating_discipline:dsp_circle"
             pre = buildPre( "DSP", tarray[ i ]);
             array2=[];
             ddata=parseJSON(values[pre+"Name_max"]);
-             log("countDiscipline for " + values[pre+"Name_max"]);
             let ty=  ddata.Type || values[pre+"Type"] || "Discipline";
-            log("ty " +ty + " ddata " + JSON.stringify(ddata));
             if(ty=="Discipline") disc++;
             if(ty=="Discipline" && disc==1) primdisc=values[pre+"Name"]; //Store the Primary Discipline to be used with a Path
             if(ty=="Questor") quest++;
@@ -14600,7 +14689,7 @@ on("change:repeating_discipline:dsp_name change:repeating_discipline:dsp_circle"
                   if(ddata2["Buff_C"+j]) {
                     array2=safeString( ddata2["Buff_C"+j] ).split(";");
                     for( k=0 ;k<array2.length ; k++ ) {
-                      log("processing Buff for Path " + array2[k]);
+                      //log("processing Buff for Path " + array2[k]);
                       // if(safeString( array2[k] ).startsWith("Karma:") && !s.includes(array2[k])) s+=(array2[k].substring(array2[k].search("Karma:")+6) + "\n");
                       if(array2[k].includes("Physical Defense")) pd[2]=Math.max(pd[2],parseInt2(safeString( array2[k] ).trim().charAt(1)));
                       else if(array2[k].includes("Mystic Defense")) md[2]=Math.max(md[2],parseInt2(safeString( array2[k] ).trim().charAt(1)));
@@ -14864,7 +14953,7 @@ on("change:repeating_talents:t_poison-type change:repeating_knacks:nac_poison-ty
 
 // Takes an Earthdawn step number, and returns a string containing the dice to be rolled.
 // If step is less than 1, returns an empty string.
-StepToDice = function( stepNum , edition)  {
+var StepToDice = function( stepNum , edition)  {
 'use strict';
 try {
 let dice = "";
@@ -17266,7 +17355,33 @@ else if( fromSheetVersion < 3.16 ) {
 
 } // End ver 3.16
 
+else if( fromSheetVersion < 3.18 ) {
+  toSheetVersion = 3.18;
 
+  var newNotes = "Earthdawn by FASA Character Sheet version: " + toSheetVersion + " by Chris Dickey and JB Faure .\n"
+  // Note: Put update stuff here.
+  + "Access the WIKI by pressing the red '?' button at the top right of the character name. "
+  + "Alternatively the url is 'https://wiki.roll20.net/Earthdawn_-_FASA_Official'. Read it.\n"
+  + "-New Legend Point Tracker in the sheet. Everytime you make a change that requires LPs, an automatic transaction will appear on top of the sheet. Adjust the text and amounts, and post to your journal in the Legends Tab. Functionality replaces the API functionality that will be disabled.\n"
+  + "-New Display for the Thread Items with a separate field for Test and Key Knowledge.\n"
+
+
+  + notes;
+  // Comment this line out if not to change tab to force release notes visible.
+  showNotes = (showNotes === -1) ? -1 : 1;
+
+
+
+  if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
+  setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
+    'use strict';
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  });
+  else{
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  }
+
+} // End ver 3.18
 
     else  {
 
@@ -17979,6 +18094,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           //   vals[ "APIflag" ] = flags;
           vals[pre+"Circle_max"] = values[pre+"Circle"]; //Store the last Circle processed
           vals[pre+"show-createbutton"] = 0;
+          //log("Create Talents vals "+JSON.stringify(vals));
           setAttrsLog( vals );
         });
       });
@@ -18292,9 +18408,10 @@ var updateLPSummary = function fnupdateLPSummary() {
                     rnk = getInt( values, pre + "Rank" );
                     orig=values[pre + "Type" ];
                     if(!orig  || !_.isString(orig) || orig=="0") orig="Novice";
-                    off=CalcOffset(orig,undefined,values[pre+"Name"]); //Will return undefined if not one of the Tiers
                     if(rnk>0 &&(orig=="Novice"|| orig=="Journeyman"|| orig=="Warden"|| orig=="Master"))
                     {
+                      off=CalcOffset(orig,undefined,values[pre+"Name"]); //Will return undefined if not one of the Tiers
+
                       inc=0
                       for(let j=1; j<=rnk; j++) inc+=fibocost[j+off];  //Thread Items like Talents
                       val+=inc;
@@ -18342,47 +18459,7 @@ on("change:attrib-dex-increases change:attrib-str-increases change:attrib-tou-in
 
 
 
-on("clicked:post_update", fn(function ocPost_Update() {
-  'use strict';
-  try{
-  getAttrs([ "record-type","record-reason", "record-item","record-journal", "record-amount-LP" , "record-amount-SP","record-date-throalic","LP-Total","LP-Current","Wealth_Silver"], function(values) {
-    let vals = {};
-    let d = new Date(),
-     n = d.getFullYear()+"-"+(d.getMonth() +1)+"-"+d.getDate(),
-     i=(values["record-item"] || "SP"),
-     lp= safeString( i ).startsWith("LP"),
-     sp= safeString( i ).endsWith("SP");
 
-     if(sp) switch((values["record-type"] || "Gain")){
-       case "Spend" :
-       case "Decrease" : vals["Wealth_Silver"]=getInt(values,"Wealth_Silver") - getInt(values,"record-amount-SP"); break;
-       case "Gain" :
-       case "Refund" : vals["Wealth_Silver"]=getInt(values,"Wealth_Silver") + getInt(values,"record-amount-SP"); break;
-       default : vals["Wealth_Silver"]=getInt(values,"Wealth_Silver") + getInt(values,"record-amount-SP");
-     }
-
-     if(lp) switch((values["record-type"] || "Gain")){
-       case "Decrease" :   vals["LP-Total"]=getInt(values,"LP-Total") - getInt(values,"record-amount-LP");
-       case "Spend" : vals["LP-Current"]=getInt(values,"LP-Current") - getInt(values,"record-amount-LP"); break;
-       case "Gain" : vals["LP-Total"]=getInt(values,"LP-Total") + getInt(values,"record-amount-LP");
-       case "Refund" : vals["LP-Current"]=getInt(values,"LP-Current") + getInt(values,"record-amount-LP"); break;
-       default :
-       vals["LP-Total"]=getInt(values,"LP-Total") + getInt(values,"record-amount-LP");
-       vals["LP-Current"]=getInt(values,"LP-Current") + getInt(values,"record-amount-LP");
-     }
-
-     vals["record-journal"]= n + "   " + (values["record-date-throalic"] ||"")+ " "
-      + ((lp || sp ) ? (values["record-type"] ||"") : "")
-      + " "
-      + (lp ? (getInt(values,"record-amount-LP") + " LP (New Total " + vals["LP-Current"] + " LP)  ") :"")
-      + (lp &&sp ? " & " :"")
-      + (sp ? (getInt(values,"record-amount-SP") + " SP (New Total " + vals["Wealth_Silver"] + " SP)  ") :"")
-      + " : " + (values["record-reason"] ||"") + "\n" + (values["record-journal"] ||"");
-     vals["record-reason"]="";
-    setAttrsLog(vals);
-  });
-} catch(err) {log("Earthdawn:ocPost_Update() error caught: " + err );}
-})); //End ocPost_Update
 
 
 
@@ -18533,7 +18610,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
       //v3.15 For Augment Knacks we need to also get in the query the Augmented Talent or Knack. We must have a compadata
       let cquery=BuildCompendiumQuery(tname,code),
       aug=""; //aug will be "" for not Augment Knack, and will be the base Talent for Augment that apply to the Talent, and the KnackName for those that apply to another Knack
-      log("Autofill data "+JSON.stringify(data) + " cquery " + JSON.stringify(cquery));
+      //log("Autofill data "+JSON.stringify(data) + " cquery " + JSON.stringify(cquery));
       if(data && safeString(data.KnackType).startsWith("Augment")){
         log("Augment Knack");
         cquery=[cquery];
@@ -18552,7 +18629,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
 
        getCompendiumQuery2(cquery,comp_data, compendium_pages => {
 
-        log( "Earthdawn-Autofill : Compendium Search result for " + code + ": " + tname + " \n" +  JSON.stringify(compendium_pages));
+        //log( "Earthdawn-Autofill : Compendium Search result for " + code + ": " + tname + " \n" +  JSON.stringify(compendium_pages));
 
         if(compsearch && compendium_pages && compendium_pages[0] && compendium_pages[0].data && compendium_pages[0].data.Category){
         //log("Earthdawn-Autofill :Found " + compendium_pages.length + " page(s) in the compendium for"+ code + ": " + tname + " \n");
@@ -18563,7 +18640,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
           else if(values["Race"]=="Spirit")       catarray=["Spirit Powers","Creature Powers","Talents","Skills","Devotions","Dragon Powers","Horror Powers"];
           else if(values["Race"]=="Dragon")       catarray=["Dragon Powers","Creature Powers","Talents","Skills","Devotions","Spirit Powers","Horror Powers"];
           else if(values["Race"]=="Horror")       catarray=["Horror Powers","Creature Powers","Talents","Skills","Devotions","Spirit Powers","Dragon Powers"];
-          else                                    catarray=["Talents","Skills","Devotions","Horror Powers","Dragon Powers","Spirit Powers","Creature Powers"];
+          else                                    catarray=["Talents","Devotions","Skills","Horror Powers","Dragon Powers","Spirit Powers","Creature Powers"];
 
           for(let i=0;i<catarray.length;i++) {//Explore the categories by order
             ind=compendium_pages.findIndex(page => safeString(page.data.Category).replace(/\s/,"%20")==safeString( catarray[i] ).replace(/\s/,"%20"));
@@ -19665,7 +19742,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         default : log("Earthdawn:FillEntryData() unknown code: " + code ); return;
       }
 
-      let attarray=["Adjustment-Notes","Race", "Movement","SrRating",pre+"Name",pre+"Notes",pre+"Rank",pre+"Rank-Adjust",pre+"Attribute",pre+"RowID","edition","APIflag","isNamegiver","Dex-Step","Str-Step","Tou-Step","Per-Step","Wil-Step","Cha-Step","Initiative-Step","WeightAdjustment"];
+      let attarray=["Adjustment-Notes","Race", "Movement","SrRating",pre+"Name",pre+"Type",pre+"Notes",pre+"Rank",pre+"Rank-Adjust",pre+"Attribute",pre+"RowID","edition","APIflag","isNamegiver","Dex-Step","Str-Step","Tou-Step","Per-Step","Wil-Step","Cha-Step","Initiative-Step","WeightAdjustment"];
       if(entry.roll20_attmodnm) attarray.push(entry.roll20_attmodnm);
 
       getAttrs(attarray , function gaFillEntryData(values) {
@@ -19827,7 +19904,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         entry.roll20_extra_note= "Weight Adjusted due to Race by a factor " + values["WeightAdjustment"] +"\n"+ (entry.roll20_extra_note ||"");
       }
 
-      if(entry.Category=="Devotions" || (entry.roll20_Type && entry.roll20_Type.startsWith("QD-"))){ //Default Devotions
+      if(entry.Category=="Devotions" || (entry.roll20_Type && entry.roll20_Type.startsWith("QD-")) || (values[pre+"Type"] && values[pre+"Type"].startsWith("QD-"))){ //Default Devotions
         //log("Devotion");
         entry.roll20_Karma_Limit_max="0"; //No Karma on Devotions
         if(!entry.roll20_DP_Limit_max) entry.roll20_DP_Limit_max="1"; //Default devotions to enhabling DP
@@ -20473,7 +20550,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 
 
 //MP paths
-]},{"talent":"Thread Weaving","knacks":[	{"knackname":"Brother of Stone","requirement":"Rank 5, Speak Obsidiman, Read and Write Obsidiman, Obsidiman Lore 5","restrictions":"Any Discipline 5","page":"AJMP"}
+]},{"talent":"Thread Weaving","knacks":[	{"knackname":"Brother of Stone","requirement":"Rank 5, Speak Obsidiman, ReadWrite Obsidiman, Obsidiman Lore 5","restrictions":"Any Discipline 5","page":"AJMP"}
 ,	{"knackname":"Fire Eater","requirement":"Rank 5, ork","restrictions":"Any Discipline 5","page":"AJMP"}
 ,	{"knackname":"Horror Stalker","requirement":"Rank 5","restrictions":"Any Discipline 5","page":"AJMP"}
 ,	{"knackname":"Journeyman","requirement":"Rank 5, Versatility rank 5, Human","restrictions":"Any Discipline 5","page":"AJMP"}
@@ -20482,13 +20559,13 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 ,	{"knackname":"Outcast","requirement":"Rank 5","restrictions":"Any Discipline 5","page":"AJMP"}
 ,	{"knackname":"Purifier","requirement":"Rank 5","restrictions":"Any Discipline 5","page":"AJMP"}
 ,	{"knackname":"Scholar","requirement":"Rank 5, Knowledge skill rank 5","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Tail Dancer","requirement":"Rank 5, Dancing 5, Melee Weapons rank 5, t’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Tail Dancer (Ch’tard)","requirement":"Rank 5, Dancing 5, Melee Weapons rank 5, t’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Tail Dancer (Edo)","requirement":"Rank 5, Dancing 5, Melee Weapons rank 5, t’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Tail Dancer (Shivoavara)","requirement":"Rank 5, Dancing 5, Melee Weapons rank 5, t’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Tail Dancer (Skora)","requirement":"Rank 5, Dancing 5, Melee Weapons rank 5, t’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Windmaster","requirement":"Rank 5, Melee Weapons rank 5, windling","restrictions":"Any Discipline 5","page":"AJMP"}
-,	{"knackname":"Woodsman","requirement":"Rank 5, Speak Elf, Read and Write Elf (Sperethiel), Elf Lore 5","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Tail Dancer","requirement":"Rank 5, Dancing rank 5, Melee Weapons rank 5, T’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Tail Dancer (Ch’tard)","requirement":"Rank 5, Dancing rank 5, Melee Weapons rank 5, T’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Tail Dancer (Edo)","requirement":"Rank 5, Dancing rank 5, Melee Weapons rank 5, T’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Tail Dancer (Shivoavara)","requirement":"Rank 5, Dancing rank 5, Melee Weapons rank 5, T’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Tail Dancer (Skora)","requirement":"Rank 5, Dancing rank 5, Melee Weapons rank 5, T’skrang","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Windmaster","requirement":"Rank 5, Melee Weapons rank 5, Windling","restrictions":"Any Discipline 5","page":"AJMP"}
+,	{"knackname":"Woodsman","requirement":"Rank 5, Speak Elf, ReadWrite Elf, Elf Lore 5","restrictions":"Any Discipline 5","page":"AJMP"}
 
 
 ]}
@@ -20509,7 +20586,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
       let req2,nork,rk,meet=false;
       if(lg) log("req " + req + " trk "+trk);
       if(!req || req.length <=3 ) return true;
-      req2=safeString( req ).toLowerCase().trim();
+      req2=safeString( req ).toLowerCase().trim().replace("\'","’"); //Replace single quotes U+0027 that can be seen as string delimiter by apostrophe U+2019 that is just a character for apostrophe
       nork= isNaN(req2[req2.length-1]);
       rk= nork? 0 : parseInt2(req2.substring(req2.length-2).trim()); //Requirement end with a one or 2 digit number, separated by a space
       req2=nork ? req2 : req2.substring(0,req2.length-2).trim();            //Removed the found rank if any
@@ -20569,7 +20646,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
               attarray.push( buildPre( "SK", skarray[ i ] ) + "Class");
             }
 
-            getSectionIDsOrdered("repeating_language", function gsIdRepeatingLanguage(larray) {
+            getSectionIDsOrdered("repeating_skilll", function gsIdRepeatingLanguage(larray) {
               for( let i = 0; i < larray.length; i++){
                 attarray.push( buildPre( "SKL", larray[ i ] ) + "Name");
                 attarray.push( buildPre( "SKL", larray[ i ] ) + "Speak");
@@ -20589,17 +20666,17 @@ var updateKnackSummary = function fnupdateKnackSummary() {
                 dflt=(values["Knack-Summary-Param"]==2); //If true, the defltrk will be used to calculated the criterias
 
                 //building the character array with everything that defines the character
-                charray.push({"name": safeString( values["Race"] ).toLowerCase()});
+                charray.push({"name": safeString( values["Race"] ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")});
                 charray.push({"name": "strength", "rank" : getInt(values,"Attrib-Str-Curr")});
                 for( let i = 0; i < tarray.length; i++){
                   let rk= ((values[ buildPre( "T", tarray[ i ] ) + "Type"] =="Free") ? values[ buildPre( "T", tarray[ i ] ) + "LinkedValue"] :  values[ buildPre( "T", tarray[ i ] ) + "Rank"])||"0"
-                charray.push({ "name": safeString( values[buildPre( "T", tarray[ i ] ) + "Name"] ).toLowerCase()||"" , "rank" : rk });
+                charray.push({ "name": safeString( values[buildPre( "T", tarray[ i ] ) + "Name"] ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" , "rank" : rk });
               }
                 maxvalue=0
                 for( let i = 0; i < darray.length; i++){
                   pre=buildPre( "DSP", darray[ i ] );
-                  charray.push({ "name": safeString( values[pre + "Name"] ).toLowerCase()||"" , "rank" : values[pre + "Circle"]||"0" });
-                  if(values[pre + "VariantName"])   charray.push({ "name": safeString( values[pre + "VariantName"] ).toLowerCase()||"" , "rank" : values[pre + "Circle"]||"0" });
+                  charray.push({ "name": safeString( values[pre + "Name"] ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" , "rank" : values[pre + "Circle"]||"0" });
+                  if(values[pre + "VariantName"])   charray.push({ "name": safeString( values[pre + "VariantName"] ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" , "rank" : values[pre + "Circle"]||"0" });
                   if(!values[pre + "Type"] || values[pre + "Type"]=="Discipline")
                   maxvalue= Math.max(maxvalue,getInt(values,pre + "Circle"));
                 }
@@ -20607,40 +20684,47 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 
                 for( let i = 0; i < sparray.length; i++){
                   pre=buildPre( "SP", sparray[ i ] );
-                  charray.push({ "name": safeString( values[pre + "Name"] ).toLowerCase()||""});
+                  charray.push({ "name": safeString( values[pre + "Name"] ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||""});
                 }
 
 
                 for( let i = 0; i < karray.length; i++)
-                charray.push({ "name": safeString( values[buildPre( "NAC", karray[ i ] ) + "Name"] ).toLowerCase()||""});
+                charray.push({ "name": safeString( values[buildPre( "NAC", karray[ i ] ) + "Name"] ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||""});
                 maxvalue=0;
+
                 for( let i = 0; i < skarray.length; i++) {
                   pre=buildPre( "SK", skarray[ i ] );
                   let name = values[pre + "Name"]||"";
                   if(values[pre + "Class"] =="Knowledge" && (name.includes("Elven")  || name.includes("Elf"))) name="Elf Lore";
                   if(values[pre + "Class"] =="Knowledge" && name.includes("Obsidi")) name="Obsidiman Lore"; //A bit of extra specificity is needed to help with brother of stones and Woodsmen
-                  charray.push({ "name": safeString( values[pre + "Name"] ).toLowerCase()||"" , "rank" : values[pre + "Rank"]||"0" });
+                  charray.push({ "name": safeString( name).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" , "rank" : values[pre + "Rank"]||"0" });
                   if(values[pre + "Class"] =="Knowledge")
                   maxvalue= Math.max(maxvalue,getInt(values,pre + "Rank"));
                 }
                 charray.push({ "name": "knowledge skill" , "rank" : maxvalue });
+
+
                 for( let i = 0; i < larray.length; i++){
                   pre=buildPre( "SKL", larray[ i ] );
                   let name = values[pre + "Name"]||"";
+                  log("Language name " + name)
                   if(name.includes("Elven") || name.includes("Spere") || name.includes("Elf")) name="Elf";
                   if(name.includes("Obsidi")) name="Obsidiman"; //A bit of extra specificity is needed to help with brother of stones and Woodsmen
                   if(values[pre+"Speak"]=="1" || values[pre+"Speak-T"]=="1")
-                  charray.push({ "name": "speak "+ safeString( name ).toLowerCase()||"" });
+                  charray.push({ "name": "speak "+ safeString( name ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" });
                   if(values[pre+"ReadWrite"]=="1" || values[pre+"ReadWrite-T"]=="1")
-                  charray.push({ "name": "readwrite "+ safeString( name ).toLowerCase()||"" });
+                  charray.push({ "name": "readwrite "+ safeString( name ).toLowerCase().replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" });
                 }
                 //end of character array creation
+
+                log("values " +JSON.stringify(values));
+                log("Character Array " + JSON.stringify(charray));
 
                 //Testing all Talents
                 for( let i = 0; i < tarray.length; i++){
                   ss="";
                   pre=buildPre( "T", tarray[ i ] );
-                  let nm=values[pre+"Name"];
+                  let nm=safeString(values[pre+"Name"]).replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’");
                   let ty=values[pre+"Type"];
                   if(!ty || ty=="0" || safeString( ty ).startsWith("D") || safeString( ty ).startsWith("TO") || safeString( ty ).startsWith("PA")) { // 20220705: Addition : Only discipline/TO and Path Talents are open for Knacks
                     let rk=getInt(values,pre+"Rank");
@@ -20667,7 +20751,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
                 for( let i = 0; i < darray.length; i++){
                   ss="";
                   pre=buildPre( "DSP", darray[ i ] );
-                  let nm=values[pre+"Name"]||"";
+                  let nm=safeString(values[pre+"Name"]).replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’");
                   let rk=getInt(values,pre+"Circle");
                   //log("Testing for " +nm);
                   if(nm!=""){
@@ -20692,7 +20776,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
                 for( let i = 0; i < sparray.length; i++){
                   ss="";
                   pre=buildPre( "SP", sparray[ i ] );
-                  let nm=values[pre+"Name"]||"";
+                  let nm=safeString(values[pre+"Name"]).replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’");
                   //let rk=getInt(values,pre+"Circle");
                   //log("Testing for " +nm);
                   if(nm!=""){
@@ -20751,7 +20835,7 @@ on("clicked:stop-using-api", fn(function ocStopUsingApi() {
 // Will identify existing rowid with the same name (or create a rowid) and update the name and buttonInfo
 // Also used when an Ability is indirectly added (i.e. via the abilityadd field of the compendium)
 var AbilityDrop = function fnAbilityDrop(nm,rep,code,un,data,mode,comp_data) { // Except if nodup==true will search in the repeating_section rep if any rep_item has Name==nm, and return the rowid. If not found, will return a new rowID
-  let attarray=[],
+  let attarray=["TransacQueueLength"],
   rowID,found=false,newInfo,
   nodup=(mode && mode.includes("noduplicate")), //Allows 2 entries of the same name to be created, (useful for WPN)
   addqty=(mode && mode.includes("addqty")), //When detecting a duplicate, will update the Qty (useful for INV)
@@ -20879,7 +20963,16 @@ var AbilityDrop = function fnAbilityDrop(nm,rep,code,un,data,mode,comp_data) { /
         " Spend : " +
          " Buy " + ((data.roll20_Qty ? (parseInt(data.roll20_Qty))||1 : 1)==1 ? "a " : parseInt(data.roll20_Qty) + " Units of ") + (nm||""));
         //vals["APIflag"]=flag;
-}
+        log("dealing with inventory cost");
+          let trid=generateRowIdNoUnderscore(),
+            pre3=buildPre("TR",trid);
+            vals["TransacQueueLength"]=getInt(values,"TransacQueueLength")+1;
+            vals[pre3+"record-reason"]= "Buy " + ((data.roll20_Qty ? (parseInt(data.roll20_Qty))||1 : 1)==1 ? "a " : parseInt(data.roll20_Qty) + " Units of ") + (nm||"");
+            vals[pre3+"record-amount-SP"]=(data.roll20_Cost || data.Cost);
+            vals[pre3+"record-type"]="Spend";
+
+
+        }
           setAttrsLog( vals,null,function(){
           if(rowID && code=="DSP") repDiscipline(rowID,data);
           else if(rowID && abadd || code=="SPM") AutoFill(newInfo+"Name","AbilityAdd",nm,data,comp_data);
@@ -22913,7 +23006,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
 
 
             //LANGUAGES
-            AbilityArrayDrop (data["Language"],"repeating_language","SKL");
+            AbilityArrayDrop (data["Language"],"repeating_skilll","SKL");
             //Weapons
             AbilityArrayDrop (data["Weapons"],"repeating_weapons","WPN",null,true); //Default all Weapons to CombatSlot=1
 
@@ -23402,9 +23495,492 @@ on("sheet:compendium-drop", fn(function onCompDrop() {
 } catch(err) {log("Earthdawn:ocCompDrop error caught: " + err );}
 }));
 
+//**************LP Tracking functions*****
+
+
+// var CountTransac = function fnCountTransaction(eventInfo) {
+//   'use strict';
+//   try{
+//     log("CountTransaction " + JSON.stringify(eventInfo));
+//     getSectionIDs("repeating_transaction", function(tarray) {
+//       setAttrs({"TransacQueueLength" : tarray.length})
+//     });
+//   } catch(err) {log("Earthdawn:CountTransac() error caught: " + err );}
+// }; //end CountTransac ()
+// on("change:repeating_transaction remove:repeating_transaction", fn(CountTransac) );
+
+
+var PostTransac= function fnPostTransac(transacarray,cb){
+
+  'use strict';
+  try{
+  getAttrs([ "record-journal","record-date-throalic","LP-Total","LP-Current","Wealth_Silver","Wealth_Copper"], function(values) {
+    let vals = {};
+    let d = new Date(),
+     n = d.getFullYear()+"-"+(d.getMonth() +1)+"-"+d.getDate();
+     vals["record-journal"]= n + "   " + (values["record-date-throalic"] ||"")+ " ";
+
+     vals["LP-Total"]=getInt(values,"LP-Total");
+     vals["LP-Current"]=getInt(values,"LP-Current");
+     let silver=parseFloat(getInt(values,"Wealth_Silver")) +parseFloat(getInt(values,"Wealth_Copper"))/10;
+     for(let j=0; j<transacarray.length;j++){
+
+     let i=(transacarray[j].item || "SP"),
+     lp= safeString( i ).startsWith("LP") && parseInt2(transacarray[j].amountlp)!==0,
+     sp= safeString( i ).endsWith("SP") && parseFloat(transacarray[j].amountsp)!==0;
+
+     if(sp) switch(transacarray[j].type){
+       case "Spend" :
+       case "Decrease" : silver -= parseFloat(transacarray[j].amountsp); break;
+       case "Gain" :
+       case "Refund" : silver += parseFloat(transacarray[j].amountsp); break;
+       default : silver += parseFloat(transacarray[j].amountsp);
+     }
+
+     if(lp) switch(transacarray[j].type){
+       case "Decrease" :   vals["LP-Total"] -= parseInt2(transacarray[j].amountlp);
+       case "Spend" : vals["LP-Current"] -=  parseInt2(transacarray[j].amountlp); break;
+       case "Gain" : vals["LP-Total"] += parseInt2(transacarray[j].amountlp);
+       case "Refund" : vals["LP-Current"] += parseInt2(transacarray[j].amountlp); break;
+       default :
+       vals["LP-Total"]=getInt(values,"LP-Total") + parseInt2(transacarray[j].amountlp);
+       vals["LP-Current"]=getInt(values,"LP-Current") + parseInt2(transacarray[j].amountlp);
+     }
+
+
+     vals["Wealth_Silver"]=parseInt2(silver);
+     vals["Wealth_Copper"]=parseInt2(10*(silver-parseFloat(vals["Wealth_Silver"])));
+
+
+     vals["record-journal"]= vals["record-journal"]
+      + "▶" +((lp || sp ) ? (transacarray[j].type ||"") : "")
+      + " "
+      + (lp ? (parseInt2(transacarray[j].amountlp) + " LP (New Total " + vals["LP-Current"] + " LP)  ") :"")
+      + (lp && sp ? " & " :"")
+      + (sp ? (parseInt2(transacarray[j].amountsp) + " SP (New Total " + vals["Wealth_Silver"] + " SP)  ") :"")
+      + (transacarray[j].amountdays>0 ? " and " + transacarray[j].amountdays + " days " : "")
+      + " : " + (transacarray[j].reason ||"") + " ";
+     }
+
+     vals["record-journal"]="\n" + vals["record-journal"]+ (values["record-journal"] ||"");
+
+    setAttrsLog(vals,null,cb);
+  });
+} catch(err) {log("Earthdawn:PostTransac() error caught: " + err );}
+
+} //End PostTransac
+
+
+
+on("clicked:post_update", fn(function ocPost_Update() {
+  'use strict';
+  try{
+  getAttrs([ "record-type","record-reason", "record-item","record-journal", "record-amount-LP" , "record-amount-SP"], function(values) {
+    let type=(values["record-type"] || "Gain"),
+    reason=values["record-reason"]|| "",
+    item=values["record-item"] || "SP",
+    amountlp=getInt(values,"record-amount-LP"),
+    amountsp=parseFloat(values["record-amount-SP"]),
+    vals={};
+    vals["record-amount-LP"]="0";
+    vals["record-amount-SP"]="0";
+    vals["record-reason"]="";
+
+    PostTransac([{type:type,reason : reason, item : item, amountlp : amountlp, amountsp : amountsp,amountdays : null}],function(){
+
+      setAttrsLog(vals);
+    });
+  });
+} catch(err) {log("Earthdawn:ocPost_Update() error caught: " + err );}
+})); //End ocPost_Update
+
+
+
+on("clicked:transacignoreall", fn(function ocTransacIgnoreAll() {
+  'use strict';
+  try{
+    getSectionIDs("repeating_transaction", function gsIdRepeatingTransaction(tarray) {
+      for( let i = 0; i < tarray.length; i++)
+        removeRepeatingRow("repeating_transaction_" + tarray[i] );
+
+        setAttrs({"TransacQueueLength" : 0});
+  });
+} catch(err) {log("Earthdawn:ocTransacIgnoreAll() error caught: " + err );}
+})); //End ocTransacIgnoreAll
+
+
+
+on("clicked:repeating_transaction:transacignore", fn(function ocTransacIgnore(eventInfo) {
+  'use strict';
+  try{
+    let att = getAttrib(eventInfo),
+        rid = safeString( att ).split("_")[2];
+        removeRepeatingRow("repeating_transaction_" + rid );
+        getAttrs([ "TransacQueueLength"], function(values) {
+          setAttrs({"TransacQueueLength" : getInt(values,"TransacQueueLength")-1});
+
+        });
+
+} catch(err) {log("Earthdawn:ocTransacIgnore() error caught: " + err );}
+})); //End ocTransacIgnore
+
+
+
+on("clicked:repeating_transaction:transacupdate", fn(function ocTransacUpdate(eventInfo) {
+  'use strict';
+  try{
+    let att = getAttrib(eventInfo),
+        rid = safeString( att ).split("_")[2],
+        pre=buildPre("TR",rid);
+        getAttrs([ "TransacQueueLength", pre+"record-type",pre+"record-reason", pre+ "record-amount-LP" , pre+"record-amount-SP",pre+"record-amount-days"], function(values) {
+          let type=(values[pre+"record-type"] || "Spend"),
+          reason=values[pre+"record-reason"]|| "",
+          item= "LPSP",
+          amountlp=getInt(values,pre+"record-amount-LP"),
+          amountsp=parseFloat(values[pre+"record-amount-SP"]),
+          amountdays=getInt(values,pre+"record-amount-days");
+
+
+        PostTransac([{type:type,reason : reason, item : item, amountlp : amountlp, amountsp : amountsp,amountdays : amountdays}],function(){
+          removeRepeatingRow("repeating_transaction_" + rid );
+          setAttrs({"TransacQueueLength" : getInt(values,"TransacQueueLength")-1});
+        });
+        });
+
+
+} catch(err) {log("Earthdawn:ocTransacUpdate() error caught: " + err );}
+})); //End ocTransacUpdate
+
+
+on("clicked:transacupdateall", fn(function ocTransacUpdateAll() {
+  'use strict';
+  try{
+    getSectionIDs("repeating_transaction", function gsIdRepeatingTransaction(tarray) {
+      let attarray=[];
+      let transacarray=[];
+      for(let i=0; i < tarray.length; i++){
+        let pre=buildPre("TR",tarray[i])
+        attarray.push( pre+"record-type" );
+        attarray.push( pre+"record-reason" );
+        attarray.push( pre+ "record-amount-LP" );
+        attarray.push( pre+ "record-amount-SP" );
+        attarray.push( pre+ "record-amount-days" );
+      }
+        getAttrs(attarray, function(values) {
+          for(let i=0; i < tarray.length; i++){
+            let pre=buildPre("TR",tarray[i])
+          let type=(values[pre+"record-type"] || "Spend"),
+          reason=values[pre+"record-reason"]|| "",
+          item= "LPSP",
+          amountlp=getInt(values,pre+"record-amount-LP"),
+          amountsp=parseFloat(values[pre+"record-amount-SP"]),
+          amountdays=getInt(values,pre+"record-amount-days");
+
+          transacarray.push({type:type,reason : reason, item : item, amountlp : amountlp, amountsp : amountsp,amountdays : amountdays})
+          }
+        PostTransac(transacarray,function(){
+          for(let i=0; i < tarray.length; i++)
+          removeRepeatingRow("repeating_transaction_" + tarray[i] );
+          setAttrs({"TransacQueueLength" : 0});
+        });
+
+        });
+
+});
+} catch(err) {log("Earthdawn:ocTransacUpdateAll() error caught: " + err );}
+})); //End ocTransacUpdateAll
+
+//Posts the New Transactions
+var updateLPTransac = function fnupdateLPTransac(eventInfo) {
+  'use strict';
+  try{
+    //log ( "EarthDawn : updateLPTransac() " + JSON.stringify(eventInfo));
+
+    let att = getAttrib(eventInfo)||"";
+    let code="",rowid,pre;
+    if (!att || att==="") return;
+    let attarray = ["legend-transaction-mode","TransacQueueLength","edition_max", "CreationMode","NPC","LP-CreationOffset","LP-CreationOffset-Spells","LS-Speak-Rank","LS-ReadWrite-Rank","LP-Current","LP-Total", "LP-SpellsOption","Per-Step","NbDisc","LP-AttribOption","LP-Extra-Cost","LP-D2-Circle","LP-D3-Circle","LP-D4-Circle","LP-D2-Talents","LP-D3-Talents","LP-D4-Talents","Dex-Step","Str-Step","Tou-Step","Per-Step","Wil-Step","Cha-Step"];
+    if(att.startsWith("attrib")) code="ATT";  //ATT(ribute), T, NAC, SK, TI, SP, SPM, DSP, LS (Language)
+    else if(att.startsWith("ls")) code="LS";
+    else if(att.startsWith("repeating")){
+      if(!eventInfo.removedInfo){
+      code = repeatSection(3,att);
+      rowid = repeatSection(2,att);
+      pre = buildPre(code,rowid);
+       switch(code){
+         case "TI" :
+         case "SK" :
+         case "T" : attarray.push(pre+"Name");attarray.push(pre+"Rank");attarray.push(pre+"Type"); break;
+         case "SPM" : attarray.push(pre+"Rank");attarray.push(pre+"Origin"); break;
+         case "NAC" : attarray.push(pre+"Name");attarray.push(pre+"Requirements");attarray.push(pre+"Type"); break;
+         case "SP" : attarray.push(pre+"Name");attarray.push(pre+"Circle"); break;
+         case "DSP" : attarray.push(pre+"Name");attarray.push(pre+"Circle"); attarray.push(pre+"Type");break;
+         default : log("Earthdawn LPTransac - Unknown triger 1 "+  att); return;
+        }
+      } else { //When it is a remove, we won't get the code
+        let x = safeString( att ).split("_"),
+        code2 =x[1];
+        //log("code2 " + code2);
+        switch(code2){
+          case "threads" : code = "TI" ; break;
+          case "skills" : code = "SK" ; break;
+          case "talents" : code = "T"  ; break;
+          case "matrix" : code = "SPM" ; break;
+          case "knacks" : code = "NAC" ; break;
+          case "spell" : code = "SP" ; break;
+          case "discipline" : code = "DSP" ;break;
+          default : log("Earthdawn LPTransac - Unknown case for Removal"+  att); return;
+         }
+         rowid = x[2];
+         pre = buildPre(code,rowid);
+         log("pre " + pre);
+      }
+    } else{
+      log("Earthdawn LPTransac - Unknown triger 2 "+  att);
+      return;
+    }
+
+
+    getAttrs( attarray , function gaLPTransac(values) {
+      'use strict';
+      logvalues( values);
+
+      if(values["CreationMode"]=="1" || values["NPC"]!=="0" || parseFloat( values[ "edition_max" ] ) !== SheetVersion ||values["legend-transaction-mode"]=="0") return; //Do not log during Creation or for NPCs or if update of the sheet has not been done
+
+
+
+      var CalcOffset = function(ty) { //calcoffset to be determined depending on the discipline and the tier
+        'use strict';
+        let o;
+        let x=safeString( ty ).split("-");
+        let t,d; //t = tier, d="TO1","V1"...
+        if(x[1]) {t=x[1]; d=x[0];}
+        else t=ty; //If there is a - then split between discipline and Tier
+        switch(safeString( t ).toLowerCase()){
+          case "racial" :
+          case "follower":
+          case "novice" : o=0; break;
+          case "adherant":
+          case "adherent":
+          case "journeyman" : o=1; break;
+          case "exemplar" :
+          case "warden" : o=2; break;
+          case "master" : o=3; break;
+          default :  return -20; //Default, we return an offset of -20 that will give 0 costs
+        }
+        if(!d || isNaN(parseInt(d[d.length-1]))) return o; //If no discipline number specified, calculate just with the offset due to tier
+        else return (Math.min(3,o+parseInt2(d[d.length-1])-1)); //1st discipline, no offset, each subsequent discipline counts as 1 rank higher in the Fibonacci
+      };//end CalcOffset()
+
+      let fibocost= [0,100,200,300,500,800,1300,2100,3400,5500,8900,14400,23300,37700,61000,98700,159700,258400,418100];
+
+      var CalcFibo = function(rnk0,rnk1) {
+        let val=0;
+        for(let i=Math.max(0,rnk0);i<Math.min(rnk1,18);i++)
+          val+=fibocost[i+1];
+        return val;
+      }
 
 
 
 
+      //let rnk=0,off=0,orig=0,inc=0,st=0;
+      // let trnk=8, skrnk=14;
+      // let sprnk=getInt(values,"Per-Step")
+      //let val=0;
+      //let spval=0;
+
+      let newID= generateRowIdNoUnderscore(),
+        pre2=buildPre("TR",newID);
+      let amountlp=0,
+      amountdays=0,
+      amountsp=0,
+      reason="",
+      rtype="Spend",
+      nm,rkdspl,tynm,rknm,o;
+      let oldval={},newval={};
+      let vals={};
+
+      //We must first deal with deletion by merging back the removedInfo to the values
+      if(att.startsWith("repeating") && eventInfo.removedInfo){
+        for(var key in eventInfo.removedInfo) values[key]=eventInfo.removedInfo[key]; //We now have the removed data in values, but must be careful, because values is supposed to be up to date, and for deletion is not
+        log("values " +JSON.stringify(values));
+        }
+
+        //name and some basic values
+      switch(code){
+        case "ATT" :  nm= att.split("-")[1];nm=nm.charAt(0).toUpperCase() + nm.slice(1); rkdspl="Attribute Increase"; break;
+        case "LS"  :  nm= (att=="ls-speak-rank" ? "Speak Language" : "Read & Write Language") + "Novice Skill"; rkdspl="Rank"; break;
+        case "TI"  :  nm=values[pre+"Name"]; rkdspl="Thread Rank";rknm="Rank";tynm="Type"; break;
+        case "NAC" :  nm=values[pre+"Name"]; rkdspl="Knack Rank";rknm="Requirements";tynm="Type"; break;
+        case "SK"  :  nm=values[pre+"Name"]; rkdspl="Skill Rank";rknm="Rank";tynm="Type"; break;
+        case "T"   : nm=values[pre+"Name"]; rkdspl="Talent Rank";rknm="Rank";tynm="Type"; break;
+        case "SP"  : nm=values[pre+"Name"]; rkdspl="Spell Circle"; rknm="Circle"; break;
+        case "DSP" : nm=values[pre+"Name"]; rkdspl=(((values[pre+"Type"])=="Discipline") ? "Circle" : "Rank");rknm="Circle" ,tynm="Type"; break;
+        case "SPM" : nm="Matrix";rknm="Rank";rkdspl="Rank";tynm="Origin"; break;
+        default : log("Earthdawn LPTransac - Unknown triger "+  att); return;
+       }
+
+       if(eventInfo.previousValue && eventInfo.newValue && eventInfo.newValue==eventInfo.previousValue &&eventInfo.sourceType=="player") eventInfo.previousValue=undefined; //This is due to a bug in roll20... where it sometimes return identical values. the sourceType is because for Circle, Circle_max triggers it in CreateTalents
+
+       //Now find the old and new values
+       switch(code){
+         case "ATT" :
+         if(values["LP-AttribOption"]=="0") return; //With this optional rule, Attrib Increases do not cost so Ignore them
+          oldval.rk=parseInt(eventInfo.previousValue)|0;
+          newval.rk=parseInt(eventInfo.newValue)|0;
+          break;
+         case "LS"  :
+          oldval.rk=parseInt(eventInfo.previousValue)|0;
+          newval.rk=parseInt(eventInfo.newValue)|0;
+          break;
+        case "TI"  :
+        case "NAC" :
+        case "SK"  :
+        case "T"   :
+        case "SP"  :
+        case "SPM" :
+        case "DSP" :
+          if(eventInfo.removedInfo){
+            newval.tier=values[pre+tynm];
+            oldval.tier=values[pre+tynm];
+            newval.rk=0;
+            oldval.rk=values[pre+rknm]|0;
+          }else{
+            newval.tier=values[pre+tynm];
+            oldval.tier=(eventInfo.sourceAttribute == (pre+tynm).toLowerCase())? eventInfo.previousValue : values[pre+tynm];
+            newval.rk=values[pre+rknm]|0;
+            oldval.rk=(eventInfo.sourceAttribute == (pre+rknm).toLowerCase())? eventInfo.previousValue|0 : values[pre+rknm]|0;
+          }
+        break;
+         default : log("Earthdawn LPTransac - Unknown triger "+  att); return;
+        }
+
+
+        //Time to Calculate
+        switch(code){
+          case "ATT" :
+          newval.o=4;
+          oldval.o=4;
+          newval.lpcost=CalcFibo(newval.o,newval.rk+newval.o);
+          oldval.lpcost=CalcFibo(oldval.o,oldval.rk+oldval.o);
+          amountlp = newval.lpcost - oldval.lpcost;
+          amountdays= getInt(values,nm+"-Step") * (newval.rk-oldval.rk);//Number of days of training = Attribute Step. 10sp per day
+          amountsp = amountdays * 10;
+          break;
+
+          case "LS"  :
+          newval.o=1;
+          oldval.o=1;
+          newval.lpcost=CalcFibo(newval.o,newval.rk+newval.o);
+          oldval.lpcost=CalcFibo(oldval.o,oldval.rk+oldval.o);
+          amountlp = newval.lpcost - oldval.lpcost;
+          amountdays= 0;
+          newval.amountdays=0;
+          oldval.amountdays=0
+          for(let i=0; i<newval.rk; i++) newval.amountdays+= 7 * (i+1);
+          for(let i=0; i<oldval.rk; i++) oldval.amountdays+= 7 * (i+1);
+          amountdays=newval.amountdays-oldval.amountdays
+          amountsp = amountdays /7 * 10;
+          break;
+
+          case "DSP" :
+          let spdspcost =[0,200,300,500,800,1000,1500,2000,2500,3500,5000,7500,10000,15000,20000]
+          newval.spcost=0;
+          switch(newval.tier){
+            case "Questor" :
+            case "Path-Journeyman" : newval.o=1;  break;
+            case "Path-Master" : newval.o=3; break;
+            case "Other" : newval.o=-20; break;//Other are Free
+            default : newval.o=-20;//Discipline don't cost LP but sp
+            for(let i=0;i<newval.rk;i++) newval.spcost+=spdspcost[i]
+          }
+          oldval.spcost=0;
+          switch(oldval.tier){
+            case "Questor" :
+            case "Path-Journeyman" : oldval.o=1;  break;
+            case "Path-Master" : oldval.o=3;  break;
+            case "Other" : oldval.o=-20;  break;//Other are Free
+            default : oldval.o=-20;//Discipline don't cost LP but sp
+            for(let i=0;i<oldval.rk;i++) oldval.spcost+=spdspcost[i]
+          }
+          newval.lpcost=CalcFibo(newval.o,newval.rk+newval.o);
+          oldval.lpcost=CalcFibo(oldval.o,oldval.rk+oldval.o);
+          amountlp = newval.lpcost - oldval.lpcost;
+          amountsp = newval.spcost - oldval.spcost;
+          break;
+
+          case "SPM" :
+          case "T":
+          case "TI"  :
+          newval.o=CalcOffset(newval.tier);
+          oldval.o=CalcOffset(oldval.tier);
+          newval.lpcost=CalcFibo(newval.o,newval.rk+newval.o);
+          oldval.lpcost=CalcFibo(oldval.o,oldval.rk+oldval.o);
+          amountlp = newval.lpcost - oldval.lpcost;
+          break;
+
+          case "SK"  :
+          newval.o=CalcOffset(newval.tier)+1;
+          oldval.o=CalcOffset(oldval.tier)+1;
+          newval.lpcost=CalcFibo(newval.o,newval.rk+newval.o);
+          oldval.lpcost=CalcFibo(oldval.o,oldval.rk+oldval.o);
+          amountlp = newval.lpcost - oldval.lpcost;
+          newval.amountdays=0;
+          oldval.amountdays=0;
+          for(let i=0; i<newval.rk; i++) newval.amountdays+= 7 * (i+1);
+          for(let i=0; i<oldval.rk; i++) oldval.amountdays+= 7 * (i+1);
+          amountdays=newval.amountdays-oldval.amountdays
+          amountsp = amountdays /7 * 10;
+          break;
+
+          case "NAC" :
+          newval.o= newval.tier=="Knack" ? 0 : -20;
+          oldval.o= oldval.tier=="Knack" ? 0 : -20;
+          newval.lpcost=fibocost[Math.max(newval.rk+newval.o,0)];
+          oldval.lpcost=fibocost[Math.max(oldval.rk+oldval.o,0)];
+          amountlp = newval.lpcost - oldval.lpcost;
+          newval.amountdays=newval.rk;
+          oldval.amountdays=oldval.rk;
+          amountdays=newval.amountdays-oldval.amountdays
+          amountsp = amountdays *50;
+          break;
+
+          case "SP"  :
+          newval.o= 0;
+          oldval.o= 0;
+          newval.lpcost=fibocost[Math.max(newval.rk+newval.o,0)];
+          oldval.lpcost=fibocost[Math.max(oldval.rk+oldval.o,0)];
+          amountlp = newval.lpcost - oldval.lpcost;
+
+          amountsp = amountlp *100;
+          break;
+
+
+          default : log("Earthdawn LPTransac - Unknown triger "+  att); return;
+        }
+
+
+        if(amountlp<0|amountsp<0|amountdays<0){
+          rtype="Refund";
+          amountlp=-amountlp;
+          amountsp=-amountsp;
+          amountdays=-amountdays;
+        }
+
+   vals["TransacQueueLength"]=getInt(values,"TransacQueueLength")+1;
+   vals[pre2+"record-reason"]= nm + " " +  rkdspl + " " + ( (code!=="NAC" && newval.tier && oldval.tier==newval.tier ) ? newval.tier+" " : "" ) + oldval.rk + (oldval.rk==newval.rk ? "" : "->" + newval.rk ) + (oldval.tier==newval.tier ? "" : " "+ oldval.tier + "->" + newval.tier );
+   vals[pre2+"record-amount-days"]=amountdays;
+   vals[pre2+"record-amount-LP"]=amountlp;
+   vals[pre2+"record-amount-SP"]=amountsp;
+   vals[pre2+"record-type"]=rtype;
+   if(amountdays!==0 || amountlp!==0 || amountsp!==0 )
+  setAttrsLog(vals);
+});
+
+} catch(err) {log("Earthdawn:updateLPTransac() error caught: " + err );}
+}; // End updateLPTransac()
+on("change:repeating_skills:sk_rank change:repeating_skills:sk_type change:repeating_threads:ti_rank change:repeating_threads:ti_type change:repeating_matrix:spm_rank change:repeating_matrix:spm_origin change:repeating_talents:t_rank change:repeating_talents:t_type change:repeating_knacks:nac_requirements change:repeating_knacks:nac_type change:repeating_spell:sp_circle remove:repeating_talents remove:repeating_matrix remove:repeating_spell remove:repeating_knacks remove:repeating_threads remove:repeating_skills change:repeating_discipline:dsp_circle change:repeating_discipline:dsp_type  remove:repeating_discipline", fn(updateLPTransac) );
+on("change:attrib-dex-increases change:attrib-str-increases change:attrib-tou-increases change:attrib-per-increases change:attrib-wil-increases change:attrib-cha-increases change:ls-speak-rank change:ls-readwrite-rank", fn(updateLPTransac) );
 
 </script>
