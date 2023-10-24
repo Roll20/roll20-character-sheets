@@ -17,6 +17,7 @@ gulp.task('dataforge', async function() {
     rolls: await axios.get('/rolls.json'),
     oracles: await axios.get('/oracles.json'),
     moves: await axios.get('/moves.json'),
+    legacyassets: await axios.get('/assets.json'),
   }
 
   const rawData = {
@@ -28,7 +29,8 @@ gulp.task('dataforge', async function() {
     truths: starforged['Setting Truths'],
     encounters: starforged['Encounters'],
     movegroups: apiData.movegroups.data,
-    rolls: apiData.rolls.data
+    rolls: apiData.rolls.data,
+    legacyassets: apiData.legacyassets.data
   };
 
   const translationData = {
