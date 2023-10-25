@@ -82,10 +82,8 @@ function buildOracleTranslations () {
           subOracle.Table.forEach((row) => {
             if(row.Result.includes('⏵') && row.Summary) {
               oracleTranslations[row.$id] = row.Summary
-            } else if (row.Result.includes('⏵')) {
-              oracleTranslations[row.$id] = convertToHtml(row.Result, false)
             } else {
-              oracleTranslations[row.$id] = row.Result
+              oracleTranslations[row.$id] = convertToHtml(row.Result, false)
             }
           })
         })
@@ -93,10 +91,8 @@ function buildOracleTranslations () {
         oracle.Table.forEach((row) => {
           if(row.Result.includes('⏵') && row.Summary) {
             oracleTranslations[row.$id] = row.Summary
-          } else if (row.Result.includes('⏵')) {
-            oracleTranslations[row.$id] = convertToHtml(row.Result, false)
           } else {
-            oracleTranslations[row.$id] = row.Result
+            oracleTranslations[row.$id] = convertToHtml(row.Result, false)
           }
         })
       } else {
