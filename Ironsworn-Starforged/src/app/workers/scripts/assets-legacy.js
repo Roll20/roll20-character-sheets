@@ -163,29 +163,43 @@ on('change:hide_legacy_assets_button', function() {
   });
 });
 
-// Legacy Asset Helpers
+// Legacy Asset Helpers / Changelog
+const versionNumber = '2.0.0'
+
+on('change:close_changelog', function() {
+  setAttrs({
+    [`changelog_${versionNumber}`]: 'on',
+  });
+});
 
 on('sheet:opened', function() {
   checkIfLegacyAssetsExistAndEnable('assets')
-  checkIfLegacyAssetsExistAndEnable('module-assets')
-  checkIfLegacyAssetsExistAndEnable('support-vehicle-assets')
 });
 
 function checkIfLegacyAssetsExistAndEnable(section) {
   const formattedBoxAttr = `hide_legacy_${section.replace('-', '_')}_button_box`
   const formattedShowHideAttr = `showhide_legacy_${section.replace('-', '_')}`
-  getAttrs([formattedBoxAttr], function(values) {
+  getAttrs([formattedBoxAttr, `changelog_${versionNumber}`], function(values) {
     if(values[formattedBoxAttr] !== 'off') {
       getSectionIDs(section, function(idarray) {
         if(idarray.length > 0) {
-          setAttrs({
-            [formattedBoxAttr]: 'on',
-            [formattedShowHideAttr]: 'on'
-          })
+          if(values[`changelog_${versionNumber}`] === 'on') { 
+            setAttrs({
+              [formattedBoxAttr]: 'on',
+              [formattedShowHideAttr]: 'on'
+            })
+          } else {
+            setAttrs({
+              [formattedBoxAttr]: 'on',
+              [formattedShowHideAttr]: 'on',
+              'changelog_2.0.0': 'off'
+            })
+          }
         } else {
           setAttrs({
             [formattedBoxAttr]: 'off',
-            [formattedShowHideAttr]: 'off'
+            [formattedShowHideAttr]: 'off',
+            'changelog_2.0.0': 'on'
           })
         }
       })

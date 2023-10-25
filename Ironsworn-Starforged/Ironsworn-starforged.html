@@ -1,4 +1,12 @@
 
+<input class="changelog hide-element" type="checkbox" name="attr_changelog_2.0.0"/>
+<div class="changelog">
+  <div class="copy">Part 1 of the full release has now been done, which includes the updated oracles and assets. Note for existing character sheets please refer to the assets page as there is additional work that needs to be done, as it required a change for how assets were handled and the fact some assets were removed/changed in the full release. The move updates will be released next.</div>
+  <label class="close-changelog">
+    <input class="hide-element" type="checkbox" name="attr_close_changelog"/>
+    <div class="i18n-text" data-i18n="page-info-close">Close</div>
+  </label>
+</div>
 <input class="modes-show hide-element" type="checkbox" name="attr_modes_choice" checked="checked"/>
 <div class="modes-show hide-element">
   <div class="mode-title">
@@ -38246,29 +38254,43 @@ on('change:hide_legacy_assets_button', function() {
   });
 });
 
-// Legacy Asset Helpers
+// Legacy Asset Helpers / Changelog
+const versionNumber = '2.0.0'
+
+on('change:close_changelog', function() {
+  setAttrs({
+    [`changelog_${versionNumber}`]: 'on',
+  });
+});
 
 on('sheet:opened', function() {
   checkIfLegacyAssetsExistAndEnable('assets')
-  checkIfLegacyAssetsExistAndEnable('module-assets')
-  checkIfLegacyAssetsExistAndEnable('support-vehicle-assets')
 });
 
 function checkIfLegacyAssetsExistAndEnable(section) {
   const formattedBoxAttr = `hide_legacy_${section.replace('-', '_')}_button_box`
   const formattedShowHideAttr = `showhide_legacy_${section.replace('-', '_')}`
-  getAttrs([formattedBoxAttr], function(values) {
+  getAttrs([formattedBoxAttr, `changelog_${versionNumber}`], function(values) {
     if(values[formattedBoxAttr] !== 'off') {
       getSectionIDs(section, function(idarray) {
         if(idarray.length > 0) {
-          setAttrs({
-            [formattedBoxAttr]: 'on',
-            [formattedShowHideAttr]: 'on'
-          })
+          if(values[`changelog_${versionNumber}`] === 'on') { 
+            setAttrs({
+              [formattedBoxAttr]: 'on',
+              [formattedShowHideAttr]: 'on'
+            })
+          } else {
+            setAttrs({
+              [formattedBoxAttr]: 'on',
+              [formattedShowHideAttr]: 'on',
+              'changelog_2.0.0': 'off'
+            })
+          }
         } else {
           setAttrs({
             [formattedBoxAttr]: 'off',
-            [formattedShowHideAttr]: 'off'
+            [formattedShowHideAttr]: 'off',
+            'changelog_2.0.0': 'on'
           })
         }
       })
@@ -38351,12 +38373,6 @@ on('change:mode_button', function(eventinfo) {
 on('change:stat_mode_button', function(eventinfo) {
   setAttrs({
     stat_mode: eventinfo.newValue,
-  });
-});
-
-on('change:close_changelog', function() {
-  setAttrs({
-    'changelog_1.0.0': 'on',
   });
 });
   const stdProgress = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
