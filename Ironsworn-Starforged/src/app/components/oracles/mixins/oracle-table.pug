@@ -10,18 +10,18 @@ mixin oracleMultiSubTable(oracle, header=false)
   -
     let mergedRows = [];
     //- if all subtables have the same number of rows
-    if (oracle.Tables.every(subtable =>
-      subtable.Table.length == oracle.Tables[0].Table.length
+    if (oracle.Oracles.every(subtable =>
+      subtable.Table.length == oracle.Oracles[0].Table.length
       //- && subtable.Table.map(row => row.Description) == oracle.Tables[0].Table.map(row => row.Description)
     )) {
-      oracle.Tables[0].Table.forEach((row, index) => {
+      oracle.Oracles[0].Table.forEach((row, index) => {
         let newRow = _.clone(row);
         newRow.Chance = [];
-        oracle.Tables.forEach(subOracle => newRow.Chance.push(subOracle.Table[index].Chance));
+        oracle.Oracles.forEach(subOracle => newRow.Chance.push(subOracle.Table[index].Chance));
         mergedRows.push(newRow);
       })
     } else {
-      let tables = oracle.Tables.map(subtable => subtable.Table);
+      let tables = oracle.Oracles.map(subtable => subtable.Table);
       let baseTable = _.clone(tables.reduce((a, b) => a.length > b.length ? a : b));
       // selects longest as starting point
       baseTable.forEach((row) => {
@@ -49,10 +49,10 @@ mixin oracleMultiSubTable(oracle, header=false)
     thead
       if (header===true)
         tr
-          th.oracle-subtitle(colspan=(oracle.Tables.length+1))=oracle['Display name']||oracle.Name
+          th.oracle-subtitle(colspan=(oracle.Oracles.length+1))=oracle.Name
       tr
-        each subOracle in oracle.Tables
-          th.oracle-column-head.oracle-roll=subOracle.Name||subOracle['Display name'].replace(/^.* - /g, "")
+        each subOracle in oracle.Oracles
+          th.oracle-column-head.oracle-roll=subOracle.Name.replace(/^.* - /g, "")
         th.oracle-column-head.oracle-roll=`Result`
     each row, index in mergedRows
       +oracleTableRow(mergedRows, row, index)
