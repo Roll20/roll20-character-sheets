@@ -4334,6 +4334,9 @@
 						<b>ENHANCEMENT:</b> Rolltemplate update, moved <i>Notes:</i> to a separate row and then applied a title prefix, if needed. For example, if you entered 
 						notes for a Ranged Attack, the roll result chat will have a title called <b>Weapon Notes</b> then the notes are displayed below it.
 					</li>
+					<li>
+						<b>ENHANCEMENT:</b> Combat tab, ranged sub-tab, updates to Thrown Object Tool. Added additional notes and ability to link to DX, Skill, or Technique.
+					</li>
 				</ul>
 					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13549,7 +13552,12 @@ visualize what it will look like in chat.
 						<div class="table">
 							<div class="header">
 								<div class="cell col0-st">
-									<span data-i18n="abbreviation-thrown-pounds-label">Thrown (<span name="attr_weight_system"></span>)</span>
+									<div class="popup">
+										<span data-i18n="abbreviation-thrown-pounds-label">Thrown (<span name="attr_weight_system"></span>)</span>
+									</div>
+									<div class="tooltip" style="margin-left: -36px;">
+										<span data-i18n="thrown-tooltip">This is the ability to throw any small, relatively smooth object that fits in the palm of your hand.  See the Throwing skill (B226). Also see Throwing rules (B355).</span>
+									</div>
 								</div>
 								<div class="cell col8">
 									<div class="popup">
@@ -13784,28 +13792,89 @@ visualize what it will look like in chat.
 											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} @{weight_system}.}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[{@{thrown_object_skill} + @{modifier} + @{ranged_roll_modifier}, @{ranged_roll_max_nine_value} }kl1]]}} {{useModTool=[[1]]}} {{maxNine=[[@{ranged_roll_max_nine}]]}} {{rollModifier=[[@{ranged_roll_modifier}]]}} {{rollModifierSummary=@{ranged_roll_modifier_summary}}} {{rollTraitSummary=@{ranged_roll_trait_summary}}} {{hitLocation=@{ranged_roll_hit_location}}} {{maneuver=@{ranged_roll_maneuver}}} {{allOutAttack=@{ranged_roll_allout_attack}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Thrown}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" name="roll_vsSL" />
 										</div>
 									</div> <!-- .row -->
-									<div class="row row-details2">
-										<div class="cell col0 label">
-											<span data-i18n="weapon-notes-label">Weapon Notes</span>
-										</div>
-										<div class="cell col1">
-											<input type="text" name="attr_thrown_object_notes" title="Macro: @{NAME|thrown_object_notes}" />
-										</div>
-										<div class="cell col2 label">
-											<div class="popup">
-												<span data-i18n="damage-notes-label">Damage Notes</span>
-											</div>
-											<span class="tooltip">
-												<span data-i18n="ranged-damage-notes-tooltip">
-			<strong>Hint:</strong> Enter inline rolls for additional results.<br />
-			Example: Does an additional [[1d6]] fire damage.
+
+									<div class="melee-notebox">
+
+										<div class="row">
+
+											<!-- hidden input is used to show/hide Row ID: based on selection -->
+											<input type="hidden" name="attr_thrown_link_type" value="DX" />
+											<div class="cell margin-right">
+												<div class="popup">
+													<span data-i18n="link-to-label">Link To</span>:
+												</div>
+												<span class="tooltip">
+													<span data-i18n="thrown-link-to-note"></span>
 												</span>
-											</span>
+											</div>
+											<div class="cell margin-right">
+												<select name="attr_thrown_link_type" title="Macro: @{NAME|thrown_link_type}">
+													<option value="nothing" data-i18n="option-nothing">Nothing</option>
+													<option value="DX" selected data-i18n="option-dexterity">DX</option>
+													<option value="Skill" data-i18n="option-skill">Skill</option>
+													<option value="Technique" data-i18n="option-technique">Technique</option>
+												</select>
+											</div>
+											<div class="cell col-row-id label show-hide-row-id">
+												<div class="popup">
+													<span data-i18n="row-id-label">Row ID:</span>
+												</div>
+												<span class="tooltip">
+													<span data-i18n="copy-paste-row-id-tooltip">
+				Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
+				When the skill/spell is updated, the technique's parent name and base skill level<br />
+				will be updated.<br />
+				Once entered, this will change the Skill/Spell for this particular attack to match<br />
+				the skill/spell level of the Base Skill. Do not change this skill Level number manually.
+													</span>
+												</span>	
+											</div>
+											<div class="cell col-input-medium show-hide-row-id">
+												<input type="hidden" name="attr_thrown_skill_row_id_toggle" value="0" />
+												<input type="text" name="attr_thrown_skill_row_id" class="align-left" title="Macro: @{NAME|thrown_skill_row_id}" />
+											</div>
+											<div class="cell">
+												<span data-i18n="skill-modifier-label">Skill Mod</span><span>:</span>
+												<input type="number" value="0" step="1" name="attr_thrown_skill_modifier" />
+											</div>
+		
+											<div class="cell col-wide">
+												<input type="hidden" name="attr_thrown_skill_row_id_message" value="DX" />
+												<b><span data-i18n="name-label">Name:</span></b>
+												<span name="attr_thrown_skill_row_id_message"></span>
+												<input type="hidden" name="attr_thrown_skill_row_id_level" value="" />
+												<b><span data-i18n="skill-level-label">Level</span>:</b>
+												<span name="attr_thrown_skill_row_id_level"></span>
+											</div>
+		
+										</div> <!-- .row -->
+		
+										<div class="row">
+											<div class="cell">
+												<span data-i18n="thrown-reason-for-modifiers-label">Reason for all modifiers (ST, Damage, Skill)</span><br />
+												<textarea class="text-left notes" name="attr_thrown_object_reason_for_mod" title="Macro: @{NAME|attr_thrown_object_reason_for_mod}"></textarea>
+											</div>
 										</div>
-										<div class="cell col3">
-											<input type="text" name="attr_thrown_object_damage_notes" title="Macro: @{NAME|thrown_object_damage_notes}" />
-										</div>
+						
+										<div class="row">
+											<div class="cell">
+												<span data-i18n="weapon-notes-label">Weapon Notes</span><br />
+												<textarea class="text-left notes" name="attr_thrown_object_notes" title="Macro: @{NAME|attr_thrown_object_notes}"></textarea>
+											</div>
+											<div class="cell">
+												<div>
+													<div class="popup">
+														<span data-i18n="damage-notes-label">Damage Notes</span>
+													</div>
+													<span class="tooltip">
+														<span data-i18n="ranged-damage-notes-tooltip"><strong>Hint:</strong> Enter inline rolls for additional results.<br />Example: Does an additional [[1d6]] fire damage.</span>
+													</span>
+												</div>
+												<textarea class="text-left notes" name="attr_thrown_object_damage_notes" title="Macro: @{NAME|attr_thrown_object_damage_notes}"></textarea>
+											</div>
+										</div> <!-- .row -->
 									</div>
+
 								</div> <!-- .row -->
 							</div>
 							<!-- .end repcontainer -->
@@ -15891,6 +15960,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 				<li>
 					<b>ENHANCEMENT:</b> Rolltemplate update, moved <i>Notes:</i> to a separate row and then applied a title prefix, if needed. For example, if you entered 
 					notes for a Ranged Attack, the roll result chat will have a title called <b>Weapon Notes</b> then the notes are displayed below it.
+				</li>
+				<li>
+					<b>ENHANCEMENT:</b> Combat tab, ranged sub-tab, updates to Thrown Object Tool. Added additional notes and ability to link to DX, Skill, or Technique.
 				</li>
 			</ul>
 			
@@ -25378,6 +25450,245 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 	
 	}
+
+	// check for thrown modifier skill change
+	on("change:thrown_link_type change:thrown_skill_row_id", event => {
+	
+		updateLinkedThrownSkill(null);
+
+	});
+
+	function updateLinkedThrownSkill(callback) {
+
+		// check if we need to set default value
+		callback = callback || noop;
+
+		getAttrs(["thrown_link_type", "thrown_skill_row_id", "thrown_skill_modifier"], values => {
+
+			let rowType = values.thrown_link_type;
+	
+			let skillRowId = values.thrown_skill_row_id;
+	
+			let skillMod = +values.thrown_skill_modifier;
+	
+			let { updateMethod, repeatingTableToUse } = getLinkedSkillUpdateMethod(rowType);
+	
+			let skillName = "";
+	
+			let skillLevel = "";
+	
+			let updateFields = {};
+	
+			// if updating using a repeating field AND no row id, clear the fields
+			if (updateMethod == "nothing" || (updateMethod != "attribute" && skillRowId.length === 0)) {
+	
+				updateFields["thrown_skill_row_id_message"] = "";
+	
+				updateFields["thrown_skill_row_id_level"] = "";
+
+				updateFields["thrown_skill_row_id"] = "";
+	
+				setAttrs(updateFields, null, callback);
+	
+			} else if (updateMethod == "attribute") {
+	
+				updateLinkedThrownSkillByAttribute(rowType, callback);
+	
+			} else {
+	
+				updateLinkedThrownSkillByTable(repeatingTableToUse, skillRowId, rowType, callback);
+	
+			}
+
+		});
+		
+	}
+
+	/**
+	 * Update the linked thrown skill by using an attribute stat
+	 *
+	 * @param {string}      rowType  The attribute to use for setting weapon skill level
+	 * @param {() => void=} callback Callback function 
+	 */
+	 function updateLinkedThrownSkillByAttribute(rowType, callback) {
+		callback = callback || noop;
+	
+		let fieldName;
+	
+		switch (rowType) {
+			case "DX":
+				fieldName = "dexterity";
+				break;
+	
+			default:
+				fieldName = null;
+				break;
+		}
+	
+		let skillLevel = "";
+
+		let updateFields = {};
+
+		if (fieldName) {
+
+			// update the skill level for knockback save.
+			getAttrs([fieldName], function (skillValues) {
+				
+				skillLevel = +skillValues[fieldName];
+
+				updateFields["thrown_skill_row_id_message"] = rowType;
+
+				updateFields["thrown_skill_row_id_level"] = skillLevel;
+
+				updateFields["thrown_skill_row_id"] = "";
+
+				setAttrs(updateFields, null, callback);
+
+			});
+
+		} else {
+
+			updateFields["thrown_skill_row_id_message"] = "";
+
+			updateFields["thrown_skill_row_id_level"] = "";
+
+			updateFields["thrown_skill_row_id"] = "";
+
+			setAttrs(updateFields, null, callback);
+
+		}
+
+	}
+
+	/**
+	 * Update the Thrown based on a repeating item
+	 *
+	 * @param {string} repeatingTableToUse Name of table that contains the row id
+	 * @param {string} skillRowId          The Row that has the information we need for name and skill level to use
+	 * @param {string} rowType             Type of knockback defense
+	 * @param {() => void=} callback       An optional call back function  
+	 */
+	 function updateLinkedThrownSkillByTable(repeatingTableToUse, skillRowId, rowType, callback) {
+		// if it's a good row id, let's update stuff
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
+	
+		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+	
+		// update the skill level for weapon.
+		getAttrs([skillFieldName, skillFieldNameOfSkill], function (skillValues) {
+	
+			let skillLevel = +skillValues[skillFieldName];
+	
+			let updateFields = {};
+	
+			// check for valid skill level
+			if (skillLevel > 0) {
+	
+				updateFields["thrown_skill_row_id_message"] = skillValues[skillFieldNameOfSkill];
+	
+				updateFields["thrown_skill_row_id_level"] = skillLevel;
+	
+				setAttrs(updateFields, null, callback);
+	
+			} else {
+	
+				// show an error message
+				updateFields["thrown_skill_row_id_message"] = `Could not find ${rowType}.`;
+	
+				setAttrs(updateFields, { silent: true }, callback);
+	
+			}
+	
+		});
+	}
+
+	/**
+	 * Checks to see if the thrown skill is linked to this rowId
+	 *
+	 * @param {string} rowId Row ID of a skill or the Attribute that might be linked to a weapon
+	 */
+	function updateThrownLinkedToRow(rowId) {
+	
+		let fields = ["thrown_row_type", "thrown_skill_row_id"];
+
+		getAttrs(fields, values => {
+
+			let updateFields = {};
+
+			// convert the values object into an array
+			let entries = Object.entries(values);
+
+			// loop through each entry
+			for (const [field, value] of entries) {
+
+				// NOTE: This match based on either skill/technique ID or against an attribute
+				// the field name lets us know which.
+				if (value == rowId) {
+
+					updateLinkedThrownSkill();
+
+					break; // we found a match, no reason to continue
+
+				}
+
+			}
+
+		});
+
+	}
+
+	on("change:thrown_skill_row_id_level change:thrown_skill_modifier", (event) => {
+
+		updateThrownSkill();
+
+	});
+
+	function updateThrownSkill() {
+
+		let fields = ["thrown_skill_row_id_level", "thrown_skill_modifier", "thrown_object_skill"];
+
+		getAttrs(fields, values => {
+
+			let selectedSkillLevel = Number(values.thrown_skill_row_id_level);
+
+			let skillModifier = Number(values.thrown_skill_modifier);
+
+			let currentSkillLevel = Number(values.thrown_object_skill);
+
+			if (isNaN(skillModifier)) {
+				skillModifier = 0;
+			}
+
+			if (isNaN(currentSkillLevel)) {
+				currentSkillLevel = 0;
+			}
+
+			let finalSkillLevel = 0;
+
+			if (isNaN(selectedSkillLevel)) {
+
+				// if they didn't use a selectedSkill then use the current skill level
+				finalSkillLevel = currentSkillLevel + skillModifier;
+
+			} else {
+
+				// otherwise use the selectedSkillLevel (such as linked to DX, Skill, or Technique)
+				finalSkillLevel = selectedSkillLevel + skillModifier;
+			}
+
+			if (finalSkillLevel <= 0) {
+				finalSkillLevel = 10;
+			}
+
+			let updateFields = {
+				thrown_object_skill: finalSkillLevel
+			};
+
+			setAttrs(updateFields, { silent: true });
+
+		});
+
+	}
 	
 	/**
 	 * Get Damage Type Note for damage type string
@@ -28019,7 +28330,9 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 	
 		updateKnockbackLinkedToRow(rowId);
 
-		updateSlamLinkedToRow(rowId);	
+		updateSlamLinkedToRow(rowId);
+
+		updateThrownLinkedToRow(rowId);
 	
 	}
 	
