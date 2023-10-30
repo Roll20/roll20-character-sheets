@@ -4340,6 +4340,13 @@
 					<li>
 						<b>ENHANCEMENT:</b> Updated tooltips for Active Defense, Dodge and Retreat (vs. Melee Attacks Only), ACC, AIM BONUS, and Unconsciousness.
 					</li>
+					<li>
+						<b>ENHANCEMENT:</b> All damage rolls automatically implement negative modifier rules from B378 based on appropriate damage type, 
+						<i>"A negative modifier can't reduce damage below 0 if the attack does crushing damage, or below 1 if it does any other type of damage."</i>
+					</li>
+					<li>
+						<b>BUGFIX:</b> Fixed issue during load of a new version of the character sheet. The modifier columns for languages were not calculating correctly.
+					</li>
 				</ul>
 					
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -5569,7 +5576,7 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 					</div>
 					<div class="cell col4">
 						<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Thrust Damage}} {{damageRoll=[[@{thrust}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgThrust" class="roll_damage" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Thrust Damage}} {{damageRoll=[[{@{thrust}, {0}}kh1]]}} {{damageType=Crushing (cr)}}" name="roll_dmgThrust" class="roll_damage" />
 					</div>
 				</div> <!-- .row -->
 
@@ -5627,7 +5634,7 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_striking_st_bas
 					</div>
 					<div class="cell col4">
 						<input type="hidden" name="attr_swing_damage_dice_icon" class="swing-damage-dice-icon" value="explode" />
-						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Swing Damage}} {{damageRoll=[[@{swing}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgSwing" class="roll_damage" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Swing Damage}} {{damageRoll=[[{@{swing}, {0}}kh1]]}} {{damageType=Crushing (cr)}}" name="roll_dmgSwing" class="roll_damage" />
 					</div>
 				</div> <!-- .row -->
 
@@ -12629,7 +12636,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col2">
 										<input type="hidden" name="attr_damage_dice_icon" class="melee-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[@{damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{minimum_damage_note}}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[ { @{damage}, {@{minimum_damage}} }kh1 ]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
 									</div>
 									<div class="cell col3">
 										<select name="attr_type" title="Macro: @{NAME|repeating_melee_$[row #]_type}">
@@ -12650,6 +12657,7 @@ visualize what it will look like in chat.
 										</select>
 										<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_aff}" />
 										<input type="hidden" name="attr_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_minimum_damage" value="0" />
 									</div>
 									<div class="cell col4">
 										<input type="text" name="attr_reach" title="Macro: @{NAME|repeating_melee_$[row #]_reach}" />
@@ -13229,7 +13237,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col2">
 										<input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[@{damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{minimum_damage_note}}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[ { @{damage}, {@{minimum_damage}} }kh1 ]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
 									</div>
 									<div class="cell col3">
 										<select name="attr_type" title="Macro: @{NAME|repeating_ranged_$[row #]_type}">
@@ -13250,6 +13258,7 @@ visualize what it will look like in chat.
 										</select>
 										<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_aff}" />
 										<input type="hidden" name="attr_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_minimum_damage" value="1" />
 									</div>
 									<div class="cell col4">
 										<input type="text" name="attr_acc" title="Macro: @{NAME|repeating_ranged_$[row #]_acc}" />
@@ -13758,13 +13767,13 @@ visualize what it will look like in chat.
 										</div>
 										<div class="cell col2">
 											<input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} @{weight_system}.}} {{damageRoll=[[@{thrown_object_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{thrown_minimum_damage_note}}} {{damageType=@{thrown_object_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{thrown_object_damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{thrown_object_damage_notes}}}" name="roll_damage" class="roll_damage" />
+											<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} @{weight_system}.}} {{damageRoll=[[ { @{thrown_object_damage}, {@{thrown_minimum_damage}} }kh1 ]]}} {{damageType=@{thrown_object_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{thrown_object_damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{thrown_object_damage_notes}}}" name="roll_damage" class="roll_damage" />
 										</div>
 										<div class="cell col3">
 											<select name="attr_thrown_object_damage_type" title="Macro: @{NAME|thrown_object_damage_type}">
 												<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
 												<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
-												<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+												<option value="Crushing (cr)" selected><span data-i18n="abbreviation-option-crushing">cr</span></option>
 												<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
 												<option value="Piercing (pi)"><span data-i18n="abbreviation-option-piercing">pi</span></option>
 												<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
@@ -13777,8 +13786,9 @@ visualize what it will look like in chat.
 												<option value="Knockback (knock)"><span data-i18n="abbreviation-option-knockback">knock</span></option>
 												<option value="Special (spec)"><span data-i18n="abbreviation-option-special">spec</span></option>
 											</select>
-											<input type="hidden" name="attr_thrown_object_damage_type_note" value="@{damage_type_note_cut}" />
-											<input type="hidden" name="attr_thrown_minimum_damage_note" value="Min 1" />
+											<input type="hidden" name="attr_thrown_object_damage_type_note" value="@{damage_type_note_cr}" />
+											<input type="hidden" name="attr_thrown_minimum_damage_note" value="Min 0" />
+											<input type="hidden" name="attr_thrown_minimum_damage" value="0" />
 										</div>
 										<div class="cell col4">
 											<input type="number" step="1" name="attr_thrown_object_acc" value="0" title="Macro: @{NAME|thrown_object_acc}" />
@@ -14169,7 +14179,9 @@ visualize what it will look like in chat.
 			Damage x1
 			Vitals Damage x3
 			Skull Damage x4" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{drMultiplier=@{shotgun_dr_multiplier}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
+										<input type="hidden" name="attr_shotgun_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_shotgun_minimum_damage" value="1" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{drMultiplier=@{shotgun_dr_multiplier}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{damageType=@{shotgun_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_shotgun_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14262,11 +14274,11 @@ Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe m
 							</div>
 							<div class="item">
 								<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Slam Damage}} {{damageRoll=[[@{slam_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{notesTitlePrefix=Damage}} {{notes=@{raw_slam_damage_notes}}}" name="roll_dmgSlam" class="roll_damage" />
+								<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Slam Damage}} {{damageRoll=[[ { @{slam_damage}, {@{slam_minimum_damage}} }kh1 ]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}} {{notesTitlePrefix=Damage}} {{notes=@{raw_slam_damage_notes}}}" name="roll_dmgSlam" class="roll_damage" />
 							</div>
 							<div class="item">
 								<select name="attr_slam_damage_type" title="Macro: @{NAME|slam_damage_type}">
-									<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+									<option value="Crushing (cr)" selected><span data-i18n="abbreviation-option-crushing">cr</span></option>
 									<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
 									<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
 									<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
@@ -14282,7 +14294,8 @@ Slam requires an Attack, All-out Attack, or Move and Attack maneuver. Your foe m
 									<option value="Special (spec)"><span data-i18n="abbreviation-option-special">spec</span></option>
 								</select>
 								<input type="hidden" name="attr_slam_damage_type_note" value="@{damage_type_note_cr}" />
-								<input type="hidden" name="attr_slam_minimum_damage_note" value="Min 1" />
+								<input type="hidden" name="attr_slam_minimum_damage_note" value="Min 0" />
+								<input type="hidden" name="attr_slam_minimum_damage" value="0" />
 								<input type="hidden" name="attr_slam_damage_divisor" value="1" />
 							</div>
 							<div class="item">
@@ -14448,7 +14461,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 
 									<div class="cell roll-modifiers" style="margin-left: 4px;">
 										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Overrun Damage}} {{damageRoll=[[@{slam_overrun_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{slam_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}}" name="roll_dmgOverrun" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Overrun Damage}} {{damageRoll=[[ { @{slam_overrun_damage}, {@{slam_minimum_damage}} }kh1 ]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{slam_damage_type_note}}}" name="roll_dmgOverrun" class="roll_damage" />
 									</div>
 								</div><!-- .row -->
 
@@ -14641,7 +14654,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									</div>
 									<div class="cell damage-type">
 										<select name="attr_falling_damage_type" title="Macro: @{NAME|falling_damage_type}">
-											<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+											<option value="Crushing (cr)" selected><span data-i18n="abbreviation-option-crushing">cr</span></option>
 											<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
 											<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
 											<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
@@ -14650,12 +14663,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 											<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
 										</select>
 										<input type="hidden" name="attr_falling_damage_type_note" value="@{damage_type_note_cr}" />
-										<input type="hidden" name="attr_falling_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_falling_minimum_damage_note" value="Min 0" />
+										<input type="hidden" name="attr_falling_minimum_damage" value="0" />
 										<input type="hidden" name="attr_falling_damage_divisor" value="1" />
 									</div>
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Falling Damage}} {{damageRoll=[[@{falling_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{falling_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{falling_damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Falling}} {{notes=@{falling_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Falling Damage}} {{damageRoll=[[ { @{falling_damage}, {@{falling_minimum_damage}} }kh1 ]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{falling_damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Falling}} {{notes=@{falling_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_falling_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14692,7 +14706,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									</div>
 									<div class="cell damage-type">
 										<select name="attr_collision_damage_type" title="Macro: @{NAME|collision_damage_type}">
-											<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+											<option value="Crushing (cr)" selected><span data-i18n="abbreviation-option-crushing">cr</span></option>
 											<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
 											<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
 											<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
@@ -14701,12 +14715,13 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 											<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
 										</select>
 										<input type="hidden" name="attr_collision_damage_type_note" value="@{damage_type_note_cr}" />
-										<input type="hidden" name="attr_collision_minimum_damage_note" value="Min 1" />
+										<input type="hidden" name="attr_collision_minimum_damage_note" value="Min 0" />
+										<input type="hidden" name="attr_collision_minimum_damage" value="0" />
 										<input type="hidden" name="attr_collision_damage_divisor" value="1" />
 									</div>
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Collision Damage}} {{damageRoll=[[@{collision_damage}]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=@{collision_minimum_damage_note}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{collision_damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{collision_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Collision Damage}} {{damageRoll=[[ { @{collision_damage}, {@{collision_minimum_damage}} }kh1 ]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{collision_damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{collision_damage_notes}}}" name="roll_dmgFalling" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_collision_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14900,7 +14915,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_demo_how_much_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
 										<input type="hidden" name="attr_demo_how_much_damage_divisor" value="1" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[ floor( (@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}) / @{demo_how_much_damage_divisor} )]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[ floor( (@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}) / @{demo_how_much_damage_divisor} )]]}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_demo_how_much_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -14965,7 +14980,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_demo_how_big_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
 										<input type="hidden" name="attr_demo_how_big_damage_divisor" value="1" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[ floor( (@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}) / @{demo_how_big_damage_divisor} )]]}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[ floor( (@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}) / @{demo_how_big_damage_divisor} )]]}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 										<button type="action" name="act_demo_how_big_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
@@ -15022,7 +15037,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									</div>
 									<div class="cell roll-damage">
 										<input type="hidden" name="attr_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[ @{fragmentation_damage} ]]}} {{damageType=Cutting (cut)}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Cutting min 1}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+										<button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[{@{fragmentation_damage}, {1}}kh1]]}} {{damageType=Cutting (cut)}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
 									</div>
 									<div class="cell reset">
 									</div>
@@ -15979,6 +15994,13 @@ Select the indent level of the inventory item. This is handy to help show the it
 				</li>
 				<li>
 					<b>ENHANCEMENT:</b> Updated tooltips for Active Defense, Dodge and Retreat (vs. Melee Attacks Only), ACC, AIM BONUS, and Unconsciousness.
+				</li>
+				<li>
+					<b>ENHANCEMENT:</b> All damage rolls automatically implement negative modifier rules from B378 based on appropriate damage type, 
+					<i>"A negative modifier can't reduce damage below 0 if the attack does crushing damage, or below 1 if it does any other type of damage."</i>
+				</li>
+				<li>
+					<b>BUGFIX:</b> Fixed issue during load of a new version of the character sheet. The modifier columns for languages were not calculating correctly.
 				</li>
 			</ul>
 			
@@ -18234,19 +18256,6 @@ Select the indent level of the inventory item. This is handy to help show the it
 				</div><!-- end option-column -->
 				
 				<div class="option-column">
-
-					<div class="option-container damage-type-notes">
-
-						<h4>
-							<span data-i18n="minimum-damage-notes-label">Minimum Damage Notes</span>
-						</h4>
-
-						<div class="toggle-notes">
-							<input type="checkbox" name="attr_show_minimum_damage_notes" value="1" checked="checked" />
-							<span data-i18n="show-notes-in-roll-template-label">Show notes in roll template</span>
-						</div>
-						
-					</div>
 
 					<div class="option-container damage-type-notes">
 					
@@ -22654,17 +22663,25 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 				let spokenFieldName = `repeating_languages_${id}_spoken`;
 
+				let spokenModPointsFieldName = `repeating_languages_${id}_spoken_mod_points`;
+
 				let spokenTalentFieldName = `repeating_languages_${id}_spoken_talent`;
 
 				let writtenFieldName = `repeating_languages_${id}_written`;
+
+				let writtenModPointsFieldName = `repeating_languages_${id}_written_mod_points`;
 
 				let writtenTalentFieldName = `repeating_languages_${id}_written_talent`;
 
 				fields.push(spokenFieldName);
 
+				fields.push(spokenModPointsFieldName);
+
 				fields.push(spokenTalentFieldName);
 
 				fields.push(writtenFieldName);
+
+				fields.push(writtenModPointsFieldName);
 
 				fields.push(writtenTalentFieldName);
 
@@ -22674,7 +22691,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 
 					let spokenPoints = Number(values[spokenFieldName]);
 
+					let spokenModPoints = NUmber(values[spokenModPointsFieldName]);
+
 					let writtenPoints = Number(values[writtenFieldName]);
+
+					let writtenModPoints = Number(values[writtenModPointsFieldName]);
 
 					let totalPoints = 0;
 
@@ -22685,7 +22706,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 						writtenPoints = Number(values[writtenTalentFieldName]);
 					}
 
-					totalPoints = spokenPoints + writtenPoints;
+					totalPoints = spokenPoints + spokenModPoints + writtenPoints + writtenModPoints;
 
 					// initialize an object to hold fields to update.
 					const items = {};
@@ -25381,10 +25402,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let typeNote = getDamageTypeNote(values.repeating_melee_type, values);
 	
 			let minDamageNote = getMinimumDamageNote(values.repeating_melee_type);
+
+			let minDamage = minDamageNote.replace("Min ", "");
 	
 			setAttrs({
 				"repeating_melee_damage_type_note": typeNote,
 				"repeating_melee_minimum_damage_note": minDamageNote,
+				"repeating_melee_minimum_damage": minDamage
 			});
 	
 		});
@@ -25457,10 +25481,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			let typeNote = getDamageTypeNote(values.thrown_object_damage_type, values);
 	
 			let minDamageNote = getMinimumDamageNote(values.thrown_object_damage_type);
+
+			let minDamage = minDamageNote.replace("Min ", "");
 	
 			setAttrs({
 				"thrown_object_damage_type_note": typeNote,
 				"thrown_minimum_damage_note": minDamageNote,
+				"thrown_minimum_damage": minDamage
 			});
 	
 		});
@@ -25705,6 +25732,141 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		});
 
 	}
+
+	// update damage notes for slam
+	on('change:slam_damage_type', function (event) {
+	
+		updateSlamDamageTypes();
+	
+	});
+	
+	/*
+	 * Update the slam damage type notes
+	 */
+	function updateSlamDamageTypes() {
+	
+		getAttrs(['slam_damage_type',
+			'damage_type_note_cut',
+			'damage_type_note_imp',
+			'damage_type_note_cr',
+			'damage_type_note_pi_minus',
+			'damage_type_note_pi',
+			'damage_type_note_pi_plus',
+			'damage_type_note_pi_plus_plus',
+			'damage_type_note_aff',
+			'damage_type_note_burn',
+			'damage_type_note_cor',
+			'damage_type_note_fat',
+			'damage_type_note_tox',
+			'damage_type_note_spec',
+			'damage_type_note_knockback'
+		], function (values) {
+	
+			let typeNote = getDamageTypeNote(values.slam_damage_type, values);
+	
+			let minDamageNote = getMinimumDamageNote(values.slam_damage_type);
+
+			let minDamage = minDamageNote.replace("Min ", "");
+	
+			setAttrs({
+				"slam_damage_type_note": typeNote,
+				"slam_minimum_damage_note": minDamageNote,
+				"slam_minimum_damage": minDamage
+			});
+	
+		});
+	
+	}
+
+	// update damage notes for falling
+	on('change:falling_damage_type', function (event) {
+	
+		updateFallingDamageTypes();
+	
+	});
+	
+	/*
+	 * Update the falling damage type notes
+	 */
+	function updateFallingDamageTypes() {
+	
+		getAttrs(['falling_damage_type',
+			'damage_type_note_cut',
+			'damage_type_note_imp',
+			'damage_type_note_cr',
+			'damage_type_note_pi_minus',
+			'damage_type_note_pi',
+			'damage_type_note_pi_plus',
+			'damage_type_note_pi_plus_plus',
+			'damage_type_note_aff',
+			'damage_type_note_burn',
+			'damage_type_note_cor',
+			'damage_type_note_fat',
+			'damage_type_note_tox',
+			'damage_type_note_spec',
+			'damage_type_note_knockback'
+		], function (values) {
+	
+			let typeNote = getDamageTypeNote(values.falling_damage_type, values);
+	
+			let minDamageNote = getMinimumDamageNote(values.falling_damage_type);
+
+			let minDamage = minDamageNote.replace("Min ", "");
+	
+			setAttrs({
+				"falling_damage_type_note": typeNote,
+				"falling_minimum_damage_note": minDamageNote,
+				"falling_minimum_damage": minDamage
+			});
+	
+		});
+	
+	}
+
+	// update damage notes for collision
+	on('change:collision_damage_type', function (event) {
+	
+		updateFallingDamageTypes();
+	
+	});
+	
+	/*
+	 * Update the collision damage type notes
+	 */
+	function updateFallingDamageTypes() {
+	
+		getAttrs(['collision_damage_type',
+			'damage_type_note_cut',
+			'damage_type_note_imp',
+			'damage_type_note_cr',
+			'damage_type_note_pi_minus',
+			'damage_type_note_pi',
+			'damage_type_note_pi_plus',
+			'damage_type_note_pi_plus_plus',
+			'damage_type_note_aff',
+			'damage_type_note_burn',
+			'damage_type_note_cor',
+			'damage_type_note_fat',
+			'damage_type_note_tox',
+			'damage_type_note_spec',
+			'damage_type_note_knockback'
+		], function (values) {
+	
+			let typeNote = getDamageTypeNote(values.collision_damage_type, values);
+	
+			let minDamageNote = getMinimumDamageNote(values.collision_damage_type);
+
+			let minDamage = minDamageNote.replace("Min ", "");
+	
+			setAttrs({
+				"collision_damage_type_note": typeNote,
+				"collision_minimum_damage_note": minDamageNote,
+				"collision_minimum_damage": minDamage
+			});
+	
+		});
+	
+	}
 	
 	/**
 	 * Get Damage Type Note for damage type string
@@ -25863,12 +26025,18 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					let note = getDamageTypeNote(type, noteFieldValues);
 	
 					let minDamageNote = getMinimumDamageNote(type);
+
+					let minDamage = minDamageNote.replace("Min ", "");
 	
 					let minDamageNoteField = `repeating_${sectionName}_${id}_minimum_damage_note`;
+	
+					let minDamageField = `repeating_${sectionName}_${id}_minimum_damage`;
 	
 					updateFields[damageTypeNoteField] = note;
 	
 					updateFields[minDamageNoteField] = minDamageNote;
+
+					updateFields[minDamageField] = minDamage;
 	
 				});
 	
@@ -26549,7 +26717,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			strDmg = `${strDmg}+${dieModifier}`;
 		
 			if (damageDivisor > 1) {
-				strDmg = `(${strDmg})/2`;
+				strDmg = `floor((${strDmg})/2)`;
 			}
 		
 		} else if (dieModifier < 0) {
@@ -26557,11 +26725,11 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 			strDmg = `${strDmg}${dieModifier}`
 	
 			if (damageDivisor > 1) {
-				strDmg = `(${strDmg})/2`;
+				strDmg = `floor((${strDmg})/2)`;
 			}
 		
 		} else if (damageDivisor > 1) {
-			strDmg = `${strDmg}/2`;
+			strDmg = `floor((${strDmg})/2)`;
 		}
 
 		
@@ -27244,6 +27412,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					slam_hit_points: hitPoints,
 					slam_damage_type: "Crushing (cr)",
 					slam_link_type: "DX",
+					slam_minimum_damage_note: "Min 0",
+					slam_minimum_damage: "0",
 					is_slam_attack_new: 0,
 					slam_overrun_st: slamST,
 					slam_overrun_damage: damageType.thrust
@@ -30380,6 +30550,10 @@ B378
 			let damageMod = 0;
 	
 			let damageTypeNote = getDamageTypeNote(values.shotgun_damage_type, values);
+
+			let minDamageNote = getMinimumDamageNote(values.shotgun_damage_type);
+
+			let minDamage = minDamageNote.replace("Min ", "");
 	
 			// try to get the base damage die for shotgun
 			// 1d6+1. arrDamage = [1][6+1]
@@ -30430,7 +30604,9 @@ B378
 				"shotgun_close_damage": closeDamage,
 				"shotgun_dr_multiplier": drMultiplier,
 				"shotgun_dr_multiplier_notes": multiplierNote,
-				"shotgun_damage_type_note": damageTypeNote
+				"shotgun_damage_type_note": damageTypeNote,
+				"shotgun_minimum_damage_note": minDamageNote,
+				"shotgun_minimum_damage": minDamage
 			};
 	
 			setAttrs(updateFields);
