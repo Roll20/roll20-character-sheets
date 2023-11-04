@@ -10,14 +10,30 @@ mixin oracleListGroupItem(id, buttonLabel)
 
 mixin oracleSubOraclesListGroupItem(id, buttonLabel, oracles)
   -
-    let counter = 0;Label
-    let options = [];
-    oracles.forEach((oracle) => {
-      let tableLabel = oracle['Name'];
-      options.push(`${tableLabel},${counter}`);
-      counter++;
+    //- let counter = 0;Label
+    //- let options = [];
+    //- oracles.forEach((oracle) => {
+    //-   let tableLabel = oracle['Name'];
+    //-   options.push(`${tableLabel},${counter}`);
+    //-   counter++;
+    //- })
+    //- console.log('opt 1', options)
+
+    let count = 0
+    const options = oracles.map((table) => {
+      if (table.Oracles) {
+        const subOracleOptions = table.Oracles.map((oracle) => {
+          return `${oracle['Name']}&#44;${count++}`
+        })
+        return `${table['Name']},?{${table['Name']}&#124;${subOracleOptions.join('&#124;')}&#125;`
+      } else {
+        return `${table['Name']},${count++}`
+      }
     })
-    console.log('opt 1', options)
+
+    //- ?{Choose Table|Atmosphere,0|Settlements,?{Settlements&#124;Terminus&#44;0&#124;Outlands&#44;1&#124;Expanse&#44;2}|Observed From Space,2|Feature,3|Life,4}
+    //- ?{Choose Table|Atmosphere,0|Settlements,?{Settlements&#124;Terminus&#44;0&#124;Outlands&#44;1&#124;Expanse&#44;2}|Observed From Space,2|Feature,3|Life,4}
+
   - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
   +oracleRollBtn(id, buttonLabel, rollQuery)
 
@@ -47,11 +63,21 @@ mixin oracleRollBtn(id, buttonLabel, rollQuery="")
     .btn-content.oracle-name=buttonLabel.replace(/ - /i, ": ")
 
 mixin oracleMultiBtn(oracle, btnText, indexOffset=0)
-  - const labelText = oracle['Name']
-  - const options = oracle.Oracles.map((table, index) => { return `${table['Name']},${index+indexOffset}` })
-  - console.log('opt 2', options)
-  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}} {{header=${labelText}}}`
-  - const id = oracle.$id
+  -
+    const labelText = oracle['Name']
+    const options = oracle.Oracles.map((table, index) => {
+      if (table.Oracles) {
+        const subOracleOptions = table.Oracles.map((oracle, index) => {
+          return `${oracle['Name']}&#44;${index}`
+        })
+        return `?{Type&#124;${subOracleOptions.join('&#124;')}}`
+      } else {
+        return `${table['Name']},${index+indexOffset}`
+      }
+    })
+    console.log('opt 2', options)
+    const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}} {{header=${labelText}}}`
+    const id = oracle.$id
   label.roll-label.embedded-btn=btnText||labelText
     button.hide-element(
       type='roll'
