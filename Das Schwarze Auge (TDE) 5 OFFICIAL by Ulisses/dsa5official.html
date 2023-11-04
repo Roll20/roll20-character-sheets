@@ -21467,6 +21467,12 @@
 
     <div class="section optnsub2 filterBorder" style="margin: 40px 0;">
 <div  style="margin-top: 40px;">
+  <h3>v1.5.9 (08/23/2023)</h3>
+  <ul>
+    <li>Fixed AP cost payment for some special abilities</li>
+    <li>Changed default language translation file to en in respect to roll20 new translation system.</li>
+    <li>Adjusted some more issues with combat special abilities</li>
+  </ul>
   <h3>v1.5.8 (07/10/2023)</h3>
   <ul>
     <li>Fixes inured to encumbrance</li>
@@ -25662,7 +25668,6 @@
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="1"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="2"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="3"/>
-                                            <input name="attr_sonderfertigkeitkampftyp" type="radio" class="hidden passiveHider" value="3" />
                                             <div class="rating col30">
   <label>
     <input type="radio" name="attr_selectedLevel" value="0" />
@@ -26104,7 +26109,6 @@
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="1"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="2"/>
                                             <input type="radio" class="hidden filtercombatlevel" name='attr_sonderfertigkeit_stufe' value="3"/>
-                                            <input name="attr_sonderfertigkeitkampftyp" type="radio" class="hidden passiveHider" value="3" />
                                             <div class="rating col30">
   <label>
     <input type="radio" name="attr_selectedLevel" value="0" />
@@ -29855,7 +29859,6 @@
     for (let x of dsa5Module().dsa5.modifiers) {
       for (const id of specIds) {
         const isCombat = Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeittyp`]) == 3;
-        const passiveCombatskill = isCombat && Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeitkampftyp`]) == 3;
         const activated = Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_aktiviert`]) == 1;
         if (activated || isCombat) {
           const selection = _getAttrfromSelection(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_auswahl${x}`]);
@@ -29863,7 +29866,7 @@
             const dataVal = Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_mod${x}`]);
 
             let multiplier = 1;
-            if (isCombat && !passiveCombatskill) {
+            if (isCombat) {
               multiplier = Number(values[`repeating_sonderfertigkeit_${id}_selectedLevel`]);
             } else {
               multiplier = multiply ? Number(values[`repeating_sonderfertigkeit_${id}_sonderfertigkeit_stufe`]) : 1;
@@ -32563,7 +32566,7 @@ const threeDiceRoll = async({ template = "DSA-Talente", attributes, contingents,
     }
 
     const specCost = (apvalue, stufe) => {
-        const splits = apvalue.split(/[\/;]+/)
+        const splits = apvalue.replace(/ (AP|Abenteuerpunkte|Adventure points|Adventure Points)$/, "").split(/[\/;]+/)
         return Number(splits[stufe] || splits[0]) || 0
     }
 

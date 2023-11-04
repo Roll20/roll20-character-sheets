@@ -5,6 +5,15 @@
 
 
 ## Changelog
+### v1.5.9 (08/23/2023)
+* Fixed AP cost payment for some special abilities
+* Changed default language translation file to en in respect to roll20 new translation system.
+* Adjusted some more issues with combat special abilities
+
+### 1.5.8 (07/10/2023)  
+* Fixes inured to encumbrance
+* Change behaviour of passive combat skill bonuses to always apply their effect
+  
 ### v1.5.5 (03/20/2023)
 * Preview ranged attack roll final die
   
