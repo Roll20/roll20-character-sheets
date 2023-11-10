@@ -4,6 +4,11 @@ UnofficialCharacter Sheet Template for Ten Candles tabletop game, [Ten Candles](
 ## Version 1.0
 (Evilbram) Nov. 2023
 
+## Version 1.1
+(Evilbram) Nov. 2023
+- CSE conversion and Darkmode switch available
+- Design improvement
+
 A simple and light character sheet for the role-playing game "Ten Candles".
 The character sheet collects all the character information.
 Check boxes in front of each card to remember their use.
