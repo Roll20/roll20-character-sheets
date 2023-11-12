@@ -4331,6 +4331,10 @@
 						<b>NEW:</b> Added a sheet type selector to the footer in case there are weird things with Roll20 that break your charactersheet.
 					</li>
 					<li>
+						<b>FIX:</b> Roll Result Template. Moved the target field (aka effective skill) above the actual roll, 
+						since the original target field was getting lost being after the success/fail notes. Resolved a couple critical fail notes logic bugs.
+					</li>
+					<li>
 						GURPS 2.9.20 - Re-added Updates
 					</li>
 					<li>
@@ -15912,6 +15916,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 							<label>
 								<span data-i18n="range-band-label">Range Band</span>:<br />
 								<select name="attr_chase_range_band">
+									<option value="none">--<span data-i18n="select-label">Select</span>--</option>
 									<option value="close"><span data-i18n="chase-range-band-option-close">Close (0 to 5 hexes)</span></option>
 									<option value="short"><span data-i18n="chase-range-band-option-short">Short (6 to 20 hexes)</span></option>
 									<option value="medium" selected><span data-i18n="chase-range-band-option-medium">Medium (21 to 100 hexes)</span></option>
@@ -15923,9 +15928,11 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 					<div class="grid-cell grid-cell__callout_left">
 						<label>Description</label>
+						<input type="hidden" name="attr_chase_range_band_description_range" value="" />
+						<input type="hidden" name="attr_chase_range_band_description" value="" />
 						<div>
-							Range Penalty: -3 to -6 (Default is -3 or GM discretion for attack rolls)<br />
-							Can talk to enemey, or toss things at them.
+							<i>Range Penalty:</i> <span name="attr_chase_range_band_description_range"></span><br />
+							<i>Description:</i> <span name="attr_chase_range_band_description"></span>
 						</div>
 					</div>
 				</div>
@@ -16368,6 +16375,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<ul>
 				<li>
 					<b>NEW:</b> Added a sheet type selector to the footer in case there are weird things with Roll20 that break your charactersheet.
+				</li>
+				<li>
+					<b>FIX:</b> Roll Result Template. Moved the target field (aka effective skill) above the actual roll, 
+					since the original target field was getting lost being after the success/fail notes. Resolved a couple critical fail notes logic bugs.
 				</li>
 				<li>
 					GURPS 2.9.20 - Re-added Updates
@@ -19246,6 +19257,40 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                     </td>
                 </tr>
                 {{/selected}}
+				{{#effectiveSkill}}
+                <tr>
+                    <td class="label"><span data-i18n="target-label">Target</span>:</td>
+                    <td class="effective-skill">
+                        {{effectiveSkill}}
+                        {{#useFrightLabel}}
+                            <i>Fright Threshold</i>
+                        {{/useFrightLabel}}
+						
+						{{#isSkillRoll}}
+							<i>(Effective Skill)</i>
+						{{/isSkillRoll}}
+						
+                        <!-- If defense roll, check for effective skill below 1 -->
+                        {{#rollTotal() activeDefense 1}}
+                            {{#rollLess() effectiveSkill 1}}
+							<div style="color: red; margin-top: 6px;">
+								<span data-i18n="rolltemplate-warning-less-than-one-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
+							</div> 
+                            {{/rollLess() effectiveSkill 1}}
+                        {{/rollTotal() activeDefense 1}}
+                        
+                        <!-- For other rolls, check for effective skill below 3 -->
+						{{#rollTotal() activeDefense 0}}
+							{{#rollLess() effectiveSkill 3}}
+							<div style="color: red; margin-top: 6px;">
+								<span data-i18n="rolltemplate-warning-less-than-three-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
+							</div> 
+                            {{/rollLess() effectiveSkill 3}}
+                        {{/rollTotal() activeDefense 0}}
+                        
+                    </td>
+                </tr>
+                {{/effectiveSkill}}
                 {{#rollResult}}
                         
                         <!-- WARNING THIS IS GOING TO GET UGLY AND HARD TO FOLLOW -->
@@ -20232,51 +20277,7 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                                     {{/rollGreater() rollResult 12}}
                                 {{/rollLess() effectiveSkill 4}}
                                 
-                                <!-- if effective skill is 4, critical failure is 14 or higher -->
-                                {{#rollTotal() effectiveSkill 4}}
-                                    {{#rollGreater() rollResult 13}}
-									<tr class="rollResult">
-										<td colspan="2">
-										{{spellCriticalFailureNote}}
-										</td>
-									</tr>
-                                    {{/rollGreater() rollResult 13}}
-                                {{/rollTotal() effectiveSkill 4}}
-                                
-                                <!-- if effective skill is 5, critical failure is 15 or higher -->
-                                {{#rollTotal() effectiveSkill 5}}
-                                    {{#rollGreater() rollResult 14}}
-									<tr class="rollResult">
-										<td colspan="2">
-										{{spellCriticalFailureNote}}
-										</td>
-									</tr>
-                                    {{/rollGreater() rollResult 14}}
-                                {{/rollTotal() effectiveSkill 5}}
-                                
-                                <!-- if effective skill is 6, critical failure is 16 or higher -->
-                                {{#rollTotal() effectiveSkill 6}}
-                                    {{#rollGreater() rollResult 15}}
-									<tr class="rollResult">
-										<td colspan="2">
-										{{spellCriticalFailureNote}}
-										</td>
-									</tr>
-                                    {{/rollGreater() rollResult 15}}
-                                {{/rollTotal() effectiveSkill 6}}
-                                
-                                <!-- if effective skill is 7 to 15, critical failure is 17 or 18 -->
-                                {{#rollBetween() effectiveSkill 7 15}}
-                                    {{#rollGreater() rollResult 16}}
-									<tr class="rollResult">
-										<td colspan="2">
-										{{spellCriticalFailureNote}}
-										</td>
-									</tr>
-                                    {{/rollGreater() rollResult 16}}
-                                {{/rollBetween() effectiveSkill 7 15}}
-                                
-                                <!-- NOTE: Roll of 18 check has already been made -->
+                                 <!-- NOTE: Roll of 18 check has already been made -->
                                   
                                 <!-- additional critical failure text -->
                                 <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
@@ -20306,13 +20307,13 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                                 {{#rollTotal() effectiveSkill 4}}
                                     
                                     <!-- normal failure -->
-                                    {{#rollLess() rollResult 15}}
+                                    {{#rollLess() rollResult 14}}
 									<tr class="rollResult">
 										<td colspan="2">
 										{{spellFailNote}}
 										</td>
 									</tr>
-                                    {{/rollLess() rollResult 15}}
+                                    {{/rollLess() rollResult 14}}
                                     
                                     <!-- critical failure -->
                                     {{#rollGreater() rollResult 13}}
@@ -20454,41 +20455,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
                 {{/spellRoll}}
                 {{/rollResult}}
                 
-                {{#effectiveSkill}}
-                <tr>
-                    <td class="label"><span data-i18n="target-label">Target</span>:</td>
-                    <td class="effective-skill">
-                        {{effectiveSkill}}
-                        {{#useFrightLabel}}
-                            <i>Fright Threshold</i>
-                        {{/useFrightLabel}}
-						
-						{{#isSkillRoll}}
-							<i>(Effective Skill)</i>
-						{{/isSkillRoll}}
-						
-                        <!-- If defense roll, check for effective skill below 1 -->
-                        {{#rollTotal() activeDefense 1}}
-                            {{#rollLess() effectiveSkill 1}}
-							<div style="color: red; margin-top: 6px;">
-								<span data-i18n="rolltemplate-warning-less-than-one-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
-							</div> 
-                            {{/rollLess() effectiveSkill 1}}
-                        {{/rollTotal() activeDefense 1}}
-                        
-                        <!-- For other rolls, check for effective skill below 3 -->
-						{{#rollTotal() activeDefense 0}}
-							{{#rollLess() effectiveSkill 3}}
-							<div style="color: red; margin-top: 6px;">
-								<span data-i18n="rolltemplate-warning-less-than-three-description"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</span>
-							</div> 
-                            {{/rollLess() effectiveSkill 3}}
-                        {{/rollTotal() activeDefense 0}}
-                        
-                    </td>
-                </tr>
-                {{/effectiveSkill}}
-
 				<!-- Hard-coded defense roll modifiers -->
 				{{#rollTotal() showDodgeNotes 1}}
 
@@ -40671,5 +40637,47 @@ B378
 		
 
 	});
+
+	/* ------- CHASE CONTROL SHEET ------- */
+	const chaseRangeBandData = new Map([
+		["close", { name: "Close", start: "0-5 yards", rangePenaltyRange: "0 to -2", rangePenalty: 0, description: "Can touch rival, at least some of the time." }],
+		["short", { name: "Short", start: "6-20 yards", rangePenaltyRange: "-3 to -6", rangePenalty: -3, description: "Can talk to enemy, or toss things at him." }],
+		["medium", { name: "Medium", start: "21-100 yards", rangePenaltyRange: "-7 to -10", rangePenalty: -7, description: "Can only shout at rival; need a gun to attack him." }],
+		["long", { name: "Long", start: "101-500 yards", rangePenaltyRange: "-11 to -14", rangePenalty: -11, description: "Opponent is out of earshot, at scoped rifle range." }],
+		["extreme", { name: "Extreme", start: "500+ yards", rangePenaltyRange: "-15 or worse", rangePenalty: -15, description: "Rival difficult or impossible to see or shoot." }],
+	]);
+
+	on("change:chase_range_band", (event) => {
+
+		const rangeBand = event.newValue ?? "none";
+
+		updateRangeBandDescription(rangeBand);
+
+	});
+
+	const updateRangeBandDescription = (rangeBand) => {
+
+		const chaseRangeBand = chaseRangeBandData.get(rangeBand);
+
+		let rangeDescription = "";
+
+		let description = "";
+
+		if (chaseRangeBand) {
+
+			rangeDescription = `${chaseRangeBand.rangePenaltyRange} (Default is ${chaseRangeBand.rangePenalty} or GM discretion for attack rolls)`;
+
+			description = chaseRangeBand.description;
+
+		}
+
+		const updateValues = {
+			chase_range_band_description_range: rangeDescription,
+			chase_range_band_description: description
+		};
+
+		setAttrs(updateValues)
+
+	}
 
 </script>
