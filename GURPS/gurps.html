@@ -15881,11 +15881,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 								<span data-i18n="current-sequence-label">Current Sequence</span>:
 							</label>
 							<select name="attr_chase_sequence">
-								<option value="quarry_chooses" selected><span data-i18n="chase-sequence-option-quarry-chooses">Quarry chooses maneuver</span></option>
+								<option value="none" selected>--<span data-i18n="select-label">Select</span>--</option>
+								<option value="quarry_chooses"><span data-i18n="chase-sequence-option-quarry-chooses">Quarry chooses maneuver</span></option>
 								<option value="pursuer_chooses"><span data-i18n="chase-sequence-option-pursuer-chooses">Pursuer chooses maneuver</span></option>
 								<option value="pursuer_rolls"><span data-i18n="chase-sequence-option-pursuer-rolls">Pursuer resolves all rolls</span></option>
 								<option value="quarry_rolls"><span data-i18n="chase-sequence-option-quarry-rolls">Quarry resolves all rolls</span></option>
-								<option value="quick_content"><span data-i18n="chase-sequence-option-quick-content">Quick Contest of Chase Rolls</span></option>
+								<option value="quick_contest"><span data-i18n="chase-sequence-option-quick-contest">Quick Contest of Chase Rolls</span></option>
 								<option value="adjust_band"><span data-i18n="chase-sequence-option-range-band">Adjust range band</span></option>
 								<option value="next_round"><span data-i18n="chase-sequence-option-next-round">Proceed to next round</span></option>
 							</select>
@@ -15893,20 +15894,27 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 					<div class="grid-cell">
 						<div class="container-label-input">
-							<label>
-								<span data-i18n="help-label">Help</span>:
-							</label>
-							<button type="action" name="act_chase_get_result" class="btn">
+							<button type="action" name="act_chase_get_result" class="standard-button margin_right_small">
 								<span data-i18n="get-results-label">Get Quick Contest Results</span>
 							</button>
+							<label>
+								<span data-i18n="help-label">Help</span>
+							</label>							
 						</div>
+					</div>
+					<div class="grid-cell">
+						<button type="action" name="act_chase_reset" class="standard-button margin_right_small">
+							<span data-i18n="reset-label">Reset</span>
+						</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="chase-row">
 				<input type="hidden" name="attr_chase_content_result" />
-				<div>Place the results of quick content here using input value @{chase_content_result}</div>
+				<div>
+					<span name="attr_chase_content_result"></span>
+				</div>
 			</div>
 
 			<div class="chase-row">
@@ -15922,6 +15930,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<option value="medium" selected><span data-i18n="chase-range-band-option-medium">Medium (21 to 100 hexes)</span></option>
 									<option value="long"><span data-i18n="chase-range-band-option-long">Long (101 to 500 hexes)</span></option>
 									<option value="extreme"><span data-i18n="chase-range-band-option-extreme">Extreme (501+ hexes)</span></option>
+									<option value="escape"><span data-i18n="chase-range-band-option-escape">Escape!</span></option>
 								</select>
 							</label>
 						</div>
@@ -15940,9 +15949,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 
 			<!-- Quarry Section -->
-			<div class="chase-row">
-				<div>
-					<h3><span data-i18n="quarry-label">Quarry</span></h3>
+			<div class="chase-row section-header">
+				<div class="padding__left_small">
+					<input type="hidden" name="attr_chase_sequence" value="none" />
+					<h3 class="quarry"><span data-i18n="quarry-label">Quarry</span></h3>
 				</div>
 			</div>
 
@@ -15956,6 +15966,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<option value="none">--<span data-i18n="select-label">Select</span>--</option>
 									<option value="attack"><span data-i18n="attack-label">Attack</span></option>
 									<option value="disembark-embark"><span data-i18n="disembark-embark-label">Disembark/Embark</span></option>
+									<option value="take-control"><span data-i18n="take-control-label">Take Control</span></option>
 									<option value="emergency-action"><span data-i18n="emergency-action-label">Emergency Action</span></option>
 									<option value="force"><span data-i18n="force-label">Force</span></option>
 									<option value="hide"><span data-i18n="hide-label">Hide</span></option>
@@ -15991,7 +16002,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<div class="container-label-input">
 							<label>
 								<span data-i18n="final-modifier-label">Final Modifier</span>:
-								<input type="number" name="attr_chase_quarry_final_modifier" readonly="readonly" value="0" title="Macro: @{NAME|chase_quarry_final_modifier}" />
+								<input type="number" name="attr_chase_quarry_final_modifier" readonly="readonly" value="0" class="input-disabled" title="Macro: @{NAME|chase_quarry_final_modifier}" />
 							</label>
 						</div>
 					</div>
@@ -16083,6 +16094,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 					<div class="grid-cell">
 						<input type="number" step="1" name="attr_quarry_speed" value="0" title="Macro: @{NAME|quarry_handling}" />
+						<input type="hidden" name="attr_quarry_speed_chase_mod" value="0" title="Macro: @{NAME|quarry_speed_chase_mod}" />
 					</div>
 
 					<div class="grid-cell">
@@ -16115,7 +16127,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						</div>
 
 						<fieldset class="repeating_chase-quarry-support-actions">
-							<div class="grid-chase-support-actions">
+							<div class="grid-chase-support-actions grid__padding_bottom_small">
 								<div class="grid-cell">
 									<input type="text" name="attr_name" value="" title="Macro: @{NAME|repeating_chase-quarry-support-actions_$[row #]_name}" />
 								</div>
@@ -16139,8 +16151,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 							<div class="grid-cell">Mod</div>
 						</div>
 
+						<input type="hidden" name="attr_chase_quarry_chase_mod_table_total" value="0" />
 						<fieldset class="repeating_chase-quarry-modifiers">
-							<div class="grid-chase-modifiers">
+							<div class="grid-chase-modifiers grid__padding_bottom_small">
 								<div class="grid-cell">
 									<input type="text" name="attr_name" value="" title="Macro: @{NAME|repeating_chase-quarry-modifiers_$[row #]_name}" />
 								</div>
@@ -16157,9 +16170,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 			</div>
 
 			<!-- Pursuer Section -->
-			<div class="chase-row">
-				<div>
-					<h3><span data-i18n="pursuer-label">Pursuer</span></h3>
+			<div class="chase-row section-header">
+				<div class="padding__left_small">
+					<input type="hidden" name="attr_chase_sequence" value="none" />
+					<h3 class="pursuer"><span data-i18n="pursuer-label">Pursuer</span></h3>
 				</div>
 			</div>
 
@@ -16173,6 +16187,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<option value="none">--<span data-i18n="select-label">Select</span>--</option>
 									<option value="attack"><span data-i18n="attack-label">Attack</span></option>
 									<option value="disembark-embark"><span data-i18n="disembark-embark-label">Disembark/Embark</span></option>
+									<option value="take-control"><span data-i18n="take-control-label">Take Control</span></option>
 									<option value="emergency-action"><span data-i18n="emergency-action-label">Emergency Action</span></option>
 									<option value="force"><span data-i18n="force-label">Force</span></option>
 									<option value="mobility-pursuit"><span data-i18n="mobiliy-pursuit-label">Mobility Pursuit</span></option>
@@ -16206,7 +16221,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<div class="container-label-input">
 							<label>
 								<span data-i18n="final-modifier-label">Final Modifier</span>:
-								<input type="number" name="attr_chase_pursuer_final_modifier" readonly="readonly" value="0" title="Macro: @{NAME|chase_pursuer_final_modifier}" />
+								<input type="number" name="attr_chase_pursuer_final_modifier" readonly="readonly" value="0" class="input-disabled" title="Macro: @{NAME|chase_pursuer_final_modifier}" />
 							</label>
 						</div>
 					</div>
@@ -16298,6 +16313,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 					<div class="grid-cell">
 						<input type="number" step="1" name="attr_pursuer_speed" value="0" title="Macro: @{NAME|pursuer_handling}" />
+						<input type="hidden" name="attr_pursuer_speed_chase_mod" value="0" title="Macro: @{NAME|pursuer_speed_chase_mod}" />
 					</div>
 
 					<div class="grid-cell">
@@ -16330,7 +16346,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						</div>
 
 						<fieldset class="repeating_chase-pursuer-support-actions">
-							<div class="grid-chase-support-actions">
+							<div class="grid-chase-support-actions grid__padding_bottom_small">
 								<div class="grid-cell">
 									<input type="text" name="attr_name" value="" title="Macro: @{NAME|repeating_chase-pursuer-support-actions_$[row #]_name}" />
 								</div>
@@ -16354,8 +16370,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 							<div class="grid-cell">Mod</div>
 						</div>
 
+						<input type="hidden" name="attr_chase_pursuer_chase_mod_table_total" value="0" />
 						<fieldset class="repeating_chase-pursuer-modifiers">
-							<div class="grid-chase-modifiers">
+							<div class="grid-chase-modifiers grid__padding_bottom_small">
 								<div class="grid-cell">
 									<input type="text" name="attr_name" value="" title="Macro: @{NAME|repeating_chase-pursuer-modifiers_$[row #]_name}" />
 								</div>
@@ -40679,6 +40696,7 @@ B378
 		["medium", { name: "Medium", start: "21-100 yards", rangePenaltyRange: "-7 to -10", rangePenalty: -7, description: "Can only shout at rival; need a gun to attack him." }],
 		["long", { name: "Long", start: "101-500 yards", rangePenaltyRange: "-11 to -14", rangePenalty: -11, description: "Opponent is out of earshot, at scoped rifle range." }],
 		["extreme", { name: "Extreme", start: "500+ yards", rangePenaltyRange: "-15 or worse", rangePenalty: -15, description: "Rival difficult or impossible to see or shoot." }],
+		["escape", { name: "Escape!", start: "Beyond Extreme!", rangePenaltyRange: "None, combat over", rangePenalty: -30, description: "Quarry has escaped, chase is over!" }],
 	]);
 
 	const chaseManeuverData = new Map([
@@ -40693,9 +40711,18 @@ B378
 		}],
 		["disembark-embark", { 
 			name: "Disembark/Embark", 
-			description: "Leave or enter a vehicle, such as dashing into a building. If pursuer doesn't pick Disember/Embark then you can perform a Mobility Escape next round. Entering lets you take control of a vehicle next round.", 
+			description: "Leave or enter a vehicle or building. If pursuer doesn't pick Disembark/Embark then you can perform a Mobility Escape next round. If embarking, next round you have the option to select the Take Control maneuver.", 
 			conditions: "Must be in a vehicle to leave one, or have access to a vehicle to board one; latter requires suitable scenery or Lucky Break.", 
-			actions: "Make a Vehicle control roll to start a vehicle, on failure try again next turn. Passengers can attack with ranged weapons.", 
+			actions: "Passengers can attack with ranged weapons. If Embarking, next round you can attempt the Take Control maneuver.", 
+			chaseRolls: "Static maneuver.", 
+			chaseMod: 0,
+			chaseOptions: []
+		}],
+		["take-control", { 
+			name: "Take Control", 
+			description: "Take Control. In the book, this is also Disembark/Embark. To help avoid confusion, Take Control was created as a new maneuver.", 
+			conditions: "", 
+			actions: "Make a Vehicle control roll to start or hotwire a vehicle, on failure try again next turn. Passengers can attack with ranged weapons.", 
 			chaseRolls: "Static maneuver.", 
 			chaseMod: 0,
 			chaseOptions: []
@@ -40711,16 +40738,16 @@ B378
 		}],
 		["force", { 
 			name: "Force", 
-			description: "Attempt to force an enemy vehicle off the road.", 
-			conditions: "Round starts at Close range and you're in a vehicle that could strike your rival's.", 
-			actions: "Roll against vehicle operation skill to hit. Target may attempt to dodge. On hit, target must make control roll at -1/+1 per 5 points by which your vehicle's ST is higher/lower than target's vehicle ST. Failure causes target to check for a Wipeout. Passengers can attack with ranged weapons.", 
+			description: "Attempt to force target off the road.", 
+			conditions: "Round starts at Close range and you're able to strike your rival.", 
+			actions: "Roll vehicle operation skill to hit. Target may attempt to dodge. On hit, target must make control roll at -1/+1 per 5 points by which your vehicle's ST is higher/lower than target's vehicle ST. Failure causes target to check for a Wipeout. Passengers can attack with ranged weapons.", 
 			chaseRolls: "-2", 
 			chaseMod: -2,
 			chaseOptions: []
 		}],
 		["hide", { 
 			name: "Hide", 
-			description: "Attempt to duck out of sight of pursuer in a cluttered area.", 
+			description: "Attempt to use scenery to prevent pursuer from seeing you.", 
 			conditions: "Round starts at Medium range or greater; Suitable scenery or Lucky Break.", 
 			actions: "", 
 			chaseRolls: "-10 at medium range, -5 at Long range, or 0 at Extreme range. On foot make chase against Stealth. If you win, pursuer loses sight of you! You may opt to escape or become the pursuer, selecting Short, Medium, or Long range. If you lose, Pursuer is automatically at Close range.", 
@@ -40733,27 +40760,27 @@ B378
 		}],
 		["mobility-escape", { 
 			name: "Mobility Escape", 
-			description: "Escape pursuit by going where your pursuer cannot.", 
-			conditions: "Either a mismatched chase (e.g., air vs land) or suitable Scenery or Lucky Break. A Lucky Break can enable a Mobility Escape even if your pursuer is equally mobile.", 
+			description: "Escape by going where your pursuer can't.", 
+			conditions: "Either a mismatched chase (e.g., air vs land) or suitable Scenery or Lucky Break.", 
 			actions: "", 
-			chaseRolls: "If your pursuer truly can't follow you, their maneuver is treated as static even if it otherwise wouldn't be, on this and future rounds. Pursuer can use Lucky Break to prevent this if they haven't selected a static maneuver.", 
+			chaseRolls: "If your pursuer can't follow, their maneuver is treated as static, on this and future rounds. Pursuer can use Lucky Break to avoid the forced static maneuver.", 
 			chaseMod: 0,
 			chaseOptions: []
 		}],
 		["mobility-pursuit", { 
 			name: "Mobility Pursuit", 
 			description: "Cut off your quarry by taking a route that they cannot; fly over buildings with helicopter to thwart motorcyclist.", 
-			conditions: "Either a mismatched chase or suitable scenery or Lucky Break. A Lucky Break can allow this even when both parties are traveling the same way - e.g., you catch a ride on a conveyor belt to cheat in a foot chase.", 
+			conditions: "Either a mismatched chase or suitable scenery or Lucky Break.", 
 			actions: "", 
-			chaseRolls: "+5. If you win, you must choose a reduced range.", 
+			chaseRolls: "+5. If you win, must choose a reduced range.", 
 			chaseMod: 5,
 			chaseOptions: []
 		}],
 		["move", { 
 			name: "Move", 
-			description: "Chase or flee your rival using sheer skill and speed. This is the “default” maneuver: no conditions apply, there are no Chase Roll modifiers, and nobody attacks (take Move and Attack for that).", 
-			conditions: "", 
-			actions: "", 
+			description: "Move using sheer skill and speed.", 
+			conditions: "None", 
+			actions: "None, nobody attacks (take Move and Attack for that)", 
 			chaseRolls: "", 
 			chaseMod: 0,
 			chaseOptions: []
@@ -40817,6 +40844,50 @@ B378
 			chaseOptions: []
 		}]
 	]);
+
+	on("change:chase_sequence", event => {
+
+		let sequence = event.newValue ?? "none";
+
+		processChaseSequence(sequence);
+
+	});
+
+	const processChaseSequence = (sequence) => {
+
+		if (sequence == "next_round") {
+			updateChaseRound();
+		}
+
+	}
+
+	const updateChaseRound = () => {
+
+		let fields = ["chase_round"];
+
+		getAttrs(fields, values => {
+
+			let currentRound = Number(values.chase_round) ?? 1;
+
+			let nextRound = currentRound + 1;
+
+			let keyValuePairs = {
+				chase_round: nextRound,
+				chase_sequence: "quarry_chooses",
+				chase_quarry_maneuver: "none",
+				chase_quarry_modifier: 0,
+				chase_quarry_made_by: 0,
+				chase_pursuer_maneuver: "none",
+				chase_pursuer_modifier: 0,
+				chase_pursuer_made_by: 0,
+				chase_content_result: ""
+			};
+
+			setAttrs(keyValuePairs);
+
+		});
+
+	};
 
 	on("change:chase_range_band", (event) => {
 
@@ -40911,5 +40982,160 @@ B378
 		setAttrs(updateValues)
 
 	}
+
+	const chaseParticipants = ["quarry", "pursuer"];
+
+	chaseParticipants.forEach( participant => {
+
+		on(`change:chase_${participant}_modifier change:${participant}_handling change:chase_${participant}_chase_mod_table_total change:${participant}_speed_chase_mod`, event => {
+
+			updateChaseModifiers(participant);
+
+		});
+
+	});
+		
+	const updateChaseModifiers = (participant) => {
+
+		let fields = [
+			`chase_${participant}_modifier`, 
+			`${participant}_handling`,
+			`chase_${participant}_chase_mod_table_total`,
+			`${participant}_speed_chase_mod`
+		];
+
+		getAttrs(fields, values => {
+
+			let modifier = Number(values[`chase_${participant}_modifier`]) ?? 0;
+
+			let handling = Number(values[`${participant}_handling`]) ?? 0;
+
+			let tableTotal = Number(values[`chase_${participant}_chase_mod_table_total`]) ?? 0;
+
+			let speedMod = Number(values[`${participant}_speed_chase_mod`]) ?? 0;
+
+			let total = modifier + handling + tableTotal + speedMod;
+
+			let keyValues = {};
+
+			keyValues[`chase_${participant}_final_modifier`] = total;
+
+			setAttrs(keyValues);
+
+		});
+
+	};
+	
+	chaseParticipants.forEach( participant => {
+
+		on(`change:repeating_chase-${participant}-modifiers:mod`, event => {
+
+			sumRepeating(`repeating_chase-${participant}-modifiers`, 'mod', function (total) {
+			
+				let keyValues = {};
+
+				keyValues[`chase_${participant}_chase_mod_table_total`] = total;
+
+				setAttrs(keyValues);
+
+			});
+	
+		});
+
+	});
+	
+	chaseParticipants.forEach( participant => {
+
+		on(`change:${participant}_speed`, event => {
+
+			let speed = event.newValue ?? 0;
+
+			updateParticipantSpeedModifier(participant, speed);
+	
+		});
+
+	});
+
+	const updateParticipantSpeedModifier = (participant, speed) => {
+		
+		let speedMod = Math.abs(getModBySpeedRange(speed));
+
+		let keyValues = {};
+
+		keyValues[`${participant}_speed_chase_mod`] = speedMod;
+
+		setAttrs(keyValues);
+		
+	};
+
+	on("clicked:chase_get_result", event => {
+		getChaseResults();
+	});
+
+	const getChaseResults = () => {
+
+		let fields = [
+			"chase_quarry_made_by",
+			"chase_pursuer_made_by",
+		];
+
+		getAttrs(fields, values => {
+
+			let quarryRollBy = Number(values.chase_quarry_made_by) ?? 0;
+
+			let pursuerRollBy = Number(values.chase_pursuer_made_by) ?? 0;
+
+			let difference = quarryRollBy - pursuerRollBy;
+
+			let winner = "Quarry";
+
+			if (difference < 0) {
+				winner = "Pursuer";
+			}
+
+			let victoryDifference = Math.abs(difference);
+
+			let result = "Tie, no change to range band.";
+
+			if (1 <= victoryDifference && victoryDifference <= 4) {
+				result = `${winner} won by ${victoryDifference}, no change to range band.`;
+			} else if (5 <= victoryDifference && victoryDifference <= 9) {
+				result = `${winner} won by ${victoryDifference}, they may shift range band by one step in either direction, unless instructed otherwise.`;
+			} else if (victoryDifference >= 10) {
+				result = `${winner} won by ${victoryDifference}, they may shift range band by two steps in either direction, unless instructed otherwise.`;
+			}
+
+			let keyValues = {
+				chase_content_result: result
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	};
+
+	on("clicked:chase_reset", (event) => {
+		chaseResetForm();
+	});
+
+	const chaseResetForm = () => {
+
+		let keyValuePairs = {
+			chase_round: 1,
+			chase_sequence: "none",
+			chase_range_band: "none",
+			chase_quarry_maneuver: "none",
+			chase_quarry_modifier: 0,
+			chase_quarry_made_by: 0,
+			chase_pursuer_maneuver: "none",
+			chase_pursuer_modifier: 0,
+			chase_pursuer_made_by: 0,
+			chase_content_result: ""
+		};
+
+		setAttrs(keyValuePairs);
+
+	};
 
 </script>
