@@ -4,6 +4,17 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.3
+### Fixed
+- [Issue #70: Using hidden HP configs is not working right](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/70)
+- [Issue #72: Text is too light when weapon is not favored](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/72) - Removed text transparency
+- Added some missing translation keys
+
+### Changed
+- Removed v3 conversion problems notice from the options bar
+- Removed the redo v3 conversions button from help pop-up
+- Reduced transparency on greyed out items
+
 ## 3.2
 ### Fixed
 - Issue causing default setting of Mythic Britain to actually be Mythic Babylon and visa-versa.

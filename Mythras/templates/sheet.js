@@ -353,7 +353,7 @@ function upgradeGeneric3Dot1() {
  * @param version the sheet version already parse to a float or 0 if not a valid float
  */
 function versioning(sheet_type, version) {
-    const latestVersion = '3.2';
+    const latestVersion = '3.3';
     if (debug) {console.log(`Current sheet version = ${version}`);}
     version = parseFloat(version) || 0;
     /* Eval sheet version and run upgrade functions as needed, note we have dropped functions of old versions */
@@ -377,7 +377,7 @@ function versioning(sheet_type, version) {
         else if (sheet_type === 'vehicle') {upgradeGeneric3Dot1();}
         versioning(sheet_type, '3.1');
     } else if (version >= 3.1) { /* TODO change this when we next introduce a version that requires updating */
-        setAttrs({"version": "3.2"});
+        setAttrs({"version": "3.3"});
     }
 }
 
