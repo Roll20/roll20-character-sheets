@@ -16155,7 +16155,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 
 					<div class="grid-cell">
-						<input type="number" step="1" name="attr_quarry_chase_skill" value="10" title="Macro: @{NAME|quarry_chase_skill}" />
+						<input type="number" step="1" name="attr_quarry_chase_skill" class="half-width" value="10" title="Macro: @{NAME|quarry_chase_skill}" />
+						<input type="hidden" name="attr_chase_quarry_modifier_description" value="" />
+						<button type="roll" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[0]]}} {{characterName=Quarry}} {{skillName=Chase Skill Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{quarry_chase_skill} + @{chase_quarry_final_modifier}]]}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{rollModifier=@{chase_quarry_final_modifier}}} {{rollModifierSummary=@{chase_quarry_modifier_description}}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[1]]}} {{maneuver=@{chase_quarry_maneuver}}}" class="btn ui-draggable"></button>
 					</div>
 
 				</div>
@@ -16308,10 +16310,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 								<div class="standard-tooltip">
 									<span data-i18n="final-modifier-label">Final Modifier</span>:
 									<span class="tooltiptext small-width">
-										<span data-i18n="chase-modifier-label">Chase Modifier</span>: <span name="attr_chase_quarry_modifier"></span><br />
-										<span data-i18n="handling-modifier-label">Handling Modifier</span>: <span name="attr_quarry_handling"></span><br />
-										<span data-i18n="speed-modifier-label">Speed Modifier</span>: <span name="attr_quarry_speed_chase_mod"></span><br />
-										<span data-i18n="chase-modifier-table-label">Chase Modifier Table</span>: <span name="attr_chase_quarry_chase_mod_table_total"></span>
+										<span data-i18n="chase-modifier-label">Chase Modifier</span>: <span name="attr_chase_pursuer_modifier"></span><br />
+										<span data-i18n="handling-modifier-label">Handling Modifier</span>: <span name="attr_pursuer_handling"></span><br />
+										<span data-i18n="speed-modifier-label">Speed Modifier</span>: <span name="attr_pursuer_speed_chase_mod"></span><br />
+										<span data-i18n="chase-modifier-table-label">Chase Modifier Table</span>: <span name="attr_chase_pursuer_chase_mod_table_total"></span>
 									</span>
 								</div>
 								<input type="number" name="attr_chase_pursuer_final_modifier" readonly="readonly" value="0" class="input-disabled" title="Macro: @{NAME|chase_pursuer_final_modifier}" />
@@ -16464,7 +16466,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 					</div>
 
 					<div class="grid-cell">
-						<input type="number" step="1" name="attr_pursuer_chase_skill" value="10" title="Macro: @{NAME|pursuer_chase_skill}" />
+						<input type="number" step="1" name="attr_pursuer_chase_skill" class="half-width" value="10" title="Macro: @{NAME|pursuer_chase_skill}" />
+						<input type="hidden" name="attr_chase_pursuer_modifier_description" value="" />
+						<button type="roll" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[0]]}} {{characterName=Pursuer}} {{skillName=Chase Skill Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{pursuer_chase_skill} + @{chase_pursuer_final_modifier}]]}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{rollModifier=@{chase_pursuer_final_modifier}}} {{rollModifierSummary=@{chase_pursuer_modifier_description}}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[1]]}} {{maneuver=@{chase_pursuer_maneuver}}}" class="btn ui-draggable"></button>
 					</div>
 
 				</div>
@@ -20920,7 +20924,6 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 					</td>
 				</tr>
 				{{/customMacro}}
-
 
 				{{#rollTotal() displayRollModifierSummary 1}}
 					
@@ -41386,6 +41389,47 @@ B378
 		
 	};
 
+	chaseParticipants.forEach( participant => {
+
+		on(`change:chase_${participant}_modifier change:${participant}_handling change:${participant}_speed_chase_mod change:chase_${participant}_chase_mod_table_total`, event => {
+
+			updateChaseRollDescription(participant);
+	
+		});
+
+	});
+
+	const updateChaseRollDescription = participant => {
+
+		const fields = [
+			`chase_${participant}_modifier`,
+			`${participant}_handling`,
+			`${participant}_speed_chase_mod`,
+			`chase_${participant}_chase_mod_table_total`
+		];
+
+		getAttrs(fields, values => {
+
+			let chaseMod = Number(values[`chase_${participant}_modifier`]) ?? 0;
+			let handlingMod = Number(values[`${participant}_handling`]) ?? 0;
+			let speedMod = Number(values[`${participant}_speed_chase_mod`]) ?? 0;
+			let tableMod = Number(values[`chase_${participant}_chase_mod_table_total`]) ?? 0;
+
+			let description = `Chase Modifier: ${chaseMod}
+Handling Modifier: ${handlingMod}
+Speed Modifier: ${speedMod}
+Chase Modifier Table: ${tableMod}`;
+
+			let keyValues = {};
+
+			keyValues[`chase_${participant}_modifier_description`] = description;
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
 	on("clicked:chase_get_result", event => {
 		getChaseResults();
 	});
@@ -41395,6 +41439,8 @@ B378
 		let fields = [
 			"chase_quarry_made_by",
 			"chase_pursuer_made_by",
+			"quarry_is_static",
+			"pursuer_is_static",
 		];
 
 		getAttrs(fields, values => {
@@ -41403,26 +41449,61 @@ B378
 
 			let pursuerRollBy = Number(values.chase_pursuer_made_by) ?? 0;
 
+			let quarryIsStatic = values.quarry_is_static == "1";
+
+			let pursuerIsStatic = values.pursuer_is_static == "1";
+
+			// positive value, quarry rolled better. negative value pursuer rolled better
 			let difference = quarryRollBy - pursuerRollBy;
 
 			let winner = "Quarry";
 
-			if (difference < 0) {
+			if (quarryIsStatic == true && pursuerIsStatic == true) {
+				winner = "Tie";
+			} else if (quarryIsStatic == false && pursuerIsStatic == false && difference < 0) {
 				winner = "Pursuer";
+			} else if (quarryIsStatic == true && pursuerIsStatic == false) {
+				winner = "Pursuer";
+				if (difference > 0) {
+					difference = 0;
+				}
+			} else if (quarryIsStatic == false && pursuerIsStatic == true) {
+				winner = "Quarry";
+				if (difference < 0) {
+					difference = 0;
+				}
 			}
 
 			let victoryDifference = Math.abs(difference);
-
+			
 			let result = "Tie, no change to range band.";
 
-			if (1 <= victoryDifference && victoryDifference <= 4) {
-				result = `${winner} won by ${victoryDifference}, no change to range band.`;
-			} else if (5 <= victoryDifference && victoryDifference <= 9) {
-				result = `${winner} won by ${victoryDifference}, they may shift range band by one step in either direction, unless instructed otherwise.`;
-			} else if (victoryDifference >= 10) {
-				result = `${winner} won by ${victoryDifference}, they may shift range band by two steps in either direction, unless instructed otherwise.`;
-			}
+			if (quarryIsStatic == true && pursuerIsStatic == true) {
 
+				result = `Quarry and Pursuer are static, no change to range band.`;
+			
+			} else if (quarryIsStatic == true || pursuerIsStatic == true) {
+
+				if (0 <= victoryDifference && victoryDifference <= 4) {
+					result = `${winner} won by ${victoryDifference}, they may shift range band by one step in either direction because opponent is static, unless instructed otherwise.`;
+				} else if (5 <= victoryDifference && victoryDifference <= 9) {
+					result = `${winner} won by ${victoryDifference}, they may shift range band by two steps in either direction because opponent is static, unless instructed otherwise.`;
+				} else if (victoryDifference >= 10) {
+					result = `${winner} won by ${victoryDifference}, they may shift range band by three steps in either direction because opponent is static, unless instructed otherwise.`;
+				}
+
+			} else {
+
+				if (1 <= victoryDifference && victoryDifference <= 4) {
+					result = `${winner} won by ${victoryDifference}, no change to range band.`;
+				} else if (5 <= victoryDifference && victoryDifference <= 9) {
+					result = `${winner} won by ${victoryDifference}, they may shift range band by one step in either direction, unless instructed otherwise.`;
+				} else if (victoryDifference >= 10) {
+					result = `${winner} won by ${victoryDifference}, they may shift range band by two steps in either direction, unless instructed otherwise.`;
+				}
+
+			}
+			
 			let keyValues = {
 				chase_content_result: result
 			};
