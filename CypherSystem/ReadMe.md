@@ -3,7 +3,7 @@ Character sheet, with integrated rolls and optional API script, for the Cypher S
 It can look like and be used as a sheet for _Numen&eacute;ra_ (except the armor stat cost, as per the CSR rule) or _The Strange_ (except the armor stat cost thing also, and the recursion management which requires several characters/sheets, one per recursion).
 
 # Current version:
-Version 1.6 (February 21st, 2016).
+Version 1.7 (September 17th, 2017).
 
 * Screenshot [Generic Cypher System style](CypherSystem.png)
 * Screenshot [Numenera style](CypherSystem_style_Numenera.png)
@@ -41,6 +41,9 @@ Set up the API script:
 
 
 # Release Notes
+
+## Release 1.7 (September 17th, 2017)
+Technical optimisation.
 
 ## Release 1.6 (February 21st, 2016)
 Cosmetic changes, to ease access to the delete button on repeatable sections, and diminish repeatable sections line height.
@@ -80,7 +83,7 @@ The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/mast
 Layout changes: larger stat pools and slightly smaller buttons.
 
 Addition of 2 API buttons: reset Action parameters, and reset/complete rest of the character.
-The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/cyphersystemsheet.js) must be updated.
+The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/1.2/cyphersystemsheet.js) must be updated.
 
 ## Release 1.0 (September 2015)
 Creation of the sheet.

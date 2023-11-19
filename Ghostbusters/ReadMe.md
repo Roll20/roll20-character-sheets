@@ -3,6 +3,12 @@
 ## Who you gonna call?
 
 ### Changelog
+
+### 0.0.7
+* Changed default roll button icon to a d6
+* Removed duplicate CSS
+* Minor Code Cleanup (HTML & CSS)
+
 ### 0.0.6
 * Added Ghost Die back into the sheet
 * Talents are now being calculated correctly with their appropriate Traits

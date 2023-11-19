@@ -28,6 +28,10 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+#### 0.1.8
+
+* Removed errant character
+
 #### 0.1.7
 
 * Revamped and made consistent all roll templates for:

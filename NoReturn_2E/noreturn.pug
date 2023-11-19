@@ -1,0 +1,127 @@
+//
+    CREATED by          Gorthian
+    Version				1.1 HF1
+    Letzte Änderung		2023-10-05
+    GitHub				https://github.com/Gorthian/Roll20_NoReturn_CharacterSheet
+    Wiki				https://github.com/Gorthian/Roll20_NoReturn_CharacterSheet/wiki
+    Bugs & Issues		https://github.com/Gorthian/Roll20_NoReturn_CharacterSheet/issues
+
+// Globale Variablen
+-
+    //- Liste der verfügbaren Seiten. Bei Änderungen auch button-list ind src/js/sheetworker.js anpassen
+    var pages = [
+        {name:'one', i18n:'seite-1'},
+        {name:'two', i18n:'seite-2'},
+        {name:'three', i18n:'seite-3'}
+    ];
+    //- Um die Robotik-Seite zu aktivieren muss hier noch {name:'three', i18n:'seite-3'} eingefügt werden
+
+    //- Liste der Fähigkeiten
+    var i=0
+    var skills = [
+        {id:i++,name:'akrobatik', attribute:'beweglichkeit'},
+        {id:i++,name:'astronomie', attribute:'wissen'},
+        {id:i++,name:'ausdauer', attribute:'konstitution'},
+        {id:i++,name:'ausweichen', attribute:'beweglichkeit'},
+        {id:i++,name:'basteln', attribute:'handwerk'},
+        {id:i++,name:'blocken', attribute:'konstitution'},
+        {id:i++,name:'bodenfahrzeuge', attribute:'geschick'},
+        {id:i++,name:'chemie', attribute:'wissen'},
+        {id:i++,name:'computer', attribute:'wissen'},
+        {id:i++,name:'dressieren', attribute:'charisma'},
+        {id:i++,name:'einschuechtern_ch', attribute:'charisma'},
+        {id:i++,name:'einschuechtern_st', attribute:'staerke'},
+        {id:i++,name:'elektronik', attribute:'handwerk'},
+        {id:i++,name:'feuerwaffenbau', attribute:'handwerk'},
+        {id:i++,name:'fluggeraete', attribute:'geschick'},
+        {id:i++,name:'gassenwissen', attribute:'wissen'},
+        {id:i++,name:'geschuetze', attribute:'geschick'},
+        {id:i++,name:'grossraumschiff', attribute:'wissen'},
+        {id:i++,name:'heimlichkeit', attribute:'wahrnehmung'},
+        {id:i++,name:'inspiration', attribute:'charisma'},
+        {id:i++,name:'klettern', attribute:'beweglichkeit'},
+        {id:i++,name:'kunst', attribute:'handwerk'},
+        {id:i++,name:'mechanik', attribute:'handwerk'},
+        {id:i++,name:'medizin', attribute:'wissen'},
+        {id:i++,name:'menschenkenntnis', attribute:'charisma'},
+        {id:i++,name:'nachforschen', attribute:'wahrnehmung'},
+        {id:i++,name:'nahkampf', attribute:'beweglichkeit'},
+        {id:i++,name:'naturkunde', attribute:'wissen'},
+        {id:i++,name:'orientierung', attribute:'wahrnehmung'},
+        {id:i++,name:'projektilwaffen', attribute:'geschick'},
+        {id:i++,name:'raumjaeger', attribute:'geschick'},
+        {id:i++,name:'raumschiff', attribute:'geschick'},
+        {id:i++,name:'reaktion', attribute:'wahrnehmung'},
+        {id:i++,name:'reiten', attribute:'beweglichkeit'},
+        {id:i++,name:'rennen', attribute:'beweglichkeit'},
+        {id:i++,name:'robotik', attribute:'handwerk'},
+        {id:i++,name:'ruestungsbau', attribute:'handwerk'},
+        {id:i++,name:'sagen-mythen', attribute:'wissen'},
+        {id:i++,name:'saufen', attribute:'konstitution'},
+        {id:i++,name:'schaetzen', attribute:'wahrnehmung'},
+        {id:i++,name:'schauspiel', attribute:'charisma'},
+        {id:i++,name:'schiessen', attribute:'geschick'},
+        {id:i++,name:'schwere-waffen', attribute:'geschick'},
+        {id:i++,name:'schwimmen', attribute:'beweglichkeit'},
+        {id:i++,name:'sicherheitstechnik', attribute:'handwerk'},
+        {id:i++,name:'spezies', attribute:'wissen'},
+        {id:i++,name:'springen', attribute:'beweglichkeit'},
+        {id:i++,name:'spruehwaffen', attribute:'geschick'},
+        {id:i++,name:'stemmen', attribute:'staerke'},
+        {id:i++,name:'taschendiebstahl', attribute:'geschick'},
+        {id:i++,name:'ueberreden', attribute:'charisma'},
+        {id:i++,name:'verhandeln', attribute:'charisma'},
+        {id:i++,name:'waffenbau', attribute:'handwerk'},
+        {id:i++,name:'waffenkampf', attribute:'beweglichkeit'},
+        {id:i++,name:'wasserfahrzeuge', attribute:'geschick'},
+        {id:i++,name:'willenskraft', attribute:'wissen'},
+        {id:i++,name:'wurfwaffen', attribute:'geschick'},
+        {id:i++,name:'zero-g', attribute:'beweglichkeit'},
+    ]
+
+//
+    ********************************
+    * START noreturn.pug
+    ********************************
+//- MIXINs
+mixin input-text(attribute, i18n, standard)
+    // MIXIN : noreturn.pug : input-text
+    div 
+        label(class="sheet-input-label" data-i18n=i18n)
+    div
+        input(type="text" name="attr_"+attribute default=standard)
+
+mixin repeating-textarea(name)
+    // MIXIN : noreturn.pug : repeating-textarea
+    div(class="sheet-box")
+        h1(data-i18n=name)
+        fieldset(class="repeating_"+name)
+            input(name="attr_"+name+"-titel" type="text" class="sheet-input-underline")
+            details 
+                summary &nbsp;
+                textarea(name="attr_"+name+"-beschreibung" class="sheet-details-standard")
+
+//- SEITENINHALT
+div(class="sheet-noreturn" role="article")    
+    div(class="sheet-noreturn-body")
+        input(type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="page-one")    
+        div(class="sheet-tabs" role="navigation" aria-label="Angezeigte Seite auswählen" lang="de")
+            each page in pages
+                button(class="sheet-toggle-button" type="action" name="act_page-"+page.name data-i18n=page.i18n)
+        include src/html/page-one.pug
+        include src/html/page-two.pug
+        include src/html/page-three.pug
+        include src/html/page-four.pug
+    
+
+//- ROLL TEMPLATES
+include src/html/rolltemplates.pug
+
+// SHEET WORKERS
+script(type="text/worker")
+    include src/js/sheetworker.js
+
+//
+    ********************************
+    * ENDE noreturn.pug
+    ********************************

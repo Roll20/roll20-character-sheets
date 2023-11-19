@@ -1,0 +1,53 @@
++templateWrapper(templateName)
+  .header
+    +templateConditionalDisplay('header')
+      h3 {{header}}
+    +characterLink
+  .content
+    +templateConditionalDisplay('roll')
+      .template-row.center
+        +templateConditionalDisplay('roll_name')
+          h5 {{roll_name}}
+        +templateConditionalDisplay('roll_name','invert')
+          h5(data-i18n='roll')
+        +rollGreater({values:'computed::result 0'})
+          span.crit {{roll}}
+        +rollLess({values:'computed::result 0'})
+          span.fumble {{roll}}
+        +rollBetween({values:'computed::result 0 0'})
+          span.regular-roll {{roll}}
+      +templateConditionalDisplay('result')
+        .template-row
+          //- Failure Handling
+          +rollLess({values:'roll 7'})
+            //- Fumble Handling
+            +rollLess({values:'computed::result 0'})
+              h5(data-i18n='critical failure').critical.failure
+              +templateConditionalDisplay('fumble_result')
+                span {{fumble_result}}
+              +templateConditionalDisplay('fumble_result','invert')
+                span {{failure_result}}
+            +rollLess({values:'computed::result 0',invert:true})
+              h5(data-i18n='failure').failure
+              span {{failure_result}}
+          +rollBetween({values:'roll 7 9'})
+            h5(data-i18n='mixed success')
+            span {{mixed_result}}
+          +rollGreater({values:'roll 9'})
+            +rollGreater({values:'computed::result 0'})
+              h5(data-i18n='critical success').critical.success
+              +templateConditionalDisplay('critical_result')
+                span {{critical_result}}
+              +templateConditionalDisplay('critical_result','invert')
+                span {{success_result}}
+            +rollGreater({values:'computed::result 0',invert:true})
+              h5(data-i18n='full success').success
+              span {{success_result}}
+    +templateConditionalDisplay('description')
+      .template-row
+        h5(data-i18n='description')
+        span {{description}}
+    +allProps({values:'header character_name character_id roll_name roll result fumble_result failure_result mixed_result success_result critical_result description'})
+      .template-row
+        h5 {{key}}
+        span {{value}}

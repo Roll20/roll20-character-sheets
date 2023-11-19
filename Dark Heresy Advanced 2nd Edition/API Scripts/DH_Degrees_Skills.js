@@ -59,11 +59,11 @@ var rollResultForSkill40k = function (token, attribute, skillBn1, skillBn2, skil
 		output2 = '<span style="color:red">' + token + ' rolled a 100 and automatically fails by <B>1 degree</B>.</span>';
 	}
 	else if (roll <= modTarget) {
-		degOfSuc = (Math.floor(modTarget / 10) - Math.floor(roll / 10)) + 1;
+		degOfSuc = Math.floor((modTarget - roll) / 10) + 1;
 		output2 = '<span style="color:green">' + token + ' succeeds by <B>' + degOfSuc + ' degree(s)</B>.</span>';
 	}
 	else {
-		degOfSuc = (Math.floor(roll / 10) - Math.floor(modTarget / 10)) + 1;
+		degOfSuc = Math.floor((roll - modTarget) / 10) + 1;
 		output2 = '<span style="color:red">' + token + ' fails by <B>' + degOfSuc + ' degree(s)</B></span>.';
 	}
 
