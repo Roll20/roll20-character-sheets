@@ -209,19 +209,19 @@
 				<!-- (3) A sticky note for more player notes.   																																-->
 			
 				<!-- The rule card:	-->
-					<div class="item-portrait-00">
-						<h1>Welcome!</h1>
-						<div class="item-portrait-flex-container">
-							<div class="item-portrait-rule-description">
-								<h1>Starting Character Points</h1>
-								<p>Heroic characters are typically built on a base of 125 CP plus up to 50 CP that are offset with Complications. Use the Bonus CP input at the bottom of this sheet to account for free abilities.</p>
-							</div>
-							<div class="item-portrait-rule-description">
-								<h1>Portrait</h1>
-								<p>You may change this frame to your avatar or to space for more notes with the hidden side arrow buttons.</p>
-							</div>
+				<div class="item-portrait-00">
+					<h1>Welcome!</h1>
+					<div class="item-portrait-flex-container">
+						<div class="item-portrait-rule-description">
+							<h1>Starting Character Points</h1>
+							<p>Heroic characters are typically built on a base of 125 CP plus up to 50 CP that are offset with Complications. Use the Bonus CP input at the bottom of this sheet to account for free abilities.</p>
 						</div>
-					</div> 
+						<div class="item-portrait-rule-description">
+							<h1>Portrait</h1>
+							<p>You may change this frame to your avatar or to space for more notes with the hidden side arrow buttons.</p>
+						</div>
+					</div>
+				</div> 
 			
 				<!-- Avatar Portrait Image -->
 				<div class="item-portrait-01">
@@ -1212,12 +1212,15 @@
 				<div class="item-tab-gear-slide-flex-container-martial-maneuvers-block">
 
 					<!-- Standard Attack -->
-					<div class="subitem-tab-gear-slide-flex-container-standard-attack">
-						<div class=custom-button-triangle></div>
-						<h1>Basic Attack</h1>
-						<h2 title="@{hiddenManeuverDamage01}">HA STR/5</h2>
-						<input type="text" value="1/2" name="attr_normalPhase01" title="@{normalPhase01}" tabindex="-1" readonly="">
-						<button type="action" class="button buttonRollNormalAttack" tabindex="-1" name="act_standardAttackRoll" title="%{standardAttackRoll}">Roll</button>
+					<div class=".item-flex-maneuver">
+						<div class="subitem-flex-container-martial-row">
+							<div class="subitem-tab-gear-slide-flex-container-standard-attack">
+								<h1>Basic Attack</h1>
+								<h2 title="@{hiddenManeuverDamage01}">HA STR/5</h2>
+								<input type="text" value="1/2" name="attr_normalPhase01" title="@{normalPhase01}" tabindex="-1" readonly="">
+								<button type="action" class="button buttonRollNormalAttack" tabindex="-1" name="act_standardAttackRoll" title="%{standardAttackRoll}">Roll</button>
+							</div>
+						</div>
 					</div>
 
 					<input type="hidden" class="sheet-maneuver-toggle" name="attr_maneuverToggle"  value="maneuverExpand01" />
@@ -5755,7 +5758,7 @@
 			</div>
 
 			<div class="item-options-row">
-				<div class="custom-select-skill">
+				<div class="custom-select-option">
 					<select name="attr_whisperToGM">
 						<option value="" selected>Never</option>
 						<option value="/w GM ">Always</option>
@@ -5771,7 +5774,7 @@
 				</div>
 				
 				<div class="item-version-information">
-					<input type="text" value="2.1" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+					<input type="text" value="2.2" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 				</div>
 			</div>
 		</div>	
@@ -6085,6 +6088,7 @@
 
 		attributes.theSheetAvatar = values.character_avatar;
 
+		// Version Checks
 		// Check for unversioned sheets
 		if (values.validateMay23 == undefined) {
 			// if no points spent, then it's a new sheet
@@ -6094,7 +6098,6 @@
 			attributes.validateMay23 = 1;
 		}
 		let version = origVersion;
-
 		
 		if (version < 1.1) {
 			values = await _getAttrs(["intelligenceChance", "enhancedPerceptionModifier", "body", "stun", "endurance", "strength", "optionSuperHeroicEndurance"]);
@@ -6116,13 +6119,18 @@
 				attributes.whisperToGM = "";
 			version = 2.1;
 		}
+		
+		if (version < 2.2) {
+			// No updates to attributes needed except version number (for now).
+			version = 2.2;
+		}
 
 		if (version != origVersion) {
 			console.log(`Updated ${name} from ${origVersion} to ${version}`);
 			attributes.version = version;
 		}
 
-		// We are doing this with await's in order to only do a single setAttrs at the end
+		// We are doing this with awaits in order to only do a single setAttrs at the end
 		setAttrs(attributes);
 	});
 	
@@ -8670,8 +8678,8 @@
 			normalMessage += " x" + NSTUN + "STUN";
 		}
 		if (BODYx != 1) {
-			normalMessage += " x" + BODYx + "BODY";
-			killMessage += " x" + BODYx + "BODY";
+			normalMessage += " x" + BODYx + " BODY";
+			killMessage += " x" + BODYx + " BODY";
 		}
 
 		var theHitLocation = {
