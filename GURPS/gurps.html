@@ -23135,6 +23135,8 @@ Diffuse: Max 2HP (Exception: Area-effect, cone, and explosion attacks cause norm
 		upgradeHitLocationPenaltiesToNewVersion();
 
 		updateRuleSixteenForSpells();
+
+		moveOldMacros();
 	
 	}
 	
@@ -42255,5 +42257,68 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	};
+
+	/**
+	 * Check to see if any old macros need to move over 
+	 * to the new system
+	 */
+	const moveOldMacros = () => {
+
+		let fields = [
+			"old_macros_moved",
+			"skills_custom_macro",
+			"custom_macro_defense",
+			"custom_macro_melee",
+			"custom_macro_ranged",
+			"spell_custom_macro"
+		];
+
+		getAttrs(fields, values => {
+
+			let hasMoved = values.old_macros_moved == "true";
+
+			let macroSkill = values.skills_custom_macro ?? "";
+
+			let macroDefense = values.custom_macro_defense ?? "";
+
+			let macroMelee = values.custom_macro_melee ?? "";
+
+			let macroRanged = values.custom_macro_ranged ?? "";
+
+			let macroSpell = values.spell_custom_macro;
+
+			if (hasMoved) {
+				return;
+			}
+
+			let keyValues = {
+				old_macros_moved: "true"
+			};
+
+			if (macroSkill) {
+				keyValues["custom_skill_macro_one_code"] = macroSkill;
+			}
+
+			if (macroDefense) {
+				keyValues["custom_skill_macro_two_code"] = macroDefense;
+			}
+
+			if (macroMelee) {
+				keyValues["custom_skill_macro_three_code"] = macroMelee;
+			}
+
+			if (macroRanged) {
+				keyValues["custom_skill_macro_four_code"] = macroRanged;
+			}
+
+			if (macroSpell) {
+				keyValues["custom_skill_macro_five_code"] = macroRanged;
+			}
+
+			setAttrs(keyValues);
+
+		});
+
+	}
 
 </script>
