@@ -353,7 +353,7 @@ function upgradeGeneric3Dot1() {
  * @param version the sheet version already parse to a float or 0 if not a valid float
  */
 function versioning(sheet_type, version) {
-    const latestVersion = '3.4';
+    const latestVersion = '3.5';
     if (!sheet_type) {
         sheet_type = "pc";
     }
@@ -386,8 +386,8 @@ function versioning(sheet_type, version) {
             upgradeCharacter3Dot4();
         }
         versioning(sheet_type, '3.4');
-    } else if (version <= 3.4) { /* TODO change this when we next introduce a version that requires updating */
-        setAttrs({"version": "3.4"});
+    } else if (version <= 3.5) { /* TODO change this when we next introduce a version that requires updating */
+        setAttrs({"version": "3.5"});
     }
 }
 
