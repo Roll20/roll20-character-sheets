@@ -42452,4 +42452,96 @@ Characters with Skill: ${knowsSkill}`;
 		return number;
 	};
 
+	const macroSkillCounts= [
+		"one", 
+		"two",
+		"three",
+		"four",
+		"five",
+		"six"
+	];
+
+	macroSkillCounts.forEach(count => {
+
+		on(`change:custom_skill_macro_${count}_name`, event => {
+
+			let skillName = event.newValue ?? "missing";
+
+			repeatingMacroSections.forEach(section => {
+				updateMacroSkillNames(section, skillName, count);
+			});
+
+		});
+
+	});
+
+
+	const updateMacroSkillNames = (section, skillName, count) => {
+
+		getSectionIDs(section, ids => {
+
+			if (ids.length == 0) {
+				return;
+			}
+
+			let keyValues = {};
+
+			ids.forEach(id => {
+
+				// build the field name, example: repeating_skills_{id}_custom_skill_macro_one_name
+				let fieldName = `repeating_${section}_${id}_macro_${count}_name`;
+
+				// set the field to the skill name
+				keyValues[fieldName] = skillName;
+
+			});
+
+			setAttrs(keyValues);
+
+		});
+
+	};
+
+	macroSkillCounts.forEach(count => {
+
+		on(`change:custom_skill_macro_${count}_code`, event => {
+
+			let code = event.newValue ?? "";
+
+			repeatingMacroSections.forEach(section => {
+				updateMacroSkillCode(section, code, count);
+			});
+
+		});
+
+	});
+
+
+	const updateMacroSkillCode = (section, code, count) => {
+
+		getSectionIDs(section, ids => {
+
+			if (ids.length == 0) {
+				return;
+			}
+
+			let keyValues = {};
+
+			ids.forEach(id => {
+
+				// build the field name, example: repeating_skills_{id}_custom_skill_macro_one_name
+				let fieldName = `repeating_${section}_${id}_macro_${count}`;
+
+				// set the field to the skill name
+				keyValues[fieldName] = code;
+
+			});
+			
+			setAttrs(keyValues);
+
+		});
+
+	};
+	
+
 </script>
