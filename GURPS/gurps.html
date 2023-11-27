@@ -43333,6 +43333,13 @@ Characters with Skill: ${knowsSkill}`;
 		"six"
 	];
 
+	const macroSkillActiveDefenses = [
+		"dodge",
+		"dodge_retreat",
+		"dodge_drop",
+		"knockback"
+	];
+	
 	macroSkillCounts.forEach(count => {
 
 		on(`change:custom_skill_macro_${count}_name`, event => {
@@ -43343,10 +43350,15 @@ Characters with Skill: ${knowsSkill}`;
 				updateMacroSkillNames(section, skillName, count);
 			});
 
+			macroSkillActiveDefenses.forEach(defense => {
+
+				updateActiveDefenseMacroNames(defense, skillName, count);
+
+			});
+
 		});
 
 	});
-
 
 	const updateMacroSkillNames = (section, skillName, count) => {
 
@@ -43382,6 +43394,12 @@ Characters with Skill: ${knowsSkill}`;
 
 			repeatingMacroSections.forEach(section => {
 				updateMacroSkillCode(section, code, count);
+			});
+
+			macroSkillActiveDefenses.forEach(defense => {
+
+				updateActiveDefenseMacros(defense, code, count);
+
 			});
 
 		});
@@ -43429,13 +43447,49 @@ Characters with Skill: ${knowsSkill}`;
 
 	};
 
-	const macroSkillActiveDefenses = [
-		"dodge",
-		"dodge_retreat",
-		"dodge_drop",
-		"knockback"
-	];
-	
+	const updateActiveDefenseMacroNames = (defense, skillName, count) => {
+
+		// field to udpate: defense_dodge_macro_one_name
+		let codeFieldName = `defense_${defense}_macro_${count}_name`;
+
+		let keyValues = {};
+
+		keyValues[codeFieldName] = skillName;
+
+		setAttrs(keyValues);
+
+	}
+
+	const updateActiveDefenseMacros = (defense, code, count) => {
+		
+		// get the value, looking for: defense_dodge_macro_one_checked
+		let checkedFieldName = `defense_${defense}_macro_${count}_checked`;
+
+		let fields = [checkedFieldName];
+
+		getAttrs(fields, values => {
+
+			let isChecked = values[checkedFieldName] == "1";
+
+			let codeToUse = "";
+
+			if (isChecked) {
+				codeToUse = code;
+			}
+
+			// field to udpate: defense_dodge_macro_one
+			let codeFieldName = `defense_${defense}_macro_${count}`;
+
+			let keyValues = {};
+
+			keyValues[codeFieldName] = codeToUse;
+
+			setAttrs(keyValues);
+
+		});
+
+	};
+
 	// we need to check for changes to each type of active defense
 	// for each macro, which is number one through six.
 	macroSkillActiveDefenses.forEach(defense => {
