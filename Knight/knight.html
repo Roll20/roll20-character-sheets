@@ -2970,6 +2970,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isTirSecurite = false;
   let isUltraviolence = false;
 
   let isBourreau = false;
@@ -3353,7 +3354,10 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eReaction) { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
-  if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
+  if (eTirSecurite) {
+    autresEffets.push(i18n_tirSecurite);
+    isTirSecurite = true;
+  }
 
   if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
 
@@ -3421,6 +3425,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isAmbidextrie = isAmbidextrie;
   result.isDeuxMains = isDeuxMains;
   result.isLourd = isLourd;
+  result.isTirSecurite = isTirSecurite;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -6584,7 +6589,7 @@ async function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion,
   return result;
 }
 
-function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd) {
+function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -6607,11 +6612,14 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
 
       if (isAAgressive) { autresAmeliorationsS.push(i18n_agressive); }
       break;
@@ -6764,7 +6772,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
   return result;
 }
 
-function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
+function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -6784,11 +6792,14 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
       break;
 
     case 'agressif':
@@ -13330,6 +13341,7 @@ rollCombatContact.forEach((button) => {
     let isEAmbidextrie = false;
     let isELourd = false;
     let isEDeuxMains = false;
+    let isTirSecurite = false;
 
     let isAAgressive = false;
     let isASoeur = false;
@@ -13501,6 +13513,7 @@ rollCombatContact.forEach((button) => {
 
       isEAkimbo = effets.isAkimbo;
       isEAmbidextrie = effets.isAmbidextrie;
+      isTirSecurite = effets.isTirSecurite;
 
       isBourreau = effets.isBourreau;
       isDevastation = effets.isDevastation;
@@ -13618,7 +13631,7 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd);
+    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -14330,12 +14343,14 @@ rollCombatDistance.forEach((button) => {
     let isTenebricide = false;
     let isTirRafale = false;
     let isUltraviolence = false;
+    let isLourd = false;
 
     let isELumiere = false;
     let lumiereValue = 0;
 
     let isEAkimbo = false;
     let isEAmbidextrie = false;
+    let isTirSecurite = false;
 
     let isBourreau = false;
     let isDevastation = false;
@@ -14450,7 +14465,6 @@ rollCombatDistance.forEach((button) => {
 
     isAntiAnatheme = effets.isAntiAnatheme;
 
-    isAssassin = effets.isAssassin;
     isAssistantAttaque = effets.isAssistantAttaque;
 
     isCadence = effets.isCadence;
@@ -14480,6 +14494,7 @@ rollCombatDistance.forEach((button) => {
 
     isEAkimbo = effets.isAkimbo;
     isEAmbidextrie = effets.isAmbidextrie;
+    isTirSecurite = effets.isTirSecurite;
 
     isBourreau = effets.isBourreau;
     isDevastation = effets.isDevastation;
@@ -14545,7 +14560,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
+    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -15178,7 +15193,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false);
+    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false, false);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -15654,9 +15669,9 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let getStyle;
 
     if (type.includes('&{template:combat} {{portee=^{portee-contact}}}')) {
-      getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
+      getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, hasArmure, oTir, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, hasArmure, oTir, false, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);
@@ -19056,9 +19071,9 @@ for (let i = 0; i < rollMAImprovise; i += 1) {
     let getStyle;
 
     if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
-      getStyle = getStyleContactMod(attrs, '', baseDegats, baseViolence, true, 0, false, false, false, false, false, false, false, false, false);
+      getStyle = getStyleContactMod(attrs, '', baseDegats, baseViolence, true, 0, false, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, true, 0, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, true, 0, false, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);
@@ -19406,7 +19421,7 @@ rollCombatArchangel.forEach((button) => {
 
         if (cBonus.length > 0) { exec.push(cBonus.join(' - ')); }
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -19788,7 +19803,7 @@ rollCombatNephilim.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -19911,7 +19926,7 @@ rollCombatNephilim.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -20273,7 +20288,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]]);
         bViolence = 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -20498,7 +20513,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -20628,7 +20643,7 @@ rollCombatDemon.forEach((button) => {
         violence = Number(attrs[roll[2]].split('D')[0]);
         bViolence = Number(attrs[roll[2]].split('D')[1].split('+')[1]) || 0;
 
-        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false);
+        getStyle = getStyleDistanceMod(attrs, degats, violence, '', '', true, 0, false, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
