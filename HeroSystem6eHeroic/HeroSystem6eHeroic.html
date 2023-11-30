@@ -8679,6 +8679,7 @@
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["martialNormalDamage"+maneuverId] != 0;
+				// let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
 			
 				let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
 			
@@ -8689,12 +8690,9 @@
 				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
 						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{martialManeuverName"+maneuverId+"}}} ";
 				if (values.displayDegreeOfSuccess != 0) {
-					// theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} ";
-					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} ";
+					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} ";
 				} else {
-					// theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
-					// + "{{Result=[[3d6cf6cs1]]}}";
-					theRoll += "{{OCV=[[@{ocv}[OCV]-@{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
+					theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
 					+ "{{Result=[[3d6cf6cs1]]}}";
 				}
 				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
@@ -8707,31 +8705,32 @@
 					let computed = parseInt(results.results[dmgType].result)||0;
 					let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 			
-			// 		// Get hit location message if system used.
-			// 		if (useHitLocations) {
-			// 			let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
-			// 			theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
-			// 			theSTUNMultiplier = theHitLocation.STUNx;
-			// 		}
-			// 
-			// 		if (isNormalDamage) {
-			// 			// Convert dice roll to equivalent BODY damage.
-			// 			computed = convertStunToBody(results.results.STUN.rolls);
-			// 		} else {
-			// 			theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
-			// 			computed *= theSTUNMultiplier;
-			// 
-			// 			computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
-			// 		}
-			// 
-			// 		let theResult = new Object();
-			// 		theResult[otherDmgType] = computed;
-			// 		theResult.HITLOC = theMessage;
-			// 			
-			// 		// Subtract END cost if option checked.
-			// 		if (values.optionAutoSubtractEND != 0) {
-			// 			subtractEndurance(subtractENDAmt);
-			// 		}
+					// Get hit location message if system used.
+					if (useHitLocations) {
+						let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+						theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
+						theSTUNMultiplier = theHitLocation.STUNx;
+					}
+			
+					if (isNormalDamage) {
+						// Convert dice roll to equivalent BODY damage.
+						computed = convertStunToBody(results.results.STUN.rolls);
+					} else {
+						// theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
+						theSTUNMultiplier = Math.max(1,theSTUNMultiplier);
+						computed *= theSTUNMultiplier;
+			
+						computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+					}
+			
+					let theResult = new Object();
+					theResult[otherDmgType] = computed;
+					theResult.HITLOC = theMessage;
+						
+					// Subtract END cost if option checked.
+					if (values.optionAutoSubtractEND != 0) {
+						subtractEndurance(subtractENDAmt);
+					}
 			
 					finishRoll(results.rollId, theResult);
 				});
