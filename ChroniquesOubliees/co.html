@@ -761,7 +761,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           </tr>
           <tr>
             <td>
-              <input type="checkbox" class="hidden-tab attaque-droite" value="1" checked name = "attr_montrerattaquedroite" />
+              <input type="checkbox" class="hidden-tab attaque-droite" value="1" name = "attr_montrerattaquedroite" />
               <div class="tab-content attaque-droite">
                     <button type="action" class="d20-dice atk" name="act_maindroite"/>
               </div>
@@ -3611,7 +3611,10 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
             'casque_on', 'casque_rd', 'defbouclieron', 'defbouclier',
             'force', 'dexterite', 'constitution', 'intelligence', 'sagesse', 'charisme'
           ], function(values) {
-            if (values.armeEnMain) sa.maindroite = values.armeEnMain;
+            if (values.armeEnMain) {
+              sa.maindroite = values.armeEnMain;
+              sa.montrerattaquedroite = '1';
+            }
             if (values.armeEnMain_max) {
               if (values.armeEnMain_max == values.armeEnMain)
                 sa.maingauche = '2m';
@@ -6888,7 +6891,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           set = true;
         }
       } else {
-        if (values.torseequipe_max != values.torseequipe) {
+        if (values.torseequipe && values.torseequipe_max != values.torseequipe) {
           sa.torseequipe_max = values.torseequipe;
           set = true;
         }
@@ -6994,19 +6997,23 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
   on('change:defarmureon', function(enventInfo) {
     getAttrs(['defarmureon', 'defarmure', 'defarmuremalus', 'torseequipe', 'torseequipe_max'], function(values) {
       if (values.defarmureon == '0') {
-        setAttrs({
-          torseequipe: '0'
-        }, {
-          silent: true
-        });
+        let sa = { torseequipe: '0' };
+        if (values.torseequipe && values.torseequipe != '0') sa.torseequipe_max = values.torseequipe;
+        setAttrs(sa, silent);
         return;
       }
-      if (values.torseequipe != '0') return;
+      if (values.torseequipe && values.torseequipe != '0') return;//armure déjà équipée
       //On met une armure
-      let nouvelleArmure = values.torseequipe_max;
+      let nouvelleArmure = '-1';
+      if (values.torseequipe_max) nouvelleArmure = values.torseequipe_max;
       let sa = {
         torseequipe: nouvelleArmure
       };
+      if (nouvelleArmure == '-1') {
+        setAttrs(sa, silent);
+        return;
+      }
+      //On cherche la nouvelle armure pour mettre à jour les valeurs
       getSectionIDs('repeating_armures', function(idArray) {
         let armureTrouvee;
         let n = idArray.length;
@@ -7056,7 +7063,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           set = true;
         }
       } else {
-        if (values.teteequipe_max != values.teteequipe) {
+        if (values.teteequipe && values.teteequipe_max != values.teteequipe) {
           sa.teteequipe_max = values.teteequipe;
           set = true;
         }
@@ -7112,19 +7119,22 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
   on('change:casque_on', function(enventInfo) {
     getAttrs(['casque_on', 'casque_rd', 'casque_malus', 'teteequipe', 'teteequipe_max'], function(values) {
       if (values.casque_on == '0') {
-        setAttrs({
-          teteequipe: '0'
-        }, {
-          silent: true
-        });
+        let sa ={ teteequipe: '0' };
+        if (values.teteequipe) sa.teteequipe_max = values.teteequipe;
+        setAttrs(sa, silent);
         return;
       }
-      if (values.teteequipe != '0') return;
+      if (values.teteequipe && values.teteequipe != '0') return;
       //On met une armure
-      let nouvelleArmure = values.teteequipe_max;
+      let nouvelleArmure = '-1';
+      if (values.teteequipe_max) nouvelleArmure = values.teteequipe_max;
       let sa = {
         teteequipe: nouvelleArmure
       };
+      if (nouvelleArmure == '-1') {
+        setAttrs(sa, silent);
+        return;
+      }
       getSectionIDs('repeating_armures', function(idArray) {
         let casqueTrouve;
         let n = idArray.length;
@@ -7282,26 +7292,30 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
       if (values.defbouclieron == '0') {
         if (values.maingauche.startsWith('b')) {
           setAttrs({
-            maingauche: '0'
+            maingauche: '0',
+            maingauche_max: values.maingauche.substring(1)
           }, silent);
         }
         return;
       }
       if (values.maingauche.startsWith('b')) return;
       //On met un bouclier
-      let nouvelleArmure = values.maingauche_max;
+      let nouvelleArmure = '-1';
+      if (values.maingauche_max) nouvelleArmure = values.maingauche_max;
       let sa = {
         maingauche: 'b' + nouvelleArmure
       };
+      if (nouvelleArmure == '-1') {
+        setAttrs(sa, silent);
+        return;
+      }
       getSectionIDs('repeating_armures', function(idArray) {
         let bouclierTrouve;
         let n = idArray.length;
         let fin = function() {
           n--;
           if (n > 0) return;
-          setAttrs(sa, {
-            silent: true
-          });
+          setAttrs(sa, silent);
         };
         if (n === 0) {
           fin();
