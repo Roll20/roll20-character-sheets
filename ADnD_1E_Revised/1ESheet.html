@@ -55,7 +55,7 @@
           </h4>
           <ul>
             <li>Added a Custom Attributes section located on the settings page. Use custom attributes to track misc. adjustments for macros and mods. ie Ring of Protection +1 Saves, +1 AC.</li>
-            <li>Expanded the Special Abilities to include additional fields/attributes to better handle SLA's and misc. Powers. To-do: Roll template needs to be updated.</li>
+            <li>Expanded the Special Abilities to include additional fields/attributes to better handle SLA's and misc. Powers. New Abilities will automatically get the updated roll tmeplate for these new fields. Manually reset the macro-text(ie delete the current macro-text) to force the new default macro.  To-do: Auto-update roll template for old/existing special abilities.</li>
             <li>New fields/attributes;
               <ul><b>- PC/NPC:</b> @{pc_image_link}, @{surprise_others_mod}, @{senses}, @{pc_image_link}, @{npc_image_link}, @{npc_link}</ul>
               <ul><b>- Spells:</b> @{priest_caster_level}, @{mage_caster_level}, @{spell_link}, @{spell_notes}</ul>
@@ -2503,8 +2503,11 @@
 
               <!--old macro
                 <textarea class="height-short" name="attr_ability_macro_text" title="@{repeating_ability_$X_ability_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{freetext=@{ability_short_description} @{ability_description}}}</textarea>
+
+                11/30/23 macro
+                &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=@{ability_current|max}}}
                 -->
-              <textarea class="span-all height-short toggle-macros" name="attr_ability_macro_text" title="@{repeating_ability_$X_ability_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=@{ability_current|max}}}</textarea>
+              <textarea class="span-all height-short toggle-macros" name="attr_ability_macro_text" title="@{repeating_ability_$X_ability_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=@{ability_current|max}}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}</textarea>
             </div>
           </details>
         </fieldset>
@@ -3743,6 +3746,12 @@
         <span class="sheet-row sheet-span-two sheet-tcat">Roll = {{roll}}</span>
       {{/^rollTotal() roll 0}}
       <!--Spells and Special Abilities-->
+      {{#effect_type}}
+        <span class="sheet-row">
+          <span class="sheet-tcat">Effect Type</span>
+          <span>{{effect_type}}</span>
+        </span>
+      {{/effect_type}}
       {{#school}}
         <span class="sheet-row">
           <span class="sheet-tcat">Type</span>
@@ -3791,6 +3800,12 @@
           <span>{{saving_throw}}</span>
         </span>
       {{/saving_throw}}
+      {{#save_type}}
+        <span class="sheet-row">
+          <span class="sheet-tcat">Save Type</span>
+          <span>{{save_type}}</span>
+        </span>
+      {{/save_type}}
       {{#type}}
         <span class="sheet-row">
           <span class="sheet-tcat">Type:</span>
@@ -3850,11 +3865,11 @@
         </span>
       </span>
 
-      {{#allprops() name subtag footer freetext color school spell_level range duration area_of_effect components casting_time saving_throw type roll roll_high roll_low roll_target mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
+      {{#allprops() name subtag footer freetext color effect_type school spell_level range duration area_of_effect components casting_time saving_throw save_type type roll roll_high roll_low roll_target mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
         <span class="sheet-row sheet-span-two sheet-all-props">
           {{key}}{{value}}
         </span>
-      {{/allprops() name subtag footer freetext color school spell_level range duration area_of_effect components casting_time saving_throw type roll roll_high roll_low roll_target mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
+      {{/allprops() name subtag footer freetext color effect_type school spell_level range duration area_of_effect components casting_time saving_throw save_type type roll roll_high roll_low roll_target mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
 
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
