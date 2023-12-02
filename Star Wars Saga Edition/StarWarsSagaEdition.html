@@ -2168,8 +2168,8 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 					<td><input type="number" name="attr_NPC-DT" value="@{NPC-DamageThresholdDefense}+@{DamageThresholdMisc}[Misc]+@{DamageThresholdSize}[Size]+@{CTIgnoreDT}"  disabled="true" title="Damage Threshold @{NPC-DT}" /></td>
 					<td>&nbsp;=&nbsp;</td>
 					<td><select name="attr_NPC-DamageThresholdDefense" style="width:80px;" title="Damage Threshold Defense @{NPC-DamageThresholdDefense}">
-					  <option value="@{NPC-Fortitude}" data-i18n="fortitude" selected>Fortitude</option>
-					  <option value="@{NPC-Will}" data-i18n="will">Will</option>
+					  <option value="@{Fortitude}" data-i18n="fortitude" selected>Fortitude</option>
+					  <option value="@{Will}" data-i18n="will">Will</option>
 					</select></td>
 					<td><input type="number" name="attr_DamageThresholdMisc" value="0"  title="Damage Threshold Miscellaneous Modifier @{DamageThresholdMisc}" /></td>
 				</tr>	
@@ -2264,39 +2264,82 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 	 <br />
 	<div class="sheet-2colrow">
 		<div class="sheet-col">
-			<div class="sheet-textHead"><span data-i18n="defenses">Defenses</span></div>
 			<table class="sheet-spacing">
-				<tr>
-					<th></th>
-					<th></th>
-					<th>Total after CT</th>
-					<th>Formula</th>
-				</tr>
+				<tr><div class="sheet-textHead2Col"><span data-i18n="defenses">Defenses</span></div></tr>
+				<thead>
+					<tr>
+						<th></th>
+						<th><span data-i18n="total">Total</span></th>
+						<th></th>
+						<th style="min-width:50px">	<span>Level / Armor</span>	</th>
+					<!--	<th style="min-width:50px">	<span><span data-i18n="level">Level</span> /<br /><span data-i18n="armor">Armor</span></span>	</th> -->
+						<th><span data-i18n="class">Class</span></th>					
+						<th><span data-i18n="mod">Mod</span></th>
+						<th><span data-i18n="misc">Misc</span></th>
+					</tr>
+				</thead>	
+			  <tbody>
 				<tr>
 					<td class="sheet-col1" rowspan="2"><span data-i18n="reflex">Reflex</span></td>
-					<td></td>
-					<td><input type="number" name="attr_NPC-Reflex" value="@{RefTotal}+@{ct}" disabled="true" title="Reflex @{NPC-Reflex}" /></td> 
-					<td><input type="text" name="attr_RefTotal" value="10+@{level}+@{Dex|max}+@{RefSizeMod}" title="Reflex Total (You can use formulas, for example: 10+@{level}[Level]+@{Dex|max} or enter the total Defence Score) @{RefTotal}"/></td>
+					<td><input type="number" name="attr_Reflex" value="10+@{RefMod}[Mod]+@{RefLevel}[Level]+@{RefClass}[Class]+@{RefMisc}[Misc]+@{RefSizeMod}[Size Mod]+@{CT}[CT]" disabled="true" title="Reflex @{Reflex}" /></td> 
+					<td>&nbsp;=&nbsp;10&nbsp;+&nbsp;</td>
+					<td><input type="number" name="attr_RefLevel" value="@{RefLevel|max}" disabled="true" title="Reflex Level / Armor bonus @{RefLevel}"/>	<input type="text" name="attr_RefLevel_max" value="@{level}" title="Reflex Level Formula @{RefLevel|max}" class="hidden" /></td>	
+					<td><input type="number" name="attr_RefClass" value="0" title="Reflex Class bonus @{RefClass}" /></td>
+					<td> <select name="attr_RefMod" class="modtype" title="Reflex Ability Modifier (default DEX) @{RefMod}">
+					  <option value="@{str|max}" data-i18n="str">STR</option>
+					  <option value="@{dex|max}" data-i18n="dex" selected>DEX</option>
+					  <option value="@{ArmorDex}" data-i18n="dex_max">DEX (Max Armor)</option>
+					  <option value="@{con|max}" data-i18n="con">CON</option>
+					  <option value="@{int|max}" data-i18n="int">INT</option>
+					  <option value="@{wis|max}" data-i18n="wis">WIS</option>
+					  <option value="@{cha|max}" data-i18n="cha">CHA</option>
+					</select></td>
+					<td><input type="number" name="attr_RefMisc" value="0" title="Reflex Miscellaneous Modifier @{RefMisc}" /></td>
 				</tr>
 					<input type="hidden" name="attr_dexpenalty" title="dexpenalty" value="( [[ (0-floor((@{dex|max} +0.1)/(abs(@{dex|max}+0.1) +0.001))*@{dex|max}) ]] )" disabled="true" />				
 				<tr>
-					<!-- rowspan placeholder -->
 					<td class="sheet-col1"><div class="sheet-small"><span data-i18n="flatfooted">Flatfooted</span></div></td>
-					<td><input type="number" name="attr_NPC-ReflexFlatFooted" value="@{RefTotal|max}+@{ct}" disabled="true"  title="Reflex Flat Footed @{NPC-ReflexFlatFooted}" /></td>					 
-					<td><input type="text" name="attr_RefTotal_max" value="10+@{level}+@{dexpenalty}+@{RefSizeMod}"  title="FlatFooted Reflex Total (You can use formulas, for example: 10+@{level} or enter the total Defence Score) @{RefTotal|max}"/></td>
+					<td><input type="number" name="attr_ReflexFlatFooted" value="10+@{dexpenalty}[Dex Penalty]+@{RefLevel}[Level]+@{RefClass}[Class]+@{RefFlatFootedMisc}[Misc]+@{RefSizeMod}[Size Mod]+@{CT}[CT]" disabled="true" title="Reflex Flat Footed @{ReflexFlatFooted}" /></td>
+					<td></td>
+					<td colspan="2" align="right">
+						<input type="number" value="0" name="attr_RefSizeMod" class="hidden" />
+					</td>
+					<td><input type="number" name="attr_RefFlatFootedMisc" value="0" title="Reflex Flat Footed Miscellaneous Modifier @{RefFlatFootedMisc}" /></td>
 				</tr>
+						
 				<tr>
 					<td class="sheet-col1"><span data-i18n="fortitude">Fortitude</span></td>
-					<td rowspan="2"></td>
-					<td><input type="number" name="attr_NPC-Fortitude" value="@{FortTotal}+@{ct}" disabled="true" title ="Fortitude @{NPC-Fortitude}" />					 
-					<td><input type="text" name="attr_FortTotal" value="10+@{level}+@{CON|max}"  title="Fortitude Total (You can use formulas, for example: 10+@{level} or enter the total Defence Score) @{FortTotal}"/></td>
+					<td><input type="number" name="attr_Fortitude" value="10+@{FortMod}[Mod]+@{FortLevel}[Level]+@{FortClass}[Class]+@{FortMisc}[Misc]+@{CT}[CT]" disabled="true" title="Fortitude @{Fortitude}" />
+					<td>&nbsp;=&nbsp;10&nbsp;+&nbsp;</td>
+					<td><input type="number" name="attr_FortLevel" value="@{FortLevel|max}" disabled="true" title="Fortitude Level / Armor bonus @{FortLevel}" />	<input type="text" name="attr_FortLevel_max" value="@{level}" title="Fortitude Level Formula @{FortLevel|max}" class="hidden" /></td>	
+					<td><input type="number" name="attr_FortClass" value="0" title="Fortitude Class bonus @{FortClass}" /></td>
+					<td> <select name="attr_FortMod" class="modtype " title="Fortitude Ability Modifier (default CON) @{FortMod}">
+					  <option value="@{str|max}" data-i18n="str">STR</option>
+					  <option value="@{dex|max}" data-i18n="dex">DEX</option>	
+					  <option value="@{con|max}" data-i18n="con" selected>CON</option>
+					  <option value="@{int|max}" data-i18n="int">INT</option>
+					  <option value="@{wis|max}" data-i18n="wis">WIS</option>
+					  <option value="@{cha|max}" data-i18n="cha">CHA</option>
+					</select></td>
+					<td><input type="number" name="attr_FortMisc" value="0" title="Fortitude Miscellaneous Modifier @{FortMisc}" /></td>
 				</tr>
 				<tr>
-					<td class="sheet-col1"><span data-i18n="will">Will</span></td>					
-					<!-- rowspan placeholder -->
-					<td><input type="number" name="attr_NPC-Will" value="@{WillTotal}+@{ct}" disabled="true" title="Will @{NPC-Will}"/></td>					 
-					<td><input type="text" name="attr_WillTotal" value="10+@{level}+@{Wis|max}"  title="Will Total (You can use formulas, for example: 10+@{level} or enter the total Defence Score) @{WillTotal}"/></td>
+					<td class="sheet-col1"><span data-i18n="will">Will</span></td>
+					<td><input type="number" name="attr_Will" value="10+@{WillMod}[Mod]+@{WillLevel}[Level]+@{WillClass}[Class]+@{WillMisc}[Misc]+@{CT}[CT]" disabled="true" title="Will @{Will}" /></td>
+					<td>&nbsp;=&nbsp;10&nbsp;+&nbsp;</td>
+					<td><input type="number" name="attr_WillLevel" value="@{level}" disabled="true" title="Will Level / Armor bonus @{WillLevel}"/></td>		
+					<td><input type="number" name="attr_WillClass" value="0" title="Will Class bonus @{WillClass}" /></td>
+					<td> <select name="attr_WillMod" class="modtype" title="Will Ability Modifier (default WIS) @{WillMod}">
+					  <option value="@{str|max}" data-i18n="str">STR</option>
+					  <option value="@{dex|max}" data-i18n="dex">DEX</option>	
+					  <option value="@{con|max}" data-i18n="con">CON</option>
+					  <option value="@{int|max}" data-i18n="int">INT</option>
+					  <option value="@{wis|max}" data-i18n="wis" selected>WIS</option>
+					  <option value="@{cha|max}" data-i18n="cha">CHA</option>
+					</select></td>
+					<td><input type="number" name="attr_WillMisc" value="0" title="Will Miscellaneous Modifier @{WillMisc}" /></td>
 				</tr>
+			  </tbody>
 				<tbody>
 				<tr>
 					<td colspan="7"><textarea type="text" name="attr_DefenseNotes" class="atkNotes" title="Defense Notes @{DefenseNotes}" placeholder="Defense Notes"></textarea></td>
