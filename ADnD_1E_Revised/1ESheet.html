@@ -51,10 +51,11 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">12/01/23'</label>
+              <label class="right">12/02/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Fixed a bug that caused a gap between repeating rows of spells.</li>
             <li>Added info link to Equipment.</li>
             <li>Toggling the sheet's role from PC to NPC will also change the main tab text to help indicate that the NPC sheet role can use both the 'Monster' tab and PC tab which gets renamed 'NPC' with this update. Toggle back to PC and the main tab displays 'PC' and hides the Monster tab.</li>
             <li>Added @{hitdice_total} to Class Details to Track total/effective Hit Dice for Spell effects and XP.</li>
@@ -4722,10 +4723,15 @@
         const replacements = {
           ability_old:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{freetext=@{ability_short_description} @{ability_description}}}',
-          ability_new:
+          ability_old_v2:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=@{ability_current|max}}}',
+          ability_new:
+            '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
         };
         _.each(idability, (id) => {
+          if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v2) {
+            update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v2, replacements.ability_new);
+          }
           if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old) {
             update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old, replacements.ability_new);
           }
