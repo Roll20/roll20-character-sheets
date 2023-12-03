@@ -51,7 +51,7 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">12/02/23'</label>
+              <label class="right">12/03/23'</label>
             </span>
           </h4>
           <ul>
@@ -3426,7 +3426,7 @@
           <span>Author: Vince &amp; the Roll20 Community</span>
           <label>
             <span>v.</span>
-            <input type="text" class="width-smallest version" name="attr_sheet_version" value="1.638" readonly />
+            <input type="text" class="width-smallest version" name="attr_sheet_version" value="1.639" readonly />
             <i>beta</i>
           </label>
         </span>
@@ -4999,6 +4999,43 @@
     });
   };
 
+  // clear old armor details fields that have been removed
+  const clearArmnorOther = (current_version, final_version) => {
+    const update = {};
+    update.armorother_cost = 0;
+    update.armorother2_cost = 0;
+    update.armorother3_cost = 0;
+    update.armorother4_cost = 0;
+    update.armorother5_cost = 0;
+    update.armorother6_cost = 0;
+    update.armorother_weight = 0;
+    update.armorother2_weight = 0;
+    update.armorother3_weight = 0;
+    update.armorother4_weight = 0;
+    update.armorother5_weight = 0;
+    update.armorother6_weight = 0;
+    update.armorother_carried = 0;
+    update.armorother2_carried = 0;
+    update.armorother3_carried = 0;
+    update.armorother4_carried = 0;
+    update.armorother5_carried = 0;
+    update.armorother6_carried = 0;
+    update.armorother_bulk = 0;
+    update.armorother2_bulk = 0;
+    update.armorother3_bulk = 0;
+    update.armorother4_bulk = 0;
+    update.armorother5_bulk = 0;
+    update.armorother6_bulk = 0;
+    clog(`VERSION UPDATE: clearArmnorOther completed.`);
+    setAttrs(
+      update,
+      {
+        silent: true,
+      },
+      versionator(current_version, final_version)
+    );
+  };
+
   const stat_functions = () => {
     strengthCalcs();
     intelligenceCalcs();
@@ -5103,9 +5140,10 @@
       migrateAC(1.636, final_version);
     } else if (current_version < 1.637) {
       weaponMacroUpdate(1.637, final_version);
-      // all updates completed
     } else if (current_version < 1.638) {
       monsterHD(1.638, final_version);
+    } else if (current_version < 1.639) {
+      clearArmnorOther(1.639, final_version);
       // all updates completed
     } else if (current_version < final_version) {
       setAttrs({
@@ -5116,12 +5154,11 @@
       newSheet();
     }
   };
-
   // Versioning
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
     // Set attr_sheet_version to the final_version to prevent new sheets from stepping through versionator
-    const final_version = 1.638;
+    const final_version = 1.64;
     getAttrs(['sheet_version'], (v) => {
       const current_version = float(v.sheet_version);
       clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
@@ -5143,54 +5180,20 @@
   });
 
   // Armor Cost
-  on(
-    'change:armor_cost change:armortype2_cost change:armorshield_cost change:armorhelmet_cost change:armorother_cost change:armorother2_cost change:armorother3_cost change:armorother4_cost change:armorother5_cost change:armorother6_cost',
-    (eventInfo) => {
-      // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-      // clog('Armor Costs re-calculated');
-      getAttrs(
-        [
-          'armor_cost',
-          'armortype2_cost',
-          'armorshield_cost',
-          'armorhelmet_cost',
-          'armorother_cost',
-          'armorother2_cost',
-          'armorother3_cost',
-          'armorother4_cost',
-          'armorother5_cost',
-          'armorother6_cost',
-        ],
-        (v) => {
-          const output = {};
-          const armor_cost = +v.armor_cost || 0;
-          const armorType2_cost = +v.armortype2_cost || 0;
-          const armorShield_cost = +v.armorshield_cost || 0;
-          const armorHelmet_cost = +v.armorhelmet_cost || 0;
-          const armorOther_cost = +v.armorother_cost || 0;
-          const armorOther2_cost = +v.armorother2_cost || 0;
-          const armorOther3_cost = +v.armorother3_cost || 0;
-          const armorOther4_cost = +v.armorother4_cost || 0;
-          const armorOther5_cost = +v.armorother5_cost || 0;
-          const armorOther6_cost = +v.armorother6_cost || 0;
-          const armorCost = float(
-            armor_cost +
-              armorType2_cost +
-              armorShield_cost +
-              armorHelmet_cost +
-              armorOther_cost +
-              armorOther2_cost +
-              armorOther3_cost +
-              armorOther4_cost +
-              armorOther5_cost +
-              armorOther6_cost
-          ).toFixed(2);
-          output.total_armor_cost = armorCost;
-          setAttrs(output);
-        }
-      );
-    }
-  );
+  on('change:armor_cost change:armortype2_cost change:armorshield_cost change:armorhelmet_cost', (eventInfo) => {
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog('Armor Costs re-calculated');
+    getAttrs(['armor_cost', 'armortype2_cost', 'armorshield_cost', 'armorhelmet_cost'], (v) => {
+      const output = {};
+      const armor_cost = +v.armor_cost || 0;
+      const armorType2_cost = +v.armortype2_cost || 0;
+      const armorShield_cost = +v.armorshield_cost || 0;
+      const armorHelmet_cost = +v.armorhelmet_cost || 0;
+      const armorCost = float(armor_cost + armorType2_cost + armorShield_cost + armorHelmet_cost).toFixed(2);
+      output.total_armor_cost = armorCost;
+      setAttrs(output);
+    });
+  });
 
   // Weapon Cost
   on('change:repeating_weapon:weapon_cost change:repeating_weapon:weapon_quantity remove:repeating_weapon', (eventInfo) => {
@@ -5219,66 +5222,24 @@
 
   // Armor Weight
   on(
-    'sheet:opened change:armor_weight change:armortype_carried change:armortype2_weight change:armortype2_carried change:armorshield_weight change:armorshield_carried change:armorhelmet_weight change:armorhelmet_carried change:armorother_weight change:armorother_carried change:armorother2_weight change:armorother2_carried change:armorother3_weight change:armorother3_carried change:armorother4_weight change:armorother4_carried change:armorother5_weight change:armorother5_carried change:armorother6_weight change:armorother6_carried',
+    'sheet:opened change:armor_weight change:armortype_carried change:armortype2_weight change:armortype2_carried change:armorshield_weight change:armorshield_carried change:armorhelmet_weight change:armorhelmet_carried',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       // clog('Armor Weights re-calculated');
       getAttrs(
-        [
-          'armor_weight',
-          'armortype_carried',
-          'armortype2_weight',
-          'armortype2_carried',
-          'armorshield_weight',
-          'armorshield_carried',
-          'armorhelmet_weight',
-          'armorhelmet_carried',
-          'armorother_weight',
-          'armorother_carried',
-          'armorother2_weight',
-          'armorother2_carried',
-          'armorother3_weight',
-          'armorother3_carried',
-          'armorother4_weight',
-          'armorother4_carried',
-          'armorother5_weight',
-          'armorother5_carried',
-          'armorother6_weight',
-          'armorother6_carried',
-        ],
+        ['armor_weight', 'armortype_carried', 'armortype2_weight', 'armortype2_carried', 'armorshield_weight', 'armorshield_carried', 'armorhelmet_weight', 'armorhelmet_carried'],
         (v) => {
           const output = {};
           const armorType_carried = +v.armortype_carried || 0;
           const armorType2_carried = +v.armortype2_carried || 0;
           const armorShield_carried = +v.armorshield_carried || 0;
           const armorHelmet_carried = +v.armorhelmet_carried || 0;
-          const armorOther_carried = +v.armorother_carried || 0;
-          const armorOther2_carried = +v.armorother2_carried || 0;
-          const armorOther3_carried = +v.armorother3_carried || 0;
-          const armorOther4_carried = +v.armorother4_carried || 0;
-          const armorOther5_carried = +v.armorother5_carried || 0;
-          const armorOther6_carried = +v.armorother6_carried || 0;
           const armor_weight = +v.armor_weight || 0;
           const armorType2_weight = +v.armortype2_weight || 0;
           const armorShield_weight = +v.armorshield_weight || 0;
           const armorHelmet_weight = +v.armorhelmet_weight || 0;
-          const armorOther_weight = +v.armorother_weight || 0;
-          const armorOther2_weight = +v.armorother2_weight || 0;
-          const armorOther3_weight = +v.armorother3_weight || 0;
-          const armorOther4_weight = +v.armorother4_weight || 0;
-          const armorOther5_weight = +v.armorother5_weight || 0;
-          const armorOther6_weight = +v.armorother6_weight || 0;
           const armorWeight = float(
-            armorType_carried * armor_weight +
-              armorType2_carried * armorType2_weight +
-              armorShield_carried * armorShield_weight +
-              armorHelmet_carried * armorHelmet_weight +
-              armorOther_carried * armorOther_weight +
-              armorOther2_carried * armorOther2_weight +
-              armorOther3_carried * armorOther3_weight +
-              armorOther4_carried * armorOther4_weight +
-              armorOther5_carried * armorOther5_weight +
-              armorOther6_carried * armorOther6_weight
+            armorType_carried * armor_weight + armorType2_carried * armorType2_weight + armorShield_carried * armorShield_weight + armorHelmet_carried * armorHelmet_weight
           );
           output.total_armor_weight = armorWeight;
           setAttrs(output);
