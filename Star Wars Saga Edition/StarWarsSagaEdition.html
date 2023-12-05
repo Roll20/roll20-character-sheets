@@ -378,9 +378,9 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 				<div class="sheet-table-row sectGrapple">				
 					<span class="sheet-table-data">
 							<input type="number" name="attr_Grapple" value="@{BAB}[BAB]+@{GrpMod}[Mod]+@{GrappleSize}[Size]+@{GrpMod|max}[Misc]+@{CT}[CT]" disabled="true" title="Grapple @{Grapple}" />
-							<select name="attr_GrpMod" class="modtype" title="Choose the highest modifier @{GrpMod}">
-										  <option value="@{str|max}" data-i18n="str">STR</option>
-										  <option value="@{dex|max}" data-i18n="dex" selected>DEX</option>
+							<select name="attr_GrpTypeMod" class="modtype" title="Choose the highest modifier @{GrpTypeMod}">
+										  <option value="str" data-i18n="str">STR</option>
+										  <option value="dex" data-i18n="dex" selected>DEX</option>
 							</select>
 							<input type="number" value="0" name="attr_GrappleSize" class="hidden" />	<input type="number" name="attr_GrpMod_max" value="0" title="Miscellaneous Grapple Modifier @{GrpMod|max}" />					
 					</span>
@@ -6230,11 +6230,11 @@ on("change:dex change:str", function () {
 		let DEX_mod = Math.floor(values.dex / 2) - 5;	
 		let STR_mod = Math.floor(values.str / 2) - 5;			
 		if (DEX_mod > STR_mod ) {
-		setAttrs({"grpMod": "@{dex|max}"}); 
+		setAttrs({"GrpTypeMod": "dex"}); 
 		console.log("Grapple Mod Switcher  Dex Mod Enabled (" + DEX_mod +") > STR_mod ("+ STR_mod +") ==");
 		}
 		else {
-		setAttrs({"grpMod": "@{str|max}"});
+		setAttrs({"GrpTypeMod": "str"});
 		console.log("Grapple Mod Switcher  Str Mod Enabled ("+ STR_mod +") >= DEX_mod (" + DEX_mod +") ==");
 		}		
    });
@@ -6303,6 +6303,23 @@ on("sheet:opened change:str change:dex change:con change:int change:wis change:c
 		"wis_max": WIS_mod,
 		"cha_max": CHA_mod		
 		});	
+	});
+});
+
+on("sheet:opened change:grptypemod change:str change:dex",function(){
+<!-- Attribute Sheet Worker -->
+	getAttrs(["str", "dex", "grptypemod"], function(values) {
+	let STR_mod = Math.floor(values.str / 2) - 5;
+	let DEX_mod = Math.floor(values.dex / 2) - 5;
+	console.log(values.grptypemod);
+		if (values.grptypemod == "str" ) {
+		console.log("str");
+		setAttrs({"grpmod": STR_mod});		
+		}
+		else {
+		console.log("dex");
+		setAttrs({"grpmod": DEX_mod});		
+		}
 	});
 });
 
