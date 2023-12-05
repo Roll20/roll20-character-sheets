@@ -1204,7 +1204,7 @@
 			<div class="item-tab-gear-slide-flex-container-martial-maneuvers">
 				<!-- Slide showing special martial arts maneuvers. Entries need to be supplied by the user. -->
 				<div class="subitem-tab-gear-slide-flex-container-martial-maneuvers-heading">
-					<h1>Martial Maneuvers</h1>
+					<h1>Martial and Combat Maneuvers</h1>
 					<h1>Phase</h1>
 					<h1>CP</h1>
 				</div>
@@ -1302,7 +1302,7 @@
 									</button>
 								</div>
 							</div>
-							<input type="text" value="" maxlength="34" name="attr_martialManeuverName02" title="@{martialManeuverName02}" tabindex="172"/>
+							<input type="text" value="Block" maxlength="34" name="attr_martialManeuverName02" title="@{martialManeuverName02}" tabindex="172"/>
 							<div class="maneuver-mover-plus-minus-enclosure">
 								<div class="maneuver-mover-plus-minus-button">
 									<button type="action" class="button buttonPlus" tabindex="-1" name="act_martialManeuverUp02">
@@ -6104,6 +6104,7 @@
 <input type="hidden" name="attr_currentDCV" value="0"/>
 
 <!-- Jackob's Roll Template -->
+<!-- Basic checks -->
 <rolltemplate class="sheet-rolltemplate-custom">
 	<div class="template-wrapper">
 	  <div class="sheet-container sheet-color-{{color}}">
@@ -6149,6 +6150,27 @@
 		</div>
 	</div>
 </rolltemplate>
+
+
+<!-- Jackob's Roll Template for defensive actions (blocks)-->
+<rolltemplate class="sheet-rolltemplate-custom-defense">
+	<div class="template-wrapper">
+	  <div class="sheet-container sheet-color-{{color}}">
+		<div class="sheet-header">
+		  {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+		  {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+		</div>
+		<div class="sheet-content">
+		  {{#allprops() title subtitle desc color}}
+		  <div class="sheet-key">{{key}}</div>
+		  <div class="sheet-value">{{value}}</div>
+		  {{/allprops() title subtitle desc color}}
+		  {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+		</div>
+	  </div>
+	</div>
+</rolltemplate>
+
 
 <!-- Jackob's Roll Template for normal damage attacks -->
 <!-- Includes row for computed BODY damage using July, 2021 Roll Parsing feature -->
@@ -6216,7 +6238,71 @@
 	</div>
 </rolltemplate>
 
-<!-- Jackob's Roll Template -->
+<!-- Jackob's Roll Template for killing damage maneuvers -->
+<rolltemplate class="sheet-rolltemplate-custom-maneuver">
+	<div class="sheet-template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+			</div>
+			<div class="sheet-content">
+				{{#allprops() title subtitle desc color HITLOC STUN BODY}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle desc color HITLOC STUN BODY}}
+				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+				<!-- Stun, Body, and Hit Location go at the end -->
+				{{#STUN}}
+				<div class="sheet-key">STUN</div>
+				<div class="sheet-value">{{computed::STUN}}</div>
+				{{/STUN}}
+				{{#BODY}}
+				<div class="sheet-key">BODY</div>
+				<div class="sheet-value">{{computed::BODY}}</div>
+				{{/BODY}}
+				{{#HITLOC}}
+				<div class="sheet-key">Hit Location</div>
+				<div class="sheet-value">{{computed::HITLOC}}</div>
+				{{/HITLOC}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Jackob's Roll Template for normal damage maneuvers -->
+<rolltemplate class="sheet-rolltemplate-custom-normal-maneuver">
+	<div class="sheet-template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+			</div>
+			<div class="sheet-content">
+				{{#allprops() title subtitle desc color HITLOC STUN BODY}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle desc color HITLOC STUN BODY}}
+				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+				<!-- Stun, Body, and Hit Location go at the end -->
+					{{#STUN}}
+					<div class="sheet-key">STUN</div>
+					<div class="sheet-value">{{computed::STUN}}</div>
+					{{/STUN}}
+					{{#BODY}}
+					<div class="sheet-key">BODY</div>
+					<div class="sheet-value">{{computed::BODY}}</div>
+					{{/BODY}}
+					{{#HITLOC}}
+					<div class="sheet-key">Hit Location</div>
+					<div class="sheet-value">{{computed::HITLOC}}</div>
+					{{/HITLOC}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Jackob's Roll Template for armor activation-->
 <rolltemplate class="sheet-rolltemplate-custom-activate">
 	<div class="sheet-template-wrapper">
 	  <div class="sheet-container sheet-color-{{color}}">
@@ -8807,63 +8893,82 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX.
 			
-			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId,"martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "hiddenBasicEndurance",
-					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
+			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId,"martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "hiddenBasicEndurance", "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["maneuverNormalDamage"+maneuverId] != 0;
-			
+				let isBlocking = values["maneuverBlock"+maneuverId] != 0;
+				
+				// Martial maneuvers by default cost no endurance. Come back to this.
 				let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
-			
+				
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
-				// If isNormalDamage is TRUE, use the Normal Damage template.
-				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack} {{title=@{character_name} - @{character_title}}} "
-						+ "{{subtitle= Uses @{martialManeuverName"+maneuverId+"} to make a " + (isNormalDamage ? "normal" : "killing") + " attack.}} ";
-				if (values.displayDegreeOfSuccess != 0) {
-					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} ";
+				if (isBlocking) {
+					// Use the Blocking template.
+					theRoll += "&{template:custom-defense} {{title=@{character_name} - @{character_title}}} "
+						+ "{{subtitle=Blocks with @{martialManeuverName"+maneuverId+"}}} ";
+					if (values.displayDegreeOfSuccess != 0) {
+						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
+					} else {
+						theRoll += "{{OCV=[[@{ocv}[OCV] + @{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} " + "{{Result=[[3d6cf6cs1]]}} ";
+					}
 				} else {
-					theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
-					+ "{{Result=[[3d6cf6cs1]]}}";
-				}
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
+					// If isNormalDamage is TRUE, use the Normal Damage template.
+					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-maneuver} {{title=@{character_name} - @{character_title}}} "
+						+ "{{subtitle= Uses @{martialManeuverName"+maneuverId+"} to make a " + (isNormalDamage ? "normal" : "killing") + " attack.}} ";
+					if (values.displayDegreeOfSuccess != 0) {
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} ";
+					} else {
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV]+?{Modifier|0}[Modifier]]]}} "
+						+ "{{Result=[[3d6cf6cs1]]}}";
+					}
+					theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}} " : "")
 						+ "{{"+dmgType+"=[[@{hiddenManeuverDamage"+maneuverId+"}]]}} "
 						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
-				if (useHitLocations)
-					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
-			
+					if (useHitLocations)
+						theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
+				}
+				
 				startRoll(theRoll, (results) => {
-					let computed = parseInt(results.results[dmgType].result)||0;
-					let theSTUNMultiplier = Math.floor(Math.random()*3+1);
-			
+					if (!isBlocking) {
+						let computed = parseInt(results.results[dmgType].result)||0;
+						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
+					}
+					
 					// Get hit location message if system used.
-					if (useHitLocations) {
-						let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+					if (useHitLocations && !isBlocking) {
+						var theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 						theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 						theSTUNMultiplier = theHitLocation.STUNx;
 					}
-			
-					if (isNormalDamage) {
-						// Convert dice roll to equivalent BODY damage.
-						computed = convertStunToBody(results.results.STUN.rolls);
-					} else {
-						// theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
-						theSTUNMultiplier = Math.max(1,theSTUNMultiplier);
-						computed *= theSTUNMultiplier;
-			
-						computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+					
+					if (!isBlocking) {
+						if (isNormalDamage)
+							// Convert dice roll to equivalent BODY damage.
+							computed = convertStunToBody(results.results.STUN.rolls);
+						else {
+							// theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
+							theSTUNMultiplier = Math.max(1,theSTUNMultiplier);
+							computed *= theSTUNMultiplier;
+							
+							computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+						}
 					}
-			
+					
 					let theResult = new Object();
-					theResult[otherDmgType] = computed;
-					theResult.HITLOC = theMessage;
+					
+					if (!isBlocking) {
+						theResult[otherDmgType] = computed;
+						theResult.HITLOC = theMessage;
+					}
 						
 					// Subtract END cost if option checked.
 					if (values.optionAutoSubtractEND != 0) {
 						subtractEndurance(subtractENDAmt);
 					}
-			
+						
 					finishRoll(results.rollId, theResult);
 				});
 			});
@@ -9278,13 +9383,13 @@
 			let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 
 			theRoll += "?{Blocking|Yes,";
-			// This is nested queries so we need to use &rbrace; for } and &#124; for |
+			// This a nested query so we need to use &rbrace; for } and &#124; for |
 
 			// Blocking Roll
-			theRoll += "&{template:custom&rbrace; {{title=@{character_name} - @{character_title}&rbrace;&rbrace; "
+			theRoll += "&{template:custom-defense&rbrace; {{title=@{character_name} - @{character_title}&rbrace;&rbrace; "
 					+ "{{subtitle=Blocks with @{shieldName}&rbrace;&rbrace; ";
 			if (dispDoS) {
-				theRoll	+= "{{vs OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; ";
+				theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; ";
 			} else {
 				theRoll += "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; "
 					+ "{{Result=[[3d6cf6cs1]]&rbrace;&rbrace; ";
