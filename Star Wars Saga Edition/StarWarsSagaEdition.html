@@ -205,19 +205,19 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 				<tr><th><span data-i18n="bonus">Bonus</span></th>		<th></th>	<th><span data-i18n="current">Current</span></th> <th><span data-i18n="total">Total</span></th>
 					<td></td>
 					<td>&nbsp;&nbsp;</td>
-					<!-- rowspan placholder -->
+					<!-- rowspan placeholder -->
 					<td rowspan="5" style="text-align:left">
-						<input type="checkbox" value="0" name="attr_CT" id="ct_normal-checkbox-PC" class="Persistent-checkbox ctnormal" name="attr_CT"/>
+						<input type="checkbox" value="0" id="ct_normal-checkbox-PC" class="Persistent-checkbox ctnormal" name="attr_condTrack"/>
 						<label for="ct_normal-checkbox-PC">Normal</label>
-						<input type="checkbox" value="-1" name="attr_CT" id="ct_minus1-checkbox-PC" class="Persistent-checkbox ctminus1" name="attr_CT"/>
+						<input type="checkbox" value="1" id="ct_minus1-checkbox-PC" class="Persistent-checkbox ctminus1" name="attr_condTrack"/>
 						<label for="ct_minus1-checkbox-PC">-1</label>
-						<input type="checkbox" value="-2" name="attr_CT" id="ct_minus2-checkbox-PC" class="Persistent-checkbox ctminus2" name="attr_CT"/>
+						<input type="checkbox" value="2" id="ct_minus2-checkbox-PC" class="Persistent-checkbox ctminus2" name="attr_condTrack"/>
 						<label for="ct_minus2-checkbox-PC">-2</label>
-						<input type="checkbox" value="-5" name="attr_CT" id="ct_minus5-checkbox-PC" class="Persistent-checkbox ctminus5" name="attr_CT"/>
+						<input type="checkbox" value="5" id="ct_minus5-checkbox-PC" class="Persistent-checkbox ctminus5" name="attr_condTrack"/>
 						<label for="ct_minus5-checkbox-PC">-5</label>
-						<input type="checkbox" value="-10" name="attr_CT" id="ct_minus10-checkbox-PC" class="Persistent-checkbox ctminus10" name="attr_CT"/>
+						<input type="checkbox" value="10" id="ct_minus10-checkbox-PC" class="Persistent-checkbox ctminus10" name="attr_condTrack"/>
 						<label for="ct_minus10-checkbox-PC">-10</label>					
-						<input type="checkbox" value="0[Helpless]" name="attr_CT" id="ct_helpless-checkbox-PC" class="Persistent-checkbox cthelpless" name="attr_helpless"/>
+						<input type="checkbox" value="50" id="ct_helpless-checkbox-PC" class="Persistent-checkbox cthelpless" name="attr_condTrack"/>
 						<label for="ct_helpless-checkbox-PC">Helpless</label>
 						<input type="checkbox" id="Persistent-checkbox-PC" class="Persistent-checkbox ctpersistent" name="attr_Persistent"/>
 						<label for="Persistent-checkbox-PC" title="Indicates a persistent condition @{Persistent}">Persistent</label></td>
@@ -6249,6 +6249,45 @@ on("change:level", function () {
 	let level = parseInt(values.level)||0;	
 	let xptotal = (level+=1)*(values.level*.5)*1000;
 	setAttrs({"XP_max": xptotal});
+	});
+});
+</script>
+
+
+
+<script type="text/worker">
+on('sheet:opened',function(){
+	getAttrs(["condTrack", "speed", "ct_max"], function(values) {
+	let ct = parseInt(values.condTrack);
+	let savedspeed = parseInt(values.speed);
+		if (ct < 10) {
+		setAttrs({ct_max: savedspeed});
+		console.log("CT is not -10 or helpless storing speed as: " + savedspeed);
+		}		
+	});
+});
+
+on("change:condTrack change:dex", function () {
+	getAttrs(["condTrack", "dex", "ct_max"], function(values) {
+	let ct = parseInt(values.condTrack);
+	let savedspeed = parseInt(values.ct_max);		
+	let halfspeed = Math.floor(values.ct_max / 2);	
+	let DEX_mod = Math.floor(values.dex / 2) - 5;	
+	console.log("Dex mod is: " + DEX_mod);
+	if (ct < 10) {
+	setAttrs({"speed": savedspeed});	
+	setAttrs({"ct": -ct});	
+	}
+	if (ct == 10){	
+	setAttrs({"speed": halfspeed});	
+	setAttrs({"ct": -ct});	
+	} 	
+	if (ct == 50){		
+		setAttrs({
+			"speed": 0,
+			"ct": 0,
+		 });	
+	} 	
 	});
 });
 </script>
