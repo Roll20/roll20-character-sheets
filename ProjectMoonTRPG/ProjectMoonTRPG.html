@@ -10430,43 +10430,58 @@ function updateAdvantages(changeval){
 
 getAttrs(["Paralysis", "Fortune", "advState", "advNum", "disadvNum"], function(values) {
 
-	let newparalysis = values.Paralysis;
-	let newfortune = values.Fortune;
 	let newadvstate = values.advState;
 
-	if(values.advState == "Advantage" && values.advNum != "0"){
-	newfortune = parseInt(values.Fortune - changeval);
+	let newparalysis = values.Paralysis - parseInt(changeval);
+	let newfortune = values.Fortune - parseInt(changeval);
+	let newadvnum = values.advNum - parseInt(changeval);
+	let newdisadvnum = values.disadvNum - parseInt(changeval);
 
-		if(newfortune < 0){
-		newfortune = "0";
+	if(newfortune < 0){newfortune = 0;}
+	if(newparalysis < 0){newparalysis = 0;}
+	if(newadvnum < 0){ newadvnum = 0;}
+	if(newdisadvnum < 0) { newdisadvnum = 0;}
+
+	let comparePos = newadvnum;
+	let compareNeg = newdisadvnum;
+
+	const output = {};
+
+	if(values.advState == "Advantage" && values.advNum != "0"){
+
+		if(values.Fortune > 0){
+		output["Fortune"] = newfortune;
+		comparePos = newfortune;
+		compareNeg = newparalysis;
 		}
+		else{
+		output["advNum"] = newadvnum;}
 
 	}
 	else if(values.advState == "Disadvantage" && values.disadvNum != "0"){
-	newparalysis = parseInt(values.Paralysis - changeval);
 
-
-		if(newparalysis < 0){
-		newparalysis = "0";
+		if(values.Paralysis > 0){
+		output["Paralysis"] = newparalysis;
+		comparePos = newfortune;
+		compareNeg = newparalysis;
 		}
-
+		else{
+		output["disadvNum"] = newdisadvnum;}
 	}
-	else {
 
-	if(newfortune == newparalysis){
+	if(comparePos == compareNeg){
 	newadvstate = "0";
 	}
-	else if(newfortune > newparalysis){
+	else if(comparePos > compareNeg){
 	newadvstate = "Advantage";
 	}
-	else if(newfortune < newparalysis){
+	else if(comparePos < compareNeg){
 	newadvstate = "Disadvantage";
 	}
 
-	}
+	output["advState"] = newadvstate;
 
-
-	setAttrs({"advState":newadvstate, "Paralysis":newparalysis, "Fortune":newfortune});
+	setAttrs(output);
 
 	});
 
@@ -10880,7 +10895,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	combinedice2 = parseInt(basedice2) + parseInt(distortdice2) + parseInt(skilldice2);
 	combinedice3 = parseInt(basedice3) + parseInt(distortdice3) + parseInt(skilldice3) + parseInt(activepower);
 
-	if(combinedice1 > 1 && values.settingMultihitUses == "true" && limitbehavior != "Limitless" && limitbehavior != null){
+	if(values.settingMultihitUses == "true" && limitbehavior != "Limitless" && limitbehavior != null){
 		if(combinedice1 > currentuses){
 		combinedice1 = newuses;
 		newuses = "0";
@@ -10891,7 +10906,7 @@ getSectionIDs(`repeating_global`, idarray => {
 		}
 
 	}
-	else if(combinedice1 == 1 && limitbehavior != "Limitless" && limitbehavior != null) {
+	else if(values.settingMultihitUses != "true" && limitbehavior != "Limitless" && limitbehavior != null) {
 		newuses = newuses - 1;
 		if(newuses < 0){ newuses = "0";}
 	}
