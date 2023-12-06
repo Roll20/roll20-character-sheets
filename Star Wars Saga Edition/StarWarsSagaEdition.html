@@ -6615,40 +6615,41 @@ on("change:condTrack change:dex", function () {
 	});
 });
 
-on("sheet:opened change:str change:dex change:con change:int change:wis change:cha",function(){
-<!-- Attribute Sheet Worker -->
-	getAttrs(["str", "dex", "con", "int", "wis", "cha"], function(values) {
-	let STR_mod = Math.floor(values.str / 2) - 5;
-	let DEX_mod = Math.floor(values.dex / 2) - 5;
-	let CON_mod = Math.floor(values.con / 2) - 5;
-	let INT_mod = Math.floor(values.int / 2) - 5;
-	let WIS_mod = Math.floor(values.wis / 2) - 5;
-	let CHA_mod = Math.floor(values.cha / 2) - 5;	
-	setAttrs({
-		"str_max": STR_mod,
-		"dex_max": DEX_mod,
-		"con_max": CON_mod,
-		"int_max": INT_mod,
-		"wis_max": WIS_mod,
-		"cha_max": CHA_mod		
-		});	
-	});
+const stats = ['str','dex','con','int','wis','cha'];
+stats.forEach(function (stat) {
+    on("change:" + stat + " sheet:opened", function () {
+        getAttrs([stat], function (values) {
+            const stat_score = parseInt(values[stat])||0; // this extracts the stat, and assumes a stat score of 0 the stat is not recognised as a number.
+            const stat_modifier = Math.floor(stat_score/2) -5; // this gives a +0 at 10-11, and +/1 for 2 point difference.
+            setAttrs({
+                [stat + '_max']: stat_modifier 
+            });
+        });
+    });
 });
 
-on("sheet:opened change:grptypemod change:str change:dex",function(){
+on("change:grptypemod change:str change:dex",function(eventInfo){
 <!-- Attribute Sheet Worker -->
+    let event = (eventInfo.sourceAttribute||0); //This gets the repeating row ID of the changed attribute
 	getAttrs(["str", "dex", "grptypemod"], function(values) {
 	let STR_mod = Math.floor(values.str / 2) - 5;
 	let DEX_mod = Math.floor(values.dex / 2) - 5;
-	console.log(values.grptypemod);
 		if (values.grptypemod == "str" ) {
-		console.log("str");
 		setAttrs({"grpmod": STR_mod});		
 		}
 		else {
-		console.log("dex");
 		setAttrs({"grpmod": DEX_mod});		
 		}
+	});
+});
+
+on("change:grptypemod",function(eventInfo){
+<!-- Attribute Sheet Worker -->
+    let event = (eventInfo.sourceAttribute||0); //This gets the repeating row ID of the changed attribute
+	console.log("Triggering Event: " + event);
+	getAttrs([event], function(values) {
+	console.log(values.event);
+
 	});
 });
 
