@@ -475,17 +475,17 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 				</tr>				
 				<tr>
 					<td class="sheet-col1"><input type="checkbox" class="sheet-hidden" name="attr_willformula-show" id="willLabel" value="1"/><label class="defenseStatslabel" for="willLabel" title="Show/Hide Willpower Formula"><span data-i18n="will">Will</span></label></td>
-					<td><input type="number" name="attr_Will" value="10+@{WillMod}[Mod]+@{WillLevel}[Level]+@{WillClass}[Class]+@{WillMisc}[Misc]+@{CT}[CT]" disabled="true" title="Will @{Will}" /></td>
+					<td><input type="number" name="attr_Will" value="" readonly="true" title="Will @{Will}" /></td>
 					<td>&nbsp;=&nbsp;10&nbsp;+&nbsp;</td>
 					<td><input type="number" name="attr_WillLevel" value="@{level}" disabled="true" title="Will Level / Armor bonus @{WillLevel}"/></td>
 					<td><input type="number" name="attr_WillClass" value="0" title="Will Class bonus @{WillClass}" /></td>
 					<td> <select name="attr_WillMod" class="modtype" title="Will Ability Modifier (default WIS) @{WillMod}">
-					  <option value="@{str|max}" data-i18n="str">STR</option>
-					  <option value="@{dex|max}" data-i18n="dex">DEX</option>
-					  <option value="@{con|max}" data-i18n="con">CON</option>
-					  <option value="@{int|max}" data-i18n="int">INT</option>
-					  <option value="@{wis|max}" data-i18n="wis" selected>WIS</option>
-					  <option value="@{cha|max}" data-i18n="cha">CHA</option>
+					  <option value="str_max" data-i18n="str">STR</option>
+					  <option value="dex_max" data-i18n="dex">DEX</option>
+					  <option value="con_max" data-i18n="con">CON</option>
+					  <option value="int_max" data-i18n="int">INT</option>
+					  <option value="wis_max" data-i18n="wis" selected>WIS</option>
+					  <option value="cha_max" data-i18n="cha">CHA</option>
 					</select></td>
 					<td><input type="number" name="attr_WillMisc" value="0" title="Will Miscellaneous Modifier @{WillMisc}" /></td>
 				</tr>
@@ -2369,7 +2369,7 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 					<td class="sheet-col1"><span data-i18n="will">Will</span></td>					
 					<!-- rowspan placeholder -->
 					<td><input type="number" name="attr_NPC-Will" value="@{WillTotal}+@{ct}" disabled="true" title="Will @{NPC-Will}"/></td>					 
-					<td><input type="text" name="attr_WillTotal" value="10+@{level}+@{Wis|max}"  title="Will Total (You can use formulas, for example: 10+@{level} or enter the total Defence Score) @{WillTotal}"/></td>
+					<td><input type="text" name="attr_WillTotal" value=""  title="Will Total (You can use formulas, for example: 10+@{level} or enter the total Defence Score) @{WillTotal}"/></td>
 				</tr>
 				<tbody>
 				<tr>
@@ -6306,8 +6306,9 @@ var ArmorUpdate = function() {
 	}); //End
 };
 //Defense Sheetworker, not the cleanest but it works
-on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc', function(){
-	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "dex_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc"], function(values) {
+on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc', function(){
+	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "dex_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal"], function(values) {
+	
 		let stat = values.refmod;	
 		getAttrs([stat], function(value) {	
         const refmodAttributeValue = parseInt(value[stat]);			
@@ -6330,8 +6331,8 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		}
 		});
 		let fortstat = values.fortmod;	
-		getAttrs([fortstat], function(value) {	
-        const fortmodAttributeValue = parseInt(value[fortstat]);			
+		getAttrs([fortstat], function(valuef) {	
+        const fortmodAttributeValue = parseInt(valuef[fortstat]);			
 		if(!values.forttotal) {
 			let fortsum = 10 + fortmodAttributeValue + parseInt(values.level) + parseInt(values.fortclass) + parseInt(values.fortmisc) + parseInt(values.CT);
 			setAttrs({"Fortitude": fortsum});		
@@ -6341,9 +6342,21 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		setAttrs({"Fortitude": values.forttotal});			
 		}
 		});	
-		
+		let willstat = values.willmod;	
+		getAttrs([willstat], function(value) {	
+        const willmodAttributeValue = parseInt(value[willstat]);			
+		if(!values.willtotal) {
+			let willsum = 10 + willmodAttributeValue + parseInt(values.level) + parseInt(values.willclass) + parseInt(values.willmisc) + parseInt(values.CT);
+			setAttrs({"Will": willsum});		
+    	}
+		else {
+		console.log("WILLPOWER FORMULA IS BEING OVERWRITTEN");		
+		setAttrs({"Will": values.willtotal});			
+		}
+		});		
 	});	
 });  
+//10+@{WillMod}[Mod]+@{WillLevel}[Level]+@{WillClass}[Class]+@{WillMisc}[Misc]+@{CT}[CT]
 //10+@{FortMod}[Mod]+@{FortLevel}[Level]+@{FortClass}[Class]+@{FortMisc}[Misc]+@{CT}[CT]
 
 //10+@{dexpenalty}[Dex Penalty]+@{RefLevel}[Level]+@{RefClass}[Class]+@{RefFlatFootedMisc}[Misc]+@{RefSizeMod}[Size Mod]+@{CT}[CT]
