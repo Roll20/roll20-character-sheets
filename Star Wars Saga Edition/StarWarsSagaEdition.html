@@ -6305,23 +6305,25 @@ var ArmorUpdate = function() {
 	}
 	}); //End
 };
+
 //Defense Sheetworker, not the cleanest but it works
 on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal change:condtrack', function(){
-	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "dex_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack"], function(values) {
+	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "str_max", "dex_max", "con_max", "int_max", "wis_max", "cha_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack"], function(values) {
 
-		let stat = values.refmod;	
-		getAttrs([stat], function(value) {	
-        let refmodAttributeValue = parseInt(value[stat]);		
-			console.log("condtrack value:", values.condtrack);
+		let ref = values.refmod;
+		let refstatValue = values[ref]; // Fetch the value of the attribute represented by the string stored in `stat`
+		let fort = values.fortmod;
+		let fortstatValue = values[fort]; // Fetch the value of the attribute represented by the string stored in `stat`
+		let will = values.willmod;
+		let willstatValue = values[will]; // Fetch the value of the attribute represented by the string stored in `stat`		
+
+				
 		if (!values.reftotal) {
-			console.log("condtrack value:", values.condtrack);
-			console.log("refmod value:", stat);
-
-			if (values.condtrack === "50" && stat === "dex_max") {
+			if (values.condtrack === "50" && ref === "dex_max") {
 				console.log("condtrack is '50' and refmod is 'dex_max'");
-				refmodAttributeValue = -5;
+				refstatValue = -5;
 			}	
-			let reflexsum = 10 + refmodAttributeValue + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefMisc) + parseInt(values.CT) + parseInt(values.RefSizeMod);
+			let reflexsum = 10 + refstatValue + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefMisc) + parseInt(values.CT) + parseInt(values.RefSizeMod);
 			setAttrs({"Reflex": reflexsum});		
     	}
 		else {
@@ -6329,39 +6331,30 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		setAttrs({"Reflex": values.reftotal});			
 		}
     	if(!values.reftotal_max) {
-			let min = (0 < refmodAttributeValue) ? 0 : refmodAttributeValue;			
+			let min = (0 < refstatValue) ? 0 : refstatValue;			
 			let reflexflatsum = 10 + min + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefFlatFootedMisc) + parseInt(values.RefSizeMod) + parseInt(values.CT);
 			setAttrs({"ReflexFlatFooted": reflexflatsum});		
     	}
 		else {
 		setAttrs({reflexflatfooted: parseInt(values.reftotal_max)});	
 		console.log("REFLEX Flatfoot FORMULA IS BEING OVERWRITTEN");		
-		}
-		});
-		let fortstat = values.fortmod;	
-		getAttrs([fortstat], function(valuef) {	
-        const fortmodAttributeValue = parseInt(valuef[fortstat]);			
+		}		
 		if(!values.forttotal) {
-			let fortsum = 10 + fortmodAttributeValue + parseInt(values.level) + parseInt(values.fortclass) + parseInt(values.fortmisc) + parseInt(values.CT);
+			let fortsum = 10 + fortstatValue + parseInt(values.level) + parseInt(values.fortclass) + parseInt(values.fortmisc) + parseInt(values.CT);
 			setAttrs({"Fortitude": fortsum});		
     	}
 		else {
 		console.log("FORTITUDE FORMULA IS BEING OVERWRITTEN");		
 		setAttrs({"Fortitude": values.forttotal});			
-		}
-		});	
-		let willstat = values.willmod;	
-		getAttrs([willstat], function(value) {	
-        const willmodAttributeValue = parseInt(value[willstat]);			
+		}			
 		if(!values.willtotal) {
-			let willsum = 10 + willmodAttributeValue + parseInt(values.level) + parseInt(values.willclass) + parseInt(values.willmisc) + parseInt(values.CT);
+			let willsum = 10 + willstatValue + parseInt(values.level) + parseInt(values.willclass) + parseInt(values.willmisc) + parseInt(values.CT);
 			setAttrs({"Will": willsum});		
     	}
 		else {
 		console.log("WILLPOWER FORMULA IS BEING OVERWRITTEN");		
 		setAttrs({"Will": values.willtotal});			
-		}
-		});		
+		}	
 	});	
 });  
 
