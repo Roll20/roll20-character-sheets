@@ -6306,13 +6306,21 @@ var ArmorUpdate = function() {
 	}); //End
 };
 //Defense Sheetworker, not the cleanest but it works
-on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal', function(){
-	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "dex_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal"], function(values) {
+on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal change:condtrack', function(){
+	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "dex_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack"], function(values) {
 
 		let stat = values.refmod;	
 		getAttrs([stat], function(value) {	
-        const refmodAttributeValue = parseInt(value[stat]);			
-		if(!values.reftotal) {
+        let refmodAttributeValue = parseInt(value[stat]);		
+			console.log("condtrack value:", values.condtrack);
+		if (!values.reftotal) {
+			console.log("condtrack value:", values.condtrack);
+			console.log("refmod value:", stat);
+
+			if (values.condtrack === "50" && stat === "dex_max") {
+				console.log("condtrack is '50' and refmod is 'dex_max'");
+				refmodAttributeValue = -5;
+			}	
 			let reflexsum = 10 + refmodAttributeValue + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefMisc) + parseInt(values.CT) + parseInt(values.RefSizeMod);
 			setAttrs({"Reflex": reflexsum});		
     	}
@@ -6700,28 +6708,11 @@ on("change:condTrack", function () {
 
 const stats = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
-on('change:condTrack', function() {
-    getAttrs(['condTrack'], function(values) {
-        const ctValue = values.condTrack;
-			console.log(ctValue);
-        // Check if CT is -10
-        if (ctValue === '50') {
-            // Set Dexterity score directly to -5
-			console.log("CT is 50");
-            setAttrs({"dex_max": -5 }); // Assuming the base Dexterity score is 10
-        }
-    });
-});
-
 stats.forEach(function (stat) {
-    on("change:" + stat + " sheet:opened change:condTrack", function () {
+    on("change:" + stat + " sheet:opened", function () {
         getAttrs([stat, 'condTrack'], function (values) {
             const stat_score = parseInt(values[stat]) || 0;
             let stat_modifier = Math.floor(stat_score / 2) - 5;
-            // Check if ct attribute is -10, then adjust dex modifier
-            if (values.condTrack === '50' && stat === 'dex') {
-                stat_modifier = -5; // Change the Dexterity modifier to -5
-            }
             setAttrs({
                 [stat + '_max']: stat_modifier 
             });
