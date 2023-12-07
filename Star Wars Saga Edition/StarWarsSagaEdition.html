@@ -6234,7 +6234,7 @@ var ArmorPerception = function() {
 };
 
 var ArmorUpdate = function() {
-	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "DEX", "RefMod"], function(v) {
+	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "dex", "RefMod"], function(v) {
 	let ArmorWornCheck = parseInt(v.ArmorWornCheck)||0;
 	let ArmorDefense = parseInt(v.ArmorDefense)||0;
 	let ImpArmorDefense = parseInt(v.ImpArmorDefense)||0;
@@ -6243,8 +6243,8 @@ var ArmorUpdate = function() {
 	let level = parseInt(v.level)||0;
 	let ArmorType = v.ArmorType;
 	let ArmorDex = parseInt(v.ArmorDex)||0;
-	let DEX = parseInt(v.DEX)||0;
-	let RefMod = parseInt(v.RefMod)||0;
+	let DEX = parseInt(v.dex)||0;
+	let RefMod = v.RefMod;
 /*	console.log("ArmorWornCheck = " + ArmorWornCheck + '\n' +
 				"ArmorDefense = " + ArmorDefense   + '\n' +
 				"ImpArmorDefense = " + ImpArmorDefense + '\n' +
@@ -6310,18 +6310,19 @@ var ArmorUpdate = function() {
 		});
 
 	//Determine which Dex mod to use
-	dexMod = Math.floor((parseInt(v["DEX"],10) - 10) / 2);
+	dexMod = Math.floor((parseInt(v["dex"],10) - 10) / 2);
 	console.log("==== Dex Mod for Defenses ====");
 	if(ArmorWornCheck == "1" && (v["RefMod"] == "@{dex|max}" || v["RefMod"] == "@{ArmorDex}") && v["ArmorDex"] >= dexMod) {
+	if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armorref") && v["ArmorDex"] >= dexMod) {
 		console.log("== Armor Dex ("+v["ArmorDex"]+") >= DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{dex|max}");
-		setAttrs({"RefMod": "@{dex|max}"});
+		setAttrs({"refmod": "armorref"});		
 	}
-	else if(ArmorWornCheck == "1" && (v["RefMod"] == "@{dex|max}" || v["RefMod"] == "@{ArmorDex}") && v["ArmorDex"] < dexMod) {
+	else if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armorref") && v["ArmorDex"] < dexMod) {
 		console.log("== Armor Dex ("+v["ArmorDex"]+") < DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{ArmorDex}");
-		setAttrs({"RefMod": "@{ArmorDex}"});
+		setAttrs({"refmod": "dex_max"});
 	}
-	else if(ArmorWornCheck != "1" && v["RefMod"] == "@{ArmorDex}") {console.log("RefMod = @{dex|max}");
-		setAttrs({"RefMod": "@{dex|max}"});
+	else if(ArmorWornCheck != "1" && v["RefMod"] == "armorref") {console.log("RefMod = @{dex|max}");
+		setAttrs({"refmod": "dex_max"});
 	}
 	else{console.log("== NO OPTIONS ==" + '\n' + "dexmod = " +dexMod + '\n' + "ArmorDex = " +v["ArmorDex"] + "\nRefMod = " + v["RefMod"]);}
 	}); //End
@@ -6602,11 +6603,9 @@ on("change:dex change:str", function () {
 		let STR_mod = Math.floor(values.str / 2) - 5;			
 		if (DEX_mod > STR_mod ) {
 		setAttrs({"grptypemod": "dex"}); 
-		console.log("Grapple Mod Switcher  Dex Mod Enabled (" + DEX_mod +") > STR_mod ("+ STR_mod +") ==");
 		}
 		else {
 		setAttrs({"grptypemod": "str"});
-		console.log("Grapple Mod Switcher  Str Mod Enabled ("+ STR_mod +") >= DEX_mod (" + DEX_mod +") ==");
 		}		
    });
 });
@@ -6632,14 +6631,12 @@ on("sheet:opened",function(){
 	});
 });
 
-on("change:condTrack change:dex", function () {
+on("change:condTrack", function () {
 <!-- Condition Tracker Switcher -->
 	getAttrs(["condTrack", "dex", "ct_max"], function(values) {
 	let ct = parseInt(values.condTrack);
 	let savedspeed = parseInt(values.ct_max);		
-	let halfspeed = Math.floor(values.ct_max / 2);	
-	let DEX_mod = Math.floor(values.dex / 2) - 5;	
-	console.log("Dex mod is: " + DEX_mod);
+	let halfspeed = Math.floor(values.ct_max / 2);		
 	if (ct < 10) {
 	setAttrs({"speed": savedspeed});	
 	setAttrs({"ct": -ct});	
@@ -6671,7 +6668,7 @@ stats.forEach(function (stat) {
 });
 
 on("change:grptypemod change:str change:dex",function(eventInfo){
-<!-- Attribute Sheet Worker -->
+// Attribute Sheet Worker
     let event = (eventInfo.sourceAttribute||0); //This gets the repeating row ID of the changed attribute
 	getAttrs(["str", "dex", "grptypemod"], function(values) {
 	let STR_mod = Math.floor(values.str / 2) - 5;
@@ -6684,17 +6681,6 @@ on("change:grptypemod change:str change:dex",function(eventInfo){
 		}
 	});
 });
-
-
-  on('change:grptypemod', function (eventInfo) {
-    let event = eventInfo.sourceAttribute || 0;
-    console.log(`Triggering Event: ${event}`);
-    getAttrs([event], function (values) {
-      console.log(`attribute: ${event}`);
-      const attr = values[`${event}`];
-      console.log(`value: ${attr}`);
-    });
-  });
 
 
 </script>
