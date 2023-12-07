@@ -6151,7 +6151,6 @@ on("change:equipmentwtrunningtotal change:armorwt change:armorcarry change:size 
 		if(v["ArmorCarry"] == 1) {TotalWeight = parseFloat(v["ArmorWt"]) + parseFloat(v["EquipmentWtRunningTotal"]); console.log("=== Armor is Carried ===");}
 		else {TotalWeight = parseFloat(v["EquipmentWtRunningTotal"]); console.log("=== Armor is NOT Carried ===");}
 		TotalWeight = parseFloat(TotalWeight).toFixed(1)
-		console.log("===== Equipment Weight Totals =====" + '\n' +"EquipmentWtRunningTotal = " + v["EquipmentWtRunningTotal"] + '\n' +"TotalWeight = " + TotalWeight + '\n' +"Carry Capacity = " + EquipmentCapacity );
 
 		setAttrs({"TotalEquipmentWt": TotalWeight});
 		if(TotalWeight >= EquipmentCapacity){setAttrs({"EquipmentLoad": -10});	console.log("=== Load is Heavy ===");	}
@@ -6162,7 +6161,6 @@ on("change:equipmentcostrunningtotal change:armortotalcost",function(){
 	getAttrs(["EquipmentCostRunningTotal", "ArmorTotalCost"], function(v) {
 		if(v["ArmorTotalCost"]){ArmorCost = parseInt(v["ArmorTotalCost"])} else {ArmorCost = 0}
 		TotalCost = parseInt(v["EquipmentCostRunningTotal"]) + ArmorCost;
-		console.log("===== Equipment Worth Totals =====" + '\n' +"EquipmentCostRunningTotal = " + v["EquipmentCostRunningTotal"] + '\n' +"TotalCost = " + TotalCost);
 		setAttrs({"TotalEquipmentWorth": TotalCost});
 	});
 });
@@ -6177,7 +6175,6 @@ on("change:inventoryrunningsummary change:ArmorWorn",function(){
 		else if(v["inventoryrunningsummary"].length == 0 && armorDesc.length > 0) {summary = armorDesc}
 		else if(v["inventoryrunningsummary"].length > 0 && armorDesc.length == 0) {summary = v["inventoryrunningsummary"]}
 		else {summary = ""}
-		console.log("===== Equipment Summary =====" + '\n' + summary);
 		setAttrs({"inventory": summary});
 	});
 });
@@ -6313,12 +6310,12 @@ var ArmorUpdate = function() {
 	dexMod = Math.floor((parseInt(v["dex"],10) - 10) / 2);
 	console.log("==== Dex Mod for Defenses ====");
 	if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armorref") && v["ArmorDex"] >= dexMod) {
-		console.log("== Armor Dex ("+v["ArmorDex"]+") >= DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{dex|max}");
-		setAttrs({"refmod": "armorref"});		
+		console.log("== Armor Max Dex ("+v["ArmorDex"]+") >= DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{dex|max}");
+		setAttrs({"refmod": "dex_max"});		
 	}
 	else if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armorref") && v["ArmorDex"] < dexMod) {
-		console.log("== Armor Dex ("+v["ArmorDex"]+") < DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{ArmorDex}");
-		setAttrs({"refmod": "dex_max"});
+		console.log("== Armor Max Dex ("+v["ArmorDex"]+") < DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{ArmorDex}");
+		setAttrs({"refmod": "armorref"});
 	}
 	else if(ArmorWornCheck != "1" && v["RefMod"] == "armorref") {console.log("RefMod = @{dex|max}");
 		setAttrs({"refmod": "dex_max"});
@@ -6333,7 +6330,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
     	if(!values.reftotal) {
 			getAttrs([stat], function(value) {	
             const refmodAttributeValue = parseInt(value[stat]);
-			let reflexsum = 10 + refmodAttributeValue + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefMisc) + parseInt(values.CT);
+			let reflexsum = 10 + refmodAttributeValue + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefMisc) + parseInt(values.CT) + parseInt(values.RefSizeMod);
 			setAttrs({"Reflex": reflexsum});
         });			
     	}
@@ -6625,7 +6622,6 @@ on("sheet:opened",function(){
 	let savedspeed = parseInt(values.speed);
 		if (ct < 10) {
 		setAttrs({ct_max: savedspeed});
-		console.log("CT is not -10 or helpless storing speed as: " + savedspeed);
 		}		
 	});
 });
