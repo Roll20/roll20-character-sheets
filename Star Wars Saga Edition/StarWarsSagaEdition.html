@@ -39,6 +39,7 @@
 						<input type="checkbox" value="[[@{CT}*-1]][CT Ignore]" name="attr_CTIgnoreDT"  title="Does Damage Threshold ignore penalty from the Condition Track? @{CTIgnoreDT}" />&nbsp;<span data-i18n="ignore_ct" class="not-show">Damage Threshold ignores CT</span><br/>
 						<input type="checkbox" value="1" name="attr_show-nonheroic-level" title="Show nonheroic levels? @{show-nonheroic-level}" />&nbsp;<span class="not-show">Show nonheroic levels</span><br/>
 						<input type="checkbox" value="1" name="attr_athletics-Show" title="Replace Climb, Jump, and Swim skills with Athletics skill?"/>&nbsp;<span class="not-show">Athletics skill house rule</span><br/>
+						<input type="checkbox" value="1" name="attr_autoleveling" title="Automatically increases level when XP >= XP total and puts a message in chat."/>&nbsp;<span class="not-show">Automatically Level Up</span><br/>						
 
 					</div>
 				</div>
@@ -4713,6 +4714,11 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 </div> <!-- End Vehicle Sheet -->
 <!-- start roll templates -->
 <body>
+<rolltemplate class="sheet-rolltemplate-text">
+    <div>
+        {{text}}
+    </div>
+</rolltemplate>
 <rolltemplate class="sheet-rolltemplate-attack">
     <div>
 	<table>
@@ -7063,5 +7069,35 @@ if (forcePowersRepeater) {
 } else {
     console.error("Repeating section 'repeating_forcepowers' not properly initialized.");
 }
+
+let isProcessing = false;
+
+on('change:xp change:autoleveling', function (value) {
+    if (isProcessing) return;
+    
+    isProcessing = true;
+
+    getAttrs(['xp', 'xp_max', 'level', 'character_name', 'autoleveling'], function (values) {
+        let xp = parseInt(values.xp) || 0;
+        let xp_max = parseInt(values.xp_max) || 0;
+        let level = parseInt(values.level) || 0;
+        let characterName = values.character_name || '';
+        let autoleveling = parseInt(values.autoleveling) || 0;
+
+        if (autoleveling !== null && autoleveling !== 0 && xp >= xp_max) {
+            xp -= xp_max;
+            level++;
+
+            setAttrs({
+                'xp': xp,
+                'level': level
+            });
+
+            startRoll("&{template:text} {{text=&#x2728 ***" + characterName + " has gained a level!*** &#x2728;}}", (results) => {});
+        }
+
+        isProcessing = false;
+    });
+});
 
 </script>
