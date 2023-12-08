@@ -6634,6 +6634,17 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		let will = values.willmod;
 		let willstatValue = values[will]; // Fetch the value of the attribute represented by the string stored in `stat`		
 
+		// Subtract CT from all stat values
+		let CTValue = parseInt(values.CT) || 0;
+		let reftotal = parseInt(values.reftotal) || 0;
+		let refFlattotal = parseInt(values.reftotal_max) || 0;		
+		let forttotal = parseInt(values.forttotal) || 0;
+		let willtotal = parseInt(values.willtotal) || 0;
+		reftotal += CTValue;
+		refFlattotal += CTValue;		
+		willtotal += CTValue;
+		forttotal += CTValue;		
+
 		if (values.condtrack === "50" && ref === "dex_max") {
 			console.log("condtrack is '50' and refmod is 'dex_max'");
 			refstatValue = -5;
@@ -6644,7 +6655,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
     	}
 		else {
 		console.log("REFLEX FORMULA IS BEING OVERWRITTEN");		
-		setAttrs({"Reflex": values.reftotal});			
+		setAttrs({"Reflex": reftotal});			
 		}
     	if(!values.reftotal_max) {
 			let min = (0 < refstatValue) ? 0 : refstatValue;			
@@ -6652,7 +6663,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 			setAttrs({"ReflexFlatFooted": reflexflatsum});		
     	}
 		else {
-		setAttrs({reflexflatfooted: parseInt(values.reftotal_max)});	
+		setAttrs({reflexflatfooted: refFlattotal});	
 		console.log("REFLEX Flatfoot FORMULA IS BEING OVERWRITTEN");		
 		}		
 		if(!values.forttotal) {
@@ -6661,7 +6672,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
     	}
 		else {
 		console.log("FORTITUDE FORMULA IS BEING OVERWRITTEN");		
-		setAttrs({"Fortitude": values.forttotal});			
+		setAttrs({"Fortitude": forttotal});			
 		}			
 		if(!values.willtotal) {
 			let willsum = 10 + willstatValue + parseInt(values.level) + parseInt(values.willclass) + parseInt(values.willmisc) + parseInt(values.CT);
@@ -6669,7 +6680,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
     	}
 		else {
 		console.log("WILLPOWER FORMULA IS BEING OVERWRITTEN");		
-		setAttrs({"Will": values.willtotal});			
+		setAttrs({"Will": willtotal});			
 		}	
 	});	
 });  
