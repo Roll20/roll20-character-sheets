@@ -4327,7 +4327,13 @@
 
 				<!-- current version notes: 2.10.4 -->
 				<ul>
-					<li><b>ENHANCEMENT:</b> Travel Time and Distances tool. The <b>Add Items</b> button is functional and can be used to add a number default skills to use.</li>
+					<li><b>NEW:</b> Added new sheet option <b>Use Metric Distances</b>, which is currently only implemented by the <b>Travel Time and Distance tool.</b></li>
+					<li><b>ENHANCEMENT:</b> Travel Time and Distances tool.
+						<ul>
+							<li>The <b>Add Items</b> button is functional and can be used to add a number default skills to use.</li>
+							<li>If the sheet option <b>Use Metric Distances</b> has been selected, values will display in metric.</li>
+						</ul>
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -18157,7 +18163,8 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<!-- /row 1 -->
 									
 									<!-- #row 2 -->
-									<div class="grid-cell">
+									<input type="hidden" name="attr_use_metric_distances" value="0" />
+									<div class="grid-cell united-states-customary-units">
 										<label>
 											<div class="standard-tooltip">
 												<span data-i18n="miles-per-hour-abbreviation-label">MPH</span>:
@@ -18167,8 +18174,22 @@ Select the indent level of the inventory item. This is handy to help show the it
 											</div>
 										</label>
 									</div>
-									<div class="grid-cell">
+									<div class="grid-cell united-states-customary-units">
 										<input type="text" name="attr_travel_miles_per_hour" value="2.5" readonly class="input-disabled medium-width" />
+									</div>
+
+									<div class="grid-cell metric-units">
+										<label class="">
+											<div class="standard-tooltip">
+												<span data-i18n="kilometers-per-hour-abbreviation-label">KPH</span>:
+												<span class="tooltiptext">
+													<span data-i18n="travel-kilometers-per-hour-tooltip">Average kilometers per hour.</span>
+												</span>
+											</div>
+										</label>
+									</div>
+									<div class="grid-cell metric-units">
+										<input type="text" name="attr_travel_kilometer_per_hour" value="4.0" readonly class="input-disabled medium-width" />
 									</div>
 
 									<div class="grid-cell">
@@ -18185,7 +18206,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 										<input type="number" name="attr_travel_hours_per_day" value="12" class="medium-width" />
 									</div>
 
-									<div class="grid-cell">
+									<div class="grid-cell united-states-customary-units">
 										<label>
 											<div class="standard-tooltip">
 												<span data-i18n="total-miles-label">Total Miles</span>:
@@ -18195,8 +18216,22 @@ Select the indent level of the inventory item. This is handy to help show the it
 											</div>
 										</label>
 									</div>
-									<div class="grid-cell">
+									<div class="grid-cell united-states-customary-units">
 										<input type="text" name="attr_travel_total_miles" value="30.00" readonly class="input-disabled medium-width" />
+									</div>
+									
+									<div class="grid-cell metric-units">
+										<label>
+											<div class="standard-tooltip">
+												<span data-i18n="total-kilometers-label">Total Kilometers</span>:
+												<span class="tooltiptext">
+													<span data-i18n="travel-total-kilometers-tooltip">Total kilometers traveled in the day.</span>
+												</span>
+											</div>
+										</label>
+									</div>
+									<div class="grid-cell metric-units">
+										<input type="text" name="attr_travel_total_kilometers" value="48.3" readonly class="input-disabled medium-width" />
 									</div>
 									<!-- /row 2 -->
 									
@@ -18580,7 +18615,13 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<!-- current version notes: 2.10.4 -->
 			<ul>
-				<li><b>ENHANCEMENT:</b> Travel Time and Distances tool. The <b>Add Items</b> button is functional and can be used to add a number default skills to use.</li>
+				<li><b>NEW:</b> Added new sheet option <b>Use Metric Distances</b>, which is currently only implemented by the <b>Travel Time and Distance tool.</b></li>
+				<li><b>ENHANCEMENT:</b> Travel Time and Distances tool.
+					<ul>
+						<li>The <b>Add Items</b> button is functional and can be used to add a number default skills to use.</li>
+						<li>If the sheet option <b>Use Metric Distances</b> has been selected, values will display in metric.</li>
+					</ul>
+				</li>
 			</ul>
 
 
@@ -20587,6 +20628,15 @@ Select the indent level of the inventory item. This is handy to help show the it
 							</span>
 							<span class="tooltip">
 								<span data-i18n="use-metric-tooltip">If checked, labels will be changed from LBS (pounds) to KG (kiligrams) and encumbrance formula will use metric weights.</span>
+							</span>
+						</div>
+						<div>
+							<input type="checkbox" name="attr_use_metric_distances" value="1" />
+							<span class="popup">
+								<span data-i18n="use-metric-distances-label">Use Metric Distances</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="use-metric-distances-tooltip">If checked, the tool <b>Travel Time and Distances</b> will display results in metric.</span>
 							</span>
 						</div>
 					</div><!-- end malfunction -->
@@ -44940,9 +44990,14 @@ Characters with Skill: ${knowsSkill}`;
 
 			let milesPerHour = Math.round(updatedSpeed / 2 * 100) / 100;
 
+			let kmPerHour = milesPerHour * 1.609344;
+
+			kmPerHour = Math.round(kmPerHour * 100) / 100;
+
 			let keyValues = {
 				travel_final_speed: roundedSpeed.toFixed(2),
-				travel_miles_per_hour: milesPerHour.toFixed(2)
+				travel_miles_per_hour: milesPerHour.toFixed(2),
+				travel_kilometer_per_hour: kmPerHour.toFixed(2)
 			};
 
 			setAttrs(keyValues);
@@ -44976,7 +45031,16 @@ Characters with Skill: ${knowsSkill}`;
 
 			let roundedMiles = Math.round(miles * 100) / 100;
 
-			setAttrs({travel_total_miles: roundedMiles.toFixed(2)});
+			let kilometers = miles * 1.609344;
+
+			kilometers = Math.round(kilometers * 100) / 100;
+
+			let keyValues = {
+				travel_total_miles: roundedMiles.toFixed(2),
+				travel_total_kilometers: kilometers.toFixed(2)
+			};
+
+			setAttrs(keyValues);
 
 		});
 
