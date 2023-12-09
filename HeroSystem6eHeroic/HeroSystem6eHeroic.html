@@ -8859,14 +8859,17 @@
 	arrayOf(maxManeuverNum).forEach(num => {
 		var maneuverId = String(num).padStart(2,'0');	
 		on(`clicked:showMartialRoll${maneuverId}`, (info) => {
-			getAttrs(["whisperToGM"], function(values) {
+			getAttrs(["whisperToGM", "maneuverNormalDamage"+maneuverId], function(values) {
 				var theRoll = values.whisperToGM||"";
+				let isNormalDamage = values["maneuverNormalDamage"+maneuverId] != 0;
 				
 				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Martial Maneuver - @{martialManeuverName"+maneuverId+"}}} "
+					+ "{{subtitle= Maneuver - @{martialManeuverName"+maneuverId+"}}} "
 					+ "{{Phases=@{martialManeuverPhase"+maneuverId+"}}} "
+					+ "{{END = @{maneuverEndurance"+maneuverId+"}}} "
 					+ "{{OCV = @{martialManeuverOCV"+maneuverId+"}}} "
 					+ "{{DCV = @{martialManeuverDCV"+maneuverId+"}}} "
+					+ "{{Damage = @{maneuverDamage"+maneuverId+"}" + (isNormalDamage ? " N" : " K") + "}} "
 					+ "{{desc=@{martialManeuverEffect"+maneuverId+"}}}";
 				
 				startRoll(theRoll, (results) => {
@@ -8883,7 +8886,7 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX.
 			
-			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId,"martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "maneuverEndurance"+maneuverId, "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "treasures", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
+			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "maneuverEndurance"+maneuverId, "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "treasures", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["maneuverNormalDamage"+maneuverId] != 0;
@@ -8925,12 +8928,11 @@
 					if (subtractENDAmt != 0) {
 						theRoll	+= "{{END=[[@{maneuverEndurance"+maneuverId+"}]] (@{currentEND})}}";
 					}
-					
 				} 
 				
 				let debug = values.treasures||"";
 				// debug += " damage = " + values["hiddenManeuverDamage"+maneuverId];
-				debug += " roll = " + otherDmgType;
+				debug += " roll = " + theRoll;
 				setAttrs({
 					"treasures":debug
 				});
