@@ -22,7 +22,7 @@
 				<!--In some cases, a sheetworker changes the formula to remove the "Other Modifiers" prompt. In other cases, there is a duplicate button which is hidden.-->
 				<input type="checkbox" value="1" name="attr_QuerySkillModifier" checked title="When rolling a check, ask if there are any other modifiers. (This may not work if you have modified the skill formulas.) If you add a custom skill, you must re-check this box."/>&nbsp;<span class="not-show">"Other Modifiers" prompt on skill checks</span><br/>
 				<input type="checkbox" value="1" name="attr_QueryAttackModifier" checked title="When rolling an attack, ask if there are any other modifiers. (This may not work if you have modified the attack formulas.) If you add an attack, you must re-check this box."/>&nbsp;<span class="not-show">"Other Modifiers" prompt on attack rolls</span><br/>
-				<input type="checkbox" value="1" name="attr_SpeedExtra-show" title="Speed Notes" />&nbsp;<span class="not-show">Speed notes</span><br/>
+				<input type="checkbox" value="1" name="attr_QueryForceModifier" checked title="When rolling an force power, ask if there are any other modifiers. (This may not work if you have modified the force power formulas.) If you add a force power, you must re-check this box."/>&nbsp;<span class="not-show">"Other Modifiers" prompt on force rolls</span><br/>
 				<input type="checkbox" value="1" name="attr_DR-Show" title="Show/Hide Damage Reduction" />&nbsp;<span class="not-show">Damage Reduction</span><br/>
 				<input type="checkbox" value="1" name="attr_SR-Show" title="Show/Hide Shield Rating" />&nbsp;<span class="not-show">Shield Rating</span><br/>
 				<input type="checkbox" value="1" name="attr_immune-Show" title="Show/Hide Immunities" />&nbsp;<span class="not-show">Immunities</span><br/>
@@ -1889,8 +1889,8 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 					<div class="sheet-table-row">
 						<div class="sheet-table">
 							<div class="sheet-table-row">
-								<span class="sheet-table-data">	<button type="roll" name="roll_ForcePowerCheck" value="@{ForcePowerFormula}" title="Attack Roll"> </button>	</span>
-								<span class="sheet-table-data">	<input type="text" name="attr_ForcePowerName" placeholder="Force Power Name" style="width:100%" title="Weapon Name @{repeating_forcepowers_X_WeaponName}" />	</span>
+								<span class="sheet-table-data">	<button type="roll" name="roll_ForcePowerCheck" value="@{AttackFormula}" title="Attack Roll"> </button>	</span>
+								<span class="sheet-table-data">	<input type="text" name="attr_ForcePowerName" placeholder="Force Power Name" style="width:100%" title="Weapon Name @{repeating_forcepowers_X_ForcePowerName}" />	</span>
 								<span class="sheet-table-data" style="text-align: right;">	<b>Details</b>	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="sect-show showhidetoggle" title="Show/Hide Attack Template Formula" name="attr_AttackFormula-show" value="1" /><span/>	</span>								
 							</div>
 						</div>
@@ -1901,8 +1901,8 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 							<div class="sheet-table">
 								<span class="sheet-table-data" style="width:44px;"> </span>
 								<span class="sheet-table-data atkFormula">    
-									<span class="sheet-small"><b>Description</b></span><br />
-									<textarea type="text" name="attr_ForcePowerDesc" class="atkFormula" title="Attack Template formula @{repeating_forcepowers_X_AttackFormula}" ></textarea> 
+									<span class="sheet-small"><b>Force Power Notes</b></span><br />
+									<textarea type="text" name="attr_ForcePowerNotes" class="atkFormula" title="Force Power Notes @{repeating_forcepowers_X_ForcePowerNotes}" ></textarea> 
 								</span>
 							</div>
 						</span>
@@ -1913,7 +1913,7 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 							<span class="sheet-table-data" style="width:44px">		</span>
 							<span class="sheet-table-data atkFormula">
 								<span class="sheet-small"><b>Force Power Formula</b></span>	<br />
-								<textarea type="text" name="attr_ForcePowerFormula" class="atkFormula" title="Attack Template formula @{repeating_forcepowers_X_AttackFormula}" ></textarea> 
+								<textarea type="text" name="attr_AttackFormula" class="atkFormula" title="Force Power formula @{repeating_forcepowers_X_AttackFormula}" ></textarea> 
 							</span>
 						</div>	</span>
 					</div>				
@@ -7076,5 +7076,38 @@ on('change:xp change:autoleveling', function (value) {
         isProcessing = false;
     });
 });
+
+//If this doesn't work it's because the formula Other doesn't match the strings as follows
+on('change:QueryForceModifier', () => {
+  getSectionIDs('repeating_forcepowers', (idArray) => {
+    // create an array of all the repeating section attribute names we want to get the values of.
+    const getArr = idArray.map((id) => `repeating_forcepowers_${id}_AttackFormula`);
+    getAttrs(['QueryForceModifier', ...getArr], (attributes) => {
+      // An object to store our changes in
+      const setObj = {};
+      //Assuming that QueryForceModifier is 1 when it should be the query and 0 when it should be just the 0[Other]
+      let replaceRx;
+      let replaceContent;
+	  
+      if (+attributes.QueryForceModifier) {
+        replaceRx = /0\[other\]/gi;
+        replaceContent = '?{Other Modifiers|0}[Other]';
+      } else {
+        replaceRx = /\?\{Other Modifiers|0\}\[Other\]/gi;
+        replaceContent = '0[Other]';
+      }
+      console.log('replaceRx:', replaceRx);
+      console.log('replaceContent:', replaceContent);
+      idArray.forEach((id) => {
+        const attrName = `repeating_forcepowers_${id}_AttackFormula`;
+        setObj[attrName] = attributes[attrName].replace(replaceRx, replaceContent);
+      });
+      console.log('setObj:', setObj);
+      // Apply our changes
+      setAttrs(setObj, { silent: true });
+    });
+  });
+});
+
 
 </script>
