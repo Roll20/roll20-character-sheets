@@ -216,6 +216,7 @@ wiz1['Comprehend Languages'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 161',
+    'errata': 'Sage Advice #266 p. 22',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -256,11 +257,11 @@ wiz1['Detect Magic'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 237',
-    'errata': 'Sage Advice #213 p. 85\nSage Advice #245 p. 17',
+    'errata': 'Dungeon Master Guide p. 161\nSage Advice #213 p. 85\nSage Advice #214 p. 78-79\nSage Advice #243 p. 22\nSage Advice #245 p. 17-18\nSage Advice #254 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *detect magic* spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[{10*[[@{level-wizard}]],100}kl1]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.\n&emsp;Casting *detect magic* on a cursed item generally indicates the school of magic the cursed item is imitating, i.e. *dust of sneezing and choking* that imitates *dust of disappearance* would radiate illusion/phantasm magic. If the *dust* imitates *dust of appearance* it would radiate divination or abjuration magic.'
+    'effect': 'When the *detect magic* spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[{10*[[@{level-wizard}]],100}kl1]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, a yard or more of solid wood, or a *wall of force* blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.\n&emsp;Casting *detect magic* on a cursed item generally indicates the school of magic the cursed item is imitating, i.e. *dust of sneezing and choking* that imitates *dust of disappearance* would radiate illusion/phantasm magic. If the *dust* imitates *dust of appearance* it would radiate divination or abjuration magic.'
 };
 
 wiz1['Detect Undead'] = {
