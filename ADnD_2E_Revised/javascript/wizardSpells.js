@@ -56,6 +56,7 @@ wiz1['Armor'] = {
     'reference': 'p. 170',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 55',
+    'errata': 'Sage Advice #242 p. 18',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -114,6 +115,7 @@ wiz1['Cantrip'] = {
     'reference': 'p. 171',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 123',
+    'errata': 'Sage Advice #235 p. 71',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -152,6 +154,7 @@ wiz1['Charm Person'] = {
     'reference': 'p. 171',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 137',
+    'errata': 'Dungeon Master Guide p. 89-90\nSage Advice #157 p. 24\nSage Advice #215 p. 88\nSage Advice #232 p. 94\nSage Advice #262 p. 23\nSage Advice #273 p. 117',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -192,11 +195,11 @@ wiz1['Color Spray'] = {
     'reference': 'p. 172',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 154',
-    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #213 p. 85\nSage Advice #256 p. 28\nSage Advice #273 p. 114\nDungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Player’s Handbook p. 168\nDungeon Master Guide p. 139+160\nSage Advice #201 p. 45\nSage Advice #256 p. 28\nSage Advice #260 p. 23\nSage Advice #273 p. 114\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.}}{{blindness=1'
+    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six ([[1d6]]) creatures within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.}}{{blindness=1'
 };
 
 wiz1['Comprehend Languages'] = {
