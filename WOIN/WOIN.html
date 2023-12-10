@@ -94,7 +94,7 @@
                         <button type="roll" class="sheet-rollatrrib" name="roll_psi" value="&{template:default} {{name= Psionics}} {{roll= [[(@{psionics_1} + ?{Modifiers (d6)|0})d6]]}}">PSI</button></th>
                     </div>
                     <div class="sheet-block2">
-                        <button type="roll" class="sheet-rollatrrib" name="roll_psi" value="&{template:default} {{name= Magic}} {{roll= [[(@{Magic_1} + ?{Modifiers (d6)|0})d6]]}}">MAG</button></th>
+                        <button type="roll" class="sheet-rollatrrib" name="roll_mag" value="&{template:default} {{name= Magic}} {{roll= [[(@{magic_1} + ?{Modifiers (d6)|0})d6]]}}">MAG</button></th>
                     </div>
                 </th>
             </tr>
@@ -597,7 +597,7 @@
                             <th>Skill dice pool</th>
                             <th>Dmg pool</th>
 							<th>Dmg pts</th>
-                            <th>+Dmg d6</th>
+                            <th>TradeD6</th>
                             <th>Alt dmg</th>
                             <th>Secondary damage type</th>
                             <th></th>
@@ -652,7 +652,7 @@
                                     <option value="@{charisma}">Charisma</option>
                                     <option value="@{luck}">Luck</option>
                                     <option value="@{repuation}">Reputation</option>
-                                    <option value="@{psionics}">Psionics</option>
+                                    <option value="@{magic}">Magic</option>
                                 </select>
                             </td>
                             <td><input type="text" class="sheet-text3" style="width:70px;" name="attr_weapon1_size" placeholder="Tiny" /></td>
@@ -668,7 +668,7 @@
                             <th>Skill dice pool</th>
                             <th>Dmg pool</th>
 							<th>Dmg pts</th>
-                            <th>+Dmg d6</th>
+                            <th>TradeD6</th>
                             <th>Alt dmg</th>
                             <th>Secondary damage type</th>
                             <th></th>
@@ -810,7 +810,7 @@
     	<input type="radio" class="sheet-block1 sheet-hidden" name="attr_sheet_type11" value="0" checked/><span></span>
         <input type="radio" class="sheet-block2 sheet-hidden" name="attr_sheet_type11" value="1"/><span></span>
         <div class="sheet-block1">
-			<div class="sheet-header">Condition Track</div>
+			<div class="sheet-header">Status Track</div>
             <table style="width:800px;">
                 <tr>
                     <td>Damage Type</td>
@@ -1105,7 +1105,7 @@
             </table>
 		</div>
 		<div class="sheet-block2">
-			<div class="sheet-header">Status Track</div>
+			<div class="sheet-header">Condition Track</div>
             <table style="width:800px;">
                 <tr>
                     <td>Damage Type</td>
@@ -1808,12 +1808,12 @@ on("change:repeating_skillsnew:skill_select change:repeating_skillsnew:skill_rat
 });
 
     //Skill Dice Limit Dice, skillsold
-on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rating", function() {
-    getAttrs(["repeating_skillsold_skill_select", "repeating_skillsold_skill_rating", "maximum_dice_pool", "magic", "psionics", "repuation", "luck", "charisma", "willpower", "logic", "intuition", "endurance", "agility", "strength"], function(values) {
+on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rating change:repeating_skillsold:skill_dice", function() {
+    getAttrs(["repeating_skillsold_skill_select", "repeating_skillsold_skill_rating", "repeating_skillsold_skill_dice","maximum_dice_pool", "magic", "psionics", "repuation", "luck", "charisma", "willpower", "logic", "intuition", "endurance", "agility", "strength"], function(values) {
 
         if (values.repeating_skillsold_skill_select == 0) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'None',
                 repeating_skillsold_skill_attrib_score: 0
@@ -1821,7 +1821,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 1) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.strength,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.strength,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Strength',
                 repeating_skillsold_skill_attrib_score: +values.strength
@@ -1829,7 +1829,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 2) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.agility,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.agility,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Agility',
                 repeating_skillsold_skill_attrib_score: +values.agility
@@ -1837,7 +1837,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 3) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.endurance,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.endurance,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Endurance',
                 repeating_skillsold_skill_attrib_score: +values.endurance
@@ -1845,7 +1845,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 4) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.intuition,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.intuition,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Intuition',
                 repeating_skillsold_skill_attrib_score: +values.intuition
@@ -1853,7 +1853,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 5) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.logic,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.logic,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Logic',
                 repeating_skillsold_skill_attrib_score: +values.logic
@@ -1861,7 +1861,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 6) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.willpower,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.willpower,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Willpower',
                 repeating_skillsold_skill_attrib_score: +values.willpower
@@ -1869,7 +1869,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 7) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.charisma,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.charisma,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Charisma',
                 repeating_skillsold_skill_attrib_score: +values.charisma
@@ -1877,7 +1877,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 8) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.luck,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.luck,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Luck',
                 repeating_skillsold_skill_attrib_score: +values.luck
@@ -1885,7 +1885,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 9) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.repuation,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.repuation,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Reputation',
                 repeating_skillsold_skill_attrib_score: +values.repuation
@@ -1893,7 +1893,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 10) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.psionics,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.psionics,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Psionics',
                 repeating_skillsold_skill_attrib_score: +values.psionics
@@ -1901,7 +1901,7 @@ on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rat
         }
 		else if(values.repeating_skillsold_skill_select == 11) {
             setAttrs({ 
-                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_rating + +values.magic,
+                repeating_skillsold_skill_total: +values.repeating_skillsold_skill_dice + +values.magic,
                 repeating_skillsold_skill_max_dice: +values.maximum_dice_pool,
                 repeating_skillsold_skill_attrib: 'Magic',
                 repeating_skillsold_skill_attrib_score: +values.magic
