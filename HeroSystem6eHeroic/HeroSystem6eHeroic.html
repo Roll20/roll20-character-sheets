@@ -7954,7 +7954,7 @@
 			case "str":
 			theSkillRollChance=standardSkillChance( strengthChance,skillCP,bonusLevels);
 			break;
-	
+			
 			case "dex":
 			theSkillRollChance=standardSkillChance( dexterityChance,skillCP,agilitySkillLevels+bonusLevels);
 			break;
@@ -7986,7 +7986,7 @@
 			case "dexPS":
 			theSkillRollChance=knowledgeIntSkillChance( dexterityChance, enhancerJack,skillCP,bonusLevels);
 			break;
-	
+			
 			case "ks":
 			theSkillRollChance=knowledgeSkillChance( enhancerSch,skillCP,bonusLevels);
 			break;
@@ -8002,7 +8002,7 @@
 			case "intSS":
 			theSkillRollChance=knowledgeIntSkillChance( intelligenceChance, enhancerSci, skillCP,bonusLevels);
 			break;
-	
+			
 			case "ak":
 			theSkillRollChance=knowledgeSkillChance( enhancerTrav,skillCP,bonusLevels);;
 			break;
@@ -8059,7 +8059,7 @@
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
-	
+				
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses "+displayName+" }} ";
 					if (characteristic == 'dexterity') {
@@ -8090,7 +8090,7 @@
 		on (`clicked:perceptionRoll${percType}`, (info) => {
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
 				var theRoll = values.whisperToGM||"";
-
+				
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
 						+ "{{SUCCESS= [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]-3d6cf6cs1[Roll]";
@@ -8119,7 +8119,7 @@
 		on(`clicked:testSkill${skillId}`, (info) => {
 			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
 				var theRoll = values.whisperToGM||"";
-
+				
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
 						+ "{{SUCCESS=[[@{skillRollChance"+skillId+"}[Skill Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}"
@@ -8890,9 +8890,11 @@
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["maneuverNormalDamage"+maneuverId] != 0;
+				// let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
+				let stunMod = 0; // Reserved for later use.
 				let isBlocking = values["maneuverBlock"+maneuverId] != 0;
 				
-				// Martial maneuvers by default cost no endurance. Come back to this.
+				// Martial maneuvers by default cost no endurance. Endurance costs used for flexibility.
 				let subtractENDAmt =  parseInt(values["maneuverEndurance"+maneuverId])||0;
 				
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
@@ -8940,6 +8942,7 @@
 				if (!isBlocking) {
 					startRoll(theRoll, (results) => {
 						let computed = parseInt(results.results[dmgType].result)||0;
+						let theMessage = "";
 						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 						
 						// Get hit location message if system used.
@@ -8953,6 +8956,7 @@
 							// Convert dice roll to equivalent BODY damage.
 							computed = convertStunToBody(results.results.STUN.rolls);
 						else {
+							theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
 							computed *= theSTUNMultiplier;
 											
 							computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
@@ -9331,9 +9335,9 @@
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["weaponNormalDamage"+weaponId] != 0;
 				let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
-
+				
 				let subtractENDAmt = parseInt(values["weaponEndurance"+weaponId])||0;
-
+				
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
@@ -9357,30 +9361,30 @@
 						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 				if (useHitLocations)
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
-	
+					
 				startRoll(theRoll, (results) => {
 					let computed = parseInt(results.results[dmgType].result)||0;
 					let theMessage = "AOE";
 					let theSTUNMultiplier = Math.floor(Math.random()*3+1);
-
-
+					
+					
 					// Get hit location message if system used.
 					if (useHitLocations && !areaOfEffect) {
 						let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 						theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 						theSTUNMultiplier = theHitLocation.STUNx;
 					}
-
+					
 					if (isNormalDamage) {
 						// Convert dice roll to equivalent BODY damage.
 						computed = convertStunToBody(results.results.STUN.rolls);
 					} else {
 						theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
 						computed *= theSTUNMultiplier;
-
+						
 						computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
 					}
-
+					
 					let theResult = new Object();
 					theResult[otherDmgType] = computed;
 					theResult.HITLOC = theMessage;
@@ -9389,7 +9393,7 @@
 					if (values.optionAutoSubtractEND != 0) {
 						subtractEndurance(subtractENDAmt);
 					}
-
+					
 					finishRoll(results.rollId, theResult);
 				});
 			});
@@ -9398,22 +9402,22 @@
 	
 	on('clicked:attackShield', (info) => {
 		// Roll attack and damage dice for the shield.
-						
+			
 		getAttrs(["shieldNormalDamage", "shieldStunMod", "shieldEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let isNormalDamage = values.shieldNormalDamage != 0;
 			let stunMod = parseInt(values.shieldStunMod)||0;
 			let dispDoS = values.displayDegreeOfSuccess != 0;
-
+			
 			let subtractENDAmt = parseInt(values.shieldEndurance)||0;
-
+			
 			let dmgType = isNormalDamage ? "STUN" : "BODY";
 			let otherDmgType = isNormalDamage ? "BODY" : "STUN";
-
+			
 			theRoll += "?{Blocking|Yes,";
 			// This a nested query so we need to use &rbrace; for } and &#124; for |
-
+			
 			// Blocking Roll
 			theRoll += "&{template:custom-defense&rbrace; {{title=@{character_name} - @{character_title}&rbrace;&rbrace; "
 					+ "{{subtitle=Blocks with @{shieldName}&rbrace;&rbrace; ";
@@ -9423,10 +9427,10 @@
 				theRoll += "{{OCV=[[@{ocv}[OCV]+@{shieldOCV}[Shield OCV]+@{shieldDCV}[ShieldDCV]+?{Modifiers&#124;0&rbrace;[Modifier]]]&rbrace;&rbrace; "
 					+ "{{Result=[[3d6cf6cs1]]&rbrace;&rbrace; ";
 			}
-
+			
 			// The second option in the nested query
 			theRoll += "|No,";
-
+			
 			// Attacking Roll
 			theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")+"-attack&rbrace; {{title=@{character_name} - @{character_title}&rbrace;&rbrace; "
 					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{shieldName}&rbrace;&rbrace; ";
@@ -9441,38 +9445,38 @@
 					+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]&rbrace;&rbrace;";
 			if (useHitLocations)
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]&rbrace;&rbrace;";
-
+				
 			// End Nested Query
 			theRoll += "}";
-
+			
 			startRoll(theRoll, (results) => {
 				let theMessage = "AOE";
 				let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 				let computed = parseInt(results.results[dmgType]?.result)||0;
-
+				
 				// No Damage Sections for Blocking
 				let isBlocking = results.results.STUN == undefined;
-
+				
 				// Get hit location message if system used.
 				if (useHitLocations && !isBlocking) {
 					var theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.STUNx;
 				}
-
+				
 				if (isNormalDamage && !isBlocking) {
 					// Convert dice roll to equivalent BODY damage.
 					computed = convertStunToBody(results.results.STUN.rolls);
 				} else {
 					theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
 					computed *= theSTUNMultiplier;
-
+					
 					if (theSTUNMultiplier != 1)
 						computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
 				}
-
+				
 				let theResult = new Object();
-
+				
 				if (!isBlocking) {
 					theResult[otherDmgType] = computed;
 					theResult.HITLOC = theMessage;
@@ -9482,7 +9486,7 @@
 				if (!isBlocking && values.optionAutoSubtractEND != 0) {
 					subtractEndurance(subtractENDAmt);
 				}
-
+				
 				finishRoll(results.rollId, theResult);
 			});				
 		});
