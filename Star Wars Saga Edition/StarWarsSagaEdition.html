@@ -46,13 +46,13 @@
 				<div class="sheet-col">
 					<div class="sheet-textHead" >NPC Sheet</div>
 					<div class="rule-sections">
-						<input type="checkbox" value="1" checked name="attr_OldAttacks-Show" title="Not backwards compatible. Disable on old Character Sheets."/>&nbsp;<span class="not-show">Updated Attack Section</span><br/>
-						<span>Choose individual skills</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" value="1" name="attr_reveal-skill-options" class="sect-show showhidetoggle" title="Show skill options" /><br/>
+						<input type="checkbox" value="1" checked name="attr_OldAttacks-Show" title="Not backwards compatible. Disable on old Character Sheets."/>&nbsp;<span class="not-show">Updated Attack Section</span><br/>						
+						<input type="checkbox" value="1" name="attr_reveal-skill-options" class="sect-show" title="Show skill options"/>&nbsp;<span class="not-show">Choose individual skills</span><br/>
 						<div class="sect rule-sections" style="margin-bottom:0px;">
 							<div>
-								<input type="checkbox" name="attr_NoneNPCSkills" class="sheet-hidden" id="NPCSkills1"/><label for="NPCSkills1" style="cursor:pointer"><span class="sheet-small">[none]</span></label>
-								<input type="checkbox" name="attr_CrucialNPCSkills" class="sheet-hidden" id="NPCSkills2"/><label for="NPCSkills2" style="cursor:pointer"><span class="sheet-small">[crucial]</span></label>
-								<input type="checkbox" name="attr_StandardNPCSkills" class="sheet-hidden" id="NPCSkills3"/><label for="NPCSkills3" style="cursor:pointer"><span class="sheet-small">[standard]</span></label>
+								<input type="checkbox" name="attr_NPCSkills" class="sheet-hidden" value="0" id="NPCSkills1"/><label for="NPCSkills1" style="cursor:pointer"><span class="sheet-small">[none]</span></label>
+								<input type="checkbox" name="attr_NPCSkills" class="sheet-hidden" value="1" id="NPCSkills2"/><label for="NPCSkills2" style="cursor:pointer"><span class="sheet-small">[crucial]</span></label>
+								<input type="checkbox" name="attr_NPCSkills" class="sheet-hidden" value="2" id="NPCSkills3"/><label for="NPCSkills3" style="cursor:pointer"><span class="sheet-small">[standard]</span></label>
 							</div>
 							<input type="checkbox" value="1" checked name="attr_show-Acrobatics" title="Show Acrobatics skill?" />&nbsp;<span class="not-show">Acrobatics</span><br/>
 							<input type="checkbox" value="1" name="attr_show-Athletics" title="Show Athletics skill?" />&nbsp;<span class="not-show">Athletics (house rule)</span><br/>
@@ -6064,10 +6064,7 @@ on("change:level change:dex", function() {
 on("change:size", function() {
 	SizeUpdate();
 });
-/* Not exactly sure why this doesn't work for attributes like it does for the level. The console log indicates success...*/
-//on("change:level change:str change:con change:int change:wis change:cha", function() {
-//	SkillUpdate();
-//});
+
 //Changes to Armor
 on("change:armorworncheck change:armorprof", function() {
 	ArmorUpdate();
@@ -6107,94 +6104,45 @@ on("change:NoConstitution", function() {
 		});
 	});
 });
-on("change:NoneNPCSkills",function() {
-	setAttrs({
-		"show-Acrobatics":0,
-		"show-Athletics":0,
-		"show-Climb":0,
-		"show-Deception":0,
-		"show-Endurance":0,
-		"show-GatherInformation":0,
-		"show-Initiative":0,
-		"show-Jump":0,
-		"show-KnowledgeBureaucracy":0,
-		"show-KnowledgeGalacticLore":0,
-		"show-KnowledgeLifeSciences":0,
-		"show-KnowledgePhysicalSciences":0,
-		"show-KnowledgeSocialSciences":0,
-		"show-KnowledgeTactics":0,
-		"show-KnowledgeTechnology":0,
-		"show-Mechanics":0,
-		"show-Perception":0,
-		"show-Persuasion":0,
-		"show-Pilot":0,
-		"show-Ride":0,
-		"show-Stealth":0,
-		"show-Survival":0,
-		"show-Swim":0,
-		"show-TreatInjury":0,
-		"show-UseComputer":0,
-		"show-UsetheForce":0
-	});
+const noneSkills = [
+    "Acrobatics", "Athletics", "Climb", "Deception", "Endurance", "GatherInformation",
+    "Initiative", "Jump", "KnowledgeBureaucracy", "KnowledgeGalacticLore", "KnowledgeLifeSciences",
+    "KnowledgePhysicalSciences", "KnowledgeSocialSciences", "KnowledgeTactics", "KnowledgeTechnology",
+    "Mechanics", "Perception", "Persuasion", "Pilot", "Ride", "Stealth", "Survival", "Swim",
+    "TreatInjury", "UseComputer", "UsetheForce"
+];
+
+const crucialSkills = [
+    "Acrobatics", "Deception", "Initiative", "Perception", "Persuasion", "Stealth"
+];
+
+const standardSkills = [
+    "Acrobatics", "Climb", "Deception", "Endurance", "GatherInformation", "Initiative", "Jump",
+    "KnowledgeBureaucracy", "KnowledgeGalacticLore", "KnowledgeLifeSciences", "KnowledgePhysicalSciences",
+    "KnowledgeSocialSciences", "KnowledgeTactics", "KnowledgeTechnology", "Mechanics", "Perception",
+    "Persuasion", "Pilot", "Ride", "Stealth", "Survival", "Swim", "TreatInjury", "UseComputer"
+];
+
+on("change:NPCSkills", function() {
+    getAttrs(["NPCSkills"], function(values) {
+        const npcSkills = parseInt(values.NPCSkills);
+
+        let setAttrsObj = {};
+        if (npcSkills === 0) {
+            setAttrsObj = noneSkills.reduce((obj, skill) => ({ ...obj, [`show-${skill}`]: 0 }), {});
+        } else if (npcSkills === 1) {
+            setAttrsObj = {
+                ...noneSkills.reduce((obj, skill) => ({ ...obj, [`show-${skill}`]: 0 }), {}),
+                ...crucialSkills.reduce((obj, skill) => ({ ...obj, [`show-${skill}`]: 1 }), {})
+            };
+        } else if (npcSkills === 2) {
+            setAttrsObj = standardSkills.reduce((obj, skill) => ({ ...obj, [`show-${skill}`]: 1 }), {});
+        }
+
+        setAttrs(setAttrsObj);
+    });
 });
-on("change:CrucialNPCSkills",function() {
-	setAttrs({
-		"show-Acrobatics":1,
-		"show-Athletics":0,
-		"show-Climb":0,
-		"show-Deception":1,
-		"show-Endurance":0,
-		"show-GatherInformation":0,
-		"show-Initiative":1,
-		"show-Jump":0,
-		"show-KnowledgeBureaucracy":0,
-		"show-KnowledgeGalacticLore":0,
-		"show-KnowledgeLifeSciences":0,
-		"show-KnowledgePhysicalSciences":0,
-		"show-KnowledgeSocialSciences":0,
-		"show-KnowledgeTactics":0,
-		"show-KnowledgeTechnology":0,
-		"show-Mechanics":0,
-		"show-Perception":1,
-		"show-Persuasion":1,
-		"show-Pilot":0,
-		"show-Ride":0,
-		"show-Stealth":1,
-		"show-Survival":0,
-		"show-Swim":0,
-		"show-TreatInjury":0,
-		"show-UseComputer":0
-	});
-});
-on("change:StandardNPCSkills",function() {
-	setAttrs({
-		"show-Acrobatics":1,
-		"show-Athletics":0,
-		"show-Climb":1,
-		"show-Deception":1,
-		"show-Endurance":1,
-		"show-GatherInformation":1,
-		"show-Initiative":1,
-		"show-Jump":1,
-		"show-KnowledgeBureaucracy":1,
-		"show-KnowledgeGalacticLore":1,
-		"show-KnowledgeLifeSciences":1,
-		"show-KnowledgePhysicalSciences":1,
-		"show-KnowledgeSocialSciences":1,
-		"show-KnowledgeTactics":1,
-		"show-KnowledgeTechnology":1,
-		"show-Mechanics":1,
-		"show-Perception":1,
-		"show-Persuasion":1,
-		"show-Pilot":1,
-		"show-Ride":1,
-		"show-Stealth":1,
-		"show-Survival":1,
-		"show-Swim":1,
-		"show-TreatInjury":1,
-		"show-UseComputer":1
-	});
-});
+
 on("clicked:SecondWind", function() {
     getAttrs(["hp_max", "hp", "Second_Wind", "Second_Wind_Count", "hidden_second_wind"], function(values) {
         let hp_max = parseInt(values.hp_max) || 0;
