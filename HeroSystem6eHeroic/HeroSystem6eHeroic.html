@@ -1247,7 +1247,7 @@
 									</button>
 								</div>
 							</div>
-							<input type="text" name="attr_martialManeuverName01" title="@{martialManeuverName01}" value="" maxlength="34" tabindex="170"/>
+							<input type="text" name="attr_martialManeuverName01" title="@{martialManeuverName01}" value="Basic HTH Strike" maxlength="34" tabindex="170"/>
 							<div class="maneuver-mover-plus-minus-enclosure">
 								<div class="maneuver-mover-plus-minus-button">
 									<button type="action" class="button buttonPlus" tabindex="-1" name="act_martialManeuverUp01">
@@ -1268,8 +1268,8 @@
 								<div class="subitem-flex-container-martial-details-column">
 									
 									<div class="subitem-martial-description-row">
-										<input type="text" name="attr_martialManeuverEffect01" title="@{martialManeuverEffect01}" value="" maxlength="100" tabindex="173"/>
-										<input type="number" value="0" step="1" min="0" name="attr_maneuverEndurance01" title="@{maneuverEndurance01}" tabindex="174"/>
+										<input type="text" name="attr_martialManeuverEffect01" title="@{martialManeuverEffect01}" value="Damage by STR" maxlength="100" tabindex="173"/>
+										<input type="number" value="2" step="1" min="0" name="attr_maneuverEndurance01" title="@{maneuverEndurance01}" tabindex="174"/>
 									</div>
 										
 									<div class="subitem-flex-container-martial-cv-damage-row">
@@ -1280,7 +1280,7 @@
 										<input type="number" name="attr_martialManeuverDCV01" title="@{martialManeuverDCV01}" value="0" step="1" tabindex="176"/>
 										
 										<h1>DMG:</h1>
-										<input type="text" name="attr_maneuverDamage01" title="@{maneuverDamage01}" value="0" maxlength="12" tabindex="177"/>
+										<input type="text" name="attr_maneuverDamage01" title="@{maneuverDamage01}" value="2d6" maxlength="12" tabindex="177"/>
 										
 										<h1>N:</h1>
 										
@@ -6133,7 +6133,7 @@
 <input type="hidden" name="attr_hiddenManeuverDamage07"  value="0"/>
 <input type="hidden" name="attr_hiddenManeuverDamage08"  value="0"/>
 <input type="hidden" name="attr_hiddenManeuverDamage09"  value="0"/>
-<input type="hidden" name="attr_hiddenBasicDamage"  value="0"/>
+<input type="hidden" name="attr_hiddenBasicDamage"  value="2d6"/>
 <input type="hidden" name="attr_hiddenBasicEndurance" value="2"/>
 
 <!-- Hidden variables for clean power dice strings -->
@@ -6520,31 +6520,31 @@
 	const maxComplicationNum = 6;
 
 	function arrayOf(num) {
-		// For use in our forEach loops, this creates an array of numbers 1 to num
+		// For use in our forEach loops, this creates an array of numbers 1 to num.
 		return Array.from({length: num}, (_, i) => i + 1);
 	}
 
 	function heroRoundHigh(theNumber) {
 		// In the Hero System rounding favors the player. Here where high is good.
-		let theIntegerPart = Math.floor(theNumber);
-		let theRemainder = Math.floor(100*(theNumber-theIntegerPart))/100;
+		let theIntegerPart = Math.trunc(theNumber);
+		let theRemainder = (theNumber%1).toFixed(4);
 		
-			if (theRemainder<=0.4) {
+			if (theRemainder <= 0.4) {
 				return theIntegerPart;
 			} else {
-				return theIntegerPart+1;
+				return theIntegerPart + 1;
 			}
 	}
 	
 	function heroRoundLow(theNumber) {
 		// In the Hero System rounding favors the player. Here where low is good.
-		let theIntegerPart = Math.floor(theNumber);
-		let theRemainder = Math.floor(100*(theNumber-theIntegerPart))/100;
+		let theIntegerPart = Math.trunc(theNumber);
+		let theRemainder = (theNumber%1).toFixed(4);
 		
-			if (theRemainder<0.6) {
-				return theIntegerPart;
+			if (theRemainder >= 0.6) {
+				return theIntegerPart + 1;
 			} else {
-				return theIntegerPart+1;
+				return theIntegerPart;
 			}
 	}
 	
@@ -8651,9 +8651,37 @@
 					"martialManeuverOCV"+lowId, "martialManeuverDCV"+lowId, "martialManeuverEffect"+lowId, "maneuverDamage"+lowId, "maneuverNormalDamage"+lowId, "maneuverBlock"+lowId, "maneuverEndurance"+lowId, "martialManeuverName"+highId, "martialManeuverPhase"+highId, "martialManeuverCP"+highId, "martialManeuverOCV"+highId, "martialManeuverDCV"+highId, "martialManeuverEffect"+highId, "maneuverDamage"+highId, "maneuverNormalDamage"+highId, "maneuverBlock"+highId, "maneuverEndurance"+highId], function(values)
 			{
 				var attributes = new Object();
-
-				attributes["martialManeuverName"+lowId] = values["martialManeuverName"+highId];
-				attributes["martialManeuverName"+highId] = values["martialManeuverName"+lowId];
+				
+				// Fix for empty strings. Only a problem because one maneuver is pre-assigned to Basic HTH Strike.
+				// A single space should be an acceptable compromise.
+				theString = values["martialManeuverName"+highId];
+				if ( (theString.length === 0) || (theString === null) ) {
+					attributes["martialManeuverName"+lowId] = " ";
+				} else {
+					attributes["martialManeuverName"+lowId] = values["martialManeuverName"+highId];
+				}
+				
+				theString = values["martialManeuverName"+lowId];
+				if ( (theString.length === 0) || (theString === null) ) {
+					attributes["martialManeuverName"+highId] = " ";
+				} else {
+					attributes["martialManeuverName"+highId] = values["martialManeuverName"+lowId];
+				}
+				
+				theString = values["martialManeuverEffect"+highId];
+				if ( (theString.length === 0) || (theString === null) ) {
+					attributes["martialManeuverEffect"+lowId] = " ";
+				} else {
+					attributes["martialManeuverEffect"+lowId] = values["martialManeuverEffect"+highId];
+				}
+				
+				theString = values["martialManeuverEffect"+lowId];
+				if ( (theString.length === 0) || (theString === null) ) {
+					attributes["martialManeuverEffect"+highId] = " ";
+				} else {
+					attributes["martialManeuverEffect"+highId] = values["martialManeuverEffect"+lowId];
+				}
+				
 				attributes["martialManeuverPhase"+lowId] = values["martialManeuverPhase"+highId];
 				attributes["martialManeuverPhase"+highId] = values["martialManeuverPhase"+lowId];
 				attributes["martialManeuverCP"+lowId] = values["martialManeuverCP"+highId];
@@ -8662,8 +8690,8 @@
 				attributes["martialManeuverOCV"+highId] = values["martialManeuverOCV"+lowId];
 				attributes["martialManeuverDCV"+lowId] = values["martialManeuverDCV"+highId];
 				attributes["martialManeuverDCV"+highId] = values["martialManeuverDCV"+lowId];
-				attributes["martialManeuverEffect"+lowId] = values["martialManeuverEffect"+highId];
-				attributes["martialManeuverEffect"+highId] = values["martialManeuverEffect"+lowId];
+				
+				// Rename to standard "martialManeuver"
 				attributes["maneuverDamage"+lowId] = values["maneuverDamage"+highId];
 				attributes["maneuverDamage"+highId] = values["maneuverDamage"+lowId];
 				attributes["maneuverNormalDamage"+lowId] = values["maneuverNormalDamage"+highId];
@@ -8672,7 +8700,7 @@
 				attributes["maneuverBlock"+highId] = values["maneuverBlock"+lowId];
 				attributes["maneuverEndurance"+lowId] = values["maneuverEndurance"+highId];
 				attributes["maneuverEndurance"+highId] = values["maneuverEndurance"+lowId];
-
+				
 				setAttrs(attributes);
 			});
 		});
@@ -8684,7 +8712,7 @@
 						
 	/* Calculate weapon endurance costs */
 	on("change:optionSuperHeroicEndurance change:weaponStrength01 change:weaponStrength02 change:weaponStrength03 change:weaponStrength04 change:weaponStrength05 change:shieldStrength change:strength", function() {
-		getAttrs(["optionSuperHeroicEndurance", "weaponStrength01", "weaponStrength02", "weaponStrength03", "weaponStrength04", "weaponStrength05","shieldStrength", "strength"], function(values) {
+		getAttrs(["optionSuperHeroicEndurance", "weaponStrength01", "weaponStrength02", "weaponStrength03", "weaponStrength04", "weaponStrength05","shieldStrength", "strength", "martialManeuverName01", "maneuverEndurance01", "treasures"], function(values) {
 			// If optionSuperHeroicEndurance is true, endurance cost is 1 per 5 strength, otherwise it is 1 per 10 strength used.
 											 
 			optionSuperHeroic = values.optionSuperHeroicEndurance;
@@ -8694,40 +8722,56 @@
 				enduranceCostFactor = 10;
 			}
 
-			let enduranceCost01= heroRoundLow( (parseInt(values.weaponStrength01)||0)/enduranceCostFactor );
+			let enduranceCost01 = heroRoundLow( (parseInt(values.weaponStrength01)||0)/enduranceCostFactor );
 			if ( (enduranceCost01<1) && (parseInt(values.weaponStrength01)||0)>0) {
 				enduranceCost01=1
 						}
 						
-			let enduranceCost02= heroRoundLow( (parseInt(values.weaponStrength02)||0)/enduranceCostFactor );
+			let enduranceCost02 = heroRoundLow( (parseInt(values.weaponStrength02)||0)/enduranceCostFactor );
 			if ( (enduranceCost02<1) && (parseInt(values.weaponStrength02)||0)>0) {
 				enduranceCost02=1
 			}
 						
-			let enduranceCost03= heroRoundLow( (parseInt(values.weaponStrength03)||0)/enduranceCostFactor );
+			let enduranceCost03 = heroRoundLow( (parseInt(values.weaponStrength03)||0)/enduranceCostFactor );
 			if ( (enduranceCost03<1) && (parseInt(values.weaponStrength03)||0)>0) {
 				enduranceCost03=1
 			}
 						
-			let enduranceCost04= heroRoundLow( (parseInt(values.weaponStrength04)||0)/enduranceCostFactor );
+			let enduranceCost04 = heroRoundLow( (parseInt(values.weaponStrength04)||0)/enduranceCostFactor );
 			if ( (enduranceCost04<1) && (parseInt(values.weaponStrength04)||0)>0) {
 				enduranceCost04=1
 						}
 						
-			let enduranceCost05= heroRoundLow( (parseInt(values.weaponStrength05)||0)/enduranceCostFactor );
+			let enduranceCost05 = heroRoundLow( (parseInt(values.weaponStrength05)||0)/enduranceCostFactor );
 			if ( (enduranceCost05<1) && (parseInt(values.weaponStrength05)||0)>0) {
 				enduranceCost05=1
 			}
 						
-			let enduranceCostShield= heroRoundLow( (parseInt(values.shieldStrength)||0)/enduranceCostFactor );
+			let enduranceCostShield = heroRoundLow( (parseInt(values.shieldStrength)||0)/enduranceCostFactor );
 			if ( (enduranceCostShield<1) && (parseInt(values.shieldStrength)||0)>0) {
 				enduranceCostShield=1
 			}
 
-			let enduranceCostBasic= heroRoundLow( (parseInt(values.strength)||0)/enduranceCostFactor );
+			let enduranceCostBasic = heroRoundLow( (parseInt(values.strength)||0)/enduranceCostFactor );
 			if ( (enduranceCostBasic<1) && (parseInt(values.strength)||0)>0) {
 				enduranceCostBasic=1
 			}
+			
+			// Check to see if the first maneuver remains the default.
+			// If it is, update its endurance.
+			let defaultName = "Basic HTH Strike";
+			let currentName = values.martialManeuverName01;
+			let theEndurance = enduranceCostBasic;
+			if (currentName.localeCompare(defaultName) === 1) {
+				theEndurance = parseInt( (values.maneuverEndurance01)||0);
+			}
+			
+			let debug = values.treasures||"";
+			// debug += " damage = " + values["hiddenManeuverDamage"+maneuverId];
+			debug += " " + (parseInt(values.strength)||0)/enduranceCostFactor;
+			setAttrs({
+				"treasures":debug
+			});
 			
 			setAttrs({
 				"weaponEndurance01":enduranceCost01,
@@ -8736,7 +8780,8 @@
 				"weaponEndurance04":enduranceCost04,
 				"weaponEndurance05":enduranceCost05,
 				"shieldEndurance":enduranceCostShield,
-				"hiddenBasicEndurance":enduranceCostBasic
+				"hiddenBasicEndurance":enduranceCostBasic,
+				"maneuverEndurance01":theEndurance
 			});
 		});
 	});
@@ -8886,7 +8931,7 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX.
 			
-			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "maneuverEndurance"+maneuverId, "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "treasures", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
+			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "maneuverEndurance"+maneuverId, "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["maneuverNormalDamage"+maneuverId] != 0;
@@ -8931,13 +8976,6 @@
 						theRoll	+= "{{END=[[@{maneuverEndurance"+maneuverId+"}]] (@{currentEND})}}";
 					}
 				} 
-				
-				let debug = values.treasures||"";
-				// debug += " damage = " + values["hiddenManeuverDamage"+maneuverId];
-				debug += " roll = " + theRoll;
-				setAttrs({
-					"treasures":debug
-				});
 				
 				if (!isBlocking) {
 					startRoll(theRoll, (results) => {
@@ -9278,7 +9316,7 @@
 		// This function attempts to clean damage text input into text more likely to be rollable dice.
 		// Only characters 0-9, d, D, +, and - are passed to attack rolls.
 		
-		getAttrs(["shieldDamage", "weaponDamage01", "weaponDamage02", "weaponDamage03", "weaponDamage04", "weaponDamage05", "strength"], function(values) {
+		getAttrs(["shieldDamage", "weaponDamage01", "weaponDamage02", "weaponDamage03", "weaponDamage04", "weaponDamage05", "strength", "martialManeuverName01", "maneuverDamage01"], function(values) {
 		
 			var theShieldDamage=values.shieldDamage;
 			theShieldDamage=theShieldDamage.replace(/[^\ddD\\+\\-]/g,"");
@@ -9310,6 +9348,15 @@
 			
 			var theStrengthDamage=theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
 			
+			// Check to see if the first maneuver remains the default.
+			// If it is, update its damage.
+			let defaultName = "Basic HTH Strike";
+			let currentName = values.martialManeuverName01;
+			let theDamage = theStrengthDamage;
+			if (currentName.localeCompare(defaultName) === 1) {
+				theDamage = values.maneuverDamage01;
+			}
+			
 			setAttrs({
 				"hiddenShieldDamage01":theShieldDamage,
 				"hiddenWeaponDamage01":theWeaponDamage01,
@@ -9317,7 +9364,8 @@
 				"hiddenWeaponDamage03":theWeaponDamage03,
 				"hiddenWeaponDamage04":theWeaponDamage04,
 				"hiddenWeaponDamage05":theWeaponDamage05,
-				"hiddenBasicDamage":theStrengthDamage
+				"hiddenBasicDamage":theStrengthDamage,
+				"maneuverDamage01":theDamage
 			});
 		});
 	});
