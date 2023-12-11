@@ -6196,40 +6196,30 @@ on("change:StandardNPCSkills",function() {
 	});
 });
 on("clicked:SecondWind", function() {
-      getAttrs(["hp_max","hp", "Second_Wind", "Second_Wind_Count", "hidden_second_wind"], function(values) {
-        // get the hp, hp_max, second wind stat, and coerce into a numerical values.
-        let hp_max = +values.hp_max || 0;
-        let hp = +values.hp || 0;
-        let Second_Wind_Count = +values.Second_Wind_Count || 0;
-        let Second_Wind = +values.Second_Wind || 0;
-        let hidden_second_wind = +values.hidden_second_wind || 0;
-        // If the character is equal or less than half health then add the value of second wind to current hit points
-        if(Second_Wind_Count > 0) {
-         	// only do anything if SW is over 0 - otherwise second wind isn't applied
-        	if (hp <= (hp_max*0.5)) {
-        		hp = Math.min(hp_max, hidden_second_wind + hp);
-        		Second_Wind_Count = Second_Wind_Count - 1;
-        		startRoll("&{template:second-wind} {{name=Second Wind}} {{roll1=[[1]]}}", (results) => {
-            	const total = results.results.roll1.result
-            	const computed = hidden_second_wind;
+    getAttrs(["hp_max", "hp", "Second_Wind", "Second_Wind_Count", "hidden_second_wind"], function(values) {
+        let hp_max = parseInt(values.hp_max) || 0;
+        let hp = parseInt(values.hp) || 0;
+        let Second_Wind_Count = parseInt(values.Second_Wind_Count) || 0;
+        let Second_Wind = parseInt(values.Second_Wind) || 0;
+        let hidden_second_wind = parseInt(values.hidden_second_wind) || 0;
 
-				finishRoll(
-					results.rollId,
-					{
-						roll1: computed
-					}
-				);
-			});
-        	} else {
-        		hp = hp;
-        		}
-        	}
+        if (Second_Wind_Count > 0) {
+            if (hp <= hp_max * 0.5) {
+                hp = Math.min(hp_max, hidden_second_wind + hp);
+                Second_Wind_Count--;
 
-			setAttrs({
-				"hp": hp,
-				"Second_Wind_Count": Second_Wind_Count
-        	});
-   });
+                startRoll("&{template:second-wind} {{name=Second Wind}} {{roll1=[[1]]}}", (results) => {
+                    const computed = hidden_second_wind;
+                    finishRoll(results.rollId, { roll1: computed });
+                });
+            }
+        }
+
+        setAttrs({
+            "hp": hp,
+            "Second_Wind_Count": Second_Wind_Count
+        });
+    });
 });
 on("change:IncludeDR", function() {
 	getAttrs(["IncludeDR", "Status"], function(values) {
@@ -6317,122 +6307,33 @@ on('change:QuerySkillModifier change:repeating_npc-skill',()=>{
 });
 
 on("change:QuerySkillModifier", function() {
-	getAttrs(["QuerySkillModifier","AcrobaticsFormula_max","AthleticsFormula_max","ClimbFormula_max","DeceptionFormula_max","EnduranceFormula_max","GatherInformationFormula_max","InitiativeFormula_max","JumpFormula_max","Knowledge-BureaucracyFormula_max","Knowledge-GalacticLoreFormula_max","Knowledge-LifeSciencesFormula_max","Knowledge-PhysicalScienceFormula_max","Knowledge-SocialScienceFormula_max","Knowledge-TacticsFormula_max","Knowledge-TechnologyFormula_max","MechanicsFormula_max","PerceptionFormula_max","PersuasionFormula_max","PilotFormula_max","RideFormula_max","StealthFormula_max","SurvivalFormula_max","SwimFormula_max","TreatInjuryFormula_max","UseComputerFormula_max","UsetheForceFormula_max"], function(values) {
-		let QSM = values.QuerySkillModifier||0;
-		let AcrobaticsFormula_max = values.AcrobaticsFormula_max;
-		let AthleticsFormula_max = values.AthleticsFormula_max;
-		let ClimbFormula_max = values.ClimbFormula_max;
-		let DeceptionFormula_max = values.DeceptionFormula_max;
-		let EnduranceFormula_max = values.EnduranceFormula_max;
-		let GatherInformationFormula_max = values.GatherInformationFormula_max;
-		let InitiativeFormula_max = values.InitiativeFormula_max;
-		let JumpFormula_max = values.JumpFormula_max;
-		let BureaucracyFormula_max = values['Knowledge-BureaucracyFormula_max'];
-		let GalacticLoreFormula_max = values['Knowledge-GalacticLoreFormula_max'];
-		let LifeSciencesFormula_max = values['Knowledge-LifeSciencesFormula_max'];
-		let PhysicalScienceFormula_max = values['Knowledge-PhysicalScienceFormula_max'];
-		let SocialScienceFormula_max = values['Knowledge-SocialScienceFormula_max'];
-		let TacticsFormula_max = values['Knowledge-TacticsFormula_max'];
-		let TechnologyFormula_max = values['Knowledge-TechnologyFormula_max'];
-		let MechanicsFormula_max = values.MechanicsFormula_max;
-		let PerceptionFormula_max = values.PerceptionFormula_max;
-		let PersuasionFormula_max = values.PersuasionFormula_max;
-		let PilotFormula_max = values.PilotFormula_max;
-		let RideFormula_max = values.RideFormula_max;
-		let StealthFormula_max = values.StealthFormula_max;
-		let SurvivalFormula_max = values.SurvivalFormula_max;
-		let SwimFormula_max = values.SwimFormula_max;
-		let TreatInjuryFormula_max = values.TreatInjuryFormula_max;
-		let UseComputerFormula_max = values.UseComputerFormula_max;
-		let UsetheForceFormula_max = values.UsetheForceFormula_max;
-		if(QSM==1) {
-			AcrobaticsFormula_max=AcrobaticsFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			AthleticsFormula_max=AthleticsFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			ClimbFormula_max=ClimbFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			DeceptionFormula_max=DeceptionFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			EnduranceFormula_max=EnduranceFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			GatherInformationFormula_max=GatherInformationFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			InitiativeFormula_max=InitiativeFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			JumpFormula_max=JumpFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			BureaucracyFormula_max=BureaucracyFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			GalacticLoreFormula_max=GalacticLoreFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			LifeSciencesFormula_max=LifeSciencesFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			PhysicalScienceFormula_max=PhysicalScienceFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			SocialScienceFormula_max=SocialScienceFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			TacticsFormula_max=TacticsFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			TechnologyFormula_max=TechnologyFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			MechanicsFormula_max=MechanicsFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			PerceptionFormula_max=PerceptionFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			PersuasionFormula_max=PersuasionFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			PilotFormula_max=PilotFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			RideFormula_max=RideFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			StealthFormula_max=StealthFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			SurvivalFormula_max=SurvivalFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			SwimFormula_max=SwimFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			TreatInjuryFormula_max=TreatInjuryFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			UseComputerFormula_max=UseComputerFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			UsetheForceFormula_max=UsetheForceFormula_max.replace('0[Other]','?{Other Modifiers\|0}[Other]');
-			console.log("Querying other modifiers for skills");
-		}
-		else {
-			AcrobaticsFormula_max=AcrobaticsFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			AthleticsFormula_max=AthleticsFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			ClimbFormula_max=ClimbFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			DeceptionFormula_max=DeceptionFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			EnduranceFormula_max=EnduranceFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			GatherInformationFormula_max=GatherInformationFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			InitiativeFormula_max=InitiativeFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			JumpFormula_max=JumpFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			BureaucracyFormula_max=BureaucracyFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			GalacticLoreFormula_max=GalacticLoreFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			LifeSciencesFormula_max=LifeSciencesFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			PhysicalScienceFormula_max=PhysicalScienceFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			SocialScienceFormula_max=SocialScienceFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			TacticsFormula_max=TacticsFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			TechnologyFormula_max=TechnologyFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			MechanicsFormula_max=MechanicsFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			PerceptionFormula_max=PerceptionFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			PersuasionFormula_max=PersuasionFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			PilotFormula_max=PilotFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			RideFormula_max=RideFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			StealthFormula_max=StealthFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			SurvivalFormula_max=SurvivalFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			SwimFormula_max=SwimFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			TreatInjuryFormula_max=TreatInjuryFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			UseComputerFormula_max=UseComputerFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			UsetheForceFormula_max=UsetheForceFormula_max.replace('?{Other Modifiers\|0}[Other]','0[Other]');
-			console.log("Not querying other modifiers for skills");
-		}
-		setAttrs({
-			"AcrobaticsFormula_max": AcrobaticsFormula_max,
-			"AthleticsFormula_max": AthleticsFormula_max,
-			"ClimbFormula_max": ClimbFormula_max,
-			"DeceptionFormula_max": DeceptionFormula_max,
-			"EnduranceFormula_max": EnduranceFormula_max,
-			"GatherInformationFormula_max": GatherInformationFormula_max,
-			"InitiativeFormula_max": InitiativeFormula_max,
-			"JumpFormula_max": JumpFormula_max,
-			"Knowledge-BureaucracyFormula_max": BureaucracyFormula_max,
-			"Knowledge-GalacticLoreFormula_max": GalacticLoreFormula_max,
-			"Knowledge-LifeSciencesFormula_max": LifeSciencesFormula_max,
-			"Knowledge-PhysicalScienceFormula_max": PhysicalScienceFormula_max,
-			"Knowledge-SocialScienceFormula_max": SocialScienceFormula_max,
-			"Knowledge-TacticsFormula_max": TacticsFormula_max,
-			"Knowledge-TechnologyFormula_max": TechnologyFormula_max,
-			"MechanicsFormula_max": MechanicsFormula_max,
-			"PerceptionFormula_max": PerceptionFormula_max,
-			"PersuasionFormula_max": PersuasionFormula_max,
-			"PilotFormula_max": PilotFormula_max,
-			"RideFormula_max": RideFormula_max,
-			"StealthFormula_max": StealthFormula_max,
-			"SurvivalFormula_max": SurvivalFormula_max,
-			"SwimFormula_max": SwimFormula_max,
-			"TreatInjuryFormula_max": TreatInjuryFormula_max,
-			"UseComputerFormula_max": UseComputerFormula_max,
-			"UsetheForceFormula_max": UsetheForceFormula_max
-		});
-	});
+    const skills = [
+        "AcrobaticsFormula_max", "AthleticsFormula_max", "ClimbFormula_max", "DeceptionFormula_max",
+        "EnduranceFormula_max", "GatherInformationFormula_max", "InitiativeFormula_max", "JumpFormula_max",
+        "Knowledge-BureaucracyFormula_max", "Knowledge-GalacticLoreFormula_max", "Knowledge-LifeSciencesFormula_max",
+        "Knowledge-PhysicalScienceFormula_max", "Knowledge-SocialScienceFormula_max", "Knowledge-TacticsFormula_max",
+        "Knowledge-TechnologyFormula_max", "MechanicsFormula_max", "PerceptionFormula_max", "PersuasionFormula_max",
+        "PilotFormula_max", "RideFormula_max", "StealthFormula_max", "SurvivalFormula_max", "SwimFormula_max",
+        "TreatInjuryFormula_max", "UseComputerFormula_max", "UsetheForceFormula_max"
+    ];
+
+    getAttrs(["QuerySkillModifier", ...skills], function(values) {
+        let QSM = parseInt(values.QuerySkillModifier) || 0;
+        const modifier = QSM === 1 ? "?{Other Modifiers|0}[Other]" : "0[Other]";
+        const updatedSkills = {};
+
+        skills.forEach(skill => {
+            let value = values[skill];
+
+            // Use a more precise regular expression to match the pattern
+            value = QSM === 1 ? value.replace(/0\[Other\]/g, modifier) : value.replace(/\?{Other Modifiers\|0}\[Other\]/g, modifier);
+            updatedSkills[skill] = value;
+        });
+
+        setAttrs(updatedSkills);
+    });
 });
+
 // ====== Vehicle Sheet ====== \\
 
 on("change:vehicle-size change:vehicle-CapitalGrapple", function() {
