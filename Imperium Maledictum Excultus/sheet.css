@@ -14,17 +14,32 @@ input::-webkit-inner-spin-button {
 }
 input[type=number] {
     -moz-appearance: textfield;
-    /* Firefox */
+    /* +++FIREFOX+++ */
 }
 
-h2 {
+.charsheet h1 {
+    background: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/imperium-maledictum-dev/Imperium%20Maledictum%20Excultus/logo.png') left top no-repeat;
+    background-size: contain;
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    text-indent: -9999px;
+}
+.charsheet h2 {
     text-transform: uppercase;
     font-size: 18px;
+    text-align: center;
+}
+.charsheet h3 {
+    text-transform: uppercase;
+    font-size: 10px;
     text-align: center;
 }
 .charsheet label,
 .label {
     font-size: 10px;
+    font-weight: normal;
 	display: inline-block;
 	width: 100%;
     line-height: 20px;
@@ -38,14 +53,32 @@ h2 {
     border-radius: 0;
     white-space: unset;
 }
+.charsheet label sub,
+.label sub {
+    display: block;
+    bottom: unset;
+    font-size: 0.5em;
+}
+.charsheet label.pullup,
+.label.pullup {
+    margin-top: -5px;
+}
+.label:empty {
+    display: unset;
+}
 .charsheet .vcol > label,
 .vcol > .label {
     margin: -10px 0 0 0;
 }
+.charsheet .vcol.nogap > label,
+.vcol.nogap > .label {
+    margin: 0;
+}
 body .charsheet div .grid input,
 body .charsheet div .grid input[type=number],
-.charsheet select,
-.input {
+body .charsheet select,
+body .charsheet .input {
+    font-family: Times, "Times New Roman", serif;
     font-size: 14px;
 	display: inline-block;
 	width: 100%;
@@ -64,8 +97,13 @@ body .charsheet div .grid input[type=number],
     outline: none;
     overflow: hidden;
 }
-.input {
+body .charsheet .input {
     cursor: default;
+}
+body .charsheet select {
+    background: white;
+    appearance: none;
+    box-shadow: none;
 }
 
 .charsheet .grid,
@@ -80,8 +118,14 @@ body .charsheet div .grid input[type=number],
 .charsheet .nogap {
     gap: 0px;
 }
+.charsheet .novgap {
+    row-gap: 0px;
+}
 .charsheet .widegap {
     gap: 20px;
+}
+.charsheet .vwidegap {
+    row-gap: 20px;
 }
 .col2 {
     grid-template-columns: repeat(2, 1fr);
@@ -89,11 +133,17 @@ body .charsheet div .grid input[type=number],
 .col3 {
     grid-template-columns: repeat(3, 1fr);
 }
+.col3-chars {
+    grid-template-columns: 3fr 1fr 2fr;
+}
 .col4 {
     grid-template-columns: repeat(4, 1fr);
 }
 .col5 {
     grid-template-columns: repeat(5, 1fr);
+}
+.col5-skills {
+    grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
 }
 .col6 {
     grid-template-columns: repeat(6, 1fr);
@@ -133,9 +183,13 @@ body .charsheet div .grid input[type=number],
 }
 .span5 {
     grid-column: span 5;
+    width: unset;
 }
 .span6 {
     grid-column: span 6;
+}
+.span7 {
+    grid-column: span 7;
 }
 .vspan2 {
     grid-row: span 2;
@@ -148,7 +202,20 @@ body .charsheet div .grid input[type=number],
     grid-auto-flow: column;
 }
 
-/* autoexpand */
+.col4-skills,
+.repeating_specialisations ~ .repcontainer .repitem {
+    grid-template-columns: 9fr 4fr 4fr 4fr;
+}
+.col3-influences,
+.repeating_influences ~ .repcontainer .repitem {
+    grid-template-columns: 5fr 1fr 12fr;
+}
+.col2-talents,
+.repeating_talents ~ .repcontainer .repitem {
+    grid-template-columns: 5fr 13fr;
+}
+
+/* +++AUTOEXPAND+++ */
 .auto-expand {
 	position: relative;
 	cursor: text;
@@ -159,17 +226,23 @@ body .charsheet div .grid input[type=number],
     min-height: 100px;
 }
 .auto-expand span {
+    font-family: Times, "Times New Roman", serif;
 	visibility: hidden;
 	white-space: pre-wrap;
 	display: block;
     line-height: 20px;
+    padding: 0 5px;
+    border: dashed 0.5px gray;
+    border-radius: 5px;
 }
 .auto-expand textarea {
+    font-family: Times, "Times New Roman", serif;
 	position: absolute;
 	z-index: 1;
 	top: 0;
 	left: 0;
 	margin: 0;
+    padding: 0 5px;
 	overflow: hidden;
 	resize: none;
     line-height: 20px;
@@ -178,21 +251,189 @@ body .charsheet div .grid input[type=number],
 	display: block;
 	box-sizing: border-box;
 	background: transparent;
-	border: none;
-	border-radius: 0;
 	box-shadow: none;
 	color: inherit;
 	letter-spacing: inherit;
-	padding: inherit;
 	text-align: inherit;
 	text-transform: inherit;
+    border: dashed 0.5px gray;
+    border-radius: 5px;
 }
 
-body .charactersheet .page1:after,
-body .charactersheet .page2:after,
-body .charactersheet .monster:after,
-body .charactersheet .settings:after {
-    content: 'Imperium Maledictum Character Sheet Ver.0.1 | https://app.roll20.net/users/2699740/robert-b';
+/* +++TABS+++ */
+.tabs {
+    display: flex;
+    margin: 0 -20px 10px -20px;
+    padding: 0 20px;
+    border-bottom: solid 1px black;
+}
+.tabs div {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+.tabs button {
+    background: whitesmoke;
+    height: 30px;
+    padding: 5px 15px;
+    border: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 10px;
+    color: silver;
+}
+.tabs button:hover {
+    background: gold;
+    color: white;
+}
+.toggle-tabs[value='page1'] ~ .tabs div.tab-page1 button,
+.toggle-tabs[value='page2'] ~ .tabs div.tab-page2 button,
+.toggle-tabs[value='settings'] ~ .tabs div.tab-settings button {
+    background: darkgray;
+    color: white;
+}
+
+body .charsheet .page1,
+body .charsheet .page2,
+body .charsheet .settings {
+    display: none;
+}
+body .charsheet .page1:after,
+body .charsheet .page2:after,
+body .charsheet .monster:after,
+body .charsheet .settings:after {
+    content: 'Imperium Maledictum Excultus Character Sheet Ver.0.1 | https://app.roll20.net/users/2699740/robert-b';
     text-align: right;
     font-size: 8px;
+}
+body .toggle-tabs[value='page1'] ~ div.page1,
+body .toggle-tabs[value='page2'] ~ div.page2,
+body .toggle-tabs[value='settings'] ~ div.settings {
+    display: grid;
+}
+
+/* +++END TABS+++ */
+
+.charsheet .grid.lined > .grid,
+.charsheet .grid.lined .repcontainer,
+.charsheet .grid.lined .repitem {
+    background: darkgray;
+    gap: 1px;
+    height: fit-content;
+}
+.charsheet .grid.lined .repcontainer {
+    border-top: solid 1px darkgray;
+}
+body .charsheet div .grid.lined input,
+body .charsheet div .grid.lined input[type=number],
+body .charsheet .grid.lined select,
+body .grid.lined .input,
+.charsheet .grid.lined > .grid > *,
+.charsheet .grid.lined .repitem > * {
+    background: white;
+    border: none;
+    padding: 2px 0;
+    height: unset;
+    text-align: center;
+}
+.charsheet .grid.lined label::first-letter,
+.charsheet .grid.lined .label::first-letter {
+    font-size: 1.5em;
+}
+.charsheet .grid.lined > .grid > *:first-child,
+.charsheet .grid.lined .repitem > *:nth-child(2),
+.characteristics .lined > .grid > *:nth-child(10n+11),
+.skills .lined > .grid > *:nth-child(7n+5) {
+    text-align: left;
+}
+.skills .lined > .grid > *:nth-child(n+0):nth-child(-n+4) {
+    font-weight: bold;
+    font-size: 0.8em;
+}
+
+body .charsheet .grid .hint {
+    color: gray;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+body .charsheet .grid .lrg {
+    font-size: 18px;
+}
+
+.vsplit {
+    background: linear-gradient(90deg,
+        #00000000 0%,
+        #00000000 calc(50% - 0.8px),
+        black 50%,
+        #00000000 calc(50% + 0.8px),
+        #00000000 100%);
+}
+.vsplit h2 {
+    background-color: white;
+}
+body .charsheet div .grid.vsplit label,
+body .charsheet div .grid.vsplit .label {
+    text-align: center;
+    background-color: white;
+}
+body .charsheet div .grid.vsplit input,
+body .charsheet div .grid.vsplit input[type=number],
+body .charsheet .grid.vsplit select,
+body .grid.vsplit .input {
+    border: dashed 0.5px gray;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* +++PAGE 1+++ */
+body .charsheet .xp {
+    position: relative;
+}
+body .charsheet .xp:before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translate(-50%, -0%);
+    height: 14px;
+    width: 14px;
+    background: linear-gradient(105deg,
+        #00000000 0%,
+        #00000000 calc(50% - 0.8px),
+        black 50%,
+        #00000000 calc(50% + 0.8px),
+        #00000000 100%);
+}
+body .charsheet .xp:after {
+    content: 'XP';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translate(-50%, -0%);
+    font-size: 10px;
+}
+body .charsheet div .grid.xp input[type=number] {
+    text-align: center;
+}
+
+body .charsheet .characteristics .grid.lined > .grid > *:nth-child(n+32):nth-child(-n+41) {
+    background: linear-gradient(90deg, gainsboro 50%, white 50%);
+    letter-spacing: 0.2em;
+    font-weight: bold;
+    text-indent: 0.2em;
+}
+
+.corruption.vsplit {
+    background: linear-gradient(90deg,
+        #00000000 0%,
+        #00000000 calc(24% - 0.8px),
+        black 24%,
+        #00000000 calc(24% + 0.8px),
+        #00000000 100%);
+}
+.corruption .auto-expand {
+    background: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/imperium-maledictum-dev/Imperium%20Maledictum%20Excultus/chaos.png') center center no-repeat;
+    background-size: contain;
+    min-height: 75px;
 }
