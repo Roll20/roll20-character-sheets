@@ -26,15 +26,35 @@ input[type=number] {
     margin: 0;
     text-indent: -9999px;
 }
-.charsheet h2 {
+.charsheet h2,
+.charsheet h3 {
+    position: relative;
     text-transform: uppercase;
     font-size: 18px;
     text-align: center;
+    line-height: unset;
+    -webkit-font-smoothing: antialiased;
+    text-shadow: 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white,
+        0 0 8px white, 0 0 8px white, 0 0 8px white, 0 0 8px white;
+}
+.charsheet h2:before,
+.charsheet h3:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    border-top: solid 1px slategray;
+    z-index: -1;
 }
 .charsheet h3 {
-    text-transform: uppercase;
     font-size: 10px;
-    text-align: center;
 }
 .charsheet label,
 .label {
@@ -70,6 +90,10 @@ input[type=number] {
 .vcol > .label {
     margin: -10px 0 0 0;
 }
+.charsheet .vsplit .vcol > label,
+.vsplit .vcol > .label {
+    margin: 0;
+}
 .charsheet .vcol.nogap > label,
 .vcol.nogap > .label {
     margin: 0;
@@ -84,7 +108,7 @@ body .charsheet .input {
 	width: 100%;
     height: 20px;
     border: none;
-    border-bottom: solid 1px black;
+    border-bottom: solid 0.5px black;
     border-radius: 0;
     padding: 0 5px;
     margin: 0;
@@ -115,6 +139,9 @@ body .charsheet select {
     grid-auto-rows: minmax(min-content, max-content);
     gap: 10px;
 }
+.repcontainer {
+    margin-bottom: 10px;
+}
 .charsheet .nogap {
     gap: 0px;
 }
@@ -136,14 +163,20 @@ body .charsheet select {
 .col3-chars {
     grid-template-columns: 3fr 1fr 2fr;
 }
+.col3-hitloc {
+    grid-template-columns: 1fr 4fr 1fr;
+}
 .col4 {
     grid-template-columns: repeat(4, 1fr);
+}
+.col4-profile1 {
+    grid-template-columns: 5fr 7fr 4fr 5fr;
 }
 .col5 {
     grid-template-columns: repeat(5, 1fr);
 }
 .col5-skills {
-    grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 8fr 3fr 2fr 3fr 4fr;
 }
 .col6 {
     grid-template-columns: repeat(6, 1fr);
@@ -204,7 +237,7 @@ body .charsheet select {
 
 .col4-skills,
 .repeating_specialisations ~ .repcontainer .repitem {
-    grid-template-columns: 9fr 4fr 4fr 4fr;
+    grid-template-columns: 8fr 5fr 3fr 4fr;
 }
 .col3-influences,
 .repeating_influences ~ .repcontainer .repitem {
@@ -213,6 +246,22 @@ body .charsheet select {
 .col2-talents,
 .repeating_talents ~ .repcontainer .repitem {
     grid-template-columns: 5fr 13fr;
+}
+.col2-crits,
+.repeating_criticals ~ .repcontainer .repitem {
+    grid-template-columns: 3fr 13fr;
+}
+.col8-weapons,
+.repeating_weapons ~ .repcontainer .repitem {
+    grid-template-columns: 6fr 3fr 1fr 2fr 3fr 1fr 1fr 10fr;
+}
+.col5-armour,
+.repeating_armour ~ .repcontainer .repitem {
+    grid-template-columns: 6fr 4fr 1fr 1fr 9fr;
+}
+.col7-powers,
+.repeating_powers ~ .repcontainer .repitem {
+    grid-template-columns: 5fr 1fr 4fr 4fr 4fr 4fr 1fr;
 }
 
 /* +++AUTOEXPAND+++ */
@@ -335,9 +384,10 @@ body .grid.lined .input,
     padding: 2px 0;
     height: unset;
     text-align: center;
+    overflow: hidden;
 }
-.charsheet .grid.lined label::first-letter,
-.charsheet .grid.lined .label::first-letter {
+.charsheet .grid.lined:not(.tight) label::first-letter,
+.charsheet .grid.lined:not(.tight) .label::first-letter {
     font-size: 1.5em;
 }
 .charsheet .grid.lined > .grid > *:first-child,
@@ -349,6 +399,31 @@ body .grid.lined .input,
 .skills .lined > .grid > *:nth-child(n+0):nth-child(-n+4) {
     font-weight: bold;
     font-size: 0.8em;
+}
+body .charsheet .repitem input[type=checkbox] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    display: grid;
+    place-content: center;
+}
+body .charsheet .repitem input[type=checkbox]:before {
+    transition: 120ms all ease-in-out;
+    content: '&';
+    font-family: 'Pictos';
+}
+body .charsheet .repitem input[type=checkbox]:checked:before {
+    content: '_';
+}
+body .charsheet .repitem .toggle-details + .auto-expand {
+    transition: 120ms all ease-in-out;
+    display: none;
+}
+body .charsheet .repitem .toggle-details[value='1'] + .auto-expand {
+    display: block;
 }
 
 body .charsheet .grid .hint {
@@ -380,9 +455,23 @@ body .charsheet div .grid.vsplit .label {
 body .charsheet div .grid.vsplit input,
 body .charsheet div .grid.vsplit input[type=number],
 body .charsheet .grid.vsplit select,
-body .grid.vsplit .input {
+body .charsheet div .grid input.dotted,
+body .charsheet div .grid input[type=number].dotted,
+body .charsheet div .grid select.dotted {
     border: dashed 0.5px gray;
     border-radius: 5px;
+    text-align: center;
+}
+body .grid.vsplit .input,
+body .charsheet div .grid .input.dotted {
+    border: none;
+    text-align: center;
+}
+body .charsheet div .grid input.unlined,
+body .charsheet div .grid input[type=number].unlined,
+body .charsheet div .grid select.unlined,
+body .charsheet div .grid .input.unlined {
+    border: none;
     text-align: center;
 }
 
