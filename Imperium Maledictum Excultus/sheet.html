@@ -103,7 +103,7 @@
             <h2>Characteristics</h2>
 
             <div class="grid nogap lined">
-                <div class="grid col10">
+                <div class="grid col10-chars">
                     <span />
                     <span class="label">WS</span>
                     <span class="label">BS</span>
@@ -916,6 +916,30 @@
                 update["encumbrance_max"] = encumbrance;
                 update["warp_charge_max"] = warp;
                 setAttrs(update);
+            });
+        });
+    });
+
+    skill_list.forEach(trigger => {
+        on(`change:${trigger}`, function() {
+            getSectionIDs("repeating_specialisations", function(idarray) {
+                let fields = [];
+                for (var i=0; i < idarray.length; i++) {
+                    let id = idarray[i];
+                    fields.push(`repeating_specialisations_${id}_specialisation_skill`);
+                    fields.push(`repeating_specialisations_${id}_specialisation_advances`);
+                }
+                getAttrs(skill_list.concat(fields), function(values) {
+                    let update = {};
+                    for (var i=0; i < idarray.length; i++) {
+                        let id = idarray[i];
+                        let skill = values[`repeating_specialisations_${id}_specialisation_skill`];
+                        let advances = parseInt(values[`repeating_specialisations_${id}_specialisation_advances`])||0;
+                        let total = (parseInt(values[`${skill}`])||0) + advances * 5;
+                        update[`repeating_specialisations_${id}_specialisation_total`] = total;
+                    }
+                    setAttrs(update);
+                });
             });
         });
     });
