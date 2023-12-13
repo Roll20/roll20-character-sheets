@@ -611,9 +611,6 @@
 					<h1>Mass</h1>
 				</div>
 				
-				<input type="hidden" name="attr_targetOCVpenalty" value="0"/>
-				<input type="hidden" name="attr_targetHitRoll" value="3d6cs0cf0"/>
-				
 				<div class="subitem-tab-gear-flex-container-shield-row">
 					<input type="text" name="attr_shieldName" title="@{shieldName}" value="" maxlength="20" tabindex="76"/>
 					<input type="number" name="attr_shieldDCV" title="@{shieldDCV}" step="1"  min="0" value="0" tabindex="77"/>
@@ -1893,7 +1890,7 @@
 					<div class="subitem-tab-gear-slide-range-modifier-container">
 						<div class="subitem-range-modifier-button-container">
 							<label class="custom-radio-button-container">
-								  <input type="radio" name="attr_rangeSelection" value="-2">
+								  <input type="radio" name="attr_rangeSelection" value="9">
 								  <span class="custom-radio-button"></span>
 							</label>
 						</div>
@@ -1907,7 +1904,7 @@
 					<div class="subitem-tab-gear-slide-range-modifier-container">
 						<div class="subitem-range-modifier-button-container">
 							<label class="custom-radio-button-container">
-								  <input type="radio" name="attr_rangeSelection" value="-4">
+								  <input type="radio" name="attr_rangeSelection" value="17">
 								  <span class="custom-radio-button"></span>
 							</label>
 						</div>
@@ -1921,7 +1918,7 @@
 					<div class="subitem-tab-gear-slide-range-modifier-container">
 						<div class="subitem-range-modifier-button-container">
 							<label class="custom-radio-button-container">
-								  <input type="radio" name="attr_rangeSelection" value="-6">
+								  <input type="radio" name="attr_rangeSelection" value="33">
 								  <span class="custom-radio-button"></span>
 							</label>
 						</div>
@@ -1935,7 +1932,7 @@
 					<div class="subitem-tab-gear-slide-range-modifier-container">
 						<div class="subitem-range-modifier-button-container">
 							<label class="custom-radio-button-container">
-								  <input type="radio" name="attr_rangeSelection" value="-8">
+								  <input type="radio" name="attr_rangeSelection" value="65">
 								  <span class="custom-radio-button"></span>
 							</label>
 						</div>
@@ -6150,6 +6147,11 @@
 	</div>
 </div>
 
+<!-- Hidden variables for combat rolls -->
+<input type="hidden" name="attr_targetOCVpenalty" value="0"/>
+<input type="hidden" name="attr_rangeOCVpenalty" value="0"/>
+<input type="hidden" name="attr_targetHitRoll" value="3d6cs0cf0"/>
+
 <!-- Hidden variables to protect characteristics during option changes -->
 <input type="hidden" name="attr_hiddenSTUN" value="20"/>
 <input type="hidden" name="CurrentBODY_max" value="10"/>
@@ -8756,15 +8758,15 @@
 	/* -------------------------------------------------- */
 	/* Functions used for gear tab                        */
 	/* -------------------------------------------------- */
-						
+		
 	/* Calculate weapon endurance costs */
 	on("change:optionSuperHeroicEndurance change:weaponStrength01 change:weaponStrength02 change:weaponStrength03 change:weaponStrength04 change:weaponStrength05 change:shieldStrength change:strength", function() {
 		getAttrs(["optionSuperHeroicEndurance", "weaponStrength01", "weaponStrength02", "weaponStrength03", "weaponStrength04", "weaponStrength05","shieldStrength", "strength"], function(values) {
 			// If optionSuperHeroicEndurance is true, endurance cost is 1 per 5 strength, otherwise it is 1 per 10 strength used.
-											 
+			
 			optionSuperHeroic = values.optionSuperHeroicEndurance;
 			let enduranceCostFactor = 5;
-							
+			
 			if (optionSuperHeroic != 0) {
 				enduranceCostFactor = 10;
 			}
@@ -8772,28 +8774,28 @@
 			let enduranceCost01 = heroRoundLow( (parseInt(values.weaponStrength01)||0)/enduranceCostFactor );
 			if ( (enduranceCost01<1) && (parseInt(values.weaponStrength01)||0)>0) {
 				enduranceCost01=1
-						}
-						
+			}
+			
 			let enduranceCost02 = heroRoundLow( (parseInt(values.weaponStrength02)||0)/enduranceCostFactor );
 			if ( (enduranceCost02<1) && (parseInt(values.weaponStrength02)||0)>0) {
 				enduranceCost02=1
 			}
-						
+			
 			let enduranceCost03 = heroRoundLow( (parseInt(values.weaponStrength03)||0)/enduranceCostFactor );
 			if ( (enduranceCost03<1) && (parseInt(values.weaponStrength03)||0)>0) {
 				enduranceCost03=1
 			}
-						
+			
 			let enduranceCost04 = heroRoundLow( (parseInt(values.weaponStrength04)||0)/enduranceCostFactor );
 			if ( (enduranceCost04<1) && (parseInt(values.weaponStrength04)||0)>0) {
 				enduranceCost04=1
-						}
-						
+			}
+			
 			let enduranceCost05 = heroRoundLow( (parseInt(values.weaponStrength05)||0)/enduranceCostFactor );
 			if ( (enduranceCost05<1) && (parseInt(values.weaponStrength05)||0)>0) {
 				enduranceCost05=1
 			}
-						
+			
 			let enduranceCostShield = heroRoundLow( (parseInt(values.shieldStrength)||0)/enduranceCostFactor );
 			if ( (enduranceCostShield<1) && (parseInt(values.shieldStrength)||0)>0) {
 				enduranceCostShield=1
@@ -8995,7 +8997,7 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX.
 			
-			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "maneuverEndurance"+maneuverId, "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
+			getAttrs(["hiddenManeuverDamage"+maneuverId, "maneuverNormalDamage"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "maneuverEndurance"+maneuverId, "maneuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeSelection"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["maneuverNormalDamage"+maneuverId] != 0;
@@ -9011,30 +9013,22 @@
 				
 				if (!isBlocking) {
 					// If isNormalDamage is TRUE, use the Normal Damage template. Else use the killing template.
-					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") 
-						+ "-attack} {{title=@{character_name} - @{character_title}}} " 
-						+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") 
-						+ " attack with @{martialManeuverName"+maneuverId+"}}} ";
+					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{martialManeuverName"+maneuverId+"}}} ";
 					if (values.displayDegreeOfSuccess != 0) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV] + @{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV] + ?{Modifiers|0}[Modifier]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}";
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV] + @{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] - @{targetOCVPenalty}[TargetOCV] + ?{Modifiers|0}[Modifier] ]]}} " 
-							+ "{{Result=[[3d6cf6cs1]]}}";
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier] ]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 					}
-					theRoll	+= (subtractENDAmt ? "{{END=[[@{maneuverEndurance"+maneuverId+"}]] (@{currentEND})}} " : "") 
-						+ "{{"+dmgType+"=[[@{hiddenManeuverDamage"+maneuverId+"}]]}} " 
-						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+					theRoll	+= (subtractENDAmt ? "{{END=[[@{maneuverEndurance"+maneuverId+"}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[[@{hiddenManeuverDamage"+maneuverId+"}]]}}" + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 					if (useHitLocations)
-						theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
+						theRoll += "{{HITLOC=[[@{targetHitRoll}]]}}";
 				} else {
 					// Use the Blocking template.
-					theRoll += "&{template:custom-defense} {{title=@{character_name} - @{character_title}}} " 
-						+ "{{subtitle=Blocks with @{martialManeuverName"+maneuverId+"}}} ";
+					theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}}" + "{{subtitle=Blocks with @{martialManeuverName"+maneuverId+"}}} ";
 					if (values.displayDegreeOfSuccess != 0) {
-						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll] + @{ocv}[OCV] + @{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] + ?{Modifiers|0}[Modifier]]]}} ";
+						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV] + @{martialManeuverOCV"+maneuverId+"}[ManeuverOCV] + ?{Modifiers|0}[Modifier]]]}} " 
-							+ "{{Result=[[3d6cf6cs1]]}} ";
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}} ";
 					}
 					if (subtractENDAmt != 0) {
 						theRoll	+= "{{END=[[@{maneuverEndurance"+maneuverId+"}]] (@{currentEND})}}";
@@ -9089,6 +9083,20 @@
 					});
 				}
 			});
+		});
+	});
+	
+	
+	/* Update range penalty */
+	on("change:rangeSelection", function () {
+		getAttrs(["rangeSelection"], function(values) {
+			let debug = values.treasures||"";
+			let theSelection = parseFloat(values.rangeSelection)||0;
+			let theOCVpenalty = parseInt(getRangePenalty(theSelection));
+			
+			setAttrs({
+				"rangeOCVpenalty":theOCVpenalty
+			})
 		});
 	});
 	
@@ -9372,6 +9380,31 @@
 					}
 		return computed;
 	}
+	
+		
+	function getRangePenalty(range) {
+		// Uses a lookup table or for longer ranges calculates the range penalty for an attack.
+		let thePenalty = 0;
+		range = heroRoundLow(range);
+		
+		if (range <= 8) {
+			thePenalty = 0;
+		} else if (range <= 16) {
+			thePenalty = -2;
+		} else if (range <= 32) {
+			thePenalty = -4;
+		} else if (range <= 64) {
+			thePenalty = -6;
+		} else if (range <= 125) {
+			thePenalty = -10;
+		} else {
+			thePenalty = -(8 + 2 * Math.ceil((Math.log2( range/125 ))));
+		}
+		
+		// Return positive value. We'll make it negative in the roll.
+		return -thePenalty;
+	}
+
 
 	/* ------------------------ */
 	/* --- Weapon Attacks   --- */
@@ -9445,23 +9478,13 @@
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
 				// If isNormalDamage is TRUE, use the Normal Damage template.
-				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "")
-					+ "-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") 
-					+ " attack with @{weaponName"+weaponId+"}}} ";
+				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} ";
 				if (values.displayDegreeOfSuccess != 0) {
-					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["
-						+ (areaOfEffect ? 0 : 1) 	
-						+ "*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} ";
+					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}} ";
 				} else {
-					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[["
-						+ (areaOfEffect ? 0 : 1) 
-						+ "*@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} "
-						+ "{{Result=[[3d6cf6cs1]]}}"
+					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
 				}
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}} " : "")
-						+ "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} "
-						+ "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 				if (useHitLocations)
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 					
