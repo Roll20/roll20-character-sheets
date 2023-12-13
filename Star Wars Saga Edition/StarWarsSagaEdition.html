@@ -6978,10 +6978,8 @@ skillnames.forEach(function (skill) {
 
 on("sheet:opened",function(){
 	getAttrs(['sheet_version'], function (values) {
-        if (values.sheetVersion !== 1) {
 			skillupdate10
-            setAttrs({ sheetversion: 1 });			
-		}
+			skillupdate11
 	});
 });
 
@@ -7014,6 +7012,41 @@ var skillupdate10 = skillnames.forEach(function (skill) {
         });
     });
 });
+
+//  attr_RefMod  attr_FortMod  attr_WillMod
+const defenses = ["refmod", "fortmod", "willmod"];
+var skillupdate11 = defenses.forEach(function (defense) {
+on("sheet:opened",function(){
+        getAttrs(["refmod", "fortmod", "willmod"], function (values) {	
+            let attrValue = values[defense];
+            switch (attrValue) {
+                case '@{str|max}':
+                    setAttrs({ [defense]: 'str_max' });
+                    break;
+                case '@{dex|max}':
+                    setAttrs({ [defense]: 'dex_max' });
+                    break;
+                case '@{ArmorDex}':
+                    setAttrs({ [defense]: 'armordex' });
+                    break;					
+                case '@{con|max}':
+                    setAttrs({ [defense]: 'con_max' });
+                    break;
+                case '@{int|max}':
+                    setAttrs({ [defense]: 'int_max' });
+                    break;
+                case '@{wis|max}':
+                    setAttrs({ [defense]: 'wis_max' });
+                    break;
+                case '@{cha|max}':
+                    setAttrs({ [defense]: 'cha_max' });
+                    break;
+                default:
+                    break;
+            }			
+        });
+    });
+});	
 
 //Autogenerate Force Power Name
 on('change:repeating_forcepowers:attackformula', function(eventInfo) {
