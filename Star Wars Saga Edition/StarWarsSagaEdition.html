@@ -431,7 +431,7 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 					<td> <select name="attr_RefMod" class="modtype" title="Reflex Ability Modifier (default DEX) @{RefMod}">
 					  <option value="str_max" data-i18n="str">STR</option>
 					  <option value="dex_max" data-i18n="dex" selected>DEX</option>
-					  <option value="armorref" data-i18n="dex_max">DEX (Max Armor)</option>
+					  <option value="armordex" data-i18n="dex_max">DEX (Max Armor)</option>
 					  <option value="con_max" data-i18n="con">CON</option>
 					  <option value="int_max" data-i18n="int">INT</option>
 					  <option value="wis_max" data-i18n="wis">WIS</option>
@@ -2485,7 +2485,7 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 					<td> <select name="attr_RefMod" class="modtype" title="Reflex Ability Modifier (default DEX) @{RefMod}">
 					  <option value="str_max" data-i18n="str">STR</option>
 					  <option value="dex_max" data-i18n="dex" selected>DEX</option>
-					  <option value="armorref" data-i18n="dex_max">DEX (Max Armor)</option>
+					  <option value="armordex" data-i18n="dex_max">DEX (Max Armor)</option>
 					  <option value="con_max" data-i18n="con">CON</option>
 					  <option value="int_max" data-i18n="int">INT</option>
 					  <option value="wis_max" data-i18n="wis">WIS</option>
@@ -6480,29 +6480,39 @@ var ArmorUpdate = function() {
 
 	//Determine which Dex mod to use
 	dexMod = Math.floor((parseInt(v["dex"],10) - 10) / 2);
-	if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armorref") && v["ArmorDex"] >= dexMod) {
+	if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armordex") && v["ArmorDex"] >= dexMod) {
 		setAttrs({"refmod": "dex_max"});		
 	}
-	else if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armorref") && v["ArmorDex"] < dexMod) {
-		setAttrs({"refmod": "armorref"});
+	else if(ArmorWornCheck == "1" && (v["RefMod"] == "dex_max" || v["RefMod"] == "armordex") && v["ArmorDex"] < dexMod) {
+		setAttrs({"refmod": "armordex"});
 	}
-	else if(ArmorWornCheck != "1" && v["RefMod"] == "armorref") {
+	else if(ArmorWornCheck != "1" && v["RefMod"] == "armordex") {
 		setAttrs({"refmod": "dex_max"});
 	}
 	}); //End
 };
 
 //Defense Sheetworker, not the cleanest but it works
-on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal change:condtrack', function(){
-	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "str_max", "dex_max", "con_max", "int_max", "wis_max", "cha_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack"], function(values) {
+on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal change:condtrack change:armorref change:armordex change:armorfort', function(){
+	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "str_max", "dex_max", "con_max", "int_max", "wis_max", "cha_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack", "armorref", "armorfort",  "armorworncheck", "armordex"], function(values) {
 
-		let ref = values.refmod;
-		let refstatValue = values[ref]; // Fetch the value of the attribute represented by the string stored in `stat`
+		let ref = values.refmod;		
+		let refstatValue = parseInt(values[ref]); // Fetch the value of the attribute represented by the string stored in `stat`
 		let fort = values.fortmod;
 		let fortstatValue = values[fort]; // Fetch the value of the attribute represented by the string stored in `stat`
 		let will = values.willmod;
 		let willstatValue = values[will]; // Fetch the value of the attribute represented by the string stored in `stat`		
-
+		let ArmorWornCheck = parseInt(values.armorworncheck)||0;
+		const level = parseInt(values.level);
+		const armorref = parseInt(values.armorref);		
+		const refClass = parseInt(values.refclass);
+		const refMisc = parseInt(values.RefMisc);
+		const RefFlatFootedMisc = parseInt(values.RefFlatFootedMisc);
+		const CT = parseInt(values.CT);
+		const refSizeMod = parseInt(values.RefSizeMod);	
+		const armorfort = parseInt(values.armorfort);
+		let armorreflevel = 0;		
+		let armorfortlevel = 0;			
 		// Subtract CT from all stat values
 		let CTValue = parseInt(values.CT) || 0;
 		let reftotal = parseInt(values.reftotal) || 0;
@@ -6513,13 +6523,22 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		refFlattotal += CTValue;		
 		willtotal += CTValue;
 		forttotal += CTValue;		
-
+		
+		if(ArmorWornCheck == "1") {
+		armorreflevel = armorref;
+		armorfortlevel = armorfort;
+		//console.log("Armor is enabled");
+		} else {
+		//console.log("armor is not enabled");
+		armorreflevel = level;
+		}
+		//console.log("armorreflevel: ", armorreflevel);		
 		if (values.condtrack === "50" && ref === "dex_max") {
 			console.log("condtrack is '50' and refmod is 'dex_max'");
 			refstatValue = -5;
 		}					
 		if (!values.reftotal) {
-			let reflexsum = 10 + refstatValue + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefMisc) + parseInt(values.CT) + parseInt(values.RefSizeMod);
+			let reflexsum = 10 + refstatValue + armorreflevel + refClass + refMisc + CT + refSizeMod;
 			setAttrs({"Reflex": reflexsum});		
     	}
 		else {
@@ -6528,7 +6547,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		}
     	if(!values.reftotal_max) {
 			let min = (0 < refstatValue) ? 0 : refstatValue;			
-			let reflexflatsum = 10 + min + parseInt(values.level) + parseInt(values.refclass) + parseInt(values.RefFlatFootedMisc) + parseInt(values.RefSizeMod) + parseInt(values.CT);
+			let reflexflatsum = 10 + min + level + refClass + RefFlatFootedMisc + refSizeMod + CT;
 			setAttrs({"ReflexFlatFooted": reflexflatsum});		
     	}
 		else {
@@ -6536,7 +6555,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		console.log("REFLEX Flatfoot FORMULA IS BEING OVERWRITTEN");		
 		}		
 		if(!values.forttotal) {
-			let fortsum = 10 + fortstatValue + parseInt(values.level) + parseInt(values.fortclass) + parseInt(values.fortmisc) + parseInt(values.CT);
+			let fortsum = 10 + fortstatValue + level + armorfortlevel + parseInt(values.fortclass) + parseInt(values.fortmisc) + CT;
 			setAttrs({"Fortitude": fortsum});		
     	}
 		else {
@@ -6544,7 +6563,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		setAttrs({"Fortitude": forttotal});			
 		}			
 		if(!values.willtotal) {
-			let willsum = 10 + willstatValue + parseInt(values.level) + parseInt(values.willclass) + parseInt(values.willmisc) + parseInt(values.CT);
+			let willsum = 10 + willstatValue + level + parseInt(values.willclass) + parseInt(values.willmisc) + CT;
 			setAttrs({"Will": willsum});		
     	}
 		else {
