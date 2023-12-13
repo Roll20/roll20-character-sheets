@@ -7155,6 +7155,31 @@ on('change:repeating_forcepowers:attackformula', function(eventInfo) {
     });
 });
 
+//Autogenerate Maneuver Name
+on('change:repeating_maneuvers:attackformula', function(eventInfo) {
+    const changedField = eventInfo.sourceAttribute;
+    const characterId = eventInfo.sourceId;
+
+    const maneuvernameField = changedField.replace('_attackformula', '_maneuvername');
+    console.log(maneuvernameField);
+
+    getAttrs([changedField], function(values) {
+        const text = values[changedField];
+
+		const regex = /header=(.*?)}}/;
+		const match = text.match(regex);	
+		if (match && match[1]) {
+			const extractedValue = match[1].trim();
+			console.log(extractedValue);
+			const updateObject = {};
+			updateObject[maneuvernameField] = extractedValue;
+			setAttrs(updateObject);
+		} else {
+			console.log("No match found");
+		}
+    });
+});
+
 on('change:dsp change:wis', function() {
     getAttrs(['dsp', 'wis'], function(values) {
         const dsp = parseInt(values.dsp) || 0;
