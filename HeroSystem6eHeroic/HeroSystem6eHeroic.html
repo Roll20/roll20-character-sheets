@@ -6090,7 +6090,7 @@
 				</label>
 				<h1>Takes No STUN</h1>
 			</div>
-
+			
 			<div class="item-options-row">
 				<label class="container-checkbox">
 					<input type="checkbox" checked="checked" name="attr_displayDegreeOfSuccess">
@@ -6098,7 +6098,15 @@
 				</label>
 				<h1>Display Degree of Success</h1>
 			</div>
-
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" checked="checked" name="attr_optionResetTargeting">
+					<span class="checkmark" title="@{optionResetTargeting}"></span>
+				</label>
+				<h1>Health reset buttons also reset target and range</h1>
+			</div>
+			
 			<div class="item-options-row">
 				<div class="custom-select-option">
 					<select name="attr_whisperToGM">
@@ -6109,7 +6117,7 @@
 				</div>
 				<h1>Whisper Rolls to GM</h1>
 			</div>
-
+			
 			<div class="item-version-row">
 				<div class="item-version-label">
 					<h2>Version:</h2>
@@ -6778,13 +6786,22 @@
 	
 	// Reset endurance and stun in item-characteristics-health when the reset action button is clicked.
 	on("clicked:resetHealth", function () {
-		getAttrs(["endurance","stun"], function(values) {
+		getAttrs(["endurance", "stun", "optionResetTargeting", "rangeSelection"], function(values) {
 			const maxEND = parseInt(values.endurance);
 			const maxSTUN = parseInt(values.stun);
+			
+			let theRangeSelection = parseInt(values.rangeSelection)||0;
+			
+			let resetOption = values.optionResetTargeting||0;
+			
+			if (resetOption) {
+				theRangeSelection = 0;
+			}
 			
 			setAttrs({
 				"currentSTUN":maxSTUN,
 				"currentEND":maxEND,
+				"rangeSelection":theRangeSelection
 			});
 		});
 	});
