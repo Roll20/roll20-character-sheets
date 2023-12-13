@@ -463,7 +463,7 @@ For help, please see the wiki page. <input type="text" disabled="true" name="wik
 					<td class="sheet-col1"><input type="checkbox" class="sheet-hidden" name="attr_fortformula-show" id="fortLabel" value="1"/><label class="defenseStatslabel" for="fortLabel" title="Show/Hide Fortitude Formula"><span data-i18n="fortitude">Fortitude</span></label></td>
 					<td><input type="number" name="attr_Fortitude" value="" readonly="true" title="Fortitude @{Fortitude}" /></td>
 					<td>&nbsp;=&nbsp;10&nbsp;+&nbsp;</td>
-					<td><input type="number" name="attr_FortLevel" value="@{FortLevel|max}" disabled="true" title="Fortitude Level / Armor bonus @{FortLevel}" />	<input type="text" name="attr_FortLevel_max" value="@{level}" title="Fortitude Level Formula @{FortLevel|max}" class="hidden" /></td>
+					<td><input type="number" name="attr_FortLevel" value="@{FortLevel|max}" disabled="true" title="Fortitude Level / Armor bonus @{FortLevel}" />	<input type="text" name="attr_FortLevel_max" title="Fortitude Level Formula @{FortLevel|max}" class="hidden" /></td>
 					<td><input type="number" name="attr_FortClass" value="0" title="Fortitude Class bonus @{FortClass}" /></td>
 					<td> <select name="attr_FortMod" class="modtype " title="Fortitude Ability Modifier (default CON) @{FortMod}">
 					  <option value="str_max" data-i18n="str">STR</option>
@@ -6070,7 +6070,7 @@ on("change:armorworncheck change:armorprof", function() {
 	ArmorUpdate();
 	ArmorPerception();
 });
-on("change:armordefense change:imparmordefense change:armorref change:armortype change:ArmorDex", function() {
+on("change:armordefense change:imparmordefense change:armorref change:armortype change:ArmorDex change:armorfort", function() {
 	ArmorUpdate();
 });
 on("change:armorperception", function() {
@@ -6412,13 +6412,14 @@ var ArmorPerception = function() {
 };
 
 var ArmorUpdate = function() {
-	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "dex", "RefMod"], function(v) {
+	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "dex", "RefMod", "armorfort"], function(v) {
 	let ArmorWornCheck = parseInt(v.ArmorWornCheck)||0;
 	let ArmorDefense = parseInt(v.ArmorDefense)||0;
 	let ImpArmorDefense = parseInt(v.ImpArmorDefense)||0;
 	let ArmorProf = parseInt(v.ArmorProf)||0;
 	let ArmorRef = parseInt(v.ArmorRef)||0;
 	let level = parseInt(v.level)||0;
+	let armorfort = parseInt(v.armorfort)||0;	
 	let ArmorType = v.ArmorType;
 	let ArmorDex = parseInt(v.ArmorDex)||0;
 	let DEX = parseInt(v.dex)||0;
@@ -6431,25 +6432,25 @@ var ArmorUpdate = function() {
 	if(ArmorWornCheck == "1") { //If Armor is being Worn
 		setAttrs({"ArmorCarry": "1"}); // Armor is Carried
 		if(ArmorProf == "1") { //if Proficient
-			armorFortitude = "@{level}+@{ArmorFort}"
+			armorFortitude = level + armorfort;
 			armorPenalty = "0";
 			if(ArmorDefense != 1 ) {
-				armorReflex = "@{ArmorRef}";
+				armorReflex = ArmorRef;
 				setAttrs({ "ImpArmorDefense": "0" });
 			}
 			else if(ArmorDefense == 1 && ImpArmorDefense != 1){
-				if (ArmorRef > level ) {armorReflex = "@{ArmorRef}";}
-				else {armorReflex = "@{level}"}
+				if (ArmorRef > level ) {armorReflex = ArmorRef;}
+				else {armorReflex = level}
 			}
 			else if(ImpArmorDefense == 1) {
-				if (ImpArmorDefenseBonus >= ArmorRef) {armorReflex = "@{level}+floor(@{ArmorRef}/2)"; console.log("== ImpArmorDefense (" + ImpArmorDefenseBonus +") > ArmorRef ("+ ArmorRef +") ==");}
-				else {armorReflex = "@{ArmorRef}";}
+				if (ImpArmorDefenseBonus >= ArmorRef) {armorReflex = level + Math.floor(ArmorRef/2); console.log("== ImpArmorDefense (" + ImpArmorDefenseBonus +") > ArmorRef ("+ ArmorRef +") ==");}
+				else {armorReflex = ArmorRef}
 			}
-			else {armorReflex = "@{level}"}
+			else {armorReflex = level}
 		}
 		else {
-			armorReflex = "@{ArmorRef}";
-			armorFortitude = "@{level}";
+			armorReflex = ArmorRef;
+			armorFortitude = level;
 			//Armor Penalty
 			switch (v["ArmorType"]) {
 				case "Light":
@@ -6466,12 +6467,14 @@ var ArmorUpdate = function() {
 		}
 	}
 	else {
-			armorReflex = "@{level}";
-			armorFortitude = "@{level}"
+			armorReflex = level;
+			armorFortitude = level;
 			armorPenalty = "0";
 			setAttrs({"ArmorCarry": "0"}); //Armor is not Carried
 		}
-
+		console.log("armorReflex",armorReflex);
+		console.log("armorFortitude",armorFortitude);
+		console.log("armorPenalty",armorPenalty);		
 		setAttrs({
 			"RefLevel_max": armorReflex,
 			"FortLevel_max": armorFortitude,
@@ -6493,9 +6496,10 @@ var ArmorUpdate = function() {
 };
 
 //Defense Sheetworker, not the cleanest but it works
-on('change:str change:dex change:con change:int change:wis change:cha sheet:opened change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal change:condtrack change:armorref change:armordex change:armorfort', function(){
-	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "str_max", "dex_max", "con_max", "int_max", "wis_max", "cha_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack", "armorref", "armorfort",  "armorworncheck", "armordex"], function(values) {
-
+on('sheet:opened change:str change:dex change:con change:int change:wis change:cha change:RefMod change:RefLevel_max change:RefClass change:RefMisc change:RefSizeMod change:CT change:RefTotal change:RefFlatFootedMisc change:forttotal change:fortmod change:fortclass change:fortmisc change:willmod change:willclass change:willmisc change:willtotal change:condtrack change:armorref change:armordex change:armorfort change:armorprof change:FortLevel_max', function(){
+	getAttrs(["reflex", "refmod", "reftotal", "level", "refclass", "RefMisc", "RefFlatFootedMisc", "RefSizeMod", "CT", "str_max", "dex_max", "con_max", "int_max", "wis_max", "cha_max", "reftotal_max", "fortmod", "forttotal", "fortclass", "fortmisc", "willmod", "willclass", "willmisc", "willtotal", "condtrack", "armorref", "armorfort",  "armorworncheck", "armordex", "reflevel_max", "fortlevel_max"], function(values) {
+		const reflevel = parseInt(values.reflevel_max);
+		let fortlevel = values.fortlevel_max;
 		let ref = values.refmod;		
 		let refstatValue = parseInt(values[ref]); // Fetch the value of the attribute represented by the string stored in `stat`
 		let fort = values.fortmod;
@@ -6524,21 +6528,13 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		willtotal += CTValue;
 		forttotal += CTValue;		
 		
-		if(ArmorWornCheck == "1") {
-		armorreflevel = armorref;
-		armorfortlevel = armorfort;
-		//console.log("Armor is enabled");
-		} else {
-		//console.log("armor is not enabled");
-		armorreflevel = level;
-		}
 		//console.log("armorreflevel: ", armorreflevel);		
 		if (values.condtrack === "50" && ref === "dex_max") {
 			console.log("condtrack is '50' and refmod is 'dex_max'");
 			refstatValue = -5;
 		}					
 		if (!values.reftotal) {
-			let reflexsum = 10 + refstatValue + armorreflevel + refClass + refMisc + CT + refSizeMod;
+			let reflexsum = 10 + refstatValue + reflevel + refClass + refMisc + CT + refSizeMod;
 			setAttrs({"Reflex": reflexsum});		
     	}
 		else {
@@ -6547,7 +6543,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		}
     	if(!values.reftotal_max) {
 			let min = (0 < refstatValue) ? 0 : refstatValue;			
-			let reflexflatsum = 10 + min + level + refClass + RefFlatFootedMisc + refSizeMod + CT;
+			let reflexflatsum = 10 + min + reflevel + refClass + RefFlatFootedMisc + refSizeMod + CT;
 			setAttrs({"ReflexFlatFooted": reflexflatsum});		
     	}
 		else {
@@ -6555,7 +6551,7 @@ on('change:str change:dex change:con change:int change:wis change:cha sheet:open
 		console.log("REFLEX Flatfoot FORMULA IS BEING OVERWRITTEN");		
 		}		
 		if(!values.forttotal) {
-			let fortsum = 10 + fortstatValue + level + armorfortlevel + parseInt(values.fortclass) + parseInt(values.fortmisc) + CT;
+			let fortsum = 10 + fortstatValue + fortlevel + parseInt(values.fortclass) + parseInt(values.fortmisc) + CT;
 			setAttrs({"Fortitude": fortsum});		
     	}
 		else {
