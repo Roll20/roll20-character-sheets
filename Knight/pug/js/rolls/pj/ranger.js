@@ -11,10 +11,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let attributs = [
     'pilonnageRanger',
     'energiePJ',
-    'caracteristique1Ranger',
-    'caracteristique2Ranger',
-    'caracteristique3Ranger',
-    'caracteristique4Ranger',
+    'caracteristique1Longbow',
+    'caracteristique2Longbow',
+    'caracteristique3Longbow',
+    'caracteristique4Longbow',
     'discretion',
     ODValue.discretion,
     ODValue.tir,
@@ -68,6 +68,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
     'canonLongRanger',
     'canonRaccourciRanger',
     'chambreDoubleRanger',
+    'cadencerangeractif',
     'interfaceGuidageRanger',
     'lunetteIntelligenteRanger',
     'chargeurExplosivesRanger',
@@ -137,6 +138,8 @@ on('clicked:distanceRangerLongbow', async (info) => {
   let isFureur = false;
   let isUltraviolence = false;
 
+  let isCadence = false;
+
   if (PG50_2 === 'on') {
     diceDegats = Number(attrs.rangerArmeDegatEvol.split('D')[0]);
     diceViolence = Number(attrs.rangerArmeViolenceEvol.split('D')[0]);
@@ -168,10 +171,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
   const mod = +attrs.jetModifDes;
   const hasBonus = +attrs.bonusCarac;
 
-  const C1 = attrs.caracteristique1Ranger;
-  const C2 = attrs.caracteristique2Ranger;
-  const C3 = attrs.caracteristique3Ranger;
-  const C4 = attrs.caracteristique4Ranger;
+  const C1 = attrs.caracteristique1Longbow;
+  const C2 = attrs.caracteristique2Longbow;
+  const C3 = attrs.caracteristique3Longbow;
+  const C4 = attrs.caracteristique4Longbow;
 
   const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
@@ -454,12 +457,11 @@ on('clicked:distanceRangerLongbow', async (info) => {
   // FIN GESTION DES EFFETS
 
   // GESTION DES AMELIORATIONS
-  let rChambreDouble = 0;
-
   const aGrappe = attrs.chargeurGrappesRanger;
   const aCLong = attrs.canonLongRanger;
   const aCRaccourci = attrs.canonRaccourciRanger;
   const aChambreDouble = attrs.chambreDoubleRanger;
+  const eCadenceA = +attrs.cadencerangeractif;
   const aIGuidage = attrs.interfaceGuidageRanger;
   const aLIntelligente = attrs.lunetteIntelligenteRanger;
   const aExplosive = attrs.chargeurExplosivesRanger;
@@ -491,9 +493,10 @@ on('clicked:distanceRangerLongbow', async (info) => {
     exec.push(`{{canonRaccourciCondition=${i18n_canonRaccourciCondition}}}`);
   }
 
-  if (aChambreDouble !== '0') {
-    rChambreDouble = '?{Plusieurs cibles ?|Oui, 3|Non, 0}';
-  }
+  if (aChambreDouble !== '0' && eCadenceA === 1) {
+    isCadence = true;
+    exec.push(`{{vChambreDouble=2) ${i18n_inclus}}}`);
+  } else if (aChambreDouble !== '0' && eCadenceA === 0) { autresAmeliorations.push(i18n_chambreDouble); }
 
   if (aLIntelligente !== '0') {
     isConditionnelA = true;
@@ -587,7 +590,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
   // FIN DE GESTION DES BONUS SPECIAUX
 
-  const MALBonus = getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
+  const MALBonus = await getMALBonus(attrs, armureL, isELumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom, autresEffets);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -728,7 +731,17 @@ on('clicked:distanceRangerLongbow', async (info) => {
   bonus = bonus.concat(ODMALShaman);
   bonus = bonus.concat(ODMALWarrior);
 
-  exec.push(`{{jet=[[ {{[[{${cRoll.join('+')}-${rChambreDouble}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`);
+  const pairOrImpair = 'cs2cs4cs6cf1cf3cf5s';
+
+  const malusRoll = isCadence === true ? 3 : 0;
+  const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+  const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+  const baseJet = '{{basejet=[[0]]}}';
+
+  exec.push(jet);
+  exec.push(baseJet);
+
   exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
   exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
@@ -762,8 +775,6 @@ on('clicked:distanceRangerLongbow', async (info) => {
     isSurprise = true;
   }
 
-  if (rChambreDouble !== 0) { exec.push(`{{vChambreDouble=${rChambreDouble}}}`); }
-
   if (devaste || bourreau || equilibre) {
     const herauts = [];
 
@@ -785,6 +796,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
     finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
@@ -804,21 +816,28 @@ on('clicked:distanceRangerLongbow', async (info) => {
       isSurprise,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
 
-    const finalComputed = {
-      jet: tJet + tBonus,
-    };
+    finishRoll(finalRoll.rollId, computed);
 
-    Object.assign(finalComputed, computed);
+    if (tJet !== 0 && computed.basejet === tExploit) {
+      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = 0;
 
-    finishRoll(finalRoll.rollId, finalComputed);
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
 
-    if (tJet !== 0 && tJet === tExploit) {
-      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
-      const tRExploit = exploitRoll.results.jet.result;
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);

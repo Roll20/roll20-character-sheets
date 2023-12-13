@@ -15,12 +15,19 @@ Add 6 general knowledge skills (to be filled in by player)
 Umiejetnosc groups
 Static XP Table for Wspolczynnik and Umiejetnosc
 
+## V 1.2
+Dark style fix visibility
+Selecting a specialization automatically marks that specializations skill groups
+
 ## TODO
 TODO: Move images to github
 TODO: Design and build inventory section
 TODO: Add kara do wspolczynnika to ustawienia rzutu
 TODO: I info button with instructions
-TODO: Dark style fix visibility
+TODO: Smaller font for rolls, roll styling
+TODO: Rzut na 1 kosc, 2 kosci
+TODO: wiedza ogolna hide toggle
+
 
 ## WONTDO
 TODO: Non-standard skills based on arbitrary Wspolczynnik

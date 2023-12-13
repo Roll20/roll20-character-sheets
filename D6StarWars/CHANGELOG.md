@@ -1,3 +1,6 @@
+### Version 2.44 (2022-08):
+- fix broken style at character sheet background
+
 ### Version 2.43 (2022-04):
 - **PC sheet**
 	- added Action selector for number of actions per round which automatically applies appropriate modifiers for MAP

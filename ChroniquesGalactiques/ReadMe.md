@@ -4,15 +4,78 @@ _A french Scifi RPG based on the D20 system / OGL 3.5._
 
 Chroniques Galactiques est un jeu de r&ocirc;le futuriste complet bas&eacute; sur le syst&egrave;me d20/OGL 3.5.
 
-Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
+Cette feuille de personnage inclut des fiches pour les personnages, pour les PNJ, pour les vaisseaux et pour les m&eacute;chas.
 
-Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
+Ces fiches comportent de nombreux jets de dés et permettent de mettre en oeuvre des r&egrave;gles optionnelles param&eacute;trables.
+
+Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données techniques pour tous les types de fiches.
 
 # Version courante
 
-V3.115.0 [Screenshot](cog_v3.png)
+V4.4.1 [Screenshot](cog_v4.png)
 
 # Notes de version
+
+___Chroniques Oubliées Galactiques Version 2___
+
+## V4.4.1 (2023.10.31)
+
+- Fiche de personnage
+  - Correction d'un bug empêchant l'exécution du code Javascript de la fiche
+
+## V4.4.0 (2023.09.30)
+
+- Fiche de personnage
+  - Correction d'un bug sur les boutons de jets de caractéristiques
+    
+    Pour les fiches existantes, sélectionner temporairement un modificateur de situation différent de 0 corrige le problème
+  - Gestion dynamique des compétences
+    
+    Une liste standard est chargée dans l'onglet Configuration mais peut être adaptée à l'univers de jeu
+    
+    Indiquer une compétence par ligne dans le format Nom|CAR|Notes (optionnel)
+    
+    Cette liste est utilisée par le  bouton +Compétences pour les ajouter dans la liste des jets de capacités
+
+## V4.3.0 (2023.08.31)
+
+- Fiche de personnage
+  - Gestion des modificateurs de situation
+  - Nouvelle option : demander le ND des jets
+  - Nouvelle option : cibler les jets d'attaque (DEF / DEP)
+  - Import de la liste d'équipement (Web App Export COMob)
+  - Import de la famille de profil (Web App Export COMob)
+  - Calcul PV, PC selon la famille de profil
+  - Ajout d'un bouton pour afficher un message de chat expliquant la syntaxe des buffs
+  - Ajout d'un bouton pour afficher un message de chat expliquant la syntaxe des propriétés d'équipement
+- Fiche de vaisseau et mécha
+  - Mention script MOD "COlib" remplacée par "COGCrew"
+
+## V4.2.0 (2023.04.09)
+
+- Suppression du calcul automatique des PV par niveau
+- Ajout option Instabilité Psy
+- Ajout onglet Version avec notes et log
+
+## V4.1.0 (2023.03.29)
+
+- Ajout import de statblock de vaisseau et de mécha
+- Prise en compte malus d'armure sur INIT, tests de DEX et d'ATD
+- Ajout détail des PV par niveaux
+
+## V4.0.0 (2022.12.30)
+
+- Révision des fiches de PJ, PNJ et Vaisseau
+- Ajout de la fiche de Mécha
+
+___Chroniques Oubliées Galactiques Version 1 (Casus)___
+
+V3.115.1 [Screenshot](cog_v3.png)
+
+## V3.115.1 (2021.12.18)
+
+- Correction noms boutons action (pas de \_ dans le nom après act\_)
+- Modification libellés options DM sans limites (bug 'optgroup' de Roll20)
 
 ## V3.115.0 (2021.11.12)
 

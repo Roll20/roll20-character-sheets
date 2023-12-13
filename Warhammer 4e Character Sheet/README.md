@@ -9,33 +9,41 @@ This is a fork of https://github.com/vicberg/Roll20-Warhammer-4e-Character-Sheet
 This Character Sheet has been updated to fix and enhance mostly in the original style. And uploaded to Roll20 for all to use.  
 I'm a active WFRP player and I plan to further enhance this sheet at time goes on. 
 
-This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. There is some additional integration like TEW companion rules, and options for certain custom house rules.
+This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of detailed manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. Including uptodate offical companion and expansion rule (TEW/UiA/WoM/AotE..), and options for certain custom house rules.
 
+Optional Custom WFRP4e token marker set 4 is available @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip // UiA Edition @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip. Follow Roll20 Token marker update instructions for your server.
 
-My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. Follow Roll20 Token marker update instructions for your server.
-The sheet should work on latest version of Firefox, MS Egde & Chrome.
+The sheet should work on latest version of Firefox, MS Egde & Chrome. at 110-125% Magnification. 
 
+Please report issues on Github or Discord : Justi#7934
   
+
 ///// ============ Main Features ============ /////  
 
 
-- Attack / Opposed / Ranged with active weapon selection system. with integrated Defensive and Impale mechanics. 
+- Mainhand / Offhand / Ranged with active weapon selection system. with integrated integated Skill, Talent & Quality mechanics. 
 
-- Skill system, Basic / Advanced Skill List is fully implemented. With Roll outcome modifiers allowing player to tie custom text and other bonuses to roll out comes like success/failure/always.
+- Combat Roll Modifier Quick Menu dropdown for Melee and Ranged, mod calculator with dymanic situation (Def Stance/Called Shot/Reach/Size/xVsy/Prone) and talent +SL/lvl integration (Stirke to Stun/Infighter/Fury..). Talent trigger's will onyl show if learned.
 
-- Roll outcome modifier fields allowing Talent Test modifiers and other bonuses to be added to skill and action rolls by the player depending their choices. These are configured on the skills which make use of them rather then centrally managed from the talent tab which only records what talents have been learned. Available for PC combat and skill rolls, but not on the NPC tab due to performance issues. 
+- Skill system, Basic / Advanced Skill List is fully implemented. 
 
-- Integrated SL results for all rolls, which aids in the manual calculation for opposed rolls (due to underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self-calculated approach while providing the maximum possible information options for talent and other bonuses.) 
+- Talent system, all Core+++ official talent integrated into roll system. Add SL to all outcome and automatically add up for total outcome. Integrated into sheet Charactistics, Carry Weigth etc, and Movement Rolls from the Action bar and and Quick menu's.
+
+- Item Qualities system, Weapons, Armor and Damage absorption system with Qualities, Enc, AP, Durable, Damage, Damage point & Talent integration. 
+
+- Integrated SL results for all rolls, which aids in the manual calculation of opposed rolls (due to underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self-calculated approach while providing the maximum possible information options for talent and other bonuses.) 
 
 - Roll Tables for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God integrated, also traggerable from clicky buttons in the roll template output when they occur.  
 
-- Armor and Damage absorption system with Enc, AP, Durable, Damage, Damage point & Robust Talent tracking. 
-
 - Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ https://pdfcoffee.com/unofficial-grimoire-12-pdf-pdf-free.html).
 
-- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs.
+- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs. Including Group Advantage rule option to disable roll intregation!
 
 - Inventory: Full Encumbrance Management system, with integrated Over encumbrance modifiers (-move/Agi), and Container & Vehicle Management section (TEW compatible) . 
+
+- Manual and Auto XP recording options.
+
+- Custom Roll outcome modifiers allowing player to tie custom text and other bonuses to roll out comes like success/failure/always.
 
 - Custom NPC tab, on sheet area to quickly add NPC for GM and players alike. Not meant to replace a full character sheet, but handy for quick trash mob types. The idea is to make a full char sheet for the "boss" and to have his henchmen as Custom NPC's on the NPC tab.  
 
@@ -56,7 +64,7 @@ The sheet should work on latest version of Firefox, MS Egde & Chrome.
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage integration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommend separate character sheet for actual NPC bosses/major characters).  
 - Condition Tracking integration into roll template. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stunned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too.  
 
-This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v3.1 (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip) due to naming convention. 
+This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v4 @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip // UiA Edition @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip
 
 Condition effects are currently hard coded as follows (updated June 15th 2021): 
 
@@ -73,7 +81,119 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
-June 6th 2022 v1.56.1
+July 8th 2023 v1.66a
+
+- Fixed Legs plate amror penalty when modified with pracitcal quality. It will now reduce the -20 pen to stealth to -10, instead of to 0.
+
+
+June 30nd 2023 v1.66
+
+- Added Practical Quality option tick box to all Mail/Plate Armor, this will reduce all penalties by -10 on the given armor piece and update the penalties boxes accordingly.
+- Corrected issue on Armor Tab where Shield Durability was adding to AP on the hit locations display to the right.
+
+
+June 22nd 2023 v1.65c
+
+- Added the Norse Race (Sea of Claws), same attribute as humans with default size average.
+- Fixed some rolls not working under certain conditions.
+- Fixed some failed roll Talent modifier text not displaying correctly. eg - You may Reverse Dice
+
+
+February 28th 2023 v1.65b
+
+- Fixed Talent Nobleblood test +SL text during leadership rolls, now correctly dislays as situational bonus SL.
+
+
+February 14th 2023 v1.65a
+
+- Fixed some skill rolls not always working due to new Besmirched condition bug
+- Fixed NPC fumble/crit not working from the combat text clicky
+- Fixed Talent integration description il8n tags
+- Fixed Channelling so no long removes SL from the Ext Accu SL pool when failing the roll
+
+
+December 20th 2022 v1.65
+
+- Added Ranged Weapons to be equipable in Mainhand/Offhand. This allows ranged offhand, and mixing with Melee inclding Dualwield Ranged.
+- Ranged weapons now have Two-handed weapon option to support full Main/Off hand functionality.
+- Added a new quick weapon selector at the bottom of Combat actions section for all Mainhand/Offhand and Rangd weapons. Once Weapons are added in the Weapons tab they will show on the selector.
+- Added "Master And Commander" Talent (from C7 Sea of Claws) to the Talent list, with integrated Leadrship SL bonus support.
+- Implemented Besmirched Condition effects, when besmirched Characters will get -2 SL to tests rolled with Fellowship Skill.
+- Added Warpstone & ZZAP! Weapon Qualities for skaven weapons (from C7 Horned Rat Companion) to both Melee and Ranged Weapons, and apporpriate effects in roll output for Main PC & NPCs.
+- Various bug fixes
+
+
+December 12th 2022 v1.64a
+
+- Fixed Blather talent not adding to AutoXP.
+- Fixed VsSize Melee modifier not adding +10 to Melee attack Modifiers when vs larger targets then yourself.
+
+
+November 4th 2022 v1.64
+
+- Added Spell/Pray (Magic) Drop-down Assist: this is similar to the Melee/Ranged ones. Its shows all learned spells Petty/Arcance from the spellbook, or blessings/miracles, in a collapsable menu with lore  channeling, Accu SL and Cast buttons for Quick access to those buttons under Combat actions.
+
+- Fix Accurate Mod reset
+- Fix Deadeye shot bonus not applying
+- Fix Characteristics Auto XP bug
+- Optimized NPC weapon switch code
+- Added visable RT Overcast popup info list when casting non-damage spells
+
+
+October 31st 2022 v1.63
+
+- New setting switch for Optional Fumble/Oops Rules by FighterChimp on Ratcatcher Guild Discord @ https://discord.com/channels/449845411344154634/449846068356710412/611069939654066177. These are somewhat similar to Core, but with better descriptions which are more adaptable to melee/ranged/magic. Matter of preference for GM.
+
+- Fixed Fast Shot not showing in Ranged assist drop-down window when above LVL 1.
+- Fixed XP not adding for Fast Shot Talent.
+
+
+October 8th 2022 v1.62
+
+- NPC Tab - Weapon Qualities & Combat Talent support added. Similar to PC weapons, it adds cog setting button next to NPC weapons to configure qualities. A limited set of optional talents have been added and will add SL modifiers. Also adds offhand penalty on the Opp Weapon if it not the same as the Atk Weapon, modified by Melee Parry/Ambidextrous as appropriate. Changes do slow down this Tab a little, recommend configuring NPC then minimize and use minibutton for combat.
+
+- Added mouse over popup Overcast Table in the roll output for Spell cast rolls next the "SL Effect".
+- Fixed Aethyric Attunement and Wizard robes +SL not adding to Channelling roll when rolled from the Skill Tab.
+- Fixed Furious Assault +SL not adding to the final result in the roll outcome when initiated from the Furious Assault roll template mini button.
+- Fixed issue with Melee Bonus re-applying after a hit in certain circumstances. Bonus Value was not being cleared from the Weapons Tab.
+
+September 24th 2022 v1.61
+
+- Updated Armor Tab - There is now 3 (Light/Medium/Heavy) Equip/unequip buttons at the top of the tab. This allows quicker equiping and unequiping of armor for players. Also all Equip/Unequip and Worn/Unworn actions in this tab now automatally activate or disable the corresponding armor penatlies. 
+
+
+August 22th 2022 v1.6b
+
+- Removed critical rt display for Prayer spells, as they do not get dubs random criticals, only fumbles.
+- Adds conditional check when peforming Dual Wield attack, if the Player has just rolled a crit, they now will chose if they want to use main hand or crit result for the DW attack. Crit result DW hits will now remove any modifier on crit roll before reversal, so result stays within 1d100 range.
+- Fixed recent issue with Darkmode on Chrome based browsers, white text was showing in much of the chat log RT output while in darkmode.
+- Added translation tags for Blessings spell list.
+- Custom WFRP4e token marker set 4.0 released includes UiA edition with no Advantage markers. Splits Fear into 1/2/3 markers. And a number of usefull custom markers. Url:
+
+https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip
+
+UiA Edition: https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip
+
+
+August 8th 2022 v1.6a
+
+- Fixed Enchanted Staff CN mod when casting. Should now add -1 appropriatly for all Lore's.
+- Fixed used with Characteristics Mod add reseting undere certain circumstances.
+- Channeling rolls from the Skill tab will now add Accu Ext SL to spells and rituals of the same Lore.
+
+
+July 11th 2022 v1.6
+
+UI & Code consolidation Update
+- Major clean up of sheet code (-25%), removed much of the pre-devmode code for the old SL system. This improves overall sheet performance and load times.
+- New SL system (formely Devmode/Talent integration only) is now fully integrated as default and used for all rolls. 
+- SL RT result line cleaned up, roll SL outcome clearly outlined, with bonus SL (colored), and final SL outlined.
+- Besmirched added to conditions list, it is currently not yet intergrated into Fellowship rolls. (TBD)
+- Talent Integration XP now fully integrated. Sheets that where using Auto XP custom talent entries will need to delete them and transfer them to the new integrated talents. Custom Talents can still be added manually.
+- NPC's will remember equiped weapon types we closing and reopening a sheet.
+
+
+June 6th 2022 v1.56a
 
 - Fixed NPC weapon rolls not working when Talent Integration is disabled.
 - NPC Crit roll button will now follow UiA rules if then are active/selected.
@@ -216,7 +336,7 @@ July 12th 2021 v1.51
 
 July 5th 2021 v1.5 
 
-- Automatic XP Spent calculation (as per core rule book) has been intergrated to the sheet as a optional feature, activate this in the XP or settings tabs. This will calculate all XP on the fly after Talents or Advances are entered in the sheet. Special Xp circumstances like free/starting XP or changing career/level need to be added manually to the "Other XP" section in the XP tab. XP calculation is capped at 50 skill advances/10 talent levels as descibed in the core rules, advances above this will not count toward the overall spent total. You can not mix Auto & Manual modes at the same time, but you can switch between them at anytime.
+- Automatic XP Spent calculation (as per core rule book) has been integrated to the sheet as a optional feature, activate this in the XP or settings tabs. This will calculate all XP on the fly after Talents or Advances are entered in the sheet. Special Xp circumstances like free/starting XP or changing career/level need to be added manually to the "Other XP" section in the XP tab. XP calculation is capped at 50 skill advances/10 talent levels as descibed in the core rules, advances above this will not count toward the overall spent total. You can not mix Auto & Manual modes at the same time, but you can switch between them at anytime.
 - Made Armor Penalties on Perception and Stealth rolls visible on the Rolltempalte so it clear that they are being applied.
 - Fixed some advanced skill target numbers which were calculating conditions twice.
 
@@ -494,10 +614,6 @@ Dec 24 2019
  
 Future release wish list : 
 
-
-- Optional integrated Fast SL, this has been request a number of times, but it's hard to implement a secondary SL system. (maybe) 
-- More themes. (v1.4) 
-- WFRP 4e Roll API, fully integrated. This is the dream, very hard to do.. (x.x) 
-
+- TBA
 
 Enjoy. 

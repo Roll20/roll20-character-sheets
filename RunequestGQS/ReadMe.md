@@ -34,12 +34,28 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## 23.05.2023
+    Fixed 2 Headed Dragonsnail location roll
+    Adjusted location of hit location button
+
+## 16.05.2023
+    Scorpion men Thorax hit location roll fix
+    Centered THP loss header
+    Added magical damage bonus to missile weapons
+
+## 14.05.2023
+    Added Augmentation modifier for characteristic and resistance roll.
+
+
+## 11.05.2023
+    Fixed Total Hit Point multiple wound calculation 
+    Fixed  Spirit Combat damage calculation for POW+CHA totals > 56
 
 ## 25.10.2021
 
 	Fixed Strike issues with DEX 19+.  DEX will have to be changed for this to be triggered.
 	Added headers to Parry & Attack Rolls
-	Added delimiters to clarigy the start and end of attacks and parries.
+	Added delimiters to clarify  the start and end of attacks and parries.
 
 ## 06.10.2021
 

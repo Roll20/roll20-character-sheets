@@ -86,7 +86,6 @@ rollCombatAutrePNJ.forEach((button) => {
     let isAssistantAttaque = false;
     let isAntiAnatheme = false;
     let isCadence = false;
-    let sCadence = 0;
     let vCadence = 0;
     let isDestructeur = false;
     let vDestructeur = 0;
@@ -96,13 +95,23 @@ rollCombatAutrePNJ.forEach((button) => {
     let isObliteration = false;
     let isTenebricide = false;
     let isTirRafale = false;
-    let isChambreDouble = false;
     let isFureur = false;
     let isUltraviolence = false;
     let isSurprise = false;
 
     let isELumiere = false;
     let lumiereValue = 0;
+
+    let isBourreau = false;
+    let isDevastation = false;
+    let isGuidage = false;
+    let isRegularite = false;
+
+    let eBourreauValue = 0;
+    let eDevastationValue = 0;
+
+    let hasEnergieRetiree = false;
+    let vEnergieRetiree = 0;
 
     let autresEffets = [];
     let autresAmeliorationsA = [];
@@ -128,7 +137,6 @@ rollCombatAutrePNJ.forEach((button) => {
     isAssistantAttaque = effets.isAssistantAttaque;
 
     isCadence = effets.isCadence;
-    sCadence = effets.sCadence;
     vCadence = effets.vCadence;
 
     isDestructeur = effets.isDestructeur;
@@ -150,6 +158,14 @@ rollCombatAutrePNJ.forEach((button) => {
 
     isELumiere = effets.isELumiere;
     lumiereValue = Number(effets.eLumiereValue);
+
+    isBourreau = effets.isBourreau;
+    isDevastation = effets.isDevastation;
+    isGuidage = effets.isGuidage;
+    isRegularite = effets.isRegularite;
+
+    eBourreauValue = effets.vBourreau;
+    eDevastationValue = effets.vDevastation;
 
     if (effets.isConditionnelA) { isConditionnelA = true; }
 
@@ -178,9 +194,8 @@ rollCombatAutrePNJ.forEach((button) => {
     if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = ameliorationsA.attaquesSurprisesCondition; }
 
     if (ameliorationsA.isChambreDouble) {
-      isCadence = false;
-      isChambreDouble = ameliorationsA.isChambreDouble;
-      sCadence = ameliorationsA.rChambreDouble;
+      isCadence = true;
+      vCadence = ameliorationsA.vCadence;
     }
 
     autresEffets = autresEffets.concat(ameliorationsA.autresEffets);
@@ -224,8 +239,18 @@ rollCombatAutrePNJ.forEach((button) => {
       bViolence.push(sBonusViolenceFixe);
     }
 
+    if (isGuidage) {
+      hasEnergieRetiree = true;
+      vEnergieRetiree += 5;
+    }
+
     if (sEnergie) {
-      autresSpecial.push(`^{energie} (${sEnergieValue})`);
+      hasEnergieRetiree = true;
+      vEnergieRetiree += +sEnergieValue;
+    }
+
+    if (hasEnergieRetiree) {
+      autresSpecial.push(`^{energie} (${vEnergieRetiree})`);
     }
 
     // FIN DE GESTION DES BONUS SPECIAUX
@@ -247,10 +272,17 @@ rollCombatAutrePNJ.forEach((button) => {
     violence.push(`${diceViolence}D6`);
     violence = violence.concat(bViolence);
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = isGuidage === true ? 'cs1cs3cs5cf2cf4cf6s' : 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = isCadence === true ? 3 : 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
 
     firstExec.push(jet);
-    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    firstExec.push(baseJet);
+    exec.push(`{{Exploit=[[${total}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
     exec.push(`{{degats=[[${degats.join('+')}]]}}`);
@@ -292,16 +324,6 @@ rollCombatAutrePNJ.forEach((button) => {
         exec.push(`{{obliterationAS=${ASTenebricide.join('\n+')}}}`);
         exec.push(`{{obliterationASValue=${_.reduce(ASValueObliteration, (n1, n2) => n1 + n2, 0)}}}`);
       }
-    }
-
-    if (isCadence) {
-      exec.push(`{{rCadence=${i18n_cadence} ${vCadence} ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
-    }
-
-    if (isChambreDouble) {
-      exec.push(`{{rCadence=${i18n_chambreDouble} (${i18n_cadence} 2) ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
     }
 
     if (eASAssassinValue > 0) {
@@ -360,11 +382,15 @@ rollCombatAutrePNJ.forEach((button) => {
 
     if (effets.firstExec) { firstExec = firstExec.concat(effets.firstExec); }
 
+    if (isBourreau) { exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauValue} ${i18n_inclus}}}`); }
+    if (isDevastation) { exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationValue} ${i18n_inclus}}}`); }
+
     exec = firstExec.concat(exec);
 
     const finalRoll = await startRoll(exec.join(' '));
 
     const tJet = finalRoll.results.jet.result;
+    const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
     const tExploit = finalRoll.results.Exploit.result;
@@ -382,23 +408,39 @@ rollCombatAutrePNJ.forEach((button) => {
       isSurprise,
       isMeurtrier,
       isUltraviolence,
+      isBourreau,
+      isDevastation,
+      isRegularite,
+      isGuidage,
     };
 
-    const computed = updateRoll(finalRoll, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions);
-
-    const finalComputed = {
-      jet: tJet + tBonus,
+    const conditionsValues = {
+      eBourreauValue,
+      eDevastationValue,
     };
 
-    Object.assign(finalComputed, computed);
+    const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bDegats, tViolence, rViolence, bViolence, conditions, conditionsValues);
 
-    finishRoll(finalRoll.rollId, finalComputed);
+    finishRoll(finalRoll.rollId, computed);
 
-    if (tJet !== 0 && tJet === tExploit) {
+    if (tJet !== 0 && computed.basejet === tExploit) {
       const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-      const tRExploit = exploitRoll.results.jet.result;
+      const rExploit = exploitRoll.results.jet.dice;
+      const exploitPairOrImpair = isGuidage === true ? 1 : 0;
+
+      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === exploitPairOrImpair) {
+          nV = 1;
+        }
+
+        return accumulateur + nV;
+      }, 0);
+
       const exploitComputed = {
-        jet: tRExploit,
+        jet: jetExploit,
       };
 
       finishRoll(exploitRoll.rollId, exploitComputed);

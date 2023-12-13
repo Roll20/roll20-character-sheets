@@ -24,6 +24,9 @@ rollCombatPNJContact.forEach((button) => {
       'Masque',
       'MasquePNJAE',
       'MasquePNJAEMaj',
+      'Dame',
+      'DamePNJAE',
+      'DamePNJAEMaj',
       'capaciteFanMade',
       'attaqueOmbre',
     ];
@@ -84,10 +87,7 @@ rollCombatPNJContact.forEach((button) => {
     let isSurprise = false;
 
     let isCadence = false;
-    let rCadence = '0';
     let vCadence = 0;
-
-    let isChromee = false;
 
     let isArmeAzurine = false;
     let vArmeAzurine = 0;
@@ -106,6 +106,14 @@ rollCombatPNJContact.forEach((button) => {
 
     let isRouagesCasses = false;
     let vRouagesCasses = 0;
+
+    let isBourreau = false;
+    let isDevastation = false;
+    let isGuidage = false;
+    let isRegularite = false;
+
+    let eBourreauValue = 0;
+    let eDevastationValue = 0;
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -223,6 +231,8 @@ rollCombatPNJContact.forEach((button) => {
     const vMachineAE = totalAspect(attrs, 'Machine');
     const vMasque = +attrs.Masque;
     const vMasqueAE = totalAspect(attrs, 'Masque');
+    const vDame = +attrs.Dame;
+    const vDameAE = totalAspect(attrs, 'Dame');
 
     const aBase = attrs[`${prefix}AspectPNJ`] || '0';
     let aspect = '0';
@@ -298,7 +308,7 @@ rollCombatPNJContact.forEach((button) => {
 
     // GESTION DES EFFETS
 
-    const rEffets = getWeaponsEffectsPNJ(prefix, attrs, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+    const rEffets = getWeaponsEffectsPNJ(prefix, attrs, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE, vDame, vDameAE);
 
     firstExec = firstExec.concat(rEffets.firstExec);
     exec = exec.concat(rEffets.exec);
@@ -321,8 +331,15 @@ rollCombatPNJContact.forEach((button) => {
     isFureur = rEffets.isFureur;
 
     isCadence = rEffets.isCadence;
-    rCadence = rEffets.rCadence || '0';
     vCadence = rEffets.vCadence;
+
+    isBourreau = rEffets.isBourreau;
+    isDevastation = rEffets.isDevastation;
+    isGuidage = rEffets.isGuidage;
+    isRegularite = rEffets.isRegularite;
+
+    eBourreauValue = rEffets.vBourreau;
+    eDevastationValue = rEffets.vDevastation;
 
     attaquesSurprises = attaquesSurprises.concat(rEffets.attaquesSurprises);
     attaquesSurprisesValue = attaquesSurprisesValue.concat(rEffets.attaquesSurprisesValue);
@@ -372,6 +389,8 @@ rollCombatPNJContact.forEach((button) => {
 
     if (rAS.isConditionnelV) { isConditionnelV = true; }
 
+    if (!isMeurtrier) { isMeurtrier = rAS.isBarbelee; }
+
     // FIN GESTION DES AMELIORATIONS STRUCTURELLES
 
     // GESTION DES AMELIORATIONS ORNEMENTALLES
@@ -387,13 +406,16 @@ rollCombatPNJContact.forEach((button) => {
 
     if (rAO.vCadence > 0) {
       isCadence = false;
-      rCadence = rAO.rCadence;
       vCadence = rAO.vCadence;
     }
 
     if (rAO.isObliteration) { isObliteration = true; }
 
-    isChromee = rAO.isChromee;
+    if (rAO.isChromee) {
+      isCadence = true;
+      vCadence = rAO.vCadence;
+    }
+
     isCraneRieur = rAO.isCraneRieur;
 
     isArmeAzurine = rAO.isArmeAzurine;
@@ -438,6 +460,8 @@ rollCombatPNJContact.forEach((button) => {
     const sEnergieValue = attrs[`${prefix}energieValue`];
     let sEnergieText = '';
     let pasEnergie = false;
+    let hasEnergieRetiree = false;
+    let vEnergieRetiree = 0;
     let newEnergie = 0;
 
     if (sBonusDegats) {
@@ -452,10 +476,20 @@ rollCombatPNJContact.forEach((button) => {
       bViolence += Number(sBonusViolenceFixe);
     }
 
-    if (sEnergie) {
-      autresSpecial.push(`${i18n_energieRetiree} (${sEnergieValue})`);
+    if (isGuidage) {
+      hasEnergieRetiree = true;
+      vEnergieRetiree += 5;
+    }
 
-      newEnergie = Number(energie) - Number(sEnergieValue);
+    if (sEnergie) {
+      hasEnergieRetiree = true;
+      vEnergieRetiree += +sEnergieValue;
+    }
+
+    if (hasEnergieRetiree) {
+      newEnergie = Number(energie) - Number(vEnergieRetiree);
+
+      autresSpecial.push(`${i18n_energieRetiree} (${vEnergieRetiree})`);
 
       if (newEnergie === 0) {
         sEnergieText = i18n_plusEnergie;
@@ -472,13 +506,21 @@ rollCombatPNJContact.forEach((button) => {
 
     if (cRoll.length === 0) { cRoll.push(0); }
 
-    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}-${rCadence}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+    const pairOrImpair = isGuidage === true ? 'cs1cs3cs5cf2cf4cf6s' : 'cs2cs4cs6cf1cf3cf5s';
+
+    const malusRoll = isCadence === true ? 3 : 0;
+    const total = Math.max(cRoll.reduce((accumulateur, valeurCourante) => accumulateur + valeurCourante, 0) - malusRoll, 0);
+
+    const jet = `{{jet=[[ ${total}d6${pairOrImpair}]]}}`;
+    const baseJet = '{{basejet=[[0]]}}';
+
     firstExec.push(jet);
+    firstExec.push(baseJet);
 
     bonus.push(AEValue);
 
     exec.push(`{{vAE=${AEValue}}}`);
-    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    exec.push(`{{Exploit=[[${total}]]}}`);
     exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
 
     if (diceDegats < 0) { diceDegats = 0; }
@@ -487,16 +529,6 @@ rollCombatPNJContact.forEach((button) => {
 
     firstExec.push(`{{degats=[[${diceDegats}D6+${bDegats}]]}}`);
     firstExec.push(`{{violence=[[${diceViolence}D6+${bViolence}]]}}`);
-
-    if (isCadence) {
-      exec.push(`{{rCadence=${i18n_cadence} ${vCadence} ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${sCadence}D}}`);
-    }
-
-    if (isChromee) {
-      exec.push(`{{rCadence=${i18n_chromee} (${i18n_cadence} ${vCadence}) ${i18n_inclus}}}`);
-      exec.push(`{{vCadence=${rCadence}D}}`);
-    }
 
     if (isObliteration) {
       let ASObliteration = [];
@@ -602,6 +634,9 @@ rollCombatPNJContact.forEach((button) => {
 
     if (isConditionnelV) { exec.push('{{violenceConditionnel=true}}'); }
 
+    if (isBourreau) { exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauValue} ${i18n_inclus}}}`); }
+    if (isDevastation) { exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationValue} ${i18n_inclus}}}`); }
+
     firstExec = firstExec.concat(exec);
 
     // ROLL
@@ -614,6 +649,7 @@ rollCombatPNJContact.forEach((button) => {
       const rViolence = finalRoll.results.violence.dice;
 
       const tJet = finalRoll.results.jet.result;
+      const rJet = finalRoll.results.jet.dice;
 
       const tBonus = finalRoll.results.bonus.result;
       const tExploit = finalRoll.results.Exploit.result;
@@ -634,30 +670,45 @@ rollCombatPNJContact.forEach((button) => {
         isGriffureGravee,
         isMasqueBrise,
         isRouagesCasses,
+        isBourreau,
+        isDevastation,
+        isRegularite,
+        isGuidage,
       };
 
-      const computed = updateRoll(finalRoll, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions);
-
-      const finalComputed = {
-        jet: tJet + tBonus,
+      const conditionsValues = {
+        eBourreauValue,
+        eDevastationValue,
       };
 
-      Object.assign(finalComputed, computed);
+      const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, [bDegats], tViolence, rViolence, [bViolence], conditions, conditionsValues);
 
-      finishRoll(finalRoll.rollId, finalComputed);
+      finishRoll(finalRoll.rollId, computed);
 
-      if (tJet !== 0 && tJet === tExploit) {
+      if (tJet !== 0 && computed.basejet === tExploit) {
         const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-        const tRExploit = exploitRoll.results.jet.result;
+        const rExploit = exploitRoll.results.jet.dice;
+        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
+
+        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+          const vC = valeurCourante;
+          let nV = 0;
+
+          if (vC % 2 === exploitPairOrImpair) {
+            nV = 1;
+          }
+
+          return accumulateur + nV;
+        }, 0);
 
         const exploitComputed = {
-          jet: tRExploit,
+          jet: jetExploit,
         };
 
         finishRoll(exploitRoll.rollId, exploitComputed);
       }
 
-      if (sEnergie !== false) {
+      if (hasEnergieRetiree) {
         setAttrs({
           energiePNJ: newEnergie,
         });
