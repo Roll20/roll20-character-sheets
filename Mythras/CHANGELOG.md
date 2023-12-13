@@ -4,6 +4,19 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.5
+### Fixed
+- [Various reapeating fields can not be added to the macro bar #77](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/77)
+- Weapons added via the meg import were not getting their rollval set to make the buttons work
+
+## 3.4
+### Fixed
+- [Damage modifier and other fields may not appear when weapon button used from roll template #73](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/73)
+- [Favoriting Weapons & Clicking them from the Combat Style prompts all notes #68](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/68)
+
+### Changed
+- Weapon rolls were renamed from `%{$ID_damage}` to `%{$ID_roll}`.  They now use custom roll parsing and the roll button itself is a reference to the ability
+
 ## 3.3
 ### Fixed
 - [Issue #70: Using hidden HP configs is not working right](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/70)
