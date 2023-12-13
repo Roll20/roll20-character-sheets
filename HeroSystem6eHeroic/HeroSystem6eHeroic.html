@@ -6785,23 +6785,28 @@
 	}
 	
 	// Reset endurance and stun in item-characteristics-health when the reset action button is clicked.
+	// Also resets targeting choices if that option is checked.
 	on("clicked:resetHealth", function () {
-		getAttrs(["endurance", "stun", "optionResetTargeting", "rangeSelection"], function(values) {
+		getAttrs(["endurance", "stun", "optionResetTargeting", "targetSelection", "rangeSelection"], function(values) {
 			const maxEND = parseInt(values.endurance);
 			const maxSTUN = parseInt(values.stun);
 			
-			let theRangeSelection = parseInt(values.rangeSelection)||0;
+			let theRangeSelection;
+			let theTargetSelection;
 			
-			let resetOption = values.optionResetTargeting||0;
-			
-			if (resetOption) {
+			if (values.optionResetTargeting != 0) {
 				theRangeSelection = 0;
+				theTargetSelection = 1;
+			} else {
+				theRangeSelection = parseInt(values.rangeSelection)||0;
+				theTargetSelection = parseInt(values.targetSelection)||1;
 			}
 			
 			setAttrs({
 				"currentSTUN":maxSTUN,
 				"currentEND":maxEND,
-				"rangeSelection":theRangeSelection
+				"rangeSelection":theRangeSelection,
+				"targetSelection":theTargetSelection
 			});
 		});
 	});
@@ -9031,6 +9036,7 @@
 				if (!isBlocking) {
 					// If isNormalDamage is TRUE, use the Normal Damage template. Else use the killing template.
 					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{martialManeuverName"+maneuverId+"}}} ";
+					theRoll += "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
 					if (values.displayDegreeOfSuccess != 0) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}";
 					} else {
