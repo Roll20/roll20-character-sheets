@@ -413,7 +413,6 @@ on("change:probe_hazard_wuerfel", function(){
         let hazard = parseInt(values["probe_hazard_wuerfel"]);
 
         standard = summe - hazard;
-        if(hazard < 1) {hazard = 1}
         if(standard < 0) {standard = 0}        
         
         setAttrs({

@@ -1242,3 +1242,51 @@ function upgradeCharacter3Dot1() {
         });
     });
 }
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.1+ to 3.4
+ */
+function upgradeCharacter3Dot4() {
+    console.log("Upgrading character to 3.4");
+
+    getSectionIDs("repeating_meleeweapon", function(meleeIds) {
+        getSectionIDs("repeating_rangedweapon", function(rangedIds) {
+            
+            let meleeGetAttrs = [];
+            meleeIds.forEach(id => {
+                meleeGetAttrs.push(`repeating_meleeweapon_${id}_name`, `repeating_meleeweapon_${id}_favored`);
+            });
+
+            let rangedGetAttrs = [];
+            rangedIds.forEach(id => {
+                rangedGetAttrs.push(`repeating_rangedweapon_${id}_name`, `repeating_rangedweapon_${id}_favored`);
+            });
+
+            getAttrs(['character_id'].concat(rangedGetAttrs, meleeGetAttrs), function(v) {
+                let newAttrs = {'version': '3.4'};
+                
+                let weaponButtons = ""
+                meleeIds.forEach(id => {
+                    if (v[`repeating_meleeweapon_${id}_favored`] === '1') {
+                        const name = v[`repeating_meleeweapon_${id}_name`];
+                        weaponButtons = weaponButtons + ` [${name}](~${v['character_id']}|repeating_meleeweapon_${id}_roll)`;
+                        console.log(`Upgrading repeating_meleeweapon_${id}_rollval`);
+                        newAttrs[`repeating_meleeweapon_${id}_rollval`] = `%{${v['character_id']}|repeating_meleeweapon_${id}_roll}`;
+                    }
+                });
+                rangedIds.forEach(id => {
+                    if (v[`repeating_rangedweapon_${id}_favored`] === '1') {
+                        const name = v[`repeating_rangedweapon_${id}_name`];
+                        weaponButtons = weaponButtons + ` [${name}](~${v['character_id']}|repeating_rangedweapon_${id}_roll)`;
+                        console.log(`Upgrading repeating_rangedweapon_${id}_rollval`);
+                        newAttrs[`repeating_rangedweapon_${id}_rollval`] = `%{${v['character_id']}|repeating_rangedweapon_${id}_roll}`;
+                    }
+                });
+                console.log("Upgrading weapon_buttons to " + weaponButtons);
+                newAttrs['weapon_buttons'] = weaponButtons;
+                console.log("newAttrs = " + newAttrs);
+                setAttrs(newAttrs);
+            });
+        });
+    });
+}
