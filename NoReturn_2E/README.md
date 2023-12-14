@@ -13,6 +13,11 @@ https://www.mannifest-games.com/
 
 # Release Notes
 
+**2023-12-10 v1.1 HF2**
+
+* New Feature
+  * Würfe mir 0 Hazard-Di ermöglichen
+
 **2023-10-05 v1.1 HF1**
 
 * Bugfixes
