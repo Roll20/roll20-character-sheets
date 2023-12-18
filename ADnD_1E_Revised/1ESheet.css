@@ -128,9 +128,9 @@
     padding: 0.25em 0 0 0;
 }
 
-/*toggle options*/
+/* Tabs */
 
-/*hide PC*/
+/* hide PC page */
 .charsheet .background .npc-box,
 .charsheet .background .header-box,
 .charsheet .background .class-box,
@@ -153,6 +153,7 @@
     display: grid;
 }
 
+/* Show PC page */
 .charsheet input[value="0"].toggle-npc ~ .background .class-box,
 .charsheet input[value="0"].toggle-npc ~ .background .armor-box,
 .charsheet input[value="0"].toggle-npc ~ .background .personal-attributes-box,
@@ -168,7 +169,7 @@
     display: block;
 }
 
-/*Hide NPC tab*/
+/* Hide Monster page*/
 .charsheet input[value="0"].is-npc ~ .background .wrapper .top-header .npc-tabs input[value="1"].toggle-npc,
 .charsheet input[value="0"].is-npc ~ .background .wrapper .top-header .npc-tabs input[value="1"].toggle-npc + span.tab,
 .charsheet input[value="0"].is-npc + input[value="1"].toggle-npc ~ .background .npc-box,
@@ -189,6 +190,7 @@
     display: none;
 }
 
+/* show with Monster page*/
 .charsheet input[value="1"].toggle-npc ~ .background .weapons-box,
 .charsheet input[value="1"].toggle-npc ~ .background .special-abilities-box {
     display: block;
@@ -213,10 +215,12 @@
     margin: 0 0 0 .5em;
 }
 
+/* Show Sheet Options */
 .charsheet input[value="99"].toggle-npc ~ .background .options-box {
     display: block;
 }
 
+/* Hide PC and Monster */
 .charsheet input[value="99"].toggle-npc ~ .background .npc-box,
 .charsheet input[value="99"].toggle-npc ~ .background .header-box,
 .charsheet input[value="99"].toggle-npc ~ .background .class-box,
@@ -241,7 +245,8 @@
     display: none;
 }
 
-/*Hide Areas: thief skills, spells, nwp, costs, comeliness */
+/* toggle options */
+/* Hide Sheet Areas: thief skills, spells, nwp, costs, comeliness */
 .charsheet input[type="checkbox"].toggle-thief-skills:checked ~ .background .thief-skills-box,
 .charsheet input[type="checkbox"].toggle-thief-skills:checked ~ .background .toggle-backstab,
 .charsheet input[type="checkbox"].toggle-spells:checked ~ .background .spells-box,
@@ -262,10 +267,6 @@
     display: block;
     text-align: end;
     max-width: 70%;
-}
-
-.charsheet input[type="checkbox"].toggle-costs:checked ~ .background .armor-columns {
-    grid-template-columns: 4.5em 3em minmax(8em, 2fr) repeat(4, minmax(3.5em, 1fr)) 7em 3em 3em;
 }
 
 .charsheet input[type="checkbox"].toggle-costs:checked ~ .background .weapons-row2 {
@@ -1180,15 +1181,23 @@ summary::-webkit-details-marker {
     grid-column: 1/-1;
 }
 
-.charsheet .armor-columns {
+
+.charsheet .armor-columns,
+/* were these added for handling a duplicate repeating_equipment test? */
+.charsheet .equipment-display-carry .armor-columns,
+.charsheet .equipment-display-carry .armor-columns:has(.equipment-type[value="2"]) {
     align-items: center;
     display: grid;
-    grid-template-columns: 4.5em 3em minmax(8em, 2fr) repeat(4, minmax(3.5em, 1fr)) 7em 3em 3em 4em;
+    grid-template-columns: 4.5em 3em minmax(8em, 2fr) repeat(4, minmax(3.5em, 1fr)) 7em;
     justify-items: center;
 }
 
 .charsheet .armor-box .armor-columns.sect {
     padding: 0;
+}
+
+.charsheet .armor-box .material-icons + .armor-columns.sect {
+    margin-top: -1em;
 }
 
 .charsheet .armor-box .sect-show:not(:checked) ~ .sect + .armor-columns {
@@ -1378,6 +1387,12 @@ summary::-webkit-details-marker {
     margin-block: 1px;
 }
 
+.charsheet .repcontainer[data-groupname="repeating_equipment"].editmode .repitem:has(input.toggle-carry[value="0"] ~ .equipment-display-carry),
+.charsheet .repcontainer[data-groupname="repeating_equipment"].editmode .repitem:has(input.toggle-carry[value="1"] ~ .equipment-display-carry) {
+    line-height: 1.4em;
+    margin: auto;
+}
+
 .charsheet .weapons-box {
     grid-row-start: auto;
     grid-column: 1/-1;
@@ -1562,7 +1577,11 @@ details[open].thac0-box {
     grid-column: 1/-1;
 }
 
-.charsheet .equipment-columns {
+
+
+.charsheet .equipment-columns,
+/* overrides Armor grid when adding new gear on Armor tab */
+.charsheet input[type="hidden"].equipment-display-type[value="2"] ~ .repcontainer .equipment-columns:has(.equipment-type[value="0"]) {
     align-items: center;
     display: grid;
     grid-template-columns: 5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em,
@@ -1571,27 +1590,67 @@ details[open].thac0-box {
     justify-items: center;
 }
 
+/* Armor tab only */
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .equipment-columns,
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .repcontainer .equipment-columns {
+    display: grid;
+    grid-template-columns: 5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em,
+            7em) minmax(3em, 5em) minmax(1em, 4em) minmax(1em, 4em);
+}
+
+
 .charsheet span.equipment-columns.column-header {
     margin-top: 4px;
     padding-top: 2px;
 }
 
-/*hide weight and cost for weapons and armor*/
-.charsheet .background input[type="hidden"].equipment-type[value="1"] ~ .equipment-columns .hidden-for-armor-weapon,
-.charsheet .background input[type="hidden"].equipment-type[value="2"] ~ .equipment-columns .hidden-for-armor-weapon,
-.charsheet .equipment-type[value="1"] ~ .hidden-for-armor-weapon,
-.charsheet .equipment-type[value="2"] ~ .hidden-for-armor-weapon {
+/* hide stuff for the weapons and armor tab*/
+.charsheet .background input[type="hidden"].equipment-display-type[value="1"] ~ .equipment-columns .hidden-for-weapons,
+.charsheet .equipment-type[value="1"] ~ .hidden-for-weapons,
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .equipment-columns .hidden-for-armor,
+.charsheet .equipment-type[value="2"] ~ .hidden-for-armor {
     display: none;
 }
 
-.charsheet .background input[type="hidden"].equipment-type[value="1"] ~ .equipment-columns,
-.charsheet .background input[type="hidden"].equipment-type[value="2"] ~ .equipment-columns,
-.charsheet .background input[type="hidden"].equipment-type[value="1"] ~ .repcontainer .equipment-columns,
-.charsheet .background input[type="hidden"].equipment-type[value="2"] ~ .repcontainer .equipment-columns {
+/* needed as a placeholder for when all types of equipment are displayed */
+.charsheet .equipment-display-type[value="-1"] ~ .repcontainer .equipment-type[value="2"] ~ .hidden-for-armor {
+    display: block;
+    opacity: 0;
+}
+
+/* hide the weapon and armor details row for all other tabs */
+.charsheet .equipment-box .show-for-weapon,
+.charsheet .equipment-box .show-for-armor {
+    display: none;
+}
+
+/* show the weapon and armor details row only if on the weapon or armor tab */
+.charsheet .background input[type="hidden"].equipment-display-type[value="1"] ~ .equipment-columns .show-for-weapon,
+.charsheet .equipment-type[value="1"] ~ .show-for-weapon,
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .equipment-columns .show-for-armor,
+.charsheet .equipment-type[value="2"] ~ .show-for-armor {
+    align-items: baseline;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    padding: 2px;
+}
+
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .equipment-columns .show-for-armor label,
+.charsheet .equipment-type[value="2"] ~ .show-for-armor label {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+
+/* .charsheet .background input[type="hidden"].equipment-display-type[value="1"] ~ .equipment-columns,
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .equipment-columns,
+.charsheet .background input[type="hidden"].equipment-display-type[value="1"] ~ .repcontainer .equipment-columns,
+.charsheet .background input[type="hidden"].equipment-display-type[value="2"] ~ .repcontainer .equipment-columns {
     grid-template-columns: 5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em,
             7em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(3em, 5em) minmax(1em,
             3em) 0.5em minmax(1em, 3em) 0 0;
-}
+} */
 
 .charsheet .capacity-box {
     display: flex;
@@ -1820,14 +1879,18 @@ input.toggle-single-column-spells:checked ~ .background .repcontainer[data-group
 .charsheet div.spell-details-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    margin-inline: auto;
+    max-width: 80%;
     padding: 4px;
-    width: fit-content;
+    width: auto;
 }
 
 .charsheet input.toggle-single-column-abilities:not(:checked) ~ .background .special-abilities-box .spell-details-grid,
 .charsheet input.toggle-single-column-spells:not(:checked) ~ .background .spell-display .spell-details-grid {
     border: none;
+    max-width: fit-content;
 }
+
 .charsheet input.toggle-single-column-abilities:not(:checked) ~ .background .special-abilities-box .spell-details-grid {
     margin-top: -1em;
 }
@@ -1969,9 +2032,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 .charsheet .announcements-box .announcements-title {
     color: #005ea2;
     font-weight: bold;
-    margin: -2px 0 0 0;
-    position: relative;
-    right: 0;
+    margin: 0;
 }
 
 .charsheet .announcements {
@@ -2090,6 +2151,11 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     width: 100%;
     display: flex;
     justify-content: flex-start;
+}
+
+.charsheet input.toggle-carry ~ .equipment-display-carry,
+.charsheet input.toggle-type + .equipment-display-carry .equipment-display-type {
+    display: none;
 }
 
 /* done within the repeating row
@@ -2708,7 +2774,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     border: none;
     height: 1.5em;
     position: absolute;
-    width: 18em;
+    max-width: 14em;
     z-index: 1;
 }
 
@@ -2813,6 +2879,10 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     position: absolute;
     width: 7em;
     z-index: 2;
+}
+
+.charsheet .armor-box input[type="checkbox"].sect-show + span + span.material-icons::after {
+    display: none;
 }
 
 /* special attention needed here */
@@ -3535,6 +3605,19 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 .repcontrol_edit,
 .repcontrol_add {
     float: right;
+}
+
+.ui-dialog .charsheet .editmode ~ .repcontrol .repcontrol_edit {
+    background-color: #f5f5f5;
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+    border: 1px solid #ccc;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    border-bottom-color: #bbb;
+    margin-top: 2px;
+    padding-block: 1px;
+    width: 100%;
+    z-index: 4;
 }
 
 .itemcontrol .repcontrol_del {
