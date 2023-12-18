@@ -18008,7 +18008,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 								<div class="grid-cell">
 									<label>
-										<span data-i18n="speed-label">Speed</span>
+										<div class="standard-tooltip">
+											<span data-i18n="speed-label">Speed</span>
+											<span class="tooltiptext">
+												<span data-i18n="climbing-tool-speed-tooltip">The tool assumes the distance between rungs is one foot.</span>
+											</span>
+										</div>
 									</label>
 								</div>
 							
@@ -18034,17 +18039,19 @@ Select the indent level of the inventory item. This is handy to help show the it
 								</div>
 								
 								<div class="grid-cell">
-									<input type="checkbox" name="attr_climbing_tool_in_combat" value="1" />
+									<input type="checkbox" name="attr_climbing_tool_in_combat" checked value="1" />
 								</div>
 
 								<div class="grid-cell">
-									<input type="hidden" name="attr_climbing_tool_speed" value="3 rungs/sec" />
-									<span name="attr_climbing_tool_speed"></span>
+									<input type="hidden" name="attr_climbing_tool_speed_in_feet" value="3" />
+									<input type="hidden" name="attr_climbing_tool_speed_description" value="3 rungs/sec" />
+									<span name="attr_climbing_tool_speed_description"></span>
 								</div>
 							
 								<div class="grid-cell">
-									<input type="hidden" name="attr_climbing_tool_type_of_climb_modifier" value="No roll" />
-									<span name="attr_climbing_tool_type_of_climb_modifier"></span>
+									<input type="hidden" name="attr_climbing_tool_type_of_climb_modifier" value="no-roll" />
+									<input type="hidden" name="attr_climbing_tool_type_of_climb_modifier_description" value="No roll" />
+									<span name="attr_climbing_tool_type_of_climb_modifier_description"></span>
 								</div>
 								
 							</div>
@@ -18085,7 +18092,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 										</label>
 									</div>
 									<div>
-										<input type="number" value="0" readonly name="attr_climbing_tool_final_modifier" class="medium-width" />
+										<input type="text" value="No roll" readonly name="attr_climbing_tool_final_modifier" class="medium-width input-disabled" />
 									</div>
 								</div>
 
@@ -18102,7 +18109,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 										</label>
 									</div>
 									<div>
-										<input type="number" value="0" min="0" step="1" name="attr_climbing_tool_height" class="medium-width" />
+										<input type="number" value="12" min="0" step="1" name="attr_climbing_tool_height" class="medium-width" />
 									</div>
 								</div>
 
@@ -18113,7 +18120,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 										</label>
 									</div>
 									<div>
-										<input type="number" value="0" min="0" step="1" readonly name="attr_climbing_tool_travel_time" class="medium-width" />
+										<input type="tex" value="4 sec" readonly name="attr_climbing_tool_travel_time" class="large-width input-disabled" />
 									</div>
 								</div>
 
@@ -18129,7 +18136,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 										</label>
 									</div>
 									<div>
-										<input type="number" value="0" readonly name="attr_climbing_tool_number_of_rolls" class="medium-width" />
+										<input type="text" value="1" readonly name="attr_climbing_tool_number_of_rolls" class="medium-width input-disabled" />
 									</div>
 								</div>
 
@@ -45247,4 +45254,181 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	const climbingTypes = [
+		{key: "ladder-up", translationCode: "ladder-up-option", name: "Ladder up", modifierDescription: "No roll", modifier: "no-roll", combatSpeedDescription: "3 rungs/sec", combatSpeedInFeet: 3, normalSpeedDescription: "1 rung/sec", normalSpeedInFeet: 1 },
+		{key: "ladder-down", translationCode: "ladder-down-option", name: "Ladder down", modifierDescription: "No roll", modifier: "no-roll", combatSpeedDescription: "2 rungs/sec", combatSpeedInFeet: 2, normalSpeedDescription: "1 rung/sec", normalSpeedInFeet: 1 },
+		{key: "tree", translationCode: "ordindary-tree-option", name: "Ordindary tree", modifierDescription: "+5", modifier: 5, combatSpeedDescription: "1 ft/sec", combatSpeedInFeet: 1, normalSpeedDescription: "1 ft/3 sec", normalSpeedInFeet: .33333 },
+		{key: "mountain", translationCode: "ordinary-mountain-option", name: "Ordinary mountain", modifierDescription: "0", modifier: 0, combatSpeedDescription: "1 ft/2 sec", combatSpeedInFeet: .5, normalSpeedDescription: "10 ft/min", normalSpeedInFeet: .16666 },
+		{key: "vertical-stone-wall", translationCode: "vertical-stone-wall-option", name: "Vertical stone wall", modifierDescription: "-3", modifier: -3, combatSpeedDescription: "1 ft/5 sec", combatSpeedInFeet: .2, normalSpeedDescription: "4 ft/min", normalSpeedInFeet: .06666 },
+		{key: "modern-building", translationCode: "modern-building-option", name: "Modern building", modifierDescription: "-3", modifier: -3, combatSpeedDescription: "1 ft/10 sec", combatSpeedInFeet: .1, normalSpeedDescription: "2 ft/min", normalSpeedInFeet: .03333 },
+		{key: "rope-up", translationCode: "rope-up-option", name: "Rope-up", modifierDescription: "-2", modifier: -2, combatSpeedDescription: "1 ft/sec", combatSpeedInFeet: 1, normalSpeedDescription: "20 ft/min", normalSpeedInFeet: .33333 },
+		{key: "rope-down-no-equipment", translationCode: "rope-down-no-equipment-option", name: "Rope-down w/o equipment", modifierDescription: "-1", modifier: -1, combatSpeedDescription: "2 ft/sec", combatSpeedInFeet: 2, normalSpeedDescription: "30 ft/min", normalSpeedInFeet: .5 },
+		{key: "rope-down-with-equipment", translationCode: "rope-down-with-equipment-option", name: "Rope-down w/ equipment", modifierDescription: "-1", modifier: -1, combatSpeedDescription: "12 ft/sec", combatSpeedInFeet: 12, normalSpeedDescription: "12 ft/sec", normalSpeedInFeet: 12 },
+	];
+
+	const climbingTypeFields = [
+		"climbing_tool_type_of_climb",
+		"climbing_tool_in_combat",
+	];
+
+	climbingTypeFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+
+			updateClimbingTypeInfo();
+
+		});
+
+	});
+
+	const updateClimbingTypeInfo = () => {
+
+		getAttrs(climbingTypeFields, values => {
+
+			let inCombat = values.climbing_tool_in_combat == "1";
+
+			let key = values.climbing_tool_type_of_climb;
+
+			let climbingType = climbingTypes.find(type => type.key == key);
+
+			if (climbingType) {
+
+				let speedDescription = climbingType.normalSpeedDescription;
+
+				let speed = climbingType.normalSpeedInFeet;
+
+				let modifierDescription = climbingType.modifierDescription;
+
+				let modifier = climbingType.modifier;
+
+				if (inCombat) {
+					speedDescription = climbingType.combatSpeedDescription;
+					speed = climbingType.combatSpeedInFeet;
+				}
+
+				let keyValues = {
+					climbing_tool_speed_in_feet: speed,
+					climbing_tool_speed_description: speedDescription,
+					climbing_tool_type_of_climb_modifier: modifier,
+					climbing_tool_type_of_climb_modifier_description: modifierDescription
+				};
+
+				setAttrs(keyValues);
+
+			}
+
+		});
+
+	}
+
+	const climbingModifierFields = [
+		"climbing_tool_type_of_climb_modifier",
+		"climbing_tool_encumbrance",
+		"climbing_tool_custom_modifier"
+	];
+
+	climbingModifierFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+
+			updateClimbingModifier();
+
+		});
+
+	});
+
+	const updateClimbingModifier = () => {
+
+		getAttrs(climbingModifierFields, values => {
+
+			let hasRoll = values.climbing_tool_type_of_climb_modifier != "no-roll";
+
+			let finalModifier = "No roll";
+
+			if (hasRoll) {
+
+				let baseMod = Number(values.climbing_tool_type_of_climb_modifier) ?? 0;
+
+				let encumbrance = Number(values.climbing_tool_encumbrance) ?? 0;
+
+				let customMod = Number(values.climbing_tool_custom_modifier) ?? 0;
+
+				finalModifier = baseMod + encumbrance + customMod;
+
+			}
+
+			let keyValues = {
+				climbing_tool_final_modifier: finalModifier
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	const climbingTimeFields = [
+		"climbing_tool_speed_in_feet",
+		"climbing_tool_height"
+	];
+
+	climbingTimeFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+			updateClimbingTime();	
+		});
+
+	});
+
+	const updateClimbingTime = () => {
+
+		let fields = climbingTimeFields.concat(["climbing_tool_type_of_climb_modifier"]);
+
+		getAttrs(fields, values => {
+
+			let hasRoll = values.climbing_tool_type_of_climb_modifier != "no-roll";
+
+			// feet per second
+			let speed = Number(values.climbing_tool_speed_in_feet) ?? 0;
+
+			// height in feet
+			let height = Number(values.climbing_tool_height) ?? 0;
+
+			let timeInSeconds = height / speed;
+
+			let timeInMinutes = timeInSeconds / 60;
+
+			let timeInHours = timeInMinutes / 60;
+
+			let description = Math.round(timeInSeconds) + " sec";
+
+			let numberOfRolls = 1 + Math.floor(timeInMinutes / 5);
+
+			// check for no rolls
+			if (hasRoll == false) {
+				numberOfRolls = "No rolls";
+			}
+
+			if (timeInHours >= 1) {
+				let hours = Math.floor(timeInHours);
+				let minutes = Math.round((timeInHours % 1) * 60);
+				description = `${hours} hrs ${minutes} min`;
+			} else if (timeInMinutes >= 1) {
+				let minutes = Math.floor(timeInMinutes);
+				let seconds = Math.round((timeInMinutes % 1) * 60);
+				description = `${minutes} min ${seconds} sec`;
+			}
+
+			let keyValues = {
+				climbing_tool_travel_time: description,
+				climbing_tool_number_of_rolls: numberOfRolls
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	
 </script>
