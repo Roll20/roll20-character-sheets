@@ -18198,7 +18198,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 								<div class="grid-cell">
 									<span class="container-label-input">
 										<span>x</span><span>&nbsp;</span>
-										<input type="number" value="0" min="0" step="1" name="attr_digging_tool_custom_modifier" class="medium-width" />
+										<input type="number" value="1" min="0" step="1" name="attr_digging_tool_custom_modifier" class="medium-width" />
 									</span>
 								</div>
 								<div class="grid-cell">&nbsp;</div>
@@ -18216,19 +18216,24 @@ Select the indent level of the inventory item. This is handy to help show the it
 								</div>
 								<div class="grid-cell">
 									<select name="attr_digging_tool_action">
-										<option value="dig-loose-soil" data-i18n="dig-loose-soil-action-option" selected>Dig loose soil, sand, etc</option>
-										<option value="dig-ordinary-soil" data-i18n="dig-ordinary-soil-action-option">Dig ordinary soil</option>
+										<option value="shovel-loose-soil" data-i18n="shovel-loose-soil-action-option" selected>Shovel loose soil, sand, etc</option>
+										<option value="shovel-ordinary-soil" data-i18n="shovel-ordinary-soil-action-option">Shovel ordinary soil</option>
 										<option value="pick-ordinary-soil" data-i18n="pick-ordinary-soil-action-option">Pick ordinary soil</option>
-										<option value="pig-hard-soil" data-i18n="pick-hard-soil-action-option">Pick hard soil, clay, etc</option>
+										<option value="pick-hard-soil" data-i18n="pick-hard-soil-action-option">Pick hard soil, clay, etc</option>
+										<option value="shovel-hard-soil" data-i18n="shovel-hard-soil-action-option">Shovel hard soil, clay, etc</option>
+										<option value="pick-shovel-hard-soil" data-i18n="pick-shovel-hard-soil-action-option">Pick & shovel hard soil, clay, etc</option>
+										<option value="pick-hard-rock" data-i18n="pick-hard-rock-action-option">Pick hard rock</option>
+										<option value="shovel-hard-rock" data-i18n="shovel-hard-rock-action-option">Shovel hard rock</option>
 									</select>
 								</div>
 								<div class="grid-cell">
-									<input type="hidden" name="attr_digging_tool_digging_rate_cubicfeet_hour" value="40" />
-									<input type="text" name="attr_digging_tool_digging_rate_description" value="40 CF/HR" title="Digging rate" readonly class="medium-large-width input-disabled" />
+									<input type="hidden" name="attr_digging_tool_digging_rate_multiplier" value="2" />
+									<input type="hidden" name="attr_digging_tool_digging_rate_cubic_feet_hour" value="40" />
+									<input type="text" name="attr_digging_tool_digging_rate_description" value="40 cf/hr" title="Digging rate" readonly class="medium-large-width input-disabled" />
 								</div>
 								<div class="grid-cell">
 									<input type="hidden" name="attr_digging_tool_fatigue_per_hour" value="1" />
-									<input type="text" name="attr_digging_tool_fatigue_description" value="1 FP/HR" title="Fatigue rate" readonly class="medium-large-width input-disabled" />
+									<input type="text" name="attr_digging_tool_fatigue_description" value="1 FP/hr" title="Fatigue rate" readonly class="medium-large-width input-disabled" />
 								</div>
 
 								<!-- row #4 -->
@@ -18247,7 +18252,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 								</div>
 								<div class="grid-cell">
 									<input type="hidden" name="attr_digging_tool_total_volume_for_hours" value="320" />
-									<input type="text" name="attr_digging_tool_total_volume_for_hours_description" value="320 CF" title="Total volume" readonly class="medium-large-width input-disabled" />
+									<input type="text" name="attr_digging_tool_total_volume_for_hours_description" value="320 cf" title="Total volume" readonly class="medium-large-width input-disabled" />
 								</div>
 								<div class="grid-cell">
 									<input type="hidden" name="attr_digging_tool_total_fatigue_for_hours" value="8" />
@@ -18270,15 +18275,15 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<span>x</span>
 									<input type="number" value="3" min="0" name="attr_digging_tool_width" title="width" class="small-medium-width" />
 									<span>x</span>
-									<input type="number" value="6" min="0" name="attr_digging_tool_depth" title="depth" class="small-medium-width" />
+									<input type="number" value="12" min="0" name="attr_digging_tool_depth" title="depth" class="small-medium-width" />
 								</div>
 								<div class="grid-cell">
-									<input type="hidden" name="attr_digging_tool_total_volume_for_dimensions" value="108" />
-									<input type="text" name="attr_digging_tool_total_volume_for_dimensions_description" value="108 CF" title="Total volume" readonly class="medium-large-width input-disabled" />
+									<input type="hidden" name="attr_digging_tool_total_volume_for_dimensions" value="216" />
+									<input type="text" name="attr_digging_tool_total_volume_for_dimensions_description" value="216 cf" title="Total volume" readonly class="medium-large-width input-disabled" />
 								</div>
 								<div class="grid-cell">
-									<input type="hidden" name="attr_digging_tool_total_hours_for_dimensions" value="14" />
-									<input type="text" name="attr_digging_tool_total_hours_for_dimensions_description" value="14 hours" readonly class="medium-large-width input-disabled" />
+									<input type="hidden" name="attr_digging_tool_total_hours_for_dimensions" value="5.4" />
+									<input type="text" name="attr_digging_tool_total_hours_for_dimensions_description" value="5.4 hours" readonly class="medium-large-width input-disabled" />
 								</div>
 
 							</div>
@@ -45562,5 +45567,203 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	
+	const diggingTools = [
+		{key: "iron-steel", name: "Iron or steel tools", modifier: "1"},
+		{key: "wooden", name: "Wooden tools", modifier: ".5"},
+		{key: "improvised", name: "Improvised tools", modifier: ".25"},
+		{key: "custom", name: "Custom modifier", modifier: ".125"},
+	];
+
+	on("change:digging_tool_implentation", event => {
+
+		const key = event.newValue ?? "iron-steel";
+
+		updateDiggingToolInfo(key);
+
+	});
+
+	const updateDiggingToolInfo = (key) => {
+
+		let tool = diggingTools.find(tool => tool.key == key);
+
+		if (tool) {
+
+			let keyValues = {
+				digging_tool_custom_modifier: tool.modifier
+			};
+
+			setAttrs(keyValues);
+
+		}
+
+	}
+
+	const diggingActions = [
+		{key: "shovel-loose-soil", name: "Shovel loose soil, sand, etc", digRateMultiplier: 2, fatigueRate: 1 },
+		{key: "shovel-ordinary-soil", name: "Shovel ordinary soil", digRateMultiplier: 1, fatigueRate: 2 },
+		{key: "pick-ordinary-soil", name: "Pick ordinary soil", digRateMultiplier: 4, fatigueRate: 2 },
+		{key: "pick-hard-soil", name: "Pick hard soil", digRateMultiplier: 2, fatigueRate: 3 },
+		{key: "shovel-hard-soil", name: "Shovel hard soil", digRateMultiplier: 2, fatigueRate: 3 },
+		{key: "pick-shovel-hard-soil", name: "Pick & shovel hard soil", digRateMultiplier: .6, fatigueRate: 3 },
+		{key: "pick-hard-rock", name: "Pick hard rock", digRateMultiplier: 1, fatigueRate: 4 },
+		{key: "shovel-hard-rock", name: "Shovel hard rock", digRateMultiplier: 1, fatigueRate: 4 },
+	];
+
+	on("change:digging_tool_action", event => {
+
+		const key = event.newValue ?? "shovel-loose-soil";
+
+		updateDiggingToolRates(key);
+
+	});
+
+	const updateDiggingToolRates = key => {
+
+		let action = diggingActions.find(action => action.key == key);
+
+		if (action) {
+
+			let keyValues = {
+				digging_tool_digging_rate_multiplier: action.digRateMultiplier,
+				digging_tool_fatigue_per_hour: action.fatigueRate,
+				digging_tool_fatigue_description: `${action.fatigueRate} FP/hr`,
+			};
+
+			setAttrs(keyValues);
+			
+		}
+
+	}
+
+	const digRateFields = [
+		"digging_tool_basic_lift",
+		"digging_tool_custom_modifier",
+		"digging_tool_digging_rate_multiplier",
+	];
+
+	digRateFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+
+			updateDigRate();
+
+		});
+
+	});
+
+	const updateDigRate = () => {
+
+		getAttrs(digRateFields, values => {
+
+			let basicLift = Number(values.digging_tool_basic_lift) ?? 0;
+
+			let modifier = Number(values.digging_tool_custom_modifier) ?? 0;
+
+			let rateMultiplier = Number(values.digging_tool_digging_rate_multiplier) ?? 0;
+
+			let rate = basicLift * modifier * rateMultiplier;
+
+			let rateDescription = `${rate} cf/hr`;
+
+			let keyValues = {
+				digging_tool_digging_rate_cubic_feet_hour: rate,
+				digging_tool_digging_rate_description: rateDescription
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	const digHourFields = [
+		"digging_tool_hours",
+		"digging_tool_digging_rate_cubic_feet_hour",
+		"digging_tool_fatigue_per_hour"
+	];
+
+	digHourFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+
+			updateDigHours();
+
+		})
+
+	});
+
+	const updateDigHours = () => {
+		
+		getAttrs(digHourFields, values => {
+
+			let hours = Number(values.digging_tool_hours) ?? 0;
+
+			let digRate = Number(values.digging_tool_digging_rate_cubic_feet_hour) ?? 0;
+
+			let fatigueRate = Number(values.digging_tool_fatigue_per_hour) ?? 0;
+
+			let volume = hours * digRate;
+
+			let fatigue = hours * fatigueRate;
+
+			let keyValues = {
+				digging_tool_total_volume_for_hours: volume,
+				digging_tool_total_volume_for_hours_description: `${volume} cf`,
+				digging_tool_total_fatigue_for_hours: fatigue,
+				digging_tool_total_fatigue_for_hours_description: `${fatigue} FP`
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	const digAreaFields = [
+		"digging_tool_height",
+		"digging_tool_width",
+		"digging_tool_depth",
+		"digging_tool_digging_rate_cubic_feet_hour"
+	];
+
+	digAreaFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+
+			updateDigArea();
+
+		});
+
+	});
+
+	const updateDigArea = () => {
+
+		getAttrs(digAreaFields, values => {
+
+			let height = Number(values.digging_tool_height) ?? 0;
+
+			let width = Number(values.digging_tool_width) ?? 0;
+
+			let depth = Number(values.digging_tool_depth) ?? 0;
+
+			let volume = height * width * depth;
+
+			let digRate = Number(values.digging_tool_digging_rate_cubic_feet_hour) ?? 0;
+
+			let hours = volume / digRate;
+
+			let keyValues = {
+				digging_tool_total_volume_for_dimensions: volume,
+				digging_tool_total_volume_for_dimensions_description: `${volume} cf`,
+				digging_tool_total_hours_for_dimensions: hours,
+				digging_tool_total_hours_for_dimensions_description: `${hours} hours`
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+
 </script>
