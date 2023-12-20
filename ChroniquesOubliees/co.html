@@ -3295,7 +3295,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
 <!-- FIN TEMPLATES -->
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-    let silent = {
+  let silent = {
     silent: true
   };
 
@@ -5458,6 +5458,11 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
     if (!reset) max_attack_label = toInt(v.max_attack_label, 0, 0);
     let max_armure_label = 0;
     if (!reset) max_armure_label = toInt(v.max_armure_label, 0, 0);
+    let equip_div = '';
+    if (!reset) equip_div = v.equip_div;
+    let armure;
+    let arme;
+    let bouclier;
     equipement.forEach(function(gear) {
       const nbr = parseInt(gear.nombre);
       if (isNaN(nbr) || nbr < 1) return;
@@ -5470,6 +5475,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
       }
       let isWeapon = false;
       let isArmor = false;
+      let isConsumable = false;
       let predicats = {};
       gear.props.forEach(function(prop) {
         switch (prop.id) {
@@ -5487,9 +5493,18 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
             isWeapon = true;
             predicats[prop.id] = prop.valeur;
             break;
+          case 'consommable':
+            isConsumable = true;
+            break;
         }
       });
-      if (isWeapon) {
+      if (isConsumable) {
+        let pref = 'repeating_equipement_' + generateRowID() + '_';
+        sa[pref + 'equip_nom'] = gearName;
+        sa[pref + 'equip_qte'] = nbr;
+        let effet = effetDeConsommable(gearName);
+        if (effet) sa[pref + 'equip_effet'] = effet.effet;
+      } else if (isWeapon) {
         let pref = 'repeating_armes_' + generateRowID() + '_arme';
         max_attack_label++;
         sa.max_attack_label = max_attack_label;
@@ -5507,7 +5522,8 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           sa[pref + 'crit'] = predicats.critique;
         if (predicats.def) sa[pref + 'predicats'] = 'DEF:' + predicats.def;
         if (predicats.dm1m) {
-          sa[pref + 'typeattaque'] = 'Arme 1 main';
+          if (sa[pref+'typeattaque'] != 'Arme de jet')
+            sa[pref + 'typeattaque'] = 'Arme 1 main';
           let dm = parseDice(predicats.dm1m);
           if (dm) {
             if (dm.nbDe > 1) sa[pref + 'dmnbde'] = dm.nbDe;
@@ -5523,7 +5539,28 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
             if (dm.bonus) sa[pref + 'dmdiv'] = dm.bonus;
           }
         }
+        let dague = gearName.toLowerCase().includes('dague');
+        if (arme && !arme.dague && !dague) {
+          arme.plusieurs = true;
+          if (sa[pref + 'typeattaque'] == 'Arme 1 main') {
+            if (arme.a1m) arme.a1mp = true;
+            else {
+              arme.label = max_attack_label;
+              arme.nom = gearName;
+              arme.a1m = true;
+            }
+          }
+        } else if (!arme || (arme && arme.dague && !dague)) {
+          arme = {};
+          arme.label = max_attack_label;
+          arme.nom = gearName;
+          arme.dague = dague;
+          arme.a1m = sa[pref + 'typeattaque'] == 'Arme 1 main';
+          arme.a2m = sa[pref + 'typeattaque'] == 'Arme 2 mains';
+        }
       } else if (isArmor) {
+        let torse = true;
+        let mg = false;
         let pref = 'repeating_armures_' + generateRowID() + '_';
         max_armure_label++;
         sa.max_armure_label = max_armure_label;
@@ -5531,29 +5568,99 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
         sa[pref + 'labelarmure'] = max_armure_label;
         if (predicats.def) {
           sa[pref + 'bonusarmure'] = predicats.def;
-          if (gearName.toLowerCase().includes('bouclier'))
+          if (gearName.toLowerCase().includes('bouclier')) {
             sa[pref + 'typearmure'] = 'Bouclier';
+            torse = false;
+            mg = true;
+          }
           if (predicats.rd) sa[pref + 'effetarmure'] = 'RD:' + predicats.rd;
           if (!predicats.malus) sa[pref + 'malusarmure'] = predicats.def;
         } else if (predicats.rd) {
           sa[pref + 'bonusarmure'] = predicats.rd;
           sa[pref + 'typearmure'] = 'Casque';
+          torse = false;
           if (!predicats.malus) sa[pref + 'malusarmure'] = predicats.rd;
         }
         if (predicats.malus) sa[pref + 'malusarmure'] = predicats.malus;
+        if (torse) {
+          if (armure) armure.plusieurs = true;
+          else {
+            armure = {label:max_armure_label, nom:gearName, def:predicats.def};
+            if (predicats.malus) armure.malus = predicats.malus;
+            else armure.malus = armure.def;
+          }
+        } else if (mg) {
+          if (bouclier) bouclier.plusieurs = true;
+          else {
+            bouclier = {label:max_armure_label, nom:gearName, def:predicats.def};
+            if (predicats.malus) bouclier.malus = predicats.malus;
+            else bouclier.malus = bouclier.def;
+          }
+        }
       } else {
-        let pref = 'repeating_equipement_' + generateRowID() + '_';
-        sa[pref + 'equip_nom'] = gearName;
-        sa[pref + 'equip_qte'] = nbr;
-        let effet = effetDeConsommable(gearName);
-        if (effet) sa[pref + 'equip_effet'] = effet.effet;
+        if (equip_div) equip_div += '\n'+gearName;
+        else equip_div = gearName;
       }
     });
+    sa.equip_div = equip_div;
+    if (armure && !armure.plusieurs) {
+      sa.torseequipe = armure.label;
+      sa.torseequipe_max = armure.label;
+      sa.defarmureon = '1';
+      sa.defarmure = armure.def;
+      sa.defarmuremalus = armure.malus;
+    } else if (reset) {
+      sa.torseequipe = '0';
+      sa.torseequipe_max = '0';
+      sa.defarmureon = '0';
+      sa.defarmure = 0;
+      sa.defarmuremalus = 0;
+    }
+    if (arme) {
+      if (arme.plusieurs) {
+        if (bouclier && !bouclier.plusieurs && arme.a1m && !arme.a1mp) {//on choisit une arme à une main
+          sa.maindroite = arme.label;
+          sa.montrerattaquedroite = '1';
+        } else if (reset) {
+          sa.maindroite = '0';
+          sa.montrerattaquedroite = '0';
+        }
+      } else {
+        sa.maindroite = arme.label;
+        sa.montrerattaquedroite = '1';
+        if (arme.a2m) {
+          sa.maingauche = '2m';
+          sa.montrerattaquegauche = '0';
+          bouclier = false;
+        } else if (reset) {
+          sa.maingauche = '0';
+          sa.montrerattaquegauche = '0';
+        }
+      }
+    } else if (reset) {
+      sa.maindroite = '0';
+      sa.montrerattaquedroite = '0';
+      sa.maingauche = '0';
+      sa.montrerattaquegauche = '0';
+    }
+    if (bouclier && !bouclier.plusieurs) {
+      sa.maingauche = 'b' + bouclier.label;
+      sa.maingauche_max = bouclier.label;
+      sa.defbouclieron = '1';
+      sa.defbouclier = bouclier.def;
+      sa.defboucliermalus = bouclier.malus;
+    } else if (reset && !(arme && arme.a2m)) {
+      sa.maingauche = '0';
+      sa.maingauche_max = '0';
+      sa.defbouclieron = '0';
+      sa.defbouclier = 0;
+      sa.defboucliermalus = 0;
+    }
   }
 
   //Ne cascade pas, faire les calculs
   on('clicked:importprofile', function() {
-    getAttrs(['json_profile', 'reset_gears', 'max_attack_label', 'max_armure_label', 'scriptVersion', 'scriptVersion_max'], function(v) {
+    getAttrs(['json_profile', 'reset_gears', 'max_attack_label', 'max_armure_label', 'scriptVersion', 'scriptVersion_max', 'equip_div'], function(v) {
       const jsonProfile = v.json_profile.trim();
       if (jsonProfile === '') return;
       const resetGear = parseInt(v.reset_gears);
@@ -6999,7 +7106,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
             selected: !armeTrouvee
           });
           opt = {
-            label: 'arme à 2 mains',
+            label: 'tenu à 2 mains',
             value: '2m'
           };
           if (!armeGaucheTrouvee && mainGauche == opt.value) {
