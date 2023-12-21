@@ -164,6 +164,8 @@
   <section class="powers">
     <span class="spacer">
       <h2 class="narrow">All Known Powers</h2>
+      <input type="hidden" name="attr_powersEquipped" value="0">
+      <span class="pull-right">You've equipped <span name="attr_powersEquipped"></span>/5 powers.</span>
     </span>
   <fieldset class="repeating_powers">
     <label class="inline">Equipped?</label>
@@ -382,7 +384,7 @@
       
       <button disabled="true" class="disab inline" type="roll" name="roll_item" value=""></button>
       
-      <button type="roll"  name="roll_item" value="&{template:powers} {{title=Item}} {{name=@{character_name}}} {{description=@{itemtext}}} {{powerName=@{itemname}}}"></button>
+      <button type="roll" class="enab" name="roll_item" value="&{template:powers} {{title=Item}} {{name=@{character_name}}} {{description=@{itemtext}}} {{powerName=@{itemname}}}"></button>
       
       <input class="item" spellcheck="false" type="text" name="attr_itemname" value="Name">
       <label class="inline">Used?</label>
@@ -1151,7 +1153,7 @@
         
         <div class="drop">
           <label for="attr_injuredOps">Are Injured</label>
-          <input type="number" name="attr_injuredOps" value="0" min="0">
+          <input type="number" name="attr_injuredOps" novalidate value="0" min="0">
         </div>
         
         <div class="drop">
@@ -1455,9 +1457,9 @@
 
 <!-- Datalists & thing that don't show directly on sheet -->
   
-  <input type="hidden" name="attr_smash_fail" value="lose 1 HP" />
-  <input type="hidden" name="attr_cyber_fail" value="lose 1 Biotech" />
-  <input type="hidden" name="attr_sly_fail" value="gain either Painted or Taunted" />
+  <input type="hidden" name="attr_smash_fail" value="lose 1 HP and the Manager invokes a complication" />
+  <input type="hidden" name="attr_cyber_fail" value="lose 1 Biotech and the Manager invokes a complication" />
+  <input type="hidden" name="attr_sly_fail" value="gain either Painted or Taunted and the Manager invokes a complication" />
   <input type="hidden" name="attr_roll_formula_smash" value="" />
   <input type="hidden" name="attr_roll_results_cyber" value="" />
   <input type="hidden" name="attr_roll_results_sly" value="" />
@@ -2218,7 +2220,8 @@ function getAssistantInfo(assistant) {
 
 
 function buildDicePool(numDice) {
-  if(numDice == 0) {
+console.log("Building dice pool for " + numDice);
+  if(numDice <= 0) {
     numDice = 2;
     const rolls = [...Array(numDice)].map(() => "[[d6]]").join(", ");
     return `[[{${rolls}}kl1]]`; // Keep LOWEST not highest
@@ -2229,7 +2232,7 @@ function buildDicePool(numDice) {
 }
 
 function getResults(numDice) {
-  if(numDice === 0) {
+  if(numDice <= 0) {
     numDice = 2;
   }
   return numDice <= 1
@@ -2364,7 +2367,7 @@ on("change:dicemod", function(eventInfo) {
       "sly",
       "cyber"
     ], function(values) {
-    
+    console.log("Dicemod changed");
     const diceMod = parseInt(eventInfo.newValue);
     updateSmashFormulas(parseInt(values.smash) + diceMod);
     updateSlyFormulas(parseInt(values.sly) + diceMod);
@@ -2393,6 +2396,7 @@ on("change:smash", function(eventInfo) {
 });
 
 function updateSlyFormulas(totalSlyDice) {
+console.log("Total sly dice: " + totalSlyDice);
   const roll_formula_sly = buildDicePool(totalSlyDice);
   const roll_results_sly = getResults(totalSlyDice);
    setAttrs({
@@ -2574,7 +2578,7 @@ on("change:repeating_powers:equipped", function(eventInfo) {
   getAttrs(["powersEquipped"], (values) => {
     setAttrs(
       {
-        powersEquipped: values.powersEquipped + changeval
+        powersEquipped: parseInt(values.powersEquipped) + changeval
       }
     );
   });
@@ -2645,6 +2649,7 @@ on("change:hivedecayroom1 change:hivedecayroom2 change:hivedecayroom3 change:hiv
 });
 
 on("sheet:opened", () => {
+console.log("Load");
   // Initialize our default values. Not necessary if we used translation.
   getAttrs(["smash_fail", "cyber_fail", "sly_fail", "smash", "sly", "cyber", "dicemod", "sublockedroom6"], (values) => {
     const sm = values.smash_fail;
@@ -2826,7 +2831,21 @@ on("clicked:reset", function() {
         }
         if(rows) setAttrs(rows);
     });
-    
+    console.log("Antwer");
+    // Reload all weapons
+    getSectionIDs("repeating_weapon",  idarray => {
+        let rows = {};
+        for (let i = 0; i < idarray.length; i++) {
+          getAttrs(['repeating_weapon_' + idarray[i] + '_max_ammo'], function(values){
+            let maxVal = parseInt(values['repeating_weapon_' + idarray[i] + '_max_ammo']);
+            console.log(maxVal);
+            rows['repeating_weapon_' + idarray[i] + '_ammo'] = maxVal;
+            if(rows) setAttrs(rows);
+          })
+        }
+        
+    });
+    console.log("Bruges");
     const shouldResetPowers = values.resetpowers == 'true';
     if(shouldResetPowers) {
     

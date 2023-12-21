@@ -22,15 +22,23 @@ All the TypeScript files in `src/ts` are concatenated together and then placed i
 
 ## Changelog
 
+### 1.0.2
+
+-   Multiple minor tweaks
+    -   Added missing XP field
+    -   Added a Notes field below Equipment
+    -   Added Armor Proficiency
+    -   Add more space to some fields in the Path tab
+
 ### 1.0.1
 
-* Fix the logo having the wrong URL
+-   Fix the logo having the wrong URL
 
 ### 1.0.0
 
-* Initial release of the sheet.
-  * Full support for all necessary information during play.
-  * Action, damage and Doom rolls
-  * Re-rolling the failed dice of the last Action Roll, automatically deducting Doom points
-  * Character Path tab for biographic information
-  * 3 different background themes
+-   Initial release of the sheet.
+    -   Full support for all necessary information during play.
+    -   Action, damage and Doom rolls
+    -   Re-rolling the failed dice of the last Action Roll, automatically deducting Doom points
+    -   Character Path tab for biographic information
+    -   3 different background themes

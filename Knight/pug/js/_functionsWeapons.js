@@ -44,13 +44,13 @@ const wpnEffects = [
   'designation', 'destructeur', 'devastation', 'dispersion', 'enChaine', 'esperance', 'excellence', 'fureur', 'guidage', 'ignoreArmure',
   'ignoreCdF', 'leste', 'lestePNJ', 'lourd', 'lumiere', 'meurtrier', 'obliteration',
   'orfevrerie', 'orfevreriePNJ', 'parasitage', 'penetrant', 'perceArmure', 'precision', 'precisionPNJ', 'reaction', 'regularite', 'silencieux', 'soumission', 'tenebricite',
-  'tirRafale', 'tirSecurite', 'ultraViolence',
+  'tirRafale', 'tirSecurite', 'ultraViolence', 'cdf', 'immobilisation', 'intimidanteHumain', 'intimidanteAnatheme', 'retourFlamme', 'sansArmure', 'boost',
 ];
 
 const wpnEffectsValue = [
   'assassinValue', 'barrageValue', 'bourreauValue', 'cadenceValue', 'cadenceactif', 'chargeurValue', 'chocValue',
   'defenseValue', 'degatContinueValue', 'devastationValue', 'dispersionValue', 'guidageactif', 'lumiereValue', 'parasitageValue',
-  'penetrantValue', 'perceArmureValue', 'reactionValue',
+  'penetrantValue', 'perceArmureValue', 'reactionValue', 'cdfValue', 'immobilisationValue', 'boostValue',
 ];
 
 const wpnAmeliorationS = [
@@ -87,7 +87,7 @@ const wpnSpecialValue = [
   'BDDiversD6', 'BDDiversFixe', 'BVDiversD6', 'BVDiversFixe', 'energieValue',
 ];
 
-function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir) {
+function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura) {
   const result = {};
 
   const exec = [];
@@ -132,6 +132,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isTirSecurite = false;
   let isUltraviolence = false;
 
   let isBourreau = false;
@@ -206,6 +207,16 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   const eTirSecurite = isApplied(effet[`${prefix}tirSecurite`]);
   const eUltraviolence = isApplied(effet[`${prefix}ultraViolence`]);
   const eUltraviolenceV = 2;
+  const eCdF = isApplied(effet[`${prefix}cdf`]);
+  const eCdFV = effet[`${prefix}cdfValue`];
+  const eImmobilisation = isApplied(effet[`${prefix}immobilisation`]);
+  const eImmobilisationV = effet[`${prefix}immobilisationValue`];
+  const eIntimidanteHumain = isApplied(effet[`${prefix}intimidanteHumain`]);
+  const eIntimidanteAnatheme = isApplied(effet[`${prefix}intimidanteAnatheme`]);
+  const eRetourFlamme = isApplied(effet[`${prefix}retourFlamme`]);
+  const eSansArmure = isApplied(effet[`${prefix}sansArmure`]);
+  const eBoost = isApplied(effet[`${prefix}boost`]);
+  const eBoostV = effet[`${prefix}boostValue`];
 
   if (eAntiAnatheme || armure === 'berserk') {
     isConditionnelD = true;
@@ -505,7 +516,36 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eReaction) { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
-  if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
+  if (eTirSecurite) {
+    autresEffets.push(i18n_tirSecurite);
+    isTirSecurite = true;
+  }
+
+  if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
+
+  if (eImmobilisation) { autresEffets.push(`${i18n_immobilisation} ${eImmobilisationV}`); }
+
+  if (eIntimidanteAnatheme) {
+    isConditionnelV = true;
+    let vIntimidanteAnatheme = +vAura;
+    if (hasArmure) vIntimidanteAnatheme += +oAura;
+
+    exec.push(`{{intimidanteAnatheme=${i18n_intimidanteAnatheme}}} {{intimidanteAnathemeCondition=${i18n_intimidanteAnathemeCondition}}} {{intimidanteAnathemeValue=${vIntimidanteAnatheme}}}`);
+  }
+
+  if (eIntimidanteHumain) {
+    isConditionnelV = true;
+    let vIntimidanteHumain = +vAura;
+    if (hasArmure) vIntimidanteHumain += +oAura;
+
+    exec.push(`{{intimidanteHumain=${i18n_intimidanteHumain}}} {{intimidanteHumainCondition=${i18n_intimidanteHumainCondition}}} {{intimidanteHumainValue=${vIntimidanteHumain}}}`);
+  }
+
+  if (eRetourFlamme) { autresEffets.push(`${i18n_retourFlamme}`); }
+
+  if (eSansArmure) { autresEffets.push(`${i18n_sansArmure}`); }
+
+  if (eBoost) { autresEffets.push(`${i18n_boost} ${eBoostV}`); }
 
   result.isConditionnelA = isConditionnelA;
   result.isConditionnelD = isConditionnelD;
@@ -547,6 +587,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isAmbidextrie = isAmbidextrie;
   result.isDeuxMains = isDeuxMains;
   result.isLourd = isLourd;
+  result.isTirSecurite = isTirSecurite;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -561,7 +602,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   return result;
 }
 
-function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE) {
+function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE, vDame, vDameAE) {
   const result = {};
 
   const exec = [];
@@ -674,6 +715,16 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
   const eTirSecurite = isApplied(data[`${prefix}tirSecurite`]);
   const eUltraviolence = isApplied(data[`${prefix}ultraViolence`]);
   const eUltraviolenceV = 2;
+  const eCdF = isApplied(data[`${prefix}cdf`]);
+  const eCdFV = data[`${prefix}cdfValue`];
+  const eImmobilisation = isApplied(data[`${prefix}immobilisation`]);
+  const eImmobilisationV = data[`${prefix}immobilisationValue`];
+  const eIntimidanteHumain = isApplied(data[`${prefix}intimidanteHumain`]);
+  const eIntimidanteAnatheme = isApplied(data[`${prefix}intimidanteAnatheme`]);
+  const eRetourFlamme = isApplied(data[`${prefix}retourFlamme`]);
+  const eSansArmure = isApplied(data[`${prefix}sansArmure`]);
+  const eBoost = isApplied(data[`${prefix}boost`]);
+  const eBoostV = data[`${prefix}boostValue`];
 
   if (eAntiAnatheme) {
     isConditionnelD = true;
@@ -938,6 +989,32 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
 
   if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
 
+  if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
+
+  if (eImmobilisation) { autresEffets.push(`${i18n_immobilisation} ${eImmobilisationV}`); }
+
+  if (eIntimidanteAnatheme) {
+    isConditionnelV = true;
+    let vIntimidanteAnatheme = Math.ceil(+vDame / 2);
+    vIntimidanteAnatheme += +vDameAE;
+
+    exec.push(`{{intimidanteAnatheme=${i18n_intimidanteAnatheme}}} {{intimidanteAnathemeCondition=${i18n_intimidanteAnathemeCondition}}} {{intimidanteAnathemeValue=${vIntimidanteAnatheme}}}`);
+  }
+
+  if (eIntimidanteHumain) {
+    isConditionnelV = true;
+    let vIntimidanteHumain = Math.ceil(+vDame / 2);
+    vIntimidanteHumain += +vDameAE;
+
+    exec.push(`{{intimidanteHumain=${i18n_intimidanteHumain}}} {{intimidanteHumainCondition=${i18n_intimidanteHumainCondition}}} {{intimidanteHumainValue=${vIntimidanteHumain}}}`);
+  }
+
+  if (eRetourFlamme) { autresEffets.push(`${i18n_retourFlamme}`); }
+
+  if (eSansArmure) { autresEffets.push(`${i18n_sansArmure}`); }
+
+  if (eBoost) { autresEffets.push(`${i18n_boost} ${eBoostV}`); }
+
   result.isConditionnelA = isConditionnelA;
   result.isConditionnelD = isConditionnelD;
   result.isConditionnelV = isConditionnelV;
@@ -1099,6 +1176,16 @@ function getWeaponsEffectsAutre(prefix, effet) {
   const eTirSecurite = isApplied(effet[`${prefix}tirSecurite`]);
   const eUltraviolence = isApplied(effet[`${prefix}ultraViolence`]);
   const eUltraviolenceV = 2;
+  const eCdF = isApplied(effet[`${prefix}cdf`]);
+  const eCdFV = effet[`${prefix}cdfValue`];
+  const eImmobilisation = isApplied(effet[`${prefix}immobilisation`]);
+  const eImmobilisationV = effet[`${prefix}immobilisationValue`];
+  const eIntimidanteHumain = isApplied(effet[`${prefix}intimidanteHumain`]);
+  const eIntimidanteAnatheme = isApplied(effet[`${prefix}intimidanteAnatheme`]);
+  const eRetourFlamme = isApplied(effet[`${prefix}retourFlamme`]);
+  const eSansArmure = isApplied(effet[`${prefix}sansArmure`]);
+  const eBoost = isApplied(effet[`${prefix}boost`]);
+  const eBoostV = effet[`${prefix}boostValue`];
 
   if (eAntiAnatheme) {
     isConditionnelD = true;
@@ -1352,6 +1439,20 @@ function getWeaponsEffectsAutre(prefix, effet) {
 
   if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
 
+  if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
+
+  if (eImmobilisation) { autresEffets.push(`${i18n_immobilisation} ${eImmobilisationV}`); }
+
+  if (eIntimidanteAnatheme) { autresEffets.push(`${i18n_intimidanteAnatheme}`); }
+
+  if (eIntimidanteHumain) { autresEffets.push(`${eIntimidanteHumain}`); }
+
+  if (eRetourFlamme) { autresEffets.push(`${i18n_retourFlamme}`); }
+
+  if (eSansArmure) { autresEffets.push(`${i18n_sansArmure}`); }
+
+  if (eBoost) { autresEffets.push(`${i18n_boost} ${eBoostV}`); }
+
   result.isConditionnelA = isConditionnelA;
   result.isConditionnelD = isConditionnelD;
   result.isConditionnelV = isConditionnelV;
@@ -1525,6 +1626,16 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   const eTirSecurite = isApplied(effet[`${prefix}tirSecurite`]);
   const eUltraviolence = isApplied(effet[`${prefix}ultraViolence`]);
   const eUltraviolenceV = 2;
+  const eCdF = isApplied(effet[`${prefix}cdf`]);
+  const eCdFV = effet[`${prefix}cdfValue`];
+  const eImmobilisation = isApplied(effet[`${prefix}immobilisation`]);
+  const eImmobilisationV = effet[`${prefix}immobilisationValue`];
+  const eIntimidanteHumain = isApplied(effet[`${prefix}intimidanteHumain`]);
+  const eIntimidanteAnatheme = isApplied(effet[`${prefix}intimidanteAnatheme`]);
+  const eRetourFlamme = isApplied(effet[`${prefix}retourFlamme`]);
+  const eSansArmure = isApplied(effet[`${prefix}sansArmure`]);
+  const eBoost = isApplied(effet[`${prefix}boost`]);
+  const eBoostV = effet[`${prefix}boostValue`];
 
   if (eAntiAnatheme) {
     isConditionnelD = true;
@@ -1779,6 +1890,20 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
   if (eReaction) { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
   if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
+
+  if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
+
+  if (eImmobilisation) { autresEffets.push(`${i18n_immobilisation} ${eImmobilisationV}`); }
+
+  if (eIntimidanteAnatheme) { autresEffets.push(`${i18n_intimidanteAnatheme}`); }
+
+  if (eIntimidanteHumain) { autresEffets.push(`${eIntimidanteHumain}`); }
+
+  if (eRetourFlamme) { autresEffets.push(`${i18n_retourFlamme}`); }
+
+  if (eSansArmure) { autresEffets.push(`${i18n_sansArmure}`); }
+
+  if (eBoost) { autresEffets.push(`${i18n_boost} ${eBoostV}`); }
 
   result.isConditionnelA = isConditionnelA;
   result.isConditionnelD = isConditionnelD;
@@ -3626,7 +3751,7 @@ async function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion,
   return result;
 }
 
-function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd) {
+function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -3649,11 +3774,14 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
 
       if (isAAgressive) { autresAmeliorationsS.push(i18n_agressive); }
       break;
@@ -3806,7 +3934,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
   return result;
 }
 
-function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
+function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -3826,11 +3954,14 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
       break;
 
     case 'agressif':
