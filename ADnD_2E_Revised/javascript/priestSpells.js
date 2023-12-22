@@ -152,10 +152,11 @@ pri1['Detect Magic'] = {
     'reference': 'p. 253',
     'book': 'PHB',
     'book-compendium': 'Priest’ Spell Compendium Volume One p. 201',
-    'errata': 'Dungeon Master Guide p. 161\nSage Advice #213 p. 85\nSage Advice #214 p. 78-79\nSage Advice #243 p. 22\nSage Advice #245 p. 17-18\nSage Advice #254 p. 24',
+    'errata': 'Dungeon Master Guide p. 161\nThe Complete Psionics Handbook p. 110\nSage Advice #213 p. 85\nSage Advice #214 p. 78-79\nSage Advice #243 p. 22\nSage Advice #245 p. 17-18\nSage Advice #254 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'psionics': '*Detect magic* never detects psionic activity.',
     'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[{10*[[@{level-priest}]],100}kl1]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, solid wood at least 1 yard thick, or a *wall of force*.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.\n&emsp;Casting *detect magic* on a cursed item generally indicates the sphere of magic the cursed item is imitating, i.e. *cloak of poisonousness* that imitates *cloak of protection* would radiate the protection sphere.'
 };
 

@@ -7,6 +7,8 @@ const INFO = 2;
 const WARNING = 3;
 const ERROR = 4;
 
+const PSIONICS_HANDBOOK = 'The Complete Psionics Handbook';
+
 const BOOK_FIELDS = [
     'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb','book-psionics',
     'book-tom','book-aaeg',
@@ -270,6 +272,16 @@ const getActiveSettings = function (settingFields, values) {
         .filter(Boolean)
         .filter(book => book !== '0');
     return new Set(settings);
+}
+
+const isBookActive = function (books, obj) {
+    let activeBooks = getActiveSettings(BOOK_FIELDS, books);
+    console.log(activeBooks);
+    if (typeof obj === 'string') {
+        return activeBooks.has(obj);
+    }
+
+    return false
 }
 
 const isBookInactive = function (books, obj) {
@@ -1196,6 +1208,12 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
+            let effect = spell['effect'];
+            if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+                console.log('adding psionics stuff');
+                effect += `}}{{psionics=${spell['psionics']}`;
+            }
+
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
                 [`repeating_spells-${section}_spell-level`]        : displaySpellLevel(spell['level'], className),
@@ -1215,7 +1233,7 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+                [`repeating_spells-${section}_spell-effect`]       : effect
             };
 
             if (isPriest) {
@@ -2759,6 +2777,9 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push('checktarget=[[@{scroll-failure}]]%');
         rollBuilder.push('fail=DM roll for Magical Spell Failure');
         rollBuilder.push(`effects=${spell['effect']}`);
+        if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+            rollBuilder.push(`psionics=${spell['psionics']}`);
+        }
 
         let scrollMacro = rollBuilder.string();
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
