@@ -250,6 +250,7 @@
 .charsheet input[type="checkbox"].toggle-thief-skills:checked ~ .background .thief-skills-box,
 .charsheet input[type="checkbox"].toggle-thief-skills:checked ~ .background .toggle-backstab,
 .charsheet input[type="checkbox"].toggle-spells:checked ~ .background .spells-box,
+.charsheet input[type="checkbox"].toggle-caster2:checked ~ .background .toggle-caster2,
 .charsheet input[type="checkbox"].toggle-nwp:checked ~ .background .nonweapon-proficiencies-box,
 .charsheet input[type="checkbox"].toggle-costs:checked ~ .background .toggle-costs,
 .charsheet input[type="checkbox"].toggle-comeliness:checked ~ .background .toggle-comeliness,
@@ -354,6 +355,11 @@
     width: 100%;
     /* Inputs match the width of the parent element as defined by the spans */
     font-size: 1.4rem;
+}
+
+.charsheet .shrink-on-placeholder:placeholder-shown {
+    order: -1;
+    visibility: collapse;
 }
 
 /* main grid */
@@ -1695,7 +1701,7 @@ details[open].thac0-box {
     grid-column: 1/-1;
 }
 
-.repcontainer[data-groupname="repeating_ability"] {
+.charsheet .repcontainer[data-groupname="repeating_ability"] {
     column-count: 2;
     column-gap: 0.25em;
     column-width: 300px;
@@ -1708,7 +1714,7 @@ input.toggle-single-column-abilities:checked ~ .background .repcontainer[data-gr
     min-width: auto;
 }
 
-.repcontainer[data-groupname="repeating_ability"] .repitem {
+.charsheet .repcontainer[data-groupname="repeating_ability"] .repitem {
     min-width: 300px;
     display: grid;
     -webkit-column-break-inside: avoid;
@@ -1846,7 +1852,7 @@ input.toggle-single-column-abilities:checked ~ .background .repcontainer[data-gr
 }
 
 /*single column*/
-.repcontainer[data-groupname="repeating_spells"] {
+.charsheet .repcontainer[data-groupname="repeating_spells"] {
     column-count: 2;
     column-gap: 0.25em;
     column-width: 300px;
@@ -1859,9 +1865,8 @@ input.toggle-single-column-spells:checked ~ .background .repcontainer[data-group
     min-width: max-content;
 }
 
-.repcontainer[data-groupname="repeating_spells"] .repitem {
-    min-width: 300px;
-    display: grid;
+.charsheet .repcontainer[data-groupname="repeating_spells"] .repitem {
+    min-width: 301px;
     -webkit-column-break-inside: avoid;
     page-break-inside: avoid;
     break-inside: avoid;
@@ -1891,10 +1896,13 @@ input.toggle-single-column-spells:checked ~ .background .repcontainer[data-group
     max-width: fit-content;
 }
 
+.charsheet input.toggle-single-column-spells:not(:checked) ~ .background .spell-display .spell-details-grid > :first-child {
+    margin-top: -.75em;
+}
+
 .charsheet input.toggle-single-column-abilities:not(:checked) ~ .background .special-abilities-box .spell-details-grid {
     margin-top: -1em;
 }
-
 
 .charsheet .spell-details-grid label {
     justify-content: left;
@@ -1911,7 +1919,7 @@ input.toggle-single-column-spells:checked ~ .background .repcontainer[data-group
     grid-column: 1/-1;
 }
 
-.repcontainer[data-groupname="repeating_notes"] {
+.charsheet .repcontainer[data-groupname="repeating_notes"] {
     column-count: 2;
     column-gap: 0.25em;
     column-width: 300px;
@@ -1924,7 +1932,7 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     min-width: max-content;
 }
 
-.repcontainer[data-groupname="repeating_notes"] .repitem {
+.charsheet .repcontainer[data-groupname="repeating_notes"] .repitem {
     min-width: 300px;
     display: grid;
     -webkit-column-break-inside: avoid;
@@ -1986,7 +1994,7 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     margin-top: .25em;
 }
 
-.repcontainer[data-groupname="repeating_attributes"] {
+.charsheet .repcontainer[data-groupname="repeating_attributes"] {
     column-count: 2;
     column-gap: 0.25em;
     column-width: 300px;
@@ -1999,7 +2007,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     min-width: max-content;
 }
 
-.repcontainer[data-groupname="repeating_attributes"] .repitem {
+.charsheet .repcontainer[data-groupname="repeating_attributes"] .repitem {
     min-width: 300px;
     display: grid;
     -webkit-column-break-inside: avoid;
@@ -2007,7 +2015,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     break-inside: avoid;
 }
 
-.repcontainer[data-groupname="repeating_attributes"] .repitem > div {
+.charsheet .repcontainer[data-groupname="repeating_attributes"] .repitem > div {
     padding: 4px;
 }
 
@@ -2158,11 +2166,15 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     display: none;
 }
 
-/* done within the repeating row
-   May need to toggle css from outside the repeating row.
-	 itemcontrol/Edit mode shows Move and Del buttons based on if a row is visible when the unlock button is clicked.
-	 But then the per-row css to hide/show row is rendered which hides a row.  Move and Del are still seen.
-*/
+.charsheet input.toggle-show[value="1"] ~ .spell-display.top-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.charsheet input.toggle-show[value="1"] ~ .spell-display.top-row label {
+    flex: 1 1 auto;
+    width: auto;
+}
 
 .charsheet input.toggle-carry[value="1"] ~ .equipment-display-carry,
 .charsheet input.toggle-type[value="1"] + .equipment-display-carry .equipment-display-type,
@@ -2181,7 +2193,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 
 /* toggle memorized only */
 .charsheet input.toggle-show[value="1"] ~ input.toggle-memorized:checked + input.toggle-all:not(:checked) ~ .spell-display {
-    display: inherit;
+    display: flex;
 }
 
 .charsheet input.toggle-show[value="1"] ~ input.toggle-memorized:not(:checked) ~ .spell-display {
@@ -2189,7 +2201,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 }
 
 .charsheet input.toggle-show[value="1"] ~ input.toggle-memorized:not(:checked) + input.toggle-all:checked ~ .spell-display {
-    display: inherit;
+    display: flex;
 }
 
 /* ensure un-memorized spells top-row and details get 100% opacity with hover/focus */
@@ -2199,6 +2211,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 }
 
 .charsheet .equipment-tabs,
+.charsheet .spell-caster-tabs,
 .charsheet .spell-tabs,
 .charsheet .npc-tabs {
     align-items: center;
@@ -2212,6 +2225,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 
 .charsheet .spell-tabs {
     margin: 0 0 10px 0;
+    border-top: 1px solid #1f1f1f;
 }
 
 .charsheet .spell-display .two-columns .span-all {
@@ -2240,6 +2254,16 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     text-align: center;
     white-space: nowrap;
     width: 9%;
+}
+
+.charsheet .spell-caster-tabs {
+    margin: auto;
+    padding: 6px 0 0 0;
+    width: 100%;
+}
+
+.charsheet .spell-caster-tabs span.tab {
+    width: 4.5em;
 }
 
 .charsheet .npc-tabs span.tab {
@@ -2276,6 +2300,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 }
 
 .charsheet div.equipment-tabs > input.tab-hidden,
+.charsheet div.spell-caster-tabs > input.tab-hidden,
 .charsheet div.spell-tabs > input.tab-hidden,
 .charsheet section.npc-tabs > input.tab-hidden {
     height: 1.3em;
@@ -2284,6 +2309,11 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     position: relative;
     width: 10%;
     z-index: 1;
+}
+
+.charsheet div.spell-caster-tabs > input.tab-hidden {
+    margin-right: -4.5em;
+    width: 4.5em;
 }
 
 .charsheet section.npc-tabs > input.tab-hidden {
@@ -2439,6 +2469,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     border-color: rgba(204, 204, 204, 0.44);
     cursor: pointer;
     margin: 1px 0 1px 0;
+    max-height: 1.75em;
     padding: 1px 0 0 2px;
     text-align: center;
     width: auto;
@@ -2664,7 +2695,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 
 .charsheet h4 {
     color: inherit;
-    margin: .25em .5em .25em 0;
+    margin: .25em .5em .25em .5em;
     text-align: right;
     font-size: 1em;
 }
@@ -3031,7 +3062,7 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 
 .sheet-rolltemplate-attacks .sheet-span-two,
 .sheet-rolltemplate-attacks-table .sheet-span-two,
-.sheet-rolltemplate-general .sheet-span-two {
+.sheet-rolltemplate-general div span.sheet-span-two {
     align-items: end;
     display: flex;
     flex-direction: row;
@@ -3092,8 +3123,8 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 }
 
 /* border below header/subheader */
-.sheet-rolltemplate-attacks .sheet-row:first-child,
-.sheet-rolltemplate-general .sheet-row:first-child {
+.sheet-rolltemplate-attacks div > .sheet-row:first-child,
+.sheet-rolltemplate-general div > .sheet-row:first-child {
     border-bottom: 2px solid #000;
 }
 
@@ -3106,11 +3137,6 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     font-weight: bold;
 }
 
-.sheet-rolltemplate-attacks .sheet-center,
-.sheet-rolltemplate-attacks-table .sheet-center {
-    text-align: center;
-}
-
 .sheet-rolltemplate-attacks span,
 .sheet-rolltemplate-attacks-table span {
     display: inline-flex;
@@ -3120,9 +3146,9 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     text-align: start;
 }
 
-.sheet-rolltemplate-attacks span.sheet-text,
-.sheet-rolltemplate-attacks-table span.sheet-text,
-.sheet-rolltemplate-general span.sheet-text {
+.sheet-rolltemplate-attacks span.sheet-text.sheet-text,
+.sheet-rolltemplate-attacks-table span.sheet-text.sheet-text,
+.sheet-rolltemplate-general span.sheet-text.sheet-text {
     color: #222;
     display: block;
     line-height: initial;
@@ -3139,24 +3165,36 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     color: var(--dark-secondarytext);
 }
 
+.sheet-rolltemplate-general .sheet-tcat + span,
+.sheet-rolltemplate-attacks .sheet-tcat + span {
+    justify-content: end;
+}
+
+.sheet-rolltemplate-attacks .sheet-bold,
+.sheet-rolltemplate-general .sheet-bold,
 .sheet-rolltemplate-general .sheet-tcat,
 .sheet-rolltemplate-general .sheet-tcat + span,
 .sheet-rolltemplate-attacks .sheet-tcat + span {
     font-weight: bold;
 }
 
-.sheet-rolltemplate-general .sheet-left {
+.sheet-rolltemplate-general .sheet-left,
+.sheet-rolltemplate-general span span.sheet-left {
     justify-content: left;
     text-align: left;
 }
 
-.sheet-rolltemplate-general .sheet-center {
-    text-align: center;
-}
-
-.sheet-rolltemplate-general .sheet-right {
+.sheet-rolltemplate-general .sheet-right,
+.sheet-rolltemplate-general span span.sheet-right {
     justify-content: right;
     text-align: right;
+}
+
+.sheet-rolltemplate-attacks .sheet-center,
+.sheet-rolltemplate-attacks-table .sheet-center,
+.sheet-rolltemplate-general .sheet-center {
+    align-self: center;
+    text-align: center;
 }
 
 .sheet-rolltemplate-attacks div .sheet-ToHit,

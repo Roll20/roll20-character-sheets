@@ -10,6 +10,7 @@
 <input type="hidden" name="attr_is_npc" value="0" class="is-npc" />
 <input type="hidden" name="attr_toggle_npc" value="0" class="toggle-npc" />
 <input type="checkbox" name="attr_toggle_costs" value="1" class="toggle-costs hidden" />
+<input type="checkbox" name="attr_toggle_caster2" value="1" class="toggle-caster2 hidden" checked/>
 <input type="checkbox" name="attr_toggle_thief_skills" value="1" class="toggle-thief-skills hidden" checked />
 <input type="checkbox" name="attr_toggle_spells" value="1" class="toggle-spells hidden" />
 <input type="checkbox" name="attr_toggle_nwp" value="1" class="toggle-nwp hidden" />
@@ -51,14 +52,16 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">12/17/23'</label>
+              <label class="right">12/21/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Added Caster Class 1 and Caster Class 2. Each class will have it's own spell/day grid. Repeating spells now include the caster class and the caster level. Caster Class 2 related sections are hidden by default but can be toggled visible in the sheet options. Spells can be sorted by Caster class.</li>
+            <li>Added Save Type field to spells.</li>
             <li>Armor Details rows are now synced with repeating_equipment under Armor. Changes made to either should be reflected in both locations. There are now 6 "Other" rows that can be used for anything else that might effect AC. ie magical items and spells. Weight and Cost calcs are now included with equipment.</li>
             <li>Added two more custom rows to Armor Details section.</li>
             <li>Fixed a bug that caused a gap between repeating rows of spells.</li>
-            <li>Added info link to Equipment.</li>
+            <li>Added a url "Link" attribute and button to Spells, Equipment, Special Abilities, NWP, and Monster. Button sends a clickable "LINK" to chat. Link has also been added to the roll template.</li>
             <li>Toggling the sheet's role from PC to NPC will also change the main tab text to help indicate that the NPC sheet role can use both the 'Monster' tab and PC tab which gets renamed 'NPC' with this update. Toggle back to PC and the main tab displays 'PC' and hides the Monster tab.</li>
             <li>Added @{hitdice_total} to Class Details to Track total/effective Hit Dice for Spell effects and XP.</li>
             <li>Added a Custom Attributes section located on the settings page. Use custom attributes to track misc. adjustments for macros and mods. ie Ring of Protection +1 Saves, +1 AC.</li>
@@ -459,13 +462,13 @@
         <button type="roll" class="button stack-text info-link" name="attr_npc_link_roll" value="[**LINK**](@{npc_link})" title="@{npc_link_roll}">
           <span>Link</span>
         </button>
-        <input type="text" class="left" name="attr_npc_link" title="@{npc_link}" value="" placeholder="http://www.example.com" />
+        <input type="text" class="left" name="attr_npc_link" title="@{npc_link}" value="" placeholder="https://www.example.com" />
       </span>
       <span class="inline-label">
         <button type="roll" class="button stack-text" name="attr_npc_image_link_roll" value="" title="@{npc_image_link_roll}">
           <span>Image:</span>
         </button>
-        <input type="text" class="left" name="attr_npc_image_link" title="@{npc_image_link}" value="" placeholder="http://www.example.com/image.jpg" />
+        <input type="text" class="left" name="attr_npc_image_link" title="@{npc_image_link}" value="" placeholder="https://www.example.com/image.jpg" />
       </span>
     </section>
     <section class="npc-box statblock3">
@@ -1371,7 +1374,7 @@
           <button type="roll" class="button stack-text" name="attr_pc_image_link_roll" value="[**LINK**](@{pc_image_link})" title="@{pc_image_link_roll}">
             <span>Image:</span>
           </button>
-          <input type="text" class="left" name="attr_pc_image_link" title="@{pc_image_link}" value="" placeholder="http://www.example.com/image.jpg" />
+          <input type="text" class="left" name="attr_pc_image_link" title="@{pc_image_link}" value="" placeholder="https://www.example.com/image.jpg" />
         </span>
       </div>
       <hr>
@@ -1870,7 +1873,7 @@
                 <option value="1">Clerics, Druids and Monks</option>
                 <option value="2">Fighters, Paladins, Rangers,</option>
                 <option value="2">Bards, & 0-lvl Halflings & Humans</option>
-                <option value="3">Magic-Users and Illusionists</option>
+                <option value="3">Magic-Users and Illusists</option>
                 <option value="4">Thieves and Assassins</option>
                 <option value="5">Monsters</option>
               </select>
@@ -1964,7 +1967,7 @@
                 <option value="0" selected>Select a Class or Monster</option>
                 <option value="1">Clerics, Druids and Monks</option>
                 <option value="2">Fighters, Paladins, Rangers, Bards, & 0-lvl Halflings & Humans</option>
-                <option value="3">Magic-Users and Illusionists</option>
+                <option value="3">Magic-Users and Illusists</option>
                 <option value="4">Thieves and Assassins</option>
                 <option value="5">Monsters</option>
               </select>
@@ -2441,10 +2444,11 @@
                     <button type="roll" class="button stack-text info-link" name="attr_equipment_link_roll" value="[**LINK**](@{equipment_link})" title="@{repeating_equipment_$X_equipment_link_roll}">
                       <span>Link</span>
                     </button>
-                    <input type="text" class="left" name="attr_equipment_link" title="@{repeating_equipment_$X_equipment_link}" value="" placeholder="http://www.example.com" />
+                    <input type="text" class="left" name="attr_equipment_link" title="@{repeating_equipment_$X_equipment_link}" value="" placeholder="https://www.example.com" />
                   </label>
                 </span>
-                <textarea class="span-all height-short toggle-macros" name="attr_equipment_macro_text" title="@{repeating_equipment_$X_equipment_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{freetext=@{equipment_description}}} {{quantity= @{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}</textarea>
+                <!-- <textarea class="span-all height-short toggle-macros" name="attr_equipment_macro_text" title="@{repeating_equipment_$X_equipment_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{freetext=@{equipment_description}}} {{quantity= @{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}</textarea> -->
+                <textarea class="span-all height-short toggle-macros" name="attr_equipment_macro_text" title="@{repeating_equipment_$X_equipment_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{link=@{equipment_link}}} {{freetext=@{equipment_description}}} {{quantity= @{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}</textarea>
               </details>
             </div>
           </div>
@@ -2643,7 +2647,7 @@
               <label><span>Duration:</span>
                 <input type="text" name="attr_ability_duration" title="@{repeating_ability_$X_ability_duration}" value="" placeholder="n/a" />
               </label>
-              <label><span>Ability Save:</span>
+              <label><span>Save Type:</span>
                 <input type="text" name="attr_ability_save_type" title="@{repeating_ability_$X_ability_save_type}" value="" placeholder="n/a" />
               </label>
               <label class="span-two"><span>Area of Effect:</span>
@@ -2655,7 +2659,7 @@
                 <button type="roll" class="button stack-text info-link" name="attr_ability_link_roll" value="[**LINK**](@{ability_link})" title="@{repeating_ability_$X_ability_link_roll}">
                   <span>Link</span>
                 </button>
-                <input type="text" class="left" name="attr_ability_link" title="@{repeating_ability_$X_ability_link}" value="" placeholder="http://www.example.com" />
+                <input type="text" class="left" name="attr_ability_link" title="@{repeating_ability_$X_ability_link}" value="" placeholder="https://www.example.com" />
               </label>
             </span>
             <span class="inline-label">
@@ -2672,7 +2676,8 @@
               12/3/23 macro_v3
               &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}
               -->
-            <textarea class="height-short toggle-macros" name="attr_ability_macro_text" title="@{repeating_ability_$X_ability_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}</textarea>
+            <!-- <textarea class="height-short toggle-macros" name="attr_ability_macro_text" title="@{repeating_ability_$X_ability_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}</textarea> -->
+            <textarea class="height-short toggle-macros" name="attr_ability_macro_text" title="@{repeating_ability_$X_ability_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}</textarea>
           </details>
         </fieldset>
         <!-- deprecated since each repeating row includes description and notes-->
@@ -2732,10 +2737,19 @@
               <label class="span-all" style="margin-bottom: 2px;">
                 <textarea class="height-short" name="attr_nwp_description" title="@{repeating_nonweaponproficiencies_$X_nwp_description}" placeholder="Ability Description"></textarea>
               </label>
+              <span class="span-all inline-label">
+                <label>
+                  <button type="roll" class="button stack-text info-link btn ui-draggable" name="attr_nwp_link_roll" value="[**LINK**](@{nwp_link})" title="@{repeating_nonweaponproficiencies_$X_nwp_link_roll}">
+                    <span>Link</span>
+                  </button>
+                  <input type="text" class="left" name="attr_nwp_link" title="@{repeating_nonweaponproficiencies_$X_nwp_link}" value="" placeholder="https://www.example.com">
+                </label>
+              </span>
               <!-- OLD NWP MACRO
                 <textarea name="attr_nwp_macro_text" title="@{repeating_nonweaponproficiencies_$X_nwp_macro_text}" class="height-short">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{Proficiency Check=[[ 1d20 + [[@{nwp_modifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{nwp_attribute}[ATTR] ]]}}{{freetext=@{nwp_short_description}}}</textarea>
               -->
-              <textarea class="span-all height-short toggle-macros" name="attr_nwp_macro_text" title="@{repeating_nonweaponproficiencies_$X_nwp_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{NWP Mod Applied=[[ @{nwp_modifier} ]]}} {{freetext=@{nwp_short_description}}}</textarea>
+              <!-- <textarea class="span-all height-short toggle-macros" name="attr_nwp_macro_text" title="@{repeating_nonweaponproficiencies_$X_nwp_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{NWP Mod Applied=[[ @{nwp_modifier} ]]}} {{freetext=@{nwp_short_description}}}</textarea> -->
+              <textarea class="span-all height-short toggle-macros" name="attr_nwp_macro_text" title="@{repeating_nonweaponproficiencies_$X_nwp_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{nwp_mod_applied=[[ @{nwp_modifier} ]]}} {{link=@{nwp_link}}} {{freetext=@{nwp_short_description} @{nwp_description}}}</textarea>
             </div>
           </details>
         </fieldset>
@@ -3049,12 +3063,12 @@
         <div class="section center">
           <span class="inline-label">
             <label class="auto-width">
-              <span>Cleric/Druid Caster Level</span>
-              <input type="text" class="width-small" name="attr_priest_caster_level" title="@{priest_caster_level}" value="0" />
+              <h4>Caster Class 1:</h4>
+              <input type="text" class="auto-width" name="attr_caster_class1_name" title="@{caster_class1_name}" value="" placeholder="enter caster class" />
             </label>
-            <label class="auto-width">
-              <span>Magic-user/Illusionist Caster Level</span>
-              <input type="text" class="width-small" name="attr_mage_caster_level" title="@{mage_caster_level}" value="0" />
+            <label class="width-medium">
+              <h4>Level:</h4>
+              <input type="text" class="width-small" name="attr_caster_class1_level" title="@{caster_class1_level}" value="0" />
             </label>
           </span>
           <span class="spells-top column-header">
@@ -3091,7 +3105,51 @@
             <span><input type="text" class="width-fill" name="attr_spells_lvl_9_current" title="@{spells_lvl_9_current}" value="0" /></span>
             <span><input type="text" class="width-fill" name="attr_spells_lvl_9_max" title="@{spells_lvl_9_max}" value="0" /></span>
           </span>
-          <span class="to-hit spells-bottom">
+            <span class="to-hit spells-bottom">
+            <span>Cantrips</span>
+            <span>1st</span>
+            <span>2nd</span>
+            <span>3rd</span>
+            <span>4th</span>
+            <span>5th</span>
+            <span>6th</span>
+            <span>7th</span>
+            <span>8th</span>
+            <span>9th</span>
+          </span>
+          <span class="spells-middle toggle-caster2">
+            <span class="inline-label span-all no-border">
+              <label class="auto-width">
+                <h4>Caster Class 2:</h4>
+                <input type="text" class="auto-width" name="attr_caster_class2_name" title="@{caster_class2_name}" value="" placeholder="enter caster class" />
+              </label>
+              <label class="width-medium">
+                <h4>Level:</h4>
+                <input type="text" class="width-small" name="attr_caster_class2_level" title="@{caster_class2_level}" value="0" />
+              </label>
+            </span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_0_current" title="@{spells2_lvl_0_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_0_max" title="@{spells2_lvl_0_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_1_current" title="@{spells2_lvl_1_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_1_max" title="@{spells2_lvl_1_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_2_current" title="@{spells2_lvl_2_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_2_max" title="@{spells2_lvl_2_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_3_current" title="@{spells2_lvl_3_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_3_max" title="@{spells2_lvl_3_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_4_current" title="@{spells2_lvl_4_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_4_max" title="@{spells2_lvl_4_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_5_current" title="@{spells2_lvl_5_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_5_max" title="@{spells2_lvl_5_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_6_current" title="@{spells2_lvl_6_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_6_max" title="@{spells2_lvl_6_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_7_current" title="@{spells2_lvl_7_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_7_max" title="@{spells2_lvl_7_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_8_current" title="@{spells2_lvl_8_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_8_max" title="@{spells2_lvl_8_max}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_9_current" title="@{spells2_lvl_9_current}" value="0" /></span>
+            <span><input type="text" class="width-fill" name="attr_spells2_lvl_9_max" title="@{spells2_lvl_9_max}" value="0" /></span>
+          </span>
+          <span class="to-hit spells-bottom toggle-caster2">
             <span>Cantrips</span>
             <span>1st</span>
             <span>2nd</span>
@@ -3104,14 +3162,21 @@
             <span>9th</span>
           </span>
         </div>
-        <span>
-          <span>Single Column</span>
-          <input type="checkbox" class="width-small toggle-single-column-spells" name="attr_toggle_single_column_spells" title="@{toggle_single_column_spells}" value="1" />
-        </span>
-        <span>
-          <span>Memorized Only</span>
-          <input type="checkbox" class="width-small" name="attr_toggle_show_memorized" title="@{toggle_show_memorized}" value="1" />
-        </span>
+        <div class="inline-label">
+          <div class="spell-caster-tabs toggle-caster2">
+            <input type="radio" class="tab-hidden tab" name="attr_spell_caster_tabs" value="0"><span class="tab">Caster 1</span>
+            <input type="radio" class="tab-hidden tab" name="attr_spell_caster_tabs" value="1"><span class="tab">Caster 2</span>
+            <input type="radio" class="tab-hidden tab" name="attr_spell_caster_tabs" value="-1" checked><span class="tab">All</span>
+          </div>
+          <span>
+            <span>Single Column</span>
+            <input type="checkbox" class="width-small toggle-single-column-spells" name="attr_toggle_single_column_spells" title="@{toggle_single_column_spells}" value="1" />
+          </span>
+          <span>
+            <span>Memorized Only</span>
+            <input type="checkbox" class="width-small" name="attr_toggle_show_memorized" title="@{toggle_show_memorized}" value="1" />
+          </span>
+        </div>
         <div class="spell-tabs">
           <input type="radio" class="tab-hidden tab" name="attr_spell_tabs" value="0"><span class="tab">Cantrips</span>
           <input type="radio" class="tab-hidden tab" name="attr_spell_tabs" value="1"><span class="tab">1st</span>
@@ -3127,23 +3192,22 @@
         </div>
         <div class="sect">
           <fieldset class="repeating_spells">
+            <!-- show only the spell level chosen -->
             <input type="hidden" class="hidden toggle-show" name="attr_spell_show" value="1" readonly />
+            <!-- lower opacity of un-memorized spells -->
             <input type="hidden" class="hidden not-memorized" name="attr_spell_memorized" value="0" readonly />
+            <!-- hide un-memorized spells -->
             <input type="checkbox" class="hidden toggle-memorized" name="attr_spell_show_memorized" value="1" readonly />
+            <!-- show all spell levels -->
             <input type="checkbox" class="hidden toggle-all" name="attr_spell_show_all" value="1" readonly checked />
             <span class="top-row spells-repheader spell-display border-top-half">
               <button class="normal-roll" type="roll" name="attr_spell_roll" title="%{selected|repeating_spells_$X_spell_roll}" value="@{spell_macro_text}">&nbsp;<span>Roll</span></button>
               <label>
-                <input type="text" class="idth-fill" name="attr_spell_name" title="@{repeating_spells_$X_spell_name}" placeholder="Spell Name" />
+                <input type="text" class="auto-width" name="attr_spell_name" title="@{repeating_spells_$X_spell_name}" placeholder="Spell Name" />
               </label>
-              <label>
-                <span class="inline-label label-parenthesis-left label-parenthesis-right">
-                  <input type="text" list="spell_school" name="attr_spell_school" title="@{repeating_spells_$X_spell_school}" placeholder="Spell Type">
-                </span>
-              </label>
-              <label class="right">
+              <label class="right" style="min-width: 2em; max-width: 3em;">
                 <span>#</span>
-                <input type="text" class="width-smaller" name="attr_spell_memorized" title="@{repeating_spells_$X_spell_memorized}" value="0" />
+                <input type="text" class="width-smallest" name="attr_spell_memorized" title="@{repeating_spells_$X_spell_memorized}" value="0" />
               </label>
             </span>
             <details class="spell-display border-bottom-half">
@@ -3151,6 +3215,20 @@
                 <span class="material-icons gear-nav"></span>
               </summary>
               <div class="spell-details-grid border">
+                <span class="span-all inline-label">
+                  <label>
+                    <select class="select width-medium" name="attr_spell_caster_class" title="@{repeating_spells_$X_spell_caster_class}">
+                      <option value="0">n/a</option>
+                      <option value="1" selected>Caster 1</option>
+                      <option class="toggle-caster2" value="2">Caster 2</option>
+                    </select>
+                    <input type="text" class="auto-width shrink-on-placeholder" name="attr_spell_caster_class_name" value="" title="@{repeating_spells_$X_spell_caster_class_name}" placeholder="add caster class" readonly />
+                  </label>
+                  <label class="right" style="min-width: 3em; max-width: 4em;">
+                    <span>Lvl</span>
+                    <input type="text" class="width-smallest" name="attr_spell_caster_class_level" value="0" title="@{repeating_spells_$X_spell_caster_class_level}" readonly />
+                  </label>
+                </span>
                 <label><span>Spell Level:</span>
                   <select class="field-select width-small" name="attr_spell_level" title="@{repeating_spells_$X_spell_level}">
                     <option selected>?</option>
@@ -3165,6 +3243,12 @@
                     <option>8</option>
                     <option>9</option>
                   </select>
+                </label>
+                <label>
+                  <span>School:</span>
+                  <span class="inline-label width-fill">
+                    <input type="text" list="spell_school" name="attr_spell_school" title="@{repeating_spells_$X_spell_school}" placeholder="Spell Type">
+                  </span>
                 </label>
                 <label><span>Components:</span>
                   <input type="text" name="attr_spell_components" title="@{repeating_spells_$X_spell_components}" value="" placeholder="V,S,M" />
@@ -3181,6 +3265,9 @@
                 <label><span>Saving Throw:</span>
                   <input type="text" name="attr_spell_save" title="@{repeating_spells_$X_spell_save}" value="" placeholder="None" />
                 </label>
+                <label><span>Save Type:</span>
+                  <input type="text" name="attr_spell_save_type" title="@{repeating_spell_$X_spell_save_type}" value="" placeholder="n/a">
+                </label>
                 <label class="span-two"><span>Area of Effect:</span>
                   <input type="text" name="attr_spell_aoe" title="@{repeating_spells_$X_spell_aoe}" value="" placeholder="One Creature" />
                 </label>
@@ -3190,7 +3277,7 @@
                 <button type="roll" class="button stack-text info-link" name="attr_spell_link_roll" value="[**LINK**](@{spell_link})" title="@{spell_link_roll}">
                   <span>Link</span>
                 </button>
-                <input type="text" class="left" name="attr_spell_link" title="@{repeating_spells_$X_spell_link}" value="" placeholder="http://www.example.com" />
+                <input type="text" class="left" name="attr_spell_link" title="@{repeating_spells_$X_spell_link}" value="" placeholder="https://www.example.com" />
               </label>
               <span class="inline-label height-short span-all">
                 <label>
@@ -3200,7 +3287,8 @@
               </span>
               <!-- OLD SPELL MACRO
                 <textarea name="attr_spell_macro_text" class="height-short" title="@{repeating_spells_$X_spell_macro_text}">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{Level:=@{spell_level}}} {{Range:=@{spell_range}}} {{Duration:=@{spell_duration}}} {{AOE:=@{spell_aoe}}} {{Comp:=@{spell_components}}} {{CT:=@{spell_ct}}} {{Save:=@{spell_save}}} {{freetext=@{spell_description}}}</textarea>	-->
-              <textarea name="attr_spell_macro_text" class="height-short toggle-macros span-all" title="@{repeating_spells_$X_spell_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{freetext=@{spell_description}}}</textarea>
+              <!-- <textarea name="attr_spell_macro_text" class="height-short toggle-macros span-all" title="@{repeating_spells_$X_spell_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{freetext=@{spell_description}}}</textarea> -->
+              <textarea name="attr_spell_macro_text" class="height-short toggle-macros span-all" title="@{repeating_spells_$X_spell_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{spell_class=@{spell_caster_class_name}}} {{spell_class_level=@{spell_caster_class_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{save_type=@{spell_save_type}}} {{link=@{spell_link}}} {{freetext=@{spell_description}}}</textarea>
             </details>
           </fieldset>
         </div>
@@ -3294,7 +3382,7 @@
           </label>
           <label>
             <span class="stack-text">Image URL:</span>
-            <input type="text" class="width-fill border-light" name="attr_sheet_image_url" title="Enter a valid image URL." value="" placeholder="http://www.example.com/image.jpg" />
+            <input type="text" class="width-fill border-light" name="attr_sheet_image_url" title="Enter a valid image URL." value="" placeholder="https://www.example.com/image.jpg" />
           </label>
         </span>
         <span class="inline-label width-fill">
@@ -3360,6 +3448,10 @@
           <label>
             <span>Spells:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_spells" value="1" title="@{toggle_spells}" />
+          </label>
+          <label>
+            <span>Caster Class 2:</span>
+            <input type="checkbox" class="width-small" name="attr_toggle_caster2" value="1" title="@{toggle_caster2}" checked/>
           </label>
           <label>
             <span>NWP:</span>
@@ -3501,7 +3593,7 @@
                     <button type="roll" class="button stack-text info-link" name="attr_attribute_link_roll" value="[**LINK**](@{attribute_link})" title="@{repeating_attributes_$X_attribute_link_roll}">
                       <span>Link</span>
                     </button>
-                    <input type="text" class="left" name="attr_attribute_link" title="@{repeating_attributes_$X_attribute_link}" value="" placeholder="http://www.example.com" />
+                    <input type="text" class="left" name="attr_attribute_link" title="@{repeating_attributes_$X_attribute_link}" value="" placeholder="https://www.example.com" />
                   </label>
                 </span>
                 <textarea name="attr_attribute_notes" class="inline-label span-all height-short" title="@{repeating_attributes_$X_attribute_notes}" placeholder="Notes"></textarea>
@@ -3549,11 +3641,11 @@
 
       {{#attack1}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Attack = {{attack1}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Attack =</span>&nbsp;{{attack1}}
             {{#rollWasCrit() attack1}}
               <!-- Only seen if 'Use Crit Damage' is enabled -->
               {{#rollGreater() crit 0}}
-                {{#crit}}CRIT!{{/crit}}
+                {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
               {{/rollGreater() crit 0}}
             {{/rollWasCrit() attack1}}
           </span>
@@ -3600,7 +3692,7 @@
             {{#rollWasCrit() attack2}}
               <!-- Only seen if 'Use Crit Damage' is enabled -->
               {{#rollGreater() crit 0}}
-                {{#crit}}CRIT!{{/crit}}
+                {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
               {{/rollGreater() crit 0}}
             {{/rollWasCrit() attack2}}
           </span>
@@ -3635,7 +3727,7 @@
             {{#rollWasCrit() attack3}}
               <!-- Only seen if 'Use Crit Damage' is enabled -->
               {{#rollGreater() crit 0}}
-                {{#crit}}CRIT!{{/crit}}
+                {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
               {{/rollGreater() crit 0}}
             {{/rollWasCrit() attack3}}
           </span>
@@ -3670,7 +3762,7 @@
             {{#rollWasCrit() attack4}}
               <!-- Only seen if 'Use Crit Damage' is enabled -->
               {{#rollGreater() crit 0}}
-                {{#crit}}CRIT!{{/crit}}
+                {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
               {{/rollGreater() crit 0}}
             {{/rollWasCrit() attack4}}
           </span>
@@ -3701,20 +3793,20 @@
 
       {{#damage1vsSM}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage = {{damage1vsSM}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage =</span>&nbsp;{{damage1vsSM}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
       {{/damage1vsSM}}
       {{#damage1vsL}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage vs LG = {{damage1vsL}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage vs LG =</span>&nbsp;{{damage1vsL}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
@@ -3722,20 +3814,20 @@
 
       {{#damage2vsSM}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage 2 = {{damage2vsSM}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage 2 =</span>&nbsp;{{damage2vsSM}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
       {{/damage2vsSM}}
       {{#damage2vsL}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage 2 vs LG = {{damage2vsL}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage 2 vs LG =</span>&nbsp;{{damage2vsL}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
@@ -3743,20 +3835,20 @@
 
       {{#damage3vsSM}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage 3 = {{damage3vsSM}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage 3 =</span>&nbsp;{{damage3vsSM}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
       {{/damage3vsSM}}
       {{#damage3vsL}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage 3 vs LG = {{damage3vsL}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage 3 vs LG =</span>&nbsp;{{damage3vsL}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
@@ -3764,20 +3856,20 @@
 
       {{#damage4vsSM}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage 4 = {{damage4vsSM}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage 4 =</span>&nbsp;{{damage4vsSM}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
       {{/damage4vsSM}}
       {{#damage4vsL}}
         <span class="sheet-row">
-          <span class="sheet-span-two sheet-tcat">Damage 4 vs LG = {{damage4vsL}}
+          <span class="sheet-span-two sheet-tcat"><span class="sheet-center">Damage 4 vs LG =</span>&nbsp;{{damage4vsL}}
             <!-- Only seen if 'Use Crit Damage' is enabled -->
             {{#rollGreater() crit 0}}
-              {{#crit}}CRIT!{{/crit}}
+              {{#crit}}<span class="sheet-bold sheet-center">CRIT!</span>{{/crit}}
             {{/rollGreater() crit 0}}
           </span>
         </span>
@@ -3786,25 +3878,25 @@
       <span class="sheet-row">
         <span class="sheet-span-two sheet-tcat">
           {{#rollGreater() backstab 1}}
-            {{#backstab}}<b>Backstab Attack!!!</b>{{/backstab}}
+            {{#backstab}}<span class="sheet-bold sheet-center">Backstab Attack!!!</span>{{/backstab}}
           {{/rollGreater() backstab 1}}
         </span>
       </span>
 
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
-          {{#damagetype}}<b>Type:&nbsp;</b>{{damagetype}}&nbsp;{{/damagetype}}
-            {{#rate}}<b>RoF:&nbsp;</b>{{rate}}&nbsp;{{/rate}}
-              {{#range}}<b>Range:&nbsp;</b>{{range}}&nbsp;{{/range}}
-                {{#length}}<b>Length:&nbsp;</b>{{length}}&nbsp;{{/length}}
-                  {{#space}}<b>Space:&nbsp;</b>{{space}}&nbsp;{{/space}}
-                    {{#speed}}<b>Speed:&nbsp;</b>{{speed}}&nbsp;{{/speed}}
+          {{#damagetype}}<span class="sheet-bold">Type:&nbsp;</span>{{damagetype}}&nbsp;{{/damagetype}}
+            {{#rate}}<span class="sheet-bold">RoF:&nbsp;</span>{{rate}}&nbsp;{{/rate}}
+              {{#range}}<span class="sheet-bold">Range:&nbsp;</span>{{range}}&nbsp;{{/range}}
+                {{#length}}<span class="sheet-bold">Length:&nbsp;</span>{{length}}&nbsp;{{/length}}
+                  {{#space}}<span class="sheet-bold">Space:&nbsp;</span>{{space}}&nbsp;{{/space}}
+                    {{#speed}}<span class="sheet-bold">Speed:&nbsp;</span>{{speed}}&nbsp;{{/speed}}
                       {{#range}}
                         {{#rollGreater() ammo 0}}
-                          {{#ammo}}<b>Ammo:&nbsp;</b>{{ammo}}&nbsp;{{/ammo}}
+                          {{#ammo}}<span class="sheet-bold">Ammo:&nbsp;</span>{{ammo}}&nbsp;{{/ammo}}
                         {{/rollGreater() ammo 0}}
                         {{#rollTotal() ammo 0}}
-                          {{#ammo}}<b>No Ammo!</b>&nbsp;{{/ammo}}
+                          {{#ammo}}<span class="sheet-bold">No Ammo!</span>&nbsp;{{/ammo}}
                         {{/rollTotal() ammo 0}}
                       {{/range}}
         </span>
@@ -3828,7 +3920,7 @@
 
       {{#WeaponNotes}}
         <span class="sheet-row">
-          <span class="sheet-text sheet-span-two sheet-text"><b>Notes</b>:&nbsp;{{WeaponNotes}}</span>
+          <span class="sheet-text sheet-span-two sheet-text"><span class="sheet-bold">Notes</span>:&nbsp;{{WeaponNotes}}</span>
         </span>
       {{/WeaponNotes}}
       {{#freetext}}
@@ -3888,7 +3980,7 @@
           <span class="sheet-tcat sheet-span-two sheet-failure">Failure...</span>
         {{/rollLess() roll_high roll_target}}
         </span>
-        <span class="sheet-row sheet-span-two sheet-tcat">Roll ={{roll_high}} vs {{roll_target}}</span>
+        <span class="sheet-row sheet-span-two sheet-tcat">Roll ={{roll_high}}&nbsp;<span class="sheet-center">vs</span>&nbsp;{{roll_target}}</span>
       {{/roll_high}}
       <!--Success/Failure for Roll Low-->
       {{#roll_low}}
@@ -3900,10 +3992,10 @@
           <span class="sheet-tcat sheet-span-two sheet-failure">Failure...</span>
         {{/rollGreater() roll_low roll_target}}
         </span>
-        <span class="sheet-row sheet-span-two sheet-tcat">Roll = {{roll_low}} vs {{roll_target}}</span>
+        <span class="sheet-row sheet-span-two sheet-tcat"><span class="sheet-center">Roll =</span>&nbsp;{{roll_low}}&nbsp;<span class="sheet-center">vs</span>&nbsp;{{roll_target}}</span>
       {{/roll_low}}
       {{#^rollTotal() roll 0}}
-        <span class="sheet-row sheet-span-two sheet-tcat">Roll = {{roll}}</span>
+        <span class="sheet-row sheet-span-two sheet-tcat"><span class="sheet-center">Roll =</span>&nbsp;{{roll}}</span>
       {{/^rollTotal() roll 0}}
       <!--Spells and Special Abilities-->
       {{#effect_type}}
@@ -3912,6 +4004,12 @@
           <span>{{effect_type}}</span>
         </span>
       {{/effect_type}}
+      {{#spell_class}}
+        <span class="sheet-row">
+          <span class="sheet-tcat">{{spell_class}}</span>
+          {{#spell_class_level}}<span>Level:{{spell_class_level}}</span>{{/spell_class_level}}
+        </span>
+      {{/spell_class}}
       {{#school}}
         <span class="sheet-row">
           <span class="sheet-tcat">Type</span>
@@ -4025,18 +4123,19 @@
         </span>
       </span>
 
-      {{#allprops() name subtag footer freetext color effect_type school spell_level range duration area_of_effect components casting_time saving_throw save_type type roll roll_high roll_low roll_target mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
+      {{#allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
         <span class="sheet-row sheet-span-two sheet-all-props">
           {{key}}{{value}}
         </span>
-      {{/allprops() name subtag footer freetext color effect_type school spell_level range duration area_of_effect components casting_time saving_throw save_type type roll roll_high roll_low roll_target mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
+      {{/allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
 
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
-          {{#mod_applied}}<b>Mod Applied:</b>{{mod_applied}}{{/mod_applied}}
-          {{#wis_applied}}<b>Wis Applied:</b>{{wis_applied}}{{/wis_applied}}
-          {{#encumbrance_adjustment}}<b>Encumbrance Adj:</b>{{encumbrance_adjustment}}{{/encumbrance_adjustment}}
-          {{#dex_adjustment}}<b>Dex Adj:</b>{{dex_adjustment}}{{/dex_adjustment}}
+          {{#nwp_mod_applied}}<span class="sheet-bold">NWP Mod Applied:</span>{{nwp_mod_applied}}{{/nwp_mod_applied}}
+          {{#mod_applied}}<span class="sheet-bold">Mod Applied:</span>{{mod_applied}}{{/mod_applied}}
+          {{#wis_applied}}<span class="sheet-bold">Wis Applied:</span>{{wis_applied}}{{/wis_applied}}
+          {{#encumbrance_adjustment}}<span class="sheet-bold">Encumbrance Adj:</span>{{encumbrance_adjustment}}{{/encumbrance_adjustment}}
+          {{#dex_adjustment}}<span class="sheet-bold">Dex Adj:</span>{{dex_adjustment}}{{/dex_adjustment}}
         </span>
       </span>
 
@@ -4052,6 +4151,11 @@
           <span class="sheet-row sheet-span-two sheet-text">{{freetext}}</span>
         </span>
       {{/freetext}}
+      {{#link}}
+      <span class="sheet-row">
+        <span class="sheet-span-two sheet-right">[LINK]({{link}})</span>
+      </span>
+      {{/link}}
       <span class="sheet-row">
         <span class="sheet-template-footer sheet-span-two">{{#footer}}{{footer}}{{/footer}}</span>
       </span>
@@ -4061,54 +4165,54 @@
 
 <!--Datalists-->
 <datalist id="spell_school">
-  <option value="Abjuration">Abjuration</option>
-  <option value="Abjuration, Evocation">Abjuration, Evocation</option>
-  <option value="Abjuration/Alteration">Abjuration/Alteration</option>
-  <option value="Abjuration/Conjuration/Summoning">Abjuration/Conjuration/Summoning</option>
-  <option value="Abjuration/Evocation">Abjuration/Evocation</option>
-  <option value="Alteration">Alteration</option>
-  <option value="Alteration, Enchantment">Alteration, Enchantment</option>
-  <option value="Alteration/Conjuration">Alteration/Conjuration</option>
-  <option value="Alteration/Conjuration/Summoning">Alteration/Conjuration/Summoning</option>
-  <option value="Alteration/Enchantment">Alteration/Enchantment</option>
-  <option value="Alteration/Evocation">Alteration/Evocation</option>
-  <option value="Alteration/Illusion">Alteration/Illusion</option>
-  <option value="Alteration/Illusion/Phantasm">Alteration/Illusion/Phantasm</option>
-  <option value="Alteration/Phantasm">Alteration/Phantasm</option>
+  <option value="Abjur">Abjur</option>
+  <option value="Abjur, Evoc">Abjur, Evoc</option>
+  <option value="Abjur/Alter">Abjur/Alter</option>
+  <option value="Abjur/Conj/Summ">Abjur/Conj/Summ</option>
+  <option value="Abjur/Evoc">Abjur/Evoc</option>
+  <option value="Alter">Alter</option>
+  <option value="Alter, Ench">Alter, Ench</option>
+  <option value="Alter/Conj">Alter/Conj</option>
+  <option value="Alter/Conj/Summ">Alter/Conj/Summ</option>
+  <option value="Alter/Ench">Alter/Ench</option>
+  <option value="Alter/Evoc">Alter/Evoc</option>
+  <option value="Alter/Illus">Alter/Illus</option>
+  <option value="Alter/Illus/Phant">Alter/Illus/Phant</option>
+  <option value="Alter/Phant">Alter/Phant</option>
   <option value="Charm">Charm</option>
-  <option value="Conjuration">Conjuration</option>
-  <option value="Conjuration, Alteration">Conjuration, Alteration</option>
-  <option value="Conjuration/Phantasm">Conjuration/Phantasm</option>
-  <option value="Conjuration/Summoning">Conjuration/Summoning</option>
-  <option value="Divination">Divination</option>
-  <option value="Enchantment">Enchantment</option>
-  <option value="Enchantment, Alteration">Enchantment, Alteration</option>
-  <option value="Enchantment/Alteration">Enchantment/Alteration</option>
-  <option value="Enchantment/Charm">Enchantment/Charm</option>
-  <option value="Enchantment/Charm/Illusion/Phantasm">Enchantment/Charm/Illusion/Phantasm</option>
-  <option value="Enchantment/Divination">Enchantment/Divination</option>
-  <option value="Enchantment/Evocation">Enchantment/Evocation</option>
-  <option value="Evocation">Evocation</option>
-  <option value="Evocation, Alteration">Evocation, Alteration</option>
-  <option value="Evocation/Abjuration">Evocation/Abjuration</option>
-  <option value="Evocation/Alteration">Evocation/Alteration</option>
-  <option value="Evocation/Alteration/Enchantment/Charm">Evocation/Alteration/Enchantment/Charm</option>
-  <option value="Evocation/Conjuration">Evocation/Conjuration</option>
-  <option value="Evocation/Divination">Evocation/Divination</option>
-  <option value="Evocation/Enchantment">Evocation/Enchantment</option>
-  <option value="Evocation/Enchantment/Charm">Evocation/Enchantment/Charm</option>
-  <option value="Evocation/Illusion">Evocation/Illusion</option>
-  <option value="Evocation/Illusion/Phantasm">Evocation/Illusion/Phantasm</option>
-  <option value="Illusion">Illusion</option>
-  <option value="Illusion/Enchantment">Illusion/Enchantment</option>
-  <option value="Illusion/Phantasm">Illusion/Phantasm</option>
-  <option value="Illusion/Phantasm/Abjuration">Illusion/Phantasm/Abjuration</option>
-  <option value="Illusion/Phantasm/Alteration">Illusion/Phantasm/Alteration</option>
-  <option value="Illusion/Phantasm/Conjuration/Summoning">Illusion/Phantasm/Conjuration/Summoning</option>
-  <option value="Invocation">Invocation</option>
-  <option value="Necromantic">Necromantic</option>
-  <option value="Necromantic, Conjuration">Necromantic, Conjuration</option>
-  <option value="Summoning">Summoning</option>
+  <option value="Conj">Conj</option>
+  <option value="Conj, Alter">Conj, Alter</option>
+  <option value="Conj/Phant">Conj/Phant</option>
+  <option value="Conj/Summ">Conj/Summ</option>
+  <option value="Divin">Divin</option>
+  <option value="Ench">Ench</option>
+  <option value="Ench, Alter">Ench, Alter</option>
+  <option value="Ench/Alter">Ench/Alter</option>
+  <option value="Ench/Charm">Ench/Charm</option>
+  <option value="Ench/Charm/Illus/Phant">Ench/Charm/Illus/Phant</option>
+  <option value="Ench/Divin">Ench/Divin</option>
+  <option value="Ench/Evoc">Ench/Evoc</option>
+  <option value="Evoc">Evoc</option>
+  <option value="Evoc, Alter">Evoc, Alter</option>
+  <option value="Evoc/Abjur">Evoc/Abjur</option>
+  <option value="Evoc/Alter">Evoc/Alter</option>
+  <option value="Evoc/Alter/Ench/Charm">Evoc/Alter/Ench/Charm</option>
+  <option value="Evoc/Conj">Evoc/Conj</option>
+  <option value="Evoc/Divin">Evoc/Divin</option>
+  <option value="Evoc/Ench">Evoc/Ench</option>
+  <option value="Evoc/Ench/Charm">Evoc/Ench/Charm</option>
+  <option value="Evoc/Illus">Evoc/Illus</option>
+  <option value="Evoc/Illus/Phant">Evoc/Illus/Phant</option>
+  <option value="Illus">Illus</option>
+  <option value="Illus/Ench">Illus/Ench</option>
+  <option value="Illus/Phant">Illus/Phant</option>
+  <option value="Illus/Phant/Abjur">Illus/Phant/Abjur</option>
+  <option value="Illus/Phant/Alter">Illus/Phant/Alter</option>
+  <option value="Illus/Phant/Conj/Summ">Illus/Phant/Conj/Summ</option>
+  <option value="Invoc">Invoc</option>
+  <option value="Necro">Necro</option>
+  <option value="Necro, Conj">Necro, Conj</option>
+  <option value="Summ">Summ</option>
   <option value="Varies">Varies</option>
 </datalist>
 
@@ -4945,7 +5049,7 @@
     });
   };
 
-  // update Ability macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
+  // update Special Ability macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
   const abilityMacroUpdate = (current_version, final_version) => {
     getSectionIDs('repeating_ability', (idability) => {
       const attrsAbility = [];
@@ -4961,10 +5065,18 @@
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=@{ability_current|max}}}',
           ability_old_v3:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[ @{ability_current|max} ]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
-          ability_new:
+          ability_new_v4:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[ @{ability_current|max} ]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
+          ability_new:
+            '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
         };
         _.each(idability, (id) => {
+          if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v4) {
+            update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v4, replacements.ability_new);
+          }
+          if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v3) {
+            update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v3, replacements.ability_new);
+          }
           if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v2) {
             update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v2, replacements.ability_new);
           }
@@ -4997,10 +5109,18 @@
         const replacements = {
           nwp_old:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{Proficiency Check=[[ 1d20 + [[@{nwp_modifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{nwp_attribute}[ATTR] ]]}}{{freetext=@{nwp_short_description}}}',
-          nwp_new:
+          nwp_old_v2:
             '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{NWP Mod Applied=[[ @{nwp_modifier} ]]}} {{freetext=@{nwp_short_description}}}',
+          nwp_new:
+            '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{nwp_mod_applied=[[ @{nwp_modifier} ]]}} {{link=@{nwp_link}}} {{freetext=@{nwp_short_description} @{nwp_description}}}',
         };
         _.each(idnwps, (id) => {
+          if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] === replacements.nwp_old_2) {
+            update[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
+              replacements.nwp_old_2,
+              replacements.nwp_new
+            );
+          }
           if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] === replacements.nwp_old) {
             update[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
               replacements.nwp_old,
@@ -5035,10 +5155,15 @@
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{Level:=@{spell_level}}} {{Range:=@{spell_range}}} {{Duration:=@{spell_duration}}} {{AOE:=@{spell_aoe}}} {{Comp:=@{spell_components}}} {{CT:=@{spell_ct}}} {{Save:=@{spell_save}}} {{freetext=@{spell_description}}}',
           spell_old_v2:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{Range:=@{spell_range}}} {{Duration:=@{spell_duration}}} {{AOE:=@{spell_aoe}}} {{Save:=@{spell_save}}}',
-          spell_new:
+          spell_old_v3:
             '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{freetext=@{spell_description}}}',
+          spell_new:
+            '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{spell_class=@{spell_caster_class_name}}} {{spell_class_level=@{spell_caster_class_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{save_type=@{spell_save_type}}} {{link=@{spell_link}}} {{freetext=@{spell_description}}}',
         };
         _.each(idspells, (id) => {
+          if (v[`repeating_spells_${id}_spell_macro_text`] === replacements.spell_old_v3) {
+            update[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spell_old_v3, replacements.spell_new);
+          }
           if (v[`repeating_spells_${id}_spell_macro_text`] === replacements.spell_old_v2) {
             update[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spell_old_v2, replacements.spell_new);
           }
@@ -5048,6 +5173,42 @@
         });
         update.sheet_version = current_version;
         clog(`VERSION UPDATE: spellsMacroUpdate completed on: ${attrsSpells}`);
+        setAttrs(
+          update,
+          {
+            silent: true,
+          },
+          versionator(current_version, final_version)
+        );
+      });
+    });
+  };
+
+  // update Equipment macro-text ONLY IF they haven't been edited. Tests against v1.641 macro-text
+  const equipmentMacroUpdate = (current_version, final_version) => {
+    getSectionIDs('repeating_equipment', (idequip) => {
+      const attrsEquipment = [];
+      _.each(idequip, (itemid) => {
+        attrsEquipment.push(`repeating_equipment_${itemid}_equipment_macro_text`);
+      });
+      getAttrs([...attrsEquipment], (v) => {
+        const update = {};
+        const replacements = {
+          equipment_old:
+            '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{freetext=@{equipment_description}}} {{quantity= @{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
+          equipment_new:
+            '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{link=@{equipment_link}}} {{freetext=@{equipment_description}}} {{quantity=@{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
+        };
+        _.each(idequip, (id) => {
+          if (v[`repeating_equipment_${id}_equipment_macro_text`] === replacements.equipment_old) {
+            update[`repeating_equipment_${id}_equipment_macro_text`] = v[`repeating_equipment_${id}_equipment_macro_text`].replace(
+              replacements.equipment_old,
+              replacements.equipment_new
+            );
+          }
+        });
+        update.sheet_version = current_version;
+        clog(`VERSION UPDATE: equipmentMacroUpdate completed on: ${attrsEquipment}`);
         setAttrs(
           update,
           {
@@ -5122,9 +5283,7 @@
             output.repeating_weapon_weapon_range_error = 1;
           }
         }
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   }
@@ -5270,7 +5429,6 @@
       const other4 = v.armorother4;
       const other5 = v.armorother5;
       const other6 = v.armorother6;
-
       // check name and if rep_row exists
       if (armor1) {
         if (row_removed === 0) {
@@ -5948,6 +6106,8 @@
       clearArmnorOther(1.639, final_version);
     } else if (current_version < 1.64) {
       migrateArmorDetails(1.641, final_version);
+    } else if (current_version < 1.642) {
+      equipmentMacroUpdate(1.643, final_version);
       // all updates completed
     } else if (current_version < final_version) {
       setAttrs({
@@ -5962,7 +6122,7 @@
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
     // Set attr_sheet_version to the final_version to prevent new sheets from stepping through versionator
-    const final_version = 1.641;
+    const final_version = 1.643;
     getAttrs(['sheet_version'], (v) => {
       const current_version = float(v.sheet_version);
       clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
@@ -6200,9 +6360,7 @@
       const carriedCalc = +v.repeating_equipment_equipment_carried_select || 1;
       const carriedValue = carriedCalc === 1 ? 1 : 0;
       output.repeating_equipment_equipment_carried = carriedValue;
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   });
 
@@ -6231,9 +6389,7 @@
           output[`repeating_equipment_${id}_equipment_show_carry`] = carried === -1 || carried === thiscarriedCalc ? 1 : 0;
           output.equipment_tabs_type = isType ? thistype : type;
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     });
   });
@@ -6580,7 +6736,6 @@
   });
 
   // sync Repeating_Equipment Armor to Armor Details rows
-  // ignore type, otherwise multiples in the idArray with the same id...
   on(
     'change:repeating_equipment:equipment_item change:repeating_equipment:equipment_armor_worn change:repeating_equipment:equipment_armor_ac change:repeating_equipment:equipment_armor_base change:repeating_equipment:equipment_armor_magic change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_bulk',
     (eventInfo) => {
@@ -6599,8 +6754,8 @@
   );
 
   // sync armor button - fill armor details row with repeating attr values
-  // if the row already exists, but is moved to a new row,
-  // removeEmptyArmorRows will delete/reset old row
+  // if the row already exists, but is then moved to a new row,
+  // removeEmptyArmorRows will test for duplicates and delete/reset old row
   on('clicked:repeating_equipment:addarmor', (eventInfo) => {
     const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
     // clog(`sourceAttribute id: ${id}`);
@@ -6624,7 +6779,7 @@
   });
 
   // Spell Tabs and Memorized toggle
-  on('change:spell_tabs change:toggle_show_memorized', (eventInfo) => {
+  on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_spells', (idArray) => {
       const fieldnames = [];
@@ -6632,24 +6787,83 @@
         fieldnames.push(`repeating_spells_${id}_spell_memorized`);
         fieldnames.push(`repeating_spells_${id}_spell_show_all`);
         fieldnames.push(`repeating_spells_${id}_spell_level`);
+        fieldnames.push(`repeating_spells_${id}_spell_caster_class`);
       });
-      getAttrs(['spell_tabs', 'toggle_show_memorized', ...fieldnames], (v) => {
+      getAttrs(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fieldnames], (v) => {
         const output = {};
         const memorizedOnly = +v.toggle_show_memorized || 0;
-        const level = +v.spell_tabs || 0;
+        const casterTab = +v.spell_caster_tabs || 0; // -1, 0, 1
+        const hideCaster2 = +v.toggle_caster2 || 0;
+        const levelTab = +v.spell_tabs || 0;
         idArray.forEach((id) => {
-          const thismemorizedOnly = +v[`repeating_spells_${id}_spell_memorized`] || 0;
-          const thislevel = +v[`repeating_spells_${id}_spell_level`] || 0;
-          output[`repeating_spells_${id}_spell_show_memorized`] = memorizedOnly === 1 && thismemorizedOnly > 0 ? 1 : 0;
+          const thisMemorizedOnly = +v[`repeating_spells_${id}_spell_memorized`] || 0;
+          const thisCaster = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
+          const thisLevel = +v[`repeating_spells_${id}_spell_level`] || 0;
+          output[`repeating_spells_${id}_spell_show_memorized`] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
           output[`repeating_spells_${id}_spell_show_all`] = memorizedOnly === 1 ? 0 : 1;
-          output[`repeating_spells_${id}_spell_show`] = level === -1 || level === thislevel ? 1 : 0;
+          // show the spell that matches the spell level tab selected
+          if (levelTab === -1 || levelTab === thisLevel) {
+            // caster2 is hidden: show the spell
+            if (hideCaster2 === 1) {
+              output[`repeating_spells_${id}_spell_show`] = 1;
+              // sheet is using 2 caster classes so continue to caster tabs
+            } else if (hideCaster2 === 0) {
+              // caster tab is set to All or spell is class n/a: show the spell
+              if (casterTab === -1 || thisCaster === 0) {
+                output[`repeating_spells_${id}_spell_show`] = 1;
+                // caster tab is caster1 and spell is caster1: show the spell
+              } else if (casterTab === 0 && thisCaster === 1) {
+                output[`repeating_spells_${id}_spell_show`] = 1;
+                // caster tab is caster2 and spell is caster2: show the spell
+              } else if (casterTab === 1 && thisCaster === 2) {
+                output[`repeating_spells_${id}_spell_show`] = 1;
+                // hide the spell
+              } else {
+                output[`repeating_spells_${id}_spell_show`] = 0;
+              }
+            }
+            // hide the spell that does not match spell level tab selected
+          } else {
+            output[`repeating_spells_${id}_spell_show`] = 0;
+          }
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     });
   });
+
+  // Spell Caster Class Name/Level fill-in sync
+  on(
+    'change:repeating_spells:spell_name change:repeating_spells:spell_caster_class change:caster_class1_name change:caster_class2_name change:caster_class1_level change:caster_class2_level',
+    (eventInfo) => {
+      getSectionIDs('repeating_spells', (idArray) => {
+        const output = {};
+        const nonRep = ['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level'];
+        const fields = [];
+        idArray.forEach((id) => {
+          // Do something with the IDs...
+          fields.push(`repeating_spells_${id}_spell_caster_class`);
+        });
+        const combined = [...nonRep, ...fields];
+        getAttrs(combined, (v) => {
+          idArray.forEach((id) => {
+            const thisClass = +v[`repeating_spells_${id}_spell_caster_class`] || 0;
+            clog(`thisClass: ${thisClass}`);
+            if (thisClass === 0) {
+              output[`repeating_spells_${id}_spell_caster_class_name`] = '';
+            } else if (thisClass === 1) {
+              output[`repeating_spells_${id}_spell_caster_class_name`] = v.caster_class1_name;
+              output[`repeating_spells_${id}_spell_caster_class_level`] = +v.caster_class1_level || 0;
+            } else if (thisClass === 2) {
+              output[`repeating_spells_${id}_spell_caster_class_name`] = v.caster_class2_name;
+              output[`repeating_spells_${id}_spell_caster_class_level`] = +v.caster_class2_level || 0;
+            }
+          });
+          setAttrs(output, {silent: true});
+        });
+      });
+    }
+  );
 
   // ToHitACadj Toggle
   on(
@@ -6663,9 +6877,7 @@
           thisflag === 1
             ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
             : '{{ToHitACadj2to10}}';
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     }
   );
@@ -6715,9 +6927,7 @@
           output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = thishitTableMacro;
           output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = thishitTableSelect;
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     });
   });
@@ -6739,9 +6949,7 @@
           output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
           output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     });
   });
@@ -6774,9 +6982,7 @@
             output[`repeating_weapon_${id}_weapon_backstab_mult`] = 1;
           }
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     });
   });
@@ -6807,9 +7013,7 @@
       const secondary_mod = Math.min(0, dex_mod - 4);
       output.dual_pen_primary = primary_mod;
       output.dual_pen_secondary = secondary_mod;
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -6839,9 +7043,7 @@
           const thispenalty = Math.min(0, handed_mod);
           output[`repeating_weapon_${id}_weapon_dual_pen`] = thispenalty;
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     });
   });
@@ -6862,9 +7064,7 @@
       if (currentType !== currentTypeFlag) {
         output.repeating_weapon_weapon_attack_type_flag = currentType;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   });
 
@@ -6890,9 +7090,7 @@
         output.hp_quotient = numberOfClasses;
         output.hitpoints_total = totalHP;
         output.hitpoints_max = syncHpFlag === 1 ? int(totalHP) : hitPointsMax;
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   };
@@ -7167,9 +7365,7 @@
         output.armorclass_combined_shield_mod_magic_inverted = combinedShieldModMagic_add_sign;
         output.armorclass_total = totalAC;
         output.armorclass = syncAcFlag === 1 ? totalAC : armorClass;
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   };
@@ -7214,9 +7410,7 @@
           output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
           output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
         });
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       });
     }
   );
@@ -7227,10 +7421,7 @@
     clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const output = {};
     // test if API is creating the repeating row and bail
-    if (eventInfo.sourceType !== 'player') {
-      clog(`The ${eventInfo.sourceType} is creating a new repeating attack.`);
-      return;
-    }
+    if (eventInfo.sourceType !== 'player') return;
     // testing for new weapon_name (ie no existing value)
     if (eventInfo.newValue === eventInfo.previousValue) {
       clog(`The ${eventInfo.sourceType} is creating a new repeating attack. Setting defaults.`);
@@ -7286,9 +7477,7 @@
       output.repeating_weapon_weapon_critdamagelarge_chat_menu = '[Roll Damage vs LG](~@{character_id}|repeating_weapon_weapon_critdamagelarge_roll)';
       output.repeating_weapon_weapon_critdamagesmallmedium_npc_chat_menu = '[Damage](~@{character_id}|repeating_weapon_weapon_critdamagesmallmedium_npc_roll)';
       output.repeating_weapon_weapon_critdamagelarge_npc_chat_menu = '[Damage vs LG](~@{character_id}|repeating_weapon_weapon_critdamagelarge_npc_roll)';
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     }
   });
 
@@ -7447,9 +7636,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.pickpockets = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7476,9 +7663,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.openlocks = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7505,9 +7690,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.findtraps = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7534,9 +7717,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.movequietly = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7563,9 +7744,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.hideinshadows = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7592,9 +7771,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.hearnoise = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7621,9 +7798,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.climbwalls = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7650,9 +7825,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.readlanguages = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7679,9 +7852,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.thiefmisc = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7708,9 +7879,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.thiefmisc1 = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7737,9 +7906,7 @@
       if (oldSkill === 0 && newSkill !== 0) {
         output.thiefmisc2 = newSkill;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7848,9 +8015,7 @@
         if (oldSave === 20 && newSave !== 20) {
           output.saveparalysispoisondeath = newSave;
         }
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   }
@@ -7891,9 +8056,7 @@
         if (oldSave === 20 && newSave !== 20) {
           output.savepetrificationpolymorph = newSave;
         }
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   }
@@ -7931,9 +8094,7 @@
         if (oldSave === 20 && newSave !== 20) {
           output.saverodsstaveswands = newSave;
         }
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   }
@@ -7964,9 +8125,7 @@
         if (oldSave === 20 && newSave !== 20) {
           output.savebreathweapons = newSave;
         }
-        setAttrs(output, {
-          silent: true,
-        });
+        setAttrs(output, {silent: true});
       }
     );
   }
@@ -7995,9 +8154,7 @@
       if (oldSave === 20 && newSave !== 20) {
         output.savespells = newSave;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -8010,9 +8167,7 @@
       const miscSavemisc = +v.savemisc_misc_mod || 0;
       const tempSavemisc = +v.savemisc_temp_mod || 0;
       output.savemisc = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc) || 0;
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -8040,9 +8195,7 @@
       if (oldSave === 20 && newSave !== 20) {
         output.savemisc1 = newSave;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -8070,9 +8223,7 @@
       if (oldSave === 20 && newSave !== 20) {
         output.savemisc2 = newSave;
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -9120,9 +9271,7 @@
         output.toggle_matrixhd = 0;
         // clog('Need to choose a class/monster to continue.');
       }
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   });
 
@@ -9556,9 +9705,7 @@
       output.minorstrengthfeat = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per);
       output.minorstrengthfeat_locked = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per, true);
       output.encumbrancebonus = (AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per);
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   };
 
@@ -9577,9 +9724,7 @@
       output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
       output.minspells = AT_INT.getEntry(stat_int).getMinSpells();
       output.maxspells = AT_INT.getEntry(stat_int).getMaxSpells();
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   };
 
@@ -9590,9 +9735,7 @@
       output.mentalsavebonus = (AT_WIS.getEntry(stat_wis).getMentalSaveBonus() <= 0 ? '' : '+') + AT_WIS.getEntry(stat_wis).getMentalSaveBonus();
       output.spellbonus = AT_WIS.getEntry(stat_wis).getSpellBonus();
       output.spellfailure = AT_WIS.getEntry(stat_wis).getSpellFailure();
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   };
 
@@ -9606,9 +9749,7 @@
       output.surprisebonus_inverted = surprisebonus_add_sign;
       output.rangedbonus = (AT_DEX.getEntry(stat_dex).getRangedBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getRangedBonus();
       output.armorbonus = (AT_DEX.getEntry(stat_dex).getArmorBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getArmorBonus();
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   };
 
@@ -9626,9 +9767,7 @@
       }
       output.systemshock = AT_CON.getEntry(stat_con).getSystemShock();
       output.resurrectionsurvival = AT_CON.getEntry(stat_con).getResurrectionSurvival();
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   };
 
@@ -9640,9 +9779,7 @@
       output.loyaltybonus = (AT_CHA.getEntry(stat_cha).getLoyaltyBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getLoyaltyBonus();
       output.reactionbonus = (AT_CHA.getEntry(stat_cha).getReactionBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getReactionBonus();
       output.comeliness_cha_adj = (AT_CHA.getEntry(stat_cha).getComeliness() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getComeliness();
-      setAttrs(output, {
-        silent: true,
-      });
+      setAttrs(output, {silent: true});
     });
   };
 
