@@ -7415,69 +7415,125 @@
     }
   );
 
-  // Set repeating_weapon defaults for new weapon row
-  // beneficial for API access to the repeating attributes
+  const section_attribute = (section, id, field) => `repeating_${section}_${id}_${field}`;
+  // Set repeating_weapon defaults for new weapon rows
+  // beneficial for API to detect the attributes
   on('change:repeating_weapon:weapon_name', (eventInfo) => {
     clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    const output = {};
     // test if API is creating the repeating row and bail
     if (eventInfo.sourceType !== 'player') return;
     // testing for new weapon_name (ie no existing value)
     if (eventInfo.newValue === eventInfo.previousValue) {
       clog(`The ${eventInfo.sourceType} is creating a new repeating attack. Setting defaults.`);
-      output.repeating_weapon_weapon_attack_type = 0;
-      output.repeating_weapon_weapon_dual = '';
-      output.repeating_weapon_weapon_range_small = 1;
-      output.repeating_weapon_weapon_range_medium = 3;
-      output.repeating_weapon_weapon_whisper_to_hit =
-        '\n/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
-      output.repeating_weapon_weapon_whisper_to_hit_select = 0;
-      output.repeating_weapon_weapon_dual_pen = 0;
-      output.repeating_weapon_weapon_backstab_var = 0;
-      output.repeating_weapon_weapon_tohitbonus = 0;
-      output.repeating_weapon_weapon_magicbonus = 0;
-      output.repeating_weapon_weapon_prof = 0;
-      output.repeating_weapon_weapon_backstab = 1;
-      output.repeating_weapon_weapon_backstab_bonus = 0;
-      output.repeating_weapon_weapon_backstab_mult = 1;
-      output.repeating_weapon_weapon_attackdmgbonus = 0;
-      output.repeating_weapon_weapon_num_attacks = 1;
-      output.repeating_weapon_weapon_quantity = 1;
-      output.repeating_weapon_weapon_ammo = 0;
-      output.repeating_weapon_weapon_ammo_max = 0;
-      output.repeating_weapon_weapon_weight = 0;
-      output.repeating_weapon_weapon_cost = 0;
-      output.repeating_weapon_weapon_range_small = 1;
-      output.repeating_weapon_weapon_range_medium = 2;
-      output.repeating_weapon_weapon_range_long = 3;
-      output.repeating_weapon_weapon_length = '';
-      output.repeating_weapon_weapon_space = '';
-      output.repeating_weapon_weapon_speed = '';
-      output.repeating_weapon_weapon_thac_adj0 = 0;
-      output.repeating_weapon_weapon_thac_adj1 = 0;
-      output.repeating_weapon_weapon_thac_adj2 = 0;
-      output.repeating_weapon_weapon_thac_adj3 = 0;
-      output.repeating_weapon_weapon_thac_adj4 = 0;
-      output.repeating_weapon_weapon_thac_adj5 = 0;
-      output.repeating_weapon_weapon_thac_adj6 = 0;
-      output.repeating_weapon_weapon_thac_adj7 = 0;
-      output.repeating_weapon_weapon_thac_adj8 = 0;
-      output.repeating_weapon_weapon_thac_adj9 = 0;
-      output.repeating_weapon_weapon_thac_adj10 = 0;
-      output.repeating_weapon_weapon_notes = '';
-      output.repeating_weapon_weapon_macro_text =
-        '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + ( @{weapon_backstab_bonus}[BACKSTAB] ) + ( @{weapon_tohitbonus}[HIT_BON] ) + ( @{weapon_prof_pen}[PROF_PEN] ) + ( @{weapon_dual_pen}[DUAL_PEN] ) + ( @{weapon_magicbonus}[MAG_BON] ) + ( ?{To Hit Modifier?|0}[MISC_MOD] ) ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}';
-      output.weapon_damage_chat_menu_npc =
-        '{{damagevsSMchatmenu=@{weapon_damagesmallmedium_npc_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_npc_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_npc_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_npc_chat_menu}}}';
-      output.repeating_weapon_weapon_damagesmallmedium_chat_menu = '[Roll Damage](~@{character_id}|repeating_weapon_weapon_damagesmallmedium_roll)';
-      output.repeating_weapon_weapon_damagelarge_chat_menu = '[Roll Damage vs LG](~@{character_id}|repeating_weapon_weapon_damagelarge_roll)';
-      output.repeating_weapon_weapon_damagesmallmedium_npc_chat_menu = '[Damage](~@{character_id}|repeating_weapon_weapon_damagesmallmedium_npc_roll)';
-      output.repeating_weapon_weapon_damagelarge_npc_chat_menu = '[Damage vs LG](~@{character_id}|repeating_weapon_weapon_damagelarge_npc_roll)';
-      output.repeating_weapon_weapon_critdamagesmallmedium_chat_menu = '[Roll Damage](~@{character_id}|repeating_weapon_weapon_critdamagesmallmedium_roll)';
-      output.repeating_weapon_weapon_critdamagelarge_chat_menu = '[Roll Damage vs LG](~@{character_id}|repeating_weapon_weapon_critdamagelarge_roll)';
-      output.repeating_weapon_weapon_critdamagesmallmedium_npc_chat_menu = '[Damage](~@{character_id}|repeating_weapon_weapon_critdamagesmallmedium_npc_roll)';
-      output.repeating_weapon_weapon_critdamagelarge_npc_chat_menu = '[Damage vs LG](~@{character_id}|repeating_weapon_weapon_critdamagelarge_npc_roll)';
-      setAttrs(output, {silent: true});
+      getSectionIDs('repeating_weapon', (idArray) => {
+        const output = {};
+        const fields = [];
+        idArray.forEach((id) => {
+          fields.push(section_attribute('weapon', id, 'weapon_attack_type'));
+          fields.push(section_attribute('weapon', id, 'weapon_dual'));
+          fields.push(section_attribute('weapon', id, 'weapon_range_small'));
+          fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
+          fields.push(section_attribute('weapon', id, 'weapon_whisper_to_hit'));
+          fields.push(section_attribute('weapon', id, 'weapon_whisper_to_hit_select'));
+          fields.push(section_attribute('weapon', id, 'weapon_dual_pen'));
+          fields.push(section_attribute('weapon', id, 'weapon_backstab_var'));
+          fields.push(section_attribute('weapon', id, 'weapon_tohitbonus'));
+          fields.push(section_attribute('weapon', id, 'weapon_magicbonus'));
+          fields.push(section_attribute('weapon', id, 'weapon_prof'));
+          fields.push(section_attribute('weapon', id, 'weapon_backstab'));
+          fields.push(section_attribute('weapon', id, 'weapon_backstab_bonus'));
+          fields.push(section_attribute('weapon', id, 'weapon_backstab_mult'));
+          fields.push(section_attribute('weapon', id, 'weapon_attackdmgbonus'));
+          fields.push(section_attribute('weapon', id, 'weapon_num_attacks'));
+          fields.push(section_attribute('weapon', id, 'weapon_quantity'));
+          fields.push(section_attribute('weapon', id, 'weapon_ammo'));
+          fields.push(section_attribute('weapon', id, 'weapon_ammo_max'));
+          fields.push(section_attribute('weapon', id, 'weapon_weight'));
+          fields.push(section_attribute('weapon', id, 'weapon_cost'));
+          fields.push(section_attribute('weapon', id, 'weapon_range_small'));
+          fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
+          fields.push(section_attribute('weapon', id, 'weapon_range_long'));
+          fields.push(section_attribute('weapon', id, 'weapon_length'));
+          fields.push(section_attribute('weapon', id, 'weapon_space'));
+          fields.push(section_attribute('weapon', id, 'weapon_speed'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj0'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj1'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj2'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj3'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj4'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj5'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj6'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj7'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj8'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj9'));
+          fields.push(section_attribute('weapon', id, 'weapon_thac_adj10'));
+          fields.push(section_attribute('weapon', id, 'weapon_notes'));
+          fields.push(section_attribute('weapon', id, 'weapon_macro_text'));
+          fields.push(section_attribute('weapon', id, 'weapon_damagesmallmedium_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_damagelarge_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_damagelarge_npc_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_critdamagesmallmedium_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_critdamagelarge_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_critdamagelarge_npc_chat_menu'));
+          fields.push(section_attribute('weapon', id, 'weapon_damage_chat_menu_npc'));
+        });
+        getAttrs(fields, (v) => {
+          idArray.forEach((id) => {
+            output.repeating_weapon_weapon_attack_type = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+            output.repeating_weapon_weapon_dual = v[section_attribute('weapon', id, 'weapon_dual')];
+            output.repeating_weapon_weapon_range_small = +v[section_attribute('weapon', id, 'weapon_range_small')] || 0;
+            output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
+            output.repeating_weapon_weapon_whisper_to_hit = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
+            output.repeating_weapon_weapon_whisper_to_hit_select = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
+            output.repeating_weapon_weapon_dual_pen = +v[section_attribute('weapon', id, 'weapon_dual_pen')] || 0;
+            output.repeating_weapon_weapon_backstab_var = +v[section_attribute('weapon', id, 'weapon_backstab_var')] || 0;
+            output.repeating_weapon_weapon_tohitbonus = +v[section_attribute('weapon', id, 'weapon_tohitbonus')] || 0;
+            output.repeating_weapon_weapon_magicbonus = +v[section_attribute('weapon', id, 'weapon_magicbonus')] || 0;
+            output.repeating_weapon_weapon_prof = +v[section_attribute('weapon', id, 'weapon_prof')] || 0;
+            output.repeating_weapon_weapon_backstab = +v[section_attribute('weapon', id, 'weapon_backstab')] || 0;
+            output.repeating_weapon_weapon_backstab_bonus = +v[section_attribute('weapon', id, 'weapon_backstab_bonus')] || 0;
+            output.repeating_weapon_weapon_backstab_mult = +v[section_attribute('weapon', id, 'weapon_backstab_mult')] || 0;
+            output.repeating_weapon_weapon_attackdmgbonus = +v[section_attribute('weapon', id, 'weapon_attackdmgbonus')] || 0;
+            output.repeating_weapon_weapon_num_attacks = +v[section_attribute('weapon', id, 'weapon_num_attacks')] || 0;
+            output.repeating_weapon_weapon_quantity = +v[section_attribute('weapon', id, 'weapon_quantity')] || 0;
+            output.repeating_weapon_weapon_ammo = +v[section_attribute('weapon', id, 'weapon_ammo')] || 0;
+            output.repeating_weapon_weapon_ammo_max = +v[section_attribute('weapon', id, 'weapon_ammo_max')] || 0;
+            output.repeating_weapon_weapon_weight = +v[section_attribute('weapon', id, 'weapon_weight')] || 0;
+            output.repeating_weapon_weapon_cost = +v[section_attribute('weapon', id, 'weapon_cost')] || 0;
+            output.repeating_weapon_weapon_range_small = +v[section_attribute('weapon', id, 'weapon_range_small')] || 0;
+            output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
+            output.repeating_weapon_weapon_range_long = +v[section_attribute('weapon', id, 'weapon_range_long')] || 0;
+            output.repeating_weapon_weapon_length = v[section_attribute('weapon', id, 'weapon_length')];
+            output.repeating_weapon_weapon_space = v[section_attribute('weapon', id, 'weapon_space')];
+            output.repeating_weapon_weapon_speed = v[section_attribute('weapon', id, 'weapon_speed')];
+            output.repeating_weapon_weapon_thac_adj0 = +v[section_attribute('weapon', id, 'weapon_thac_adj0')] || 0;
+            output.repeating_weapon_weapon_thac_adj1 = +v[section_attribute('weapon', id, 'weapon_thac_adj1')] || 0;
+            output.repeating_weapon_weapon_thac_adj2 = +v[section_attribute('weapon', id, 'weapon_thac_adj2')] || 0;
+            output.repeating_weapon_weapon_thac_adj3 = +v[section_attribute('weapon', id, 'weapon_thac_adj3')] || 0;
+            output.repeating_weapon_weapon_thac_adj4 = +v[section_attribute('weapon', id, 'weapon_thac_adj4')] || 0;
+            output.repeating_weapon_weapon_thac_adj5 = +v[section_attribute('weapon', id, 'weapon_thac_adj5')] || 0;
+            output.repeating_weapon_weapon_thac_adj6 = +v[section_attribute('weapon', id, 'weapon_thac_adj6')] || 0;
+            output.repeating_weapon_weapon_thac_adj7 = +v[section_attribute('weapon', id, 'weapon_thac_adj7')] || 0;
+            output.repeating_weapon_weapon_thac_adj8 = +v[section_attribute('weapon', id, 'weapon_thac_adj8')] || 0;
+            output.repeating_weapon_weapon_thac_adj9 = +v[section_attribute('weapon', id, 'weapon_thac_adj9')] || 0;
+            output.repeating_weapon_weapon_thac_adj10 = +v[section_attribute('weapon', id, 'weapon_thac_adj10')] || 0;
+            output.repeating_weapon_weapon_notes = v[section_attribute('weapon', id, 'weapon_notes')];
+            output.repeating_weapon_weapon_macro_text = v[section_attribute('weapon', id, 'weapon_macro_text')];
+            output.repeating_weapon_weapon_damagesmallmedium_chat_menu = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_chat_menu')];
+            output.repeating_weapon_weapon_damagelarge_chat_menu = v[section_attribute('weapon', id, 'weapon_damagelarge_chat_menu')];
+            output.repeating_weapon_weapon_damagesmallmedium_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')];
+            output.repeating_weapon_weapon_damagelarge_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_damagelarge_npc_chat_menu')];
+            output.repeating_weapon_weapon_critdamagesmallmedium_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')];
+            output.repeating_weapon_weapon_critdamagelarge_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagelarge_chat_menu')];
+            output.repeating_weapon_weapon_critdamagesmallmedium_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')];
+            output.repeating_weapon_weapon_critdamagelarge_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')];
+            output.repeating_weapon_weapon_damage_chat_menu_npc = v[section_attribute('weapon', id, 'weapon_damage_chat_menu_npc')];
+          });
+          setAttrs(output, {silent: true});
+        });
+      });
     }
   });
 
@@ -7517,9 +7573,7 @@
               } else {
                 return;
               }
-              setAttrs(output, {
-                silent: true,
-              });
+              setAttrs(output, {silent: true});
             });
           });
         });
