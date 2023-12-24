@@ -8,7 +8,7 @@ This is the Official Mongoose Paranoia Perfect Edition Character Sheet
 
 ### Version 1.03.00
 
-- You can now drag and drop Equipment, Secret Socities, Survey Groups and Mutant Powers to the PC sheet
+- You can now drag and drop Secret Socities, Survey Groups and Mutant Powers to the PC sheet from the Compendium, Equipment will be added soon
 
 ### Version 1.02.00
 
