@@ -56,6 +56,7 @@
             </span>
           </h4>
           <ul>
+            <li>Fixed missing armor weight and cost for armor 1 when migrating older sheets.</li>
             <li>Added Caster Class 1 and Caster Class 2. Each class will have it's own spell/day grid. Repeating spells now include the caster class and the caster level. Caster Class 2 related sections are hidden by default but can be toggled visible in the sheet options. Spells can be sorted by Caster class.</li>
             <li>Added Save Type field to spells.</li>
             <li>Armor Details rows are now synced with repeating_equipment under Armor. Changes made to either should be reflected in both locations. There are now 6 "Other" rows that can be used for anything else that might effect AC. ie magical items and spells. Weight and Cost calcs are now included with equipment.</li>
@@ -706,9 +707,11 @@
       <input type="hidden" name="attr_armorother6_row_id" value="0" />
       <input type="hidden" name="attr_armordetails_array" value="0" />
       <!-- used to hold the old armor details attributes moved to repeating_equipment -->
+      <input type="hidden" name="attr_armor_weight" value="0" />
+      <input type="hidden" name="attr_armor_cost" value="0" />
       <input class="hidden" type="checkbox" name="attr_armortype_carried" value="1" checked />
-      <input type="hidden" name="attr_armortype_weight" value="0" />
-      <input type="hidden" name="attr_armortype_cost" value="0" />
+      <!-- <input type="hidden" name="attr_armortype_weight" value="0" />
+      <input type="hidden" name="attr_armortype_cost" value="0" /> -->
       <input class="hidden" type="checkbox" name="attr_armortype2_carried" value="1" checked />
       <input type="hidden" name="attr_armortype2_weight" value="0" />
       <input type="hidden" name="attr_armortype2_cost" value="0" />
@@ -4357,8 +4360,8 @@
     'armortype_magic',
     'armortype_bulk',
     'armortype_carried',
-    'armortype_weight',
-    'armortype_cost',
+    'armor_weight',
+    'armor_cost',
     'armortype2_worn',
     'armortype2',
     'armortype2_ac',
@@ -5398,7 +5401,7 @@
       let newID = '';
       let id_low = id;
       id_low = id_low !== null ? id.toLowerCase() : id_low;
-      // clog(`syncArmorToEquipment id: ${id_low} attr: ${attr} row_removed: ${row_removed}`);
+      clog(`syncArmorToEquipment id: ${id_low} attr: ${attr} row_removed: ${row_removed}`);
       const armortype1_ID = v.armortype1_row_id.toString();
       const armortype2_ID = v.armortype2_row_id.toString();
       const armorshield_ID = v.armorshield_row_id.toString();
@@ -5421,7 +5424,7 @@
         armorother5_ID,
         armorother6_ID,
       ].map((str) => (str ? str.toString().toLowerCase() : '0'));
-      // clog(`syncArmorToEquipment idArray: [${idArray}]`);
+      clog(`syncArmorToEquipment idArray: [${idArray}]`);
       const armor1 = v.armortype;
       const armor2 = v.armortype2;
       const shield = v.armorshield;
@@ -5448,9 +5451,9 @@
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype_magic;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 1;
-            output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype_weight || 0;
-            output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype_cost || 0;
-            // clog(`repeating Armor exists armor1:${newID}`);
+            output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
+            output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
+            clog(`repeating Armor exists armor1:${newID}`);
           } else if (armortype1_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5464,9 +5467,9 @@
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype_magic;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 1;
-            output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype_weight || 0;
-            output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype_cost || 0;
-            // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
+            output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
+            output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
+            clog(`repeating armor does not exist. Creating armor1: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[0]) {
           // repeating_row REMOVED RESETING ROW
@@ -5477,7 +5480,7 @@
           output.armortype_base = 10;
           output.armortype_magic = 0;
           output.armortype_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
         }
       } else if (!armor1 && armortype1_ID && armortype1_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5488,7 +5491,7 @@
         output.armortype_base = 10;
         output.armortype_magic = 0;
         output.armortype_bulk = 0;
-        // clog(`Armor Details row has been reset armor1:${newID}`);
+        clog(`Armor Details row has been reset armor1:${newID}`);
       }
       if (armor2) {
         if (row_removed === 0) {
@@ -5507,7 +5510,7 @@
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 1;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
-            // clog(`repeating Armor exists armor2:${newID}`);
+            clog(`repeating Armor exists armor2:${newID}`);
           } else if (armortype2_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5523,7 +5526,7 @@
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 1;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
-            // clog(`repeating armor does not exist. Creating armor2: ${newID}`);
+            clog(`repeating armor does not exist. Creating armor2: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[1]) {
           // repeating_row REMOVED RESETING ROW
@@ -5534,7 +5537,7 @@
           output.armortype2_base = 10;
           output.armortype2_magic = 0;
           output.armortype2_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor2:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset armor2:${newID}`);
         }
       } else if (!armor2 && armortype2_ID && armortype2_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5545,7 +5548,7 @@
         output.armortype2_base = 10;
         output.armortype2_magic = 0;
         output.armortype2_bulk = 0;
-        // clog(`Armor Details row has been reset armor2:${newID}`);
+        clog(`Armor Details row has been reset armor2:${newID}`);
       }
       if (shield) {
         if (row_removed === 0) {
@@ -5565,7 +5568,7 @@
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 1;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
-            // clog(`repeating Armor exists shield:${newID}`);
+            clog(`repeating Armor exists shield:${newID}`);
           } else if (armorshield_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5582,7 +5585,7 @@
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 1;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
-            // clog(`repeating armor does not exist. Creating shield: ${newID}`);
+            clog(`repeating armor does not exist. Creating shield: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[2]) {
           // repeating_row REMOVED RESETING ROW
@@ -5594,7 +5597,7 @@
           output.armorshield_magic = 0;
           output.armorshield_mod = 0;
           output.armorshield_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset shield:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset shield:${newID}`);
         }
       } else if (!shield && armorshield_ID && armorshield_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5606,7 +5609,7 @@
         output.armorshield_magic = 0;
         output.armorshield_mod = 0;
         output.armorshield_bulk = 0;
-        // clog(`Armor Details row has been reset shield:${newID}`);
+        clog(`Armor Details row has been reset shield:${newID}`);
       }
       if (helmet) {
         if (row_removed === 0) {
@@ -5623,7 +5626,7 @@
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 1;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
-            // clog(`repeating Armor exists helmet:${newID}`);
+            clog(`repeating Armor exists helmet:${newID}`);
           } else if (armorhelmet_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5637,7 +5640,7 @@
             output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 1;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
-            // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
+            clog(`repeating armor does not exist. Creating helmet: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[3]) {
           // repeating_row REMOVED RESETING ROW
@@ -5648,7 +5651,7 @@
           output.armorhelmet_base = 10;
           output.armorhelmet_magic = 0;
           output.armorhelmet_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset helmet:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset helmet:${newID}`);
         }
       } else if (!helmet && armorhelmet_ID && armorhelmet_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5659,7 +5662,7 @@
         output.armorhelmet_base = 10;
         output.armorhelmet_magic = 0;
         output.armorhelmet_bulk = 0;
-        // clog(`Armor Details row has been reset helmet:${newID}`);
+        clog(`Armor Details row has been reset helmet:${newID}`);
       }
       if (other1) {
         if (row_removed === 0) {
@@ -5675,7 +5678,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
-            // clog(`repeating Armor exists other1:${newID}`);
+            clog(`repeating Armor exists other1:${newID}`);
           } else if (armorother1_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5688,7 +5691,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
-            // clog(`repeating armor does not exist. Creating other1: ${newID}`);
+            clog(`repeating armor does not exist. Creating other1: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[4]) {
           // repeating_row REMOVED RESETING ROW
@@ -5700,7 +5703,7 @@
           output.armorother_magic = 0;
           output.armorother_mod = 0;
           output.armorother_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset other1:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset other1:${newID}`);
         }
       } else if (!other1 && armorother1_ID && armorother1_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5712,7 +5715,7 @@
         output.armorother_magic = 0;
         output.armorother_mod = 0;
         output.armorother_bulk = 0;
-        // clog(`Armor Details row has been reset other1:${newID}`);
+        clog(`Armor Details row has been reset other1:${newID}`);
       }
       if (other2) {
         if (row_removed === 0) {
@@ -5728,7 +5731,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
-            // clog(`repeating Armor exists other2:${newID}`);
+            clog(`repeating Armor exists other2:${newID}`);
           } else if (armorother2_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5741,7 +5744,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
-            // clog(`repeating armor does not exist. Creating other2: ${newID}`);
+            clog(`repeating armor does not exist. Creating other2: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[5]) {
           // repeating_row REMOVED RESETING ROW
@@ -5753,7 +5756,7 @@
           output.armorother2_magic = 0;
           output.armorother2_mod = 0;
           output.armorother2_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset other2:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset other2:${newID}`);
         }
       } else if (!other2 && armorother2_ID && armorother2_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5765,7 +5768,7 @@
         output.armorother2_magic = 0;
         output.armorother2_mod = 0;
         output.armorother2_bulk = 0;
-        // clog(`Armor Details row has been reset other2:${newID}`);
+        clog(`Armor Details row has been reset other2:${newID}`);
       }
       if (other3) {
         if (row_removed === 0) {
@@ -5781,7 +5784,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
-            // clog(`repeating Armor exists other3:${newID}`);
+            clog(`repeating Armor exists other3:${newID}`);
           } else if (armorother3_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5794,7 +5797,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
-            // clog(`repeating armor does not exist. Creating other3: ${newID}`);
+            clog(`repeating armor does not exist. Creating other3: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[6]) {
           // repeating_row REMOVED RESETING ROW
@@ -5806,7 +5809,7 @@
           output.armorother3_magic = 0;
           output.armorother3_mod = 0;
           output.armorother3_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset other3:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset other3:${newID}`);
         }
       } else if (!other3 && armorother3_ID && armorother3_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5818,7 +5821,7 @@
         output.armorother3_magic = 0;
         output.armorother3_mod = 0;
         output.armorother3_bulk = 0;
-        // clog(`Armor Details row has been reset other3:${newID}`);
+        clog(`Armor Details row has been reset other3:${newID}`);
       }
       if (other4) {
         if (row_removed === 0) {
@@ -5834,7 +5837,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
-            // clog(`repeating Armor exists other4:${newID}`);
+            clog(`repeating Armor exists other4:${newID}`);
           } else if (armorother4_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5847,7 +5850,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
-            // clog(`repeating armor does not exist. Creating other4: ${newID}`);
+            clog(`repeating armor does not exist. Creating other4: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[7]) {
           // repeating_row REMOVED RESETING ROW
@@ -5859,7 +5862,7 @@
           output.armorother4_magic = 0;
           output.armorother4_mod = 0;
           output.armorother4_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset other4:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset other4:${newID}`);
         }
       } else if (!other4 && armorother4_ID && armorother4_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5871,7 +5874,7 @@
         output.armorother4_magic = 0;
         output.armorother4_mod = 0;
         output.armorother4_bulk = 0;
-        // clog(`Armor Details row has been reset other4:${newID}`);
+        clog(`Armor Details row has been reset other4:${newID}`);
       }
       if (other5) {
         if (row_removed === 0) {
@@ -5887,7 +5890,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
-            // clog(`repeating Armor exists other5:${newID}`);
+            clog(`repeating Armor exists other5:${newID}`);
           } else if (armorother5_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5900,7 +5903,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
-            // clog(`repeating armor does not exist. Creating other5: ${newID}`);
+            clog(`repeating armor does not exist. Creating other5: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[8]) {
           // repeating_row REMOVED RESETING ROW
@@ -5912,7 +5915,7 @@
           output.armorother5_magic = 0;
           output.armorother5_mod = 0;
           output.armorother5_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset other5:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset other5:${newID}`);
         }
       } else if (!other5 && armorother5_ID && armorother5_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5924,7 +5927,7 @@
         output.armorother5_magic = 0;
         output.armorother5_mod = 0;
         output.armorother5_bulk = 0;
-        // clog(`Armor Details row has been reset other5:${newID}`);
+        clog(`Armor Details row has been reset other5:${newID}`);
       }
       if (other6) {
         if (row_removed === 0) {
@@ -5940,7 +5943,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
-            // clog(`repeating Armor exists other6:${newID}`);
+            clog(`repeating Armor exists other6:${newID}`);
           } else if (armorother6_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
             newID = generateRowID();
@@ -5953,7 +5956,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
-            // clog(`repeating armor does not exist. Creating other6: ${newID}`);
+            clog(`repeating armor does not exist. Creating other6: ${newID}`);
           }
         } else if (row_removed === 1 && id_low === idArray[9]) {
           // repeating_row REMOVED RESETING ROW
@@ -5965,7 +5968,7 @@
           output.armorother6_magic = 0;
           output.armorother6_mod = 0;
           output.armorother6_bulk = 0;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset other6:${newID}`);
+          clog(`rep_removed:${row_removed} - Armor Details row has been reset other6:${newID}`);
         }
       } else if (!other6 && armorother6_ID && armorother6_ID.length === 20) {
         // has name && NO id = REMOVED RESET ROW
@@ -5977,7 +5980,7 @@
         output.armorother6_magic = 0;
         output.armorother6_mod = 0;
         output.armorother6_bulk = 0;
-        // clog(`Armor Details row has been reset other6:${newID}`);
+        clog(`Armor Details row has been reset other6:${newID}`);
       }
       setAttrs(output, {silent: true}, armorDetailsRowidArray());
     });
@@ -6747,8 +6750,8 @@
             output.armortype_magic = magic;
             output.armortype_bulk = bulk;
             output.armortype_carried = carried;
-            output.armortype_weight = weight;
-            output.armortype_cost = cost;
+            output.armor_weight = weight;
+            output.armor_cost = cost;
             output.armortype1_row_id = id;
             break;
           case 2:
