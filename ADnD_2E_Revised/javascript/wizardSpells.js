@@ -543,9 +543,11 @@ wiz1['Magic Missile'] = {
     'reference': 'p. 176',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 534',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #227 p. 47',
     'damage': 'M1: [[1d4+1]]}}{{d2t=[[ [[@{level-wizard}]]-2]]}}{{d2=, M2: [[1d4+1]]}}{{d3t=[[ [[@{level-wizard}]]-4]]}}{{d3=, M3: [[1d4+1]]}}{{d4t=[[ [[@{level-wizard}]]-6]]}}{{d4=, M4: [[1d4+1]]}}{{d5t=[[ [[@{level-wizard}]]-8]]}}{{d5=, M5: [[1d4+1]]',
     'damage-type': '',
     'healing': '',
+    'psionics': '*Magic Missile* spell has no effect inside a stasis field.',
     'effect': 'Use of the *magic missile* spell creates up to five missiles of magical energy that dart forth from the wizard’s fingertip and unerringly strike their target. This includes enemy creatures in a melee. The target creature must be seen or otherwise detected to be hit, however, so near-total concealment, such as that offered by arrow slits, can render the spell ineffective. Likewise, the caster must be able to identify the target. He cannot direct a magic missile to “Strike the commander of the legion,” unless he can single out the commander from the rest of the soldiers. Specific parts of a creature cannot be singled out. Inanimate objects (locks, etc.) cannot be damaged by the spell, and any attempt to do so wastes the missiles to no effect. Against creatures, each missile inflicts 1d4+1 points of damage.\n&emsp;For every two extra levels of experience, the wizard gains an additional missile—he has two at 3rd level, three at 5th level, four at 7th level, etc., up to a total of five missiles at 9th level. Currently [[1+{ceil([[@{level-wizard}]]/2)-1,4}kl1]] missiles. If the wizard has multiple missile capability, he can have them strike a single target creature or several creatures within a 10-foot cube as desired.'
 };
 
