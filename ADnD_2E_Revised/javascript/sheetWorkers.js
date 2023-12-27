@@ -999,7 +999,7 @@ function parseSpheres(spheresStrings, regex) {
 
 const getSpellSchools = function (spell, books) {
     let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
-    return spell['school'] + `%NEWLINE%(${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
+    return spell['school'] + `%NEWLINE%S&M: (${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
     // return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
     //     ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
     //     : spell['school'];
