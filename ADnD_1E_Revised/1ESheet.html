@@ -52,10 +52,13 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">12/25/23'</label>
+              <label class="right">12/26/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Fixed a bug in the equipment default value update that set all equipment to carried.</li>
+            <li>Fixed equipment type dropdown from teleporting to the matching tab view when the "Show All" tab is selected.</li>
+            <li>Sync spell tab level view to match a spell level change.</li>
             <li>Fixed missing armor weight and cost for armor 1 when migrating older sheets.</li>
             <li>Added Caster Class 1 and Caster Class 2. Each class will have it's own spell/day grid. Repeating spells now include the caster class and the caster level. Caster Class 2 related sections are hidden by default but can be toggled visible in the sheet options. Spells can be sorted by Caster class.</li>
             <li>Added Save Type field to spells.</li>
@@ -709,14 +712,14 @@
       <!-- used to hold the old armor details attributes moved to repeating_equipment -->
       <input type="hidden" name="attr_armor_weight" value="0" />
       <input type="hidden" name="attr_armor_cost" value="0" />
-      <input class="hidden" type="checkbox" name="attr_armortype_carried" value="1" checked />
-      <input class="hidden" type="checkbox" name="attr_armortype2_carried" value="1" checked />
+      <input type="checkbox" class="hidden" name="attr_armortype_carried" value="1" />
+      <input type="checkbox" class="hidden" name="attr_armortype2_carried" value="1" />
       <input type="hidden" name="attr_armortype2_weight" value="0" />
       <input type="hidden" name="attr_armortype2_cost" value="0" />
-      <input class="hidden" type="checkbox" name="attr_armorshield_carried" value="1" checked />
+      <input type="checkbox" class="hidden" name="attr_armorshield_carried" value="1" />
       <input type="hidden" name="attr_armorshield_weight" value="0" />
       <input type="hidden" name="attr_armorshield_cost" value="0" />
-      <input class="hidden" type="checkbox" name="attr_armorhelmet_carried" value="1" checked />
+      <input type="checkbox" class="hidden" name="attr_armorhelmet_carried" value="1" />
       <input type="hidden" name="attr_armorhelmet_weight" value="0" />
       <input type="hidden" name="attr_armorhelmet_cost" value="0" />
 
@@ -2341,7 +2344,7 @@
                   <option value="1" selected>Yes</option>
                   <option value="2">Mount</option>
                 </select>
-                <input type="text" class="hidden" name="attr_equipment_carried" value="1" readonly />
+                <input type="checkbox" class="hidden" name="attr_equipment_carried" value="1" />
                 <input type="text" class="width-smaller hidden-for-armor" name="attr_equipment_quantity" title="@{repeating_equipment_$X_equipment_quantity}" value="1" />
                 <span class="hidden-for-armor">/</span>
                 <input type="text" class="width-smaller hidden-for-armor" name="attr_equipment_quantity_max" title="@{repeating_equipment_$X_equipment_quantity|max}" value="1" />
@@ -3069,7 +3072,7 @@
             </label>
             <label class="width-medium">
               <h4>Level:</h4>
-              <input type="text" class="width-small" name="attr_caster_class1_level" title="@{caster_class1_level}" value="1" />
+              <input type="text" class="width-small" name="attr_caster_class1_level" title="@{caster_class1_level}" value="0" />
             </label>
           </span>
           <span class="spells-top column-header">
@@ -3126,7 +3129,7 @@
               </label>
               <label class="width-medium">
                 <h4>Level:</h4>
-                <input type="text" class="width-small" name="attr_caster_class2_level" title="@{caster_class2_level}" value="1" />
+                <input type="text" class="width-small" name="attr_caster_class2_level" title="@{caster_class2_level}" value="0" />
               </label>
             </span>
             <span><input type="text" class="width-fill" name="attr_spells2_lvl_0_current" title="@{spells2_lvl_0_current}" value="0" /></span>
@@ -3374,7 +3377,7 @@
           </label>
         </span>
         <span class="inline-label width-fill">
-          <label style="width:12em;">
+          <label style="min-width: 13em; width: auto;">
             <span class="stack-text">Sheet Image:</span>
             <select class="field-select" name="attr_sheet_image" title="@{sheet_image}">
               <option value="1" selected>Use Avatar</option>
@@ -3431,17 +3434,16 @@
             <input type="text" class="width-small-plus border-light" name="attr_ability_check_die" value="1d20" title="@{ability_check_die} | Die/Dice vs Ability Score. ie 1d20, 4d6, 3d6, etc." />
           </label>
           <label>
-            <span>Use Crit Damage:</span>
-            <input type="checkbox" class="width-small" name="attr_toggle_critdamage" value="1" title="@{toggle_critdamage} | Use crit damage rolls on natural 20. Defaults to weapon damage x2. Crit damage handling can be adjusted per attack." />
-          </label>
-          <label>
             <span>Use THAC0:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_to_hit_table" value="1" title="@{toggle_to_hit_table} | Use THAC0 instead of Attack Matrix" />
           </label>
+          <label>
+            <span>Use Crit Damage:</span>
+            <input type="checkbox" class="width-small" name="attr_toggle_critdamage" value="1" title="@{toggle_critdamage} | Use crit damage rolls on natural 20. Defaults to weapon damage x2. Crit damage handling can be adjusted per attack." />
+          </label>
         </span>
-        <span class="inline-label wrap">
-          <input type="checkbox" class="hidden" />
-          <h4>Hide Areas:</h4>
+        <span class="six-columns">
+          <h4 style="grid-row: 1/3; justify-self: left;">Hide Areas:</h4>
           <label>
             <span>Thief Skills:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_thief_skills" value="1" title="@{toggle_thief_skills}" checked />
@@ -5354,7 +5356,7 @@
   };
 
   // One-time update: clear old armor details fields that have been removed
-  const clearArmnorOther = (current_version, final_version) => {
+  const clearArmorOther = (current_version, final_version) => {
     const update = {};
     update.armorother_cost = 0;
     update.armorother2_cost = 0;
@@ -5380,7 +5382,7 @@
     update.armorother4_bulk = 0;
     update.armorother5_bulk = 0;
     update.armorother6_bulk = 0;
-    clog(`VERSION UPDATE: clearArmnorOther completed.`);
+    clog(`VERSION UPDATE: clearArmorOther completed.`);
     setAttrs(
       update,
       {
@@ -5448,7 +5450,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype_magic;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
             // clog(`repeating Armor exists armor1:${newID}`);
@@ -5464,7 +5466,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype_magic;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
             // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
@@ -5505,7 +5507,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype2_magic;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
             // clog(`repeating Armor exists armor2:${newID}`);
@@ -5521,7 +5523,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype2_magic;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
             // clog(`repeating armor does not exist. Creating armor2: ${newID}`);
@@ -5563,7 +5565,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
             // clog(`repeating Armor exists shield:${newID}`);
@@ -5580,7 +5582,7 @@
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
             output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
             // clog(`repeating armor does not exist. Creating shield: ${newID}`);
@@ -5621,7 +5623,7 @@
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet;
             output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
             // clog(`repeating Armor exists helmet:${newID}`);
@@ -5635,7 +5637,7 @@
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet;
             output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
             // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
@@ -6029,8 +6031,8 @@
           output[section_attribute('equipment', id, 'equipment_type')] = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
           output[section_attribute('equipment', id, 'equipment_current')] = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
           output[section_attribute('equipment', id, 'equipment_current_max')] = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
-          output[section_attribute('equipment', id, 'equipment_carried_select')] = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 1;
-          output[section_attribute('equipment', id, 'equipment_carried')] = +v[section_attribute('equipment', id, 'equipment_carried')] || 1;
+          output[section_attribute('equipment', id, 'equipment_carried_select')] = +v[section_attribute('equipment', id, 'equipment_carried')] || 0; // setting to carried to preserve existing value
+          output[section_attribute('equipment', id, 'equipment_carried')] = +v[section_attribute('equipment', id, 'equipment_carried')] || 0;
           output[section_attribute('equipment', id, 'equipment_quantity')] = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
           output[section_attribute('equipment', id, 'equipment_quantity_max')] = +v[section_attribute('equipment', id, 'equipment_quantity_max')] || 0;
           output[section_attribute('equipment', id, 'equipment_weight')] = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
@@ -6176,6 +6178,60 @@
     });
   };
 
+  // FUTURE
+  const syncWeapons = () => {
+    getSectionIDs('repeating_weapon', (weaponsArray) => {
+      getSectionIDs('repeating_equipment', (equipmentArray) => {
+        const output = {};
+        const weaponFields = {};
+        const equipmentFields = {};
+        const fields = [...weaponFields, ...equipmentFields];
+        weaponsArray.forEach((id) => {
+          fields.push(section_attribute('weapon', id, 'weapon_name'));
+          fields.push(section_attribute('weapon', id, 'weapon_quantity'));
+          fields.push(section_attribute('weapon', id, 'weapon_weight'));
+          fields.push(section_attribute('weapon', id, 'weapon_cost'));
+        });
+        equipmentArray.forEach((id) => {
+          fields.push(section_attribute('equipment', id, 'equipment_item'));
+          fields.push(section_attribute('equipment', id, 'equipment_quantity'));
+          fields.push(section_attribute('equipment', id, 'equipment_weight'));
+          fields.push(section_attribute('equipment', id, 'equipment_cost'));
+        });
+        getAttrs(fields, (v) => {
+          weaponsArray.forEach((id) => {
+            const weaponName = v[section_attribute('weapon', id, 'weapon_cost')];
+            const weaponQuantity = v[section_attribute('weapon', id, 'weapon_cost')];
+            const weaponWeight = v[section_attribute('weapon', id, 'weapon_cost')];
+            const weaponCost = v[section_attribute('weapon', id, 'weapon_cost')];
+          });
+          equipmentArray.forEach((id) => {
+            const equipmentName = v[section_attribute('equipment', id, 'equipment_cost')];
+            const equipmentQuantity = v[section_attribute('equipment', id, 'equipment_cost')];
+            const equipmentWeight = v[section_attribute('equipment', id, 'equipment_cost')];
+            const equipmentCost = v[section_attribute('equipment', id, 'equipment_cost')];
+          });
+          setAttrs(output, {silent: true});
+        });
+      });
+    });
+  };
+
+  // FUTURE
+  const migrateWeaponWeightCost = (current_version, final_version) => {
+    const output = {};
+    // do something
+    output.sheet_version = current_version;
+    clog(`VERSION UPDATE: setWeaponsUpdate completed.`);
+    setAttrs(
+      output,
+      {
+        silent: true,
+      },
+      versionator(current_version, final_version)
+    );
+  };
+
   const stat_functions = () => {
     strengthCalcs();
     intelligenceCalcs();
@@ -6283,7 +6339,7 @@
     } else if (current_version < 1.638) {
       monsterHD(1.638, final_version);
     } else if (current_version < 1.639) {
-      clearArmnorOther(1.639, final_version);
+      clearArmorOther(1.639, final_version);
     } else if (current_version < 1.64) {
       migrateArmorDetails(1.641, final_version);
     } else if (current_version < 1.642) {
@@ -6382,10 +6438,10 @@
         ['armor_weight', 'armortype_carried', 'armortype2_weight', 'armortype2_carried', 'armorshield_weight', 'armorshield_carried', 'armorhelmet_weight', 'armorhelmet_carried'],
         (v) => {
           const output = {};
-          const armorType_carried = +v.armortype_carried || 1;
-          const armorType2_carried = +v.armortype2_carried || 1;
-          const armorShield_carried = +v.armorshield_carried || 1;
-          const armorHelmet_carried = +v.armorhelmet_carried || 1;
+          const armorType_carried = +v.armortype_carried || 0;
+          const armorType2_carried = +v.armortype2_carried || 0;
+          const armorShield_carried = +v.armorshield_carried || 0;
+          const armorHelmet_carried = +v.armorhelmet_carried || 0;
           const armor_weight = +v.armor_weight || 0;
           const armorType2_weight = +v.armortype2_weight || 0;
           const armorShield_weight = +v.armorshield_weight || 0;
@@ -6535,19 +6591,6 @@
     });
   });
 
-  // Equipment Carry select sync
-  // equip tabs use selector, but weight calcs use equipment_carried
-  on('change:repeating_equipment:equipment_carried_select', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['repeating_equipment_equipment_carried_select'], (v) => {
-      const output = {};
-      const carriedCalc = +v.repeating_equipment_equipment_carried_select || 1;
-      const carriedValue = carriedCalc === 1 ? 1 : 0;
-      output.repeating_equipment_equipment_carried = carriedValue;
-      setAttrs(output, {silent: true});
-    });
-  });
-
   // Equipment Tabs
   on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
@@ -6562,16 +6605,21 @@
       });
       getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fieldnames], (v) => {
         const output = {};
-        const type = +v.equipment_tabs_type || 0;
-        const carried = +v.equipment_tabs_carry || 0;
+        const typeTab = +v.equipment_tabs_type || 0;
+        const carriedTab = +v.equipment_tabs_carry || 0;
         idArray.forEach((id) => {
-          const thistype = +v[`repeating_equipment_${id}_equipment_type`] || 0;
-          const thiscarriedCalc = +v[`repeating_equipment_${id}_equipment_carried_select`] || 1;
-          // Use CSS to hide/show the repeating row using type and/or carried
-          // IF value="1" show, otherwise display:none
-          output[`repeating_equipment_${id}_equipment_show_type`] = type === -1 || type === thistype ? 1 : 0;
-          output[`repeating_equipment_${id}_equipment_show_carry`] = carried === -1 || carried === thiscarriedCalc ? 1 : 0;
-          output.equipment_tabs_type = isType ? thistype : type;
+          const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
+          const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+          // Weight calcs use equipment_carried
+          const thisCarriedValue = thisCarriedSelect === 1 ? 1 : 0;
+          output[`repeating_equipment_${id}_equipment_carried`] = thisCarriedValue;
+          // Use CSS to hide/show the repeating row using typeTab and/or carriedTab
+          output[`repeating_equipment_${id}_equipment_show_type`] = typeTab === -1 || typeTab === thisType ? 1 : 0;
+          output[`repeating_equipment_${id}_equipment_show_carry`] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
+          // Jump to type tab when changing type unless view is set to Show All
+          if (typeTab !== -1) {
+            output.equipment_tabs_type = isType ? thisType : typeTab;
+          }
         });
         setAttrs(output, {silent: true});
       });
@@ -6729,7 +6777,7 @@
         const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
         const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
         const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
-        const carried = +v[`repeating_equipment_${id}_equipment_carried_select`] || 1;
+        const carried = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
         const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
         const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
         const thisLog = [
@@ -7011,18 +7059,34 @@
             output[`repeating_spells_${id}_spell_show`] = 0;
           }
         });
-        setAttrs(output, {silent: true});
+        setAttrs(output);
       });
     });
   });
 
-  // Spell Caster Class Name/Level fill-in sync
+  // Spell Tabs level change sync
+  on('change:repeating_spells:spell_level', (eventInfo) => {
+    // test if API is creating the repeating row and bail
+    if (eventInfo.sourceType !== 'player') return;
+    getAttrs(['repeating_spells_spell_level', 'spell_tabs'], (v) => {
+      const output = {};
+      const levelTab = +v.spell_tabs || 0;
+      const thisLevel = v.repeating_spells_spell_level;
+      // sync spell tab view to the spell level change
+      if (thisLevel !== '?' && levelTab !== thisLevel) {
+        output.spell_tabs = thisLevel;
+      }
+      setAttrs(output);
+    });
+  });
+
+  // Spell Caster Class Name/Level fill-in
   on(
     'change:repeating_spells:spell_name change:repeating_spells:spell_caster_class change:caster_class1_name change:caster_class2_name change:caster_class1_level change:caster_class2_level',
     (eventInfo) => {
       getSectionIDs('repeating_spells', (idArray) => {
         const output = {};
-        const nonRep = ['class', 'secondclass', 'level', 'level_2', 'caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level'];
+        const nonRep = ['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level'];
         const fields = [];
         idArray.forEach((id) => {
           // Do something with the IDs...
@@ -7030,31 +7094,18 @@
         });
         const combined = [...nonRep, ...fields];
         getAttrs(combined, (v) => {
-          const class1 = v.class;
-          const class2 = v.secondclass;
-          const class1Level = +v.level || 0;
-          const class2Level = +v.level_2 || 0;
-          const caster1 = v.caster_class1_name;
-          const caster2 = v.caster_class2_name;
-          if (caster1 === '') {
-            output.caster_class1_name = class1;
-            output.caster_class1_level = class1Level;
-          }
-          if (caster2 === '') {
-            output.caster_class2_name = class2;
-            output.caster_class2_level = class2Level;
-          }
           idArray.forEach((id) => {
             const thisClass = +v[`repeating_spells_${id}_spell_caster_class`] || 0;
-            clog(`thisClass: ${thisClass}`);
             if (thisClass === 0) {
               output[`repeating_spells_${id}_spell_caster_class_name`] = '';
             } else if (thisClass === 1) {
               output[`repeating_spells_${id}_spell_caster_class_name`] = v.caster_class1_name;
               output[`repeating_spells_${id}_spell_caster_class_level`] = +v.caster_class1_level || 0;
+              output[`repeating_spells_${id}_spell_caster_class`] = thisClass;
             } else if (thisClass === 2) {
               output[`repeating_spells_${id}_spell_caster_class_name`] = v.caster_class2_name;
               output[`repeating_spells_${id}_spell_caster_class_level`] = +v.caster_class2_level || 0;
+              output[`repeating_spells_${id}_spell_caster_class`] = thisClass;
             }
           });
           setAttrs(output, {silent: true});
@@ -7751,8 +7802,8 @@
           output.repeating_equipment_equipment_type = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
           output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
           output.repeating_equipment_equipment_current_max = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
-          output.repeating_equipment_equipment_carried_select = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 1;
-          output.repeating_equipment_equipment_carried = +v[section_attribute('equipment', id, 'equipment_carried')] || 1;
+          output.repeating_equipment_equipment_carried_select = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0;
+          output.repeating_equipment_equipment_carried = +v[section_attribute('equipment', id, 'equipment_carried')] || 0;
           output.repeating_equipment_equipment_quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
           output.repeating_equipment_equipment_quantity_max = +v[section_attribute('equipment', id, 'equipment_quantity_max')] || 0;
           output.repeating_equipment_equipment_weight = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
