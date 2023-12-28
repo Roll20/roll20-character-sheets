@@ -4327,8 +4327,8 @@
 
 				<!-- current version notes: 2.10.5 -->
 				<ul>
-					<li><b>NEW:</b> Added <b>Climbing</b> tool, located under Tools > Feats.</li>
-					<li><b>NEW:</b> Added <b>Digging</b> too, located under Tools > Feats.</li>
+					<li><b>NEW:</b> Added <b>Climbing</b> tool, located under Tools > Feats. Select <b>User Metric Distances & Volumes</b> to see metric values.</li>
+					<li><b>NEW:</b> Added <b>Digging</b> too, located under Tools > Feats. Select <b>User Metric Distances & Volumes</b> to see metric values.</li>
 					<li><b>BUGFIX:</b> Updated title from <b>Detailed Format</b> to <b>Detailed</b>. Reported by Tommi.</li>
 					<li><b>ENHANCEMENT:</b> For the <b>Your Hit Locations</b> tab, added a border around damage taken to increase visiblity. Suggested by Tommi.</li>
 				</ul>
@@ -18185,7 +18185,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 								<!-- row #1 -->
 								<div class="grid-cell">
 									<label>
-										<span data-i18n="basic-lift-label">Basic Lift</span>
+										<div class="standard-tooltip">
+											<span data-i18n="basic-lift-label">Basic Lift</span>
+											<span class="tooltiptext">
+												<span data-i18n="digging-tool-basic-lift-tooltip">Enter the basic lift of the character doing the digging, (ST * ST)/5.</span>
+											</span>
+										</div>
 									</label>
 								</div>
 								<div class="grid-cell">
@@ -18951,8 +18956,8 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<!-- current version notes: 2.10.5 -->
 			<ul>
-				<li><b>NEW:</b> Added <b>Climbing</b> tool, located under Tools > Feats.</li>
-				<li><b>NEW:</b> Added <b>Digging</b> too, located under Tools > Feats.</li>
+				<li><b>NEW:</b> Added <b>Climbing</b> tool, located under Tools > Feats. Select <b>User Metric Distances & Volumes</b> to see metric values.</li>
+				<li><b>NEW:</b> Added <b>Digging</b> too, located under Tools > Feats. Select <b>User Metric Distances & Volumes</b> to see metric values.</li>
 				<li><b>BUGFIX:</b> Updated title from <b>Detailed Format</b> to <b>Detailed</b>. Reported by Tommi.</li>
 				<li><b>ENHANCEMENT:</b> For the <b>Your Hit Locations</b> tab, added a border around damage taken to increase visiblity. Suggested by Tommi.</li>
 			</ul>
@@ -45685,6 +45690,7 @@ Characters with Skill: ${knowsSkill}`;
 		"digging_tool_basic_lift",
 		"digging_tool_custom_modifier",
 		"digging_tool_digging_rate_multiplier",
+		"use_metric_distances",
 	];
 
 	digRateFields.forEach(field => {
@@ -45701,6 +45707,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		getAttrs(digRateFields, values => {
 
+			let useMetric = values.use_metric_distances == "1";
+
 			let basicLift = Number(values.digging_tool_basic_lift) ?? 0;
 
 			let modifier = Number(values.digging_tool_custom_modifier) ?? 0;
@@ -45710,6 +45718,17 @@ Characters with Skill: ${knowsSkill}`;
 			let rate = basicLift * modifier * rateMultiplier;
 
 			let rateDescription = `${rate} cf/hr`;
+
+			if (useMetric) {
+
+				// convert cubic feet per hour to cubic meters per hour
+				let metricRate = convertCubicFeetToCubicMeters(rate);
+
+				// round to decimal places
+				metricRate = Math.round(metricRate * 100) / 100;
+
+				rateDescription = `${metricRate} m³/hr`;
+			}
 
 			let keyValues = {
 				digging_tool_digging_rate_cubic_feet_hour: rate,
@@ -45722,10 +45741,16 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	const convertCubicFeetToCubicMeters = (cubicFeetPerHour) => {
+		const conversionFactor = 0.0283168;
+		return cubicFeetPerHour * conversionFactor;
+	}
+
 	const digHourFields = [
 		"digging_tool_hours",
 		"digging_tool_digging_rate_cubic_feet_hour",
-		"digging_tool_fatigue_per_hour"
+		"digging_tool_fatigue_per_hour",
+		"use_metric_distances",
 	];
 
 	digHourFields.forEach(field => {
@@ -45742,6 +45767,8 @@ Characters with Skill: ${knowsSkill}`;
 		
 		getAttrs(digHourFields, values => {
 
+			let useMetric = values.use_metric_distances == "1";
+
 			let hours = Number(values.digging_tool_hours) ?? 0;
 
 			let digRate = Number(values.digging_tool_digging_rate_cubic_feet_hour) ?? 0;
@@ -45752,9 +45779,23 @@ Characters with Skill: ${knowsSkill}`;
 
 			let fatigue = hours * fatigueRate;
 
+			let volumeForHoursDescription = `${volume} cf`;
+
+			if (useMetric) {
+
+				// convert cubic feet to cubic meters
+				let metricVolume = convertCubicFeetToCubicMeters(volume);
+
+				// round to decimal places
+				metricVolume = Math.round(metricVolume * 100) / 100;
+
+				volumeForHoursDescription = `${metricVolume} m³`;
+
+			}
+
 			let keyValues = {
 				digging_tool_total_volume_for_hours: volume,
-				digging_tool_total_volume_for_hours_description: `${volume} cf`,
+				digging_tool_total_volume_for_hours_description: volumeForHoursDescription,
 				digging_tool_total_fatigue_for_hours: fatigue,
 				digging_tool_total_fatigue_for_hours_description: `${fatigue} FP`
 			};
@@ -45769,7 +45810,8 @@ Characters with Skill: ${knowsSkill}`;
 		"digging_tool_height",
 		"digging_tool_width",
 		"digging_tool_depth",
-		"digging_tool_digging_rate_cubic_feet_hour"
+		"digging_tool_digging_rate_cubic_feet_hour",
+		"use_metric_distances",
 	];
 
 	digAreaFields.forEach(field => {
@@ -45786,6 +45828,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		getAttrs(digAreaFields, values => {
 
+			let useMetric = values.use_metric_distances == "1";
+
 			let height = Number(values.digging_tool_height) ?? 0;
 
 			let width = Number(values.digging_tool_width) ?? 0;
@@ -45798,9 +45842,24 @@ Characters with Skill: ${knowsSkill}`;
 
 			let hours = volume / digRate;
 
+			let volumeForDimensionsDescription = `${volume} cf`;
+
+			if (useMetric) {
+
+				// convert digrate to cubic meters
+				let digRateMetric = convertCubicFeetToCubicMeters(digRate);
+
+				hours = volume / digRateMetric;
+				
+				volumeForDimensionsDescription = `${volume} m³`;
+			}
+
+			// round to one decimal places
+			hours = Math.round(hours * 10) / 10;
+
 			let keyValues = {
 				digging_tool_total_volume_for_dimensions: volume,
-				digging_tool_total_volume_for_dimensions_description: `${volume} cf`,
+				digging_tool_total_volume_for_dimensions_description: volumeForDimensionsDescription,
 				digging_tool_total_hours_for_dimensions: hours,
 				digging_tool_total_hours_for_dimensions_description: `${hours} hours`
 			};
