@@ -565,10 +565,11 @@ wiz1['Mending'] = {
     'reference': 'p. 176',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 559',
+    'errata': 'The Complete Wizard’s Handbook p. 83',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell repairs small breaks or tears in objects. It will weld a broken ring, chain link, medallion, or slender dagger, providing but one break exists. Ceramic or wooden objects with multiple breaks can be invisibly rejoined to be as strong as new. A hole in a leather sack or wineskin is completely healed over by a *mending* spell. This spell does not, by itself, repair magical items of any type. One turn after the spell is cast, the magic of the joining fades, and the effect cannot be magically dispelled. The maximum volume of material the caster can mend is 1 cubic foot per level. Current maximum volume is [[@{level-wizard}]] cubic feet.'
+    'effect': 'This spell repairs small breaks or tears in objects. It will weld a broken ring, chain link, medallion, or slender dagger, providing but one break exists. Ceramic or wooden objects with multiple breaks can be invisibly rejoined to be as strong as new, such as a leaky boat, a torn document, a broken wagon axle, or a cut rope (but it won’t link the ends of two different ropes to make a single rope). A hole in a leather sack or wineskin is completely healed over by a *mending* spell. This spell does not, by itself, repair magical items of any type. One turn after the spell is cast, the magic of the joining fades, and the effect cannot be magically dispelled. The maximum volume of material the caster can mend is 1 cubic foot per level. Current maximum volume is [[@{level-wizard}]] cubic feet.'
 };
 
 wiz1['Message'] = {
