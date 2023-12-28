@@ -52,10 +52,12 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">12/26/23'</label>
+              <label class="right">12/28/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Sheet Settings; expanded the "Reset" macros button to include buttons for each repeating section. Reseting simply clears the existing macro-text in order to use the most current default macros used for sheet rolls.</li>
+            <li>Weapon weight and cost migration; one-time update checks for any existing repeating_weapons that have either weight or cost being tracked (ie non-zero value) and creates a copy of them to equipment|weapons if an item isn't already in equipment with the exact same name. "Matched" items are updated with the weapon weight and cost values. Weight and Cost calcs are now included with equipment.</li>
             <li>Fixed a bug in the equipment default value update that set all equipment to carried.</li>
             <li>Fixed equipment type dropdown from teleporting to the matching tab view when the "Show All" tab is selected.</li>
             <li>Sync spell tab level view to match a spell level change.</li>
@@ -2107,15 +2109,6 @@
                 </span>
                 <label>Dual-Wield</label>
               </span>
-              <span>
-                <textarea class="hidden" name="attr_weapon_whisper_to_hit"></textarea>
-                <select class="width-small-plus select-over-label" name="attr_weapon_whisper_to_hit_select" title="@{repeating_weapon_$X_weapon_whisper_to_hit_select}">
-                  <option value="0" class="matrix-box" selected>Matrix</option>
-                  <option value="1" class="thac0-box">THACO</option>
-                  <option value="2">No</option>
-                </select>
-                <label title="Include '/w gm Hit table'?">/w gm?</label>
-              </span>
             </span>
             <span class="weapons-row2 center">
               <details>
@@ -2219,17 +2212,20 @@
                 <input type="text" class="width-smaller" name="attr_weapon_quantity" value="1" title="@{repeating_weapon_$X_weapon_quantity}" />
                 <span>Qty</span>
               </label>
-              <label class="label-under-small hide-as-npc">
-                <input type="text" class="width-small" name="attr_weapon_weight" value="0" title="@{repeating_weapon_$X_weapon_weight}" />
-                <span>Wt</span>
-              </label>
-              <label class="label-under-small toggle-costs hide-as-npc">
-                <input type="text" class="width-small" name="attr_weapon_cost" value="0" title="@{repeating_weapon_$X_weapon_cost}" />
-                <span>Cost</span>
-              </label>
+              <span class="label-under">
+                <textarea class="hidden" name="attr_weapon_whisper_to_hit"></textarea>
+                <select class="width-small-plus select-over-label" name="attr_weapon_whisper_to_hit_select" title="@{repeating_weapon_$X_weapon_whisper_to_hit_select}">
+                  <option value="0" class="matrix-box" selected="">Matrix</option>
+                  <option value="1" class="thac0-box">THACO</option>
+                  <option value="2">No</option>
+                </select>
+                <label title="Include '/w gm Hit table'?">/w gm?</label>
+              </span>
             </span>
             <!--deprecated: weapon_dmgbonus has been replaced with weapon_attackdmgbonus-->
             <input type="hidden" name="attr_weapon_dmgbonus" value="0" />
+            <input type="hidden" name="attr_weapon_weight" value="0" />
+            <input type="hidden" name="attr_weapon_cost" value="0" />
           </div>
           <details class="border-bottom-half">
             <summary>
@@ -2413,14 +2409,14 @@
                       <option value="0">0</option>
                     </select>
                   </label>
+                  <input type="checkbox" class="hidden toggle-input-error" name="attr_equipment_armor_magic_error" value="1" checked />
                   <label>
                     <span>Magic</span>
-                    <input type="checkbox" class="hidden toggle-input-error" name="attr_equipment_armor_magic_error" value="1" checked />
                     <input type="text" class="width-small" name="attr_equipment_armor_magic" value="0" title="@{repeating_equipment_$X_equipment_armor_magic | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2."/>
                   </label>
+                  <input type="checkbox" class="hidden toggle-input-error" name="attr_equipment_armor_mod_error" value="1" checked />
                   <label>
                     <span>Misc</span>
-                    <input type="checkbox" class="hidden toggle-input-error" name="attr_equipment_armor_mod_error" value="1" checked />
                     <input type="text" class="width-small" name="attr_equipment_armor_mod" value="0" title="@{repeating_equipment_$X_equipment_armor_mod | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
                   </label>
                   <label>
@@ -2466,14 +2462,14 @@
           <input type="text" class="width-fill" name="attr_total_equipment_weight" title="@{total_equipment_weight}" value="0" readonly />
           <input type="text" class="width-fill toggle-costs" name="attr_total_equipment_cost" title="@{total_equipment_cost}" value="0" readonly />
 
-          <!-- HIDDEN BECAUSE ARMOR IS NOW INCLUDED IN EQUIPMENT CALCS -->
+          <!-- HIDDEN BECAUSE ARMOR and Weapons are NOW INCLUDED IN EQUIPMENT CALCS -->
           <label class="hidden">Armor:</label>
-          <input type="text" class="hidden width-fill" name="attr_total_armor_weight" title="@{total_armor_weight}" value="0" readonly />
-          <input type="text" class="hidden width-fill toggle-costs" name="attr_total_armor_cost" title="@{total_armor_cost}" value="0" readonly />
+          <input type="text" class="hidden width-fill" name="attr_total_armor_weight" value="0" readonly />
+          <input type="text" class="hidden width-fill toggle-costs" name="attr_total_armor_cost" value="0" readonly />
+          <label class="hidden">Weapons:</label>
+          <input type="text" class="hidden width-fill" name="attr_total_weapon_weight" value="0" readonly />
+          <input type="text" class="hidden width-fill toggle-costs" name="attr_total_weapon_cost" value="0" readonly />
 
-          <label>Weapons:</label>
-          <input type="text" class="width-fill" name="attr_total_weapon_weight" title="@{total_weapon_weight}" value="0" readonly />
-          <input type="text" class="width-fill toggle-costs" name="attr_total_weapon_cost" title="@{total_weapon_cost}" value="0" readonly />
           <label>Coins:</label>
           <input type="text" class="width-fill" name="attr_total_coin_weight" title="@{total_coin_weight}" value="0" readonly />
           <label class="width-fill toggle-costs">---</label>
@@ -3315,8 +3311,8 @@
       <div class="header">SETTINGS</div><span class="material-icons"></span>
       <div class="settings sect">
         <span class="inline-label">
-          <label style="width:14em;" title="Choose a background or color scheme. Only the 'Default' scheme is compatible with roll20's dark mode option.">
-            <span>Background:</span>
+          <h4>Background:</h4>
+          <label style="width:auto;" title="Choose a background or color scheme. Only the 'Default' scheme is compatible with roll20's dark mode option.">
             <select class="background-selection field-select width-fill" name="attr_background" title="@{background}">
               <option value="1" default>White</option>
               <option value="2">Parchment</option>
@@ -3349,8 +3345,8 @@
           </label>
         </span>
         <span class="inline-label width-fill">
-          <label style="min-width: 13em; width: auto;">
-            <span class="stack-text">Sheet Image:</span>
+          <h4 class="stack-text">Sheet Image:</h4>
+          <label style="width: auto;">
             <select class="field-select" name="attr_sheet_image" title="@{sheet_image}">
               <option value="1" selected>Use Avatar</option>
               <option value="0">Use URL</option>
@@ -3362,8 +3358,8 @@
           </label>
         </span>
         <span class="inline-label width-fill">
-          <label style="width:10em;">
-            <span class="stack-text">Surprise die:</span>
+          <h4 class="stack-text">Surprise die:</h4>
+          <label style="width:auto;">
             <select name="attr_surprise_die" class="field-select width-small" title="@{surprise_die}">
               <option value="6" selected>1d6</option>
               <option value="8">1d8</option>
@@ -3381,8 +3377,8 @@
             <textarea class="height-half" name="attr_surprise_macro_text" title="@{surprise_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Surprise 1-?{Surprised on?(enter upper limit)|@{surprise}} on 1d@{surprise_die}}} {{roll=[[ 1d@{surprise_die}cf&lt;?{Surprised on?(enter upper limit)|@{surprise}}cs&gt;?{Surprised on?(enter upper limit)|@{surprise}} ]] }} {{Surprise Others Adj: [[ @{surprise_others_mod} ]]}} {{Segment Adjustments}} {{encumbrance_adjustment=[[ {(@{current_encumbrance}-1),0}kh1 ]]}} {{dex_adjustment=[[ @{surprisebonus} ]]}}</textarea>
         </span>
         <span class="inline-label width-fill"">
-          <label style="width:10em;">
-            <span class="stack-text">Initiative die:</span>
+          <h4 class="stack-text">Initiative die:</h4>
+          <label style="width:auto;">
             <select name="attr_initiative_die" class="field-select width-small" title="@{initiative_die}">
               <option value="6" selected>1d6</option>
               <option value="8">1d8</option>
@@ -3416,39 +3412,39 @@
         </span>
         <span class="six-columns">
           <h4 style="grid-row: 1/3; justify-self: left;">Hide Areas:</h4>
-          <label>
+          <label class="inline-label">
             <span>Thief Skills:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_thief_skills" value="1" title="@{toggle_thief_skills}" checked />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Spells:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_spells" value="1" title="@{toggle_spells}" />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Caster Class 2:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_caster2" value="1" title="@{toggle_caster2}" checked/>
           </label>
-          <label>
+          <label class="inline-label">
             <span>NWP:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_nwp" value="1" title="@{toggle_nwp}" />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Costs:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_costs" value="1" title="@{toggle_costs}" />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Exceptional:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_exceptional" value="1" title="@{toggle_exceptional}" checked />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Comeliness:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_comeliness" value="1" title="@{toggle_comeliness}" checked />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Multi-Class:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_multiclass" value="1" title="@{toggle_multiclass}" />
           </label>
-          <label>
+          <label class="inline-label">
             <span>Sheet Macros:</span>
             <input type="checkbox" class="width-small" name="attr_toggle_macros" value="1" title="@{toggle_macros}" checked />
           </label>
@@ -3470,25 +3466,30 @@
             </select>
           </label>
         </span>
-        <span class="inline-label wrap">
-          <h4>ADVANCED Options:</h4>
-          <label title="WARNING: any customization/editing that has been done on existing macro-text fields will be lost! You will not break anything by reseting. Reseting a field simply erases the existing value and forces the sheet to re-populate the field with the latest default value.">
-            <span>Reset Macros to Sheet Defaults:</span>
-            <button type="action" name="act_resetmacros" class="button reset-macros"><span>Reset Now</span></button>
-          </label>
-          <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
-            <span>Sync HP:</span>
-            <input type="checkbox" class="width-small" name="attr_sync_hp_flag" value="1" />
-            <span></span>
-          </label>
-          <label class="sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
-            <span>Sync AC:</span>
-            <input type="checkbox" class="width-small" name="attr_sync_ac_flag" value="1" />
-            <span></span>
-          </label>
-          <label title="@{autocalc_ac} | This is a persistant setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
-            <span>Auto-Calc AC:</span>
-            <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
+        <span class="eight-columns">
+          <h4 style="grid-row: 1/3; justify-self: left;">ADVANCED Options:</h4>
+          <span class="span-seven" title="WARNING: any customization/editing that has been done on existing macro-text fields will be lost! You will not break anything by reseting. Reseting a field simply erases the existing value and forces the sheet to re-populate the field with the latest default value.">
+            <button type="action" name="act_resetallmacros" class="stack-text button reset-macros"><span>Reset All</span></button>
+            <button type="action" name="act_resetweaponsmacros" class="stack-text button reset-macros"><span>Reset Weapons</span></button>
+            <button type="action" name="act_resetspellsmacros" class="stack-text button reset-macros"><span>Reset Spells</span></button>
+            <button type="action" name="act_resetabilitiesmacros" class="stack-text button reset-macros"><span>Reset Abilities</span></button>
+            <button type="action" name="act_resetnwpsmacros" class="stack-text button reset-macros"><span>Reset NWP</span></button>
+            <button type="action" name="act_resetequipmentmacros" class="stack-text button reset-macros"><span>Reset Equip</span></button>
+          </span>
+          <label></label>
+          <label class="span-four inline-label">
+            <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
+              <span>Sync HP:</span>
+              <input type="checkbox" class="width-small" name="attr_sync_hp_flag" value="1" />
+            </label>
+            <label class="sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
+              <span>Sync AC:</span>
+              <input type="checkbox" class="width-small" name="attr_sync_ac_flag" value="1" />
+            </label>
+            <label title="@{autocalc_ac} | This is a persistant setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
+              <span>Auto-Calc AC:</span>
+              <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
+            </label>
           </label>
         </span>
       </div>
@@ -3572,7 +3573,7 @@
                   </label>
                 </span>
                 <textarea name="attr_attribute_notes" class="inline-label span-all height-short" title="@{repeating_attributes_$X_attribute_notes}" placeholder="Notes"></textarea>
-                <textarea class="span-all height-short toggle-macros" name="attr_attribute_macro_text" title="@{repeating_attributes_$X_attribute_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{attribute_name}}} {{type=@{attribute_type}}} {{attribute_mod_1_name=@{attribute_mod_1_name}}} {{attribute_mod_1=@{attribute_mod_1}}} {{attribute_mod_1_max=@{attribute_mod_1|max}}} {{attribute_mod_2_name=@{attribute_mod_2_name}}} {{attribute_mod_2=@{attribute_mod_2}}} {{attribute_mod_2_max=@{attribute_mod_2|max}}} {{attribute_mod_3_name=@{attribute_mod_3_name}}} {{attribute_mod_3=@{attribute_mod_3}}} {{attribute_mod_3_max=@{attribute_mod_3|max}}} {{attribute_mod_4_name=@{attribute_mod_4_name}}} {{attribute_mod_4=@{attribute_mod_4}}} {{attribute_mod_4_max=@{attribute_mod_4|max}}} {{attribute_mod_5_name=@{attribute_mod_5_name}}} {{attribute_mod_5=@{attribute_mod_5}}} {{attribute_mod_5_max=@{attribute_mod_5|max}}} {{attribute_mod_6_name=@{attribute_mod_6_name}}} {{attribute_mod_6=@{attribute_mod_6}}} {{attribute_mod_6_max=@{attribute_mod_6|max}}} {{notes=@{attribute_notes}}} {{freetext=@{attribute_description}}}</textarea>
+                <textarea class="span-all height-short toggle-macros" name="attr_attribute_macro_text" title="@{repeating_attributes_$X_attribute_macro_text}">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{attribute_name}}} {{type=@{attribute_type}}} {{attribute_mod_1_name=@{attribute_mod_1_name}}} {{attribute_mod_1=@{attribute_mod_1}}} {{attribute_mod_1_max=@{attribute_mod_1|max}}} {{attribute_mod_2_name=@{attribute_mod_2_name}}} {{attribute_mod_2=@{attribute_mod_2}}} {{attribute_mod_2_max=@{attribute_mod_2|max}}} {{attribute_mod_3_name=@{attribute_mod_3_name}}} {{attribute_mod_3=@{attribute_mod_3}}} {{attribute_mod_3_max=@{attribute_mod_3|max}}} {{attribute_mod_4_name=@{attribute_mod_4_name}}} {{attribute_mod_4=@{attribute_mod_4}}} {{attribute_mod_4_max=@{attribute_mod_4|max}}} {{attribute_mod_5_name=@{attribute_mod_5_name}}} {{attribute_mod_5=@{attribute_mod_5}}} {{attribute_mod_5_max=@{attribute_mod_5|max}}} {{attribute_mod_6_name=@{attribute_mod_6_name}}} {{attribute_mod_6=@{attribute_mod_6}}} {{attribute_mod_6_max=@{attribute_mod_6|max}}} {{notes=@{attribute_notes}}} {{link=@{attribute_link}}} {{freetext=@{attribute_description}}}</textarea>
               </span>
             </div>
           </fieldset>
@@ -4398,6 +4399,19 @@
     'armorother6_magic',
     'armorother6_mod',
   ];
+
+  // generate a unique ID 100 % of the time
+  const uniqueids = {};
+  const generateUniqueRowID = function () {
+    let generated = generateRowID();
+    while (uniqueids[generated] === true) {
+      clog(`generateUniqueRowID: ${generated} is not a unique ID, trying again.`);
+      generated = generateRowID();
+    }
+    clog(`generateUniqueRowID: ${generated} verified as unique, returning.`);
+    uniqueids[generated] = true;
+    return generated;
+  };
 
   // use in getSectionIds to separate repeating attribute names
   const section_attribute = (section, id, field) => `repeating_${section}_${id}_${field}`;
@@ -5428,7 +5442,7 @@
             // clog(`repeating Armor exists armor1:${newID}`);
           } else if (armortype1_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armortype1_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
@@ -5485,7 +5499,7 @@
             // clog(`repeating Armor exists armor2:${newID}`);
           } else if (armortype2_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armortype2_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
@@ -5543,7 +5557,7 @@
             // clog(`repeating Armor exists shield:${newID}`);
           } else if (armorshield_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorshield_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
@@ -5601,7 +5615,7 @@
             // clog(`repeating Armor exists helmet:${newID}`);
           } else if (armorhelmet_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorhelmet_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
@@ -5653,7 +5667,7 @@
             // clog(`repeating Armor exists other1:${newID}`);
           } else if (armorother1_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorother1_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
@@ -5706,7 +5720,7 @@
             // clog(`repeating Armor exists other2:${newID}`);
           } else if (armorother2_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorother2_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
@@ -5759,7 +5773,7 @@
             // clog(`repeating Armor exists other3:${newID}`);
           } else if (armorother3_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorother3_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
@@ -5812,7 +5826,7 @@
             // clog(`repeating Armor exists other4:${newID}`);
           } else if (armorother4_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorother4_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
@@ -5865,7 +5879,7 @@
             // clog(`repeating Armor exists other5:${newID}`);
           } else if (armorother5_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorother5_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
@@ -5918,7 +5932,7 @@
             // clog(`repeating Armor exists other6:${newID}`);
           } else if (armorother6_ID.length === 1) {
             // No name && Has id = CREATE NEW ROW
-            newID = generateRowID();
+            newID = generateUniqueRowID();
             output.armorother6_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
@@ -6150,13 +6164,35 @@
     });
   };
 
-  // FUTURE
-  const syncWeapons = () => {
+  // One-time update: migrate Weapon weight and cost to repeating_equipment
+  const clearWeaponsWeightCost = () => {
+    // clear old weapon weight and cost values
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const output = {};
+      const fields = [];
+      idArray.forEach((id) => {
+        fields.push(section_attribute('weapon', id, 'weapon_quantity'));
+        fields.push(section_attribute('weapon', id, 'weapon_weight'));
+        fields.push(section_attribute('weapon', id, 'weapon_cost'));
+      });
+      getAttrs(fields, (v) => {
+        idArray.forEach((id) => {
+          output[section_attribute('weapon', id, 'weapon_quantity')] = +v[section_attribute('weapon', id, 'weapon_quantity')] || 0;
+          output[section_attribute('weapon', id, 'weapon_weight')] = 0;
+          output[section_attribute('weapon', id, 'weapon_cost')] = 0;
+          clog(`CLEARED OLD WEAPON WEIGHT AND COST`);
+        });
+        setAttrs(output);
+      });
+    });
+  };
+
+  const migrateWeaponWeightCostFunction = () => {
     getSectionIDs('repeating_weapon', (weaponsArray) => {
       getSectionIDs('repeating_equipment', (equipmentArray) => {
         const output = {};
-        const weaponFields = {};
-        const equipmentFields = {};
+        const weaponFields = [];
+        const equipmentFields = [];
         const fields = [...weaponFields, ...equipmentFields];
         weaponsArray.forEach((id) => {
           fields.push(section_attribute('weapon', id, 'weapon_name'));
@@ -6164,35 +6200,99 @@
           fields.push(section_attribute('weapon', id, 'weapon_weight'));
           fields.push(section_attribute('weapon', id, 'weapon_cost'));
         });
-        equipmentArray.forEach((id) => {
-          fields.push(section_attribute('equipment', id, 'equipment_item'));
-          fields.push(section_attribute('equipment', id, 'equipment_quantity'));
-          fields.push(section_attribute('equipment', id, 'equipment_weight'));
-          fields.push(section_attribute('equipment', id, 'equipment_cost'));
+        equipmentArray.forEach((idEquip) => {
+          fields.push(section_attribute('equipment', idEquip, 'equipment_item'));
+          fields.push(section_attribute('equipment', idEquip, 'equipment_quantity'));
+          fields.push(section_attribute('equipment', idEquip, 'equipment_weight'));
+          fields.push(section_attribute('equipment', idEquip, 'equipment_cost'));
         });
         getAttrs(fields, (v) => {
+          const equipmentNamesArray = [];
+          const equipmentWeightsArray = [];
+          const equipmentCostsArray = [];
+          const equipmentIdsArray = [];
+          let newID = '';
           weaponsArray.forEach((id) => {
-            const weaponName = v[section_attribute('weapon', id, 'weapon_cost')];
-            const weaponQuantity = v[section_attribute('weapon', id, 'weapon_cost')];
-            const weaponWeight = v[section_attribute('weapon', id, 'weapon_cost')];
+            const weaponName = v[section_attribute('weapon', id, 'weapon_name')];
+            const weaponQuantity = v[section_attribute('weapon', id, 'weapon_quantity')];
+            const weaponWeight = v[section_attribute('weapon', id, 'weapon_weight')];
             const weaponCost = v[section_attribute('weapon', id, 'weapon_cost')];
+            equipmentArray.forEach((idEquip) => {
+              const equipmentId = idEquip;
+              equipmentIdsArray.push(equipmentId); // Push each equipmentName value into the array
+              const equipmentName = v[section_attribute('equipment', idEquip, 'equipment_item')];
+              equipmentNamesArray.push(equipmentName); // Push each equipmentName value into the array
+              const equipmentWeight = v[section_attribute('equipment', idEquip, 'equipment_weight')];
+              equipmentWeightsArray.push(equipmentWeight); // Push each equipmentWeight value into the array
+              const equipmentCost = v[section_attribute('equipment', idEquip, 'equipment_cost')];
+              equipmentCostsArray.push(equipmentCost); // Push each equipmentCost value into the array
+            });
+            // test weapon name against equipment names
+            // create a new row, update existing row, or ignore?
+            // zero out weapon row weight and cost
+            if (weaponWeight !== 0 || weaponCost !== 0) {
+              clog(`weaponName:${weaponName} weaponWeight:${weaponWeight} weaponCost:${weaponCost}`);
+              const nameIndex = equipmentNamesArray.indexOf(weaponName);
+              if (nameIndex === -1) {
+                clog(`NO MATCH || COPY TO NEW ROW ||`);
+                newID = generateUniqueRowID();
+                output[`repeating_equipment_${newID}_equipment_type`] = 1;
+                output[`repeating_equipment_${newID}_equipment_item`] = weaponName;
+                output[`repeating_equipment_${newID}_equipment_quantity`] = weaponQuantity;
+                output[`repeating_equipment_${newID}_equipment_quantity_max`] = weaponQuantity;
+                output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
+                output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
+              } else if (equipmentWeightsArray[nameIndex] === '0' && equipmentCostsArray[nameIndex] === '0') {
+                // weight & cost are being tracked on weapons
+                clog(
+                  `MATCH w/weight & cost tracked on weapons. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`
+                );
+                newID = equipmentIdsArray[nameIndex];
+                output[`repeating_equipment_${newID}_equipment_type`] = 1;
+                output[`repeating_equipment_${newID}_equipment_quantity`] = weaponQuantity;
+                output[`repeating_equipment_${newID}_equipment_quantity_max`] = weaponQuantity;
+                output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
+                output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
+              } else if (equipmentWeightsArray[nameIndex] !== '0' && equipmentCostsArray[nameIndex] === '0') {
+                // weight is being tracked on equipment but costs are not
+                clog(
+                  `MATCH w/weight tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`
+                );
+                newID = equipmentIdsArray[nameIndex];
+                output[`repeating_equipment_${newID}_equipment_type`] = 1;
+                output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
+              } else if (equipmentWeightsArray[nameIndex] === '0' && equipmentCostsArray[nameIndex] !== '0') {
+                // weight is not being tracked on equipment but costs are
+                clog(
+                  `MATCH w/cost tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`
+                );
+                newID = equipmentIdsArray[nameIndex];
+                output[`repeating_equipment_${newID}_equipment_type`] = 1;
+                output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
+              } else if (equipmentWeightsArray[nameIndex] !== '0' && equipmentCostsArray[nameIndex] !== '0') {
+                clog(
+                  `100% MATCH weight & cost tracked on equipment. || IGNORE ROW || name:${weaponName} weight: ${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex}`
+                );
+              } else {
+                clog(`No attribute data to migrate. || IGNORE ROW ||`);
+              }
+            }
           });
-          equipmentArray.forEach((id) => {
-            const equipmentName = v[section_attribute('equipment', id, 'equipment_cost')];
-            const equipmentQuantity = v[section_attribute('equipment', id, 'equipment_cost')];
-            const equipmentWeight = v[section_attribute('equipment', id, 'equipment_cost')];
-            const equipmentCost = v[section_attribute('equipment', id, 'equipment_cost')];
-          });
-          setAttrs(output, {silent: true});
+          setAttrs(
+            output,
+            {
+              silent: true,
+            },
+            clearWeaponsWeightCost()
+          );
         });
       });
     });
   };
 
-  // FUTURE
   const migrateWeaponWeightCost = (current_version, final_version) => {
     const output = {};
-    // do something
+    migrateWeaponWeightCostFunction();
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: setWeaponsUpdate completed.`);
     setAttrs(
@@ -6320,6 +6420,8 @@
       setEquipmentUpdate(1.644, final_version);
     } else if (current_version < 1.645) {
       setWeaponsUpdate(1.645, final_version);
+    } else if (current_version < 1.646) {
+      migrateWeaponWeightCost(1.646, final_version);
       // all updates completed
     } else if (current_version < final_version) {
       setAttrs({
@@ -6334,7 +6436,7 @@
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
     // Set attr_sheet_version to the final_version to prevent new sheets from stepping through versionator
-    const final_version = 1.645;
+    const final_version = 1.646;
     getAttrs(['sheet_version'], (v) => {
       const current_version = float(v.sheet_version);
       clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
@@ -6375,11 +6477,12 @@
     });
   });
 
+  // weapon cost is now included with repeating_equipment
   // Weapon Cost
-  on('change:repeating_weapon:weapon_cost change:repeating_weapon:weapon_quantity remove:repeating_weapon', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    repeatingSum('total_weapon_cost', 'weapon', ['weapon_cost', 'weapon_quantity']);
-  });
+  // on('change:repeating_weapon:weapon_cost change:repeating_weapon:weapon_quantity remove:repeating_weapon', (eventInfo) => {
+  //   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  //   repeatingSum('total_weapon_cost', 'weapon', ['weapon_cost', 'weapon_quantity']);
+  // });
 
   // Equipment Cost
   on('change:repeating_equipment:equipment_cost change:repeating_equipment:equipment_quantity remove:repeating_equipment', (eventInfo) => {
@@ -6393,8 +6496,11 @@
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       getAttrs(['total_armor_cost', 'total_weapon_cost', 'total_equipment_cost'], (v) => {
+        const total_armor_cost = 0; // armor and weapon costs are now included with repeating_equipment
+        const total_weapon_cost = 0; // armor and weapon costs are now included with repeating_equipment
         setAttrs({
-          total_cost: (float(v.total_armor_cost) + float(v.total_weapon_cost) + float(v.total_equipment_cost) - float(v.total_equipment_cost_mount)).toFixed(2),
+          // total_cost: (float(v.total_armor_cost) + float(v.total_weapon_cost) + float(v.total_equipment_cost) - float(v.total_equipment_cost_mount)).toFixed(2),
+          total_cost: (float(total_armor_cost) + float(total_weapon_cost) + float(v.total_equipment_cost) - float(v.total_equipment_cost_mount)).toFixed(2),
         });
       });
     }
@@ -6432,11 +6538,12 @@
     }
   );
 
+  // weapon weight is now included with repeating_equipment
   // Weapon Weight
-  on('change:repeating_weapon:weapon_weight change:repeating_weapon:weapon_quantity remove:repeating_weapon', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    repeatingSum('total_weapon_weight', 'weapon', ['weapon_weight', 'weapon_quantity']);
-  });
+  // on('change:repeating_weapon:weapon_weight change:repeating_weapon:weapon_quantity remove:repeating_weapon', (eventInfo) => {
+  //   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  //   repeatingSum('total_weapon_weight', 'weapon', ['weapon_weight', 'weapon_quantity']);
+  // });
 
   // Equipment Weight
   on(
@@ -6463,8 +6570,11 @@
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       getAttrs(['total_armor_weight', 'total_weapon_weight', 'total_coin_weight', 'total_equipment_weight'], (v) => {
+        const total_armor_weight = 0; // armor and weapon weight are now included with repeating_equipment
+        const total_weapon_weight = 0; // armor and weapon weight are now included with repeating_equipment
         setAttrs({
-          total_weight: Math.round(float(v.total_armor_weight) + float(v.total_weapon_weight) + float(v.total_coin_weight) + float(v.total_equipment_weight)),
+          // total_weight: Math.round(float(v.total_armor_weight) + float(v.total_weapon_weight) + float(v.total_coin_weight) + float(v.total_equipment_weight)),
+          total_weight: Math.round(total_armor_weight + total_weapon_weight + float(v.total_coin_weight) + float(v.total_equipment_weight)),
         });
       });
     }
@@ -7827,23 +7937,23 @@
               const equipmentRows = equipmentID.length;
               const spellsRows = spellsID.length;
               if (weaponRows === 0) {
-                const newrowid = generateRowID();
+                const newrowid = generateUniqueRowID();
                 output[`repeating_weapon_${newrowid}_weapon_value`] = 1;
               }
               if (abilityRows === 0) {
-                const newrowid = generateRowID();
+                const newrowid = generateUniqueRowID();
                 output[`repeating_ability_${newrowid}_ability_value`] = 1;
               }
               if (nwpRows === 0) {
-                const newrowid = generateRowID();
+                const newrowid = generateUniqueRowID();
                 output[`repeating_nonweaponproficiencies_${newrowid}_nwp_value`] = 1;
               }
               if (equipmentRows === 0) {
-                const newrowid = generateRowID();
+                const newrowid = generateUniqueRowID();
                 output[`repeating_equipment_${newrowid}_equipment_value`] = 1;
               }
               if (spellsRows === 0) {
-                const newrowid = generateRowID();
+                const newrowid = generateUniqueRowID();
                 output[`repeating_spells_${newrowid}_spell_value`] = 1;
               } else {
                 return;
@@ -7857,9 +7967,14 @@
   });
 
   // Reset Macros to default
-  on('clicked:resetmacros', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    // clog('reset macros detected');
+  on('clicked:resetallmacros clicked:resetequipmentmacros clicked:resetweaponsmacros clicked:resetabilitiesmacros clicked:resetnwpsmacros clicked:resetspellsmacros', (eventInfo) => {
+    const eventTrigger = eventInfo.triggerName;
+    // Use a regular expression to match and capture the word after "clicked:"
+    const match = eventTrigger.match(/clicked:(\w+)/);
+    // Check if there is a match and extract the captured word
+    const clickedWord = match ? match[1] : null;
+    // clog(`Change Detected:${JSON.stringify(eventInfo)}`);
+    // clog(`reset macros detected: ${clickedWord}`);
     getSectionIDs('repeating_equipment', (idequipment) => {
       getSectionIDs('repeating_weapon', (idweapons) => {
         getSectionIDs('repeating_ability', (idabilities) => {
@@ -7891,44 +8006,56 @@
               getAttrs(
                 ['surprise_macro_text', 'init_macro_text', ...attrsEquipment, ...attrsAttackspecial, ...attrsAttack, ...attrsWeapon, ...attrsAbility, ...attrsNWP, ...attrsSpells],
                 (v) => {
-                  if (v.surprise_macro_text) {
-                    output.surprise_macro_text = '';
-                    // clog(`macro reset completed on: surprise`);
+                  if (clickedWord === 'resetallmacros') {
+                    if (v.surprise_macro_text) {
+                      output.surprise_macro_text = '';
+                      // clog(`macro reset completed on: surprise`);
+                    }
+                    if (v.init_macro_text) {
+                      output.init_macro_text = '';
+                      // clog(`macro reset completed on: initiative`);
+                    }
                   }
-                  if (v.init_macro_text) {
-                    output.init_macro_text = '';
-                    // clog(`macro reset completed on: initiative`);
+                  if (clickedWord === 'resetallmacros' || clickedWord === 'resetequipmentmacros') {
+                    _.each(idequipment, (id) => {
+                      if (v[`repeating_equipment_${id}_equipment_macro_text`]) {
+                        output[`repeating_equipment_${id}_equipment_macro_text`] = '';
+                        // clog(`macro reset completed on: ${attrsEquipment}`);
+                      }
+                    });
                   }
-                  _.each(idequipment, (id) => {
-                    if (v[`repeating_equipment_${id}_equipment_macro_text`]) {
-                      output[`repeating_equipment_${id}_equipment_macro_text`] = '';
-                      // clog(`macro reset completed on: ${attrsEquipment}`);
-                    }
-                  });
-                  _.each(idweapons, (id) => {
-                    if (v[`repeating_weapon_${id}_weapon_macro_text`]) {
-                      output[`repeating_weapon_${id}_weapon_macro_text`] = '';
-                      // clog(`macro reset completed on: ${attrsWeapon}`);
-                    }
-                  });
-                  _.each(idabilities, (id) => {
-                    if (v[`repeating_ability_${id}_ability_macro_text`]) {
-                      output[`repeating_ability_${id}_ability_macro_text`] = '';
-                      // clog(`macro reset completed on: ${attrsAbility}`);
-                    }
-                  });
-                  _.each(idnwps, (id) => {
-                    if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`]) {
-                      output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
-                      // clog(`macro reset completed on: ${attrsNWP}`);
-                    }
-                  });
-                  _.each(idspells, (id) => {
-                    if (v[`repeating_spells_${id}_spell_macro_text`]) {
-                      output[`repeating_spells_${id}_spell_macro_text`] = '';
-                      // clog(`macro reset completed on: ${attrsSpells}`);
-                    }
-                  });
+                  if (clickedWord === 'resetallmacros' || clickedWord === 'resetweaponsmacros') {
+                    _.each(idweapons, (id) => {
+                      if (v[`repeating_weapon_${id}_weapon_macro_text`]) {
+                        output[`repeating_weapon_${id}_weapon_macro_text`] = '';
+                        // clog(`macro reset completed on: ${attrsWeapon}`);
+                      }
+                    });
+                  }
+                  if (clickedWord === 'resetallmacros' || clickedWord === 'resetabilitiesmacros') {
+                    _.each(idabilities, (id) => {
+                      if (v[`repeating_ability_${id}_ability_macro_text`]) {
+                        output[`repeating_ability_${id}_ability_macro_text`] = '';
+                        // clog(`macro reset completed on: ${attrsAbility}`);
+                      }
+                    });
+                  }
+                  if (clickedWord === 'resetallmacros' || clickedWord === 'resetnwpsmacros') {
+                    _.each(idnwps, (id) => {
+                      if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`]) {
+                        output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
+                        // clog(`macro reset completed on: ${attrsNWP}`);
+                      }
+                    });
+                  }
+                  if (clickedWord === 'resetallmacros' || clickedWord === 'resetspellsmacros') {
+                    _.each(idspells, (id) => {
+                      if (v[`repeating_spells_${id}_spell_macro_text`]) {
+                        output[`repeating_spells_${id}_spell_macro_text`] = '';
+                        // clog(`macro reset completed on: ${attrsSpells}`);
+                      }
+                    });
+                  }
                   setAttrs(output, {
                     silent: true,
                   });
