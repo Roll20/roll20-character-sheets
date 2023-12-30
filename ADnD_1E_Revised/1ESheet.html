@@ -52,7 +52,7 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">12/28/23'</label>
+              <label class="right">12/29/23'</label>
             </span>
           </h4>
           <ul>
@@ -3479,10 +3479,12 @@
             <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
               <span>Sync HP:</span>
               <input type="checkbox" class="width-small" name="attr_sync_hp_flag" value="1" />
+              <span></span>
             </label>
             <label class="sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
               <span>Sync AC:</span>
               <input type="checkbox" class="width-small" name="attr_sync_ac_flag" value="1" />
+              <span></span>
             </label>
             <label title="@{autocalc_ac} | This is a persistant setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
               <span>Auto-Calc AC:</span>
@@ -6455,33 +6457,6 @@
     });
   });
 
-  // Armor Cost
-  on('change:armor_cost change:armortype2_cost change:armorshield_cost change:armorhelmet_cost', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    // clog('Armor Costs re-calculated');
-    getAttrs(['armor_cost', 'armortype2_cost', 'armorshield_cost', 'armorhelmet_cost'], (v) => {
-      const output = {};
-      const armor_cost = +v.armor_cost || 0;
-      const armorType2_cost = +v.armortype2_cost || 0;
-      const armorShield_cost = +v.armorshield_cost || 0;
-      const armorHelmet_cost = +v.armorhelmet_cost || 0;
-      const armorCost = float(armor_cost + armorType2_cost + armorShield_cost + armorHelmet_cost).toFixed(2);
-      // CAN BE CONVERTED TO USE repeating_equipment Armor in order to display Armor cost as sub-total
-      // ARMOR COST IS NOW INCLUDED IN EQUIPMENT CALCS
-      // SETTING ARMOR WEIGHT TO 0
-      // output.total_armor_cost = armorCost;
-      output.total_armor_cost = 0;
-      setAttrs(output);
-    });
-  });
-
-  // weapon cost is now included with repeating_equipment
-  // Weapon Cost
-  // on('change:repeating_weapon:weapon_cost change:repeating_weapon:weapon_quantity remove:repeating_weapon', (eventInfo) => {
-  //   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  //   repeatingSum('total_weapon_cost', 'weapon', ['weapon_cost', 'weapon_quantity']);
-  // });
-
   // Equipment Cost
   on('change:repeating_equipment:equipment_cost change:repeating_equipment:equipment_quantity remove:repeating_equipment', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
@@ -6489,20 +6464,14 @@
   });
 
   // Total Cost
-  on(
-    'sheet:opened change:repeating_equipment remove:repeating_equipment change:repeating_weapon remove:repeating_weapon change:total_armor_cost change:total_weapon_cost change:total_equipment_cost',
-    (eventInfo) => {
-      // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-      getAttrs(['total_armor_cost', 'total_weapon_cost', 'total_equipment_cost'], (v) => {
-        const total_armor_cost = 0; // armor and weapon costs are now included with repeating_equipment
-        const total_weapon_cost = 0; // armor and weapon costs are now included with repeating_equipment
-        setAttrs({
-          // total_cost: (float(v.total_armor_cost) + float(v.total_weapon_cost) + float(v.total_equipment_cost) - float(v.total_equipment_cost_mount)).toFixed(2),
-          total_cost: (float(total_armor_cost) + float(total_weapon_cost) + float(v.total_equipment_cost) - float(v.total_equipment_cost_mount)).toFixed(2),
-        });
+  on('sheet:opened change:repeating_equipment remove:repeating_equipment change:total_equipment_cost', (eventInfo) => {
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    getAttrs(['total_equipment_cost'], (v) => {
+      setAttrs({
+        total_cost: float(v.total_equipment_cost).toFixed(2),
       });
-    }
-  );
+    });
+  });
 
   // Armor Weight
   on(
@@ -6857,9 +6826,13 @@
         const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
         const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
         const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
-        const carried = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+        let carried = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
         const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
         const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
+        // armor in use should always be considered as carried
+        if (worn === 1 && carried !== 1) {
+          carried = 1;
+        }
         const thisLog = [
           `ID:${id} ITEM:${item} TYPE:${type} WORN:${worn} AC:${ac} BASE:${base} MAGIC:${magic} MOD:${mod} BULK:${bulk} CARRIED:${carried} WEIGHT:${weight} COST:${cost} UPDATED:`,
         ];
@@ -7049,7 +7022,7 @@
 
   // sync Repeating_Equipment Armor to Armor Details rows
   on(
-    'change:repeating_equipment:equipment_item change:repeating_equipment:equipment_armor_worn change:repeating_equipment:equipment_armor_ac change:repeating_equipment:equipment_armor_base change:repeating_equipment:equipment_armor_magic change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_bulk',
+    'change:repeating_equipment:equipment_item change:repeating_equipment:equipment_armor_worn change:repeating_equipment:equipment_armor_ac change:repeating_equipment:equipment_armor_base change:repeating_equipment:equipment_armor_magic change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_bulk change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_cost',
     (eventInfo) => {
       const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
       if (eventInfo.sourceType === 'sheetworker') return;
@@ -7071,6 +7044,7 @@
   on('clicked:repeating_equipment:addarmor', (eventInfo) => {
     const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
     // clog(`sourceAttribute id: ${id}`);
+    // callback to run removeEmptyArmorRows()
     fillArmorDetails(id, () => {
       removeEmptyArmorRows();
     });
