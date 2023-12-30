@@ -748,7 +748,7 @@ wiz1['Sleep'] = {
     'reference': 'p. 178',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 825',
-    'errata': 'Sage Advice #245 p. 17\nSage Advice #273 p. 114',
+    'errata': 'Sage Advice #177 p. 54\nSage Advice #245 p. 17\nSage Advice #273 p. 114',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -768,6 +768,7 @@ wiz1['Spider Climb'] = {
     'reference': 'p. 179',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 855',
+    'errata': 'Sage Advice #163 p. 105',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -828,6 +829,7 @@ wiz1['Tenser\'s Floating Disc'] = {
     'reference': 'p. 179',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 930',
+    'errata': 'Sage Advice #240 p. 12+14\nSage Advice #247 p. 20+22',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -847,11 +849,11 @@ wiz1['Unseen Servant'] = {
     'reference': 'p. 180',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 972',
-    'errata': 'Dungeon Master Option: High-Level Campaigns p. 75',
+    'errata': 'Sage Advice #261 p. 10\nDungeon Master Option: High-Level Campaigns p. 75',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *unseen servant* is an non-visible, mindless, and shapeless force, used to step and fetch, open unstuck doors, and hold chairs, as well as to clean and mend. It is not strong, but unfailingly obeys the command of the wizard. It can perform only one activity at a time and can move only lightweight items, carrying a maximum of 20 pounds or push or pull 40 pounds across a smooth surface. It can open only normal doors, drawers, lids, etc. The *unseen servant* cannot fight, nor can it be killed, as it is a force rather than a creature. It can be magically dispelled, or eliminated after receiving 6 points of damage from area-effect spells, breath weapons, or similar attacks. If the caster attempts to send it beyond the allowed radius, the spell ends immediately.\n\n&emsp;The *unseen servant* does not have any sense or powers of reason. It is incapable of any action except following its instructions to the letter. Thus, while it can be sent to the bottom of a pool to grab whatever objects it encounters, it cannot be directed to grab any gems or coins it might find.\n&emsp;A *permanent unseen servant* always hovers within 30 feet of the caster. If destroyed, it reforms in 2d10 rounds.\n&emsp;A *permanent unseen servant* can be cast on an area and instructed to endlessly perform a single task, such as forever cleaning a room. Once a task is set, it cannot be changed.'
+    'effect': 'The *unseen servant* is an non-visible, mindless, and shapeless force, used to step and fetch, open unstuck doors, and hold chairs, as well as to clean and mend. It is not strong, but unfailingly obeys the command of the wizard. It can perform only one activity at a time and can move only lightweight items, carrying a maximum of 20 pounds or push or pull 40 pounds across a smooth surface. It can open only normal doors, drawers, lids, etc. The *unseen servant* cannot fight, nor can it be killed, as it is a force rather than a creature. It can be magically dispelled, or eliminated after receiving 6 points of damage from area-effect spells, breath weapons, or similar attacks. If the caster attempts to send it beyond the allowed radius, the spell ends immediately.\n&emsp;The *unseen servant* does not have any sense or powers of reason. It is incapable of any action except following its instructions to the letter. Thus, while it can be sent to the bottom of a pool to grab whatever objects it encounters, it cannot be directed to grab any gems or coins it might find.\n&emsp;**Permanency:** The permanent version of this spell creates an invisible servant that always hovers within 30 feet of the caster. If destroyed, it reforms in 2d10 rounds.\n&emsp;**Permanency (Optional):** A permanent *unseen servant* can be cast on an area and instructed to endlessly perform a single task, such as forever cleaning a room. Once a task is set, it cannot be changed.'
 };
 
 wiz1['Ventriloquism'] = {
