@@ -969,7 +969,7 @@ wiz2['Blindness'] = {
     'reference': 'p. 181',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 96',
-    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #256 p. 28',
+    'errata': 'Player’s Handbook p. 168\nDungeon Master Guide p. 139+160\nSage Advice #201 p. 45\nSage Advice #256 p. 28\nSage Advice #260 p. 23',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -1011,11 +1011,11 @@ wiz2['Continual Light'] = {
     'reference': 'p. 181',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 175',
-    'errata': 'Dungeon Master Guide p. 139+160\nSage Advice #172 p. 90\nSage Advice #256 p. 28\nSage Advice #265 p. 24\nDungeon Master Option: High-Level Campaigns p. 70',
+    'errata': 'Player’s Handbook p. 168\nDungeon Master Guide p. 139+160\nSage Advice #153 p. 7\nSage Advice #172 p. 90\nSage Advice #201 p. 45\nSage Advice #256 p. 28\nSage Advice #260 p. 23\nSage Advice #265 p. 24\nDungeon Master Option: High-Level Campaigns p. 70',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures who suffer penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, it can be cast into the air, onto an object, or at a creature. When cast at a creature, the target gets a saving throw vs. spell; success indicates that the spell affects the space about 1 foot behind the creature instead. Note that this spell can also blind a creature if it is successfully cast upon the creature’s visual organs. If the spell is cast on a small object that is then placed in a light-proof covering, the spell’s effects are blocked until the covering is removed.\n&emsp;A *continual light* brought into an area of magical darkness (or vice versa) is temporarily negated so that the otherwise prevailing light conditions exist in the overlapping areas of effect. A direct casting of *continual light* against a similar or weaker magical darkness cancels both. The wizard’s version of *continual light* cannot be reversed to create magical darkness.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in the typical campaign. Extremely hard and expensive materials can last hundreds or even thousands of years.}}{{blindness=1'
+    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures who suffer penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, it can be cast into the air, onto an object, or at a creature. When cast at a creature, the target gets a saving throw vs. spell; success indicates that the spell affects the space about 1 foot behind the creature instead. Note that this spell can also blind a creature if it is successfully cast upon the creature’s visual organs. If the spell is cast on a small object that is then placed in a light-proof covering, the spell’s effects are blocked until the covering is removed.\n&emsp;A *continual light* brought into an area of magical darkness (or vice versa) is temporarily negated so that the otherwise prevailing light conditions exist in the overlapping areas of effect. If multiple *continual lights* are brought into an area of magical darkness, only one *continual light* will go out per magical darkness effect and the remaining will work as normal. A direct casting of *continual light* against a similar or weaker magical darkness cancels both. The wizard’s version of *continual light* cannot be reversed to create magical darkness.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in the typical campaign. Extremely hard and expensive materials can last hundreds or even thousands of years. Perishable materials, such as most foodstuffs, will rot normally long before a *continual light* spell can affect them. Likewise, most creatures will be dust before the spell will hurt them. If an object is consumed by this spell, the spell ceases to function.}}{{blindness=1'
 };
 
 wiz2['Darkness, 15\' Radius'] = {
