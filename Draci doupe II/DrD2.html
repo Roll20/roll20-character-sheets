@@ -2047,6 +2047,7 @@
                     </div>
                     <div class="drd-flex" tabindex="-1">
                         <button type="roll" tabindex="-1" value="@{whisper_option} &{template:drd-default} @{name_option} {{character_id=@{character_id}}} {{subtitle=@{network5_name}}} {{profession=charakteristika}} {{level=@{network5_char}}} {{result=[[?{Zvol typ hodu|obyčejně, 2d6 [obyčejně]|přesně, 3d6kh2 [přesně]|nepřesně, 3d6dh1 [nepřesně]}+@{network5_char}]]}}"></button>
+                        <button class="drd-roll-flat" type="roll" tabindex="-1" value="@{whisper_option} &{template:drd-default} @{name_option} {{character_id=@{character_id}}} {{subtitle=@{network5_name}}} {{profession=bez charakteristiky}} {{level=0}} {{result=[[?{Zvol typ hodu|obyčejně, 2d6 [obyčejně]|přesně, 3d6kh2 [přesně]|nepřesně, 3d6dh1 [nepřesně]}]]}}"></button>
                         <span class="drd-hint" tabindex="-1">
                             <span class="drd-hint-text">
                                 <p><span style="font-family: 'dicefontd6'; font-size: 1.5em;">L</span> – k hodu se <b>přičte</b> charakteristika</p>
@@ -2680,67 +2681,63 @@
             });
         });
     });
-    on('change:sheet_type', function(eventInfo){
-        let prevVal = eventInfo.previousValue;
-        let newVal = eventInfo.newValue;
-        switch(newVal) {
-            case 'pc':
-                setAttrs({
-                    sheet_tab: 'pc_character'
-                }, {silent: true});
-                break;
-            case 'npc':
-                setAttrs({
-                    sheet_tab: 'npc_character'
-                }, {silent: true});
-                break;
-            default:
-                break;
-        } 
-        if(newVal != prevVal){
-        }
-    });
-
+    
     /*
-     * Tab switching
-     * https://wiki.roll20.net/CSS_Wizardry#Tabs
-     */
+    * Tab switching
+    * https://wiki.roll20.net/CSS_Wizardry#Tabs
+    */
     const tabButtons = [
-        'pc_character', 'pc_skills', 'pc_journal', 'pc_networks', 'pc_organisations', 'pc_inventory',
-        'npc_character', 'npc_journal'
+    'pc_character', 'pc_skills', 'pc_journal', 'pc_networks', 'pc_organisations', 'pc_inventory',
+    'npc_character', 'npc_journal',
+    'journal_page1', 'journal_page2', 'journal_page3', 'journal_page4', 'journal_page5',
+    'networks_page1', 'networks_page2',
+    'orgs_page1', 'orgs_page2'
     ];
     tabButtons.forEach(button => {
         on(`clicked:${button}`, function() {
+            let substring = button.substring(0, button.search(/_/));
+            let attr = '';
+            switch (substring) {
+                case 'pc':
+                case 'npc':
+                    attr = 'sheet_tab';
+                    break;
+                case 'journal':
+                    attr = 'journal_page';
+                    break;
+                case 'networks':
+                    attr = 'networks_page';
+                    break;
+                case 'orgs':
+                    attr = 'orgs_page';
+                    break;
+                default:
+                    break;
+            }
             setAttrs({
-                sheet_tab: button
+                [attr]: button
             });
         });
     });
-    const journalButtonList = ['journal_page1', 'journal_page2', 'journal_page3', 'journal_page4', 'journal_page5'];
-    journalButtonList.forEach(button => {
-        on(`clicked:${button}`, function () {
-            setAttrs({
-                journal_page: button
-            });
-        });
+    on('change:sheet_type', function(eventInfo){
+        let prevVal = eventInfo.previousValue;
+        let newVal = eventInfo.newValue;
+        let tab = '';
+        switch(newVal) {
+            case 'pc':
+                tab = 'pc_character';
+                break;
+            case 'npc':
+                tab = 'npc_character';
+                break;
+            default:
+                break;
+        }
+        setAttrs({
+            sheet_tab: tab
+        }, {silent: true});
     });
-    const networksButtonList = ['networks_page1', 'networks_page2'];
-    networksButtonList.forEach(button => {
-        on(`clicked:${button}`, function () {
-            setAttrs({
-                networks_page: button
-            });
-        });
-    });
-    const orgsButtonList = ['orgs_page1', 'orgs_page2'];
-    orgsButtonList.forEach(button => {
-        on(`clicked:${button}`, function () {
-            setAttrs({
-                orgs_page: button
-            });
-        });
-    });
-    
+
     /*
     * https://wiki.roll20.net/Building_Character_Sheets#Storing_User_Data
     * Attributes are only created after having been edited for the first time
@@ -2755,6 +2752,7 @@
                 initializeAttrs(Object.getOwnPropertyNames(v), Object.values(v));
             });
         });
+        
         getAttrs(professions, function(v){
             initializeAttrs(Object.getOwnPropertyNames(v), Object.values(v));
         });
@@ -2786,11 +2784,9 @@
         getAttrs(['group_size'], function(v) {
             showGroupCount(v.group_size);
         });
-
         getAttrs(['is_companion'], function(v) {
             showCompanionStats(v.is_companion);
         });
-
         getAttrs(['categories_shown'], function(v) {
             showCategories(toArray(v.categories_shown));
         });
@@ -2800,12 +2796,12 @@
     function prePopulateSection(sectionName, minRows, fieldName) {
         getSectionIDs(sectionName, function(idArray) {
             var currentRows = idArray.length;
-            var newrowattrs = {};
+            var newrowAttrs = {};
             for(var i = currentRows; i < minRows; i++) {
-                var newrowid = generateRowID();                
-                newrowattrs["repeating_" + sectionName + "_" + newrowid + "_" + fieldName] = 0;
+                var newRowId = generateRowID();                
+                newrowAttrs["repeating_" + sectionName + "_" + newRowId + "_" + fieldName] = 0;
             }
-            setAttrs(newrowattrs);
+            setAttrs(newrowAttrs);
         });
     }
 
@@ -2910,14 +2906,13 @@
         let newVal = parseInt(eventInfo.newValue)||0;
         workerLog(`change:${eventInfo.sourceAttribute}`, { eventInfo });
         if(newVal != prevVal) {
-            orderProfessions();
             calculateLevel();
         }
     });
     
     /* JQuery to show/hide group count */
     function showGroupCount(groupSize) {
-        if((groupSize === 'individual') || (groupSize === 'swarm')) {
+        if((groupSize == 'individual') || (groupSize == 'swarm')) {
             $20('.drd-group-count').addClass('drd-hidden');
         }else $20('.drd-group-count').removeClass('drd-hidden');
     }
@@ -2932,11 +2927,11 @@
 
     /* JQuery to show/hide companion stats */
     function showCompanionStats(isCompanion) {
-        if(isCompanion === '✗') {
+        if(isCompanion == '✗') {
             $20('.drd-companion-wage').addClass('drd-hidden');
             $20('.drd-npc-companion').addClass('drd-hidden');
             $20('.drd-companion-butt').removeClass('drd-toggled');
-        }else if(isCompanion === '✓') {
+        }else if(isCompanion == '✓') {
             $20('.drd-companion-wage').removeClass('drd-hidden');
             $20('.drd-npc-companion').removeClass('drd-hidden');
             $20('.drd-companion-butt').addClass('drd-toggled');
@@ -2999,7 +2994,6 @@
             let srcAttr = eventInfo.sourceAttribute;
             let prevVal = parseInt(eventInfo.previousValue)||0;
             let newVal = parseInt(eventInfo.newValue)||0;
-            let diff = Math.abs(newVal - prevVal);
             if(newVal != prevVal || (srcAttr.includes('current'))){
                 workerLog(`change:${srcAttr}`, { eventInfo });
                 let attrs = [`${group}_level`, `${group}_pool`, `${group}_current`, `${group}_scarred`, `${group}_exhausted`, 'sheet_type'];
@@ -3029,7 +3023,7 @@
                             level = 16;
                         }
                         pool = level;
-                        if(scarred == 0) {current = level - exhausted;} else {current = currentMax - exhausted;}
+                        if(scarred === 0) {current = level - exhausted;} else {current = currentMax - exhausted;}
                         clearSquares(group);
                     }else if(srcAttr.includes('current')){
                         exhausted = currentMax - current;
@@ -3075,15 +3069,15 @@
                 let scarred = parseInt(values[2]);
                 let sheetType = String(values[3]);
                 workerLog(`(${sheetType}) ${button} square clicked`);
-                if (prevChar === '/') {
+                if (prevChar == '/') {
                     newChar = 'X';
                     scarred++;
-                } else if (prevChar === 'X') {
+                } else if (prevChar == 'X') {
                     newChar = ' ';
                     scarred--;
                     current++;
-                } else if (prevChar === ' ') {
-                    if(sheetType === 'pc') {
+                } else if (prevChar == ' ') {
+                    if(sheetType == 'pc') {
                         newChar='/';
                         current--;
                     }else {
@@ -3123,14 +3117,14 @@
                 let scarred = parseInt(values[2]);
                 let sheetType = String(values[3]);
                 workerLog(`[${sheetType}] ${button} square clicked`);
-                if (prevChar === '/') {
+                if (prevChar == '/') {
                     newChar = 'X';
                     scarred++;
-                } else if (prevChar === 'X') {
+                } else if (prevChar == 'X') {
                     newChar = ' ';
                     scarred--;
                     current++;
-                } else if (prevChar === ' ') {
+                } else if (prevChar == ' ') {
                     newChar='/';
                     current--;
                 }
@@ -3165,14 +3159,14 @@
                 let current = parseInt(values[1]);
                 let scarred = parseInt(values[2]);
                 workerLog(`(${sheetType}) ${button} square clicked`);
-                if (prevChar === '/') {
+                if (prevChar == '/') {
                     newChar = 'X';
                     scarred++;
-                } else if (prevChar === 'X') {
+                } else if (prevChar == 'X') {
                     newChar = ' ';
                     scarred--;
                     current++;
-                } else if (prevChar === ' ') {
+                } else if (prevChar == ' ') {
                     newChar='/';
                     current--;
                 }
@@ -3202,9 +3196,9 @@
             let newChar = 'L';
             if (!prevChar) {
                 newChar = 'S';
-            } else if (prevChar === 'L') {
+            } else if (prevChar == 'L') {
                 newChar = 'S';
-            } else if (prevChar === 'S') {
+            } else if (prevChar == 'S') {
                 newChar = 'T';
             }
             setAttrs({
@@ -3220,7 +3214,7 @@
         getAttrs(['is_companion'], function (v) {
             let prevChar = v.is_companion;
             let newChar = '✓';
-            if (prevChar === '✓') {
+            if (prevChar == '✓') {
                 newChar = '✗';
             }
             setAttrs({
