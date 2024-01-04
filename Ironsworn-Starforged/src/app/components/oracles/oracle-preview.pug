@@ -13,25 +13,34 @@ mixin oraclePreviewToggle(type, name, id)
 
 mixin oracleRollGroup(group)
   .oracle-box.surface
-    .oracle-title=group['Display name']||group.Name
+    .oracle-title=group.Name
     each oracle in group.Oracles
-      - const header = `${group['Display name']||group.Name} - ${oracle.Name}`
+      - const header = `${group.Name} - ${oracle.Name}`
       .oracle
-        if (oracle.Tables)
-          - let buttonLabel = oracle['Display name']||oracle.Name
-          +oracleSubtablesListGroupItem(oracle.id, buttonLabel, oracle.Tables)
+        if (oracle.Oracles)
+          - let buttonLabel = oracle.Name
+          +oracleSubOraclesListGroupItem(oracle.$id, buttonLabel, oracle.Oracles)
         else
-          +oracleRollBtn(oracle.id, oracle['Display name']||oracle.Name)
-    if group.Subcategories
-      each subCategory in group.Subcategories
-        - const buttonLabel = subCategory['Display name']||subCategory.Name
-        .oracle.oracle-subcategory
-          +oracleSubtablesListGroupItem(subCategory.id, buttonLabel, subCategory.Oracles)
+          +oracleRollBtn(oracle.$id, oracle.Name)
+    if group.Categories
+      each category in group.Categories
+        - const header = `${group.Name} - ${category.Name}`
+        .oracle
+          if (category.Oracles)
+            - let buttonLabel = category.Name
+            +oracleSubOraclesListGroupItem(category.$id, buttonLabel, category.Oracles)
+          else
+            +oracleRollBtn(category.$id, category.Name)
+    //- if group.Subcategories
+    //-   each subCategory in group.Subcategories
+    //-     - const buttonLabel = subCategory['Display name']||subCategory.Name
+    //-     .oracle.oracle-subcategory
+    //-       +oracleSubOraclesListGroupItem(subCategory.id, buttonLabel, subCategory.Oracles)
 
 mixin oraclePreview(oracle, groupName)
-  input(class=`${oracle.id} hide-element` type='radio' name=`attr_oracle_preview` value=oracle.id)
-  div(class=`${oracle.id} showhide oracle-table-preview surface` id=oracle.id)
-    - let nameString = oracle['Display name'] && oracle['Display name'].match(/ - /i) ? oracle['Display name'].replace(/ - /i, ": ") : `${groupName}: ${oracle['Display name']||oracle.Name}`
+  input(class=`${oracle.$id} hide-element` type='radio' name=`attr_oracle_preview` value=oracle.$id)
+  div(class=`${oracle.$id} showhide oracle-table-preview surface` id=oracle.$id)
+    - let nameString = oracle['Display name'] && oracle['Display name'].match(/ - /i) ? oracle['Display name'].replace(/ - /i, ": ") : `${groupName}: ${oracle.Name}`
     .oracle-title=nameString
     if oracle.Table
       +oracleTable(oracle)

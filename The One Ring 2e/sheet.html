@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-06-00" />
+<input type="hidden" name="attr_version" value="03-07-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -1427,6 +1427,30 @@
         <input name="attr_weapon_damage_2" value="0" class="number" type="number">
         <input name="attr_weapon_injury_2" value="0" class="number" type="number">
         <input name="attr_weapon_special_damage_2" type="text">
+        <span>
+            <input type="hidden" name="attr_adv_weapon3_roll1" value="" />
+            <button type="roll" class="table-rolls" value="@{adv_weapon3_roll1}" name="roll_weapon3"></button>
+            <input type="hidden" name="attr_adv_weapon3_roll2" value="" />
+            <button type="roll" class="table-rolls crosshair" value="@{adv_weapon3_roll2}"
+                name="roll_weapon3_target"></button>
+            <span class="parsed-rolls">
+                <input type='hidden' name='attr_adv_weapon3_action' value=''>
+                <button type='action' name='act_adv_weapon3_action' style="display: none;"></button>
+                <button type='roll' name='roll_adv_weapon3' class="parsed-rolls" value='@{adv_weapon3_action}'
+                    title="Use this button when you have a Parry Rating that you can enter manually."></button>
+
+                <input type='hidden' name='attr_adv_weapon3_target_action' value=''>
+                <button type='action' name='act_adv_weapon3_target_action' style="display: none;"></button>
+                <button type='roll' name='roll_adv_weapon3_target' class="parsed-rolls crosshair"
+                    value='@{adv_weapon3_target_action}'
+                    title="Use this button when you have an player token to target."></button>
+            </span>
+            <input name="attr_weapon_skill_name_3" type="text">
+        </span>
+        <input name="attr_weapon_rating_3" value="0" class="number" type="number">
+        <input name="attr_weapon_damage_3" value="0" class="number" type="number">
+        <input name="attr_weapon_injury_3" value="0" class="number" type="number">
+        <input name="attr_weapon_special_damage_3" type="text">
     </div>
     <div class="adversary-fell-abilities">
         <h1 data-i18n="fell-ability">Fell Ability</h1>
@@ -1994,8 +2018,8 @@
                 'weapon_1_target_action', 'weapon_2_target_action', 'weapon_3_target_action', 'weapon_4_target_action', 'weapon_5_target_action', 'weapon_6_target_action',
                 'axes_action', 'bows_action', 'spears_action', 'swords_action', 
                 'axes_target_action', 'bows_target_action', 'spears_target_action', 'swords_target_action',
-                'adv_weapon1_action', 'adv_weapon2_action',
-                'adv_weapon1_target_action', 'adv_weapon2_target_action'
+                'adv_weapon1_action', 'adv_weapon2_action', 'adv_weapon3_action',
+                'adv_weapon1_target_action', 'adv_weapon2_target_action', 'adv_weapon3_target_action'
                 ];
             const setObj = actions.reduce((accumulator,actionName)=>{
                 accumulator[actionName] = `%{${values.character_name}|${actionName}}`;//Update the action call
@@ -2424,7 +2448,7 @@
     });
 
     // table adversary weapon rolls (to reflect the active stance attack bonus) 
-    const advweaponattrs = ["adv_weapon1", "adv_weapon2"]; 
+    const advweaponattrs = ["adv_weapon1", "adv_weapon2", "adv_weapon3"]; 
     on(`change:stance sheet:opened`, function() {
         getAttrs([""], function(values) {
             advweaponattrs.forEach(advweaponattr => {
@@ -2443,7 +2467,7 @@
 
     // parsed adversary combat proficiency rolls
     // act_adv_weapon1_target
-    on('clicked:adv_weapon1_action clicked:adv_weapon1_target_action clicked:adv_weapon2_action clicked:adv_weapon2_target_action ', async (ev) => {
+    on('clicked:adv_weapon1_action clicked:adv_weapon1_target_action clicked:adv_weapon2_action clicked:adv_weapon2_target_action clicked:adv_weapon3_action clicked:adv_weapon3_target_action', async (ev) => {
         clog(`Starting first roll`);
         let options = stripaction((ev.triggerName).slice(18)).split("_"),
             index = options[0],
@@ -2602,6 +2626,7 @@
         character["armourprot"] = int(characterData["armour"]);
         let weapon1 = characterData["weaponProficiencies"][0] || false;
         let weapon2 = characterData["weaponProficiencies"][1] || false;
+        let weapon3 = characterData["weaponProficiencies"][2] || false;
         if (weapon1) {
             character["weapon_skill_name_1"] = weapon1["weaponname"] || "";
             character["weapon_rating_1"] = int(weapon1["rating"]);
@@ -2615,6 +2640,13 @@
             character["weapon_damage_2"] = int(weapon2["damage"]);
             character["weapon_injury_2"] = int(weapon2["injury"]);
             character["weapon_special_damage_2"] = weapon2["special"] || "";
+        }
+        if (weapon3){
+            character["weapon_skill_name_3"] = weapon2["weaponname"] || "";
+            character["weapon_rating_3"] = int(weapon2["rating"]);
+            character["weapon_damage_3"] = int(weapon2["damage"]);
+            character["weapon_injury_3"] = int(weapon2["injury"]);
+            character["weapon_special_damage_3"] = weapon2["special"] || "";
         }
 
         let newrowid = 0;
@@ -2641,7 +2673,12 @@
             ["weapon_rating_2"] : 0,
             ["weapon_damage_2"] : 0,
             ["weapon_injury_2"] : 0,
-            ["weapon_special_damage_2"] : ""
+            ["weapon_special_damage_2"] : "",
+            ["weapon_skill_name_3"] : "",
+            ["weapon_rating_3"] : 0,
+            ["weapon_damage_3"] : 0,
+            ["weapon_injury_3"] : 0,
+            ["weapon_special_damage_3"] : ""
         });
         getSectionIDs("repeating_fell-abilities", function(idarray) {
             for(var i=0; i < idarray.length; i++) {
@@ -3017,6 +3054,24 @@
                 }
             }
 
+            if (build < 28) {
+                attrs["build"] = 28;
+                let releaselog = {msg:""};
+                hlog(`Release 03.07.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Added
+- third adversary attack
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
             /*
             if (build === 9) {
                 attrs["build"] = 8;

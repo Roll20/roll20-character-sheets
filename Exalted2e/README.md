@@ -28,9 +28,15 @@ If you feel you've contributed to the development of this character sheet, don't
 * Brian Shields
 * Benjamin Bandelow
 * Andreas J.
-* Matt Z.
+* Matt Z. (github.com/Briteblade)
 
 ### Changelog
+
+### 2023-12-12
+* Mortal 'castes' added by github.com/Adrail86
+* Fixed an error that broke alignment of mortal abilities
+* Fixed an error that stacked mortal stats underneath all other castes
+* Corrected several spelling errors
 
 ### 2022-07-22
 * Added Lunar ability tracking
