@@ -1,26 +1,39 @@
-@font-face {
-  font-family: 'Play';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Play-Bold'), url(http://themes.googleusercontent.com/static/fonts/play/v4/ZzUearZLklGfoL18Ti0GaQ.woff) format('woff');
+@import url('https://fonts.googleapis.com/css?family=Play:wght@400&display=swap');
+
+input.tab::before,
+label.clickable,
+.sheet-textHead > span,
+.sheet-textHead,
+.sheet-texthead2Col,
+.sheet-textHead2Col,
+.sheet-record {
+    font-family: 'Play';
 }
 
 :root {
 	/* Light mode colors */
   --sheet-text: #000;
+  --active-tab-bg1:#dcdcdc;
+  --active-tab-bg2:#fcfcfc;
+  --inactive-tab-bg1:#fff;
+  --inactive-tab-bg2:#c8c8c8;
   --input-border: #222;
   --input-border-top: #ccc;
   --input-disabled-bg:#e3e3e3;
   --input-disabled-border:#444;
   --input-disabled-border-top:#999;
   --header-bg: #000;
+  --header-bg-highlight: #555;
+  --col1-bg:#a7a8aa;
   --header-text: #fff;
+  --header-text-highlight: #b9b9b9;
   --button-border: #d0d0d0;
   --button-bg: #a7a8aa;
   --button-inset: #ffffff80;
   --button-image: #000000;
   --button2-text: #333;
   --checkbox-accent: #606060;
+  --rule-borders: #777;
   --persistent-checked-bg: #888;
   --persistent-checked-inset: #6668;
   --persistent-checked-textshadow: #707070c0;
@@ -95,7 +108,7 @@
 .charsheet input[disabled]::-webkit-inner-spin-button,
 .charsheet input[readonly]::-webkit-outer-spin-button,
 .charsheet input[readonly]::-webkit-inner-spin-button {
-	/* This is necessary for Chrome, since the spin buttons still take up space in disabled input boxes, even while invisible. */
+	/* This is necessary for Chrome, since the spin buttons still take up space in disabled and readonly input boxes, even while invisible. */
 	display:none;
 }
  
@@ -139,7 +152,9 @@
 }
  
 .charsheet div.sheet-textHead, 
-.charsheet div.sheet-textHead2Col {
+.charsheet div.sheet-textHead2Col,
+.charsheet label.sheet-textHead,
+.charsheet label.sheet-textHead2Col {
     background-color: var(--header-bg);
     color: var(--header-text);
     font-size: 15px;
@@ -151,6 +166,7 @@
     border-spacing: 0px 4px;   
 	margin-left: -2px;
 }
+
 .charsheet div.sheet-textHead2Col, 
 .charsheet table.sheet-table2col {
 	min-width: 395px;
@@ -242,12 +258,6 @@
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
 	border-radius: 4px;
@@ -272,18 +282,13 @@
 	width:90%;
 	padding: 0px 3px;
 	text-align: center;
+    font-family: 'Play';
 	font-size: 12px;
 	user-select: none;
-	line-height: 16px;
+	line-height: 1.3em;
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
 	border-radius: 100px;
@@ -293,17 +298,17 @@
 
 .charsheet input[type="checkbox"].Persistent-checkbox:checked + label {
 	text-shadow: 0 1px 1px var(--persistent-checked-textshadow);
-	background-image: none;
+    background-image: none;
 	background-color: var(--persistent-checked-bg);
 	color: var(--sheet-text);
 	box-shadow: 0 1px 0 var(--persistent-checked-inset) inset;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:hover + label {
+.charsheet input.ct-label:hover + label {
 	filter: brightness(103%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked:hover + label {
+.charsheet input[type="checkbox"].Persistent-checkbox:hover + label {
 	filter: brightness(107%);
 }
 
@@ -421,6 +426,27 @@
 .defaultCrew:not(:checked) ~ .defaultCrewLock {
 	pointer-events:none;
 }
+
+/* Code for hideable sections */
+.charsheet label.sheet-textHead {
+    margin-right: 2px;
+    padding: 2.5px 0px;
+}
+
+.charsheet label.sheet-textHead2Col {
+    margin-right: 2px;
+    padding: 2.5px 5px;
+}
+
+label.clickable:hover {
+    background-color: var(--header-bg-highlight);
+    text-shadow: 0px 0px 4px var(--header-text-highlight);
+    cursor: pointer;
+}
+
+input:not(:checked) + label.clickable {
+    margin-bottom:5px;
+}
  
 /* ******** Start code for tabs ******** */
 .charsheet div.sheet-tab-content
@@ -434,7 +460,7 @@
 }
 
 .rule-sections {
-	border: 1px solid #777;
+	border: 1px solid var(--rule-borders);
 	border-radius: 5px;
 	padding: 5px;
 	margin-bottom: 5px;
@@ -456,31 +482,22 @@
     content: attr(title);
     text-align: center;
     display: inline-block;
-     
-    background: #fff;
-    background: -moz-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -webkit-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -ms-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -o-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-     
+    background: var(--inactive-tab-bg1);
+    background: linear-gradient(to top, var(--inactive-tab-bg2), var(--inactive-tab-bg1), var(--inactive-tab-bg2));
     width: 150px;
-    height: 20px;
+    height: 22px;
     font-size: 18px;
 }
 
 .charsheet input.tab:checked::before {
-    background: #dcdcdc;
-    background: -moz-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -webkit-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -ms-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -o-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    /* border-bottom-color: #fff; */
+    background: var(--active-tab-bg1);
+    background: linear-gradient(to top, var(--active-tab-bg2), var(--active-tab-bg1), var(--active-tab-bg2));
 }
+
 .charsheet input.tab:not(:first-child)::before {
     border-left: none;
 }
+
 .charsheet div.sheet-tab-content { 
     margin: 2px 0 0 5px;
     padding: 5px;
@@ -516,7 +533,7 @@
     padding-left: 5px;
 }
 .sheet-col1 {
-    background-color: #a7a8aa;
+    background-color: var(--col1-bg);
     border-radius: 5px;
 }
 .sheet-skillsCol1 {
@@ -608,6 +625,7 @@
   --dm-input-disabled-border: #444457;
   --dm-input-disabled-border-top: #393949;
   --dm-header-bg: #338;
+  --dm-header-bg-highlight: #44a;
   --dm-header-text: #f5f5f5;
   --dm-tab-active-gradient1: #333;
   --dm-tab-active-gradient2: #6e6e6e;
@@ -672,9 +690,15 @@
 }
 
 .sheet-darkmode .charsheet div.sheet-textHead2Col,
-.sheet-darkmode .charsheet div.sheet-textHead {
+.sheet-darkmode .charsheet div.sheet-textHead,
+.sheet-darkmode .charsheet label.sheet-textHead,
+.sheet-darkmode .charsheet label.sheet-textHead2Col {
 	background-color: var(--dm-header-bg);
 	color: var(--dm-header-text);
+}
+
+.sheet-darkmode .charsheet label.clickable:hover {
+    background-color: var(--dm-header-bg-highlight);
 }
 
 .sheet-darkmode .charsheet input.tab {
@@ -690,9 +714,9 @@
 }
 
 .sheet-darkmode .charsheet input[type="checkbox"].Persistent-checkbox:checked + label {
-	background-color: var(--dm-persistent-checked-bg);
-	box-shadow: 0 1px 0 var(--dm-persistent-checked-inset) inset;
-	border: 1px solid var(--dm-persistent-checked-border);
+    background-color: var(--dm-persistent-checked-bg);
+    box-shadow: 0 1px 0 var(--dm-persistent-checked-inset) inset;
+    border: 1px solid var(--dm-persistent-checked-border);
 }
 
 /* This doesn't work right now, but hopefully it can be fixed eventually. */
@@ -724,9 +748,12 @@
   --rt-result-bg: #000;
   --rt-result-text: #f5f5f5;
   --rt-result-border: #a7a8aa;
-  --rt-result-crit-bg: #3fb315;
+  --rt-result-crit-bg: #44c1ff;
+  --rt-result-crit-border: #44c1ff;
   --rt-result-fail-bg: #b31515;
-  --rt-result-mixed-bg: #4a57ed;
+  --rt-result-fail-border: #b31515;
+  --rt-result-mixed-bg: #525cca;
+  --rt-result-mixed-border: #525cca;
 }
 
 	/* All roll templates (or most of them, anyway) */
@@ -821,6 +848,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.fullcrit,
 .sheet-rolltemplate-second-wind .inlinerollresult.fullcrit {
     background-color: var(--rt-result-crit-bg);
+    border-color: var(--rt-result-crit-border);
 }
 
 .sheet-rolltemplate-sagadefault .inlinerollresult.fullfail,
@@ -828,6 +856,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.fullfail,
 .sheet-rolltemplate-second-wind .inlinerollresult.fullfail {
     background-color: var(--rt-result-fail-bg);
+    border-color: var(--rt-result-fail-border);
 }
 
 .sheet-rolltemplate-sagadefault .inlinerollresult.importantroll,
@@ -835,6 +864,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.importantroll,
 .sheet-rolltemplate-second-wind .inlinerollresult.importantroll {
     background-color: var(--rt-result-mixed-bg);
+    border-color: var(--rt-result-mixed-border);
 }
 
 .sheet-rolltemplate-sagadefault div,
@@ -868,7 +898,7 @@
     text-align: center;
     border-left: none;
 	border-top-right-radius: 2.5px;
-    width: 75px;
+    width: 65px;
 }
 
 .sheet-rolltemplate-skill tr:last-child td {
@@ -951,8 +981,8 @@
   --rtdm-result-text: #f5f5f5;
   --rtdm-result-bg: #4a206c;
   --rtdm-result-border: #732d95;
-  --rtdm-result-crit-bg: #247905;
-  --rtdm-result-crit-border: #46c419;
+  --rtdm-result-crit-bg: #00a0c2;
+  --rtdm-result-crit-border: #13ebee;
   --rtdm-result-fail-bg: #790505;
   --rtdm-result-fail-border: #c41919;
   --rtdm-result-mixed-bg: #3944ca;
