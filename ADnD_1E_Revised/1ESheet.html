@@ -52,10 +52,11 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/6/23'</label>
+              <label class="right">1/8/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Fixed triggering event for total weight. Was not recalculating until sheet open.</li>
             <li>Fixed portrait image resize to be consistant between using the default avatar image or custom image url.</li>
             <li>Armor details on repeating_equipment has been moved into the expanded sub-section.</li>
             <li>Fixed equipment|armor|shield AC and AR dropdown selectors to match Armor Details.</li>
@@ -1267,7 +1268,7 @@
         <span class="armor-columns">
           <span class="span-four"></span>
           <span class="inline-label span-six">
-            <span class="inline-label" title="@{autocalc_ac} | This is a persistant setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
+            <span class="inline-label" title="@{autocalc_ac} | This is a persistent setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
               <label>Auto-Calc AC:</label>
               <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
               <button type="action" class="button width-medium" name="act_calcac" title="This is an immediate action and works regardless of the Auto-Calc AC setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">Calc AC</button>
@@ -2991,7 +2992,7 @@
           </label>
         </span>
         <span class="thief-columns">
-          <button class="button subheader stack-text" type="roll" name="roll_movequietly" title="%{selected|movequietly}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Move Quietly}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{movequietly} ]]%}}"><span>Move Silently</span></button>
+          <button class="button subheader stack-text" type="roll" name="roll_movequietly" title="%{selected|movequietly}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Move Silently}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{movequietly} ]]%}}"><span>Move Silently</span></button>
           <label class="label-percent">
             <input type="text" name="attr_movequietly" class="field-border readonly-span" title="@{movequietly}" value="0" />
           </label>
@@ -3665,7 +3666,7 @@
               <input type="checkbox" class="width-small" name="attr_sync_ac_flag" value="1" />
               <span></span>
             </label>
-            <label title="@{autocalc_ac} | This is a persistant setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
+            <label title="@{autocalc_ac} | This is a persistent setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
               <span>Auto-Calc AC:</span>
               <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
             </label>
@@ -6841,7 +6842,7 @@
         output.total_equipment_weight = totalEquipmentWeight.toFixed(2);
         output.total_equipment_weight_adjusted = total_equipment_weight_adjusted.toFixed(2);
         output.total_weight = total_weight;
-        setAttrs(output, {silent: true});
+        setAttrs(output);
       });
     });
   };
@@ -6874,7 +6875,7 @@
   // Encumbrance Calcs
   function setCurrentEncumbranceFlag() {
     getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'max_load', 'total_weight'], (v) => {
-      // clog('Current Encumbrance flag has been re-calculated');
+      clog('Current Encumbrance flag has been re-calculated');
       const output = {};
       const normal_load_adjusted = +v.normal_load_adjusted || 0;
       const heavy_load = +v.heavy_load || 0;
@@ -6903,7 +6904,7 @@
   on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['encumbrancebonus', 'normal_load', 'normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'max_load', 'total_weight'], (v) => {
-      // clog('Encumbrance has been re-calculated');
+      clog('Encumbrance has been re-calculated');
       const output = {};
       const encumbrancebonus = +v.encumbrancebonus || 0;
       const normal_load = 350;
