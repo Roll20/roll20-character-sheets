@@ -5396,32 +5396,33 @@
 
   // Parse Ranges
   function calcRange() {
-    getAttrs(
-      [
-        `repeating_weapon_weapon_range`,
-        `repeating_weapon_weapon_range_short`,
-        `repeating_weapon_weapon_range_medium`,
-        `repeating_weapon_weapon_range_long`,
-        `repeating_weapon_weapon_attack_type`,
-        `repeating_weapon_weapon_range_error`,
-      ],
-      (v) => {
-        // clog('Weapon Range has been re-calculated');
-        const output = {};
-        let thisRange = v.repeating_weapon_weapon_range;
-        // remove quotes to prevent NaN (ie distance indicators)
-        thisRange = thisRange.replace(/'/g, '');
-        thisRange = thisRange.replace(/"/g, '');
-        // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-        const thisType = +v.repeating_weapon_weapon_attack_type;
-        // parse ranges
-        const thisRangeArray = thisRange.split('/').join(',').split(' ').join(',').split('-').join(',').split(',');
-        // clog(`thisRangeArray: ${thisRangeArray}`);
-        const thisRangeShort = Number(thisRangeArray[0]);
-        let thisRangeMedium = Number(thisRangeArray[1]);
-        let thisRangeLong = Number(thisRangeArray[2]);
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const output = {};
+      const fields = [];
+      idArray.forEach((id) => {
+        fields.push(section_attribute('weapon', id, 'weapon_range'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_short'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_long'));
+        fields.push(section_attribute('weapon', id, 'weapon_attack_type'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_error'));
+      });
+      getAttrs(fields, (v) => {
+        idArray.forEach((id) => {
+          // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
+          const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+          if (thisType === 0 || thisType === 2) return;
+          let thisRange = v[section_attribute('weapon', id, 'weapon_range')];
+          // remove quotes to prevent NaN (ie distance indicators)
+          thisRange = thisRange.replace(/'/g, '');
+          thisRange = thisRange.replace(/"/g, '');
+          // parse ranges
+          const thisRangeArray = thisRange.split('/').join(',').split(' ').join(',').split('-').join(',').split(',');
+          // clog(`thisRangeArray: ${thisRangeArray}`);
+          const thisRangeShort = Number(thisRangeArray[0]);
+          let thisRangeMedium = Number(thisRangeArray[1]);
+          let thisRangeLong = Number(thisRangeArray[2]);
 
-        if (thisType === 1 || thisType === 3) {
           // clog(`Attack is Ranged. repeating_weapon_weapon_attack_type = ${thisType}`);
 
           // if only a single number is entered, make it Long ie Manticore spikes
@@ -5433,33 +5434,35 @@
 
           // check to see if range is in the proper format.
           if (Number.isNaN(thisRangeShort)) {
-            output.repeating_weapon_weapon_range_short = 0;
-            output.repeating_weapon_weapon_range_error = thisRange === '' ? 1 : 0;
+            output[section_attribute('weapon', id, 'weapon_range_short')] = 0;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
             // clog(`WARNING: Field is not in the proper format.`);
           } else {
-            output.repeating_weapon_weapon_range_short = thisRangeShort;
+            output[section_attribute('weapon', id, 'weapon_range_short')] = thisRangeShort;
           }
           if (Number.isNaN(thisRangeMedium)) {
-            output.repeating_weapon_weapon_range_medium = 0;
-            output.repeating_weapon_weapon_range_error = thisRange === '' ? 1 : 0;
+            output[section_attribute('weapon', id, 'weapon_range_medium')] = 0;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
             // clog(`WARNING: Field is not in the proper format.`);
           } else {
-            output.repeating_weapon_weapon_range_medium = thisRangeMedium;
+            output[section_attribute('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
           }
           if (Number.isNaN(thisRangeLong)) {
-            output.repeating_weapon_weapon_range_long = 0;
-            output.repeating_weapon_weapon_range_error = thisRange === '' ? 1 : 0;
+            output[section_attribute('weapon', id, 'weapon_range_long')] = 0;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
             // clog(`WARNING: Field is not in the proper format.`);
           } else {
-            output.repeating_weapon_weapon_range_long = thisRangeLong;
+            output[section_attribute('weapon', id, 'weapon_range_long')] = thisRangeLong;
           }
           if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
-            output.repeating_weapon_weapon_range_error = 1;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = 1;
+          } else {
+            // clog(`Value did not parse.`);
           }
-        }
+        });
         setAttrs(output, {silent: true});
-      }
-    );
+      });
+    });
   }
 
   const updateRange = (current_version, final_version) => {
@@ -6917,7 +6920,7 @@
       if (autocalc_movement_flag === 1) {
         output.current_encumbrance_move = currentEncumbrance;
       } else {
-        clog(`Auto-calc Movement is disabled.`);
+        // clog(`Auto-calc Movement is disabled.`);
       }
       setAttrs(output);
     });
@@ -7723,7 +7726,7 @@
         fieldnames.push(`repeating_weapon_${id}_weapon_whisper_to_hit_select`);
         fieldnames.push(`repeating_weapon_${id}_weapon_whisper_to_hit`);
       });
-      getAttrs(['weapon_whisper_to_hit', 'weapon_whisper_to_hit_select', 'toggle_to_hit_table', ...fieldnames], (v) => {
+      getAttrs(['toggle_to_hit_table', ...fieldnames], (v) => {
         const output = {};
         const flag = +v.toggle_to_hit_table || 0;
 
@@ -7768,11 +7771,11 @@
   on('change:repeating_weapon:weapon_prof_flag change:weapon_proficiency_initial change:weapon_proficiency_added_per_level change:weapon_proficiency_penalty', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) => {
-        fieldnames.push(`repeating_weapon_${id}_weapon_prof_flag`);
+        fields.push(`repeating_weapon_${id}_weapon_prof_flag`);
       });
-      getAttrs(['weapon_prof_flag', 'weapon_proficiency_penalty', ...fieldnames], (v) => {
+      getAttrs(['weapon_proficiency_penalty', ...fields], (v) => {
         // clog('Weapon Proficiency has been re-calculated');
         const output = {};
         idArray.forEach((id) => {
@@ -7790,11 +7793,11 @@
   on('change:repeating_weapon:weapon_backstab_flag change:backstab change:backstab_bonus change:toggle_thief_skills', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) => {
-        fieldnames.push(`repeating_weapon_${id}_weapon_backstab_flag`);
+        fields.push(`repeating_weapon_${id}_weapon_backstab_flag`);
       });
-      getAttrs(['backstab', 'backstab_bonus', 'weapon_backstab_flag', 'toggle_thief_skills', ...fieldnames], (v) => {
+      getAttrs(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields], (v) => {
         const output = {};
         const thiefSkills = +v.toggle_thief_skills;
         const thisMult = +v.backstab || 1;
@@ -7857,14 +7860,17 @@
   on('change:repeating_weapon:weapon_dual change:dual_pen_primary change:dual_pen_secondary', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = idArray.reduce((fields, id) => [...fields, `repeating_weapon_${id}_weapon_dual`], []);
-      getAttrs(['dual_pen_primary', 'dual_pen_secondary', ...fieldnames], (v) => {
+      const output = {};
+      const fields = [];
+      idArray.forEach((id) => {
+        fields.push(section_attribute('weapon', id, 'weapon_dual'));
+      });
+      getAttrs(['dual_pen_primary', 'dual_pen_secondary', ...fields], (v) => {
         // clog('Weapon Attack Type has been re-calculated');
-        const output = {};
         const primary = +v.dual_pen_primary || 0;
         const secondary = +v.dual_pen_secondary || 0;
         idArray.forEach((id) => {
-          const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
+          const attack_type = v[section_attribute('weapon', id, 'weapon_dual')];
           let handed_mod = 0;
           if (attack_type === 'Primary') {
             handed_mod = primary;
@@ -7873,7 +7879,7 @@
             handed_mod = secondary;
           }
           const thispenalty = Math.min(0, handed_mod);
-          output[`repeating_weapon_${id}_weapon_dual_pen`] = thispenalty;
+          output[section_attribute('weapon', id, 'weapon_dual_pen')] = thispenalty;
         });
         setAttrs(output, {silent: true});
       });
@@ -7903,28 +7909,25 @@
   // HP Calcs
   calcHP = () => {
     // clog('HP re-calculated');
-    getAttrs(
-      ['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class', 'hitpoints_class_total', 'hp_quotient', 'hitpoints_total'],
-      (v) => {
-        const output = {};
-        const syncHpFlag = +v.sync_hp_flag || 0;
-        const hitPointsMax = +v.hitpoints_max || 0;
-        const hitpoints_1_class = +v.hitpoints_1_class || 0;
-        const hitpoints_2_class = +v.hitpoints_2_class || 0;
-        const hitpoints_3_class = +v.hitpoints_3_class || 0;
-        const class1 = hitpoints_1_class !== 0 ? 1 : 0;
-        const class2 = hitpoints_2_class !== 0 ? 1 : 0;
-        const class3 = hitpoints_3_class !== 0 ? 1 : 0;
-        const numberOfClasses = int(class1 + class2 + class3) || 0;
-        const totalClassHP = int(Math.max(0, hitpoints_1_class) + Math.max(0, hitpoints_2_class) + Math.max(0, hitpoints_3_class)) || 0;
-        const totalHP = float(totalClassHP / numberOfClasses).toFixed(2);
-        output.hitpoints_class_total = totalClassHP;
-        output.hp_quotient = numberOfClasses;
-        output.hitpoints_total = totalHP;
-        output.hitpoints_max = syncHpFlag === 1 ? int(totalHP) : hitPointsMax;
-        setAttrs(output, {silent: true});
-      }
-    );
+    getAttrs(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class'], (v) => {
+      const output = {};
+      const syncHpFlag = +v.sync_hp_flag || 0;
+      const hitPointsMax = +v.hitpoints_max || 0;
+      const hitpoints_1_class = +v.hitpoints_1_class || 0;
+      const hitpoints_2_class = +v.hitpoints_2_class || 0;
+      const hitpoints_3_class = +v.hitpoints_3_class || 0;
+      const class1 = hitpoints_1_class !== 0 ? 1 : 0;
+      const class2 = hitpoints_2_class !== 0 ? 1 : 0;
+      const class3 = hitpoints_3_class !== 0 ? 1 : 0;
+      const numberOfClasses = int(class1 + class2 + class3) || 0;
+      const totalClassHP = int(Math.max(0, hitpoints_1_class) + Math.max(0, hitpoints_2_class) + Math.max(0, hitpoints_3_class)) || 0;
+      const totalHP = float(totalClassHP / numberOfClasses).toFixed(2);
+      output.hitpoints_class_total = totalClassHP;
+      output.hp_quotient = numberOfClasses;
+      output.hitpoints_total = totalHP;
+      output.hitpoints_max = syncHpFlag === 1 ? int(totalHP) : hitPointsMax;
+      setAttrs(output, {silent: true});
+    });
   };
 
   on('sheet:opened change:sync_hp_flag change:hitpoints change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
