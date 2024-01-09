@@ -52,10 +52,12 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/8/23'</label>
+              <label class="right">1/9/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Added an Auto-Calc Movement option. The movement load can be temporarily selected even if the auto-calc option is enabled but any changes to encumbrance, base movement, or opening the sheet will cause a re-calc. If Auto-Calc Movement is disabled, any manual changes to the movement load will be persistant.</li>
+            <li>Fixed NPC image link roll.</li>
             <li>Fixed triggering event for total weight. Was not recalculating until sheet open.</li>
             <li>Fixed portrait image resize to be consistant between using the default avatar image or custom image url.</li>
             <li>Armor details on repeating_equipment has been moved into the expanded sub-section.</li>
@@ -248,11 +250,11 @@
         </label>
       </span>
       <span class="inline-label split">
-        <label>
+        <label style="min-width:10.5em">
           <span>ARMOR CLASS:</span>
           <input type="text" class="width-smallest field-border" name="attr_armorclass" title="@{armorclass} | Best AC." value="10">
         </label>
-        <label class="width-medium">
+        <label class="width-medium-plus">
           <span>AR:</span>
           <select name="attr_unarmored_base" title="@{unarmored_base}" class="select width-small-plus">
             <option value="10" selected>10</option>
@@ -336,28 +338,6 @@
           <span>SENSES:</span>
           <textarea class="height-short" name="attr_senses" title="@{senses}" placeholder="Nil"></textarea>
         </label>
-      </span>
-      <span class="inline-label wrap right">
-          <button class="button stack-text span-two" type="roll" name="attr_init-roll" title="%{selected|init-roll}" value="@{init_macro_text}"><span>Initiative</span></button>
-          <button class="button stack-text" type="roll" name="attr_surprise-roll" title="%{selected|surprise-roll}" value="@{surprise_macro_text}"><span>Surprise</span></button>
-          <label class="auto-width">
-            <span>Surprise Chance</span>
-            <input type="text" class="width-smaller" name="attr_surprise" title="@{surprise}" value="2" />
-          </label>
-          <label class="auto-width">
-            <select name="attr_surprise_die" class="field-select width-medium" title="@{surprise_die}">
-              <option value="6" selected="">of 6</option>
-              <option value="8">of 8</option>
-              <option value="10">of 10</option>
-              <option value="12">of 12</option>
-              <option value="20">of 20</option>
-              <option value="100">of 100</option>
-            </select>
-          </label>
-          <label class="auto-width">
-            <span>Surprise Others Adj.</span>
-            <input type="text" class="width-smaller" name="attr_surprise_others_mod" title="@{surprise_others_mod} | The modifier is typically indicated as bonus although the value is SUBTRACTED from the opponents Surprise check." value="0" />
-          </label>
       </span>
     </section>
     <section class="npc-box statblock2">
@@ -475,7 +455,7 @@
         <input type="text" class="left" name="attr_npc_link" title="@{npc_link}" value="" placeholder="https://www.example.com" />
       </span>
       <span class="inline-label">
-        <button type="roll" class="button stack-text" name="attr_npc_image_link_roll" value="" title="@{npc_image_link_roll}">
+        <button type="roll" class="button stack-text" name="attr_npc_image_link_roll" value="[**LINK**](@{npc_image_link})" title="@{npc_image_link_roll}">
           <span>Image:</span>
         </button>
         <input type="text" class="left" name="attr_npc_image_link" title="@{npc_image_link}" value="" placeholder="https://www.example.com/image.jpg" />
@@ -486,6 +466,30 @@
       <div class="image-avatar" name="attr_sheet_image_url" title="Avatar">
         <img alt="" name="attr_character_avatar" title="Avatar">&nbsp;
       </div>
+    </section>
+    <section class="npc-box statblock3-span">
+      <span class="inline-label wrap">
+        <button class="button stack-text span-two" type="roll" name="attr_init-roll" title="%{selected|init-roll}" value="@{init_macro_text}"><span>Initiative</span></button>
+        <button class="button stack-text" type="roll" name="attr_surprise-roll" title="%{selected|surprise-roll}" value="@{surprise_macro_text}"><span>Surprise</span></button>
+        <label class="auto-width">
+          <span>Surprise Chance</span>
+          <input type="text" class="width-smaller" name="attr_surprise" title="@{surprise}" value="2" />
+        </label>
+        <label class="auto-width">
+          <select name="attr_surprise_die" class="field-select width-medium" title="@{surprise_die}">
+            <option value="6" selected="">of 6</option>
+            <option value="8">of 8</option>
+            <option value="10">of 10</option>
+            <option value="12">of 12</option>
+            <option value="20">of 20</option>
+            <option value="100">of 100</option>
+          </select>
+        </label>
+        <label class="auto-width">
+          <span>Surprise Others Adj.</span>
+          <input type="text" class="width-smaller" name="attr_surprise_others_mod" title="@{surprise_others_mod} | The modifier is typically indicated as bonus although the value is SUBTRACTED from the opponents Surprise check." value="0" />
+        </label>
+      </span>
     </section>
     <section class="npc-box statblock4">
       <textarea name="attr_npc_notes" title="@{npc_notes}" placeholder="Enter Notes/Description..." style="height:100%;"></textarea>
@@ -591,11 +595,11 @@
           </span>
         </span>
         <span class="ac-columns">
-          <label class="label-under">
+          <label class="label-under" title="@{armorclass_shieldless} | Best AC without a Shield bonus.">
             <input type="text" class="readonly-span width-smaller" name="attr_armorclass_shieldless" title="@{armorclass_shieldless} | Best AC without a Shield bonus." value="0" />
             <span class="text-medium">Shieldless</span>
           </label>
-          <label class="label-under">
+          <label class="label-under" title="@{armorclass_rear} | Best AC without a Dex bonus.">
             <input type="text" class="readonly-span width-smaller" name="attr_armorclass_rear" title="@{armorclass_rear} | Best AC without a Dex bonus." value="0" />
             <span class="text-medium">Rear</span>
           </label>
@@ -1622,48 +1626,56 @@
           <span>Run/Flee</span>
         </span>
         <span class="basemove-columns">
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="0" readonly />
           <label class="label-under">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="0" readonly />
             <input type="text" class="width-smaller field-border" name="attr_movement" title="@{movement}" value="12" />
             <span>Normal</span>
           </label>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="1" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{movement_heavy}">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="1" readonly />
             <input type="text" class="hidden" name="attr_movement_heavy" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_heavy" title="@{movement_heavy}"></span>
             <span>Heavy</span>
           </label>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="2" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{movement_load}">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="2" readonly />
             <input type="text" class="hidden" name="attr_movement_load" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_load" title="@{movement_load}"></span>
             <span>Very Heavy</span>
           </label>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="3" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{movement_max}">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="3" readonly />
             <input type="text" class="hidden" name="attr_movement_max" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_max" title="@{movement_max}"></span>
             <span class="long">Encumbered</span>
           </label>
           <h4 class="long">Move/Round</h4>
           <label class="text-large">=</label>
-          <label class="label-under">
+          <label class="label-under" title="@{movement_normal}">
             <input type="text" class="hidden" name="attr_movement_normal" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_normal" title="@{movement_normal}"></span>
             <span class="text-small">(Adj.Speed x1')</span>
           </label>
-          <label class="label-under">
+          <label class="label-under" title="@{movement_known}">
             <input type="text" class="hidden" name="attr_movement_known" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_known" title="@{movement_known}"></span>
             <span class="text-small">(Adj.Speed x5')</span>
           </label>
-          <label class="label-under">
+          <label class="label-under" title="@{movement_run}">
             <input type="text" class="hidden" name="attr_movement_run" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_run" title="@{movement_run}"></span>
             <span class="text-small">(Adj.Speed x10')</span>
           </label>
           <!--deprecated attribute: crawl kept in case attribute is needed -->
           <input type="text" class="hidden" name="attr_movement_crawl" value="0" readonly />
+          <label></label>
+          <label></label>
+          <span class="span-two">
+            <label class="inline-label width-small" title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
+              <span>Auto-Calc Movement:</span>
+              <input type="checkbox" class="width-small" name="attr_autocalc_movement_flag" value="1" checked />
+            </label>
+          </span>
         </span>
       </div>
       <hr>
@@ -1689,7 +1701,7 @@
         </span>
         <span class="saves-columns">
           <button class="button subheader stack-text" type="roll" name="roll_saveparalysispoisondeath" title="%{selected|saveparalysispoisondeath}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Paralysis, Poison or Death Magic}} {{roll_high=[[ 1d20 + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[@{saveparalysispoisondeath}]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}}"><span>Paralysis, Poison, or Death Magic</span></button>
-          <span><input type="text" class="width-smaller field-border readonly-span" name="attr_saveparalysispoisondeath" title="@{saveparalysispoisondeath}" value="20" /></span>
+          <span title="@{saveparalysispoisondeath}"><input type="text" class="width-smaller field-border readonly-span" name="attr_saveparalysispoisondeath" title="@{saveparalysispoisondeath}" value="20" /></span>
           <span class="text-large">=</span>
           <span><input type="text" class="width-smaller" name="attr_saveparalysispoisondeath_base" title="@{saveparalysispoisondeath_base}" value="20" /></span>
           <span class="text-large">+</span>
@@ -1703,7 +1715,7 @@
         </span>
         <span class="saves-columns">
           <button class="button subheader stack-text" type="roll" name="roll_savepetrificationpolymorph" title="%{selected|savepetrificationpolymorph}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Petrification or Polymorph}} {{roll_high=[[ 1d20 + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[@{savepetrificationpolymorph}]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}}"><span>Petrification or Polymorph</span></button>
-          <span><input type="text" class="width-smaller field-border readonly-span" name="attr_savepetrificationpolymorph" title="@{savepetrificationpolymorph}" value="20" /></span>
+          <span title="@{savepetrificationpolymorph}"><input type="text" class="width-smaller field-border readonly-span" name="attr_savepetrificationpolymorph" title="@{savepetrificationpolymorph}" value="20" /></span>
           <span class="text-large">=</span>
           <span><input type="text" class="width-smaller" name="attr_savepetrificationpolymorph_base" title="@{savepetrificationpolymorph_base}" value="20" /></span>
           <span class="text-large">+</span>
@@ -1717,7 +1729,7 @@
         </span>
         <span class="saves-columns">
           <button class="button subheader stack-text" type="roll" name="roll_saverodsstaveswands" title="%{selected|saverodsstaveswands}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Rods, Staves, or Wands}} {{roll_high=[[ 1d20 + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[@{saverodsstaveswands}]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}}"><span>Rods, Staves, or Wands</span></button>
-          <span><input type="text" class="width-smaller field-border readonly-span" name="attr_saverodsstaveswands" title="@{saverodsstaveswands}" value="20" /></span>
+          <span title="@{saverodsstaveswands}"><input type="text" class="width-smaller field-border readonly-span" name="attr_saverodsstaveswands" title="@{saverodsstaveswands}" value="20" /></span>
           <span class="text-large">=</span>
           <span><input type="text" class="width-smaller" name="attr_saverodsstaveswands_base" title="@{saverodsstaveswands_base}" value="20" /></span>
           <span class="text-large">+</span>
@@ -1731,7 +1743,7 @@
         </span>
         <span class="saves-columns">
           <button class="button subheader stack-text" type="roll" name="roll_savebreathweapons" title="%{selected|savebreathweapons}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Breath Weapon}} {{roll_high=[[ 1d20 + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[@{savebreathweapons}]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}}"><span>Breath Weapon</span></button>
-          <span><input type="text" class="width-smaller field-border readonly-span" name="attr_savebreathweapons" title="@{savebreathweapons}" value="20" /></span>
+          <span title="@{savebreathweapons}"><input type="text" class="width-smaller field-border readonly-span" name="attr_savebreathweapons" title="@{savebreathweapons}" value="20" /></span>
           <span class="text-large">=</span>
           <span><input type="text" class="width-smaller" name="attr_savebreathweapons_base" title="@{savebreathweapons_base}" value="20" /></span>
           <span class="text-large">+</span>
@@ -1745,7 +1757,7 @@
         </span>
         <span class="saves-columns">
           <button class="button subheader stack-text" type="roll" name="roll_savespells" title="%{selected|savespells}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Spells}} {{roll_high=[[ 1d20 + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[@{savespells}]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}}"><span>Spells</span></button>
-          <span><input type="text" class="width-smaller field-border readonly-span" name="attr_savespells" title="@{savespells}" value="20" /></span>
+          <span title="@{savespells}"><input type="text" class="width-smaller field-border readonly-span" name="attr_savespells" title="@{savespells}" value="20" /></span>
           <span class="text-large">=</span>
           <span><input type="text" class="width-smaller" name="attr_savespells_base" title="@{savespells_base}" value="20" /></span>
           <span class="text-large">+</span>
@@ -1768,7 +1780,7 @@
               </summary>
               <input type="text" class="width-fill" name="attr_savemisc_name" title="@{savemisc_name}" value="Custom..." />
             </details>
-            <span><input type="text" class="width-smaller field-border readonly-span" name="attr_savemisc" title="@{savemisc}" value="20" /></span>
+            <span title="@{savemisc}"><input type="text" class="width-smaller field-border readonly-span" name="attr_savemisc" title="@{savemisc}" value="20" /></span>
             <span class="text-large">=</span>
             <span><input type="text" class="width-smaller" name="attr_savemisc_base" title="@{savemisc_base}" value="20" /></span>
             <span class="text-large">+</span>
@@ -1788,7 +1800,7 @@
               </summary>
               <input type="text" class="width-fill" name="attr_savemisc1_name" title="@{savemisc1_name}" value="Custom..." />
             </details>
-            <span><input type="text" class="width-smaller field-border readonly-span" name="attr_savemisc1" title="@{savemisc1}" value="20" /></span>
+            <span title="@{savemisc1}"><input type="text" class="width-smaller field-border readonly-span" name="attr_savemisc1" title="@{savemisc1}" value="20" /></span>
             <span class="text-large">=</span>
             <span><input type="text" class="width-smaller" name="attr_savemisc1_base" title="@{savemisc1_base}" value="20" /></span>
             <span class="text-large">+</span>
@@ -1808,7 +1820,7 @@
               </summary>
               <input type="text" class="width-fill" name="attr_savemisc2_name" title="@{savemisc2_name}" value="Custom..." />
             </details>
-            <span><input type="text" class="width-smaller field-border readonly-span" name="attr_savemisc2" title="@{savemisc2}" value="20" /></span>
+            <span title="@{savemisc2}"><input type="text" class="width-smaller field-border readonly-span" name="attr_savemisc2" title="@{savemisc2}" value="20" /></span>
             <span class="text-large">=</span>
             <span><input type="text" class="width-smaller" name="attr_savemisc2_base" title="@{savemisc2_base}" value="20" /></span>
             <span class="text-large">+</span>
@@ -1880,7 +1892,7 @@
         <input type="checkbox" class="hidden toggle-to-hit-table" name="attr_toggle_to_hit_table" value="1" />
         <!-- To Hit Table-->
         <details class="matrix-box">
-          <summary>
+          <summary title="Enter To-Hit Armor Class Table data.">
             <span class="material-icons grid"></span>
             <span class="label-matrix">Attack Matrix</span>
             <span class="material-icons"></span>
@@ -1890,7 +1902,7 @@
             <label>Autofill using selectors:</label>
             <label>
               <span>Class/Monster:</span>
-              <select class="width-medium" name="attr_matrix_class" title="@{matrix_class}">
+              <select class="width-medium border" name="attr_matrix_class" title="@{matrix_class}">
                 <option value="0" selected>Select a Class or Monster</option>
                 <option value="1">Clerics, Druids and Monks</option>
                 <option value="2">Fighters, Paladins, Rangers,</option>
@@ -1903,11 +1915,11 @@
             <input type="checkbox" name="attr_toggle_matrixhd" value="1" class="toggle-matrixhd hidden" />
             <label class="matrix-level">
               <span>Level:</span>
-              <input type="number" min="0" name="attr_matrix_level" value="1" title="@{matrix_level}" />
+              <input class="width-small border" type="number" min="0" name="attr_matrix_level" value="1" title="@{matrix_level}" style="height: 1.75em; margin: -8px 0 2px 0;">
             </label>
             <label class="matrix-hd" style="margin-left: -1em;">
               <span>HD/Lvl:</span>
-              <select class="field-select width-small-plus" name="attr_matrix_hitdice" title="@{matrix_hitdice}">
+              <select class="field-select width-small-plus border" name="attr_matrix_hitdice" title="@{matrix_hitdice}" style="height: 1.75em; margin: -8px 0 2px 0;">
                 <option value="0" selected>Select HD/Lvl</option>
                 <option value="1">up to 1-1</option>
                 <option value="2">1-1</option>
@@ -1975,7 +1987,7 @@
         </details>
         <!-- THAC0 Table-->
         <details class="thac0-box">
-          <summary>
+          <summary title="Enter THAC0 data">
             <span class="material-icons grid"></span>
             <span class="label-matrix">THAC0</span>
             <span class="material-icons"></span>
@@ -2636,16 +2648,16 @@
           <label>Equipment:</label>
           <input type="text" class="hidden width-fill" name="attr_total_equipment_weight" title="@{total_equipment_weight}" value="0" readonly />
           <!-- show equipment weight w/out armor and weapon weight -->
-          <input type="text" class="width-fill" name="attr_total_equipment_weight_adjusted" title="@{total_equipment_weight_adjusted}" value="0" readonly />
+          <input type="text" class="width-fill" name="attr_total_equipment_weight_adjusted" title="@{total_equipment_weight_adjusted} | Carried Equipment Weight - Weapons and Armor." value="0" readonly />
           <input type="text" class="width-fill toggle-costs" name="attr_total_equipment_cost" title="@{total_equipment_cost}" value="0" readonly />
 
           <!-- HIDDEN BECAUSE ARMOR and Weapons are NOW INCLUDED IN EQUIPMENT CALCS -->
           <label>Armor:</label>
-          <input type="text" class="width-fill" name="attr_total_armor_weight" value="0" readonly />
+          <input type="text" class="width-fill" name="attr_total_armor_weight" value="0" title="@{total_armor_weight}" readonly />
           <label class="width-fill center toggle-costs">---</label>
           <input type="text" class="hidden width-fill toggle-costs" name="attr_total_armor_cost" value="0" readonly />
           <label>Weapons:</label>
-          <input type="text" class="width-fill" name="attr_total_weapon_weight" value="0" readonly />
+          <input type="text" class="width-fill" name="attr_total_weapon_weight" value="0" title="@{total_weapon_weight}" readonly />
           <label class="width-fill center toggle-costs">---</label>
           <input type="text" class="hidden width-fill toggle-costs" name="attr_total_weapon_cost" value="0" readonly />
 
@@ -2653,8 +2665,8 @@
           <input type="text" class="width-fill" name="attr_total_coin_weight" title="@{total_coin_weight}" value="0" readonly />
           <label class="width-fill center toggle-costs">---</label>
           <label>TOTALS:</label>
-          <input type="text" class="width-fill field-border" name="attr_total_weight" title="@{total_weight}" value="0" readonly />
-          <input type="text" class="width-fill field-border toggle-costs" name="attr_total_cost" title="@{total_cost}" value="0" readonly />
+          <input type="text" class="width-fill field-border" name="attr_total_weight" title="@{total_weight} | Total Carried Weight." value="0" readonly />
+          <input type="text" class="width-fill field-border toggle-costs" name="attr_total_cost" title="@{total_cost} | Total Equipment Costs." value="0" readonly />
         </div>
       </div>
       <!--Wealth-->
@@ -2698,7 +2710,7 @@
           <span class="span-four column-header">Current Encumbrance</span>
         </div>
         <div class="capacity-box-loads center">
-          <label class="label-under">
+          <label class="label-under" title="@{normal_load} 'Unencumbered load' (defaults 350gp based on STR 8-11.)">
             <input type="text" class="hidden" name="attr_normal_load" value="350" readonly />
             <span type="text" class="readonly-span" name="attr_normal_load" title="@{normal_load} 'Unencumbered load' (defaults 350gp based on STR 8-11.)"></span>
             <span>Base</span>
@@ -2711,26 +2723,26 @@
             </span>
           </label>
           <span class="text-large">=</span>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="0" checked="checked" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{normal_load_adjusted} Unencumbered + Weight Allowance.)">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="0" checked="checked" readonly />
             <input type="text" class="hidden" name="attr_normal_load_adjusted" value="0" readonly />
             <span class="readonly-span" name="attr_normal_load_adjusted" title="@{normal_load_adjusted} Unencumbered + Weight Allowance.)"></span>
             <span>Unencumbered</span>
           </label>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="1" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{heavy_load} Heavy load = Unencumbered + (Weight Allowance x2).">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="1" readonly />
             <input type="text" class="hidden" name="attr_heavy_load" value="0" readonly />
             <span class="readonly-span" name="attr_heavy_load" title="@{heavy_load} Heavy load = Unencumbered + (Weight Allowance x2)."></span>
             <span>Heavy</span>
           </label>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="2" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{very_heavy_load} Very heavy load = Unencumbered + (Weight Allowance x3).">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="2" readonly />
             <input type="text" class="hidden" name="attr_very_heavy_load" value="0" readonly />
             <span class="readonly-span" name="attr_very_heavy_load" title="@{very_heavy_load} Very heavy load = Unencumbered + (Weight Allowance x3)."></span>
             <span>Very Heavy</span>
           </label>
-          <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="3" readonly />
-          <label class="label-under">
+          <label class="label-under" title="@{max_load} Any amount greater than; Unencumbered + (Weight Allowance x3).">
+            <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="3" readonly />
             <span>
               <input type="text" class="hidden" name="attr_max_load" value="0" readonly />
               <span class="readonly-span" name="attr_max_load" title="@{max_load} Any amount greater than; Unencumbered + (Weight Allowance x3).">
@@ -2927,7 +2939,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_pickpockets" title="%{selected|pickpockets}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Pick Pockets}} {{roll_low=[[ 1d100 ]]%}} {{roll_target= [[ @{pickpockets} ]]%}}"><span>Pick Pockets</span></button>
-          <label class="label-percent">
+          <label class="label-percent"title="@{pickpockets}">
             <input type="text" name="attr_pickpockets" class="field-border readonly-span" title="@{pickpockets}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -2949,7 +2961,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_openlocks" title="%{selected|openlocks}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Locks}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{openlocks} ]]%}}"><span>Open Locks</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{openlocks}">
             <input type="text" name="attr_openlocks" class="field-border readonly-span" title="@{openlocks}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -2971,7 +2983,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_findtraps" title="%{selected|findtraps}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Find/Remove Traps}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{findtraps} ]]%}}"><span>Find/Remove Traps</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{findtraps}">
             <input type="text" name="attr_findtraps" class="field-border readonly-span" title="@{findtraps}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -2993,7 +3005,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_movequietly" title="%{selected|movequietly}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Move Silently}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{movequietly} ]]%}}"><span>Move Silently</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{movequietly}">
             <input type="text" name="attr_movequietly" class="field-border readonly-span" title="@{movequietly}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -3015,7 +3027,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_hideinshadows" title="%{selected|HideInShadows}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Hide In Shadows}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{hideinshadows} ]]%}}"><span>Hide In Shadows</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{hideinshadows}">
             <input type="text" name="attr_hideinshadows" class="field-border readonly-span" title="@{hideinshadows}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -3037,7 +3049,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_hearnoise" title="%{selected|hearnoise}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Hear Noise}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{hearnoise} ]]%}}"><span>Hear Noise</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{hearnoise}">
             <input type="text" name="attr_hearnoise" class="field-border readonly-span" title="@{hearnoise}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -3059,7 +3071,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_climbwalls" title="%{selected|climbwalls}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}"><span>Climb Walls</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{climbwalls}">
             <input type="text" name="attr_climbwalls" class="field-border readonly-span" title="@{climbwalls}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -3081,7 +3093,7 @@
         </span>
         <span class="thief-columns">
           <button class="button subheader stack-text" type="roll" name="roll_readlanguages" title="%{selected|readlanguages}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Read Languages}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{readlanguages} ]]%}}"><span>Read Languages</span></button>
-          <label class="label-percent">
+          <label class="label-percent" title="@{readlanguages}">
             <input type="text" name="attr_readlanguages" class="field-border readonly-span" title="@{readlanguages}" value="0" />
           </label>
           <span class="text-large">=</span>
@@ -3112,7 +3124,7 @@
               </summary>
               <input type="text" class="width-fill" name="attr_thiefmisc_name" title="@{thiefmisc_name}" value="Custom..." />
             </details>
-            <label class="label-percent">
+            <label class="label-percent" title="@{thiefmisc}">
               <input type="text" name="attr_thiefmisc" class="field-border readonly-span" title="@{thiefmisc}" value="0" />
             </label>
             <span class="text-large">=</span>
@@ -3140,7 +3152,7 @@
               </summary>
               <input type="text" class="width-fill" name="attr_thiefmisc1_name" title="@{thiefmisc1_name}" value="Custom..." />
             </details>
-            <label class="label-percent">
+            <label class="label-percent" title="@{thiefmisc1}">
               <input type="text" name="attr_thiefmisc1" class="field-border readonly-span" title="@{thiefmisc1}" value="0" />
             </label>
             <span class="text-large">=</span>
@@ -3168,7 +3180,7 @@
               </summary>
               <input type="text" class="width-fill" name="attr_thiefmisc2_name" title="@{thiefmisc2_name}" value="Custom..." />
             </details>
-            <label class="label-percent">
+            <label class="label-percent" title="@{thiefmisc2}">
               <input type="text" name="attr_thiefmisc2" class="field-border readonly-span" title="@{thiefmisc2}" value="0" />
             </label>
             <span class="text-large">=</span>
@@ -3526,7 +3538,7 @@
           <h4 class="stack-text">Sheet Image:</h4>
           <label style="width: auto;">
             <select class="field-select" name="attr_sheet_image" title="@{sheet_image}">
-              <option value="1" selected>Use Avatar</option>
+              <option value="1" selected>Avatar</option>
               <option value="0">Use URL</option>
             </select>
           </label>
@@ -3654,8 +3666,7 @@
             <button type="action" name="act_resetnwpsmacros" class="stack-text button reset-macros"><span>Reset NWP</span></button>
             <button type="action" name="act_resetequipmentmacros" class="stack-text button reset-macros"><span>Reset Equip</span></button>
           </span>
-          <label></label>
-          <label class="span-four inline-label">
+          <span class="span-six inline-label wrap">
             <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
               <span>Sync HP:</span>
               <input type="checkbox" class="width-small" name="attr_sync_hp_flag" value="1" />
@@ -3670,7 +3681,11 @@
               <span>Auto-Calc AC:</span>
               <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
             </label>
-          </label>
+            <label title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
+              <span>Auto-Calc Movement:</span>
+              <input type="checkbox" class="width-small" name="attr_autocalc_movement_flag" value="1" checked />
+            </label>
+          </span>
         </span>
       </div>
       <!-- Custom Attributes-->
@@ -3772,7 +3787,7 @@
           <span>Author: Vince &amp; the Roll20 Community</span>
           <label>
             <span>v.</span>
-            <input type="text" class="width-smallest version" name="attr_sheet_version" value="1.646" readonly />
+            <input type="text" class="width-small version" name="attr_sheet_version" value="1.646" readonly />
             <i>beta</i>
           </label>
         </span>
@@ -6874,9 +6889,10 @@
 
   // Encumbrance Calcs
   function setCurrentEncumbranceFlag() {
-    getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'max_load', 'total_weight'], (v) => {
+    getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag'], (v) => {
       // clog('Current Encumbrance flag has been re-calculated');
       const output = {};
+      const autocalc_movement_flag = +v.autocalc_movement_flag || 0;
       const normal_load_adjusted = +v.normal_load_adjusted || 0;
       const heavy_load = +v.heavy_load || 0;
       const very_heavy_load = +v.very_heavy_load || 0;
@@ -6897,13 +6913,19 @@
         // clog('===== Carrying Capacity is Encumbered =====');
       }
       output.current_encumbrance = currentEncumbrance;
+      // Bail out if unless auto-calc movement is enabled
+      if (autocalc_movement_flag === 1) {
+        output.current_encumbrance_move = currentEncumbrance;
+      } else {
+        clog(`Auto-calc Movement is disabled.`);
+      }
       setAttrs(output);
     });
   }
 
   on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['encumbrancebonus', 'normal_load', 'normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'max_load', 'total_weight'], (v) => {
+    getAttrs(['encumbrancebonus'], (v) => {
       // clog('Encumbrance has been re-calculated');
       const output = {};
       const encumbrancebonus = +v.encumbrancebonus || 0;
@@ -6921,21 +6943,21 @@
 
   // Movement Calcs
   function setCurrentMovement() {
-    getAttrs(['current_encumbrance', 'movement', 'movement_normal', 'movement_known', 'movement_run'], (v) => {
+    getAttrs(['current_encumbrance_move', 'movement'], (v) => {
       // clog('Movement Rates have been re-calculated');
       const output = {};
       // only extract an integer from movement
       const movement = +v.movement.toString().replace(/[^0-9]/g, '');
-      const current_encumbrance = +v.current_encumbrance || 0;
+      const current_encumbrance_move = +v.current_encumbrance_move || 0;
       let adjustedMove = 0;
 
-      if (current_encumbrance === 0) {
+      if (current_encumbrance_move === 0) {
         adjustedMove = movement;
         // clog('=====Movement is Normal=====');
-      } else if (current_encumbrance === 1) {
+      } else if (current_encumbrance_move === 1) {
         adjustedMove = int(movement - 3);
         // clog('=====Movement is Heavy=====');
-      } else if (current_encumbrance === 2) {
+      } else if (current_encumbrance_move === 2) {
         adjustedMove = int(movement - 6);
         // clog('=====Movement is Very Heavy=====');
       } else {
@@ -6950,9 +6972,9 @@
     });
   }
 
-  on('sheet:opened change:movement change:current_encumbrance', (eventInfo) => {
+  on('sheet:opened change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['current_encumbrance', 'movement', 'movement_heavy', 'movement_load', 'movement_max'], (v) => {
+    getAttrs(['movement'], (v) => {
       // clog('Current Base Movement has been re-calculated');
       const output = {};
       // only extract an integer from movement
