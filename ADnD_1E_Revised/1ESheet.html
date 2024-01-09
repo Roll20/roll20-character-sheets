@@ -4492,6 +4492,25 @@
   let constitutionCalcs = '';
   let charismaCalcs = '';
   let armorDetailsRowidArray;
+  let saveparalysispoisondeathCalc = '';
+  let savepetrificationpolymorphCalc = '';
+  let saverodsstaveswandsCalc = '';
+  let savebreathweaponsCalc = '';
+  let savespellsCalc = '';
+  let savemiscCalc = '';
+  let savemisc1Calc = '';
+  let savemisc2Calc = '';
+  let pickpocketsCalc = '';
+  let openlocksCalc = '';
+  let findtrapsCalc = '';
+  let movequietlyCalc = '';
+  let hideinshadowsCalc = '';
+  let hearnoiseCalc = '';
+  let climbwallsCalc = '';
+  let readlanguagesCalc = '';
+  let thiefmiscCalc = '';
+  let thiefmisc1Calc = '';
+  let thiefmisc2Calc = '';
 
   const armorRowIDs = [
     'armortype1_row_id',
@@ -4606,33 +4625,26 @@
   const dmgSwap = (current_version, final_version) => {
     // copy DmgBonus value to AttackDmgBonus
     // replace all instances of @{DmgBonus} with @{AttackDmgBonus} in macro-text
-
     // Get oldSectionID
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = [];
-      _.each(idArray, (currentID) => {
-        fieldnames.push(`repeating_weapon_${currentID}_DmgBonus`, `repeating_weapon_${currentID}_macro-text`);
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_weapon_${id}_DmgBonus`, `repeating_weapon_${id}_macro-text`);
       });
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const macrodefault =
           '&{template:attacks} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}';
-        _.each(idArray, (currentID) => {
-          const macrotext = v[`repeating_weapon_${currentID}_macro-text`] || macrodefault;
+        _.each(idArray, (id) => {
+          const macrotext = v[`repeating_weapon_${id}_macro-text`] || macrodefault;
           // replaces old attribute value with new
-          // update[`repeating_weapon_${currentID}_macro-text`] = macrotext.replace(new RegExp('@{DmgBonus}', 'g'), '@{AttackDmgBonus}');
-          update[`repeating_weapon_${currentID}_macro-text`] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
-          update[`repeating_weapon_${currentID}_AttackDmgBonus`] = int(v[`repeating_weapon_${currentID}_DmgBonus`]);
+          // update[`repeating_weapon_${id}_macro-text`] = macrotext.replace(new RegExp('@{DmgBonus}', 'g'), '@{AttackDmgBonus}');
+          update[`repeating_weapon_${id}_macro-text`] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
+          update[`repeating_weapon_${id}_AttackDmgBonus`] = int(v[`repeating_weapon_${id}_DmgBonus`]);
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: dmgSwap completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: dmgSwap completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4641,26 +4653,20 @@
   const maxSwap = (current_version, final_version) => {
     // Get oldSectionID
     getSectionIDs('repeating_ability', (idArray) => {
-      const fieldnames = [];
-      _.each(idArray, (currentID) => {
-        fieldnames.push(`repeating_ability_${currentID}_max`);
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_ability_${id}_max`);
       });
 
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
-        _.each(idArray, (currentID) => {
+        _.each(idArray, (id) => {
           // replaces old attribute value with new
-          update[`repeating_ability_${currentID}_current_max`] = int(v[`repeating_ability_${currentID}_max`]);
+          update[`repeating_ability_${id}_current_max`] = int(v[`repeating_ability_${id}_max`]);
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: maxSwap completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: maxSwap completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4668,41 +4674,35 @@
   // replace default macro-text of non-weapon proficiencies ONLY IF they haven't been edited
   const nwpMacroUpdate = (current_version, final_version) => {
     const update = {};
-    getSectionIDs('repeating_nonweaponproficiencies', (idnwps) => {
-      const attrsNWPs = [];
-      _.each(idnwps, (itemid) => {
-        attrsNWPs.push(`repeating_nonweaponproficiencies_${itemid}_macro-text`);
+    getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_nonweaponproficiencies_${id}_macro-text`);
       });
-      getAttrs([...attrsNWPs], (v) => {
+      getAttrs([...fields], (v) => {
         const replacements = {
           nwp_old:
             '&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{=@{short_description}}}{{Success Amount=[[((@{rAttribute})+(@{rSlots}-1)-1d20)cs>1cf<-1]]}}',
           nwp_new:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20 + [[@{rmodifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{rAttribute}[ATTR] ]]}}{{freetext=@{short_description}}}',
         };
-        _.each(idnwps, (id) => {
+        _.each(idArray, (id) => {
           if (v[`repeating_nonweaponproficiencies_${id}_macro-text`]) {
             update[`repeating_nonweaponproficiencies_${id}_macro-text`] = v[`repeating_nonweaponproficiencies_${id}_macro-text`].replace(replacements.nwp_old, replacements.nwp_new);
           }
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: nwpMacroUpdate completed on: ${attrsNWPs}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: nwpMacroUpdate completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   const weaponNameFix = (current_version, final_version) => {
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) =>
-        fieldnames.push(
+        fields.push(
           `repeating_weapon_${id}_roll`,
           `repeating_weapon_${id}_weaponname`,
           `repeating_weapon_${id}_tohitbonus`,
@@ -4721,7 +4721,7 @@
           `repeating_weapon_${id}_weaponnotes`
         )
       );
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const namesToFix = {
           '@{rateoffire}': '@{weapon_rateoffire}',
@@ -4762,23 +4762,17 @@
           if (doUpdate(v[`repeating_weapon_${id}_weaponnotes`])) update[`repeating_weapon_${id}_weapon_notes`] = v[`repeating_weapon_${id}_weaponnotes`];
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: weaponNameFix completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: weaponNameFix completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   const spellNameFix = (current_version, final_version) => {
     getSectionIDs('repeating_spells', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) =>
-        fieldnames.push(
+        fields.push(
           `repeating_spells_${id}_roll`,
           `repeating_spells_${id}_memorized`,
           `repeating_spells_${id}_level`,
@@ -4795,7 +4789,7 @@
           `repeating_spells_${id}_description-show`
         )
       );
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const namesToFix = {
           '@{memorized}': '@{spell_memorized}',
@@ -4831,23 +4825,17 @@
           if (doUpdate(v[`repeating_spells_${id}_description-show`])) update[`repeating_spells_${id}_spell_description_show`] = int(v[`repeating_spells_${id}_description-show`]);
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: spellNameFix completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: spellNameFix completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   const equipmentNameFix = (current_version, final_version) => {
     getSectionIDs('repeating_equipment', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) =>
-        fieldnames.push(
+        fields.push(
           `repeating_equipment_${id}_item-show`,
           `repeating_equipment_${id}_item`,
           `repeating_equipment_${id}_location`,
@@ -4858,7 +4846,7 @@
           `repeating_equipment_${id}_cost`
         )
       );
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         idArray.forEach((id) => {
           if (doUpdate(v[`repeating_equipment_${id}_item-show`])) update[`repeating_equipment_${id}_equipment_item_show`] = v[`repeating_equipment_${id}_item-show`];
@@ -4871,23 +4859,17 @@
           if (doUpdate(v[`repeating_equipment_${id}_cost`])) update[`repeating_equipment_${id}_equipment_cost`] = float(v[`repeating_equipment_${id}_cost`]);
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: equipmentNameFix completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: equipmentNameFix completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   const abilityNameFix = (current_version, final_version) => {
     getSectionIDs('repeating_ability', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) =>
-        fieldnames.push(
+        fields.push(
           `repeating_ability_${id}_roll`,
           `repeating_ability_${id}_name`,
           `repeating_ability_${id}_short_description`,
@@ -4898,7 +4880,7 @@
           `repeating_ability_${id}_description-show`
         )
       );
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const namesToFix = {
           '@{name}': '@{ability_name}',
@@ -4923,14 +4905,8 @@
             update[`repeating_ability_${id}_ability_description_show`] = int(v[`repeating_ability_${id}_description-show`]);
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: abilityNameFix completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: abilityNameFix completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4938,9 +4914,9 @@
   // fix duplicated repeating attribute names. Replaces old attribute names in macro_text
   const nwpNameFix = (current_version, final_version) => {
     getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) =>
-        fieldnames.push(
+        fields.push(
           `repeating_nonweaponproficiencies_${id}_roll`,
           `repeating_nonweaponproficiencies_${id}_name`,
           `repeating_nonweaponproficiencies_${id}_rAttribute`,
@@ -4952,7 +4928,7 @@
           `repeating_nonweaponproficiencies_${id}_description`
         )
       );
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const namesToFix = {
           '@{name}': '@{nwp_name}',
@@ -4986,14 +4962,8 @@
             update[`repeating_nonweaponproficiencies_${id}_nwp_description`] = v[`repeating_nonweaponproficiencies_${id}_description`];
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: nwpNameFix completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: nwpNameFix completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5074,31 +5044,90 @@
     });
   };
 
+  // One-time update: Auto Calc Ability rows
+  const stat_functions = () => {
+    strengthCalcs();
+    intelligenceCalcs();
+    wisdomCalcs();
+    dexterityCalcs();
+    constitutionCalcs();
+    charismaCalcs();
+  };
+
+  autoCalcAbilityRows = (current_version, final_version) => {
+    const output = {};
+    stat_functions();
+    output.sheet_version = current_version;
+    clog(`VERSION UPDATE: autoCalcAbilityRows completed`);
+    setAttrs(output, versionator(current_version, final_version));
+  };
+
+  // One-time update: Auto Calc Save rows
+  autoCalcSaveRows = (current_version, final_version) => {
+    const output = {};
+    saveparalysispoisondeathCalc();
+    savepetrificationpolymorphCalc();
+    saverodsstaveswandsCalc();
+    savebreathweaponsCalc();
+    savespellsCalc();
+    savemiscCalc();
+    savemisc1Calc();
+    savemisc2Calc();
+    output.sheet_version = current_version;
+    clog(`VERSION UPDATE: autoCalcSaveRows completed`);
+    setAttrs(
+      output,
+      {
+        silent: true,
+      },
+      versionator(current_version, final_version)
+    );
+  };
+
+  // One-time update: Auto Calc Thief rows
+  autoCalcThiefRows = (current_version, final_version) => {
+    const output = {};
+    pickpocketsCalc();
+    openlocksCalc();
+    findtrapsCalc();
+    movequietlyCalc();
+    hideinshadowsCalc();
+    hearnoiseCalc();
+    climbwallsCalc();
+    readlanguagesCalc();
+    thiefmiscCalc();
+    thiefmisc1Calc();
+    thiefmisc2Calc();
+    output.sheet_version = current_version;
+    clog(`VERSION UPDATE: autoCalcThiefRows completed`);
+    setAttrs(
+      output,
+      {
+        silent: true,
+      },
+      versionator(current_version, final_version)
+    );
+  };
+
   // Remove @{weapon_whisper_to_hit}
   const removeWhisper = (current_version, final_version) => {
     // remove all instances of @{weapon_whisper_to_hit} in macro-text
-    getSectionIDs('repeating_weapon', (idweapons) => {
+    getSectionIDs('repeating_weapon', (idArray) => {
       const attrsWeapons = [];
-      _.each(idweapons, (itemid) => {
-        attrsWeapons.push(`repeating_weapon_${itemid}_weapon_macro_text`);
+      _.each(idArray, (id) => {
+        attrsWeapons.push(`repeating_weapon_${id}_weapon_macro_text`);
       });
       getAttrs([...attrsWeapons], (v) => {
         const update = {};
         const macrodefault =
           '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{attack1=[[1d20 + @{weapon_tohitbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{weapon_damagesmallmedium} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{weapon_damagelarge} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{weapon_notes}}} @{weapon_whisper_to_hit}';
-        _.each(idweapons, (itemid) => {
-          const macrotext = v[`repeating_weapon_${itemid}_weapon_macro_text`] || macrodefault;
-          update[`repeating_weapon_${itemid}_weapon_macro_text`] = macrotext.replace(/} @{weapon_whisper_to_hit}/g, '}');
+        _.each(idArray, (id) => {
+          const macrotext = v[`repeating_weapon_${id}_weapon_macro_text`] || macrodefault;
+          update[`repeating_weapon_${id}_weapon_macro_text`] = macrotext.replace(/} @{weapon_whisper_to_hit}/g, '}');
         });
         update.sheet_version = current_version;
         clog(`VERSION UPDATE: removeWhisper completed on: ${attrsWeapons}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5119,13 +5148,7 @@
       }
       update.sheet_version = current_version;
       clog(`VERSION UPDATE: migrate HP completed.`);
-      setAttrs(
-        update,
-        {
-          silent: true,
-        },
-        versionator(current_version, final_version)
-      );
+      setAttrs(update, {silent: true}, versionator(current_version, final_version));
       calcHP();
     });
   };
@@ -5158,13 +5181,7 @@
       }
       update.sheet_version = current_version;
       clog(`VERSION UPDATE: Migrate AC completed.`);
-      setAttrs(
-        update,
-        {
-          silent: true,
-        },
-        versionator(current_version, final_version)
-      );
+      setAttrs(update, {silent: true}, versionator(current_version, final_version));
       calcAC();
     });
   };
@@ -5172,12 +5189,12 @@
   // update Weapon macro-text ONLY IF they haven't been edited.
   // Tests against previous macro-text changes back to v1.58
   const weaponMacroUpdate = (current_version, final_version) => {
-    getSectionIDs('repeating_weapon', (idweapons) => {
-      const attrsWeapons = [];
-      _.each(idweapons, (itemid) => {
-        attrsWeapons.push(`repeating_weapon_${itemid}_weapon_macro_text`);
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_weapon_${id}_weapon_macro_text`);
       });
-      getAttrs([...attrsWeapons], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const replacements = {
           weapon_old:
@@ -5195,7 +5212,7 @@
           weapon_new:
             '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + ( @{weapon_backstab_bonus}[BACKSTAB] ) + ( @{weapon_tohitbonus}[HIT_BON] ) + ( @{weapon_prof_pen}[PROF_PEN] ) + ( @{weapon_dual_pen}[DUAL_PEN] ) + ( @{weapon_magicbonus}[MAG_BON] ) + ( ?{To Hit Modifier?|0}[MISC_MOD] ) ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}',
         };
-        _.each(idweapons, (id) => {
+        _.each(idArray, (id) => {
           if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v6) {
             update[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old_v6, replacements.weapon_new);
           } else if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v5) {
@@ -5211,26 +5228,20 @@
           }
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: weaponMacroUpdate completed on: ${attrsWeapons}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: weaponMacroUpdate completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   // update Special Ability macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
   const abilityMacroUpdate = (current_version, final_version) => {
-    getSectionIDs('repeating_ability', (idability) => {
-      const attrsAbility = [];
-      _.each(idability, (itemid) => {
-        attrsAbility.push(`repeating_ability_${itemid}_ability_macro_text`);
+    getSectionIDs('repeating_ability', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_ability_${id}_ability_macro_text`);
       });
-      getAttrs([...attrsAbility], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const replacements = {
           ability_old:
@@ -5244,7 +5255,7 @@
           ability_new:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[@{ability_current|max}]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
         };
-        _.each(idability, (id) => {
+        _.each(idArray, (id) => {
           if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v4) {
             update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v4, replacements.ability_new);
           }
@@ -5259,26 +5270,20 @@
           }
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: abilityMacroUpdate completed on: ${attrsAbility}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: abilityMacroUpdate completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   // update NWP macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
   const nwpMacroUpdate2 = (current_version, final_version) => {
-    getSectionIDs('repeating_nonweaponproficiencies', (idnwps) => {
-      const attrsNWP = [];
-      _.each(idnwps, (itemid) => {
-        attrsNWP.push(`repeating_nonweaponproficiencies_${itemid}_nwp_macro_text`);
+    getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_nonweaponproficiencies_${id}_nwp_macro_text`);
       });
-      getAttrs([...attrsNWP], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const replacements = {
           nwp_old:
@@ -5288,7 +5293,7 @@
           nwp_new:
             '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{nwp_mod_applied=[[ @{nwp_modifier} ]]}} {{link=@{nwp_link}}} {{freetext=@{nwp_short_description} @{nwp_description}}}',
         };
-        _.each(idnwps, (id) => {
+        _.each(idArray, (id) => {
           if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] === replacements.nwp_old_2) {
             update[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
               replacements.nwp_old_2,
@@ -5303,26 +5308,20 @@
           }
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: nwpMacroUpdate2 completed on: ${attrsNWP}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: nwpMacroUpdate2 completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   // update Spells macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
   const spellsMacroUpdate = (current_version, final_version) => {
-    getSectionIDs('repeating_spells', (idspells) => {
-      const attrsSpells = [];
-      _.each(idspells, (itemid) => {
-        attrsSpells.push(`repeating_spells_${itemid}_spell_macro_text`);
+    getSectionIDs('repeating_spells', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_spells_${id}_spell_macro_text`);
       });
-      getAttrs([...attrsSpells], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const replacements = {
           spell_old:
@@ -5334,7 +5333,7 @@
           spell_new:
             '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{spell_class=@{spell_caster_class_name}}} {{spell_class_level=@{spell_caster_class_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{save_type=@{spell_save_type}}} {{link=@{spell_link}}} {{freetext=@{spell_description}}}',
         };
-        _.each(idspells, (id) => {
+        _.each(idArray, (id) => {
           if (v[`repeating_spells_${id}_spell_macro_text`] === replacements.spell_old_v3) {
             update[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spell_old_v3, replacements.spell_new);
           }
@@ -5346,24 +5345,18 @@
           }
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: spellsMacroUpdate completed on: ${attrsSpells}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: spellsMacroUpdate completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   // update Equipment macro-text ONLY IF they haven't been edited. Tests against v1.641 macro-text
   const equipmentMacroUpdate = (current_version, final_version) => {
-    getSectionIDs('repeating_equipment', (idequip) => {
+    getSectionIDs('repeating_equipment', (idArray) => {
       const attrsEquipment = [];
-      _.each(idequip, (itemid) => {
-        attrsEquipment.push(`repeating_equipment_${itemid}_equipment_macro_text`);
+      _.each(idArray, (id) => {
+        attrsEquipment.push(`repeating_equipment_${id}_equipment_macro_text`);
       });
       getAttrs([...attrsEquipment], (v) => {
         const update = {};
@@ -5373,7 +5366,7 @@
           equipment_new:
             '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{link=@{equipment_link}}} {{freetext=@{equipment_description}}} {{quantity=@{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
         };
-        _.each(idequip, (id) => {
+        _.each(idArray, (id) => {
           if (v[`repeating_equipment_${id}_equipment_macro_text`] === replacements.equipment_old) {
             update[`repeating_equipment_${id}_equipment_macro_text`] = v[`repeating_equipment_${id}_equipment_macro_text`].replace(
               replacements.equipment_old,
@@ -5383,13 +5376,7 @@
         });
         update.sheet_version = current_version;
         clog(`VERSION UPDATE: equipmentMacroUpdate completed on: ${attrsEquipment}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5469,40 +5456,28 @@
     const update = {};
     calcRange();
     update.sheet_version = current_version;
-    setAttrs(
-      update,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
+    setAttrs(update, {silent: true}, versionator(current_version, final_version));
   };
 
   // replace all instances of @{weapon_attack_type_pen} with @{weapon_dual_pen} in macro-text
   const updateAttackTypeMacro = (current_version, final_version) => {
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = [];
-      _.each(idArray, (currentID) => {
-        fieldnames.push(`repeating_weapon_${currentID}_weapon_macro_text`);
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(`repeating_weapon_${id}_weapon_macro_text`);
       });
-      getAttrs([...fieldnames], (v) => {
+      getAttrs([...fields], (v) => {
         const update = {};
         const macrodefault =
           '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + @{weapon_backstab_bonus}[BACKSTAB] + @{weapon_tohitbonus}[HIT_BON] + @{weapon_prof_pen}[PROF_PEN] + @{weapon_dual_pen}[DUAL_PEN]+ @{weapon_magicbonus}[MAG_BON] + ?{To Hit Modifier?|0}[MISC_MOD] ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} @{weapon_tohitacadj}';
-        _.each(idArray, (currentID) => {
-          const macrotext = v[`repeating_weapon_${currentID}_weapon_macro_text`] || macrodefault;
-          update[`repeating_weapon_${currentID}_weapon_macro_text`] = macrotext.replace(/@{weapon_attack_type_pen}/g, '@{weapon_dual_pen}');
-          update[`repeating_weapon_${currentID}_weapon_macro_text`] = macrotext.replace(/{{attacktype=@{weapon_attack_type}}} /g, '');
+        _.each(idArray, (id) => {
+          const macrotext = v[`repeating_weapon_${id}_weapon_macro_text`] || macrodefault;
+          update[`repeating_weapon_${id}_weapon_macro_text`] = macrotext.replace(/@{weapon_attack_type_pen}/g, '@{weapon_dual_pen}');
+          update[`repeating_weapon_${id}_weapon_macro_text`] = macrotext.replace(/{{attacktype=@{weapon_attack_type}}} /g, '');
         });
         update.sheet_version = current_version;
-        clog(`VERSION UPDATE: updateAttackTypeMacro completed on: ${fieldnames}`);
-        setAttrs(
-          update,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        clog(`VERSION UPDATE: updateAttackTypeMacro completed on: ${fields}`);
+        setAttrs(update, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5516,13 +5491,7 @@
       update.monsterHD = monsterHD_value === '' ? hitDice_value : '';
       update.sheet_version = current_version;
       clog(`VERSION UPDATE: monsterHD completed.`);
-      setAttrs(
-        update,
-        {
-          silent: true,
-        },
-        versionator(current_version, final_version)
-      );
+      setAttrs(update, {silent: true}, versionator(current_version, final_version));
     });
   };
 
@@ -5554,13 +5523,7 @@
     update.armorother5_bulk = 0;
     update.armorother6_bulk = 0;
     clog(`VERSION UPDATE: clearArmorOther completed.`);
-    setAttrs(
-      update,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
+    setAttrs(update, {silent: true}, versionator(current_version, final_version));
   };
 
   // combines 2 arrays so that the row_id attr is ONLY used with copyArmorToEquipment()
@@ -5647,7 +5610,7 @@
       if (matchingArray) {
         console.log(`Match found in array: ${matchingArray}`);
       } else {
-        console.log(`No match found for attribute: ${attrToCheck}`);
+        // console.log(`No match found for attribute: ${attrToCheck}`);
       }
 
       const armor1 = v.armortype;
@@ -6294,13 +6257,7 @@
     syncArmorToEquipment(null, null, row_removed, migrate);
     update.sheet_version = current_version;
     clog(`VERSION UPDATE: migrateArmorDetails completed.`);
-    setAttrs(
-      update,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
+    setAttrs(update, {silent: true}, versionator(current_version, final_version));
   };
 
   // One-time update: sets equipment default values
@@ -6349,13 +6306,7 @@
         });
         output.sheet_version = current_version;
         clog(`VERSION UPDATE: setEquipmentUpdate completed.`);
-        setAttrs(
-          output,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -6468,13 +6419,7 @@
         });
         output.sheet_version = current_version;
         clog(`VERSION UPDATE: setWeaponsUpdate completed.`);
-        setAttrs(
-          output,
-          {
-            silent: true,
-          },
-          versionator(current_version, final_version)
-        );
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -6593,13 +6538,7 @@
               }
             }
           });
-          setAttrs(
-            output,
-            {
-              silent: true,
-            },
-            clearWeaponsWeightCost()
-          );
+          setAttrs(output, {silent: true}, clearWeaponsWeightCost());
         });
       });
     });
@@ -6610,22 +6549,7 @@
     migrateWeaponWtCostFunction();
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: migrateWeaponWtCost completed.`);
-    setAttrs(
-      output,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
-  };
-
-  const stat_functions = () => {
-    strengthCalcs();
-    intelligenceCalcs();
-    wisdomCalcs();
-    dexterityCalcs();
-    constitutionCalcs();
-    charismaCalcs();
+    setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
   // Check and set Ability defaults to 8 on new sheets
@@ -6660,13 +6584,7 @@
         // clog(`~~~~~~ OLD SHEET DETECTED: ${testOldChar}`);
         output.old_character = 0;
       }
-      setAttrs(
-        output,
-        {
-          silent: true,
-        },
-        stat_functions()
-      );
+      setAttrs(output, {silent: true}, stat_functions());
     });
   };
 
@@ -6998,12 +6916,12 @@
     const pattern = /equipment_type/;
     const isType = pattern.test(source);
     getSectionIDs('repeating_equipment', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) => {
-        fieldnames.push(`repeating_equipment_${id}_equipment_type`);
-        fieldnames.push(`repeating_equipment_${id}_equipment_carried_select`);
+        fields.push(`repeating_equipment_${id}_equipment_type`);
+        fields.push(`repeating_equipment_${id}_equipment_carried_select`);
       });
-      getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fieldnames], (v) => {
+      getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
         const output = {};
         const typeTab = +v.equipment_tabs_type || 0;
         const carriedTab = +v.equipment_tabs_carry || 0;
@@ -7584,14 +7502,14 @@
   on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_spells', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) => {
-        fieldnames.push(`repeating_spells_${id}_spell_memorized`);
-        fieldnames.push(`repeating_spells_${id}_spell_show_all`);
-        fieldnames.push(`repeating_spells_${id}_spell_level`);
-        fieldnames.push(`repeating_spells_${id}_spell_caster_class`);
+        fields.push(`repeating_spells_${id}_spell_memorized`);
+        fields.push(`repeating_spells_${id}_spell_show_all`);
+        fields.push(`repeating_spells_${id}_spell_level`);
+        fields.push(`repeating_spells_${id}_spell_caster_class`);
       });
-      getAttrs(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fieldnames], (v) => {
+      getAttrs(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields], (v) => {
         const output = {};
         const memorizedOnly = +v.toggle_show_memorized || 0;
         const casterTab = +v.spell_caster_tabs || 0; // -1, 0, 1
@@ -7721,12 +7639,12 @@
   on('change:toggle_to_hit_table change:repeating_weapon:weapon_name change:repeating_weapon:weapon_whisper_to_hit_select', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_weapon', (idArray) => {
-      const fieldnames = [];
+      const fields = [];
       idArray.forEach((id) => {
-        fieldnames.push(`repeating_weapon_${id}_weapon_whisper_to_hit_select`);
-        fieldnames.push(`repeating_weapon_${id}_weapon_whisper_to_hit`);
+        fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit_select`);
+        fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit`);
       });
-      getAttrs(['toggle_to_hit_table', ...fieldnames], (v) => {
+      getAttrs(['toggle_to_hit_table', ...fields], (v) => {
         const output = {};
         const flag = +v.toggle_to_hit_table || 0;
 
@@ -8575,7 +8493,8 @@
   });
 
   // Thief Calcs
-  function pickpocketsCalc() {
+
+  pickpocketsCalc = () => {
     getAttrs(['pickpockets', 'pickpockets_base', 'pickpockets_racial_mod', 'pickpockets_ability_mod', 'pickpockets_magic'], (v) => {
       const output = {};
       const basePickpockets = +v.pickpockets_base || 0;
@@ -8600,9 +8519,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function openlocksCalc() {
+  openlocksCalc = () => {
     getAttrs(['openlocks', 'openlocks_base', 'openlocks_racial_mod', 'openlocks_ability_mod', 'openlocks_magic'], (v) => {
       const output = {};
       const baseOpenlocks = +v.openlocks_base || 0;
@@ -8627,9 +8546,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function findtrapsCalc() {
+  findtrapsCalc = () => {
     getAttrs(['findtraps', 'findtraps_base', 'findtraps_racial_mod', 'findtraps_ability_mod', 'findtraps_magic'], (v) => {
       const output = {};
       const baseFindtraps = +v.findtraps_base || 0;
@@ -8654,9 +8573,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function movequietlyCalc() {
+  movequietlyCalc = () => {
     getAttrs(['movequietly', 'movequietly_base', 'movequietly_racial_mod', 'movequietly_ability_mod', 'movequietly_magic'], (v) => {
       const output = {};
       const baseMovequietly = +v.movequietly_base || 0;
@@ -8681,9 +8600,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function hideinshadowsCalc() {
+  hideinshadowsCalc = () => {
     getAttrs(['hideinshadows', 'hideinshadows_base', 'hideinshadows_racial_mod', 'hideinshadows_ability_mod', 'hideinshadows_magic'], (v) => {
       const output = {};
       const baseHideinshadows = +v.hideinshadows_base || 0;
@@ -8708,9 +8627,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function hearnoiseCalc() {
+  hearnoiseCalc = () => {
     getAttrs(['hearnoise', 'hearnoise_base', 'hearnoise_racial_mod', 'hearnoise_ability_mod', 'hearnoise_magic'], (v) => {
       const output = {};
       const baseHearnoise = +v.hearnoise_base || 0;
@@ -8735,9 +8654,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function climbwallsCalc() {
+  climbwallsCalc = () => {
     getAttrs(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic'], (v) => {
       const output = {};
       const baseClimbwalls = +v.climbwalls_base || 0;
@@ -8762,9 +8681,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function readlanguagesCalc() {
+  readlanguagesCalc = () => {
     getAttrs(['readlanguages', 'readlanguages_base', 'readlanguages_racial_mod', 'readlanguages_ability_mod', 'readlanguages_magic'], (v) => {
       const output = {};
       const baseReadlanguages = +v.readlanguages_base || 0;
@@ -8789,9 +8708,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function thiefmiscCalc() {
+  thiefmiscCalc = () => {
     getAttrs(['thiefmisc', 'thiefmisc_base', 'thiefmisc_racial_mod', 'thiefmisc_ability_mod', 'thiefmisc_magic'], (v) => {
       const output = {};
       const baseThiefmisc = +v.thiefmisc_base || 0;
@@ -8816,9 +8735,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function thiefmisc1Calc() {
+  thiefmisc1Calc = () => {
     getAttrs(['thiefmisc1', 'thiefmisc1_base', 'thiefmisc1_racial_mod', 'thiefmisc1_ability_mod', 'thiefmisc1_magic'], (v) => {
       const output = {};
       const baseThiefmisc1 = +v.thiefmisc1_base || 0;
@@ -8843,9 +8762,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function thiefmisc2Calc() {
+  thiefmisc2Calc = () => {
     getAttrs(['thiefmisc2', 'thiefmisc2_base', 'thiefmisc2_racial_mod', 'thiefmisc2_ability_mod', 'thiefmisc2_magic'], (v) => {
       const output = {};
       const baseThiefmisc2 = +v.thiefmisc2_base || 0;
@@ -8870,31 +8789,6 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
-
-  // One-time update: Auto Calc Thief rows
-  autoCalcThiefRows = (current_version, final_version) => {
-    const output = {};
-    pickpocketsCalc();
-    openlocksCalc();
-    findtrapsCalc();
-    movequietlyCalc();
-    hideinshadowsCalc();
-    hearnoiseCalc();
-    climbwallsCalc();
-    readlanguagesCalc();
-    thiefmiscCalc();
-    thiefmisc1Calc();
-    thiefmisc2Calc();
-    output.sheet_version = current_version;
-    clog(`VERSION UPDATE: autoCalcThiefRows completed`);
-    setAttrs(
-      output,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
   };
 
   on('change:pickpockets_base change:pickpockets_racial_mod change:pickpockets_ability_mod change:pickpockets_magic', (eventInfo) => {
@@ -8943,7 +8837,7 @@
   });
 
   // Save Calcs
-  function saveparalysispoisondeathCalc() {
+  saveparalysispoisondeathCalc = () => {
     getAttrs(
       [
         'saveparalysispoisondeath',
@@ -8980,9 +8874,9 @@
         setAttrs(output, {silent: true});
       }
     );
-  }
+  };
 
-  function savepetrificationpolymorphCalc() {
+  savepetrificationpolymorphCalc = () => {
     getAttrs(
       [
         'savepetrificationpolymorph',
@@ -9021,9 +8915,9 @@
         setAttrs(output, {silent: true});
       }
     );
-  }
+  };
 
-  function saverodsstaveswandsCalc() {
+  saverodsstaveswandsCalc = () => {
     getAttrs(
       [
         'saverodsstaveswands',
@@ -9059,9 +8953,9 @@
         setAttrs(output, {silent: true});
       }
     );
-  }
+  };
 
-  function savebreathweaponsCalc() {
+  savebreathweaponsCalc = () => {
     getAttrs(
       ['savebreathweapons', 'savebreathweapons_base', 'savebreathweapons_racial_mod', 'savebreathweapons_ability_mod', 'savebreathweapons_misc_mod', 'savebreathweapons_temp_mod'],
       (v) => {
@@ -9090,9 +8984,9 @@
         setAttrs(output, {silent: true});
       }
     );
-  }
+  };
 
-  function savespellsCalc() {
+  savespellsCalc = () => {
     getAttrs(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod'], (v) => {
       const output = {};
       const baseSavespells = +v.savespells_base || 0;
@@ -9118,9 +9012,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function savemiscCalc() {
+  savemiscCalc = () => {
     getAttrs(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod'], (v) => {
       const output = {};
       const baseSavemisc = +v.savemisc_base || 0;
@@ -9131,9 +9025,9 @@
       output.savemisc = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc) || 0;
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function savemisc1Calc() {
+  savemisc1Calc = () => {
     getAttrs(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod'], (v) => {
       const output = {};
       const baseSavemisc1 = +v.savemisc1_base || 0;
@@ -9159,9 +9053,9 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
+  };
 
-  function savemisc2Calc() {
+  savemisc2Calc = () => {
     getAttrs(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod'], (v) => {
       const output = {};
       const baseSavemisc2 = +v.savemisc2_base || 0;
@@ -9187,28 +9081,6 @@
       }
       setAttrs(output, {silent: true});
     });
-  }
-
-  // One-time update: Auto Calc Save rows
-  autoCalcSaveRows = (current_version, final_version) => {
-    const output = {};
-    saveparalysispoisondeathCalc();
-    savepetrificationpolymorphCalc();
-    saverodsstaveswandsCalc();
-    savebreathweaponsCalc();
-    savespellsCalc();
-    savemiscCalc();
-    savemisc1Calc();
-    savemisc2Calc();
-    output.sheet_version = current_version;
-    clog(`VERSION UPDATE: autoCalcSaveRows completed`);
-    setAttrs(
-      output,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
   };
 
   on(
@@ -10743,15 +10615,6 @@
       output.comeliness_cha_adj = (AT_CHA.getEntry(stat_cha).getComeliness() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getComeliness();
       setAttrs(output, {silent: true});
     });
-  };
-
-  // One-time update: Auto Calc Ability rows
-  autoCalcAbilityRows = (current_version, final_version) => {
-    const output = {};
-    stat_functions();
-    output.sheet_version = current_version;
-    clog(`VERSION UPDATE: autoCalcAbilityRows completed`);
-    setAttrs(output, versionator(current_version, final_version));
   };
 
   on('change:strength change:exceptionalstrength', (eventInfo) => {
