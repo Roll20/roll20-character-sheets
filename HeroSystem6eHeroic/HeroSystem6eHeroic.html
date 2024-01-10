@@ -6087,6 +6087,14 @@
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
+					<input type="checkbox" name="attr_optionTakesNoSTUN">
+					<span class="checkmark" title="@{optionTakesNoSTUN}"></span>
+				</label>
+				<h1>Takes No STUN</h1>
+			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
 					<input type="checkbox" checked="checked" name="attr_optionAutoSubtractEND">
 					<span class="checkmark" title="@{optionAutoSubtractEND}"></span>
 				</label>
@@ -6111,10 +6119,10 @@
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
-					<input type="checkbox" name="attr_optionTakesNoSTUN">
-					<span class="checkmark" title="@{optionTakesNoSTUN}"></span>
+					<input type="checkbox" checked="checked" name="attr_optionResetTargeting">
+					<span class="checkmark" title="@{optionResetTargeting}"></span>
 				</label>
-				<h1>Takes No STUN</h1>
+				<h1>Health Reset Buttons Also Reset Hit Location and Range</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -6123,14 +6131,6 @@
 					<span class="checkmark" title="@{displayDegreeOfSuccess}"></span>
 				</label>
 				<h1>Display Degree of Success</h1>
-			</div>
-			
-			<div class="item-options-row">
-				<label class="container-checkbox">
-					<input type="checkbox" checked="checked" name="attr_optionResetTargeting">
-					<span class="checkmark" title="@{optionResetTargeting}"></span>
-				</label>
-				<h1>Health reset buttons also reset target and range</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -6180,6 +6180,9 @@
 	  	<span><input class="tally" type="number" value="0" min="0" name=attr_totalCharacterCost title="@{totalCharacterCost}" readonly="true" tabindex="-1"/></span>
 	</div>
 </div>
+
+<!-- Hidden sheet identifier -->
+<input type="hidden" name="attr_sheet_name" value="HeroSystem6eHeroic"/>
 
 <!-- Hidden variables for combat rolls -->
 <input type="hidden" name="attr_targetOCVpenalty" value="0"/>
@@ -6536,10 +6539,22 @@
 		}
 		
 		if (version < 2.3) {
+			values = await _getAttrs(["martialManeuverOCV01", "martialManeuverOCV02", "martialManeuverOCV03", "martialManeuverOCV04", "martialManeuverOCV05", "martialManeuverOCV06", "martialManeuverOCV07", "martialManeuverOCV08", "martialManeuverOCV09", "martialManeuverDCV01", "martialManeuverDCV02", "martialManeuverDCV03", "martialManeuverDCV04", "martialManeuverDCV05", "martialManeuverDCV06", "martialManeuverDCV07", "martialManeuverDCV08", "martialManeuverDCV09", "strength", "intelligence", "useCharacteristicMaximums", "enhancedPerceptionModifier", "perceptionModifierVision", "perceptionModifierHearing", "perceptionModifierSmell"]);
+			
+			// Ensure hiddenBasicDamage is available.
+			let statValue = parseInt(values.strength)||0;
+			let theNumberOfD6 = (parseInt((statValue - (statValue%5))/5)||0).toString();
+			
+			let theNumberOfD3 = 0;
+			if (statValue%5 > 2) {
+				theNumberOfD3 = 1;
+			}
+			
+			var hiddenDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
+			
+			attributes.hiddenBasicDamage = hiddenDamage;
+			
 			// Update martial maneuver text CVs to integers.
-			
-			values = await _getAttrs(["martialManeuverOCV01", "martialManeuverOCV02", "martialManeuverOCV03", "martialManeuverOCV04", "martialManeuverOCV05", "martialManeuverOCV06", "martialManeuverOCV07", "martialManeuverOCV08", "martialManeuverOCV09", "martialManeuverDCV01", "martialManeuverDCV02", "martialManeuverDCV03", "martialManeuverDCV04", "martialManeuverDCV05", "martialManeuverDCV06", "martialManeuverDCV07", "martialManeuverDCV08", "martialManeuverDCV09"]);
-			
 			attributes.martialManeuverOCV01 = parseInt(values.martialManeuverOCV01)||0;
 			attributes.martialManeuverDCV01 = parseInt(values.martialManeuverDCV01)||0;
 			
@@ -6565,7 +6580,22 @@
 			attributes.martialManeuverDCV08 = parseInt(values.martialManeuverDCV08)||0;
 			
 			attributes.martialManeuverOCV09 = parseInt(values.martialManeuverOCV09)||0;
-			attributes.martialManeuverDCV09 = parseInt(values.martialManeuverDCV09)||0;
+			attributes.martialManeuverDCV09 = parseInt(values.martialManeuverDCV09)||0
+			attributes.martialManeuverDamage09 = hiddenDamage;
+			
+			// Update perception roll chances.
+			statValue = parseInt(values.intelligence)||10;
+			enhancedPerceptionMod = parseInt(values.enhancedPerceptionModifier)||0;
+			perceptionModVision = parseInt(values.perceptionModifierVision)||0;
+			perceptionModHearing = parseInt(values.perceptionModifierHearing)||0;
+			perceptionModSmell = parseInt(values.perceptionModifierSmell)||0;
+			
+			attributes.perceptionVision = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModVision;
+			attributes.perceptionHearing = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModHearing;
+			attributes.perceptionSmell = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModSmell;
+			
+			// Add sheet_name identifier.
+			attributes.sheet_name = "HeroSystem6eHeroic";
 			
 			version = 2.3;
 		}
@@ -9007,7 +9037,6 @@
 				
 				if (currentEffect.includes(keywordPhrase) && isNormalDamage) {
 					// The effect includes the keyword phrase and the maneuver is still a normal damage attack.
-					attributes["treasures"] = "invoked";
 					theEndurance = parseInt(values.hiddenBasicEndurance)||0;
 					theDamage = values.hiddenBasicDamage;
 					theHiddenDamage = values.hiddenBasicDamage;
@@ -9498,12 +9527,12 @@
 			
 			
 			// Calculate basic strength damage dice and create a roll20 dice string of d6s and d3s.
-			let theStrength=parseInt(values.strength)||0;
-			let theNumberOfD6=(parseInt((theStrength-(theStrength%5))/5)||0).toString();
+			let theStrength = parseInt(values.strength)||0;
+			let theNumberOfD6 = (parseInt((theStrength - (theStrength%5))/5)||0).toString();
 			
-			let theNumberOfD3=0;
-			if (theStrength%5>2) {
-				theNumberOfD3=1;
+			let theNumberOfD3 = 0;
+			if (theStrength%5 > 2) {
+				theNumberOfD3 = 1;
 			}
 			
 			var theStrengthDamage=theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
