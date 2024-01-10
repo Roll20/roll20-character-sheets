@@ -913,3 +913,26 @@
     </div>
     </fieldset>
 </div>
+<script type="text/worker">
+    on('change:repeating_inventory:item_weight remove:repeating_inventory', function() {
+        getSectionIDs('repeating_inventory', function(IDArray) {
+            var fieldNames = [];
+            for (var i=0; i < IDArray.length; i++) {
+                fieldNames.push('repeating_inventory_' + IDArray[i] + '_item_weight');
+            }
+            getAttrs(fieldNames, function(values) {
+                var output = {};
+                var totalWeight = 0;
+
+                for (var i=0; i < IDArray.length; i++) {
+                    var weight = parseFloat(values['repeating_inventory_' + IDArray[i] + '_item_weight']) || 0;
+                    totalWeight += weight;
+                    output['repeating_inventory_' + IDArray[i]] = weight;
+                }
+
+                output['current_carry_weight'] = totalWeight;
+                setAttrs(output);
+            });
+        });
+    });
+</script>
