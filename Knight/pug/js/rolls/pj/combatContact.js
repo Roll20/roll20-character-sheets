@@ -49,6 +49,8 @@ rollCombatContact.forEach((button) => {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'aura',
+      `${ODValue.aura}`,
       'energiePJ',
       'espoir',
       'devasterAnatheme',
@@ -300,6 +302,8 @@ rollCombatContact.forEach((button) => {
     const oTir = +attrs[`${ODValue.tir}`];
     const vCombat = +attrs.combat;
     const oCombat = +attrs[`${ODValue.combat}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -348,6 +352,7 @@ rollCombatContact.forEach((button) => {
     let isEAmbidextrie = false;
     let isELourd = false;
     let isEDeuxMains = false;
+    let isTirSecurite = false;
 
     let isAAgressive = false;
     let isASoeur = false;
@@ -468,7 +473,7 @@ rollCombatContact.forEach((button) => {
     if (hasOptions) {
       // GESTION DES EFFETS
 
-      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
       bDegats = bDegats.concat(effets.bDegats);
       eASAssassin = effets.eASAssassin;
@@ -519,6 +524,7 @@ rollCombatContact.forEach((button) => {
 
       isEAkimbo = effets.isAkimbo;
       isEAmbidextrie = effets.isAmbidextrie;
+      isTirSecurite = effets.isTirSecurite;
 
       isBourreau = effets.isBourreau;
       isDevastation = effets.isDevastation;
@@ -636,7 +642,7 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd);
+    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);

@@ -3,7 +3,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-undef */
 
-const rollCombatGrenade = ['grenade1', 'grenade2', 'grenade3', 'grenade4', 'grenade5'];
+const rollCombatGrenade = ['grenade1', 'grenade2', 'grenade3', 'grenade4', 'grenade5', 'grenade6'];
 
 rollCombatGrenade.forEach((button) => {
   on(`clicked:${button}`, async (info) => {
@@ -238,6 +238,14 @@ rollCombatGrenade.forEach((button) => {
         autresEffets.push(i18n_antiVehicule);
         autresEffets.push(`${i18n_dispersion} 3`);
         break;
+      case 'grenade6':
+        isConditionnelA = true;
+
+        exec.push(`{{demoralisant=${i18n_demoralisant} 1}} {{demoralisantCondition=${i18n_demoralisantCondition}}}`);
+        autresEffets.push(i18n_ignoreCouvert);
+        autresEffets.push(i18n_nonLetal);
+        autresEffets.push(`${i18n_dispersion} 6`);
+        break;
       default:
         isConditionnelA = false;
         hasDgts = false;
@@ -248,7 +256,7 @@ rollCombatGrenade.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false);
+    const getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, '', '', hasArmure, oTir, false, false, false, false, false);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
