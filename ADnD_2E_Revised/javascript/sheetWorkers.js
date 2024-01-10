@@ -849,16 +849,17 @@ on('clicked:opendoor-check', function (eventInfo){
        let rollBuilder = new RollTemplateBuilder('2Echeck');
        rollBuilder.push('character=@{character_name}','checkroll=[[1d20cs1cf20]]','color=blue','success=The door swings open!');
 
+       let checkTarget;
        let match = values.opendoor.match(/(\d+)\((\d+)\)/);
-       if (!match) {
-           rollBuilder.push('checkvs=Open Heavy/Stuck Doors Check','checktarget=[[@{opendoor}]]','fail=The door stays shut, but you can try again.');
-           return printRoll(rollBuilder.string());
+       if (match) {
+           checkTarget = await extractQueryResult(`?{What kind of door?|Heavy / Stuck door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
+       } else {
+           checkTarget = '@{opendoor}';
        }
+       rollBuilder.push(`checktarget=[[${checkTarget}+(@{misc-mod})]]`);
 
-       let target = await extractQueryResult(`?{What kind of door?|Heavy / Stuck door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
-       rollBuilder.push(`checktarget=[[${target}]]`);
-       if (target === match[1]) {
-           rollBuilder.push('checkvs=Open Heavy/Stuck Doors Check','fail=The door stays shut, but you can try again.');
+       if (!match || checkTarget === match[1]) {
+           rollBuilder.push('checkvs=Open Heavy/Stuck Doors Check','fail=The door stays shut, but you can try again with a cumulative -1 penalty for each try.');
        } else {
            rollBuilder.push('checkvs=Open Locked/Barred/Magically Held Doors Check','fail=The door stays shut. No further attempts can be made by @{character_name}.');
        }
