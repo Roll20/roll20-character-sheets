@@ -52,10 +52,11 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/9/23'</label>
+              <label class="right">1/10/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Armor Details: the unArmored Base row has been included with repeating_equipment|armor sync. This row is designed to represent any non-armor "Base AC". ie monsters natural skin/hide or a PC's clothing.</li>
             <li>Added an Auto-Calc Movement option. The movement load can be temporarily selected even if the auto-calc option is enabled but any changes to encumbrance, base movement, or opening the sheet will cause a re-calc. If Auto-Calc Movement is disabled, any manual changes to the movement load will be persistant.</li>
             <li>Fixed NPC image link roll.</li>
             <li>Fixed triggering event for total weight. Was not recalculating until sheet open.</li>
@@ -716,6 +717,7 @@
       <div class="sect header">ARMOR DETAILS</div>
       <span class="sect material-icons"></span>
       <!-- used to sync armor details to repeating_equipment-->
+      <input type="hidden" name="attr_unarmored_row_id" value="0" />
       <input type="hidden" name="attr_armortype1_row_id" value="0" />
       <input type="hidden" name="attr_armortype2_row_id" value="0" />
       <input type="hidden" name="attr_armorshield_row_id" value="0" />
@@ -731,15 +733,18 @@
         holds the old armor details attributes moved to repeating_equipment
         and is also used to get armor weight sub-total
       -->
+      <input type="checkbox" class="hidden" name="attr_unarmored_carried" value="1" />
       <input type="checkbox" class="hidden" name="attr_armortype_carried" value="1" />
       <input type="checkbox" class="hidden" name="attr_armortype2_carried" value="1" />
       <input type="checkbox" class="hidden" name="attr_armorshield_carried" value="1" />
       <input type="checkbox" class="hidden" name="attr_armorhelmet_carried" value="1" />
       <input type="hidden" name="attr_armor_weight" value="0" />
+      <input type="hidden" name="attr_unarmored_weight" value="0" />
       <input type="hidden" name="attr_armortype2_weight" value="0" />
       <input type="hidden" name="attr_armorshield_weight" value="0" />
       <input type="hidden" name="attr_armorhelmet_weight" value="0" />
       <input type="hidden" name="attr_armor_cost" value="0" />
+      <input type="hidden" name="attr_unarmored_cost" value="0" />
       <input type="hidden" name="attr_armortype2_cost" value="0" />
       <input type="hidden" name="attr_armorshield_cost" value="0" />
       <input type="hidden" name="attr_armorhelmet_cost" value="0" />
@@ -756,13 +761,9 @@
           <span>Bulk</span>
         </span>
         <span class="armor-columns">
-          <span class="span-three center">
-            <span class="two-columns inline-label">
-              <label>Unarmored Base</label>
-              <input type="checkbox" class="hidden" name="attr_unarmored_worn" title="@{unarmored_worn}" value="1" checked />
-              <input type="text" class="width-fill" name="attr_unarmored" title="@{unarmored}" placeholder="No Armor (10)" />
-            </span>
-          </span>
+          <label class="span-two stack-text">UnArmored Base</label>
+          <input type="checkbox" class="hidden" name="attr_unarmored_worn" title="@{unarmored_worn}" value="1" checked />
+          <input type="text" class="width-fill" name="attr_unarmored" title="@{unarmored} | Use for Unarmored, Clothing, etc." placeholder="Description" />
           <select class="select" name="attr_unarmored_ac" title="@{unarmored_ac}">
             <option value="10" selected>10</option>
             <option value="9">9</option>
@@ -789,6 +790,14 @@
             <option value="1">1</option>
             <option value="0">0</option>
             <option value="-">-</option>
+          </select>
+          <span></span>
+          <span></span>
+          <select class="select width-fill" name="attr_unarmored_bulk" title="@{unarmored_bulk}">
+            <option value="0" selected>n/a</option>
+            <option value="1">non-Bulky 12"</option>
+            <option value="2">Fairly 9"</option>
+            <option value="3">Bulky 6"</option>
           </select>
         </span>
         <span class="armor-columns">
@@ -1621,8 +1630,8 @@
           <span class="span-four">Adjusted Speed</span>
           <span></span>
           <span></span>
-          <span>Explore/Map</span>
-          <span>Known Route</span>
+          <span class="stack-text">Explore<wbr>/Map</span>
+          <span class="stack-text">Known Route</span>
           <span>Run/Flee</span>
         </span>
         <span class="basemove-columns">
@@ -1641,7 +1650,7 @@
             <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="2" readonly />
             <input type="text" class="hidden" name="attr_movement_load" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_load" title="@{movement_load}"></span>
-            <span>Very Heavy</span>
+            <span style="white-space: nowrap;">Very Heavy</span>
           </label>
           <label class="label-under" title="@{movement_max}">
             <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="3" readonly />
@@ -1654,17 +1663,17 @@
           <label class="label-under" title="@{movement_normal}">
             <input type="text" class="hidden" name="attr_movement_normal" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_normal" title="@{movement_normal}"></span>
-            <span class="text-small">(Adj.Speed x1')</span>
+            <span class="text-small">(Speed x1')</span>
           </label>
           <label class="label-under" title="@{movement_known}">
             <input type="text" class="hidden" name="attr_movement_known" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_known" title="@{movement_known}"></span>
-            <span class="text-small">(Adj.Speed x5')</span>
+            <span class="text-small">(Speed x5')</span>
           </label>
           <label class="label-under" title="@{movement_run}">
             <input type="text" class="hidden" name="attr_movement_run" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_run" title="@{movement_run}"></span>
-            <span class="text-small">(Adj.Speed x10')</span>
+            <span class="text-small">(Speed x10')</span>
           </label>
           <!--deprecated attribute: crawl kept in case attribute is needed -->
           <input type="text" class="hidden" name="attr_movement_crawl" value="0" readonly />
@@ -2371,6 +2380,11 @@
                 <input type="text" class="width-smaller" name="attr_equipment_quantity_max" title="@{repeating_equipment_$X_equipment_quantity|max}" value="1" />
                 <input type="text" class="width-fill" name="attr_equipment_weight" title="@{repeating_equipment_$X_equipment_weight}" value="0" />
                 <input type="text" class="width-fill toggle-costs" name="attr_equipment_cost" title="@{repeating_equipment_$X_equipment_cost}" value="0" />
+              </span>
+              <details class="border-bottom-half">
+                <summary>
+                  <span class="material-icons gear-nav"></span>
+                </summary>
                 <!-- sync armor-->
                 <span class="span-all show-for-armor inline-label">
                   <input type="hidden" class="show-shield-only" name="attr_equipment_armor_type" value="0" />
@@ -2379,134 +2393,8 @@
                     <button type="action" name="act_addarmor" title="Adds armor to the selected Armor Details row.">+Add</button>
                     <span>to</span>
                     <select class="select width-medium" name="attr_equipment_armor_type" title="@{repeating_equipment_$X_equipment_armor_type}">
-                      <option value="0" selected>choose</option>
-                      <option value="1">Armor 1</option>
-                      <option value="2">Armor 2</option>
-                      <option value="3">Shield</option>
-                      <option value="4">Helmet</option>
-                      <option value="5">Other 1</option>
-                      <option value="6">Other 2</option>
-                      <option value="7">Other 3</option>
-                      <option value="8">Other 4</option>
-                      <option value="9">Other 5</option>
-                      <option value="10">Other 6</option>
-                    </select>
-                  </label>
-                  <label>
-                    <span>In Use</span>
-                    <input type="checkbox" name="attr_equipment_armor_worn" value="1" title="@{repeating_equipment_$X_equipment_armor_worn}" />
-                  </label>
-                  <label>
-                    <span>AC</span>
-                    <select class="select show-shield-only" name="attr_equipment_armor_ac" title="@{repeating_equipment_$X_equipment_armor_ac} | ie +2 lowers AC by -2.">
-                      <option value="0" selected="">0</option>
-                      <option value="-1">+1</option>
-                      <option value="-2">+2</option>
-                      <option value="-3">+3</option>
-                      <option value="-4">+4</option>
-                      <option value="-5">+5</option>
-                      <option value="-6">+6</option>
-                      <option value="-7">+7</option>
-                      <option value="-8">+8</option>
-                      <option value="-9">+9</option>
-                      <option value="-10">+10</option>
-                    </select>
-                    <select class="select" name="attr_equipment_armor_ac" title="@{repeating_equipment_$X_equipment_armor_ac}">
-                      <option value="10" selected="">10</option>
-                      <option value="9">9</option>
-                      <option value="8">8</option>
-                      <option value="7">7</option>
-                      <option value="6">6</option>
-                      <option value="5">5</option>
-                      <option value="4">4</option>
-                      <option value="3">3</option>
-                      <option value="2">2</option>
-                      <option value="1">1</option>
-                      <option value="0">0</option>
-                      <option class="hidden" value="-1">-1</option>
-                      <option class="hidden" value="-2">-2</option>
-                      <option class="hidden" value="-3">-3</option>
-                      <option class="hidden" value="-4">-4</option>
-                      <option class="hidden" value="-5">-5</option>
-                      <option class="hidden" value="-6">-6</option>
-                      <option class="hidden" value="-7">-7</option>
-                      <option class="hidden" value="-8">-8</option>
-                      <option class="hidden" value="-9">-9</option>
-                      <option class="hidden" value="-10">-10</option>
-                    </select>
-                  </label>
-                  <label>
-                    <span>AR</span>
-                    <select class="select show-shield-only" name="attr_equipment_armor_base" title="@{repeating_equipment_$X_equipment_armor_base} | ie +2 lowers AC by -2.">
-                      <option value="0" selected="">0</option>
-                      <option value="-1">+1</option>
-                      <option value="-2">+2</option>
-                      <option value="-3">+3</option>
-                      <option value="-4">+4</option>
-                      <option value="-5">+5</option>
-                      <option value="-6">+6</option>
-                      <option value="-7">+7</option>
-                      <option value="-8">+8</option>
-                      <option value="-9">+9</option>
-                      <option value="-10">+10</option>
-                    </select>
-                    <select class="select" name="attr_equipment_armor_base" title="@{repeating_equipment_$X_equipment_armor_base}">
-                      <option value="10" selected="">10</option>
-                      <option value="9">9</option>
-                      <option value="8">8</option>
-                      <option value="7">7</option>
-                      <option value="6">6</option>
-                      <option value="5">5</option>
-                      <option value="4">4</option>
-                      <option value="3">3</option>
-                      <option value="2">2</option>
-                      <option value="1">1</option>
-                      <option value="0">0</option>
-                      <option class="hidden" value="-1">-1</option>
-                      <option class="hidden" value="-2">-2</option>
-                      <option class="hidden" value="-3">-3</option>
-                      <option class="hidden" value="-4">-4</option>
-                      <option class="hidden" value="-5">-5</option>
-                      <option class="hidden" value="-6">-6</option>
-                      <option class="hidden" value="-7">-7</option>
-                      <option class="hidden" value="-8">-8</option>
-                      <option class="hidden" value="-9">-9</option>
-                      <option class="hidden" value="-10">-10</option>
-                    </select>
-                  </label>
-                  <input type="checkbox" class="hidden toggle-input-error" name="attr_equipment_armor_magic_error" value="1" checked />
-                  <label>
-                    <span>Magic</span>
-                    <input type="text" class="width-small" name="attr_equipment_armor_magic" value="0" title="@{repeating_equipment_$X_equipment_armor_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2."/>
-                  </label>
-                  <input type="checkbox" class="hidden toggle-input-error" name="attr_equipment_armor_mod_error" value="1" checked />
-                  <label>
-                    <span>Misc</span>
-                    <input type="text" class="width-small" name="attr_equipment_armor_mod" value="0" title="@{repeating_equipment_$X_equipment_armor_mod} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
-                  </label>
-                  <label>
-                    <span>Bulk</span>
-                    <select class="select" name="attr_equipment_armor_bulk" title="@{repeating_equipment_$X_equipment_armor_bulk}">
-                      <option value="0" selected="">n/a</option>
-                      <option value="1">non-Bulky 12"</option>
-                      <option value="2">Fairly 9"</option>
-                      <option value="3">Bulky 6"</option>
-                    </select>
-                  </label>
-                </span>
-              </span>
-              <details class="border-bottom-half">
-                <summary>
-                  <span class="material-icons gear-nav"></span>
-                </summary>
-                <span class="span-all show-for-armor inline-label">
-                  <input type="hidden" class="show-shield-only" name="attr_equipment_armor_type" value="0" />
-                  <label>Armor Details:</label>
-                  <label>
-                    <button type="action" name="act_addarmor" title="Adds armor to the selected Armor Details row.">+Add</button>
-                    <span>to</span>
-                    <select class="select width-medium" name="attr_equipment_armor_type" title="@{repeating_equipment_$X_equipment_armor_type}">
-                      <option value="0" selected>choose</option>
+                      <option value="" selected>choose</option>
+                      <option value="0">Clothing</option>
                       <option value="1">Armor 1</option>
                       <option value="2">Armor 2</option>
                       <option value="3">Shield</option>
@@ -4513,6 +4401,7 @@
   let thiefmisc2Calc = '';
 
   const armorRowIDs = [
+    'unarmored_row_id',
     'armortype1_row_id',
     'armortype2_row_id',
     'armorshield_row_id',
@@ -4525,6 +4414,14 @@
     'armorother6_row_id',
   ];
   const armorAttrs = [
+    'unarmored_worn',
+    'unarmored',
+    'unarmored_ac',
+    'unarmored_base',
+    'unarmored_bulk',
+    'unarmored_carried',
+    'unarmored_weight',
+    'unarmored_cost',
     'armortype_worn',
     'armortype',
     'armortype_ac',
@@ -5536,6 +5433,7 @@
       let id_low = id;
       id_low = id_low !== null ? id.toLowerCase() : id_low;
       // clog(`syncArmorToEquipment id:${id_low}  attr:${attr}  row_removed:${row_removed}`);
+      const unarmored0_ID = v.unarmored_row_id.toString();
       const armortype1_ID = v.armortype1_row_id.toString();
       const armortype2_ID = v.armortype2_row_id.toString();
       const armorshield_ID = v.armorshield_row_id.toString();
@@ -5547,6 +5445,7 @@
       const armorother5_ID = v.armorother5_row_id.toString();
       const armorother6_ID = v.armorother6_row_id.toString();
       const idArray = [
+        unarmored0_ID,
         armortype1_ID,
         armortype2_ID,
         armorshield_ID,
@@ -5560,6 +5459,7 @@
       ].map((str) => (str ? str.toString().toLowerCase() : '0'));
       // clog(`syncArmorToEquipment idArray: [${idArray}]`);
       // use arrays to determine what row to create/update/reset
+      const unarmoredAttrs = ['unarmored_worn', 'unarmored', 'unarmored_ac', 'unarmored_base', 'unarmored_bulk', 'unarmored_carried', 'unarmored_weight', 'unarmored_cost'];
       const armor1Attrs = ['armortype_worn', 'armortype', 'armortype_ac', 'armortype_base', 'armortype_magic', 'armortype_bulk', 'armortype_carried', 'armor_weight', 'armor_cost'];
       const armor2Attrs = [
         'armortype2_worn',
@@ -5601,7 +5501,7 @@
       const other5Attrs = ['armorother5_worn', 'armorother5', 'armorother5_ac', 'armorother5_base', 'armorother5_magic', 'armorother5_mod'];
       const other6Attrs = ['armorother6_worn', 'armorother6', 'armorother6_ac', 'armorother6_base', 'armorother6_magic', 'armorother6_mod'];
       function matchAttr(attribute) {
-        const arrays = {armor1Attrs, armor2Attrs, shieldAttrs, helmetAttrs, other1Attrs, other2Attrs, other3Attrs, other4Attrs, other5Attrs, other6Attrs};
+        const arrays = {unarmoredAttrs, armor1Attrs, armor2Attrs, shieldAttrs, helmetAttrs, other1Attrs, other2Attrs, other3Attrs, other4Attrs, other5Attrs, other6Attrs};
         const matchingArray = Object.entries(arrays).find(([arrayName, array]) => array.includes(attribute));
         return matchingArray ? matchingArray[0] : null; // Return the array name or null if no match is found
       }
@@ -5612,7 +5512,7 @@
       } else {
         // console.log(`No match found for attribute: ${attrToCheck}`);
       }
-
+      const armor0 = v.unarmored;
       const armor1 = v.armortype;
       const armor2 = v.armortype2;
       const shield = v.armorshield;
@@ -5624,7 +5524,73 @@
       const other5 = v.armorother5;
       const other6 = v.armorother6;
       // match the row
-      if (matchingArray === 'armor1Attrs' || id_low === idArray[0] || migrate) {
+      if (matchingArray === 'unarmoredAttrs' || id_low === idArray[0] || migrate) {
+        if (matchingArray === 'unarmoredAttrs' || migrate) {
+          if (armor0) {
+            if (unarmored0_ID.length === 20) {
+              // has name && has id = UPDATE ROW
+              newID = unarmored0_ID.toLowerCase();
+              output.unarmored_row_id = newID;
+              output[`repeating_equipment_${newID}_equipment_type`] = 2;
+              output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
+              output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+              output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
+              output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+              output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+              output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
+              // armor in use should always be considered as carried
+              if (+v.unarmored_worn === 1 && +v.unarmored_carried !== 1) {
+                output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+              } else {
+                output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+              }
+              output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
+              output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
+              // clog(`repeating Armor exists armor1:${newID}`);
+            } else {
+              // has name but NO id = CREATE NEW ROW
+              newID = generateUniqueRowID();
+              output.unarmored_row_id = newID.toLowerCase();
+              output[`repeating_equipment_${newID}_equipment_type`] = 2;
+              output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
+              output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+              output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
+              output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+              output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+              output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
+              output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
+              // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
+            }
+          } else if (unarmored0_ID === idArray[0]) {
+            // no name but id exists: armor detail row REMOVED RESETING ROW
+            output.unarmored_row_id = 0;
+            output.unarmored_worn = 1;
+            output.unarmored = '';
+            output.unarmored_ac = 10;
+            output.unarmored_base = 10;
+            output.unarmored_bulk = 0;
+            output.unarmored_weight = 0;
+            output.unarmored_cost = 0;
+            output.unarmored_carried = 1;
+            // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
+          }
+        } else {
+          // null means repeating_row removed: has Name and id = REMOVED RESET ROW
+          output.unarmored_row_id = 0;
+          output.unarmored_worn = 1;
+          output.unarmored = '';
+          output.unarmored_ac = 10;
+          output.unarmored_base = 10;
+          output.unarmored_bulk = 0;
+          output.unarmored_weight = 0;
+          output.unarmored_cost = 0;
+          output.unarmored_carried = 1;
+          // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
+        }
+      }
+      if (matchingArray === 'armor1Attrs' || id_low === idArray[1] || migrate) {
         if (matchingArray === 'armor1Attrs' || migrate) {
           if (armor1) {
             if (armortype1_ID.length === 20) {
@@ -5665,7 +5631,7 @@
               output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
               // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
             }
-          } else if (armortype1_ID === idArray[0]) {
+          } else if (armortype1_ID === idArray[1]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armortype1_row_id = 0;
             output.armortype_worn = 0;
@@ -5694,7 +5660,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
         }
       }
-      if (matchingArray === 'armor2Attrs' || id_low === idArray[1] || migrate) {
+      if (matchingArray === 'armor2Attrs' || id_low === idArray[2] || migrate) {
         if (matchingArray === 'armor2Attrs' || migrate) {
           if (armor2) {
             if (armortype2_ID.length === 20) {
@@ -5735,7 +5701,7 @@
               output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
               // clog(`repeating armor does not exist. Creating armor2: ${newID}`);
             }
-          } else if (armortype2_ID === idArray[1]) {
+          } else if (armortype2_ID === idArray[2]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armortype2_row_id = 0;
             output.armortype2_worn = 0;
@@ -5764,7 +5730,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor2:${newID}`);
         }
       }
-      if (matchingArray === 'shieldAttrs' || id_low === idArray[2] || migrate) {
+      if (matchingArray === 'shieldAttrs' || id_low === idArray[3] || migrate) {
         if (matchingArray === 'shieldAttrs' || migrate) {
           if (shield) {
             if (armorshield_ID.length === 20) {
@@ -5807,7 +5773,7 @@
               output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
               // clog(`repeating armor does not exist. Creating shield: ${newID}`);
             }
-          } else if (armorshield_ID === idArray[2]) {
+          } else if (armorshield_ID === idArray[3]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorshield_row_id = 0;
             output.armorshield_worn = 0;
@@ -5838,7 +5804,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset shield:${newID}`);
         }
       }
-      if (matchingArray === 'helmetAttrs' || id_low === idArray[3] || migrate) {
+      if (matchingArray === 'helmetAttrs' || id_low === idArray[4] || migrate) {
         if (matchingArray === 'helmetAttrs' || migrate) {
           if (helmet) {
             if (armorhelmet_ID.length === 20) {
@@ -5875,7 +5841,7 @@
               output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
               // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
             }
-          } else if (armorhelmet_ID === idArray[3]) {
+          } else if (armorhelmet_ID === idArray[4]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorhelmet_row_id = 0;
             output.armorhelmet_worn = 0;
@@ -5904,7 +5870,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset helmet:${newID}`);
         }
       }
-      if (matchingArray === 'other1Attrs' || id_low === idArray[4] || migrate) {
+      if (matchingArray === 'other1Attrs' || id_low === idArray[5] || migrate) {
         if (matchingArray === 'other1Attrs' || migrate) {
           if (other1) {
             if (armorother1_ID.length === 20) {
@@ -5936,7 +5902,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
               // clog(`repeating armor does not exist. Creating other1: ${newID}`);
             }
-          } else if (armorother1_ID === idArray[4]) {
+          } else if (armorother1_ID === idArray[5]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorother1_row_id = 0;
             output.armorother_worn = 0;
@@ -5961,7 +5927,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset other1:${newID}`);
         }
       }
-      if (matchingArray === 'other2Attrs' || id_low === idArray[5] || migrate) {
+      if (matchingArray === 'other2Attrs' || id_low === idArray[6] || migrate) {
         if (matchingArray === 'other2Attrs' || migrate) {
           if (other2) {
             if (armorother2_ID.length === 20) {
@@ -5992,7 +5958,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
               // clog(`repeating armor does not exist. Creating other2: ${newID}`);
             }
-          } else if (armorother2_ID === idArray[5]) {
+          } else if (armorother2_ID === idArray[6]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorother2_row_id = 0;
             output.armorother2_worn = 0;
@@ -6017,7 +5983,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset other2:${newID}`);
         }
       }
-      if (matchingArray === 'other3Attrs' || id_low === idArray[6] || migrate) {
+      if (matchingArray === 'other3Attrs' || id_low === idArray[7] || migrate) {
         if (matchingArray === 'other3Attrs' || migrate) {
           if (other3) {
             if (armorother3_ID.length === 20) {
@@ -6049,7 +6015,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
               // clog(`repeating armor does not exist. Creating other3: ${newID}`);
             }
-          } else if (armorother3_ID === idArray[6]) {
+          } else if (armorother3_ID === idArray[7]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorother3_row_id = 0;
             output.armorother3_worn = 0;
@@ -6074,7 +6040,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset other3:${newID}`);
         }
       }
-      if (matchingArray === 'other4Attrs' || id_low === idArray[7] || migrate) {
+      if (matchingArray === 'other4Attrs' || id_low === idArray[8] || migrate) {
         if (matchingArray === 'other4Attrs' || migrate) {
           if (other4) {
             if (armorother4_ID.length === 20) {
@@ -6106,7 +6072,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
               // clog(`repeating armor does not exist. Creating other4: ${newID}`);
             }
-          } else if (armorother4_ID === idArray[7]) {
+          } else if (armorother4_ID === idArray[8]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorother4_row_id = 0;
             output.armorother4_worn = 0;
@@ -6131,7 +6097,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset other4:${newID}`);
         }
       }
-      if (matchingArray === 'other5Attrs' || id_low === idArray[8] || migrate) {
+      if (matchingArray === 'other5Attrs' || id_low === idArray[9] || migrate) {
         if (matchingArray === 'other5Attrs' || migrate) {
           if (other5) {
             if (armorother5_ID.length === 20) {
@@ -6163,7 +6129,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
               // clog(`repeating armor does not exist. Creating other5: ${newID}`);
             }
-          } else if (armorother5_ID === idArray[8]) {
+          } else if (armorother5_ID === idArray[9]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorother5_row_id = 0;
             output.armorother5_worn = 0;
@@ -6188,7 +6154,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset other5:${newID}`);
         }
       }
-      if (matchingArray === 'other6Attrs' || id_low === idArray[9] || migrate) {
+      if (matchingArray === 'other6Attrs' || id_low === idArray[10] || migrate) {
         if (matchingArray === 'other6Attrs' || migrate) {
           if (other6) {
             if (armorother6_ID.length === 20) {
@@ -6220,7 +6186,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
               // clog(`repeating armor does not exist. Creating other6: ${newID}`);
             }
-          } else if (armorother6_ID === idArray[9]) {
+          } else if (armorother6_ID === idArray[10]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.armorother6_row_id = 0;
             output.armorother6_worn = 0;
@@ -6731,6 +6697,7 @@
         fields.push(section_attribute('equipment', id, 'equipment_weight'));
         fields.push(section_attribute('equipment', id, 'equipment_quantity'));
         fields.push(section_attribute('equipment', id, 'equipment_carried'));
+        fields.push(section_attribute('equipment', id, 'equipment_carried_select'));
       });
       const combined = [...nonRep, ...fields];
       getAttrs(combined, (v) => {
@@ -6741,7 +6708,10 @@
           const type = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
           const armorType = +v[section_attribute('equipment', id, 'equipment_armorType')] || 0;
           // const location = v[section_attribute('equipment', id, 'equipment_location')];
-          const carried = +v[section_attribute('equipment', id, 'equipment_carried')] || 0;
+          // Weight calcs use equipment_carried
+          const carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+          const carried = carriedSelect === 1 ? 1 : 0;
+          output[`repeating_equipment_${id}_equipment_carried`] = carried;
           const quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
           let weight = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
           let weaponWeight = 0;
@@ -6791,7 +6761,7 @@
 
   // Equipment Weight Calcs
   on(
-    'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:total_coin_weight remove:repeating_equipment',
+    'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:total_coin_weight remove:repeating_equipment',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       sumEquipmentWeight();
@@ -6844,7 +6814,7 @@
     });
   }
 
-  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight', (eventInfo) => {
+  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['encumbrancebonus'], (v) => {
       // clog('Encumbrance has been re-calculated');
@@ -6927,8 +6897,8 @@
         const carriedTab = +v.equipment_tabs_carry || 0;
         idArray.forEach((id) => {
           const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
-          const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
           // Weight calcs use equipment_carried
+          const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
           const thisCarriedValue = thisCarriedSelect === 1 ? 1 : 0;
           output[`repeating_equipment_${id}_equipment_carried`] = thisCarriedValue;
           // Use CSS to hide/show the repeating row using typeTab and/or carriedTab
@@ -6953,6 +6923,7 @@
       const fieldnames = idArray.reduce((fields, id) => [...fields, `repeating_equipment_${id}_equipment_armor_type`], []);
       getAttrs(['armordetails_array', ...armorRowIDs, ...fieldnames], (v) => {
         const output = {};
+        const unarmored0_ID = v.unarmored_row_id.toString();
         const armortype1_ID = v.armortype1_row_id.toString();
         const armortype2_ID = v.armortype2_row_id.toString();
         const armorshield_ID = v.armorshield_row_id.toString();
@@ -6964,6 +6935,7 @@
         const armorother5_ID = v.armorother5_row_id.toString();
         const armorother6_ID = v.armorother6_row_id.toString();
         const armorDetailsArray = [
+          unarmored0_ID,
           armortype1_ID,
           armortype2_ID,
           armorshield_ID,
@@ -6978,7 +6950,7 @@
         // clog(`armordetails_array: ${armorDetailsArray}`);
         idArray.forEach((id) => {
           const type = v[`repeating_equipment_${id}_equipment_armor_type`];
-          if (type !== '0') {
+          if (type !== '') {
             // Find positions where id matches in armorDetailsArray
             const matchingIndices = armorDetailsArray
               .map((element, index) => {
@@ -7014,42 +6986,46 @@
 
               switch (removeRow) {
                 case '1':
+                  output.unarmored = '';
+                  clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
+                  break;
+                case '2':
                   output.armortype = '';
                   clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
                   break;
-                case '2':
+                case '3':
                   output.armortype2 = '';
                   clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
                   break;
-                case '3':
+                case '4':
                   output.armorshield = '';
                   clog(`>> DELETE/RESET ROW 3 - Shield <<`);
                   break;
-                case '4':
+                case '5':
                   output.armorhelmet = '';
                   clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
                   break;
-                case '5':
+                case '6':
                   output.armorother = '';
                   clog(`>> DELETE/RESET ROW 5 - Other <<`);
                   break;
-                case '6':
+                case '7':
                   output.armorother2 = '';
                   clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
                   break;
-                case '7':
+                case '8':
                   output.armorother3 = '';
                   clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
                   break;
-                case '8':
+                case '9':
                   output.armorother4 = '';
                   clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
                   break;
-                case '9':
+                case '10':
                   output.armorother5 = '';
                   clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
                   break;
-                case '10':
+                case '11':
                   output.armorother6 = '';
                   clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
                   break;
@@ -7079,6 +7055,21 @@
     getAttrs(armorAttrs, (v) => {
       const output = {};
       let newID = '';
+      if (attr === 'unarmored' && attrPrev === undefined) {
+        // has new name but NO id = CREATE NEW ROW
+        newID = generateUniqueRowID();
+        output.unarmored_row_id = newID.toLowerCase();
+        output[`repeating_equipment_${newID}_equipment_type`] = 2;
+        output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
+        output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
+        output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
+        output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+        output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.unarmored_magic;
+        output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+        output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
+        output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
+        // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
+      }
       if (attr === 'armortype' && attrPrev === undefined) {
         // has new name but NO id = CREATE NEW ROW
         newID = generateUniqueRowID();
@@ -7261,6 +7252,9 @@
         const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
         const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
         const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
+        // unarmored is always "in use" but is hidden attr,
+        // but should be to drop clothing ie swim, sleep, etc.
+        const carriedUnarmored = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
         let carried = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
         const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
         const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
@@ -7273,8 +7267,21 @@
           `ID:${id} ITEM:${item} TYPE:${type} WORN:${worn} AC:${ac} BASE:${base} MAGIC:${magic} MOD:${mod} BULK:${bulk} CARRIED:${carried} WEIGHT:${weight} COST:${cost} UPDATED:`,
         ];
         switch (type) {
-          case 0:
+          case '':
             clog(`Choose an armor row.`);
+            break;
+          case 0:
+            // clog(`${thisLog} Armor 1`);
+            output.unarmored_worn = worn;
+            output.unarmored = item;
+            output.unarmored_ac = ac;
+            output.unarmored_base = base;
+            output.unarmored_magic = magic;
+            output.unarmored_bulk = bulk;
+            output.unarmored_carried = carriedUnarmored;
+            output.unarmored_weight = weight;
+            output.unarmored_cost = cost;
+            output.unarmored1_row_id = id;
             break;
           case 1:
             // clog(`${thisLog} Armor 1`);
@@ -7401,17 +7408,19 @@
   // checks repeating_equipment id against armor details ids
   function testArmorRowIDs(id, callback) {
     getAttrs(armorRowIDs, (v) => {
-      const armortype1_ID = v.armortype1_row_id;
-      const armortype2_ID = v.armortype2_row_id;
-      const armorshield_ID = v.armorshield_row_id;
-      const armorhelmet_ID = v.armorhelmet_row_id;
-      const armorother1_ID = v.armorother1_row_id;
-      const armorother2_ID = v.armorother2_row_id;
-      const armorother3_ID = v.armorother3_row_id;
-      const armorother4_ID = v.armorother4_row_id;
-      const armorother5_ID = v.armorother5_row_id;
-      const armorother6_ID = v.armorother6_row_id;
+      const unarmored0_ID = v.unarmored_row_id.toString();
+      const armortype1_ID = v.armortype1_row_id.toString();
+      const armortype2_ID = v.armortype2_row_id.toString();
+      const armorshield_ID = v.armorshield_row_id.toString();
+      const armorhelmet_ID = v.armorhelmet_row_id.toString();
+      const armorother1_ID = v.armorother1_row_id.toString();
+      const armorother2_ID = v.armorother2_row_id.toString();
+      const armorother3_ID = v.armorother3_row_id.toString();
+      const armorother4_ID = v.armorother4_row_id.toString();
+      const armorother5_ID = v.armorother5_row_id.toString();
+      const armorother6_ID = v.armorother6_row_id.toString();
       const idArray = [
+        unarmored0_ID,
         armortype1_ID,
         armortype2_ID,
         armorshield_ID,
