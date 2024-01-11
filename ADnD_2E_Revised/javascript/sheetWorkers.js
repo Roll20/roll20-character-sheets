@@ -834,17 +834,20 @@ on('change:charisma change:leadership change:appearance', function() {
 
 on('clicked:opendoor-check', function (eventInfo){
    getAttrs(['opendoor'], async function (values){
-       let match = values.opendoor.match(/(\d+)\((\d+)\)/);
        let rollBuilder = new RollTemplateBuilder('2Echeck');
        rollBuilder.push('character=@{character_name}','checkroll=[[1d20cs1cf20]]','color=blue','success=The door swings open!');
-       if (!match) {
-           rollBuilder.push('checkvs=Open Doors Check','checktarget=[[@{opendoor}]]','fail=The door stays shut, but you can try again.');
-           return printRoll(rollBuilder.string());
+
+       let checkTarget;
+       let match = values.opendoor.match(/(\d+)\((\d+)\)/);
+       if (match) {
+           checkTarget = await extractQueryResult(`?{What kind of door?|Heavy / Stuck door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
+       } else {
+           checkTarget = '@{opendoor}';
        }
-       let target = await extractQueryResult(`?{What kind of door?|Normal door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
-       rollBuilder.push(`checktarget=[[${target}]]`);
-       if (target === match[1]) {
-           rollBuilder.push('checkvs=Open Normal Doors Check','fail=The door stays shut, but you can try again.');
+       rollBuilder.push(`checktarget=[[${checkTarget}+(@{misc-mod})]]`);
+
+       if (!match || checkTarget === match[1]) {
+           rollBuilder.push('checkvs=Open Heavy/Stuck Doors Check','fail=The door stays shut, but you can try again with a cumulative -1 penalty for each try.');
        } else {
            rollBuilder.push('checkvs=Open Locked/Barred/Magically Held Doors Check','fail=The door stays shut. No further attempts can be made by @{character_name}.');
        }
@@ -1980,7 +1983,7 @@ async function debugSeverity(severityDice) {
         : await extractRollResult(severityDice);
 }
 
-function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set) {
+function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set, severityDice) {
     let effect;
     let additionalHit = {};
     if (severityRoll < 4) {
@@ -1998,7 +2001,7 @@ function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType,
     }
 
     critEffectExplanations(effect, set);
-    effect = `[[${severityRoll}]]: ${effect}`;
+    effect = `${severityDice}&#61;[[${severityRoll}]]: ${effect}`;
     return {
         effect: effect,
         additionalLocations: additionalHit.locations
@@ -2013,7 +2016,7 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
     let additionalLocation = additionalLocations.find(l => additionalLocationRoll <= l.chance);
     let displayAdditionalLocationRoll = additionalLocations.length === 1
         ? ''
-        :`(1d100:${additionalLocationRoll})`;
+        :`(1d100&#61;[[${additionalLocationRoll}]])`;
     let severityRoll = await debugSeverity(severityDice);
     let generalLocation = additionalLocation.general;
     let specificLocation = additionalLocation.specific;
@@ -2026,8 +2029,8 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
         specificLocation = 'Tail';
         locationNote = SPELL_CRIT_13_EFFECT_TABLE[targetType]['Tail'].note;
     }
-    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set);
-    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
+    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set, severityDice);
+    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting the **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
     rollBuilder.push(displayAdditionalEffect);
 
     return await recursiveAdditionalHit(effectObj.additionalLocations, iteration, additionalString+' additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
@@ -2212,15 +2215,16 @@ function setupSpellCrit(section) {
                 '|Major 2d4 (Max. potential damage is less than target max hp),2d4' +
                 '|Severe 2d6 (Max. potential damage is less than twice target max hp),2d6' +
                 '|Mortal 2d8 (Max. potential damage is twice or more target max hp),2d8}');
+            let severityName;
             switch (severityDice) { // optional to add this
-                case '1d6': rollBuilder.push(`severity=Minor`); break;
-                case '2d4': rollBuilder.push(`severity=Major`); break;
-                case '2d6': rollBuilder.push(`severity=Severe`); break;
-                case '2d8': rollBuilder.push(`severity=Mortal`); break;
+                case '1d6': severityName='Minor'; break;
+                case '2d4': severityName='Major'; break;
+                case '2d6': severityName='Severe'; break;
+                case '2d8': severityName='Mortal'; break;
             }
 
             if (hits > 0 && errors.length === 0)
-                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and causing **${severityName}** effect (rolling ${severityDice})`);
             else
                 rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
 
@@ -2241,8 +2245,8 @@ function setupSpellCrit(section) {
                     let severityRoll = await debugSeverity(severityDice);
                     let displayLocationRoll = attackType === 'Called Shot'
                         ? ''
-                        : `(${locationDice}:${locationRoll})`;
-                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
+                        : `(${locationDice}&#61;[[${locationRoll}]])`;
+                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set, severityDice);
                     let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
                     rollBuilder.push(displayEffect);
 
@@ -2390,19 +2394,20 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
             }
         }
 
+        let severityName;
         let severityDice;
         const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
         if (sizeDiff < 0) {
-            rollBuilder.push(`severity=Minor`);
+            severityName='Minor';
             severityDice = '1d6';
         } else if (sizeDiff === 0) {
-            rollBuilder.push(`severity=Major`);
+            severityName='Major';
             severityDice = '2d4';
         } else if (sizeDiff === 1) {
-            rollBuilder.push(`severity=Severe`);
+            severityName='Severe';
             severityDice = '2d6';
         } else if (sizeDiff > 1) {
-            rollBuilder.push(`severity=Mortal`);
+            severityName='Mortal';
             severityDice = '2d8';
         }
         let severityRoll = await extractRollResult(severityDice);
@@ -2421,8 +2426,8 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
             let displayLocationRoll = attackType === 'Called Shot'
                 ? ''
-                : `(${locationDice}:${locationRoll})`;
-            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and rolling ${severityDice} for effect=[[${severityRoll}]]: ${critEffect}`);
+                : `(${locationDice}&#61;[[${locationRoll}]])`;
+            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and causing **${severityName}** effect (rolling ${severityDice})=${severityDice}&#61;[[${severityRoll}]]: ${critEffect}`);
             critEffectExplanations(critEffect, set);
         } else {
             errors.push('weapon type');
