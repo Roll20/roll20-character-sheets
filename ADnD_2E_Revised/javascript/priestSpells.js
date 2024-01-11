@@ -205,7 +205,7 @@ pri1['Endure Cold/Endure Heat'] = {
     'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'The create water spell requires at least a drop of water; the destroy water spell, at least a pinch of dust.',
+    'materials': '',
     'reference': 'p. 254',
     'book': 'PHB',
     'damage': '',

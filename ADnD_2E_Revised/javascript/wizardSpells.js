@@ -606,7 +606,7 @@ wiz1['Protection From Evil'] = {
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
-    'cast-time': '1 turn',
+    'cast-time': '1',
     'saving-throw': 'None',
     'materials': 'The wizard must trace a 3-foot-diameter circle on the floor (or ground) with powdered silver.',
     'reference': 'p. 177',
