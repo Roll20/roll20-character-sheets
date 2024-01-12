@@ -52,10 +52,11 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/10/23'</label>
+              <label class="right">1/11/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Armor Bulk and Encumbrance are now used to auto-adjust the movement load indicator and speeds. Dex penalty and roll template bulk/encumbrance text are on the to-do list.</li>
             <li>Armor Details: the unArmored Base row has been included with repeating_equipment|armor sync. This row is designed to represent any non-armor "Base AC". ie monsters natural skin/hide or a PC's clothing.</li>
             <li>Fixed a bug with newly added equipment and the equipment_carried_select attr. While the select showed "carried", the weight calc was incorrectly using "0" (ie not carried), which is the default value for equipment_carried.</li>
             <li>Added an Auto-Calc Movement option. The movement load can be temporarily selected even if the auto-calc option is enabled but any changes to encumbrance, base movement, or opening the sheet will cause a re-calc. If Auto-Calc Movement is disabled, any manual changes to the movement load will be persistant.</li>
@@ -734,11 +735,6 @@
         holds the old armor details attributes moved to repeating_equipment
         and is also used to get armor weight sub-total
       -->
-      <input type="checkbox" class="hidden" name="attr_unarmored_carried" value="1" />
-      <input type="checkbox" class="hidden" name="attr_armortype_carried" value="1" />
-      <input type="checkbox" class="hidden" name="attr_armortype2_carried" value="1" />
-      <input type="checkbox" class="hidden" name="attr_armorshield_carried" value="1" />
-      <input type="checkbox" class="hidden" name="attr_armorhelmet_carried" value="1" />
       <input type="hidden" name="attr_armor_weight" value="0" />
       <input type="hidden" name="attr_unarmored_weight" value="0" />
       <input type="hidden" name="attr_armortype2_weight" value="0" />
@@ -755,11 +751,12 @@
           <span></span>
           <span title="Only worn items are included in the AC calculations below.">In Use</span>
           <span>Armor Type</span>
-          <span>AC</span>
-          <span>AC Rating</span>
-          <span title="Magical Bonuses">Magic Adj.</span>
-          <span title="Additional AC adjustments for helm, shield, etc.">Misc. Adj.</span>
-          <span>Bulk</span>
+          <span title="Armor Class">AC</span>
+          <span title="Armor Rating">AR</span>
+          <span title="Magical Bonuses">Magic</span>
+          <span title="Additional AC adjustments">Misc</span>
+          <span title="Items in use are carried, but items not in use can still be carried.">Carried</span>
+          <span title="Armor Bulk affects movement">Bulk</span>
         </span>
         <span class="armor-columns">
           <label class="span-two stack-text">UnArmored Base</label>
@@ -794,6 +791,8 @@
           </select>
           <span></span>
           <span></span>
+          <span></span>
+          <input type="checkbox" class="hidden" name="attr_unarmored_carried" value="1" />
           <select class="select width-fill" name="attr_unarmored_bulk" title="@{unarmored_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -845,6 +844,7 @@
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armortype_magic_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armortype_magic" value="0" title="@{armortype_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <span></span>
+          <input type="checkbox" name="attr_armortype_carried" value="1" />
           <select class="select width-fill" name="attr_armortype_bulk" title="@{armortype_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -885,6 +885,7 @@
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armortype2_magic_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armortype2_magic" value="0" title="@{armortype2_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <span></span>
+          <input type="checkbox" name="attr_armortype2_carried" value="1" />
           <select class="select width-fill" name="attr_armortype2_bulk" title="@{armortype2_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -926,6 +927,7 @@
           <input type="text" class="width-small" name="attr_armorshield_magic" value="0" title="@{armorshield_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armorshield_mod_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armorshield_mod" value="0" title="@{armorshield_mod} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
+          <input type="checkbox" name="attr_armorshield_carried" value="1" />
           <select class="select width-fill" name="attr_armorshield_bulk" title="@{armorshield_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -953,6 +955,7 @@
           <span></span>
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armorhelmet_magic_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armorhelmet_magic" value="0" title="@{armorhelmet_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
+          <span></span>
           <span></span>
           <span></span>
         </span>
@@ -1028,6 +1031,7 @@
           <input type="text" class="width-small" name="attr_armorother2_magic" value="0" title="@{armorother2_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armorother2_mod_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armorother2_mod" value="0" title="@{armorother2_mod} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
+          <span></span>
           <span></span>
         </span>
         <span class="sect armor-columns">
@@ -1137,6 +1141,7 @@
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armorother5_mod_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armorother5_mod" value="0" title="@{armorother5_mod} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <span></span>
+          <span></span>
         </span>
         <span class="sect armor-columns">
           <label>Other</label>
@@ -1172,6 +1177,7 @@
           <input type="text" class="width-small" name="attr_armorother6_magic" value="0" title="@{armorother6_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armorother6_mod_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armorother6_mod" value="0" title="@{armorother6_mod} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
+          <span></span>
           <span></span>
         </span>
         <span class="armor-columns">
@@ -1221,7 +1227,10 @@
               <input type="text" class="hidden" name="attr_armorclass_mod_total" value="0" readonly />
             </span>
           </span>
-          <span class="span-three"></span>
+          <label class="readonly-span-textonly span-two" title="@{current_bulk_label} | Current Bulk as per active armors, shield, clothing, etc.">
+            <input type="text" class="width-fill" name="attr_current_bulk_label" value="" readonly />
+          </label>
+            <input type="text" class="hidden" name="attr_current_bulk" value="" />
         </span>
         <hr>
         <!--AC Calcs-->
@@ -1678,14 +1687,21 @@
           </label>
           <!--deprecated attribute: crawl kept in case attribute is needed -->
           <input type="text" class="hidden" name="attr_movement_crawl" value="0" readonly />
-          <label></label>
-          <label></label>
-          <span class="span-two">
-            <label class="inline-label width-small" title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
-              <span>Auto-Calc Movement:</span>
-              <input type="checkbox" class="width-small" name="attr_autocalc_movement_flag" value="1" checked />
-            </label>
-          </span>
+          <span></span>
+          <label class="inline-label span-two" title="@{current_bulk_label} | Current Bulk as per active armors, shield, clothing, etc.">
+            <span>Armor Bulk:</span>
+            <input type="text" class="width-fill" name="attr_current_bulk_label" value="" readonly />
+          </label>
+          <label class="inline-label span-two" title="@{current_encumbrance_label} | Encumbrance is the current load for carried weight vs strength adjustments.">
+            <span>Encumbrance:</span>
+            <input type="text" class="width-fill" name="attr_current_encumbrance_label" value="" readonly />
+          </label>
+          <span></span>
+          <span></span>
+          <label class="inline-label width-small" title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
+            <span>Auto-Calc Movement:</span>
+            <input type="checkbox" class="width-small" name="attr_autocalc_movement_flag" value="1" checked />
+          </label>
         </span>
       </div>
       <hr>
@@ -5509,7 +5525,7 @@
       const attrToCheck = attr;
       const matchingArray = matchAttr(attrToCheck);
       if (matchingArray) {
-        console.log(`Match found in array: ${matchingArray}`);
+        // console.log(`Match found in array: ${matchingArray}`);
       } else {
         // console.log(`No match found for attribute: ${attrToCheck}`);
       }
@@ -5539,9 +5555,10 @@
               output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
-              // armor in use should always be considered as carried
-              if (+v.unarmored_worn === 1 && +v.unarmored_carried !== 1) {
+              // armor in use ie 'worn', should always be considered as carried
+              if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+                output.unarmored_carried = 1;
               } else {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
               }
@@ -5606,9 +5623,10 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-              // armor in use should always be considered as carried
-              if (+v.armortype_worn === 1 && +v.armortype_carried !== 1) {
+              // armor in use ie 'worn', should always be considered as carried
+              if (+v.armortype_worn === 1 && +v.armortype_carried === 0) {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+                output.armortype_carried = 1;
               } else {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
               }
@@ -5676,9 +5694,10 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armortype2_magic;
               output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-              // armor in use should always be considered as carried
-              if (+v.armortype2_worn === 1 && +v.armortype2_carried !== 1) {
+              // armor in use ie 'worn', should always be considered as carried
+              if (+v.armortype2_worn === 1 && +v.armortype2_carried === 0) {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+                output.armortype2_carried = 1;
               } else {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
               }
@@ -5747,15 +5766,16 @@
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
               output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-              // armor in use should always be considered as carried
-              if (+v.armorshield_worn === 1 && +v.armorshield_carried !== 1) {
+              // armor in use ie 'worn', should always be considered as carried
+              if (+v.armorshield_worn === 1 && +v.armorshield_carried === 0) {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+                output.armorshield_carried = 1;
               } else {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
               }
               output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
               output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
-              clog(`repeating Armor exists shield:${newID}`);
+              // clog(`repeating Armor exists shield:${newID}`);
             } else {
               // has name but NO id = CREATE NEW ROW
               newID = generateUniqueRowID();
@@ -5818,9 +5838,10 @@
               output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet;
               output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
-              // armor in use should always be considered as carried
-              if (+v.armorhelmet_worn === 1 && +v.armorhelmet_carried !== 1) {
+              // armor in use ie 'worn', should always be considered as carried
+              if (+v.armorhelmet_worn === 1 && +v.armorhelmet_carried === 0) {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+                output.armorhelmet_carried = 1;
               } else {
                 output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
               }
@@ -5886,7 +5907,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
-              // armor in use should always be considered as carried
+              // armor in use ie 'worn', should always be considered as carried
               output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorother_worn === 1 ? 1 : 0;
               // clog(`repeating Armor exists other1:${newID}`);
             } else {
@@ -5943,7 +5964,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
-              // armor in use should always be considered as carried
+              // armor in use ie 'worn', should always be considered as carried
               output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorother2_worn === 1 ? 1 : 0;
             } else {
               // has name but NO id = CREATE NEW ROW
@@ -5999,7 +6020,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
-              // armor in use should always be considered as carried
+              // armor in use ie 'worn', should always be considered as carried
               output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorother3_worn === 1 ? 1 : 0;
               // clog(`repeating Armor exists other3:${newID}`);
             } else {
@@ -6056,7 +6077,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
-              // armor in use should always be considered as carried
+              // armor in use ie 'worn', should always be considered as carried
               output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorother4_worn === 1 ? 1 : 0;
               // clog(`repeating Armor exists other4:${newID}`);
             } else {
@@ -6113,7 +6134,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
-              // armor in use should always be considered as carried
+              // armor in use ie 'worn', should always be considered as carried
               output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorother5_worn === 1 ? 1 : 0;
               // clog(`repeating Armor exists other5:${newID}`);
             } else {
@@ -6170,7 +6191,7 @@
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
               output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
-              // armor in use should always be considered as carried
+              // armor in use ie 'worn', should always be considered as carried
               output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorother6_worn === 1 ? 1 : 0;
               // clog(`repeating Armor exists other6:${newID}`);
             } else {
@@ -6710,9 +6731,15 @@
           const armorType = +v[section_attribute('equipment', id, 'equipment_armorType')] || 0;
           // const location = v[section_attribute('equipment', id, 'equipment_location')];
           // Weight calcs use equipment_carried
+          let carried = 0;
           const carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
-          const carried = carriedSelect === 1 ? 1 : 0;
-          output[`repeating_equipment_${id}_equipment_carried`] = carried;
+          if (carriedSelect === 1) {
+            carried = 1;
+            output[`repeating_equipment_${id}_equipment_carried`] = 1;
+          } else {
+            carried = 0;
+            output[`repeating_equipment_${id}_equipment_carried`] = 0;
+          }
           const quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
           let weight = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
           let weaponWeight = 0;
@@ -6762,7 +6789,7 @@
 
   // Equipment Weight Calcs
   on(
-    'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:total_coin_weight remove:repeating_equipment',
+    'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn change:total_coin_weight remove:repeating_equipment',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       sumEquipmentWeight();
@@ -6781,7 +6808,7 @@
 
   // Encumbrance Calcs
   function setCurrentEncumbranceFlag() {
-    getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag'], (v) => {
+    getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag', 'current_bulk', 'current_encumbrance_move'], (v) => {
       // clog('Current Encumbrance flag has been re-calculated');
       const output = {};
       const autocalc_movement_flag = +v.autocalc_movement_flag || 0;
@@ -6789,34 +6816,44 @@
       const heavy_load = +v.heavy_load || 0;
       const very_heavy_load = +v.very_heavy_load || 0;
       const total_weight = +v.total_weight || 0;
+      const current_bulk = +v.current_bulk || 0;
       let currentEncumbrance = 0;
 
       if (total_weight <= normal_load_adjusted) {
+        output.current_encumbrance_label = 'Normal';
         currentEncumbrance = 0;
+        output.current_encumbrance = currentEncumbrance;
+        // Bail out if unless auto-calc movement is enabled
+        output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Unencumbered =====');
       } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
+        output.current_encumbrance_label = 'Heavy';
         currentEncumbrance = 1;
+        output.current_encumbrance = currentEncumbrance;
+        // Bail out if unless auto-calc movement is enabled
+        output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Heavy =====');
       } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
+        output.current_encumbrance_label = 'Very Heavy';
         currentEncumbrance = 2;
+        output.current_encumbrance = currentEncumbrance;
+        // Bail out if unless auto-calc movement is enabled
+        output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Very Heavy =====');
       } else {
+        output.current_encumbrance_label = 'Encumbered';
         currentEncumbrance = 3;
+        output.current_encumbrance = currentEncumbrance;
+        // Bail out if unless auto-calc movement is enabled
+        output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Encumbered =====');
-      }
-      output.current_encumbrance = currentEncumbrance;
-      // Bail out if unless auto-calc movement is enabled
-      if (autocalc_movement_flag === 1) {
-        output.current_encumbrance_move = currentEncumbrance;
-      } else {
-        // clog(`Auto-calc Movement is disabled.`);
       }
       setAttrs(output);
     });
   }
 
-  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk', (eventInfo) => {
+    clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['encumbrancebonus'], (v) => {
       // clog('Encumbrance has been re-calculated');
       const output = {};
@@ -6879,6 +6916,68 @@
     });
   });
 
+  // Bulk Calcs
+  function setCurrentBulk() {
+    getAttrs(
+      [
+        'unarmored_bulk',
+        'armortype_bulk',
+        'armortype2_bulk',
+        'armorshield_bulk',
+        'armorhelmet_bulk',
+        'armortype_worn',
+        'armortype2_worn',
+        'armorshield_worn',
+        'armorhelmet_worn',
+        'armorshield_carried',
+      ],
+      (v) => {
+        const output = {};
+        const armortype_worn = +v.armortype_worn || 0;
+        const armortype2_worn = +v.armortype2_worn || 0;
+        const armorshield_worn = +v.armorshield_worn || 0;
+        const armorshield_carried = +v.armorshield_carried || 0;
+        // shield bulk s/b considered even if it's just carried
+        const armorShieldWornOrCarried = Math.max(armorshield_worn, armorshield_carried);
+        const armorhelmet_worn = +v.armorhelmet_worn || 0;
+        const unarmored_bulk = +v.unarmored_bulk || 0;
+        const armortype_bulk = +(v.armortype_bulk || 0) * armortype_worn;
+        const armortype2_bulk = +(v.armortype2_bulk || 0) * armortype2_worn;
+        const armorshield_bulk = +(v.armorshield_bulk || 0) * armorShieldWornOrCarried;
+        const armorhelmet_bulk = +(v.armorhelmet_bulk || 0) * armorhelmet_worn;
+        const armorBulk = Math.max(unarmored_bulk, armortype_bulk, armortype2_bulk, armorshield_bulk, armorhelmet_bulk);
+        switch (armorBulk) {
+          case 0:
+            output.current_bulk_label = 'Not Bulky';
+            output.current_bulk = 0;
+            break;
+          case 1:
+            output.current_bulk_label = 'Not Bulky/Light';
+            output.current_bulk = 1;
+            break;
+          case 2:
+            output.current_bulk_label = 'Fairly/Moderate';
+            output.current_bulk = 2;
+            break;
+          case 3:
+            output.current_bulk_label = 'Bulky/Heavy';
+            output.current_bulk = 3;
+            break;
+          default:
+            clog(`>> failure in bulk calculation <<`);
+        }
+        setAttrs(output);
+      }
+    );
+  }
+  on(
+    'change:unarmored_bulk change:armortype_bulk change:armortype2_bulk change:armorshield_bulk change:armorhelmet_bulk change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorshield_carried remove:repeating_equipment',
+    (eventInfo) => {
+      // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+      setCurrentBulk();
+    }
+  );
+
   // Equipment Tabs
   on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
@@ -6898,9 +6997,18 @@
         const carriedTab = +v.equipment_tabs_carry || 0;
         idArray.forEach((id) => {
           const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
+
           // Weight calcs use equipment_carried
+          let thisCarriedValue = 0;
           const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
-          const thisCarriedValue = thisCarriedSelect === 1 ? 1 : 0;
+          if (thisCarriedSelect === 1) {
+            thisCarriedValue = 1;
+            output[`repeating_equipment_${id}_equipment_carried`] = 1;
+          } else {
+            thisCarriedValue = 0;
+            output[`repeating_equipment_${id}_equipment_carried`] = 0;
+          }
+
           output[`repeating_equipment_${id}_equipment_carried`] = thisCarriedValue;
           // Use CSS to hide/show the repeating row using typeTab and/or carriedTab
           output[`repeating_equipment_${id}_equipment_show_type`] = typeTab === -1 || typeTab === thisType ? 1 : 0;
@@ -7045,7 +7153,7 @@
   const armorDetailslisteners = `${armorAttrs.map((stat) => `change:${stat}`).join(' ')}`;
 
   on(armorDetailslisteners, (eventInfo) => {
-    clog(eventInfo);
+    // clog(eventInfo);
     if (eventInfo.sourceType === 'sheetworker') return;
     const attr = eventInfo.sourceAttribute;
     const attrPrev = eventInfo.previousValue;
@@ -7253,19 +7361,24 @@
         const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
         const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
         const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
-        // unarmored is always "in use" but is hidden attr,
-        // but should be to drop clothing ie swim, sleep, etc.
-        const carriedUnarmored = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
-        let carried = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+        let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
         const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
         const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
-        // armor in use should always be considered as carried
-        if (worn === 1 && carried !== 1) {
-          carried = 1;
+        // armor in use ie 'worn', should always be considered as carried
+        if (worn === 1) {
+          carriedSelect = 1;
+          output[`repeating_equipment_${id}_equipment_carried_select`] = 1;
+        } else if (worn === 0) {
+          if (carriedSelect === 0) {
+            carriedSelect = 0;
+            output[`repeating_equipment_${id}_equipment_carried_select`] = 0;
+          } else if (carriedSelect === 2) {
+            carriedSelect = 2;
+            output[`repeating_equipment_${id}_equipment_carried_select`] = 2;
+          }
         }
-        output[`repeating_equipment_${id}_equipment_carried_select`] = carried;
         const thisLog = [
-          `ID:${id} ITEM:${item} TYPE:${type} WORN:${worn} AC:${ac} BASE:${base} MAGIC:${magic} MOD:${mod} BULK:${bulk} CARRIED:${carried} WEIGHT:${weight} COST:${cost} UPDATED:`,
+          `ID:${id} ITEM:${item} TYPE:${type} WORN:${worn} AC:${ac} BASE:${base} MAGIC:${magic} MOD:${mod} BULK:${bulk} CARRIED:${carriedSelect} WEIGHT:${weight} COST:${cost} UPDATED:`,
         ];
         switch (type) {
           case '':
@@ -7279,7 +7392,9 @@
             output.unarmored_base = base;
             output.unarmored_magic = magic;
             output.unarmored_bulk = bulk;
-            output.unarmored_carried = carriedUnarmored;
+            // unarmored is always "in use" but is hidden attr,
+            // but should be to drop clothing ie swim, sleep, etc.
+            output.unarmored_carried = 1;
             output.unarmored_weight = weight;
             output.unarmored_cost = cost;
             output.unarmored1_row_id = id;
@@ -7292,7 +7407,7 @@
             output.armortype_base = base;
             output.armortype_magic = magic;
             output.armortype_bulk = bulk;
-            output.armortype_carried = carried;
+            output.armortype_carried = carriedSelect;
             output.armor_weight = weight;
             output.armor_cost = cost;
             output.armortype1_row_id = id;
@@ -7305,7 +7420,7 @@
             output.armortype2_base = base;
             output.armortype2_magic = magic;
             output.armortype2_bulk = bulk;
-            output.armortype2_carried = carried;
+            output.armortype2_carried = carriedSelect;
             output.armortype2_weight = weight;
             output.armortype2_cost = cost;
             output.armortype2_row_id = id;
@@ -7319,7 +7434,7 @@
             output.armorshield_magic = magic;
             output.armorshield_mod = mod;
             output.armorshield_bulk = bulk;
-            output.armorshield_carried = carried;
+            output.armorshield_carried = carriedSelect;
             output.armorshield_weight = weight;
             output.armorshield_cost = cost;
             output.armorshield_row_id = id;
@@ -7330,7 +7445,7 @@
             output.armorhelmet = item;
             output.armorhelmet_base = base;
             output.armorhelmet_magic = magic;
-            output.armorhelmet_carried = carried;
+            output.armorhelmet_carried = carriedSelect;
             output.armorhelmet_weight = weight;
             output.armorhelmet_cost = cost;
             output.armorhelmet_row_id = id;
@@ -7468,7 +7583,7 @@
 
   // sync/update Armor Details when repeating_equipment armor changes
   on(
-    'change:repeating_equipment:equipment_item change:repeating_equipment:equipment_armor_worn change:repeating_equipment:equipment_armor_ac change:repeating_equipment:equipment_armor_base change:repeating_equipment:equipment_armor_magic change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_bulk change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_cost',
+    'change:repeating_equipment:equipment_item change:repeating_equipment:equipment_armor_worn change:repeating_equipment:equipment_armor_ac change:repeating_equipment:equipment_armor_base change:repeating_equipment:equipment_armor_magic change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_bulk change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_cost',
     (eventInfo) => {
       const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
       if (eventInfo.sourceType === 'sheetworker') return;
