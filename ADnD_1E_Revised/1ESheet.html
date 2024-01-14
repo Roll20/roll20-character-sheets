@@ -52,10 +52,11 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/11/23'</label>
+              <label class="right">1/14/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Fixed incorrect table data for STR and CON. Updated Open Doors macro to use % vs d6.</li>
             <li>Armor Bulk and Encumbrance are now used to auto-adjust the movement load indicator and speeds. Dex penalty and roll template bulk/encumbrance text are on the to-do list.</li>
             <li>Armor Details: the unArmored Base row has been included with repeating_equipment|armor sync. This row is designed to represent any non-armor "Base AC". ie monsters natural skin/hide or a PC's clothing.</li>
             <li>Fixed a bug with newly added equipment and the equipment_carried_select attr. While the select showed "carried", the weight calc was incorrectly using "0" (ie not carried), which is the default value for equipment_carried.</li>
@@ -589,11 +590,11 @@
             </span>
           </label>
           <span class="class-details">
-            <input type="checkbox" class="sect-show" title="@{class-details-show}" name="attr_class-details_show" value="1" checked />
+            <input type="checkbox" class="sect-show" title="@{class_details_show}" name="attr_class_details_show" value="1" checked />
             <span class="subheader">Class Details</span><span class="material-icons"></span>
           </span>
           <span class="armor-details">
-            <input type="checkbox" class="sect-show" title="@{armor-details-show}" name="attr_armor-details_show" value="1" checked />
+            <input type="checkbox" class="sect-show" title="@{armor_details_show}" name="attr_armor_details_show" value="1" checked />
             <span class="subheader">Armor Details</span><span class="material-icons"></span>
           </span>
         </span>
@@ -622,7 +623,7 @@
     </section>
     <!-- Class Details -->
     <section class="class-box">
-      <input type="checkbox" class="sect-show" name="attr_class-details_show" value="1" checked />
+      <input type="checkbox" class="sect-show" name="attr_class_details_show" value="1" checked />
       <div class="sect header">CLASS DETAILS</div>
       <span class="sect material-icons"></span>
       <div class="sect border">
@@ -715,7 +716,7 @@
     </section>
     <!-- Armor Details-->
     <section class="armor-box">
-      <input type="checkbox" class="sect-show" name="attr_armor-details_show" value="1" checked />
+      <input type="checkbox" class="sect-show" name="attr_armor_details_show" value="1" checked />
       <div class="sect header">ARMOR DETAILS</div>
       <span class="sect material-icons"></span>
       <!-- used to sync armor details to repeating_equipment-->
@@ -1450,16 +1451,16 @@
             <span class="stack-text">Weight All.</span>
           </label>
           <input type="text" class="width-small" name="attr_encumbrancebonus" title="@{encumbrancebonus} | Weight Allowance in gp." value="0" />
-          <button class="button stack-text" type="roll" name="attr_minorstrengthfeat-roll" title="%{selected|minorstrengthfeat-roll} | Minor Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Doors 1d?{Choose a die roll based on Strength|STR 3-18(00) 1d6,6|STR 19-20 1d8,8|STR 21 1d10,10|STR 22-23 1d12,12|STR 24 1d20,20|STR 25 1d24,24}}} {{roll_low=[[ 1d?{Choose a die roll based on Strength|STR 3-18(00) 1d6,6|STR 19-20 1d8,8|STR 21 1d10,10|STR 22-23 1d12,12|STR 24 1d20,20|STR 25 1d24,24} ]] }} {{roll_target=[[ @{minorstrengthfeat} ]]}} {{[Open a Locked Door?](~@{character_id}|minorstrengthfeat_locked-roll)}} {{freetext=[[ @{minorstrengthfeat_locked} ]] in 6 chance to force open a locked, barred, magically held, or wizard locked door. Fighter's only.}}"><span>Open Doors</span></button>
+          <button class="button stack-text" type="roll" name="attr_minorstrengthfeat-roll" title="%{selected|minorstrengthfeat-roll} | Minor Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Doors}} {{roll_low=[[ 1d100cs ]]%}} {{roll_target=[[ @{minorstrengthfeat} ]]}} {{[Open a Locked Door?](~@{character_id}|minorstrengthfeat_locked-roll)}} {{freetext=[[ @{minorstrengthfeat_locked} ]] chance to force open a locked, barred, magically held, or wizard locked door. Fighter's only.}}"><span>Open Doors</span></button>
           <span class="two-columns">
-            <input type="text" class="width-smallest" name="attr_minorstrengthfeat" title="@{minorstrengthfeat} | Minor Strength Feat: uses the highest # from STR table." value="0">
-            <span>
-              <span class="text-superscript" title="@{minorstrengthfeat_locked} | Fighter's can attempt to force open a locked, barred, magically held, or wizard locked door.">
-                (<span name="attr_minorstrengthfeat_locked">0</span>)
-              </span>
-              <button class="hidden" type="roll" name="attr_minorstrengthfeat_locked-roll" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Locked Door 1d6}} {{roll_low=[[ 1d6 ]] }} {{roll_target=[[ @{minorstrengthfeat_locked} ]]}}"></button>
+            <label class="label-percent">
+              <input type="text" class="width-smallest" name="attr_minorstrengthfeat" title="@{minorstrengthfeat} | Minor Strength Feat: uses the highest # from STR table." value="0">
+            </label>
+            <span class="text-superscript" title="@{minorstrengthfeat_locked} | Fighter's can attempt to force open a locked, barred, magically held, or wizard locked door." style="margin: -3px 0 0 -5px;">
+              <span name="attr_minorstrengthfeat_locked"></span>
             </span>
             <input type="hidden" name="attr_minorstrengthfeat_locked" value="0" />
+            <button class="hidden" type="roll" name="attr_minorstrengthfeat_locked-roll" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Locked Door}} {{roll_low=[[ 1d100cs ]]% }} {{roll_target=[[ @{minorstrengthfeat_locked} ]]%}}"></button>
           </span>
           <button class="button stack-text" type="roll" name="attr_majorstrengthfeat-roll" title="%{selected|majorstrengthfeat-roll} | Major Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Bend Bars/Lift Gates}} {{roll_low=[[1d100cs]]%}} {{roll_target=[[ @{majorstrengthfeat}]]%}}"><span>Bend Bars</span></button>
           <label class="label-percent">
@@ -1490,7 +1491,9 @@
             <span class="stack-text">Max # Spells</span>
           </label>
           <input type="text" class="width-smaller" name="attr_maxspells" title="@{maxspells}" value="0" />
-          <button class="button stack-text span-two" type="roll" name="attr_init-roll" title="%{selected|init-roll}" value="@{init_macro_text}"><span>Initiative</span></button>
+          <label class="span-two">
+            <button class="button stack-text init-surprise" type="roll" name="attr_init-roll" title="%{selected|init-roll}" value="@{init_macro_text}"><span>Initiative</span></button>
+          </label>
           <!-- WIS -->
           <label>
             <button type="roll" class="button stack-text text-large" name="attr_wisdom_check_roll" title="%{selected|wisdom_check_roll}" value="@{wisdom_check_macro_text}"><span>WIS</span></button>
@@ -1514,7 +1517,9 @@
           <label class="label-percent">
             <input type="text" class="width-smaller" name="attr_spellfailure" title="@{spellfailure}" value="0" />
           </label>
-          <button class="button stack-text span-two" type="roll" name="attr_surprise-roll" title="%{selected|surprise-roll}" value="@{surprise_macro_text}"><span>Surprise</span></button>
+          <label class="span-two">
+            <button class="button stack-text init-surprise" type="roll" name="attr_surprise-roll" title="%{selected|surprise-roll}" value="@{surprise_macro_text}"><span>Surprise</span></button>
+          </label>
           <!-- DEX -->
           <label>
             <button type="roll" class="button stack-text text-large" name="attr_dexterity_check_roll" title="%{selected|dexterity_check_roll}" value="@{dexterity_check_macro_text}"><span>DEX</span></button>
@@ -1692,13 +1697,11 @@
             <span>Armor Bulk:</span>
             <input type="text" class="width-fill" name="attr_current_bulk_label" value="" readonly />
           </label>
-          <label class="inline-label span-two" title="@{current_encumbrance_label} | Encumbrance is the current load for carried weight vs strength adjustments.">
+          <label class="inline-label span-three" title="@{current_encumbrance_label} | Encumbrance is the current load for carried weight vs strength adjustments.">
             <span>Encumbrance:</span>
             <input type="text" class="width-fill" name="attr_current_encumbrance_label" value="" readonly />
           </label>
-          <span></span>
-          <span></span>
-          <label class="inline-label width-small" title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
+          <label class="inline-label span-three right" title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
             <span>Auto-Calc Movement:</span>
             <input type="checkbox" class="width-small" name="attr_autocalc_movement_flag" value="1" checked />
           </label>
@@ -2134,15 +2137,15 @@
                   <input type="text" class="width-smaller" name="attr_weapon_backstab_var" value="0" title="@{repeating_weapon_$X_weapon_backstab_bonus} | Uses the @{backstab_bonus} from the Thief's section below." readonly="">
                   <input type="number" class="hidden" name="attr_weapon_backstab_bonus" value="0" />
                 </span>
-                <label title="Apply a Backstab bonus to the attack roll.">Backstab Adj.</label>
+                <label title="Apply a Backstab bonus to the attack roll.">Backstab</label>
               </span>
               <label class="label-under-small">
                 <input type="text" class="width-medium" name="attr_weapon_tohitbonus" title="@{repeating_weapon_$X_weapon_tohitbonus}" value="0" />
-                <span>To-Hit Adj.</span>
+                <span>To-Hit</span>
               </label>
               <label class="label-under-small">
                 <input type="text" class="width-medium" name="attr_weapon_magicbonus" title="@{repeating_weapon_$X_weapon_magicbonus}" value="0" />
-                <span>Magic Adj.</span>
+                <span>Magic</span>
               </label>
               <span class="label-under">
                 <span class="two-inputs-over-label">
@@ -3683,20 +3686,18 @@
     </section>
     <!-- Footer -->
     <section class="footer-box">
-      <div class="text-small">
-        <span class="inline-label">
-          <span>Questions/feedback?</span>
-          <button type="roll" class="url-roll" value="[Current AD&D1e thread](https://app.roll20.net/forum/post/10354613/ad-and-d-1e-update-part-2)">Current AD&D1e sheet thread on Roll20</button>
-        </span>
-        <span class="inline-label">
-          <span>Author: Vince &amp; the Roll20 Community</span>
-          <label>
-            <span>v.</span>
-            <input type="text" class="width-small version" name="attr_sheet_version" value="1.646" readonly />
-            <i>beta</i>
-          </label>
-        </span>
-      </div>
+      <span class="inline-label text-small">
+        <span>Questions/feedback?</span>
+        <button type="roll" class="url-roll" value="[Current AD&D1e thread](https://app.roll20.net/forum/post/10354613/ad-and-d-1e-update-part-2)">Current AD&D1e sheet thread on Roll20</button>
+      </span>
+      <span class="inline-label text-small">
+        <span>Author: Vince &amp; the Roll20 Community</span>
+        <label>
+          <span>v.</span>
+          <input type="text" class="width-small version" name="attr_sheet_version" value="1.646" readonly />
+          <i>beta</i>
+        </label>
+      </span>
     </section>
   </div>
 </div>
@@ -10250,7 +10251,7 @@
 
   // Strength Table Entry
   class StrengthCheck {
-    constructor(meleebonus, dmgbonus, majorstrengthfeat, minorstrengthfeat, minorstrengthfeat_locked, encumbrancebonus) {
+    constructor(meleebonus, dmgbonus, encumbrancebonus, minorstrengthfeat, minorstrengthfeat_locked, majorstrengthfeat) {
       this.meleebonus = meleebonus;
       this.dmgbonus = dmgbonus;
       this.majorstrengthfeat = majorstrengthfeat;
@@ -10283,38 +10284,38 @@
 
   class StrengthAdjustmentTable {
     constructor() {
-      // MeleeAttackBonus, MeleeDamageBonus, MajorStrengthCheck, MinorStrengthCheck, MinorStrengthCheck(locked), EncumbranceBonus
+      // MeleeAttackBonus, MeleeDamageBonus, EncumbranceBonus, MinorStrengthCheck, MinorStrengthCheck(locked), MajorStrengthCheck
       this.strength_dict = {
-        3: new StrengthCheck(-3, -1, 15, 1, 0, -350),
-        4: new StrengthCheck(-2, -1, 15, 1, 0, -250),
-        5: new StrengthCheck(-2, -1, 15, 1, 0, -250),
-        6: new StrengthCheck(-1, 0, 15, 1, 0, -150),
-        7: new StrengthCheck(-1, 0, 15, 1, 0, -150),
-        8: new StrengthCheck(0, 0, 30, 2, 0, 0),
-        9: new StrengthCheck(0, 0, 30, 2, 0, 0),
-        10: new StrengthCheck(0, 0, 30, 2, 0, 0),
-        11: new StrengthCheck(0, 0, 30, 2, 0, 0),
-        12: new StrengthCheck(0, 0, 30, 2, 0, 100),
-        13: new StrengthCheck(0, 0, 30, 2, 0, 100),
-        14: new StrengthCheck(0, 0, 30, 2, 0, 200),
-        15: new StrengthCheck(0, 0, 30, 2, 0, 200),
-        16: new StrengthCheck(0, 1, 50, 3, 0, 350),
-        17: new StrengthCheck(1, 1, 50, 3, 0, 500),
+        3: new StrengthCheck(-3, -1, -350, 15, 0, 0),
+        4: new StrengthCheck(-2, -1, -250, 15, 0, 0),
+        5: new StrengthCheck(-2, -1, -250, 15, 0, 0),
+        6: new StrengthCheck(-1, 0, -150, 15, 0, 0),
+        7: new StrengthCheck(-1, 0, -150, 15, 0, 0),
+        8: new StrengthCheck(0, 0, 0, 30, 0, 1),
+        9: new StrengthCheck(0, 0, 0, 30, 0, 1),
+        10: new StrengthCheck(0, 0, 0, 30, 0, 2),
+        11: new StrengthCheck(0, 0, 0, 30, 0, 2),
+        12: new StrengthCheck(0, 0, 100, 30, 0, 4),
+        13: new StrengthCheck(0, 0, 100, 30, 0, 4),
+        14: new StrengthCheck(0, 0, 200, 30, 0, 7),
+        15: new StrengthCheck(0, 0, 200, 30, 0, 7),
+        16: new StrengthCheck(0, 1, 350, 50, 0, 10),
+        17: new StrengthCheck(1, 1, 500, 50, 0, 13),
         18: {
-          None: new StrengthCheck(1, 2, 50, 3, 0, 750),
-          '01-50': new StrengthCheck(1, 3, 50, 3, 0, 1000),
-          '51-75': new StrengthCheck(2, 3, 70, 4, 0, 1250),
-          '76-90': new StrengthCheck(2, 4, 70, 4, 0, 1500),
-          '91-99': new StrengthCheck(2, 5, 70, 4, 1, 2000),
-          '00': new StrengthCheck(3, 6, 85, 5, 1, 3000),
+          None: new StrengthCheck(1, 2, 750, 50, 0, 16),
+          '01-50': new StrengthCheck(1, 3, 1000, 50, 0, 20),
+          '51-75': new StrengthCheck(2, 3, 1250, 70, 0, 25),
+          '76-90': new StrengthCheck(2, 4, 1500, 70, 0, 30),
+          '91-99': new StrengthCheck(2, 5, 2000, 70, 15, 35),
+          '00': new StrengthCheck(3, 6, 3000, 85, 15, 40),
         },
-        19: new StrengthCheck(3, 7, 90, 7, 3, 4500),
-        20: new StrengthCheck(3, 8, 90, 7, 3, 5000),
-        21: new StrengthCheck(4, 9, 90, 9, 4, 6000),
-        22: new StrengthCheck(4, 10, 90, 11, 4, 7500),
-        23: new StrengthCheck(5, 11, 90, 11, 5, 9000),
-        24: new StrengthCheck(6, 12, 95, 19, 7, 12000),
-        25: new StrengthCheck(7, 14, 95, 23, 9, 15000),
+        19: new StrengthCheck(3, 7, 4500, 90, 50, 50),
+        20: new StrengthCheck(3, 8, 5000, 90, 50, 60),
+        21: new StrengthCheck(4, 9, 6000, 90, 70, 70),
+        22: new StrengthCheck(4, 10, 7500, 90, 70, 80),
+        23: new StrengthCheck(5, 11, 9000, 90, 85, 90),
+        24: new StrengthCheck(6, 12, 12000, 95, 87, 100),
+        25: new StrengthCheck(7, 14, 15000, 95, 90, 100),
       };
     }
 
@@ -10549,15 +10550,18 @@
         7: new ConstitutionEntry('0', 55, 60),
         8: new ConstitutionEntry('0', 60, 65),
         9: new ConstitutionEntry('0', 65, 70),
-        10: new ConstitutionEntry('0', 70, 85),
-        11: new ConstitutionEntry('0', 75, 90),
-        12: new ConstitutionEntry('0', 80, 92),
-        13: new ConstitutionEntry('0', 85, 94),
-        14: new ConstitutionEntry('0', 88, 96),
-        15: new ConstitutionEntry('1', 91, 98),
-        16: new ConstitutionEntry('2', 95, 100),
-        17: new ConstitutionEntry('3', 97, 100),
-        18: new ConstitutionEntry('4', 99, 100),
+        10: new ConstitutionEntry('0', 70, 75),
+        11: new ConstitutionEntry('0', 75, 80),
+        12: new ConstitutionEntry('0', 80, 85),
+        13: new ConstitutionEntry('0', 85, 90),
+        14: new ConstitutionEntry('0', 88, 92),
+        15: new ConstitutionEntry('1', 91, 94),
+        16: new ConstitutionEntry('2', 95, 96),
+        // fighter only bonuses?
+        // 17 +2/+3 * 97% 98%
+        // 18 +2/+4 * 99% 100%
+        17: new ConstitutionEntry('3', 97, 97),
+        18: new ConstitutionEntry('4', 99, 99),
         19: new ConstitutionEntry('5', 99, 100),
         20: new ConstitutionEntry('5', 99, 100),
         21: new ConstitutionEntry('6', 99, 100),

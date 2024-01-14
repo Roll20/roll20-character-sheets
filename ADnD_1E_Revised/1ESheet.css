@@ -161,6 +161,11 @@
 }
 
 /* Show PC page */
+.charsheet input[value="0"].toggle-npc ~ .background,
+.charsheet input[value="99"].toggle-npc ~ .background {
+    min-width: 650px;
+}
+
 .charsheet input[value="0"].toggle-npc ~ .background .class-box,
 .charsheet input[value="0"].toggle-npc ~ .background .armor-box,
 .charsheet input[value="0"].toggle-npc ~ .background .personal-attributes-box,
@@ -203,6 +208,14 @@
     display: block;
 }
 
+.charsheet input[value="1"].toggle-npc ~ .background {
+    min-width: 360px;
+}
+
+.charsheet input[value="1"].toggle-npc ~ .background .footer-box {
+    width: auto;
+}
+
 .charsheet input[value="1"].toggle-npc ~ .background .npc-box {
     align-items: flex-start;
     display: inline-flex;
@@ -223,8 +236,14 @@
 }
 
 /* Show Sheet Options */
+.charsheet input[value="99"].toggle-npc ~ .background .wrapper,
 .charsheet input[value="99"].toggle-npc ~ .background .options-box {
     display: block;
+}
+
+.charsheet input[value="99"].toggle-npc ~ .background .wrapper .options-box > .header,
+.charsheet input[value="99"].toggle-npc ~ .background .wrapper .options-box > .sect-show:first-child {
+    margin-top: 1em;
 }
 
 /* Hide PC and Monster */
@@ -299,8 +318,7 @@
 .charsheet input[type="checkbox"].toggle-costs:checked ~ .background input[type="hidden"].equipment-display-type[value="2"] ~ .equipment-columns,
 .charsheet input[type="checkbox"].toggle-costs:checked ~ .background input[type="hidden"].equipment-display-type[value="2"] ~ .repcontainer .equipment-columns {
     display: grid;
-    grid-template-columns: 5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em,
-            7em) minmax(3em, 5em) minmax(1em, 4em) 0;
+    grid-template-columns: 5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em);
 }
 
 .charsheet input[type="checkbox"].toggle-costs:checked ~ .background .equipment-totals {
@@ -813,10 +831,15 @@ summary::-webkit-details-marker {
 }
 
 .charsheet .label-percent::after {
+    bottom: 2px;
     content: "%";
-    margin: 0 -1ch 0 0;
+    font-size: .85em;
     font-weight: normal;
-    padding: 0 0 .25em 0;
+    left: -5px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    position: relative;
+    z-index: -1;
 }
 
 .charsheet .label-equals::after {
@@ -883,9 +906,9 @@ summary::-webkit-details-marker {
 .charsheet .top-header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    margin: -2em 0 0 -1.45em;
+    margin: -2em 0 0 0;
     grid-column: 1/-1;
-    width: calc(100% + 2em);
+    z-index: 1;
 }
 
 .charsheet .npc-toggle {
@@ -954,7 +977,9 @@ summary::-webkit-details-marker {
 
 .charsheet .announcements-box input[type="checkbox"].sect-show {
     height: 1em;
-    width: 2em;
+    position: absolute;
+    right: -1.5em;
+    width: 2.5em;
 }
 
 .charsheet .npc-box.statblock1 {
@@ -1054,15 +1079,17 @@ section.npc-box.statblock3 .image-avatar {
     display: grid;
     grid-column: 1/-1;
     grid-row-start: 2;
-    grid-template-columns: auto 1.5fr auto;
+    grid-template-columns: 1fr 1.5fr auto;
     justify-items: center;
 }
 
 .charsheet .heading-box {
-    display: flex;
-    grid-row-start: 1;
-    grid-column-start: 1;
     align-self: center;
+    display: flex;
+    grid-column-start: 1;
+    grid-row-start: 1;
+    justify-content: center;
+    width: 100%;
 }
 
 .charsheet .logo-box {
@@ -1182,11 +1209,11 @@ section.npc-box.statblock3 .image-avatar {
 .charsheet .header-box:has(.toggle-avatar:checked + .image-avatar img[src]) {
     grid-template-columns: 1fr 1.5fr 1fr;
 }
-
+.charsheet .background,
 .charsheet .logo-box,
 .charsheet .image-avatar,
-.charsheet .portrait-box,
-.charsheet .npc-box.statblock3 {
+.charsheet .portrait-box
+{
     container-type: inline-size;
 }
 
@@ -1217,14 +1244,114 @@ section.npc-box.statblock3 .image-avatar {
     }
 }
 
-/* NPC portrait breakpoint behavior */
-@container (max-width: 100px) {
-    .charsheet .wrapper section.npc-box.statblock3 div.image-avatar {
-        height: 120px;
-        max-height: 75%;
-        min-width: 120px;
-        transform: translateY(-29%) translateX(-12%);
+/* NPC single column */
+@container (max-width: 491px) {
+    .charsheet .background .wrapper {
+        grid-template-columns: 100%;
+    }
+
+    .charsheet .background .footer-box {
+        grid-column: 1;
+        margin-top: 1em;
+    }
+
+    /* NPC portrait breakpoint behavior */
+    .charsheet .background section.npc-box.statblock3 div.image-avatar {
+        height: 110px;
+        max-height: 110px;
+        right: 7.9em;
+        top: -0.5em;
         transition: all ease-in .4s;
+        width: 110px;
+    }
+
+    .charsheet .background .statblock1 > input[type="text"] {
+        width: 63%;
+    }
+
+    .charsheet .background .statblock3-span {
+        grid-column: 1/2;
+    }
+
+    .charsheet .background .statblock4 {
+        grid-row-start: 8;
+        grid-column: 1/2;
+        min-height: 10em;
+        padding: inherit;
+    }
+
+    /* attacks */
+    .charsheet input[value="1"].toggle-npc ~ .background .weapons-box {
+        font-size: 80%;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ .background .weapons-box .to-hit-adj-box .to-hit,
+    .charsheet input[value="1"].toggle-npc ~ .background .weapons-box .to-hit-adj-box .to-hit-input {
+        overflow: hidden;
+    }
+
+    /* special abilities */
+    .charsheet input[value="1"].toggle-npc ~ .background .special-abilities-box .sect > span:first-child {
+        display: none;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ .background .special-abilities-box .repcontainer[data-groupname="repeating_ability"],
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities:not(:checked) ~ .background .repcontainer[data-groupname="repeating_ability"] {
+        column-count: 1;
+        column-gap: 0;
+        column-width: auto;
+        min-width: 100%;
+        height: auto;
+    }
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities:checked ~ .background .repcontainer[data-groupname="repeating_ability"] {
+        column-count: 1;
+        min-width: auto;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ .repcontainer[data-groupname="repeating_ability"] .repitem {
+        min-width: 300px;
+        display: grid;
+        -webkit-column-break-inside: avoid;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .special-abilities-row1.column-header.two-column-header {
+        display: none;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .special-abilities-row1.two-column-header {
+        align-items: center;
+        display: grid;
+        grid-template-columns: 5em 1fr 7em 5em 1fr 7em;
+        justify-items: center;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .repcontainer[data-groupname="repeating_ability"] .special-abilities-row1 {
+        display: grid;
+        grid-template-areas:
+            "a b b b c c c"
+            "d d d d d d d";
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .repcontainer[data-groupname="repeating_ability"] .special-abilities-row1 .ability-area-roll {
+        grid-area: a;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .repcontainer[data-groupname="repeating_ability"] .special-abilities-row1 .ability-area-name {
+        grid-area: b;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .repcontainer[data-groupname="repeating_ability"] .special-abilities-row1 .ability-area-uses {
+        grid-area: c;
+    }
+
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .repcontainer[data-groupname="repeating_ability"] .special-abilities-row1 .ability-area-desc {
+        grid-area: d;
+    }
+    .charsheet input[value="1"].toggle-npc ~ input.toggle-single-column-abilities ~ .background .special-abilities-box .spell-details-grid {
+        border: none;
+        max-width: fit-content;
     }
 }
 
@@ -1432,6 +1559,23 @@ section.npc-box.statblock3 .image-avatar {
     justify-items: center;
 }
 
+.charsheet .abilities-columns .label-parenthesis-left.label-parenthesis-right {
+    justify-content: center;
+    margin-inline: 2px;
+}
+
+.charsheet .abilities-columns .label-parenthesis-left.label-parenthesis-right::before,
+.charsheet .abilities-columns .label-parenthesis-left.label-parenthesis-right::after {
+    margin: 0 -5px 3px -5px;
+}
+
+.charsheet .abilities-box .abilities-columns button.init-surprise {
+    margin: auto;
+    min-height: 1.75em;
+    max-width: 10em;
+    width: 60%;
+}
+
 .charsheet .abilities-columns label,
 .charsheet .abilities-columns button {
     justify-content: end;
@@ -1464,6 +1608,7 @@ section.npc-box.statblock3 .image-avatar {
     align-items: center;
     display: grid;
     grid-template-columns: minmax(7em, 1fr) minmax(4em, 1fr) minmax(4em, 1.5fr) minmax(5em, 1.5fr) minmax(4em, 1fr) auto minmax(4em, 1fr) minmax(5em, 1fr) minmax(5em, 1fr);
+    row-gap: .75em;
     text-align: center;
 }
 
@@ -1533,7 +1678,7 @@ section.npc-box.statblock3 .image-avatar {
 
 .charsheet .weapons-row1 {
     display: grid;
-    grid-template-columns: 5em minmax(8em, 2fr) repeat(auto-fit, minmax(6em, 1fr));
+    grid-template-columns: 5em minmax(8em, 2fr) repeat(auto-fit, minmax(5.25em, 1fr));
     grid-template-rows: auto;
     justify-items: center;
     align-items: center;
@@ -1640,7 +1785,7 @@ details[open].thac0-box {
     background-color: #b9b9b9;
     color: initial;
     margin: 0 0 0 1em;
-    min-width: 440px;
+    min-width: 445px;
     position: absolute;
     width: 85%;
     z-index: 3;
@@ -1845,7 +1990,6 @@ input.toggle-single-column-abilities:checked ~ .background .repcontainer[data-gr
     display: grid;
     grid-template-columns: 5em 1fr 7em 5em 1fr 7em;
     justify-items: center;
-    min-width: 604px;
 }
 
 .charsheet input.toggle-single-column-abilities:not(:checked) ~ .background .repcontainer[data-groupname="repeating_ability"] .special-abilities-row1 {
@@ -2144,8 +2288,13 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
 }
 
 .charsheet .footer-box {
-    grid-row-start: 15;
+    column-gap: 2em;
+    display: flex;
+    flex-wrap: wrap;
     grid-column: 1/-1;
+    grid-row-start: 15;
+    justify-content: space-around;
+    margin: auto;
 }
 
 .charsheet .footer-box div {
@@ -2686,9 +2835,13 @@ input.toggle-single-column-attributes:checked ~ .background .repcontainer[data-g
     cursor: pointer;
     display: flex;
     font-size: .9em;
+    height: 100%;
     justify-content: center;
+    margin: auto;
+    max-height: 2.5em;
     min-height: 1.5em;
     width: min-content;
+    z-index: 1;
 }
 
 .charsheet .settings button[type="roll"].stack-text,
