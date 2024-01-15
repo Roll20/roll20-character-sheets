@@ -191,6 +191,7 @@ wiz1['Comprehend Languages'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
     'school-spells-and-magic': 'Universal Magic (Reversible)',
+    'reversible': 'Confuse Languages',
     'range': 'Touch',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': '1 speaking creature or written text',
@@ -10104,9 +10105,11 @@ wizardSpells['wiz8'] = wiz8;
 wizardSpells['wiz9'] = wiz9;
 
 const wizmonster = {};
-for (const [_, section] of Object.entries(wizardSpells)) {
+for (const [spellLevel, section] of Object.entries(wizardSpells)) {
     for (const [spellName, spell] of Object.entries(section)) {
         wizmonster[spellName] = spell;
+        if (spell['reversible'])
+            wizardSpells[spellLevel][`${spell['reversible']} (Reverse of ${spellName})`] = spell;
     }
 }
 wizardSpells['wizmonster'] = wizmonster;
