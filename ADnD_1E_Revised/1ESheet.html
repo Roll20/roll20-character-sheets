@@ -52,10 +52,11 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/14/23'</label>
+              <label class="right">1/15/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Adjustment to exceptional abilities so that they will only be displayed if the Show Exceptional is unchecked in sheet settings and the ability is at least 18. Exceptional Strength is always shown regardless of the hide option.</li>
             <li>Fixed incorrect table data for STR and CON. Updated Open Doors macro to use % vs d6.</li>
             <li>Armor Bulk and Encumbrance are now used to auto-adjust the movement load indicator and speeds. Dex penalty and roll template bulk/encumbrance text are on the to-do list.</li>
             <li>Armor Details: the unArmored Base row has been included with repeating_equipment|armor sync. This row is designed to represent any non-armor "Base AC". ie monsters natural skin/hide or a PC's clothing.</li>
@@ -1229,7 +1230,7 @@
             </span>
           </span>
           <label class="readonly-span-textonly span-two" title="@{current_bulk_label} | Current Bulk as per active armors, shield, clothing, etc.">
-            <input type="text" class="width-fill" name="attr_current_bulk_label" value="" readonly />
+            <input type="text" class="width-fill" name="attr_current_bulk_label" value="" placeholder="no bulk" readonly />
           </label>
             <input type="text" class="hidden" name="attr_current_bulk" value="" />
         </span>
@@ -1436,8 +1437,9 @@
             <input type="text" class="hidden" name="attr_strength_check_macro_text" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Strength Check}} {{roll_low=[[ @{ability_check_die}cs ]]}} {{roll_target=[[ @{strength} ]]}}" />
           </label>
           <input type="text" class="field-border" name="attr_strength" title="@{strength}" value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionalstrength" title="@{exceptionalstrength}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_strength_flag" value="1" />
+          <label class="toggle-exceptional strength">
+            <input type="text" class="width-smallest" name="attr_exceptionalstrength" title="@{exceptionalstrength}" value="0" />
           </label>
           <label>
             <span class="stack-text">To-Hit Adj.</span>
@@ -1451,12 +1453,13 @@
             <span class="stack-text">Weight All.</span>
           </label>
           <input type="text" class="width-small" name="attr_encumbrancebonus" title="@{encumbrancebonus} | Weight Allowance in gp." value="0" />
-          <button class="button stack-text" type="roll" name="attr_minorstrengthfeat-roll" title="%{selected|minorstrengthfeat-roll} | Minor Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Doors}} {{roll_low=[[ 1d100cs ]]%}} {{roll_target=[[ @{minorstrengthfeat} ]]}} {{[Open a Locked Door?](~@{character_id}|minorstrengthfeat_locked-roll)}} {{freetext=[[ @{minorstrengthfeat_locked} ]] chance to force open a locked, barred, magically held, or wizard locked door. Fighter's only.}}"><span>Open Doors</span></button>
+          <button class="button stack-text" type="roll" name="attr_minorstrengthfeat-roll" title="%{selected|minorstrengthfeat-roll} | Minor Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Doors}} {{roll_low=[[ 1d100cs ]]%}} {{roll_target=[[ @{minorstrengthfeat} ]]}} {{locked_doors=[Open a Locked Door?](~@{character_id}|minorstrengthfeat_locked-roll) You have a [[@{selected|minorstrengthfeat_locked}]]% chance to force open a locked, barred, magically held, or wizard locked door. Fighter's only.}}"><span>Open Doors</span></button>
           <span class="two-columns">
             <label class="label-percent">
               <input type="text" class="width-smallest" name="attr_minorstrengthfeat" title="@{minorstrengthfeat} | Minor Strength Feat: uses the highest # from STR table." value="0">
             </label>
-            <span class="text-superscript" title="@{minorstrengthfeat_locked} | Fighter's can attempt to force open a locked, barred, magically held, or wizard locked door." style="margin: -3px 0 0 -5px;">
+            <input type="checkbox" class="hidden exceptional" name="attr_exceptional_strength_flag" value="1" />
+            <span class="text-superscript toggle-exceptional strength" title="@{minorstrengthfeat_locked} | Fighter's can attempt to force open a locked, barred, magically held, or wizard locked door with exceptional Strength of 18(99)+.">
               <span name="attr_minorstrengthfeat_locked"></span>
             </span>
             <input type="hidden" name="attr_minorstrengthfeat_locked" value="0" />
@@ -1472,8 +1475,9 @@
             <input type="text" class="hidden" name="attr_intelligence_check_macro_text" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Intelligence Check}} {{roll_low=[[ @{ability_check_die}cs ]]}} {{roll_target=[[ @{intelligence} ]]}}" />
           </label>
           <input type="text" class="field-border" name="attr_intelligence" title="@{intelligence}" value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right toggle-exceptional">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionalintelligence" title="@{exceptionalintelligence}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_intelligence_flag" value="1" />
+          <label class="toggle-exceptional">
+            <input type="text" class="width-smallest" name="attr_exceptionalintelligence" title="@{exceptionalintelligence}" value="0" />
           </label>
           <label>
             <span class="stack-text">Add. Lang.</span>
@@ -1500,8 +1504,9 @@
             <input type="text" class="hidden" name="attr_wisdom_check_macro_text" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Wisdom Check}} {{roll_low=[[ @{ability_check_die}cs ]]}} {{roll_target=[[ @{wisdom} ]]}}" />
           </label>
           <input type="text" class="field-border" name="attr_wisdom" title="@{wisdom}" value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right toggle-exceptional">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionalwisdom" title="@{exceptionalwisdom}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_wisdom_flag" value="1" />
+          <label class="toggle-exceptional">
+            <input type="text" class="width-smallest" name="attr_exceptionalwisdom" title="@{exceptionalwisdom}" value="0" />
           </label>
           <button class="button stack-text" type="roll" name="attr_mentalsave-roll" title="%{selected|mentalsave-roll}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Mental Save}} {{roll_high=[[ 1d20 + [[ ?{Modifier?|0} ]][MOD] + [[ @{mentalsavebonus} ]][BON] ]]}} {{roll_target=[[?{Target # for success?|20}]]}} {{wis_applied=[[ @{mentalsavebonus} ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}}"><span>Save</span></button>
           <input type="text" class="width-smaller" name="attr_mentalsavebonus" title="@{mentalsavebonus}" value="0" />
@@ -1526,8 +1531,9 @@
             <input type="text" class="hidden" name="attr_dexterity_check_macro_text" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Dexterity Check}} {{roll_low=[[ @{ability_check_die}cs ]]}} {{roll_target=[[ @{dexterity} ]]}}" />
           </label>
           <input type="text" class="field-border" name="attr_dexterity" title="@{dexterity}" value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right toggle-exceptional">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionaldexterity" title="@{exceptionaldexterity}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_dexterity_flag" value="1" />
+          <label class="toggle-exceptional">
+            <input type="text" class="width-smallest" name="attr_exceptionaldexterity" title="@{exceptionaldexterity}" value="0" />
           </label>
           <label>
             <span class="stack-text">Reaction Adj.</span>
@@ -1562,8 +1568,9 @@
             <input type="text" class="hidden" name="attr_constitution_check_macro_text" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Constitution Check}} {{roll_low=[[ @{ability_check_die}cs ]]}} {{roll_target=[[ @{constitution} ]]}}" />
           </label>
           <input type="text" class="field-border" name="attr_constitution" title="@{constitution}" value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right toggle-exceptional">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionalconstitution" title="@{exceptionalconstitution}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_constitution_flag" value="1" />
+          <label class="toggle-exceptional">
+            <input type="text" class="width-smallest" name="attr_exceptionalconstitution" title="@{exceptionalconstitution}" value="0" />
           </label>
           <label>
             <span class="stack-text">HP Adj.</span>
@@ -1587,8 +1594,9 @@
             <input type="text" class="hidden" name="attr_charisma_check_macro_text" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Charisma Check}} {{roll_low=[[ @{ability_check_die}cs ]]}} {{roll_target=[[ @{charisma} ]]}}" />
           </label>
           <input type="text" class="field-border" name="attr_charisma" title="@{charisma}" value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right toggle-exceptional">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionalcharisma" title="@{exceptionalcharisma}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_charisma_flag" value="1" />
+          <label class="toggle-exceptional">
+            <input type="text" class="width-smallest" name="attr_exceptionalcharisma" title="@{exceptionalcharisma}" value="0" />
           </label>
           <label>
             <span class="stack-text">Max # Hench.</span>
@@ -1612,12 +1620,11 @@
           <label class="toggle-comeliness">
             <span class="text-large">COM</span>
           </label>
-
           <input type="text" class="field-border toggle-comeliness" name="attr_comeliness" title="@{comeliness} | Score should reflect 'Adjusted Comeliness' which takes into account Charisma and/or any racial adjustments." value="10" />
-          <label class="label-parenthesis-left label-parenthesis-right toggle-exceptional toggle-comeliness">
-            <input type="text" class="width-smallest no-border" name="attr_exceptionalcomeliness" title="@{exceptionalcomeliness}" value="0" />
+          <input type="checkbox" class="hidden exceptional" name="attr_exceptional_comeliness_flag" value="1" />
+          <label class="toggle-exceptional toggle-comeliness">
+            <input type="text" class="width-smallest" name="attr_exceptionalcomeliness" title="@{exceptionalcomeliness}" value="0" />
           </label>
-
           <span class="span-ten inline-label toggle-comeliness">
             <b class="text-large">=</b>
             <span class="stack-text">Base COM</span>
@@ -1695,11 +1702,11 @@
           <span></span>
           <label class="inline-label span-two" title="@{current_bulk_label} | Current Bulk as per active armors, shield, clothing, etc.">
             <span>Armor Bulk:</span>
-            <input type="text" class="width-fill" name="attr_current_bulk_label" value="" readonly />
+            <input type="text" class="width-fill" name="attr_current_bulk_label" value="" placeholder="no bulk" readonly />
           </label>
           <label class="inline-label span-three" title="@{current_encumbrance_label} | Encumbrance is the current load for carried weight vs strength adjustments.">
             <span>Encumbrance:</span>
-            <input type="text" class="width-fill" name="attr_current_encumbrance_label" value="" readonly />
+            <input type="text" class="width-fill" name="attr_current_encumbrance_label" value="" placeholder="no encumbrance" readonly />
           </label>
           <label class="inline-label span-three right" title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
             <span>Auto-Calc Movement:</span>
@@ -4185,6 +4192,13 @@
         </span>
       {{/attribute_mod_6_name}}
 
+      <!-- locked door -->
+      {{#rollGreater() locked_doors 0}}
+        {{#locked_doors}}
+          <span class="sheet-row sheet-span-two sheet-text">{{locked_doors}}</span>
+        {{/locked_doors}}
+      {{/rollGreater() locked_doors 0}}
+
       <span class="sheet-row">
         <span class="sheet-span-two sheet-tcat sheet-right">
           {{#uses_max}}
@@ -4200,11 +4214,11 @@
         </span>
       </span>
 
-      {{#allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
+      {{#allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
         <span class="sheet-row sheet-span-two sheet-all-props">
           {{key}}{{value}}
         </span>
-      {{/allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes}}
+      {{/allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied encumbrance_adjustment dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
 
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
@@ -4389,6 +4403,7 @@
   let autoCalcSaveRows = '';
   let autoCalcThiefRows = '';
   let autoCalcAbilityRows = '';
+  let calcRange = '';
   let calcHP = '';
   let calcAC = '';
   let strengthCalcs = '';
@@ -5296,77 +5311,7 @@
     });
   };
 
-  // Parse Ranges
-  function calcRange() {
-    getSectionIDs('repeating_weapon', (idArray) => {
-      const output = {};
-      const fields = [];
-      idArray.forEach((id) => {
-        fields.push(section_attribute('weapon', id, 'weapon_range'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_short'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_long'));
-        fields.push(section_attribute('weapon', id, 'weapon_attack_type'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_error'));
-      });
-      getAttrs(fields, (v) => {
-        idArray.forEach((id) => {
-          // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-          const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
-          if (thisType === 0 || thisType === 2) return;
-          let thisRange = v[section_attribute('weapon', id, 'weapon_range')];
-          // remove quotes to prevent NaN (ie distance indicators)
-          thisRange = thisRange.replace(/'/g, '');
-          thisRange = thisRange.replace(/"/g, '');
-          // parse ranges
-          const thisRangeArray = thisRange.split('/').join(',').split(' ').join(',').split('-').join(',').split(',');
-          // clog(`thisRangeArray: ${thisRangeArray}`);
-          const thisRangeShort = Number(thisRangeArray[0]);
-          let thisRangeMedium = Number(thisRangeArray[1]);
-          let thisRangeLong = Number(thisRangeArray[2]);
-
-          // clog(`Attack is Ranged. repeating_weapon_weapon_attack_type = ${thisType}`);
-
-          // if only a single number is entered, make it Long ie Manticore spikes
-          if (thisRangeArray.length === 1 && thisRangeShort >= 0 && !thisRangeMedium && !thisRangeLong) {
-            thisRangeMedium = thisRangeShort;
-            thisRangeLong = thisRangeShort;
-          }
-          // clog(`thisRangeShort: ${thisRangeShort} |thisRangeMedium: ${thisRangeMedium} |thisRangeLong: ${thisRangeLong}`);
-
-          // check to see if range is in the proper format.
-          if (Number.isNaN(thisRangeShort)) {
-            output[section_attribute('weapon', id, 'weapon_range_short')] = 0;
-            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
-            // clog(`WARNING: Field is not in the proper format.`);
-          } else {
-            output[section_attribute('weapon', id, 'weapon_range_short')] = thisRangeShort;
-          }
-          if (Number.isNaN(thisRangeMedium)) {
-            output[section_attribute('weapon', id, 'weapon_range_medium')] = 0;
-            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
-            // clog(`WARNING: Field is not in the proper format.`);
-          } else {
-            output[section_attribute('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
-          }
-          if (Number.isNaN(thisRangeLong)) {
-            output[section_attribute('weapon', id, 'weapon_range_long')] = 0;
-            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
-            // clog(`WARNING: Field is not in the proper format.`);
-          } else {
-            output[section_attribute('weapon', id, 'weapon_range_long')] = thisRangeLong;
-          }
-          if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
-            output[section_attribute('weapon', id, 'weapon_range_error')] = 1;
-          } else {
-            // clog(`Value did not parse.`);
-          }
-        });
-        setAttrs(output, {silent: true});
-      });
-    });
-  }
-
+  // One-Time update
   const updateRange = (current_version, final_version) => {
     const update = {};
     calcRange();
@@ -6543,25 +6488,27 @@
 
   // Check and set Ability defaults to 8 on new sheets
   const newSheet = () => {
-    getAttrs(['hitdice', 'armorclass', 'ArmorClass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'new_character'], (v) => {
+    getAttrs(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character'], (v) => {
       const output = {};
+      const testOldChar = +v.old_character || 0;
+      if (testOldChar === 1) {
+        // clog(`~~~~~~ OLD SHEET DETECTED old_character:${testOldChar}`);
+        return;
+      }
       const testHitdice = +v.hitdice;
       const testAC = +v.armorclass || 0;
-      const testStr = +v.strength;
-      const testInt = +v.intelligence;
-      const testWis = +v.wisdom;
-      const testDex = +v.dexterity;
-      const testCon = +v.constitution;
-      const testCha = +v.charisma;
-      const testOldChar = +v.new_character;
+      const testStr = +v.strength || 0;
+      const testInt = +v.intelligence || 0;
+      const testWis = +v.wisdom || 0;
+      const testDex = +v.dexterity || 0;
+      const testCon = +v.constitution || 0;
+      const testCha = +v.charisma || 0;
       // new sheets will have all abilities '10' by default
       // defaults will then be set to '8' default
       const testAbility = testStr + testInt + testWis + testDex + testCon + testCha;
       // clog(`~~~~~~ Average Ability detected: ${testAbility}, Hit Dice: ${testHitdice}, AC: ${testAC}`);
-      if (testOldChar === 1) {
-        // clog(`~~~~~~ OLD SHEET DETECTED: ${testOldChar}`);
-      } else if (testHitdice === 0 && testAC === 10 && testAbility === 60) {
-        // clog(`~~~~~~ NEW SHEET DETECTED: ${testOldChar}, Ability Defaults set to "8".`);
+      if (testHitdice === 0 && testAC === 10 && testAbility === 60) {
+        // clog(`~~~~~~ NEW SHEET DETECTED old_character:${testOldChar}, Ability Defaults set to "8".`);
         output.strength = testStr === 10 ? 8 : testStr;
         output.intelligence = testInt === 10 ? 8 : testInt;
         output.wisdom = testWis === 10 ? 8 : testWis;
@@ -6569,11 +6516,12 @@
         output.constitution = testCon === 10 ? 8 : testCon;
         output.charisma = testCha === 10 ? 8 : testCha;
         output.old_character = 1;
+        stat_functions();
       } else {
-        // clog(`~~~~~~ OLD SHEET DETECTED: ${testOldChar}`);
-        output.old_character = 0;
+        // clog(`~~~~~~ OLD SHEET DETECTED old_character:${testOldChar}`);
+        output.old_character = 1;
       }
-      setAttrs(output, {silent: true}, stat_functions());
+      setAttrs(output, {silent: true});
     });
   };
 
@@ -6650,7 +6598,7 @@
         sheet_version: final_version,
       });
     } else if (current_version === final_version) {
-      // new sheet?
+      // check if new sheet and set abilities
       newSheet();
     }
   };
@@ -6663,6 +6611,32 @@
       const current_version = float(v.sheet_version);
       clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
       versionator(current_version, final_version);
+    });
+  });
+
+  // Exceptional
+  on('change:strength change:intelligence change:wisdom change:dexterity change:constitution change:charisma change:comeliness', (eventInfo) => {
+    getAttrs(['strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional'], (v) => {
+      const output = {};
+      const toggle_exceptional = +v.toggle_exceptional || 0;
+      const strength = +v.strength || 0;
+      const intelligence = +v.intelligence || 0;
+      const wisdom = +v.wisdom || 0;
+      const dexterity = +v.dexterity || 0;
+      const constitution = +v.constitution || 0;
+      const charisma = +v.charisma || 0;
+      const comeliness = +v.comeliness || 0;
+      if (toggle_exceptional === 0) {
+        // output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+        output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
+        output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
+        output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
+        output.exceptional_constitution_flag = constitution >= 18 ? 1 : 0;
+        output.exceptional_charisma_flag = charisma >= 18 ? 1 : 0;
+        output.exceptional_comeliness_flag = comeliness >= 18 ? 1 : 0;
+      }
+      output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+      setAttrs(output, {silent: true});
     });
   });
 
@@ -6790,7 +6764,7 @@
 
   // Equipment Weight Calcs
   on(
-    'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn change:total_coin_weight remove:repeating_equipment',
+    'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn change:total_coin_weight remove:repeating_equipment',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       sumEquipmentWeight();
@@ -6853,8 +6827,8 @@
     });
   }
 
-  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk', (eventInfo) => {
-    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  on('change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag // change:current_bulk', (eventInfo) => {
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['encumbrancebonus'], (v) => {
       // clog('Encumbrance has been re-calculated');
       const output = {};
@@ -6902,7 +6876,7 @@
     });
   }
 
-  on('sheet:opened change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', (eventInfo) => {
+  on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['movement'], (v) => {
       // clog('Current Base Movement has been re-calculated');
@@ -7866,8 +7840,37 @@
     });
   });
 
+  function syncDualPen() {
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const output = {};
+      const fields = [];
+      idArray.forEach((id) => {
+        fields.push(section_attribute('weapon', id, 'weapon_dual'));
+      });
+      getAttrs(['dual_pen_primary', 'dual_pen_secondary', ...fields], (v) => {
+        clog('Weapon Attack Type has been re-calculated');
+        const primary = +v.dual_pen_primary || 0;
+        const secondary = +v.dual_pen_secondary || 0;
+        idArray.forEach((id) => {
+          const attack_type = v[section_attribute('weapon', id, 'weapon_dual')];
+          let handed_mod = 0;
+          if (attack_type === 'Primary') {
+            handed_mod = primary;
+          }
+          if (attack_type === 'Secondary') {
+            handed_mod = secondary;
+          }
+          const thispenalty = Math.min(0, handed_mod);
+          output[section_attribute('weapon', id, 'weapon_dual_pen')] = thispenalty;
+        });
+        setAttrs(output, {silent: true});
+      });
+    });
+  }
+
   // Weapon Dual-Wield Calc Penalty
-  function calcDualPen() {
+  on('change:repeating_weapon:weapon_dual change:dual_pen_primary change:dual_pen_secondary change:dexterity', (eventInfo) => {
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['dexterity'], (v) => {
       // clog('Weapon Attack Type has been re-calculated');
       const output = {};
@@ -7892,52 +7895,88 @@
       const secondary_mod = Math.min(0, dex_mod - 4);
       output.dual_pen_primary = primary_mod;
       output.dual_pen_secondary = secondary_mod;
-      setAttrs(output, {silent: true});
+      setAttrs(output, {silent: true}, syncDualPen());
     });
-  }
-
-  on('sheet:opened change:dexterity', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    calcDualPen();
   });
 
-  on('change:repeating_weapon:weapon_dual change:dual_pen_primary change:dual_pen_secondary', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // Weapon Range: Parse Ranges
+  calcRange = () => {
     getSectionIDs('repeating_weapon', (idArray) => {
       const output = {};
       const fields = [];
       idArray.forEach((id) => {
-        fields.push(section_attribute('weapon', id, 'weapon_dual'));
+        fields.push(section_attribute('weapon', id, 'weapon_range'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_short'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_long'));
+        fields.push(section_attribute('weapon', id, 'weapon_attack_type'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_error'));
       });
-      getAttrs(['dual_pen_primary', 'dual_pen_secondary', ...fields], (v) => {
-        // clog('Weapon Attack Type has been re-calculated');
-        const primary = +v.dual_pen_primary || 0;
-        const secondary = +v.dual_pen_secondary || 0;
+      getAttrs(fields, (v) => {
         idArray.forEach((id) => {
-          const attack_type = v[section_attribute('weapon', id, 'weapon_dual')];
-          let handed_mod = 0;
-          if (attack_type === 'Primary') {
-            handed_mod = primary;
+          // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
+          const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+          if (thisType === 0 || thisType === 2) return;
+          let thisRange = v[section_attribute('weapon', id, 'weapon_range')];
+          // remove quotes to prevent NaN (ie distance indicators)
+          thisRange = thisRange.replace(/'/g, '');
+          thisRange = thisRange.replace(/"/g, '');
+          // parse ranges
+          const thisRangeArray = thisRange.split('/').join(',').split(' ').join(',').split('-').join(',').split(',');
+          // clog(`thisRangeArray: ${thisRangeArray}`);
+          const thisRangeShort = Number(thisRangeArray[0]);
+          let thisRangeMedium = Number(thisRangeArray[1]);
+          let thisRangeLong = Number(thisRangeArray[2]);
+
+          // clog(`Attack is Ranged. repeating_weapon_weapon_attack_type = ${thisType}`);
+
+          // if only a single number is entered, make it Long ie Manticore spikes
+          if (thisRangeArray.length === 1 && thisRangeShort >= 0 && !thisRangeMedium && !thisRangeLong) {
+            thisRangeMedium = thisRangeShort;
+            thisRangeLong = thisRangeShort;
           }
-          if (attack_type === 'Secondary') {
-            handed_mod = secondary;
+          // clog(`thisRangeShort: ${thisRangeShort} |thisRangeMedium: ${thisRangeMedium} |thisRangeLong: ${thisRangeLong}`);
+
+          // check to see if range is in the proper format.
+          if (Number.isNaN(thisRangeShort)) {
+            output[section_attribute('weapon', id, 'weapon_range_short')] = 0;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+            // clog(`WARNING: Field is not in the proper format.`);
+          } else {
+            output[section_attribute('weapon', id, 'weapon_range_short')] = thisRangeShort;
           }
-          const thispenalty = Math.min(0, handed_mod);
-          output[section_attribute('weapon', id, 'weapon_dual_pen')] = thispenalty;
+          if (Number.isNaN(thisRangeMedium)) {
+            output[section_attribute('weapon', id, 'weapon_range_medium')] = 0;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+            // clog(`WARNING: Field is not in the proper format.`);
+          } else {
+            output[section_attribute('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
+          }
+          if (Number.isNaN(thisRangeLong)) {
+            output[section_attribute('weapon', id, 'weapon_range_long')] = 0;
+            output[section_attribute('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+            // clog(`WARNING: Field is not in the proper format.`);
+          } else {
+            output[section_attribute('weapon', id, 'weapon_range_long')] = thisRangeLong;
+          }
+          if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
+            output[section_attribute('weapon', id, 'weapon_range_error')] = 1;
+          } else {
+            // clog(`Value did not parse.`);
+          }
         });
         setAttrs(output, {silent: true});
       });
     });
-  });
+  };
 
-  // Weapon Range
   on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_type', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     calcRange();
   });
 
   // Weapon Attack Type
-  on('sheet:opened change:repeating_weapon:weapon_attack_type', (eventInfo) => {
+  on('change:repeating_weapon:weapon_attack_type', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['repeating_weapon_weapon_attack_type', 'repeating_weapon_weapon_attack_type_flag'], (v) => {
       const output = {};
@@ -7974,7 +8013,7 @@
     });
   };
 
-  on('sheet:opened change:sync_hp_flag change:hitpoints change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
+  on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     calcHP();
   });
@@ -8254,7 +8293,7 @@
   };
 
   on(
-    'sheet:opened change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
+    'change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
     (eventInfo) => {
       // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
       const recalc = 0;
@@ -8271,7 +8310,7 @@
 
   // Chat Menu Buttons - Damage Rolls
   on(
-    'sheet:opened change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:toggle_critdamage',
+    'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:toggle_critdamage',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       getSectionIDs('repeating_weapon', (idArray) => {
@@ -8619,7 +8658,6 @@
   });
 
   // Thief Calcs
-
   pickpocketsCalc = () => {
     getAttrs(['pickpockets', 'pickpockets_base', 'pickpockets_racial_mod', 'pickpockets_ability_mod', 'pickpockets_magic'], (v) => {
       const output = {};
@@ -10307,7 +10345,7 @@
           '51-75': new StrengthCheck(2, 3, 1250, 70, 0, 25),
           '76-90': new StrengthCheck(2, 4, 1500, 70, 0, 30),
           '91-99': new StrengthCheck(2, 5, 2000, 70, 15, 35),
-          '00': new StrengthCheck(3, 6, 3000, 85, 15, 40),
+          '00': new StrengthCheck(3, 6, 3000, 85, 30, 40),
         },
         19: new StrengthCheck(3, 7, 4500, 90, 50, 50),
         20: new StrengthCheck(3, 8, 5000, 90, 50, 60),
@@ -10557,11 +10595,11 @@
         14: new ConstitutionEntry('0', 88, 92),
         15: new ConstitutionEntry('1', 91, 94),
         16: new ConstitutionEntry('2', 95, 96),
-        // fighter only bonuses?
-        // 17 +2/+3 * 97% 98%
-        // 18 +2/+4 * 99% 100%
-        17: new ConstitutionEntry('3', 97, 97),
-        18: new ConstitutionEntry('4', 99, 99),
+        // *cap @ +2 unless fighter type
+        // 17 +3*
+        // 18 +4*
+        17: new ConstitutionEntry('3', 97, 98),
+        18: new ConstitutionEntry('4', 99, 100),
         19: new ConstitutionEntry('5', 99, 100),
         20: new ConstitutionEntry('5', 99, 100),
         21: new ConstitutionEntry('6', 99, 100),
