@@ -10133,10 +10133,14 @@ const wizmonster = {};
 for (const [spellLevel, section] of Object.entries(wizardSpells)) {
     for (const [spellName, spell] of Object.entries(section)) {
         wizmonster[spellName] = spell;
-        if (spell['reversible'])
-            wizardSpells[spellLevel][`${spell['reversible']} (Reverse of ${spellName})`] = spell;
+        if (spell['reversible']) {
+            let reverseSpellName = `${spell['reversible']} (Reverse of ${spellName})`;
+            wizardSpells[spellLevel][reverseSpellName] = spell;
+            wizmonster[reverseSpellName] = spell;
+        }
     }
 }
+
 wizardSpells['wizmonster'] = wizmonster;
 /* ---- Wizard spells end ---- */
 module.exports = wizardSpells;
