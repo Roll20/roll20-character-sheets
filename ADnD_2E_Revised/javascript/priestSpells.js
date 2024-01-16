@@ -8785,13 +8785,18 @@ priestSpells['pri7'] = pri7;
 priestSpells['priq'] = priq;
 
 const primonster = {};
-for (const [_, section] of Object.entries(priestSpells)) {
+for (const [spellLevel, section] of Object.entries(priestSpells)) {
     for (const [spellName, spell] of Object.entries(section)) {
         let name = spellName;
         if (spellName === 'Fortify' && spell.book === 'Player\'s Option: Spells & Magic') {
             name += " (S&M)";
         }
         primonster[name] = spell;
+        if (spell['reversible']) {
+            let reverseSpellName = `${spell['reversible']} (Reverse of ${spellName})`;
+            priestSpells[spellLevel][reverseSpellName] = spell;
+            primonster[reverseSpellName] = spell;
+        }
     }
 }
 priestSpells['primonster'] = primonster;
