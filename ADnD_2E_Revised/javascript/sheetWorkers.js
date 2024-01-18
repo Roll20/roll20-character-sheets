@@ -2694,7 +2694,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
     if (!eventInfo.newValue)
         return;
 
-    let spellName = eventInfo.newValue.replace('Scroll of ', '');
+    let spellName = eventInfo.newValue.replace(/ scroll$/, '');
     let wizardSpell = wizardSpells['wizmonster'][spellName];
     let priestSpell = priestSpells['primonster'][spellName];
     if (!wizardSpell && !priestSpell)
