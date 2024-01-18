@@ -24062,17 +24062,9 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 	var rollID = results.rollId;
 	results = results.results;
 	var TaW = results.wert.result;
-	var mod = results.mod.result;
-
-	// The result does not contain rolls of 0 dice (0d1cs0cf2), unmodified checks and checks with effective encumbrance 0 do not produce rolls (but still a roll result!).
-	var ebe = 0;
-	if (results.mod.rolls.length === 1)
-	{
-		ebe = mod;
-	} else if (results.mod.rolls.length === 2) {
-		ebe = results.mod.rolls[1].results.reduce((total, num) => {return total + num;}, 0);
-	}
-	var modonly = mod - ebe;
+	var modTotal = results.mod.result;
+	var ebe = results.ebe.result;
+	var modOnly = modTotal - ebe;
 
 	var stats = [
 		results.stats.rolls[0].dice,
@@ -24124,7 +24116,7 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 		TaP*-Berechnung
 	*/
 	var effRolls = rolls;
-	var effTaW = TaW - mod;
+	var effTaW = TaW - modTotal;
 	var TaPstar = effTaW;
 
 	// Negativer TaW: |effTaW| zu Teilwürfen addieren
@@ -24163,7 +24155,7 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 	finishRoll(
 		rollID,
 		{
-			mod: modonly,
+			mod: modOnly,
 			roll: TaPstar,
 			result: result,
 			criticality: criticality,
