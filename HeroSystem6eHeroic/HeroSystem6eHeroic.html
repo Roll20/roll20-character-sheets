@@ -9715,8 +9715,8 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId,
-					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess"], function(values) {
+			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId,
+					"optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeSelection", "rangeOCVpenalty"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
@@ -9728,13 +9728,35 @@
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
+				// Check to see if this is a ranged attack.
+				let isRangedAttack = false;
+				
+				if (parseInt(values.rangeSelection)||0) {
+					isRangedAttack = true;
+				}
+				
+				// However, if the weapon's RMod is better than the range penalty, ignore range.
+				if ((parseInt(values["weaponRangeMod"+weaponId])||0) > (parseInt(values.rangeOCVpenalty)||0))  {
+					isRangedAttack = false;
+				}
+				
 				// If isNormalDamage is TRUE, use the Normal Damage template.
 				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} ";
-				if (values.displayDegreeOfSuccess != 0) {
-					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}} ";
+				
+				if (isRangedAttack) {
+					if (values.displayDegreeOfSuccess != 0) {
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]+?{Modifiers|0}[Modifier]]]}} ";
+					} else {
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+					}
 				} else {
-					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+					if (values.displayDegreeOfSuccess != 0) {
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-0[NetRangePenalty]+?{Modifiers|0}[Modifier]]]}} ";
+					} else {
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-0[NetRangePenalty]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+					}
 				}
+				
 				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 				if (useHitLocations)
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
