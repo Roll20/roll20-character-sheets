@@ -23,6 +23,7 @@ pri1['Animal Friendship'] = {
 pri1['Bless'] = {
     'level': '1',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Curse',
     'sphere': 'All',
     'range': '60 yards',
     'duration': '6 rounds',
@@ -81,6 +82,7 @@ pri1['Command'] = {
 pri1['Create Water'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Destroy Water',
     'sphere': 'Elemental (Water)',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -100,6 +102,7 @@ pri1['Create Water'] = {
 pri1['Cure Light Wounds'] = {
     'level': '1',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Cause Light Wounds',
     'sphere': 'Healing',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -119,6 +122,7 @@ pri1['Cure Light Wounds'] = {
 pri1['Detect Evil'] = {
     'level': '1',
     'school': 'Divination (Reversible)',
+    'reversible': 'Detect Good',
     'sphere': 'All',
     'sphere-spells-and-magic': 'Divination',
     'range': '0',
@@ -293,6 +297,7 @@ pri1['Invisibility to Undead'] = {
 pri1['Light'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Darkness',
     'sphere': 'Sun',
     'sphere-spells-and-magic': 'Creation, Guardian, Sun',
     'range': '120 yards',
@@ -371,6 +376,7 @@ pri1['Pass Without Trace'] = {
 pri1['Protection From Evil'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Protection From Good',
     'sphere': 'Protection',
     'range': 'Touch',
     'duration': '[[3*[[@{level-priest}]] ]] rounds',
@@ -390,6 +396,7 @@ pri1['Protection From Evil'] = {
 pri1['Purify Food & Drink'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Putrefy Food & Drink',
     'sphere': 'All',
     'range': '30 yards',
     'duration': 'Permanent',
@@ -409,6 +416,7 @@ pri1['Purify Food & Drink'] = {
 pri1['Remove Fear'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Cause Fear',
     'sphere': 'Charm',
     'range': '10 yards',
     'duration': 'Special',
@@ -567,6 +575,7 @@ pri2['Charm Person or Mammal'] = {
 pri2['Detect Charm'] = {
     'level': '2',
     'school': 'Divination (Reversible)',
+    'reversible': 'Undetectable Charm',
     'sphere': 'Divination',
     'range': '30 yards',
     'duration': '1 turn',
@@ -683,6 +692,7 @@ pri2['Flame Blade'] = {
 pri2['Goodberry'] = {
     'level': '2',
     'school': 'Alteration, Evocation (Reversible)',
+    'reversible': 'Badberry',
     'sphere': 'Plant',
     'range': 'Touch',
     'duration': '[[1+[[@{level-priest}]] ]] days',
@@ -702,6 +712,7 @@ pri2['Goodberry'] = {
 pri2['Heat Metal'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Chill Metal',
     'sphere': 'Elemental (Fire)',
     'range': '40 yards',
     'duration': '7 rounds',
@@ -741,6 +752,7 @@ pri2['Hold Person'] = {
 pri2['Know Alignment'] = {
     'level': '2',
     'school': 'Divination (Reversible)',
+    'reversible': 'Undetectable Alignment',
     'sphere': 'Divination',
     'range': '10 yards',
     'duration': '1 turn',
@@ -954,6 +966,7 @@ pri2['Trip'] = {
 pri2['Warp Wood'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Straighten Wood',
     'sphere': 'Plant',
     'range': '[[10*[[@{level-priest}]] ]] yards',
     'duration': 'Permanent',
@@ -1050,6 +1063,7 @@ pri3['Call Lightning'] = {
 pri3['Continual Light'] = {
     'level': '3',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Continual Darkness',
     'sphere': 'Sun',
     'sphere-spells-and-magic': 'Creation, Guardian, Sun',
     'range': '120 yards',
@@ -1089,6 +1103,7 @@ pri3['Create Food & Water'] = {
 pri3['Cure Blindness or Deafness'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Cause Blindness or Deafness',
     'sphere': 'Necromantic',
     'sphere-spells-and-magic': 'Healing',
     'range': 'Touch',
@@ -1109,6 +1124,7 @@ pri3['Cure Blindness or Deafness'] = {
 pri3['Cure Disease'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Cause Disease',
     'sphere': 'Necromantic',
     'sphere-spells-and-magic': 'Healing',
     'range': 'Touch',
@@ -1225,6 +1241,7 @@ pri3['Hold Animal'] = {
 pri3['Locate Object'] = {
     'level': '3',
     'school': 'Divination (Reversible)',
+    'reversible': 'Obscure Object',
     'sphere': 'Divination',
     'range': '[[60+10*[[@{level-priest}]] ]] yards',
     'duration': '8 hours.',
@@ -1378,6 +1395,7 @@ pri3['Pyrotechnics'] = {
 pri3['Remove Curse'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Bestow Curse',
     'sphere': 'Protection',
     'sphere-spells-and-magic': 'All',
     'range': 'Touch',
@@ -1554,6 +1572,7 @@ pri3['Tree'] = {
 pri3['Water Breathing'] = {
     'level': '3',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Air Breathing',
     'sphere': 'Elemental (Water, Air)',
     'sphere-spells-and-magic': 'Elemental (Water)',
     'range': 'Touch',
@@ -1655,6 +1674,7 @@ pri4['Call Woodland Beings'] = {
 pri4['Cloak of Bravery'] = {
     'level': '4',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Cloak of Fear',
     'sphere': 'Charm',
     'range': 'Touch',
     'duration': 'Special',
@@ -1693,6 +1713,7 @@ pri4['Control Temperature, 10\' Radius'] = {
 pri4['Cure Serious Wounds'] = {
     'level': '4',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Cause Serious Wounds',
     'sphere': 'Healing',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -1712,6 +1733,7 @@ pri4['Cure Serious Wounds'] = {
 pri4['Detect Lie'] = {
     'level': '4',
     'school': 'Divination (Reversible)',
+    'reversible': 'Undetectable Lie',
     'sphere': 'Divination',
     'range': '30 yards',
     'duration': '[[@{level-priest}]] rounds',
@@ -1769,6 +1791,7 @@ pri4['Free Action'] = {
 pri4['Giant Insect'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Shrink Insect',
     'sphere': 'Animal',
     'range': '20 yards',
     'duration': 'Permanent',
@@ -1845,6 +1868,7 @@ pri4['Imbue With Spell Ability'] = {
 pri4['Lower Water'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Raise Water',
     'sphere': 'Elemental (Water)',
     'range': '120 yards',
     'duration': '[[@{level-priest}]] turns',
@@ -1864,6 +1888,7 @@ pri4['Lower Water'] = {
 pri4['Neutralize Poison'] = {
     'level': '4',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Poison',
     'sphere': 'Healing',
     'sphere-necromancers': ', Necromantic',
     'range': 'Touch',
@@ -1903,6 +1928,7 @@ pri4['Plant Door'] = {
 pri4['Produce Fire'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Quench Fire',
     'sphere': 'Elemental (Fire)',
     'range': '40 yards',
     'duration': '1 round',
@@ -1922,6 +1948,7 @@ pri4['Produce Fire'] = {
 pri4['Protection From Evil, 10\' Radius'] = {
     'level': '4',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Protection From Good, 10\' Radius',
     'sphere': 'Protection',
     'range': 'Touch',
     'duration': '[[@{level-priest}]] turns',
@@ -2039,6 +2066,7 @@ pri4['Spell Immunity'] = {
 pri4['Sticks to Snakes'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Snakes to Sticks',
     'sphere': 'Plant',
     'range': '30 yards',
     'duration': '[[2*[[@{level-priest}]] rounds',
@@ -2058,6 +2086,7 @@ pri4['Sticks to Snakes'] = {
 pri4['Tongues'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Babble',
     'sphere': 'Divination',
     'sphere-spells-and-magic': 'All',
     'range': '0',
@@ -2098,6 +2127,7 @@ pri5['Air Walk'] = {
 pri5['Animal Growth'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Shrink Animal',
     'sphere': 'Animal',
     'range': '80 yards',
     'duration': '[[2*[[@{level-priest}}]] ]] rounds',
@@ -2236,6 +2266,7 @@ pri5['Control Winds'] = {
 pri5['Cure Critical Wounds'] = {
     'level': '5',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Cause Critical Wounds',
     'sphere': 'Healing',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -2255,6 +2286,7 @@ pri5['Cure Critical Wounds'] = {
 pri5['Dispel Evil'] = {
     'level': '5',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Dispel Good',
     'sphere': 'Protection, Summoning',
     'sphere-necromancers': ', Necromantic',
     'sphere-spells-and-magic': 'Guardian, Summoning',
@@ -2431,6 +2463,7 @@ pri5['Rainbow'] = {
 pri5['Raise Dead'] = {
     'level': '5',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Slay Living',
     'sphere': 'Necromantic',
     'range': '120 yards',
     'duration': 'Permanent',
@@ -2469,6 +2502,7 @@ pri5['Spike Stones'] = {
 pri5['Transmute Rock to Mud'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Transmute Mud to Rock',
     'sphere': 'Elemental (Earth, Water)',
     'sphere-spells-and-magic': 'Elemental (Earth)',
     'range': '160 yards',
@@ -2644,6 +2678,7 @@ pri6['Conjure Animals'] = {
 pri6['Conjure Fire Elemental'] = {
     'level': '6',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Dismiss Fire Elemental',
     'sphere': 'Elemental (Fire)',
     'range': '80 yards',
     'duration': '[[@{level-priest}]] turns',
@@ -2663,6 +2698,7 @@ pri6['Conjure Fire Elemental'] = {
 pri6['Find the Path'] = {
     'level': '6',
     'school': 'Divination (Reversible)',
+    'reversible': 'Lose the Path',
     'sphere': 'Divination',
     'range': 'Touch',
     'duration': '[[@{level-priest}]] turns',
@@ -2721,6 +2757,7 @@ pri6['Forbiddance'] = {
 pri6['Heal'] = {
     'level': '6',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Harm',
     'sphere': 'Healing',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -2836,6 +2873,7 @@ pri6['Stone Tell'] = {
 pri6['Transmute Water to Dust'] = {
     'level': '6',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Transmute Dust to Water',
     'sphere': 'Elemental (Water, Earth)',
     'sphere-spells-and-magic': 'Elemental (Water)',
     'range': '60 yards',
@@ -3051,6 +3089,7 @@ pri7['Confusion'] = {
 pri7['Conjure Earth Elemental'] = {
     'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Dismiss Earth Elemental',
     'sphere': 'Elemental (Earth), Summoning',
     'sphere-spells-and-magic': 'Elemental (Earth)',
     'range': '40 yards',
@@ -3148,6 +3187,7 @@ pri7['Exaction'] = {
 pri7['Fire Storm'] = {
     'level': '7',
     'school': 'Evocation (Reversible)',
+    'reversible': 'Fire Quench',
     'sphere': 'Elemental (Fire)',
     'range': '160 yards',
     'duration': '1 round',
@@ -3187,6 +3227,7 @@ pri7['Gate'] = {
 pri7['Holy Word'] = {
     'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Unholy Word',
     'sphere': 'Combat',
     'range': '0',
     'duration': 'Special',
@@ -3206,6 +3247,7 @@ pri7['Holy Word'] = {
 pri7['Regenerate'] = {
     'level': '7',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Wither',
     'sphere': 'Necromantic',
     'sphere-spells-and-magic': 'Healing',
     'range': 'Touch',
@@ -3247,6 +3289,7 @@ pri7['Reincarnate'] = {
 pri7['Restoration'] = {
     'level': '7',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Energy Drain',
     'sphere': 'Necromantic',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -3266,6 +3309,7 @@ pri7['Restoration'] = {
 pri7['Resurrection'] = {
     'level': '7',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Destruction',
     'sphere': 'Necromantic',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -3611,6 +3655,7 @@ pri1['Personal Reading'] = {
 pri1['Ring of Hands'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Ring of Woe',
     'sphere': 'Protection',
     'range': '0',
     'duration': '[[2d10]] rounds',
@@ -4011,6 +4056,7 @@ pri2['Rally'] = {
 pri2['Sanctify'] = {
     'level': '2',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Defile',
     'sphere': 'All',
     'range': '10 yards',
     'duration': 'Special',
@@ -4144,6 +4190,7 @@ pri3['Choose Future'] = {
 pri3['Create Campsite'] = {
     'level': '3',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Break Camp',
     'sphere': 'Travelers',
     'range': '0',
     'duration': 'Special',
@@ -4277,6 +4324,7 @@ pri3['Know Customs'] = {
 pri3['Line of Protection'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'Line of Destruction',
     'sphere': 'Protection',
     'range': '0',
     'duration': '[[@{level-priest}]] rounds',
@@ -4851,6 +4899,7 @@ pri4['Join With Astral Traveler'] = {
 pri4['Leadership'] = {
     'level': '4',
     'school': 'Enchantment/Charm, Alteration (Reversible)',
+    'reversible': 'Doubt',
     'sphere': 'War',
     'range': 'Special',
     'duration': 'Special',
@@ -4966,6 +5015,7 @@ pri4['Solipsism'] = {
 pri4['Tanglefoot'] = {
     'level': '4',
     'school': 'Alteration, Abjuration (Reversible)',
+    'reversible': 'Selective Passage',
     'sphere': 'War',
     'range': '240 yards',
     'duration': '[[2*[[@{level-priest}]] ]] turns',
@@ -5061,6 +5111,7 @@ pri4['Weather Stasis'] = {
 pri5['Age Object'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Youthful Object',
     'sphere': 'Time',
     'range': '10 yards',
     'duration': 'Permanent',
@@ -5156,6 +5207,7 @@ pri5['Chaotic Commands'] = {
 pri5['Clear Path'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Clutter Path',
     'sphere': 'Travelers',
     'range': '0',
     'duration': '[[@{level-priest}]] hours',
@@ -5541,6 +5593,7 @@ pri5['Undead Ward'] = {
 pri6['Age Creature'] = {
     'level': '6',
     'school': 'Alteration (Reversible)',
+    'reversible': 'Restore Youth',
     'sphere': 'Time',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -5636,6 +5689,7 @@ pri6['Gravity Variation'] = {
 pri6['The Great Circle'] = {
     'level': '6',
     'school': 'Abjuration (Reversible)',
+    'reversible': 'The Black Circle',
     'sphere': 'Sun',
     'sphere-spells-and-magic': 'Creation',
     'range': '0',
@@ -5865,6 +5919,7 @@ pri7['Age Dragon'] = {
 pri7['Breath of Life'] = {
     'level': '7',
     'school': 'Necromantic (Reversible)',
+    'reversible': 'Breath of Death',
     'sphere': 'Necromantic',
     'range': '0',
     'duration': '[[@{level-priest}]] hours',
@@ -6747,6 +6802,7 @@ pri2['Animal Eyes'] = {
 pri2['Locate Animal Follower'] = {
     'level': '2',
     'school': 'Divination (Reversible)',
+    'reversible': 'Obscure Follower',
     'sphere': 'Animal',
     'range': '[[60+10*[[@{level-priest}]] ]] yards',
     'duration': '8 hours',
@@ -7417,6 +7473,7 @@ pri3['Life Drain'] = {
 pri3['Spirit Bind'] = {
     'level': '3',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Spirit Release',
     'sphere': 'Necromantic',
     'range': '10 yards',
     'duration': 'Permanent',
@@ -7436,6 +7493,7 @@ pri3['Spirit Bind'] = {
 pri4['Cause Insanity'] = {
     'level': '4',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Cure Insanity',
     'sphere': 'Necromantic, Thought',
     'range': 'Touch',
     'duration': 'Permanent',
@@ -7531,6 +7589,7 @@ pri5['Scourge'] = {
 pri5['Undead Regeneration'] = {
     'level': '5',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Drain Undead',
     'sphere': 'Necromantic',
     'range': 'Touch',
     'duration': 'Instantaneous',
@@ -7917,6 +7976,7 @@ pri2['Chaos Ward'] = {
 pri2['Cure Moderate Wounds'] = {
     'level': '2',
     'school': 'Necromancy (Reversible)',
+    'reversible': 'Cause Moderate Wounds',
     'sphere': 'Healing',
     'range': 'Touch',
     'duration': 'Instantaneous',
@@ -8709,6 +8769,7 @@ pri7['Antimineral Shell'] = {
 pri7['Conjure Air or Water Elemental'] = {
     'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
+    'reversible': 'Dismiss Air or Water Elemental',
     'sphere': 'Elemental (Air/Water)',
     'range': '80 yards',
     'duration': '[[@{level-priest}]] turns',
