@@ -8788,7 +8788,7 @@
 		var highId = String(num == maxManeuverNum ? 1 : num + 1).padStart(2,'0');
 		on("clicked:martialManeuverDown"+lowId+" clicked:martialManeuverUp"+highId, function() {
 			getAttrs(["martialManeuverName"+lowId, "martialManeuverPhase"+lowId, "martialManeuverCP"+lowId,
-					"martialManeuverOCV"+lowId, "martialManeuverDCV"+lowId, "martialManeuverEffect"+lowId, "martialManeuverDamage"+lowId, "martialManeuverNormal"+lowId, "martialManeuverBlock"+lowId, "martialManeuverEndurance"+lowId, "martialManeuverName"+highId, "martialManeuverPhase"+highId, "martialManeuverCP"+highId, "martialManeuverOCV"+highId, "martialManeuverDCV"+highId, "martialManeuverEffect"+highId, "martialManeuverDamage"+highId, "martialManeuverNormal"+highId, "martialManeuverBlock"+highId, "martialManeuverEndurance"+highId], function(values)
+					"martialManeuverOCV"+lowId, "martialManeuverDCV"+lowId, "martialManeuverEffect"+lowId, "martialManeuverDamage"+lowId, "hiddenMartialManeuverDamage"+lowId, "martialManeuverNormal"+lowId, "martialManeuverBlock"+lowId, "martialManeuverEndurance"+lowId, "martialManeuverName"+highId, "martialManeuverPhase"+highId, "martialManeuverCP"+highId, "martialManeuverOCV"+highId, "martialManeuverDCV"+highId, "martialManeuverEffect"+highId, "martialManeuverDamage"+highId, "hiddenMartialManeuverDamage"+highId, "martialManeuverNormal"+highId, "martialManeuverBlock"+highId, "martialManeuverEndurance"+highId], function(values)
 			{
 				var attributes = new Object();
 				
@@ -8832,6 +8832,8 @@
 				attributes["martialManeuverDCV"+highId] = values["martialManeuverDCV"+lowId];
 				attributes["martialManeuverDamage"+lowId] = values["martialManeuverDamage"+highId];
 				attributes["martialManeuverDamage"+highId] = values["martialManeuverDamage"+lowId];
+				attributes["hiddenMartialManeuverDamage"+lowId] = values["hiddenMartialManeuverDamage"+highId];
+				attributes["hiddenMartialManeuverDamage"+highId] = values["hiddenMartialManeuverDamage"+lowId];
 				attributes["martialManeuverNormal"+lowId] = values["martialManeuverNormal"+highId];
 				attributes["martialManeuverNormal"+highId] = values["martialManeuverNormal"+lowId];
 				attributes["martialManeuverBlock"+lowId] = values["martialManeuverBlock"+highId];
@@ -9093,13 +9095,13 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX.
 			
-			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeSelection"], function(values) {
+			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeSelection", "currentDCV"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormalDamage = values["martialManeuverNormal"+maneuverId] != 0;
 				let stunMod = parseInt(values["martialManeuverStunMod"+maneuverId])||0;
 				let isBlocking = values["martialManeuverBlock"+maneuverId] != 0;
-				
+
 				// Martial maneuvers by default cost no endurance. Endurance costs used for flexibility.
 				let subtractENDAmt =  parseInt(values["martialManeuverEndurance"+maneuverId])||0;
 				
@@ -9109,7 +9111,14 @@
 				if (!isBlocking) {
 					// If isNormalDamage is TRUE, use the Normal Damage template. Else use the killing template.
 					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{martialManeuverName"+maneuverId+"}}} ";
-					theRoll += "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
+					
+					if ((parseInt(values["currentDCV"])||0)+(parseInt(values["martialManeuverDCV"+maneuverId])||0) >= 0) {
+						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
+					} else {
+						// Minimum DCV is zero.
+						theRoll +=  "{{DCV=[[0[Minimum]]]}}";
+					}
+					
 					if (values.displayDegreeOfSuccess != 0) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}";
 					} else {
@@ -9133,7 +9142,7 @@
 				
 				if (!isBlocking) {
 					startRoll(theRoll, (results) => {
-						let computed = parseInt(results.results[dmgType].result)||0;
+						var computed = parseInt(results.results[dmgType].result)||0;
 						let theMessage = "";
 						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 						
@@ -9215,31 +9224,31 @@
 		
 		getAttrs(["martialManeuverDamage01", "martialManeuverDamage02", "martialManeuverDamage03", "martialManeuverDamage04","martialManeuverDamage05", "martialManeuverDamage06", "martialManeuverDamage07", "martialManeuverDamage08", "martialManeuverDamage09"], function(values) {
 			
-			var martialManeuverDamage01 = values.martialManeuverDamage01||0;
+			var martialManeuverDamage01 = values.martialManeuverDamage01;
 			martialManeuverDamage01 = martialManeuverDamage01.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage02 = values.martialManeuverDamage02||0;
+			var martialManeuverDamage02 = values.martialManeuverDamage02;
 			martialManeuverDamage02 = martialManeuverDamage02.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage03 = values.martialManeuverDamage03||0;
+			var martialManeuverDamage03 = values.martialManeuverDamage03;
 			martialManeuverDamage03 = martialManeuverDamage03.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage04 = values.martialManeuverDamage04||0;
+			var martialManeuverDamage04 = values.martialManeuverDamage04;
 			martialManeuverDamage04 = martialManeuverDamage04.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage05 = values.martialManeuverDamage05||0;
+			var martialManeuverDamage05 = values.martialManeuverDamage05;
 			martialManeuverDamage05 = martialManeuverDamage05.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage06 = values.martialManeuverDamage06||0;
+			var martialManeuverDamage06 = values.martialManeuverDamage06;
 			martialManeuverDamage06 = martialManeuverDamage06.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage07 = values.martialManeuverDamage07||0;
+			var martialManeuverDamage07 = values.martialManeuverDamage07;
 			martialManeuverDamage07 = martialManeuverDamage07.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage08 = values.martialManeuverDamage08||0;
+			var martialManeuverDamage08 = values.martialManeuverDamage08;
 			martialManeuverDamage08 = martialManeuverDamage08.replace(/[^\ddD\\+\\-]/g,"");
 			
-			var martialManeuverDamage09 = values.martialManeuverDamage09||0;
+			var martialManeuverDamage09 = values.martialManeuverDamage09;
 			martialManeuverDamage09 = martialManeuverDamage09.replace(/[^\ddD\\+\\-]/g,"");
 			
 			setAttrs({
@@ -9585,7 +9594,7 @@
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 					
 				startRoll(theRoll, (results) => {
-					let computed = parseInt(results.results[dmgType].result)||0;
+					var computed = parseInt(results.results[dmgType].result)||0;
 					let theMessage = "AOE";
 					let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 					
