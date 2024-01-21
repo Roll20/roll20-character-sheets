@@ -196,14 +196,15 @@
 
    
     const checklist = [
-    'attribute_strength',
-     'attribute_athletic',
-      'attribute_dexterity',
-       'attribute_senses',
+        'attribute_strength',
+        'attribute_athletic',
+        'attribute_dexterity',
+        'attribute_senses',
         'attribute_knowledge',
         'attribute_willpower',
-     'skill_acrobatics',
+        'skill_acrobatics',
         'skill_alertness',
+        'skill_animalhandling',
         'skill_perception',
         'skill_firstaid',
         'skill_sleightofhand',
@@ -254,7 +255,8 @@
         'parry_weapon_musket',
         'parry_weapon_dodge',
         'parry_weapon_shield'];
-        checklist.forEach(checkaction => {
+        
+    checklist.forEach(checkaction => {
         on(`clicked:${checkaction}`, function() {
                 
             var mounted = false;
@@ -595,6 +597,7 @@
     const skills = {
         'skill_acrobatics':{att: 'attribute_athletic'},
         'skill_alertness':{att: 'attribute_senses'},
+        'skill_animalhandling':{att: 'attribute_willpower'},
         'skill_perception':{att: 'attribute_senses'},
         'skill_firstaid':{att: 'attribute_knowledge'},
         'skill_sleightofhand':{att: 'attribute_dexterity'},
