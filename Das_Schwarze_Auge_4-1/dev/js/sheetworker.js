@@ -598,8 +598,8 @@ on(
 					}
 
 					/*
-					   Herzstück des Rechners
-					                          */
+						 Herzstück des Rechners
+																		*/
 					// Definitionen
 					var mod_gesamt = {};
 					var dauer_gesamt = {};
@@ -1364,35 +1364,35 @@ on(
 		"sf_kampfgespur", "sf_kampfreflexe", "sf_klingentanzer",
 		"BE",
 		"IB_mod_wounds"], function(v) {
-        let update = {
-            'MU': Math.max(0, +v.mu_basis + +v.mu_mod + (v.MU_mod_wounds || 0)),
-            'KL': Math.max(0, +v.kl_basis + +v.kl_mod + (v.KL_mod_wounds || 0)),
-            'IN': Math.max(0, +v.in_basis + +v.in_mod + (v.IN_mod_wounds || 0)),
-            'CH': +v.ch_basis + +v.ch_mod,
-            'FF': Math.max(0, +v.ff_basis + +v.ff_mod + (v.FF_mod_wounds || 0)),
-            'GE': Math.max(0, +v.ge_basis + +v.ge_mod + (v.GE_mod_wounds || 0)),
-            'KO': Math.max(0, +v.ko_basis + +v.ko_mod + (v.KO_mod_wounds || 0)),
-            'KK': Math.max(0, +v.kk_basis + +v.kk_mod + (v.KK_mod_wounds || 0)),
-            'erschoepfung_basis': +v.ko_basis,
-            'erschoepfung_max': +v.ko_basis + +v.erschoepfung_mod,
-            'wundschwelle': Math.ceil((+v.ko_basis) / 2) + +v.eisern,
-            'aspgrundw': calculateAEBase({"MU": v.mu_basis, "IN": v.in_basis, "CH": v.ch_basis, "sf_gefaess_der_sterne": v.sf_gefaess_der_sterne}),
-            'AE_max': calculateAEBase({"MU": v.mu_basis, "IN": v.in_basis, "CH": v.ch_basis, "sf_gefaess_der_sterne": v.sf_gefaess_der_sterne}) + +v.aspzugek,
-            'ausgrundw': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2),
-            'AU_max': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2) + +v.auszugek,
-            'legrundw': Math.ceil(+v.ko_basis + (+v.kk_basis / 2)),
-            'LE_max': Math.ceil(+v.ko_basis + (+v.kk_basis / 2)) + +v.lezugek,
-            'mrgrundw': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5),
-            'MR': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5) + +v.mrzugek,
-            'ueberanstrengung_max': +v.ko_basis,
-            'inibasis': Math.round((+v.mu_basis + +v.mu_basis + +v.in_basis + +v.ge_basis) / 5),
-            'atbasis': Math.round((+v.mu_basis + +v.ge_basis + +v.kk_basis) / 5),
-            'pabasis': Math.round((+v.in_basis + +v.ge_basis + +v.kk_basis) / 5),
-            'fkbasis': Math.round((+v.in_basis + +v.ff_basis + +v.kk_basis) / 5),
-            // Old attributes kept for compatibility (used in token bars)
-            'aus_max': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2) + +v.auszugek,
-            'asp_max': calculateAEBase({"MU": v.mu_basis, "IN": v.in_basis, "CH": v.ch_basis, "sf_gefaess_der_sterne": v.sf_gefaess_der_sterne}) + +v.aspzugek
-        };
+				let update = {
+						'MU': Math.max(0, +v.mu_basis + +v.mu_mod + (v.MU_mod_wounds || 0)),
+						'KL': Math.max(0, +v.kl_basis + +v.kl_mod + (v.KL_mod_wounds || 0)),
+						'IN': Math.max(0, +v.in_basis + +v.in_mod + (v.IN_mod_wounds || 0)),
+						'CH': +v.ch_basis + +v.ch_mod,
+						'FF': Math.max(0, +v.ff_basis + +v.ff_mod + (v.FF_mod_wounds || 0)),
+						'GE': Math.max(0, +v.ge_basis + +v.ge_mod + (v.GE_mod_wounds || 0)),
+						'KO': Math.max(0, +v.ko_basis + +v.ko_mod + (v.KO_mod_wounds || 0)),
+						'KK': Math.max(0, +v.kk_basis + +v.kk_mod + (v.KK_mod_wounds || 0)),
+						'erschoepfung_basis': +v.ko_basis,
+						'erschoepfung_max': +v.ko_basis + +v.erschoepfung_mod,
+						'wundschwelle': Math.ceil((+v.ko_basis) / 2) + +v.eisern,
+						'aspgrundw': calculateAEBase({"MU": v.mu_basis, "IN": v.in_basis, "CH": v.ch_basis, "sf_gefaess_der_sterne": v.sf_gefaess_der_sterne}),
+						'AE_max': calculateAEBase({"MU": v.mu_basis, "IN": v.in_basis, "CH": v.ch_basis, "sf_gefaess_der_sterne": v.sf_gefaess_der_sterne}) + +v.aspzugek,
+						'ausgrundw': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2),
+						'AU_max': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2) + +v.auszugek,
+						'legrundw': Math.ceil(+v.ko_basis + (+v.kk_basis / 2)),
+						'LE_max': Math.ceil(+v.ko_basis + (+v.kk_basis / 2)) + +v.lezugek,
+						'mrgrundw': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5),
+						'MR': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5) + +v.mrzugek,
+						'ueberanstrengung_max': +v.ko_basis,
+						'inibasis': Math.round((+v.mu_basis + +v.mu_basis + +v.in_basis + +v.ge_basis) / 5),
+						'atbasis': Math.round((+v.mu_basis + +v.ge_basis + +v.kk_basis) / 5),
+						'pabasis': Math.round((+v.in_basis + +v.ge_basis + +v.kk_basis) / 5),
+						'fkbasis': Math.round((+v.in_basis + +v.ff_basis + +v.kk_basis) / 5),
+						// Old attributes kept for compatibility (used in token bars)
+						'aus_max': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2) + +v.auszugek,
+						'asp_max': calculateAEBase({"MU": v.mu_basis, "IN": v.in_basis, "CH": v.ch_basis, "sf_gefaess_der_sterne": v.sf_gefaess_der_sterne}) + +v.aspzugek
+				};
 
 		/*
 			Calculation of "real" base initiative (inibasis2)
@@ -1425,150 +1425,150 @@ on(
 		inibasis2 += IBbonus;
 		inibasis2 = Math.max(0, inibasis2);
 
-        update['inibasis2'] = inibasis2;
-        update['INI_dice_count'] = INIdicecount;
+				update['inibasis2'] = inibasis2;
+				update['INI_dice_count'] = INIdicecount;
 
-        // Calculate Speed (GS)
-        var speed;
-        let GS = {
-            'Basis': +v.gs_basis,
-            'Mod': +v.gs_mod + (v.GS_mod_wounds || 0),
-            'GE-Einfluss': 0
-        };
-        if (update['GE'] < 11) {
-            GS['GE-Einfluss'] = -1;
-        } else if (update['GE'] > 15) {
-            GS['GE-Einfluss'] = 1;
-        }
-        // Speed (GS) cannot be lower than 1
-        speed = Math.max(1, GS['Basis'] + GS['Mod'] + GS['GE-Einfluss'])
-        update['GS'] = speed;
-        safeSetAttrs(update);
-    }); 
+				// Calculate Speed (GS)
+				var speed;
+				let GS = {
+						'Basis': +v.gs_basis,
+						'Mod': +v.gs_mod + (v.GS_mod_wounds || 0),
+						'GE-Einfluss': 0
+				};
+				if (update['GE'] < 11) {
+						GS['GE-Einfluss'] = -1;
+				} else if (update['GE'] > 15) {
+						GS['GE-Einfluss'] = 1;
+				}
+				// Speed (GS) cannot be lower than 1
+				speed = Math.max(1, GS['Basis'] + GS['Mod'] + GS['GE-Einfluss'])
+				update['GS'] = speed;
+				safeSetAttrs(update);
+		}); 
 });
 
 on("change:repeating_gaben:name_gabe change:repeating_gaben:name_gabe_zusatz", function(eventInfo) {
-    safeGetAttrs(["repeating_Gaben_Name_Gabe", "repeating_Gaben_Name_Gabe_Zusatz"], function(v) {
-        let gabe = v.repeating_Gaben_Name_Gabe;
-        let gabeZusatz = v.repeating_Gaben_Name_Gabe_Zusatz;
-        let gaben = {
-            "empathie": [ ["mu", "in", "in"], "Empathie" ],
-            "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
-            "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
-            "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
-            "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
-            "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
-            "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
-            "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
-        };
-        if (gabe != "nothing") {
-            let update = {
-                'repeating_Gaben_eigenschaft1': gaben[gabe][0][0],
-                'repeating_Gaben_eigenschaft2': gaben[gabe][0][1],
-                'repeating_Gaben_eigenschaft3': gaben[gabe][0][2],
-                'repeating_Gaben_Name_Gabe_Anzeige': gaben[gabe][1]
-            };
-            if (gabeZusatz != "") {
-                update['repeating_Gaben_Name_Gabe_Anzeige'] += " (" + gabeZusatz + ")";
-            }
-            safeSetAttrs(update);
-        } else {
-            let update = {};
-            if(gabeZusatz !== "") {
-                update['repeating_Gaben_Name_Gabe_Anzeige'] = gabeZusatz;
-            } else {
-                update['repeating_Gaben_Name_Gabe_Anzeige'] = "Eigene Gabe";
-            }
-            safeSetAttrs(update);
-        }
-    });
+		safeGetAttrs(["repeating_Gaben_Name_Gabe", "repeating_Gaben_Name_Gabe_Zusatz"], function(v) {
+				let gabe = v.repeating_Gaben_Name_Gabe;
+				let gabeZusatz = v.repeating_Gaben_Name_Gabe_Zusatz;
+				let gaben = {
+						"empathie": [ ["mu", "in", "in"], "Empathie" ],
+						"gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
+						"geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
+						"kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
+						"magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
+						"prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
+						"tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
+						"zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
+				};
+				if (gabe != "nothing") {
+						let update = {
+								'repeating_Gaben_eigenschaft1': gaben[gabe][0][0],
+								'repeating_Gaben_eigenschaft2': gaben[gabe][0][1],
+								'repeating_Gaben_eigenschaft3': gaben[gabe][0][2],
+								'repeating_Gaben_Name_Gabe_Anzeige': gaben[gabe][1]
+						};
+						if (gabeZusatz != "") {
+								update['repeating_Gaben_Name_Gabe_Anzeige'] += " (" + gabeZusatz + ")";
+						}
+						safeSetAttrs(update);
+				} else {
+						let update = {};
+						if(gabeZusatz !== "") {
+								update['repeating_Gaben_Name_Gabe_Anzeige'] = gabeZusatz;
+						} else {
+								update['repeating_Gaben_Name_Gabe_Anzeige'] = "Eigene Gabe";
+						}
+						safeSetAttrs(update);
+				}
+		});
 });
 
 on("change:repeating_metatalente201904:name_metatalent change:repeating_metatalente201904:name_metatalent_eigen", function(eventInfo) {
-    safeGetAttrs(["repeating_Metatalente201904_Name_Metatalent", "repeating_Metatalente201904_Name_Metatalent_Eigen"], function(v) {
-        let metatalent = v.repeating_Metatalente201904_Name_Metatalent;
-        let metatalentEigen = v.repeating_Metatalente201904_Name_Metatalent_Eigen;
-        let metatalente = {
-            "ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
-            "hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
-            "kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
-            "nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
-            "pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
-            "speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
-            "tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
-            "wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
-        };
-        if (metatalent != "nothing")  {
-            safeSetAttrs({
-                'repeating_Metatalente201904_eigenschaft1': metatalente[metatalent][0][0],
-                'repeating_Metatalente201904_eigenschaft2': metatalente[metatalent][0][1],
-                'repeating_Metatalente201904_eigenschaft3': metatalente[metatalent][0][2],
-                'repeating_Metatalente201904_Name_Metatalent_Anzeige': metatalente[metatalent][1]
-            });
-        } else {
-            let update = {};
-            if (metatalentEigen != "") {
-                update['repeating_metatalent_Name_Metatalent_Anzeige'] = metatalentEigen;
-            } else {
-                update['repeating_metatalent_Name_Metatalent_Anzeige'] = "Eigenes Metatalent";
-            }
-            safeSetAttrs(update);
-        }
-    });
+		safeGetAttrs(["repeating_Metatalente201904_Name_Metatalent", "repeating_Metatalente201904_Name_Metatalent_Eigen"], function(v) {
+				let metatalent = v.repeating_Metatalente201904_Name_Metatalent;
+				let metatalentEigen = v.repeating_Metatalente201904_Name_Metatalent_Eigen;
+				let metatalente = {
+						"ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
+						"hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
+						"kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
+						"nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
+						"pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
+						"speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
+						"tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
+						"wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
+				};
+				if (metatalent != "nothing")  {
+						safeSetAttrs({
+								'repeating_Metatalente201904_eigenschaft1': metatalente[metatalent][0][0],
+								'repeating_Metatalente201904_eigenschaft2': metatalente[metatalent][0][1],
+								'repeating_Metatalente201904_eigenschaft3': metatalente[metatalent][0][2],
+								'repeating_Metatalente201904_Name_Metatalent_Anzeige': metatalente[metatalent][1]
+						});
+				} else {
+						let update = {};
+						if (metatalentEigen != "") {
+								update['repeating_metatalent_Name_Metatalent_Anzeige'] = metatalentEigen;
+						} else {
+								update['repeating_metatalent_Name_Metatalent_Anzeige'] = "Eigenes Metatalent";
+						}
+						safeSetAttrs(update);
+				}
+		});
 });
 
 on("change:repeating_gaben:eigenschaft1 change:repeating_gaben:eigenschaft2 change:repeating_gaben:eigenschaft3", function(eventInfo) {
-    safeGetAttrs(["repeating_Gaben_eigenschaft1", "repeating_Gaben_eigenschaft2", "repeating_Gaben_eigenschaft3", "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
-            let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
-            safeSetAttrs({
-                'repeating_Gaben_hiddeneigenschaft1': attributes[v.repeating_Gaben_eigenschaft1] || 0,
-                'repeating_Gaben_hiddeneigenschaft2': attributes[v.repeating_Gaben_eigenschaft2] || 0,
-                'repeating_Gaben_hiddeneigenschaft3': attributes[v.repeating_Gaben_eigenschaft3] || 0
-            });
-    });
+		safeGetAttrs(["repeating_Gaben_eigenschaft1", "repeating_Gaben_eigenschaft2", "repeating_Gaben_eigenschaft3", "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
+						let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
+						safeSetAttrs({
+								'repeating_Gaben_hiddeneigenschaft1': attributes[v.repeating_Gaben_eigenschaft1] || 0,
+								'repeating_Gaben_hiddeneigenschaft2': attributes[v.repeating_Gaben_eigenschaft2] || 0,
+								'repeating_Gaben_hiddeneigenschaft3': attributes[v.repeating_Gaben_eigenschaft3] || 0
+						});
+		});
 });
 
 on("change:repeating_metatalente201904:eigenschaft1 change:repeating_metatalente201904:eigenschaft2 change:repeating_metatalente201904:eigenschaft3", function(eventInfo) {
-    safeGetAttrs(["repeating_Metatalente201904_eigenschaft1", "repeating_Metatalente201904_eigenschaft2", "repeating_Metatalente201904_eigenschaft3", "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
-            let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
-            safeSetAttrs({
-                'repeating_Metatalente201904_hiddeneigenschaft1': attributes[v.repeating_Metatalente201904_eigenschaft1] || 0,
-                'repeating_Metatalente201904_hiddeneigenschaft2': attributes[v.repeating_Metatalente201904_eigenschaft2] || 0,
-                'repeating_Metatalente201904_hiddeneigenschaft3': attributes[v.repeating_Metatalente201904_eigenschaft3] || 0
-            });
-    });
+		safeGetAttrs(["repeating_Metatalente201904_eigenschaft1", "repeating_Metatalente201904_eigenschaft2", "repeating_Metatalente201904_eigenschaft3", "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
+						let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
+						safeSetAttrs({
+								'repeating_Metatalente201904_hiddeneigenschaft1': attributes[v.repeating_Metatalente201904_eigenschaft1] || 0,
+								'repeating_Metatalente201904_hiddeneigenschaft2': attributes[v.repeating_Metatalente201904_eigenschaft2] || 0,
+								'repeating_Metatalente201904_hiddeneigenschaft3': attributes[v.repeating_Metatalente201904_eigenschaft3] || 0
+						});
+		});
 });
 
 on("change:mu change:kl change:in change:ch change:ff change:ge change:ko change:kk", function(eventInfo) {
-    // Aktualisiere Talentwerte
-    safeGetAttrs(["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
-        let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
-        let update = {};
+		// Aktualisiere Talentwerte
+		safeGetAttrs(["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
+				let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
+				let update = {};
 
-        // Aktualisiere Gaben
-        getSectionIDs("gaben", function(idarray) {
-             _.each(idarray, function(currentID, i) {
-                safeGetAttrs(["repeating_Gaben_" + currentID + "_eigenschaft1", "repeating_Gaben_" + currentID + "_eigenschaft2", "repeating_Gaben_" + currentID + "_eigenschaft3"], function(v) {
-                    update["repeating_Gaben_" + currentID + "_hiddeneigenschaft1"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft1"]];
-                    update["repeating_Gaben_" + currentID + "_hiddeneigenschaft2"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft2"]];
-                    update["repeating_Gaben_" + currentID + "_hiddeneigenschaft3"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft3"]];
-                    safeSetAttrs(update);
-                });
-            });
-        });
+				// Aktualisiere Gaben
+				getSectionIDs("gaben", function(idarray) {
+						 _.each(idarray, function(currentID, i) {
+								safeGetAttrs(["repeating_Gaben_" + currentID + "_eigenschaft1", "repeating_Gaben_" + currentID + "_eigenschaft2", "repeating_Gaben_" + currentID + "_eigenschaft3"], function(v) {
+										update["repeating_Gaben_" + currentID + "_hiddeneigenschaft1"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft1"]];
+										update["repeating_Gaben_" + currentID + "_hiddeneigenschaft2"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft2"]];
+										update["repeating_Gaben_" + currentID + "_hiddeneigenschaft3"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft3"]];
+										safeSetAttrs(update);
+								});
+						});
+				});
 
-        // Aktualisiere Metatalente
-        getSectionIDs("metatalente201904", function(idarray) {
-             _.each(idarray, function(currentID, i) {
-                safeGetAttrs(["repeating_Metatalente201904_" + currentID + "_eigenschaft1", "repeating_Metatalente201904_" + currentID + "_eigenschaft2", "repeating_Metatalente201904_" + currentID + "_eigenschaft3"], function(v) {
-                    update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft1"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft1"]];
-                    update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft2"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft2"]];
-                    update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft3"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft3"]];
-                    safeSetAttrs(update);
-                });
-            });
-        });
-    });
+				// Aktualisiere Metatalente
+				getSectionIDs("metatalente201904", function(idarray) {
+						 _.each(idarray, function(currentID, i) {
+								safeGetAttrs(["repeating_Metatalente201904_" + currentID + "_eigenschaft1", "repeating_Metatalente201904_" + currentID + "_eigenschaft2", "repeating_Metatalente201904_" + currentID + "_eigenschaft3"], function(v) {
+										update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft1"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft1"]];
+										update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft2"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft2"]];
+										update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft3"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft3"]];
+										safeSetAttrs(update);
+								});
+						});
+				});
+		});
 });
 
 on(
@@ -1666,19 +1666,19 @@ on(
 });
 
 on("change:ap_gesamt change:ap_ausgegeben", function(eventInfo) {
-    safeGetAttrs(["ap_gesamt", "ap_ausgegeben"], function(v) {
-        safeSetAttrs({
-            ap_verfuegbar: +v.ap_gesamt - +v.ap_ausgegeben
-        });
-    });
+		safeGetAttrs(["ap_gesamt", "ap_ausgegeben"], function(v) {
+				safeSetAttrs({
+						ap_verfuegbar: +v.ap_gesamt - +v.ap_ausgegeben
+				});
+		});
 });
 
 on("change:kegrundw change:kezugek", function(eventInfo) {
-    safeGetAttrs(["kegrundw", "kezugek"], function(v) {
-        safeSetAttrs({
-            "KE_max": +v.kegrundw + +v.kezugek
-        });
-    });
+		safeGetAttrs(["kegrundw", "kezugek"], function(v) {
+				safeSetAttrs({
+						"KE_max": +v.kegrundw + +v.kezugek
+				});
+		});
 });
 
 /*
@@ -1702,76 +1702,76 @@ Relevant character sheet versions
 * 20230618: Confirmation/Reaction Buttons
 */
 function migrationCheck() {
-    safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
-        var caller = "migrationCheck";
-        debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
-        debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
+		safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
+				var caller = "migrationCheck";
+				debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
+				debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
-        let initialized = v["sheet_initialized"];
-        let dataVersion = parseInt(v["data_version"]);
-        let sheetVersion = parseInt(v["character_sheet_version"]);
+				let initialized = v["sheet_initialized"];
+				let dataVersion = parseInt(v["data_version"]);
+				let sheetVersion = parseInt(v["character_sheet_version"]);
 
-        /*
-        If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
-        New characters do not need any migration, but sheet initialization to set up the sheet including setting data_version to the current sheet version.
+				/*
+				If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
+				New characters do not need any migration, but sheet initialization to set up the sheet including setting data_version to the current sheet version.
 
-        Why this is necessary
-        * Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
-        * Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
-        * If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
-        * This would lead to no migrations being performed.
-        * On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
-        */
+				Why this is necessary
+				* Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
+				* Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
+				* If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
+				* This would lead to no migrations being performed.
+				* On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
+				*/
 
-        // Initialization First Safeguard Check (function not called based on one attribute)
-        if (
-            initialized === 0
-            ||
-            initialized === "0"
-            ||
-            initialized === "false"
-            ||
-            initialized === false
-        ) {
-            debugLog(caller, "initialized is false.");
-            initialized = false;
-        } else {
-            debugLog(caller, "initialized is true. Skipping initialization.");
-            initialized = true;
-        }
+				// Initialization First Safeguard Check (function not called based on one attribute)
+				if (
+						initialized === 0
+						||
+						initialized === "0"
+						||
+						initialized === "false"
+						||
+						initialized === false
+				) {
+						debugLog(caller, "initialized is false.");
+						initialized = false;
+				} else {
+						debugLog(caller, "initialized is true. Skipping initialization.");
+						initialized = true;
+				}
 
-        let functionsToCall = [];
-        let firstFunction;
+				let functionsToCall = [];
+				let firstFunction;
 
 		if (initialized)
 		{
-            /*
-                we run over the possible migrations and check if they are already applied.
-                if not and it is the first migration, than the function name is saved as "firstFunction"
-                if it is not the first migration to apply it is added to "functionsToCall" array
-            */
-            for (version of versionsWithMigrations) {
-                if (dataVersion < version) {
-                    var functionName = "migrateTo" + version;
-                    debugLog(caller, "dataVersion " + dataVersion + " is older than version " + version + " which needs a migration. Invoking migration function: " + functionName);
-                    if (firstFunction) {
-                        functionsToCall.push(functionName);
-                    } else {
-                        firstFunction = functionName;
-                    }
-                };
-            }
-        } else {
+						/*
+								we run over the possible migrations and check if they are already applied.
+								if not and it is the first migration, than the function name is saved as "firstFunction"
+								if it is not the first migration to apply it is added to "functionsToCall" array
+						*/
+						for (version of versionsWithMigrations) {
+								if (dataVersion < version) {
+										var functionName = "migrateTo" + version;
+										debugLog(caller, "dataVersion " + dataVersion + " is older than version " + version + " which needs a migration. Invoking migration function: " + functionName);
+										if (firstFunction) {
+												functionsToCall.push(functionName);
+										} else {
+												firstFunction = functionName;
+										}
+								};
+						}
+				} else {
 			firstFunction = "initializeSheet";
-        }
+				}
 
-        // if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
-        // then we call the function with name "firstFunction"
-        if (firstFunction) {
-            functionsToCall.push("setCurrentVersion");
-            window[firstFunction](functionsToCall);
-        }
-    });
+				// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+				// then we call the function with name "firstFunction"
+				if (firstFunction) {
+						functionsToCall.push("setCurrentVersion");
+						window[firstFunction](functionsToCall);
+				}
+		});
 }
 
 function setCurrentVersion() {
@@ -1780,27 +1780,27 @@ function setCurrentVersion() {
 }
 
 function callNextMigration(migrationChain) {
-    if (migrationChain && migrationChain.length > 0) {
-        let nextMigration = migrationChain.shift();
-        if (nextMigration) {
-            window[nextMigration](migrationChain);
-        }
-    }
+		if (migrationChain && migrationChain.length > 0) {
+				let nextMigration = migrationChain.shift();
+				if (nextMigration) {
+						window[nextMigration](migrationChain);
+				}
+		}
 }
 
 /*
  this list has to be always ordered ascending in order to apply the migration steps in the correct order
 */
 var versionsWithMigrations = [
-    20190427,
-    20200809,
-    20210413,
-    20210718,
-    20211010,
-    20220116,
-    20220604,
-    20220821,
-    20230618
+		20190427,
+		20200809,
+		20210413,
+		20210718,
+		20211010,
+		20220116,
+		20220604,
+		20220821,
+		20230618
 ];
 
 function initializeSheet(migrationChain) {
@@ -1886,7 +1886,7 @@ function initializeSheet(migrationChain) {
 		safeguardAttrs.concat(["data_version"]),
 		function(v, missing, badDef)
 		{
-		    debugLog(caller, "Safeguard attributes:", v);
+				debugLog(caller, "Safeguard attributes:", v);
 			var attrs = { "sheet_initialized": false };
 			var dataVersionSet = true;
 
@@ -1959,290 +1959,290 @@ function initializeSheet(migrationChain) {
 */
 function migrateTo20190427 (migrationChain) {
 	var caller = "migrateTo20190427";
-    debugLog(caller, "migrateTo20190427 invoked");
+		debugLog(caller, "migrateTo20190427 invoked");
 
-    getSectionIDs("GabenTalente", function(gabenIDs) {
-        getSectionIDs("MetaTalente", function(metatalenteIDs) {
+		getSectionIDs("GabenTalente", function(gabenIDs) {
+				getSectionIDs("MetaTalente", function(metatalenteIDs) {
 
-            let giftsConversion = {
-                "@{MU}": "mu",
-                "@{KL}": "kl",
-                "@{IN}": "in",
-                "@{CH}": "ch",
-                "@{FF}": "ff",
-                "@{GE}": "ge",
-                "@{KO}": "ko",
-                "@{KK}": "kk",
-                "---": "nothing",
-                "Empathie": "empathie",
-                "Gefahreninstinkt": "gefahreninstinkt",
-                "Geräuschhexerei": "geraeuschhexerei",
-                "Kräfteschub/Talentschub": "kraefteschub/talentschub",
-                "Magiegespür": "magiegespuer",
-                "Prophezeien": "prophezeien",
-                "Tierempathie": "tierempathie",
-                "Zwergennase": "zwergennase",
-            };
+						let giftsConversion = {
+								"@{MU}": "mu",
+								"@{KL}": "kl",
+								"@{IN}": "in",
+								"@{CH}": "ch",
+								"@{FF}": "ff",
+								"@{GE}": "ge",
+								"@{KO}": "ko",
+								"@{KK}": "kk",
+								"---": "nothing",
+								"Empathie": "empathie",
+								"Gefahreninstinkt": "gefahreninstinkt",
+								"Geräuschhexerei": "geraeuschhexerei",
+								"Kräfteschub/Talentschub": "kraefteschub/talentschub",
+								"Magiegespür": "magiegespuer",
+								"Prophezeien": "prophezeien",
+								"Tierempathie": "tierempathie",
+								"Zwergennase": "zwergennase",
+						};
 
-            let metaTalentConversion = {
-                "@{MU}": "mu",
-                "@{KL}": "kl",
-                "@{IN}": "in",
-                "@{CH}": "ch",
-                "@{FF}": "ff",
-                "@{GE}": "ge",
-                "@{KO}": "ko",
-                "@{KK}": "kk",
-                "---": "nothing",
-                "Ansitzjagd": "ansitzjagd",
-                "Hetzjagd": "hetzjagd",
-                "Kräutersuchen": "kraeutersuchen",
-                "Nahrungsammeln": "nahrungsammeln",
-                "Pirschjagd": "pirschjagd",
-                "Speerfischen": "speerfischen",
-                "Tierfallenstellen": "tierfallenstellen",
-                "Wachehalten": "wachehalten"
-            };
-                
-            let gaben = {
-                "nothing": [ ["---", "---", "---"], "nothing" ],
-                "empathie": [ ["mu", "in", "in"], "Empathie" ],
-                "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
-                "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
-                "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
-                "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
-                "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
-                "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
-                "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
-            };
-                
-            let metatalente = {
-                "nothing": [ ["---", "---", "---"], "nothing" ],
-                "ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
-                "hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
-                "kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
-                "nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
-                "pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
-                "speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
-                "tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
-                "wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
-            };
+						let metaTalentConversion = {
+								"@{MU}": "mu",
+								"@{KL}": "kl",
+								"@{IN}": "in",
+								"@{CH}": "ch",
+								"@{FF}": "ff",
+								"@{GE}": "ge",
+								"@{KO}": "ko",
+								"@{KK}": "kk",
+								"---": "nothing",
+								"Ansitzjagd": "ansitzjagd",
+								"Hetzjagd": "hetzjagd",
+								"Kräutersuchen": "kraeutersuchen",
+								"Nahrungsammeln": "nahrungsammeln",
+								"Pirschjagd": "pirschjagd",
+								"Speerfischen": "speerfischen",
+								"Tierfallenstellen": "tierfallenstellen",
+								"Wachehalten": "wachehalten"
+						};
+								
+						let gaben = {
+								"nothing": [ ["---", "---", "---"], "nothing" ],
+								"empathie": [ ["mu", "in", "in"], "Empathie" ],
+								"gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
+								"geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
+								"kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
+								"magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
+								"prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
+								"tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
+								"zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
+						};
+								
+						let metatalente = {
+								"nothing": [ ["---", "---", "---"], "nothing" ],
+								"ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
+								"hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
+								"kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
+								"nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
+								"pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
+								"speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
+								"tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
+								"wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
+						};
 
-            let attrsToGet = ["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"];
-            // GIFTS MIGRATION
-            if(gabenIDs.length == 0) {
-                debugLog(caller, "Migration: No gifts found, nothing to migrate.");
-            } else {
-                debugLog(caller, "Migration: Found old gifts, continuing ...");
-                for(var i=0; i < gabenIDs.length; i++) {
-                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TalentName");
-                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1");
-                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft2");
-                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft3");
-                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TaW");
-                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_SE");
-                }
-            }
+						let attrsToGet = ["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"];
+						// GIFTS MIGRATION
+						if(gabenIDs.length == 0) {
+								debugLog(caller, "Migration: No gifts found, nothing to migrate.");
+						} else {
+								debugLog(caller, "Migration: Found old gifts, continuing ...");
+								for(var i=0; i < gabenIDs.length; i++) {
+										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TalentName");
+										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1");
+										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft2");
+										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft3");
+										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TaW");
+										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_SE");
+								}
+						}
 
-            // META-TALENTS MIGRATION
-            if(metatalenteIDs.length == 0) {
-                debugLog(caller, "Migration: No meta-talents found, nothing to migrate.");
-            } else {
-                debugLog(caller, "Migration: Found old meta-talents, continuing ...");
-                for(var i=0; i < metatalenteIDs.length; i++) {
-                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName");
-                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1");
-                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft2");
-                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft3");
-                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TaW");
-                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_SE");
-                }
-            }
+						// META-TALENTS MIGRATION
+						if(metatalenteIDs.length == 0) {
+								debugLog(caller, "Migration: No meta-talents found, nothing to migrate.");
+						} else {
+								debugLog(caller, "Migration: Found old meta-talents, continuing ...");
+								for(var i=0; i < metatalenteIDs.length; i++) {
+										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName");
+										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1");
+										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft2");
+										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft3");
+										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TaW");
+										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_SE");
+								}
+						}
 
-            // Gaben
-            safeGetAttrs(
-                attrsToGet, function(v) {
-                    debugLog(caller, v);
-                    let defaultGiftTaW = 3;
-                    let defaultMetaTaW = 0;
-                    let update = {};
-                    for(var i=0; i < gabenIDs.length; i++) {
-                        let newrow = generateRowID();
-                        let current = gabenIDs[i];
-                        let prefixNew = "repeating_Gaben_" + newrow;
-                        let prefixOld = "repeating_GabenTalente_" + current;
+						// Gaben
+						safeGetAttrs(
+								attrsToGet, function(v) {
+										debugLog(caller, v);
+										let defaultGiftTaW = 3;
+										let defaultMetaTaW = 0;
+										let update = {};
+										for(var i=0; i < gabenIDs.length; i++) {
+												let newrow = generateRowID();
+												let current = gabenIDs[i];
+												let prefixNew = "repeating_Gaben_" + newrow;
+												let prefixOld = "repeating_GabenTalente_" + current;
 
-                        // Gather data
-                        // Updating the name will set the stats automatically
-                        // To prevent overwriting of custom stats check that the RAW stats are used
-                        // Need to check that the three correct ones are used, order irrelevant
-                        // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
-                        let gabeStats = gaben[giftsConversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
-                        let gabeStatsOld = [giftsConversion[v[prefixOld + "_Eigenschaft1"]], giftsConversion[v[prefixOld + "_Eigenschaft2"]], giftsConversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
-                        if(gabeStats == gabeStatsOld) {
-                            update[prefixNew + "_Name_Gabe"] = giftsConversion[v[prefixOld + "_TalentName"]];
-                            update[prefixNew + "_Name_Gabe_Zusatz"] = "";
-                        } else {
-                            update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
-                        }
-                        if(v[prefixOld + "_SE"] == "on") {
-                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
-                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
-                        } else {
-                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
-                        }
-                        update[prefixNew + "_Name_Gabe_Anzeige"] = giftsConversion[v[prefixOld + "_TalentName"]];
-                        update[prefixNew + "_Eigenschaft1"] = giftsConversion[v[prefixOld + "_Eigenschaft1"]];
-                        update[prefixNew + "_Eigenschaft2"] = giftsConversion[v[prefixOld + "_Eigenschaft2"]];
-                        update[prefixNew + "_Eigenschaft3"] = giftsConversion[v[prefixOld + "_Eigenschaft3"]];
-                        update[prefixNew + "_hiddenEigenschaft1"] = v[giftsConversion[v[prefixOld + "_Eigenschaft1"]]];
-                        update[prefixNew + "_hiddenEigenschaft2"] = v[giftsConversion[v[prefixOld + "_Eigenschaft2"]]];
-                        update[prefixNew + "_hiddenEigenschaft3"] = v[giftsConversion[v[prefixOld + "_Eigenschaft3"]]];
-                        if(v[prefixOld + "_TaW"] === "") {
-                            update[prefixNew + "_TaW"] = defaultGiftTaW;
-                        } else {
-                            update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
-                        }
-                    }
-                    debugLog(caller, update);
+												// Gather data
+												// Updating the name will set the stats automatically
+												// To prevent overwriting of custom stats check that the RAW stats are used
+												// Need to check that the three correct ones are used, order irrelevant
+												// Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+												let gabeStats = gaben[giftsConversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+												let gabeStatsOld = [giftsConversion[v[prefixOld + "_Eigenschaft1"]], giftsConversion[v[prefixOld + "_Eigenschaft2"]], giftsConversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+												if(gabeStats == gabeStatsOld) {
+														update[prefixNew + "_Name_Gabe"] = giftsConversion[v[prefixOld + "_TalentName"]];
+														update[prefixNew + "_Name_Gabe_Zusatz"] = "";
+												} else {
+														update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+														debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
+												}
+												if(v[prefixOld + "_SE"] == "on") {
+														update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
+														debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
+												} else {
+														update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
+												}
+												update[prefixNew + "_Name_Gabe_Anzeige"] = giftsConversion[v[prefixOld + "_TalentName"]];
+												update[prefixNew + "_Eigenschaft1"] = giftsConversion[v[prefixOld + "_Eigenschaft1"]];
+												update[prefixNew + "_Eigenschaft2"] = giftsConversion[v[prefixOld + "_Eigenschaft2"]];
+												update[prefixNew + "_Eigenschaft3"] = giftsConversion[v[prefixOld + "_Eigenschaft3"]];
+												update[prefixNew + "_hiddenEigenschaft1"] = v[giftsConversion[v[prefixOld + "_Eigenschaft1"]]];
+												update[prefixNew + "_hiddenEigenschaft2"] = v[giftsConversion[v[prefixOld + "_Eigenschaft2"]]];
+												update[prefixNew + "_hiddenEigenschaft3"] = v[giftsConversion[v[prefixOld + "_Eigenschaft3"]]];
+												if(v[prefixOld + "_TaW"] === "") {
+														update[prefixNew + "_TaW"] = defaultGiftTaW;
+												} else {
+														update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+												}
+										}
+										debugLog(caller, update);
 
-                    for(var i=0; i < metatalenteIDs.length; i++) {
-                        let newrow = generateRowID();
-                        let current = metatalenteIDs[i];
-                        let prefixNew = "repeating_Metatalente201904_" + newrow;
-                        let prefixOld = "repeating_MetaTalente_" + current;
+										for(var i=0; i < metatalenteIDs.length; i++) {
+												let newrow = generateRowID();
+												let current = metatalenteIDs[i];
+												let prefixNew = "repeating_Metatalente201904_" + newrow;
+												let prefixOld = "repeating_MetaTalente_" + current;
 
-                        // Gather data
-                        // Updating the name will set the stats automatically
-                        // To prevent overwriting of custom stats check that the RAW stats are used
-                        // Need to check that the three correct ones are used, order irrelevant
-                        // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
-                        let metatalentStats = metatalente[metaTalentConversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
-                        let metatalentStatsOld = [metaTalentConversion[v[prefixOld + "_Eigenschaft1"]], metaTalentConversion[v[prefixOld + "_Eigenschaft2"]], metaTalentConversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
-                        if(metatalentStats == metatalentStatsOld) {
-                            update[prefixNew + "_Name_Metatalent"] = metaTalentConversion[v[prefixOld + "_TalentName"]];
-                            update[prefixNew + "_Name_Metatalent_Eigen"] = "";
-                        } else {
-                            update[prefixNew + "_Name_Metatalent_Eigen"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
-                        }
-                        if(v[prefixOld + "_SE"] == "on") {
-                            update[prefixNew + "_Name_Metatalent_Eigen"] += "[x] SE";
-                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
-                        } else {
-                            update[prefixNew + "_Name_Metatalent_Eigen"] += "[ ] SE";
-                        }
-                        update[prefixNew + "_Name_Metatalent_Anzeige"] = metaTalentConversion[v[prefixOld + "_TalentName"]];
-                        update[prefixNew + "_Eigenschaft1"] = metaTalentConversion[v[prefixOld + "_Eigenschaft1"]];
-                        update[prefixNew + "_Eigenschaft2"] = metaTalentConversion[v[prefixOld + "_Eigenschaft2"]];
-                        update[prefixNew + "_Eigenschaft3"] = metaTalentConversion[v[prefixOld + "_Eigenschaft3"]];
-                        update[prefixNew + "_hiddenEigenschaft1"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft1"]]];
-                        update[prefixNew + "_hiddenEigenschaft2"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft2"]]];
-                        update[prefixNew + "_hiddenEigenschaft3"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft3"]]];
-                        if(v[prefixOld + "_TaW"] === "") {
-                            update[prefixNew + "_TaW"] = defaultMetaTaW;
-                        } else {
-                            update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
-                        }
-                    }
+												// Gather data
+												// Updating the name will set the stats automatically
+												// To prevent overwriting of custom stats check that the RAW stats are used
+												// Need to check that the three correct ones are used, order irrelevant
+												// Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+												let metatalentStats = metatalente[metaTalentConversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+												let metatalentStatsOld = [metaTalentConversion[v[prefixOld + "_Eigenschaft1"]], metaTalentConversion[v[prefixOld + "_Eigenschaft2"]], metaTalentConversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+												if(metatalentStats == metatalentStatsOld) {
+														update[prefixNew + "_Name_Metatalent"] = metaTalentConversion[v[prefixOld + "_TalentName"]];
+														update[prefixNew + "_Name_Metatalent_Eigen"] = "";
+												} else {
+														update[prefixNew + "_Name_Metatalent_Eigen"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+														debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
+												}
+												if(v[prefixOld + "_SE"] == "on") {
+														update[prefixNew + "_Name_Metatalent_Eigen"] += "[x] SE";
+														debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
+												} else {
+														update[prefixNew + "_Name_Metatalent_Eigen"] += "[ ] SE";
+												}
+												update[prefixNew + "_Name_Metatalent_Anzeige"] = metaTalentConversion[v[prefixOld + "_TalentName"]];
+												update[prefixNew + "_Eigenschaft1"] = metaTalentConversion[v[prefixOld + "_Eigenschaft1"]];
+												update[prefixNew + "_Eigenschaft2"] = metaTalentConversion[v[prefixOld + "_Eigenschaft2"]];
+												update[prefixNew + "_Eigenschaft3"] = metaTalentConversion[v[prefixOld + "_Eigenschaft3"]];
+												update[prefixNew + "_hiddenEigenschaft1"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft1"]]];
+												update[prefixNew + "_hiddenEigenschaft2"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft2"]]];
+												update[prefixNew + "_hiddenEigenschaft3"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft3"]]];
+												if(v[prefixOld + "_TaW"] === "") {
+														update[prefixNew + "_TaW"] = defaultMetaTaW;
+												} else {
+														update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+												}
+										}
 
-                    // Create new row
-                    safeSetAttrs(update, {}, function() {
-                        callNextMigration(migrationChain);
-                    });
-            });
-        });
-    });
+										// Create new row
+										safeSetAttrs(update, {}, function() {
+												callNextMigration(migrationChain);
+										});
+						});
+				});
+		});
 }
 
 /*
-    Migration steps:
-    - if more than one close range weapon is active, only keep the first one of them as active
-    - if no close range weapon is active, set the first one active
-    - calculate attack value for "Peitsche" talent
-    - calculate fighting values
-    - set shield_pa and parryweapon_pa to 0
-    - set shield_pa_available and parryweapon_pa_available to "0"
-    - change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
-    - calculate BE from armor
-    - calculate BE modifications for weapons
+		Migration steps:
+		- if more than one close range weapon is active, only keep the first one of them as active
+		- if no close range weapon is active, set the first one active
+		- calculate attack value for "Peitsche" talent
+		- calculate fighting values
+		- set shield_pa and parryweapon_pa to 0
+		- set shield_pa_available and parryweapon_pa_available to "0"
+		- change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
+		- calculate BE from armor
+		- calculate BE modifications for weapons
 */
 function migrateTo20200809(migrationChain) {
 	var caller = "migrateTo20200809";
-    debugLog(caller, "migrateTo20200809 invoked");
+		debugLog(caller, "migrateTo20200809 invoked");
 
-    safeGetAttrs([
-            "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
-            "RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", 
-            "RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "BE_RG", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
-            "BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",  
-            "NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4"], function(v) {
-        
-        var attrsToChange = {};
-        var activeCount = 0;
-        for (var i = 1; i <= 4; i++) {
-            if (v["NKW_Aktiv" + i] === "1") {
-                activeCount += 1;
-            }
-            if (activeCount > 1) {
-                attrsToChange["NKW_Aktiv" + i] = "0";
-            }
-        }
-        if (activeCount === 0) {
-            attrsToChange["NKW_Aktiv1"] = "1";
-        }
+		safeGetAttrs([
+						"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
+						"RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", 
+						"RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "BE_RG", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
+						"BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",  
+						"NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4"], function(v) {
+				
+				var attrsToChange = {};
+				var activeCount = 0;
+				for (var i = 1; i <= 4; i++) {
+						if (v["NKW_Aktiv" + i] === "1") {
+								activeCount += 1;
+						}
+						if (activeCount > 1) {
+								attrsToChange["NKW_Aktiv" + i] = "0";
+						}
+				}
+				if (activeCount === 0) {
+						attrsToChange["NKW_Aktiv1"] = "1";
+				}
 
-        var peitscheAT = 0;
-        if (v["TaW_peitsche"]) {
-            peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
-        }
-        attrsToChange["AT_peitsche"] = peitscheAT;
+				var peitscheAT = 0;
+				if (v["TaW_peitsche"]) {
+						peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
+				}
+				attrsToChange["AT_peitsche"] = peitscheAT;
 
-        if (v["sf_rustungsgewonungII"] === "1") {
-            attrsToChange["sf_rustungsgewohnungII"] = "1";
-        }
+				if (v["sf_rustungsgewonungII"] === "1") {
+						attrsToChange["sf_rustungsgewohnungII"] = "1";
+				}
 
-        // take calculated values into "v" so that they are available to following computation steps
-        Object.assign(v, attrsToChange);
+				// take calculated values into "v" so that they are available to following computation steps
+				Object.assign(v, attrsToChange);
 
-        var calculatedRuestungBE = calculateRuestungBE(v, {});
-        // apply calculated values to attrsToChange
-        Object.assign(attrsToChange, calculatedRuestungBE);
+				var calculatedRuestungBE = calculateRuestungBE(v, {});
+				// apply calculated values to attrsToChange
+				Object.assign(attrsToChange, calculatedRuestungBE);
 
-        var beTaw = 0;
-        // take BE_RG from calculated values
-        if (calculatedRuestungBE["BE_RG"]) {
-            beTaw += parseInt(calculatedRuestungBE["BE_RG"]);
-        }
-        if (v["BE_Last"]) {
-            beTaw += parseInt(v["BE_Last"]);
-        }
-        attrsToChange["BE_TaW"] = beTaw;
-        v["BE_TaW"] = beTaw;
+				var beTaw = 0;
+				// take BE_RG from calculated values
+				if (calculatedRuestungBE["BE_RG"]) {
+						beTaw += parseInt(calculatedRuestungBE["BE_RG"]);
+				}
+				if (v["BE_Last"]) {
+						beTaw += parseInt(v["BE_Last"]);
+				}
+				attrsToChange["BE_TaW"] = beTaw;
+				v["BE_TaW"] = beTaw;
 
-        var weaponBE = calculateWeaponBE(v);
-        attrsToChange["be_at_mod"] = weaponBE.be_at;
-        attrsToChange["be_pa_mod"] = weaponBE.be_pa;
+				var weaponBE = calculateWeaponBE(v);
+				attrsToChange["be_at_mod"] = weaponBE.be_at;
+				attrsToChange["be_pa_mod"] = weaponBE.be_pa;
 
-        safeSetAttrs(attrsToChange, {}, function(){
-            callNextMigration(migrationChain);
-        });
-    });
+				safeSetAttrs(attrsToChange, {}, function(){
+						callNextMigration(migrationChain);
+				});
+		});
 }
 
 /*
-    Migration steps:
-    - Check for shield attack availability
-    - Update wound modifiers
-    - Update initiative modifiers from the main (melee) weapon
-    - Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
+		Migration steps:
+		- Check for shield attack availability
+		- Update wound modifiers
+		- Update initiative modifiers from the main (melee) weapon
+		- Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
 */
 function migrateTo20210413(migrationChain) {
 	var caller = "migrateTo20210413";
-    debugLog(caller, "migrateTo20210413 invoked");
+		debugLog(caller, "migrateTo20210413 invoked");
 
-    safeGetAttrs(["activeShieldRowId"], function(values) {
+		safeGetAttrs(["activeShieldRowId"], function(values) {
 		var variablesToGet = [
 			"sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag",
 			"KK_Basis", "KK_mod",
@@ -2267,13 +2267,13 @@ function migrateTo20210413(migrationChain) {
 		];
 		// Updates for shield attack
 		var activeShieldRowId = values["activeShieldRowId"];
-    
-        // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-        if (activeShieldRowId) {
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-        }
+		
+				// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+				if (activeShieldRowId) {
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+				}
 
 		safeGetAttrs(variablesToGet, function(values) {
 			/*
@@ -2283,16 +2283,16 @@ function migrateTo20210413(migrationChain) {
 				* Make up our own little KK here for migration purposes
 			*/
 			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
-		    let attrsToChange = {};
+				let attrsToChange = {};
 
-		    for (var i = 1; i <= 4; i++) {
-		        attrsToChange["NKW" + i + "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, i);
-		    }
+				for (var i = 1; i <= 4; i++) {
+						attrsToChange["NKW" + i + "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, i);
+				}
 
-		    let result = calculateShieldAttack(values, activeShieldRowId);
+				let result = calculateShieldAttack(values, activeShieldRowId);
 
-		    attrsToChange["shield_at_mod"] = result.shieldAtMod;
-		    attrsToChange["shield_at_available"] = result.shieldAtAvailable;
+				attrsToChange["shield_at_mod"] = result.shieldAtMod;
+				attrsToChange["shield_at_available"] = result.shieldAtAvailable;
 
 			// Updates for wound modifiers
 			var mods = calculateWoundModifiers(values);
@@ -2311,7 +2311,7 @@ function migrateTo20210413(migrationChain) {
 				"KK_mod_wounds": mods["KK"]
 			});
 			
-		    attrsToChange["shield_at"] = Math.max(0, parseInt(values["AT_raufen"]) + parseInt(attrsToChange["AT_mod_wounds"]));
+				attrsToChange["shield_at"] = Math.max(0, parseInt(values["AT_raufen"]) + parseInt(attrsToChange["AT_mod_wounds"]));
 
 			// Updates for INI modifiers
 			// Set INI modifier from (main) weapon
@@ -2345,14 +2345,14 @@ function migrateTo20210413(migrationChain) {
 			inibasis2 += IBbonus;
 			inibasis2 = Math.max(0, inibasis2);
 
-		    attrsToChange["inibasis2"] = inibasis2;
-		    attrsToChange["INI_dice_count"] = INIdicecount;
+				attrsToChange["inibasis2"] = inibasis2;
+				attrsToChange["INI_dice_count"] = INIdicecount;
 
-		    safeSetAttrs(attrsToChange, {}, function(){
-		        callNextMigration(migrationChain);
-		    });
+				safeSetAttrs(attrsToChange, {}, function(){
+						callNextMigration(migrationChain);
+				});
 		});
-    });
+		});
 }
 
 /*
@@ -2769,8 +2769,8 @@ function migrateTo20230618(migrationChain) {
 }
 
 on("sheet:opened", function() {
-    migrationCheck();
-    safeSetAttrs({ "safe-sheet-open": Date.now() });
+		migrationCheck();
+		safeSetAttrs({ "safe-sheet-open": Date.now() });
 });
 
 /*
@@ -2781,67 +2781,67 @@ We need to make sure that the right thing™ is done
 */
 on("change:repeating_shields:shield_active", function(eventInfo) {
 	var caller = "???";
-    // Get the source shield, its row ID and whether it was turned on or off
-    var sourceShield = eventInfo.sourceAttribute;
-    var sourceShieldId = extractRowId(sourceShield);
-    var mode = eventInfo.newValue;
+		// Get the source shield, its row ID and whether it was turned on or off
+		var sourceShield = eventInfo.sourceAttribute;
+		var sourceShieldId = extractRowId(sourceShield);
+		var mode = eventInfo.newValue;
 
-    // Get all the shields
-    getSectionIDs("shields", function(idarray) {
-        var prefix = "repeating_shields_";
-        var suffix = "_shield_active";
+		// Get all the shields
+		getSectionIDs("shields", function(idarray) {
+				var prefix = "repeating_shields_";
+				var suffix = "_shield_active";
 
-        // Gather all the shield_active states (as attribute names)
-        var attrsToGet = [];
-        for(id of idarray) {
-            attrsToGet.push(prefix + id + suffix);
-        }
+				// Gather all the shield_active states (as attribute names)
+				var attrsToGet = [];
+				for(id of idarray) {
+						attrsToGet.push(prefix + id + suffix);
+				}
 
-        // Get the attributes
-        safeGetAttrs( attrsToGet, function(shieldActiveStates) {
-            var activeShields = [];
-            var activeShieldRowId = "";
+				// Get the attributes
+				safeGetAttrs( attrsToGet, function(shieldActiveStates) {
+						var activeShields = [];
+						var activeShieldRowId = "";
 
-            for (attr of attrsToGet) {
-                if (shieldActiveStates[ attr ] === "on") {
-                    activeShields.push(attr);
-                }
-            }
+						for (attr of attrsToGet) {
+								if (shieldActiveStates[ attr ] === "on") {
+										activeShields.push(attr);
+								}
+						}
 
-            var attrsToChange = {};
-            // 0 active shields? Deactivate shields, nothing to do.
-            if (activeShields.length === 0) {
-                // do something for deactivation
-                debugLog(caller, "Deactivating shields/parry weapons ...");
-                activeShieldRowId = "";
-            } else if (activeShields.length === 1) {
-                // this is the active shield
-                var activeShield = activeShields[0];
-                debugLog(caller, "Setting active shields/parry weapons to \"" + activeShield + "\"");
-                activeShieldRowId = extractRowId(activeShield);
-            } else {
-                // If one shield got activated, deactivate all others.
-                if (mode === "on") {
-                    activeShieldRowId = sourceShieldId;
-                    debugLog(caller, "Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
-                    for (activeShield of activeShields) {
-                        if (activeShield !== sourceShield) {
-                            attrsToChange[ activeShield ] = 0;
-                        }
-                    }
-                } else {
-                // If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
-                    debugLog(caller, "Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
-                    activeShieldRowId = extractRowId(activeShields[0]);
-                    for (var i = 1; i < activeShields.length; i++) {
-                        attrsToChange[ activeShields[i] ] = 0;
-                    }
-                }
-            }
-            attrsToChange[ "activeShieldRowId" ] = activeShieldRowId;
-            safeSetAttrs( attrsToChange, { silent: true }, () => { calculateCombatValues() } );
-        });
-    });
+						var attrsToChange = {};
+						// 0 active shields? Deactivate shields, nothing to do.
+						if (activeShields.length === 0) {
+								// do something for deactivation
+								debugLog(caller, "Deactivating shields/parry weapons ...");
+								activeShieldRowId = "";
+						} else if (activeShields.length === 1) {
+								// this is the active shield
+								var activeShield = activeShields[0];
+								debugLog(caller, "Setting active shields/parry weapons to \"" + activeShield + "\"");
+								activeShieldRowId = extractRowId(activeShield);
+						} else {
+								// If one shield got activated, deactivate all others.
+								if (mode === "on") {
+										activeShieldRowId = sourceShieldId;
+										debugLog(caller, "Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
+										for (activeShield of activeShields) {
+												if (activeShield !== sourceShield) {
+														attrsToChange[ activeShield ] = 0;
+												}
+										}
+								} else {
+								// If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
+										debugLog(caller, "Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
+										activeShieldRowId = extractRowId(activeShields[0]);
+										for (var i = 1; i < activeShields.length; i++) {
+												attrsToChange[ activeShields[i] ] = 0;
+										}
+								}
+						}
+						attrsToChange[ "activeShieldRowId" ] = activeShieldRowId;
+						safeSetAttrs( attrsToChange, { silent: true }, () => { calculateCombatValues() } );
+				});
+		});
 });
 
 /* Helper attributes "TP_W_Aktiv" and "TP_Bonus_Aktiv" for combat calculations
@@ -2963,92 +2963,92 @@ on(
 "change:sf_beidhandigerkampfi change:sf_beidhandigerkampfii change:vorteil_beidhaendig " +
 "change:at_mod_wounds change:pa_mod_wounds ",
 function(eventInfos) {
-    calculateCombatValues();
+		calculateCombatValues();
 });
 
 function calculateCombatValues() {
 	var caller = "calculateCombatValues";
-    debugLog(caller, "calculating combat values");
-    // Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
-    // "activeShieldRowId" can be the id of either a shield or a parry weapon
-    safeGetAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
-        var weapon = 0;
-        if (rowIdValues["NKW_Aktiv1"] === "1") {
-            weapon = 1;
-        } else if (rowIdValues["NKW_Aktiv2"] === "1") {
-            weapon = 2;
-        } else if (rowIdValues["NKW_Aktiv3"] === "1") {
-            weapon = 3;
-        } else if (rowIdValues["NKW_Aktiv4"] === "1") {
-            weapon = 4;
-        } else {
-            // didn't find an active weapon. setting values to 0;
-            attrsToChange = {
-                "AT_Aktiv": 0,
-                "AT_Aktiv_TaW": "0",
-                "PA_Aktiv": 0,
-                "PA_Aktiv_TaW": "0",
-                "shield_pa": 0,
-                "parryweapon_at": 0,
-                "parryweapon_pa": 0,
-                "shield_pa_available": "0",
-                "parryweapon_pa_available": "0"
-            }
-            safeSetAttrs(attrsToChange);
-            return;
-        }
-        var variablesToGet = [
-            "KK", "KK_Basis", "KK_mod",
-        	"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
-        	"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
-        	"INIModNKW" + weapon,
-        	"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
-            "TaW_anderthalbhander", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
-            "TaW_infanteriewaffen", "TaW_kettenstabe", "TaW_kettenwaffen", "TaW_lanzenreiten", "TaW_peitsche", "TaW_raufen", "TaW_ringen", "TaW_sabel",
-            "TaW_schwerter", "TaW_speere", "TaW_stabe", "TaW_zweihandflegel", "TaW_zweihand-hiebwaffen", "TaW_zweihandschwerter",
-            "AT_anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
-            "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
-            "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
-            "AT_mod_wounds",
-            "PA_anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
-            "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", 
-            "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
-            "PA_mod_wounds",
-            "PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "be_at_mod", "be_pa_mod",
-            "sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig"
-             ];
+		debugLog(caller, "calculating combat values");
+		// Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
+		// "activeShieldRowId" can be the id of either a shield or a parry weapon
+		safeGetAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
+				var weapon = 0;
+				if (rowIdValues["NKW_Aktiv1"] === "1") {
+						weapon = 1;
+				} else if (rowIdValues["NKW_Aktiv2"] === "1") {
+						weapon = 2;
+				} else if (rowIdValues["NKW_Aktiv3"] === "1") {
+						weapon = 3;
+				} else if (rowIdValues["NKW_Aktiv4"] === "1") {
+						weapon = 4;
+				} else {
+						// didn't find an active weapon. setting values to 0;
+						attrsToChange = {
+								"AT_Aktiv": 0,
+								"AT_Aktiv_TaW": "0",
+								"PA_Aktiv": 0,
+								"PA_Aktiv_TaW": "0",
+								"shield_pa": 0,
+								"parryweapon_at": 0,
+								"parryweapon_pa": 0,
+								"shield_pa_available": "0",
+								"parryweapon_pa_available": "0"
+						}
+						safeSetAttrs(attrsToChange);
+						return;
+				}
+				var variablesToGet = [
+						"KK", "KK_Basis", "KK_mod",
+					"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
+					"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
+					"INIModNKW" + weapon,
+					"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
+						"TaW_anderthalbhander", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
+						"TaW_infanteriewaffen", "TaW_kettenstabe", "TaW_kettenwaffen", "TaW_lanzenreiten", "TaW_peitsche", "TaW_raufen", "TaW_ringen", "TaW_sabel",
+						"TaW_schwerter", "TaW_speere", "TaW_stabe", "TaW_zweihandflegel", "TaW_zweihand-hiebwaffen", "TaW_zweihandschwerter",
+						"AT_anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
+						"AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
+						"AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
+						"AT_mod_wounds",
+						"PA_anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
+						"PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", 
+						"PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+						"PA_mod_wounds",
+						"PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "be_at_mod", "be_pa_mod",
+						"sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig"
+						 ];
 
-        // Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
-        var activeShieldRowId = rowIdValues["activeShieldRowId"];
+				// Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
+				var activeShieldRowId = rowIdValues["activeShieldRowId"];
 
-        // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-        if (activeShieldRowId) {
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_bf");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_ini_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_name");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
-        }
+				// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+				if (activeShieldRowId) {
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_bf");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_ini_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_name");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
+				}
 
-        safeGetAttrs(variablesToGet, function(values) {
-            var attrsToChange = {};
+				safeGetAttrs(variablesToGet, function(values) {
+						var attrsToChange = {};
 
 			// Prepare against NaN KK
 			if (isNaN(values["KK"])) {
 				values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
 			}
 
-            // Used for AT, PA and TP calc
-            let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
+						// Used for AT, PA and TP calc
+						let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
 
-            // Berechne Waffen-AT
-            var ATkampftechnikRaw = values["NKW_AT_typ" + weapon];
-            // AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
-            if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
+						// Berechne Waffen-AT
+						var ATkampftechnikRaw = values["NKW_AT_typ" + weapon];
+						// AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
+						if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
 				var AT = 0;
 				var taw = 0;
 				var ATkampftechnik = ATkampftechnikRaw.match("@{AT_(.*)}");
@@ -3066,30 +3066,30 @@ function calculateCombatValues() {
 					AT = parseInt(values["AT_" + ATkampftechnik[1].toLowerCase()]);
 				}
 
-                var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
-                var spec = parseInt(values["NKW" + weapon + "_Spez"]);
-                var atValue = AT + atMod + spec + (values.AT_mod_wounds || 0);
-                // bei aktivem Schild (nicht bei Parierwaffen), wird der AT Wert der Hauptwaffe um den AT-Mod des Schildes verändert
-                if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
-                    atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
-                }
-                if (values["be_at_mod"]) {
-                    atValue -= parseInt(values["be_at_mod"]);
-                }
+								var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
+								var spec = parseInt(values["NKW" + weapon + "_Spez"]);
+								var atValue = AT + atMod + spec + (values.AT_mod_wounds || 0);
+								// bei aktivem Schild (nicht bei Parierwaffen), wird der AT Wert der Hauptwaffe um den AT-Mod des Schildes verändert
+								if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
+										atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+								}
+								if (values["be_at_mod"]) {
+										atValue -= parseInt(values["be_at_mod"]);
+								}
 
 				// Negative TP/KK reduziert auch AT
-                if (tpkkMod && tpkkMod < 0) {
-                    atValue += tpkkMod;
-                }
-                attrsToChange["AT_Aktiv"] = Math.max(0, atValue);
-                attrsToChange["AT_Aktiv_TaW"] = taw;
-            }
+								if (tpkkMod && tpkkMod < 0) {
+										atValue += tpkkMod;
+								}
+								attrsToChange["AT_Aktiv"] = Math.max(0, atValue);
+								attrsToChange["AT_Aktiv_TaW"] = taw;
+						}
 
-            // Berechne Waffen-PA
-            var PAkampftechnikRaw = values["NKW_PA_typ" + weapon];
-            var paValue = 0;
-            // Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
-            if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
+						// Berechne Waffen-PA
+						var PAkampftechnikRaw = values["NKW_PA_typ" + weapon];
+						var paValue = 0;
+						// Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
+						if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
 				var PA = 0;
 				var taw = 0;
 				var PAkampftechnik = PAkampftechnikRaw.match("@{PA_(.*)}");
@@ -3107,120 +3107,120 @@ function calculateCombatValues() {
 					PA = parseInt(values["PA_" + PAkampftechnik[1].toLowerCase()]);
 				}
 
-                var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
-                var spec = parseInt(values["NKW" + weapon + "_Spez"]);
-                var wounds = isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds'];
-                paValue = PA + paMod + spec + wounds;
+								var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
+								var spec = parseInt(values["NKW" + weapon + "_Spez"]);
+								var wounds = isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds'];
+								paValue = PA + paMod + spec + wounds;
 
-                if (values["be_pa_mod"]) {
-                    paValue -= parseInt(values["be_pa_mod"]);
-                }
-                
-                if (Number.isNaN(paValue) || paValue < 0) {
-                    paValue = 0;
-                }
-                if (tpkkMod && tpkkMod < 0) {
-                    paValue += tpkkMod;
-                }
-                attrsToChange["PA_Aktiv"] = Math.max(0, paValue);
-                attrsToChange["PA_Aktiv_TaW"] = taw;
-            }
+								if (values["be_pa_mod"]) {
+										paValue -= parseInt(values["be_pa_mod"]);
+								}
+								
+								if (Number.isNaN(paValue) || paValue < 0) {
+										paValue = 0;
+								}
+								if (tpkkMod && tpkkMod < 0) {
+										paValue += tpkkMod;
+								}
+								attrsToChange["PA_Aktiv"] = Math.max(0, paValue);
+								attrsToChange["PA_Aktiv_TaW"] = taw;
+						}
 
-            // Berechne Schild-PA und Parierwaffen-AT (Annahme: Kampf mit "falscher" Hand)
-            var shieldPa = 0;
-            var parryweaponAT = 0;
-            var parryweaponPa = 0;
-            // natürlich nur, wenn ein Schild aktiv ist (Siehe WdS S. 70)
-            if (activeShieldRowId) {
-                var linkhand = values["sf_linkhand"];
-                if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
-                    // Lade die Werte der für Schildparaden relevanten SF
-                    var schildkampf1 = values["sf_schildkampfI"];
-                    var schildkampf2 = values["sf_schildkampfII"];
-                    // Wir starten mit dem PA Basiswert des Charakters
-                    shieldPa = parseInt(values["PABasis"]);
-                    // Für Schildkampf 2 werden 5 Punkte, für Schildkampf 1 3 Punkte und für Linkhand 1 Punkt addiert
-                    if (schildkampf2 === "1") {
-                        shieldPa += 5;
-                    } else if (schildkampf1 === "1") {
-                        shieldPa += 3;
-                    } else if (linkhand === "1") {
-                        shieldPa += 1;
-                    }
+						// Berechne Schild-PA und Parierwaffen-AT (Annahme: Kampf mit "falscher" Hand)
+						var shieldPa = 0;
+						var parryweaponAT = 0;
+						var parryweaponPa = 0;
+						// natürlich nur, wenn ein Schild aktiv ist (Siehe WdS S. 70)
+						if (activeShieldRowId) {
+								var linkhand = values["sf_linkhand"];
+								if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
+										// Lade die Werte der für Schildparaden relevanten SF
+										var schildkampf1 = values["sf_schildkampfI"];
+										var schildkampf2 = values["sf_schildkampfII"];
+										// Wir starten mit dem PA Basiswert des Charakters
+										shieldPa = parseInt(values["PABasis"]);
+										// Für Schildkampf 2 werden 5 Punkte, für Schildkampf 1 3 Punkte und für Linkhand 1 Punkt addiert
+										if (schildkampf2 === "1") {
+												shieldPa += 5;
+										} else if (schildkampf1 === "1") {
+												shieldPa += 3;
+										} else if (linkhand === "1") {
+												shieldPa += 1;
+										}
 
-                    // Ist der PA Wert der Waffe >= 21 werden 3 Punkte, >= 18 2 Punkte und >= 15 1 Punkt addiert
-                    if (paValue >= 21) {
-                        shieldPa += 3;
-                    } else if (paValue >= 18) {
-                        shieldPa += 2;
-                    } else if (paValue >= 15) {
-                        shieldPa += 1;
-                    }
+										// Ist der PA Wert der Waffe >= 21 werden 3 Punkte, >= 18 2 Punkte und >= 15 1 Punkt addiert
+										if (paValue >= 21) {
+												shieldPa += 3;
+										} else if (paValue >= 18) {
+												shieldPa += 2;
+										} else if (paValue >= 15) {
+												shieldPa += 1;
+										}
 
-                    // berechne BE modifikator mit ein
-                    if (values["be_pa_mod"]) {
-                        shieldPa -= parseInt(values["be_pa_mod"]);
-                    }
+										// berechne BE modifikator mit ein
+										if (values["be_pa_mod"]) {
+												shieldPa -= parseInt(values["be_pa_mod"]);
+										}
 
-                    // Zuletzt: Addiere den PA-Modifikator des Schildes
-                    shieldPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
-                } else if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
-                    // Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
-                    // TODO: Spezialisierungen beachten
-                    var parryWeaponCombatTechnique = values["repeating_shields_" + activeShieldRowId + "_combat_technique"];
-                    if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique")) {
-                        var AT = 0;
+										// Zuletzt: Addiere den PA-Modifikator des Schildes
+										shieldPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
+								} else if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
+										// Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
+										// TODO: Spezialisierungen beachten
+										var parryWeaponCombatTechnique = values["repeating_shields_" + activeShieldRowId + "_combat_technique"];
+										if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique")) {
+												var AT = 0;
 
-                        // Suche nach der richtigen Schreibweise des Attributnamens ...
-                        AT = parseInt(values["AT_" + parryWeaponCombatTechnique]);
-                        if (isNaN(AT)) {
-                            AT = parseInt(values["AT_" + parryWeaponCombatTechnique.toLowerCase()])
-                        }
+												// Suche nach der richtigen Schreibweise des Attributnamens ...
+												AT = parseInt(values["AT_" + parryWeaponCombatTechnique]);
+												if (isNaN(AT)) {
+														AT = parseInt(values["AT_" + parryWeaponCombatTechnique.toLowerCase()])
+												}
 
-                        var atMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+												var atMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
 
-                        var atValue =
-                            AT + atMod
-                            + values["AT_mod_wounds"]
-                            - parseInt(values["be_at_mod"]);
-                        attrsToChange["parryweapon_at"] = atValue;
-                    }
+												var atValue =
+														AT + atMod
+														+ values["AT_mod_wounds"]
+														- parseInt(values["be_at_mod"]);
+												attrsToChange["parryweapon_at"] = atValue;
+										}
 
-                    var parierwaffen1 = values["sf_parierwaffenI"];
-                    var parierwaffen2 = values["sf_parierwaffenII"];
-                    // Basis für Parierwaffen-PA ist die PA der Hauptwaffe
-                    parryweaponPa = Math.max(0, paValue);
+										var parierwaffen1 = values["sf_parierwaffenI"];
+										var parierwaffen2 = values["sf_parierwaffenII"];
+										// Basis für Parierwaffen-PA ist die PA der Hauptwaffe
+										parryweaponPa = Math.max(0, paValue);
 
-                    // Dazu wird der PA-Mod der Parierwaffe addiert
-                    parryweaponPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
+										// Dazu wird der PA-Mod der Parierwaffe addiert
+										parryweaponPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
 
-                    if (parierwaffen2 === "1") {
-                        parryweaponPa += 2;
-                    } else if (parierwaffen1 === "1") {
-                        parryweaponPa += -1;
-                    } else if (linkhand === "1") {
-                        parryweaponPa += -4;
-                    } else {
-                        // Ohne die SF Linkhand können Parierwaffen nicht verwendet werden
-                        parryweaponPa = 0;
-                    }
-                }
-                // Wundeinfluss (bei Parierwaffe über PA-Wert der Hauptwaffe bereits drin)
-                shieldPa = Math.max(0, shieldPa + (isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds']));
-            }
-            
-            if (shieldPa > 0) {
-                attrsToChange["shield_pa_available"] = "on";
-            } else {
-                attrsToChange["shield_pa_available"] = "0";
-            }
-            if (parryweaponPa > 0) {
-                attrsToChange["parryweapon_pa_available"] = "on";
-            } else {
-                attrsToChange["parryweapon_pa_available"] = "0";
-            }
-            attrsToChange["shield_pa"] = shieldPa;
-            attrsToChange["parryweapon_pa"] = parryweaponPa;
+										if (parierwaffen2 === "1") {
+												parryweaponPa += 2;
+										} else if (parierwaffen1 === "1") {
+												parryweaponPa += -1;
+										} else if (linkhand === "1") {
+												parryweaponPa += -4;
+										} else {
+												// Ohne die SF Linkhand können Parierwaffen nicht verwendet werden
+												parryweaponPa = 0;
+										}
+								}
+								// Wundeinfluss (bei Parierwaffe über PA-Wert der Hauptwaffe bereits drin)
+								shieldPa = Math.max(0, shieldPa + (isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds']));
+						}
+						
+						if (shieldPa > 0) {
+								attrsToChange["shield_pa_available"] = "on";
+						} else {
+								attrsToChange["shield_pa_available"] = "0";
+						}
+						if (parryweaponPa > 0) {
+								attrsToChange["parryweapon_pa_available"] = "on";
+						} else {
+								attrsToChange["parryweapon_pa_available"] = "0";
+						}
+						attrsToChange["shield_pa"] = shieldPa;
+						attrsToChange["parryweapon_pa"] = parryweaponPa;
 
 			// Set INI modifier from (main) weapon
 			var weaponini = 0;
@@ -3230,28 +3230,28 @@ function calculateCombatValues() {
 			}
 			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
 
-            // Set INI modifier from shields/parry weapons
-            var shieldparryini = 0;
-            if (activeShieldRowId) {
-                shieldparryini = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_ini_mod"]);
-            }
-            attrsToChange["ShieldParryINI"] = shieldparryini;
+						// Set INI modifier from shields/parry weapons
+						var shieldparryini = 0;
+						if (activeShieldRowId) {
+								shieldparryini = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_ini_mod"]);
+						}
+						attrsToChange["ShieldParryINI"] = shieldparryini;
 
-            // Set shield parry weapon BF (Bruchfaktor; lit. breaking factor -> fragility)
-            var shieldparrybf = 0;
-            if (activeShieldRowId) {
-                shieldparrybf = values["repeating_shields_" + activeShieldRowId + "_shield_bf"];
-                if (shieldparrybf === undefined || isNaN(parseInt(shieldparrybf))) {
-                    shieldparrybf = 0;
-                }
-            }
-            attrsToChange["shield_bf"] = shieldparrybf;
+						// Set shield parry weapon BF (Bruchfaktor; lit. breaking factor -> fragility)
+						var shieldparrybf = 0;
+						if (activeShieldRowId) {
+								shieldparrybf = values["repeating_shields_" + activeShieldRowId + "_shield_bf"];
+								if (shieldparrybf === undefined || isNaN(parseInt(shieldparrybf))) {
+										shieldparrybf = 0;
+								}
+						}
+						attrsToChange["shield_bf"] = shieldparrybf;
 
-            // Set shield parry weapon TP/KK (damage modifier based on low/high strength)
-            var shieldparrytpkkdefault = "13/3";
-            var shieldparrytpkk = shieldparrytpkkdefault;
-            if (activeShieldRowId) {
-                shieldparrytpkk = values["repeating_shields_" + activeShieldRowId + "_shield_tpkk"];
+						// Set shield parry weapon TP/KK (damage modifier based on low/high strength)
+						var shieldparrytpkkdefault = "13/3";
+						var shieldparrytpkk = shieldparrytpkkdefault;
+						if (activeShieldRowId) {
+								shieldparrytpkk = values["repeating_shields_" + activeShieldRowId + "_shield_tpkk"];
 
 				// Check for correct TP/KK
 				{
@@ -3270,83 +3270,83 @@ function calculateCombatValues() {
 						shieldparrytpkk = shieldparrytpkkdefault;
 					}
 				}
-                // We are misusing the TP/KK function a bit ...
-                var TPKK = new Object();
-                TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
-                TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
-                shieldparrytpkk = calculateTpKKModFromValuesAndWeaponNumber(
-                    {
-                        "KK": values["KK"],
-                        "NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
-                        "NKW-schild_Schwellenwert": TPKK["Schritt"]
-                    },
-                    "-schild"
-                );
-            }
-            attrsToChange["shield_tpkk"] = shieldparrytpkk;
+								// We are misusing the TP/KK function a bit ...
+								var TPKK = new Object();
+								TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
+								TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
+								shieldparrytpkk = calculateTpKKModFromValuesAndWeaponNumber(
+										{
+												"KK": values["KK"],
+												"NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
+												"NKW-schild_Schwellenwert": TPKK["Schritt"]
+										},
+										"-schild"
+								);
+						}
+						attrsToChange["shield_tpkk"] = shieldparrytpkk;
 
-            // Set shield parry weapon TP (damage)
-            // For now no calculations, just showing text
-            var shieldparrytp = "";
-            var shieldparrytproll = "";
-            if (activeShieldRowId) {
-                shieldparrytp = values["repeating_shields_" + activeShieldRowId + "_shield_tp"];
-                if (shieldparrytp === undefined || shieldparrytp === "") {
-                    shieldparrytp = " ";
-                } else {
-                    shieldparrytproll = shieldparrytp.replace("W", "d");
-                }
-            }
-            attrsToChange["shield_tp"] = shieldparrytp;
-            attrsToChange["shield_tp_roll"] = shieldparrytproll;
+						// Set shield parry weapon TP (damage)
+						// For now no calculations, just showing text
+						var shieldparrytp = "";
+						var shieldparrytproll = "";
+						if (activeShieldRowId) {
+								shieldparrytp = values["repeating_shields_" + activeShieldRowId + "_shield_tp"];
+								if (shieldparrytp === undefined || shieldparrytp === "") {
+										shieldparrytp = " ";
+								} else {
+										shieldparrytproll = shieldparrytp.replace("W", "d");
+								}
+						}
+						attrsToChange["shield_tp"] = shieldparrytp;
+						attrsToChange["shield_tp_roll"] = shieldparrytproll;
 
-            // Set shield parry weapon name
-            var shieldparryname = "";
-            if (activeShieldRowId) {
-                shieldparryname = values["repeating_shields_" + activeShieldRowId + "_shield_name"];
-                if (shieldparryname === undefined || shieldparryname === "") {
-                    shieldparryname = " ";
-                }
-            }
-            attrsToChange["shield_name"] = shieldparryname;
+						// Set shield parry weapon name
+						var shieldparryname = "";
+						if (activeShieldRowId) {
+								shieldparryname = values["repeating_shields_" + activeShieldRowId + "_shield_name"];
+								if (shieldparryname === undefined || shieldparryname === "") {
+										shieldparryname = " ";
+								}
+						}
+						attrsToChange["shield_name"] = shieldparryname;
 
-            safeSetAttrs(attrsToChange);
-        });
-    });
+						safeSetAttrs(attrsToChange);
+				});
+		});
 }
 
 // Wird eine Nahkampfwaffe aktiviert, werden alle anderen deaktiviert. Auf diese Weise wird sichergestellt, dass immer maximal eine Nahkampfwaffe aktiv ist.
 // Funktionsweise siehe Methode unten zum deaktivieren der Schilde
 on("change:nkw_aktiv1 change:nkw_aktiv2 change:nkw_aktiv3 change:nkw_aktiv4", function(eventInfo) {
-    if (eventInfo.newValue !== "1") {
-        return;
-    }
-    var attrsToChange = {};
-    for (var i = 1; i <= 4; i++) {
-        if (eventInfo.sourceAttribute !== "nkw_aktiv" + i) {
-            attrsToChange["NKW_Aktiv" + i] = 0;
-        }
-    }
-    safeSetAttrs(attrsToChange);
+		if (eventInfo.newValue !== "1") {
+				return;
+		}
+		var attrsToChange = {};
+		for (var i = 1; i <= 4; i++) {
+				if (eventInfo.sourceAttribute !== "nkw_aktiv" + i) {
+						attrsToChange["NKW_Aktiv" + i] = 0;
+				}
+		}
+		safeSetAttrs(attrsToChange);
 });
 
 // wird verwendet um aus dem Attributsnamen einer repeating section die Row-ID zu ermitteln
 function extractRowId(attributeId) {
-    return attributeId.match("repeating_[a-zA-Z]*_([-a-zA-Z0-9]*)_.*")[1];
+		return attributeId.match("repeating_[a-zA-Z]*_([-a-zA-Z0-9]*)_.*")[1];
 }
 
 on("change:atbasis change:taw_peitsche change:at_peitsche", function(eventInfo) {
-    // do prevent infinite loop
-    if (eventInfo.sourceType === "sheetworker" && eventInfo.sourceAttribute === "AT_peitsche") {
-        return;
-    }
-    safeGetAttrs([ "ATbasis", "TaW_peitsche" ], function(values) {
-        var peitscheAT = 0;
-        if (values["TaW_peitsche"]) {
-            peitscheAT = parseInt(values["ATbasis"]) + parseInt(values["TaW_peitsche"]);
-        }
-        safeSetAttrs({ "AT_peitsche": peitscheAT });
-    });
+		// do prevent infinite loop
+		if (eventInfo.sourceType === "sheetworker" && eventInfo.sourceAttribute === "AT_peitsche") {
+				return;
+		}
+		safeGetAttrs([ "ATbasis", "TaW_peitsche" ], function(values) {
+				var peitscheAT = 0;
+				if (values["TaW_peitsche"]) {
+						peitscheAT = parseInt(values["ATbasis"]) + parseInt(values["TaW_peitsche"]);
+				}
+				safeSetAttrs({ "AT_peitsche": peitscheAT });
+		});
 });
 
 on(
@@ -3357,10 +3357,10 @@ on(
 "change:sf_rustungsgewohnungi change:rustungsgewohnungi_rustungen " +
 "change:sf_rustungsgewohnungii " +
 "change:sf_rustungsgewohnungiii", function(eventInfo) {
-    safeGetAttrs([ "RSName1", "RS_gBE1", "RSAktiv1", "RSName2", "RS_gBE2", "RSAktiv2", "RS_gBE3", "RSAktiv3", "RSName3", "RS_gBE4", "RSAktiv4", "RSName4", "sf_rustungsgewohnungI", "rustungsgewohnungI_rustungen", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"], function(values) {
-        var attrsToChange = calculateRuestungBE(values, eventInfo);
-        safeSetAttrs(attrsToChange);
-    });
+		safeGetAttrs([ "RSName1", "RS_gBE1", "RSAktiv1", "RSName2", "RS_gBE2", "RSAktiv2", "RS_gBE3", "RSAktiv3", "RSName3", "RS_gBE4", "RSAktiv4", "RSName4", "sf_rustungsgewohnungI", "rustungsgewohnungI_rustungen", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"], function(values) {
+				var attrsToChange = calculateRuestungBE(values, eventInfo);
+				safeSetAttrs(attrsToChange);
+		});
 });
 
 // Berechnet die BE der aktiven Rüstungsteile
@@ -3369,7 +3369,7 @@ on(
 // Enthält auch die Berechnung der auf die Initiative wirksamen BE aus Rüstung (BE_RG_INI)
 function calculateRuestungBE(values, eventInfo) {
 	var caller = "calculateRuestungBE";
-    var attrsToChange = {};
+		var attrsToChange = {};
 
 	// Determine old/previous degree of armour adaptation
 	var RG = { '1': values["sf_rustungsgewohnungI"], '2': values["sf_rustungsgewohnungII"], '3': values["sf_rustungsgewohnungIII"] };
@@ -3489,21 +3489,21 @@ function calculateRuestungBE(values, eventInfo) {
 	}
 
 	// Encumbrance calculation
-    var totalBe = 0;
-    for (var i = 1; i <= 4; i++) {
-        if (values["RSAktiv" + i] === "1") {
-            totalBe += parseFloat(values["RS_gBE" + i]);
-        }
-    }
+		var totalBe = 0;
+		for (var i = 1; i <= 4; i++) {
+				if (values["RSAktiv" + i] === "1") {
+						totalBe += parseFloat(values["RS_gBE" + i]);
+				}
+		}
 
 	totalBe -= RGBonus;
-    if (totalBe < 0) {
-        totalBe = 0;
-    }
+		if (totalBe < 0) {
+				totalBe = 0;
+		}
 
-    totalBe = DSAround(roundDecimals(totalBe, 1));
+		totalBe = DSAround(roundDecimals(totalBe, 1));
 
-    attrsToChange["BE_RG"] = totalBe;
+		attrsToChange["BE_RG"] = totalBe;
 
 	// Initiative reduction due to armour
 	var BEINI = 0;
@@ -3515,7 +3515,7 @@ function calculateRuestungBE(values, eventInfo) {
 	}
 	attrsToChange["BE_RG_INI"] = BEINI;
 
-    return attrsToChange;
+		return attrsToChange;
 }
 
 // Astral Energy: Base value
@@ -3562,28 +3562,28 @@ function calculateAEBase(values) {
 		AE = DSAround(CH + (MU + IN) / 2);
 	}
 
-    return AE;
+		return AE;
 }
 
 // Berechne BE-Basis aus dem gesamten Rüstungs BE und der BE durch Last
 on("change:be_rg change:be_last", function(eventInfo) {
-    safeGetAttrs(["BE_RG", "BE_Last"], function(values) {
-        var beTaw = calculateBEBasis(values);
-        safeSetAttrs({ "BE": beTaw });
-    });
+		safeGetAttrs(["BE_RG", "BE_Last"], function(values) {
+				var beTaw = calculateBEBasis(values);
+				safeSetAttrs({ "BE": beTaw });
+		});
 });
 
 // Berechnet beTaW Wert
 // Benötigt GesBE und BE_Last
 function calculateBEBasis(values) {
-    var beTaw = 0;
-    if (values["BE_RG"]) {
-        beTaw += parseInt(values["BE_RG"]);
-    }
-    if (values["BE_Last"]) {
-        beTaw += parseInt(values["BE_Last"]);
-    }
-    return beTaw;
+		var beTaw = 0;
+		if (values["BE_RG"]) {
+				beTaw += parseInt(values["BE_RG"]);
+		}
+		if (values["BE_Last"]) {
+				beTaw += parseInt(values["BE_Last"]);
+		}
+		return beTaw;
 }
 
 // Berechne Waffenspezifische BE
@@ -3593,41 +3593,41 @@ on(
 "change:nkw_aktiv2 change:nkw_at_typ2 change:nkw_pa_typ2 " +
 "change:nkw_aktiv3 change:nkw_at_typ3 change:nkw_pa_typ3 " +
 "change:nkw_aktiv4 change:nkw_at_typ4 change:nkw_pa_typ4", function(eventInfo) {
-    safeGetAttrs([ "BE", "NKW_Aktiv1", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_Aktiv2", "NKW_AT_typ2", "NKW_PA_typ2", "NKW_Aktiv3", "NKW_AT_typ3", "NKW_PA_typ3", "NKW_Aktiv4", "NKW_AT_typ4", "NKW_PA_typ4" ], function(values) {
-        var weaponBE = calculateWeaponBE(values);
+		safeGetAttrs([ "BE", "NKW_Aktiv1", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_Aktiv2", "NKW_AT_typ2", "NKW_PA_typ2", "NKW_Aktiv3", "NKW_AT_typ3", "NKW_PA_typ3", "NKW_Aktiv4", "NKW_AT_typ4", "NKW_PA_typ4" ], function(values) {
+				var weaponBE = calculateWeaponBE(values);
 
-        safeSetAttrs({ be_at_mod: weaponBE.be_at, be_pa_mod: weaponBE.be_pa });
-    });
+				safeSetAttrs({ be_at_mod: weaponBE.be_at, be_pa_mod: weaponBE.be_pa });
+		});
 });
 
 const combatTechniques = {
-    "anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
-    "armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
-    "belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
-    "blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
-    "bogen":               { type: "ranged", ebe: -3,        "at-only": true },
-    "diskus":              { type: "ranged", ebe: -2,        "at-only": true },
-    "dolche":              { type: "melee",  ebe: -1,        "at-only": false },
-    "fechtwaffen":         { type: "melee",  ebe: -1,        "at-only": false },
-    "hiebwaffen":          { type: "melee",  ebe: -4,        "at-only": false },
-    "infanteriewaffen":    { type: "melee",  ebe: -3,        "at-only": false },
-    "kettenstabe":         { type: "melee",  ebe: -1,        "at-only": false },
-    "kettenwaffen":        { type: "melee",  ebe: -3,        "at-only": false },
-    "lanzenreiten":        { type: "melee",  ebe: undefined, "at-only": false },
-    "peitsche":            { type: "melee",  ebe: -1,        "at-only": true },
-    "raufen":              { type: "melee",  ebe: 0,         "at-only": false },
-    "ringen":              { type: "melee",  ebe: 0,         "at-only": false },
-    "sabel":               { type: "melee",  ebe: -2,        "at-only": false },
-    "schleuder":           { type: "ranged", ebe: -2,        "at-only": true },
-    "schwerter":           { type: "melee",  ebe: -2,        "at-only": false },
-    "speere":              { type: "melee",  ebe: -3,        "at-only": false },
-    "stabe":               { type: "melee",  ebe: -2,        "at-only": false },
-    "wurfbeile":           { type: "ranged", ebe: -2,        "at-only": true },
-    "wurfmesser":          { type: "ranged", ebe: -3,        "at-only": true },
-    "wurfspeere":          { type: "ranged", ebe: -2,        "at-only": true },
-    "zweihandflegel":      { type: "melee",  ebe: -3,        "at-only": false },
-    "zweihand-hiebwaffen": { type: "melee",  ebe: -3,        "at-only": false },
-    "zweihandschwerter":   { type: "melee",  ebe: -2,        "at-only": false }
+		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
+		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
+		"belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
+		"blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
+		"bogen":               { type: "ranged", ebe: -3,        "at-only": true },
+		"diskus":              { type: "ranged", ebe: -2,        "at-only": true },
+		"dolche":              { type: "melee",  ebe: -1,        "at-only": false },
+		"fechtwaffen":         { type: "melee",  ebe: -1,        "at-only": false },
+		"hiebwaffen":          { type: "melee",  ebe: -4,        "at-only": false },
+		"infanteriewaffen":    { type: "melee",  ebe: -3,        "at-only": false },
+		"kettenstabe":         { type: "melee",  ebe: -1,        "at-only": false },
+		"kettenwaffen":        { type: "melee",  ebe: -3,        "at-only": false },
+		"lanzenreiten":        { type: "melee",  ebe: undefined, "at-only": false },
+		"peitsche":            { type: "melee",  ebe: -1,        "at-only": true },
+		"raufen":              { type: "melee",  ebe: 0,         "at-only": false },
+		"ringen":              { type: "melee",  ebe: 0,         "at-only": false },
+		"sabel":               { type: "melee",  ebe: -2,        "at-only": false },
+		"schleuder":           { type: "ranged", ebe: -2,        "at-only": true },
+		"schwerter":           { type: "melee",  ebe: -2,        "at-only": false },
+		"speere":              { type: "melee",  ebe: -3,        "at-only": false },
+		"stabe":               { type: "melee",  ebe: -2,        "at-only": false },
+		"wurfbeile":           { type: "ranged", ebe: -2,        "at-only": true },
+		"wurfmesser":          { type: "ranged", ebe: -3,        "at-only": true },
+		"wurfspeere":          { type: "ranged", ebe: -2,        "at-only": true },
+		"zweihandflegel":      { type: "melee",  ebe: -3,        "at-only": false },
+		"zweihand-hiebwaffen": { type: "melee",  ebe: -3,        "at-only": false },
+		"zweihandschwerter":   { type: "melee",  ebe: -2,        "at-only": false }
 }
 
 /*
@@ -3671,48 +3671,48 @@ function calculateWeaponBEModifiers(combatTechnique, BE) {
 	return BEModifiers;
 }
 /* 
-    Methode die die waffenspezifische BE berechnet und nach AT und PA getrennt zurückgibt. 
-    Benötigt
-    NKW_Aktiv 1-4
-    NKW_AT_typ 1-4
-    NKW_PA_typ 1-4
-    BE
+		Methode die die waffenspezifische BE berechnet und nach AT und PA getrennt zurückgibt. 
+		Benötigt
+		NKW_Aktiv 1-4
+		NKW_AT_typ 1-4
+		NKW_PA_typ 1-4
+		BE
 */
 function calculateWeaponBE(values) {
-    var weapon = 0;
-    var BEModifiers = { "be_at": 0, "be_pa": 0 };
+		var weapon = 0;
+		var BEModifiers = { "be_at": 0, "be_pa": 0 };
 
-    if (values["NKW_Aktiv1"] === "1") {
-        weapon = 1;
-    } else if (values["NKW_Aktiv2"] === "1") {
-        weapon = 2;
-    } else if (values["NKW_Aktiv3"] === "1") {
-        weapon = 3;
-    } else if (values["NKW_Aktiv4"] === "1") {
-        weapon = 4;
-    } else {
-        return BEModifiers;
-    }
-    var baseBE = values["BE"];
-    var atTyp = values["NKW_AT_typ" + weapon];
-    var paTyp = values["NKW_PA_typ" + weapon];
-    var combatTechnique = {};
+		if (values["NKW_Aktiv1"] === "1") {
+				weapon = 1;
+		} else if (values["NKW_Aktiv2"] === "1") {
+				weapon = 2;
+		} else if (values["NKW_Aktiv3"] === "1") {
+				weapon = 3;
+		} else if (values["NKW_Aktiv4"] === "1") {
+				weapon = 4;
+		} else {
+				return BEModifiers;
+		}
+		var baseBE = values["BE"];
+		var atTyp = values["NKW_AT_typ" + weapon];
+		var paTyp = values["NKW_PA_typ" + weapon];
+		var combatTechnique = {};
 
-    if (atTyp && atTyp !== "0" && atTyp !== 0) {
-        combatTechnique[ "AT" ] = atTyp.match("@\{AT_([^}]+)\}")[1].toLowerCase();
-    } 
-    if (paTyp && paTyp !== "0" && paTyp !== 0) {
-        combatTechnique[ "PA" ] = paTyp.match("@\{PA_([^}]+)\}")[1].toLowerCase();
-    }
+		if (atTyp && atTyp !== "0" && atTyp !== 0) {
+				combatTechnique[ "AT" ] = atTyp.match("@\{AT_([^}]+)\}")[1].toLowerCase();
+		} 
+		if (paTyp && paTyp !== "0" && paTyp !== 0) {
+				combatTechnique[ "PA" ] = paTyp.match("@\{PA_([^}]+)\}")[1].toLowerCase();
+		}
 
-    if (combatTechnique[ "AT" ] === combatTechnique[ "PA" ]) {
-        BEModifiers = calculateWeaponBEModifiers(combatTechnique["AT"], baseBE);
-    } else {
-        BEModifiers[ "be_at" ] = calculateWeaponBEModifiers(combatTechnique["AT"], baseBE)["be_at"];
-        BEModifiers[ "be_pa" ] = calculateWeaponBEModifiers(combatTechnique["PA"], baseBE)["be_pa"];
-    }
+		if (combatTechnique[ "AT" ] === combatTechnique[ "PA" ]) {
+				BEModifiers = calculateWeaponBEModifiers(combatTechnique["AT"], baseBE);
+		} else {
+				BEModifiers[ "be_at" ] = calculateWeaponBEModifiers(combatTechnique["AT"], baseBE)["be_at"];
+				BEModifiers[ "be_pa" ] = calculateWeaponBEModifiers(combatTechnique["PA"], baseBE)["be_pa"];
+		}
 
-    return BEModifiers;
+		return BEModifiers;
 }
 
 /*
@@ -3802,9 +3802,9 @@ on(
 "change:sf_linkhand change:sf_beidhandigerkampfI change:sf_beidhandigerkampfII change:vorteil_beidhaendig " +
 "change:sf_parierwaffeni change:sf_parierwaffenii " +
 "change:sf_schildkampfi change:sf_schildkampfii ", function(eventInfo) {
-    safeGetAttrs(["sf_linkhand", "sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
-        var caller = "???";
-        var attrsToChange = {};
+		safeGetAttrs(["sf_linkhand", "sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+				var caller = "???";
+				var attrsToChange = {};
 
 		// Caution: This might cause trouble if some function other than this one changed these attributes.
 		if (eventInfo.sourceType === "sheetworker")
@@ -3815,67 +3815,67 @@ on(
 		switch(eventInfo.sourceAttribute) {
 			case "sf_linkhand":
 				if (eventInfo.newValue === "0") {
-				    if (values["sf_parierwaffenII"] === "1") {
-				        attrsToChange["sf_parierwaffenII"] = "0";
-				    }
-				    if (values["sf_parierwaffenI"] === "1") {
-				        attrsToChange["sf_parierwaffenI"] = "0";
-				    }
-				    if (values["sf_schildkampfI"] === "1") {
-				        attrsToChange["sf_schildkampfI"] = "0";
-				    }
-				    if (values["sf_schildkampfII"] === "1") {
-				        attrsToChange["sf_schildkampfII"] = "0";
-				    }
+						if (values["sf_parierwaffenII"] === "1") {
+								attrsToChange["sf_parierwaffenII"] = "0";
+						}
+						if (values["sf_parierwaffenI"] === "1") {
+								attrsToChange["sf_parierwaffenI"] = "0";
+						}
+						if (values["sf_schildkampfI"] === "1") {
+								attrsToChange["sf_schildkampfI"] = "0";
+						}
+						if (values["sf_schildkampfII"] === "1") {
+								attrsToChange["sf_schildkampfII"] = "0";
+						}
 				}
 				break;
 			case "sf_parierwaffeni":
 				if (eventInfo.newValue === "1") {
-				    if (values["sf_linkhand"] === "0") {
-				        attrsToChange["sf_linkhand"] = "1";
-				    }
+						if (values["sf_linkhand"] === "0") {
+								attrsToChange["sf_linkhand"] = "1";
+						}
 				} else {
-				    if (values["sf_parierwaffenII"] === "1") {
-				        attrsToChange["sf_parierwaffenII"] = "0";
-				    }
+						if (values["sf_parierwaffenII"] === "1") {
+								attrsToChange["sf_parierwaffenII"] = "0";
+						}
 				}
 				break;
 			case "sf_parierwaffenii":
 				if (eventInfo.newValue === "1") {
-				    if (values["sf_linkhand"] === "0") {
-				        attrsToChange["sf_linkhand"] = "1";
-				    }
-				    if (values["sf_parierwaffenI"] === "0") {
-				        attrsToChange["sf_parierwaffenI"] = "1";
-				    }
+						if (values["sf_linkhand"] === "0") {
+								attrsToChange["sf_linkhand"] = "1";
+						}
+						if (values["sf_parierwaffenI"] === "0") {
+								attrsToChange["sf_parierwaffenI"] = "1";
+						}
 				}
 				break;
 			case "sf_schildkampfi":
 				if (eventInfo.newValue === "1") {
-				    if (values["sf_linkhand"] === "0") {
-				        attrsToChange["sf_linkhand"] = "1";
-				    }
+						if (values["sf_linkhand"] === "0") {
+								attrsToChange["sf_linkhand"] = "1";
+						}
 				} else {
-				    if (values["sf_schildkampfII"] === "1") {
-				        attrsToChange["sf_schildkampfII"] = "0";
-				    }
+						if (values["sf_schildkampfII"] === "1") {
+								attrsToChange["sf_schildkampfII"] = "0";
+						}
 				}
 				break;
 			case "sf_schildkampfii":
 				if (eventInfo.newValue === "1") {
-				    if (values["sf_linkhand"] === "0") {
-				        attrsToChange["sf_linkhand"] = "1";
-				    }
-				    if (values["sf_schildkampfI"] === "0") {
-				        attrsToChange["sf_schildkampfI"] = "1";
-				    }
+						if (values["sf_linkhand"] === "0") {
+								attrsToChange["sf_linkhand"] = "1";
+						}
+						if (values["sf_schildkampfI"] === "0") {
+								attrsToChange["sf_schildkampfI"] = "1";
+						}
 				}
 				break;
 		}
-        safeSetAttrs(attrsToChange, () => {
+				safeSetAttrs(attrsToChange, () => {
 			calculateCombatValues(eventInfo);
-        });
-    });
+				});
+		});
 });
 
 on(
@@ -3919,39 +3919,39 @@ on(
 "change:nkw3_schwellenwertkk change:nkw3_schwellenwert " +
 "change:nkw4_schwellenwertkk change:nkw4_schwellenwert", function(eventInfo) {
 
-    var weaponsToCalculate = [];
-    let attrsToGet = [ "KK", "KK_Basis", "KK_mod" ];
+		var weaponsToCalculate = [];
+		let attrsToGet = [ "KK", "KK_Basis", "KK_mod" ];
 
-    // Gather all affected melee weapons (NKW)
-    // Changes to KK (strength) can affect all weapons
-    // Compare with lowercase as all attribute names are lowercase in eventInfo
-    if (eventInfo.sourceAttribute === "kk") {
-        for (var weapon = 1; weapon <= 4; weapon++) {
-            weaponsToCalculate.push(weapon);
-            attrsToGet.push("NKW" + weapon + "_Schwellenwert");
-            attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
-        }
-    // Use the slot (number) of the weapon which just got changed
-    } else {
-        let matchResult = eventInfo.sourceAttribute.match(/nkw(\d)_.*/i);
-        let weapon = matchResult[1];
-        weaponsToCalculate.push(weapon);
-        attrsToGet.push("NKW" + weapon + "_Schwellenwert");
-        attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
-    }
+		// Gather all affected melee weapons (NKW)
+		// Changes to KK (strength) can affect all weapons
+		// Compare with lowercase as all attribute names are lowercase in eventInfo
+		if (eventInfo.sourceAttribute === "kk") {
+				for (var weapon = 1; weapon <= 4; weapon++) {
+						weaponsToCalculate.push(weapon);
+						attrsToGet.push("NKW" + weapon + "_Schwellenwert");
+						attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
+				}
+		// Use the slot (number) of the weapon which just got changed
+		} else {
+				let matchResult = eventInfo.sourceAttribute.match(/nkw(\d)_.*/i);
+				let weapon = matchResult[1];
+				weaponsToCalculate.push(weapon);
+				attrsToGet.push("NKW" + weapon + "_Schwellenwert");
+				attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
+		}
 
-    safeGetAttrs(attrsToGet, function(values) {
+		safeGetAttrs(attrsToGet, function(values) {
 		// Prepare against NaN KK
 		if (isNaN(values["KK"])) {
 			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
 		}
-        let attrsToChange = {};
-        for (var i = 0; i < weaponsToCalculate.length; i++) {
-            let weapon = weaponsToCalculate[i];
-            attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, weapon);
-        }
-        safeSetAttrs(attrsToChange);
-    })
+				let attrsToChange = {};
+				for (var i = 0; i < weaponsToCalculate.length; i++) {
+						let weapon = weaponsToCalculate[i];
+						attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, weapon);
+				}
+				safeSetAttrs(attrsToChange);
+		})
 });
 
 /* TP/KK modifies (usually only) TP, but sometimes also AT and PA
@@ -3989,12 +3989,12 @@ Algorithm
 
 Example TP/KK = 10/3
 Str. Dif. Flo. Res.
-  4   -6    2   -2
-  5   -5    1   -1
-  6   -4    1   -1
-  7   -3    1   -1
-  8   -2    0    0
-  9   -1    0    0
+	4   -6    2   -2
+	5   -5    1   -1
+	6   -4    1   -1
+	7   -3    1   -1
+	8   -2    0    0
+	9   -1    0    0
  10    0    0    0
  11    1    0    0
  12    2    0    0
@@ -4007,13 +4007,13 @@ Str. Dif. Flo. Res.
 
 // Special version
 function calculateTpKKModFromValuesAndWeaponNumber(values, weapon) {
-    const func = "calculateTpKKModFromValuesAndWeaponNumber";
-    let KK = parseInt(values["KK"]);
-    let threshold = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
-    let step = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
+		const func = "calculateTpKKModFromValuesAndWeaponNumber";
+		let KK = parseInt(values["KK"]);
+		let threshold = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
+		let step = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
 
-    var tpkkMod = calculateTpKKMod(KK, threshold, step);
-    return tpkkMod;
+		var tpkkMod = calculateTpKKMod(KK, threshold, step);
+		return tpkkMod;
 }
 
 // General version
@@ -4045,43 +4045,43 @@ function calculateTpKKMod(KK, threshold, step) {
 
 // calculate shield attack modifier
 on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:at_raufen change:at_mod_wounds", function(eventInfos) {
-    safeGetAttrs(["activeShieldRowId"], function(rowIdValues) {
-        var caller = "???";
-        var activeShieldRowId = rowIdValues["activeShieldRowId"];
-        if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
-            if (eventInfos.newValue === "on") {
-                activeShieldRowId = extractRowId(eventInfos.sourceAttribute);
-            } else if (eventInfos.sourceType === "player") {
-                activeShieldRowId = undefined;
-            }
-        }
+		safeGetAttrs(["activeShieldRowId"], function(rowIdValues) {
+				var caller = "???";
+				var activeShieldRowId = rowIdValues["activeShieldRowId"];
+				if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
+						if (eventInfos.newValue === "on") {
+								activeShieldRowId = extractRowId(eventInfos.sourceAttribute);
+						} else if (eventInfos.sourceType === "player") {
+								activeShieldRowId = undefined;
+						}
+				}
 
-        let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag", "AT_raufen", "AT_mod_wounds"]
+				let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag", "AT_raufen", "AT_mod_wounds"]
 
-        // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-        if (activeShieldRowId) {
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
-        } else {
-            debugLog(caller, "no active shield found");
-            safeSetAttrs({
+				// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+				if (activeShieldRowId) {
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
+				} else {
+						debugLog(caller, "no active shield found");
+						safeSetAttrs({
 				"shield_at": 0,
 				"shield_at_available": "0",
 				"shield_at_mod": 0
 			});
-            return;
-        }
+						return;
+				}
 
-        safeGetAttrs(variablesToGet, function(values) {
-            let result = calculateShieldAttack(values, activeShieldRowId);
-            debugLog(caller, 'calculated shield attack');
-            debugLog(caller, result);
-            safeSetAttrs(result);
-        });
+				safeGetAttrs(variablesToGet, function(values) {
+						let result = calculateShieldAttack(values, activeShieldRowId);
+						debugLog(caller, 'calculated shield attack');
+						debugLog(caller, result);
+						safeSetAttrs(result);
+				});
 
-    });
+		});
 });
 
 function calculateShieldAttack(values, activeShieldRowId) {
@@ -4163,33 +4163,33 @@ on(
 
 		// Activation/Deactivation logic for ambidextrous fighting
 		if (
-			   eventInfos["sourceAttribute"] === "sf_beidhandigerkampfii"
+				 eventInfos["sourceAttribute"] === "sf_beidhandigerkampfii"
 			&& eventInfos["newValue"] === "1"
 		) {
 			attrsToChange["sf_linkhand"] = "1";
 			attrsToChange["sf_beidhandigerkampfI"] = "1";
 		}
 		if (
-			   eventInfos["sourceAttribute"] === "sf_beidhandigerkampfi"
+				 eventInfos["sourceAttribute"] === "sf_beidhandigerkampfi"
 			&& eventInfos["newValue"] === "1"
 		) {
 			attrsToChange["sf_linkhand"] = "1";
 		}
 		if (
-			   eventInfos["sourceAttribute"] === "sf_linkhand"
+				 eventInfos["sourceAttribute"] === "sf_linkhand"
 			&& eventInfos["newValue"] === "0"
 		) {
 			attrsToChange["sf_beidhandigerkampfI"] = "0";
 			attrsToChange["sf_beidhandigerkampfII"] = "0";
 		}
 		if (
-			   eventInfos["sourceAttribute"] === "sf_beidhandigerkampfi"
+				 eventInfos["sourceAttribute"] === "sf_beidhandigerkampfi"
 			&& eventInfos["newValue"] === "0"
 		) {
 			attrsToChange["sf_beidhandigerkampfII"] = "0";
 		}
 
-    safeGetAttrs(attrs, function(values) {
+		safeGetAttrs(attrs, function(values) {
 			const ambidextrous = values["vorteil_beidhaendig"];
 			const lefthandedFighting = values["sf_linkhand"];
 			const ambidextrousFighting1 = values["sf_beidhandigerkampfI"];
@@ -4211,7 +4211,7 @@ on(
 			}
 			debugLog(func, "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
-    });
+		});
 });
 
 /* 
@@ -4498,11 +4498,11 @@ function debugLog(caller, ...args) {
 Base64 is compatible with Roll20's strings. In order to push data from one roll to the next, conversion to and from Base64 is used.
 */
 function base64EncodeUTF8(str) {
-  return btoa(encodeURIComponent(str));
+	return btoa(encodeURIComponent(str));
 }
 
 function base64DecodeUTF8(str) {
-  return decodeURIComponent(atob(str));
+	return decodeURIComponent(atob(str));
 }
 
 /*
@@ -4581,12 +4581,12 @@ function nestRollMacro(rollMacro, level) {
 		level -= 1;
 		if (level > 0) {
 			rollMacro = replacer(rollMacro, level);
-        }
+				}
 		return rollMacro;
-     }
+		 }
 
-     result = replacer(rollMacro, level);
-     return result;
+		 result = replacer(rollMacro, level);
+		 return result;
 }
 
 /*
@@ -5503,12 +5503,12 @@ function DSAsane (value, type) {
 			// Limited set of combat techniques to choose from
 			// Must be within the set
 			const meleeCombatTechniques = [
-			    "anderthalbhander", "dolche",              "fechtwaffen",
-			    "hiebwaffen",       "infanteriewaffen",    "kettenstabe",
-			    "kettenwaffen",     "lanzenreiten",        "peitsche",
-			    "raufen",           "ringen",              "sabel",
-			    "schwerter",        "speere",              "stabe",
-			    "zweihandflegel",   "zweihand-hiebwaffen", "zweihandschwerter"
+					"anderthalbhander", "dolche",              "fechtwaffen",
+					"hiebwaffen",       "infanteriewaffen",    "kettenstabe",
+					"kettenwaffen",     "lanzenreiten",        "peitsche",
+					"raufen",           "ringen",              "sabel",
+					"schwerter",        "speere",              "stabe",
+					"zweihandflegel",   "zweihand-hiebwaffen", "zweihandschwerter"
 			];
 			const stringValue = String(value);
 			if (meleeCombatTechniques.includes(stringValue.toLowerCase()) === false) {
