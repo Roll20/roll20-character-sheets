@@ -1,5 +1,15 @@
 Change Log
 ==============================================
+**2023-09-04 ** v.85 Chuz (James Culp)
+	New Feature - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
+	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.
+	Bugfix - GM Helper sheet, incrementing OS using the + button was doing strange things, this has been fixed.
+**2023-07-10 ** v.84 Chuz (James Culp)
+	Bugfix - AoE Spells weren't adding the right amount of drain for 12m and 14m
+	Bugfix - Attribute+Attribute selections were missing Strength
+	New Feature - skill mods in the repeating skill list now should update those skills everywhere in the sheet.
+	Bugfix - Sprint rolls now include -1 skill modifier if the PC doesn't have an Athletics skill.  Also added a function to resynch the hidden skill attributes any time a skill name is changed (via the drop down changing) or a skill is deleted.
+	Bugfix - Fixed the increment button on the OS Tracker it now adds 1 instead of concatenating a 1 after the other digits sometimes.
 **2023-06-15 ** v.83 Chuz (James Culp)
 	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
 	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
