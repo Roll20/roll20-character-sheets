@@ -2,6 +2,7 @@
 <input type="hidden" class="sheet-npc-powers-boolean" name="attr_npc_powers"/>
 <input type="hidden" class="sheet-wounding-boolean" name="attr_wounding_rules"/>
 <input type="hidden" class="sheet-legacy-freight-boolean" name="attr_legacy_freight"/>
+<input type="hidden" class="sheet-subsidizedtrade-boolean" name="attr_subsidizedtrade"/>
 <input type="hidden" name="attr_alt_rolltemplate_val" value=""/>
 <div class="sheet-settings">
     <span data-i18n="settings-u"></span>
@@ -2691,7 +2692,7 @@
                     <option value="@{mod-Dexterity}" data-i18n="skilldexterityoption-u">Dexterity</option>
                 </select> <input class="sheet-input" type="text" name="attr_weapon_damage-1"/>
                 <input class="sheet-input" type="number" name="attr_weapon_tl-1" value="0"/>
-                <input class="sheet-input" type="text" name="attr_weapon_range-1" value="0""/>
+                <input class="sheet-input" type="text" name="attr_weapon_range-1" value="0"/>
                 <input class="sheet-input" type="number" name="attr_weapon_weight-1" value="0" step="0.05"/>
                 <input class="sheet-input" type="text" name="attr_weapon_magazine-1" value="0"/>
                 <textarea class="sheet-input sheet-laf-wauto" name="attr_weapon_note-1"></textarea>
@@ -2783,6 +2784,15 @@
         <button class="sheet-laf-initbutton btn ui-draggable sheet-wide-button" type="roll" name="roll_initiative" value="@{whispertoggle} &{template:skill-general@{alt_rolltemplate_val}} {{skill=^{initiative-u}}} {{character= @{character_name} }} @{ro_default_rolltype}+@{animal_initmod}+@{initiative_effect} @{ro_default_mod} &{tracker}]]}}">
             <div class="sheet-button_header">Roll Initiative (Select Token)</div>
         </button>
+    </div>
+    <br>
+    <div class="sheet-redborder sheet-laf-centredgrid sheet-laf-animal">
+        <div>
+            <span class="sheet-header sheet-shipcomponent" data-i18n="description-u">Notes</span>
+        </div>
+        <div>
+            <textarea class="sheet-laf-width-99" name="attr_animal_notes"></textarea>
+        </div>
     </div>
 </div>
 <div class="sheet-tab-content sheet-ship">
@@ -3282,7 +3292,7 @@
             <span class="sheet-header sheet-shipcomponent" data-i18n="description-u">Description</span>
         </div>
         <div>
-            <textarea class="sheet-laf-width-99" name="attr_ship_description"></textarea>
+            <textarea class="sheet-laf-width-99" style="height: 150px;" name="attr_ship_description"></textarea>
         </div>
     </div>
 </div>
@@ -3497,12 +3507,18 @@
         <input type="checkbox" name="attr_cargomanifest_show" class="sheet-hider sheet-crate" value="1" checked>
         <span></span>
         <div class="sheet-body sheet-slidein sheet-speculativegoods">
-            <div class="sheet-groupfunds">
-                <h3>Group Funds: Cr</h3>
-                <input name="attr_group_funds" type="number" value="0">
+            <div class="sheet-groupfunds sheet-redborder" style="width: 98%; margin-left: auto; margin-right: auto;">
+                <h3>Operating Fund: Cr</h3>
+                <input name="attr_group_funds" class="sheet-bold" type="text" value="0">
                 <input name="attr_speculative_sg_tons_total" type="number" value="0" class="sheet-hidden">
                 <input name="attr_speculative_fg_tons_total" type="number" value="0" class="sheet-hidden">
                 <input name="attr_speculative_og_tons_total" type="number" value="0" class="sheet-hidden">
+                <h3>Subsidized:&nbsp;</h3>
+                <input type="checkbox" name="attr_subsidizedtrade" value="1">
+                <div class="sheet-subsidizedtrade">
+                    <h3>Ship's Fund: Cr&nbsp;</h3>
+                    <input name="attr_ships_funds" class="sheet-bold" type="text" value="0">
+                </div>
             </div>
             <br>
             <div class="sheet-speculativegoods-row-pg">
@@ -4663,6 +4679,7 @@
                     <span class="sheet-bold">Population</span>
                     <br>
                     <input type="number" class="sheet-input sheet-bold" name="attr_speculative_sale_population" value="0" min="0" max="12">
+                    <br>
                     <span class="sheet-bold">Law Level</span>
                     <br>
                     <input type="number" class="sheet-input sheet-bold" name="attr_speculative_sale_lawlevel" value="0" min="0" max="18">
@@ -4852,7 +4869,7 @@
                     <th colspan="4">{{character}}</th>
                 </tr>
                 <tr class="sheet-rolltemplate-alt-power">
-                    <td colspan="4" >{{power}} {{spec}}</td>
+                    <td colspan="4">{{power}} {{spec}}</td>
                 </tr>
                 <tr>
                     {{#rollhasboon}}
@@ -4864,14 +4881,14 @@
                 </tr>
                 <tr>
                     <td colspan="4">Power: {{roll}}</td>
-<!--                    <td colspan="2">Effect: {{rolleffect}}</td>-->
+                    <!--                    <td colspan="2">Effect: {{rolleffect}}</td>-->
                 </tr>
             </table>
         </div>
-    </rolltemplate> 
-        
-    <rolltemplate class="sheet-rolltemplate-range">
-        <table class="sheet-range">
+    </rolltemplate>
+
+    <rolltemplate class="sheet-rolltemplate-combat">
+        <table class="sheet-combat">
             <tr>
                 <th colspan="4">{{weapon}}</th>
             </tr>
@@ -4888,8 +4905,8 @@
             </tr>
             {{/rollhasbane}}
             <tr>
-                <td><span data-i18n="attack-u">Attack</span></td>
-                <td>{{roll}}</td>
+                <td><span data-i18n="attack-u">Attack</span> <span>[Effect]</span></td>
+                <td>{{roll}} [{{computed::effect}}]</td>
             </tr>
             {{#bb}}
             <tr>
@@ -4907,7 +4924,7 @@
         </table>
     </rolltemplate>
 
-    <rolltemplate class="sheet-rolltemplate-range-alt">
+    <rolltemplate class="sheet-rolltemplate-combat-alt">
         <div class="sheet-rolltemplate-alt">
             <table>
                 <tr>
@@ -4923,14 +4940,11 @@
                 <td colspan="4">Rolling with BANE</td>
                 {{/rollhasbane}}
                 <tr>
-                    <td colspan="4">Attack: {{roll}}</td>
-<!--                    <td colspan="2">Effect: {{rolleffect}}</td>-->
+                    <td colspan="4">Attack: {{roll}} Effect: [{{computed::effect}}]</td>
+                    <!--                    <td colspan="2">Effect: {{rolleffect}}</td>-->
                 </tr>
                 <tr>
                     <td colspan="4">Damage: {{computed::damage}}</td>
-                </tr>
-                <tr>
-                    <td colspan="4">{{note}}</td>
                 </tr>
             </table>
         </div>
@@ -4948,7 +4962,7 @@
             <tr>
                 <td colspan="2"><span data-i18n="rollwithboon-u">Rolling with BOON</span></td>
             </tr>
-            {{/rollhasboon}} 
+            {{/rollhasboon}}
             {{#rollhasbane}}
             <tr>
                 <td colspan="2"><span data-i18n="rollwithbane-u">Rolling with BANE</span></td>
@@ -6115,8 +6129,7 @@
 
                     const wD = formatWeaponDamage(values["weapon_damage-" + weapon]);
 
-                    //startRoll("@{whispertoggle}&{template:range@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=@{weapon_name-" + weapon + "}}}  @{ro_default_rolltype} + @{weapon_DM-" + weapon + "}[DM] + @{weapon_skill-" + weapon + "}[Skill] @{ro_default_mod}]]}} {{damage=[[@{weapon_damage-" + weapon + "}]]}} {{effect=''}} {{range=@{weapon_range-" + weapon + "}}}", (results) => {
-                    startRoll("@{whispertoggle}&{template:range@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=@{weapon_name-" + weapon + "}}}  @{ro_default_rolltype} + @{weapon_DM-" + weapon + "}[DM] + @{weapon_skill-" + weapon + "}[Skill] @{ro_default_mod}]]}} {{damage=[[" + wD.weaponDamage + "]]}} {{effect=''}} {{range=@{weapon_range-" + weapon + "}}}", (results) => {
+                    startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=@{weapon_name-" + weapon + "}}} {{effect=[[0D6]]}} @{ro_default_rolltype} + @{weapon_DM-" + weapon + "}[DM] + @{weapon_skill-" + weapon + "}[Skill] @{ro_default_mod}]]}} {{damage=[[" + wD.weaponDamage + "]]}} {{effect=''}} {{range=@{weapon_range-" + weapon + "}}}", (results) => {
                         const toHit = results.results.roll.result;
                         var damage = results.results.damage.result
 
@@ -6153,7 +6166,7 @@
 
                 const wD = formatWeaponDamage(values[weaponDamage]);
 
-                startRoll("@{whispertoggle}&{template:range@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=@{" + weaponName + "}}}  @{ro_default_rolltype} + @{" + weaponDM + "}[DM] + @{" + weaponSkill + "}[Skill] @{ro_default_mod}]]}}  {{damage=[[" + wD.weaponDamage + "]]}} {{range=@{" + weaponRange + "}}}", (results) => {
+                startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=@{" + weaponName + "}}} {{effect=[[0D6]]}} @{ro_default_rolltype} + @{" + weaponDM + "}[DM] + @{" + weaponSkill + "}[Skill] @{ro_default_mod}]]}}  {{damage=[[" + wD.weaponDamage + "]]}} {{range=@{" + weaponRange + "}}}", (results) => {
                     const toHit = results.results.roll.result;
                     var damage = results.results.damage.result
                     var effect = 0;
@@ -6210,21 +6223,30 @@
 
         // Update group funds, we may call this from somehwere we are doing a getAttrs, so current total
         // could be provided, if not, we get it
-        function updateGroupFunds(updateBy, currentTotal) {
+        function updateGroupFunds(updateBy, groupFunds, shipsFunds, subsidizedTrade) {
 
-            console.log("MgT2E: Update group funds: Update by:" + updateBy + ", current total: " + currentTotal);
+            console.log("MgT2E: Update group/ships funds: Update by:" + updateBy + ", group funds: " + groupFunds + ", ships funds: " + shipsFunds + ", subsidized: " + subsidizedTrade);
 
-            var newTotal = 0;
-            if(currentTotal !== undefined) {
-                newTotal = +updateBy + +currentTotal;
-                setAttrs({group_funds: newTotal});
+            if(subsidizedTrade === "1") {
+                if(shipsFunds !== undefined) {
+                    setAttrs({ships_funds: +updateBy + +shipsFunds});
+                }
+                else {
+                    getAttrs(["ships_funds"], function(value) {
+                        setAttrs({ships_funds: +value.ships_funds + +updateBy});
+                    });
+                }
             }
             else {
-                getAttrs(["group_funds"], function(value) {
-                    setAttrs({group_funds: +value.groupFunds + +updateBy});
-                });
+                if(groupFunds !== undefined) {
+                    setAttrs({group_funds: +updateBy + +groupFunds});
+                }
+                else {
+                    getAttrs(["group_funds"], function(value) {
+                        setAttrs({group_funds: +value.group_funds + +updateBy});
+                    });
+                }
             }
-            setAttrs();
         }
 
         // We will keep a log of major operations for diagnostic purposes and blank this out on sheet:open
@@ -6506,13 +6528,12 @@
 
             addTradeLogMessage("MgT2E: In Passenger Take: " + JSON.stringify(info), true);
 
-            var attrs = [];
+            var attrs = ["group_funds", "ships_funds", "subsidizedtrade"];
             var attrsToSet = {};
             ["high", "medium", "basic", "low"].forEach(key => {
                 attrs.push("passengers_" + key + "_num_take");
                 attrs.push("passengers_" + key + "_cost");
             });
-            attrs.push("group_funds");
 
             var passengersTaken = 0;
             getAttrs(attrs, function(value) {
@@ -6523,8 +6544,8 @@
 
                     var k = key.toLowerCase();
                     var passengersToTake = +value["passengers_" + k + "_num_take"];
-                    passengersTaken += passengersToTake
-                    var cash = Math.round(passengersToTake * +value["passengers_" + k + "_cost"])
+                    passengersTaken += passengersToTake;
+                    var cash = Math.round(passengersToTake * +value["passengers_" + k + "_cost"]);
                     attrsToSet["passengers_" + k + "_num_taken"] = +value["passengers_" + k + "_num_take"];
                     profit += cash;
                     if(cash > 0) {
@@ -6535,7 +6556,6 @@
 
                 // Check we actually selected some passengers to take!
                 if(passengersTaken === 0) {
-
                     addTradeLogMessage("- NO passengers taken", true);
                     return;
                 }
@@ -6546,7 +6566,13 @@
                 // Chat this out, then update group funds
                 startRoll("&{template:trade-broker@{alt_rolltemplate_val}} {{header=Passengers Taken}} {{message=Cr" + profit + " Received}} {{roll=" + (msg === "()" ? "" : msg) + "}}", (results) => {
 
-                    updateGroupFunds(profit, +value.group_funds);
+                    updateGroupFunds(profit, +value.group_funds, +value.ships_funds, value.subsidizedtrade);
+                    // Zero out values
+                    ["high", "medium", "basic", "low"].forEach(key => {
+                        attrsToSet["passengers_" + key + "_num_take"] = 0;
+                        attrsToSet["passengers_" + key + "_num_available"] = 0;
+                        attrsToSet["passengers_" + key + "_cost"] = 0;
+                    });
                     setAttrs(attrsToSet);
 			        finishRoll(results.rollId, {});
 			    });
@@ -7082,7 +7108,8 @@
             addTradeLogMessage("MgT2E: In Freight Deliver: " + JSON.stringify(info), true);
 
             // Iterate through the hold finding any rows with keys that start with "0"
-            var keyAttrs = [];
+            var keyAttrs = ["group_funds", "freight_late", "ships_funds", "subsidizedtrade"];
+
             getSectionIDs("repeating_speculative-freight-goods", function(idArray) {
 
                 if(idArray.length === 0) {
@@ -7099,8 +7126,6 @@
                     attr = "repeating_speculative-freight-goods_" + idArray[i] + "_speculative_fg_baseprice";
                     keyAttrs.push(attr);
                 }
-                keyAttrs.push("group_funds");
-                keyAttrs.push("freight_late");
 
                 // Gather the attributes we need
                 getAttrs(keyAttrs, function(value) {
@@ -7134,7 +7159,8 @@
                             profit = Math.round((1-((results.results.roll.result+4)*0.1)) * profit);
                             addTradeLogMessage("- Late delivery: late charge: " + lateCharge + "%, profit: " + profit, true);
                         }
-                        updateGroupFunds(profit, +value.group_funds);
+                        updateGroupFunds(profit, +value.group_funds, +value.ships_funds, value.subsidizedtrade);
+
                         var msg = "";
                         if(lateCharge > 0) {
                             msg = "Late Charge: Cr" + (origProfit - profit) + " (" + lateCharge + "%)";
@@ -9181,18 +9207,21 @@
 
                 const wD = formatWeaponDamage(v[damage]);
 
-                startRoll("@{whispertoggle}&{template:range@{alt_rolltemplate_val}} {{character=" + v.animal_name + "}} {{weapon=" + v[name] + "}}  @{ro_default_rolltype} + " + v[attackMod] + " @{ro_default_mod}]]}}  {{damage=[[" + wD.weaponDamage + "]]}}", (results) => {
+                startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=" + v.animal_name + "}} {{weapon=" + v[name] + "}} {{effect=[[0D6]]}}  @{ro_default_rolltype} + " + v[attackMod] + " @{ro_default_mod}]]}}  {{damage=[[" + wD.weaponDamage + "]]}}", (results) => {
                     const toHit = results.results.roll.result;
-                    var damage = results.results.damage.result
+                    var damage = results.results.damage.result;
+                    var effect = results.results.effect.result;
                     if(toHit > 8 && !wD.isDestructive) {
                         damage += (toHit - 8);
+                        effect = toHit - 8;
                     }
 
                     finishRoll(
                         results.rollId,
                         {
                             roll: toHit,
-                            damage: damage
+                            damage: damage,
+                            effect: effect
                         }
                     );
                 });
@@ -9320,7 +9349,7 @@
                         weaponDamage = weaponDamage.replace("DD", "D6*10");
                     }
 
-                    startRoll("@{whispertoggle}&{template:range@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=" + mountName + ":" + weaponType + "}}  @{ro_default_rolltype} + " + gunnerDM + " + " + dexMod + " + " + customMod + " @{ro_default_mod}]]}} {{damage=[[" + weaponDamage + "]]}}", (results) => {
+                    startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=" + mountName + ":" + weaponType + "}}  @{ro_default_rolltype} + " + gunnerDM + " + " + dexMod + " + " + customMod + " @{ro_default_mod}]]}} {{damage=[[" + weaponDamage + "]]}}", (results) => {
                         const toHit = results.results.roll.result;
                         var damage = results.results.damage.result
 
@@ -9476,188 +9505,193 @@
                         gunnerDM = 0;
                     }
 
-                    startRoll("@{whispertoggle}&{template:range@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=" + hpName + ":" + weaponType + (+numWeapons == 1 ? "" : " x " + numWeapons) + "}}  @{ro_default_rolltype} + " + gunnerDM + " + " + dexMod + " + " + customMod + " @{ro_default_mod}]]}} {{damage=[[" + weaponDamage + " + " + damageMod + "]]}}", (results) => {
-                    const toHit = results.results.roll.result;
-                    var damage = results.results.damage.result
+                    const wD = formatWeaponDamage(weaponDamage);
 
-                    finishRoll(
-                        results.rollId,
-                        {
-                            roll: toHit,
-                            damage: damage,
+                    startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=" + hpName + ":" + weaponType + (+numWeapons == 1 ? "" : " x " + numWeapons) + "}} {{effect=[[0D6]]}} @{ro_default_rolltype} + " + gunnerDM + " + " + dexMod + " + " + customMod + " @{ro_default_mod}]]}} {{damage=[[" + weaponDamage + " + " + damageMod + "]]}}", (results) => {
+
+                        const toHit = results.results.roll.result;
+                        var damage = results.results.damage.result;
+                        var effect = results.results.effect.result;
+                        if(toHit > 8 && !wD.isDestructive) {
+                            damage += (toHit - 8);
+                            effect = toHit - 8;
                         }
-                    );
-                });
+
+                        finishRoll(
+                            results.rollId,
+                            {
+                                roll: toHit,
+                                damage: damage,
+                                effect: effect
+                            }
+                        );
+                    });
                 });
             });
         });
 
+        /*
+        * Charactermancer stuff
+        */
 
-      /*
-       * Charactermancer stuff
-       */
-
-      const charmancerRollValues = ['charmancer_roll1', 'charmancer_roll2', 'charmancer_roll3',
-                                    'charmancer_roll4', 'charmancer_roll5', 'charmancer_roll6'];
+        const charmancerRollValues = ['charmancer_roll1', 'charmancer_roll2', 'charmancer_roll3',
+                                      'charmancer_roll4', 'charmancer_roll5', 'charmancer_roll6'];
 
 
-      const charmancerRollAssignments = ['charmancer_roll1_assignment', 'charmancer_roll2_assignment',
-                                         'charmancer_roll3_assignment', 'charmancer_roll4_assignment',
-                                         'charmancer_roll5_assignment', 'charmancer_roll6_assignment'];
+        const charmancerRollAssignments = ['charmancer_roll1_assignment', 'charmancer_roll2_assignment',
+                                           'charmancer_roll3_assignment', 'charmancer_roll4_assignment',
+                                           'charmancer_roll5_assignment', 'charmancer_roll6_assignment'];
 
-      on('sheet:opened', function(eventInfo) {
-          showOrHideRollStats();
-      });
-
-      stats.forEach(stat => {
-          on(`change:base-${stat.toLowerCase()}`, showOrHideRollStats);
-      });
-
-      function showOrHideRollStats() {
-          const baseStats = stats.map(stat => `base-${stat}`);
-          getAttrs(baseStats, hash => {
-              const sum     = Object.values(hash).reduce((a,b) => parseInt(a)+parseInt(b));
-              const element = $20("button.sheet-roll_stats");
-              if(sum == 0) {
-                  element.removeClass('sheet-hidden');
-              } else {
-                  element.addClass('sheet-hidden');
-              }
-
-          });
-      }
-
-      function toggleRollStatsPanel() {
-        $20('div.sheet-characteristics-wrapper,div.sheet-charmancer_stats-wrapper').toggleClass('sheet-hidden');
-      }
-
-      function ensureAge18() {
-        // set age to 18 if it's unset
-        getAttrs(["character_age"], (stats) => {
-            if(stats.character_age == "") {
-                setAttrs({"character_age": 18});
-            }
+        on('sheet:opened', function(eventInfo) {
+            showOrHideRollStats();
         });
-      }
 
-      function resetRollAssignments() {
-        var newAttrs = {};
-        for(let ii=0; ii<6 ;ii++) {
-          newAttrs[charmancerRollAssignments[ii]] = `base-${stats[ii]}`;
-        }
-        setAttrs(newAttrs);
-      }
+        stats.forEach(stat => {
+            on(`change:base-${stat.toLowerCase()}`, showOrHideRollStats);
+        });
 
-      on('clicked:roll-stats', function(eventInfo) {
-        ensureAge18();
-        resetRollAssignments();
-        toggleRollStatsPanel();
-      });
-
-      on('clicked:generate-stats', function(eventInfo) {
-          getAttrs(['charmancer_roll_method'], (generator) => {
-              const method = generator['charmancer_roll_method'];
-
-              var template = ['&{template:default}'];
-
-              if(method == 'yolo') {
-                  template.push('{{name=Generate Characteristics (YOLO)}}');
-                  template.push('{{STR=[[2d6]]}}');
-                  template.push('{{DEX=[[2d6]]}}');
-                  template.push('{{END=[[2d6]]}}');
-                  template.push('{{INT=[[2d6]]}}');
-                  template.push('{{EDU=[[2d6]]}}');
-                  template.push('{{SOC=[[2d6]]}}');
-              } else {
-                  template.push(`{{name=Generate Characteristics (${method.substring(2, method.length-2)})}}`);
-                  for(let ii=1; ii < 7; ii++) {
-                      template.push(`{{roll ${ii}=${method}}}`);
-                  }
-              }
-
-              startRoll(template.join(' '), (results) => {
-                const rolls = results.results;
-
-                finishRoll(results.rollId, rolls);
-
-                if(method == 'yolo') {
-                  setAttrs({
-                    'base-Strength':  rolls.STR.result,
-                    'base-Dexterity': rolls.DEX.result,
-                    'base-Endurance': rolls.END.result,
-                    'base-Intellect': rolls.INT.result,
-                    'base-Education': rolls.EDU.result,
-                    'base-Social':    rolls.SOC.result,
-                  }, toggleRollStatsPanel);
-
+        function showOrHideRollStats() {
+            const baseStats = stats.map(stat => `base-${stat}`);
+            getAttrs(baseStats, hash => {
+                const sum = Object.values(hash).reduce((a,b) => parseInt(a)+parseInt(b));
+                const element = $20("button.sheet-roll_stats");
+                if(sum == 0) {
+                    element.removeClass('sheet-hidden');
                 } else {
-                  setAttrs({
-                    'charmancer_roll1': rolls['roll 1'].result,
-                    'charmancer_roll2': rolls['roll 2'].result,
-                    'charmancer_roll3': rolls['roll 3'].result,
-                    'charmancer_roll4': rolls['roll 4'].result,
-                    'charmancer_roll5': rolls['roll 5'].result,
-                    'charmancer_roll6': rolls['roll 6'].result
-                  });
+                    element.addClass('sheet-hidden');
                 }
+          });
+        }
+
+        function toggleRollStatsPanel() {
+            $20('div.sheet-characteristics-wrapper,div.sheet-charmancer_stats-wrapper').toggleClass('sheet-hidden');
+        }
+
+        function ensureAge18() {
+            // set age to 18 if it's unset
+            getAttrs(["character_age"], (stats) => {
+                if(stats.character_age == "") {
+                    setAttrs({"character_age": 18});
+                }
+            });
+        }
+
+        function resetRollAssignments() {
+            var newAttrs = {};
+            for(let ii=0; ii<6 ;ii++) {
+                newAttrs[charmancerRollAssignments[ii]] = `base-${stats[ii]}`;
+            }
+            setAttrs(newAttrs);
+        }
+
+        on('clicked:roll-stats', function(eventInfo) {
+            ensureAge18();
+            resetRollAssignments();
+            toggleRollStatsPanel();
+        });
+
+        on('clicked:generate-stats', function(eventInfo) {
+            getAttrs(['charmancer_roll_method'], (generator) => {
+                const method = generator['charmancer_roll_method'];
+
+                var template = ['&{template:default}'];
+
+                    if(method == 'yolo') {
+                      template.push('{{name=Generate Characteristics (YOLO)}}');
+                      template.push('{{STR=[[2d6]]}}');
+                      template.push('{{DEX=[[2d6]]}}');
+                      template.push('{{END=[[2d6]]}}');
+                      template.push('{{INT=[[2d6]]}}');
+                      template.push('{{EDU=[[2d6]]}}');
+                      template.push('{{SOC=[[2d6]]}}');
+                    } else {
+                      template.push(`{{name=Generate Characteristics (${method.substring(2, method.length-2)})}}`);
+                      for(let ii=1; ii < 7; ii++) {
+                          template.push(`{{roll ${ii}=${method}}}`);
+                      }
+                    }
+
+                startRoll(template.join(' '), (results) => {
+                    const rolls = results.results;
+
+                    finishRoll(results.rollId, rolls);
+
+                    if(method == 'yolo') {
+                        setAttrs({
+                            'base-Strength':  rolls.STR.result,
+                            'base-Dexterity': rolls.DEX.result,
+                            'base-Endurance': rolls.END.result,
+                            'base-Intellect': rolls.INT.result,
+                            'base-Education': rolls.EDU.result,
+                            'base-Social':    rolls.SOC.result,
+                        }, toggleRollStatsPanel);
+                    } else {
+                        setAttrs({
+                            'charmancer_roll1': rolls['roll 1'].result,
+                            'charmancer_roll2': rolls['roll 2'].result,
+                            'charmancer_roll3': rolls['roll 3'].result,
+                            'charmancer_roll4': rolls['roll 4'].result,
+                            'charmancer_roll5': rolls['roll 5'].result,
+                            'charmancer_roll6': rolls['roll 6'].result
+                        });
+                    }
               });
           });
-      });
+        });
 
-      on(['change:charmancer_roll1_assignment', 'change:charmancer_roll2_assignment',
-          'change:charmancer_roll3_assignment', 'change:charmancer_roll4_assignment',
-          'change:charmancer_roll5_assignment', 'change:charmancer_roll6_assignment',
-         ].join(' '),
-        function(eventInfo) {
+        on(['change:charmancer_roll1_assignment', 'change:charmancer_roll2_assignment',
+            'change:charmancer_roll3_assignment', 'change:charmancer_roll4_assignment',
+            'change:charmancer_roll5_assignment', 'change:charmancer_roll6_assignment',
+            ].join(' '), function(eventInfo) {
 
-          // swap stat with old assignment
-          getAttrs(charmancerRollAssignments, (assignments) => {
-            const oldValue = eventInfo.previousValue;
-            if(!oldValue) return;
+            // swap stat with old assignment
+            getAttrs(charmancerRollAssignments, (assignments) => {
+                const oldValue = eventInfo.previousValue;
+                if(!oldValue) return;
 
-            const newAttr   = eventInfo.sourceAttribute;
-            const newValue  = eventInfo.newValue;
-            const oldAttr   = Object.keys(assignments).find(key => {return key != newAttr && assignments[key] === newValue});
+                const newAttr   = eventInfo.sourceAttribute;
+                const newValue  = eventInfo.newValue;
+                const oldAttr   = Object.keys(assignments).find(key => {return key != newAttr && assignments[key] === newValue});
 
-            if(!oldAttr || newAttr == oldAttr) return;
+                if(!oldAttr || newAttr == oldAttr) return;
 
-            // I don't now of another way to do this
-            var ii = {};
-            ii[oldAttr] = oldValue;
-            setAttrs(ii);
-          });
-        }
-      );
+                // I don't now of another way to do this
+                var ii = {};
+                ii[oldAttr] = oldValue;
+                setAttrs(ii);
+            });
+        });
 
-      on('clicked:assign-stats', function(eventInfo) {
+        on('clicked:assign-stats', function(eventInfo) {
 
         getAttrs(charmancerRollAssignments.concat(charmancerRollValues), (attrs) => {
-          const newAttrs = {};
-          for(let ii=1; ii<7 ;ii++) {
-            const attr  = attrs[`charmancer_roll${ii}_assignment`];
-            const value = attrs[`charmancer_roll${ii}`];
-            newAttrs[attr] = value;
-          }
-          setAttrs(newAttrs);
-
+            const newAttrs = {};
+            for(let ii=1; ii<7 ;ii++) {
+                const attr  = attrs[`charmancer_roll${ii}_assignment`];
+                const value = attrs[`charmancer_roll${ii}`];
+                newAttrs[attr] = value;
+            }
+            setAttrs(newAttrs);
         });
 
         toggleRollStatsPanel();
-      });
+        });
 
-      on('clicked:cancel-roll-stats', function(eventInfo) {
-        toggleRollStatsPanel();
-      });
+        on('clicked:cancel-roll-stats', function(eventInfo) {
+            toggleRollStatsPanel();
+        });
 
-      on('change:alt_rolltemplate', function(eventInfo) {
-        console.log("attr_alt_rolltemplate: " + JSON.stringify(eventInfo));
-        if(eventInfo.newValue === "0") {
-            console.log("Setting to blank");
-            setAttrs({alt_rolltemplate_val: ""}, { silent: true });
-        }
-        else {
-            setAttrs({alt_rolltemplate_val: "-alt"}, { silent: true });
-        }
-      });
+        on('change:alt_rolltemplate', function(eventInfo) {
+            console.log("attr_alt_rolltemplate: " + JSON.stringify(eventInfo));
+            if(eventInfo.newValue === "0") {
+                console.log("Setting to blank");
+                setAttrs({alt_rolltemplate_val: ""}, { silent: true });
+            }
+            else {
+                setAttrs({alt_rolltemplate_val: "-alt"}, { silent: true });
+            }
+        });
+
+
     </script>
 </div>
