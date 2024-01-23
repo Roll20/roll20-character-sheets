@@ -1971,11 +1971,11 @@ on('clicked:repeating_weapons-damage:crit2', function(eventInfo) {
         ? values[prefix+'damsm']
         : values[prefix+'daml'];
     let damageAdjFunc = (values) => [
-        `(${values[prefix+'damadj']})`,
-        `({${values[prefix+'specialist-damage']},${values[prefix+'mastery-damage']}}kh1)`,
-        `((@{strengthdmg})*${values[prefix+'strbonus1']})`,
-        `((@{dexmissile})*${values[prefix+'dexbonus1']})`,
-        '(@{temp-damadj})',
+        `([[(@{strengthdmg})*${values[prefix+'strbonus1']}]] [Strength])`,
+        `([[(@{dexmissile})*${values[prefix+'dexbonus1']}]] [Dexterity])`,
+        `([[{${values[prefix+'specialist-damage']},${values[prefix+'mastery-damage']}}kh1]] [Proficiency])`,
+        `(${values[prefix+'damadj']} [Dmg Adj])`,
+        '(@{temp-damadj} [Temp buff])',
         '(@{misc-mod})'
     ].join('+');
 
@@ -1996,11 +1996,11 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
         ? values[prefix+'damsm2']
         : values[prefix+'daml2'];
     let damageAdjFunc = (values) => [
-        `(${values[prefix+'damadj2']})`,
-        `((@{strengthdmg})*${values[prefix+'strbonus3']})`,
-        `((@{dexmissile})*${values[prefix+'dexbonus3']})`,
-        `({${values[prefix+'specialist-damage2']},${values[prefix+'mastery-damage2']}}kh1)`,
-        '(@{temp-damadj})',
+        `([[(@{strengthdmg})*${values[prefix+'strbonus3']}]] [Strength])`,
+        `([[(@{dexmissile})*${values[prefix+'dexbonus3']}]] [Dexterity])`,
+        `([[{${values[prefix+'specialist-damage2']},${values[prefix+'mastery-damage2']}}kh1]] [Proficiency])`,
+        `(${values[prefix+'damadj2']} [Dmg Adj])`,
+        '(@{temp-damadj} [Temp buff])',
         '(@{misc-mod})'
     ].join('+');
 
@@ -2478,7 +2478,7 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                 rollBuilder.push(`multiplier=(Double)`);
                 damage = `(${weaponDamage})*2`;
             }
-            rollBuilder.push(`damage=[[${damage}+[[${damageAdjFunc(values)}]] ]]`);
+            rollBuilder.push(`damage=[[${damage}+${damageAdjFunc(values)} ]]`);
         }
 
         if (errors.length > 0)
@@ -2726,7 +2726,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
     if (!eventInfo.newValue)
         return;
 
-    let spellName = eventInfo.newValue.replace('Scroll of ', '');
+    let spellName = eventInfo.newValue.replace(/ scroll$/, '');
     let wizardSpell = wizardSpells['wizmonster'][spellName];
     let priestSpell = priestSpells['primonster'][spellName];
     if (!wizardSpell && !priestSpell)
