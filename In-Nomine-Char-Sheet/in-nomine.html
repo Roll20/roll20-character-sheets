@@ -228,3 +228,85 @@
     <button name="roll_action" type="roll" value="&amp;{template:default} {{name=?{Description}}} {{Target attribute=[[(2d6)&lt;?{Attribute}]]}} {{Digito Verificador=[[1d6]]}}"></button>
 </div>-->
 <div class="footer" /> 
+
+<!-- Sheet workers -->
+<script type="text/worker">
+    // This sheetworker serves to migrate attributes from any old sheets to the new attribute names.
+on("sheet:opened", function() {
+    console.log("Checking if attribute migration needed.");
+    // This checks to see if any of these 5 attributes are in use, which should be sufficient to tell whether the sheet was used before overhaul.
+    getAttrs(["nome","Arcanjo","Coro","Corporeo", "Essencia"], function(values) {
+        // Gets the attribute if it exists, uses a default of 0 if not.
+        let name = values.nome||0;
+        let archangel = values.Arcanjo||0;
+        let choir = values.Coro||0;
+        let corporeal = values.Corporeo||0;
+        let essence = values.Essencia||0;
+        // If any of these attributes have a value from an old attribute name, then attributes are migrated.
+        if(name != 0 || archangel !=0 || choir != 0 || corporeal != 0 || essence != 0) {
+            console.log("Attributes need to be migrated");
+            // The names of some choirs are different in Portuguese. Archangel names are identical.
+            switch (choir) {
+                case "Serafim":
+                    choir = "Seraphim";
+                    break;
+                case "Querubim":
+                    choir = "Cherubim";
+                    break;
+                case "Kyriotetes":
+                    choir = "Kyriotates";
+                    break;
+                case "Mercurianos":
+                    choir = "Mercurians";
+                    break;
+                default:
+                    break;
+            }
+            getAttrs(["Coro","Palavra","Veste1","Veste2","Veste3","Corpo1","Corpo2","Corpo3","Força","Agilidade","Etero","Pontos","Mente","Disonacia","Inteligencia","Precisao","cPontos","Alma","Vontade","Precepcao","Sintonias","Discordias"], function(values) {
+                // Set all of the attributes from the old sheet
+                // First the 5 test attributes which have already been called, then the rest
+                setAttrs({
+                    "name":name,
+                    "archangel":archangel,
+                    "choir":choir,
+                    "essence":essence,
+                    "corporeal":corporeal, 
+                    "word":values.Palavra,
+                    "vessel1":values.Veste1,
+                    "vessel2":values.Veste2,
+                    "vessel3":values.Veste3,
+                    "body1":values.Corpo1,
+                    "body2":values.Corpo2,
+                    "body3":values.Corpo3,
+                    "strength":values.Força,
+                    "agility":values.Agilidade,
+                    "ethereal":values.Etero,
+                    "mind-hits":values.Pontos,
+                    "mind":values.Mente,
+                    "dissonance":values.Disonacia,
+                    "intelligence":values.Inteligencia,
+                    "precision":values.Precisao,
+                    "soul-hits":values.cPontos,
+                    "soul":values.Alma,
+                    "will":values.Vontade,
+                    "perception":values.Precepcao,
+                    "attunements":values.Sintonias,
+                    "discord":values.Discordias
+                });
+                console.log("Finished migration of attributes.");
+                // Set the key old attribute names of the sheet to 0 to prevent the sheetworker from running again.
+                setAttrs({
+                    "nome":"0",
+                    "Arcanjo":0,
+                    "Coro":0,
+                    "Corporeo":0,
+                    "Essencia":0
+                });
+            });
+        }
+        else {
+            console.log("No attributes need to be migrated.");
+        }
+    });
+});
+</script>
