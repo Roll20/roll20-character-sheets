@@ -565,7 +565,6 @@
 			</div>
 			<div class="sheet-form-group">
 				<div>
-					<button type="action" name="act_randomlevelzero">Generate Random Level 0 PC</button>
 					<button type="action" name="act_importjson">Import Shadowdarklings JSON</button>
 					<button type="action" name="act_importmonster">Import Monster Text from Book</button>
 				</div>
@@ -956,44 +955,9 @@
 		/// "Roll20 Shadowdark RPG Character Sheet is an independent product published under the 
 		/// Shadowdark RPG Third-Party License and is not affiliated with The Arcane Library, 
 		/// LLC. Shadowdark RPG © 2023 The Arcane Library, LLC."
-		///
-		/// allowed content is using the rules and game mechanics as well as names of beings, locations, spells, and items
-		/// verbatim text is restricted to monsters, spells, and magic items
 		//////////
-
-		// random fun
-		pickRandom = (a) => { return a[Math.floor(Math.random() * a.length)] }
-		rollSum = (n, d) => { return Array.from({length: n}, () => Math.floor(Math.random() * (d||6)) + 1).reduce((a, b) => a + b, 0) }
 		
-		const core_starting_gear = ["Torch", "Dagger", "Pole", "Shortbow + 5 arrows", "Rope (60')", "Oil flask", "Crowbar", "Iron spikes (10)", "Flint and steel", "Grappling hook", "Club", "Catrops (one bag)"];
 		const core_stats = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
-		const core_ancestries = ["Human", "Halfling", "Elf", "Dwarf", "Goblin", "Half-Orc"];
-		const core_backgrounds = ["Urchin", "Wanted", "Cult Initiate", "Thieves' Guild", "Banished", "Orphaned", "Wizard's Apprentice", "Jeweler", "Herbalist", "Barbarian", "Mercenary", "Sailor", "Acolyte", "Soldier", "Ranger", "Scout", "Minstrel", "Scholar", "Noble", "Chirurgeon"];
-		const core_beliefs = [ 
-			{ 
-				alignment: "Good", 
-				deities: ["Saint Terragnis", "Madeera the Covenant"] 
-			},
-			{
-				alignment: "Chaotic",
-				deities: ["Shune the Vile", "Memnon", "Ramlaat"]
-			},
-			{
-				alignment: "Neutral",
-				deities: ["Gede", "Ord"]
-			}
-		];
-
-		on("clicked:randomlevelzero", function() {
-			// prompt user to replace stats
-			getAttrs(["sheetwipe_confirm_flag", "character_name"], function(v) {
-				if (v.sheetwipe_confirm_flag !== "1") {
-					console.log("You must accept the disclaimer before generating a level 0 PC.")
-					return;
-				}
-				generate_level_zero(v.character_name);
-			});
-		});
 
 		on("clicked:importmonster", function() {
 			// prompt user to replace stats
@@ -1442,82 +1406,6 @@
 
 		let addSpaces = function(str) {
 			return str.replace(/([a-z])([A-Z])/g, "$1 $2");
-		}
-
-		let generate_level_zero = function(name) {
-			console.log("Rolling a new Level 0 PC...");
-			let belief = pickRandom(core_beliefs);
-			let update = {
-				npc: "0",
-				xp: 0,
-				base_level: 0,
-				lifetime_xp: 0,
-				xp_nextlevel: 0,
-				class: "Level 0",
-				armor: "",
-				title: "",
-				ancestry: pickRandom(core_ancestries),
-				background: pickRandom(core_backgrounds),
-				alignment: belief.alignment,
-				deity: pickRandom(belief.deities)
-			};
-
-			// roll 3d6 for each stat. Enforce optional rule: reroll if no stat exceeds 14.
-			const minFavoredStat = 14;
-			let stats = [];
-			while(true) {
-				stats = Array.from({length: core_stats.length}, () => rollSum(3, 6));
-				console.log("Rolled stats: " + stats);
-				if (Math.max(...stats) < minFavoredStat)
-				{
-					console.log("Ouch! Not a single stat below " + minFavoredStat + ". Re-rolling to be nice.");
-				}
-				else break;
-			}
-
-			// assign rolls to stats and set modifiers
-			core_stats.forEach((stat, idx) => {
-				let val = stats[idx];
-				let mod = Math.floor((val - 10) / 2);
-				update[stat + "_base"] = val;
-				update[stat] = val;
-				update[stat + "_mod"] = mod;
-			});
-
-			// HP = Con mod + 1
-			let hp = Math.max(1, update["constitution_mod"]);
-			update["hp"] = hp;
-			update["hp_max"] = hp;
-
-			// start with 1d4 common gear
-			let gearQty = rollSum(1, 4);
-			let gear = Array.from({length: gearQty}, () => pickRandom(core_starting_gear));
-			console.log("Starting Gear: " + gear.join(', '));
-			for (let i = 0; i < 22; ++i)
-			{
-				update["gearslot" + (i + 1)] = gear[i] || "";
-			}
-
-			// update derived stats
-			// AC = 10 + Dex mod
-			// Slots Capacity = max of Strength stat or 10
-			update["initiative_bonus"] = +update["dexterity_mod"];
-			update["ac"] = 10 + +update["dexterity_mod"];
-			let totalSlots = Math.max(10, update["strength"]);
-			update["slots_max"] = totalSlots;
-			update["slots"] = gearQty;
-
-			setAttrs(update, {
-				silent: true
-			});
-
-			update_slots(totalSlots);
-
-			console.log("Finished rolling new Level 0 PC");
-			const msg = "Rolled a new random Level 0 PC for " + name + ". Nice stats! " + stats;
-			startRoll(msg, (results) => {
-				finishRoll(results.rollId);
-			});
 		}
 
 		core_stats.forEach(attr => {
