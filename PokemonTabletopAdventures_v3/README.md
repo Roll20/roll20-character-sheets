@@ -23,6 +23,9 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Sep 23, 2023
+- Added an Advanced Class section to the Hybrid sheet's character details section
+
 ### Feb 22, 2023
 - It's the Form Changes update!
   - Added Terastallization, Dynamax/Gigantamax, Mega Evolution, and 3 fully customizable form changes

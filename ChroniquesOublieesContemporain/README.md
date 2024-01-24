@@ -10,11 +10,15 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.16.0 [Screenshot](coc_v2.png)
+v3.16.1 [Screenshot](coc_v2.png)
 
 # Notes de version
 
-## v3.16.0 (2023-09-17)
+## v3.16.1 (2023-10-22)
+
+- Correction du nom des jets de INT, PER et CHA de la fiche de PNJ
+
+## v3.16.0 (2023-09-10)
 
 - Import de profil
 
