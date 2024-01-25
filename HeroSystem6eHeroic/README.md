@@ -40,7 +40,7 @@ Roll buttons are color-coded:
 
 ![Green Button](/HeroSystem6eHeroic/images/GreenButton.png) Green buttons are for normal damage attacks.
 
-![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield use. This can be used for block checks, or to do killing or normal damage.
+![Light Blue Button](/HeroSystem6eHeroic/images/LightBlueButton.png) Light blue buttons are for blocks and shield attacks.
 
 ![Purple Button](/HeroSystem6eHeroic/images/PurpleButton.png) Purple buttons are for powers.
 
