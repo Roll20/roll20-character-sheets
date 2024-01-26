@@ -33,7 +33,7 @@
 		<div class="sd-row">
 			<div class="sd-col sd-core-stat">
 				<button type="roll" name="roll_initiative" title="Roll initiative; click token first"
-				value="@{wtype}&{template:simple} {{rname=Initiative}} {{r1=[[@{d20}+@{dexterity_mod}[INIT] &{tracker}]]}} @{rtype}+@{dexterity_mod}]]}} @{charname_output}">Name</button>
+				value="@{wtype}&{template:simple} {{rname=Initiative}} {{mod=@{initiative_bonus}}} {{r1=[[@{initiative_style}+@{initiative_bonus}[INIT] &{tracker}]]}} {{isinit=1}} @{charname_output}">Name</button>
 				<input type="text" class="sd-text" name="attr_character_name" title="@{character_name}" placeholder="Name">
 			</div>
 			<div class="sd-col">
@@ -69,7 +69,7 @@
 		<div class="sd-row">
 			<div class="sd-col sd-core-stat">
 				<button type="roll" name="roll_initiative" title="Roll initiative; click token first"
-				value="@{wtype}&{template:simple} {{rname=Initiative}} {{r1=[[@{d20}+@{dexterity_mod}[INIT] &{tracker}]]}} @{rtype}+@{dexterity_mod}]]}} @{charname_output}">Name</button>
+				value="@{wtype}&{template:simple} {{rname=Initiative}} {{mod=@{initiative_bonus}}} {{r1=[[@{initiative_style}+@{initiative_bonus}[INIT] &{tracker}]]}} {{isinit=1}} @{charname_output}">Name</button>
 				<input type="text" class="sd-text" name="attr_character_name" title="@{character_name}" placeholder="Name">
 			</div>
 			<div class="sd-col">
@@ -537,6 +537,16 @@
 				</label>
 			</div>
 			<div class="sheet-form-group">
+				<label class="sheet-form-checkbox">
+					<input type="checkbox" name="attr_init_tiebreaker" value="@{dexterity}/100">
+					<span>Add Dex Tiebreaker to Initiative</span>
+				</label>
+			</div>
+			<div class="sheet-form-group">
+				<label>Core Die Roll:</label>
+				<input type="text" name="attr_core_die" value="1d20" placeholder="1d20" title="@{core_die}">
+			</div>
+			<div class="sheet-form-group">
 				<div>
 					<button type="action" name="act_importjson">Import Shadowdarklings JSON</button>
 					<button type="action" name="act_importmonster">Import Monster Text from Book</button>
@@ -552,7 +562,7 @@
 			</div>
 			<div class="sheet-form-group">
 				<label>Version:</label>
-				<input type="text" name="attr_version" value="2024.1.17.1" hidden disabled>
+				<input type="text" name="attr_version" value="2024.1.25.1" hidden disabled>
 				<span name="attr_version"></span>
 			</div>
 			<div>
@@ -597,6 +607,7 @@
 		<input type="hidden" name="attr_intelligence_mod" value="0">
 		<input type="hidden" name="attr_wisdom_mod" value="0">
 		<input type="hidden" name="attr_charisma_mod" value="0">
+		<input type="hidden" name="attr_initiative_style" value="@{d20}">
 		<input type="hidden" name="attr_wtype" value="@{whispertoggle}">
 		<input type="hidden" name="attr_rtype" value="@{advantagetoggle}">
 	</div>
@@ -775,11 +786,6 @@
 							<span>Duration: {{duration}}</span>
 						</div>
 						{{/duration}}
-						{{#range}}
-						<div class="info">
-							<span>Range: {{range}}</span>
-						</div>
-						{{/range}}
 						{{#desc}}
 						<div class="info">
 							<span>
@@ -800,12 +806,17 @@
 						<span>{{rname}}{{#mod}} <span>({{mod}})</span>{{/mod}}</span>
 					</div>
 					<div class="result">
+						{{#isinit}}
+						<div>
+							<span class="roll-initiative">{{r1}}</span>
+						</div>
+						{{/isinit}}
 						{{#normal}}
 						<div class="solo">
 							<span class="roll-used">{{r1}}</span>
 						</div>
-						{{#rollWasCrit() r1}}<div class="crit-success">CRIT SUCCESS!</div>{{/rollWasCrit() r1}}
-						{{#rollWasFumble() r1}}<div class="crit-fail">CRIT FAIL!</div>{{/rollWasFumble() r1}}
+						{{#rollWasCrit() r1}}<div class="crit-success">Critical Success!</div>{{/rollWasCrit() r1}}
+						{{#rollWasFumble() r1}}<div class="crit-fail">Critical Failure!</div>{{/rollWasFumble() r1}}
 						{{/normal}}
 						{{#advantage}}
 						{{#rollLess() r1 r2}}
@@ -816,7 +827,7 @@
 						<div class="adv">
 							<span class="roll-used">{{r2}}</span>
 						</div>
-						{{#rollWasCrit() r2}}<div class="crit-success">CRIT SUCCESS!</div>{{/rollWasCrit() r2}}
+						{{#rollWasCrit() r2}}<div class="crit-success">Critical Success!</div>{{/rollWasCrit() r2}}
 						{{/rollLess() r1 r2}}
 						{{#rollTotal() r1 r2}}
 						<div class="adv">
@@ -826,8 +837,8 @@
 						<div class="adv">
 							<span class="roll-used">{{r2}}</span>
 						</div>
-						{{#rollWasCrit() r1}}<div class="crit-success">CRIT SUCCESS!</div>{{/rollWasCrit() r1}}
-						{{#rollWasFumble() r1}}<div class="crit-fail">CRIT FAIL!</div>{{/rollWasFumble() r1}}
+						{{#rollWasCrit() r1}}<div class="crit-success">Critical Success!</div>{{/rollWasCrit() r1}}
+						{{#rollWasFumble() r1}}<div class="crit-fail">Critical Failure!</div>{{/rollWasFumble() r1}}
 						{{/rollTotal() r1 r2}}
 						{{#rollGreater() r1 r2}}
 						<div class="adv">
@@ -837,7 +848,7 @@
 						<div class="adv">
 							<span class="roll-unused">{{r2}}</span>
 						</div>
-						{{#rollWasCrit() r1}}<div class="crit-success">CRIT SUCCESS!</div>{{/rollWasCrit() r1}}
+						{{#rollWasCrit() r1}}<div class="crit-success">Critical Success!</div>{{/rollWasCrit() r1}}
 						{{/rollGreater() r1 r2}}
 						{{/advantage}}
 						{{#disadvantage}}
@@ -849,7 +860,7 @@
 						<div class="adv">
 							<span class="roll-unused">{{r2}}</span>
 						</div>
-						{{#rollWasFumble() r1}}<div class="crit-fail">CRIT FAIL!</div>{{/rollWasFumble() r1}}
+						{{#rollWasFumble() r1}}<div class="crit-fail">Critical Failure!</div>{{/rollWasFumble() r1}}
 						{{/rollLess() r1 r2}}
 						{{#rollTotal() r1 r2}}
 						<div class="adv">
@@ -859,8 +870,8 @@
 						<div class="adv">
 							<span class="roll-used">{{r2}}</span>
 						</div>
-						{{#rollWasCrit() r1}}<div class="crit-success">CRIT SUCCESS!</div>{{/rollWasCrit() r1}}
-						{{#rollWasFumble() r1}}<div class="crit-fail">CRIT FAIL!</div>{{/rollWasFumble() r1}}
+						{{#rollWasCrit() r1}}<div class="crit-success">Critical Success!</div>{{/rollWasCrit() r1}}
+						{{#rollWasFumble() r1}}<div class="crit-fail">Critical Failure!</div>{{/rollWasFumble() r1}}
 						{{/rollTotal() r1 r2}}
 						{{#rollGreater() r1 r2}}
 						<div class="adv">
@@ -870,7 +881,7 @@
 						<div class="adv">
 							<span class="roll-used">{{r2}}</span>
 						</div>
-						{{#rollWasFumble() r2}}<div class="crit-fail">CRIT FAIL!</div>{{/rollWasFumble() r2}}
+						{{#rollWasFumble() r2}}<div class="crit-fail">Critical Failure!</div>{{/rollWasFumble() r2}}
 						{{/rollGreater() r1 r2}}
 						{{/disadvantage}}
 					</div>
@@ -908,7 +919,7 @@
 		// Min slots = 10; Slots = STR score (which can exceed 18) + Fighter can use CON mod
 		// Stats can go higher than 18 so it is possible a PC could exceed 20 slots. if so, use the treasure box for overflow.
 		const maxSheetSlots = 20;
-		const minPcSlots = 0; // per core rules, min PC slots is 10, but making it 0 in case some debugg/curse/etc happens
+		const minPcSlots = 0; // per core rules, min PC slots is 10, but making it 0 in case some debuff/curse/etc happens
 
 		// SD core rules goes from levels 0-10 (class abilities start at level 1)
 		const minLevel = 0;
@@ -1412,6 +1423,24 @@
 			});
 		});
 
+		on("change:advantagetoggle", function(eventinfo) {
+			if (eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
+				return;
+			}
+			update_initiative();
+		});
+
+		on("change:core_die", function() {
+			getAttrs(["core_die"], function(v) {
+				let core = v.core_die && v.core_die != "" ? v.core_die : "1d20";
+				let update = { "d20": core };
+				if (!v.core_die || v.core_die === "") {
+					update["core_die"] = "1d20";
+				}
+				setAttrs(update);
+			});
+		});
+
 		on("change:repeating_attack:atkname change:repeating_attack:atkattr_base change:repeating_attack:atkmod change:repeating_attack:atkmagic change:repeating_attack:dmgflag change:repeating_attack:dmgbase change:repeating_attack:dmgmod change:repeating_attack:dmgtype change:repeating_attack:dmg2flag change:repeating_attack:dmg2base change:repeating_attack:dmg2mod change:repeating_attack:dmg2type change:repeating_attack:dmgcustcrit change:repeating_attack:dmg2custcrit change:repeating_attack:castdc change:repeating_attack:duration change:repeating_attack:atkrange", function(eventinfo) {
 			if (eventinfo.sourceType === "sheetworker") {
 				return;
@@ -1745,13 +1774,30 @@
 		};
 
 		var update_initiative = function() {
-			var attrs_to_get = ["dexterity", "dexterity_mod", "init_tiebreaker"];
+			var attrs_to_get = ["dexterity", "dexterity_mod", "init_tiebreaker", "advantagetoggle"];
 			getAttrs(attrs_to_get, function(v) {
 				var update = {};
 				var final_init = parseInt(v["dexterity_mod"], 10);
 				if (v["init_tiebreaker"] && v["init_tiebreaker"] != 0) {
 					final_init = final_init + parseFloat((parseInt(v["dexterity"], 10) / 100).toFixed(2));
 				}
+
+				switch (v["advantagetoggle"])
+				{
+					// advantage
+				 	case "{{query=1}} {{advantage=1}} {{r2=[[@{d20}":
+						update["initiative_style"] = "{@{d20},@{d20}}kh1";
+						break;
+					// disadvantage
+				 	case "{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}":
+						update["initiative_style"] = "{@{d20},@{d20}}kl1";
+						break;
+					// normal
+					default:
+						update["initiative_style"] = "@{d20}";
+						break;
+				}
+
 				update["initiative_bonus"] = final_init;
 				setAttrs(update, {
 					silent: true
