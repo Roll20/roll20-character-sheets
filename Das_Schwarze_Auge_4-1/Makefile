@@ -4,12 +4,24 @@ MAKEFLAGS += --no-builtin-rules
 
 # File Order Important for Concatenation
 HTML = \
-	dev/html/sheet_intro.html \
-	dev/html/sheet.html \
-	dev/html/sheet_outro.html \
-	dev/html/roll_templates_intro.html \
-	dev/html/roll_templates.html \
-	dev/html/roll_templates_outro.html \
+	dev/html/sheet/intro.html \
+	dev/html/sheet/header.html \
+	dev/html/sheet/section_allgemein.html \
+	dev/html/sheet/section_grundwerte.html \
+	dev/html/sheet/section_fertigkeiten.html \
+	dev/html/sheet/section_inventar.html \
+	dev/html/sheet/section_talente.html \
+	dev/html/sheet/section_magie.html \
+	dev/html/sheet/section_liturgien.html \
+	dev/html/sheet/section_kampfwerte.html \
+	dev/html/sheet/section_notizen.html \
+	dev/html/sheet/section_config.html \
+	dev/html/sheet/section_info.html \
+	dev/html/sheet/footer.html \
+	dev/html/sheet/outro.html \
+	dev/html/roll\ templates/intro.html \
+	dev/html/roll\ templates/main.html \
+	dev/html/roll\ templates/outro.html \
 	$(JS)
 JS = \
 	dev/js/intro.js \
