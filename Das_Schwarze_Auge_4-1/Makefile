@@ -20,7 +20,9 @@ HTML = \
 	dev/html/sheet/footer.html \
 	dev/html/sheet/outro.html \
 	dev/html/roll\ templates/intro.html \
-	dev/html/roll\ templates/main.html \
+	dev/html/roll\ templates/crp.html \
+	dev/html/roll\ templates/legacy.html \
+	dev/html/roll\ templates/tests.html \
 	dev/html/roll\ templates/outro.html \
 	$(JS)
 JS = \
