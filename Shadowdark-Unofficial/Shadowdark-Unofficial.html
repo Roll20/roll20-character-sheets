@@ -33,7 +33,7 @@
 		<div class="sd-row">
 			<div class="sd-col sd-core-stat">
 				<button type="roll" name="roll_initiative" title="Roll initiative; click token first"
-				value="@{wtype}&{template:simple} {{rname=Initiative}} {{mod=@{initiative_bonus}}} {{r1=[[@{initiative_style}+@{initiative_bonus}[INIT] &{tracker}]]}} {{isinit=1}} @{charname_output}">Name</button>
+				value="@{wtype}&{template:simple} {{rname=Initiative}} {{mod=@{dexterity_mod}}} {{r1=[[@{initiative_style}+@{initiative_bonus}[INIT] &{tracker}]]}} {{isinit=1}} @{charname_output}">Name</button>
 				<input type="text" class="sd-text" name="attr_character_name" title="@{character_name}" placeholder="Name">
 			</div>
 			<div class="sd-col">
@@ -69,7 +69,7 @@
 		<div class="sd-row">
 			<div class="sd-col sd-core-stat">
 				<button type="roll" name="roll_initiative" title="Roll initiative; click token first"
-				value="@{wtype}&{template:simple} {{rname=Initiative}} {{mod=@{initiative_bonus}}} {{r1=[[@{initiative_style}+@{initiative_bonus}[INIT] &{tracker}]]}} {{isinit=1}} @{charname_output}">Name</button>
+				value="@{wtype}&{template:simple} {{rname=Initiative}} {{mod=@{dexterity_mod}}} {{r1=[[@{initiative_style}+@{initiative_bonus}[INIT] &{tracker}]]}} {{isinit=1}} @{charname_output}">Name</button>
 				<input type="text" class="sd-text" name="attr_character_name" title="@{character_name}" placeholder="Name">
 			</div>
 			<div class="sd-col">
@@ -538,7 +538,7 @@
 			</div>
 			<div class="sheet-form-group">
 				<label class="sheet-form-checkbox">
-					<input type="checkbox" name="attr_init_tiebreaker" value="@{dexterity}/100">
+					<input type="checkbox" name="attr_init_tiebreaker" value="1">
 					<span>Add Dex Tiebreaker to Initiative</span>
 				</label>
 			</div>
@@ -610,6 +610,7 @@
 		<input type="hidden" name="attr_initiative_style" value="@{d20}">
 		<input type="hidden" name="attr_wtype" value="@{whispertoggle}">
 		<input type="hidden" name="attr_rtype" value="@{advantagetoggle}">
+		<input type="hidden" name="attr_init_tiebreaker" value="0">
 	</div>
 	<div class="sheet-section sheet-section-templates">
 		<div class="sheet-rolltemplates">
@@ -1777,9 +1778,10 @@
 			var attrs_to_get = ["dexterity", "dexterity_mod", "init_tiebreaker", "advantagetoggle"];
 			getAttrs(attrs_to_get, function(v) {
 				var update = {};
-				var final_init = parseInt(v["dexterity_mod"], 10);
-				if (v["init_tiebreaker"] && v["init_tiebreaker"] != 0) {
-					final_init = final_init + parseFloat((parseInt(v["dexterity"], 10) / 100).toFixed(2));
+				debugger;
+				var final_init = parseInt(v["dexterity_mod"], 10);				
+				if (v["init_tiebreaker"] != "0") {
+					final_init = (final_init + parseFloat(Math.abs(parseInt(v["dexterity"], 10) / 100))).toFixed(2);
 				}
 
 				switch (v["advantagetoggle"])
