@@ -983,6 +983,7 @@
 
 		// convert string to title case
 		let titleCase = function(str) {
+			if(!str) return '';
 			return str.replace(/\w\S*/g, function (txt) {
 				return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 			});
@@ -1041,7 +1042,7 @@
 							monster.description += line;
 					}
 				}
-
+		
 				// push monster only if found the stats block
 				if (acIndex > 0)
 				{
@@ -1051,34 +1052,40 @@
 					console.log(`Unable to parse stats for ${monster.name}`);
 					return; // parse next monster, skip forEach iteration
 				}
-
+		
 				// stats come before actions - first stat is "AC" (armor class) and final stat is "LV" (level)
 				// attacks are included in the stats block using "ATK"
 				const statsAndActionsLines = lines.slice(acIndex);
-
+		
 				// find beginning of actions text
-				const actionsIndex = statsAndActionsLines.findIndex(o=>/[Ll][Vv]\s(\d+|\*)$/.test(o)) + 1;
+				const actionsIndex = statsAndActionsLines.findIndex(o=>/[Ll][Vv]\s(\d+|\*)(\/\d+)?$/.test(o)) + 1;
 				const actionsLines = statsAndActionsLines.slice(actionsIndex);
 				monster.actions = parseActions(actionsLines);
-
+		
 				// slice out and parse stats from between monster description and actions
 				const statsLines = statsAndActionsLines.slice(0, actionsIndex).map(o=>o.trim()).join(" ").split(/,/);
 				for (let i = 0; i < statsLines.length; i++) {
-					const statsLine = statsLines[i].trim(); // Trim leading and trailing whitespace for copy-paste issues	
+					let statsLine = statsLines[i].trim(); // Trim leading and trailing whitespace for copy-paste issues	
 					if (!statsLine?.length) continue; // skip empty lines
 					try {
 						if (!monster.armorClass && statsLine.startsWith('AC ')) {
 							const [, AC, armor] = statsLine.match(/AC (\d+)(?: \(([\w\s]+)\))?/);
 							monster.armorClass = +AC;
 							monster.armor = armor || "";
-						} else if (!monster.maxHitPoints && statsLine.startsWith('HP ')) {
-							const [, HP] = statsLine.match(/HP (\d+)/);
-							monster.maxHitPoints = parseInt(HP, 10) || monster.name==="Hydra" ? 55 : 0; // hydra heads special case (5 heads)
+						} else if (!monster.maxHitPoints && /^[Hh][Pp]\s(\*|\d+)(\/\d+)?$/.test(statsLine)) {
+							// if there is a rare case of multi-value like 4/5 grab the first number (ex: elementals don't have separate lesser/greater stats in the book)
+							const hp = /^[Hh][Pp]\s(?<hp>\*|\d+)(\/\d+)?$/.exec(statsLine).groups?.hp || "";
+							monster.maxHitPoints = parseInt(hp, 10) || (monster.name==="Hydra" ? 55 : 0); // hydra heads special case (5 heads)
 						} else if (!monster.attacks && statsLine.startsWith('ATK ')) {
+									// hacky fix for Azer (and other stat blocks that have comma in the ATK section)
+							if(/^\s+[^A-Z]/.test(statsLines[i+1]))
+							{
+								statsLine += ' + ' + statsLines[i+1]; // restore comma
+							}
 							const [, attackText] = statsLine.match(/ATK (.+)/);
 							const attackStrings = attackText.split(/\bor\b|\band\b/).map(s => s.trim());
 							const attacks = attackStrings.map(s => 
-								/^(?<qty>\d+(d\d+)?)\s*(?<name>(\+\d+)?[\w\s]*)\b(\s*)?(\((?<rng>([\w\s/]+))\)\s*)?(?<mod>[\+|\-]\d+)?(\s*)?[\(]?(?<dmg>\d+d\d+(\s\+\s\d+)?)?(\s*)?[\+,]?(\s)?(?<effect>[^\)][\w\s\+]*)?\)?/g
+								/^(?<qty>\d+(d\d+)?)\s*(?<name>(\+\d+)?[\w\s]*)\b(\s*)?(\((?<rng>([\w\s/]+))\)\s*)?(?<mod>[\+|\-]\d+)?(\s*)?[\(]?(?<dmg>(\d+[Dd]\d+|\d+)(\s\+\s\d+)?)?(\/\d+[Dd]\d+)?(\s*)?[\+,]?(\s+)?(?<effect>[^\)][\w\s\+]*)?\)?/g
 								.exec(s)?.groups).filter(s=>s!==undefined);
 							monster.attackText = attackText;
 							monster.attacks = attacks.map(attack => {
@@ -1113,8 +1120,10 @@
 							monster.stats.CHA = Math.max(1, 10 + 2 * monster.stats.cha_mod); // derive core stat
 						} else if (!monster.alignment && /^[Aa][Ll]\s+[\(\w\s]*[\w\)]$/.test(statsLine)) {
 							monster.alignment = alignments[statsLine.substring(3)];
-						} else if (!monster.level && /^[Ll][Vv]\s(\*|\d+)$/.test(statsLine)) {
-							monster.level = parseInt(statsLine.substring(3), 10) || monster.name==="Hydra" ? 10 : 0; // hydra heads special case (5 heads)
+						} else if (!monster.level && /^[Ll][Vv]\s(\*|\d+)(\/\d+)?$/.test(statsLine)) {
+							// if there is a rare case of multi-value like 4/5 grab the first number (ex: elementals don't have separate lesser/greater stats in the book)
+							const levelText = /^[Ll][Vv]\s(?<level>\*|\d+)(\/\d+)?$/.exec(statsLine).groups?.level || "";
+							monster.level = parseInt(levelText, 10) || (monster.name==="Hydra" ? 10 : 0); // hydra heads special case (5 heads)
 							break; // done getting stats - get attack text next loop
 						}
 					}
@@ -1126,7 +1135,7 @@
 			});
 			return monsters;
 		}
-		
+
 		let parseActions = function(inputArray) {
 			const result = [];
 		
@@ -1137,7 +1146,7 @@
 				};
 		
 				// action name
-				const actionNameRegex = /^[A-Z][^.]*/;
+				const actionNameRegex = /^[A-Z][^A-Z][^.]*/;
 				const actionNameMatch = inputArray[i].match(actionNameRegex);
 				if (actionNameMatch) {
 					actionObject.name = actionNameMatch[0].trim();
@@ -1684,7 +1693,7 @@
 			update[`${prefix}_atkmod`] = action.mod === undefined ? "0" : action.mod.toString();
 			update[`${prefix}_duration`] = action.duration || "";
 			update[`${prefix}_castdc`] = action.dc || "";
-			update[`${prefix}_atkrange`] = action.rng || "";
+			update[`${prefix}_atkrange`] = action.range || "";
 			update[`${prefix}_equipped`] = "1"; // default to usable state
 			update[`${prefix}_atkmagic`] = action.magBonus || "";
 			update[`${prefix}_atkcritrange`] = action.critRange || "20";
@@ -1696,7 +1705,7 @@
 			update[`${prefix}_dmg2base`] = action.damage2 || "";
 			update[`${prefix}_dmg2mmod`] = action.damage2Mod || "";
 			update[`${prefix}_dmg2custcrit`] = action.damage2CustomCrit || "";
-			update[`${prefix}_atk_desc`] = action.effect || "";
+			update[`${prefix}_atk_desc`] = action.effect ? "Effect: " + action.effect : "";
 			setAttrs(update, {
 				silent: true
 			}, () => update_attacks(attackId));
