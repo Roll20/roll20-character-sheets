@@ -129,7 +129,7 @@ const conditionalLog = function (bool, msg) {
 }
 
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
-    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}] ]]}}`);
     finishRoll(queryRoll.rollId);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
 };
@@ -1427,6 +1427,26 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
 //#endregion
 
+on(`clicked:secret-door-check`, async function (eventInfo) {
+    console.log(eventInfo);
+    let rollBuilder = new RollTemplateBuilder('2Echeck');
+    rollBuilder.push('character=@{character_name}','color=green','checkroll=[[1d6cs1cf6]]');
+
+    let doorType = await extractQueryResult(`?{Is the door Concealed (normal door hidden by a curtain or carpet) or Secret (built into the wall, sliding bookcase, requires special mechanism to open)?|Concealed|Secret}`);
+    if (doorType === 'Concealed') {
+        rollBuilder.push('checkvs=Find Concealed Door','checktarget=[[6]]', 'success=You find the concealed door!');
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    }
+
+    rollBuilder.push('checkvs=Find Secret Door', 'success=After 10 minutes of searching the 20-foot section of the wall you find the secret door!', 'fail=After 10 minutes of searching the 20-foot section of the wall you find nothing. You cannot try again, but other characters can.');
+    let infoModifier = await extractQueryResult(`?{Have the character seen the door in operation? Do they only need to find the opening mechanism?|+0 [Door is secret]|+1 [Character knows of the door]}`);
+    console.log(infoModifier);
+    rollBuilder.push(`checktarget=[[@{secret-door-base}+(@{secret-door-race})+(${infoModifier})+(@{misc-mod})]]`);
+    console.log(rollBuilder.string());
+
+    return printRoll(`/w gm ${rollBuilder.string()}`);
+});
+
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
 const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
@@ -1485,23 +1505,21 @@ on('change:armorname change:armorname2 change:repeating_hench4:armorname22', fun
     setAttrs(armorModifiers);
 });
 
-on('clicked:rt', function (eventInfo){
-    getAttrs([''], async function (values) {
-        console.log(eventInfo);
-        let rollBuilder = new RollTemplateBuilder('2Echeck');
-        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
+on('clicked:rt', async function (eventInfo){
+    console.log(eventInfo);
+    let rollBuilder = new RollTemplateBuilder('2Echeck');
+    rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
 
-        let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
-        if (skill === 'Find Traps') {
-            rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
-        } else if (skill === 'Remove Traps') {
-            rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
-        } else if (skill === 'Remove Invisible/Magical Traps') {
-            rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
-        }
+    let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
+    if (skill === 'Find Traps') {
+        rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
+    } else if (skill === 'Remove Traps') {
+        rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+    } else if (skill === 'Remove Invisible/Magical Traps') {
+        rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+    }
 
-        return printRoll(`/w gm ${rollBuilder.string()}`);
-    });
+    return printRoll(`/w gm ${rollBuilder.string()}`);
 });
 
 on('clicked:ms clicked:hs', function (eventInfo){
