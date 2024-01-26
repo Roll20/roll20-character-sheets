@@ -193,7 +193,7 @@ const isRollValid = function (rollExpression, field) {
 }
 
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
-const checkClassLevel = async function(values, rollExpression) {
+const checkClassLevel = async function(formulaField, values, rollExpression) {
     await keepContextRoll();
     let match = rollExpression.match(LEVEL_CLASS_REGEX);
     if (!match)
@@ -203,7 +203,7 @@ const checkClassLevel = async function(values, rollExpression) {
     if (levelsInExpression.size > 1)
         return rollExpression; // The user presumably knows what he is doing
 
-    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
+    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => parseInt(values[level]));
     if (levelsWithValues.length === 0)
         return rollExpression; // The user has not set levels in any fields
 
@@ -218,9 +218,9 @@ const checkClassLevel = async function(values, rollExpression) {
     } else {
         let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
             .join('|');
-        let query = values[levelInExpressionNoBrackets]
-            ? `?{Please confirm the class to use|${suggestedClasses}}`
-            : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
+        let query = parseInt(values[levelInExpressionNoBrackets])
+            ? `?{Macro [${formulaField}]: Please confirm the class to use|${suggestedClasses}}`
+            : `?{Macro [${formulaField}]: ${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
 
         let field = await extractQueryResult(query);
         return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
@@ -236,7 +236,7 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
 
         let valueToSet = {};
         if (doCheckClassLevel) {
-            let updatedRollExpression = await checkClassLevel(values, rollExpression);
+            let updatedRollExpression = await checkClassLevel(formulaField, values, rollExpression);
             if (rollExpression !== updatedRollExpression) {
                 valueToSet[formulaField] = rollExpression = updatedRollExpression;
             }
@@ -873,6 +873,7 @@ const CALCULATION_FIELDS = [
 ];
 CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
     on(`change:${formulaField}`, function (eventInfo) {
+        console.log(eventInfo);
         if (isSheetWorkerUpdate(eventInfo))
             return;
 
