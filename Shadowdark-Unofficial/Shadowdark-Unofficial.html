@@ -553,16 +553,16 @@
 				</div>
 				<label class="sheet-form-checkbox" title="@{sheetwipe_confirm_flag}">
 					<input type="checkbox" name="attr_sheetwipe_confirm_flag" value="1">
-					<span>"By checking this box, I officially swear that I want to replace my stats"</span>
+					<span>Confirm Import: "By checking this box, I officially swear that I want to replace my stats"</span>
 				</label>
 			</div>
 			<div class="sheet-form-group">
-				<label>JSON or Monster Text</label>
+				<label>JSON (Shadowdarklings format) or Monster Text (Core rules PDF format)</label>
 				<textarea name="attr_json" title="@{json}"></textarea>
 			</div>
 			<div class="sheet-form-group">
 				<label>Version:</label>
-				<input type="text" name="attr_version" value="2024.1.25.1" hidden disabled>
+				<input type="text" name="attr_version" value="2024.1.26.0" hidden disabled>
 				<span name="attr_version"></span>
 			</div>
 			<div>
@@ -942,26 +942,12 @@
 					return;
 				}
 				try {
-					const monsterSheet = parseMonsters(v.json);
+					const monster = parseMonster(v.json);
 					const isNpc = true;
-					if (monsterSheet?.length) {
-						monster = monsterSheet[0];
+					if (monster) {
 						import_sheet(monster, isNpc);
-						if (monster.attacks?.length) {
-							// help GMs: add attackText as a Multiattack feature if has multiple possible attacks or > 1 qty of single attack
-							if (monster.attackText?.length &&
-									(monster.attacks?.length > 1 || monster.attacks.filter(o=>o.qty > 1).length)) {
-								create_trait_from_feature({name: "Multiattack", description: monster.attackText});
-							}
-							monster.attacks.filter(o=>o.damage || o.damage2).forEach(o=> {
-								try { create_attack_from_action(o); }
-								catch(ex) { console.log(`Failed to add attack ${o}\n${ex}`); }
-							});
-						}
-						monster.actions.forEach(o=> {
-							try { create_trait_from_feature(o); }
-							catch(ex) { console.log(`Failed to add attack ${o}\n${ex}`); }
-						});
+					} else {
+						throw new Error("No data returned from parseMonster()");
 					}
 				}
 				catch(ex)
@@ -1002,96 +988,84 @@
 		}
 
 		// parse monster from copy-and-paste book format to shadowdarklings-style format
-		let parseMonsters = function(text) {
+		let parseMonster = function(text) {
 			const entries = [];
 			let entry = [];
-			let lines = text.split(/\n/);
-			for (let l = 0; l < lines.length; ++l) {
-				let line = lines[l];
-				if (!line?.length) continue; // skip empty lines
-		
-				// Find the first line containing the monster name
-				let isName = /^[A-Z][A-Z\s,]*[A-Z]$/.test(line);
-				if (isName) {
-					if (entry?.length) entries.push(entry.join("\n"));
-					entry = [];
-				}
-				entry.push(line);
+			let lines = text.split(/\n/)
+				.map(o=>o.trim())
+				.filter(o=>o.length);
+			if (lines.length < 3) {
+				throw new Error(
+					`This doesn't look like valid monster text. Expected format is:\n` +
+					`NAME\n` +
+					`Description text.\n` +
+					`AC 1 (armor type), HP 1, ATK 1 hammer +1 (1d4), MV near,\n` +
+					`S +1, D +0, C +0, I -1, W +0, Ch -1, AL C, LV 1\n` + 
+					`Action 1. Action 1 description.\n` +
+					`Action N. Action N description.`
+				);
 			}
-			if (entry?.length) entries.push(entry.join("\n"));
-		
-			const monsters = [];
-			let monster;
+
+			// Assume first line is the monster name
 			let acIndex = 0;
+			let monster = {
+				name: titleCase(lines[0]),
+				description: "",
+				actions: [],
+				stats: {}
+			};
 		
-			entries.forEach(entry => {
-				lines = entry.split(/\n/);
-				for (let l = 0; l < lines.length; ++l) {
-					let line = lines[l].trim();
-					if (!line?.length) continue; // skip empty lines
-		
-					// Find the first line containing the monster name
-					let isName = /^[A-Z][A-Z\s,]*[A-Z]$/.test(line);
-					if (isName) {
-						// create new monster item and add to list
-						monster = {
-							name: titleCase(line),
-							description: "",
-							actions: [],
-							stats: {}
-						};
-						acIndex = 0;
-						continue;
-					}
-		
-					// Assume AC is first stat. Everything between name and AC is Description text.
-					// Hopefully there is no monster with "AC " in the description... shrug..
-					if (/^AC \d+/.test(line)) {
-						acIndex = l;
-						break; // found start of stat block; exit loop
-					} else {
-							if (monster.description.length) monster.description += " ";
-							monster.description += line;
-					}
+			for (let l = 0; l < lines.length; ++l) {
+				let line = lines[l];	
+				// Assume AC is first stat. Everything between name and AC is Description text.
+				// Hopefully there is no monster with "AC " in the description... shrug..
+				if (monster.description.length && /^(A[Cc]\s+\d+|AC$)/.test(line)) {
+					acIndex = l;
+					break; // found start of stat block; exit loop
+				} else {
+						if (monster.description.length) monster.description += " ";
+						monster.description += line;
 				}
-		
-				// push monster only if found the stats block
-				if (acIndex > 0)
-				{
-					monsters.push(monster);
-				}
-				else {
-					console.log(`Unable to parse stats for ${monster.name}`);
-					return; // parse next monster, skip forEach iteration
-				}
-		
-				// stats come before actions - first stat is "AC" (armor class) and final stat is "LV" (level)
-				// attacks are included in the stats block using "ATK"
-				const statsAndActionsLines = lines.slice(acIndex);
-		
-				// find beginning of actions text
-				const actionsIndex = statsAndActionsLines.findIndex(o=>/(^\d+|[Ll][Vv]\s(\d+|\*)(\/\d+)?)$/.test(o)) + 1;
-				const actionsLines = statsAndActionsLines.slice(actionsIndex);
+			}
+
+			// push monster only if found the stats block
+			if (acIndex === 0) {
+				console.log(`Unable to parse stats for ${monster.name}`);
+				return monster;
+			}
+	
+			// stats come before actions - first stat is "AC" (armor class) and final stat is "LV" (level)
+			// attacks are included in the stats block using "ATK"
+			const statsAndActionsLines = lines.slice(acIndex);
+	
+			// find beginning of actions text
+			const actionsIndex = statsAndActionsLines.findIndex(o=>/(^\d+|[Ll][Vv]\s(\d+|\*)(\/\d+)?)$/.test(o)) + 1;
+			const actionsLines = statsAndActionsLines.slice(actionsIndex);
+			try {
 				monster.actions = parseActions(actionsLines);
-		
-				// slice out and parse stats from between monster description and actions
-				const statsLines = statsAndActionsLines.slice(0, actionsIndex).map(o=>o.trim()).join(" ").split(/,/);
-				for (let i = 0; i < statsLines.length; i++) {
-					let statsLine = statsLines[i].trim(); // Trim leading and trailing whitespace for copy-paste issues	
-					if (!statsLine?.length) continue; // skip empty lines
-					try {
-						if (!monster.armorClass && statsLine.startsWith('AC ')) {
-							const [, AC, armor] = statsLine.match(/AC (\d+)(?: \(([\w\s]+)\))?/);
-							monster.armorClass = +AC;
-							monster.armor = armor || "";
-						} else if (!monster.maxHitPoints && /^[Hh][Pp]\s(\*|\d+)(\/\d+)?$/.test(statsLine)) {
-							// if there is a rare case of multi-value like 4/5 grab the first number (ex: elementals don't have separate lesser/greater stats in the book)
-							const hp = /^[Hh][Pp]\s(?<hp>\*|\d+)(\/\d+)?$/.exec(statsLine).groups?.hp || "";
-							monster.maxHitPoints = parseInt(hp, 10) || (monster.name==="Hydra" ? 55 : 0); // hydra heads special case (5 heads)
-						} else if (!monster.attacks && statsLine.startsWith('ATK ')) {
-									// hacky fix for Azer (and other stat blocks that have comma in the ATK section)
-							if(/^\s+[^A-Z]/.test(statsLines[i+1]))
-							{
+			} catch (ex) {
+				console.log(`Failed to parse actions for ${monster.name}`);
+				console.log(ex);
+			}
+	
+			// slice out and parse stats from between monster description and actions
+			const statsLines = statsAndActionsLines.slice(0, actionsIndex).map(o=>o.trim()).join(" ").split(/,/);
+			for (let i = 0; i < statsLines.length; i++) {
+				let statsLine = statsLines[i].trim(); // Trim leading and trailing whitespace for copy-paste issues	
+				if (!statsLine?.length) continue; // skip empty lines
+				try {
+					if (!monster.armorClass && statsLine.startsWith('AC ')) {
+						const [, AC, armor] = statsLine.match(/AC (\d+)(?: \(([\w\s]+)\))?/);
+						monster.armorClass = +AC;
+						monster.armor = armor || "";
+					} else if (!monster.maxHitPoints && /^[Hh][Pp]\s(\*|\d+)(\/\d+)?$/.test(statsLine)) {
+						// if there is a rare case of multi-value like 4/5 grab the first number (ex: elementals don't have separate lesser/greater stats in the book)
+						const hp = /^[Hh][Pp]\s(?<hp>\*|\d+)(\/\d+)?$/.exec(statsLine).groups?.hp || "";
+						monster.maxHitPoints = parseInt(hp, 10) || (monster.name==="Hydra" ? 55 : 0); // hydra heads special case (5 heads)
+					} else if (!monster.attacks && statsLine.startsWith('ATK ')) {
+						try {
+							// hacky fix for Azer (and other stat blocks that have comma in the ATK section)
+							if(/^\s+[^A-Z]/.test(statsLines[i+1])) {
 								statsLine += ' + ' + statsLines[i+1]; // restore comma
 							}
 							const [, attackText] = statsLine.match(/ATK (.+)/);
@@ -1110,42 +1084,45 @@
 									effect: attack.effect || ""
 								};
 							});
-						} else if (!monster.movement && /^[Mm][Vv]\s[\(\s\w/]*[\w\)]$/.test(statsLine)) {
-							monster.movement = statsLine.substring(3);
-						} else if (!monster.stats.str_mod && /^[Ss]\s[\+\-]+[\d]+$/.test(statsLine)) {
-							monster.stats.str_mod = parseInt(statsLine.substring(2), 10) || 0;
-							monster.stats.STR = Math.max(1, 10 + 2 * monster.stats.str_mod); // derive core stat
-						} else if (!monster.stats.dex_mod && /^[Dd]\s[\+\-]+[\d]+$/.test(statsLine)) {
-							monster.stats.dex_mod = parseInt(statsLine.substring(2), 10) || 0;
-							monster.stats.DEX = Math.max(1, 10 + 2 * monster.stats.dex_mod); // derive core stat
-						} else if (!monster.stats.con_mod && /^[Cc]\s[\+\-]+[\d]+$/.test(statsLine)) {
-							monster.stats.con_mod = parseInt(statsLine.substring(2), 10) || 0;
-							monster.stats.CON = Math.max(1, 10 + 2 * monster.stats.con_mod); // derive core stat
-						} else if (!monster.stats.int_mod && /^[Ii]\s[\+\-]+[\d]+$/.test(statsLine)) {
-							monster.stats.int_mod = parseInt(statsLine.substring(2), 10) || 0;
-							monster.stats.INT = Math.max(1, 10 + 2 * monster.stats.int_mod); // derive core stat
-						} else if (!monster.stats.wis_mod && /^[Ww]\s[\+\-]+[\d]+$/.test(statsLine)) {
-							monster.stats.wis_mod = parseInt(statsLine.substring(2), 10) || 0;
-							monster.stats.WIS = Math.max(1, 10 + 2 * monster.stats.wis_mod); // derive core stat
-						} else if (!monster.stats.cha_mod && /^[Cc][Hh]\s[\+\-]+[\d]+$/.test(statsLine)) {
-							monster.stats.cha_mod = parseInt(statsLine.substring(3), 10) || 0;
-							monster.stats.CHA = Math.max(1, 10 + 2 * monster.stats.cha_mod); // derive core stat
-						} else if (!monster.alignment && /^[Aa][Ll]\s+[\(\w\s]*[\w\)]$/.test(statsLine)) {
-							monster.alignment = alignments[statsLine.substring(3)];
-						} else if (!monster.level && /^[Ll][Vv]\s(\*|\d+)(\/\d+)?$/.test(statsLine)) {
-							// if there is a rare case of multi-value like 4/5 grab the first number (ex: elementals don't have separate lesser/greater stats in the book)
-							const levelText = /^[Ll][Vv]\s(?<level>\*|\d+)(\/\d+)?$/.exec(statsLine).groups?.level || "";
-							monster.level = parseInt(levelText, 10) || (monster.name==="Hydra" ? 10 : 0); // hydra heads special case (5 heads)
-							break; // done getting stats - get attack text next loop
+						} catch (ex) {
+							console.log(`Failed to parse attacks for ${monster.name}`);
+							console.log(ex);
 						}
-					}
-					catch (ex) { 
-						console.log(ex);
-						console.log(monster); 
+					} else if (!monster.movement && /^[Mm][Vv]\s[\(\s\w/]*[\w\)]$/.test(statsLine)) {
+						monster.movement = statsLine.substring(3);
+					} else if (!monster.stats.str_mod && /^[Ss]\s[\+\-]+[\d]+$/.test(statsLine)) {
+						monster.stats.str_mod = parseInt(statsLine.substring(2), 10) || 0;
+						monster.stats.STR = Math.max(1, 10 + 2 * monster.stats.str_mod); // derive core stat
+					} else if (!monster.stats.dex_mod && /^[Dd]\s[\+\-]+[\d]+$/.test(statsLine)) {
+						monster.stats.dex_mod = parseInt(statsLine.substring(2), 10) || 0;
+						monster.stats.DEX = Math.max(1, 10 + 2 * monster.stats.dex_mod); // derive core stat
+					} else if (!monster.stats.con_mod && /^[Cc]\s[\+\-]+[\d]+$/.test(statsLine)) {
+						monster.stats.con_mod = parseInt(statsLine.substring(2), 10) || 0;
+						monster.stats.CON = Math.max(1, 10 + 2 * monster.stats.con_mod); // derive core stat
+					} else if (!monster.stats.int_mod && /^[Ii]\s[\+\-]+[\d]+$/.test(statsLine)) {
+						monster.stats.int_mod = parseInt(statsLine.substring(2), 10) || 0;
+						monster.stats.INT = Math.max(1, 10 + 2 * monster.stats.int_mod); // derive core stat
+					} else if (!monster.stats.wis_mod && /^[Ww]\s[\+\-]+[\d]+$/.test(statsLine)) {
+						monster.stats.wis_mod = parseInt(statsLine.substring(2), 10) || 0;
+						monster.stats.WIS = Math.max(1, 10 + 2 * monster.stats.wis_mod); // derive core stat
+					} else if (!monster.stats.cha_mod && /^[Cc][Hh]\s[\+\-]+[\d]+$/.test(statsLine)) {
+						monster.stats.cha_mod = parseInt(statsLine.substring(3), 10) || 0;
+						monster.stats.CHA = Math.max(1, 10 + 2 * monster.stats.cha_mod); // derive core stat
+					} else if (!monster.alignment && /^[Aa][Ll]\s+[\(\w\s]*[\w\)]$/.test(statsLine)) {
+						monster.alignment = alignments[statsLine.substring(3)];
+					} else if (!monster.level && /^[Ll][Vv]\s(\*|\d+)(\/\d+)?$/.test(statsLine)) {
+						// if there is a rare case of multi-value like 4/5 grab the first number (ex: elementals don't have separate lesser/greater stats in the book)
+						const levelText = /^[Ll][Vv]\s(?<level>\*|\d+)(\/\d+)?$/.exec(statsLine).groups?.level || "";
+						monster.level = parseInt(levelText, 10) || (monster.name==="Hydra" ? 10 : 0); // hydra heads special case (5 heads)
+						break; // done getting stats - get attack text next loop
 					}
 				}
-			});
-			return monsters;
+				catch (ex) { 
+					console.log(ex);
+					console.log(monster); 
+				}
+			}
+			return monster;
 		}
 		
 		let parseActions = function(inputArray) {
@@ -1387,6 +1364,29 @@
 			});
 			update_slots(sheet.gearSlotsTotal);
 			console.log("Finished importing custom sheet");
+
+			if (isNpc) {
+				importMonsterActions(sheet);
+			}
+		}
+
+		let importMonsterActions = function(monster)
+		{
+			if (monster.attacks?.length) {
+				// help GMs: add attackText as a Multiattack feature if has multiple possible attacks or > 1 qty of single attack
+				if (monster.attackText?.length &&
+						(monster.attacks?.length > 1 || monster.attacks.filter(o=>o.qty > 1).length)) {
+					create_trait_from_feature({name: "Multiattack", description: monster.attackText});
+				}
+				monster.attacks.filter(o=>o.damage || o.damage2).forEach(o=> {
+					try { create_attack_from_action(o); }
+					catch(ex) { console.log(`Failed to add attack ${o}\n${ex}`); }
+				});
+			}
+			monster.actions.forEach(o=> {
+				try { create_trait_from_feature(o); }
+				catch(ex) { console.log(`Failed to add attack ${o}\n${ex}`); }
+			});
 		}
 
 		let addSpaces = function(str) {
@@ -1778,14 +1778,12 @@
 			var attrs_to_get = ["dexterity", "dexterity_mod", "init_tiebreaker", "advantagetoggle"];
 			getAttrs(attrs_to_get, function(v) {
 				var update = {};
-				debugger;
 				var final_init = parseInt(v["dexterity_mod"], 10);				
 				if (v["init_tiebreaker"] != "0") {
 					final_init = (final_init + parseFloat(Math.abs(parseInt(v["dexterity"], 10) / 100))).toFixed(2);
 				}
 
-				switch (v["advantagetoggle"])
-				{
+				switch (v["advantagetoggle"]) {
 					// advantage
 				 	case "{{query=1}} {{advantage=1}} {{r2=[[@{d20}":
 						update["initiative_style"] = "{@{d20},@{d20}}kh1";
