@@ -27,7 +27,25 @@ HTML = \
 	$(JS)
 JS = \
 	dev/js/intro.js \
-	dev/js/sheetworker.js \
+	dev/js/constants.js \
+	dev/js/utilities_general.js \
+	dev/js/utilities_dsa.js \
+	dev/js/initialization_migration_common.js \
+	dev/js/initialization.js \
+	dev/js/migration.js \
+	dev/js/base_values.js \
+	dev/js/advantages_disadvantages.js \
+	dev/js/talents.js \
+	dev/js/magic.js \
+	dev/js/liturgies.js \
+	dev/js/melee.js \
+	dev/js/ranged_combat_calculator.js \
+	dev/js/ranged_combat_other.js \
+	dev/js/armour_encumbrance_initiative.js \
+	dev/js/wounds.js \
+	dev/js/debug_mode.js \
+	dev/js/roll_macro_generator.js \
+	dev/js/other.js \
 	dev/js/outro.js
 CSS = \
 	dev/css/style.css
