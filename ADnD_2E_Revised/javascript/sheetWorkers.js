@@ -192,6 +192,34 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
+const getClassesWithLevels = function(values) {
+    let result = {};
+    Object.entries(LEVEL_FIELDS).forEach(([levelField, classField]) => {
+        let levelValue = parseInt(values[levelField]);
+        if (isNaN(levelValue) || levelValue < 1) {
+            return;
+        }
+        result[levelField] = {level: levelValue, className: values[classField]}
+        switch (levelField.slice(-1)) {
+            case "1": result[levelField].classGroup = 'warrior'; break;
+            case "2": result[levelField].classGroup = 'wizard'; break;
+            case "3": result[levelField].classGroup = 'priest'; break;
+            case "4": result[levelField].classGroup = 'rogue'; break;
+            case "5": result[levelField].classGroup = 'psionicist'; break;
+        }
+    });
+    return result;
+}
+
+const getClassSuggestionOptions = function (values) {
+    return Object.entries(getClassesWithLevels(values)).map(([levelField,classProperties]) => {
+        // remove comma as it breaks query format
+        let className = classProperties.className.replaceAll(/[,|]/g,'');
+        className = className ? className : `${levelField}`;
+        return `${className} level ${classProperties.level},${levelField}`;
+    }).join('|');
+}
+
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
 const checkClassLevel = async function(formulaField, values, rollExpression) {
     await keepContextRoll();
@@ -201,23 +229,23 @@ const checkClassLevel = async function(formulaField, values, rollExpression) {
 
     let levelsInExpression = new Set(match);
     if (levelsInExpression.size > 1)
-        return rollExpression; // The user presumably knows what he is doing
+        return rollExpression; // More than one level-class present. The user presumably knows what he is doing
 
-    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => parseInt(values[level]));
-    if (levelsWithValues.length === 0)
+    let classesWithLevels = getClassesWithLevels(values);
+    let levelsWithValue = Object.keys(classesWithLevels);
+    if (levelsWithValue.length === 0)
         return rollExpression; // The user has not set levels in any fields
 
     let [levelInExpression] = levelsInExpression; // first element from set
     let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
-    if (levelsWithValues.length === 1) {
-        if (levelInExpressionNoBrackets === levelsWithValues[0]) {
+    if (levelsWithValue.length === 1) {
+        if (levelInExpressionNoBrackets === levelsWithValue[0]) {
             return rollExpression;
         } else {
-            return  rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
+            return  rollExpression.replaceAll(levelInExpressionNoBrackets, classesWithLevels[0]);
         }
     } else {
-        let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
-            .join('|');
+        let suggestedClasses = getClassSuggestionOptions(values);
         let query = parseInt(values[levelInExpressionNoBrackets])
             ? `?{Macro [${formulaField}]: Please confirm the class to use|${suggestedClasses}}`
             : `?{Macro [${formulaField}]: ${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
@@ -853,6 +881,110 @@ on('clicked:opendoor-check', function (eventInfo){
        }
        return printRoll(rollBuilder.string());
    });
+});
+//#endregion
+
+//#region Saving throws autofill
+on('clicked:saving-throws-character', function (eventInfo) {
+    const ravenloftTab = 'tab2';
+    getAttrs([ravenloftTab, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
+        let classesWithLevels = getClassesWithLevels(values);
+        let numberOfClasses = Object.keys(classesWithLevels).length;
+        if (numberOfClasses === 0) {
+            return showToast(ERROR,'Saving throws not updated','All class levels were 0. Please set your class levels on the Character->Info->Details tab');
+        } else if (numberOfClasses > 1) {
+            let characterType = await extractQueryResult('?{Are you a Multi-class or Dual-class?|Multi-class|Dual-class}');
+            if (characterType === 'Dual-class') {
+                let classSuggestionOptions = getClassSuggestionOptions(values);
+                let activeClass = await extractQueryResult(`?{Which class is your current active class?|${classSuggestionOptions}}`);
+                let restrictionsLifted = Object.entries(classesWithLevels)
+                    .every(([levelField,classProperties]) => levelField === activeClass || classesWithLevels[activeClass].level > classProperties.level);
+                if (!restrictionsLifted) {
+                    Object.keys(classesWithLevels).forEach(key => key === activeClass || delete classesWithLevels[key])
+                }
+            }
+        }
+
+        // Ensure all levels are below 21 to keep within index
+        Object.values(classesWithLevels).forEach(classProperties => Math.min(classProperties.level,21));
+
+        let classInfo = Object.values(classesWithLevels).map(cp => `• ${capitalizeFirst(cp.classGroup)} level: ${cp.level}`).join('\n');
+        let toastObject = getToastObject(SUCCESS,'Saving throw updated',`Character saving throws updated based on the following class(es):\n${classInfo}`);
+        let newValue = {...toastObject};
+        newValue['partar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['poitar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['deatar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['rodtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['statar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['wantar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['pettar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['petrificationPolymorph'][cp.level]));
+        newValue['poltar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['petrificationPolymorph'][cp.level]));
+        newValue['breathtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['breath'][cp.level]));
+        newValue['sptar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['spell'][cp.level]));
+        if (values[ravenloftTab] === '2') {
+            newValue['ftar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['fear'][cp.level]));
+            newValue['horrtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['horror'][cp.level]));
+            newValue['madtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['madness'][cp.level]));
+        }
+
+        setAttrs(newValue);
+    });
+});
+
+on('clicked:saving-throws-monster', function (eventInfo) {
+    getAttrs(['hitdice','monsterhpextra','monsterintelligence'], async function (values) {
+        let hitDice = parseInt(values['hitdice']) || 0;
+        let monsterExtraHp = parseInt(values['monsterhpextra']) || 0
+        let intelligentLevel = hitDice + Math.ceil(monsterExtraHp / 4);
+
+        let monsterInt = parseInt(values['monsterintelligence']);
+        if (isNaN(monsterInt)) {
+            await keepContextRoll();
+            return showToast(ERROR, 'Monster Intelligence Missing', 'Monster Intelligence must be set to calculate saving throws.');
+        } else if (monsterInt < 1) {
+            intelligentLevel = Math.ceil(intelligentLevel / 2);
+        }
+
+        hitDice = Math.min(hitDice, 21);
+        intelligentLevel = Math.min(intelligentLevel, 21);
+
+        let intro = 'Monsters get the best saving throws from all classes.'
+        let classes = [];
+        if (await extractQueryResult(`?{${intro} Can the monster fight (Warrior)?|Yes|No}`) === 'Yes') {
+            classes.push('warrior');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster cast wizard spells (Wizard)?|Yes|No}`) === 'Yes') {
+            classes.push('wizard');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster cast priest spells (Priest)?|Yes|No}`) === 'Yes') {
+            classes.push('priest');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster use rogue skills (Rogue)?|Yes|No}`) === 'Yes') {
+            classes.push('rogue');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster use Psionic powers (Psionicist)?|Yes|No}`) === 'Yes') {
+            classes.push('psionicist');
+        }
+
+        let classInfo = classes.map(className => `• ${capitalizeFirst(className)} level: ${intelligentLevel}`).join('\n');
+        if (hitDice !== intelligentLevel) {
+            classInfo += `\nPoison and Death saves are based on level: ${hitDice}`;
+        }
+        let toastObject = getToastObject(SUCCESS,'Saving throw updated',`Monster saving throws updated based on the following class(es):\n${classInfo}`);
+        let newValue = {...toastObject};
+        newValue['monpartar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][intelligentLevel]));
+        newValue['monpoitar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][hitDice]));
+        newValue['mondeatar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][hitDice]));
+        newValue['monrodtar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monstatar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monwantar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monpettar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['petrificationPolymorph'][intelligentLevel]));
+        newValue['monpoltar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['petrificationPolymorph'][intelligentLevel]));
+        newValue['monbretar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['breath'][intelligentLevel]));
+        newValue['monspetar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['spell'][intelligentLevel]));
+
+        setAttrs(newValue);
+    })
 });
 //#endregion
 
