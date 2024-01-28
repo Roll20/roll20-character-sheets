@@ -14,6 +14,7 @@ HTML = \
 	dev/html/sheet/section_magie.html \
 	dev/html/sheet/section_liturgien.html \
 	dev/html/sheet/section_kampfwerte.html \
+	dev/html/sheet/section_regeneration.html \
 	dev/html/sheet/section_notizen.html \
 	dev/html/sheet/section_config.html \
 	dev/html/sheet/section_info.html \
