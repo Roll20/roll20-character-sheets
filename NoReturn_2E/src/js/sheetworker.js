@@ -1,11 +1,11 @@
 /*
     CREATED by          Gorthian
-    Letzte Änderung		2023-05-27
+    Version				1.1 HF4
+    Letzte Änderung		2023-12-16
 */
 
-
 /* TAB MENU */
-const buttonlist = ["page-one","page-two"]; //Bei Änderungen auch die globale Variable in noreturn.pug anpassen
+const buttonlist = ["page-one","page-two","page-three",,"page-four"]; //Bei Änderungen auch die globale Variable in noreturn.pug anpassen
 buttonlist.forEach(button => {
     on(`clicked:${button}`, function() {
         console.log(button);
@@ -101,28 +101,41 @@ function setDicebot(skill,attribut,summe,skillNotiz,hazard=1,biomechanik=0) {
         "probe_standard_wuerfel"            : summe-hazard,               
         "probe_bonus_wuerfel"               : 0,
         "probe_bonus"                       : 0,
-        "probe_biomechanik"                 : biomechanik
+        "probe_biomechanik"                 : biomechanik,        
     });
 }
 
 //Trefferpunkte setzen
 function setTrefferpunkte() {
-    getAttrs(["trefferpunkte"], function(values) {
+    getAttrs(["trefferpunkte","trefferpunkte-old","trefferpunkte-zone-2","trefferpunkte-zone-3","trefferpunkte-zone-4","trefferpunkte-zone-5","trefferpunkte-zone-6","trefferpunkte-zone-7","trefferpunkte-zone-8","trefferpunkte-zone-9","trefferpunkte-zone-10","trefferpunkte-zone-11","trefferpunkte-zone-12"], function(values) {
         let trefferpunkte = parseInt(values["trefferpunkte"]||30); //Standardwert ist 30
+        let trefferpunkte_old = parseInt(values["trefferpunkte-old"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone2 = parseInt(values["trefferpunkte-zone-2"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone3 = parseInt(values["trefferpunkte-zone-3"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone4 = parseInt(values["trefferpunkte-zone-4"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone5 = parseInt(values["trefferpunkte-zone-5"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone6 = parseInt(values["trefferpunkte-zone-6"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone7 = parseInt(values["trefferpunkte-zone-7"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone8 = parseInt(values["trefferpunkte-zone-8"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone9 = parseInt(values["trefferpunkte-zone-9"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone10 = parseInt(values["trefferpunkte-zone-10"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone11 = parseInt(values["trefferpunkte-zone-11"]||trefferpunkte); //Standardwert sind die allgemeinen TP
+        let zone12 = parseInt(values["trefferpunkte-zone-12"]||trefferpunkte); //Standardwert sind die allgemeinen TP
 
         setAttrs({
             "trefferpunkte"             : trefferpunkte,
-            "trefferpunkte-zone-2"      : trefferpunkte,
-            "trefferpunkte-zone-3"      : trefferpunkte,
-            "trefferpunkte-zone-4"      : trefferpunkte,
-            "trefferpunkte-zone-5"      : trefferpunkte,
-            "trefferpunkte-zone-6"      : trefferpunkte,
-            "trefferpunkte-zone-7"      : trefferpunkte,
-            "trefferpunkte-zone-8"      : trefferpunkte,
-            "trefferpunkte-zone-9"      : trefferpunkte,
-            "trefferpunkte-zone-10"     : trefferpunkte,
-            "trefferpunkte-zone-11"     : trefferpunkte,
-            "trefferpunkte-zone-12"     : trefferpunkte
+            "trefferpunkte-zone-2"      : zone2==trefferpunkte_old?trefferpunkte:zone2,
+            "trefferpunkte-zone-3"      : zone3==trefferpunkte_old?trefferpunkte:zone3,
+            "trefferpunkte-zone-4"      : zone4==trefferpunkte_old?trefferpunkte:zone4,
+            "trefferpunkte-zone-5"      : zone5==trefferpunkte_old?trefferpunkte:zone5,
+            "trefferpunkte-zone-6"      : zone6==trefferpunkte_old?trefferpunkte:zone6,
+            "trefferpunkte-zone-7"      : zone7==trefferpunkte_old?trefferpunkte:zone7,
+            "trefferpunkte-zone-8"      : zone8==trefferpunkte_old?trefferpunkte:zone8,
+            "trefferpunkte-zone-9"      : zone9==trefferpunkte_old?trefferpunkte:zone9,
+            "trefferpunkte-zone-10"     : zone10==trefferpunkte_old?trefferpunkte:zone10,
+            "trefferpunkte-zone-11"     : zone11==trefferpunkte_old?trefferpunkte:zone11,
+            "trefferpunkte-zone-12"     : zone12==trefferpunkte_old?trefferpunkte:zone12,
+            "trefferpunkte-old"         : trefferpunkte
         });
     });
 }
@@ -156,7 +169,7 @@ skilllist.forEach(skills => {
     let skill = skills[0];
     let attribut = skills[1];
     on(`clicked:probe-${skill}-${attribut}`, function() {        
-        getAttrs([skill, skill+"_mod", skill+"_biomechanik", skill+"_modifikatoren", attribut, attribut+"-mod1", attribut+"-mod2", attribut+"-biomechanik"], function(values) {
+        getAttrs([skill, skill+"_mod", skill+"_biomechanik",  attribut, attribut+"-biomechanik"], function(values) {
             let summeSkill = 0;
             let summeAttribut = 0;
             let summe = 0;
@@ -164,17 +177,10 @@ skilllist.forEach(skills => {
             let skillNotiz = values[skill+"_mod"];
             let biomechanik_skill = parseInt(values[skill+"_biomechanik"]||0);
             let biomechanik_attribut = parseInt(values[attribut+"-biomechanik"]||0);
-            let modifikatoren = parseInt(values[skill+"_modifikatoren"]||0);
-            let attributWert = parseInt(values[attribut]||0);
-            let attributMod1 = parseInt(values[attribut+"-mod1"]||0);
-            let attributMod2 = parseInt(values[attribut+"-mod2"]||0);            
+            let attributWert = parseInt(values[attribut]||0);            
     
             summeSkill = parseInt(values[skill]);
-            if (modifikatoren==0) { //Prüfen ob die Attributsmodifikatoren automatisch mit eingerechnet werden sollen
-                summeAttribut = attributWert;
-            } else {
-                summeAttribut = attributWert + attributMod1 + attributMod2;
-            }            
+            summeAttribut = attributWert;
             summe = summeSkill + summeAttribut;
 
             if (summeSkill==0) {summe = summe -2} //Ist die Fertigkeitsstufe 0, bekommt die Probe einen Malus von 2
@@ -195,27 +201,6 @@ skilllist.forEach(skills => {
 });
 
 // Attributsproben
-// ...mit Modifikatoren
-attributeslist.forEach(attribut => {    
-    on(`clicked:probe-${attribut}`, function() {        
-        getAttrs([attribut, attribut+"-mod1", attribut+"-mod2", attribut+"-biomechanik"], function(values) {
-            let summe = 0;
-            let hazard = 0;
-            let biomechanik = parseInt(values[attribut+"-biomechanik"]||0);
-            let wert = parseInt(values[attribut]||0);
-            let mod1 = parseInt(values[attribut+"-mod1"]||0);
-            let mod2 = parseInt(values[attribut+"-mod2"]||0);
-            console.log(getTranslationByKey("attributsprobe") + ":" + wert + "/" + mod1 + "/" + mod2);
-            
-            summe = wert + mod1 + mod2;
-            if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
-                hazard = summe;
-            }
-            setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard);
-        });
-    });
-});
-
 // ...ohne Modifikatoren
 attributeslist.forEach(attribut => {    
     on(`clicked:probe-ohne-mod-${attribut}`, function() {        
@@ -226,12 +211,13 @@ attributeslist.forEach(attribut => {
      
             if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
                 hazard = summe;
+            } else { //Andernfalls wird der Hazard-Di auf 1 gesetzt
+                hazard = 1;
             }
             setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard);
         });
     });
 });
-
 
 // Proben auf Besondere Fertigkeiten
 on("clicked:repeating_besondere-fertigkeiten:probe", function(eventInfo) {
@@ -316,7 +302,6 @@ on("clicked:sprachprobe_babel", function(eventInfo) {
         setzeSprachprobe(spracheName,spracheStufe);
     });
 });
-
 
 on("clicked:wirf-probe",function(){
     getAttrs(["character_name","probe_summe_wuerfel","probe_standard_wuerfel","probe_original_standard_wuerfel","probe_hazard_wuerfel","probe_original_hazard_wuerfel","probe_bonus_wuerfel","probe_bonus","probe_skill","probe_attribut","probe_biomechanik"], function(values) {
@@ -407,90 +392,6 @@ on("clicked:wirf-probe",function(){
     });        
 });
 
-on("clicked:wirf-manuelle-probe",function(){
-    getAttrs(["character_name","manuelle_probe_standard_wuerfel","manuelle_probe_hazard_wuerfel","manuelle_probe_bonus_wuerfel","manuelle_probe_bonus"], function(values) {
-        let standard = parseInt(values["manuelle_probe_standard_wuerfel"]||0);
-        let hazard = parseInt(values["manuelle_probe_hazard_wuerfel"]||0);        
-        let bonuswuerfel = parseInt(values["manuelle_probe_bonus_wuerfel"]||0);
-        let bonus = parseInt(values["manuelle_probe_bonus"]||0);
-        let charaktername = values["character_name"];
-        let roll = ""
-        let summe = hazard + standard + bonuswuerfel;
-
-        //Bei negativen Bonuswürfeln die Anzahl an Würfeln reduzieren
-        if (bonuswuerfel <0)
-        {
-            //Bei negativen Bonuswürfeln zunächst die Standard-Würfel und dann die Hazard-Würfel reduzieren
-            standard = standard + bonuswuerfel;
-            if(standard <0)
-            {
-                hazard = hazard + standard;
-                standard = 0;
-            }                
-            if (hazard<1) {hazard=0} //Bei manuellen Proben sind acuh Würde ohne Hazard-Di möglich
-        }
-
-        roll = "&{template:probe_offen}"; //Das Rolltemplate festlegen
-        roll = roll + "{{charaktername="+charaktername+"}}"; //Den Charakternamen mitgeben
-        roll = roll + "{{fertigkeit="+getTranslationByKey("manuelle_probe")+"}}"; //Die Fertigkeit auf die gewürfelt wird
-        roll = roll + "{{hazard=[["+hazard+"d6!6]]}}"; //Der Hazard-Wurf            
-        roll = roll + "{{wurf=[["+standard+"d6]]}}"; //Der normale Wurf
-        roll = roll + "{{bonuswurf=[["+bonuswuerfel+"d6]]}}"; //Die Bonuswürfel
-        roll = roll + "{{bonus=[["+bonus+"]]}}"; //Bonus abfragen
-        roll = roll + "{{summe=[["+summe+"]]}}"; //Platzhalter für die Summe
-
-        startRoll(roll, (results) => {
-            const hazard = parseInt(results.results.hazard.result);                
-            const wurf = parseInt(results.results.wurf.result);  
-            const bonuswurf = parseInt(results.results.bonuswurf.result);              
-            const bonus = parseInt(results.results.bonus.result);
-            let summe = 0;
-
-            console.log(bonuswurf);
-            if(bonuswurf<1)
-            {
-                summe = hazard+wurf+bonus;
-            } else {
-                summe = hazard+wurf+bonuswurf+bonus;
-            }
-
-            let hazard_wuerfel = "";
-            for (const n of results.results.hazard.dice) {
-                hazard_wuerfel = hazard_wuerfel + ""+n+"";
-            }
-
-            let wurf_wuerfel = "";
-            for (const n of results.results.wurf.dice) {
-                wurf_wuerfel = wurf_wuerfel + ""+n+"";
-            }
-
-            let wurf_bonus = "";
-            for (const n of results.results.bonuswurf.dice) {
-                wurf_bonus = wurf_bonus + ""+n+"";
-            }
-
-            finishRoll(
-                results.rollId,
-                {
-                    summe: summe,
-                    hazard: hazard_wuerfel,                
-                    wurf: wurf_wuerfel,
-                    bonuswurf: wurf_bonus
-                }
-            );                
-        });
-    });        
-});
-
-on("clicked:reset-manuelle-probe",function(){
-    setAttrs({
-        "manuelle_probe_hazard_wuerfel"     : 0,
-        "manuelle_probe_standard_wuerfel"   : 0,
-        "manuelle_probe_bonus_wuerfel"      : 0,
-        "manuelle_probe_bonus"              : 0
-    });
-});
-
 on("clicked:trefferzone",function(){
     roll = "&{template:trefferzone}"; //Das Rolltemplate festlegen
     roll = roll + "{{zone=[[2d6]]}}"; //Die Zone auswürfeln    
@@ -515,7 +416,6 @@ on("change:probe_hazard_wuerfel", function(){
         let hazard = parseInt(values["probe_hazard_wuerfel"]);
 
         standard = summe - hazard;
-        if(hazard < 1) {hazard = 1}
         if(standard < 0) {standard = 0}        
         
         setAttrs({

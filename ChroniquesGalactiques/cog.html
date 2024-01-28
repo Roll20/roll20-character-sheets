@@ -1,9 +1,9 @@
 <div class="sheet-mainBg">
   <!-- FDP -->
   <!-- INPUT HIDDEN Version FdP -->
-  <input type="hidden" name="attr_VERFDP" value="4.2.0" />
-  <input type="hidden" name="attr_VERSION" value="4.2.0" />
-  <!-- INPUT HIDDEN Univers (COF, CG, COC) -->
+  <input type="hidden" name="attr_VERFDP" value="4.4.1" />
+  <input type="hidden" name="attr_VERSION" value="4.4.1" />
+  <!-- INPUT HIDDEN Univers (COF, COG, COC) -->
   <input type="hidden" name="attr_UNIVERS" value="COG" />
   <input type="hidden" name="attr_token_url" value="" />
   <input type="hidden" name="attr_token_dsp" value="" />
@@ -90,6 +90,28 @@
     name="attr_QRYMODT"
     value="?{Carac. ?|Force,@{FOR_TEST}|Dextérité,@{DEX_TEST}|Constitution,@{CON_TEST}|Intelligence,@{INT_TEST}|Perception,@{PER_TEST}|Charisme,@{CHA_TEST}}"
   />
+  <input
+    type="hidden"
+    name="attr_QRYND"
+    value="?{ND Test ?|Facile,5|Moyenne,10|Difficile,15|Très difficile,20|Extrême,25|Impossible,30}"
+  />
+  <input
+    type="hidden"
+    name="attr_QRYDEF"
+    value="@{target|pnj_def}"
+  />
+  <input
+    type="hidden"
+    name="attr_QRYDEP"
+    value="@{target|pnj_dep}"
+  />
+  <!-- INPUT HIDDEN Mod Situation  -->
+  <input type="hidden" name="attr_MODSIT_FOR" value="0">
+  <input type="hidden" name="attr_MODSIT_DEX" value="0">
+  <input type="hidden" name="attr_MODSIT_CON" value="0">
+  <input type="hidden" name="attr_MODSIT_INT" value="0">
+  <input type="hidden" name="attr_MODSIT_PER" value="0">
+  <input type="hidden" name="attr_MODSIT_CHA" value="0">
   <!-- INPUT HIDDEN Postes de combat vaisseaux -->
   <input type="hidden" name="attr_POSTE_PIL" value="" />
   <input type="hidden" name="attr_POSTE_MOT" value="" />
@@ -125,8 +147,8 @@
   <div style="display: none">
     <button
       type="roll"
-      name="roll_incident_tir"
-      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{subtags=Attaque}} {{name=Incident de tir}} {{test=[[1d20cf1cs>2]]}} {{test_crit=Surchauffe ! Tir au prochain tour}} {{test_fumble=Batterie déchargée !}}"
+      name="roll_inctir"
+      value="@{selected|togm}&{template:co1} {{perso=@{selected|character_name}}} {{subtags=Attaque}} {{name=Incident de tir}} {{test=[[1d20cf1cs>2]]}} {{test_crit=Surchauffe ! Tir au prochain tour}} {{test_fumble=Batterie déchargée !}}"
     />
   </div>
   <div class="sheet-container">
@@ -134,7 +156,7 @@
     <div style="width: 420px; vertical-align: middle; text-align: center">
       <img
         width="320px"
-        title="Version 4.2.0 - 09/04/2023"
+        title="Version 4.4.1 - 31/10/2023"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog2_logo.png"
       />
       <img width="90px" height="90px" name="attr_character_token" />
@@ -339,10 +361,9 @@
       class="sheet-imghr"
       src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
     />
-    <div class="sheet-3colrow">
-      <input type="hidden" name="attr_rof4" value="" />
+    <div class="sheet-2colrow">
+      <input type="hidden" name="attr_rof4" value="+ 0" />
       <div class="sheet-col" style="text-align: center">
-        <input type="hidden" name="attr_sitbonus" value="" />
         Situation :&nbsp;
         <select
           class="sheet-carac"
@@ -360,15 +381,13 @@
       <div class="sheet-col">
         <input type="hidden" name="attr_matmod_desc" value="" />
         <input type="hidden" name="attr_matmod" value="0" />
-        <input type="hidden" name="attr_matbonus" value="" />
         Matériel :&nbsp;<span name="attr_matmod_desc"></span>&nbsp;/&nbsp;<span
           name="attr_matmod"
         ></span>
-      </div>
+      </div><!--
       <div class="sheet-col">
-        <input type="hidden" name="attr_chcbonus" value="" />
         Chance :&nbsp;<input type="checkbox" name="attr_chcmod" value="1" />
-      </div>
+      </div> -->
     </div>
     <br />
     <input
@@ -429,7 +448,7 @@
                       type="roll"
                       name="roll_jet_for"
                       title="%{jet_for} Jet de Force"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Force}} {{subtags=Test}} {{carac=[[@{FOR_SUP}[Dé] + [[@{FOR_TEST}]][Bonus] @{rof4} ]] }}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Force}} {{subtags=Test}} {{carac=[[@{FOR_SUP}[Dé] + [[@{FOR_TEST}]][Bonus FOR] @{rof4} + ([[@{MODSIT_FOR}]][Situation]) ]] }} @{prompt_nd}"
                     >
                       FOR
                     </button>
@@ -473,7 +492,7 @@
                       type="roll"
                       name="roll_jet_dex"
                       title="%{jet_dex} Jet de Dext&eacute;rit&eacute;"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Dext&eacute;rit&eacute;}} {{subtags=Test}} {{carac=[[@{DEX_SUP}[Dé] + [[@{DEX_TEST}]][Bonus] - [[@{ARMURE_MALUS}]][Armure] @{rof4} ]] }}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Dext&eacute;rit&eacute;}} {{subtags=Test}} {{carac=[[@{DEX_SUP}[Dé] + [[@{DEX_TEST}]][Bonus DEX] - [[@{ARMURE_MALUS}]][Armure] @{rof4} + ([[@{MODSIT_DEX}]][Situation]) ]] }} @{prompt_nd}"
                     >
                       DEX
                     </button>
@@ -519,7 +538,7 @@
                       type="roll"
                       name="roll_jet_con"
                       title="%{jet_con} Jet de Constitution"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Constitution}} {{subtags=Test}} {{carac=[[@{CON_SUP}[Dé] + [[@{CON_TEST}]][Bonus] @{rof4} ]] }}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Constitution}} {{subtags=Test}} {{carac=[[@{CON_SUP}[Dé] + [[@{CON_TEST}]][Bonus CON] @{rof4} + ([[@{MODSIT_CON}]][Situation]) ]] }} @{prompt_nd}"
                     >
                       CON
                     </button>
@@ -563,7 +582,7 @@
                       type="roll"
                       name="roll_jet_int"
                       title="%{jet_int} Jet d'Intelligence"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Intelligence}} {{subtags=Test}} {{carac=[[@{INT_SUP}[Dé] + [[@{INT_TEST}]][Bonus] @{rof4} ]] }}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Intelligence}} {{subtags=Test}} {{carac=[[@{INT_SUP}[Dé] + [[@{INT_TEST}]][Bonus INT] @{rof4} + ([[@{MODSIT_INT}]][Situation]) ]] }} @{prompt_nd}"
                     >
                       INT
                     </button>
@@ -607,7 +626,7 @@
                       type="roll"
                       name="roll_jet_per"
                       title="%{jet_per} Jet de Perception"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Perception}} {{subtags=Test}} {{carac=[[@{PER_SUP}[Dé] + [[@{PER_TEST}]][Bonus] @{rof4} ]] }}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Perception}} {{subtags=Test}} {{carac=[[@{PER_SUP}[Dé] + [[@{PER_TEST}]][Bonus PER] @{rof4} + ([[@{MODSIT_PER}]][Situation]) ]] }} @{prompt_nd}"
                     >
                       PER
                     </button>
@@ -651,7 +670,7 @@
                       type="roll"
                       name="roll_jet_cha"
                       title="%{jet_cha} Jet de Charisme"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Charisme}} {{subtags=Test}} {{carac=[[@{CHA_SUP}[Dé] + [[@{CHA_TEST}]][Bonus] @{rof4} ]] }}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Charisme}} {{subtags=Test}} {{carac=[[@{CHA_SUP}[Dé] + [[@{CHA_TEST}]][Bonus CHA] @{rof4} + ([[@{MODSIT_CHA}]][Situation]) ]] }} @{prompt_nd}"
                     >
                       CHA
                     </button>
@@ -940,7 +959,7 @@
                             type="roll"
                             name="roll_jet_init"
                             title="%{jet_init} Jet d'initiative"
-                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Initiative}} {{subtags=Combat}} {{carac=[[@{INIT}[Init.] + @{INIT_VAR}[Dé(s)] &{tracker}]]}}"
+                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Initiative}} {{subtags=Combat}} {{carac=[[@{INIT}[Init.] + @{INIT_VAR}[Dé(s)] &{tracker} ]]}}"
                           >
                             INITIATIVE
                           </button>
@@ -979,7 +998,7 @@
                             type="roll"
                             name="roll_jet_cac"
                             title="%{jet_cac} Jet d'attaque au contact"
-                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Au Contact}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKCAC}]][Bonus] @{rof4} ]] }}"
+                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Au Contact}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKCAC}]][Bonus] @{rof4} ]] }} @{target_def}"
                           >
                             AU CONTACT
                           </button>
@@ -1033,7 +1052,7 @@
                             type="roll"
                             name="roll_jet_tir"
                             title="%{jet_tir} Jet d'attaque à distance"
-                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=&Agrave; Distance}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKTIR}]][Bonus] @{rof4} ]] }}"
+                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=&Agrave; Distance}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKTIR}]][Bonus] @{rof4} ]] }} @{target_def}"
                           >
                             &Agrave; DISTANCE
                           </button>
@@ -1087,7 +1106,7 @@
                             type="roll"
                             name="roll_jet_psyinf"
                             title="%{jet_psyinf} Jet d'attaque psychique : Influence"
-                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Psychique (Influence)}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKPSYINFLU}]][Bonus] @{rof4} ]] }}"
+                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Psychique (Influence)}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKPSYINFLU}]][Bonus] @{rof4} ]] }} @{target_dep}"
                           >
                             PSY Influence
                           </button>
@@ -1141,7 +1160,7 @@
                             type="roll"
                             name="roll_jet_psyint"
                             title="%{jet_psyint} Jet d'attaque psychique : Intuition"
-                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Psychique (Intuition)}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKPSYINTUI}]][Bonus] @{rof4} ]] }}"
+                            value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{name=Psychique (Intuition)}} {{subtags=Attaque}} {{attaque=[[@{JETNORMAL}cs20cf1[Dé] + [[@{ATKPSYINTUI}]][Bonus] @{rof4} ]] }} @{target_dep}"
                           >
                             PSY Intuition
                           </button>
@@ -1645,7 +1664,7 @@
                       class="sheet-neutre"
                       name="roll_pjatk"
                       title="%{repeating_armes_$N_pjatk}"
-                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{subtags=Attaque}} {{name=@{armenom}}} {{portee=@{armeportees}}} {{desc=@{armejetn} @{armelim}}} {{@{armeatt}[[@{armejetd}cs>@{armecrit}cf<@{armeinct}[Dé] + [[@{armeatk}]][Attaque] + [[@{armeatkdiv}]][Bonus] + (@{distance}) + (@{couvert}) + (@{visibilite}) + (@{armebuff}) @{rof4} ]] }} {{@{armedmg}[[[[@{armedmnbde}d@{armedmde}@{armedmrel}@{armedmvrel}]][Dé DM] + ([[@{tirhp}d@{armedmde}]])[Tir HP] + ([[@{armedmcar}]])[Mod.DM] + (@{armedmdiv})[Bonus DM] + (@{armebuffdm})]]}} {{dmtype=@{armedmtype}}} {{degats2=@{armedmg2}}} {{dm2type=@{armedm2_desc}}} {{special=@{armespec}}}"
+                      value="@{togm}&{template:co1} @{token_dsp} {{perso=@{character_name}}} {{subtags=Attaque}} {{name=@{armenom}}} {{portee=@{armeportees}}} {{desc=@{armejetn}@{armelim}}} {{@{armeatt}[[@{armejetd}cs>@{armecrit}cf<@{armeinct}[Dé] + [[@{armeatk}]][Attaque] + [[@{armeatkdiv}]][Bonus] + ([[@{distance}]])[Portée] + ([[@{couvert}]])[Couvert] + ([[@{visibilite}]])[Visibilité] + ([[@{armebuff}]])[Mod.Att] @{rof4} ]] }} {{@{armedmg}[[[[@{armedmnbde}d@{armedmde}@{armedmrel}@{armedmvrel}]][Dé DM] + ([[@{tirhp}d@{armedmde}]])[Tir HP] + ([[@{armedmcar}]])[Mod.Car] + (@{armedmdiv})[Bonus DM] + (@{armebuffdm})[Mod.DM] ]]}} {{dmtype=@{armedmtype}}} {{degats2=@{armedmg2}}} {{dm2type=@{armedm2_desc}}} {{special=@{armespec}}} @{targetdefp}"
                     />
                   </td>
                   <td class="sheet-boxinputleft" style="min-width: 130px">
@@ -1892,6 +1911,7 @@
                       title="@{armedm2_desc}"
                     />
                     <input type="hidden" name="attr_armedmg2" value="" />
+                    <input type="hidden" name="attr_targetdefp" value="" />
                   </td>
                 </tr>
               </table>
@@ -2331,7 +2351,7 @@
                     title=""
                     value="&{template:co1} @{token_dsp} {{perso=@{character_name} }} {{subtags=Capacité }} {{name=@{voie1-t4} }} {{desc=**@{voie1nom}, rang [[4]]** }} {{text=@{voie1-4} }}"
                   >
-                    <span class="sheet-iconbtn">w</span>w
+                    <span class="sheet-iconbtn">w</span>
                   </button>
                 </span>
                 <br /><span
@@ -4141,6 +4161,16 @@
               Jets de Capacités
             </td>
             <td class="sheet-textbase" style="width: 100%">&nbsp;</td>
+            <td>
+              <button
+                type="action"
+                class="sheet-flatbtn sheet-iconbtn sheet-txt-bold"
+                name="act_addskills"
+                title=""
+              >
+                +Compétences
+              </button>
+            </td>
           </tr>
         </table>
         <fieldset class="repeating_jetcapas">
@@ -4187,31 +4217,37 @@
                   size="1"
                   title="@{jetcapade} Dé"
                 >
-                  <option value="4">d4</option>
-                  <option value="6">d6</option>
-                  <option value="8">d8</option>
-                  <option value="10">d10</option>
-                  <option value="12">d12</option>
-                  <option value="@{ETATDE}" selected>
-                    d20 (ou d12 si Affaibli)
-                  </option></select
-                >&nbsp;(
+                  <option value="@{ETATDE}" selected>d20 (d12 si Affaibli)</option>
+                  <optgroup>
+                    <option class="sheet-optgroup" value="" disabled>&nbsp;Jets normaux</option>
+                    <option value="4">d4</option>
+                    <option value="6">d6</option>
+                    <option value="8">d8</option>
+                    <option value="10">d10</option>
+                    <option value="12">d12</option>
+                  </optgroup>
+                  <optgroup>
+                    <option class="sheet-optgroup" value="" disabled>&nbsp;Jets explosifs</option>
+                    <option value="4!">d4+</option>
+                    <option value="6!">d6+</option>
+                    <option value="8!">d8+</option>
+                    <option value="10!">d10+</option>
+                    <option value="12!">d12+</option>
+                  </optgroup>
+                </select>&nbsp;(
                 <select
                   class="sheet-carac"
                   style="width: 30px"
                   name="attr_jetcapatypjet"
                   size="1"
-                  title="@{jetcapatypjet} Option du jet : normal, meilleur dé, moins bon dé, sans limite"
+                  title="@{jetcapatypjet} Option du jet : normal, meilleur dé, moins bon dé"
                 >
                   <option value="">
-                    N - Normal / additionner tous les dés
+                    N - Normal / Additionner les dés
                   </option>
                   <option value="kh1">S - Garder le meilleur dé</option>
                   <option value="kl1">I - Garder le moins bon dé</option>
-                  <option value="!">
-                    E - Explosif (jet sans limite)
-                  </option></select
-                >)&nbsp;+
+                </select>)&nbsp;+
                 <select
                   class="sheet-carac"
                   style="width: 60px"
@@ -4233,7 +4269,7 @@
                     <option value="@{CHA}">CHA</option>
                     <option value="@{QRYMOD}">Choix base</option>
                   </optgroup>
-                  <optgroup label="Mod. de Test"
+                  <optgroup label="Mod. de Test">
                     <option disabled class="sheet-optgroup">
                       &nbsp;Mod. de test
                     </option>
@@ -4254,8 +4290,8 @@
                     <option value="@{ATKMEN}">MEN</option>
                     <option value="@{ATKMAG}">MAG</option>
                     <option value="@{ATKPIL}">PIL</option>
-                  </optgroup></select
-                >+&nbsp;(
+                  </optgroup>
+                </select>+&nbsp;(
                 <input type="hidden" name="attr_jetcapacoeff" value="1" />
                 <select
                   class="sheet-carac"
@@ -4273,8 +4309,8 @@
                   <option value="@{RANG_VOIE6}">Voie 6</option>
                   <option value="@{RANG_VOIE7}">Voie 7</option>
                   <option value="@{RANG_VOIE8}">Voie 8</option>
-                  <option value="@{RANG_VOIE9}">Voie 9</option></select
-                >)&nbsp;+
+                  <option value="@{RANG_VOIE9}">Voie 9</option>
+                </select>)&nbsp;+
                 <input type="hidden" name="attr_jetcapaskill" value="" />
                 <input
                   type="number"
@@ -4345,7 +4381,7 @@
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
       />
       <div>
-        <span class="sheet-textfatleft">Traits, Avantages, Relations</span>
+        <span class="sheet-textfatleft">Traits, Avantages, Relations (<span name="attr_PR"></span>/<span name="attr_PR_max"></span>)</span>
         <fieldset class="repeating_traits">
           <table class="sheet-tabsep">
             <tr>
@@ -4360,7 +4396,7 @@
                   w
                 </button>
               </td>
-              <td class="sheet-boxinputleft" style="width: 200px">
+              <td class="sheet-boxinputleft" style="width: 220px">
                 <input
                   type="text"
                   class="sheet-txt-bold"
@@ -4369,13 +4405,31 @@
                   title="@{traitnom}"
                 />
               </td>
-              <td class="sheet-boxinputleft" style="width: 150px">
-                <input
-                  type="text"
-                  name="attr_traittype"
-                  placeholder="Origine/Type de trait"
-                  title="@{traittype}"
-                />
+              <td class="sheet-boxinputleft" style="width: 120px">
+                <select style="width: 120px" name="attr_traittype" title="@{traittype}">
+                  <option value="">Choisir...</option>
+                  <optgroup label="Traits">
+                    <option disabled class="sheet-optgroup">
+                      &nbsp;Traits
+                    </option>
+                    <option value="feat">Trait</option>
+                    <option value="adv">Avantage</option>
+                  </optgroup>
+                  <optgroup label="Relations">
+                    <option disabled class="sheet-optgroup">
+                      &nbsp;Relations
+                    </option>
+                    <option value="acq">Connaissance</option>
+                    <option value="ally">Allié</option>
+                    <option value="foe">Ennemi</option>
+                  </optgroup>
+                  <optgroup label="Autres">
+                    <option disabled class="sheet-optgroup">
+                      &nbsp;Autres
+                    </option>
+                    <option value="other">Divers</option>
+                  </optgroup>
+                </select>
               </td>
               <td class="sheet-boxinputleft">
                 <textarea
@@ -4392,9 +4446,63 @@
         class="sheet-imghr"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
       />
+      <div class="sheet-textfatleft">MODs Situation<!--
+        <button 
+          type="roll" 
+          class="sheet-iconbtn sheet-flatbtn" 
+          title="Aide BUFFS attributs" 
+          value="/w @{character_name} &{template:default} {{name=Aide BUFFS attributs}} {{Format=attribut : valeur (séparés par des ;)}} {{Attributs=...}} {{Caracs:=FOR,DEX,CON,INT,PER,CHA}} {{ATC:=Att. au contact (alias: atkcac, cac, contact)}} {{ATD:=Att. à distance (alias : atktir, cad, distance, tir)}} {{MAG:=Att. Magique (alias : atkmag, magie)}} {{PSYINF:=Att. Psy Influence (alias : psyinflu)}} {{PSYINT:=Att. Psy Intuition (alias : psyintui)}} {{INIT:=Initiative (alias : initiative)}} {{DEF:=Défense}} {{DEP:=Défense Psy}} {{PV:=Points de Vie}} {{SIT:XXX=MOD de situation carac XXX}} {{Valeurs=...}} {{Nombre=Buff/debuff fixe}} {{[attr]=Attribut 'attr'}} {{[VOIE#]=Rang dans la voie no #}} {{[rang {voie}]=Rang dans la voie {voie} }}"
+        ><span class="sheet-iconbtn">i</span>
+        </button>-->
+      </div>
+      <fieldset class="repeating_sitmod">
+        <table class="sheet-tabsep">
+          <tr>
+            <td class="sheet-boxinputleft" style="width: 60px;">
+              <select name="attr_sitmod-carac" class="sheet-carac" style="width: 60px;" title="@{sitmod-carac}">
+                <option value="">Choix</option>
+                <option value="FOR">FOR</option>
+                <option value="DEX">DEX</option>
+                <option value="CON">CON</option>
+                <option value="INT">INT</option>
+                <option value="PER">PER</option>
+                <option value="CHA">CHA</option>
+              </select>
+            </td>
+            <td class="sheet-boxinputleft" style="width: 30px;">
+              <input
+                type="number"
+                name="attr_sitmod-value"
+                style="width: 60px;" 
+                title="@{sitmod-value}"
+              />
+            </td>
+            <td class="sheet-boxinputleft">
+              <input
+                type="text"
+                name="attr_sitmod-situation"
+                placeholder="Situation"
+                title="@{sitmod-situation}"
+              />
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <img
+        class="sheet-imghr"
+        src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
+      />
       <div class="sheet-row">
         <!-- BUFFS -->
-        <div class="sheet-textfatleft">BUFFS</div>
+        <div class="sheet-textfatleft">BUFFS
+          <button 
+            type="roll" 
+            class="sheet-iconbtn sheet-flatbtn" 
+            title="Aide BUFFS attributs" 
+            value="/w @{character_name} &{template:default} {{name=Aide BUFFS attributs}} {{Format=attribut : valeur (séparés par des ;)}} {{Attributs=...}} {{Caracs:=FOR,DEX,CON,INT,PER,CHA}} {{ATC:=Att. au contact (alias: atkcac, cac, contact)}} {{ATD:=Att. à distance (alias : atktir, cad, distance, tir)}} {{MAG:=Att. Magique (alias : atkmag, magie)}} {{PSYINF:=Att. Psy Influence (alias : psyinflu)}} {{PSYINT:=Att. Psy Intuition (alias : psyintui)}} {{INIT:=Initiative (alias : initiative)}} {{DEF:=Défense}} {{DEP:=Défense Psy}} {{PV:=Points de Vie}} {{SIT:XXX=MOD de situation carac XXX}} {{Valeurs=...}} {{Nombre=Buff/debuff fixe}} {{[attr]=Attribut 'attr'}} {{[VOIE#]=Rang dans la voie no #}} {{[rang {voie}]=Rang dans la voie {voie} }}"
+          ><span class="sheet-iconbtn">i</span>
+          </button>
+        </div>
         <fieldset class="repeating_buffs">
           <table class="sheet-tabsep">
             <tr>
@@ -4417,13 +4525,17 @@
                 <input
                   type="text"
                   name="attr_buffmods"
-                  placeholder="Attribut : Valeur; Attribut : Valeur; ..."
+                  placeholder="Attribut : Valeur ; Attribut : Valeur ; ..."
                   title="@{buffmods}"
                 />
               </td>
             </tr>
           </table>
         </fieldset>
+        <img
+          class="sheet-imghr"
+          src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png"
+        />
         <input
           type="checkbox"
           class="sheet-block-switch"
@@ -4746,7 +4858,16 @@
         <!-- Equipement et règles optionnelles -->
         <div class="sheet-2colrow">
           <div class="sheet-col" title="repeating_equipement">
-            <div class="sheet-boxtitre">&Eacute;QUIPEMENT</div>
+            <div class="sheet-boxtitre">&Eacute;QUIPEMENT
+              <button 
+                type="roll" 
+                class="sheet-iconbtn sheet-flatbtn" 
+                title="Aide équipement" 
+                value="/w @{character_name} &{template:default} {{name=Aide propriétés d'équipement}} {{Format=propriété:valeur (séparées par des ,)}} {{DEF:=Bonus de DEF armure}} {{DEF-:=Malus d'armure}} {{RD:=Réduction DM}} {{ATD:=Portée arme à distance}} {{DM:=Dommages arme}} {{MOD:=Bonus de matériel}} {{Porté=Cocher pour inclure l'équipement dans l'encombrement}} {{Utilisé=Cocher un ou plusieurs équipements pour calcul du meilleur bonus}} {{A une attaque=Cocher pour créer un ligne d'attaque}}"
+              >
+                <span class="sheet-iconbtn">i</span>
+              </button>
+            </div>
             <div class="sheet-boxinputleft">
               <span class="sheet-textbase">Crédits&nbsp;:</span>&nbsp;
               <input
@@ -4818,7 +4939,10 @@
                   class="sheet-carac"
                   style="width: 70%"
                   name="attr_equip-props"
-                  title="@{equip-props} Propriétés de l'équipement"
+                  title="@{equip-props} Propriétés de l'équipement
+                  DEF: Bonus DEF d'armure, DEF-: Malus d'armure, RD: Réduction DM,
+                  ATD: Portée arme à distance, DM: Dommage arme
+                  MOD: Bonus d'équipement"
                   placeholder="Propriétés (DEF, DM, MOD, etc...)"
                 />
                 <input
@@ -4960,6 +5084,30 @@
               </select>
             </li>
             <li>
+              <span class="sheet-textbase">Demander le ND :</span>
+              <input
+                type="checkbox"
+                name="attr_prompt_nd"
+                value="{{nd=[[@{QRYND}]] }}"
+                title="@{prompt_nd}"
+              />
+            </li>
+            <li>
+              <span class="sheet-textbase">Cibler l'adversaire :</span>&nbsp;
+              <input
+                type="checkbox"
+                name="attr_target_def"
+                value="{{def=[[@{QRYDEF}]] }}"
+                title="@{target_def}"
+              />&nbsp;DEF&nbsp;
+              <input
+                type="checkbox"
+                name="attr_target_dep"
+                value="{{def=[[@{QRYDEP}]] }}"
+                title="@{target_dep}"
+              />&nbsp;DEP&nbsp;
+            </li>            
+            <li>
               <span class="sheet-textbase">Initiative variable :</span>
               <input
                 type="checkbox"
@@ -5024,10 +5172,17 @@
           </ul>
         </div>
         <!-- Custom attributes -->
-        <div class="sheet-col"> <!--
+        <div class="sheet-col">
           <div>
-            <span class="sheet-textfatleft">ATTRIBUTS PERSONNALISES</span>
+            <span class="sheet-textfatleft">COMPETENCES</span>
           </div>
+          <textarea 
+            class="sheet-statblock" 
+            name="attr_skills"
+            placeholder="Nom|CAR|Description (une compétence par ligne)"
+            title="@{skills} Liste des compétences"
+          ></textarea>
+          <!--
           <textarea 
             class="sheet-statblock" 
             name="attr_custom" 
@@ -5043,13 +5198,14 @@
       />
       <div class="sheet-row">
         <input type="checkbox" class="sheet-block-switch" />
-        <span class="sheet-textbase">Importer profil</span>
+        <span class="sheet-textbase">Importer profil & équipement</span>
         <div class="sheet-block-hidden"></div>
         <div class="sheet-block-show">
           <div class="sheet-2colrow">
             <div class="sheet-col">
               <textarea
                 class="sheet-boxinputleft sheet-statblock"
+                wrap="hard"
                 name="attr_json_profile"
               ></textarea>
             </div>
@@ -5059,7 +5215,7 @@
                 name="roll_exportcomob" 
                 class="sheet-flatbtn sheet-iconbtn" 
                 title="Exporter le profil"
-                value="[Export Chroniques Mobiles](http://comob-data.rpgapps.net)">
+                value="[Export Chroniques Mobiles](https://comob-data.rpgapps.net)">
                 <span class="sheet-iconbtn">c</span>&nbsp;Export Chroniques Mobiles
               </button>
               <br>
@@ -5073,6 +5229,8 @@
               >
                 <span class="sheet-iconbtn">W</span>&nbsp;Importer
               </button>
+              <input type="checkbox" name="attr_reset_gears" value="1">
+              <span>Réinitialiser les listes armes & équipement</span>
             </div>
           </div>
         </div>
@@ -5090,6 +5248,44 @@
           </div>
           <div class="sheet-scroll-300">
             <ul>
+              <li>
+                <strong>Version 4.4.1</strong> (2023.10.31)
+                <ul>
+                  <li>Correction d'un bug empêchant le lancement du code Javascript de la fiche</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Version 4.4.0</strong> (2023.09.30)
+                <ul>
+                  <em>Fiche de personnage</em>
+                  <li>
+                    Correction d'un bug sur les boutons de jets de caractéristiques<br>
+                    Pour les fiches existantes, sélectionner temporairement un modificateur de situation différent de 0 corrige le problème
+                  </li>
+                  <li>
+                    Gestion dynamique des compétences<br>
+                    Une liste standard est chargée dans l'onglet Configuration mais peut être adaptée à l'univers de jeu <br>
+                    Indiquer une compétence par ligne dans le format Nom|CAR|Notes (optionnel)<br>
+                    Cette liste est utilisée par le  bouton +Compétences pour les ajouter dans la liste des jets de capacités
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <strong>Version 4.3.0</strong> (2023.08.31)
+                <ul>
+                  <em>Fiche de personnage</em>
+                  <li>Gestion des modificateurs de situation</li>
+                  <li>Nouvelle option : demander le ND des jets</li>
+                  <li>Nouvelle option : cibler les jets d'attaque (DEF / DEP)</li>
+                  <li>Import de la liste d'équipement (Web App Export COMob)</li>
+                  <li>Import de la famille de profil (Web App Export COMob)</li>
+                  <li>Calcul PV, PC selon famille en import de profil</li>
+                  <li>Bouton d'affichage d'un message pour la syntaxe des buffs</li>
+                  <li>Bouton d'affichage d'un message pour la syntaxe des propriétés d'équipement</li>
+                  <em>Fiche de vaisseau et mécha</em>
+                  <li>Mention script MOD "COlib" remplacée par "COGCrew"</li>
+                </ul>
+              </li>
               <li>
                 <strong>Version 4.2.0</strong> (2023.04.08)
                 <ul>
@@ -6449,9 +6645,16 @@
               value="[[1d6!]]"
             />
           </li>
-          <li title="Le script MOD COlib est concçu pour maintenir à jour les bonus d'équipage">
-            <span class="textbase">Utiliser COlib</span>&nbsp;
-            <input type="checkbox" name="attr_colib" value="1">
+          <li title="Le script MOD COGCrew est conçu pour maintenir à jour les bonus d'équipage">
+            <button 
+              type="roll" 
+              name="roll_cogcrew" 
+              class="sheet-linkbtn sheet-flatbtn sheet-iconbtn"
+              title="COGCrew"
+              value="[Télécharger COGCrew](https://github.com/stephaned68/COGCrew)">
+              Utiliser COGCrew&nbsp;<span class="sheet-iconbtn">j</span>
+            </button>
+            <input type="checkbox" name="attr_cogcrew" value="1">
           </li>
         </ul>
       </div>
@@ -8250,9 +8453,9 @@
                 value="[[1d6!]]"
               />
             </li>
-            <li title="Le script MOD COlib est concçu pour maintenir à jour les bonus d'équipage">
-              <span class="textbase">Utiliser COlib</span>&nbsp;
-              <input type="checkbox" name="attr_colib" value="1">
+            <li title="Le script MOD COGCrew est conçu pour maintenir à jour les bonus d'équipage">
+              <span class="textbase">Utiliser <a href="https://github.com/stephaned68/COGCrew" target="_blank" rel="noopener noreferrer">COGCrew</a></span>&nbsp;
+              <input type="checkbox" name="attr_cogcrew" value="1">
             </li>
           </ul>
         </div>
@@ -8317,6 +8520,18 @@
         <td class="sheet-subheader">{{subtags}}</td>
         <th>{{name}}</th>
       </tr>
+      {{#nd}}
+      <tr>
+        <td class="sheet-subheader">ND</td>
+        <th style="padding: 2px;">{{nd}}</th>
+      </tr>
+      {{/nd}}
+      {{#def}}
+      <tr>
+        <td class="sheet-subheader">DEF</td>
+        <th style="padding: 2px;">{{def}}</th>
+      </tr>
+      {{/def}}
       {{#portee}}
       <tr>
         <td style="font-size: smaller; text-align: center" colspan="2">
@@ -8361,7 +8576,105 @@
         {{/jet}}
         <td>{{carac}}</td>
       </tr>
-      {{/carac}} 
+      {{/carac}}
+      {{#nd}}
+        {{#rollTotal() nd 5}}
+          {{#rollLess() carac -4}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: red;">Echec critique !</strong>
+            </td>
+          </tr>
+          {{/rollLess() carac -4}}
+          {{#rollGreater() carac 14}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: green">Réussite critique !</strong>
+            </td>
+          </tr>
+          {{/rollGreater() carac 14}}
+        {{/rollTotal() nd 5}}
+        {{#rollTotal() nd 10}}
+          {{#rollLess() carac 1}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: red;">Echec critique !</strong>
+            </td>
+          </tr>
+          {{/rollLess() carac 1}}
+          {{#rollGreater() carac 19}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: green;">Réussite critique !</strong>
+            </td>
+          </tr>
+          {{/rollGreater() carac 19}}
+        {{/rollTotal() nd 10}}
+        {{#rollTotal() nd 15}}
+          {{#rollLess() carac 4}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: red;">Echec critique !</strong>
+            </td>
+          </tr>
+          {{/rollLess() carac 4}}
+          {{#rollGreater() carac 24}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: green;">Réussite critique !</strong>
+            </td>
+          </tr>
+          {{/rollGreater() carac 24}}
+        {{/rollTotal() nd 15}}
+        {{#rollTotal() nd 20}}
+          {{#rollLess() carac 11}}
+          <tr>      
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: red;">Echec critique !</strong>
+            </td>
+          </tr>
+          {{/rollLess() carac 11}}
+          {{#rollGreater() carac 29}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: green;">Réussite critique !</strong>
+            </td>
+          </tr>
+          {{/rollGreater() carac 29}}
+        {{/rollTotal() nd 20}}
+        {{#rollTotal() nd 25}}
+          {{#rollLess() carac 14}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: red;">Echec critique !</strong>
+            </td>
+          </tr>
+          {{/rollLess() carac 14}}
+          {{#rollGreater() carac 34}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: green;">Réussite critique !</strong>
+            </td>
+          </tr>
+          {{/rollGreater() carac 34}}
+        {{/rollTotal() nd 25}}
+        {{#rollTotal() nd 30}}
+          {{#rollLess() carac 21}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: red;">Echec critique !</strong>
+            </td>
+          </tr>
+          {{/rollLess() carac 21}}
+          {{#rollGreater() carac 39}}
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <strong style="color: green;">Réussite critique !</strong>
+            </td>
+          </tr>
+          {{/rollGreater() carac 39}}
+        {{/rollTotal() nd 30}}
+      {{/nd}}
       {{#test}}
       <tr>
         <td colspan="2" style="display: none">{{test}}</td>
@@ -8379,7 +8692,7 @@
           <div class="sheet-desc"><b>{{test_fumble}}</b></div>
         </td>
       </tr>
-      {{/rollWasFumble() test}} 
+      {{/rollWasFumble() test}}
       {{/test}} 
       {{#attaque}} 
       {{#rollWasCrit() attaque}}
@@ -8389,8 +8702,8 @@
       {{/rollWasCrit() attaque}} 
       {{#rollWasFumble() attaque}}
       <tr>
-        <td colspan="2" style="color: red">
-          <b>Fumble !</b>&nbsp;[Incident de tir](~target|incident_tir)
+        <td colspan="2" style="color: #f44;">
+          <b title="Sélectionner votre token avant de faire le jet d'incident de tir">Fumble !</b>&nbsp;[Incident de tir](~selected|inctir" style="border: none; padding: 0px; background-color: transparent; color: #f44; font-size: 1em; font-weight: bold; text-decoration: underline;)
         </td>
       </tr>
       {{/rollWasFumble() attaque}}
@@ -8399,9 +8712,6 @@
         <td>{{attaque}}</td>
       </tr>
       {{#degats}}
-      <tr>
-        <td colspan="2">&nbsp;</td>
-      </tr>
       <tr>
         <td class="sheet-tcat">Dégâts</td>
         <td>
@@ -8459,72 +8769,128 @@
 </rolltemplate>
 <!-- FIN TEMPLATES -->
 
-<!-- **** SCRIPTS / SHEET ²ERS -->
+<!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
 
 /**
- * constants
- */
+* constants
+*/
 const SHEET_PC = "pj";
 const SHEET_STARSHIP = "vaisseau";
 const SHEET_NPC = "pnj";
 const SHEET_MECHA = "mecha";
 
 /**
- * settings global object
- */
+* settings global object
+*/
 const wkrSettings = {
   debugMode: false,
 };
 
 /**
- * Convert to integer
- * @param {string} value value to cast
- * @param {int} onError default value on error
- * @returns integer value
- */
+* abilities list
+*/
+const ABILITIES = [ "FOR", "DEX", "CON", "INT", "PER", "CHA" ];
+
+/**
+* skills list
+*/
+const SKILLS = {
+  FOR: [
+    { name: "Athlétisme" },
+    { name: "Exo-armures" },
+    { name: "Intimidation" },
+    { name: "Zéro-G" },
+  ],
+  DEX: [
+    { name: "Acrobaties" },
+    { name: "Chirurgie" },
+    { name: "Discrétion" },
+    {
+      name: "Pilotage",
+      focus: "vaisseaux spatiaux, véhicules planétaires, mechas",
+    },
+    { name: "Premiers soins" },
+    { name: "Réparation", focus: "armes, armures, électronique" },
+  ],
+  CON: [{ name: "Endurance" }, { name: "Résistance" }],
+  INT: [
+    {
+      name: "Conn. académiques",
+      focus:
+        "arts et lettres, sciences naturelles, sciences formelles, science économique, sciences sociales, droit, langues",
+    },
+    { name: "Culture générale" },
+    {
+      name: "Electronique",
+      focus: "hacking, informatique, intrusion, robotique",
+    },
+    { name: "Ingénierie", focus: "moteurs, structures, systèmes de survie" },
+    { name: "Investigation" },
+    { name: "Technologie" },
+    { name: "Xénomorphes" },
+  ],
+  PER: [
+    { name: "Observation" },
+    { name: "Psychologie", focus: "empathie, perspicacité" },
+    { name: "Sens du danger" },
+    { name: "Survie", focus: "par milieu naturel" },
+  ],
+  CHA: [
+    { name: "Bluff" },
+    { name: "Persuasion", focus: "interrogatoire, logique, marchandage" },
+    { name: "Séduction" },
+  ],
+};
+
+/**
+* Convert to integer
+* @param {string} value value to cast
+* @param {int} onError default value on error
+* @returns integer value
+*/
 function int(value, onError = 0) {
   return parseInt(value) || onError;
 }
 
 /**
- * Convert to float
- * @param {string} value value to cast
- * @param {float} onError default value on error
- * @returns float value
- */
+* Convert to float
+* @param {string} value value to cast
+* @param {float} onError default value on error
+* @returns float value
+*/
 function float(value, onError = 0) {
   return parseFloat(value) || onError;
 }
 
 /**
- * Get string or empty value
- * @param {string} value value to cast
- * @param {string} onError default value on null/undefined
- * @returns string value
- */
+* Get string or empty value
+* @param {string} value value to cast
+* @param {string} onError default value on null/undefined
+* @returns string value
+*/
 function stringOrDefault(value, onError = "") {
   return value || onError;
 }
 
 /**
- * Capitalize string
- * @param {string} str string to capitalize
- * @returns capitalized string
- */
+* Capitalize string
+* @param {string} str string to capitalize
+* @returns capitalized string
+*/
 function capitalize(str) {
   if (str && str !== "")
     return str.substring(0, 1).toUpperCase() + str.substring(1);
 }
 
 /**
- * Log to JS console with color & style
- * @param {any} data data to log
- * @param {string} title title of logged data
- * @param {string} color color name for log line
- * @param {string} style CSS style for log line
- * @param {string} headerStyle CSS style for log title
- */
+* Log to JS console with color & style
+* @param {any} data data to log
+* @param {string} title title of logged data
+* @param {string} color color name for log line
+* @param {string} style CSS style for log line
+* @param {string} headerStyle CSS style for log title
+*/
 function clog(
   data,
   title = "",
@@ -8556,10 +8922,10 @@ function clog(
 }
 
 /**
- * Generate a random number between 1 and max
- * @param {integer} max Upper bound of range
- * @returns {integer} Generated random number
- */
+* Generate a random number between 1 and max
+* @param {integer} max Upper bound of range
+* @returns {integer} Generated random number
+*/
 function getRandom(max) {
   const min = 1;
   max = Math.floor(max);
@@ -8567,21 +8933,21 @@ function getRandom(max) {
 }
 
 /**
- * Compute caracteristic modifier
- * @param {integer} value Characteristic value
- * @returns modifier
- */
+* Compute caracteristic modifier
+* @param {integer} value Characteristic value
+* @returns modifier
+*/
 function getMod(value) {
   value = int(value);
   return Math.floor((value - 10) / 2);
 }
 
 /**
- * Parse a chunk of data into name & value
- * @param {string} data Chunk of data to parse
- * @param {string} delim Delimiter (defaults to ':')
- * @returns an object with name and value properties
- */
+* Parse a chunk of data into name & value
+* @param {string} data Chunk of data to parse
+* @param {string} delim Delimiter (defaults to ':')
+* @returns an object with name and value properties
+*/
 function parseNameValue(data, delim) {
   delim = stringOrDefault(delim, ":");
   let parsed = {};
@@ -8601,31 +8967,31 @@ function parseNameValue(data, delim) {
 }
 
 /**
- * Remove all rows for a repeating section
- * @param {string} sectionName Repeating section to clear
- */
+* Remove all rows for a repeating section
+* @param {string} sectionName Repeating section to clear
+*/
 function removeRepeating(sectionName) {
-  getSectionIDs(sectionName, function (ids) {
-    for (let id of ids) {
-      removeRepeatingRow(`repeating_${sectionName}_${id}`);
-    }
+  getSectionIDs(sectionName, function (rowIds) {
+    rowIds.forEach(rowId => {
+      removeRepeatingRow(`repeating_${sectionName}_${rowId}`);
+    });
   });
 }
 
 /**
- * Check if sheet is a vehicle
- * @param {string} sheetTypeValue sheet type
- * @returns {boolean}
- */
+* Check if sheet is a vehicle
+* @param {string} sheetTypeValue sheet type
+* @returns {boolean}
+*/
 function isVehicle(sheetTypeValue) {
   return [SHEET_STARSHIP, SHEET_MECHA].includes(sheetTypeValue);
 }
 
 /**
- * Add a trait/ability to an NPC object
- * @param {object} npcObj
- * @param {object} traitObj
- */
+* Add a trait/ability to an NPC object
+* @param {object} npcObj
+* @param {object} traitObj
+*/
 function addTrait(npcObj, traitObj) {
   if (traitObj.name !== "" && traitObj.desc !== "") {
     if (!npcObj.abilities) npcObj.abilities = [];
@@ -8636,11 +9002,11 @@ function addTrait(npcObj, traitObj) {
 }
 
 /**
- * Import an NPC statblock text
- * @param {string} text statblock to parse
- * @param {string} charName NPC name
- * @returns {object} NPC object
- */
+* Import an NPC statblock text
+* @param {string} text statblock to parse
+* @param {string} charName NPC name
+* @returns {object} NPC object
+*/
 function importStatblock(text, charName) {
   text = text.replace(/\r/g, "");
   text = text.replace(/\n[ ]*\+/g, "+");
@@ -8782,11 +9148,11 @@ function importStatblock(text, charName) {
 }
 
 /**
- * Import a ship statblock text
- * @param {string} text statblock to parse
- * @param {string} shipName starship name
- * @returns {object} ship object
- */
+* Import a ship statblock text
+* @param {string} text statblock to parse
+* @param {string} shipName starship name
+* @returns {object} ship object
+*/
 function importShipSB(text, shipName) {
   text = text.replace(/\r/g, "");
   text = text.replace(/\n[ ]*\+/g, "+");
@@ -8892,11 +9258,11 @@ function importShipSB(text, shipName) {
 }
 
 /**
- * Import a mecha statblock text
- * @param {string} text statblock to parse
- * @param {string} mechName mecha name
- * @returns {object} mecha object
- */
+* Import a mecha statblock text
+* @param {string} text statblock to parse
+* @param {string} mechName mecha name
+* @returns {object} mecha object
+*/
 function importMechaSB(text, mechName) {
   text = text.replace(/\r/g, "");
   text = text.replace(/\n[ ]*\+/g, "+");
@@ -8993,11 +9359,11 @@ function importMechaSB(text, mechName) {
 }
 
 /**
- * Process base attributes from parsed NPC object
- * @param {string} universe
- * @param {object} pnjObj NPC object
- * @returns {string} Result messsage
- */
+* Process base attributes from parsed NPC object
+* @param {string} universe
+* @param {object} pnjObj NPC object
+* @returns {string} Result messsage
+*/
 function processBaseAttributes(universe, pnjObj) {
   var result = "";
   var pnj_sagper = "";
@@ -9007,7 +9373,7 @@ function processBaseAttributes(universe, pnjObj) {
     pnj_sagper = "pnj_sag";
     pnj_jetsagper = "pnj_jetsag";
     if (!pnjObj.hasOwnProperty("SAG") && pnjObj.hasOwnProperty("PER")) {
-      // in case a CG/COC statblock is pasted to COF
+      // in case a COG/COC statblock is pasted to COF
       sagOrPer = pnjObj.PER;
       result = "Attention : PER trouvé à la place de SAG";
     } else {
@@ -9015,11 +9381,11 @@ function processBaseAttributes(universe, pnjObj) {
     }
   }
   if (universe === "COC" || universe === "COG") {
-    // CG & COC uses PER (Perception)
+    // COG & COC uses PER (Perception)
     pnj_sagper = "pnj_per";
     pnj_jetsagper = "pnj_jetper";
     if (!pnjObj.hasOwnProperty("PER") && pnjObj.hasOwnProperty("SAG")) {
-      // in case a COF statblock is pasted to CG/COC
+      // in case a COF statblock is pasted to COG/COC
       sagOrPer = pnjObj.SAG;
       result = "Attention : SAG trouvé à la place de PER";
     } else {
@@ -9089,11 +9455,11 @@ function processBaseAttributes(universe, pnjObj) {
 }
 
 /**
- * Process attacks from parsed NPC object
- * @param {string} universe
- * @param {object} pnjObj NPC object
- * @returns {string} Result message
- */
+* Process attacks from parsed NPC object
+* @param {string} universe
+* @param {object} pnjObj NPC object
+* @returns {string} Result message
+*/
 function processAttacks(universe, pnjObj) {
   removeRepeating("pnjatk");
   let result = "";
@@ -9196,11 +9562,11 @@ function processAttacks(universe, pnjObj) {
 }
 
 /**
- * Process abilities/traits from parsed NPC object
- * @param {string} universe
- * @param {object} pnjObj NPC object
- * @returns {string} Result message
- */
+* Process abilities/traits from parsed NPC object
+* @param {string} universe
+* @param {object} pnjObj NPC object
+* @returns {string} Result message
+*/
 function processTraits(universe, pnjObj) {
   removeRepeating("pnjcapas");
   let result = "";
@@ -9235,7 +9601,7 @@ function processTraits(universe, pnjObj) {
         newRowID = "repeating_pnjcapas_" + generateRowID();
         let abilityRow = {};
         abilityRow[`${newRowID}_capanom`] = name;
-        ["FOR", "DEX", "CON", "INT", "PER", "SAG", "CHA"].forEach((attr) => {
+        ABILITIES.forEach((attr) => {
           regExp = new RegExp(`Mod\. de ${attr}`, "gi");
           desc = desc.replace(regExp, `@{pnj_${attr.toLowerCase()}}`);
         });
@@ -9266,8 +9632,8 @@ function processTraits(universe, pnjObj) {
 }
 
 /**
- * List of ship weapons, types & shoot incident rating
- */
+* List of ship weapons, types & shoot incident rating
+*/
 const shipWeapons = [
   { name: "canon léger", type: "t", inct: 1 },
   { name: "canon moyen", type: "t", inct: 1 },
@@ -9289,10 +9655,10 @@ const shipWeapons = [
 ];
 
 /**
- * Process attributes from parsed Ship object
- * @param {object} shipObj ship object
- * @returns {string} Result messsage
- */
+* Process attributes from parsed Ship object
+* @param {object} shipObj ship object
+* @returns {string} Result messsage
+*/
 function processShipAttributes(shipObj) {
   let success = "Import réussi !";
   let messages = "";
@@ -9384,8 +9750,8 @@ function processShipAttributes(shipObj) {
 }
 
 /**
- * List of mech weapons with type, shot mishap, ranges & cool/heat params
- */
+* List of mech weapons with type, shot mishap, ranges & cool/heat params
+*/
 const mechWeapons = [
   {
     name: "canon cinétique",
@@ -9459,8 +9825,8 @@ const mechWeapons = [
 ];
 
 /**
- * List of mech options with optional functions to alter attributes
- */
+* List of mech options with optional functions to alter attributes
+*/
 const mechOptions = [
   {
     name: "ancre d'artillerie",
@@ -9496,9 +9862,9 @@ const mechOptions = [
 ];
 
 /**
- * Alter attributes for 'stablisateurs' options
- * @param {object} attrs attributes object
- */
+* Alter attributes for 'stablisateurs' options
+* @param {object} attrs attributes object
+*/
 function mechStabilisateurs(attrs) {
   Object.keys(attrs).forEach((k) => {
     if (k.endsWith("_atkbonus")) {
@@ -9510,9 +9876,9 @@ function mechStabilisateurs(attrs) {
 }
 
 /**
- * Alter attributes for 'ancre d'artillerie' options
- * @param {object} attrs attributes object
- */
+* Alter attributes for 'ancre d'artillerie' options
+* @param {object} attrs attributes object
+*/
 function mechAncresArtillerie(attrs) {
   Object.keys(attrs).forEach((ak) => {
     if (ak.endsWith("_atkbonus")) {
@@ -9530,10 +9896,10 @@ function mechAncresArtillerie(attrs) {
 }
 
 /**
- * Create mecha character sheet attributes
- * @param {object} mechObj mecha statblock parsed object
- * @returns {string} result
- */
+* Create mecha character sheet attributes
+* @param {object} mechObj mecha statblock parsed object
+* @returns {string} result
+*/
 function processMechaAttributes(mechObj) {
   let success = "Import réussi !";
   let messages = "";
@@ -9560,7 +9926,7 @@ function processMechaAttributes(mechObj) {
   delete mechObj.PER;
   mechAttrs.mec_cha = int(mechObj.CHA);
   delete mechObj.CHA;
-  ["for", "dex", "con", "int", "per", "cha"].forEach(
+  ABILITIES.map(a => a.toLowerCase()).forEach(
     (attr) => (mechAttrs[`mec_jet${attr}`] = "1d20")
   );
   mechAttrs.mec_dv = stringOrDefault(mechObj.DV).substring(1);
@@ -9651,17 +10017,12 @@ function processMechaAttributes(mechObj) {
 }
 
 /**
- * (Re-)Build the CARACS serialized objects
- */
+* (Re-)Build the CARACS serialized objects
+*/
 function buildCaracs() {
   getAttrs(
     [
-      "FOR",
-      "DEX",
-      "CON",
-      "INT",
-      "PER",
-      "CHA",
+      ...ABILITIES,
       "NIVEAU",
       "RANG_VOIE1",
       "RANG_VOIE2",
@@ -9709,38 +10070,159 @@ function buildCaracs() {
 }
 
 /**
- * On clicking JSON profile import button
- * - parse and update profile's path & abilities
- */
-on("clicked:importprofile", function () {
-  getAttrs(["json_profile"], function (value) {
-    if (value.json_profile.trim() === "") return;
-    const jsonData = JSON.parse(value.json_profile);
-    const attrs = {
-      json_profile: "",
-      PROFIL: jsonData.profile,
-      FAMILLE: jsonData.family,
-    };
-    jsonData.paths.forEach((path, ix) => {
-      attrs[`voie${ix + 1}nom`] = path.name;
-      path.abilities.forEach((ability, rank) => {
-        if (typeof ability === "string") {
-          attrs[`voie${ix + 1}-t${rank + 1}`] = ability;
-        } else {
-          attrs[`voie${ix + 1}-t${rank + 1}`] = ability.name;
-          attrs[`voie${ix + 1}-${rank + 1}`] = ability.description;
-        }
-      });
+* Parse profile information
+* @param {object} attrs attributes to add
+* @param {object} data JSON data to parse
+* @returns {object} attrs updated attributes
+*/
+function importProfileJSON(attrs, data) {
+  data.paths.forEach((path, ix) => {
+    attrs[`voie${ix + 1}nom`] = path.name;
+    path.abilities.forEach((ability, rank) => {
+      if (typeof ability === "string") {
+        attrs[`voie${ix + 1}-t${rank + 1}`] = ability;
+      } else {
+        attrs[`voie${ix + 1}-t${rank + 1}`] = ability.name;
+        attrs[`voie${ix + 1}-${rank + 1}`] = ability.description;
+      }
     });
-    clog(attrs, "JSON profile parser");
+  });
+  return attrs;
+}
+
+/**
+* Parse gear information
+* @param {object} attrs attributes to add
+* @param {object} data JSON data to parse
+* @param {boolean} reset delete weapons & gears lists
+* @returns {object} attrs updated attributes
+*/
+function importGearJSON(attrs, data, reset = false) {
+  if (reset) {
+    removeRepeating("equipement");
+    removeRepeating("armes");
+  }
+  data.forEach((gear, ix) => {
+    const nbr = int(gear.nombre);
+    if (nbr <= 0) return;
+    let gearName = "";
+    if (gear.code === "autre") {
+      gearName = gear.special;
+    } else {
+      gearName = gear.designation;
+      if (gear.special) gearName += " " + gear.special;
+    }
+    let isWeapon = false;
+    let gearProps = [];
+    gear.props.forEach((prop) => {
+      let gearProp = "";
+      if (prop.id === "def") gearProp = "DEF";
+      if (prop.id === "malus") gearProp = "DEF-";
+      if (prop.id === "rd") gearProp = "RD";
+      if (prop.id.startsWith("dm")) {
+        gearProp = "DM";
+        isWeapon = true;
+      }
+      if (prop.id == "portee") gearProp = "ATD";
+      if (gearProp !== "") gearProps.push(`${gearProp}:${prop.valeur}`);
+    });
+    const newRowID = "repeating_equipement_" + generateRowID();
+    attrs[`${newRowID}_equip-desc`] = gearName;
+    attrs[`${newRowID}_equip-props`] = gearProps.join(", ");
+    attrs[`${newRowID}_equip-atk`] = isWeapon ? "1" : "0";
+  });
+  return attrs;
+}
+
+/**
+* On clicking JSON profile import button
+* - parse and update profile's path & abilities
+* - optionally parse profile's gear
+*/
+on("clicked:importprofile", function () {
+  getAttrs(["json_profile", "reset_gears", "NIVEAU", "CON", "CHA"], function (v) {
+    if (v.json_profile.trim() === "") return;
+    const reset_gears = int(v.reset_gears) === 1 ? true : false;
+    const jsonData = JSON.parse(v.json_profile);
+    let attrs = {
+      json_profile: "",
+      reset_gears: 0
+    };
+    if (jsonData.character) {
+      const level = Math.max(1,int(v.NIVEAU));
+      const conVal = int(v.CON);
+      const chaVal = int(v.CHA);
+      attrs["PROFIL"] = jsonData.character.profile;
+      attrs["FAMILLE"] = jsonData.character.family;
+      const familyId = jsonData.character.familyId || "";
+      switch (familyId) {
+        case "action":
+          attrs.PC = 2;
+          attrs.DV = "10";
+          break;
+        case "aventure":
+          attrs.PC = 4;
+          attrs.DV = "8";
+          break;
+        case "reflexion":
+          attrs.PC = 2;
+          attrs.DV = "6";
+          break;
+      }
+      attrs.PC += chaVal;
+      if (level === 1) {
+        attrs.NIVEAU = 1;
+        attrs.PV_max = int(attrs.DV) + conVal;
+        attrs.PV = attrs.PV_max;
+      }
+      if (["action", "aventure"].indexOf(familyId) !== -1) {
+        const combat = jsonData.character.combat || [];
+        if (combat.length > 0) {
+          combat.forEach(attr => {
+            clog(attr)
+            const { name, value } = parseNameValue(attr);
+            let atk = "";
+            switch (name) {
+              case "ATC":
+                atk = "CAC";
+                break;
+              case "ATD":
+                atk = "TIR";
+                break;
+              case "ATP":
+                atk = "PSY";
+                break;
+              case "INIT":
+                const newRowID = "repeating_buffs_" + generateRowID();
+                attrs[`${newRowID}_buffon`] = 1;
+                attrs[`${newRowID}_buffnom`] = jsonData.character.profile;
+                attrs[`${newRowID}_buffmods`] = `INIT: ${value}`;
+                break;
+            }
+            if (atk !== "") {
+              attrs[`ATK${atk}_BASE`] = value;
+            }
+          });
+        }
+      }
+      attrs = importProfileJSON(attrs, jsonData.character);
+      if (jsonData.gears) {
+        attrs = importGearJSON(attrs, jsonData.gears, reset_gears);
+      }
+    } else {
+      attrs["PROFIL"] = jsonData.profile;
+      attrs["FAMILLE"] = jsonData.family;
+      attrs = importProfileJSON(attrs, jsonData);
+    }
+    clog(attrs, "JSON profile & gear parser");
     setAttrs(attrs);
     buildCaracs();
   });
 });
 
 /**
- * Sheet migrations
- */
+* Sheet migrations
+*/
 function migrateSheetV1_7() {
   getAttrs(
     ["FOR_SUP", "DEX_SUP", "CON_SUP", "INT_SUP", "PER_SUP", "CHA_SUP"],
@@ -9919,12 +10401,7 @@ function migrateSheetV3_4() {
 
 function migrateSheetV3_5() {
   const attrList = [
-    "FOR",
-    "DEX",
-    "CON",
-    "INT",
-    "PER",
-    "CHA",
+    ...ABILITIES,
     "ATKCAC",
     "ATKTIR",
     "PSYINFLU",
@@ -10154,37 +10631,77 @@ function migrateSheetV4() {
 }
 
 function migrateSheetV420() {
-  getAttrs(["type_personnage", "PV_NIVEAU", "PV_max", "logvers"], function (values) {
-    if (values.type_personnage !== SHEET_PC) return;
+  getAttrs(
+    ["type_personnage", "PV_NIVEAU", "PV_max", "logvers"],
+    function (values) {
+      if (values.type_personnage !== SHEET_PC) return;
 
-    let logvers = stringOrDefault(values.logvers);
-    let logv = "Migration Version 4.2.0 - " + new Date().toLocaleDateString();
-    let pv_max = 0;
-    let pv = [];
-    try {
-      pv = JSON.parse(stringOrDefault(values.PV_NIVEAU));
-    } catch (e) {}
-    if (pv.length === 0) {
-      logv += ` : erreur PV_NIVEAU ${PV_NIVEAU}\n`
-    } else {
-      for (n=0; n <= 9; n++) {
-        pv_max += int(pv[n]);
-      }
-      if (pv_max !== int(values.PV_max)) {
-        logv += `PV : ${PV_max}, PV calculés : ${pv_max}\n`;
+      let logvers = stringOrDefault(values.logvers);
+      let logv = "Migration Version 4.2.0 - " + new Date().toLocaleDateString();
+      let pv_max = 0;
+      let pv = [];
+      try {
+        pv = JSON.parse(stringOrDefault(values.PV_NIVEAU));
+      } catch (e) {}
+      if (pv.length === 0) {
+        logv += ` : erreur PV_NIVEAU ${PV_NIVEAU}\n`;
       } else {
-        logv += " : Succès\n";
+        for (n = 0; n <= 9; n++) {
+          pv_max += int(pv[n]);
+        }
+        if (pv_max !== int(values.PV_max)) {
+          logv += `PV : ${PV_max}, PV calculés : ${pv_max}\n`;
+        } else {
+          logv += " : Succès\n";
+        }
       }
+      setAttrs({ logvers: logv + logvers });
     }
-    setAttrs({ logvers: logv + logvers });
+  );
+}
+
+function migrateSheetV430_Dice(options) {
+  getSectionIDs(options.section, function (ids) {
+    ids.forEach((id) => {
+      getAttrs(
+        [
+          `repeating_${options.section}_${id}_${options.jetde}`,
+          `repeating_${options.section}_${id}_${options.typejet}`,
+          "logvers",
+        ],
+        function (values) {
+          const [ jetde, typejet ] = Object.keys(values);
+          let logvers = stringOrDefault(values.logvers);
+          if (values[typejet] === "!") {
+            const attrs = {};
+            attrs[jetde] = values[jetde] += "!";
+            attrs[typejet] = values[typejet] = "";
+            attrs["logvers"] =
+              `Migration ${options.section}-${id} \n` + logvers;
+            setAttrs(attrs);
+          }
+        }
+      );
+    });
+  });
+}
+
+function migrateSheetV430() {
+  getAttrs(["type_personnage"], function (v) {
+    if (v.type_personnage === SHEET_PC)
+      migrateSheetV430_Dice({
+        section: "jetcapas",
+        jetde: "jetcapade",
+        typejet: "jetcapatypjet",
+      });
   });
 }
 
 /**
- * Run migrations
- * @param {string} verfdp current character sheet version
- * @param {string} newver new character sheet version
- */
+* Run migrations
+* @param {string} verfdp current character sheet version
+* @param {string} newver new character sheet version
+*/
 function migrateSheet(verfdp, newver) {
   if (verfdp.major === 0) {
     // Version 1.6 vers 1.7
@@ -10243,13 +10760,17 @@ function migrateSheet(verfdp, newver) {
     migrateSheetV420();
     clog(newver, "migrate sheet");
   }
+  if (verfdp.major === 4 && verfdp.minor <= 3) {
+    migrateSheetV430();
+    clog(newver, "migrate sheet");
+  }
 }
 
 /**
- * Parse semantic version label
- * @param {string} version
- * @returns version object
- */
+* Parse semantic version label
+* @param {string} version
+* @returns version object
+*/
 function parseSemVer(version) {
   version += ".0.0";
   if (version.toLowerCase().startsWith("v")) version = version.slice(1);
@@ -10262,10 +10783,10 @@ function parseSemVer(version) {
 }
 
 /**
- * Get character token's URL
- * @param {object} values attribute values
- * @returns URL for character token
- */
+* Get character token's URL
+* @param {object} values attribute values
+* @returns URL for character token
+*/
 function getTokenURL(values) {
   const token_url_def =
     "https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/";
@@ -10282,12 +10803,12 @@ function getTokenURL(values) {
 }
 
 /**
- * On opening the character sheet :
- * - Perform sheet version updates
- * - Update some default attribute values
- * - One-time setup some new attribute values
- * - Rebuild derived attributes
- */
+* On opening the character sheet :
+* - Perform sheet version updates
+* - Update some default attribute values
+* - One-time setup some new attribute values
+* - Rebuild derived attributes
+*/
 on("sheet:opened", function () {
   // **** Gestion transition de version
   getAttrs(["VERSION", "VERFDP", "debug_mode"], function (values) {
@@ -10327,7 +10848,7 @@ on("sheet:opened", function () {
       "ATKTIRV_BUFF1_DESC",
     ],
     function (values) {
-      if (values.UNIVERS == "CG") {
+      if (values.UNIVERS == "COG") {
         if (values.type_personnage == SHEET_STARSHIP && values.PE_ONCE !== "") {
           const for_buff_desc = values.FOR_BUFF1_DESC || values.PE_ONCE;
           const dex_buff_desc = values.DEX_BUFF1_DESC || values.PE_ONCE;
@@ -10376,14 +10897,20 @@ on("sheet:opened", function () {
       });
     }
   });
+  // liste des compétences
+  getAttrs(["skills"], function (v) {
+    if (stringOrDefault(v.skills) === "") {
+      loadSkills();
+    }
+  })
   // rebuild all
   rebuildAll();
 });
 
 /**
- * On changing character name :
- * - replace double quotes with guillemets
- */
+* On changing character name :
+* - replace double quotes with guillemets
+*/
 on("change:character_name", function () {
   getAttrs(["character_name"], function (values) {
     var charName = values.character_name;
@@ -10394,8 +10921,8 @@ on("change:character_name", function () {
 });
 
 /**
- * Update the xxx_TEST attributes
- */
+* Update the xxx_TEST attributes
+*/
 function updateModTest(carac) {
   const attrs = [`${carac}`, `${carac}_BUFF`];
   if (carac == "DEX") attrs.push("ARMURE_MALUS");
@@ -10437,9 +10964,9 @@ on("change:cha change:cha_buff", function () {
 });
 
 /**
- * On changing base PC, CHA or addtl PC :
- * - update max PC
- */
+* On changing base PC, CHA or addtl PC :
+* - update max PC
+*/
 function updatePC() {
   getAttrs(["PCBASE", "CHA", "PCDIV"], function (values) {
     let pc_max = 0;
@@ -10455,9 +10982,51 @@ on("change:pcbase change:cha change:pcdiv", function () {
 });
 
 /**
- * On changing CON or FOR :
- * - update wounds threshold
- */
+* Update PR & PR_max
+*/
+function updatePR() {
+  getAttrs(["CHA"], function (v) {
+    let PR_max = 3 + int(v.CHA);
+    getSectionIDs("traits", function (rowIds) {
+      let PR_used = 0;
+      rowIds.forEach(rowId => {
+        getAttrs([`repeating_traits_${rowId}_traittype`], function(v) {
+          const [ traitTypeK ] = Object.keys(v);
+          const traitType = stringOrDefault(v[traitTypeK]);
+          switch (traitType) {
+            case "acq":
+              PR_used += 1;
+              break;
+            case "ally":
+              PR_used += 3;
+              break;
+            case "foe":
+              PR_max += 2;
+              break;
+          }
+          const PR = PR_max - PR_used;
+          setAttrs({ PR, PR_max });
+        })
+      });
+    });
+  });
+}
+
+/**
+* On changing CHA or Relations
+* - Update PR
+*/
+on("change:cha change:repeating_traits:traittype", function (eventInfo) {
+  if (eventInfo.sourceAttribute.startsWith("repeating_traits_")) {
+    if (["acq", "ally", "foe"].indexOf(eventInfo.newValue) === -1) return;
+  }
+  updatePR();
+});
+
+/**
+* On changing CON or FOR :
+* - update wounds threshold
+*/
 function updateSEUILBG() {
   getAttrs(["CON", "FOR"], function (values) {
     let seuilbg = 10;
@@ -10473,13 +11042,14 @@ on("change:con change:for", function () {
 });
 
 /**
- * Parse a buff text
- * @param {string} v Buff text
- * @param {object} caracs CARACS attribute deserialized as an object
- * @returns Buff value as number
- */
+* Parse a buff text
+* @param {string} v Buff text
+* @param {object} caracs CARACS attribute deserialized as an object
+* @returns Buff value as number
+*/
 function buffValue(v, caracs) {
   v = v.trim();
+  clog(v);
   let bm = 1;
   if (v.startsWith("-")) bm = -1;
   if (v.indexOf("2[") !== -1) {
@@ -10517,20 +11087,21 @@ function buffValue(v, caracs) {
 }
 
 /**
- * Parse an attribute list of buffs and sets its value
- * @param {string} buffAttr Name of attribute buff list to parse
- */
+* Parse an attribute list of buffs and sets its value
+* @param {string} buffAttr Name of attribute buff list to parse
+*/
 function parseBuff(buffAttr) {
   getAttrs([`${buffAttr}_BUFF_LIST`, "CARACS"], function (v) {
-    let buffAttr = Object.keys(v)[0];
+    let [ buffAttr ] = Object.keys(v);
     let buffList = v[buffAttr];
     let caracs = JSON.parse(v.CARACS);
     let buffSum = 0;
     if (buffList && buffList !== "") {
       let buffs = buffList.split(";");
       for (let b = 0; b < buffs.length; b++) {
-        let buff = buffs[b];
-        if (buff && buff !== "") {
+        let buff = buffs[b] || "";
+        if (buff !== "") {
+          console.log(buff);
           let delim = buff.indexOf(":") !== -1 ? ":" : " ";
           let buffv = buff.split(delim);
           let buffName = "";
@@ -10555,15 +11126,14 @@ function parseBuff(buffAttr) {
 }
 
 /**
- * Update buffs after an attribute value change
- * @param {object} e eventInfo object
- */
+* Update buffs after an attribute value change
+* @param {object} e eventInfo object
+*/
 function updateBuffs(e) {
-  const caracs = ["FOR", "DEX", "CON", "INT", "PER", "CHA"];
   const changed = e.sourceAttribute.toUpperCase();
-  if (!caracs.includes(changed)) return;
+  if (!ABILITIES.includes(changed)) return;
   const attrs = [
-    ...caracs,
+    ...ABILITIES,
     "ATKCAC",
     "ATKTIR",
     "PSYINTUI",
@@ -10587,8 +11157,8 @@ function updateBuffs(e) {
 }
 
 /**
- * On changing an attribute serialized in the CARACS attribute
- */
+* On changing an attribute serialized in the CARACS attribute
+*/
 on(
   [
     "change:for",
@@ -10627,8 +11197,8 @@ on(
 );
 
 /**
- * Update the INIT(iative) attribute
- */
+* Update the INIT(iative) attribute
+*/
 function updateINIT() {
   getAttrs(["DEX", "PER", "INIT_BUFF", "ARMURE_MALUS"], function (values) {
     let initVal = 10;
@@ -10641,21 +11211,24 @@ function updateINIT() {
 }
 
 /**
- * On changing the relevant attributes
- * Update the INIT(iative) attribute
- */
+* On changing the relevant attributes
+* Update the INIT(iative) attribute
+*/
 on(
-  ["change:dex", "change:per", "change:init_buff", "change:armure_malus"].join(
-    " "
-  ),
+  [
+    "change:dex",
+    "change:per",
+    "change:init_buff",
+    "change:armure_malus"
+  ].join(" "),
   function () {
     updateINIT();
   }
 );
 
 /**
- * Update the DEF(ense) attribute
- */
+* Update the DEF(ense) attribute
+*/
 function updateDEF() {
   getAttrs(
     [
@@ -10680,9 +11253,9 @@ function updateDEF() {
 }
 
 /**
- * On changing the relevant attributes
- * Update the DEF(ense) attribute
- */
+* On changing the relevant attributes
+* Update the DEF(ense) attribute
+*/
 on(
   [
     "change:defarmure",
@@ -10699,8 +11272,8 @@ on(
 );
 
 /**
- * Update the DE(fense) P(sychique) attribute
- */
+* Update the DE(fense) P(sychique) attribute
+*/
 function updateDEP() {
   getAttrs(["CHA", "DEP_BUFF"], function (values) {
     let depVal = 10;
@@ -10711,16 +11284,16 @@ function updateDEP() {
 }
 
 /**
- * On changing the relevant attributes
- * Update the DE(fense) P(sychique) attribute
- */
+* On changing the relevant attributes
+* Update the DE(fense) P(sychique) attribute
+*/
 on("change:cha change:dep_buff", function () {
   updateDEP();
 });
 
 /**
- * On changing the buff lists
- */
+* On changing the buff lists
+*/
 on("change:for_buff_list", function () {
   parseBuff("FOR");
 });
@@ -10782,8 +11355,8 @@ on("change:pv_buff_list", function () {
 });
 
 /**
- * Rebuild the buff lists from the buffs repeating section
- */
+* Rebuild the buff lists from the buffs repeating section
+*/
 function rebuildBuffs() {
   getSectionIDs("buffs", function (ids) {
     const aliases = {
@@ -10826,9 +11399,10 @@ function rebuildBuffs() {
           `repeating_buffs_${id}_buffmods`,
         ],
         function (values) {
-          const enabled = int(values[Object.keys(values)[0]]);
-          const buffName = values[Object.keys(values)[1]];
-          const buffMods = values[Object.keys(values)[2]];
+          const [ buffOnK, buffNomK, buffModsK ] = Object.keys(values);
+          const enabled = int(values[buffOnK]);
+          const buffName = stringOrDefault(values[buffNomK]);
+          const buffMods = stringOrDefault(values[buffModsK]);
           if (enabled == 1 && buffName !== "" && buffMods !== "") {
             const mods = buffMods.split(";");
             for (const mod of mods) {
@@ -10855,20 +11429,65 @@ function rebuildBuffs() {
 }
 
 /**
- * On changing or removing an entry in the buff repeating section
- * - Rebuild the buff lists
- */
-on("change:repeating_buffs", function () {
-  rebuildBuffs();
-});
-
-on("remove:repeating_buffs", function () {
+* On changing or removing an entry in the buff repeating section
+* - Rebuild the buff lists
+*/
+on("change:repeating_buffs remove:repeating_buffs", function () {
   rebuildBuffs();
 });
 
 /**
- * Spaceships Buffs
- */
+* Rebuild the situation mods from repeating section
+*/
+function rebuildSitMod() {
+  getSectionIDs("sitmod", function (ids) {
+    const modSit = { FOR: [], DEX: [], CON: [], INT: [], PER: [], CHA: [] }
+    for (const id of ids) {
+      const rowId = `repeating_sitmod_${id}`;
+      getAttrs(
+        [
+          `${rowId}_sitmod-carac`,
+          `${rowId}_sitmod-value`,
+          `${rowId}_sitmod-situation`,
+          "sitmod"
+        ],
+        function (values) {
+          const sitmod = int(values.sitmod);
+          const [ caracK, modK, situationK ] = Object.keys(values);
+          const carac = stringOrDefault(values[caracK]);
+          const mod = int(values[modK]);
+          const situation = stringOrDefault(values[situationK]);
+          modSit[carac].push(`(${mod}) ${situation},${mod}`);
+          const attr = {};
+          attr[`MODSIT_${carac}`] = "?{Situation ?|Aucune,0|" + modSit[carac].join("|") + "}";
+          if (sitmod !== 0) {
+            attr[`MODSIT_${carac}`] = `{${sitmod},` + attr[`MODSIT_${carac}`] + "}kl1";
+          }
+          setAttrs(attr);
+        }
+      );
+    }
+  });
+}
+
+/**
+* On changing or removing an entry in the situation mods repeating section
+* - Rebuild the situation mods
+*/
+on("change:sitmod change:repeating_sitmod remove:repeating_sitmod", function () {
+  getAttrs([ "sitmod" ], function(v) {
+    const sitmod = int(v.sitmod);
+    const attrs = {};
+    ABILITIES.forEach(ability => attrs[`MODSIT_${ability}`] = sitmod);
+    setAttrs(attrs, function() {
+      rebuildSitMod();
+    })
+  });
+});
+
+/**
+* Spaceships Buffs
+*/
 function attrBuff(attr) {
   let attrs = [];
   for (let b = 1; b < 6; b++) {
@@ -11008,9 +11627,9 @@ on(
 );
 
 /**
- * On changing the 'Blessure' checkbox
- * - Set the ETATDE attribute (roll d20 or d12)
- */
+* On changing the 'Blessure' checkbox
+* - Set the ETATDE attribute (roll d20 or d12)
+*/
 on("change:blessure", function () {
   getAttrs(["BLESSURE"], function (values) {
     var etatde = values.BLESSURE == "1" ? "12" : "20";
@@ -11021,9 +11640,9 @@ on("change:blessure", function () {
 });
 
 /**
- * On changing the 'POISSE' checkbox
- * - Set the standard rolls
- */
+* On changing the 'POISSE' checkbox
+* - Set the standard rolls
+*/
 on("change:poisse", function () {
   getAttrs(["POISSE"], function (values) {
     var jetn = values.POISSE == "1" ? "2d@{ETATDE}kl1" : "1d@{ETATDE}";
@@ -11045,9 +11664,9 @@ on("change:poisse", function () {
 });
 
 /**
- * On changing the 'PV' value
- * - Set the 'BLESSURE' attribute
- */
+* On changing the 'PV' value
+* - Set the 'BLESSURE' attribute
+*/
 on("change:pv", function () {
   getAttrs(
     ["PV", "PV_max", "LAST_PV", "SEUILBG", "BLESSURE"],
@@ -11069,10 +11688,10 @@ on("change:pv", function () {
 });
 
 /**
- * On changing (pasting) an NPC, starship or mecha statblock
- * - Parse the statblock text
- * - Create the NPC, starship or mecha character sheet
- */
+* On changing (pasting) an NPC, starship or mecha statblock
+* - Parse the statblock text
+* - Create the NPC, starship or mecha character sheet
+*/
 on("clicked:statblockimport", function () {
   getAttrs(
     ["UNIVERS", "type_fiche", "statblock", "character_name"],
@@ -11146,8 +11765,8 @@ on("clicked:statblockimport", function () {
 });
 
 /**
- * Convert an NPC to a PC character sheet
- */
+* Convert an NPC to a PC character sheet
+*/
 function convertToPC() {
   const npcAtkAttribs = [
     "atkatt",
@@ -11184,7 +11803,7 @@ function convertToPC() {
     ],
     function (values) {
       let attrs = {};
-      for (let attr of ["FOR", "DEX", "CON", "INT", "PER", "CHA"]) {
+      for (let attr of ABILITIES) {
         let attrv = int(values[`pnj_${attr.toLowerCase()}`]);
         attrs[attr] = attrv;
         if (attr === "DEX") {
@@ -11300,9 +11919,9 @@ function convertToPC() {
 }
 
 /**
- * On changing the sheet type
- * - Convert an NPC to a PC
- */
+* On changing the sheet type
+* - Convert an NPC to a PC
+*/
 on("change:type_personnage", function (eventInfo) {
   if (eventInfo.previousValue === SHEET_NPC && eventInfo.newValue === "pj")
     convertToPC();
@@ -11322,13 +11941,13 @@ on("change:type_personnage", function (eventInfo) {
 });
 
 /**
- * Return attributes array for a starship station
- * @param {string} ship_attr Spaceship station shortname
- * @param {string} crew_attr Crew station ability
- */
+* Return attributes array for a starship station
+* @param {string} ship_attr Spaceship station shortname
+* @param {string} crew_attr Crew station ability
+*/
 function attrStation(ship_attr, crew_attr) {
   return [
-    "colib",
+    "cogcrew",
     `POSTE_${ship_attr}_OQP`,
     `POSTE_${ship_attr}_NOM`,
     `POSTE_${ship_attr}_BONUS`,
@@ -11337,11 +11956,11 @@ function attrStation(ship_attr, crew_attr) {
 }
 
 /**
- * Build hidden macro formulas for spaceship stations
- * @param {array} v Attributes list
- * @param {string} attr Spaceship station shortname
- * @param {array} fill Fillers for attribute formulas
- */
+* Build hidden macro formulas for spaceship stations
+* @param {array} v Attributes list
+* @param {string} attr Spaceship station shortname
+* @param {array} fill Fillers for attribute formulas
+*/
 function setStation(v, attr, fill) {
   let station = {};
   let attrx = "";
@@ -11375,14 +11994,14 @@ function setStation(v, attr, fill) {
     station_attr
   ] = `[[${station_car}*${station_held}]][${fill[0]}${station_crew}] + [[${station_bonus}*${station_held}]][${fill[1]}${station_crew}]`;
   station[`EQUIP_${attr}`] = station_held === 1 ? station_crew.trim() : "aucun";
-  if (int(v.colib) === 1) station["POSTES_EQ"] = `update:${SHEET_STARSHIP}`;
+  if (int(v.cogcrew) === 1) station["POSTES_EQ"] = `update:${SHEET_STARSHIP}`;
   setAttrs(station);
 }
 
 /**
- * On change of spaceship stations character names or bonus
- * - Rebuild hidden macro formulas
- */
+* On change of spaceship stations character names or bonus
+* - Rebuild hidden macro formulas
+*/
 on(
   [
     "change:poste_pil_oqp",
@@ -11462,8 +12081,8 @@ on(
 );
 
 /**
- * Rebuild starship INITiative
- */
+* Rebuild starship INITiative
+*/
 function updateShipInit() {
   getAttrs(
     [
@@ -11507,8 +12126,8 @@ on(
 );
 
 /**
- * Rebuild starship DEFenses
- */
+* Rebuild starship DEFenses
+*/
 function updateShipDEF() {
   getAttrs(
     [
@@ -11560,8 +12179,8 @@ on(
 );
 
 /**
- * Energy points management functions
- */
+* Energy points management functions
+*/
 function updateShipEP() {
   getAttrs(
     ["type_fiche", "NIVEAU", "PEV_BUFF", "FOR", "PEV_DMG", "PEV"],
@@ -11660,10 +12279,10 @@ on(
 );
 
 /**
- * Initialize an array of abilities
- * @param {string} voie path #
- * @returns Array of attribute names
- */
+* Initialize an array of abilities
+* @param {string} voie path #
+* @returns Array of attribute names
+*/
 function attrRanks(voie) {
   let attrs = [];
   for (let r = 1; r < 6; r++) {
@@ -11675,9 +12294,9 @@ function attrRanks(voie) {
 }
 
 /**
- * Determine current rank in a path
- * @param {string} voie path #
- */
+* Determine current rank in a path
+* @param {string} voie path #
+*/
 function setRank(voie) {
   getAttrs(attrRanks(voie), function (v) {
     let vr = 0;
@@ -11697,10 +12316,10 @@ function setRank(voie) {
 }
 
 /**
- * On changing any of the paths info (title or abilities)
- * - Determine the current rank in the path
- * - Rebuild the CARACS attribute
- */
+* On changing any of the paths info (title or abilities)
+* - Determine the current rank in the path
+* - Rebuild the CARACS attribute
+*/
 on(
   [
     "change:voie1nom",
@@ -11918,8 +12537,8 @@ on(
 );
 
 /**
- * Compute the armor malus
- */
+* Compute the armor malus
+*/
 function setArmorMalus() {
   getAttrs(["DEFARMUREON", "DEFARMUREMALUS"], function (values) {
     let armure_on = int(values.DEFARMUREON);
@@ -11931,9 +12550,9 @@ function setArmorMalus() {
 }
 
 /**
- * On changing the armor attributes
- * - Re-compute the armor malus
- */
+* On changing the armor attributes
+* - Re-compute the armor malus
+*/
 on(
   ["change:defarmureon", "change:defarmuremalus"].join(" "),
   function (eventInfo) {
@@ -11942,9 +12561,9 @@ on(
 );
 
 /**
- * On changing the 2nd damage info
- * - Set the roll macro for the 2nd damage
- */
+* On changing the 2nd damage info
+* - Set the roll macro for the 2nd damage
+*/
 on(
   [
     "change:repeating_armes:armedm2_de",
@@ -11968,9 +12587,9 @@ on(
 );
 
 /**
- * On changing the attack range
- * - Set the ranged attack text for the roll template
- */
+* On changing the attack range
+* - Set the ranged attack text for the roll template
+*/
 on("change:repeating_armes:armeportee", function () {
   getAttrs(["repeating_armes_armeportee"], function (value) {
     let um = "";
@@ -11993,18 +12612,19 @@ on("change:repeating_armes:armeportee", function () {
 });
 
 /**
- * Process a limited action checkbox attribute
- * @param {object} v Attributes object
- * @returns (L) if limited action
- */
+* Process a limited action checkbox attribute
+* @param {object} v Attributes object
+* @returns (L) if limited action
+*/
 function actionLimitee(v) {
-  return int(v[Object.keys(v)[0]]) === 1 ? "(L)" : "";
+  const [ k ] = Object.keys(v); 
+  return int(v[k]) === 1 ? " (L)" : "";
 }
 
 /**
- * On changing an attack limited action checkbox
- * - Set the limited action portion of the roll macro
- */
+* On changing an attack limited action checkbox
+* - Set the limited action portion of the roll macro
+*/
 on("change:repeating_armes:arme_al", function () {
   getAttrs(["repeating_armes_arme_al"], function (value) {
     setAttrs({
@@ -12014,9 +12634,53 @@ on("change:repeating_armes:arme_al", function () {
 });
 
 /**
- * On changing an ability limited action checkbox
- * - Set the limited action portion of the roll macro
- */
+ *
+ */ 
+on(
+  [
+    "change:repeating_armes:armeatt",
+    "change:repeating_armes:armeatk"
+  ].join(" "),
+  function () {
+    getAttrs([
+        "repeating_armes_targetdefp",
+        "repeating_armes_armeatt",
+        "repeating_armes_armeatk",
+        "target_def",
+        "target_dep"
+      ], function (v) {
+      console.log(v);
+      let targetdefp = "";
+      const armeatt = ( stringOrDefault(v["repeating_armes_armeatt"]) === "0" ) ? 0 : 1;
+      const armeatk = stringOrDefault(v["repeating_armes_armeatk"]);
+      if (armeatt === 1) {
+        const target_def = stringOrDefault(v.target_def);
+        const target_dep = stringOrDefault(v.target_dep);
+        switch (armeatk) {
+          case "@{ATKCAC}":
+          case "@{ATKTIR}":
+          case "@{ATKMAG}":
+            if (target_def !== "0") targetdefp = target_def;
+            break;
+          case "@{ATKCAC}":
+          case "@{ATKTIR}":
+          case "@{ATKMAG}":
+            if (target_dep !== "0") targetdefp = target_dep;
+            break;
+        }
+      }
+      console.log(targetdefp);
+      setAttrs({
+        repeating_armes_targetdefp: targetdefp,
+      });
+    });
+  }
+);
+
+/**
+* On changing an ability limited action checkbox
+* - Set the limited action portion of the roll macro
+*/
 on("change:repeating_jetcapas:jetcapa_al", function () {
   getAttrs(["repeating_jetcapas_jetcapa_al"], function (value) {
     setAttrs({
@@ -12026,9 +12690,9 @@ on("change:repeating_jetcapas:jetcapa_al", function () {
 });
 
 /**
- * On changing ranks modifier attributes
- * - Set the ability/skill description
- */
+* On changing ranks modifier attributes
+* - Set the ability/skill description
+*/
 on(
   [
     "change:repeating_jetcapas:jetcapavoie",
@@ -12072,9 +12736,9 @@ on(
 );
 
 /**
- * On changing path & rank number attributes
- * - Set the path & rank identifier (v?r?)
- */
+* On changing path & rank number attributes
+* - Set the path & rank identifier (v?r?)
+*/
 on(
   [
     "change:repeating_jetcapas:jetcapavoieno",
@@ -12093,8 +12757,9 @@ on(
         rankData.push(vr.replace("v", "voie").replace("r", "-t"));
         rankData.push(vr.replace("v", "voie").replace("r", "-"));
         getAttrs(rankData, function (values) {
-          const rankName = values[Object.keys(values)[0]];
-          const rankDesc = values[Object.keys(values)[1]];
+          const [ rankNameK, rankDescK ] = Object.keys(values);
+          const rankName = stringOrDefault(values[rankName]);
+          const rankDesc = stringOrDefault(values[rankDesc]);
           const updated = {
             repeating_jetcapas_jetcapanom: rankName,
             repeating_jetcapas_jetcapadesc: rankDesc,
@@ -12108,8 +12773,8 @@ on(
 );
 
 /**
- * Compute character encumbrance
- */
+* Compute character encumbrance
+*/
 function encumbrance() {
   getSectionIDs("repeating_equipement", function (ids) {
     setAttrs({ total_enc: 0 });
@@ -12125,9 +12790,10 @@ function encumbrance() {
           `repeating_equipement_${id}_equip-on`,
         ],
         function (values) {
-          const qte = int(values[Object.keys(values)[0]]);
-          const enc = int(values[Object.keys(values)[1]]);
-          const equipe = int(values[Object.keys(values)[2]]);
+          const [ qteK, encK, equipeK ] = Object.keys(values);
+          const qte = int(values[qteK]);
+          const enc = int(values[encK]);
+          const equipe = int(values[equipeK]);
           if (equipe === 1) {
             if (enc === 0) {
               encombrement.zeros += qte;
@@ -12147,8 +12813,8 @@ function encumbrance() {
 }
 
 /**
- * Determine best gear bonus
- */
+* Determine best gear bonus
+*/
 function gearBonus() {
   getSectionIDs("repeating_equipement", function (ids) {
     let matmod = "";
@@ -12163,10 +12829,11 @@ function gearBonus() {
           "CARACS",
         ],
         function (values) {
-          const use = int(values[Object.keys(values)[0]]);
+          const [ useK, descK, propsK ] = Object.keys(values);
+          const use = int(values[useK]);
           if (use !== 1) return;
-          const desc = stringOrDefault(values[Object.keys(values)[1]]);
-          const props = stringOrDefault(values[Object.keys(values)[2]]);
+          const desc = stringOrDefault(values[desK]);
+          const props = stringOrDefault(values[propsK]);
           for (const prop of props.split(",")) {
             const parsed = parseNameValue(prop);
             const propName = parsed.name ? parsed.name.toUpperCase() : "";
@@ -12190,9 +12857,9 @@ function gearBonus() {
 }
 
 /**
- * On changing character equipment
- * - Recompute character encumbrance
- */
+* On changing character equipment
+* - Recompute character encumbrance
+*/
 on(
   ["change:repeating_equipement", "remove:repeating_equipement"].join(" "),
   function () {
@@ -12202,10 +12869,10 @@ on(
 );
 
 /**
- * On changing equipment properties
- * - Change DEF & RD for armor & shield
- * - Add or remove attack line for a weapon
- */
+* On changing equipment properties
+* - Change DEF & RD for armor & shield
+* - Add or remove attack line for a weapon
+*/
 on(
   [
     "change:repeating_equipement:equip-desc",
@@ -12229,13 +12896,14 @@ on(
         "RD",
       ],
       function (values) {
-        const props = values[Object.keys(values)[0]];
-        const eqpon = int(values[Object.keys(values)[1]]);
+        const [ propsK, eqpOnK, hasAtK, atkIdK, atkNameK ] = Object.keys(values);
+        const props = values[propsK];
+        const eqpon = int(values[eqpOnK]);
 
         const attrs = {};
 
-        const hasAtk = int(values[Object.keys(values)[2]]);
-        let atkId = values[Object.keys(values)[3]];
+        const hasAtk = int(values[hasAtK]);
+        let atkId = values[atkIdK];
         if (eventInfo.sourceAttribute.endsWith("equip-atk") && !hasAtk) {
           if (atkId) {
             removeRepeatingRow(`repeating_armes_${atkId}`);
@@ -12245,7 +12913,7 @@ on(
           return;
         }
 
-        const atkName = values[Object.keys(values)[4]];
+        const atkName = values[atkNameK];
         let atkInfo = {};
 
         // parse properties
@@ -12275,8 +12943,9 @@ on(
           // Armor malus
           if (propName === "DEF-") {
             const defmalus = int(values.DEFARMUREMALUS);
+            const propVal = int(parsed.value);
             if (propVal !== defmalus) {
-              attrs.DEFARMUREMALUS = propVal;
+              attrs.DEFARMUREMALUS = Math.abs(propVal);
             }
           }
           // Damage reduction
@@ -12319,7 +12988,7 @@ on(
           }
         }
         // Add/update attack line
-        if (hasAtk) {
+        if (eventInfo.sourceAttribute.endsWith("equip-atk") && hasAtk) {
           if (!atkId) {
             atkId = generateRowID();
           }
@@ -12356,9 +13025,9 @@ on(
 );
 
 /**
- * On changing the total character's encumbrance
- * - Set character's conditions
- */
+* On changing the total character's encumbrance
+* - Set character's conditions
+*/
 on("change:total_enc", function () {
   getAttrs(["use_encombrement", "total_enc", "seuil_enc"], function (values) {
     let use_encombrement = values.use_encombrement === 1 ? true : false;
@@ -12393,23 +13062,23 @@ on("change:total_enc", function () {
 });
 
 /**
- * Rebuild derived attributes
- * - ranks in skill branches
- * - encumbrance
- * - CARACS attribute
- * - INITiative value
- * - DEFense value
- * - Psy Defense value
- * - General buffs
- * - Attack and DM mods
- */
+* Rebuild derived attributes
+* - ranks in skill branches
+* - encumbrance
+* - CARACS attribute
+* - INITiative value
+* - DEFense value
+* - Psy Defense value
+* - General buffs
+* - Attack and DM mods
+*/
 function rebuildAllPC() {
   for (const v of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
     setRank(v.toString());
   }
   encumbrance();
   buildCaracs();
-  rebuildCustom();
+  //rebuildCustom();
   updateINIT();
   updateDEF();
   updateDEP();
@@ -12419,12 +13088,12 @@ function rebuildAllPC() {
 }
 
 /**
- * Rebuild Ship derived attributes
- * - Energy Points
- * - INITiative value
- * - DEFense values
- * - Damage threshold
- */
+* Rebuild Ship derived attributes
+* - Energy Points
+* - INITiative value
+* - DEFense values
+* - Damage threshold
+*/
 function rebuildAllShip() {
   updateShipEP();
   updateShipInit();
@@ -12434,40 +13103,42 @@ function rebuildAllShip() {
 }
 
 /**
- * Rebuild derived attributes
- */
+* Rebuild derived attributes
+*/
 function rebuildAll() {
-  getAttrs(["type_personnage", "colib"], function (v) {
+  getAttrs(["type_personnage", "colib", "cogcrew"], function (v) {
+    if (stringOrDefault(v.cogcrew) === "") v.cogcrew = v.colib;
     if (v.type_personnage === SHEET_PC) rebuildAllPC();
     if (v.type_personnage === SHEET_STARSHIP) rebuildAllShip();
     if (v.type_personnage === SHEET_MECHA) rebuildAllMech();
     const vehicle = isVehicle(v.type_personnage);
-    const colib = int(v.colib) === 1 ? true : false;
+    const useCOGCrew = int(v.cogcrew) === 1 ? true : false;
     const physical = vehicle ? "0" : "1";
-    const update = (vehicle && colib) ? `update:${v.type_personnage}` : "";
-    setAttrs({ physical: physical, sbresult: "", POSTES_EQ: update });
+    const update = vehicle && useCOGCrew ? `update:${v.type_personnage}` : "";
+    setAttrs({ physical, sbresult: "", cogcrew: v.cogcrew, POSTES_EQ: update });
   });
 }
 
 /**
- * On clicking the Reset button
- * - Rebuild derived attributes
- */
+* On clicking the Reset button
+* - Rebuild derived attributes
+*/
 on("clicked:resetattrib", function () {
   rebuildAll();
 });
 
 /**
- * Search for a general buff to synchronize with an attack modifier
- * @param {string} buffName Name of buff to synchronize
- * @param {string} buffOn State of buff to synchronize
- */
+* Search for a general buff to synchronize with an attack modifier
+* @param {string} buffName Name of buff to synchronize
+* @param {string} buffOn State of buff to synchronize
+*/
 function updateMatchBuffs(buffName, buffOn) {
   getSectionIDs("repeating_buffs", function (ids) {
     const attrs = {};
     for (const id of ids) {
       getAttrs([`repeating_buffs_${id}_buffnom`], function (v) {
-        const name = stringOrDefault(v[Object.keys(v)[0]]);
+        const [ nameK ] = Object.keys(v);
+        const name = stringOrDefault(v[nameK]);
         if (name.toLowerCase() === buffName.toLowerCase()) {
           attrs[`repeating_buffs_${id}_buffon`] = buffOn;
         }
@@ -12478,10 +13149,10 @@ function updateMatchBuffs(buffName, buffOn) {
 }
 
 /**
- * Rebuild the attack/dm modifiers
- * @param {string} section Repeating section name
- * @param {string} buffAttr Attack modifier attribute being rebuilt
- */
+* Rebuild the attack/dm modifiers
+* @param {string} section Repeating section name
+* @param {string} buffAttr Attack modifier attribute being rebuilt
+*/
 function rebuildModAtkDM(section, buffAttr) {
   getSectionIDs(section, function (ids) {
     const sectId = section.split("_")[1];
@@ -12496,9 +13167,10 @@ function rebuildModAtkDM(section, buffAttr) {
         ],
         function (values) {
           let caracs = JSON.parse(values.CARACS);
-          const modOn = stringOrDefault(values[Object.keys(values)[0]], "0");
-          const modNom = stringOrDefault(values[Object.keys(values)[1]]);
-          let modVal = stringOrDefault(values[Object.keys(values)[2]]);
+          const [ modOnK, modNomK, modValK ] = Object.keys(values);
+          const modOn = stringOrDefault(values[modOnK], "0");
+          const modNom = stringOrDefault(values[modNomK]);
+          let modVal = stringOrDefault(values[modValK]);
           if (modOn === "1" && modNom !== "" && modVal !== "") {
             let sign = "";
             if (modVal.startsWith("-") || modVal.startsWith("+")) {
@@ -12518,6 +13190,7 @@ function rebuildModAtkDM(section, buffAttr) {
     }
     getSectionIDs("repeating_armes", function (ids) {
       const attrs = {};
+      if (armebuff === "") armebuff = 0;
       for (const id of ids) {
         attrs[`repeating_armes_${id}_${buffAttr}`] = armebuff;
       }
@@ -12527,9 +13200,9 @@ function rebuildModAtkDM(section, buffAttr) {
 }
 
 /**
- * On changing or removing attack modifiers
- * - Rebuild attack buffs from modifiers
- */
+* On changing or removing attack modifiers
+* - Rebuild attack buffs from modifiers
+*/
 on(
   ["change:repeating_modatk", "remove:repeating_modatk"].join(" "),
   function () {
@@ -12538,16 +13211,16 @@ on(
 );
 
 /**
- * On changing or removing damage modifiers
- * - Rebuild damage buffs from modifiers
- */
+* On changing or removing damage modifiers
+* - Rebuild damage buffs from modifiers
+*/
 on(["change:repeating_moddm", "remove:repeating_moddm"].join(" "), function () {
   rebuildModAtkDM("repeating_moddm", "armebuffdm");
 });
 
 /**
- * Condition codes
- */
+* Condition codes
+*/
 const conditions = {
   aveugle: "A",
   blesse: "B",
@@ -12562,8 +13235,8 @@ const conditions = {
 };
 
 /**
- * Condition modifiers
- */
+* Condition modifiers
+*/
 const conditions_data = {
   "": {
     atc: 0,
@@ -12637,11 +13310,11 @@ const conditions_data = {
 };
 
 /**
- * Apply condition(s) as buffs to combat stats
- * @param {object} buffs Buff object
- * @param {string} conditionAttr Name of attribute storing conditions
- * @param {integer} s Sign (-1/+1)
- */
+* Apply condition(s) as buffs to combat stats
+* @param {object} buffs Buff object
+* @param {string} conditionAttr Name of attribute storing conditions
+* @param {integer} s Sign (-1/+1)
+*/
 function applyConditions(buffs, conditionAttr, s) {
   if (conditionAttr === "") return;
   for (let cond of conditionAttr) {
@@ -12653,9 +13326,9 @@ function applyConditions(buffs, conditionAttr, s) {
 }
 
 /**
- * On changing the weakened state
- * - Change the physical and mental state rolls
- */
+* On changing the weakened state
+* - Change the physical and mental state rolls
+*/
 on("change:etatde", function () {
   getAttrs(["ETATDE"], function (v) {
     setAttrs({
@@ -12665,9 +13338,9 @@ on("change:etatde", function () {
   });
 });
 /**
- * On changing the enabled condition(s)
- * - Set/Unset combat stats buffs
- */
+* On changing the enabled condition(s)
+* - Set/Unset combat stats buffs
+*/
 on(
   [
     "clicked:aveugle",
@@ -12780,56 +13453,59 @@ on(
   }
 );
 
-/**
- * Adjust starship total hit points 
- */
-function starshipHP() {
-  getAttrs(["type_fiche", "NIVEAU", "DV", "CON"], 
-    function (values) {
-      if (values.type_fiche !== SHEET_STARSHIP) return;
+function loadSkills() {
+  let skills = "";
 
-      const niveau = int(values.NIVEAU);
-      const dv = int(values.DV);
-      if (niveau === 0 || dv === 0) return;
-    
-      const valCON = int(values.CON);
-      let pv_max = (dv + valCON) * niveau;
-      pv_max += pv_buff;
-      setAttrs({ PV_max: pv_max });
-    }
-  );
+  for (const carac in SKILLS) {
+    SKILLS[carac].forEach(skill => {
+      skills += `${skill.name}|${carac}|${skill.focus || ""}\n`;
+    });
+  }
+
+  setAttrs({ skills });
 }
 
 /**
- * On changing any attribute related to hit points
- * - Re-compute the total hit points for starship
- */
-on(
-  [
-    "change:niveau",
-    "change:dv",
-    "change:con",
-  ].join(" "),
-  function () {
-    starshipHP();
-  }
-);
+* Adjust starship total hit points
+*/
+function starshipHP() {
+  getAttrs(["type_fiche", "NIVEAU", "DV", "CON"], function (values) {
+    if (values.type_fiche !== SHEET_STARSHIP) return;
+
+    const niveau = int(values.NIVEAU);
+    const dv = int(values.DV);
+    if (niveau === 0 || dv === 0) return;
+
+    const valCON = int(values.CON);
+    let pv_max = (dv + valCON) * niveau;
+    pv_max += pv_buff;
+    setAttrs({ PV_max: pv_max });
+  });
+}
 
 /**
- * On changing the HP buff
- * - Re-compute max HP for PC
- */
-on("change:pv_buff", function(eventInfo) {
+* On changing any attribute related to hit points
+* - Re-compute the total hit points for starship
+*/
+on(["change:niveau", "change:dv", "change:con"].join(" "), function () {
+  starshipHP();
+});
+
+/**
+* On changing the HP buff
+* - Re-compute max HP for PC
+*/
+on("change:pv_buff", function (eventInfo) {
   const oldVal = int(eventInfo.previousValue);
   const newVal = int(eventInfo.newValue);
-  getAttrs(["PV_max"], function(v) {
+  getAttrs(["PV_max"], function (v) {
     setAttrs({ PV_max: int(v.PV_max) - oldVal + newVal });
   });
 });
 
 /**
- * Compute starship damage threshold
- */
+* Compute starship damage threshold
+*/
 function starshipDMThreshold(values) {
   getAttrs(
     ["type_personnage", "NIVEAU", "DV", "CON", "PV_BUFF"],
@@ -12849,9 +13525,9 @@ function starshipDMThreshold(values) {
 }
 
 /**
- * On changing any attribute related to hit points
- * - Re-compute the starship damage threshold
- */
+* On changing any attribute related to hit points
+* - Re-compute the starship damage threshold
+*/
 on(
   [
     "change:type_personnage",
@@ -12866,12 +13542,12 @@ on(
 );
 
 /**
- * Recalculate the crew adjustments to mecha's abilities
- */
+* Recalculate the crew adjustments to mecha's abilities
+*/
 function updateMechCrew() {
   getAttrs(
     [
-      "colib",
+      "cogrew",
       "mec_crew1_car",
       "mec_crew1_bonus",
       "mec_crew1_rank",
@@ -12898,7 +13574,8 @@ function updateMechCrew() {
       const crew2_status = int(values.mec_crew2_status);
       attrs[`mec_crew_${values.mec_crew2_car}`] =
         crew2_status * Math.sign(crew2_rank) * crew2_bonus;
-      if (int(values.colib) === 1) attrs["POSTES_EQ"] = `update:${SHEET_MECHA}`;
+      if (int(values.cogcrew) === 1)
+        attrs["POSTES_EQ"] = `update:${SHEET_MECHA}`;
       setAttrs(attrs);
     }
   );
@@ -12921,8 +13598,8 @@ on(
 );
 
 /**
- * Recalculate attack scores
- */
+* Recalculate attack scores
+*/
 function updateMechAttacks() {
   getAttrs(["NIVEAU", "mec_for", "mec_int", "mec_crew_int"], function (values) {
     let mec_atc = 0;
@@ -12952,8 +13629,8 @@ on(
 );
 
 /**
- * Recalculate cooling score
- */
+* Recalculate cooling score
+*/
 function updateMechCooling() {
   getAttrs(["NIVEAU", "mec_cha", "mec_crew_cha"], function (values) {
     let mec_froid_max = 0;
@@ -12972,8 +13649,8 @@ on(
 );
 
 /**
- * Recalculate Init & DEFenses
- */
+* Recalculate Init & DEFenses
+*/
 function updateMechInitDef() {
   getAttrs(
     ["mec_dex", "mec_crew_dex", "mec_per", "mec_crew_per", "mec_con"],
@@ -13010,8 +13687,8 @@ on(
 );
 
 /**
- * Recalculate speed
- */
+* Recalculate speed
+*/
 function updateMechSpeed() {
   getAttrs(["mec_dex", "mec_crew_dex", "mec_vitesse_base"], function (values) {
     const dex = 1 + int(values.mec_dex) + int(values.mec_crew_dex);
@@ -13025,8 +13702,8 @@ on("change:mec_dex change:mec_crew_dex change:mec_vitesse_base", function () {
 });
 
 /**
- * Recalculate hit points
- */
+* Recalculate hit points
+*/
 function updateMechHP() {
   getAttrs(["NIVEAU", "mec_dv", "mec_con", "mec_pv"], function (values) {
     const niveau = int(values.NIVEAU);
@@ -13044,8 +13721,8 @@ on("change:niveau change:mec_dv change:mec_con", function () {
 });
 
 /**
- * Recalculate gunner bonus
- */
+* Recalculate gunner bonus
+*/
 on(
   [
     "change:repeating_mecatk:crewint_bonus",
@@ -13055,7 +13732,7 @@ on(
   function () {
     getAttrs(
       [
-        "colib",
+        "cogcrew",
         "repeating_mecatk_crewint_bonus",
         "repeating_mecatk_crewint_rank",
         "repeating_mecatk_crewint_status",
@@ -13064,7 +13741,8 @@ on(
         const bonus = int(values.repeating_mecatk_crewint_bonus);
         const rank = int(values.repeating_mecatk_crewint_rank);
         const status = int(values.repeating_mecatk_crewint_status);
-        const postes_eq = int(values.colib) === 1 ? `update:${SHEET_MECHA}` : ""
+        const postes_eq =
+          int(values.cogcrew) === 1 ? `update:${SHEET_MECHA}` : "";
         setAttrs({
           POSTES_EQ: postes_eq,
           repeating_mecatk_crewint: status * Math.sign(rank) * bonus,
@@ -13075,8 +13753,8 @@ on(
 );
 
 /**
- * Recalculate all
- */
+* Recalculate all
+*/
 function rebuildAllMech() {
   updateMechCrew();
   updateMechAttacks();
@@ -13088,8 +13766,8 @@ function rebuildAllMech() {
 }
 
 /**
- * Update Rule of 4
- */
+* Update Rule of 4
+*/
 function updateRuleOf4() {
   getAttrs(
     [
@@ -13123,7 +13801,6 @@ function updateRuleOf4() {
       "sitmod",
       "matmod",
       "matmod_desc",
-      "chcmod",
     ],
     function (values) {
       let cmpmod = 0;
@@ -13140,12 +13817,10 @@ function updateRuleOf4() {
       const sitmod = int(values.sitmod);
       const matmod = int(values.matmod);
       const matmod_desc = values.matmod_desc || "Matériel";
-      const chcmod = int(values.chcmod);
       let rof4 = "";
       if (cmpmod > 0) rof4 += `+ ([[${cmpmod}]])[${cmpmod_desc}]`;
-      rof4 += `+ ([[${sitmod}]])[Situation]`;
       if (matmod > 0) rof4 += `+ ([[${matmod}]])[${matmod_desc}]`;
-      if (chcmod > 0) rof4 += `+ ([[${chcmod * 5}]])[Chance]`;
+      if (rof4 === "") rof4 = "+[[0]]";
       setAttrs({ rof4 });
     }
   );
@@ -13156,7 +13831,6 @@ on(
     "change:sitmod",
     "change:matmod",
     "change:matmod_desc",
-    "change:chcmod",
     "change:cp1mod",
     "change:cp2mod",
     "change:cp3mod",
@@ -13173,8 +13847,43 @@ on(
 );
 
 /**
- * Custom attributes
- 
+* create skill list
+*/
+function createSkillList() {
+  getAttrs(["skills"], function (v) {
+    const skillRows = {};
+    const skills = v.split('\n');
+    skills.forEach(skill => {
+      const [ name, ability, focus ] = skill.split("|");
+      const skillRowID = "repeating_jetcapas_" + generateRowID();
+      skillRows[`${skillRowID}_jetcapanom`] = "Compétence";
+      skillRows[`${skillRowID}_jetcapacarac`] = `@{${ability}_TEST}`;
+      skillRows[`${skillRowID}_jetcapatitre`] = `${name} (${ability})`;
+      skillRows[`${skillRowID}_jetcapadesc`] = focus || "";
+    });
+    setAttrs(skillRows);
+  });
+  /*
+  const abilities = Object.keys(SKILLS);
+  const skillRows = {};
+  abilities.forEach((ability) => {
+    SKILLS[ability].forEach((skill) => {
+      const skillRowID = "repeating_jetcapas_" + generateRowID();
+      skillRows[`${skillRowID}_jetcapanom`] = "Compétence";
+      skillRows[`${skillRowID}_jetcapacarac`] = `@{${ability}_TEST}`;
+      skillRows[`${skillRowID}_jetcapatitre`] = `${skill.name} (${ability})`;
+      skillRows[`${skillRowID}_jetcapadesc`] = skill.focus || "";
+    });
+  });
+  setAttrs(skillRows); */
+}
+
+on("clicked:addskills", function () {
+  createSkillList();
+});
+
+//'[Chance](~jet_pc" style="border: none; padding: 0px; background-color: transparent; color: red; font-size: 1em; font-weight: bold; text-decoration: underline;'
+
 function rebuildCustom() {
   getAttrs(["custom"], function (v) {
     const custom = stringOrDefault(v.custom).split("\n");
@@ -13185,18 +13894,18 @@ function rebuildCustom() {
       let sepChar;
       if (row.indexOf("::") !== -1) sepChar = "::";
       else sepChar = ":";
-      const name = row.split(sepChar)[0].trim();
-      const value = row.split(sepChar)[1].trim();
+      const [ name, value ] = row.split(sepChar).map(data => data.trim());
       if (name !== "" && value !== "") customAttrs[`custom_${name}`] = value;
     });
     setAttrs(customAttrs);
   });
 }
 
+/*
 on("change:custom", function() {
   rebuildCustom();
 });
- */
+*/
 
 </script>
 <!-- FIN SCRIPTS / SHEET WORKERS -->

@@ -10,9 +10,24 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.15.0 [Screenshot](coc_v2.png)
+v3.16.1 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.16.1 (2023-10-22)
+
+- Correction du nom des jets de INT, PER et CHA de la fiche de PNJ
+
+## v3.16.0 (2023-09-10)
+
+- Import de profil
+
+  - Ajout base attaques, DV, INIT à l'import de profil
+  - Ajout armes / équipement à l'import de profil
+  - Calcul PV et PC niveau 1
+
+- Correction bug de création d'une attaque via les propriétés d'équipement (prise en compte ATD:xxx)
+- Ajout messages d'aide sur les BUFFs et les propriétés d'équipements
 
 ## v3.15.0 (2023-04-30)
 
