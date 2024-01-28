@@ -195,6 +195,82 @@ on(
 		}
 });
 
+on(
+	"change:sf_regeneration_i " +
+	"change:sf_regeneration_ii " +
+	"change:sf_meisterliche_regeneration ",
+	function(eventInfo) {
+	safeGetAttrs([
+		"sf_meisterliche_regeneration_leiteigenschaft",
+		"MU", "KL", "IN", "CH", "FF", "GE", "KO", "KK"
+	], function(v) {
+		var attrsToChange = {};
+		var regenerationLevel = 0; // 0 to +3
+		const stats = {
+			"@{MU}": v["MU"], 
+			"@{KL}": v["KL"], 
+			"@{IN}": v["IN"], 
+			"@{CH}": v["CH"], 
+			"@{FF}": v["FF"], 
+			"@{GE}": v["GE"], 
+			"@{KO}": v["KO"], 
+			"@{KK}": v["KK"]
+		};
+		const mainStat = stats[v["sf_meisterliche_regeneration_leiteigenschaft"]];
+		var AEBaseRegenerationRoll = "1d6";
+		const source = eventInfo.sourceAttribute;
+		const sourceType = eventInfo.sourceType;
+
+		if (sourceType === "player") {
+			// Handle changes to degree of astral regeneration
+			if (source === "sf_regeneration_i" && eventInfo.newValue === "1") {
+				regenerationLevel = 1;
+			} else if (source === "sf_regeneration_i" && eventInfo.newValue === "0") {
+				regenerationLevel = 0;
+			} else if (source === "sf_regeneration_ii" && eventInfo.newValue === "1") {
+				regenerationLevel = 2;
+			} else if (source === "sf_regeneration_ii" && eventInfo.newValue === "0") {
+				regenerationLevel = 1;
+			} else if (source === "sf_meisterliche_regeneration" && eventInfo.newValue === "1") {
+				regenerationLevel = 3;
+				AEBaseRegenerationRoll = parseInt(mainStat) / 3;
+				AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll).toString() + "d1";
+			} else if (source === "sf_meisterliche_regeneration" && eventInfo.newValue === "0") {
+				regenerationLevel = 2;
+			}
+
+			// Populate attrsToChange so we don't forget later on
+			switch(regenerationLevel) {
+				case 0:
+					attrsToChange["sf_regeneration_i"] = "0";
+					attrsToChange["sf_regeneration_ii"] = "0";
+					attrsToChange["sf_meisterliche_regeneration"] = "0";
+					break;
+				case 1:
+					attrsToChange["sf_regeneration_i"] = "1";
+					attrsToChange["sf_regeneration_ii"] = "0";
+					attrsToChange["sf_meisterliche_regeneration"] = "0";
+					break;
+				case 2:
+					attrsToChange["sf_regeneration_i"] = "1";
+					attrsToChange["sf_regeneration_ii"] = "1";
+					attrsToChange["sf_meisterliche_regeneration"] = "0";
+					break;
+				case 3:
+					attrsToChange["sf_regeneration_i"] = "1";
+					attrsToChange["sf_regeneration_ii"] = "1";
+					attrsToChange["sf_meisterliche_regeneration"] = "1";
+					break;
+			}
+			attrsToChange["reg_ae_base"] = AEBaseRegenerationRoll;
+
+			// Regeneration mod from special skills
+			attrsToChange["reg_ae_mod_sf"] = regenerationLevel;	// regeneration, astral energy, modifier, special skills (Sonderfertigkeiten)
+			safeSetAttrs(attrsToChange);
+		}
+	});
+});
+
 /* handle regeneration-related values */
 on(
 	"change:reg_le_mod_vn " +

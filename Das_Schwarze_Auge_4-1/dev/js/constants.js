@@ -72,6 +72,7 @@ const defaultValues = {
 	"AE_max": 12,
 	"aspgrundw": 12,
 	"asp_max": 12, // Old attributes kept for compatibility (used in token bars)
+	"sf_meisterliche_regeneration_leiteigenschaft": "@{KL}",
 
 	"KE_max": 0,
 

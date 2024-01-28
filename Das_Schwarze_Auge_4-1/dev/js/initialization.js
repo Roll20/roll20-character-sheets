@@ -10,7 +10,7 @@ function initializeSheet(migrationChain) {
 		"erschoepfung_basis", "erschoepfung_max",
 		"ueberanstrengung_max",
 		"mrgrundw", "MR", "wundschwelle",
-		"AE_max", "aspgrundw", "asp_max",
+		"AE_max", "aspgrundw", "asp_max", "sf_meisterliche_regeneration_leiteigenschaft",
 		"KE_max",
 		"ap_verfuegbar",
 
