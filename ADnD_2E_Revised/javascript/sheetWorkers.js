@@ -1942,7 +1942,7 @@ on('change:repeating_ammo:ammoname', function(eventInfo) {
 });
 
 //Follower weapons
-function setupFollowerWeaponsAutoFill(repeating, sections) {
+function setupFollowerWeaponsAutoFill(repeating, weaponSections) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
         let comparerFields = ['rof','small-medium','large','range','speed'];
         if (isPlayersOption) {
@@ -1951,20 +1951,20 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
         return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
 
-    sections.forEach(section => {
+    weaponSections.forEach(weaponSection => {
         let changePrefix = repeating ? `repeating_${repeating}:` : '';
-        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
+        on(`change:${changePrefix}weaponnamehench${weaponSection}`, function(eventInfo) {
             let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
             let setWeaponFunc = function (weapon) {
                 let weaponInfo = {};
-                weaponInfo[`${repeatingRowPrefix}attacknumhench${section}`] = weapon['rof'] || '1';
-                weaponInfo[`${repeatingRowPrefix}attackadjhench${section}`] = weapon['bonus'];
-                weaponInfo[`${repeatingRowPrefix}damadjhench${section}`]    = weapon['bonus'];
-                weaponInfo[`${repeatingRowPrefix}damsmhench${section}`]     = weapon['small-medium'];
-                weaponInfo[`${repeatingRowPrefix}damlhench${section}`]      = weapon['large'];
-                weaponInfo[`${repeatingRowPrefix}rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
-                weaponInfo[`${repeatingRowPrefix}weaptypehench${section}`]  = weapon['type'];
-                weaponInfo[`${repeatingRowPrefix}weapspeedhench${section}`] = weapon['speed'];
+                weaponInfo[`${repeatingRowPrefix}attacknumhench${weaponSection}`] = weapon['rof'] || '1';
+                weaponInfo[`${repeatingRowPrefix}attackadjhench${weaponSection}`] = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damadjhench${weaponSection}`]    = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damsmhench${weaponSection}`]     = weapon['small-medium'];
+                weaponInfo[`${repeatingRowPrefix}damlhench${weaponSection}`]      = weapon['large'];
+                weaponInfo[`${repeatingRowPrefix}rangehench${weaponSection}`]     = weapon['range'] || weapon['reach'] || 'Melee';
+                weaponInfo[`${repeatingRowPrefix}weaptypehench${weaponSection}`]  = weapon['type'];
+                weaponInfo[`${repeatingRowPrefix}weapspeedhench${weaponSection}`] = weapon['speed'];
 
                 setAttrs(weaponInfo);
             };
@@ -1973,23 +1973,31 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     });
 }
 
-const FOLLOWER_WEAPONS = [
-    {repeating: '',       sections: ['',    '001', '002']},
-    {repeating: 'hench',  sections: ['003', '004', '005']},
-    {repeating: '',       sections: ['006', '007', '008']},
-    {repeating: 'hench2', sections: ['009', '010', '011']},
-    {repeating: '',       sections: ['012', '013', '014']},
-    {repeating: 'hench3', sections: ['015', '016', '017']},
-    {repeating: '',       sections: ['018', '019', '020']},
-    {repeating: 'hench4', sections: ['021', '022', '023']},
-    {repeating: '',       sections: ['024', '025', '026']},
-    {repeating: 'hench5', sections: ['027', '028', '029']},
-    {repeating: '',       sections: ['030', '031', '032']},
-    {repeating: 'hench6', sections: ['033', '034', '035']},
+function setupFollowerThac0AutoFill(repeating, sections) {
+    sections.forEach(section => {
+        let changePrefix = repeating ? `repeating_${repeating}:` : '';
+        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
+        });
+    });
+}
+
+const FOLLOWERS = [
+    {repeating: '',       weaponSections: ['',    '001', '002']},
+    {repeating: 'hench',  weaponSections: ['003', '004', '005']},
+    {repeating: '',       weaponSections: ['006', '007', '008']},
+    {repeating: 'hench2', weaponSections: ['009', '010', '011']},
+    {repeating: '',       weaponSections: ['012', '013', '014']},
+    {repeating: 'hench3', weaponSections: ['015', '016', '017']},
+    {repeating: '',       weaponSections: ['018', '019', '020']},
+    {repeating: 'hench4', weaponSections: ['021', '022', '023']},
+    {repeating: '',       weaponSections: ['024', '025', '026']},
+    {repeating: 'hench5', weaponSections: ['027', '028', '029']},
+    {repeating: '',       weaponSections: ['030', '031', '032']},
+    {repeating: 'hench6', weaponSections: ['033', '034', '035']},
 ];
 
-FOLLOWER_WEAPONS.forEach(fw => {
-    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
+FOLLOWERS.forEach(fw => {
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.weaponSections);
 });
 
 // Monster weapons
