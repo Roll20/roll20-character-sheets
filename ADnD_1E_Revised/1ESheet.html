@@ -52,10 +52,12 @@
                 <span name="attr_sheet_version" class="width-smaller version left"></span>
                 <span class="text-small version">beta</span>
               </label>
-              <label class="right">1/24/23'</label>
+              <label class="right">1/25/23'</label>
             </span>
           </h4>
           <ul>
+            <li>Fixed a bug in the Bulk load calculation incorrectly using "Heavy" as the baseline instead of "Normal".</li>
+            <li>The Encumbered condition will remove any DEX bonus from AC calculations. There will also be a visual indicator (dashed-border w/small warning icon) added to the "Dex Adj." field when Encumbered as a helpful reminder.</li>
             <li>Added Weapon Proficiency total field. @{weapon_proficiency_total}</li>
             <li>Sheet portrait can now be clicked on to post the image to chat.</li>
             <li>Increased the Monster portrait image area. Avatar or URL images will fill the vailable space up to a 350px<sup>2</sup>.</li>
@@ -1243,79 +1245,77 @@
         </span>
         <hr>
         <!--AC Calcs-->
-        <span class="armor-columns">
-          <span class="ac-calc-columns">
-            <label class="label-under-small" title="@{unarmored_base} | Enter a value for Natural Armor or a No Armor rating. Default is 10.">
-              <input type="text" class="readonly-span width-small" name="attr_unarmored_base" value="10" />
-              <span>UnArmored</span>
-            </label>
-            <label class="label-under-small" title="@{armorclass_base} | Compares the UnArmored Base AC value to the AC from above and uses the lowest.">
-              <input type="text" class="readonly-span width-small" name="attr_armorclass_base" value="0" />
-              <span>AC Base</span>
-            </label>
-            <label class="label-under-small" title="@{armorclass_combined_mod_magic} | Magic + Misc. Adjustments from above.">
-              <input type="text" class="hidden" name="attr_armorclass_combined_mod_magic" value="0" />
-              <input type="text" class="readonly-span width-small" name="attr_armorclass_combined_mod_magic_inverted" value="0" />
-              <!--mod and magic totals stored here if needed-->
-              <input type="text" class="hidden" name="attr_armorclass_magic" value="0" readonly />
-              <input type="text" class="hidden" name="attr_armorclass_mod" value="0" readonly />
-              <span>Armor Adj.</span>
-            </label>
-            <label class="text-large">=</label>
-            <label class="label-under" title="@{armorclass_rear} | Best AC without a Dex bonus.">
-              <input type="text" class="readonly-span field-border" name="attr_armorclass_rear" value="0" />
-              <span>Rear</span>
-            </label>
-            <label class="label-under-small" title="@{armorbonus} | Defensive Adjustment from Dexterity row.">
-              <input type="text" class="readonly-span width-small" name="attr_armorbonus_inverted" value="0" />
-              <span class="inline-label center">
-                <span>Dex Adj.</span>
-                <input type="checkbox" style="width:1em;" name="attr_armorbonus_toggle" title="@{armorbonus_toggle} | Dex bonus may need to be removed for certain conditions." value="1" checked />
-              </span>
-            </label>
-            <label class="text-large">=</label>
-            <label class="label-under" title="@{armorclass_shieldless} | Best AC without a Shield bonus.">
-              <input type="text" class="readonly-span field-border" name="attr_armorclass_shieldless" value="0" />
-              <span>Shieldless</span>
-            </label>
-            <label class="label-under-small" title="@{armorclass_combined_shield_mod_magic} | Magic + Misc. Adjustments from Shield above.">
-              <input type="text" class="hidden" name="attr_armorclass_combined_shield_mod_magic" value="0" />
-              <input type="text" class="readonly-span width-small" name="attr_armorclass_combined_shield_mod_magic_inverted" value="0" />
-              <!--mod and magic totals stored here if needed-->
-              <input type="text" class="hidden" name="attr_armorclass_shield_mod" value="0" readonly />
-              <input type="text" class="hidden" name="attr_armorclass_shield_magic" value="0" readonly />
-              <span>Shield Adj.</span>
-            </label>
-            <label class="text-large">=</label>
-            <label class="label-under" title="@{armorclass_total} | Best AC">
-              <input type="text" class="readonly-span field-border" name="attr_armorclass_total" value="0" />
-              <span>Total AC</span>
-            </label>
-            <label class="label-under-small" title="@{armorclass_rating} | Best AR">
-              <input type="text" class="readonly-span width-small" name="attr_armorclass_rating" value="-" />
-              <span>Armor Rating</span>
-            </label>
-          </span>
+        <span class="ac-calc-columns">
+          <label class="label-under-small" title="@{unarmored_base} | Enter a value for Natural Armor or a No Armor rating. Default is 10.">
+            <input type="text" class="readonly-span width-small" name="attr_unarmored_base" value="10" />
+            <span>UnArmored</span>
+          </label>
+          <label class="label-under-small" title="@{armorclass_base} | Compares the UnArmored Base AC to the AC from above and uses the best(lowest) value.">
+            <input type="text" class="readonly-span width-small" name="attr_armorclass_base" value="0" />
+            <span>AC Base</span>
+          </label>
+          <label class="label-under-small" title="@{armorclass_combined_mod_magic} | Magic + Misc. Adjustments from above.">
+            <input type="text" class="hidden" name="attr_armorclass_combined_mod_magic" value="0" />
+            <input type="text" class="readonly-span width-small" name="attr_armorclass_combined_mod_magic_inverted" value="0" />
+            <!--mod and magic totals stored here if needed-->
+            <input type="text" class="hidden" name="attr_armorclass_magic" value="0" readonly />
+            <input type="text" class="hidden" name="attr_armorclass_mod" value="0" readonly />
+            <span>Armor Adj.</span>
+          </label>
+          <input type="checkbox" class="hidden toggle-input-attention" name="attr_encumbrance_flag" value="1" checked>
+          <label class="text-large">=</label>
+          <label class="label-under" title="@{armorclass_rear} | Best AC without a Dex bonus.">
+            <input type="text" class="readonly-span field-border" name="attr_armorclass_rear" value="0" />
+            <span>Rear</span>
+          </label>
+          <input type="checkbox" class="hidden toggle-input-attention" name="attr_encumbrance_flag" value="1" checked>
+          <label class="label-under-small" title="@{armorbonus} | Defensive Adjustment from Dexterity row.">
+            <input type="text" class="readonly-span width-small" name="attr_armorbonus_inverted" value="0" />
+            <span class="material-icons" title="Encumbered! DEX bonus has been removed.">nearby_error</span>
+            <span class="inline-label center" title="@{armorbonus_toggle} | DEX bonus can be removed circumstantially.">
+              <span>Dex Adj.</span>
+              <input type="checkbox" style="width:1em;" name="attr_armorbonus_toggle" value="1" checked />
+            </span>
+          </label>
+          <label class="text-large">=</label>
+          <label class="label-under" title="@{armorclass_shieldless} | Best AC without a Shield bonus.">
+            <input type="text" class="readonly-span field-border" name="attr_armorclass_shieldless" value="0" />
+            <span>Shieldless</span>
+          </label>
+          <label class="label-under-small" title="@{armorclass_combined_shield_mod_magic} | Magic + Misc. Adjustments from Shield above.">
+            <input type="text" class="hidden" name="attr_armorclass_combined_shield_mod_magic" value="0" />
+            <input type="text" class="readonly-span width-small" name="attr_armorclass_combined_shield_mod_magic_inverted" value="0" />
+            <!--mod and magic totals stored here if needed-->
+            <input type="text" class="hidden" name="attr_armorclass_shield_mod" value="0" readonly />
+            <input type="text" class="hidden" name="attr_armorclass_shield_magic" value="0" readonly />
+            <span>Shield Adj.</span>
+          </label>
+          <label class="text-large">=</label>
+          <label class="label-under" title="@{armorclass_total} | Best AC">
+            <input type="text" class="readonly-span field-border" name="attr_armorclass_total" value="0" />
+            <span>Total AC</span>
+          </label>
         </span>
-        <span class="armor-columns">
-          <span class="span-four"></span>
-          <span class="inline-label span-six">
-            <span class="inline-label" title="@{autocalc_ac} | This is a persistent setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
-              <label>Auto-Calc AC:</label>
-              <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
-              <button type="action" class="button width-medium" name="act_calcac" title="This is an immediate action and works regardless of the Auto-Calc AC setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">Calc AC</button>
-            </span>
-            <span class="inline-label sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
-              <label>Sync AC:</label>
-              <input type="checkbox" class="width-small" name="attr_sync_ac_flag" value="1" />
-              <span></span>
-            </span>
-            <span class="inline-label" title="@{armor_rating_flag} | AC is not from armor. Weapons vs Armor Type does not apply.">
-              <label>Ignore AR:</label>
-              <input class="width-small" type="checkbox" name="attr_armor_rating_flag" value="1" />
-            </span>
+        <span class="five-columns">
+          <span class="inline-label" title="@{autocalc_ac} | This is a persistent setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
+            <label>Auto-Calc AC:</label>
+            <input type="checkbox" class="width-small" name="attr_autocalc_ac" value="1" checked />
+            <button type="action" class="button width-medium" name="act_calcac" title="This is an immediate action and works regardless of the Auto-Calc AC setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">Calc AC</button>
           </span>
-        </span>
+          <span class="inline-label sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
+            <label>Sync AC:</label>
+            <input type="checkbox" class="width-small" name="attr_sync_ac_flag" value="1" />
+            <span></span>
+          </span>
+          <span></span>
+          <span class="inline-label" title="@{armor_rating_flag} | AC is not from armor. Weapons vs Armor Type does not apply.">
+            <label>Ignore AR:</label>
+            <input class="width-small" type="checkbox" name="attr_armor_rating_flag" value="1" />
+          </span>
+          <span class="inline-label" title="@{armorclass_rating} | Best AR">
+            <label>Armor Rating</label>
+            <input type="text" class="readonly-span width-small" name="attr_armorclass_rating" value="-" />
+          </span>
         </span>
         <span class="inline-label">
           <label>Notes:
@@ -1678,7 +1678,7 @@
             <span class="readonly-span no-border" name="attr_movement_load" title="@{movement_load}"></span>
             <span class="nowrap">Very Heavy</span>
           </label>
-          <label class="label-under" title="@{movement_max} |No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, -2 AC.">
+          <label class="label-under" title="@{movement_max} |No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, Enemies get +2 to-hit.">
             <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance_move" value="3" readonly />
             <input type="text" class="hidden" name="attr_movement_max" value="0" readonly />
             <span class="readonly-span no-border" name="attr_movement_max" title="@{movement_max}"></span>
@@ -4248,7 +4248,7 @@
                     {{/rollTotal() current_encumbrance 2}}
                     {{#rollTotal() current_encumbrance 3}}
                       {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Encumbered</span>
-                        &nbsp;<span>No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, -2 AC.</span>{{/current_encumbrance}}
+                        &nbsp;<span>No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, Enemies get +2 to-hit.</span>{{/current_encumbrance}}
                     {{/rollTotal() current_encumbrance 3}}
         </span>
       </span>
@@ -4330,9 +4330,9 @@
   <option value="Varies">Varies</option>
 </datalist>
 
-<script type="text/javascript">
-  // javascript
-  // worker
+<script type="text/worker">
+  // text/javascript
+  // text/worker
 
   // GiGs custom handling for number type and logs
   const int = (score, error = 0) => parseInt(score) || error;
@@ -5110,6 +5110,7 @@
   const migrateAC = (current_version, final_version) => {
     getAttrs(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus'], (v) => {
       const update = {};
+      const recalc = 0;
       let armorClass = +v.armorclass || 0;
       const armorBonus = +v.armorbonus || 0;
       const armorClassTotal = +v.armorclass_total || 0;
@@ -5135,7 +5136,7 @@
       update.sheet_version = current_version;
       clog(`VERSION UPDATE: Migrate AC completed.`);
       setAttrs(update, {silent: true}, versionator(current_version, final_version));
-      calcAC();
+      calcAC(recalc);
     });
   };
 
@@ -6840,6 +6841,7 @@
         // clog('===== Carrying Capacity is Very Heavy =====');
       } else {
         output.current_encumbrance_label = 'Encumbered';
+        // no DEX Bonus to AC
         currentEncumbrance = 3;
         output.current_encumbrance = currentEncumbrance;
         // Bail out if unless auto-calc movement is enabled
@@ -6850,7 +6852,7 @@
     });
   }
 
-  on('change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag // change:current_bulk', (eventInfo) => {
+  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['encumbrancebonus'], (v) => {
       // clog('Encumbrance has been re-calculated');
@@ -6904,6 +6906,7 @@
     getAttrs(['movement'], (v) => {
       // clog('Current Base Movement has been re-calculated');
       const output = {};
+      const recalc = 0;
       // only extract an integer from movement
       const movement = +v.movement.toString().replace(/[^0-9]/g, '');
       output.movement_heavy = Math.max(int(movement - 3), 0);
@@ -6911,6 +6914,7 @@
       output.movement_max = Math.max(int(movement - 9), 0);
       setAttrs(output);
       setCurrentMovement();
+      calcAC(recalc);
     });
   });
 
@@ -6951,15 +6955,15 @@
             break;
           case 1:
             output.current_bulk_label = 'Not Bulky/Light';
-            output.current_bulk = 1;
+            output.current_bulk = 0;
             break;
           case 2:
             output.current_bulk_label = 'Fairly/Moderate';
-            output.current_bulk = 2;
+            output.current_bulk = 1;
             break;
           case 3:
             output.current_bulk_label = 'Bulky/Heavy';
-            output.current_bulk = 3;
+            output.current_bulk = 2;
             break;
           default:
             clog(`>> failure in bulk calculation <<`);
@@ -6968,6 +6972,7 @@
       }
     );
   }
+
   on(
     'change:unarmored_bulk change:armortype_bulk change:armortype2_bulk change:armorshield_bulk change:armorhelmet_bulk change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorshield_carried remove:repeating_equipment',
     (eventInfo) => {
@@ -7352,6 +7357,7 @@
       ],
       (v) => {
         const output = {};
+        const recalc = 0;
         const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
         const item = v[`repeating_equipment_${id}_equipment_item`];
         const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`] || 0;
@@ -7515,7 +7521,7 @@
         // Once done, call the provided callback
         if (callback) callback();
         setAttrs(output, {silent: true});
-        calcAC(0);
+        calcAC(recalc);
       }
     );
   }
@@ -8103,6 +8109,7 @@
         'armorother6_mod',
         'autocalc_ac',
         'armor_rating_flag',
+        'current_encumbrance_move',
         'sync_ac_flag',
       ],
       (v) => {
@@ -8140,8 +8147,23 @@
         const armorOther4_worn = +v.armorother4_worn || 0;
         const armorOther5_worn = +v.armorother5_worn || 0;
         const armorOther6_worn = +v.armorother6_worn || 0;
-        const armorBonusToggle = +v.armorbonus_toggle || 0;
-        const armorBonus = +v.armorbonus * armorBonusToggle || 0;
+        // check encumbrance/bulk for DEX penalty
+        const current_encumbrance_move = +v.current_encumbrance_move || 0;
+        let armorBonusToggle = +v.armorbonus_toggle || 0;
+        let armorBonus = +v.armorbonus || 0;
+        let encumbranceConditionFlag = 1;
+        // encumbered and has a DEX bonus
+        if (current_encumbrance_move === 3 && armorBonus < 0) {
+          armorBonusToggle = 0;
+          armorBonus = 0;
+          encumbranceConditionFlag = 0;
+          // toggle off DEX only if there is a DEX bonus
+        } else if (armorBonus < 0) {
+          armorBonus = +v.armorbonus * armorBonusToggle || 0;
+        } else {
+          armorBonus = +v.armorbonus || 0;
+        }
+        output.encumbrance_flag = encumbranceConditionFlag;
         const armorType_base = +v.armortype_base || 0;
         const armorType2_base = +v.armortype2_base || 0;
         const armorShield_base = +v.armorshield_base || 0;
@@ -8493,24 +8515,26 @@
       const combined = [...nonRep, ...fields];
       getAttrs(combined, (v) => {
         idArray.forEach((id) => {
-          output.repeating_equipment_equipment_type = +v.equipment_tabs_type;
-          output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')] || 0;
-          output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
-          output.repeating_equipment_equipment_current_max = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
-          output.repeating_equipment_equipment_carried_select = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 1;
-          output.repeating_equipment_equipment_carried = +v[section_attribute('equipment', id, 'equipment_carried')] || 1;
-          output.repeating_equipment_equipment_quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 1;
-          output.repeating_equipment_equipment_quantity_max = +v[section_attribute('equipment', id, 'equipment_quantity_max')] || 1;
-          output.repeating_equipment_equipment_weight = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
-          output.repeating_equipment_equipment_cost = +v[section_attribute('equipment', id, 'equipment_cost')] || 0;
-          output.repeating_equipment_equipment_armor_type = +v[section_attribute('equipment', id, 'equipment_armor_type')] || 0;
-          output.repeating_equipment_equipment_armor_worn = +v[section_attribute('equipment', id, 'equipment_armor_worn')] || 0;
-          output.repeating_equipment_equipment_armor_ac = +v[section_attribute('equipment', id, 'equipment_armor_ac')] || 0;
-          output.repeating_equipment_equipment_armor_base = +v[section_attribute('equipment', id, 'equipment_armor_base')] || 0;
-          output.repeating_equipment_equipment_armor_magic = v[section_attribute('equipment', id, 'equipment_armor_magic')];
-          output.repeating_equipment_equipment_armor_mod = v[section_attribute('equipment', id, 'equipment_armor_mod')];
-          output.repeating_equipment_equipment_armor_bulk = +v[section_attribute('equipment', id, 'equipment_armor_bulk')] || 0;
-          output.repeating_equipment_equipment_macro_text = v[section_attribute('equipment', id, 'equipment_macro_text')];
+          const equipType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
+          // clog(`equipType:${equipType}`);
+          output[section_attribute('equipment', id, 'equipment_type')] = equipType <= 0 ? 0 : equipType;
+          output[section_attribute('equipment', id, 'equipment_show_type')] = +v[section_attribute('equipment', id, 'equipment_show_type')] || 0;
+          output[section_attribute('equipment', id, 'equipment_current')] = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
+          output[section_attribute('equipment', id, 'equipment_current_max')] = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
+          output[section_attribute('equipment', id, 'equipment_carried_select')] = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 1;
+          output[section_attribute('equipment', id, 'equipment_carried')] = +v[section_attribute('equipment', id, 'equipment_carried')] || 1;
+          output[section_attribute('equipment', id, 'equipment_quantity')] = +v[section_attribute('equipment', id, 'equipment_quantity')] || 1;
+          output[section_attribute('equipment', id, 'equipment_quantity_max')] = +v[section_attribute('equipment', id, 'equipment_quantity_max')] || 1;
+          output[section_attribute('equipment', id, 'equipment_weight')] = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
+          output[section_attribute('equipment', id, 'equipment_cost')] = +v[section_attribute('equipment', id, 'equipment_cost')] || 0;
+          output[section_attribute('equipment', id, 'equipment_armor_type')] = +v[section_attribute('equipment', id, 'equipment_armor_type')] || 0;
+          output[section_attribute('equipment', id, 'equipment_armor_worn')] = +v[section_attribute('equipment', id, 'equipment_armor_worn')] || 0;
+          output[section_attribute('equipment', id, 'equipment_armor_ac')] = +v[section_attribute('equipment', id, 'equipment_armor_ac')] || 0;
+          output[section_attribute('equipment', id, 'equipment_armor_base')] = +v[section_attribute('equipment', id, 'equipment_armor_base')] || 0;
+          output[section_attribute('equipment', id, 'equipment_armor_magic')] = v[section_attribute('equipment', id, 'equipment_armor_magic')];
+          output[section_attribute('equipment', id, 'equipment_armor_mod')] = v[section_attribute('equipment', id, 'equipment_armor_mod')];
+          output[section_attribute('equipment', id, 'equipment_armor_bulk')] = +v[section_attribute('equipment', id, 'equipment_armor_bulk')] || 0;
+          output[section_attribute('equipment', id, 'equipment_macro_text')] = v[section_attribute('equipment', id, 'equipment_macro_text')];
         });
         setAttrs(output, {silent: true});
       });
@@ -10730,7 +10754,7 @@
       output.minorstrengthfeat = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per);
       output.minorstrengthfeat_locked = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per, true);
       output.encumbrancebonus = (AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per);
-      setAttrs(output, {silent: true});
+      setAttrs(output);
     });
   };
 
@@ -10774,7 +10798,7 @@
       output.surprisebonus_inverted = surprisebonus_add_sign;
       output.rangedbonus = (AT_DEX.getEntry(stat_dex).getRangedBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getRangedBonus();
       output.armorbonus = (AT_DEX.getEntry(stat_dex).getArmorBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getArmorBonus();
-      setAttrs(output, {silent: true});
+      setAttrs(output);
     });
   };
 
@@ -10792,7 +10816,7 @@
       }
       output.systemshock = AT_CON.getEntry(stat_con).getSystemShock();
       output.resurrectionsurvival = AT_CON.getEntry(stat_con).getResurrectionSurvival();
-      setAttrs(output, {silent: true});
+      setAttrs(output);
     });
   };
 

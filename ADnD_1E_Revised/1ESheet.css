@@ -380,11 +380,30 @@
 }
 
 /* indicates an input error */
-.charsheet input[type="checkbox"].toggle-input-error:not(:checked) + label input,
-.charsheet input[type="checkbox"].toggle-input-error:not(:checked) + input {
+.charsheet input[type="checkbox"].toggle-input-error:not(:checked) + label input[type="text"],
+.charsheet input[type="checkbox"].toggle-input-error:not(:checked) + input[type="text"] {
     outline: 2px dotted gold;
     color: red;
     box-shadow: 0 0 0 2px red;
+}
+
+/* indicates attention */
+.charsheet input[type="checkbox"].toggle-input-attention:not(:checked) + label input[type="text"] {
+    outline-offset: -1px;
+    outline: 2px dashed #a5a1a7;
+}
+
+.charsheet .toggle-input-attention + label .material-icons {
+    display: none;
+}
+
+.charsheet input[type="checkbox"].toggle-input-attention:not(:checked) + label .material-icons {
+    color: crimson;
+    display: block;
+    font-size: 1.5em;
+    margin: -.25em 0 0 2.5em;
+    opacity: .65;
+    position: absolute;
 }
 
 .charsheet .wrapper .autoexpand,
@@ -1261,6 +1280,7 @@ section.npc-box.statblock3 .image-avatar {
 }
 
 .charsheet .background,
+.charsheet .header-box,
 .charsheet .logo-box,
 .charsheet .image-avatar,
 .charsheet .portrait-box
@@ -1277,13 +1297,24 @@ section.npc-box.statblock3 .image-avatar {
     }
 }
 
+@container (max-width: 678px) {
+    .charsheet .background .wrapper .header-box .portrait-box {
+        display: block;
+        max-height: 148px;
+        min-height: 148px;
+        position: relative;
+        right: 6vw;
+        top: -2em;
+    }
+}
+
 /* works for avatar image */
 @container (max-width: 187px) {
     .charsheet .background .wrapper .header-box .portrait-box .image-avatar {
+        max-height: 148px;
+        overflow: visible;
+        margin: auto;
         min-width: 148px;
-        height: 148px;
-        transform: translateY(-17%) translateX(-20%);
-        transition: all ease-in-out .2s;
     }
 }
 
@@ -1478,11 +1509,8 @@ section.npc-box.statblock3 .image-avatar {
 }
 
 .charsheet .ac-calc-columns {
-    align-items: end;
     display: grid;
-    grid-column: 1/-1;
-    grid-template-columns: minmax(3em, .75fr) minmax(3em, .75fr) minmax(3em, .75fr) auto minmax(3em, .75fr) minmax(3em, .75fr) auto minmax(4em, 1fr) minmax(3em, .75fr) auto minmax(4em, 1fr) minmax(4em, 1fr);
-    justify-self: stretch;
+    grid-template-columns: minmax(3em, .75fr) minmax(3em, .75fr) minmax(3em, .75fr) auto minmax(3em, .75fr) minmax(3em, .75fr) auto minmax(4em, 1fr) minmax(3em, .75fr) auto minmax(4em, 1fr) auto;
 }
 
 .charsheet .sync-lock > input[type="checkbox"],
@@ -1721,13 +1749,13 @@ section.npc-box.statblock3 .image-avatar {
 }
 
 .charsheet .repcontainer[data-groupname="repeating_weapon"] .repitem,
-.charsheet .repcontainer[data-groupname="repeating_equipment"] .repitem:has(input.toggle-carry[value="1"]),
+.charsheet .repcontainer[data-groupname="repeating_equipment"] .repitem,
 .charsheet .repcontainer[data-groupname="repeating_ability"] .repitem,
 .charsheet .repcontainer[data-groupname="repeating_nonweaponproficiencies"] .repitem,
-.charsheet .repcontainer[data-groupname="repeating_spells"] .repitem:has(input.toggle-show[value="1"]),
 .charsheet .repcontainer[data-groupname="repeating_notes"] .repitem {
     margin-block: 1px;
 }
+
 
 .charsheet .repcontainer[data-groupname="repeating_equipment"].editmode .repitem:has(input.toggle-carry[value="0"] ~ .equipment-display-carry),
 .charsheet .repcontainer[data-groupname="repeating_equipment"].editmode .repitem:has(input.toggle-carry[value="1"] ~ .equipment-display-carry) {
@@ -2111,7 +2139,7 @@ details[open].thac0-box {
 .charsheet .repcontainer[data-groupname="repeating_spells"] .repitem,
 .charsheet .repcontainer[data-groupname="repeating_notes"] .repitem,
 .charsheet .repcontainer[data-groupname="repeating_attributes"] .repitem {
-    display: grid;
+    display: block;
     -webkit-column-break-inside: avoid;
     page-break-inside: avoid;
     break-inside: avoid;
@@ -2246,9 +2274,8 @@ details[open].thac0-box {
 }
 
 .charsheet .spells-repheader {
-    display: grid;
+    display: flex;
     font-size: 1.4rem;
-    grid-template-columns: 5em minmax(8em, 2fr) minmax(6em, 1.5fr) auto;
     justify-items: center;
     padding: 2px;
     width: 100%;
@@ -2523,22 +2550,15 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     text-overflow: unset;
 }
 
-/* Tabs */
-.charsheet .equipment-display-carry,
-.charsheet .equipment-display-carry .equipment-display-type,
-.charsheet .spell-display {
-    display: none;
-}
-
-.charsheet .repcontrol {
-    width: 100%;
+/* Equipment Tabs */
+.charsheet .repcontainer[data-groupname="repeating_equipment"] .repitem {
     display: flex;
-    justify-content: flex-start;
+    height: 0;
+    overflow: hidden;
 }
 
-.charsheet input.toggle-carry ~ .equipment-display-carry,
-.charsheet input.toggle-type + .equipment-display-carry .equipment-display-type {
-    display: none;
+.charsheet .repitem:has(input.toggle-carry[value="1"] ~ input.toggle-type[value="1"] + .equipment-display-carry .equipment-display-type) {
+    height: auto;
 }
 
 .charsheet input.toggle-show[value="1"] ~ .spell-display.top-row {
@@ -2550,10 +2570,15 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     width: auto;
 }
 
-.charsheet input.toggle-carry[value="1"] ~ .equipment-display-carry,
-.charsheet input.toggle-type[value="1"] + .equipment-display-carry .equipment-display-type,
-.charsheet input.toggle-show[value="1"] ~ .spell-display {
-    display: inherit;
+/* Spells Tabs */
+.charsheet .wrapper .repcontainer[data-groupname="repeating_spells"] .repitem {
+    display: block;
+    height: 0;
+    overflow: hidden;
+}
+
+.charsheet .repcontainer[data-groupname="repeating_spells"] .repitem:has(input.toggle-show[value="1"] ~ .spell-display) {
+    height: auto;
 }
 
 /* emphasize memorized */
@@ -3390,7 +3415,7 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
 /*edit mode*/
 .ui-dialog .charsheet .repcontainer.editmode .repitem .itemcontrol {
     display: block;
-    z-index: 4;
+    z-index: 2;
 }
 
 /*Roll Templates*/
@@ -3991,7 +4016,12 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     background-color: var(--darkpurple);
 }
 
-.repcontrol .btn {
+.charsheet .repcontrol {
+    width: 100%;
+    display: flex;
+}
+
+.charsheet .repcontrol .btn {
     background: none;
     border: medium none;
     box-shadow: none;
@@ -3999,12 +4029,12 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     padding: 2px 2px 0 2px;
 }
 
-.repcontrol .btn:focus {
+.charsheet .repcontrol .btn:focus {
     outline: 0;
 }
 
-.repcontrol .repcontrol_edit:after,
-.repcontrol .repcontrol_add::before {
+.charsheet .repcontrol .repcontrol_edit:after,
+.charsheet .repcontrol .repcontrol_add::before {
     background-color: #fff;
     border-radius: 2px;
     border: 1px solid #5a5957;
@@ -4016,56 +4046,42 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     visibility: visible;
 }
 
-.repcontrol .repcontrol_edit:after {
+.charsheet .repcontrol .repcontrol_edit:after {
     content: "(";
 }
 
-.editmode ~ .repcontrol .repcontrol_edit:after {
+.charsheet .editmode ~ .repcontrol .repcontrol_edit:after {
     content: ")";
 }
 
-.repcontrol .repcontrol_add:before {
+.charsheet .repcontrol .repcontrol_add:before {
     content: "&";
 }
 
-.repcontrol .repcontrol_edit:hover:after,
-.repcontrol .repcontrol_add:hover:before {
+.charsheet .editmode ~ .repcontrol .repcontrol_edit:hover:after,
+.charsheet .repcontrol .repcontrol_edit:hover:after,
+.charsheet .repcontrol .repcontrol_add:hover:before {
     background-color: #efefef;
     color: #000;
 }
 
-.itemcontrol {
-    z-index: 10;
-}
-
-.itemcontrol .repcontrol_del,
-.itemcontrol .repcontrol_move {
+.charsheet .itemcontrol .repcontrol_del,
+.charsheet .itemcontrol .repcontrol_move {
     font-size: 1.3rem;
     height: 2rem;
     margin: 4px auto auto auto;
     padding: 0;
-    opacity: 0.5;
     width: 2rem;
     float: right;
 }
 
-.itemcontrol .repcontrol_move {
+.charsheet .itemcontrol .repcontrol_move {
     color: #0060df;
     width: 4rem;
     outline: 1px solid #0060df;
 }
 
-.itemcontrol .repcontrol_del:hover,
-.itemcontrol .repcontrol_move:hover {
-    opacity: 1;
-}
-
-.repcontrol_edit,
-.repcontrol_add {
-    float: right;
-}
-
-.ui-dialog .charsheet .editmode ~ .repcontrol .repcontrol_edit {
+.charsheet .editmode ~ .repcontrol .repcontrol_edit {
     background-color: #f5f5f5;
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
     border: 1px solid #ccc;
@@ -4075,9 +4091,24 @@ input.toggle-single-column-notes:checked ~ .background .repcontainer[data-groupn
     margin-top: 2px;
     padding-block: 1px;
     width: 100%;
-    z-index: 4;
 }
 
-.itemcontrol .repcontrol_del {
-    border: 0;
+.charsheet .repcontainer.ui-sortable.editmode {
+    outline: 1px solid red;
+    position: relative;
+}
+
+.charsheet .repitem.ui-sortable-helper {
+    outline: 1px solid red;
+    display: inline-block;
+    opacity: 1;
+}
+
+.charsheet .editmode .repitem:has(.itemcontrol a:focus),
+.charsheet .editmode .repitem:has(.itemcontrol a:active) {
+    outline: 2px solid red;
+    right: 0;
+    display: block;
+    position: relative;
+    color: red;
 }
