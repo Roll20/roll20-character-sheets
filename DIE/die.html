@@ -24,15 +24,20 @@
 				<option class="sheet-ParagonSelect" value="9">[REDACTED]</option>
 			</select>   
 		</p>
-		
-		<div align="right">
-			<button type="action" name="act_basic">Basic</button>
-			<button type="action" name="act_advancement" class="advancement-button">Advancement</button>
-			<button type="action" name="act_vent" class="vent-button">Vent/Stance</button>
-			<button type="action" name="act_gifts" class="gifts-button">Gifts</button>
-			<button type="action" name="act_gods" class="gods-button">Gods</button>
-			<button type="action" name="act_rules" class="rules-button">Rules</button>
-			<button type="action" name="act_cheats" class="cheats-button">Cheats</button>
+		<div class="sheet-2colrow">
+			<div class="sheet-col" align="left">
+				<button type="action" name="act_init">Initiative</button>
+				<input type="checkbox" name="attr_GmWhisper"><span> <i>Whisper Rolls</i></span>
+			</div>
+			<div class="sheet-col" align="right">
+				<button type="action" name="act_basic">Basic</button>
+				<button type="action" name="act_advancement" class="advancement-button">Advancement</button>
+				<button type="action" name="act_vent" class="vent-button">Vent/Stance</button>
+				<button type="action" name="act_gifts" class="gifts-button">Gifts</button>
+				<button type="action" name="act_gods" class="gods-button">Gods</button>
+				<button type="action" name="act_rules" class="rules-button">Rules</button>
+				<button type="action" name="act_cheats" class="cheats-button">Cheats</button>
+			</div>
 		</div>
 	</div>
 
@@ -88,9 +93,9 @@
 						<button type="action" class="stat-button" value="Str" name="act_roll"><span>Str</span>:</button> <input type="number" name="attr_Str" min="0" max="4" style="width: 45px"> &nbsp; 
 						<button type="action" class="stat-button" value="Dex" name="act_roll"><span>Dex</span>:</button> <input type="number" name="attr_Dex" min="0" max="4" style="width: 45px"> &nbsp;
 						<button type="action" class="stat-button" value="Con" name="act_roll"><span>Con</span>:</button> <input type="number" name="attr_Con" min="0" max="4" style="width: 45px"> &nbsp;
-						<button type="action" class="stat-button" value="Int" name="roll_roll"><span>Int</span>:</button> <input type="number" name="attr_Int" min="0" max="4" style="width: 45px"> &nbsp;
-						<button type="action" class="stat-button" value="Wis" name="roll_roll"><span>Wis</span>:</button> <input type="number" name="attr_Wis" min="0" max="4" style="width: 45px"> &nbsp;
-						<button type="action" class="stat-button" value="Cha" name="roll_roll"><b><u>Cha</u></b>:</button> <input type="number" name="attr_Cha" min="0" max="4" style="width: 45px"> &nbsp;<br>     
+						<button type="action" class="stat-button" value="Int" name="act_roll"><span>Int</span>:</button> <input type="number" name="attr_Int" min="0" max="4" style="width: 45px"> &nbsp;
+						<button type="action" class="stat-button" value="Wis" name="act_roll"><span>Wis</span>:</button> <input type="number" name="attr_Wis" min="0" max="4" style="width: 45px"> &nbsp;
+						<button type="action" class="stat-button" value="Cha" name="act_roll"><b><u>Cha</u></b>:</button> <input type="number" name="attr_Cha" min="0" max="4" style="width: 45px"> &nbsp;<br>     
 					</p>
 					<div class="stat-row2">
 						<div><b>Guard</b><span class="grey-text"> =<b>Dex</b><br>Resets at the start of each fight</span></div><input type="number" name="attr_Guard" min="0" max="4" style="width: 45px;height: 28px">
@@ -4597,36 +4602,29 @@
 	};
 	
 	on("clicked:roll", (event) => {
-		
-		console.log(event);
-		getAttrs([event.htmlAttributes.value], v => {
+		getAttrs([event.htmlAttributes.value, "GmWhisper"], v  => {
 			let statvalue = (v[Object.keys(v)[0]]) ?? 0;
 			let statname = Object.keys(v)[0];
-			console.log("Stat Name: "+statvalue);
-			console.log("Stat Value: "+statvalue);
+			let whisper = v["GmWhisper"] != 0;
 			var question = "?{Advantages|0|1|2|3|-1|-2|-3}";
 			
 			getQuery(question).then(bonusdice => {
-				console.log("Bonus Dice: "+ bonusdice);
 				var numdice = parseInt(statvalue,10) + parseInt(bonusdice,10);
 				//This will make sure to give the value of zero instead of null
 				if(!numdice){
 					numdice = 0;
 				}
-				var rollexpr = "";
+				var rollexpr = whisper ? "/w gm " : "";
 				if(numdice <= 0){
-					rollexpr = "&{template:die} {{name=@{character_name}}} {{roll_name="+statname+"}} {{stat_name="+statname+"}} {{roll=[[2d6kl1]]}} {{dice=[[0]]}}";
+					rollexpr += "&{template:die} {{name=@{character_name}}} {{roll_name="+statname+"}} {{stat_name="+statname+"}} {{roll=[[2d6kl1]]}} {{dice=[[0]]}}";
 				} else {
-					rollexpr = "&{template:die} {{name=@{character_name}}} {{roll_name="+statname+"}} {{stat_name="+statname+"}} {{roll=[["+numdice+"d6kh1]]}} {{dice=[[0]]}}";
+					rollexpr += "&{template:die} {{name=@{character_name}}} {{roll_name="+statname+"}} {{stat_name="+statname+"}} {{roll=[["+numdice+"d6kh1]]}} {{dice=[[0]]}}";
 				}
-				console.log(rollexpr);
 				startRoll(rollexpr, (results) => {
 					var dicelist = "";
-					console.log(results.results);
-					console.log("Dice: "+results.results.roll.dice);
 					if(numdice <= 0)
 					{
-						dicelist = results.results.roll.result;
+						dicelist = "[" + results.results.roll.result + "]";
 					}
 					else
 					{
@@ -4645,10 +4643,10 @@
 	});
 	
 	on("clicked:fool", (event) => {
-		
-		console.log(event);
-		getAttrs(["Fool-Circle1", "Fool-Cross1", "Fool-Circle2", "Fool-Cross2", "Fool-Circle3", "Fool-Cross3", "Fool-Circle4", "Fool-Cross4", "Fool-Circle5", "Fool-Cross5", "Fool-Circle6", "Fool-Cross6",], v => {
-			startRoll("&{template:fool} {{name=@{character_name}}} {{roll=[[1d6]]}} {{result=[[0]]}} {{isCross=[[0]]}} {{isCircle=[[0]]}}", (results) => {
+		getAttrs(["Fool-Circle1", "Fool-Cross1", "Fool-Circle2", "Fool-Cross2", "Fool-Circle3", "Fool-Cross3", "Fool-Circle4", "Fool-Cross4", "Fool-Circle5", "Fool-Cross5", "Fool-Circle6", "Fool-Cross6", "GmWhisper"], v => {
+			let whisper = v["GmWhisper"] != 0;
+			let whisperPrefix = whisper ? "/w gm " : "";
+			startRoll(whisperPrefix + "&{template:fool} {{name=@{character_name}}} {{roll=[[1d6]]}} {{result=[[0]]}} {{isCross=[[0]]}} {{isCircle=[[0]]}}", (results) => {
 				let foolRoll = results.results.roll.result;
 				
 				var cross = 0;
@@ -4695,6 +4693,22 @@
 			});
 		});
 	});
+	
+	on("clicked:init", (event) => {
+		getAttrs(["Dex", "GmWhisper"], v  => {
+			let whisper = v["GmWhisper"] != 0;
+			let value = v["Dex"];
+			var whisperPrefix = whisper ? "/w gm " : "";
+			startRoll(whisperPrefix + "&{template:init} {{name=@{character_name}}} {{roll=[["+value+" &{tracker}]]}} {{result=[[0]]}}", (results) => {
+				let initRoll = results.results.roll.result;
+				finishRoll(results.rollId,
+					{
+						result: initRoll
+					}
+				);
+			});
+		});
+	});
 </script>
 
 
@@ -4727,5 +4741,13 @@
 			<td>You rolled a Cross!</td>
 		</tr>
 		{{/rollTotal() computed::isCross 1}}
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-init">
+	<table>
+		<tr> 
+			<td>{{name}} Initiative: {{computed::result}}</th>
+		</tr>
 	</table>
 </rolltemplate>
