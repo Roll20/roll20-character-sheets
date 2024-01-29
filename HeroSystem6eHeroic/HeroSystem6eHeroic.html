@@ -366,8 +366,8 @@
 				<div class="subitem-characteristics-perception-row-container">
 					<div class="subitem-characteristics-perception-stat-container">
 						<h1>Perception</h1>
-						<div class="subitem-characteristics-perception-column-container">
-							<span>+<input type="number" name="attr_enhancedPerceptionModifier" title="@{enhancedPerceptionModifier}" value="0" min="-10" max="10" step="1" tabindex="35"></span>
+						<div class="subitem-characteristics-perception-column-container-first">
+							<span><input type="text" name="attr_perceptionBase" title="@{perceptionBase}" value="11" readonly tabindex="-1">+<input type="number" name="attr_enhancedPerceptionModifier" title="@{enhancedPerceptionModifier}" value="0" min="-10" max="10" step="1" tabindex="35"></span>
 							
 							<input type="text" name="attr_perceptionEnhanced" title="@{perceptionEnhanced}" value="11" readonly tabindex="-1">
 							
@@ -6534,7 +6534,7 @@
 				
 				<div class="item-version-information">
 					<!-- Update version before release. -->
-					<input type="text" value="2.41" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+					<input type="text" value="2.42" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 				</div>
 			</div>
 		</div>	
@@ -6984,8 +6984,14 @@
 		}
 		
 		if (version < 2.41) {
-			// No changes needed.
-			version = 2.41;
+			values = await _getAttrs(["intelligence"]);
+			
+			// Update to new addition: perceptionBase.
+			let statValue = parseInt(values.intelligence)||10;
+			
+			attributes.perceptionBase = calculateRoll(statValue);
+			
+			version = 2.42;
 		}
 
 		if (version != origVersion) {
@@ -7479,6 +7485,7 @@
 			setAttrs({
 				"intelligenceCP":statCP,
 				"intelligenceChance":calculateRoll(statValue),
+				"perceptionBase":calculateRoll(statValue),
 				"perceptionEnhanced":calculateRoll(statValue)+enhancedPerceptionMod,
 				"perceptionVision":calculateRoll(statValue)+enhancedPerceptionMod+perceptionModVision,
 				"perceptionHearing":calculateRoll(statValue)+enhancedPerceptionMod+perceptionModHearing,
