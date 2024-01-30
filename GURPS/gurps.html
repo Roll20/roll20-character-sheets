@@ -4325,12 +4325,9 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.10.7 -->
+				<!-- current version notes: 2.10.8 -->
 				<ul>
-					<li><b>ENHANCEMENT:</b> Active Defense tab; moved roll modifiers to its own section, just above the Active Defense headers. Suggested by Uncle Mojo.</li>
-					<li><b>ENHANCEMENT:</b> Skills and Techniques tables, updated skill roll results. The chat dialog will now show how much you made/missed the roll by.</li>
-					<li><b>ENHANCEMENT:</b> Defense, Melee, and Range tables, updated skill roll results. The chat dialog will now show how much you made/missed the roll by.</li>
-					<li><b>ENHANCEMENT:</b> Grimoire, Spells tables, updated skill roll results. The chat dialog will now show how much you made/missed the roll by.</li>
+					<li><b>ENHANCEMENT:</b> Ranged attack table. If you enter a ROF greater than 1, the attack roll will ask for the number of shots fired and the roll results will show the number of hits based on recoil. If there's no recoil entered, it will assume the recoil is 1.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13954,6 +13951,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col6">
 										<input type="text" name="attr_rof" title="Macro: @{NAME|repeating_ranged_$[row #]_rof}" />
+										<input type="hidden" name="attr_shots_fired_macro" value="" />
 									</div>
 									<div class="cell col7">
 										<input type="text" name="attr_shots" title="Macro: @{NAME|repeating_ranged_$[row #]_shots}" />
@@ -20034,12 +20032,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.10.7 -->
+			<!-- current version notes: 2.10.8 -->
 			<ul>
-				<li><b>ENHANCEMENT:</b> Active Defense tab; moved roll modifiers to its own section, just above the Active Defense headers. Suggested by Uncle Mojo.</li>
-				<li><b>ENHANCEMENT:</b> Skills and Techniques tables, updated skill roll results. The chat dialog will now show how much you made/missed the roll by.</li>
-				<li><b>ENHANCEMENT:</b> Defense, Melee, and Range tables, updated skill roll results. The chat dialog will now show how much you made/missed the roll by.</li>
-				<li><b>ENHANCEMENT:</b> Grimoire, Spells tables, updated skill roll results. The chat dialog will now show how much you made/missed the roll by.</li>
+				<li><b>ENHANCEMENT:</b> Ranged attack table. If you enter a ROF greater than 1, the attack roll will ask for the number of shots fired and the roll results will show the number of hits based on recoil. If there's no recoil entered, it will assume the recoil is 1.</li>
 			</ul>
 
 			<h4>Version: 2.10.6</h4>
@@ -23083,6 +23078,9 @@ B378
 							<td class="label"><span data-i18n="hits-label">Hits</span>:</td>
 							<td>
 								<span class="effective-skill">{{computed::hits}}</span> round(s) hit
+								{{#shotsFired}}
+									out of {{shotsFired}} shot(s)
+								{{/shotsFired}}
 							</td>
 						</tr>
 						{{/rollGreater() computed::hits 0}}
@@ -23215,6 +23213,9 @@ B378
 							<td class="label"><span data-i18n="hits-label">Hits</span>:</td>
 							<td>
 								<span class="effective-skill">{{computed::hits}}</span> round(s) hit
+								{{#shotsFired}}
+									out of {{shotsFired}} shot(s)
+								{{/shotsFired}}
 							</td>
 						</tr>
 						{{/rollGreater() computed::hits 0}}
@@ -23365,6 +23366,9 @@ B378
 							<td class="label"><span data-i18n="hits-label">Hits</span>:</td>
 							<td>
 								<span class="effective-skill">{{computed::hits}}</span> round(s) hit
+								{{#shotsFired}}
+									out of {{shotsFired}} shot(s)
+								{{/shotsFired}}
 							</td>
 						</tr>
 						{{/rollGreater() computed::hits 0}}
@@ -23536,6 +23540,9 @@ B378
 								<td class="label"><span data-i18n="hits-label">Hits</span>:</td>
 								<td>
 									<span class="effective-skill">{{computed::hits}}</span> round(s) hit
+									{{#shotsFired}}
+										out of {{shotsFired}} shot(s)
+									{{/shotsFired}}
 								</td>
 							</tr>
 							{{/rollGreater() computed::hits 0}}
@@ -24099,6 +24106,9 @@ B378
 								<td class="label"><span data-i18n="hits-label">Hits</span>:</td>
 								<td>
 									<span class="effective-skill">{{computed::hits}}</span> round(s) hit
+									{{#shotsFired}}
+										out of {{shotsFired}} shot(s)
+									{{/shotsFired}}
 								</td>
 							</tr>
 							{{/rollGreater() computed::hits 0}}
@@ -24496,7 +24506,7 @@ B378
                 </tr>
                 {{/spellRoll}}
                 {{/rollResult}}
-                
+
 				<!-- Hard-coded defense roll modifiers -->
 				{{#rollTotal() showDodgeNotes 1}}
 
@@ -25049,9 +25059,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.10.7";
+	const version = "2.10.8";
 	
-	const latestChangesDate = "1/29/2024";
+	const latestChangesDate = "2/5/2024";
 	
 	let modCascade = true;
 	
@@ -46244,6 +46254,22 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	const getNumberOfHits = (recoil, max, difference) => {
+
+		let hits = 0;
+
+		if (difference >= 0 && recoil > 0) {
+			hits = Math.floor(difference / recoil) + 1;
+		}
+
+		// check for max, hits can't exceed the max value.
+		if (max > 0 && hits > max) {
+			hits = max;
+		}
+
+		return hits;
+	}
+
 	const rollRepeatingSkillRoll = async (event) => {
 
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
@@ -47267,12 +47293,12 @@ Characters with Skill: ${knowsSkill}`;
 		}
 
 		// get the roll fields and add to rollData
-		let skillRollData = await getRepeatingRangedRollData(rowId);
+		let [skillRollData, recoil] = await getRepeatingRangedRollData(rowId);
 
 		rollData += skillRollData;
 
 		// append the rollDifference
-		rollData += " {{rollDifference=[[0]]}}";
+		rollData += " {{rollDifference=[[0]]}} {{hits=[[0]]}}";
 
 		// TODO: append result status; critical_success, success, fail, critical_fail, malfunction
 
@@ -47284,8 +47310,21 @@ Characters with Skill: ${knowsSkill}`;
 
 		const difference = effectiveSkill - roll;
 
+		const max = skillRoll.results?.shotsFired?.result || 0;
+
+		console.log("skillRoll", skillRoll);
+		
+		console.log("recoil", recoil);
+
+		console.log("max", max);
+
+		hits = getNumberOfHits(recoil, max, difference);
+
+		console.log(hits);
+
 		let customData = {
-			rollDifference: difference
+			rollDifference: difference,
+			hits: hits
 		};
 
 		finishRoll(skillRoll.rollId, customData);
@@ -47304,6 +47343,7 @@ Characters with Skill: ${knowsSkill}`;
 		"ranged_roll_allout_attack",
 		"notes",
 		"rof",
+		"shots_fired_macro",
 		"recoil",
 		"malfunction",
 		"malfunction_verify",
@@ -47362,6 +47402,8 @@ Characters with Skill: ${knowsSkill}`;
 		notes = notes.replace(/\n/g, '\\n');
 
 		let rof = values[`${sectionName}_rof`] ?? "1";
+
+		let shotsFired = values[`${sectionName}_shots_fired_macro`] ?? "";
 
 		let recoil = values[`${sectionName}_recoil`] ?? "-1";
 
@@ -47451,8 +47493,15 @@ Characters with Skill: ${knowsSkill}`;
 			rollDataArray.push(`{{rof=${rof}}}`);
 		}
 
+		if (shotsFired) {
+			rollDataArray.push(`{{shotsFired=${shotsFired}}}`);
+		}
+
+		let recoilValue = 0;
+
 		if (recoil) {
 			rollDataArray.push(`{{recoil=${recoil}}}`);
+			recoilValue = Number(recoil);
 		}
 
 		if (malfunction) {
@@ -47537,7 +47586,7 @@ Characters with Skill: ${knowsSkill}`;
 
 		let rollData = rollDataArray.join(" ");
 
-		return rollData;
+		return [rollData, recoilValue];
 
 	}
 
@@ -49167,6 +49216,48 @@ Characters with Skill: ${knowsSkill}`;
 			setAttrs(keyValues);
 
 		});
+	}
+
+	on("change:repeating_ranged:rof change:repeating_ranged:recoil", event => {
+
+		updateRangedShotsFiredMacro();
+
+	});
+
+	const updateRangedShotsFiredMacro = rowId => {
+
+		let fields = [
+			`repeating_ranged_rof`,
+			`repeating_ranged_recoil`
+		];
+
+		getAttrs(fields, values => {
+
+			console.log(values);
+
+			let rof = values.repeating_ranged_rof ?? "1";
+
+			// handles specific case for Jet.
+			rof = rof.toLowerCase();
+
+			let recoil = Number(values.repeating_ranged_recoil) ?? 1;
+
+			let macro = "";
+
+			let nonMultipleShotValues = ["1", "jet"];
+
+			if (!nonMultipleShotValues.includes(rof)) {
+				macro = "[[?{Shots fired|0}]]";
+			}
+
+			let keyValues = {
+				[`repeating_ranged_shots_fired_macro`]: macro
+			};
+
+			setAttrs(keyValues);
+
+		});
+
 	}
 
 </script>
