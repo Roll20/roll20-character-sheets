@@ -2936,6 +2936,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push(`crit=${spell['crit-size'] || ''}`);
         rollBuilder.push(`damage=${spell['damage']}`);
         rollBuilder.push(`damagetype=${spell['damage-type']}`);
+        rollBuilder.push(`healing=${spell['healing']}`);
         rollBuilder.push(`reference=${spell['reference']}, ${spell['book']}`);
         rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll.' : ''}`);
         rollBuilder.push('checkroll=[[1d100]]%');
