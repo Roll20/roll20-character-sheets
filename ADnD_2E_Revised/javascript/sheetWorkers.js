@@ -23,6 +23,14 @@ const LEVEL_FIELDS = {
     'level-class5': 'class5',
 };
 
+const THAC0_FORMULAS = {
+    'warrior':    l => 21-l,
+    'wizard':     l => 21-Math.ceil(l/3),
+    'priest':     l => 22-(Math.ceil(l/3)*2),
+    'rogue':      l => 21-Math.ceil(l/2),
+    'psionicist': l => 21-Math.ceil(l/2),
+}
+
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
 
@@ -1973,31 +1981,60 @@ function setupFollowerWeaponsAutoFill(repeating, weaponSections) {
     });
 }
 
-function setupFollowerThac0AutoFill(repeating, sections) {
-    sections.forEach(section => {
-        let changePrefix = repeating ? `repeating_${repeating}:` : '';
-        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
-        });
+function setupFollowerThac0AndSavingThrowsAutoFill(classGroup, repeating, weaponSections, index) {
+    if (index === null) {
+        return;
+    }
+    let changePrefix = repeating ? `repeating_${repeating}:` : '';
+    on(`change:${changePrefix}henchlvl${index}`, function(eventInfo) {
+        if (doEarlyReturn(eventInfo, [`henchlvl${index}`]))
+            return;
+
+        let levelInt = parseInt(eventInfo.newValue);
+        if (isNaN(levelInt))
+            return;
+
+        let thac0 = THAC0_FORMULAS[classGroup](levelInt);
+        let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
+
+        let toastObject = getToastObject(SUCCESS, 'Updated THAC0 and Saving throws', `Updated THAC0 and Saving throws to match a single class ${capitalizeFirst(classGroup)} at level ${levelInt}`);
+        let newValue = {...toastObject};
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[0]}`] = thac0;
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[1]}`] = thac0;
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[2]}`] = thac0;
+        newValue[`${repeatingRowPrefix}hench${index}partar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}poitar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}deatar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}rodtar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}statar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}wantar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}pettar`] = SAVING_THROWS[classGroup]['petrificationPolymorph'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}poltar`] = SAVING_THROWS[classGroup]['petrificationPolymorph'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}bretar`] = SAVING_THROWS[classGroup]['breath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}spetar`] = SAVING_THROWS[classGroup]['spell'][levelInt]
+
+        setAttrs(newValue);
     });
 }
 
 const FOLLOWERS = [
-    {repeating: '',       weaponSections: ['',    '001', '002']},
-    {repeating: 'hench',  weaponSections: ['003', '004', '005']},
-    {repeating: '',       weaponSections: ['006', '007', '008']},
-    {repeating: 'hench2', weaponSections: ['009', '010', '011']},
-    {repeating: '',       weaponSections: ['012', '013', '014']},
-    {repeating: 'hench3', weaponSections: ['015', '016', '017']},
-    {repeating: '',       weaponSections: ['018', '019', '020']},
-    {repeating: 'hench4', weaponSections: ['021', '022', '023']},
-    {repeating: '',       weaponSections: ['024', '025', '026']},
-    {repeating: 'hench5', weaponSections: ['027', '028', '029']},
-    {repeating: '',       weaponSections: ['030', '031', '032']},
-    {repeating: 'hench6', weaponSections: ['033', '034', '035']},
+    {classGroup: 'warrior', repeating: '',       weaponSections: ['',    '001', '002'], index: ''},
+    {classGroup: 'warrior', repeating: 'hench',  weaponSections: ['003', '004', '005'], index: '1'},
+    {classGroup: 'wizard',  repeating: '',       weaponSections: ['006', '007', '008'], index: '2'},
+    {classGroup: 'wizard',  repeating: 'hench2', weaponSections: ['009', '010', '011'], index: '22'},
+    {classGroup: 'priest',  repeating: '',       weaponSections: ['012', '013', '014'], index: '3'},
+    {classGroup: 'priest',  repeating: 'hench3', weaponSections: ['015', '016', '017'], index: '33'},
+    {classGroup: 'rogue',   repeating: '',       weaponSections: ['018', '019', '020'], index: '4'},
+    {classGroup: 'rogue',   repeating: 'hench4', weaponSections: ['021', '022', '023'], index: '44'},
+    {classGroup: 'psionicist',   repeating: '',       weaponSections: ['024', '025', '026'], index: '5'},
+    {classGroup: 'psionicist',   repeating: 'hench5', weaponSections: ['027', '028', '029'], index: '55'},
+    {classGroup: 'animal',  repeating: '',       weaponSections: ['030', '031', '032'], index: null},
+    {classGroup: 'animal',  repeating: 'hench6', weaponSections: ['033', '034', '035'], index: null},
 ];
 
 FOLLOWERS.forEach(fw => {
     setupFollowerWeaponsAutoFill(fw.repeating, fw.weaponSections);
+    setupFollowerThac0AndSavingThrowsAutoFill(fw.classGroup, fw.repeating, fw.weaponSections, fw.index)
 });
 
 // Monster weapons
