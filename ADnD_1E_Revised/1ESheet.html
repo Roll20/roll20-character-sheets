@@ -6983,13 +6983,43 @@
     }
   );
 
-  // Equipment Tabs
-  on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type', (eventInfo) => {
+  // Equipment Type and Carry Changes
+  on('change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    const id = eventInfo.sourceAttribute.split('_')[2];
     const source = `${eventInfo.sourceAttribute}`;
     // parses the event text
     const pattern = /equipment_type/;
+    // boolean for equipment_type change
     const isType = pattern.test(source);
+    const fields = [`repeating_equipment_${id}_equipment_type`, `repeating_equipment_${id}_equipment_carried_select`];
+    getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
+      const output = {};
+      const typeTab = +v.equipment_tabs_type || 0;
+      const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
+      // thisCarriedSelect will be 0, 1, 2
+      const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+      // Weight calcs use equipment_carried
+      if (thisCarriedSelect === 1) {
+        output[`repeating_equipment_${id}_equipment_carried`] = 1;
+      } else {
+        output[`repeating_equipment_${id}_equipment_carried`] = 0;
+      }
+      // Jump to type tab when changing type unless view is set to Show All
+      if (typeTab !== -1) {
+        if (isType) {
+          output.equipment_tabs_type = thisType;
+        } else {
+          output.equipment_tabs_type = typeTab;
+        }
+      }
+      setAttrs(output);
+    });
+  });
+
+  // Equipment Tabs hide/show Rows
+  on('change:equipment_tabs_type change:equipment_tabs_carry', (eventInfo) => {
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getSectionIDs('repeating_equipment', (idArray) => {
       const fields = [];
       idArray.forEach((id) => {
@@ -7002,30 +7032,10 @@
         const carriedTab = +v.equipment_tabs_carry || 0;
         idArray.forEach((id) => {
           const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
-
-          // Weight calcs use equipment_carried
-          let thisCarriedValue = 0;
           const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
-          if (thisCarriedSelect === 1) {
-            thisCarriedValue = 1;
-            output[`repeating_equipment_${id}_equipment_carried`] = 1;
-          } else {
-            thisCarriedValue = 0;
-            output[`repeating_equipment_${id}_equipment_carried`] = 0;
-          }
-
-          output[`repeating_equipment_${id}_equipment_carried`] = thisCarriedValue;
           // Use CSS to hide/show the repeating row using typeTab and/or carriedTab
           output[`repeating_equipment_${id}_equipment_show_type`] = typeTab === -1 || typeTab === thisType ? 1 : 0;
           output[`repeating_equipment_${id}_equipment_show_carry`] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
-          // Jump to type tab when changing type unless view is set to Show All
-          if (typeTab !== -1) {
-            if (isType) {
-              output.equipment_tabs_type = thisType;
-            } else {
-              output.equipment_tabs_type = typeTab;
-            }
-          }
         });
         setAttrs(output);
       });
