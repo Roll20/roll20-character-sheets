@@ -1282,11 +1282,11 @@ wiz2['Improved Phantasmal Force'] = {
     'reference': 'p. 184',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 455',
-    'errata': 'Sage Advice #249 p. 22\nSage Advice #256 p. 27',
+    'errata': 'Sage Advice #171 p. 90\nSage Advice #249 p. 22\nSage Advice #256 p. 27',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Like the 1st-level *phantasmal force* spell, this spell creates the illusion of any object, creature, or force, as long as it is within the spell’s area of effect. The spellcaster can maintain the illusion with minimal concentration; thus, he can move at half normal speed (but not cast other spells). Some minor sounds are included in the effects of the spell, but not understandable speech. Also, the improved phantasm continues for two rounds after the wizard ceases to concentrate upon it.\n&emsp;*Improved phantasmal force* can create an illusionary object that a creature can hide behind, but not the illusion that the creature is not there.'
+    'effect': 'Like the 1st-level *phantasmal force* spell, this spell creates the illusion of any object, creature, or force, as long as it is within the spell’s area of effect. The spellcaster can maintain the illusion with minimal concentration; thus, he can move at half normal speed (but not cast other spells). Some minor sounds are included in the effects of the spell, but not understandable speech. Also, the improved phantasm continues for two rounds after the wizard ceases to concentrate upon it.\n&emsp;This spell cannot be used to create a limited form of invisibility. *Improved phantasmal force* can create an illusionary object that a creature can hide behind, but not the illusion that the creature is not there.'
 };
 
 wiz2['Invisibility'] = {
