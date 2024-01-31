@@ -1159,6 +1159,7 @@ wiz2['Flaming Sphere'] = {
     'reference': 'p. 182',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 376',
+    'errata': 'Sage Advice #200 p. 105-106',
     'damage': '*Direct contact:* [[2d4]] Fire.\n*5 feet proximity:* [[1d4]]',
     'damage-type': 'Heat',
     'healing': '',
