@@ -1115,9 +1115,11 @@ wiz2['Detect Invisibility'] = {
     'reference': 'p. 182',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 235',
+    'errata': 'The Complete Psionics Handbook p. 110',
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'psionics': '*Detect Invisibility* is effective against psionic invisibility, astral travelers, shadow form, and ethereal characters. It is not effective against characters in other dimensions.',
     'effect': 'When the wizard casts a *detect invisibility* spell, he is able to see clearly any objects or beings that are invisible, as well as any that are astral, ethereal, or out of phase. In addition, it enables the wizard to detect hidden or concealed creatures (for example, thieves in shadows, halflings in underbrush, and so on). It does not reveal the method of concealment or invisibility, except in the case of astral travelers (where the silver cord can be seen). It does not reveal illusions or enable the caster to see through physical objects. Detection is a path 10 ft. wide along the wizard’s line of sight to the range limit.'
 };
 
@@ -1135,11 +1137,12 @@ wiz2['ESP'] = {
     'reference': 'p. 182',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 324',
-    'errata': 'Sage Advice #228 p. 84\nDungeon Master Option: High-Level Campaigns p. 70-71',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #228 p. 84\nDungeon Master Option: High-Level Campaigns p. 70-71',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When an *ESP* spell is used, the caster is able to detect the surface thoughts—that is, whatever the subject happens to be thinking about at the time—of any creatures in range—except for those of undead and creatures without minds (as we know them). The ESP is stopped by 2 feet of rock, 2 inches of any metal other than lead, or a thin sheet of lead foil.\n&emsp;The wizard employing the spell is able to probe the surface thoughts of one creature per round, getting simple instinctual thoughts from lower order creatures. Probes can continue on the same creature from round to round or can move on to other creatures. The caster can use the spell to help determine if a creature lurks behind a door, for example. The caster can sense which direction the thoughts are coming from (left, right, ahead, behind, up, down, or some combination of these). If the caster spends one round studying an area containing hidden creatures, he can tell about how many there are, but he still doesn’t know exactly where they are. The ESP does not always reveal what sort of creature it is.\n&emsp;If used as part of a program of interrogation, an intelligent and wary subject receives an initial saving throw. If successful, the creature successfully resists and the spell reveals no additional information. If the saving throw is failed, the caster may learn additional information, according to the DM’s ruling. The creature’s Wisdom adjustment always applies, as may additional bonuses up to +4, based on the sensitivity of the information sought, at the DM’s option. Guidelines for the bonus is given in Dungeon Master Option: High-Level Campaign p. 71.'
+    'psionics': 'A Psionicist always gets a saving throw against this *ESP* with a +2 bonus. Success negates the spell.',
+    'effect': 'When an *ESP* spell is used, the caster is able to detect the surface thoughts—that is, whatever the subject happens to be thinking about at the time—of any creatures in range—except for those of undead and creatures without minds (as we know them). The ESP is stopped by 2 feet of rock, 2 inches of any metal other than lead, or a thin sheet of lead foil.\n&emsp;The wizard employing the spell is able to probe the surface thoughts of one creature per round, getting simple instinctual thoughts from lower order creatures. Probes can continue on the same creature from round to round or can move on to other creatures. The caster can use the spell to help determine if a creature lurks behind a door, for example. The ESP does not always reveal what sort of creature it is. The caster can sense which direction the thoughts are coming from (left, right, ahead, behind, up, down, or some combination of these). If the caster spends one round studying an area containing hidden creatures, he can tell about how many there are, but he still doesn’t know exactly where they are.\n&emsp;If used as part of a program of interrogation, an intelligent and wary subject receives an initial saving throw. Wisdom modifiers always apply, with a possible additional bonus up to +4 at the DM’s option. If successful, the creature successfully resists and the spell reveals no additional information. If the saving throw is failed, the caster may learn additional information, according to the DM’s ruling. The creature’s Wisdom adjustment always applies, as may additional bonuses up to +4, based on the sensitivity of the information sought. Guidelines for the bonus is given in Dungeon Master Option: High-Level Campaign p. 71.'
 };
 
 wiz2['Flaming Sphere'] = {
