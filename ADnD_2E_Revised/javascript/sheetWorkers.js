@@ -1581,7 +1581,7 @@ on(`clicked:secret-door-check`, async function (eventInfo) {
     rollBuilder.push('checkvs=Find Secret Door', 'fail=After 10 minutes of searching the 20-foot section of the wall you find nothing. You cannot try again, but other characters can.');
     let infoModifier = await extractQueryResult(`?{Have the character seen the door in operation? Do they only need to find the opening mechanism?|+0 [Door is secret]|+1 [Character knows of the door]}`);
     if (infoModifier === '+0 [Door is secret]') {
-        rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the secret door! (Including the mechanism to open the door, except in very rare cases where another check is needed to find the mechanism).');
+        rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the secret door including the opening mechanism! (Except in very rare cases where another check is needed to find the mechanism).');
     } else {
         rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the mechanism for the secret door!');
     }
