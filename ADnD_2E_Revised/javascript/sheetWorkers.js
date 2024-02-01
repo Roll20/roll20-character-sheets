@@ -1994,10 +1994,10 @@ function setupFollowerThac0AndSavingThrowsAutoFill(classGroup, repeating, weapon
             return;
 
         let levelInt = parseInt(eventInfo.newValue);
-        if (isNaN(levelInt))
+        if (isNaN(levelInt) || levelInt < 0)
             return;
 
-        let thac0 = THAC0_FORMULAS[classGroup](levelInt);
+        let thac0 = THAC0_FORMULAS[classGroup](Math.max(levelInt,1)); // Ensure THAC0 does not go above 20
         let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
 
         let toastObject = getToastObject(SUCCESS, 'Updated THAC0 and Saving throws', `Updated THAC0 and Saving throws to match a single class ${capitalizeFirst(classGroup)} at level ${levelInt}`);
@@ -2005,6 +2005,8 @@ function setupFollowerThac0AndSavingThrowsAutoFill(classGroup, repeating, weapon
         newValue[`${repeatingRowPrefix}thac0hench${weaponSections[0]}`] = thac0;
         newValue[`${repeatingRowPrefix}thac0hench${weaponSections[1]}`] = thac0;
         newValue[`${repeatingRowPrefix}thac0hench${weaponSections[2]}`] = thac0;
+
+        levelInt = Math.min(levelInt,21); // Ensure we stay inside index
         newValue[`${repeatingRowPrefix}hench${index}partar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
         newValue[`${repeatingRowPrefix}hench${index}poitar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
         newValue[`${repeatingRowPrefix}hench${index}deatar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
