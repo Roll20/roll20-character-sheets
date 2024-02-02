@@ -13,6 +13,21 @@ https://www.mannifest-games.com/
 
 # Release Notes
 
+**2024-01-23 v1.1 HF4**
+
+* Bugfix
+    * Text bei "Physiologische Störungen" korrigiert
+    * Schmerztoleranz bei neuen Charakteren mit 3 vorbelegen
+    * Standardwert für Spezies auf 0 gesetzt
+
+* Redesign
+    * Überschriften jetzt besser lesbar
+
+**2023-12-16 v1.1 HF3**
+
+* Bugfix
+    * Bei Attributsproben ebenfalls einen Hazard-Di vorbelegen
+
 **2023-12-10 v1.1 HF2**
 
 * New Feature

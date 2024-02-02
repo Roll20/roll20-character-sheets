@@ -3,7 +3,7 @@ A Hero System 6th Edition character sheet for Roll20
 
 This character sheet is designed for use in heroic-level Hero System games such as Fantasy Hero or Star Hero. Characters in these games tend to have many skills, few powers, and employ weapons that generally do killing damage and are purchased with in-game money rather than character points. The overall aim of this character sheet is to make playing Heroic-level games in Hero System as easy as possible. This sheet attempts to handle the basic bookkeeping math for characteristics, skills, powers, and complications. However, no skill names, power names, power descriptions, advantages, or limitations are included, except for the six skill enhancers, overall levels, and endurance-related choices, which are required for the internal math. Please refer to official Hero System rules publications or the official helper software Hero Designer for this information (https://www.herogames.com).
 
-The number of skills (30 general, 7 combat, 6 maneuvers, and 9 languages) and powers (10) is hard-coded to handle the background math and for aesthetics, but should be sufficient for general use.
+The number of skills (30 general skills, 7 combat skills, 9 maneuvers, and 9 languages) and powers (17) is hard-coded to handle the background math and for aesthetics, but should be sufficient for general use.
 
 This sheet has support for either armor activation rolls or the optional hit location system (see Options). The choice to use one or the other system is a GM campaign-level decision.
 
@@ -40,7 +40,7 @@ Roll buttons are color-coded:
 
 ![Green Button](/HeroSystem6eHeroic/images/GreenButton.png) Green buttons are for normal damage attacks.
 
-![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield use. This can be used for block checks, or to do killing or normal damage.
+![Light Blue Button](/HeroSystem6eHeroic/images/LightBlueButton.png) Light blue buttons are for blocks and shield attacks.
 
 ![Purple Button](/HeroSystem6eHeroic/images/PurpleButton.png) Purple buttons are for powers.
 
