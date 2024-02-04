@@ -889,6 +889,21 @@ const melee = [
 ];
 
 /*
+	Constants for regeneration-related things
+*/
+// Regeneration buttons
+const reg = [
+	'reg_schlaf'
+];
+
+// Minimum regeneration per regeneration phase (sleep)
+const regLimitLower = {
+	'le': 0,
+	'ae': 0,
+	'ke': 0
+};
+
+/*
 	Constants for translating (new) internal name to (old) internal name and UI name
 
 In the long run, all attributes should be migrated to the new ones.

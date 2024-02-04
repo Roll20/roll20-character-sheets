@@ -4,7 +4,9 @@ on(
 	"change:nachteil_schlechte_regeneration " +
 	"change:vorteil_schnelle_heilung_i " +
 	"change:vorteil_schnelle_heilung_ii " +
-	"change:vorteil_schnelle_heilung_iii ",
+	"change:vorteil_schnelle_heilung_iii " +
+	"change:nachteil_verwoehnt " +
+	"change:nachteil_verwoehnt_wert ",
 	function(eventInfo) {
 		var attrsToChange = {};
 		var regenerationLevel = 0; // -1 to +3
@@ -318,4 +320,64 @@ on(
 		//safeSetAttrs(attrsToChange);
 	});
 });
+
+
+on('clicked:reg_schlaf-action', async (info) => {
+	const caller = "Action Listener for Regeneration Button (Sleep)";
+	results = await startRoll(
+		"@{gm_roll_opt} " +
+		"&{template:default} " +
+		"{{name=Gute Nacht!}} " +
+		"{{le=[[@{LE}d1]]}} " +
+		"{{lebase=[[1d6 + (@{reg_le_mod_vn}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_le})]]}} " +
+		"{{leko=[[@{reg_le_ko}]]}} " +
+		"{{wound=[[2d1]]}} " +
+		"{{ae=[[@{AE}d1]]}} " +
+		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
+		"{{aein=[[@{reg_ae_in}]]}} " +
+		"{{ke=[[@{KE}d1]]}} " +
+		"{{kereg=[[0]]}} "
+	);
+	debugLog(caller, "head", "info:", info, "results:", results);
+	var rollID = results.rollId;
+	var results = results.results;
+
+	safeGetAttrs(
+		[
+		'LE', 'AE', 'KE',
+		'LE_max', 'AE_max', 'KE_max',
+		'nachteil_verwoehnt' ], function(values) {
+		var attrsToChange = {};
+		var LERegTotal = 0;
+		// Additional regeneration from KO check
+		var LEKO = 0;
+		if (results["leko"].result >= 0) {
+			LEKO = 1;
+		} else {
+			if (values["nachteil_verwoehnt"] === "1") {
+				LEKO = -1;
+			} else {
+				LEKO = 0;
+			}
+		}
+		LERegTotal = results["lebase"].result + LEKO;
+		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
+		attrsToChange["LE"] = parseInt(values["LE"]) + LERegTotal;
+		attrsToChange["LE"] = Math.min(attrsToChange["LE"], values["LE_max"]);
+		console.log("values", values, "LERegTotal", LERegTotal, "attrsToChange", attrsToChange);
+
+
+		var AERegTotal = 0;
+		var KERegTotal = 0;
+		safeSetAttrs(attrsToChange);
+	});
+			
+
+	finishRoll(
+		rollID,
+		{	}
+	);
+});
+
+
 /* regeneration end */
