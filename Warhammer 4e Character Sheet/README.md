@@ -81,6 +81,16 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+February 2024 v1.7
+
+- Added first iteration of Vehicle & Enterprise sheet page modes. These allow you too create sheets to record various values and information associated with these. As per rule additions from various source books UiA,SoC,EiS and Enterpirse rules from Achives of the Empire III. Further rolls (ie traveling etc) info may be added in a later update. Weapons will not be included on Vehicle sheets due to requiring the character statsistic and skill to fire etc.
+
+Fixes
+- Fixed Drilled Talent costing double the intended XP, ie 200 instead of 100 xp per lvl
+- Fixed issue with Spell casting where changing the Accu Ext SL modifier during the roll in the popout window would not change the actual spell outcome as intented, but used the existing sheet Accu Ext SL field value instead. It will now overwrite dynamically.
+- Fixed problem with Custom Spells/miracles names not showing correctly on the Quick spell drop down list.
+
+
 July 8th 2023 v1.66a
 
 - Fixed Legs plate amror penalty when modified with pracitcal quality. It will now reduce the -20 pen to stealth to -10, instead of to 0.
