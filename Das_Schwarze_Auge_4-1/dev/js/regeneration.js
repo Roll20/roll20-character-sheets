@@ -4,9 +4,7 @@ on(
 	"change:nachteil_schlechte_regeneration " +
 	"change:vorteil_schnelle_heilung_i " +
 	"change:vorteil_schnelle_heilung_ii " +
-	"change:vorteil_schnelle_heilung_iii " +
-	"change:nachteil_verwoehnt " +
-	"change:nachteil_verwoehnt_wert ",
+	"change:vorteil_schnelle_heilung_iii ",
 	function(eventInfo) {
 		var attrsToChange = {};
 		var regenerationLevel = 0; // -1 to +3
@@ -70,6 +68,57 @@ on(
 			attrsToChange["reg_le_mod_vn"] = regenerationLevel; // regeneration, life energy, modifier, advantages/disadvantages (Vorteile/Nachteile)
 			safeSetAttrs(attrsToChange);
 		}
+});
+
+on(
+	"change:nachteil_verwoehnt " +
+	"change:nachteil_verwoehnt_wert " +
+	"change:nachteil_schlechte_regeneration " +
+	"change:vorteil_schnelle_heilung_i " +
+	"change:vorteil_schnelle_heilung_ii " +
+	"change:vorteil_schnelle_heilung_iii " +
+	"change:reg_schlaf_verwoehnt_zufrieden ",
+	function(eventInfo) {
+		safeGetAttrs(
+			[
+				'nachteil_verwoehnt', 'nachteil_verwoehnt_wert',
+				'nachteil_schlechte_regeneration', 
+				'vorteil_schnelle_heilung_i',
+				'vorteil_schnelle_heilung_ii',
+				'vorteil_schnelle_heilung_iii',
+				'reg_schlaf_verwoehnt_zufrieden'
+			], function(values) {
+			var attrsToChange = {};
+
+			// Handle "spoilt"
+			var spoilt = 0;
+			if (
+				values["nachteil_verwoehnt"] === "1" &&
+				values["reg_schlaf_verwoehnt_zufrieden"] === "0"
+			) {
+				spoilt = parseInt(values["nachteil_verwoehnt_wert"]);
+			} else {
+				spoilt = 0;
+			}
+
+			var regLEKOMod = spoilt;
+			// Handle changes to degree of life regeneration
+			if (values["nachteil_schlechte_regeneration"] === "1") {
+				regLEKOMod += 2;
+			} else if (values["vorteil_schnelle_heilung_iii"] === "1") {
+				regLEKOMod -= 3;
+			} else if (values["vorteil_schnelle_heilung_ii"] === "1") {
+				regLEKOMod -= 2;
+			} else if (values["vorteil_schnelle_heilung_i"] === "1") {
+				regLEKOMod -= 1;
+			} else {
+				regLEKOMod += 0;
+			}
+
+			attrsToChange["reg_le_ko"] = `@{KO} - (1d20 + (${regLEKOMod}))`;
+
+			safeSetAttrs(attrsToChange);
+		});
 });
 
 on(
@@ -344,9 +393,11 @@ on('clicked:reg_schlaf-action', async (info) => {
 
 	safeGetAttrs(
 		[
-		'LE', 'AE', 'KE',
-		'LE_max', 'AE_max', 'KE_max',
-		'nachteil_verwoehnt' ], function(values) {
+			'LE', 'AE', 'KE',
+			'LE_max', 'AE_max', 'KE_max',
+			'nachteil_verwoehnt',
+			'reg_schlaf_verwoehnt_zufrieden'
+		], function(values) {
 		var attrsToChange = {};
 		var LERegTotal = 0;
 		// Additional regeneration from KO check
@@ -354,7 +405,7 @@ on('clicked:reg_schlaf-action', async (info) => {
 		if (results["leko"].result >= 0) {
 			LEKO = 1;
 		} else {
-			if (values["nachteil_verwoehnt"] === "1") {
+			if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
 				LEKO = -1;
 			} else {
 				LEKO = 0;
