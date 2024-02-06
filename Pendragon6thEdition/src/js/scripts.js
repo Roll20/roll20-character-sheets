@@ -5,6 +5,7 @@ const characteristics = {
   knockdown: ["size"],
   majorWound: ["constitution"],
   healingRate: ["constitution"],
+  brawlDamage: ["strength", "size"],
 };
 
 //When performing calculations in King Arthur Pendragon, round
@@ -16,6 +17,19 @@ const round = (sum) => (sum % 1 >= 0.5 ? Math.ceil(sum) : Math.floor(sum));
 
 const total = (v) =>
   Object.values(v).reduce((partialSum, a) => partialSum + parseFloat(a), 0);
+
+characteristics.brawlDamage.forEach((attr) => {
+  on(`change:${attr}`, () => {
+    getAttrs(characteristics.brawlDamage, (values) => {
+      //Brawl Damage =  (STR+SIZ)/6
+      const damage = round(total(values) / 6);
+      setAttrs({
+        brawl_damage: damage,
+        brawl_damage_open: round(damage / 2),
+      });
+    });
+  });
+});
 
 characteristics.movement.forEach((attr) => {
   on(`change:${attr}`, () => {
