@@ -726,14 +726,13 @@
 				<h1>Mass</h1>
 			</div>
 			
-			<!-- These are needed here for Roll button coloring -->
-			<input type="hidden" class="weapon-normal-damage01" name="attr_weaponNormalDamage01">
-			<input type="hidden" class="weapon-normal-damage02" name="attr_weaponNormalDamage02">
-			<input type="hidden" class="weapon-normal-damage03" name="attr_weaponNormalDamage03">
-			<input type="hidden" class="weapon-normal-damage04" name="attr_weaponNormalDamage04">
-			<input type="hidden" class="weapon-normal-damage05" name="attr_weaponNormalDamage05">
+			<!-- These hidden variables are here for ease of coding CSS of Roll button colors -->
 			
-			<input type="hidden" class="weapon-maneuver-type" name="attr_weaponManeuverType" value="strike">
+			<input type="hidden" class="weapon-type01" name="attr_weaponType01" value="killing">
+			<input type="hidden" class="weapon-type02" name="attr_weaponType02" value="killing">
+			<input type="hidden" class="weapon-type03" name="attr_weaponType03" value="killing">
+			<input type="hidden" class="weapon-type04" name="attr_weaponType04" value="killing">
+			<input type="hidden" class="weapon-type05" name="attr_weaponType05" value="killing">
 			
 			<!-- Weapon 01 -->
 			<div class="subitem-tab-gear-flex-container-weapon-row">
@@ -9221,7 +9220,7 @@
 	
 	
 	/* Language Skills */
-	on("change:enhancerLing change:skillFluency41 change:skillLiteracy41 change:skillFluency42 change:skillLiteracy42 change:skillFluency43 change:skillLiteracy43 change:skillFluency44 change:skillLiteracy44 change:skillFluency45 change:skillLiteracy45 change:skillFluency46 change:skillLiteracy46 change:skillFluency47 change:skillLiteracy47 change:skillFluency48 change:skillLiteracy48 change:skillFluency49 change:skillLiteracy49, optionLiteracyCostsPoints", function () {
+	on("change:enhancerLing change:skillFluency41 change:skillLiteracy41 change:skillFluency42 change:skillLiteracy42 change:skillFluency43 change:skillLiteracy43 change:skillFluency44 change:skillLiteracy44 change:skillFluency45 change:skillLiteracy45 change:skillFluency46 change:skillLiteracy46 change:skillFluency47 change:skillLiteracy47 change:skillFluency48 change:skillLiteracy48 change:skillFluency49 change:skillLiteracy49, change:optionLiteracyCostsPoints", function () {
 		// Language skills are relatively simple without levels or roll calculations. The linguist enhancer is the only complication. 
 		// All calculations handled by the function calculateLanguageSkillCost(...).
 		
@@ -9394,7 +9393,7 @@
 		var button = "maneuverExpand"+String(num).padStart(2,'0');
 		on(`clicked:${button}`, function() {
 			var attributes = new Object();
-
+			
 			attributes.maneuverToggle = button;
 			setAttrs(attributes);
 		});
@@ -9408,13 +9407,13 @@
 			arrayOf(maxManeuverNum).forEach(num => {
 				maneuverArray.push("martialManeuverCP"+String(num).padStart(2,'0'));
 			});
-
+			
 			getAttrs(maneuverArray, function(values) {
 				let totalMartialManeuversCost = 0;
 				arrayOf(maxManeuverNum).forEach(num => {
 					totalMartialManeuversCost += parseInt(values["martialManeuverCP"+String(num).padStart(2,'0')])||0;
 				})
-
+				
 				setAttrs({
 					"hiddenMartialSkillsCost":totalMartialManeuversCost
 				})
@@ -9423,15 +9422,78 @@
 	});
 	
 	
-	/* ------------------------- */
-	/* Maneuver Slide Selector   */
-	/* ------------------------- */
+	/* ------------------------------------------------------ */
+	/* Maneuver Selector and weapon attack button color state */
+	/* ------------------------------------------------------ */
 	const maneuverlist = ["block", "disarm", "dodge", "grab", "grabBy", "haymaker", "moveBy", "moveThrough", "multipleAttack", "set", "shove", "strike", "throw", "trip"];
-		maneuverlist.forEach(button => {
+	maneuverlist.forEach(button => {
 		on(`clicked:${button}`, function() {
-			setAttrs({
-				"maneuverSelection": button,
-				"weaponManeuverType": button	
+			getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05"], function(values) {
+				let weapon01 = "killing";
+				let weapon02 = "killing";
+				let weapon03 = "killing";
+				let weapon04 = "killing";
+				let weapon05 = "killing";
+				
+				if ((button === "strike") || (button === "haymaker") || (button === "multipleAttack")) {
+					if (values.weaponNormalDamage01 === "on") {
+						weapon01 = "normal";
+					}
+					if (values.weaponNormalDamage02 === "on") {
+						weapon02 = "normal";
+					}
+					if (values.weaponNormalDamage03 === "on") {
+						weapon03 = "normal";
+					}
+					if (values.weaponNormalDamage04 === "on") {
+						weapon04 = "normal";
+					}
+					if (values.weaponNormalDamage05 === "on") {
+						weapon05 = "normal";
+					}
+				} else if ((button === "block") || (button === "disarm")) {
+					weapon01 = "defense";
+					weapon02 = "defense";
+					weapon03 = "defense";
+					weapon04 = "defense";
+					weapon05 = "defense";
+				} else {
+					weapon01 = "override";
+					weapon02 = "override";
+					weapon03 = "override";
+					weapon04 = "override";
+					weapon05 = "override";
+				}
+				
+				setAttrs({
+					"maneuverSelection": button,
+					"weaponType01": weapon01,
+					"weaponType02": weapon02,
+					"weaponType03": weapon03,
+					"weaponType04": weapon04,
+					"weaponType05": weapon05
+				});
+			});
+		});
+	});
+	
+	
+	/* Update killing and normal roll button coloring state if damage type is changed */
+	arrayOf(maxWeaponNum).forEach(num => {
+		var weaponId = String(num).padStart(2,'0');
+		on(`change:weaponNormalDamage${weaponId}`, function() {		
+			getAttrs(["weaponNormalDamage"+weaponId, "weaponType"+weaponId], function(values) {
+				var attributes = new Object();
+				
+				if ((values["weaponType"+weaponId] === "normal") || (values["weaponType"+weaponId] === "killing")) {
+					if (values["weaponNormalDamage"+weaponId] === "on") {
+						attributes["weaponType"+weaponId] = "normal";
+					} else {
+						attributes["weaponType"+weaponId] = "killing";
+					}
+				}
+				
+				setAttrs(attributes);
 			});
 		});
 	});
