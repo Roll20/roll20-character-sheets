@@ -30,8 +30,13 @@ This is a [**Roll20**](https://roll20.net/) character sheet for **Achtung! Cthul
 
 # Changelog
 
+## v1.02 (2024-02-09)
+- Fix weapon damage bug (wrong value in macro)
+- Fix unnamed weapon damage attribute missing
+- CSS minor consistency changes
+
 ## v1.01 (2024-01-30)
-- Fix initial weapon damage bug
+- Fix initial weapon damage attribute missing
 
 ## v1.00 (2024-01-18)
 - Initial release
