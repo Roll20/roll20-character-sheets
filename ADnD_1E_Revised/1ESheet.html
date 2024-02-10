@@ -49,10 +49,10 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version"></span>.beta</span>
             </span>
-            <span class="right">2/9/23'</span>
+            <span class="right">2/10/23'</span>
           </h5>
           <ul>
-            <li>Added a default value of "unarmored" to @{unarmored} in order for auto-calc of AR to work without requiring manual entry for @{unarmored} on the PC-side of the sheet.</li>
+            <li>Unarmored fix to enable AC and AR calcs to work without requiring a name value for the unarmored row.</li>
             <li>Removed "Roll" from the repeating roll buttons.</li>
             <li>Updated the Special Ability macro to include "0 +" for the inline rolls to prevent a chat error if a non-number is used in the ability_die and/or ability_current_max fields. Roll template checks these inline rolls for numbers in order to show or hide info.</li>
             <li>Added rolls for Racial Notes and Special Senses.</li>
@@ -773,9 +773,9 @@
           <span title="Armor Bulk affects movement">Bulk</span>
         </span>
         <span class="armor-columns">
-          <label class="span-two"><span>UnArmored Base</span></label>
-          <input type="checkbox" class="hidden" name="attr_unarmored_worn" value="1" checked />
-          <input type="text" class="width-fill" name="attr_unarmored" value="unarmored" title="@{unarmored} | Use for Unarmored, Clothing, etc." placeholder="Description" />
+          <label class="stack-text"><span>UnArmored Base</span></label>
+          <input type="checkbox" name="attr_unarmored_worn" value="1" title="@{unarmored_worn}" checked />
+          <input type="text" class="width-fill" name="attr_unarmored" value="" title="@{unarmored} | Use for Unarmored, Clothing, etc." placeholder="Description" />
           <select class="select" name="attr_unarmored_ac" title="@{unarmored_ac}">
             <option value="10" selected>10</option>
             <option value="9">9</option>
@@ -805,8 +805,7 @@
           </select>
           <span></span>
           <span></span>
-          <span></span>
-          <input type="checkbox" class="hidden" name="attr_unarmored_carried" value="1" />
+          <input type="checkbox" name="attr_unarmored_carried" value="1" title="@{unarmored_carried} | In use/worn cannot be un-carried."/>
           <select class="select width-fill" name="attr_unarmored_bulk" title="@{unarmored_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -858,7 +857,7 @@
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armortype_magic_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armortype_magic" value="0" title="@{armortype_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <span></span>
-          <input type="checkbox" name="attr_armortype_carried" value="1" />
+          <input type="checkbox" name="attr_armortype_carried" value="1" title="@{armortype_carried} | In use/worn cannot be un-carried."/>
           <select class="select width-fill" name="attr_armortype_bulk" title="@{armortype_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -899,7 +898,7 @@
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armortype2_magic_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armortype2_magic" value="0" title="@{armortype2_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <span></span>
-          <input type="checkbox" name="attr_armortype2_carried" value="1" />
+          <input type="checkbox" name="attr_armortype2_carried" value="1" title="@{armortype2_carried} | In use/worn cannot be un-carried." />
           <select class="select width-fill" name="attr_armortype2_bulk" title="@{armortype2_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -941,7 +940,7 @@
           <input type="text" class="width-small" name="attr_armorshield_magic" value="0" title="@{armorshield_magic} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
           <input type="checkbox" class="hidden toggle-input-error" name="attr_armorshield_mod_error" value="1" checked />
           <input type="text" class="width-small" name="attr_armorshield_mod" value="0" title="@{armorshield_mod} | Bonuses lower AC.  Penalties raise AC.  ie '+2' bonus lowers AC by -2 while a '-2' penalty will raise AC by 2." />
-          <input type="checkbox" name="attr_armorshield_carried" value="1" />
+          <input type="checkbox" name="attr_armorshield_carried" value="1" title="@{armorshield_carried} | In use/worn cannot be un-carried."/>
           <select class="select width-fill" name="attr_armorshield_bulk" title="@{armorshield_bulk}">
             <option value="0" selected>n/a</option>
             <option value="1">non-Bulky 12"</option>
@@ -1278,10 +1277,10 @@
           <label class="label-under-small" title="@{armorbonus} | Defensive Adjustment from Dexterity row.">
             <input type="text" class="readonly-span width-small" name="attr_armorbonus_inverted" value="0" />
             <span class="material-icons" title="Encumbered! DEX bonus has been removed.">nearby_error</span>
-            <span class="inline-label center" title="@{armorbonus_toggle} | DEX bonus can be removed circumstantially.">
+            <label class="inline-label" title="@{armorbonus_toggle} | DEX bonus can be removed circumstantially.">
               <span>Dex Adj.</span>
               <input type="checkbox" style="width:1em;" name="attr_armorbonus_toggle" value="1" checked />
-            </span>
+            </label>
           </label>
           <label class="text-large">=</label>
           <label class="label-under" title="@{armorclass_shieldless} | Best AC without a Shield bonus.">
@@ -5590,7 +5589,7 @@
               output.unarmored_row_id = newID;
               output[`repeating_equipment_${newID}_equipment_type`] = 2;
               output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-              output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+              output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
               output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
               output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
@@ -5611,7 +5610,7 @@
               output.unarmored_row_id = newID.toLowerCase();
               output[`repeating_equipment_${newID}_equipment_type`] = 2;
               output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-              output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+              output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
               output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
               output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
@@ -5624,28 +5623,28 @@
           } else if (unarmored0_ID === idArray[0]) {
             // no name but id exists: armor detail row REMOVED RESETING ROW
             output.unarmored_row_id = 0;
-            output.unarmored_worn = 1;
+            output.unarmored_worn = +v.unarmored_worn || 0;
             output.unarmored = '';
-            output.unarmored_ac = 10;
-            output.unarmored_base = 10;
-            output.unarmored_bulk = 0;
+            output.unarmored_ac = +v.unarmored_ac || 0;
+            output.unarmored_base = +v.unarmored_base || 0;
+            output.unarmored_bulk = +v.unarmored_bulk || 0;
             output.unarmored_weight = 0;
             output.unarmored_cost = 0;
-            output.unarmored_carried = 1;
-            // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
+            output.unarmored_carried = +v.unarmored_carried || 0;
+            clog(`rep_removed:${row_removed} - ID Exists. Armor Details row has been reset unarmored:${newID}`);
           }
         } else {
           // null means repeating_row removed: has Name and id = REMOVED RESET ROW
           output.unarmored_row_id = 0;
-          output.unarmored_worn = 1;
+          output.unarmored_worn = +v.unarmored_worn || 0;
           output.unarmored = '';
-          output.unarmored_ac = 10;
-          output.unarmored_base = 10;
-          output.unarmored_bulk = 0;
+          output.unarmored_ac = +v.unarmored_ac || 0;
+          output.unarmored_base = +v.unarmored_base || 0;
+          output.unarmored_bulk = +v.unarmored_bulk || 0;
           output.unarmored_weight = 0;
           output.unarmored_cost = 0;
-          output.unarmored_carried = 1;
-          // clog(`rep_removed:${row_removed} - Armor Details row has been reset armor1:${newID}`);
+          output.unarmored_carried = +v.unarmored_carried || 0;
+          clog(`rep_removed:${row_removed} - NO ID. Armor Details row has been reset unarmored:${newID}`);
         }
       }
       if (matchingArray === 'armor1Attrs' || id_low === idArray[1] || migrate) {
@@ -7033,6 +7032,7 @@
         'armortype2_bulk',
         'armorshield_bulk',
         'armorhelmet_bulk',
+        'unarmored_worn',
         'armortype_worn',
         'armortype2_worn',
         'armorshield_worn',
@@ -7041,6 +7041,7 @@
       ],
       (v) => {
         const output = {};
+        const unarmored_worn = +v.unarmored_worn || 0;
         const armortype_worn = +v.armortype_worn || 0;
         const armortype2_worn = +v.armortype2_worn || 0;
         const armorshield_worn = +v.armorshield_worn || 0;
@@ -7048,7 +7049,7 @@
         // shield bulk s/b considered even if it's just carried
         const armorShieldWornOrCarried = Math.max(armorshield_worn, armorshield_carried);
         const armorhelmet_worn = +v.armorhelmet_worn || 0;
-        const unarmored_bulk = +v.unarmored_bulk || 0;
+        const unarmored_bulk = +(v.unarmored_bulk || 0) * unarmored_worn;
         const armortype_bulk = +(v.armortype_bulk || 0) * armortype_worn;
         const armortype2_bulk = +(v.armortype2_bulk || 0) * armortype2_worn;
         const armorshield_bulk = +(v.armorshield_bulk || 0) * armorShieldWornOrCarried;
@@ -7290,14 +7291,12 @@
         output.unarmored_row_id = newID.toLowerCase();
         output[`repeating_equipment_${newID}_equipment_type`] = 2;
         output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-        output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
+        output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
         output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
         output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-        output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.unarmored_magic;
-        output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
-        output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
-        output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
-        // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
+        output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+        output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+        clog(`repeating armor does not exist. Creating unarmored: ${newID}`);
       }
       if (attr === 'armortype' && attrPrev === undefined) {
         // has new name but NO id = CREATE NEW ROW
@@ -7511,13 +7510,10 @@
             output.unarmored = item;
             output.unarmored_ac = ac;
             output.unarmored_base = base;
-            output.unarmored_magic = magic;
             output.unarmored_bulk = bulk;
             // unarmored is always "in use" but is hidden attr,
-            // but should be to drop clothing ie swim, sleep, etc.
-            output.unarmored_carried = 1;
-            output.unarmored_weight = weight;
-            output.unarmored_cost = cost;
+            // but should be able to drop clothing ie swim, sleep, etc.
+            output.unarmored_carried = carriedSelect;
             output.unarmored1_row_id = id;
             break;
           case 1:
@@ -8229,6 +8225,7 @@
         'armorbonus',
         'armorbonus_toggle',
         'armorbonus_inverted',
+        'unarmored_worn',
         'armortype_worn',
         'armortype2_worn',
         'armorshield_worn',
@@ -8307,6 +8304,7 @@
         const armorOther4_magic = +v.armorother4_magic * -1 || 0;
         const armorOther5_magic = +v.armorother5_magic * -1 || 0;
         const armorOther6_magic = +v.armorother6_magic * -1 || 0;
+        const unarmored_worn = +v.unarmored_worn || 0;
         const armorType_worn = +v.armortype_worn || 0;
         const armorType2_worn = +v.armortype2_worn || 0;
         const armorShield_worn = +v.armorshield_worn || 0;
@@ -8334,6 +8332,7 @@
           armorBonus = +v.armorbonus || 0;
         }
         output.encumbrance_flag = encumbranceConditionFlag;
+        const unarmored_base = +v.unarmored_base || 0;
         const armorType_base = +v.armortype_base || 0;
         const armorType2_base = +v.armortype2_base || 0;
         const armorShield_base = +v.armorshield_base || 0;
@@ -8343,6 +8342,7 @@
         const armorOther4_base = +v.armorother4_base || 0;
         const armorOther5_base = +v.armorother5_base || 0;
         const armorOther6_base = +v.armorother6_base || 0;
+        const unarmored_ac = +v.unarmored_ac || 0;
         const armorType_ac = +v.armortype_ac || 0;
         const armorType2_ac = +v.armortype2_ac || 0;
         const armorShield_ac = +v.armorshield_ac || 0;
@@ -8361,7 +8361,7 @@
         const armorOther4_baseValue = armorOther4_worn === 0 ? 10 : armorOther4_base;
         const armorOther5_baseValue = armorOther5_worn === 0 ? 10 : armorOther5_base;
         const armorOther6_baseValue = armorOther6_worn === 0 ? 10 : armorOther6_base;
-        const unArmored_baseValue = +v.unarmored_base || 10;
+        const unArmored_baseValue = unarmored_worn === 0 ? 10 : unarmored_base;
         const armorType_acValue = armorType_worn === 0 ? 10 : armorType_ac;
         const armorType2_acValue = armorType2_worn === 0 ? 10 : armorType2_ac;
         const armorShield_acValue = armorShield_worn === 0 ? 0 : armorShield_ac;
@@ -8371,7 +8371,7 @@
         const armorOther4_acValue = armorOther4_worn === 0 ? 10 : armorOther4_ac;
         const armorOther5_acValue = armorOther5_worn === 0 ? 10 : armorOther5_ac;
         const armorOther6_acValue = armorOther6_worn === 0 ? 10 : armorOther6_ac;
-        const unArmored_acValue = +v.unarmored_ac || 0;
+        const unArmored_acValue = unarmored_worn === 0 ? 10 : unarmored_ac;
         const shieldModValue = armorShield_worn === 0 ? 0 : armorShield_mod;
         const shieldMagicValue = armorShield_worn === 0 ? 0 : armorShield_magic;
         const baseAR_best =
@@ -8481,7 +8481,6 @@
         const combinedShieldModMagic_add_sign = (-1 * combinedShieldModMagic <= 0 ? '' : '+') + -1 * combinedShieldModMagic;
         output.armorclass_rating_used = baseAR;
         output.armorclass_rating = armorRatingFlag === 1 ? '-' : baseAR;
-        output.unarmored_base = armorRatingFlag === 1 ? '-' : unArmored_baseValue;
         output.armorclass_rating_best = baseAR_best;
         output.armorclass_base_used = baseAC + armorShield_acValue;
         output.armorclass_base = baseAC;
@@ -8509,7 +8508,7 @@
   };
 
   on(
-    'change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
+    'change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
     (eventInfo) => {
       // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
       const recalc = 0;
