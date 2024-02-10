@@ -5615,7 +5615,14 @@
               output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
               output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
               output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+              // armor in use ie 'worn', should always be considered as carried
+              if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
+                output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+                output.unarmored_carried = 1;
+              } else {
+                output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+              }
+              // output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
               output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
               output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
               // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
@@ -5630,21 +5637,26 @@
             output.unarmored_bulk = +v.unarmored_bulk || 0;
             output.unarmored_weight = +v.unarmored_weight || 0;
             output.unarmored_cost = +v.unarmored_cost || 0;
-            output.unarmored_carried = +v.unarmored_carried || 0;
-            // clog(`rep_removed:${row_removed} - ID Exists. Armor Details row has been reset unarmored:${newID}`);
+            // armor in use ie 'worn', should always be considered as carried
+            if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
+              output.unarmored_carried = 1;
+            } else {
+              output.unarmored_carried = +v.unarmored_carried || 0;
+            }
+            // clog(`rep_removed:${row_removed} - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
           }
         } else {
           // null means repeating_row removed: has Name and id = REMOVED RESET ROW
           output.unarmored_row_id = 0;
-          output.unarmored_worn = +v.unarmored_worn || 0;
+          output.unarmored_worn = 1;
           output.unarmored = '';
-          output.unarmored_ac = +v.unarmored_ac || 0;
-          output.unarmored_base = +v.unarmored_base || 0;
-          output.unarmored_bulk = +v.unarmored_bulk || 0;
-          output.unarmored_weight = +v.unarmored_weight || 0;
-          output.unarmored_cost = +v.unarmored_cost || 0;
-          output.unarmored_carried = +v.unarmored_carried || 0;
-          // clog(`rep_removed:${row_removed} - NO ID. Armor Details row has been reset unarmored:${newID}`);
+          output.unarmored_ac = 10;
+          output.unarmored_base = 10;
+          output.unarmored_bulk = 0;
+          output.unarmored_weight = 0;
+          output.unarmored_cost = 0;
+          output.unarmored_carried = 1;
+          // clog(`rep_removed:${row_removed} - NO ID. Deleted from Equipment unarmored:${newID}`);
         }
       }
       if (matchingArray === 'armor1Attrs' || id_low === idArray[1] || migrate) {
@@ -7514,7 +7526,7 @@
             // unarmored is always "in use" but is hidden attr,
             // but should be able to drop clothing ie swim, sleep, etc.
             output.unarmored_carried = carriedSelect;
-            output.unarmored1_row_id = id;
+            output.unarmored_row_id = id;
             break;
           case 1:
             // clog(`${thisLog} Armor 1`);
