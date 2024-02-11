@@ -6836,6 +6836,7 @@
 <input type="hidden" name="attr_sheet_name" value="HeroSystem6eHeroic"/>
 
 <!-- Hidden variables for combat rolls -->
+<input type="hidden" name="attr_range" value="0"/>
 <input type="hidden" name="attr_targetOCVpenalty" value="0"/>
 <input type="hidden" name="attr_rangeOCVpenalty" value="0"/>
 <input type="hidden" name="attr_targetHitRoll" value="3d6cs0cf0"/>
@@ -7523,6 +7524,7 @@
 				setAttrs({
 					"currentSTUN":maxSTUN,
 					"currentEND":maxEND,
+					"range":0,
 					"rangeManeuver":0,
 					"rangeMartial":0,
 					"targetSelection":1,
@@ -10448,6 +10450,25 @@
 			});
 		});
 	});
+	
+	on("change:rangeManeuver change:rangeMartial", function () {
+		// Synchronize range choices with target range.
+		
+		getAttrs(["rangeManeuver", "rangeMartial", "range"], function(values) {
+			
+			let newRange = parseInt(values.rangeManeuver)||0;
+			
+			if (newRange === parseInt(values.range)||0) {
+				newRange = parseInt(values.rangeMartial)||0;
+			}
+			
+			setAttrs({
+				"rangeManeuver":newRange,
+				"rangeMartial":newRange,
+				"range":newRange
+			});
+		});
+	});
 
 
 	// Roll attack and damage dice for Weapon XX.
@@ -10455,7 +10476,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeMartial", "rangeOCVpenalty", "maneuverSelection"], function(values) {
+			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "range", "rangeOCVpenalty", "maneuverSelection"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
@@ -10473,7 +10494,7 @@
 					// First, check to see if this is a ranged attack.
 					let isRangedAttack = false;
 					
-					if (parseInt(values.rangeMartial)||0) {
+					if (parseInt(values.range)||0) {
 						isRangedAttack = true;
 					}
 					
