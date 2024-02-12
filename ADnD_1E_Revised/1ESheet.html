@@ -5179,30 +5179,37 @@
 
   // migrate AC
   const migrateAC = (current_version, final_version) => {
-    getAttrs(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus'], (v) => {
+    getAttrs(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus', 'armorshield'], (v) => {
       const update = {};
       const recalc = 0;
       let armorClass = +v.armorclass || 0;
-      const armorBonus = +v.armorbonus || 0;
+      const armorBonus = -Math.abs(v.armorbonus) || 0;
       const armorClassTotal = +v.armorclass_total || 0;
       const armortypeAC = +v.armortype_ac || 0;
       const armorShield = v.armorshield;
       clog(`armorShield:${armorShield} armorClassTotal:${armorClassTotal} armorBonus:${armorBonus} armortypeAC:${armortypeAC} armorClass:${armorClass}`);
       // older sheet will have default value for armortypeAC and armorClassTotal.  AC s/b better than 10
-      if (armorShield !== '') {
-        if (armorClassTotal === 10 + armorBonus && armortypeAC === 10 && armorClass < 10) {
+      if (armorShield !== undefined) {
+        if (armortypeAC === 10 && armorClass < 10) {
           armorClass += 1;
           update.armortype_ac = armorClass;
           update.armortype_base = armorClass;
           update.armortype_worn = 1;
+          update.armortype_carried = 1;
           update.armorshield_ac = -1;
           update.armorshield_base = -1;
           update.armorshield_worn = 1;
+          update.armorshield_carried = 1;
+          clog(`new armor w/shield`);
         }
-      } else if (armorClassTotal === 10 + armorBonus && armortypeAC === 10 && armorClass < 10) {
+      } else if (armortypeAC === 10 && armorClass < 10) {
         update.armortype_ac = armorClass;
         update.armortype_base = armorClass;
         update.armortype_worn = 1;
+        update.armortype_carried = 1;
+        clog(`new armor w/out shield`);
+      } else {
+        clog(`NEW ARMOR CHECK AND SET FAILED`);
       }
       update.sheet_version = current_version;
       clog(`VERSION UPDATE: Migrate AC completed.`);
@@ -8063,7 +8070,7 @@
         fields.push(section_attribute('weapon', id, 'weapon_dual'));
       });
       getAttrs(['dual_pen_primary', 'dual_pen_secondary', ...fields], (v) => {
-        clog('Weapon Attack Type has been re-calculated');
+        // clog('Weapon Attack Type has been re-calculated');
         const primary = +v.dual_pen_primary || 0;
         const secondary = +v.dual_pen_secondary || 0;
         idArray.forEach((id) => {
