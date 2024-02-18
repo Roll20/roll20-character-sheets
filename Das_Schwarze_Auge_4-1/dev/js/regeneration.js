@@ -192,6 +192,34 @@ on(
 });
 
 on(
+	"change:nachteil_heimwehkrank " +
+	"change:reg_schlaf_heimwehkrank_fern_der_heimat ",
+	function(eventInfo) {
+		safeGetAttrs(
+			[
+				'nachteil_heimwehkrank',
+				'reg_schlaf_heimwehkrank_fern_der_heimat'
+			], function(values) {
+			var attrsToChange = {};
+
+			// Handle "homesickness"
+			var homesick = 0;
+			if (
+				values["nachteil_heimwehkrank"] === "1" &&
+				values["reg_schlaf_heimwehkrank_fern_der_heimat"] === "1"
+			) {
+				homesick = -1;
+			} else {
+				homesick = 0;
+			}
+
+			attrsToChange["reg_ae_mod_heimwehkrank"] = homesick;
+
+			safeSetAttrs(attrsToChange);
+		});
+});
+
+on(
 	"change:nachteil_verwoehnt " +
 	"change:nachteil_verwoehnt_wert " +
 	"change:nachteil_astraler_block " +
@@ -396,7 +424,6 @@ on(
 		"nachteil_verwoehnt_wert"
 	], function(v) {
 		/* brauchen noch mehr UI
-		heimwehkrank -> "außerhalb der Heimat" -> ja -> ae reg -1
 		nahrungsrestriktion -> "Tage seit letzter Einhaltung der Restriktion" -> >0 und <=3 -> le/ae reg -2; >3 le/ae reg = 0, KO fällt (wird erst mal nur mitgeteilt, nicht berücksichtigt)
 		schlafstoerungen_i -> 4 auf 1W4 -> le/ae reg nur 1w6-1, schlafdauer wie 4 h, Status "unausgeschlafen" -> AU auf 3/4 des max. cappen, Schlechte Eigenschaften +2, Talent/Zauberproben +3
 		schlafstoerungen_ii -> 2 auf 1W2 -> wie schlafstoerungen_i; sonst: Einschlafprobe (Selbstbeherrschung +7) bei Scheitern wie schlafstoerungen_i
@@ -427,7 +454,7 @@ on('clicked:reg_schlaf-action', async (info) => {
 		"{{leko=[[@{reg_le_ko}]]}} " +
 		"{{wound=[[2d1]]}} " +
 		"{{ae=[[@{AE}d1]]}} " +
-		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
+		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_heimwehkrank}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
 		"{{aein=[[@{reg_ae_in}]]}} " +
 		"{{ke=[[@{KE}d1]]}} " +
 		"{{kereg=[[0]]}} "
