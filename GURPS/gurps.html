@@ -25061,7 +25061,7 @@ B378
 	
 	const version = "2.10.8";
 	
-	const latestChangesDate = "2/5/2024";
+	const latestChangesDate = "2/19/2024";
 	
 	let modCascade = true;
 	
@@ -26355,6 +26355,8 @@ B378
 		updateRuleSixteenForSpells();
 
 		moveOldMacros();
+
+		updateAllRangedShotsFiredMacro();
 	
 	}
 	
@@ -49224,7 +49226,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	});
 
-	const updateRangedShotsFiredMacro = rowId => {
+	const updateRangedShotsFiredMacro = () => {
 
 		let fields = [
 			`repeating_ranged_rof`,
@@ -49233,25 +49235,71 @@ Characters with Skill: ${knowsSkill}`;
 
 		getAttrs(fields, values => {
 
-			console.log(values);
-
 			let rof = values.repeating_ranged_rof ?? "1";
 
-			// handles specific case for Jet.
-			rof = rof.toLowerCase();
+			// convert rof to an integer
+			let rofNumber = parseInt(rof);
 
 			let recoil = Number(values.repeating_ranged_recoil) ?? 1;
 
 			let macro = "";
 
-			let nonMultipleShotValues = ["1", "jet"];
-
-			if (!nonMultipleShotValues.includes(rof)) {
-				macro = "[[?{Shots fired|0}]]";
+			// check if rofNumber is a valid number
+			if (!isNaN(rofNumber) && rofNumber > 1) {
+				macro = `[[?{Shots fired up to ${rof}|0}]]`;
 			}
 
 			let keyValues = {
 				[`repeating_ranged_shots_fired_macro`]: macro
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	/**
+	 * Loop through all the ranged weapons and update the shots fired macro
+	 */
+	const updateAllRangedShotsFiredMacro = () => {
+
+		getSectionIDs("repeating_ranged", ids => {
+
+			ids.forEach(id => {
+
+				updateRangedShotsFiredMacroByRowId(id);
+
+			});
+
+		});
+
+	}
+
+	/**
+	 * Update the shots fired macro for a specific ranged weapon
+	 * @param {String} id 
+	 */
+	const updateRangedShotsFiredMacroByRowId = id => {
+
+		getAttrs([`repeating_ranged_${id}_rof`, `repeating_ranged_${id}_recoil`], values => {
+
+			let rof = values[`repeating_ranged_${id}_rof`] ?? "1";
+
+			// convert rof to an integer
+			let rofNumber = parseInt(rof);
+
+			let recoil = Number(values[`repeating_ranged_${id}_recoil`]) ?? 1;
+
+			let macro = "";
+
+			// check if rofNumber is a valid number
+			if (!isNaN(rofNumber) && rofNumber > 1) {
+				macro = `[[?{Shots fired up to ${rof}|0}]]`;
+			}
+
+			let keyValues = {
+				[`repeating_ranged_${id}_shots_fired_macro`]: macro
 			};
 
 			setAttrs(keyValues);
