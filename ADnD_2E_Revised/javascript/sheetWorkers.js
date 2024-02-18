@@ -23,6 +23,14 @@ const LEVEL_FIELDS = {
     'level-class5': 'class5',
 };
 
+const THAC0_FORMULAS = {
+    'warrior':    l => 21-l,
+    'wizard':     l => 21-Math.ceil(l/3),
+    'priest':     l => 22-(Math.ceil(l/3)*2),
+    'rogue':      l => 21-Math.ceil(l/2),
+    'psionicist': l => 21-Math.ceil(l/2),
+}
+
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
 
@@ -129,7 +137,7 @@ const conditionalLog = function (bool, msg) {
 }
 
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
-    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}] ]]}}`);
     finishRoll(queryRoll.rollId);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
 };
@@ -192,8 +200,36 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
+const getClassesWithLevels = function(values) {
+    let result = {};
+    Object.entries(LEVEL_FIELDS).forEach(([levelField, classField]) => {
+        let levelValue = parseInt(values[levelField]);
+        if (isNaN(levelValue) || levelValue < 1) {
+            return;
+        }
+        result[levelField] = {level: levelValue, className: values[classField]}
+        switch (levelField.slice(-1)) {
+            case "1": result[levelField].classGroup = 'warrior'; break;
+            case "2": result[levelField].classGroup = 'wizard'; break;
+            case "3": result[levelField].classGroup = 'priest'; break;
+            case "4": result[levelField].classGroup = 'rogue'; break;
+            case "5": result[levelField].classGroup = 'psionicist'; break;
+        }
+    });
+    return result;
+}
+
+const getClassSuggestionOptions = function (values) {
+    return Object.entries(getClassesWithLevels(values)).map(([levelField,classProperties]) => {
+        // remove comma as it breaks query format
+        let className = classProperties.className.replaceAll(/[,|]/g,'');
+        className = className ? className : `${levelField}`;
+        return `${className} level ${classProperties.level},${levelField}`;
+    }).join('|');
+}
+
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
-const checkClassLevel = async function(values, rollExpression) {
+const checkClassLevel = async function(formulaField, values, rollExpression) {
     await keepContextRoll();
     let match = rollExpression.match(LEVEL_CLASS_REGEX);
     if (!match)
@@ -201,26 +237,26 @@ const checkClassLevel = async function(values, rollExpression) {
 
     let levelsInExpression = new Set(match);
     if (levelsInExpression.size > 1)
-        return rollExpression; // The user presumably knows what he is doing
+        return rollExpression; // More than one level-class present. The user presumably knows what he is doing
 
-    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
-    if (levelsWithValues.length === 0)
+    let classesWithLevels = getClassesWithLevels(values);
+    let levelsWithValue = Object.keys(classesWithLevels);
+    if (levelsWithValue.length === 0)
         return rollExpression; // The user has not set levels in any fields
 
     let [levelInExpression] = levelsInExpression; // first element from set
     let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
-    if (levelsWithValues.length === 1) {
-        if (levelInExpressionNoBrackets === levelsWithValues[0]) {
+    if (levelsWithValue.length === 1) {
+        if (levelInExpressionNoBrackets === levelsWithValue[0]) {
             return rollExpression;
         } else {
-            return  rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
+            return  rollExpression.replaceAll(levelInExpressionNoBrackets, classesWithLevels[0]);
         }
     } else {
-        let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
-            .join('|');
-        let query = values[levelInExpressionNoBrackets]
-            ? `?{Please confirm the class to use|${suggestedClasses}}`
-            : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
+        let suggestedClasses = getClassSuggestionOptions(values);
+        let query = parseInt(values[levelInExpressionNoBrackets])
+            ? `?{Macro [${formulaField}]: Please confirm the class to use|${suggestedClasses}}`
+            : `?{Macro [${formulaField}]: ${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
 
         let field = await extractQueryResult(query);
         return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
@@ -236,7 +272,7 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
 
         let valueToSet = {};
         if (doCheckClassLevel) {
-            let updatedRollExpression = await checkClassLevel(values, rollExpression);
+            let updatedRollExpression = await checkClassLevel(formulaField, values, rollExpression);
             if (rollExpression !== updatedRollExpression) {
                 valueToSet[formulaField] = rollExpression = updatedRollExpression;
             }
@@ -856,6 +892,110 @@ on('clicked:opendoor-check', function (eventInfo){
 });
 //#endregion
 
+//#region Saving throws autofill
+on('clicked:saving-throws-character', function (eventInfo) {
+    const ravenloftTab = 'tab2';
+    getAttrs([ravenloftTab, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
+        let classesWithLevels = getClassesWithLevels(values);
+        let numberOfClasses = Object.keys(classesWithLevels).length;
+        if (numberOfClasses === 0) {
+            return showToast(ERROR,'Saving throws not updated','All class levels were 0. Please set your class levels on the Character->Info->Details tab');
+        } else if (numberOfClasses > 1) {
+            let characterType = await extractQueryResult('?{Are you a Multi-class or Dual-class?|Multi-class|Dual-class}');
+            if (characterType === 'Dual-class') {
+                let classSuggestionOptions = getClassSuggestionOptions(values);
+                let activeClass = await extractQueryResult(`?{Which class is your current active class?|${classSuggestionOptions}}`);
+                let restrictionsLifted = Object.entries(classesWithLevels)
+                    .every(([levelField,classProperties]) => levelField === activeClass || classesWithLevels[activeClass].level > classProperties.level);
+                if (!restrictionsLifted) {
+                    Object.keys(classesWithLevels).forEach(key => key === activeClass || delete classesWithLevels[key])
+                }
+            }
+        }
+
+        // Ensure all levels are below 21 to keep within index
+        Object.values(classesWithLevels).forEach(classProperties => Math.min(classProperties.level,21));
+
+        let classInfo = Object.values(classesWithLevels).map(cp => `• ${capitalizeFirst(cp.classGroup)} level: ${cp.level}`).join('\n');
+        let toastObject = getToastObject(SUCCESS,'Saving throw updated',`Character saving throws updated based on the following class(es):\n${classInfo}`);
+        let newValue = {...toastObject};
+        newValue['partar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['poitar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['deatar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['rodtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['statar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['wantar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['pettar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['petrificationPolymorph'][cp.level]));
+        newValue['poltar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['petrificationPolymorph'][cp.level]));
+        newValue['breathtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['breath'][cp.level]));
+        newValue['sptar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['spell'][cp.level]));
+        if (values[ravenloftTab] === '2') {
+            newValue['ftar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['fear'][cp.level]));
+            newValue['horrtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['horror'][cp.level]));
+            newValue['madtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['madness'][cp.level]));
+        }
+
+        setAttrs(newValue);
+    });
+});
+
+on('clicked:saving-throws-monster', function (eventInfo) {
+    getAttrs(['hitdice','monsterhpextra','monsterintelligence'], async function (values) {
+        let hitDice = parseInt(values['hitdice']) || 0;
+        let monsterExtraHp = parseInt(values['monsterhpextra']) || 0
+        let intelligentLevel = hitDice + Math.ceil(monsterExtraHp / 4);
+
+        let monsterInt = parseInt(values['monsterintelligence']);
+        if (isNaN(monsterInt)) {
+            await keepContextRoll();
+            return showToast(ERROR, 'Monster Intelligence Missing', 'Monster Intelligence must be set to calculate saving throws.');
+        } else if (monsterInt < 1) {
+            intelligentLevel = Math.ceil(intelligentLevel / 2);
+        }
+
+        hitDice = Math.min(hitDice, 21);
+        intelligentLevel = Math.min(intelligentLevel, 21);
+
+        let intro = 'Monsters get the best saving throws from all classes.'
+        let classes = [];
+        if (await extractQueryResult(`?{${intro} Can the monster fight (Warrior)?|Yes|No}`) === 'Yes') {
+            classes.push('warrior');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster cast wizard spells (Wizard)?|Yes|No}`) === 'Yes') {
+            classes.push('wizard');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster cast priest spells (Priest)?|Yes|No}`) === 'Yes') {
+            classes.push('priest');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster use rogue skills (Rogue)?|Yes|No}`) === 'Yes') {
+            classes.push('rogue');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster use Psionic powers (Psionicist)?|Yes|No}`) === 'Yes') {
+            classes.push('psionicist');
+        }
+
+        let classInfo = classes.map(className => `• ${capitalizeFirst(className)} level: ${intelligentLevel}`).join('\n');
+        if (hitDice !== intelligentLevel) {
+            classInfo += `\nPoison and Death saves are based on level: ${hitDice}`;
+        }
+        let toastObject = getToastObject(SUCCESS,'Saving throw updated',`Monster saving throws updated based on the following class(es):\n${classInfo}`);
+        let newValue = {...toastObject};
+        newValue['monpartar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][intelligentLevel]));
+        newValue['monpoitar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][hitDice]));
+        newValue['mondeatar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][hitDice]));
+        newValue['monrodtar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monstatar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monwantar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monpettar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['petrificationPolymorph'][intelligentLevel]));
+        newValue['monpoltar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['petrificationPolymorph'][intelligentLevel]));
+        newValue['monbretar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['breath'][intelligentLevel]));
+        newValue['monspetar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['spell'][intelligentLevel]));
+
+        setAttrs(newValue);
+    })
+});
+//#endregion
+
 const CALCULATION_FIELDS = [
     { formulaField: 'rogue-level-base',      calculatedField: 'rogue-level-total'},
     { formulaField: 'level-wizard'},
@@ -873,6 +1013,7 @@ const CALCULATION_FIELDS = [
 ];
 CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
     on(`change:${formulaField}`, function (eventInfo) {
+        console.log(eventInfo);
         if (isSheetWorkerUpdate(eventInfo))
             return;
 
@@ -1426,6 +1567,29 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
 //#endregion
 
+on(`clicked:secret-door-check`, async function (eventInfo) {
+    console.log(eventInfo);
+    let rollBuilder = new RollTemplateBuilder('2Echeck');
+    rollBuilder.push('character=@{character_name}','color=green','checkroll=[[1d6cs1cf6]]');
+
+    let doorType = await extractQueryResult(`?{Is the door Concealed (normal door hidden by a curtain or carpet) or Secret (built into the wall, sliding bookcase, requires special mechanism to open)?|Concealed|Secret}`);
+    if (doorType === 'Concealed') {
+        rollBuilder.push('checkvs=Find Concealed Door','checktarget=[[6]]', 'success=You find the concealed door!');
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    }
+
+    rollBuilder.push('checkvs=Find Secret Door', 'fail=After 10 minutes of searching the 20-foot section of the wall you find nothing. You cannot try again, but other characters can.');
+    let infoModifier = await extractQueryResult(`?{Have the character seen the door in operation? Do they only need to find the opening mechanism?|+0 [Door is secret]|+1 [Character knows of the door]}`);
+    if (infoModifier === '+0 [Door is secret]') {
+        rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the secret door including the opening mechanism! (Except in very rare cases where another check is needed to find the mechanism).');
+    } else {
+        rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the mechanism for the secret door!');
+    }
+    rollBuilder.push(`checktarget=[[@{secret-door-base}+(@{secret-door-race})+(${infoModifier})+(@{misc-mod})]]`);
+
+    return printRoll(`/w gm ${rollBuilder.string()}`);
+});
+
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
 const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
@@ -1484,23 +1648,21 @@ on('change:armorname change:armorname2 change:repeating_hench4:armorname22', fun
     setAttrs(armorModifiers);
 });
 
-on('clicked:rt', function (eventInfo){
-    getAttrs([''], async function (values) {
-        console.log(eventInfo);
-        let rollBuilder = new RollTemplateBuilder('2Echeck');
-        rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
+on('clicked:rt', async function (eventInfo){
+    console.log(eventInfo);
+    let rollBuilder = new RollTemplateBuilder('2Echeck');
+    rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
 
-        let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
-        if (skill === 'Find Traps') {
-            rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
-        } else if (skill === 'Remove Traps') {
-            rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
-        } else if (skill === 'Remove Invisible/Magical Traps') {
-            rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
-        }
+    let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
+    if (skill === 'Find Traps') {
+        rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
+    } else if (skill === 'Remove Traps') {
+        rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+    } else if (skill === 'Remove Invisible/Magical Traps') {
+        rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+    }
 
-        return printRoll(`/w gm ${rollBuilder.string()}`);
-    });
+    return printRoll(`/w gm ${rollBuilder.string()}`);
 });
 
 on('clicked:ms clicked:hs', function (eventInfo){
@@ -1791,7 +1953,7 @@ on('change:repeating_ammo:ammoname', function(eventInfo) {
 });
 
 //Follower weapons
-function setupFollowerWeaponsAutoFill(repeating, sections) {
+function setupFollowerWeaponsAutoFill(repeating, weaponSections) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
         let comparerFields = ['rof','small-medium','large','range','speed'];
         if (isPlayersOption) {
@@ -1800,20 +1962,20 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
         return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
 
-    sections.forEach(section => {
+    weaponSections.forEach(weaponSection => {
         let changePrefix = repeating ? `repeating_${repeating}:` : '';
-        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
+        on(`change:${changePrefix}weaponnamehench${weaponSection}`, function(eventInfo) {
             let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
             let setWeaponFunc = function (weapon) {
                 let weaponInfo = {};
-                weaponInfo[`${repeatingRowPrefix}attacknumhench${section}`] = weapon['rof'] || '1';
-                weaponInfo[`${repeatingRowPrefix}attackadjhench${section}`] = weapon['bonus'];
-                weaponInfo[`${repeatingRowPrefix}damadjhench${section}`]    = weapon['bonus'];
-                weaponInfo[`${repeatingRowPrefix}damsmhench${section}`]     = weapon['small-medium'];
-                weaponInfo[`${repeatingRowPrefix}damlhench${section}`]      = weapon['large'];
-                weaponInfo[`${repeatingRowPrefix}rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
-                weaponInfo[`${repeatingRowPrefix}weaptypehench${section}`]  = weapon['type'];
-                weaponInfo[`${repeatingRowPrefix}weapspeedhench${section}`] = weapon['speed'];
+                weaponInfo[`${repeatingRowPrefix}attacknumhench${weaponSection}`] = weapon['rof'] || '1';
+                weaponInfo[`${repeatingRowPrefix}attackadjhench${weaponSection}`] = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damadjhench${weaponSection}`]    = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damsmhench${weaponSection}`]     = weapon['small-medium'];
+                weaponInfo[`${repeatingRowPrefix}damlhench${weaponSection}`]      = weapon['large'];
+                weaponInfo[`${repeatingRowPrefix}rangehench${weaponSection}`]     = weapon['range'] || weapon['reach'] || 'Melee';
+                weaponInfo[`${repeatingRowPrefix}weaptypehench${weaponSection}`]  = weapon['type'];
+                weaponInfo[`${repeatingRowPrefix}weapspeedhench${weaponSection}`] = weapon['speed'];
 
                 setAttrs(weaponInfo);
             };
@@ -1822,23 +1984,62 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     });
 }
 
-const FOLLOWER_WEAPONS = [
-    {repeating: '',       sections: ['',    '001', '002']},
-    {repeating: 'hench',  sections: ['003', '004', '005']},
-    {repeating: '',       sections: ['006', '007', '008']},
-    {repeating: 'hench2', sections: ['009', '010', '011']},
-    {repeating: '',       sections: ['012', '013', '014']},
-    {repeating: 'hench3', sections: ['015', '016', '017']},
-    {repeating: '',       sections: ['018', '019', '020']},
-    {repeating: 'hench4', sections: ['021', '022', '023']},
-    {repeating: '',       sections: ['024', '025', '026']},
-    {repeating: 'hench5', sections: ['027', '028', '029']},
-    {repeating: '',       sections: ['030', '031', '032']},
-    {repeating: 'hench6', sections: ['033', '034', '035']},
+function setupFollowerThac0AndSavingThrowsAutoFill(classGroup, repeating, weaponSections, index) {
+    if (index === null) {
+        return;
+    }
+    let changePrefix = repeating ? `repeating_${repeating}:` : '';
+    on(`change:${changePrefix}henchlvl${index}`, function(eventInfo) {
+        if (doEarlyReturn(eventInfo, [`henchlvl${index}`]))
+            return;
+
+        let levelInt = parseInt(eventInfo.newValue);
+        if (isNaN(levelInt) || levelInt < 0)
+            return;
+
+        let thac0 = THAC0_FORMULAS[classGroup](Math.max(levelInt,1)); // Ensure THAC0 does not go above 20
+        let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
+
+        let toastObject = getToastObject(SUCCESS, 'Updated THAC0 and Saving throws', `Updated THAC0 and Saving throws to match a single class ${capitalizeFirst(classGroup)} at level ${levelInt}`);
+        let newValue = {...toastObject};
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[0]}`] = thac0;
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[1]}`] = thac0;
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[2]}`] = thac0;
+
+        levelInt = Math.min(levelInt,21); // Ensure we stay inside index
+        newValue[`${repeatingRowPrefix}hench${index}partar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}poitar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}deatar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}rodtar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}statar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}wantar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}pettar`] = SAVING_THROWS[classGroup]['petrificationPolymorph'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}poltar`] = SAVING_THROWS[classGroup]['petrificationPolymorph'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}bretar`] = SAVING_THROWS[classGroup]['breath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}spetar`] = SAVING_THROWS[classGroup]['spell'][levelInt]
+
+        setAttrs(newValue);
+    });
+}
+
+const FOLLOWERS = [
+    {classGroup: 'warrior', repeating: '',       weaponSections: ['',    '001', '002'], index: ''},
+    {classGroup: 'warrior', repeating: 'hench',  weaponSections: ['003', '004', '005'], index: '1'},
+    {classGroup: 'wizard',  repeating: '',       weaponSections: ['006', '007', '008'], index: '2'},
+    {classGroup: 'wizard',  repeating: 'hench2', weaponSections: ['009', '010', '011'], index: '22'},
+    {classGroup: 'priest',  repeating: '',       weaponSections: ['012', '013', '014'], index: '3'},
+    {classGroup: 'priest',  repeating: 'hench3', weaponSections: ['015', '016', '017'], index: '33'},
+    {classGroup: 'rogue',   repeating: '',       weaponSections: ['018', '019', '020'], index: '4'},
+    {classGroup: 'rogue',   repeating: 'hench4', weaponSections: ['021', '022', '023'], index: '44'},
+    {classGroup: 'psionicist',   repeating: '',       weaponSections: ['024', '025', '026'], index: '5'},
+    {classGroup: 'psionicist',   repeating: 'hench5', weaponSections: ['027', '028', '029'], index: '55'},
+    {classGroup: 'animal',  repeating: '',       weaponSections: ['030', '031', '032'], index: null},
+    {classGroup: 'animal',  repeating: 'hench6', weaponSections: ['033', '034', '035'], index: null},
 ];
 
-FOLLOWER_WEAPONS.forEach(fw => {
-    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
+FOLLOWERS.forEach(fw => {
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.weaponSections);
+    setupFollowerThac0AndSavingThrowsAutoFill(fw.classGroup, fw.repeating, fw.weaponSections, fw.index)
 });
 
 // Monster weapons
@@ -2740,6 +2941,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push(`crit=${spell['crit-size'] || ''}`);
         rollBuilder.push(`damage=${spell['damage']}`);
         rollBuilder.push(`damagetype=${spell['damage-type']}`);
+        rollBuilder.push(`healing=${spell['healing']}`);
         rollBuilder.push(`reference=${spell['reference']}, ${spell['book']}`);
         rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll.' : ''}`);
         rollBuilder.push('checkroll=[[1d100]]%');

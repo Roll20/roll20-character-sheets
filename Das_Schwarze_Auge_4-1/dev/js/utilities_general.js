@@ -1,0 +1,181 @@
+/* utilities general begin */
+// wird verwendet um aus dem Attributsnamen einer repeating section die Row-ID zu ermitteln
+function extractRowId(attributeId) {
+		return attributeId.match("repeating_[a-zA-Z]*_([-a-zA-Z0-9]*)_.*")[1];
+}
+
+/*
+	Debug Log
+
+Instead of spamming the console unnecessarily all the time, only show messages in debug mode.
+*/
+function debugLog(caller, ...args) {
+	// Caller not optional, because of complicated handling of different amounts of parameters with console.log()
+	if (arguments.length <= 1)
+	{
+		console.log("debugLog() call with insufficient arguments detected. Nothing done.");
+		return;
+	}
+
+	safeGetAttrs(
+		['debug-mode'],
+		function(debugMode) {
+			if (debugMode['debug-mode'] === "on") {
+				console.log(caller + ":", ...args);
+			}
+		}
+	);
+	return;
+}
+
+/*
+	Encode/Decode Unicode Strings to Base64
+
+Base64 is compatible with Roll20's strings. In order to push data from one roll to the next, conversion to and from Base64 is used.
+*/
+function base64EncodeUTF8(str) {
+	return btoa(encodeURIComponent(str));
+}
+
+function base64DecodeUTF8(str) {
+	return decodeURIComponent(atob(str));
+}
+
+/*
+	Pack/Unpack Objects (JSON)
+
+In order to comfortably push data from one roll to the next, use JSON.
+*/
+function packObject(cargo) {
+	var caller = "packObject()";
+	var result = {};
+	if (typeof(cargo) !== "object") {
+		debugLog(caller, "Function input is not of type 'object'. Aborting ...");
+		result = { "error": caller + ": Function input is not of type 'object'. Type was '" + typeof(cargo) + "'." };
+		result = base64EncodeUTF8(JSON.stringify(result))
+		return result;
+	}
+
+	result = base64EncodeUTF8(JSON.stringify(cargo));
+	return result;
+}
+
+function unpackObject(cargo) {
+	var caller = "unpackObject()";
+	var result = {};
+	if (typeof(cargo) !== "string") {
+		debugLog(caller, "Function input is not of type 'string'. Aborting ...");
+		result = { "error": caller + ": Function input is not of type 'string'. Type was '" + typeof(cargo) + "'." };
+		return result;
+	}
+
+	result = JSON.parse(base64DecodeUTF8(cargo));
+	return result;
+}
+
+/*
+	Safe getAttrs()
+
+This function calls getAttrs(), but checks whether all attributes returned are actually there and are not NaN or undefined. Non-existing attributes are filled with the stored default value or 0.
+*/
+function safeGetAttrs( attrsToGet, callback ) {
+	var caller = "safeGetAttrs";
+	getAttrs(
+		attrsToGet, function(attrs) {
+			var missing = [];
+			var badDef = [];
+			var errors = [0, 0];
+
+			for (req of attrsToGet) {
+			// Check for missing attributes and try setting a default value
+				if (!attrs.hasOwnProperty(req)) {
+					errors[0] += 1;
+					missing.push(req);
+					attrs[req] = defaultValues[req] || 0;
+				}
+			// Check existing attributes for undefined or NaN
+				if (
+					typeof attrs[req] === 'undefined' ||
+					Number.isNaN(attrs[req])
+				) {
+					errors[1] += 1;
+					badDef.push(req);
+					attrs[req] = defaultValues[req] || 0;
+				}
+			}
+			if ( errors[0] > 0 ) {
+				debugLog(caller, "Non-existing attributes gotten and set to default value:", missing.join(", "));
+			}
+			if ( errors[1] > 0 ) {
+				debugLog(caller, "Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
+			}
+			callback(attrs, missing, badDef);
+		}
+	);
+}
+
+/*
+	Safe setAttrs()
+
+This function ultimately calls setAttrs(), but beforehand checks whether all attributes are are not NaN or undefined. Bad attributes are filled with the stored default value or 0.
+*/
+function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
+	var caller = "safeSetAttrs";
+	var badDef = [];
+	var errors = 0;
+
+	for (req in attrsToSet) {
+	// Check existing attributes for undefined or NaN
+		if (
+			typeof attrsToSet[req] === 'undefined' ||
+			Number.isNaN(attrsToSet[req])
+		) {
+			errors += 1;
+			badDef.push(req);
+			attrsToSet[req] = defaultValues[req] || 0;
+		}
+	}
+	if ( errors > 0 ) {
+		debugLog(caller, "Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
+	}
+
+	setAttrs( attrsToSet, options, callback );
+}
+
+/*
+	Property Checker
+	Checks whether properties (given in an array of strings) are available in an object.
+	Does not check whether the array contains strings only.
+	Returns an object with the error count (missing properties) and a string array of missing properties.
+*/
+function checkRequiredProperties(properties, values) {
+	var errors = 0;
+	var missing = [];
+
+	for (req of properties) {
+		if (!values.hasOwnProperty(req)) {
+			errors += 1;
+			missing.push(req);
+		}
+	}
+	return { "errors": errors, "missing": missing };
+}
+
+/*
+	JavaScript's Math.round() only rounds to 0 decimal places.
+	Using the toFixed() + parseFloat() method is cumbersome, so here we are with a new function.
+*/
+function roundDecimals (num, digits) {
+	var caller = "roundDecimals";
+	num = parseFloat(num);
+	digits = parseInt(digits);
+
+	if (isNaN(num) || isNaN(digits)) {
+		debugLog(caller, "NaN encountered.", "num is \"" + num + "\" and digits is \"" + digits + "\".");
+		return NaN;
+	}
+
+	num = parseFloat(num.toFixed(digits));
+	return num;
+}
+/* utilities general end */
