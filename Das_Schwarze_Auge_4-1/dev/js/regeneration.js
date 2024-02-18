@@ -462,11 +462,14 @@ on('clicked:reg_schlaf-action', async (info) => {
 	debugLog(caller, "head", "info:", info, "results:", results);
 	var rollID = results.rollId;
 	var results = results.results;
+	var computed = {};
 
 	safeGetAttrs(
 		[
 			'LE', 'AE', 'KE',
 			'LE_max', 'AE_max', 'KE_max',
+			'reg_le_fest',
+			'reg_ae_fest',
 			'nachteil_verwoehnt',
 			'reg_schlaf_verwoehnt_zufrieden'
 		], function(values) {
@@ -474,39 +477,53 @@ on('clicked:reg_schlaf-action', async (info) => {
 
 		// LE Regeneration
 		var LERegTotal = 0;
-		// Additional regeneration from KO check
-		var LEKO = 0;
-		if (results["leko"].result >= 0) {
-			LEKO = 1;
+
+		if (values["reg_le_fest"] !== "off")
+		{
+			computed["lebase"] = values["reg_le_fest"];
+			computed["leko"] = 0;
 		} else {
-			if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
-				LEKO = -1;
+			// Additional regeneration from KO check
+			var LEKO = 0;
+			if (results["leko"].result >= 0) {
+				LEKO = 1;
 			} else {
-				LEKO = 0;
+				if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
+					LEKO = -1;
+				} else {
+					LEKO = 0;
+				}
 			}
+			LERegTotal = results["lebase"].result + LEKO;
+			LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
+			attrsToChange["LE"] = parseInt(values["LE"]) + LERegTotal;
+			attrsToChange["LE"] = Math.min(attrsToChange["LE"], values["LE_max"]);
 		}
-		LERegTotal = results["lebase"].result + LEKO;
-		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
-		attrsToChange["LE"] = parseInt(values["LE"]) + LERegTotal;
-		attrsToChange["LE"] = Math.min(attrsToChange["LE"], values["LE_max"]);
 
 		// AE Regeneration
 		var AERegTotal = 0;
-		// Additional regeneration from KO check
-		var AEIN = 0;
-		if (results["aein"].result >= 0) {
-			AEIN = 1;
+
+		if (values["reg_ae_fest"] !== "off")
+		{
+			computed["aebase"] = values["reg_ae_fest"];
+			computed["aein"] = 0;
 		} else {
-			if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
-				AEIN = -1;
+			// Additional regeneration from KO check
+			var AEIN = 0;
+			if (results["aein"].result >= 0) {
+				AEIN = 1;
 			} else {
-				AEIN = 0;
+				if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
+					AEIN = -1;
+				} else {
+					AEIN = 0;
+				}
 			}
+			AERegTotal = results["aebase"].result + AEIN;
+			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
+			attrsToChange["AE"] = parseInt(values["AE"]) + AERegTotal;
+			attrsToChange["AE"] = Math.min(attrsToChange["AE"], values["AE_max"]);
 		}
-		AERegTotal = results["aebase"].result + AEIN;
-		AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
-		attrsToChange["AE"] = parseInt(values["AE"]) + AERegTotal;
-		attrsToChange["AE"] = Math.min(attrsToChange["AE"], values["AE_max"]);
 		console.log("values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange);
 
 		var KERegTotal = 0;
@@ -516,7 +533,7 @@ on('clicked:reg_schlaf-action', async (info) => {
 
 	finishRoll(
 		rollID,
-		{	}
+		computed
 	);
 });
 
