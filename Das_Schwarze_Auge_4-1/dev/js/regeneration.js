@@ -358,17 +358,34 @@ on(
 	"change:nachteil_schlafstoerungen_ii ",
 	function(eventInfo) {
 		var attrsToChange = {};
+		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
+		/*
+		Sleep Disorder I has a 25% chance (4 on 1d4) to strike, Sleep Disorder II a 50% chance (2 on 1d2).
+		Effect is is the same in both cases.
+		*/
+		var sleepDisorder = { "trigger": "1d0", "effect": "1d6 - 1" };
 
 		if (sourceType === "player") {
-			// Handle changes to degree of astral regeneration
-			// No matter whether it's "0" or "1", deactivate the second level
-			if (eventInfo.sourceAttribute === "nachteil_schlafstoerungen_i") {
+			// Handle changes to degree of sleep disorder
+			if (source === "nachteil_schlafstoerungen_i") {
 				attrsToChange["nachteil_schlafstoerungen_ii"] = "0";
-			} else if (eventInfo.sourceAttribute === "nachteil_schlafstoerungen_ii" && eventInfo.newValue === "1") {
-				attrsToChange["nachteil_schlafstoerungen_i"] = "1";
+				if (eventInfo.newValue === "0") {
+					sleepDisorder["trigger"] = "1d0";
+				} else if (eventInfo.newValue === "1") {
+					sleepDisorder["trigger"] = "1d4";
+				}
+			} else if (source === "nachteil_schlafstoerungen_ii") {
+				if (eventInfo.newValue === "1") {
+					attrsToChange["nachteil_schlafstoerungen_i"] = "1";
+					sleepDisorder["trigger"] = "1d2";
+				} else if (eventInfo.newValue === "0") {
+					sleepDisorder["trigger"] = "1d4";
+				}
 			}
 
+			attrsToChange["reg_schlaf_schlafstoerung_ausloeser"] = sleepDisorder["trigger"];
+			attrsToChange["reg_schlaf_schlafstoerung_effekt"] = sleepDisorder["effect"];
 			safeSetAttrs(attrsToChange);
 		}
 });
@@ -502,11 +519,11 @@ on('clicked:reg_schlaf-action', async (info) => {
 		"&{template:default} " +
 		"{{name=Gute Nacht!}} " +
 		"{{le=[[@{LE}d1]]}} " +
-		"{{lebase=[[1d6 + (@{reg_le_mod_vn}) + (@{reg_le_mod_nahrungsrestriktion}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_le})]]}} " +
+		"{{lebase=[[1d6 + (@{reg_le_mod_vn}) + (@{reg_le_mod_nahrungsrestriktion}) + (@{reg_schlaf_schlafstoerung}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_le})]]}} " +
 		"{{leko=[[@{reg_le_ko}]]}} " +
 		"{{wound=[[2d1]]}} " +
 		"{{ae=[[@{AE}d1]]}} " +
-		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_heimwehkrank}) + (@{reg_ae_mod_nahrungsrestriktion}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
+		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_heimwehkrank}) + (@{reg_ae_mod_nahrungsrestriktion}) + (@{reg_schlaf_schlafstoerung}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
 		"{{aein=[[@{reg_ae_in}]]}} " +
 		"{{ke=[[@{KE}d1]]}} " +
 		"{{kereg=[[0]]}} "
