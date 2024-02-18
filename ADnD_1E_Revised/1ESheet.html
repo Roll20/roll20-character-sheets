@@ -49,9 +49,11 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version"></span>.beta</span>
             </span>
-            <span class="right">2/16/24'</span>
+            <span class="right">2/17/24'</span>
           </h5>
           <ul>
+            <li>Updated Thief Skill migration to better handle existing attributes and normal skill calcs.</li>
+            <li>Climb Walls updated to allow decimals. in-turn, checks made when Climb Walls is 99.1 or greater will receive an additional d10/10 added to the roll as a fraction.</li>
             <li>Small darkmode adjustments.</li>
             <li>Added the pc/npc whisper options to image and info buttons. This also applies to clicking the sheet's image directly.</li>
             <li>Fix made to Saving Throw calc logic that would prevent entering "20" as the base value.</li>
@@ -3083,7 +3085,8 @@
           </label>
         </span>
         <span class="thief-columns">
-          <button class="button thiefskills-button" type="roll" name="roll_climbwalls" title="%{selected|climbwalls}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}"><span>Climb Walls</span></button>
+          <button class="button thiefskills-button" type="roll" name="roll_climbwalls" title="%{selected|climbwalls}" value="@{climbwalls_macro_text}"><span>Climb Walls</span></button>
+          <textarea class="hidden" name="attr_climbwalls_macro_text">@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d00 ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}</textarea>
           <label class="label-percent" title="@{climbwalls}">
             <input type="text" name="attr_climbwalls" class="field-border readonly-span" title="@{climbwalls}" value="0" />
           </label>
@@ -4309,11 +4312,11 @@
         </span>
       </span>
 
-      {{#allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
+      {{#allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target rolldecimal nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
         <span class="sheet-row sheet-span-two sheet-all-props">
           {{key}}{{value}}
         </span>
-      {{/allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
+      {{/allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target rolldecimal nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
 
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
@@ -8951,12 +8954,12 @@
       const abilityPickpockets = +v.pickpockets_ability_mod || 0;
       const magicPickpockets = +v.pickpockets_magic || 0;
       const oldSkill = +v.pickpockets || 0;
-      const newSkill = Math.max(0, Math.min(100, int(basePickpockets + racialPickpockets + abilityPickpockets + magicPickpockets)));
+      const newSkill = Math.max(0, int(basePickpockets + racialPickpockets + abilityPickpockets + magicPickpockets));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.pickpockets_base = oldSkill;
-          clog('Old pickpockets copied to Base/Class column');
+          // clog('Old pickpockets copied to Base/Class column');
         } else {
           output.pickpockets = newSkill;
         }
@@ -8980,7 +8983,7 @@
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.openlocks_base = oldSkill;
-          clog('Old openlocks copied to Base/Class column');
+          // clog('Old openlocks copied to Base/Class column');
         } else {
           output.openlocks = newSkill;
         }
@@ -9004,7 +9007,7 @@
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.findtraps_base = oldSkill;
-          clog('Old findtraps copied to Base/Class column');
+          // clog('Old findtraps copied to Base/Class column');
         } else {
           output.findtraps = newSkill;
         }
@@ -9028,7 +9031,7 @@
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.movequietly_base = oldSkill;
-          clog('Old movequietly copied to Base/Class column');
+          // clog('Old movequietly copied to Base/Class column');
         } else {
           output.movequietly = newSkill;
         }
@@ -9052,7 +9055,7 @@
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.hideinshadows_base = oldSkill;
-          clog('Old hideinshadows copied to Base/Class column');
+          // clog('Old hideinshadows copied to Base/Class column');
         } else {
           output.hideinshadows = newSkill;
         }
@@ -9076,7 +9079,7 @@
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.hearnoise_base = oldSkill;
-          clog('Old hearnoise copied to Base/Class column');
+          // clog('Old hearnoise copied to Base/Class column');
         } else {
           output.hearnoise = newSkill;
         }
@@ -9096,16 +9099,21 @@
       const magicClimbwalls = +v.climbwalls_magic || 0;
       const oldSkill = +v.climbwalls || 0;
       const newSkill = Math.max(0, Math.min(100, float(baseClimbwalls).toFixed(1) + int(racialClimbwalls + abilityClimbwalls + magicClimbwalls)));
+      const macroNormal =
+        '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}';
+      const macroExceptional =
+        '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d100 + [[1d10/10]] ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}';
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.climbwalls_base = oldSkill;
-          clog('Old climbwalls copied to Base/Class column');
+          // clog('Old climbwalls copied to Base/Class column');
         } else {
           output.climbwalls = newSkill;
         }
       } else {
         output.climbwalls = newSkill;
+        output.climbwalls_macro_text = newSkill >= 99.1 ? macroExceptional : macroNormal;
       }
       setAttrs(output, {silent: true});
     });
@@ -9124,7 +9132,7 @@
       if (migrate === 1) {
         if (oldSkill >= 0 && newSkill === 0) {
           output.readlanguages_base = oldSkill;
-          clog('Old readlanguages copied to Base/Class column');
+          // clog('Old readlanguages copied to Base/Class column');
         } else {
           output.readlanguages = newSkill;
         }
