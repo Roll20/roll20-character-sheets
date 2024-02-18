@@ -158,35 +158,30 @@ on(
 					attrsToChange["vorteil_astrale_regeneration_i"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_ii"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_iii"] = "0";
-					attrsToChange["reg_ae_in"] = "@{IN} - (1d20 + 2)";
 					break;
 				case 0:
 					attrsToChange["nachteil_astraler_block"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_i"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_ii"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_iii"] = "0";
-					attrsToChange["reg_ae_in"] = "@{IN} - 1d20";
 					break;
 				case 1:
 					attrsToChange["nachteil_astraler_block"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_i"] = "1";
 					attrsToChange["vorteil_astrale_regeneration_ii"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_iii"] = "0";
-					attrsToChange["reg_ae_in"] = "@{IN} - (1d20 - 1)";
 					break;
 				case 2:
 					attrsToChange["nachteil_astraler_block"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_i"] = "1";
 					attrsToChange["vorteil_astrale_regeneration_ii"] = "1";
 					attrsToChange["vorteil_astrale_regeneration_iii"] = "0";
-					attrsToChange["reg_ae_in"] = "@{IN} - (1d20 - 2)";
 					break;
 				case 3:
 					attrsToChange["nachteil_astraler_block"] = "0";
 					attrsToChange["vorteil_astrale_regeneration_i"] = "1";
 					attrsToChange["vorteil_astrale_regeneration_ii"] = "1";
 					attrsToChange["vorteil_astrale_regeneration_iii"] = "1";
-					attrsToChange["reg_ae_in"] = "@{IN} - (1d20 - 3)";
 					break;
 			}
 
@@ -194,6 +189,57 @@ on(
 			attrsToChange["reg_ae_mod_vn"] = regenerationLevel;	// regeneration, astral energy, modifier, advantages/disadvantages (Vorteile/Nachteile)
 			safeSetAttrs(attrsToChange);
 		}
+});
+
+on(
+	"change:nachteil_verwoehnt " +
+	"change:nachteil_verwoehnt_wert " +
+	"change:nachteil_astraler_block " +
+	"change:vorteil_astrale_regeneration_i " +
+	"change:vorteil_astrale_regeneration_ii " +
+	"change:vorteil_astrale_regeneration_iii " +
+	"change:reg_schlaf_verwoehnt_zufrieden ",
+	function(eventInfo) {
+		safeGetAttrs(
+			[
+				'nachteil_verwoehnt', 'nachteil_verwoehnt_wert',
+				'nachteil_astraler_block', 
+				'vorteil_astrale_regeneration_i',
+				'vorteil_astrale_regeneration_ii',
+				'vorteil_astrale_regeneration_iii',
+				'reg_schlaf_verwoehnt_zufrieden'
+			], function(values) {
+			var attrsToChange = {};
+
+			// Handle "spoilt"
+			var spoilt = 0;
+			if (
+				values["nachteil_verwoehnt"] === "1" &&
+				values["reg_schlaf_verwoehnt_zufrieden"] === "0"
+			) {
+				spoilt = parseInt(values["nachteil_verwoehnt_wert"]);
+			} else {
+				spoilt = 0;
+			}
+
+			var regAEINMod = spoilt;
+			// Handle changes to degree of life regeneration
+			if (values["nachteil_astraler_block"] === "1") {
+				regAEINMod += 2;
+			} else if (values["vorteil_astrale_regeneration_iii"] === "1") {
+				regAEINMod -= 3;
+			} else if (values["vorteil_astrale_regeneration_ii"] === "1") {
+				regAEINMod -= 2;
+			} else if (values["vorteil_astrale_regeneration_i"] === "1") {
+				regAEINMod -= 1;
+			} else {
+				regAEINMod += 0;
+			}
+
+			attrsToChange["reg_ae_in"] = `@{IN} - (1d20 + (${regAEINMod}))`;
+
+			safeSetAttrs(attrsToChange);
+		});
 });
 
 on(
@@ -356,7 +402,6 @@ on(
 		schlafstoerungen_ii -> 2 auf 1W2 -> wie schlafstoerungen_i; sonst: Einschlafprobe (Selbstbeherrschung +7) bei Scheitern wie schlafstoerungen_i
 		schlafwandler -> 4 auf W4 -> le/ae reg -1
 		sucht -> tage seit letztem Konsum -> Wert >= (15 - Giftstufe) -> le/ae reg = 0, pro Tag +Erschöpfung Giftstufe/3, schlechte Eigenschaften +Giftstufe/3, Talent- und Zauberproben +Giftstufe/3; Wert >= 2 * (15 - Giftstufe) -> erschöpfung, schlechte Eigenschaften, Probenmod +Giftstufe/2; Warnung bei Überanstrengung auf Max. -> KO-Senkung nicht implementiert; KO = 0 -> Giftstufe/2 SP pro Tag; vollständige (!?) Wiederherstellung durch eine Dosis möglich (Überanstrengung, Wiederaufbau KO "normal")
-		verwoehnt -> "Schlafstätte angemessen?" nein -> le/ae-reg-bonus aus KO/IN +verwoehnt_wert, bei Scheitern -> -1; 1. Schwelle für BE aus Last bei KK - 2
 		*/
 		/*
 		Wundheilung aufnehmen
@@ -399,6 +444,8 @@ on('clicked:reg_schlaf-action', async (info) => {
 			'reg_schlaf_verwoehnt_zufrieden'
 		], function(values) {
 		var attrsToChange = {};
+
+		// LE Regeneration
 		var LERegTotal = 0;
 		// Additional regeneration from KO check
 		var LEKO = 0;
@@ -415,10 +462,26 @@ on('clicked:reg_schlaf-action', async (info) => {
 		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
 		attrsToChange["LE"] = parseInt(values["LE"]) + LERegTotal;
 		attrsToChange["LE"] = Math.min(attrsToChange["LE"], values["LE_max"]);
-		console.log("values", values, "LERegTotal", LERegTotal, "attrsToChange", attrsToChange);
 
-
+		// AE Regeneration
 		var AERegTotal = 0;
+		// Additional regeneration from KO check
+		var AEIN = 0;
+		if (results["aein"].result >= 0) {
+			AEIN = 1;
+		} else {
+			if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
+				AEIN = -1;
+			} else {
+				AEIN = 0;
+			}
+		}
+		AERegTotal = results["aebase"].result + AEIN;
+		AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
+		attrsToChange["AE"] = parseInt(values["AE"]) + AERegTotal;
+		attrsToChange["AE"] = Math.min(attrsToChange["AE"], values["AE_max"]);
+		console.log("values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange);
+
 		var KERegTotal = 0;
 		safeSetAttrs(attrsToChange);
 	});
