@@ -220,6 +220,59 @@ on(
 });
 
 on(
+	"change:nachteil_nahrungsrestriktion " +
+	"change:reg_schlaf_nahrungsrestriktion_verletzt_dauer ",
+	function(eventInfo) {
+		safeGetAttrs(
+			[
+				'nachteil_nahrungsrestriktion',
+				'reg_schlaf_nahrungsrestriktion_verletzt_dauer'
+			], function(values) {
+			var attrsToChange = {};
+
+			// Handle "food restriction"
+			var restriction = 0;
+			if (values["nachteil_nahrungsrestriktion"] === "1")
+			{
+				if (
+					values["reg_schlaf_nahrungsrestriktion_verletzt_dauer"] > 0 &&
+					values["reg_schlaf_nahrungsrestriktion_verletzt_dauer"] <= 3
+				) {
+					restriction = -2;
+				} else if (values["reg_schlaf_nahrungsrestriktion_verletzt_dauer"] > 3) {
+					restriction = "total";
+				} else {
+					restriction = 0;
+				}
+			} else {
+				restriction = 0;
+			}
+
+			switch(restriction) {
+				case 0:
+				case -2:
+					attrsToChange["reg_le_mod_nahrungsrestriktion"] = restriction;
+					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = restriction;
+					attrsToChange["reg_le_fest"] = "off";
+					attrsToChange["reg_ae_fest"] = "off";
+					break;
+				case "total":
+					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_le_fest"] = 0;
+					attrsToChange["reg_ae_fest"] = 0;
+					break;
+				default:
+					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_le_fest"] = "off";
+					attrsToChange["reg_ae_fest"] = "off";
+			}
+			safeSetAttrs(attrsToChange);
+		});
+});
+
+on(
 	"change:nachteil_verwoehnt " +
 	"change:nachteil_verwoehnt_wert " +
 	"change:nachteil_astraler_block " +
@@ -424,7 +477,6 @@ on(
 		"nachteil_verwoehnt_wert"
 	], function(v) {
 		/* brauchen noch mehr UI
-		nahrungsrestriktion -> "Tage seit letzter Einhaltung der Restriktion" -> >0 und <=3 -> le/ae reg -2; >3 le/ae reg = 0, KO fällt (wird erst mal nur mitgeteilt, nicht berücksichtigt)
 		schlafstoerungen_i -> 4 auf 1W4 -> le/ae reg nur 1w6-1, schlafdauer wie 4 h, Status "unausgeschlafen" -> AU auf 3/4 des max. cappen, Schlechte Eigenschaften +2, Talent/Zauberproben +3
 		schlafstoerungen_ii -> 2 auf 1W2 -> wie schlafstoerungen_i; sonst: Einschlafprobe (Selbstbeherrschung +7) bei Scheitern wie schlafstoerungen_i
 		schlafwandler -> 4 auf W4 -> le/ae reg -1
@@ -450,11 +502,11 @@ on('clicked:reg_schlaf-action', async (info) => {
 		"&{template:default} " +
 		"{{name=Gute Nacht!}} " +
 		"{{le=[[@{LE}d1]]}} " +
-		"{{lebase=[[1d6 + (@{reg_le_mod_vn}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_le})]]}} " +
+		"{{lebase=[[1d6 + (@{reg_le_mod_vn}) + (@{reg_le_mod_nahrungsrestriktion}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_le})]]}} " +
 		"{{leko=[[@{reg_le_ko}]]}} " +
 		"{{wound=[[2d1]]}} " +
 		"{{ae=[[@{AE}d1]]}} " +
-		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_heimwehkrank}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
+		"{{aebase=[[@{reg_ae_base} + (@{reg_ae_mod_vn}) + (@{reg_ae_mod_heimwehkrank}) + (@{reg_ae_mod_nahrungsrestriktion}) + (@{reg_ae_mod_sf}) + (@{reg_schlaf_mod_general}) + (@{reg_schlaf_mod_ae})]]}} " +
 		"{{aein=[[@{reg_ae_in}]]}} " +
 		"{{ke=[[@{KE}d1]]}} " +
 		"{{kereg=[[0]]}} "
