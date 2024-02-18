@@ -49,9 +49,10 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version"></span>.beta</span>
             </span>
-            <span class="right">2/15/24'</span>
+            <span class="right">2/16/24'</span>
           </h5>
           <ul>
+            <li>Small darkmode adjustments.</li>
             <li>Added the pc/npc whisper options to image and info buttons. This also applies to clicking the sheet's image directly.</li>
             <li>Fix made to Saving Throw calc logic that would prevent entering "20" as the base value.</li>
             <li>Armor Details rows Other(2-6), AC and AR selectors have been changed from a base value(10 through 0) to a bonus(+0 through +10) to AC and AR.</li>
@@ -536,9 +537,9 @@
           <span class="inline-label">
             <label>
               <span>Class:</span>
-              <input type="text" class="width-large" name="attr_class" title="@{class}" placeholder="Class" />
+              <input type="text" name="attr_class" title="@{class}" placeholder="Class" />
             </label>
-            <label>
+            <label class="width-auto">
               <span>Lvl:</span>
               <input type="text" class="width-smaller" name="attr_level" title="@{level}" value="0" />
             </label>
@@ -546,9 +547,9 @@
           <span class="inline-label toggle-multiclass">
             <label>
               <span>Class:</span>
-              <input type="text" class="width-large" name="attr_secondclass" title="@{secondclass}" placeholder="Class" />
+              <input type="text" name="attr_secondclass" title="@{secondclass}" placeholder="Class" />
             </label>
-            <label>
+            <label class="width-auto">
               <span>Lvl:</span>
               <input type="text" class="width-smaller" name="attr_level_2" title="@{level_2}" value="0" />
             </label>
@@ -556,15 +557,15 @@
           <span class="inline-label toggle-multiclass">
             <label>
               <span>Class:</span>
-              <input type="text" class="width-large" name="attr_thirdclass" title="@{thirdclass}" placeholder="Class" />
+              <input type="text" name="attr_thirdclass" title="@{thirdclass}" placeholder="Class" />
             </label>
-            <label>
+            <label class="width-auto">
               <span>Lvl:</span>
               <input type="text" class="width-smaller" name="attr_level_3" title="@{level_3}" value="0" />
             </label>
           </span>
           <span class="inline-label toggle-multiclass-swap">
-            <label style="width: min-content;">
+            <label>
               <span>XP:</span>
               <input type="text" class="width-medium" name="attr_xp" title="@{xp}" value="0" />
             </label>
@@ -1677,7 +1678,7 @@
               <option value="1">Half-Elves, Sylvan Elves</option>
               <option value="2">Gray Elves, High Elves</option>
             </select>
-            <input class="width-smaller" name="attr_comeliness_racial_adj" value="0" readonly />
+            <input type="text" class="width-smaller" name="attr_comeliness_racial_adj" value="0" readonly />
           </span>
         </span>
       </div>
@@ -5140,19 +5141,20 @@
   // One-time update: Auto Calc Thief rows
   autoCalcThiefRows = (current_version, final_version) => {
     const output = {};
-    pickpocketsCalc();
-    openlocksCalc();
-    findtrapsCalc();
-    movequietlyCalc();
-    hideinshadowsCalc();
-    hearnoiseCalc();
-    climbwallsCalc();
-    readlanguagesCalc();
+    const migrate = 1;
+    pickpocketsCalc(migrate);
+    openlocksCalc(migrate);
+    findtrapsCalc(migrate);
+    movequietlyCalc(migrate);
+    hideinshadowsCalc(migrate);
+    hearnoiseCalc(migrate);
+    climbwallsCalc(migrate);
+    readlanguagesCalc(migrate);
     thiefmiscCalc();
     thiefmisc1Calc();
     thiefmisc2Calc();
     output.sheet_version = current_version;
-    clog(`VERSION UPDATE: autoCalcThiefRows completed`);
+    clog(`VERSION UPDATE: autoCalcThiefRows(migrate) completed`);
     setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
@@ -6835,30 +6837,33 @@
   });
 
   // Exceptional
-  on('sheet:opened change:strength change:intelligence change:wisdom change:dexterity change:constitution change:charisma change:comeliness', (eventInfo) => {
-    getAttrs(['strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional'], (v) => {
-      const output = {};
-      const toggle_exceptional = +v.toggle_exceptional || 0;
-      const strength = +v.strength || 0;
-      const intelligence = +v.intelligence || 0;
-      const wisdom = +v.wisdom || 0;
-      const dexterity = +v.dexterity || 0;
-      const constitution = +v.constitution || 0;
-      const charisma = +v.charisma || 0;
-      const comeliness = +v.comeliness || 0;
-      if (toggle_exceptional === 0) {
-        // output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
-        output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
-        output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
-        output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
-        output.exceptional_constitution_flag = constitution >= 18 ? 1 : 0;
-        output.exceptional_charisma_flag = charisma >= 18 ? 1 : 0;
-        output.exceptional_comeliness_flag = comeliness >= 18 ? 1 : 0;
-      }
-      output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
-      setAttrs(output, {silent: true});
-    });
-  });
+  on(
+    'sheet:opened change:toggle_exceptional change:strength change:intelligence change:wisdom change:dexterity change:constitution change:charisma change:comeliness',
+    (eventInfo) => {
+      getAttrs(['strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional'], (v) => {
+        const output = {};
+        const toggle_exceptional = +v.toggle_exceptional || 0;
+        const strength = +v.strength || 0;
+        const intelligence = +v.intelligence || 0;
+        const wisdom = +v.wisdom || 0;
+        const dexterity = +v.dexterity || 0;
+        const constitution = +v.constitution || 0;
+        const charisma = +v.charisma || 0;
+        const comeliness = +v.comeliness || 0;
+        if (toggle_exceptional === 0) {
+          // output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+          output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
+          output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
+          output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
+          output.exceptional_constitution_flag = constitution >= 18 ? 1 : 0;
+          output.exceptional_charisma_flag = charisma >= 18 ? 1 : 0;
+          output.exceptional_comeliness_flag = comeliness >= 18 ? 1 : 0;
+        }
+        output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+        setAttrs(output, {silent: true});
+      });
+    }
+);
 
   // PC or NPC sheet role
   on('change:is_npc', (eventInfo) => {
@@ -8938,7 +8943,7 @@
   });
 
   // Thief Calcs
-  pickpocketsCalc = () => {
+  pickpocketsCalc = (migrate) => {
     getAttrs(['pickpockets', 'pickpockets_base', 'pickpockets_racial_mod', 'pickpockets_ability_mod', 'pickpockets_magic'], (v) => {
       const output = {};
       const basePickpockets = +v.pickpockets_base || 0;
@@ -8948,24 +8953,21 @@
       const oldSkill = +v.pickpockets || 0;
       const newSkill = Math.max(0, Math.min(100, int(basePickpockets + racialPickpockets + abilityPickpockets + magicPickpockets)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.pickpockets_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.pickpockets = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.pickpockets = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.pickpockets_base = oldSkill;
+          clog('Old pickpockets copied to Base/Class column');
+        } else {
+          output.pickpockets = newSkill;
+        }
+      } else {
         output.pickpockets = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  openlocksCalc = () => {
+  openlocksCalc = (migrate) => {
     getAttrs(['openlocks', 'openlocks_base', 'openlocks_racial_mod', 'openlocks_ability_mod', 'openlocks_magic'], (v) => {
       const output = {};
       const baseOpenlocks = +v.openlocks_base || 0;
@@ -8975,24 +8977,21 @@
       const oldSkill = +v.openlocks || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseOpenlocks + racialOpenlocks + abilityOpenlocks + magicOpenlocks)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.openlocks_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.openlocks = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.openlocks = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.openlocks_base = oldSkill;
+          clog('Old openlocks copied to Base/Class column');
+        } else {
+          output.openlocks = newSkill;
+        }
+      } else {
         output.openlocks = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  findtrapsCalc = () => {
+  findtrapsCalc = (migrate) => {
     getAttrs(['findtraps', 'findtraps_base', 'findtraps_racial_mod', 'findtraps_ability_mod', 'findtraps_magic'], (v) => {
       const output = {};
       const baseFindtraps = +v.findtraps_base || 0;
@@ -9002,24 +9001,21 @@
       const oldSkill = +v.findtraps || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseFindtraps + racialFindtraps + abilityFindtraps + magicFindtraps)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.findtraps_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.findtraps = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.findtraps = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.findtraps_base = oldSkill;
+          clog('Old findtraps copied to Base/Class column');
+        } else {
+          output.findtraps = newSkill;
+        }
+      } else {
         output.findtraps = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  movequietlyCalc = () => {
+  movequietlyCalc = (migrate) => {
     getAttrs(['movequietly', 'movequietly_base', 'movequietly_racial_mod', 'movequietly_ability_mod', 'movequietly_magic'], (v) => {
       const output = {};
       const baseMovequietly = +v.movequietly_base || 0;
@@ -9029,24 +9025,21 @@
       const oldSkill = +v.movequietly || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseMovequietly + racialMovequietly + abilityMovequietly + magicMovequietly)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.movequietly_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.movequietly = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.movequietly = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.movequietly_base = oldSkill;
+          clog('Old movequietly copied to Base/Class column');
+        } else {
+          output.movequietly = newSkill;
+        }
+      } else {
         output.movequietly = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  hideinshadowsCalc = () => {
+  hideinshadowsCalc = (migrate) => {
     getAttrs(['hideinshadows', 'hideinshadows_base', 'hideinshadows_racial_mod', 'hideinshadows_ability_mod', 'hideinshadows_magic'], (v) => {
       const output = {};
       const baseHideinshadows = +v.hideinshadows_base || 0;
@@ -9056,24 +9049,21 @@
       const oldSkill = +v.hideinshadows || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseHideinshadows + racialHideinshadows + abilityHideinshadows + magicHideinshadows)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.hideinshadows_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.hideinshadows = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.hideinshadows = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.hideinshadows_base = oldSkill;
+          clog('Old hideinshadows copied to Base/Class column');
+        } else {
+          output.hideinshadows = newSkill;
+        }
+      } else {
         output.hideinshadows = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  hearnoiseCalc = () => {
+  hearnoiseCalc = (migrate) => {
     getAttrs(['hearnoise', 'hearnoise_base', 'hearnoise_racial_mod', 'hearnoise_ability_mod', 'hearnoise_magic'], (v) => {
       const output = {};
       const baseHearnoise = +v.hearnoise_base || 0;
@@ -9083,24 +9073,21 @@
       const oldSkill = +v.hearnoise || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseHearnoise + racialHearnoise + abilityHearnoise + magicHearnoise)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.hearnoise_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.hearnoise = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.hearnoise = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.hearnoise_base = oldSkill;
+          clog('Old hearnoise copied to Base/Class column');
+        } else {
+          output.hearnoise = newSkill;
+        }
+      } else {
         output.hearnoise = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  climbwallsCalc = () => {
+  climbwallsCalc = (migrate) => {
     getAttrs(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic'], (v) => {
       const output = {};
       const baseClimbwalls = +v.climbwalls_base || 0;
@@ -9108,26 +9095,23 @@
       const abilityClimbwalls = +v.climbwalls_ability_mod || 0;
       const magicClimbwalls = +v.climbwalls_magic || 0;
       const oldSkill = +v.climbwalls || 0;
-      const newSkill = Math.max(0, Math.min(100, int(baseClimbwalls + racialClimbwalls + abilityClimbwalls + magicClimbwalls)));
+      const newSkill = Math.max(0, Math.min(100, float(baseClimbwalls).toFixed(1) + int(racialClimbwalls + abilityClimbwalls + magicClimbwalls)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.climbwalls_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.climbwalls = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.climbwalls = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.climbwalls_base = oldSkill;
+          clog('Old climbwalls copied to Base/Class column');
+        } else {
+          output.climbwalls = newSkill;
+        }
+      } else {
         output.climbwalls = newSkill;
       }
       setAttrs(output, {silent: true});
     });
   };
 
-  readlanguagesCalc = () => {
+  readlanguagesCalc = (migrate) => {
     getAttrs(['readlanguages', 'readlanguages_base', 'readlanguages_racial_mod', 'readlanguages_ability_mod', 'readlanguages_magic'], (v) => {
       const output = {};
       const baseReadlanguages = +v.readlanguages_base || 0;
@@ -9137,17 +9121,14 @@
       const oldSkill = +v.readlanguages || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseReadlanguages + racialReadlanguages + abilityReadlanguages + magicReadlanguages)));
       // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.readlanguages_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.readlanguages = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.readlanguages = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
+      if (migrate === 1) {
+        if (oldSkill >= 0 && newSkill === 0) {
+          output.readlanguages_base = oldSkill;
+          clog('Old readlanguages copied to Base/Class column');
+        } else {
+          output.readlanguages = newSkill;
+        }
+      } else {
         output.readlanguages = newSkill;
       }
       setAttrs(output, {silent: true});
@@ -9161,22 +9142,9 @@
       const racialThiefmisc = +v.thiefmisc_racial_mod || 0;
       const abilityThiefmisc = +v.thiefmisc_ability_mod || 0;
       const magicThiefmisc = +v.thiefmisc_magic || 0;
-      const oldSkill = +v.thiefmisc || 0;
+      // const oldSkill = +v.thiefmisc || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseThiefmisc + racialThiefmisc + abilityThiefmisc + magicThiefmisc)));
-      // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.thiefmisc_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.thiefmisc = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.thiefmisc = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
-        output.thiefmisc = newSkill;
-      }
+      output.thiefmisc = newSkill;
       setAttrs(output, {silent: true});
     });
   };
@@ -9188,22 +9156,9 @@
       const racialThiefmisc1 = +v.thiefmisc1_racial_mod || 0;
       const abilityThiefmisc1 = +v.thiefmisc1_ability_mod || 0;
       const magicThiefmisc1 = +v.thiefmisc1_magic || 0;
-      const oldSkill = +v.thiefmisc1 || 0;
+      // const oldSkill = +v.thiefmisc1 || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseThiefmisc1 + racialThiefmisc1 + abilityThiefmisc1 + magicThiefmisc1)));
-      // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.thiefmisc1_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.thiefmisc1 = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.thiefmisc1 = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
-        output.thiefmisc1 = newSkill;
-      }
+      output.thiefmisc1 = newSkill;
       setAttrs(output, {silent: true});
     });
   };
@@ -9215,22 +9170,9 @@
       const racialThiefmisc2 = +v.thiefmisc2_racial_mod || 0;
       const abilityThiefmisc2 = +v.thiefmisc2_ability_mod || 0;
       const magicThiefmisc2 = +v.thiefmisc2_magic || 0;
-      const oldSkill = +v.thiefmisc2 || 0;
+      // const oldSkill = +v.thiefmisc2 || 0;
       const newSkill = Math.max(0, Math.min(100, int(baseThiefmisc2 + racialThiefmisc2 + abilityThiefmisc2 + magicThiefmisc2)));
-      // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
-      if (oldSkill !== 0 && newSkill === 0) {
-        output.thiefmisc2_base = oldSkill;
-        // clog('Old Thief Skill copied to Base column');
-      }
-      if (oldSkill !== 0 && newSkill !== 0) {
-        output.thiefmisc2 = newSkill;
-      }
-      if (oldSkill === 0 && newSkill === 0) {
-        output.thiefmisc2 = newSkill;
-      }
-      if (oldSkill === 0 && newSkill !== 0) {
-        output.thiefmisc2 = newSkill;
-      }
+      output.thiefmisc2 = newSkill;
       setAttrs(output, {silent: true});
     });
   };
@@ -9306,7 +9248,7 @@
         if (migrate === 1) {
           if (oldSave <= 20 && newSave === 20) {
             output.saveparalysispoisondeath_base = oldSave;
-            // clog('Old Save copied to Base/Class column');
+            // clog('Old saveparalysispoisondeath copied to Base/Class column');
           } else {
             output.saveparalysispoisondeath = newSave;
           }
@@ -9343,7 +9285,7 @@
         if (migrate === 1) {
           if (oldSave <= 20 && newSave === 20) {
             output.savepetrificationpolymorph_base = oldSave;
-            // clog('Old Save copied to Base/Class column');
+            // clog('Old savepetrificationpolymorph copied to Base/Class column');
           } else {
             output.savepetrificationpolymorph = newSave;
           }
@@ -9378,7 +9320,7 @@
         if (migrate === 1) {
           if (oldSave <= 20 && newSave === 20) {
             output.saverodsstaveswands_base = oldSave;
-            // clog('Old Save copied to Base/Class column');
+            // clog('Old saverodsstaveswands copied to Base/Class column');
           } else {
             output.saverodsstaveswands = newSave;
           }
@@ -9406,7 +9348,7 @@
         if (migrate === 1) {
           if (oldSave <= 20 && newSave === 20) {
             output.savebreathweapons_base = oldSave;
-            // clog('Old Save copied to Base/Class column');
+            // clog('Old savebreathweapons copied to Base/Class column');
           } else {
             output.savebreathweapons = newSave;
           }
@@ -9432,7 +9374,7 @@
       if (migrate === 1) {
         if (oldSave <= 20 && newSave === 20) {
           output.savespells_base = oldSave;
-          // clog('Old Save copied to Base/Class column');
+          // clog('Old savespells copied to Base/Class column');
         } else {
           output.savespells = newSave;
         }
@@ -9452,7 +9394,8 @@
       const abilitySavemisc = +v.savemisc_ability_mod || 0;
       const miscSavemisc = +v.savemisc_misc_mod || 0;
       const tempSavemisc = +v.savemisc_temp_mod || 0;
-      output.savemisc = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
+      const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
+      output.savemisc = newSave;
       setAttrs(output, {silent: true});
     });
   };
@@ -9465,22 +9408,9 @@
       const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
       const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
       const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
-      const oldSave = +v.savemisc1 || 0;
+      // const oldSave = +v.savemisc1 || 0;
       const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
-      // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-      if (oldSave !== 20 && newSave === 20) {
-        output.savemisc1_base = oldSave;
-        // // clog('Old Save copied to Base/Class column');
-      }
-      if (oldSave !== 20 && newSave !== 20) {
-        output.savemisc1 = newSave;
-      }
-      if (oldSave === 20 && newSave === 20) {
-        output.savemisc1 = newSave;
-      }
-      if (oldSave === 20 && newSave !== 20) {
-        output.savemisc1 = newSave;
-      }
+      output.savemisc1 = newSave;
       setAttrs(output, {silent: true});
     });
   };
@@ -9493,22 +9423,9 @@
       const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
       const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
       const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
-      const oldSave = +v.savemisc1 || 0;
+      // const oldSave = +v.savemisc1 || 0;
       const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
-      // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-      if (oldSave !== 20 && newSave === 20) {
-        output.savemisc2_base = oldSave;
-        // clog('Old Save copied to Base/Class column');
-      }
-      if (oldSave !== 20 && newSave !== 20) {
-        output.savemisc2 = newSave;
-      }
-      if (oldSave === 20 && newSave === 20) {
-        output.savemisc2 = newSave;
-      }
-      if (oldSave === 20 && newSave !== 20) {
-        output.savemisc2 = newSave;
-      }
+      output.savemisc2 = newSave;
       setAttrs(output, {silent: true});
     });
   };
