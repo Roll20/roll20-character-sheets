@@ -4336,6 +4336,9 @@
 					<li>
 						<b>DISPLAY BUGFIX:</b> Fixed the order of fields for the Modifier Tool Summary box. Reported by Demented Avenger.
 					</li>
+					<li>
+						<b>ENHANCEMENT:</b> Hit Location Table, each hit location how has a toggle notes button, in addition there are two links to open and close all notes. Requested by Tommi.
+					</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -10739,6 +10742,15 @@ visualize what it will look like in chat.
 
 					</div>
 
+					<div>
+						<button type="action" name="act_hit_location_open" class="link" title="Expand all hit location notes">
+							<span data-i18n="open-all-label">Open All</span>
+						</button>
+						<span>|</span>
+						<button type="action" name="act_hit_location_close" class="link" title="Close all hit location notes">
+							<span data-i18n="close-all-label">Close All</span>
+						</button>						
+					</div>
 					<div class="hit-location-container">
 
 						<input type="hidden" name="attr_armor_show_back" />
@@ -10747,6 +10759,7 @@ visualize what it will look like in chat.
 						<div class="hit-location-grid">
 
 							<!-- header row -->
+							<div class="item grid-header">&nbsp;</div>
 							<div class="item grid-header">
 								<h4 class="spacer">&nbsp;</h4>
 								<span data-i18n="location-label">Location</span>
@@ -10888,8 +10901,14 @@ visualize what it will look like in chat.
 
 						<fieldset class="repeating_hitlocation">
 
-							<div class="hit-location-grid">
+							<div class="hit-location-grid grid-standard">
 								<div class="item">
+									<label class="sheet-toggle-button">
+										<input type="checkbox" name="attr_toggle_notes" value="1">
+										<span></span>
+									</label>
+								</div>
+								<div class="item">																
 									<input type="text" name="attr_where" title="Macro: @{NAME|repeating_hitlocation_$[row #]_where}" />
 									<input type="hidden" name="attr_key" />
 								</div>
@@ -10954,23 +10973,26 @@ visualize what it will look like in chat.
 								
 							</div>
 
-							<div class="hit-location-notes-grid">
-								<div class="item grid-header">
-									<div class="popup left-align text-right-align">
-										<span data-i18n="wounds-label">Wounds</span>
+							<input type="hidden" name="attr_toggle_notes">
+							<div class="expandable-section">
+								<div class="hit-location-notes-grid">
+									<div class="item grid-header">
+										<div class="popup left-align text-right-align">
+											<span data-i18n="wounds-label">Wounds</span>
+										</div>
+										<span class="tooltip tooltip-margin-medium">
+											<span data-i18n="hitlocation-wounds-tooltip">Enter individual wounds here, if limb is crippled, bleeding, etc.<br />Example: -6 pi (major wound), -2 burn.</span>
+										</span>
 									</div>
-									<span class="tooltip tooltip-margin-medium">
-										<span data-i18n="hitlocation-wounds-tooltip">Enter individual wounds here, if limb is crippled, bleeding, etc.<br />Example: -6 pi (major wound), -2 burn.</span>
-									</span>
-								</div>
-								<div class="item">
-									<input type="text" name="attr_wounds" class="textbox-full-width" title="Macro: @{NAME|repeating_hitlocation_$[row #]_wounds}" />
-								</div>
-								<div class="item text-right-align">
-									<span data-i18n="notes-label">Notes</span>
-								</div>
-								<div class="item">
-									<input type="text" name="attr_notes" class="textbox-full-width" title="Macro: @{NAME|repeating_hitlocation_$[row #]_notes}" />
+									<div class="item">
+										<input type="text" name="attr_wounds" class="textbox-full-width" title="Macro: @{NAME|repeating_hitlocation_$[row #]_wounds}" />
+									</div>
+									<div class="item text-right-align">
+										<span data-i18n="notes-label">Notes</span>
+									</div>
+									<div class="item">
+										<input type="text" name="attr_notes" class="textbox-full-width" title="Macro: @{NAME|repeating_hitlocation_$[row #]_notes}" />
+									</div>
 								</div>
 							</div>
 							
@@ -20050,6 +20072,9 @@ Select the indent level of the inventory item. This is handy to help show the it
 				</li>
 				<li>
 					<b>DISPLAY BUGFIX:</b> Fixed the order of fields for the Modifier Tool Summary box. Reported by Demented Avenger.
+				</li>
+				<li>
+					<b>ENHANCEMENT:</b> Hit Location Table, each hit location how has a toggle notes button, in addition there are two links to open and close all notes. Requested by Tommi.
 				</li>
 			</ul>
 
@@ -49317,6 +49342,38 @@ Characters with Skill: ${knowsSkill}`;
 			let keyValues = {
 				[`repeating_ranged_${id}_shots_fired_macro`]: macro
 			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	on("clicked:hit_location_open clicked:hit_location_close", event => {
+
+		console.log(event);
+
+		let isOpen = event.triggerName == "clicked:hit_location_open";
+
+		toggleHitLocationNotes(isOpen);	
+
+	});
+
+	const toggleHitLocationNotes = isOpen => {
+
+		getSectionIDs("repeating_hitlocation", ids => {
+
+			let keyValues = {};
+
+			ids.forEach(id => {
+
+				let key = `repeating_hitlocation_${id}_toggle_notes`;
+
+				let value = isOpen ? "1" : "0";
+
+				keyValues[key] = value;
+
+			});
 
 			setAttrs(keyValues);
 
