@@ -23,6 +23,7 @@
 <input type="checkbox" name="attr_toggle_single_column_notes" class="toggle-single-column-notes hidden" value="1" />
 <input type="checkbox" name="attr_toggle_single_column_spells" class="toggle-single-column-spells hidden" value="1" />
 <input type="checkbox" name="attr_toggle_critdamage" class="toggle-critdamage hidden" value="1" />
+<input type="checkbox" name="attr_toggle_lbs" class="toggle-lbs hidden" value="1" />
 <div class="background">
   <div class="wrapper">
     <!-- Sheet Header-->
@@ -49,9 +50,11 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version"></span>.beta</span>
             </span>
-            <span class="right">2/17/24'</span>
+            <span class="right">2/19/24'</span>
           </h5>
           <ul>
+            <li>Added a Language roll button to post known languages to chat.</li>
+            <li>Added option to 'Use Lbs' instead of gold pieces when determining encumbrance. Carying capacities and carried coin weight will be divided by 10. Per-item weights need to be entered as lbs in order for the sheet to properly calculate encumbrance. Leave STR allowance in gp as per Strength table. Strength allowance will be converted to lbs on the encumbrance table.</li>
             <li>Updated Thief Skill migration to better handle existing attributes and normal skill calcs.</li>
             <li>Climb Walls updated to allow decimals. in-turn, checks made when Climb Walls is 99.1 or greater will receive an additional d10/10 added to the roll as a fraction.</li>
             <li>Small darkmode adjustments.</li>
@@ -279,26 +282,28 @@
           <span>ARMOR CLASS:</span>
           <input type="text" class="width-smallest field-border" name="attr_armorclass" title="@{armorclass} | Best AC." value="10" style="text-align:center; padding:0;">
         </label>
-        <label class="width-small-plus">
-          <span>AR:</span>
-          <select name="attr_unarmored_base" title="@{unarmored_base}" class="width-small">
-            <option value="10" selected>10</option>
-            <option value="9">9</option>
-            <option value="8">8</option>
-            <option value="7">7</option>
-            <option value="6">6</option>
-            <option value="5">5</option>
-            <option value="4">4</option>
-            <option value="3">3</option>
-            <option value="2">2</option>
-            <option value="1">1</option>
-            <option value="0">0</option>
-            <option value="-">-</option>
-          </select>
-        </label>
-        <label title="AC is not from armor. Weapons vs Armor Type does not apply." style="margin-left: -5px;">
-          <input type="checkbox" name="attr_armor_rating_flag" value="1">
-          <span style="margin-left: 0;">Ignore</span>
+        <label class="label-under-small width-auto">
+          <span>
+            <span>AR:</span>
+            <select name="attr_unarmored_base" title="@{unarmored_base}" class="width-small">
+              <option value="10" selected>10</option>
+              <option value="9">9</option>
+              <option value="8">8</option>
+              <option value="7">7</option>
+              <option value="6">6</option>
+              <option value="5">5</option>
+              <option value="4">4</option>
+              <option value="3">3</option>
+              <option value="2">2</option>
+              <option value="1">1</option>
+              <option value="0">0</option>
+              <option value="-">-</option>
+            </select>
+          </span>
+          <label title="AC is not from armor. Weapons vs Armor Type does not apply.">
+            <input type="checkbox" name="attr_armor_rating_flag" value="1">
+            <span>Ignore</span>
+          </label>
         </label>
       </span>
       <span class="inline-label split">
@@ -522,61 +527,41 @@
     <section class="header-box">
       <!--Details-->
       <div class="heading-box">
-        <span class="sect">
-          <input type="text" class="width-fill border text-large" name="attr_character_name" title="@{character_name}" placeholder="Character Name">
-          <span class="inline-label">
-            <label>
-              <span>Race:</span>
-              <input type="text" class="width-fill" name="attr_race" title="@{race}" placeholder="Description" />
-            </label>
-          </span>
-          <span class="inline-label">
-            <label>
-              <span>Alignment:</span>
-              <input type="text" class="width-fill" name="attr_alignment" title="@{alignment}" placeholder="Description" />
-            </label>
-          </span>
-          <span class="inline-label">
-            <label>
-              <span>Class:</span>
-              <input type="text" name="attr_class" title="@{class}" placeholder="Class" />
-            </label>
-            <label class="width-auto">
-              <span>Lvl:</span>
-              <input type="text" class="width-smaller" name="attr_level" title="@{level}" value="0" />
-            </label>
-          </span>
-          <span class="inline-label toggle-multiclass">
-            <label>
-              <span>Class:</span>
-              <input type="text" name="attr_secondclass" title="@{secondclass}" placeholder="Class" />
-            </label>
-            <label class="width-auto">
-              <span>Lvl:</span>
-              <input type="text" class="width-smaller" name="attr_level_2" title="@{level_2}" value="0" />
-            </label>
-          </span>
-          <span class="inline-label toggle-multiclass">
-            <label>
-              <span>Class:</span>
-              <input type="text" name="attr_thirdclass" title="@{thirdclass}" placeholder="Class" />
-            </label>
-            <label class="width-auto">
-              <span>Lvl:</span>
-              <input type="text" class="width-smaller" name="attr_level_3" title="@{level_3}" value="0" />
-            </label>
-          </span>
-          <span class="inline-label toggle-multiclass-swap">
-            <label>
-              <span>XP:</span>
-              <input type="text" class="width-medium" name="attr_xp" title="@{xp}" value="0" />
-            </label>
-            <label>
-              <input type="checkbox" name="attr_xp_bonus" title="@{xp_bonus}" value="1" />
-              <span>10%</span>
-            </label>
-          </span>
-        </span>
+        <input type="text" class="width-fill border text-large" name="attr_character_name" title="@{character_name}" placeholder="Character Name">
+        <label class="inline-label">
+          <span>Race:</span>
+          <input type="text" class="width-fill" name="attr_race" title="@{race}" placeholder="Description" />
+        </label>
+        <label class="inline-label">
+          <span>Alignment:</span>
+          <input type="text" class="width-fill" name="attr_alignment" title="@{alignment}" placeholder="Description" />
+        </label>
+        <label class="inline-label">
+          <span>Class:</span>
+          <input type="text" name="attr_class" title="@{class}" placeholder="Class" />
+          <span class="toggle-multiclass">Lvl:</span>
+          <input type="text" class="toggle-multiclass width-smaller" name="attr_level" title="@{level}" value="0" />
+        </label>
+        <label class="inline-label toggle-multiclass">
+          <span>Class:</span>
+          <input type="text" name="attr_secondclass" title="@{secondclass}" placeholder="Class" />
+          <span>Lvl:</span>
+          <input type="text" class="width-smaller" name="attr_level_2" title="@{level_2}" value="0" />
+        </label>
+        <label class="inline-label toggle-multiclass">
+          <span>Class:</span>
+          <input type="text" name="attr_thirdclass" title="@{thirdclass}" placeholder="Class" />
+          <span>Lvl:</span>
+          <input type="text" class="width-smaller" name="attr_level_3" title="@{level_3}" value="0" />
+        </label>
+        <label class="inline-label toggle-multiclass-swap">
+          <span>Lvl:</span>
+          <input type="text" class="width-smaller" name="attr_level" title="@{level}" value="0" />
+          <span>XP:</span>
+          <input type="text" class="width-medium" name="attr_xp" title="@{xp}" value="0" />
+          <input type="checkbox" name="attr_xp_bonus" title="@{xp_bonus}" value="1" />
+          <span>10%</span>
+        </label>
       </div>
       <!-- Logo and HP/AC-->
       <div class="logo-box center">
@@ -588,7 +573,7 @@
         </span>
         <span class="span-two two-columns">
           <label>
-            <span class="text-large left">HP:</span>
+            <span class="text-large left">HP</span>
             <span class="heart">
               <input type="text" class="heart-input" name="attr_hitpoints" title="@{hitpoints} | Current Hit Points." value="0" />
             </span>
@@ -600,7 +585,7 @@
             </span>
           </label>
           <label>
-            <span class="text-large">AC:</span>
+            <span class="text-large">AC</span>
             <span class="shield">
               <input type="text" class="shield-input" name="attr_armorclass" title="@{armorclass} | Best AC." value="10" />
             </span>
@@ -1441,6 +1426,7 @@
         </span>
         <span class="details-row">
           <span class="inline-label width-fill">
+            <button type="roll" name="roll_languages_roll" class="dice-button" title="%{selected|languages_roll}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Known Languages}} {{freetext=@{languages}}}"></button>
             <label>
               <span>Languages:</span>
               <textarea class="height-short" name="attr_languages" title="@{languages}" placeholder="languages known"></textarea>
@@ -1686,7 +1672,7 @@
       </div>
       <!-- Movement -->
       <div class="sect border">
-        <label class="text-large center">Speed and Movement</label>
+        <span class="subheader center width-fill">Speed and Movement</span>
         <span class="basemove-columns column-header">
           <span class="span-five">Adjusted Speed</span>
           <span></span>
@@ -1970,13 +1956,13 @@
           <input type="text" class="width-smaller" name="attr_dual_pen_secondary" title="@{dual_pen_secondary} | -4 and adjusted as per Dexterity. Auto-calculated based on Dexterity." value="0" readonly>
         </label>
       </div>
-      <div class="sect" style="margin-bottom: 1em;">
+      <div class="sect" style="margin: 5px 0 22px 0;">
         <input type="checkbox" class="hidden toggle-to-hit-table" name="attr_toggle_to_hit_table" value="1" />
         <!-- To Hit Table-->
         <details class="matrix-box">
           <summary title="Enter To-Hit Armor Class Table data.">
             <span class="material-icons grid"></span>
-            <span class="label-matrix">Attack Matrix</span>
+            <span class="subheader label-matrix">Attack Matrix</span>
             <span class="material-icons"></span>
           </summary>
           <div class="matrix-class section">
@@ -2661,8 +2647,11 @@
         </div>
         <!--Weight/Cost Totals-->
         <div class="equipment-totals">
-          <label></label>
-          <label class="center"><span>Wt.</span></label>
+          <label style="max-width: 100%;">
+            <span>Use Lbs:</span>
+            <input type="checkbox" class="width-small toggle-lbs" name="attr_toggle_lbs" value="1" title="@{toggle_lbs} | Use Lbs instead of gold pieces when determining encumbrance. Carying capacities and carried coin weight will be divided by 10. Per-item weights need to be entered as lbs in order for the sheet to properly calculate encumbrance.">
+          </label>
+          <label class="center"><span class="toggle-lbs">Wt in GP</span><span>Wt in Lbs</span></label>
           <label class="center toggle-costs">Cost</label>
           <label><span>Equipment:</span></label>
           <input type="text" class="hidden width-fill" name="attr_total_equipment_weight" value="0" readonly />
@@ -2690,7 +2679,7 @@
       </div>
       <!--Wealth-->
       <div class="wealth-box border sect">
-        <label class="subheader center">Wealth</label>
+        <span class="subheader center width-fill">Wealth</span>
         <div class="coin-columns">
           <span class="column-header"></span>
           <span class="column-header">Copper</span>
@@ -2723,25 +2712,42 @@
       </div>
       <!--Carrying Capacity-->
       <div class="span-all border sect">
-        <label class="subheader center section">Carrying Capacity</label>
+        <span class="subheader center width-fill">Carrying Capacity</span>
         <div class="capacity-box-loads">
-          <span class="span-three column-header center">Strength Adj.</span>
-          <span class="span-four column-header center">Current Encumbrance</span>
+          <span class="span-three column-header">Strength Adj.</span>
+          <span class="span-four column-header">
+            <span>Current Encumbrance</span>
+            <span class="toggle-lbs text-small">(gp)</span><span class="text-small">(lbs)</span>
+          </span>
         </div>
         <div class="capacity-box-loads center">
           <label class="label-under" title="@{normal_load} 'Unencumbered load' (defaults 350gp based on STR 8-11.)">
             <input type="text" class="hidden" name="attr_normal_load" value="350" readonly />
             <span type="text" class="readonly-span" name="attr_normal_load" title="@{normal_load} 'Unencumbered load' (defaults 350gp based on STR 8-11.)"></span>
-            <span>Base</span>
-          </label>
-          <label class="label-under">
-            <span class="center">
-              <span class="text-large">±</span>
-              <input class="width-small field-border" type="text" name="attr_encumbrancebonus" title="@{encumbrancebonus}" value="0" />
-              <span class="inline-label">Weight Allowance</span>
+            <span class="inline-label">
+              <span>Base</span>
+              <span class="toggle-lbs text-small">(gp)</span><span class="text-small">(lbs)</span>
             </span>
           </label>
-          <span class="text-large">=</span>
+          <label class="label-under">
+            <span class="center toggle-lbs" title="@{encumbrancebonus} | Weight Allowance in gp.">
+              <input class="hidden" type="text" name="attr_encumbrancebonus" value="0" />
+              <span class="readonly-span" name="attr_encumbrancebonus"></span>
+              <span class="inline-label">
+                <span>Weight All.</span>
+                <span class="text-small">(gp)</span>
+              </span>
+            </span>
+            <span class="center" title="@{encumbrancebonus_lbs} | Weight Allowance in lbs.">
+              <input class="hidden" type="text" name="attr_encumbrancebonus_lbs" value="0" readonly />
+              <span class="readonly-span" name="attr_encumbrancebonus_lbs"></span>
+              <span class="inline-label">
+                <span>Weight All.</span>
+                <span class="text-small">(lbs)</span>
+              </span>
+            </span>
+          </label>
+          <label class="text-large">=</label>
           <label class="label-under" title="@{normal_load_adjusted} Unencumbered + Weight Allowance.)">
             <input type="checkbox" class="hidden current-encumbrance" name="attr_current_encumbrance" value="0" checked="checked" readonly />
             <input type="text" class="hidden" name="attr_normal_load_adjusted" value="0" readonly />
@@ -3612,6 +3618,10 @@
           <label>
             <span>Use Crit Damage:</span>
             <input type="checkbox" name="attr_toggle_critdamage" value="1" title="@{toggle_critdamage} | Use crit damage rolls on natural 20. Defaults to weapon damage x2. Crit damage handling can be adjusted per attack." />
+          </label>
+          <label>
+            <span>Use Lbs:</span>
+            <input type="checkbox" class="toggle-lbs" name="attr_toggle_lbs" value="1" title="@{toggle_lbs} | Use Lbs instead of gold pieces when determining encumbrance. Carying capacities and carried coin weight will be divided by 10. Per-item weights need to be entered as lbs in order for the sheet to properly calculate encumbrance." />
           </label>
         </span>
         <span class="six-columns">
@@ -5488,7 +5498,7 @@
     });
   };
 
-  // One-Time update
+  // One-time update: formats and sets range fields
   const updateRange = (current_version, final_version) => {
     const update = {};
     calcRange();
@@ -5497,7 +5507,7 @@
     setAttrs(update, {silent: true}, versionator(current_version, final_version));
   };
 
-  // replace all instances of @{weapon_attack_type_pen} with @{weapon_dual_pen} in macro-text
+  // One-time update: replace @{weapon_attack_type_pen} with @{weapon_dual_pen} in attack macro-text
   const updateAttackTypeMacro = (current_version, final_version) => {
     getSectionIDs('repeating_weapon', (idArray) => {
       const fields = [];
@@ -5520,7 +5530,7 @@
     });
   };
 
-  // MonsterHD from hitdice
+  // One-time update: set MonsterHD from hitdice
   const monsterHD = (current_version, final_version) => {
     getAttrs(['hitdice', 'monsterHD'], (v) => {
       const update = {};
@@ -6446,8 +6456,6 @@
       _.each(idArray, (id) => {
         fields.push(section_attribute('weapon', id, 'weapon_attack_type'));
         fields.push(section_attribute('weapon', id, 'weapon_dual'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_small'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
         fields.push(section_attribute('weapon', id, 'weapon_whisper_to_hit'));
         fields.push(section_attribute('weapon', id, 'weapon_whisper_to_hit_select'));
         fields.push(section_attribute('weapon', id, 'weapon_dual_pen'));
@@ -6465,7 +6473,7 @@
         fields.push(section_attribute('weapon', id, 'weapon_ammo_max'));
         fields.push(section_attribute('weapon', id, 'weapon_weight'));
         fields.push(section_attribute('weapon', id, 'weapon_cost'));
-        fields.push(section_attribute('weapon', id, 'weapon_range_small'));
+        fields.push(section_attribute('weapon', id, 'weapon_range_short'));
         fields.push(section_attribute('weapon', id, 'weapon_range_medium'));
         fields.push(section_attribute('weapon', id, 'weapon_range_long'));
         fields.push(section_attribute('weapon', id, 'weapon_length'));
@@ -6497,8 +6505,6 @@
         _.each(idArray, (id) => {
           output[`repeating_weapon_${id}_weapon_attack_type`] = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
           output[`repeating_weapon_${id}_weapon_dual`] = v[section_attribute('weapon', id, 'weapon_dual')];
-          output[`repeating_weapon_${id}_weapon_range_small`] = +v[section_attribute('weapon', id, 'weapon_range_small')] || 0;
-          output[`repeating_weapon_${id}_weapon_range_medium`] = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
           output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
           output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
           output[`repeating_weapon_${id}_weapon_dual_pen`] = +v[section_attribute('weapon', id, 'weapon_dual_pen')] || 0;
@@ -6516,7 +6522,7 @@
           output[`repeating_weapon_${id}_weapon_ammo_max`] = +v[section_attribute('weapon', id, 'weapon_ammo_max')] || 0;
           output[`repeating_weapon_${id}_weapon_weight`] = +v[section_attribute('weapon', id, 'weapon_weight')] || 0;
           output[`repeating_weapon_${id}_weapon_cost`] = +v[section_attribute('weapon', id, 'weapon_cost')] || 0;
-          output[`repeating_weapon_${id}_weapon_range_small`] = +v[section_attribute('weapon', id, 'weapon_range_small')] || 0;
+          output[`repeating_weapon_${id}_weapon_range_short`] = +v[section_attribute('weapon', id, 'weapon_range_short')] || 0;
           output[`repeating_weapon_${id}_weapon_range_medium`] = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
           output[`repeating_weapon_${id}_weapon_range_long`] = +v[section_attribute('weapon', id, 'weapon_range_long')] || 0;
           output[`repeating_weapon_${id}_weapon_length`] = v[section_attribute('weapon', id, 'weapon_length')];
@@ -6606,22 +6612,22 @@
             const weaponCost = v[section_attribute('weapon', id, 'weapon_cost')];
             _.each(equipmentArray, (idEquip) => {
               const equipmentId = idEquip;
-              equipmentIdsArray.push(equipmentId); // Push each equipmentName value into the array
+              equipmentIdsArray.push(equipmentId);
               const equipmentName = v[section_attribute('equipment', idEquip, 'equipment_item')];
-              equipmentNamesArray.push(equipmentName); // Push each equipmentName value into the array
+              equipmentNamesArray.push(equipmentName);
               const equipmentWeight = v[section_attribute('equipment', idEquip, 'equipment_weight')];
-              equipmentWeightsArray.push(equipmentWeight); // Push each equipmentWeight value into the array
+              equipmentWeightsArray.push(equipmentWeight);
               const equipmentCost = v[section_attribute('equipment', idEquip, 'equipment_cost')];
-              equipmentCostsArray.push(equipmentCost); // Push each equipmentCost value into the array
+              equipmentCostsArray.push(equipmentCost);
             });
-            // test weapon name against equipment names
-            // create a new row, update existing row, or ignore?
-            // zero out weapon row weight and cost
+            // weapon weight, cost, or both are being tracked on the weapon row
             if (weaponWeight !== 0 || weaponCost !== 0) {
               clog(`weaponName:${weaponName} weaponWeight:${weaponWeight} weaponCost:${weaponCost}`);
+              // test weapon name against equipment names
               const nameIndex = equipmentNamesArray.indexOf(weaponName);
               if (nameIndex === -1) {
                 clog(`NO MATCH || COPY TO NEW ROW ||`);
+                // create a new row
                 newID = generateUniqueRowID();
                 output[`repeating_equipment_${newID}_equipment_type`] = 1;
                 output[`repeating_equipment_${newID}_equipment_item`] = weaponName;
@@ -6634,6 +6640,7 @@
                 clog(
                   `MATCH w/weight & cost tracked on weapons. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`
                 );
+                // update existing row
                 newID = equipmentIdsArray[nameIndex];
                 output[`repeating_equipment_${newID}_equipment_type`] = 1;
                 output[`repeating_equipment_${newID}_equipment_quantity`] = weaponQuantity;
@@ -6645,6 +6652,7 @@
                 clog(
                   `MATCH w/weight tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`
                 );
+                // update existing row
                 newID = equipmentIdsArray[nameIndex];
                 output[`repeating_equipment_${newID}_equipment_type`] = 1;
                 output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
@@ -6653,6 +6661,7 @@
                 clog(
                   `MATCH w/cost tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`
                 );
+                // update existing row
                 newID = equipmentIdsArray[nameIndex];
                 output[`repeating_equipment_${newID}_equipment_type`] = 1;
                 output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
@@ -6661,10 +6670,12 @@
                   `100% MATCH weight & cost tracked on equipment. || IGNORE ROW || name:${weaponName} weight: ${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex}`
                 );
               } else {
+                // ignore
                 clog(`No attribute data to migrate. || IGNORE ROW ||`);
               }
             }
           });
+          // zero out weapon row weight and cost with clearWeaponsWeightCost()
           setAttrs(output, {silent: true}, clearWeaponsWeightCost());
         });
       });
@@ -6679,6 +6690,7 @@
     setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
+  // One-time update:  checks and sets equipment-gear but the value was set out-of-range
   const setEquipmentType = (current_version, final_version) => {
     getSectionIDs('repeating_equipment', (idArray) => {
       const output = {};
@@ -6976,6 +6988,7 @@
         const totalArmorWeight = armorWeights.reduce((sum, armorWeight) => sum + armorWeight, 0);
         const totalEquipmentWeight = totalEquipmentWeights.reduce((sum, weight) => sum + weight, 0);
         const total_equipment_weight_adjusted = totalEquipmentWeight - totalArmorWeight - totalWeaponWeight;
+        // conversion for coin lbs weight outside this function
         const total_weight = Math.round(float(v.total_coin_weight) + float(totalEquipmentWeight));
         output.total_weapon_weight = totalWeaponWeight.toFixed(2);
         output.total_armor_weight = totalArmorWeight.toFixed(2);
@@ -6995,7 +7008,7 @@
 
   // Equipment Weight Calcs
   on(
-    'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn change:total_coin_weight remove:repeating_equipment',
+    'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn change:total_coin_weight remove:repeating_equipment change:toggle_lbs',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       sumEquipmentWeight();
@@ -7003,11 +7016,12 @@
   );
 
   // Coin Weight
-  on('change:pp change:gp change:ep change:sp change:cp', (eventInfo) => {
+  on('change:pp change:gp change:ep change:sp change:cp change:toggle_lbs', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['pp', 'gp', 'ep', 'sp', 'cp'], (v) => {
+    getAttrs(['pp', 'gp', 'ep', 'sp', 'cp', 'toggle_lbs'], (v) => {
+      const lbsConversion = +(v.toggle_lbs || 0) ? 10 : 1;
       setAttrs({
-        total_coin_weight: Math.round((float(v.pp) + float(v.gp) + float(v.ep) + float(v.sp) + float(v.cp)) / 1),
+        total_coin_weight: Math.round((float(v.pp) + float(v.gp) + float(v.ep) + float(v.sp) + float(v.cp)) / 1) / lbsConversion,
       });
     });
   });
@@ -7059,23 +7073,34 @@
     });
   }
 
-  on('sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['encumbrancebonus'], (v) => {
-      // clog('Encumbrance has been re-calculated');
-      const output = {};
-      const encumbrancebonus = +v.encumbrancebonus || 0;
-      const normal_load = 350;
-      const normal_load_adjusted = int(normal_load + encumbrancebonus);
-      output.normal_load = normal_load;
-      output.heavy_load = int(normal_load_adjusted + normal_load);
-      output.very_heavy_load = int(normal_load_adjusted + normal_load * 2);
-      output.max_load = int(normal_load_adjusted + normal_load * 2 + 1);
-      output.normal_load_adjusted = normal_load_adjusted;
-      setAttrs(output);
-      setCurrentEncumbranceFlag();
-    });
-  });
+  on(
+    'sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk change:encumbrancebonus_lbs change:toggle_lbs',
+    (eventInfo) => {
+      // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+      getAttrs(['encumbrancebonus', 'toggle_lbs'], (v) => {
+        // clog('Encumbrance has been re-calculated');
+        const output = {};
+        const useLbs = +(v.toggle_lbs || 0);
+        const lbsConversion = useLbs ? 0.1 : 1;
+        const normal = 350 * lbsConversion;
+        const encumbranceBonus = +v.encumbrancebonus || 0;
+        const encumbranceBonusLbs = float(encumbranceBonus * lbsConversion);
+        const thisBonus = useLbs ? encumbranceBonusLbs : encumbranceBonus;
+        const normalAdjusted = normal + thisBonus;
+        const heavy = normalAdjusted + normal;
+        const veryHeavy = heavy + normal;
+        const max = veryHeavy;
+        output.encumbrancebonus_lbs = encumbranceBonusLbs;
+        output.normal_load = normal;
+        output.normal_load_adjusted = normalAdjusted;
+        output.heavy_load = heavy;
+        output.very_heavy_load = veryHeavy;
+        output.max_load = max + 1;
+        setAttrs(output);
+        setCurrentEncumbranceFlag();
+      });
+    }
+  );
 
   // Movement Calcs
   function setCurrentMovement() {
@@ -8273,7 +8298,7 @@
     calcRange();
   });
 
-  // Weapon Attack Type
+  // set flag for css to show/hide fields according to weapon type
   on('change:repeating_weapon:weapon_attack_type', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['repeating_weapon_weapon_attack_type', 'repeating_weapon_weapon_attack_type_flag'], (v) => {
@@ -8614,8 +8639,6 @@
     const fields = [
       section_attribute('weapon', id, 'weapon_attack_type'),
       section_attribute('weapon', id, 'weapon_dual'),
-      section_attribute('weapon', id, 'weapon_range_small'),
-      section_attribute('weapon', id, 'weapon_range_medium'),
       section_attribute('weapon', id, 'weapon_whisper_to_hit'),
       section_attribute('weapon', id, 'weapon_whisper_to_hit_select'),
       section_attribute('weapon', id, 'weapon_dual_pen'),
@@ -8633,7 +8656,7 @@
       section_attribute('weapon', id, 'weapon_ammo_max'),
       section_attribute('weapon', id, 'weapon_weight'),
       section_attribute('weapon', id, 'weapon_cost'),
-      section_attribute('weapon', id, 'weapon_range_small'),
+      section_attribute('weapon', id, 'weapon_range_short'),
       section_attribute('weapon', id, 'weapon_range_medium'),
       section_attribute('weapon', id, 'weapon_range_long'),
       section_attribute('weapon', id, 'weapon_length'),
@@ -8664,8 +8687,6 @@
     getAttrs(fields, (v) => {
       output.repeating_weapon_weapon_attack_type = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
       output.repeating_weapon_weapon_dual = v[section_attribute('weapon', id, 'weapon_dual')];
-      output.repeating_weapon_weapon_range_small = +v[section_attribute('weapon', id, 'weapon_range_small')] || 0;
-      output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
       output.repeating_weapon_weapon_whisper_to_hit = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
       output.repeating_weapon_weapon_whisper_to_hit_select = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
       output.repeating_weapon_weapon_dual_pen = +v[section_attribute('weapon', id, 'weapon_dual_pen')] || 0;
@@ -8683,7 +8704,7 @@
       output.repeating_weapon_weapon_ammo_max = +v[section_attribute('weapon', id, 'weapon_ammo_max')] || 0;
       output.repeating_weapon_weapon_weight = +v[section_attribute('weapon', id, 'weapon_weight')] || 0;
       output.repeating_weapon_weapon_cost = +v[section_attribute('weapon', id, 'weapon_cost')] || 0;
-      output.repeating_weapon_weapon_range_small = +v[section_attribute('weapon', id, 'weapon_range_small')] || 0;
+      output.repeating_weapon_weapon_range_short = +v[section_attribute('weapon', id, 'weapon_range_short')] || 0;
       output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
       output.repeating_weapon_weapon_range_long = +v[section_attribute('weapon', id, 'weapon_range_long')] || 0;
       output.repeating_weapon_weapon_length = v[section_attribute('weapon', id, 'weapon_length')];
