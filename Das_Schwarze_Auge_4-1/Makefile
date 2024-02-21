@@ -22,6 +22,7 @@ HTML = \
 	dev/html/sheet/outro.html \
 	dev/html/roll\ templates/intro.html \
 	dev/html/roll\ templates/crp.html \
+	dev/html/roll\ templates/regeneration.html \
 	dev/html/roll\ templates/legacy.html \
 	dev/html/roll\ templates/tests.html \
 	dev/html/roll\ templates/outro.html \
