@@ -4,6 +4,16 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.09.00 (Build 30)
+
+- added dark theme configurable for pc + adv sheets
+- fixed Firefox rolltemplate layout bug
+- fixed several CSS bugs
+
+## 03.08.00 (Build 29)
+
+- added dark theme 
+
 ## 03.07.00 (Build 28)
 
 - added third adversary weapon
