@@ -4325,20 +4325,9 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.10.8 -->
+				<!-- current version notes: 2.10.9 -->
 				<ul>
-					<li>
-						<b>ENHANCEMENT:</b> Ranged attack table. If you enter a ROF greater than 1, the attack roll will ask for the number of shots fired and the roll results will show the number of hits based on recoil. If there's no recoil entered, it will assume the recoil is 1.
-						<ul>
-							<li><b>ACTIONS:</b> The ranged attack table should automatically update the new shots fired macro when the sheet loads, but it's possible it doesn't. In that case, just change the ROF for a ranged attack and the macro should get updated.</li>
-						</ul>
-					</li>
-					<li>
-						<b>DISPLAY BUGFIX:</b> Fixed the order of fields for the Modifier Tool Summary box. Reported by Demented Avenger.
-					</li>
-					<li>
-						<b>ENHANCEMENT:</b> Hit Location Table, each hit location has a toggle notes button, in addition there are two links to open and close all notes. Requested by Tommi.
-					</li>
+					<li><b>ENHANCEMENT:</b> Ranged table, when determining if the Number of Shots popup should appear, it now requires the recoil to be zero or higher. If it's a negative number, it will assume you're using a 3rd edition rules and so the popup is not needed.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -20062,7 +20051,13 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.10.8 -->
+			<!-- current version notes: 2.10.9 -->
+			<ul>
+				<li><b>ENHANCEMENT:</b> Ranged table, when determining if the Number of Shots popup should appear, it now requires the recoil to be zero or higher. If it's a negative number, it will assume you're using a 3rd edition rules and so the popup is not needed.</li>
+			</ul>
+			
+			<h4>Version: 2.10.8</h4>
+			<p>Pull Request: 2/19/2023</p>
 			<ul>
 				<li>
 					<b>ENHANCEMENT:</b> Ranged attack table. If you enter a ROF greater than 1, the attack roll will ask for the number of shots fired and the roll results will show the number of hits based on recoil. If there's no recoil entered, it will assume the recoil is 1.
@@ -25100,9 +25095,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.10.8";
+	const version = "2.10.9";
 	
-	const latestChangesDate = "2/19/2024";
+	const latestChangesDate = "2/26/2024";
 	
 	let modCascade = true;
 	
@@ -49286,7 +49281,7 @@ Characters with Skill: ${knowsSkill}`;
 			let macro = "";
 
 			// check if rofNumber is a valid number
-			if (!isNaN(rofNumber) && rofNumber > 1) {
+			if (!isNaN(rofNumber) && rofNumber > 1 && recoil > -1) {
 				macro = `[[?{Shots fired up to ${rof}|0}]]`;
 			}
 
@@ -49335,7 +49330,7 @@ Characters with Skill: ${knowsSkill}`;
 			let macro = "";
 
 			// check if rofNumber is a valid number
-			if (!isNaN(rofNumber) && rofNumber > 1) {
+			if (!isNaN(rofNumber) && rofNumber > 1 && recoil > -1) {
 				macro = `[[?{Shots fired up to ${rof}|0}]]`;
 			}
 
@@ -49350,8 +49345,6 @@ Characters with Skill: ${knowsSkill}`;
 	}
 
 	on("clicked:hit_location_open clicked:hit_location_close", event => {
-
-		console.log(event);
 
 		let isOpen = event.triggerName == "clicked:hit_location_open";
 
