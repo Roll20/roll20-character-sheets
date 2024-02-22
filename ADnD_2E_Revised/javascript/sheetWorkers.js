@@ -2979,6 +2979,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push('checkroll=[[1d100]]%');
         rollBuilder.push('checktarget=[[@{scroll-failure}]]%');
         rollBuilder.push('fail=DM roll for Magical Spell Failure');
+        rollBuilder.push('character=@{character_name}');
         rollBuilder.push(`effects=${spell['effect']}`);
         if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
             rollBuilder.push(`psionics=${spell['psionics']}`);
