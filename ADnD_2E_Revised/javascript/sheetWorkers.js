@@ -39,6 +39,8 @@ const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
 const SPHERE_SPELLS_AND_MAGIC = 'sphere-spells-and-magic';
 const SPHERE_FIELDS = ['sphere-druids', 'sphere-necromancers', SPHERE_SPELLS_AND_MAGIC];
 
+const SPELL_STATUS_EFFECTS = ['blindness', 'deafness', 'invisibility', 'continuing-damage', 'magical-aging'];
+
 class RollTemplateBuilder {
     constructor(template) {
         this.template = template;
@@ -1352,9 +1354,13 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
 
             let effect = spell['effect'];
             if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
-                console.log('adding psionics stuff');
                 effect += `}}{{psionics=${spell['psionics']}`;
             }
+            SPELL_STATUS_EFFECTS.forEach(status => {
+                if (spell[status] === '1') {
+                    effect += `}}{{${status}=1`;
+                }
+            });
 
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
@@ -2984,6 +2990,11 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
             rollBuilder.push(`psionics=${spell['psionics']}`);
         }
+        SPELL_STATUS_EFFECTS.forEach(status => {
+            if (spell[status] === '1') {
+                rollBuilder.push(`${status}=1`);
+            }
+        });
 
         let scrollMacro = rollBuilder.string();
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
