@@ -44,7 +44,7 @@ qualite.forEach(stat => {
 });
 
 const talents = [
-    'bougerpopotin', 'bricolertruc', 'connaitrelois', 'convaincrebaratiner', 'cueillirchasser', 'cuisiner', 'dessinerpeindre', 'fairemusique',
+    'bougerpopotin', 'bricolertruc', 'connaitrelois', 'connaitrepays', 'convaincrebaratiner', 'cueillirchasser', 'cuisiner', 'dessinerpeindre', 'fairemusique',
     'fairepoches', 'feulermenacer', 'griffer', 'herboriser', 'lireecrire', 'lireciel', 'observerfouiller', 'restercalme',
     'soccuperbetes', 'cacherombres', 'deplacerensilence', 'seduirecharmer', 'soignerblessures', 'trouverchemin', 'trouverinformation'
 ];
