@@ -7344,6 +7344,7 @@
 <input type="hidden" name="attr_hiddenMartialManeuverDamage07"  value="0"/>
 <input type="hidden" name="attr_hiddenMartialManeuverDamage08"  value="0"/>
 <input type="hidden" name="attr_hiddenMartialManeuverDamage09"  value="2d6"/>
+<input type="hidden" name="attr_hiddenSpecialDamage"  value="4d6"/>
 <input type="hidden" name="attr_hiddenBasicDamage"  value="2d6"/>
 <input type="hidden" name="attr_hiddenBasicEndurance" value="2"/>
 
@@ -11252,7 +11253,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "braceStrike", "braceMultipleAttack", "setStrike", "setMultipleAttack"], function(values) {
+			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponAdvantage"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "braceStrike", "braceMultipleAttack", "setStrike", "setMultipleAttack"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = values["weaponAreaEffect"+weaponId] != 0;
 				let useHitLocations = values.optionHitLocationSystem != 0;
@@ -11264,6 +11265,44 @@
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
+				// Update weapon damage for maneuvers that add damage.				
+				let adjustedDC = parseInt(values["weaponAdjustedDC"+weaponId])||0;
+				let baseDC = parseInt(values["weaponDC"+weaponId])||0;
+				let theAdvantage = parseFloat(values["weaponAdvantage"+weaponId])||0;
+				let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
+				let theSign = parseInt(values["hiddenWeaponSign"+weaponId])||0;
+				let capDamage = (values.optionWeaponDamageCap === "on") ? true : false;
+				let isModified = false;
+				let theMessage = "attack";
+				
+				if (values.maneuverSelection === "haymaker") {
+					if (capDamage) {
+						if ((adjustedDC + 4) > 2 * baseDC) {
+							adjustedDC = 2 * baseDC;
+						} else {
+							adjustedDC += 4;
+						}
+					} else {
+						adjustedDC += 4;
+					}
+					
+					isModified = true;
+					
+					setAttrs({
+						"hiddenSpecialDamage":getDamageDice(adjustedDC, theAdvantage, isNormal, theSign)
+					});
+				}
+				
+				// Select attack message.
+				if (values.maneuverSelection === "haymaker") {
+					theMessage = (isNormalDamage ? "Normal " : "Killing ") + "haymaker attack";
+				} else if (values.maneuverSelection === "strike") {
+					theMessage = (isNormalDamage ? "Normal " : "Killing ") + "strike";
+				} else if (values.maneuverSelection === "multipleAttack") {
+					theMessage = "Multiple " + (isNormalDamage ? "normal " : "killing ") + "attack";
+				}
+				
+				// Create dice rolling text to send to a roll dialog.
 				if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike")) {
 					// The weapon Roll is a Strike, Multiple Attack, or Haymaker.
 					
@@ -11294,23 +11333,23 @@
 					}
 					
 					// If isNormalDamage is TRUE, use the Normal Damage template.
-					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{weaponName"+weaponId+"}}} ";
+					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + theMessage + " with @{weaponName"+weaponId+"}}} ";
 					
 					if (isRangedAttack && hasRangePenalty) {
 						if (values.displayDegreeOfSuccess != 0) {
-							theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+?{Modifiers|0}[Modifier]]]}} ";
+							theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+?{Modifiers|0}[Modifier]]]}} ";
 						} else {
-							theRoll += "{{OCV=[[@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+							theRoll += "{{OCV=[[@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
 						}
 					} else {
 						if (values.displayDegreeOfSuccess != 0) {
-							theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]"+ (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}} ";
+							theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]"+ (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}} ";
 						} else {
-							theRoll += "{{OCV=[[@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]"+ (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+							theRoll += "{{OCV=[[@{ocv}[OCV]"+ (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]"+ (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
 						}
 					}
 					
-					theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[[@{hiddenWeaponDamage"+weaponId+"}]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+					theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenWeaponDamage"+weaponId+"}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 					if (useHitLocations)
 						theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 						
