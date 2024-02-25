@@ -640,7 +640,7 @@ on(
 		"reg_ae_mod_nahrungsrestriktion",
 		"reg_ae_mod_sf",
 		"reg_ae_mod_vn",
-		"reg_schlaf_mod_general", "reg_schlaf_mod_ae", "reg_schlaf_mod_le",
+		"reg_schlaf_mod_general", "reg_schlaf_mod_ae", "reg_schlaf_mod_ke", "reg_schlaf_mod_le",
 		"reg_schlaf_mod_schlafwandler",
 		"reg_schlaf_nahrungsrestriktion_effekt",
 		"reg_schlaf_schlafstoerung_ausloeser",
@@ -648,7 +648,10 @@ on(
 		"reg_schlaf_verwoehnt_zufrieden",
 		"taw_selbstbeherrschung",
 		"eigenschaft1selbstbeherrschung", "eigenschaft2selbstbeherrschung", "eigenschaft3selbstbeherrschung",
-		"cs_talent", "cf_talent"
+		"cs_talent", "cf_talent",
+		// Comfort for choosing only relevant regeneration
+		"magietab",
+		"liturgientab"
 	].map(attr => "change:" + attr).join(" "),
 	function(eventInfo) {
 	safeGetAttrs(
@@ -670,7 +673,7 @@ on(
 			'reg_ae_mod_nahrungsrestriktion',
 			'reg_ae_mod_sf',
 			'reg_ae_mod_vn',
-			'reg_schlaf_mod_general', 'reg_schlaf_mod_ae', 'reg_schlaf_mod_le',
+			'reg_schlaf_mod_general', 'reg_schlaf_mod_ae', 'reg_schlaf_mod_ke', 'reg_schlaf_mod_le',
 			'reg_schlaf_mod_schlafwandler',
 			'reg_schlaf_nahrungsrestriktion_effekt',
 			'reg_schlaf_schlafstoerung_ausloeser',
@@ -678,10 +681,32 @@ on(
 			'reg_schlaf_verwoehnt_zufrieden',
 			'TaW_selbstbeherrschung',
 			'Eigenschaft1selbstbeherrschung', 'Eigenschaft2selbstbeherrschung', 'Eigenschaft3selbstbeherrschung',
-			'cs_talent', 'cf_talent'
+			'cs_talent', 'cf_talent',
+			'MagieTab',
+			'LiturgienTab'
 		], function(values) {
 		const caller = "Action Listener for Generation of Regeneration Roll (Sleep)";
 		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		const baseRoll = [
+			values["gm_roll_opt"],
+			"&{template:reg-sleep}",
+			`{{charactername=${values["character_name"]}}}`,
+			`{{le=${values["LE"]}}}`,
+			`{{lebase=[[1d6 + (${values["reg_le_mod_vn"]}) + (${values["reg_le_mod_nahrungsrestriktion"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_le"]})]]}}`,
+			`{{leko=[[${values["reg_le_ko"]}]]}}`,
+			"{{leneu=[[0d1]]}}"
+		];
+		const AERoll = [
+			`{{ae=${values["AE"]}}}`,
+			`{{aebase=[[${values["reg_ae_base"]} + (${values["reg_ae_mod_vn"]}) + (${values["reg_ae_mod_heimwehkrank"]}) + (${values["reg_ae_mod_nahrungsrestriktion"]}) + (${values["reg_ae_mod_sf"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_ae"]})]]}}`,
+			`{{aein=[[${values["reg_ae_in"]}]]}}`,
+			"{{aeneu=[[0d1]]}}"
+		];
+		const KERoll = [
+			`{{ke=${values["KE"]}}}`,
+			`{{kebase=[[1d1 + (${values["reg_schlaf_mod_ke"]})]]}}`,
+			"{{keneu=[[0d1]]}}"
+		];
 		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_schlaf_nahrungsrestriktion_effekt})]]}}";
 		const sleepDisorderRoll = [
 			// general decision for triggering sleep disorder or not
@@ -712,24 +737,24 @@ on(
 			`{{suchtmittel=${values["nachteil_sucht_suchtmittel"]}}}`
 		];
 		const unusedRoll = [
-			"{{ke=[[@{KE}d1]]}}",
-			"{{kereg=[[0]]}}",
-			"{{keneu=[[0d1]]}}",
 			"{{wound=[[2d1]]}}"
 		];
-		var roll = [
-			values["gm_roll_opt"],
-			"&{template:reg-schlaf}",
-			`{{charactername=${values["character_name"]}}}`,
-			`{{le=${values["LE"]}}}`,
-			`{{lebase=[[1d6 + (${values["reg_le_mod_vn"]}) + (${values["reg_le_mod_nahrungsrestriktion"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_le"]})]]}}`,
-			`{{leko=[[${values["reg_le_ko"]}]]}}`,
-			"{{leneu=[[0d1]]}}",
-			`{{ae=${values["AE"]}}}`,
-			`{{aebase=[[${values["reg_ae_base"]} + (${values["reg_ae_mod_vn"]}) + (${values["reg_ae_mod_heimwehkrank"]}) + (${values["reg_ae_mod_nahrungsrestriktion"]}) + (${values["reg_ae_mod_sf"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_ae"]})]]}}`,
-			`{{aein=[[${values["reg_ae_in"]}]]}}`,
-			"{{aeneu=[[0d1]]}}"
-		];
+
+		// Build roll
+		var roll = [];
+		roll = roll.concat(baseRoll);
+
+		// Additional properties for astral energy regeneration
+		if (values["MagieTab"] === "1")
+		{
+			roll = roll.concat(AERoll);
+		}
+
+		// Additional properties for karma energy regeneration
+		if (values["LiturgienTab"] === "1")
+		{
+			roll = roll.concat(AERoll);
+		}
 
 		// Additional property for food restriction
 		if (values["reg_schlaf_nahrungsrestriktion_effekt"] !== 0)
@@ -1001,56 +1026,70 @@ on('clicked:reg_schlaf-action', async (info) => {
 		computed["leneu"] = LEneu;
 
 		// AE Regeneration
-		var AERegTotal = 0;
-		var AEneu = parseInt(values["AE"]);
-
-		if (values["reg_ae_fest"] === "off")
+		if (results["aebase"])
 		{
-			// Additional regeneration from IN check
-			var AEIN = 0;
-			if (results["aein"].result >= 0) {
-				AEIN = 1;
-			} else {
-				if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
-					AEIN = -1;
+			var AERegTotal = 0;
+			var AEneu = parseInt(values["AE"]);
+
+			if (values["reg_ae_fest"] === "off")
+			{
+				// Additional regeneration from IN check
+				var AEIN = 0;
+				if (results["aein"].result >= 0) {
+					AEIN = 1;
 				} else {
-					AEIN = 0;
+					if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
+						AEIN = -1;
+					} else {
+						AEIN = 0;
+					}
 				}
-			}
-			computed["aein"] = AEIN;
-			AERegTotal = results["aebase"].result + AEIN;
-			if (
-				results.hasOwnProperty("schlafstoerungfall") &&
-				(
-					sleepDisorder["triggered"] === 1 ||
+				computed["aein"] = AEIN;
+				AERegTotal = results["aebase"].result + AEIN;
+				if (
+					results.hasOwnProperty("schlafstoerungfall") &&
 					(
-						sleepDisorder["triggered"] === 2 &&
-						computed["result"] === 0
+						sleepDisorder["triggered"] === 1 ||
+						(
+							sleepDisorder["triggered"] === 2 &&
+							computed["result"] === 0
+						)
 					)
 				)
-			)
-			{
-				AERegTotal -= results["aeschlafstoerung"]["result"];
+				{
+					AERegTotal -= results["aeschlafstoerung"]["result"];
+				}
+				if (results.hasOwnProperty("schlafwandeln"))
+				{
+					AERegTotal += parseInt(results["schlafwandeln"]["result"]);
+				}
+			} else {
+				AERegTotal = parseInt(values["reg_ae_fest"]);
 			}
-			if (results.hasOwnProperty("schlafwandeln"))
+			computed["aeneu"] = attrsToChange["AE"];
+			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
+			AEneu += AERegTotal;
+			AEneu = Math.min(AEneu, values["AE_max"]);
+			if (parseInt(values["AE"]) !== AEneu)
 			{
-				AERegTotal += parseInt(results["schlafwandeln"]["result"]);
+				attrsToChange["AE"] = AEneu;
 			}
-		} else {
-			AERegTotal = parseInt(values["reg_ae_fest"]);
+			computed["aeneu"] = AEneu;
+			debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
 		}
-		computed["aeneu"] = attrsToChange["AE"];
-		AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
-		AEneu += AERegTotal;
-		AEneu = Math.min(AEneu, values["AE_max"]);
-		if (parseInt(values["AE"]) !== AEneu)
-		{
-			attrsToChange["AE"] = AEneu;
-		}
-		computed["aeneu"] = AEneu;
-		debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
 
-		var KERegTotal = 0;
+		// KE Regeneration
+		// No rule reduces or boosts the basal regeneration
+		var KERegTotal = 1;
+		var KEneu = parseInt(values["KE"]);
+
+		KEneu += KERegTotal;
+		KEneu = Math.min(KEneu, values["KE_max"]);
+		if (parseInt(values["KE"]) !== KEneu)
+		{
+			attrsToChange["KE"] = KEneu;
+		}
+		computed["keneu"] = KEneu;
 		safeSetAttrs(attrsToChange);
 
 		finishRoll(
