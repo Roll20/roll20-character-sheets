@@ -250,23 +250,24 @@ on(
 
 			switch(restriction) {
 				case 0:
+					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 0;
+					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
+					break;
 				case -2:
-					attrsToChange["reg_le_mod_nahrungsrestriktion"] = restriction;
-					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = restriction;
-					attrsToChange["reg_le_fest"] = "off";
-					attrsToChange["reg_ae_fest"] = "off";
+					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 1;
+					attrsToChange["reg_le_mod_nahrungsrestriktion"] = -2;
+					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = -2;
 					break;
 				case "total":
+					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 2;
 					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
 					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
-					attrsToChange["reg_le_fest"] = 0;
-					attrsToChange["reg_ae_fest"] = 0;
 					break;
 				default:
+					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 0;
 					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
 					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
-					attrsToChange["reg_le_fest"] = "off";
-					attrsToChange["reg_ae_fest"] = "off";
 			}
 			safeSetAttrs(attrsToChange);
 		});
@@ -489,6 +490,40 @@ on(
 	});
 });
 
+// Handling all changes leading to fixed regeneration
+on(
+	[
+		"reg_schlaf_nahrungsrestriktion_effekt",
+		"reg_schlaf_sucht_entzug_effekt"
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+		const caller = "Action Listener for Fixed Regeneration";
+		safeGetAttrs(
+			[
+				'reg_schlaf_nahrungsrestriktion_effekt',
+				'reg_schlaf_sucht_entzug_effekt'
+			], function(values) {
+			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
+			var attrsToChange = {};
+			const addiction = values["reg_schlaf_sucht_entzug_effekt"];
+			const restriction = values["reg_schlaf_nahrungsrestriktion_effekt"];
+
+			if (
+				addiction === 1 ||
+				addiction === 2 ||
+				restriction === 2
+			) {
+				attrsToChange["reg_le_fest"] = 0;
+				attrsToChange["reg_ae_fest"] = 0;
+			} else {
+				attrsToChange["reg_le_fest"] = "off";
+				attrsToChange["reg_ae_fest"] = "off";
+			}
+			debugLog(caller, "tail", "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange);
+		});
+});
+
 /* handle regeneration-related values */
 on(
 	"change:reg_le_mod_vn " +
@@ -554,6 +589,7 @@ on(
 		"reg_ae_mod_vn",
 		"reg_schlaf_mod_general", "reg_schlaf_mod_ae", "reg_schlaf_mod_le",
 		"reg_schlaf_mod_schlafwandler",
+		"reg_schlaf_nahrungsrestriktion_effekt",
 		"reg_schlaf_schlafstoerung_ausloeser",
 		"reg_schlaf_verwoehnt_zufrieden",
 		"taw_selbstbeherrschung",
@@ -581,6 +617,7 @@ on(
 			'reg_ae_mod_vn',
 			'reg_schlaf_mod_general', 'reg_schlaf_mod_ae', 'reg_schlaf_mod_le',
 			'reg_schlaf_mod_schlafwandler',
+			'reg_schlaf_nahrungsrestriktion_effekt',
 			'reg_schlaf_schlafstoerung_ausloeser',
 			'reg_schlaf_verwoehnt_zufrieden',
 			'TaW_selbstbeherrschung',
@@ -589,6 +626,7 @@ on(
 		], function(values) {
 		const caller = "Action Listener for Generation of Regeneration Roll (Sleep)";
 		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_schlaf_nahrungsrestriktion_effekt})]]}}";
 		const sleepDisorderRoll = [
 			// general decision for triggering sleep disorder or not
 			`{{schlafstoerung=[[${values["reg_schlaf_schlafstoerung_ausloeser"]}]]}}`,
@@ -632,6 +670,12 @@ on(
 			`{{aein=[[${values["reg_ae_in"]}]]}}`,
 			"{{aeneu=[[0d1]]}}"
 		];
+
+		// Additional property for food restriction
+		if (values["reg_schlaf_nahrungsrestriktion_effekt"] !== 0)
+		{
+			roll = roll.concat(foodRestrictionRoll);
+		}
 
 		// Additional properties for sleep disorder
 		switch(values["reg_schlaf_schlafstoerung_ausloeser"])
