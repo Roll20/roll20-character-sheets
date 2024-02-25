@@ -6729,10 +6729,7 @@
     getAttrs(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character'], (v) => {
       const output = {};
       const testOldChar = +v.old_character || 0;
-      if (testOldChar === 1) {
-        // clog(`~~~~~~ OLD SHEET DETECTED old_character:${testOldChar}`);
-        return;
-      }
+      if (testOldChar === 1) return;
       const testHitdice = +v.hitdice;
       const testAC = +v.armorclass || 0;
       const testStr = +v.strength || 0;
@@ -6866,14 +6863,13 @@
         const output = {};
         const toggle_exceptional = +v.toggle_exceptional || 0;
         const strength = +v.strength || 0;
-        const intelligence = +v.intelligence || 0;
-        const wisdom = +v.wisdom || 0;
-        const dexterity = +v.dexterity || 0;
-        const constitution = +v.constitution || 0;
-        const charisma = +v.charisma || 0;
-        const comeliness = +v.comeliness || 0;
         if (toggle_exceptional === 0) {
-          // output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+          const intelligence = +v.intelligence || 0;
+          const wisdom = +v.wisdom || 0;
+          const dexterity = +v.dexterity || 0;
+          const constitution = +v.constitution || 0;
+          const charisma = +v.charisma || 0;
+          const comeliness = +v.comeliness || 0;
           output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
           output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
           output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
@@ -6885,7 +6881,7 @@
         setAttrs(output, {silent: true});
       });
     }
-);
+  );
 
   // PC or NPC sheet role
   on('change:is_npc', (eventInfo) => {
@@ -7047,21 +7043,21 @@
         output.current_encumbrance_label = 'Unencumbered';
         currentEncumbrance = 0;
         output.current_encumbrance = currentEncumbrance;
-        // Bail out if unless auto-calc movement is enabled
+        // Bail out of IF unless auto-calc movement is enabled
         output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Unencumbered =====');
       } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
         output.current_encumbrance_label = 'Heavy';
         currentEncumbrance = 1;
         output.current_encumbrance = currentEncumbrance;
-        // Bail out if unless auto-calc movement is enabled
+        // Bail out of IF unless auto-calc movement is enabled
         output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Heavy =====');
       } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
         output.current_encumbrance_label = 'Very Heavy';
         currentEncumbrance = 2;
         output.current_encumbrance = currentEncumbrance;
-        // Bail out if unless auto-calc movement is enabled
+        // Bail out of IF unless auto-calc movement is enabled
         output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Very Heavy =====');
       } else {
@@ -7069,7 +7065,7 @@
         // no DEX Bonus to AC
         currentEncumbrance = 3;
         output.current_encumbrance = currentEncumbrance;
-        // Bail out if unless auto-calc movement is enabled
+        // Bail out of IF unless auto-calc movement is enabled
         output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
         // clog('===== Carrying Capacity is Encumbered =====');
       }
@@ -7115,7 +7111,6 @@
       const movement = +v.movement.toString().replace(/[^0-9]/g, '');
       const current_encumbrance_move = +v.current_encumbrance_move || 0;
       let adjustedMove = 0;
-
       if (current_encumbrance_move === 0) {
         adjustedMove = movement;
         // clog('=====Movement is Normal=====');
@@ -7129,10 +7124,9 @@
         adjustedMove = int(movement - 9);
         // clog('=====Movement is Encumbered=====');
       }
-
-      output.movement_normal = int(adjustedMove);
-      output.movement_known = int(adjustedMove * 5);
-      output.movement_run = int(adjustedMove * 10);
+      output.movement_normal = adjustedMove;
+      output.movement_known = adjustedMove * 5;
+      output.movement_run = adjustedMove * 10;
       setAttrs(output);
     });
   }
@@ -7145,9 +7139,9 @@
       const recalc = 0;
       // only extract an integer from movement
       const movement = +v.movement.toString().replace(/[^0-9]/g, '');
-      output.movement_heavy = Math.max(int(movement - 3), 0);
-      output.movement_load = Math.max(int(movement - 6), 0);
-      output.movement_max = Math.max(int(movement - 9), 0);
+      output.movement_heavy = Math.max(movement - 3, 0);
+      output.movement_load = Math.max(movement - 6, 0);
+      output.movement_max = Math.max(movement - 9, 0);
       setAttrs(output);
       setCurrentMovement();
       calcAC(recalc);
@@ -7157,35 +7151,21 @@
   // Bulk Calcs
   function setCurrentBulk() {
     getAttrs(
-      [
-        'unarmored_bulk',
-        'armortype_bulk',
-        'armortype2_bulk',
-        'armorshield_bulk',
-        'armorhelmet_bulk',
-        'unarmored_worn',
-        'armortype_worn',
-        'armortype2_worn',
-        'armorshield_worn',
-        'armorhelmet_worn',
-        'armorshield_carried',
-      ],
+      ['unarmored_bulk', 'armortype_bulk', 'armortype2_bulk', 'armorshield_bulk', 'unarmored_worn', 'armortype_worn', 'armortype2_worn', 'armorshield_worn', 'armorshield_carried'],
       (v) => {
         const output = {};
-        const unarmored_worn = +v.unarmored_worn || 0;
-        const armortype_worn = +v.armortype_worn || 0;
-        const armortype2_worn = +v.armortype2_worn || 0;
-        const armorshield_worn = +v.armorshield_worn || 0;
-        const armorshield_carried = +v.armorshield_carried || 0;
+        const {unarmored_worn} = v;
+        const {armortype_worn} = v;
+        const {armortype2_worn} = v;
+        const {armorshield_worn} = v;
+        const {armorshield_carried} = v;
         // shield bulk s/b considered even if it's just carried
         const armorShieldWornOrCarried = Math.max(armorshield_worn, armorshield_carried);
-        const armorhelmet_worn = +v.armorhelmet_worn || 0;
-        const unarmored_bulk = +(v.unarmored_bulk || 0) * unarmored_worn;
-        const armortype_bulk = +(v.armortype_bulk || 0) * armortype_worn;
-        const armortype2_bulk = +(v.armortype2_bulk || 0) * armortype2_worn;
-        const armorshield_bulk = +(v.armorshield_bulk || 0) * armorShieldWornOrCarried;
-        const armorhelmet_bulk = +(v.armorhelmet_bulk || 0) * armorhelmet_worn;
-        const armorBulk = Math.max(unarmored_bulk, armortype_bulk, armortype2_bulk, armorshield_bulk, armorhelmet_bulk);
+        const unarmored_bulk = v.unarmored_bulk * unarmored_worn;
+        const armortype_bulk = v.armortype_bulk * armortype_worn;
+        const armortype2_bulk = v.armortype2_bulk * armortype2_worn;
+        const armorshield_bulk = v.armorshield_bulk * armorShieldWornOrCarried;
+        const armorBulk = Math.max(unarmored_bulk, armortype_bulk, armortype2_bulk, armorshield_bulk);
         switch (armorBulk) {
           case 0:
             output.current_bulk_label = 'Not Bulky';
@@ -7219,8 +7199,9 @@
     }
   );
 
-  // Equipment Type and Carry Changes
-  on('change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type', (eventInfo) => {
+  // type/carry jumps to follow unless Show All or same type/carry tab
+  // carried_select/carried sync for weight calcs
+  on('change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const source = `${eventInfo.sourceAttribute}`;
@@ -7231,24 +7212,20 @@
     const fields = [section_attribute('equipment', id, 'equipment_type'), section_attribute('equipment', id, 'equipment_carried_select')];
     getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
       const output = {};
+      // carriedTab will be 1, 0, 2, -1
+      const carriedTab = +v.equipment_tabs_carry || 0;
+      // thisTab will be 0, 1, 2, 3, 4, -1
       const typeTab = +v.equipment_tabs_type || 0;
+      // thisType will be 0, 1, 2, 3, 4
       const thisType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
       // thisCarriedSelect will be 0, 1, 2
       const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0;
-      // Weight calcs use equipment_carried
-      if (thisCarriedSelect === 1) {
-        output[section_attribute('equipment', id, 'equipment_carried')] = 1;
-      } else {
-        output[section_attribute('equipment', id, 'equipment_carried')] = 0;
-      }
-      // Jump to type tab when changing type unless view is set to Show All
-      if (typeTab !== -1) {
-        if (isType) {
-          output.equipment_tabs_type = thisType;
-        } else {
-          output.equipment_tabs_type = typeTab;
-        }
-      }
+      // Weight calcs use equipment_carried so keep them synced
+      output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
+      // jumps to equip type tab unless Show All or same equip type tab
+      output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
+      // jumps to carry type tab unless Show All or same carry type tab
+      output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
       setAttrs(output);
     });
   });
@@ -7264,10 +7241,14 @@
       });
       getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
         const output = {};
+        // thisTab will be 0, 1, 2, 3, 4, -1
         const typeTab = +v.equipment_tabs_type || 0;
+        // carriedTab will be 1, 0, 2, -1
         const carriedTab = +v.equipment_tabs_carry || 0;
         _.each(idArray, (id) => {
+          // thisType will be 0, 1, 2, 3, 4
           const thisType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
+          // thisCarriedSelect will be 0, 1, 2
           const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0;
           // Use CSS to hide/show the repeating row using typeTab and/or carriedTab
           output[section_attribute('equipment', id, 'equipment_show_type')] = typeTab === -1 || typeTab === thisType ? 1 : 0;
