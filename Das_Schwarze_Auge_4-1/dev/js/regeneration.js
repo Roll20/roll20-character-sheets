@@ -954,6 +954,7 @@ on('clicked:reg_schlaf-action', async (info) => {
 
 		// LE Regeneration
 		var LERegTotal = 0;
+		var LEneu = parseInt(values["LE"]);
 
 		if (values["reg_le_fest"] === "off")
 		{
@@ -987,14 +988,21 @@ on('clicked:reg_schlaf-action', async (info) => {
 			{
 				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
-			LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
-			attrsToChange["LE"] = parseInt(values["LE"]) + LERegTotal;
-			attrsToChange["LE"] = Math.min(attrsToChange["LE"], values["LE_max"]);
-			computed["leneu"] = attrsToChange["LE"];
+		} else {
+			LERegTotal = parseInt(values["reg_le_fest"]);
 		}
+		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
+		LEneu += LERegTotal;
+		LEneu = Math.min(LEneu, values["LE_max"]);
+		if (parseInt(values["LE"]) !== LEneu)
+		{
+			attrsToChange["LE"] = LEneu;
+		}
+		computed["leneu"] = LEneu;
 
 		// AE Regeneration
 		var AERegTotal = 0;
+		var AEneu = parseInt(values["AE"]);
 
 		if (values["reg_ae_fest"] === "off")
 		{
@@ -1028,11 +1036,18 @@ on('clicked:reg_schlaf-action', async (info) => {
 			{
 				AERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
-			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
-			attrsToChange["AE"] = parseInt(values["AE"]) + AERegTotal;
-			attrsToChange["AE"] = Math.min(attrsToChange["AE"], values["AE_max"]);
-			computed["aeneu"] = attrsToChange["AE"];
+		} else {
+			AERegTotal = parseInt(values["reg_ae_fest"]);
 		}
+		computed["aeneu"] = attrsToChange["AE"];
+		AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
+		AEneu += AERegTotal;
+		AEneu = Math.min(AEneu, values["AE_max"]);
+		if (parseInt(values["AE"]) !== AEneu)
+		{
+			attrsToChange["AE"] = AEneu;
+		}
+		computed["aeneu"] = AEneu;
 		debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
 
 		var KERegTotal = 0;
