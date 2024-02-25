@@ -390,6 +390,29 @@ on(
 		}
 });
 
+on("change:nachteil_schlafwandler",
+	function(eventInfo) {
+		var attrsToChange = {};
+		const source = eventInfo.sourceAttribute;
+		const sourceType = eventInfo.sourceType;
+		var effect = 0;
+		/*
+		Somnambulism has a 25% chance (4 on 1d4) to strike.
+		*/
+		if (sourceType === "player") {
+			// Handle changes to degree of sleep disorder
+			if (source === "nachteil_schlafwandler") {
+				if (eventInfo.newValue === "0") {
+					effect = "0";
+				} else if (eventInfo.newValue === "1") {
+					effect = "(-1) * ({ 0d1, 1d4 - 3 }kh1)";
+				}
+			}
+			attrsToChange["reg_schlaf_mod_schlafwandler"] = effect;
+			safeSetAttrs(attrsToChange);
+		}
+});
+
 on(
 	"change:sf_regeneration_i " +
 	"change:sf_regeneration_ii " +
@@ -494,7 +517,6 @@ on(
 		"nachteil_verwoehnt_wert"
 	], function(v) {
 		/* brauchen noch mehr UI
-		schlafwandler -> 4 auf W4 -> le/ae reg -1
 		sucht -> tage seit letztem Konsum -> Wert >= (15 - Giftstufe) -> le/ae reg = 0, pro Tag +Erschöpfung Giftstufe/3, schlechte Eigenschaften +Giftstufe/3, Talent- und Zauberproben +Giftstufe/3; Wert >= 2 * (15 - Giftstufe) -> erschöpfung, schlechte Eigenschaften, Probenmod +Giftstufe/2; Warnung bei Überanstrengung auf Max. -> KO-Senkung nicht implementiert; KO = 0 -> Giftstufe/2 SP pro Tag; vollständige (!?) Wiederherstellung durch eine Dosis möglich (Überanstrengung, Wiederaufbau KO "normal")
 		*/
 		/*
@@ -512,6 +534,7 @@ on(
 // Generating Regeneration Roll (Sleep)
 on(
 	[
+		"character_name",
 		"gm_roll_opt",
 		"le", "ae", "ke",
 		"le_max", "ae_max", "ke_max",
@@ -530,6 +553,7 @@ on(
 		"reg_ae_mod_sf",
 		"reg_ae_mod_vn",
 		"reg_schlaf_mod_general", "reg_schlaf_mod_ae", "reg_schlaf_mod_le",
+		"reg_schlaf_mod_schlafwandler",
 		"reg_schlaf_schlafstoerung_ausloeser",
 		"reg_schlaf_verwoehnt_zufrieden",
 		"taw_selbstbeherrschung",
@@ -539,6 +563,7 @@ on(
 	function(eventInfo) {
 	safeGetAttrs(
 		[
+			'character_name',
 			'gm_roll_opt',
 			'LE', 'AE', 'KE',
 			'LE_max', 'AE_max', 'KE_max',
@@ -555,6 +580,7 @@ on(
 			'reg_ae_mod_sf',
 			'reg_ae_mod_vn',
 			'reg_schlaf_mod_general', 'reg_schlaf_mod_ae', 'reg_schlaf_mod_le',
+			'reg_schlaf_mod_schlafwandler',
 			'reg_schlaf_schlafstoerung_ausloeser',
 			'reg_schlaf_verwoehnt_zufrieden',
 			'TaW_selbstbeherrschung',
@@ -586,6 +612,7 @@ on(
 			"{{criticality=[[0]]}}",
 			`{{critThresholds=[[[[${values["cs_talent"]}]]d1cs0cf2 + [[${values["cf_talent"]}]]d1cs0cf2]]}}`
 		];
+		const somnambulismRoll = "{{schlafwandeln=[[(@{reg_schlaf_mod_schlafwandler})]]}}";
 		const unusedRoll = [
 			"{{ke=[[@{KE}d1]]}}",
 			"{{kereg=[[0]]}}",
@@ -595,6 +622,7 @@ on(
 		var roll = [
 			values["gm_roll_opt"],
 			"&{template:reg-schlaf}",
+			`{{charactername=${values["character_name"]}}}`,
 			`{{le=${values["LE"]}}}`,
 			`{{lebase=[[1d6 + (${values["reg_le_mod_vn"]}) + (${values["reg_le_mod_nahrungsrestriktion"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_le"]})]]}}`,
 			`{{leko=[[${values["reg_le_ko"]}]]}}`,
@@ -615,6 +643,13 @@ on(
 				roll = roll.concat(sleepDisorderRoll);
 				break;
 		}
+
+		// Additional property for somnambulism
+		if (values["reg_schlaf_mod_schlafwandler"] !== "0")
+		{
+			roll = roll.concat(somnambulismRoll);
+		}
+
 		// Modifications if fixed regeneration
 		if (values["reg_le_fest"] !== "off")
 		{
@@ -838,6 +873,10 @@ on('clicked:reg_schlaf-action', async (info) => {
 			{
 				LERegTotal -= results["leschlafstoerung"]["result"];
 			}
+			if (results.hasOwnProperty("schlafwandeln"))
+			{
+				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
+			}
 			LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
 			attrsToChange["LE"] = parseInt(values["LE"]) + LERegTotal;
 			attrsToChange["LE"] = Math.min(attrsToChange["LE"], values["LE_max"]);
@@ -874,6 +913,10 @@ on('clicked:reg_schlaf-action', async (info) => {
 			)
 			{
 				AERegTotal -= results["aeschlafstoerung"]["result"];
+			}
+			if (results.hasOwnProperty("schlafwandeln"))
+			{
+				AERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
 			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
 			attrsToChange["AE"] = parseInt(values["AE"]) + AERegTotal;
