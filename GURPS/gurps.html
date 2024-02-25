@@ -13158,7 +13158,7 @@ visualize what it will look like in chat.
 					</div>
 
 					<!-- MELEE MODIFIERS BOX -->
-					<div class="box melee-modifiers">
+					<div class="box melee-modifiers" style="overflow: hidden;">
 						
 						<div class="modifier-caption header">
 							<div class="popup">
@@ -13168,6 +13168,61 @@ visualize what it will look like in chat.
 								<span data-i18n="quick-modifiers-tooltip">Use the table below to create a set of custom modifiers that can be applied to your next your roll. If the modifier is checked, it will automatically be applied to the roll, but you must remember to uncheck the quick modifier if you don't want to use it.</span>
 							</div>
 						</div>
+
+						<!-- #Quick Modifiers Table -->
+						<input type="hidden" name="attr_melee_quick_mod_show" value="0" />
+						<div class="melee-quick-modifiers">
+							<div class="grid-standard grid-melee-quick-modifier-header">
+								<div class="grid-cell">&nbsp;</div>
+								<div class="grid-cell">
+									<span data-i18n="apply-label">Apply</span>
+								</div>
+								<div class="grid-cell">
+									<div class="standard-tooltip">
+										<span data-i18n="description-label">Description</span>
+										<span class="tooltiptext">
+											<span data-i18n="quick-mod-description-tooltip">Enter a useful description of the modifier.</span>
+										</span>
+									</div>
+								</div>
+								<div class="grid-cell">
+									<div class="standard-tooltip">
+										<span data-i18n="modifier-no-colon-label">Modifier</span>
+										<span class="tooltiptext move-far-left">
+											<span data-i18n="quick-mod-tooltip">Enter an interger for the quick modifier.</span>
+										</span>
+									</div>
+								</div>
+							</div>
+
+							<input type="hidden" name="attr_melee_quick_mod_show_in_roll" value="0" />
+							<input type="hidden" name="attr_melee_quick_mod_total" value="0" />
+							<input type="hidden" name="attr_melee_quick_mod_summary" value="" />
+							<fieldset class="repeating_melee-quick-modifier">
+								<div class="grid-standard grid-melee-quick-modifiers">
+									<div class="grid-cell">
+										<label class="toggle-button">
+											<input type="checkbox" name="attr_toggle_notes" value="1" />
+											<span></span>
+										</label>
+									</div>
+									<div class="grid-cell">
+										<input type="checkbox" name="attr_apply" value="1" title="Macro: @{NAME|repeating_melee-quick-modifier_$[row #]_apply}" />
+									</div>
+									<div class="grid-cell">
+										<input type="text" name="attr_name" value="" title="Macro: @{NAME|repeating_melee-quick-modifier_$[row #]_name}" />
+									</div>
+									<div class="grid-cell">
+										<input type="number" name="attr_modifier" value="0" step="1" class="medium-width" title="Macro: @{NAME|repeating_melee-quick-modifier_$[row #]_percent}" />
+									</div>
+									<input type="hidden" name="attr_toggle_notes" />
+									<div class="expandable-section">
+										<h4><span data-i18n="notes-label">Notes</span></h4>
+										<textarea name="attr_notes"></textarea>
+									</div>
+								</div>
+							</fieldset>
+						</div>								
 
 					</div>
 
@@ -13296,7 +13351,7 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill" title="Macro: @{NAME|repeating_melee_$[row #]_skill}" />
 									</div>
 									<div class="cell col6">
-										<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{notesTitlePrefix=Weapon}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}}" />
+										<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{notesTitlePrefix=Weapon}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{quickModShow=[[@{melee_quick_mod_show_in_roll}]]}} {{quickModTotal=[[@{melee_quick_mod_total}]]}} {{quickModSummary=@{melee_quick_mod_summary}}}" />
 									</div>
 								</div> <!-- .row -->
 
@@ -24855,6 +24910,27 @@ B378
 					</td>
 				</tr>
 				{{/popupModifier}}
+
+				<!-- quick modifiers -->
+				{{#rollTotal() quickModShow 1}}
+				<tr>
+					<td colspan="2" class="tool-modifier-title">
+						<span data-i18n="quick-modifiers-label">Quick Modifiers</span>
+					</td>
+				</tr>
+				<tr>
+                    <td class="label"><span data-i18n="modifier-label">Modifier:</span></td>
+                    <td class="effective-skill">
+						{{quickModTotal}}
+					</td>
+				</tr>
+				<tr>
+                    <td class="label"><span data-i18n="summary-label">Summary</span>:</td>
+                    <td class="effective-skill">
+						{{quickModSummary}}
+					</td>
+				</tr>
+				{{/rollTotal() quickModShow 1}}
 				
 				<!-- Roll Modifier Tool Sections -->
 				{{#rollTotal() useModTool 1}}
@@ -47136,8 +47212,6 @@ Characters with Skill: ${knowsSkill}`;
 		let infoDescription = values[`${sectionName}_info_description`] ?? "";
 		infoDescription = infoDescription.replace(/\n/g, '\\n');
 
-		console.log(infoDescription);
-
 		let finalNotes = notes;
 
 		if (notes && infoDescription) {
@@ -47450,7 +47524,7 @@ Characters with Skill: ${knowsSkill}`;
 			rollDataArray.push(`{{bookReference=${bookReference}}}`);
 		}
 		
-		rollDataArray.push(`{{effectiveSkill=[[{${level} + @{modifier} + @{melee_roll_modifier}, ${meleeRollMaxNineValue} }kl1]]}}`);
+		rollDataArray.push(`{{effectiveSkill=[[{${level} + @{modifier} + @{melee_roll_modifier} + @{melee_quick_mod_total}, ${meleeRollMaxNineValue} }kl1]]}}`);
 
 		if (meleeRollMaxNine) {
 			rollDataArray.push(`{{maxNine=[[${meleeRollMaxNine}]]}}`);
@@ -49608,6 +49682,73 @@ Characters with Skill: ${knowsSkill}`;
 
 		});
 
+	}
+
+	on("change:repeating_melee-quick-modifier:apply", event => {
+
+		updateMeleeQuickModifiers();
+
+	});
+
+	const updateMeleeQuickModifiers = () => {
+
+		getSectionIDs("repeating_melee-quick-modifier", ids => {
+
+			let fields = [];
+
+			ids.forEach(id => {
+
+				let applyField = `repeating_melee-quick-modifier_${id}_apply`;
+
+				let nameField = `repeating_melee-quick-modifier_${id}_name`;
+
+				let modifierField = `repeating_melee-quick-modifier_${id}_modifier`;
+
+				fields.push(applyField, nameField, modifierField);
+
+			});
+
+			getAttrs(fields, values => {
+
+				let totalMod = 0;
+
+				let summaryArray = [];
+
+				let showInRoll = 0;
+
+				ids.forEach(id => {
+
+					let apply = values[`repeating_melee-quick-modifier_${id}_apply`] == "1";
+
+					if (apply) {
+
+						showInRoll = 1;
+
+						let name = values[`repeating_melee-quick-modifier_${id}_name`] ?? "";
+
+						let modifier = Number(values[`repeating_melee-quick-modifier_${id}_modifier`]) ?? 0;
+
+						totalMod += modifier;
+
+						summaryArray.push(`${name} (${modifier})`);
+
+					}
+
+				});
+
+				let summary = summaryArray.join(", ");
+
+				let keyValues = {
+					melee_quick_mod_show_in_roll: showInRoll,
+					melee_quick_mod_total: totalMod,
+					melee_quick_mod_summary: summary
+				};
+
+				setAttrs(keyValues);
+
+			});
+
+		});
 	}
 
 </script>
