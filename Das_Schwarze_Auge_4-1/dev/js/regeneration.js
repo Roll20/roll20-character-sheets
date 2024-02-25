@@ -415,6 +415,61 @@ on("change:nachteil_schlafwandler",
 });
 
 on(
+	[
+		"nachteil_sucht",
+		"nachteil_sucht_giftstufe",
+		"reg_schlaf_sucht_entzug_dauer"
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+		const caller = "Action Listener for Handling Addiction Effects";
+		safeGetAttrs(
+			[
+				'nachteil_sucht',
+				'nachteil_sucht_giftstufe',
+				'reg_schlaf_sucht_entzug_dauer'
+			], function(values) {
+			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
+			var attrsToChange = {};
+
+			// Handle "addiction"
+			var addiction = 0;
+			if (values["nachteil_sucht"] === "1")
+			{
+				var threshold = 15 - parseInt(values["nachteil_sucht_giftstufe"]);
+				if (values["reg_schlaf_sucht_entzug_dauer"] < threshold)
+				{
+					addiction = 0;
+				} else if (
+					values["reg_schlaf_sucht_entzug_dauer"] >= threshold &&
+					values["reg_schlaf_sucht_entzug_dauer"] < 2 * threshold
+				) {
+					addiction = 1;
+				} else {
+					addiction = 2;
+				}
+			} else {
+				addiction = 0;
+			}
+
+			switch(addiction) {
+				case 0:
+					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 0;
+					break;
+				case 1:
+					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 1;
+					break;
+				case 2:
+					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 2;
+					break;
+				default:
+					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 0;
+			}
+			debugLog(caller, "tail", "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange);
+		});
+});
+
+on(
 	"change:sf_regeneration_i " +
 	"change:sf_regeneration_ii " +
 	"change:sf_meisterliche_regeneration ",
@@ -551,9 +606,6 @@ on(
 		"nachteil_verwoehnt",
 		"nachteil_verwoehnt_wert"
 	], function(v) {
-		/* brauchen noch mehr UI
-		sucht -> tage seit letztem Konsum -> Wert >= (15 - Giftstufe) -> le/ae reg = 0, pro Tag +Erschöpfung Giftstufe/3, schlechte Eigenschaften +Giftstufe/3, Talent- und Zauberproben +Giftstufe/3; Wert >= 2 * (15 - Giftstufe) -> erschöpfung, schlechte Eigenschaften, Probenmod +Giftstufe/2; Warnung bei Überanstrengung auf Max. -> KO-Senkung nicht implementiert; KO = 0 -> Giftstufe/2 SP pro Tag; vollständige (!?) Wiederherstellung durch eine Dosis möglich (Überanstrengung, Wiederaufbau KO "normal")
-		*/
 		/*
 		Wundheilung aufnehmen
 			mehr als 5 SP unbehandelt seit letzter Regeneration? -> Wundfieber möglich (bei gescheiterter oder ausgebliebener HKW-Probe) -> weitere Vor- und Nachteile beachten: Immunität gegen Krankheiten (alle/Wundfieber), Resistenz gegen Krankheiten (Wechselwirkung mit "Heimwehkrank" berücksichtigen), Krankheitsanfällig
@@ -573,6 +625,7 @@ on(
 		"gm_roll_opt",
 		"le", "ae", "ke",
 		"le_max", "ae_max", "ke_max",
+		"nachteil_sucht_suchtmittel",
 		"nachteil_verwoehnt",
 		"reg_le_fest",
 		"reg_ae_fest",
@@ -591,6 +644,7 @@ on(
 		"reg_schlaf_mod_schlafwandler",
 		"reg_schlaf_nahrungsrestriktion_effekt",
 		"reg_schlaf_schlafstoerung_ausloeser",
+		"reg_schlaf_sucht_entzug_effekt",
 		"reg_schlaf_verwoehnt_zufrieden",
 		"taw_selbstbeherrschung",
 		"eigenschaft1selbstbeherrschung", "eigenschaft2selbstbeherrschung", "eigenschaft3selbstbeherrschung",
@@ -603,6 +657,7 @@ on(
 			'gm_roll_opt',
 			'LE', 'AE', 'KE',
 			'LE_max', 'AE_max', 'KE_max',
+			'nachteil_sucht_suchtmittel',
 			'nachteil_verwoehnt',
 			'reg_le_fest',
 			'reg_ae_fest',
@@ -619,6 +674,7 @@ on(
 			'reg_schlaf_mod_schlafwandler',
 			'reg_schlaf_nahrungsrestriktion_effekt',
 			'reg_schlaf_schlafstoerung_ausloeser',
+			'reg_schlaf_sucht_entzug_effekt',
 			'reg_schlaf_verwoehnt_zufrieden',
 			'TaW_selbstbeherrschung',
 			'Eigenschaft1selbstbeherrschung', 'Eigenschaft2selbstbeherrschung', 'Eigenschaft3selbstbeherrschung',
@@ -651,6 +707,10 @@ on(
 			`{{critThresholds=[[[[${values["cs_talent"]}]]d1cs0cf2 + [[${values["cf_talent"]}]]d1cs0cf2]]}}`
 		];
 		const somnambulismRoll = "{{schlafwandeln=[[(@{reg_schlaf_mod_schlafwandler})]]}}";
+		const addictionRoll = [
+			`{{suchteffekt=[[${values["reg_schlaf_sucht_entzug_effekt"]}]]}}`,
+			`{{suchtmittel=${values["nachteil_sucht_suchtmittel"]}}}`
+		];
 		const unusedRoll = [
 			"{{ke=[[@{KE}d1]]}}",
 			"{{kereg=[[0]]}}",
@@ -692,6 +752,12 @@ on(
 		if (values["reg_schlaf_mod_schlafwandler"] !== "0")
 		{
 			roll = roll.concat(somnambulismRoll);
+		}
+
+		// Additional properties for addition
+		if (values["reg_schlaf_sucht_entzug_effekt"] !== "0")
+		{
+			roll = roll.concat(addictionRoll);
 		}
 
 		// Modifications if fixed regeneration
