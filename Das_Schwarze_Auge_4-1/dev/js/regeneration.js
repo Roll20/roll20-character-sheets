@@ -744,16 +744,16 @@ on(
 		var roll = [];
 		roll = roll.concat(baseRoll);
 
-		// Additional properties for astral energy regeneration
-		if (values["MagieTab"] === "1")
+		// Additional properties for astral energy regeneration, "0" = not hidden
+		if (values["MagieTab"] === "0")
 		{
 			roll = roll.concat(AERoll);
 		}
 
-		// Additional properties for karma energy regeneration
-		if (values["LiturgienTab"] === "1")
+		// Additional properties for karma energy regeneration, "0" = not hidden
+		if (values["LiturgienTab"] === "0")
 		{
-			roll = roll.concat(AERoll);
+			roll = roll.concat(KERoll);
 		}
 
 		// Additional property for food restriction
@@ -1026,9 +1026,9 @@ on('clicked:reg_schlaf-action', async (info) => {
 		computed["leneu"] = LEneu;
 
 		// AE Regeneration
+		var AERegTotal = 0;
 		if (results["aebase"])
 		{
-			var AERegTotal = 0;
 			var AEneu = parseInt(values["AE"]);
 
 			if (values["reg_ae_fest"] === "off")
@@ -1075,21 +1075,25 @@ on('clicked:reg_schlaf-action', async (info) => {
 				attrsToChange["AE"] = AEneu;
 			}
 			computed["aeneu"] = AEneu;
-			debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
 		}
 
 		// KE Regeneration
 		// No rule reduces or boosts the basal regeneration
 		var KERegTotal = 1;
-		var KEneu = parseInt(values["KE"]);
-
-		KEneu += KERegTotal;
-		KEneu = Math.min(KEneu, values["KE_max"]);
-		if (parseInt(values["KE"]) !== KEneu)
+		if (results["kebase"])
 		{
-			attrsToChange["KE"] = KEneu;
+			var KEneu = parseInt(values["KE"]);
+
+			KEneu += KERegTotal;
+			KEneu = Math.min(KEneu, values["KE_max"]);
+			if (parseInt(values["KE"]) !== KEneu)
+			{
+				attrsToChange["KE"] = KEneu;
+			}
+			computed["keneu"] = KEneu;
 		}
-		computed["keneu"] = KEneu;
+
+		debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
 		safeSetAttrs(attrsToChange);
 
 		finishRoll(
