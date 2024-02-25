@@ -7917,28 +7917,28 @@
           const thisLevel = +v[section_attribute('spells', id, 'spell_level')] || 0;
           output[section_attribute('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
           output[section_attribute('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
-          // show the spell that matches the spell level tab selected
+          // show THIS spell if spell level and spell tab match
           if (levelTab === -1 || levelTab === thisLevel) {
-            // caster2 is hidden: show the spell
+            // one caster: ignore caster tabs and show THIS spell
             if (hideCaster2 === 1) {
               output[section_attribute('spells', id, 'spell_show')] = 1;
-              // sheet is using 2 caster classes so continue to caster tabs
+              // multi-caster: continue using caster tabs
             } else if (hideCaster2 === 0) {
-              // caster tab is set to All or spell is class n/a: show the spell
+              // caster tab is All or spell class is 'n/a': show THIS spell
               if (casterTab === -1 || thisCaster === 0) {
                 output[section_attribute('spells', id, 'spell_show')] = 1;
-                // caster tab is caster1 and spell is caster1: show the spell
+                // caster tab is caster1 and spell is caster1: show THIS spell
               } else if (casterTab === 0 && thisCaster === 1) {
                 output[section_attribute('spells', id, 'spell_show')] = 1;
-                // caster tab is caster2 and spell is caster2: show the spell
+                // caster tab is caster2 and spell is caster2: show THIS spell
               } else if (casterTab === 1 && thisCaster === 2) {
                 output[section_attribute('spells', id, 'spell_show')] = 1;
-                // hide the spell
+                // hide THIS spell
               } else {
                 output[section_attribute('spells', id, 'spell_show')] = 0;
               }
             }
-            // hide the spell that does not match spell level tab selected
+            // hide THIS spell if it does not match spell level tab selected
           } else {
             output[section_attribute('spells', id, 'spell_show')] = 0;
           }
@@ -7949,17 +7949,21 @@
   });
 
   // Spell Tabs level change sync
-  on('change:repeating_spells:spell_level', (eventInfo) => {
+  on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_class', (eventInfo) => {
     // test if API is creating the repeating row and bail
     if (eventInfo.sourceType !== 'player') return;
-    getAttrs(['repeating_spells_spell_level', 'spell_tabs'], (v) => {
+    getAttrs(['repeating_spells_spell_level', 'repeating_spells_spell_caster_class', 'spell_caster_tabs', 'spell_tabs'], (v) => {
       const output = {};
+      // 0, 1, -1
+      const casterTab = +v.spell_caster_tabs || 0;
+      // 0, 1, 2
+      const thisCaster = +v.repeating_spells_spell_caster_class || 0;
       const levelTab = +v.spell_tabs || 0;
       const thisLevel = v.repeating_spells_spell_level;
-      // sync spell tab view to the spell level change
-      if (thisLevel !== '?' && levelTab !== thisLevel) {
-        output.spell_tabs = thisLevel;
-      }
+      // jumps to spell level tab unless Show All or same level tab
+      output.spell_tabs = thisLevel >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
+      // jumps to caster class tab unless Show All or same caster tab
+      output.spell_caster_tabs = casterTab !== -1 && thisCaster <= 1 ? 0 : 1;
       setAttrs(output);
     });
   });
