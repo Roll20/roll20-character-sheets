@@ -7663,17 +7663,25 @@
         const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
         const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
         // armor in use ie 'worn', should always be considered as carried
+        // if (worn === 1) {
+        //   carriedSelect = 1;
+        //   output[`repeating_equipment_${id}_equipment_carried_select`] = 1;
+        // } else if (worn === 0) {
+        //   if (carriedSelect === 0) {
+        //     carriedSelect = 0;
+        //     output[`repeating_equipment_${id}_equipment_carried_select`] = 0;
+        //   } else if (carriedSelect === 2) {
+        //     carriedSelect = 2;
+        //     output[`repeating_equipment_${id}_equipment_carried_select`] = 2;
+        //   }
+        // }
         if (worn === 1) {
           carriedSelect = 1;
           output[`repeating_equipment_${id}_equipment_carried_select`] = 1;
-        } else if (worn === 0) {
-          if (carriedSelect === 0) {
-            carriedSelect = 0;
-            output[`repeating_equipment_${id}_equipment_carried_select`] = 0;
-          } else if (carriedSelect === 2) {
-            carriedSelect = 2;
-            output[`repeating_equipment_${id}_equipment_carried_select`] = 2;
-          }
+          clog(`armor is worn: so armor is carried`);
+        } else if (worn === 0 && (carriedSelect === 0 || carriedSelect === 2)) {
+          output[`repeating_equipment_${id}_equipment_carried_select`] = carriedSelect;
+          clog(`armor is not worn: so armor is not carried or on mount.`);
         }
         const thisLog = [
           `ID:${id} ITEM:${item} TYPE:${type} WORN:${worn} AC:${ac} BASE:${base} MAGIC:${magic} MOD:${mod} BULK:${bulk} CARRIED:${carriedSelect} WEIGHT:${weight} COST:${cost} UPDATED:`,
@@ -7835,7 +7843,7 @@
       ],
       (v) => {
         const newID = generateUniqueRowID();
-        clog(`Creating a new attack newID:${newID}`);
+        // clog(`Creating a new attack newID:${newID}`);
         output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
         output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`] || 0;
         output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
@@ -11109,6 +11117,7 @@
     charismaCalcs();
   });
 
+  // uses CRP to auto-update link with sheet_image_src
   on('clicked:postimage', (eventInfo) => {
     getAttrs(['character_avatar', 'sheet_image', 'sheet_image_url', 'toggle_npc'], (v) => {
       const output = {};
