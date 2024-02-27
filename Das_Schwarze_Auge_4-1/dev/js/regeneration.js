@@ -65,7 +65,7 @@ on(
 			}
 
 			// Regeneration mod from advantages/disadvantages
-			attrsToChange["reg_le_mod_vn"] = regenerationLevel; // regeneration, life energy, modifier, advantages/disadvantages (Vorteile/Nachteile)
+			attrsToChange["reg_sleep_le_mod_advantages_disadvantages"] = regenerationLevel; // regeneration, life energy, modifier, advantages/disadvantages (Vorteile/Nachteile)
 			safeSetAttrs(attrsToChange);
 		}
 });
@@ -77,7 +77,7 @@ on(
 	"change:vorteil_schnelle_heilung_i " +
 	"change:vorteil_schnelle_heilung_ii " +
 	"change:vorteil_schnelle_heilung_iii " +
-	"change:reg_schlaf_verwoehnt_zufrieden ",
+	"change:reg_sleep_spoilt_satisfied ",
 	function(eventInfo) {
 		safeGetAttrs(
 			[
@@ -86,7 +86,7 @@ on(
 				'vorteil_schnelle_heilung_i',
 				'vorteil_schnelle_heilung_ii',
 				'vorteil_schnelle_heilung_iii',
-				'reg_schlaf_verwoehnt_zufrieden'
+				'reg_sleep_spoilt_satisfied'
 			], function(values) {
 			var attrsToChange = {};
 
@@ -94,7 +94,7 @@ on(
 			var spoilt = 0;
 			if (
 				values["nachteil_verwoehnt"] === "1" &&
-				values["reg_schlaf_verwoehnt_zufrieden"] === "0"
+				values["reg_sleep_spoilt_satisfied"] === "0"
 			) {
 				spoilt = parseInt(values["nachteil_verwoehnt_wert"]);
 			} else {
@@ -115,7 +115,7 @@ on(
 				regLEKOMod += 0;
 			}
 
-			attrsToChange["reg_le_ko"] = `@{KO} - (1d20 + (${regLEKOMod}))`;
+			attrsToChange["reg_sleep_le_ko"] = `@{KO} - (1d20 + (${regLEKOMod}))`;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -186,19 +186,19 @@ on(
 			}
 
 			// Regeneration mod from advantages/disadvantages
-			attrsToChange["reg_ae_mod_vn"] = regenerationLevel;	// regeneration, astral energy, modifier, advantages/disadvantages (Vorteile/Nachteile)
+			attrsToChange["reg_sleep_ae_mod_advantages_disadvantages"] = regenerationLevel;
 			safeSetAttrs(attrsToChange);
 		}
 });
 
 on(
 	"change:nachteil_heimwehkrank " +
-	"change:reg_schlaf_heimwehkrank_fern_der_heimat ",
+	"change:reg_sleep_homesickness_away_from_home ",
 	function(eventInfo) {
 		safeGetAttrs(
 			[
 				'nachteil_heimwehkrank',
-				'reg_schlaf_heimwehkrank_fern_der_heimat'
+				'reg_sleep_homesickness_away_from_home'
 			], function(values) {
 			var attrsToChange = {};
 
@@ -206,14 +206,14 @@ on(
 			var homesick = 0;
 			if (
 				values["nachteil_heimwehkrank"] === "1" &&
-				values["reg_schlaf_heimwehkrank_fern_der_heimat"] === "1"
+				values["reg_sleep_homesickness_away_from_home"] === "1"
 			) {
 				homesick = -1;
 			} else {
 				homesick = 0;
 			}
 
-			attrsToChange["reg_ae_mod_heimwehkrank"] = homesick;
+			attrsToChange["reg_sleep_ae_mod_homesickness"] = homesick;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -221,12 +221,12 @@ on(
 
 on(
 	"change:nachteil_nahrungsrestriktion " +
-	"change:reg_schlaf_nahrungsrestriktion_verletzt_dauer ",
+	"change:reg_sleep_food_restriction_violated_duration ",
 	function(eventInfo) {
 		safeGetAttrs(
 			[
 				'nachteil_nahrungsrestriktion',
-				'reg_schlaf_nahrungsrestriktion_verletzt_dauer'
+				'reg_sleep_food_restriction_violated_duration'
 			], function(values) {
 			var attrsToChange = {};
 
@@ -235,11 +235,11 @@ on(
 			if (values["nachteil_nahrungsrestriktion"] === "1")
 			{
 				if (
-					values["reg_schlaf_nahrungsrestriktion_verletzt_dauer"] > 0 &&
-					values["reg_schlaf_nahrungsrestriktion_verletzt_dauer"] <= 3
+					values["reg_sleep_food_restriction_violated_duration"] > 0 &&
+					values["reg_sleep_food_restriction_violated_duration"] <= 3
 				) {
 					restriction = -2;
-				} else if (values["reg_schlaf_nahrungsrestriktion_verletzt_dauer"] > 3) {
+				} else if (values["reg_sleep_food_restriction_violated_duration"] > 3) {
 					restriction = "total";
 				} else {
 					restriction = 0;
@@ -250,24 +250,24 @@ on(
 
 			switch(restriction) {
 				case 0:
-					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 0;
-					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
-					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_sleep_food_restriction_effect"] = 0;
+					attrsToChange["reg_sleep_le_mod_food_restriction"] = 0;
+					attrsToChange["reg_sleep_ae_mod_food_restriction"] = 0;
 					break;
 				case -2:
-					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 1;
-					attrsToChange["reg_le_mod_nahrungsrestriktion"] = -2;
-					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = -2;
+					attrsToChange["reg_sleep_food_restriction_effect"] = 1;
+					attrsToChange["reg_sleep_le_mod_food_restriction"] = -2;
+					attrsToChange["reg_sleep_ae_mod_food_restriction"] = -2;
 					break;
 				case "total":
-					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 2;
-					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
-					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_sleep_food_restriction_effect"] = 2;
+					attrsToChange["reg_sleep_le_mod_food_restriction"] = 0;
+					attrsToChange["reg_sleep_ae_mod_food_restriction"] = 0;
 					break;
 				default:
-					attrsToChange["reg_schlaf_nahrungsrestriktion_effekt"] = 0;
-					attrsToChange["reg_le_mod_nahrungsrestriktion"] = 0;
-					attrsToChange["reg_ae_mod_nahrungsrestriktion"] = 0;
+					attrsToChange["reg_sleep_food_restriction_effect"] = 0;
+					attrsToChange["reg_sleep_le_mod_food_restriction"] = 0;
+					attrsToChange["reg_sleep_ae_mod_food_restriction"] = 0;
 			}
 			safeSetAttrs(attrsToChange);
 		});
@@ -280,7 +280,7 @@ on(
 	"change:vorteil_astrale_regeneration_i " +
 	"change:vorteil_astrale_regeneration_ii " +
 	"change:vorteil_astrale_regeneration_iii " +
-	"change:reg_schlaf_verwoehnt_zufrieden ",
+	"change:reg_sleep_spoilt_satisfied ",
 	function(eventInfo) {
 		safeGetAttrs(
 			[
@@ -289,7 +289,7 @@ on(
 				'vorteil_astrale_regeneration_i',
 				'vorteil_astrale_regeneration_ii',
 				'vorteil_astrale_regeneration_iii',
-				'reg_schlaf_verwoehnt_zufrieden'
+				'reg_sleep_spoilt_satisfied'
 			], function(values) {
 			var attrsToChange = {};
 
@@ -297,7 +297,7 @@ on(
 			var spoilt = 0;
 			if (
 				values["nachteil_verwoehnt"] === "1" &&
-				values["reg_schlaf_verwoehnt_zufrieden"] === "0"
+				values["reg_sleep_spoilt_satisfied"] === "0"
 			) {
 				spoilt = parseInt(values["nachteil_verwoehnt_wert"]);
 			} else {
@@ -318,7 +318,7 @@ on(
 				regAEINMod += 0;
 			}
 
-			attrsToChange["reg_ae_in"] = `@{IN} - (1d20 + (${regAEINMod}))`;
+			attrsToChange["reg_sleep_ae_in"] = `@{IN} - (1d20 + (${regAEINMod}))`;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -385,8 +385,8 @@ on(
 				}
 			}
 
-			attrsToChange["reg_schlaf_schlafstoerung_ausloeser"] = sleepDisorder["trigger"];
-			attrsToChange["reg_schlaf_schlafstoerung_effekt"] = sleepDisorder["effect"];
+			attrsToChange["reg_sleep_sleep_disorder_trigger"] = sleepDisorder["trigger"];
+			attrsToChange["reg_sleep_sleep_disorder_effect"] = sleepDisorder["effect"];
 			safeSetAttrs(attrsToChange);
 		}
 });
@@ -409,7 +409,7 @@ on("change:nachteil_schlafwandler",
 					effect = "(-1) * ({ 0d1, 1d4 - 3 }kh1)";
 				}
 			}
-			attrsToChange["reg_schlaf_mod_schlafwandler"] = effect;
+			attrsToChange["reg_sleep_mod_somnambulism"] = effect;
 			safeSetAttrs(attrsToChange);
 		}
 });
@@ -418,7 +418,7 @@ on(
 	[
 		"nachteil_sucht",
 		"nachteil_sucht_giftstufe",
-		"reg_schlaf_sucht_entzug_dauer"
+		"reg_sleep_addiction_withdrawal_duration"
 	].map(attr => "change:" + attr).join(" "),
 	function(eventInfo) {
 		const caller = "Action Listener for Handling Addiction Effects";
@@ -426,7 +426,7 @@ on(
 			[
 				'nachteil_sucht',
 				'nachteil_sucht_giftstufe',
-				'reg_schlaf_sucht_entzug_dauer'
+				'reg_sleep_addiction_withdrawal_duration'
 			], function(values) {
 			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
 			var attrsToChange = {};
@@ -436,12 +436,12 @@ on(
 			if (values["nachteil_sucht"] === "1")
 			{
 				var threshold = 15 - parseInt(values["nachteil_sucht_giftstufe"]);
-				if (values["reg_schlaf_sucht_entzug_dauer"] < threshold)
+				if (values["reg_sleep_addiction_withdrawal_duration"] < threshold)
 				{
 					addiction = 0;
 				} else if (
-					values["reg_schlaf_sucht_entzug_dauer"] >= threshold &&
-					values["reg_schlaf_sucht_entzug_dauer"] < 2 * threshold
+					values["reg_sleep_addiction_withdrawal_duration"] >= threshold &&
+					values["reg_sleep_addiction_withdrawal_duration"] < 2 * threshold
 				) {
 					addiction = 1;
 				} else {
@@ -453,16 +453,16 @@ on(
 
 			switch(addiction) {
 				case 0:
-					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 0;
+					attrsToChange["reg_sleep_addiction_withdrawal_effect"] = 0;
 					break;
 				case 1:
-					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 1;
+					attrsToChange["reg_sleep_addiction_withdrawal_effect"] = 1;
 					break;
 				case 2:
-					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 2;
+					attrsToChange["reg_sleep_addiction_withdrawal_effect"] = 2;
 					break;
 				default:
-					attrsToChange["reg_schlaf_sucht_entzug_effekt"] = 0;
+					attrsToChange["reg_sleep_addiction_withdrawal_effect"] = 0;
 			}
 			debugLog(caller, "tail", "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
@@ -536,10 +536,10 @@ on(
 					attrsToChange["sf_meisterliche_regeneration"] = "1";
 					break;
 			}
-			attrsToChange["reg_ae_base"] = AEBaseRegenerationRoll;
+			attrsToChange["reg_sleep_ae_base"] = AEBaseRegenerationRoll;
 
 			// Regeneration mod from special skills
-			attrsToChange["reg_ae_mod_sf"] = regenerationLevel;	// regeneration, astral energy, modifier, special skills (Sonderfertigkeiten)
+			attrsToChange["reg_sleep_ae_mod_special_skills"] = regenerationLevel;	// regeneration, astral energy, modifier, special skills (Sonderfertigkeiten)
 			safeSetAttrs(attrsToChange);
 		}
 	});
@@ -548,31 +548,31 @@ on(
 // Handling all changes leading to fixed regeneration
 on(
 	[
-		"reg_schlaf_nahrungsrestriktion_effekt",
-		"reg_schlaf_sucht_entzug_effekt"
+		"reg_sleep_food_restriction_effect",
+		"reg_sleep_addiction_withdrawal_effect"
 	].map(attr => "change:" + attr).join(" "),
 	function(eventInfo) {
 		const caller = "Action Listener for Fixed Regeneration";
 		safeGetAttrs(
 			[
-				'reg_schlaf_nahrungsrestriktion_effekt',
-				'reg_schlaf_sucht_entzug_effekt'
+				'reg_sleep_food_restriction_effect',
+				'reg_sleep_addiction_withdrawal_effect'
 			], function(values) {
 			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
 			var attrsToChange = {};
-			const addiction = values["reg_schlaf_sucht_entzug_effekt"];
-			const restriction = values["reg_schlaf_nahrungsrestriktion_effekt"];
+			const addiction = values["reg_sleep_addiction_withdrawal_effect"];
+			const restriction = values["reg_sleep_food_restriction_effect"];
 
 			if (
 				addiction === 1 ||
 				addiction === 2 ||
 				restriction === 2
 			) {
-				attrsToChange["reg_le_fest"] = 0;
-				attrsToChange["reg_ae_fest"] = 0;
+				attrsToChange["reg_sleep_le_fixed"] = 0;
+				attrsToChange["reg_sleep_ae_fixed"] = 0;
 			} else {
-				attrsToChange["reg_le_fest"] = "off";
-				attrsToChange["reg_ae_fest"] = "off";
+				attrsToChange["reg_sleep_le_fixed"] = "off";
+				attrsToChange["reg_sleep_ae_fixed"] = "off";
 			}
 			debugLog(caller, "tail", "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
@@ -581,8 +581,8 @@ on(
 
 /* handle regeneration-related values */
 on(
-	"change:reg_le_mod_vn " +
-	"change:reg_ae_mod_vn " +
+	"change:reg_sleep_le_mod_advantages_disadvantages " +
+	"change:reg_sleep_ae_mod_advantages_disadvantages " +
 	"change:nachteil_heimwehkrank " +
 	"change:nachteil_nahrungsrestriktion " +
 	"change:nachteil_schlafstoerungen_i " +
@@ -594,8 +594,8 @@ on(
 	"change:nachteil_verwoehnt_wert ",
 	function() {
 	safeGetAttrs([
-		"reg_le_mod_vn",
-		"reg_ae_mod_vn",
+		"reg_sleep_le_mod_advantages_disadvantages",
+		"reg_sleep_ae_mod_advantages_disadvantages",
 		"nachteil_heimwehkrank",
 		"nachteil_nahrungsrestriktion",
 		"nachteil_schlafstoerungen_i",
@@ -627,25 +627,23 @@ on(
 		"le_max", "ae_max", "ke_max",
 		"nachteil_sucht_suchtmittel",
 		"nachteil_verwoehnt",
-		"reg_le_fest",
-		"reg_ae_fest",
-		"reg_le_ko",
-		"reg_le_mod_nahrungsrestriktion",
-		"reg_le_mod_vn",
-		"reg_le_schlaf_mod_general",
-		"reg_le_schlaf_mod_le",
-		"reg_ae_base",
-		"reg_ae_in",
-		"reg_ae_mod_heimwehkrank",
-		"reg_ae_mod_nahrungsrestriktion",
-		"reg_ae_mod_sf",
-		"reg_ae_mod_vn",
-		"reg_schlaf_mod_general", "reg_schlaf_mod_ae", "reg_schlaf_mod_ke", "reg_schlaf_mod_le",
-		"reg_schlaf_mod_schlafwandler",
-		"reg_schlaf_nahrungsrestriktion_effekt",
-		"reg_schlaf_schlafstoerung_ausloeser",
-		"reg_schlaf_sucht_entzug_effekt",
-		"reg_schlaf_verwoehnt_zufrieden",
+		"reg_sleep_le_fixed",
+		"reg_sleep_ae_fixed",
+		"reg_sleep_le_ko",
+		"reg_sleep_le_mod_food_restriction",
+		"reg_sleep_le_mod_advantages_disadvantages",
+		"reg_sleep_ae_base",
+		"reg_sleep_ae_in",
+		"reg_sleep_ae_mod_homesickness",
+		"reg_sleep_ae_mod_food_restriction",
+		"reg_sleep_ae_mod_special_skills",
+		"reg_sleep_ae_mod_advantages_disadvantages",
+		"reg_sleep_mod_general", "reg_sleep_ae_mod_general", "reg_sleep_ke_mod_general", "reg_sleep_le_mod_general",
+		"reg_sleep_mod_somnambulism",
+		"reg_sleep_food_restriction_effect",
+		"reg_sleep_sleep_disorder_trigger",
+		"reg_sleep_addiction_withdrawal_effect",
+		"reg_sleep_spoilt_satisfied",
 		"taw_selbstbeherrschung",
 		"eigenschaft1selbstbeherrschung", "eigenschaft2selbstbeherrschung", "eigenschaft3selbstbeherrschung",
 		"cs_talent", "cf_talent",
@@ -662,23 +660,23 @@ on(
 			'LE_max', 'AE_max', 'KE_max',
 			'nachteil_sucht_suchtmittel',
 			'nachteil_verwoehnt',
-			'reg_le_fest',
-			'reg_ae_fest',
-			'reg_le_ko',
-			'reg_le_mod_nahrungsrestriktion',
-			'reg_le_mod_vn',
-			'reg_ae_base',
-			'reg_ae_in',
-			'reg_ae_mod_heimwehkrank',
-			'reg_ae_mod_nahrungsrestriktion',
-			'reg_ae_mod_sf',
-			'reg_ae_mod_vn',
-			'reg_schlaf_mod_general', 'reg_schlaf_mod_ae', 'reg_schlaf_mod_ke', 'reg_schlaf_mod_le',
-			'reg_schlaf_mod_schlafwandler',
-			'reg_schlaf_nahrungsrestriktion_effekt',
-			'reg_schlaf_schlafstoerung_ausloeser',
-			'reg_schlaf_sucht_entzug_effekt',
-			'reg_schlaf_verwoehnt_zufrieden',
+			'reg_sleep_le_fixed',
+			'reg_sleep_ae_fixed',
+			'reg_sleep_le_ko',
+			'reg_sleep_le_mod_food_restriction',
+			'reg_sleep_le_mod_advantages_disadvantages',
+			'reg_sleep_ae_base',
+			'reg_sleep_ae_in',
+			'reg_sleep_ae_mod_homesickness',
+			'reg_sleep_ae_mod_food_restriction',
+			'reg_sleep_ae_mod_special_skills',
+			'reg_sleep_ae_mod_advantages_disadvantages',
+			'reg_sleep_mod_general', 'reg_sleep_ae_mod_general', 'reg_sleep_ke_mod_general', 'reg_sleep_le_mod_general',
+			'reg_sleep_mod_somnambulism',
+			'reg_sleep_food_restriction_effect',
+			'reg_sleep_sleep_disorder_trigger',
+			'reg_sleep_addiction_withdrawal_effect',
+			'reg_sleep_spoilt_satisfied',
 			'TaW_selbstbeherrschung',
 			'Eigenschaft1selbstbeherrschung', 'Eigenschaft2selbstbeherrschung', 'Eigenschaft3selbstbeherrschung',
 			'cs_talent', 'cf_talent',
@@ -692,29 +690,29 @@ on(
 			"&{template:reg-sleep}",
 			`{{charactername=${values["character_name"]}}}`,
 			`{{le=${values["LE"]}}}`,
-			`{{lebase=[[1d6 + (${values["reg_le_mod_vn"]}) + (${values["reg_le_mod_nahrungsrestriktion"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_le"]})]]}}`,
-			`{{leko=[[${values["reg_le_ko"]}]]}}`,
+			`{{lebase=[[1d6 + (${values["reg_sleep_le_mod_advantages_disadvantages"]}) + (${values["reg_sleep_le_mod_food_restriction"]}) + (${values["reg_sleep_mod_general"]}) + (${values["reg_sleep_le_mod_general"]})]]}}`,
+			`{{leko=[[${values["reg_sleep_le_ko"]}]]}}`,
 			"{{leneu=[[0d1]]}}"
 		];
 		const AERoll = [
 			`{{ae=${values["AE"]}}}`,
-			`{{aebase=[[${values["reg_ae_base"]} + (${values["reg_ae_mod_vn"]}) + (${values["reg_ae_mod_heimwehkrank"]}) + (${values["reg_ae_mod_nahrungsrestriktion"]}) + (${values["reg_ae_mod_sf"]}) + (${values["reg_schlaf_mod_general"]}) + (${values["reg_schlaf_mod_ae"]})]]}}`,
-			`{{aein=[[${values["reg_ae_in"]}]]}}`,
+			`{{aebase=[[${values["reg_sleep_ae_base"]} + (${values["reg_sleep_ae_mod_advantages_disadvantages"]}) + (${values["reg_sleep_ae_mod_homesickness"]}) + (${values["reg_sleep_ae_mod_food_restriction"]}) + (${values["reg_sleep_ae_mod_special_skills"]}) + (${values["reg_sleep_mod_general"]}) + (${values["reg_sleep_ae_mod_general"]})]]}}`,
+			`{{aein=[[${values["reg_sleep_ae_in"]}]]}}`,
 			"{{aeneu=[[0d1]]}}"
 		];
 		const KERoll = [
 			`{{ke=${values["KE"]}}}`,
-			`{{kebase=[[1d1 + (${values["reg_schlaf_mod_ke"]})]]}}`,
+			`{{kebase=[[1d1 + (${values["reg_sleep_ke_mod_general"]})]]}}`,
 			"{{keneu=[[0d1]]}}"
 		];
-		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_schlaf_nahrungsrestriktion_effekt})]]}}";
+		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}";
 		const sleepDisorderRoll = [
 			// general decision for triggering sleep disorder or not
-			`{{schlafstoerung=[[${values["reg_schlaf_schlafstoerung_ausloeser"]}]]}}`,
+			`{{schlafstoerung=[[${values["reg_sleep_sleep_disorder_trigger"]}]]}}`,
 			// effect of sleep disorder on life regeneration
-			"{{leschlafstoerung=[[(@{reg_schlaf_schlafstoerung_effekt})]]}}",
+			"{{leschlafstoerung=[[(@{reg_sleep_sleep_disorder_effect})]]}}",
 			// effect of sleep disorder on astral regeneration
-			"{{aeschlafstoerung=[[(@{reg_schlaf_schlafstoerung_effekt})]]}}",
+			"{{aeschlafstoerung=[[(@{reg_sleep_sleep_disorder_effect})]]}}",
 			// case for showing correct parts in roll template
 			"{{schlafstoerungfall=[[0d1]]}}"
 		];
@@ -731,9 +729,9 @@ on(
 			"{{criticality=[[0]]}}",
 			`{{critThresholds=[[[[${values["cs_talent"]}]]d1cs0cf2 + [[${values["cf_talent"]}]]d1cs0cf2]]}}`
 		];
-		const somnambulismRoll = "{{schlafwandeln=[[(@{reg_schlaf_mod_schlafwandler})]]}}";
+		const somnambulismRoll = "{{schlafwandeln=[[(@{reg_sleep_mod_somnambulism})]]}}";
 		const addictionRoll = [
-			`{{suchteffekt=[[${values["reg_schlaf_sucht_entzug_effekt"]}]]}}`,
+			`{{suchteffekt=[[${values["reg_sleep_addiction_withdrawal_effect"]}]]}}`,
 			`{{suchtmittel=${values["nachteil_sucht_suchtmittel"]}}}`
 		];
 		const unusedRoll = [
@@ -757,13 +755,13 @@ on(
 		}
 
 		// Additional property for food restriction
-		if (values["reg_schlaf_nahrungsrestriktion_effekt"] !== 0)
+		if (values["reg_sleep_food_restriction_effect"] !== 0)
 		{
 			roll = roll.concat(foodRestrictionRoll);
 		}
 
 		// Additional properties for sleep disorder
-		switch(values["reg_schlaf_schlafstoerung_ausloeser"])
+		switch(values["reg_sleep_sleep_disorder_trigger"])
 		{
 			case "1d2":
 				roll = roll.concat(sleepDisorderIIRoll);
@@ -774,35 +772,35 @@ on(
 		}
 
 		// Additional property for somnambulism
-		if (values["reg_schlaf_mod_schlafwandler"] !== "0")
+		if (values["reg_sleep_mod_somnambulism"] !== "0")
 		{
 			roll = roll.concat(somnambulismRoll);
 		}
 
 		// Additional properties for addition
-		if (values["reg_schlaf_sucht_entzug_effekt"] !== "0")
+		if (values["reg_sleep_addiction_withdrawal_effect"] !== "0")
 		{
 			roll = roll.concat(addictionRoll);
 		}
 
 		// Modifications if fixed regeneration
-		if (values["reg_le_fest"] !== "off")
+		if (values["reg_sleep_le_fixed"] !== "off")
 		{
-			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=${values["reg_le_fest"]}}}`;
+			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=${values["reg_sleep_le_fixed"]}}}`;
 			roll[roll.findIndex(value => /leko=/.test(value))] = "{{leko=[[0d1]]}}";
 		}
-		if (values["reg_ae_fest"] !== "off")
+		if (values["reg_sleep_ae_fixed"] !== "off")
 		{
-			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=${values["reg_ae_fest"]}}}`;
+			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=${values["reg_sleep_ae_fixed"]}}}`;
 			roll[roll.findIndex(value => /aein=/.test(value))] = "{{aein=[[0d1]]}}";
 		}
-		safeSetAttrs({"reg_schlaf_roll": roll.join(" ")});
+		safeSetAttrs({"reg_sleep_roll": roll.join(" ")});
 	});
 });
 
-on('clicked:reg_schlaf-action', async (info) => {
+on('clicked:reg_sleep-action', async (info) => {
 	const caller = "Action Listener for Regeneration Button (Sleep)";
-	results = await startRoll("@{reg_schlaf_roll}");
+	results = await startRoll("@{reg_sleep_roll}");
 	debugLog(caller, "head", "info:", info, "results:", results);
 	var rollID = results.rollId;
 	var results = results.results;
@@ -970,10 +968,10 @@ on('clicked:reg_schlaf-action', async (info) => {
 		[
 			'LE', 'AE', 'KE',
 			'LE_max', 'AE_max', 'KE_max',
-			'reg_le_fest',
-			'reg_ae_fest',
+			'reg_sleep_le_fixed',
+			'reg_sleep_ae_fixed',
 			'nachteil_verwoehnt',
-			'reg_schlaf_verwoehnt_zufrieden'
+			'reg_sleep_spoilt_satisfied'
 		], function(values) {
 		var attrsToChange = {};
 
@@ -981,14 +979,14 @@ on('clicked:reg_schlaf-action', async (info) => {
 		var LERegTotal = 0;
 		var LEneu = parseInt(values["LE"]);
 
-		if (values["reg_le_fest"] === "off")
+		if (values["reg_sleep_le_fixed"] === "off")
 		{
 			// Additional regeneration from KO check
 			var LEKO = 0;
 			if (results["leko"].result >= 0) {
 				LEKO = 1;
 			} else {
-				if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
+				if (values["nachteil_verwoehnt"] === "1" && values["reg_sleep_spoilt_satisfied"] === "0") {
 					LEKO = -1;
 				} else {
 					LEKO = 0;
@@ -1014,7 +1012,7 @@ on('clicked:reg_schlaf-action', async (info) => {
 				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
 		} else {
-			LERegTotal = parseInt(values["reg_le_fest"]);
+			LERegTotal = parseInt(values["reg_sleep_le_fixed"]);
 		}
 		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
 		LEneu += LERegTotal;
@@ -1031,14 +1029,14 @@ on('clicked:reg_schlaf-action', async (info) => {
 		{
 			var AEneu = parseInt(values["AE"]);
 
-			if (values["reg_ae_fest"] === "off")
+			if (values["reg_sleep_ae_fixed"] === "off")
 			{
 				// Additional regeneration from IN check
 				var AEIN = 0;
 				if (results["aein"].result >= 0) {
 					AEIN = 1;
 				} else {
-					if (values["nachteil_verwoehnt"] === "1" && values["reg_schlaf_verwoehnt_zufrieden"] === "0") {
+					if (values["nachteil_verwoehnt"] === "1" && values["reg_sleep_spoilt_satisfied"] === "0") {
 						AEIN = -1;
 					} else {
 						AEIN = 0;
@@ -1064,7 +1062,7 @@ on('clicked:reg_schlaf-action', async (info) => {
 					AERegTotal += parseInt(results["schlafwandeln"]["result"]);
 				}
 			} else {
-				AERegTotal = parseInt(values["reg_ae_fest"]);
+				AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
 			}
 			computed["aeneu"] = attrsToChange["AE"];
 			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);

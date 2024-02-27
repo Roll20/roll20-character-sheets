@@ -893,7 +893,7 @@ const melee = [
 */
 // Regeneration buttons
 const reg = [
-	'reg_schlaf'
+	'reg_sleep'
 ];
 
 // Minimum regeneration per regeneration phase (sleep)
