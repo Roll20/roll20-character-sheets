@@ -4457,9 +4457,6 @@
   const replaceSet = (attr, set) => {
     // set must be an object, with key: value pairs of 'itemToReplace': 'replaceWith'.
     let modifiedAttr = attr; // Create a new variable to store the modified string
-    // Object.entries(set).forEach(([toReplace, replaceWith]) => {
-    //   modifiedAttr = modifiedAttr.replace(new RegExp(toReplace.replace('{', '{'), 'gi'), replaceWith);
-    // });
     _.each(Object.entries(set), ([toReplace, replaceWith]) => {
       modifiedAttr = modifiedAttr.replace(new RegExp(toReplace.replace('{', '{'), 'gi'), replaceWith);
     });
@@ -4579,6 +4576,7 @@
     'armorother5_row_id',
     'armorother6_row_id',
   ];
+
   const armorAttrs = [
     'unarmored_worn',
     'unarmored',
@@ -5210,8 +5208,7 @@
       }
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: migrate HP completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
-      calcHP();
+      setAttrs(output, {silent: true}, versionator(current_version, final_version), calcHP());
     });
   };
 
@@ -5251,8 +5248,7 @@
       }
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: Migrate AC completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
-      calcAC(recalc);
+      setAttrs(output, {silent: true}, versionator(current_version, final_version), calcAC(recalc));
     });
   };
 
@@ -6916,32 +6912,35 @@
   });
 
   // Exceptional
-  on(
-    'sheet:opened change:toggle_exceptional change:strength change:intelligence change:wisdom change:dexterity change:constitution change:charisma change:comeliness',
-    (eventInfo) => {
-      getAttrs(['strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional'], (v) => {
-        const output = {};
-        const toggle_exceptional = +v.toggle_exceptional || 0;
-        const strength = +v.strength || 0;
-        if (toggle_exceptional === 0) {
-          const intelligence = +v.intelligence || 0;
-          const wisdom = +v.wisdom || 0;
-          const dexterity = +v.dexterity || 0;
-          const constitution = +v.constitution || 0;
-          const charisma = +v.charisma || 0;
-          const comeliness = +v.comeliness || 0;
-          output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
-          output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
-          output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
-          output.exceptional_constitution_flag = constitution >= 18 ? 1 : 0;
-          output.exceptional_charisma_flag = charisma >= 18 ? 1 : 0;
-          output.exceptional_comeliness_flag = comeliness >= 18 ? 1 : 0;
-        }
-        output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
-        setAttrs(output, {silent: true});
-      });
-    }
-  );
+  on('change:abilities_info_show change:toggle_exceptional change:intelligence change:wisdom change:dexterity change:constitution change:charisma change:comeliness', (eventInfo) => {
+    getAttrs(['intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional'], (v) => {
+      const output = {};
+      const toggle_exceptional = +v.toggle_exceptional || 0;
+      if (toggle_exceptional === 1) return;
+      const intelligence = +v.intelligence || 0;
+      const wisdom = +v.wisdom || 0;
+      const dexterity = +v.dexterity || 0;
+      const constitution = +v.constitution || 0;
+      const charisma = +v.charisma || 0;
+      const comeliness = +v.comeliness || 0;
+      output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
+      output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
+      output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
+      output.exceptional_constitution_flag = constitution >= 18 ? 1 : 0;
+      output.exceptional_charisma_flag = charisma >= 18 ? 1 : 0;
+      output.exceptional_comeliness_flag = comeliness >= 18 ? 1 : 0;
+      setAttrs(output, {silent: true});
+    });
+  });
+
+  on('change:abilities_info_show change:toggle_exceptional change:strength', (eventInfo) => {
+    getAttrs(['strength'], (v) => {
+      const output = {};
+      const strength = +v.strength || 0;
+      output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+      setAttrs(output, {silent: true});
+    });
+  });
 
   // PC or NPC sheet role
   on('change:is_npc', (eventInfo) => {
