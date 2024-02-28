@@ -4669,17 +4669,11 @@
   // use blankUpdateTemplate below as a guide to add updates to versionator.
   // const blankUpdateTemplate = (current_version, final_version) => {
   // have this line up near the start
-  //  const update = {};
+  //  const output = {};
   // do stuff. ie geSectionIDs, getAttrs, all the various calculations
   // then end the worker
-  //  update.sheet_version = current_version;
-  //  setAttrs(
-  //    update,
-  //    {
-  //      silent: true,
-  //    },
-  //    versionator(current_version, final_version)
-  //  );
+  //  output.sheet_version = current_version;
+  //  setAttrs(output, {silent: true}, versionator(current_version, final_version));
   // dont forget any close brackets for getattrs, etc.
   //  };
   // END
@@ -4695,18 +4689,18 @@
         fields.push(section_attribute('weapon', id, 'macro-text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const macrodefault =
           '&{template:attacks} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}';
         _.each(idArray, (id) => {
           const macrotext = v[section_attribute('weapon', id, 'macro-text')] || macrodefault;
           // replaces old attribute value with new
-          update[section_attribute('weapon', id, 'macro-text')] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
-          update[section_attribute('weapon', id, 'AttackDmgBonus')] = +v[section_attribute('weapon', id, 'DmgBonus')] || 0;
+          output[section_attribute('weapon', id, 'macro-text')] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
+          output[section_attribute('weapon', id, 'AttackDmgBonus')] = +v[section_attribute('weapon', id, 'DmgBonus')] || 0;
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: dmgSwap completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4719,21 +4713,21 @@
         fields.push(section_attribute('ability', id, 'max'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         _.each(idArray, (id) => {
           // replaces old attribute value with new
-          update[section_attribute('ability', id, 'current_max')] = +v[section_attribute('ability', id, 'max')] || 0;
+          output[section_attribute('ability', id, 'current_max')] = +v[section_attribute('ability', id, 'max')] || 0;
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: maxSwap completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   // replace default macro-text of non-weapon proficiencies ONLY IF they haven't been edited
   const nwpMacroUpdate = (current_version, final_version) => {
-    const update = {};
+    const output = {};
     getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
       const fields = [];
       _.each(idArray, (id) => {
@@ -4748,15 +4742,15 @@
         };
         _.each(idArray, (id) => {
           if (v[section_attribute('nonweaponproficiencies', id, 'macro-text')]) {
-            update[section_attribute('nonweaponproficiencies', id, 'macro-text')] = v[section_attribute('nonweaponproficiencies', id, 'macro-text')].replace(
+            output[section_attribute('nonweaponproficiencies', id, 'macro-text')] = v[section_attribute('nonweaponproficiencies', id, 'macro-text')].replace(
               replacements.nwp_old,
               replacements.nwp_new
             );
           }
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: nwpMacroUpdate completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4783,7 +4777,7 @@
         fields.push(section_attribute('weapon', id, 'weaponnotes'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const namesToFix = {
           '@{rateoffire}': '@{weapon_rateoffire}',
           '@{weaponname}': '@{weapon_name}',
@@ -4805,36 +4799,36 @@
           '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD]) ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}';
         _.each(idArray, (id) => {
           if (doUpdate(v[section_attribute('weapon', id, 'rateoffire')]))
-            update[section_attribute('weapon', id, 'weapon_rateoffire')] = int(v[section_attribute('weapon', id, 'rateoffire')]);
-          if (doUpdate(v[section_attribute('weapon', id, 'roll')])) update[section_attribute('weapon', id, 'weapon_roll')] = v[section_attribute('weapon', id, 'roll')];
-          if (doUpdate(v[section_attribute('weapon', id, 'weaponname')])) update[section_attribute('weapon', id, 'weapon_name')] = v[section_attribute('weapon', id, 'weaponname')];
+            output[section_attribute('weapon', id, 'weapon_rateoffire')] = int(v[section_attribute('weapon', id, 'rateoffire')]);
+          if (doUpdate(v[section_attribute('weapon', id, 'roll')])) output[section_attribute('weapon', id, 'weapon_roll')] = v[section_attribute('weapon', id, 'roll')];
+          if (doUpdate(v[section_attribute('weapon', id, 'weaponname')])) output[section_attribute('weapon', id, 'weapon_name')] = v[section_attribute('weapon', id, 'weaponname')];
           if (doUpdate(v[section_attribute('weapon', id, 'tohitbonus')]))
-            update[section_attribute('weapon', id, 'weapon_tohitbonus')] = int(v[section_attribute('weapon', id, 'tohitbonus')]);
+            output[section_attribute('weapon', id, 'weapon_tohitbonus')] = int(v[section_attribute('weapon', id, 'tohitbonus')]);
           if (doUpdate(v[section_attribute('weapon', id, 'magicbonus')]))
-            update[section_attribute('weapon', id, 'weapon_magicbonus')] = int(v[section_attribute('weapon', id, 'magicbonus')]);
+            output[section_attribute('weapon', id, 'weapon_magicbonus')] = int(v[section_attribute('weapon', id, 'magicbonus')]);
           if (doUpdate(v[section_attribute('weapon', id, 'attackdmgbonus')]))
-            update[section_attribute('weapon', id, 'weapon_attackdmgbonus')] = int(v[section_attribute('weapon', id, 'attackdmgbonus')]);
+            output[section_attribute('weapon', id, 'weapon_attackdmgbonus')] = int(v[section_attribute('weapon', id, 'attackdmgbonus')]);
           if (doUpdate(v[section_attribute('weapon', id, 'whisper_to-hit')]))
-            update[section_attribute('weapon', id, 'weapon_whisper_to_hit')] = v[section_attribute('weapon', id, 'whisper_to-hit')];
+            output[section_attribute('weapon', id, 'weapon_whisper_to_hit')] = v[section_attribute('weapon', id, 'whisper_to-hit')];
           if (doUpdate(v[section_attribute('weapon', id, 'macro-text')], oldMacrotext))
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = replaceSet(v[section_attribute('weapon', id, 'macro-text')], namesToFix);
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = replaceSet(v[section_attribute('weapon', id, 'macro-text')], namesToFix);
           if (doUpdate(v[section_attribute('weapon', id, 'damagesmallmedium')]))
-            update[section_attribute('weapon', id, 'weapon_damagesmallmedium')] = v[section_attribute('weapon', id, 'damagesmallmedium')];
+            output[section_attribute('weapon', id, 'weapon_damagesmallmedium')] = v[section_attribute('weapon', id, 'damagesmallmedium')];
           if (doUpdate(v[section_attribute('weapon', id, 'damagelarge')]))
-            update[section_attribute('weapon', id, 'weapon_damagelarge')] = v[section_attribute('weapon', id, 'damagelarge')];
-          if (doUpdate(v[section_attribute('weapon', id, 'range')])) update[section_attribute('weapon', id, 'weapon_range')] = v[section_attribute('weapon', id, 'range')];
+            output[section_attribute('weapon', id, 'weapon_damagelarge')] = v[section_attribute('weapon', id, 'damagelarge')];
+          if (doUpdate(v[section_attribute('weapon', id, 'range')])) output[section_attribute('weapon', id, 'weapon_range')] = v[section_attribute('weapon', id, 'range')];
           if (doUpdate(v[section_attribute('weapon', id, 'quantity')]))
-            update[section_attribute('weapon', id, 'weapon_quantity')] = float(v[section_attribute('weapon', id, 'quantity')]);
-          if (doUpdate(v[section_attribute('weapon', id, 'weight')])) update[section_attribute('weapon', id, 'weapon_weight')] = float(v[section_attribute('weapon', id, 'weight')]);
+            output[section_attribute('weapon', id, 'weapon_quantity')] = float(v[section_attribute('weapon', id, 'quantity')]);
+          if (doUpdate(v[section_attribute('weapon', id, 'weight')])) output[section_attribute('weapon', id, 'weapon_weight')] = float(v[section_attribute('weapon', id, 'weight')]);
           if (doUpdate(v[section_attribute('weapon', id, 'weaponspeed')]))
-            update[section_attribute('weapon', id, 'weapon_speed')] = int(v[section_attribute('weapon', id, 'weaponspeed')]);
-          if (doUpdate(v[section_attribute('weapon', id, 'cost')])) update[section_attribute('weapon', id, 'weapon_cost')] = float(v[section_attribute('weapon', id, 'cost')]);
+            output[section_attribute('weapon', id, 'weapon_speed')] = int(v[section_attribute('weapon', id, 'weaponspeed')]);
+          if (doUpdate(v[section_attribute('weapon', id, 'cost')])) output[section_attribute('weapon', id, 'weapon_cost')] = float(v[section_attribute('weapon', id, 'cost')]);
           if (doUpdate(v[section_attribute('weapon', id, 'weaponnotes')]))
-            update[section_attribute('weapon', id, 'weapon_notes')] = v[section_attribute('weapon', id, 'weaponnotes')];
+            output[section_attribute('weapon', id, 'weapon_notes')] = v[section_attribute('weapon', id, 'weaponnotes')];
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: weaponNameFix completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4859,7 +4853,7 @@
         fields.push(section_attribute('spells', id, 'description-show'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const namesToFix = {
           '@{memorized}': '@{spell_memorized}',
           '@{level}': '@{spell_level}',
@@ -4877,29 +4871,29 @@
         const oldMacrotext =
           '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{name}}} {{Level:=@{level}}} {{Range:=@{range}}} {{Duration:=@{duration}}} {{AOE:=@{aoe}}} {{Comp:=@{components}}} {{CT:=@{ct}}} {{Save:=@{save}}} {{freetext=@{description}}}';
         _.each(idArray, (id) => {
-          if (doUpdate(v[section_attribute('spells', id, 'roll')])) update[section_attribute('spells', id, 'spell_roll')] = v[section_attribute('spells', id, 'roll')];
+          if (doUpdate(v[section_attribute('spells', id, 'roll')])) output[section_attribute('spells', id, 'spell_roll')] = v[section_attribute('spells', id, 'roll')];
           if (doUpdate(v[section_attribute('spells', id, 'memorized')]))
-            update[section_attribute('spells', id, 'spell_memorized')] = int(v[section_attribute('spells', id, 'memorized')]);
-          if (doUpdate(v[section_attribute('spells', id, 'level')])) update[section_attribute('spells', id, 'spell_level')] = v[section_attribute('spells', id, 'level')];
-          if (doUpdate(v[section_attribute('spells', id, 'name')])) update[section_attribute('spells', id, 'spell_name')] = v[section_attribute('spells', id, 'name')];
-          if (doUpdate(v[section_attribute('spells', id, 'school')])) update[section_attribute('spells', id, 'spell_school')] = v[section_attribute('spells', id, 'school')];
-          if (doUpdate(v[section_attribute('spells', id, 'range')])) update[section_attribute('spells', id, 'spell_range')] = v[section_attribute('spells', id, 'range')];
-          if (doUpdate(v[section_attribute('spells', id, 'duration')])) update[section_attribute('spells', id, 'spell_duration')] = v[section_attribute('spells', id, 'duration')];
-          if (doUpdate(v[section_attribute('spells', id, 'aoe')])) update[section_attribute('spells', id, 'spell_aoe')] = v[section_attribute('spells', id, 'aoe')];
+            output[section_attribute('spells', id, 'spell_memorized')] = int(v[section_attribute('spells', id, 'memorized')]);
+          if (doUpdate(v[section_attribute('spells', id, 'level')])) output[section_attribute('spells', id, 'spell_level')] = v[section_attribute('spells', id, 'level')];
+          if (doUpdate(v[section_attribute('spells', id, 'name')])) output[section_attribute('spells', id, 'spell_name')] = v[section_attribute('spells', id, 'name')];
+          if (doUpdate(v[section_attribute('spells', id, 'school')])) output[section_attribute('spells', id, 'spell_school')] = v[section_attribute('spells', id, 'school')];
+          if (doUpdate(v[section_attribute('spells', id, 'range')])) output[section_attribute('spells', id, 'spell_range')] = v[section_attribute('spells', id, 'range')];
+          if (doUpdate(v[section_attribute('spells', id, 'duration')])) output[section_attribute('spells', id, 'spell_duration')] = v[section_attribute('spells', id, 'duration')];
+          if (doUpdate(v[section_attribute('spells', id, 'aoe')])) output[section_attribute('spells', id, 'spell_aoe')] = v[section_attribute('spells', id, 'aoe')];
           if (doUpdate(v[section_attribute('spells', id, 'components')]))
-            update[section_attribute('spells', id, 'spell_components')] = v[section_attribute('spells', id, 'components')];
-          if (doUpdate(v[section_attribute('spells', id, 'ct')])) update[section_attribute('spells', id, 'spell_ct')] = v[section_attribute('spells', id, 'ct')];
-          if (doUpdate(v[section_attribute('spells', id, 'save')])) update[section_attribute('spells', id, 'spell_save')] = v[section_attribute('spells', id, 'save')];
+            output[section_attribute('spells', id, 'spell_components')] = v[section_attribute('spells', id, 'components')];
+          if (doUpdate(v[section_attribute('spells', id, 'ct')])) output[section_attribute('spells', id, 'spell_ct')] = v[section_attribute('spells', id, 'ct')];
+          if (doUpdate(v[section_attribute('spells', id, 'save')])) output[section_attribute('spells', id, 'spell_save')] = v[section_attribute('spells', id, 'save')];
           if (doUpdate(v[section_attribute('spells', id, 'macro-text')], oldMacrotext))
-            update[section_attribute('spells', id, 'spell_macro_text')] = replaceSet(v[section_attribute('spells', id, 'macro-text')], namesToFix);
+            output[section_attribute('spells', id, 'spell_macro_text')] = replaceSet(v[section_attribute('spells', id, 'macro-text')], namesToFix);
           if (doUpdate(v[section_attribute('spells', id, 'description')]))
-            update[section_attribute('spells', id, 'spell_description')] = v[section_attribute('spells', id, 'description')];
+            output[section_attribute('spells', id, 'spell_description')] = v[section_attribute('spells', id, 'description')];
           if (doUpdate(v[section_attribute('spells', id, 'description-show')]))
-            update[section_attribute('spells', id, 'spell_description_show')] = int(v[section_attribute('spells', id, 'description-show')]);
+            output[section_attribute('spells', id, 'spell_description_show')] = int(v[section_attribute('spells', id, 'description-show')]);
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: spellNameFix completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4918,27 +4912,27 @@
         fields.push(section_attribute('equipment', id, 'cos'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         _.each(idArray, (id) => {
           if (doUpdate(v[section_attribute('equipment', id, 'item-show')]))
-            update[section_attribute('equipment', id, 'equipment_item_show')] = v[section_attribute('equipment', id, 'item-show')];
-          if (doUpdate(v[section_attribute('equipment', id, 'item')])) update[section_attribute('equipment', id, 'equipment_item')] = v[section_attribute('equipment', id, 'item')];
+            output[section_attribute('equipment', id, 'equipment_item_show')] = v[section_attribute('equipment', id, 'item-show')];
+          if (doUpdate(v[section_attribute('equipment', id, 'item')])) output[section_attribute('equipment', id, 'equipment_item')] = v[section_attribute('equipment', id, 'item')];
           if (doUpdate(v[section_attribute('equipment', id, 'location')]))
-            update[section_attribute('equipment', id, 'equipment_location')] = v[section_attribute('equipment', id, 'location')];
+            output[section_attribute('equipment', id, 'equipment_location')] = v[section_attribute('equipment', id, 'location')];
           if (doUpdate(v[section_attribute('equipment', id, 'carried')]))
-            update[section_attribute('equipment', id, 'equipment_carried')] = v[section_attribute('equipment', id, 'carried')];
+            output[section_attribute('equipment', id, 'equipment_carried')] = v[section_attribute('equipment', id, 'carried')];
           if (doUpdate(v[section_attribute('equipment', id, 'quantity')]))
-            update[section_attribute('equipment', id, 'equipment_quantity')] = float(v[section_attribute('equipment', id, 'quantity')]);
+            output[section_attribute('equipment', id, 'equipment_quantity')] = float(v[section_attribute('equipment', id, 'quantity')]);
           if (doUpdate(v[section_attribute('equipment', id, 'quantity_max')]))
-            update[section_attribute('equipment', id, 'equipment_quantity_max')] = float(v[section_attribute('equipment', id, 'quantity_max')]);
+            output[section_attribute('equipment', id, 'equipment_quantity_max')] = float(v[section_attribute('equipment', id, 'quantity_max')]);
           if (doUpdate(v[section_attribute('equipment', id, 'weight')]))
-            update[section_attribute('equipment', id, 'equipment_weight')] = float(v[section_attribute('equipment', id, 'weight')]);
+            output[section_attribute('equipment', id, 'equipment_weight')] = float(v[section_attribute('equipment', id, 'weight')]);
           if (doUpdate(v[section_attribute('equipment', id, 'cost')]))
-            update[section_attribute('equipment', id, 'equipment_cost')] = float(v[section_attribute('equipment', id, 'cost')]);
+            output[section_attribute('equipment', id, 'equipment_cost')] = float(v[section_attribute('equipment', id, 'cost')]);
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: equipmentNameFix completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -4957,7 +4951,7 @@
         fields.push(section_attribute('equipment', id, 'description-show'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const namesToFix = {
           '@{name}': '@{ability_name}',
           '@{current}': '@{ability_current}',
@@ -4969,24 +4963,24 @@
         const oldMacrotext =
           '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{name}}} {{freetext=@{short_description} @{description}}}';
         _.each(idArray, (id) => {
-          if (doUpdate(v[section_attribute('equipment', id, 'roll')])) update[section_attribute('equipment', id, 'ability_roll')] = v[section_attribute('equipment', id, 'roll')];
-          if (doUpdate(v[section_attribute('equipment', id, 'name')])) update[section_attribute('equipment', id, 'ability_name')] = v[section_attribute('equipment', id, 'name')];
+          if (doUpdate(v[section_attribute('equipment', id, 'roll')])) output[section_attribute('equipment', id, 'ability_roll')] = v[section_attribute('equipment', id, 'roll')];
+          if (doUpdate(v[section_attribute('equipment', id, 'name')])) output[section_attribute('equipment', id, 'ability_name')] = v[section_attribute('equipment', id, 'name')];
           if (doUpdate(v[section_attribute('equipment', id, 'short_description')]))
-            update[section_attribute('equipment', id, 'ability_short_description')] = v[section_attribute('equipment', id, 'short_description')];
+            output[section_attribute('equipment', id, 'ability_short_description')] = v[section_attribute('equipment', id, 'short_description')];
           if (doUpdate(v[section_attribute('equipment', id, 'current')]))
-            update[section_attribute('equipment', id, 'ability_current')] = int(v[section_attribute('equipment', id, 'current')]);
+            output[section_attribute('equipment', id, 'ability_current')] = int(v[section_attribute('equipment', id, 'current')]);
           if (doUpdate(v[section_attribute('equipment', id, 'current_max')]))
-            update[section_attribute('equipment', id, 'ability_current_max')] = int(v[section_attribute('equipment', id, 'current_max')]);
+            output[section_attribute('equipment', id, 'ability_current_max')] = int(v[section_attribute('equipment', id, 'current_max')]);
           if (doUpdate(v[section_attribute('equipment', id, 'macro-text')], oldMacrotext))
-            update[section_attribute('equipment', id, 'ability_macro_text')] = replaceSet(v[section_attribute('equipment', id, 'macro-text')], namesToFix);
+            output[section_attribute('equipment', id, 'ability_macro_text')] = replaceSet(v[section_attribute('equipment', id, 'macro-text')], namesToFix);
           if (doUpdate(v[section_attribute('equipment', id, 'description')]))
-            update[section_attribute('equipment', id, 'ability_description')] = v[section_attribute('equipment', id, 'description')];
+            output[section_attribute('equipment', id, 'ability_description')] = v[section_attribute('equipment', id, 'description')];
           if (doUpdate(v[section_attribute('equipment', id, 'description-show')]))
-            update[section_attribute('equipment', id, 'ability_description_show')] = int(v[section_attribute('equipment', id, 'description-show')]);
+            output[section_attribute('equipment', id, 'ability_description_show')] = int(v[section_attribute('equipment', id, 'description-show')]);
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: abilityNameFix completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5007,7 +5001,7 @@
         fields.push(section_attribute('nonweaponproficiencies', id, 'description'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const namesToFix = {
           '@{name}': '@{nwp_name}',
           '@{rAttribute}': '@{nwp_attribute}',
@@ -5021,34 +5015,34 @@
           '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20 + [[@{rmodifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{rAttribute}[ATTR] ]]}}{{freetext=@{short_description}}}';
         _.each(idArray, (id) => {
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'roll')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_roll')] = v[section_attribute('nonweaponproficiencies', id, 'roll')];
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_roll')] = v[section_attribute('nonweaponproficiencies', id, 'roll')];
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'name')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_name')] = v[section_attribute('nonweaponproficiencies', id, 'name')];
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_name')] = v[section_attribute('nonweaponproficiencies', id, 'name')];
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'rAttribute')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')] = v[section_attribute('nonweaponproficiencies', id, 'rAttribute')].toLowerCase();
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')] = v[section_attribute('nonweaponproficiencies', id, 'rAttribute')].toLowerCase();
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'short_description')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_short_description')] = v[section_attribute('nonweaponproficiencies', id, 'short_description')];
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_short_description')] = v[section_attribute('nonweaponproficiencies', id, 'short_description')];
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'rSlots')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] = int(v[section_attribute('nonweaponproficiencies', id, 'rSlots')]);
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] = int(v[section_attribute('nonweaponproficiencies', id, 'rSlots')]);
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'rModifier')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] = int(v[section_attribute('nonweaponproficiencies', id, 'rModifier')]);
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] = int(v[section_attribute('nonweaponproficiencies', id, 'rModifier')]);
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'macro-text')], oldMacrotext))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = replaceSet(v[section_attribute('nonweaponproficiencies', id, 'macro-text')], namesToFix);
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = replaceSet(v[section_attribute('nonweaponproficiencies', id, 'macro-text')], namesToFix);
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'description-show')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_description_show')] = int(v[section_attribute('nonweaponproficiencies', id, 'description-show')]);
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_description_show')] = int(v[section_attribute('nonweaponproficiencies', id, 'description-show')]);
           if (doUpdate(v[section_attribute('nonweaponproficiencies', id, 'description')]))
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_description')] = v[section_attribute('nonweaponproficiencies', id, 'description')];
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_description')] = v[section_attribute('nonweaponproficiencies', id, 'description')];
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: nwpNameFix completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
 
   // add {{color=@{color}}} to all repeating macro-text
   const macroColorUpdate = (current_version, final_version) => {
-    const update = {};
+    const output = {};
     getSectionIDs('repeating_nonweaponproficiencies', (idnwps) => {
       getSectionIDs('repeating_weapon', (idweapons) => {
         getSectionIDs('repeating_ability', (idabilities) => {
@@ -5082,7 +5076,7 @@
               };
               _.each(idnwps, (id) => {
                 if (v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')]) {
-                  update[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
+                  output[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
                     replacements.nwp_old,
                     replacements.nwp_new
                   );
@@ -5091,7 +5085,7 @@
               });
               _.each(idweapons, (id) => {
                 if (v[section_attribute('weapon', id, 'weapon_macro_text')]) {
-                  update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+                  output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
                     replacements.wpn_old,
                     replacements.wpn_new
                   );
@@ -5100,7 +5094,7 @@
               });
               _.each(idabilities, (id) => {
                 if (v[section_attribute('ability', id, 'ability_macro_text')]) {
-                  update[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
+                  output[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
                     replacements.abl_old,
                     replacements.abl_new
                   );
@@ -5109,15 +5103,15 @@
               });
               _.each(idspells, (id) => {
                 if (v[section_attribute('spells', id, 'spell_macro_text')]) {
-                  update[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
+                  output[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
                     replacements.spl_old,
                     replacements.spl_new
                   );
                   clog(`VERSION UPDATE: colorUpdate completed`);
                 }
               });
-              update.sheet_version = current_version;
-              setAttrs(update, {silent: true}, versionator(current_version, final_version));
+              output.sheet_version = current_version;
+              setAttrs(output, {silent: true}, versionator(current_version, final_version));
             });
           });
         });
@@ -5186,16 +5180,16 @@
         fields.push(section_attribute('weapon', id, 'weapon_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const macrodefault =
           '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{attack1=[[1d20 + @{weapon_tohitbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{weapon_damagesmallmedium} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{weapon_damagelarge} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{weapon_notes}}} @{weapon_whisper_to_hit}';
         _.each(idArray, (id) => {
           const macrotext = v[section_attribute('weapon', id, 'weapon_macro_text')] || macrodefault;
-          update[section_attribute('weapon', id, 'weapon_macro_text')] = macrotext.replace(/} @{weapon_whisper_to_hit}/g, '}');
+          output[section_attribute('weapon', id, 'weapon_macro_text')] = macrotext.replace(/} @{weapon_whisper_to_hit}/g, '}');
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: removeWhisper completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5204,7 +5198,7 @@
   const migrateHP = (current_version, final_version) => {
     // clog('HP migrated');
     getAttrs(['hitpoints_max', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class'], (v) => {
-      const update = {};
+      const output = {};
       const hitPointsMax = +v.hitpoints_max || 0;
       const hitpoints_1_class = +v.hitpoints_1_class || 0;
       const hitpoints_2_class = +v.hitpoints_2_class || 0;
@@ -5212,11 +5206,11 @@
       const totalClassHP = int(Math.max(0, hitpoints_1_class) + Math.max(0, hitpoints_2_class) + Math.max(0, hitpoints_3_class));
       // older sheet will not have hp per class
       if (totalClassHP === 0 && hitPointsMax > 0) {
-        update.hitpoints_1_class = hitPointsMax;
+        output.hitpoints_1_class = hitPointsMax;
       }
-      update.sheet_version = current_version;
+      output.sheet_version = current_version;
       clog(`VERSION UPDATE: migrate HP completed`);
-      setAttrs(update, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, versionator(current_version, final_version));
       calcHP();
     });
   };
@@ -5224,7 +5218,7 @@
   // migrate AC
   const migrateAC = (current_version, final_version) => {
     getAttrs(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus', 'armorshield'], (v) => {
-      const update = {};
+      const output = {};
       const recalc = 0;
       let armorClass = +v.armorclass || 0;
       const armorBonus = -Math.abs(v.armorbonus) || 0;
@@ -5236,28 +5230,28 @@
       if (armorShield !== undefined) {
         if (armortypeAC === 10 && armorClass < 10) {
           armorClass += 1;
-          update.armortype_ac = armorClass;
-          update.armortype_base = armorClass;
-          update.armortype_worn = 1;
-          update.armortype_carried = 1;
-          update.armorshield_ac = -1;
-          update.armorshield_base = -1;
-          update.armorshield_worn = 1;
-          update.armorshield_carried = 1;
+          output.armortype_ac = armorClass;
+          output.armortype_base = armorClass;
+          output.armortype_worn = 1;
+          output.armortype_carried = 1;
+          output.armorshield_ac = -1;
+          output.armorshield_base = -1;
+          output.armorshield_worn = 1;
+          output.armorshield_carried = 1;
           clog(`new armor w/shield`);
         }
       } else if (armortypeAC === 10 && armorClass < 10) {
-        update.armortype_ac = armorClass;
-        update.armortype_base = armorClass;
-        update.armortype_worn = 1;
-        update.armortype_carried = 1;
+        output.armortype_ac = armorClass;
+        output.armortype_base = armorClass;
+        output.armortype_worn = 1;
+        output.armortype_carried = 1;
         clog(`new armor w/out shield`);
       } else {
         clog(`NEW ARMOR CHECK AND SET FAILED`);
       }
-      update.sheet_version = current_version;
+      output.sheet_version = current_version;
       clog(`VERSION UPDATE: Migrate AC completed`);
-      setAttrs(update, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, versionator(current_version, final_version));
       calcAC(recalc);
     });
   };
@@ -5271,7 +5265,7 @@
         fields.push(section_attribute('weapon', id, 'weapon_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const replacements = {
           weapon_old:
             '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{attack1=[[1d20 + @{weapon_tohitbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{weapon_damagesmallmedium} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{weapon_damagelarge} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{weapon_notes}}}',
@@ -5290,40 +5284,40 @@
         };
         _.each(idArray, (id) => {
           if (v[section_attribute('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v6) {
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
               replacements.weapon_old_v6,
               replacements.weapon_current
             );
           } else if (v[section_attribute('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v5) {
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
               replacements.weapon_old_v5,
               replacements.weapon_current
             );
           } else if (v[section_attribute('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v4) {
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
               replacements.weapon_old_v4,
               replacements.weapon_current
             );
           } else if (v[section_attribute('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v3) {
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
               replacements.weapon_old_v3,
               replacements.weapon_current
             );
           } else if (v[section_attribute('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v2) {
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
               replacements.weapon_old_v2,
               replacements.weapon_current
             );
           } else if (v[section_attribute('weapon', id, 'weapon_macro_text')] === replacements.weapon_old) {
-            update[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
+            output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')].replace(
               replacements.weapon_old,
               replacements.weapon_current
             );
           }
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: weaponMacroUpdate completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5336,7 +5330,7 @@
         fields.push(section_attribute('ability', id, 'ability_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const replacements = {
           ability_old:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{freetext=@{ability_short_description} @{ability_description}}}',
@@ -5353,39 +5347,39 @@
         };
         _.each(idArray, (id) => {
           if (v[section_attribute('ability', id, 'ability_macro_text')] === replacements.ability_old_v5) {
-            update[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
+            output[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
               replacements.ability_old_v5,
               replacements.ability_current
             );
           }
           if (v[section_attribute('ability', id, 'ability_macro_text')] === replacements.ability_old_v4) {
-            update[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
+            output[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
               replacements.ability_old_v4,
               replacements.ability_current
             );
           }
           if (v[section_attribute('ability', id, 'ability_macro_text')] === replacements.ability_old_v3) {
-            update[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
+            output[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
               replacements.ability_old_v3,
               replacements.ability_current
             );
           }
           if (v[section_attribute('ability', id, 'ability_macro_text')] === replacements.ability_old_v2) {
-            update[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
+            output[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
               replacements.ability_old_v2,
               replacements.ability_current
             );
           }
           if (v[section_attribute('ability', id, 'ability_macro_text')] === replacements.ability_old) {
-            update[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
+            output[section_attribute('ability', id, 'ability_macro_text')] = v[section_attribute('ability', id, 'ability_macro_text')].replace(
               replacements.ability_old,
               replacements.ability_current
             );
           }
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: abilityMacroUpdate completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5398,7 +5392,7 @@
         fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const replacements = {
           nwp_old:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{Proficiency Check=[[ 1d20 + [[@{nwp_modifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{nwp_attribute}[ATTR] ]]}}{{freetext=@{nwp_short_description}}}',
@@ -5409,21 +5403,21 @@
         };
         _.each(idArray, (id) => {
           if (v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] === replacements.nwp_old_2) {
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
               replacements.nwp_old_2,
               replacements.nwp_current
             );
           }
           if (v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] === replacements.nwp_old) {
-            update[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
+            output[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
               replacements.nwp_old,
               replacements.nwp_current
             );
           }
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: nwpMacroUpdate2 completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5436,7 +5430,7 @@
         fields.push(section_attribute('spells', id, 'spell_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const replacements = {
           spell_old:
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{Level:=@{spell_level}}} {{Range:=@{spell_range}}} {{Duration:=@{spell_duration}}} {{AOE:=@{spell_aoe}}} {{Comp:=@{spell_components}}} {{CT:=@{spell_ct}}} {{Save:=@{spell_save}}} {{freetext=@{spell_description}}}',
@@ -5449,27 +5443,27 @@
         };
         _.each(idArray, (id) => {
           if (v[section_attribute('spells', id, 'spell_macro_text')] === replacements.spell_old_v3) {
-            update[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
+            output[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
               replacements.spell_old_v3,
               replacements.spell_current
             );
           }
           if (v[section_attribute('spells', id, 'spell_macro_text')] === replacements.spell_old_v2) {
-            update[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
+            output[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
               replacements.spell_old_v2,
               replacements.spell_current
             );
           }
           if (v[section_attribute('spells', id, 'spell_macro_text')] === replacements.spell_old) {
-            update[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
+            output[section_attribute('spells', id, 'spell_macro_text')] = v[section_attribute('spells', id, 'spell_macro_text')].replace(
               replacements.spell_old,
               replacements.spell_current
             );
           }
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: spellsMacroUpdate completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5482,7 +5476,7 @@
         fields.push(section_attribute('equipment', id, 'equipment_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const replacements = {
           equipment_old:
             '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{freetext=@{equipment_description}}} {{quantity= @{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
@@ -5491,15 +5485,15 @@
         };
         _.each(idArray, (id) => {
           if (v[section_attribute('equipment', id, 'equipment_macro_text')] === replacements.equipment_old) {
-            update[section_attribute('equipment', id, 'equipment_macro_text')] = v[section_attribute('equipment', id, 'equipment_macro_text')].replace(
+            output[section_attribute('equipment', id, 'equipment_macro_text')] = v[section_attribute('equipment', id, 'equipment_macro_text')].replace(
               replacements.equipment_old,
               replacements.equipment_current
             );
           }
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: equipmentMacroUpdate completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5585,17 +5579,17 @@
         fields.push(section_attribute('weapon', id, 'weapon_macro_text'));
       });
       getAttrs([...fields], (v) => {
-        const update = {};
+        const output = {};
         const macrodefault =
           '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + @{weapon_backstab_bonus}[BACKSTAB] + @{weapon_tohitbonus}[HIT_BON] + @{weapon_prof_pen}[PROF_PEN] + @{weapon_dual_pen}[DUAL_PEN]+ @{weapon_magicbonus}[MAG_BON] + ?{To Hit Modifier?|0}[MISC_MOD] ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} @{weapon_tohitacadj}';
         _.each(idArray, (id) => {
           const macrotext = v[section_attribute('weapon', id, 'weapon_macro_text')] || macrodefault;
-          update[section_attribute('weapon', id, 'weapon_macro_text')] = macrotext.replace(/@{weapon_attack_type_pen}/g, '@{weapon_dual_pen}');
-          update[section_attribute('weapon', id, 'weapon_macro_text')] = macrotext.replace(/{{attacktype=@{weapon_attack_type}}} /g, '');
+          output[section_attribute('weapon', id, 'weapon_macro_text')] = macrotext.replace(/@{weapon_attack_type_pen}/g, '@{weapon_dual_pen}');
+          output[section_attribute('weapon', id, 'weapon_macro_text')] = macrotext.replace(/{{attacktype=@{weapon_attack_type}}} /g, '');
         });
-        update.sheet_version = current_version;
+        output.sheet_version = current_version;
         clog(`VERSION UPDATE: updateAttackTypeMacro completed`);
-        setAttrs(update, {silent: true}, versionator(current_version, final_version));
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
       });
     });
   };
@@ -5603,48 +5597,48 @@
   // One-time update: set MonsterHD from hitdice
   const monsterHD = (current_version, final_version) => {
     getAttrs(['hitdice', 'monsterHD'], (v) => {
-      const update = {};
+      const output = {};
       const monsterHD_value = v.monsterHD;
       const hitDice_value = v.hitdice;
       if (monsterHD_value === '') {
-        update.monsterHD = hitDice_value;
+        output.monsterHD = hitDice_value;
       }
-      update.monsterHD = monsterHD_value;
-      update.sheet_version = current_version;
+      output.monsterHD = monsterHD_value;
+      output.sheet_version = current_version;
       clog(`VERSION UPDATE: monsterHD completed`);
-      setAttrs(update, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, versionator(current_version, final_version));
     });
   };
 
   // One-time update: clear old armor details fields that have been removed
   const clearArmorOther = (current_version, final_version) => {
-    const update = {};
-    update.armorother_cost = 0;
-    update.armorother2_cost = 0;
-    update.armorother3_cost = 0;
-    update.armorother4_cost = 0;
-    update.armorother5_cost = 0;
-    update.armorother6_cost = 0;
-    update.armorother_weight = 0;
-    update.armorother2_weight = 0;
-    update.armorother3_weight = 0;
-    update.armorother4_weight = 0;
-    update.armorother5_weight = 0;
-    update.armorother6_weight = 0;
-    update.armorother_carried = 0;
-    update.armorother2_carried = 0;
-    update.armorother3_carried = 0;
-    update.armorother4_carried = 0;
-    update.armorother5_carried = 0;
-    update.armorother6_carried = 0;
-    update.armorother_bulk = 0;
-    update.armorother2_bulk = 0;
-    update.armorother3_bulk = 0;
-    update.armorother4_bulk = 0;
-    update.armorother5_bulk = 0;
-    update.armorother6_bulk = 0;
+    const output = {};
+    output.armorother_cost = 0;
+    output.armorother2_cost = 0;
+    output.armorother3_cost = 0;
+    output.armorother4_cost = 0;
+    output.armorother5_cost = 0;
+    output.armorother6_cost = 0;
+    output.armorother_weight = 0;
+    output.armorother2_weight = 0;
+    output.armorother3_weight = 0;
+    output.armorother4_weight = 0;
+    output.armorother5_weight = 0;
+    output.armorother6_weight = 0;
+    output.armorother_carried = 0;
+    output.armorother2_carried = 0;
+    output.armorother3_carried = 0;
+    output.armorother4_carried = 0;
+    output.armorother5_carried = 0;
+    output.armorother6_carried = 0;
+    output.armorother_bulk = 0;
+    output.armorother2_bulk = 0;
+    output.armorother3_bulk = 0;
+    output.armorother4_bulk = 0;
+    output.armorother5_bulk = 0;
+    output.armorother6_bulk = 0;
     clog(`VERSION UPDATE: clearArmorOther completed`);
-    setAttrs(update, {silent: true}, versionator(current_version, final_version));
+    setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
   // combines 2 arrays so that the row_id attr is ONLY used with copyArmorToEquipment()
@@ -6458,13 +6452,13 @@
 
   // One-time update:  migrate Armor Details to repeating_equipment
   const migrateArmorDetails = (current_version, final_version) => {
-    const update = {};
+    const output = {};
     const row_removed = 0;
     const migrate = 1;
     syncArmorToEquipment(null, null, row_removed, migrate);
-    update.sheet_version = current_version;
+    output.sheet_version = current_version;
     clog(`VERSION UPDATE: migrateArmorDetails completed`);
-    setAttrs(update, {silent: true}, versionator(current_version, final_version));
+    setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
   // One-time update: sets all equipment default values
