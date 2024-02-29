@@ -74,6 +74,7 @@ const defaultValues = {
 	"asp_max": 12, // Old attributes kept for compatibility (used in token bars)
 	"sf_meisterliche_regeneration_leiteigenschaft": "@{KL}",
 
+	"KE": 0,
 	"KE_max": 0,
 
 	"ap_verfuegbar": 0,
@@ -278,7 +279,26 @@ const defaultValues = {
 	"wound_la": 0,
 	"wound_lb": 0,
 	"wound_ra": 0,
-	"wound_rb": 0
+	"wound_rb": 0,
+
+	// Regeneration
+	"reg_sleep_le_ko": "@{KO} - 1d20",
+	"reg_sleep_le_fixed": "off",
+	"reg_sleep_le_mod_advantages_disadvantages": 0,
+	"reg_sleep_le_mod_food_restriction": 0,
+	"reg_sleep_ae_base": "1d6",
+	"reg_sleep_ae_in": "@{IN} - 1d20",
+	"reg_sleep_ae_fixed": "off",
+	"reg_sleep_ae_mod_advantages_disadvantages": 0,
+	"reg_sleep_ae_mod_special_skills": 0,
+	"reg_sleep_ae_mod_food_restriction": 0,
+	"reg_sleep_ae_mod_homesickness": 0,
+	"reg_sleep_addiction_withdrawal_effect": "0",
+	"reg_sleep_food_restriction_effect": "0",
+	"reg_sleep_mod_somnambulism": "0",
+	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
+	"reg_sleep_sleep_disorder_trigger": "1d0",
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
 };
 
 /*
