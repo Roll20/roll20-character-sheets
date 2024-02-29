@@ -7006,35 +7006,15 @@
           // Weight calcs use equipment_carried
           let carried = 0;
           const carriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0;
-          if (carriedSelect === 1) {
-            carried = 1;
-            output[section_attribute('equipment', id, 'equipment_carried')] = 1;
-          } else {
-            carried = 0;
-            output[section_attribute('equipment', id, 'equipment_carried')] = 0;
-          }
+          output[section_attribute('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
+          carried = carriedSelect === 1 ? 1 : 0;
           const quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
           let weight = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
           let weaponWeight = 0;
           let armorWeight = 0;
-          // weights
-          if (carried === 0 || quantity === 0) {
-            weight = 0;
-            weaponWeight = 0;
-            armorWeight = 0;
-          } else {
-            weight *= quantity;
-            switch (type) {
-              case 1:
-                weaponWeight = weight;
-                break;
-              case 2:
-                armorWeight = weight;
-                break;
-              default:
-                break;
-            }
-          }
+          weight = weight * quantity * carried;
+          if (type === 1) weaponWeight = weight;
+          if (type === 2) armorWeight = weight;
           weaponWeights.push(weaponWeight);
           armorWeights.push(armorWeight);
           totalEquipmentWeights.push(weight);
