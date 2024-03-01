@@ -104,6 +104,7 @@
     flex: 1 1 64px;
     margin-inline: .75em;
     max-width: 100px;
+    min-height: 2em;
 }
 
 .tab-content .tab-pane {
@@ -371,7 +372,7 @@
 .charsheet .toggle-costs:checked ~ .background .equipment-display-type[value="2"] ~ .equipment-columns,
 .charsheet .toggle-costs:checked ~ .background .equipment-display-type[value="2"] ~ .repcontainer .equipment-columns {
     display: grid;
-    grid-template-columns: 5em minmax(7em, 3fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em);
+    grid-template-columns: 3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em);
 }
 
 /* prevent interaction until an armor type is chosen */
@@ -910,7 +911,6 @@ summary::-webkit-details-marker {
     content: "%";
     font-size: var(--text-med);
     font-weight: normal;
-    left: -5px;
     position: relative;
 }
 
@@ -1683,9 +1683,8 @@ section.npc-box.statblock3 .image-avatar {
 .charsheet .abilities-columns {
     align-items: center;
     display: grid;
-    gap: 6px 0;
+    gap: 4px 0;
     grid-template-columns: 3.65em minmax(2.5em, 3.5em) auto minmax(4em, 1fr) 2.5em minmax(4em, 1.5fr) 3.5em minmax(4em, 1.5fr) 3.5em minmax(4em, 1fr) 3.5em minmax(4em, 0.85fr) minmax(3em, 4em);
-    justify-items: center;
     margin: 0 -1em 0 -1em;
 }
 
@@ -1697,22 +1696,40 @@ section.npc-box.statblock3 .image-avatar {
     width: auto;
 }
 
+.charsheet .abilities-columns label span,
+.charsheet .abilities-columns button {
+    text-align: right;
+}
+
 /* hyperlink and image buttons */
 .charsheet .background .wrapper button.image-link,
 .charsheet .background .wrapper button.info-link {
+    background-image: none;
+    border: none;
+    box-shadow: none;
     margin: auto;
     margin-left: 0;
     min-width: auto;
-    padding: 0 0 0 3px;
-    width: 1.25em;
 }
 
-.charsheet button.image-link::after,
-.charsheet button.info-link::after {
+.charsheet .background .wrapper button.image-link:hover,
+.charsheet .background .wrapper button.info-link:hover {
+    background-image: none;
+    border: none;
+    box-shadow: none;
+}
+
+.charsheet .background .wrapper button.image-link:hover::after,
+.charsheet .background .wrapper button.info-link:hover::after {
+    color: var(--link-hover);
+}
+
+.charsheet .background .wrapper button.image-link::after,
+.charsheet .background .wrapper button.info-link::after {
+    display: flex;
     font-family: 'Pictos';
-    font-size: calc(var(--text-med) + .25rem);
-    margin: 0 4px 0 0;
-    opacity: .75;
+    font-size: 14px;
+    opacity: .7;
 }
 
 .charsheet button.image-link::after {
@@ -1913,8 +1930,10 @@ section.npc-box.statblock3 .image-avatar {
 }
 
 .charsheet .background .wrapper .weapons-row2 > details :first-child button {
-    display: inline;
+    margin-inline: auto;
+    margin-top: -2px;
     max-height: 1.125em;
+    min-width: fit-content;
     padding-top: 0;
 }
 
@@ -2273,10 +2292,11 @@ details[open].thac0-box {
     padding: 0 2px 2px 2px;
 }
 
-.charsheet .repitem .special-abilities-row1:has( ~ details[open]),
-.charsheet .repitem .spells-repheader:has(~ details[open]) {
+.charsheet input.toggle-single-column-spells:checked ~ .background .repcontainer[data-groupname="repeating_spells"] .spells-repheader:has(~ details[open]),
+.charsheet .repitem .special-abilities-row1:has( ~ details[open]) {
     margin-bottom: -.75em;
 }
+
 
 .charsheet .repitem .nonweapon-proficiencies-row1:has(~ details[open]) {
     margin-bottom: -.5em;
@@ -3006,10 +3026,33 @@ details[open].thac0-box {
     width: 18px;
 }
 
+.charsheet .background .wrapper .repitem button[type="roll"].dice-button {
+    max-height: 20px;
+    max-width: 0;
+    min-width: 20px;
+    padding: 0;
+}
 
-.charsheet .wrapper button[type="roll"].dice-button::before {
-    content: "t";
+.charsheet .wrapper button[type="roll"] span.dice-button {
+    flex-direction: row;
+    display: flex;
+}
+
+.charsheet .background .wrapper details button span::before {
+    margin-right: 2px;
+}
+
+.charsheet .wrapper button[type="roll"].dice-button::before,
+.charsheet .wrapper button[type="roll"] span.dice-button::before {
+    align-self: center;
+    content: "0";
     font-family: "dicefontd20";
+    font-size: 14px;
+    opacity: .9;
+}
+
+.charsheet .wrapper button[type="roll"] span::before {
+    margin-right: 5px;
 }
 
 .charsheet .wrapper .button span {
@@ -3051,18 +3094,48 @@ details[open].thac0-box {
     width: auto;
 }
 
+/* text-only buttons */
+.charsheet .wrapper .abilities-box .abilities-columns button,
+.charsheet .wrapper .npc-box button.text-only,
+.charsheet .background .wrapper button.text-only {
+    align-items: stretch;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    justify-self: right;
+    margin-right: 2px;
+    max-width: none;
+    min-height: 1.5em;
+    min-width: auto;
+    width: auto;
+}
+
+.charsheet .wrapper .abilities-box button span,
+.charsheet .wrapper .npc-box button.text-only span,
+.charsheet .background .wrapper button.text-only span {
+    font-family: var(--font-base);
+    font-size: var(--text-med);
+}
+
+.charsheet .wrapper .abilities-box .abilities-columns button:hover,
+.charsheet .background .wrapper .npc-box button.text-only:hover,
+.charsheet .background .wrapper button.text-only:hover {
+    background-image: none;
+    border: none;
+    box-shadow: none;
+}
+
 .charsheet .wrapper button[type="roll"]:hover,
 .charsheet .wrapper button[type="action"]:hover {
     background: linear-gradient(180deg, rgb(216 216 216) 0%, rgb(255 252 252) 50%, rgb(206 206 206) 100%);
 }
-
 
 .charsheet .wrapper button[type="roll"]::before,
 .charsheet .wrapper button[type="action"]::before {
     content: none;
 }
 
-.charsheet .button[type="roll"].ability-button {
+.charsheet .wrapper .button[type="roll"].ability-button {
     min-width: 2.25em;
     padding: 0;
     margin: 0;
@@ -3071,8 +3144,6 @@ details[open].thac0-box {
 .charsheet .button[type="roll"].ability-button span {
     font-family: var(--font-buttons2);
     font-size: var(--text-xl);
-    font-weight: var(--text-wt500);
-    margin-top: -2px;
 }
 
 .charsheet .toggle-comeliness .button[type="roll"].ability-button:hover,
@@ -3085,9 +3156,9 @@ details[open].thac0-box {
 
 .charsheet .saves-columns button[type="roll"].saves-button,
 .charsheet .thief-columns button[type="roll"].thiefskills-button {
-    min-width: 7.5em;
+    justify-self: center;
     margin-block: 1px;
-    height: 2.25em;
+    min-width: 7.5em;
 }
 
 .sheet-darkmode .wrapper button[type="roll"]::after,
@@ -3121,7 +3192,7 @@ details[open].thac0-box {
 }
 /* Dark Buttons */
 .sheet-darkmode .background .wrapper button[type="roll"],
-.sheet-darkmode .background .wrapper button[type="action"]
+.sheet-darkmode .background .wrapper button[type="action"],
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attacks a[href^="!"],
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-general a[href^="!"],
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attacks a[href^="~"],
@@ -3131,11 +3202,10 @@ details[open].thac0-box {
     border-radius: 4px;
     border-top-width: 0;
     color: var(--color-white3);
-    overflow: hidden;
 }
 
-.sheet-darkmode .wrapper button[type="roll"]:hover,
-.sheet-darkmode .wrapper button[type="action"]:hover,
+.sheet-darkmode .charsheet .background .wrapper button[type="roll"]:hover,
+.sheet-darkmode .charsheet .background .wrapper button[type="action"]:hover,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attacks a[href^="!"]:hover,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-general a[href^="!"]:hover,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attacks a[href^="~"]:hover,
@@ -3154,11 +3224,7 @@ details[open].thac0-box {
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-general a[href^="~"]:hover {
     color: var(--color-white2);
     font-weight: normal;
-}
-
-.sheet-darkmode .wrapper button[type="roll"].info-link:hover::after,
-.sheet-darkmode .wrapper button[type="roll"].image-link:hover::after {
-    margin: 0 2px 0 2px;
+    width: auto;
 }
 
 .charsheet .statblock2 .five-columns .button {
@@ -3292,7 +3358,6 @@ details[open].thac0-box {
     background-position: inherit;
     color: var(--link-hover);
     font-weight: var(--text-wt600);
-    width: 100%;
 }
 
 
