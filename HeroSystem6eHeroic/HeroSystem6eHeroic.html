@@ -2016,7 +2016,7 @@
 								<h2>DCV: +0</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Throw object or character. Does STR damage.</p>
+								<p>Throw object or character. Does STR damage. DC limited to object PD + BODY.</p>
 								<div class ="item-maneuver-line">
 									<label class="container-checkbox-small-dark">
 										<input type="checkbox" name="attr_checkBrace">
@@ -2031,8 +2031,12 @@
 									</label>
 									<p>Set adds +1 OCV to ranged attacks.</p>
 								</div>
+								<div class ="item-maneuver-line-flex">
+									<p>DC Limit:</p>
+									<input type="number" name="attr_maneuverDCLimit" title="@{maneuverDCLimit}" step="1" min="1" max="20" value="5" tabindex="-1"/>
+								</div>
 								<div class="item-maneuver-button-line">
-									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Use STR</button>
+									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Throw</button>
 								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
@@ -8058,7 +8062,8 @@
 					"targetSelection":1,
 					"maneuverSelection":"strike",
 					"checkBrace":"unchecked",
-					"checkStrike":"unchecked"
+					"checkSet":"unchecked",
+					"maneuverDCLimit":5
 				});
 			} else {
 				setAttrs({
@@ -11598,7 +11603,7 @@
 	// Roll attack and damage dice for Weapon XX.
 	on(`clicked:attackStrength`, (info) => {
 		
-		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity"], function(values) {
+		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "maneuverDCLimit"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormalDamage = true;
@@ -11689,15 +11694,29 @@
 				halfDCV = true;
 			} else if (values.maneuverSelection === "strike") {
 				rollMessage = "Strike";
+			} else if (values.maneuverSelection === "throw") {
+				rollMessage = "Throw Object";
+				
+				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
+					isModified = true;
+					adjustedDC = parseInt(values.maneuverDCLimit)||0;
+				}
+				
+				setAttrs({
+					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1)
+				});
 			}
 			
 			// Create dice rolling text to send to a roll dialog.
 			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "throw")) {
 				
 				// First, check to see if this is a ranged attack.
-				if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet) {
+				if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet || (values.maneuverSelection === "throw")) {
 					isRangedAttack = true;
-					rollMessage = "Ranged " + rollMessage;
+					
+					if (values.maneuverSelection !== "throw") {
+						rollMessage = "Ranged " + rollMessage;
+					}
 					
 					// Braced modifiers.
 					if (isBraced) {
