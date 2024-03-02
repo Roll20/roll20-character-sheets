@@ -1947,7 +1947,9 @@
 							</div>
 							<div class ="item-maneuver-block-text">
 								<p>Spend a phase to add +1 OCV to ranged attacks against selected target.</p>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">SET</button>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonSet" tabindex="-1" name="act_maneuverSet" title="@{maneuverSet}">Set</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 79</p>
@@ -1965,7 +1967,6 @@
 							</div>
 							<div class ="item-maneuver-block-text">
 								<p>Push target 1 meter per 5 STR used, which target may resist. A collision does STR damage.</p>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">Roll</button>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 79</p>
@@ -2016,7 +2017,12 @@
 								<h2>DCV: +0</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Throw object or character. Does STR damage. DC limited to object PD + BODY.</p>
+								<p>Throw object or character. Does STR damage. Dice limited to object PD + BODY.</p>
+								<div class ="item-maneuver-line-flex">
+									<p>DC Limit:</p>
+									<input type="number" name="attr_maneuverDCLimit" title="@{maneuverDCLimit}" step="1" min="1" max="20" value="5" tabindex="-1"/>
+								</div>
+
 								<div class ="item-maneuver-line">
 									<label class="container-checkbox-small-dark">
 										<input type="checkbox" name="attr_checkBrace">
@@ -2030,10 +2036,6 @@
 										<span class="checkmark-small-dark" title="@{checkSet}"></span>
 									</label>
 									<p>Set adds +1 OCV to ranged attacks.</p>
-								</div>
-								<div class ="item-maneuver-line-flex">
-									<p>DC Limit:</p>
-									<input type="number" name="attr_maneuverDCLimit" title="@{maneuverDCLimit}" step="1" min="1" max="20" value="5" tabindex="-1"/>
 								</div>
 								<div class="item-maneuver-button-line">
 									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Throw</button>
@@ -11590,6 +11592,31 @@
 			theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Dodges}} ";
 			
 			theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV+"[ManeuverDCV]]]}}";
+			
+			startRoll(theRoll, (results) => {
+				let theResult = new Object();
+					
+				finishRoll(results.rollId, theResult);
+			});
+		});
+	});
+	
+	
+	on('clicked:maneuverSet', (info) => {
+		// Display chat message and add DCV.
+			
+		getAttrs(["currentDCV", "whisperToGM"], function(values) {
+			var theRoll = values.whisperToGM||"";
+			let maneuverDCV = 0;
+			
+			theRoll += "&{template:custom} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Set}} ";
+			
+			theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV+"[ManeuverDCV]]]}}";
+			
+			
+			setAttrs({
+				"checkSet":"on"
+			});
 			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
