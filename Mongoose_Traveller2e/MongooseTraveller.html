@@ -9432,17 +9432,24 @@
 
                     // We need to handle the weapon damage based on a) are they Destructive (DD)
                     // DOES THIS APPLY: and b) number of weapons which adds the number of damage dice as extra damage
-                    weaponDamage = formatWeaponDamage(weaponDamage).weaponDamage;
+                    wD = formatWeaponDamage(weaponDamage);
 
-                    startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=" + mountName + ":" + weaponType + "}}  @{ro_default_rolltype} + " + gunnerDM + " + " + dexMod + " + " + customMod + " @{ro_default_mod}]]}} {{damage=[[" + weaponDamage + "]]}}", (results) => {
+                    startRoll("@{whispertoggle}&{template:combat@{alt_rolltemplate_val}} {{character=@{character_name}}} {{weapon=" + mountName + ":" + weaponType + "}} {{effect=[[0D6]]}} @{ro_default_rolltype} + " + gunnerDM + " + " + dexMod + " + " + customMod + " @{ro_default_mod}]]}} {{damage=[[" + wD.weaponDamage + "]]}}", (results) => {
+
                         const toHit = results.results.roll.result;
                         var damage = results.results.damage.result
+                        var effect = results.results.effect.result;
+                        if(toHit > 8 && !wD.isDestructive) {
+                            damage += (toHit - 8);
+                            effect = toHit - 8;
+                        }
 
                         finishRoll(
                             results.rollId,
                             {
                                 roll: toHit,
                                 damage: damage,
+                                effect: effect
                             }
                         );
                     });
