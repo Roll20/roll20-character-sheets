@@ -1330,12 +1330,13 @@
             <input type="text" class="readonly-span width-small" name="attr_armorclass_rating" value="-" />
           </span>
         </span>
-        <span class="inline-label width-fill">
-          <button type="roll" name="roll_defensive_notes_roll" class="dice-button" title="%{selected|defensive_notes_roll}" value="@{whisper_pc} &amp;{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Defensive Notes}} {{freetext=@{defensive_notes}}}"></button>
-          <label>
-            <span>Defensive Notes:</span>
-            <textarea name="attr_defensive_notes" class="height-short" title="@{defensive_notes}" placeholder="Enter Defensive Notes..."></textarea>
+        <span class="inline-label">
+          <label class="width-auto">
+            <button type="roll" name="roll_defensive_notes_roll" class="dice-button text-only" title="%{selected|defensive_notes_roll}" value="@{whisper_pc} &amp;{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Defensive Notes}} {{freetext=@{defensive_notes}}}">
+              <span>Defensive Notes:</span>
+            </button>
           </label>
+            <textarea name="attr_defensive_notes" class="height-short" title="@{defensive_notes}" placeholder="Enter Defensive Notes..."></textarea>
         </span>
       </div>
     </section>
@@ -6955,7 +6956,7 @@
       let toggleNPC = +v.toggle_npc;
       toggleNPC = isNPC === 0 ? 0 : 1;
       output.toggle_npc = toggleNPC;
-      setAttrs(output);
+      setAttrs(output, {silent: true});
     });
   });
 
@@ -7032,7 +7033,7 @@
         output.total_equipment_weight = totalEquipmentWeight.toFixed(2);
         output.total_equipment_weight_adjusted = total_equipment_weight_adjusted.toFixed(2);
         output.total_weight = total_weight;
-        setAttrs(output);
+        setAttrs(output, {silent: true});
       });
     });
   };
@@ -7111,7 +7112,7 @@
   }
 
   on(
-    'sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk change:encumbrancebonus_lbs change:toggle_lbs',
+    'change:equipment_info_show change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk change:encumbrancebonus_lbs change:toggle_lbs',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       getAttrs(['encumbrancebonus', 'toggle_lbs'], (v) => {
@@ -7133,8 +7134,7 @@
         output.heavy_load = heavy;
         output.very_heavy_load = veryHeavy;
         output.max_load = max + 1;
-        setAttrs(output);
-        setCurrentEncumbranceFlag();
+        setAttrs(output, {silent: true}, setCurrentEncumbranceFlag());
       });
     }
   );
@@ -7164,7 +7164,7 @@
       output.movement_normal = adjustedMove;
       output.movement_known = adjustedMove * 5;
       output.movement_run = adjustedMove * 10;
-      setAttrs(output);
+      setAttrs(output, {silent: true});
     });
   }
 
@@ -7179,9 +7179,7 @@
       output.movement_heavy = Math.max(movement - 3, 0);
       output.movement_load = Math.max(movement - 6, 0);
       output.movement_max = Math.max(movement - 9, 0);
-      setAttrs(output);
-      setCurrentMovement();
-      calcAC(recalc);
+      setAttrs(output, {silent: true}, setCurrentMovement(), calcAC(recalc));
     });
   });
 
