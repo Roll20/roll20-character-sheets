@@ -30,6 +30,9 @@ This is a [**Roll20**](https://roll20.net/) character sheet for **Achtung! Cthul
 
 # Changelog
 
+## v1.01 (2024-01-30)
+- Fix initial weapon damage bug
+
 ## v1.00 (2024-01-18)
 - Initial release
 

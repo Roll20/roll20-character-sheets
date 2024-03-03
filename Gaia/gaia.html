@@ -167,9 +167,26 @@
 		});
 	});
 
-	
-	on("change:repeating_caracteristicas:caracteristica_custo change:repeating_caracteristicas:caracteristica_alvo change:repeating_caracteristicas:caracteristica_alcance change:repeating_caracteristicas:caracteristica_acao change:repeating_caracteristicas:caracteristica_propriedades", function(e) {
-		let campos = ['_custo','_alvo','_alcance','_acao','_propriedades'];
+	on("change:repeating_abilities:habilidade_rolagem", function(e){
+		getAttrs(['repeating_abilities_habilidade_rolagem'], function(v){
+			let rollformula = v['repeating_abilities_habilidade_rolagem'];
+			setAttrs({
+				'repeating_abilities_habilidade_rollformula': (rollformula ? '[['+rollformula+']]' : '')
+			});
+		});
+	});
+
+	on("change:repeating_caracteristicas:caracteristica_rolagem", function(e){
+		getAttrs(['repeating_caracteristicas_caracteristica_rolagem'], function(v){
+			let rollformula = v['repeating_caracteristicas_caracteristica_rolagem'];
+			setAttrs({
+				'repeating_caracteristicas_caracteristica_rollformula': (rollformula ? '[['+rollformula+']]' : '')
+			});
+		});
+	});
+
+	on("change:repeating_caracteristicas:caracteristica_custo change:repeating_caracteristicas:caracteristica_alvo change:repeating_caracteristicas:caracteristica_alcance change:repeating_caracteristicas:caracteristica_acao change:repeating_caracteristicas:caracteristica_tipo change:repeating_caracteristicas:caracteristica_duracao", function(e) {
+		let campos = ['_custo','_alvo','_alcance','_acao','_tipo','_duracao'];
 		let attrs = campos.map((c) => `repeating_caracteristicas_caracteristica${c}`);
 		getAttrs(attrs, function(v){
 			let header = '';
@@ -185,8 +202,11 @@
 			if( v['repeating_caracteristicas_caracteristica_acao'] ) {
 				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_acao'];
 			}
-			if( v['repeating_caracteristicas_caracteristica_propriedades'] ) {
-				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_propriedades'];
+			if( v['repeating_caracteristicas_caracteristica_tipo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_tipo'];
+			}
+			if( v['repeating_caracteristicas_caracteristica_duracao'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_duracao'];
 			}
 			setAttrs({
 				'repeating_caracteristicas_caracteristica_header': header
@@ -1161,7 +1181,7 @@
 							</select>
 						</div>
 						<div class="flexrow ">
-							<button type="roll" class="rollbtn" name="roll_ataque" value="&{template:gaia-attack}{{character=@{character_name}}}{{rollname=Ataque @{ataque_hom_tipo}}}{{rollataque=[[@{ataque_hom_dado} + @{ofensivo} + @{ofensivo_temp} + @{exaustao}]]}}{{rolldano=[[@{poder}d8 + @{ataque_hom_dano} ]]}} {{tipodano=@{ataque_hom_dano_tipo}}} {{alcance=@{ataque_hom_alcance}}} {{propriedades=@{ataque_hom_propriedade}}}"></button>
+							<button type="roll" class="rollbtn" name="roll_ataque" value="&{template:gaia-attack}{{character=@{character_name}}}{{rollname=Ataque @{ataque_hom_tipo}}}{{rollataque=[[@{ataque_hom_dado} + @{ofensivo} + @{ofensivo_temp} + @{exaustao}]]}}{{rolldano=[[@{poder}d8 + @{ataque_hom_dano} ]]}} {{tipodano=@{ataque_hom_dano_tipo}}} {{alcance=@{ataque_hom_alcance}}} {{tipo=@{ataque_hom_propriedade}}}"></button>
 							<select class="" name="attr_ataque_hom_tipo">
 								<option value="Físico">Ataque Físico</option>
 								<option value="Mágico">Ataque Mágico</option>
@@ -1169,7 +1189,7 @@
 							<input type="text" class="item-formula" name="attr_ataque_hom_dano" value="">
 							<input type="hidden" name="attr_ataque_hom_alcance">
 							<input type="hidden" name="attr_ataque_hom_dano_tipo">
-							<input type="hidden" name="attr_ataque_hom_propriedade" value="&nbsp;">
+							<input type="hidden" name="attr_ataque_hom_tipo" value="&nbsp;">
 							
 							<select class="aptidao" name="attr_ataque_hom_dado" title="Aptidão/Inaptidão">
 								<option value="1d12">-</option>
@@ -1313,12 +1333,13 @@
 					<div class="habilidades">
 						<fieldset class="repeating_abilities">
 							<div class="flexrow ability spaced">
-								<button type="roll" class="rollbtn" name="roll_habilidade" value="&{template:gaia-ability}{{character=@{character_name}}}{{rollname=@{habilidade_nome}}} {{custo=@{habilidade_custo}}} {{alvo=@{habilidade_alvo}}} {{alcance=@{habilidade_alcance}}} {{acao=@{habilidade_acao}}} {{tipo=@{habilidade_tipo}}} {{descricao=@{habilidade_descricao}}} {{aprimoramento=@{habilidade_aprimoramento}}} {{header=@{habilidade_header}}}"></button>
+								<button type="roll" class="rollbtn" name="roll_habilidade" value="&{template:gaia-ability}{{character=@{character_name}}}{{rollname=@{habilidade_nome}}} {{custo=@{habilidade_custo}}} {{alvo=@{habilidade_alvo}}} {{alcance=@{habilidade_alcance}}} {{acao=@{habilidade_acao}}} {{tipo=@{habilidade_tipo}}} {{descricao=@{habilidade_descricao}}} {{aprimoramento=@{habilidade_aprimoramento}}} {{header=@{habilidade_header}}} {{rolagem= @{habilidade_rollformula} }}"></button>
 								<input type="text" class="item-name2" name="attr_habilidade_nome" placeholder="Nome">
 								<input type="text" class="item-name2" name="attr_habilidade_origem" placeholder="Origem">
 								<input type="checkbox" class="sheet-controls item-edit">
 								<div class="flexrow spaced hiddenattr">
 									<input type="hidden" name="attr_habilidade_header" value="">
+									<input type="hidden" name="attr_habilidade_rollformula" value="">
 									<div class="flexrow space-around">
 										<div class="input-placeholder flex0" data-placeholder="Custo" >
 											<input type="text" class="item-header" name="attr_habilidade_custo" value="" title="Custo">
@@ -1343,6 +1364,10 @@
 										<div class="input-placeholder flex0" data-placeholder="Duração" >
 											<input type="text" class="item-header" name="attr_habilidade_duracao" value="" title="Duração">
 											<span class="placeholder">Duração</span>
+										</div>
+										<div class="input-placeholder flex" data-placeholder="Rolagem" >
+											<input type="text" class="item-rollformula" name="attr_habilidade_rolagem" value="" title="Rolagem">
+											<span class="placeholder">Rolagem</span>
 										</div>
 									</div>
 									<div class="form-group flexcol flex100">
@@ -1459,12 +1484,13 @@
 					<div class="habilidades">
 						<fieldset class="repeating_caracteristicas">
 							<div class="flexrow ability spaced">
-								<button type="roll" class="rollbtn" name="roll_caracteristicas" value="&{template:gaia-ability}{{character=@{character_name}}}{{rollname=@{caracteristica_nome}}}  {{header=@{caracteristica_header}}} {{custo=@{caracteristica_custo}}} {{alvo=@{caracteristica_alvo}}} {{alcance=@{caracteristica_alcance}}} {{acao=@{caracteristica_acao}}} {{propriedades=@{caracteristica_propriedades}}} {{descricao=@{caracteristica_descricao}}} {{rolagem=[[@{caracteristica_rolagem}]]}}"></button>
+								<button type="roll" class="rollbtn" name="roll_caracteristicas" value="&{template:gaia-ability}{{character=@{character_name}}}{{rollname=@{caracteristica_nome}}}  {{header=@{caracteristica_header}}} {{custo=@{caracteristica_custo}}} {{alvo=@{caracteristica_alvo}}} {{alcance=@{caracteristica_alcance}}} {{acao=@{caracteristica_acao}}} {{propriedades=@{caracteristica_tipo}}} {{duracao=@{caracteristica_duracao}}} {{descricao=@{caracteristica_descricao}}} {{rolagem= @{caracteristica_rollformula} }}"></button>
 								<input type="text" class="item-name2" name="attr_caracteristica_nome" placeholder="Nome">
 								<input type="text" class="item-name2" name="attr_caracteristica_origem" placeholder="Livro">
 								<input type="checkbox" class="sheet-controls item-edit">
 								<div class="flexrow spaced hiddenattr">
 									<input type="hidden" name="attr_caracteristica_header" value="">
+									<input type="hidden" name="attr_caracteristica_rollformula" value="">
 									<div class="form-group flexrow space-around ">
 										<div class="input-placeholder flex0" data-placeholder="Custo" >
 											<input type="text" class="item-header" name="attr_caracteristica_custo" value="" title="Custo">
@@ -1482,12 +1508,16 @@
 											<input type="text" class="item-header" name="attr_caracteristica_acao" value="" title="Ação">
 											<span class="placeholder">Ação</span>
 										</div>
-										<div class="input-placeholder flex0" data-placeholder="Propriedades" >
-											<input type="text" class="item-header" name="attr_caracteristica_propriedades" value="" title="Propriedades">
-											<span class="placeholder">Propriedades</span>
+										<div class="input-placeholder flex0" data-placeholder="Tipo" >
+											<input type="text" class="item-header" name="attr_caracteristica_tipo" value="" title="Tipo">
+											<span class="placeholder">Tipo</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Duração" >
+											<input type="text" class="item-header" name="attr_caracteristica_duracao" value="" title="Duração">
+											<span class="placeholder">Duração</span>
 										</div>
 										<div class="input-placeholder flex0" data-placeholder="Rolagem" >
-											<input type="text" class="item-header" name="attr_caracteristica_rolagem" value="" title="Rolagem">
+											<input type="text" class="item-rollformula" name="attr_caracteristica_rolagem" value="" title="Rolagem">
 											<span class="placeholder">Rolagem</span>
 										</div>
 									</div>
@@ -1553,7 +1583,7 @@
 			<div class="roll-result">{{rolagem}}</div>
 		</div>
 		{{/rolagem}}
-		<div class="sheet-rolltemplate_extra">{{descricao}}</div>
+		<div class="sheet-rolltemplate_extra">{{descricao}}&nbsp;</div>
 		<div class="sheet-rolltemplate_extra">{{aprimoramento}}</div>
 	</div>
 </rolltemplate>
