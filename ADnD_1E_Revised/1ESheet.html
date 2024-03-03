@@ -6448,7 +6448,7 @@
           // clog(`rep_removed:${row_removed} - Armor Details row has been reset other6:${newID}`);
         }
       }
-      setAttrs(output, {silent: true}, armorDetailsRowidArray());
+      setAttrs(output, armorDetailsRowidArray(), calcAC());
     });
   }
 
@@ -7330,90 +7330,89 @@
         ].map((str) => (str ? str.toString().toLowerCase() : '0'));
         // clog(`armordetails_array: ${armorDetailsArray}`);
         _.each(idArray, (id) => {
-          const type = v[`repeating_equipment_${id}_equipment_armor_type`];
+          const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
           // 99 is nothing chosen in the selector
-          if (type !== 99) {
-            // Find positions where id matches in armorDetailsArray
-            const matchingIndices = armorDetailsArray
-              .map((element, index) => {
-                // Check if the element is equal to the id
-                if (element === id) {
-                  // If there's a match, return the corresponding row number
-                  return `${Math.floor(index) + 1}`;
-                }
-                // If there's no match, return null
-                return null;
-              })
-              .filter((index) => index !== null);
-
-            // Do stuff only when there are multiple matches
-            if (matchingIndices.length > 1) {
-              // console.log(`${matchingIndices} id:${id} type:${type}`);
-              // console.log(type);
-              // console.log(matchingIndices);
-
-              // Create a new array of index positions with multiple matches
-              const indicesWithMultipleMatches = matchingIndices;
-              // Convert indicesWithMultipleMatches array to a comma-separated string
-              const indicesString = indicesWithMultipleMatches.join(',');
-              // Create a new variable called "removeRows" with values that don't equal "type"
-              const removeRows = indicesString.split(',').filter((value) => value !== String(type));
-              // Log the resulting array which could be up to 10 matches
-              // console.log(removeRows);
-              // Further filter removeRows and save the value at index 0 to removeRow
-              const removeRow = removeRows.length > 0 ? removeRows[0] : null;
-              // Log the final result
-              // console.log(removeRow);
-              // Use removeRow to delete the old Armor Details row
-
-              switch (removeRow) {
-                case '1':
-                  output.unarmored = '';
-                  clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
-                  break;
-                case '2':
-                  output.armortype = '';
-                  clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
-                  break;
-                case '3':
-                  output.armortype2 = '';
-                  clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
-                  break;
-                case '4':
-                  output.armorshield = '';
-                  clog(`>> DELETE/RESET ROW 3 - Shield <<`);
-                  break;
-                case '5':
-                  output.armorhelmet = '';
-                  clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
-                  break;
-                case '6':
-                  output.armorother = '';
-                  clog(`>> DELETE/RESET ROW 5 - Other <<`);
-                  break;
-                case '7':
-                  output.armorother2 = '';
-                  clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
-                  break;
-                case '8':
-                  output.armorother3 = '';
-                  clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
-                  break;
-                case '9':
-                  output.armorother4 = '';
-                  clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
-                  break;
-                case '10':
-                  output.armorother5 = '';
-                  clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
-                  break;
-                case '11':
-                  output.armorother6 = '';
-                  clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
-                  break;
-                default:
-                  clog(`>> NOTHING TO DELETE/RESET <<`);
+          if (type === 99) return;
+          // Find positions where id matches in armorDetailsArray
+          const matchingIndices = armorDetailsArray
+            .map((element, index) => {
+              // Check if the element is equal to the id
+              if (element === id) {
+                // If there's a match, return the corresponding row number
+                return `${Math.floor(index) + 1}`;
               }
+              // If there's no match, return null
+              return null;
+            })
+            .filter((index) => index !== null);
+
+          // Do stuff only when there are multiple matches
+          if (matchingIndices.length > 1) {
+            // console.log(`${matchingIndices} id:${id} type:${type}`);
+            // console.log(type);
+            // console.log(matchingIndices);
+
+            // Create a new array of index positions with multiple matches
+            const indicesWithMultipleMatches = matchingIndices;
+            // Convert indicesWithMultipleMatches array to a comma-separated string
+            const indicesString = indicesWithMultipleMatches.join(',');
+            // Create a new variable called "removeRows" with values that don't equal "type"
+            const removeRows = indicesString.split(',').filter((value) => value !== String(type));
+            // Log the resulting array which could be up to 10 matches
+            // console.log(removeRows);
+            // Further filter removeRows and save the value at index 0 to removeRow
+            const removeRow = removeRows.length > 0 ? removeRows[0] : null;
+            // Log the final result
+            // console.log(removeRow);
+            // Use removeRow to delete the old Armor Details row
+
+            switch (removeRow) {
+              case '1':
+                output.unarmored = '';
+                clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
+                break;
+              case '2':
+                output.armortype = '';
+                clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
+                break;
+              case '3':
+                output.armortype2 = '';
+                clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
+                break;
+              case '4':
+                output.armorshield = '';
+                clog(`>> DELETE/RESET ROW 3 - Shield <<`);
+                break;
+              case '5':
+                output.armorhelmet = '';
+                clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
+                break;
+              case '6':
+                output.armorother = '';
+                clog(`>> DELETE/RESET ROW 5 - Other <<`);
+                break;
+              case '7':
+                output.armorother2 = '';
+                clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
+                break;
+              case '8':
+                output.armorother3 = '';
+                clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
+                break;
+              case '9':
+                output.armorother4 = '';
+                clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
+                break;
+              case '10':
+                output.armorother5 = '';
+                clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
+                break;
+              case '11':
+                output.armorother6 = '';
+                clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
+                break;
+              default:
+                clog(`>> NOTHING TO DELETE/RESET <<`);
             }
           }
         });
@@ -7637,18 +7636,6 @@
         const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
         const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
         // armor in use ie 'worn', should always be considered as carried
-        // if (worn === 1) {
-        //   carriedSelect = 1;
-        //   output[`repeating_equipment_${id}_equipment_carried_select`] = 1;
-        // } else if (worn === 0) {
-        //   if (carriedSelect === 0) {
-        //     carriedSelect = 0;
-        //     output[`repeating_equipment_${id}_equipment_carried_select`] = 0;
-        //   } else if (carriedSelect === 2) {
-        //     carriedSelect = 2;
-        //     output[`repeating_equipment_${id}_equipment_carried_select`] = 2;
-        //   }
-        // }
         if (worn === 1) {
           carriedSelect = 1;
           output[`repeating_equipment_${id}_equipment_carried_select`] = 1;
@@ -7792,8 +7779,7 @@
         }
         // Once done, call the provided callback
         if (callback) callback();
-        setAttrs(output, {silent: true});
-        calcAC(recalc);
+        setAttrs(output, calcAC(recalc));
       }
     );
   }
@@ -7913,7 +7899,7 @@
   );
 
   // sync armor button - fill armor details row with repeating attr values
-  // if the row already exists, but is then moved to a new row,
+  // IF the row already exists, but is then moved to a new row,
   // removeEmptyArmorRows will test for duplicates and reset old row
   on('clicked:repeating_equipment:addarmor', (eventInfo) => {
     const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
