@@ -18,10 +18,10 @@
 <input type="checkbox" name="attr_toggle_comeliness" value="1" class="toggle-comeliness hidden" checked />
 <input type="checkbox" name="attr_toggle_multiclass" value="1" class="toggle-multiclass hidden" />
 <input type="checkbox" name="attr_toggle_macros" value="1" class="toggle-macros hidden" checked />
-<input type="checkbox" name="attr_toggle_single_column_attributes" class="toggle-single-column-attributes hidden" value="1" />
-<input type="checkbox" name="attr_toggle_single_column_abilities" class="toggle-single-column-abilities hidden" value="1" />
-<input type="checkbox" name="attr_toggle_single_column_notes" class="toggle-single-column-notes hidden" value="1" />
-<input type="checkbox" name="attr_toggle_single_column_spells" class="toggle-single-column-spells hidden" value="1" />
+<input type="checkbox" name="attr_toggle_single_column_attributes" class="toggle-single-column-attributes hidden" value="1" checked />
+<input type="checkbox" name="attr_toggle_single_column_abilities" class="toggle-single-column-abilities hidden" value="1" checked />
+<input type="checkbox" name="attr_toggle_single_column_notes" class="toggle-single-column-notes hidden" value="1" checked />
+<input type="checkbox" name="attr_toggle_single_column_spells" class="toggle-single-column-spells hidden" value="1" checked />
 <input type="checkbox" name="attr_toggle_critdamage" class="toggle-critdamage hidden" value="1" />
 <input type="checkbox" name="attr_toggle_lbs" class="toggle-lbs hidden" value="1" />
 <div class="background">
@@ -6907,10 +6907,14 @@
   // Versioning
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-    // Set attr_sheet_version to the final_version to prevent new sheets from stepping through versionator
     const final_version = 1.653;
-    getAttrs(['sheet_version'], (v) => {
-      const current_version = float(v.sheet_version);
+    getAttrs(['sheet_version', 'old_character'], (v) => {
+      let current_version = float(v.sheet_version);
+      // prevent new sheets from stepping through versionator
+      if (+v.old_character === 0) {
+        //clog(`New Sheet:${v.old_character}`);
+        current_version = final_version;
+      }
       clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
       versionator(current_version, final_version);
     });
