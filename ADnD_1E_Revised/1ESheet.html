@@ -50,9 +50,10 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version"></span>.beta</span>
             </span>
-            <span class="right">3/2/24'</span>
+            <span class="right">3/3/24'</span>
           </h5>
           <ul>
+            <li>Added a warning indicator if the attack matrix values have not been filled out. to-Hit table values default to all "20's" otherwise.</li>
             <li>Fixed single column checkbox bug that required toggling the box to sync.</li>
             <li>Changed fractional HP field to prevent 'out of range' browser warnings.</li>
             <li>Changed most butttons to plain text.</li>
@@ -1270,13 +1271,13 @@
             <input type="text" class="hidden" name="attr_armorclass_mod" value="0" readonly />
             <span>Armor Adj.</span>
           </label>
-          <input type="checkbox" class="hidden toggle-input-attention" name="attr_encumbrance_flag" value="1" checked>
+          <input type="checkbox" class="hidden toggle-input-attention" name="attr_encumbrance_flag" value="1" checked />
           <label class="text-large">=</label>
           <label class="label-under" title="@{armorclass_rear} | Best AC without a Dex bonus.">
             <input type="text" class="readonly-span field-border" name="attr_armorclass_rear" value="0" />
             <span>Rear</span>
           </label>
-          <input type="checkbox" class="hidden toggle-input-attention" name="attr_encumbrance_flag" value="1" checked>
+          <input type="checkbox" class="hidden toggle-input-attention" name="attr_encumbrance_flag" value="1" checked />
           <label class="label-under-small" title="@{armorbonus} | Defensive Adjustment from Dexterity row.">
             <input type="text" class="readonly-span width-small" name="attr_armorbonus_inverted" value="0" />
             <span class="material-icons" title="Encumbered! DEX bonus has been removed.">nearby_error</span>
@@ -2170,6 +2171,8 @@
         </details>
       </div>
       <div class="sect">
+        <input type="checkbox" class="hidden toggle-input-attention" name="attr_attack_matrix_flag" value="1" checked />
+        <span class="material-icons" title="Attack tables have not been set!">nearby_error</span>
         <input type="checkbox" class="hidden toggle-to-hit-table" name="attr_toggle_to_hit_table" value="1" />
         <fieldset class="repeating_weapon">
           <input type="hidden" class="weapon-type-toggle" name="attr_weapon_attack_type_flag" value="0" />
@@ -8474,12 +8477,12 @@
         const current_encumbrance_move = +v.current_encumbrance_move || 0;
         let armorBonusToggle = +v.armorbonus_toggle || 0;
         let armorBonus = +v.armorbonus || 0;
-        let encumbranceConditionFlag = 1;
+        let encumbranceConditionFlag = 0;
         // encumbered and has a DEX bonus
         if (current_encumbrance_move === 3 && armorBonus < 0) {
           armorBonusToggle = 0;
           armorBonus = 0;
-          encumbranceConditionFlag = 0;
+          encumbranceConditionFlag = 1;
           // toggle off DEX only if there is a DEX bonus
         } else if (armorBonus < 0) {
           armorBonus = +v.armorbonus * armorBonusToggle || 0;
@@ -9774,6 +9777,7 @@
           output.thac9 = 0;
           output.thac10 = -1;
         }
+        output.attack_matrix_flag = 0;
       }
       // fighters table
       if (classSelected === 2) {
@@ -10008,6 +10012,7 @@
           output.thac9 = -5;
           output.thac10 = -6;
         }
+        output.attack_matrix_flag = 0;
       }
       // magic-users table
       if (classSelected === 3) {
@@ -10129,6 +10134,7 @@
           output.thac9 = 2;
           output.thac10 = 1;
         }
+        output.attack_matrix_flag = 0;
       }
       // thieves table
       if (classSelected === 4) {
@@ -10273,6 +10279,7 @@
           output.thac9 = 1;
           output.thac10 = 0;
         }
+        output.attack_matrix_flag = 0;
       }
       // monsters table
       if (classSelected === 5) {
@@ -10555,9 +10562,34 @@
           output.thac9 = -2;
           output.thac10 = -3;
         }
+        output.attack_matrix_flag = 0;
       }
       setAttrs(output, {silent: true});
       calcThac0();
+    });
+  });
+
+  on('sheet:opened change:thac0 change:thac00', (eventInfo) => {
+    getAttrs(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02'], (v) => {
+      const output = {};
+      const attack_matrix_flag = +v.attack_matrix_flag || 0;
+      const matrix_class = +v.matrix_class || 0;
+      if (attack_matrix_flag === 0 || matrix_class > 0) {
+        clog(`attack_matrix_flag:${attack_matrix_flag} matrix_class:${matrix_class}`);
+        output.attack_matrix_flag = 0;
+      } else {
+        const thac0 = +v.thac0 || 20;
+        const thac1 = +v.thac1 || 20;
+        const thac2 = +v.thac2 || 20;
+        const thac00 = +v.thac00 || 20;
+        const thac01 = +v.thac01 || 20;
+        const thac02 = +v.thac02 || 20;
+        const toHitIsDefaultValue = thac0 + thac1 + thac2;
+        const thac0IsDefaultValue = thac00 + thac01 + thac02;
+        clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
+        output.attack_matrix_flag = toHitIsDefaultValue === 60 && thac0IsDefaultValue === 60 ? 1 : 0;
+      }
+      setAttrs(output, {silent: true});
     });
   });
 
