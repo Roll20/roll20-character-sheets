@@ -391,6 +391,12 @@
       </span>
       <span class="inline-label">
         <label>
+          <span>WEAKNESSES:</span>
+          <textarea class="height-short" name="attr_weaknesses" title="@{weaknesses}" placeholder="Nil"></textarea>
+        </label>
+      </span>
+      <span class="inline-label">
+        <label>
           <span>MAGIC RESISTANCE:</span>
           <textarea class="height-short" name="attr_magic_resistance" title="@{magic_resistance}" placeholder="Nil"></textarea>
         </label>
@@ -2901,7 +2907,7 @@
     </section>
     <!-- Non Weapon Proficiencies (NWP) -->
     <section class="nonweapon-proficiencies-box">
-      <input type="checkbox" class="sect-show" name="attr_nonweapon_proficiencies_info_show" value="1" />
+      <input type="checkbox" class="sect-show" name="attr_nonweapon_proficiencies_info_show" value="1" style="max-width:18em;"/>
       <div class="header">NON WEAPON PROFICIENCIES</div><span class="material-icons"></span>
       <div class="sect">
         <span class="nonweapon-proficiencies-row1 column-header">
@@ -7120,7 +7126,7 @@
   }
 
   on(
-    'change:equipment_info_show change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk change:encumbrancebonus_lbs change:toggle_lbs',
+    'sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk change:encumbrancebonus_lbs change:toggle_lbs',
     (eventInfo) => {
       // clog(`Change Detected:${eventInfo.sourceAttribute}`);
       getAttrs(['encumbrancebonus', 'toggle_lbs'], (v) => {
@@ -8440,7 +8446,8 @@
       (v) => {
         const autoCalcAcFlag = +v.autocalc_ac || 0;
         if (autoCalcAcFlag + recalc === 0) return;
-
+        // RecalcAC button overrides sync checkbox = continue
+        // Or sync is on and an armor change detected = continue
         const output = {};
         const armorClass = +v.armorclass || 0;
         const syncAcFlag = +v.sync_ac_flag || 0;
@@ -8638,7 +8645,7 @@
   );
 
   on('clicked:calcac', (eventInfo) => {
-    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const recalc = 1;
     calcAC(recalc);
   });
@@ -10575,7 +10582,7 @@
       const attack_matrix_flag = +v.attack_matrix_flag || 0;
       const matrix_class = +v.matrix_class || 0;
       if (attack_matrix_flag === 0 || matrix_class > 0) {
-        clog(`attack_matrix_flag:${attack_matrix_flag} matrix_class:${matrix_class}`);
+        // clog(`attack_matrix_flag:${attack_matrix_flag} matrix_class:${matrix_class}`);
         output.attack_matrix_flag = 0;
       } else {
         const thac0 = +v.thac0 || 20;
@@ -10586,7 +10593,7 @@
         const thac02 = +v.thac02 || 20;
         const toHitIsDefaultValue = thac0 + thac1 + thac2;
         const thac0IsDefaultValue = thac00 + thac01 + thac02;
-        clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
+        // clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
         output.attack_matrix_flag = toHitIsDefaultValue === 60 && thac0IsDefaultValue === 60 ? 1 : 0;
       }
       setAttrs(output, {silent: true});
