@@ -4137,6 +4137,7 @@
                             <h3 class="mr--1 d--flex__item--grow0">Lebenspunkte</h3>
                             <div class="input-circle input-circle--lg d--flex__item--grow0">
                                 <input type="text" class="text--700" name="attr_lebenspunkte_t" value="0" readonly="readonly" />
+                                <input type="hidden" name="attr_lebenspunkte_t_max" value="0" readonly="readonly" />
                             </div>
                         </div>
                         <div class="d--flex">
@@ -7137,6 +7138,7 @@ on("change:beweglichkeit change:groessenklasse change:konstitution change:intuit
       setAttrs({
           geschwindigkeit: +values.beweglichkeit + +values.groessenklasse + +values.geschwindigkeitmod + +values.hiddengsw + +values.hiddengswag + +values.hiddengswspr + +values.hiddenmodgsw - +values.hiddengswbe - +values.erschoepft - +values.lahm,
           lebenspunkte: +values.groessenklasse + +values.konstitution + +values.lebenspunktemod + +values.hiddenlp,
+          lebenspunkte_t_max: (+values.groessenklasse + +values.konstitution + +values.lebenspunktemod + +values.hiddenlp) * 5,
           initiative: 10 - (+values.intuition + +values.hiddenini + +values.hiddeninibr + +values.hiddenmodini) + +values.initiativemod + +values.erschoepft,
           fokus: (+values.mystik + +values.willenskraft) * 2 + +values.fokusmod + +values.hiddenfokus,
           koerperlicherwiderstand: 12 + +values.konstitution + +values.willenskraft + +values.koerperlicherwiderstandmod + +values.hiddenkw + +values.hiddenkwhg + +values.hiddenkwbonus + +values.hiddenallwiderstand,
@@ -8203,7 +8205,7 @@ on("change:behinderung", function(eventinfo) {
 on("change:lebenspunkte", function(e) {
     getAttrs(["lebenspunkte", "lebenspunkte_e", "lebenspunkte_k", "lebenspunkte_v"], function(v) {
         setAttrs({
-            lebenspunkte_t: (+v.lebenspunkte * 5) - +v.lebenspunkte_e - +v.lebenspunkte_k - +v.lebenspunkte_v
+            lebenspunkte_t:  (+v.lebenspunkte * 5) - +v.lebenspunkte_e - +v.lebenspunkte_k - +v.lebenspunkte_v
         });
    });
 });
@@ -8239,7 +8241,7 @@ on("change:lebenspunkte_v change:lebenspunkte change:schmerzresistenz change:sw1
         });
         if (e.sourceAttribute == "lebenspunkte_v") {
             setAttrs({
-                lebenspunkte_t: (+v.lebenspunkte * 5) - +v.lebenspunkte_v - +v.lebenspunkte_e - +v.lebenspunkte_k
+                lebenspunkte_t: (+v.lebenspunkte * 5) - +v.lebenspunkte_e - +v.lebenspunkte_k - +v.lebenspunkte_v
             });
         }
    });
@@ -10933,7 +10935,7 @@ on("change:lebenspunkte_k change:lebenspunkte_e change:lebenspunkte_v", function
     if (f.sourceType == "sheetworker") { return; }
     getAttrs(["lebenspunkte_t"], function(v) {
         let newValue = f.newValue || 0;
-        let previousValue = f.previousValue || 0;
+        let previousValue = f.previousValue || 0; 
         setAttrs({
             lebenspunkte_t: +v.lebenspunkte_t - (+newValue - +previousValue)
         });
@@ -11051,7 +11053,8 @@ on("clicked:resetlp", function(f) {
             lebenspunkte_e: 0,
             lebenspunkte_k: 0,
             lebenspunkte_v: 0,
-            lebenspunkte_t: (+v.lebenspunkte * 5)
+            lebenspunkte_t: (+v.lebenspunkte * 5),
+            lebenspunkte_t_max: (+v.lebenspunkte * 5)
         });
     });
 });
