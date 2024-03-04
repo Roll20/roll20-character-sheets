@@ -10053,7 +10053,7 @@ PU2:126 = Power-Ups 2. Page 126
 							<input type="text" name="attr_level" readonly="readonly" title="Macro: @{NAME|repeating_techniquesrevised_$[row #]_level}" value="10"/>
 						</div>
 						<div class="cell col9">
-							<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Technique Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{popupModifier=@{popup_modifier}}}" />
+							<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Technique Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifier=[[@{technique_roll_modifier}]]}} {{rollModifierSummary=@{technique_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}}" />
 						</div>
 						<div class="cell col10">
 							<input type="text" name="attr_ref" title="Macro: @{NAME|repeating_techniquesrevised_$[row #]_ref}" />
@@ -43807,7 +43807,7 @@ B378
 
 		getSectionIDs("repeating_skills", ids => {
 
-			console.groupCollapsed("--resyncRepeatingSkills--");
+			// DEBUG: console.groupCollapsed("--resyncRepeatingSkills--");
 		
 			ids.forEach(rowId => {
 				
@@ -43818,8 +43818,8 @@ B378
 
 				attribs[syncFieldName] = 1;
 
-				console.info(`update linked items for rowId: ${rowId}`);
-				console.info(attribs);
+				// DEBUG: console.info(`update linked items for rowId: ${rowId}`);
+				// DEBUG: console.info(attribs);
 
 				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
 
@@ -43840,7 +43840,7 @@ B378
 
 		getSectionIDs("repeating_techniquesrevised", ids => {
 
-			console.groupCollapsed("--resyncRepeatingTechniques--");
+			// DEBUG: console.groupCollapsed("--resyncRepeatingTechniques--");
 
 			ids.forEach(rowId => {
 				
@@ -43851,7 +43851,7 @@ B378
 
 				attribs[syncFieldName] = 1;
 
-				console.info(`update linked items for rowId: ${rowId}`);
+				// DEBUG: console.info(`update linked items for rowId: ${rowId}`);
 				
 				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
 
@@ -43924,7 +43924,7 @@ B378
 
 		getSectionIDs("repeating_spells", ids => {
 
-			console.groupCollapsed("--resyncRepeatingSpells--");
+			// DEBUG: console.groupCollapsed("--resyncRepeatingSpells--");
 
 			ids.forEach(rowId => {
 				
@@ -43935,7 +43935,7 @@ B378
 
 				attribs[syncFieldName] = 1;
 
-				console.info(`update linked items for rowId: ${rowId}`);
+				// DEBUG: console.info(`update linked items for rowId: ${rowId}`);
 
 				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
 
@@ -47017,10 +47017,8 @@ Characters with Skill: ${knowsSkill}`;
 		"name",
 		"parent",
 		"level",
-		"technique_roll_modifier",
 		"technique_roll_max_nine_value",
 		"technique_roll_max_nine",
-		"technique_roll_modifier_summary",
 		"technique_roll_trait_summary",
 		"notes",
 		"show_notes_revised",
@@ -47058,13 +47056,9 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = values[`${sectionName}_level`] ?? "10";
 
-		let techniqueRollModifier = values[`${sectionName}_technique_roll_modifier`] ?? "0";
-
 		let techniqueRollMaxNine = values[`${sectionName}_technique_roll_max_nine`] ?? "0";
 
 		let techniqueRollMaxNineValue = values[`${sectionName}_technique_roll_max_nine_value`] ?? "100";
-
-		let techniqueRollModifierSummary = values[`${sectionName}_technique_roll_modifier_summary`] ?? "";
 
 		let techniqueRollTraitSummary = values[`${sectionName}_technique_roll_trait_summary`] ?? "";
 
@@ -47121,18 +47115,12 @@ Characters with Skill: ${knowsSkill}`;
 			rollDataArray.push(`{{parentName=${parent}}} `);
 		}
 		
-		rollDataArray.push(`{{effectiveSkill=[[{${level} + @{modifier} + ${techniqueRollModifier}, ${techniqueRollMaxNineValue} }kl1]]}}`);
+		rollDataArray.push(`{{effectiveSkill=[[{${level} + @{modifier} + @{technique_roll_modifier}, ${techniqueRollMaxNineValue} }kl1]]}}`);
 
 		if (techniqueRollMaxNine) {
 			rollDataArray.push(`{{maxNine=[[${techniqueRollMaxNine}]]}}`);
 		}
 
-		rollDataArray.push(`{{rollModifier=[[${techniqueRollModifier}]]}}`);
-
-		if (techniqueRollModifierSummary) {
-			rollDataArray.push(`{{rollModifierSummary=${techniqueRollModifierSummary}}}`);
-		}
-		
 		if (techniqueRollTraitSummary) {
 			rollDataArray.push(`{{rollTraitSummary=${techniqueRollTraitSummary}}}`);
 		}
