@@ -4325,44 +4325,9 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.10.9 -->
+				<!-- current version notes: 2.10.10 -->
 				<ul>
-					<li><b>ENHANCEMENT:</b> Ranged table, when determining if the Number of Shots popup should appear, it now requires the recoil to be zero or higher. If it's a negative number, it will assume you're using a 3rd edition rules and so the popup is not needed.</li>
-					<li><b>ENHANCEMENT:</b> Hit Location table, increased the width of the Summary columns.</li>
-					<li><b>ENHANCEMENT:</b> Hit Location table, added the ability to assign custom labels to the layers.
-						<ul>
-							<li>Go to the Options tab (gear icon) -> Sheet Options. Scroll to the bottom and look for the section named <b>Hit Location Options</b>.</li>
-							<li>Update the labels for each layer as you like.</li>
-							<li>Mark the checkbox for <b>Use Custom Layer Labels</b>.</li>
-						</ul>
-					</li>
-					<li><b>ENHANCEMENT:</b> General tab, Current Movement speed. If you don't have enhanced movement, it will now display your sprinting speed, see B394 and B354.</li>
-					<li>
-						<b>NEW:</b> Added a new rolltemplate named columnlayout. You can use this rolltemplate with your custom macros 
-						and can manage a 3 to 5 column table layout. For more information, go to the Help tab, Other sub-tab, 
-						and look under the section titled <b>Roll Template 3 to 5 Columns</b>.
-					</li>
-					<li>
-						<b>NEW:</b> Added quick modifier tables to Melee and Ranged tabs. This will allow a player to quickly add a modifier to their attack roll and use 
-						the checkbox to apply them. This is helpful if you have a common modifier you like to apply, such as Rapid Attack, Move and Attack, etc.
-						<ul>
-							<li>
-								<b>ACTION:</b> To view the new quick modifier tables, click the <b>Sheet Options (gear icon)</b> tab and then go to the <b>Sheet Options</b> sub tab, 
-								look for the section titled <b>Quick Modifier Options</b>.
-							</li>
-							<li>
-								<b>ACTION:</b> If you would like the quick modifiers to visible on new character sheets, 
-								you can set the options on the game level by going to your game landing page, 
-								go to game settings, and update the options for quick modifiers.
-							</li>
-						</ul>
-					</li>
-					<li>
-						<b>BUGFIX:</b> Fixed bug where the minimum damage for ranged attacks was not being calculated correctly.
-					</li>
-					<li>
-						<b>BUGFIX:</b> Ranged weapons table, malfunction options. The malfunction options were not being implemented correctly after the conversion to get margin of success/fail and number of shots that hit.
-					</li>
+					<li><b>BUGFIX:</b> Active Defense Roll Template. Info Notes not showing correctly.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -14095,7 +14060,7 @@ visualize what it will look like in chat.
 								</div>
 							</div> <!-- .header -->
 
-							<input type="hidden" name="attr_use_malfunction" value="0" />
+							<input type="hidden" name="attr_use_malfunction" />
 							<fieldset class="repeating_ranged">
 								<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 								<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_ranged_toggle_notes" />
@@ -20224,6 +20189,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<!-- current version notes: 2.10.9 -->
 			<ul>
+				<li><b>BUGFIX:</b> Active Defense Roll Template. Info Notes not showing correctly.</li>
+			</ul>
+
+			<h4>Version: 2.10.9</h4>
+			<p>Pull Request: 2/26/2023</p>
+			<ul>
 				<li><b>ENHANCEMENT:</b> Ranged table, when determining if the Number of Shots popup should appear, it now requires the recoil to be zero or higher. If it's a negative number, it will assume you're using a 3rd edition rules and so the popup is not needed.</li>
 				<li><b>ENHANCEMENT:</b> Hit Location table, increased the width of the Summary columns.</li>
 				<li><b>ENHANCEMENT:</b> Hit Location table, added the ability to assign custom labels to the layers.
@@ -25553,9 +25524,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.10.9";
+	const version = "2.10.10";
 	
-	const latestChangesDate = "2/26/2024";
+	const latestChangesDate = "3/4/2024";
 	
 	let modCascade = true;
 	
@@ -28190,32 +28161,35 @@ B378
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
 	on("change:repeating_spells:spell_toggle_notes change:repeating_skills:skill_toggle_notes change:repeating_techniquesrevised:technique_revised_toggle_notes change:repeating_melee:melee_toggle_notes change:repeating_item:item_toggle_notes", event => {
 	
-		let row = event.triggerName;
-	
-		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
-	
-		switch (section) {
-			case "repeating_spells":
-				updateRowIdDisplay(section, rowId);
-				break;
-	
-			case "repeating_skills":
-				updateRowIdDisplay(section, rowId);
-				break;
-	
-			case "repeating_techniquesrevised":
-				updateRowIdDisplay(section, rowId);
-				break;
-	
-			case "repeating_melee":
-				updateRowIdDisplay(section, rowId);
-				break;
+		if (event.triggerName) {
 
-			case "repeating_item":
-				updateRowIdDisplay(section, rowId);
-				break;
-		}
+			let row = event.triggerName;
 	
+			let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
+		
+			switch (section) {
+				case "repeating_spells":
+					updateRowIdDisplay(section, rowId);
+					break;
+		
+				case "repeating_skills":
+					updateRowIdDisplay(section, rowId);
+					break;
+		
+				case "repeating_techniquesrevised":
+					updateRowIdDisplay(section, rowId);
+					break;
+		
+				case "repeating_melee":
+					updateRowIdDisplay(section, rowId);
+					break;
+
+				case "repeating_item":
+					updateRowIdDisplay(section, rowId);
+					break;
+			}
+		}
+		
 	});
 	
 	/**
@@ -33328,7 +33302,7 @@ B378
 			// Remove number in parentheses
 			moveValue = moveValue.toString().replace(/ *\([^)]*\)/g, "");
 	
-			if (moveValue.includes("/")) {
+			if (moveValue && moveValue.includes("/")) {
 	
 				// split the value
 				// move = 8/16
@@ -33633,21 +33607,26 @@ B378
 					// the field name lets us know which.
 					if (value == rowId) {
 	
-						// we have a match, get the row id
-						// example: repeating_melee_-m1z2saaqh577ah99q6d_skill_row_id
-						// split = ["repeating", "melee", "-m1z2saaqh577ah99q6d", "skill", "row", "id"]
-						let arrField = field.split("_");
+						// check that field contains "_"
+						if (field && field.includes("_")) {
 	
-						// the id will always be the 3rd element
-						let currentId = arrField[2];
+							// we have a match, get the row id
+							// example: repeating_melee_-m1z2saaqh577ah99q6d_skill_row_id
+							// split = ["repeating", "melee", "-m1z2saaqh577ah99q6d", "skill", "row", "id"]
+							let arrField = field.split("_");
 	
-						// toggle the update field for that row
-						let toggleField = `${sectionName}_${currentId}_${prefix}_skill_row_id_toggle`;
+							// the id will always be the 3rd element
+							let currentId = arrField[2];
 	
-						updateFields[toggleField] = 1;
+							// toggle the update field for that row
+							let toggleField = `${sectionName}_${currentId}_${prefix}_skill_row_id_toggle`;
 	
-						// we have at least one match
-						foundMatch = true;
+							updateFields[toggleField] = 1;
+	
+							// we have at least one match
+							foundMatch = true;
+	
+						}
 	
 					}
 	
@@ -33679,7 +33658,7 @@ B378
 		// example: repeating_skills_-l6zk36zhcjhsyvc-kax_level
 		let sourceAttr = event.sourceAttribute;
 	
-		if (sourceAttr) {
+		if (sourceAttr && sourceAttr.includes("_")) {
 	
 			// remove the sectionname
 			let regReplace = new RegExp(sectionName + '_', "ig");
@@ -33715,7 +33694,7 @@ B378
 		let rowId = "";
 	
 		// repeating_skills_-l6zk36zhcjhsyvc-kax_level
-		if (fieldKey) {
+		if (fieldKey && fieldKey.includes("_")) {
 	
 			// remove the sectionname
 			let regReplace = new RegExp(sectionName + '_', "ig");
@@ -37646,6 +37625,10 @@ B378
 		/* check for manual changes to modifier tool just above the repeating tables section. */
 		on(`change:${section}_custom_roll_modifier change:${section}_custom_roll_modifier_reason change:${section}_roll_max_nine change:${section}_roll_apply_encumbrance change:${section}_apply_shield_db change:${section}_apply_magic_db`, event => {
 	
+			if (!event.sourceAttribute) {
+				return;
+			}
+
 			// get the section name
 			// example: sourceAttribute: "skill_roll_apply_encumbrance"
 			// we want the first part, `skill`
@@ -37740,67 +37723,6 @@ B378
 
 		});
 
-	}
-		
-	/**
-	 * Updates the custom modifier line for a summary 
-	 * and returns the corrected total
-	 * Example: summary = -1 custom modifier¬-2 Encumbrance
-	 *          note: ¬ is a line feed character
-	 *          rollModifier = -5
-	 * 			customModifier = rollModifier - (sum of other lines) = -5 - (-2) = -3
-	 *          new summary = -3 custom modifier¬-2 Encumbrance
-	 *          
-	 *          
-	 * @param {number} rollModifier The value of the custom modifier
-	 * @param {string} summary      The Current summary
-	 * @param {string} modifierDesc The text that describes the roll modifier
-	
-	 *  @returns {[number, string]} An array of [customModifier: number, summaryNew: string] 
-	 */
-	function updateCustomModifierSummary(rollModifier, summary, modifierDesc) {
-	
-		// after removing the custom modifier, sum up the remaining modifiers
-		let totalMod = 0;
-	
-		// make sure to remove any carriage returns
-		let summaryNew = summary.replaceAll("\r", "");
-	
-		// remove anything that matches the modifierDesc
-		let pattern = new RegExp(`-?[0-9]\d* ${modifierDesc}\n`, "gi");
-	
-		summaryNew = summaryNew.replace(pattern, "");
-	
-		// create an array so we can pull out modifiers and update totalMod
-		let arrSummary = summaryNew.split("\n");
-	
-		arrSummary.forEach(line => {
-	
-			let arrLine = line.split(" ");
-	
-			// the first element will always be the modifier number, unless a coder breaks the patter
-			let modifier = Number(arrLine[0]);
-	
-			if (isNaN(modifier)) {
-				modifier = 0;
-			}
-	
-			totalMod += modifier;
-	
-		});
-	
-		// the remainder should go tothe custom Modifier
-		let customModifier = rollModifier - totalMod;
-	
-		// if negative or postive value, add the description to the beginning
-		if (customModifier !== 0) {
-	
-			summaryNew = `${customModifier} ${modifierDesc}\n` + summaryNew;
-	
-		}
-	
-		return [customModifier, summaryNew];
-	
 	}
 	
 	// check for change to hit location fields
@@ -37930,9 +37852,9 @@ B378
 	
 		getAttrs(fields, values => {
 	
-			let type = values.hit_location_type;
+			let type = values.hit_location_type || "";
 	
-			let location = values[`${type}_location`];
+			let location = values[`${type}_location`] || "";
 	
 			let grapple = Number(values.grapple_modifier);
 	
@@ -38081,6 +38003,10 @@ B378
 	 */
 	function isHitLocationAffectedByShield(location) {
 	
+		if (!location) {
+			return false;
+		}
+
 		let arrLocation = location.split(" ");
 	
 		const limbs = [
@@ -38118,6 +38044,10 @@ B378
 	 */
 	function isHitLocationAffectedByProne(location) {
 	
+		if (!location) {
+			return false;
+		}
+
 		let arrLocation = location.split(" ");
 	
 		const locations = [
@@ -38628,7 +38558,7 @@ B378
 	
 					let propName = `repeating_hitlocation_layer_${layerNo}_${direction}`;
 	
-					let armor = values[propName].toString();
+					let armor = values[propName].toString() || "";
 	
 					let firstDR = 0;
 	
@@ -38639,7 +38569,7 @@ B378
 	
 					armor = armor.replace(hardenedPattern, "");
 	
-					if (armor.indexOf("*") != -1) {
+					if (armor && armor.indexOf("*") != -1) {
 	
 						isFlexible = true;
 	
@@ -38648,7 +38578,7 @@ B378
 					}
 	
 					// check for split DR
-					if (armor.indexOf("/") != -1) {
+					if (armor && armor.indexOf("/") != -1) {
 	
 						isSplit = true;
 	
@@ -38878,6 +38808,11 @@ B378
 	["melee", "ranged", "spell", "skill", "technique", "defense"].forEach(section => {
 	
 		on(`clicked:${section}_roll_reset`, async (event) => {
+
+			// check that event.htmlAttributes.name is a valid object
+			if (!event.htmlAttributes || !event.htmlAttributes.name) {
+				return;
+			}
 
 			// get the section name
 			// example: htmlAttributes.name: "act_defense_roll_reset"
@@ -42336,7 +42271,7 @@ B378
 	function getSkillAttributeDifficultyForGca(skillType) {
 	
 		// type = DX/A
-		let arrType = skillType.split("/");
+		let arrType = String(skillType).split("/");
 	
 		let attribute = arrType[0];
 	
@@ -46029,6 +45964,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		on(`change:repeating_${section}:macro_one_checked change:repeating_${section}:macro_two_checked change:repeating_${section}:macro_three_checked change:repeating_${section}:macro_four_checked change:repeating_${section}:macro_five_checked change:repeating_${section}:macro_six_checked`, event => {
 
+			if (!event.triggerName) {
+				return;
+			}
+
 			// "repeating_skills_-mtyesgj4ck8yqh-ds9t_macro_two_checked"
 			let sourceAttribute = event.sourceAttribute;
 
@@ -46773,6 +46712,10 @@ Characters with Skill: ${knowsSkill}`;
 
 	const rollRepeatingSkillRoll = async (event) => {
 
+		if (!event.triggerName) {
+			return;
+		}
+		
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
 		
 		let rollData = event.htmlAttributes.value ?? "";
@@ -47022,6 +46965,10 @@ Characters with Skill: ${knowsSkill}`;
 
 	const rollRepeatingTechniques = async (event) => {
 
+		if (!event.triggerName) {
+			return;
+		}
+		
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
 		
 		let rollData = event.htmlAttributes.value ?? "";
@@ -47254,6 +47201,10 @@ Characters with Skill: ${knowsSkill}`;
 
 	const rollRepeatingDefense = async (event) => {
 
+		if (!event.triggerName) {
+			return;
+		}
+		
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
 		
 		let rollData = event.htmlAttributes.value ?? "";
@@ -47363,13 +47314,17 @@ Characters with Skill: ${knowsSkill}`;
 		let infoDescription = values[`${sectionName}_info_description`] ?? "";
 		infoDescription = infoDescription.replace(/\n/g, '\\n');
 
-		let finalNotes = notes;
+		let finalNotesArray = [];
 
-		if (notes && infoDescription) {
-			finalNotes = `${infoDescription}\n${notes}`;
-		} else if (!notes && infoDescription) {
-			finalNotes = infoDescription;
+		if (notes) {
+			finalNotesArray.push(notes);
+		}  
+		
+		if (infoDescription) {
+			finalNotesArray.push(infoDescription);
 		}
+
+		let finalNotes = finalNotesArray.join("\\n");
 
 		let rawSuccessNote = values[`${sectionName}_raw_success_note`] ?? "";
 		
@@ -47442,7 +47397,7 @@ Characters with Skill: ${knowsSkill}`;
 		
 		rollDataArray.push(`{{showNotes=[[${showNotes}]]}}`);
 
-		if (notes) {
+		if (finalNotes) {
 			rollDataArray.push(`{{notes=${finalNotes}}}`);
 		}
 
@@ -47522,6 +47477,10 @@ Characters with Skill: ${knowsSkill}`;
 
 	const rollRepeatingMelee = async (event) => {
 
+		if (!event.triggerName) {
+			return;
+		}
+		
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
 		
 		let rollData = event.htmlAttributes.value ?? "";
@@ -47781,6 +47740,10 @@ Characters with Skill: ${knowsSkill}`;
 
 	const rollRepeatingRanged = async (event) => {
 
+		if (!event.triggerName) {
+			return;
+		}
+		
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
 		
 		let rollData = event.htmlAttributes.value ?? "";
@@ -48091,6 +48054,10 @@ Characters with Skill: ${knowsSkill}`;
 
 	const rollRepeatingSpells = async (event) => {
 
+		if (!event.triggerName) {
+			return;
+		}
+		
 		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
 		
 		let rollData = event.htmlAttributes.value ?? "";
