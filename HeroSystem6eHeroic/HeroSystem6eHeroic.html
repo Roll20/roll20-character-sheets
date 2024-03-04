@@ -1868,12 +1868,14 @@
 								<h2>DCV: -2</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Attack while making a Full Move past opponent. Halves STR for damage purposes, but adds (velocity/10) DCs. Attacker or weapon takes 1/3 of this damage.</p>
+								<p>Attack while making a Full Move past opponent. Strength is halved, but maneuver adds (velocity/10) DCs. Attacker or weapon takes 1/3 of this damage.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
 									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
 								</div>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">Roll</button>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Use STR</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 70</p>
@@ -1895,7 +1897,9 @@
 									<p>Velocity:</p>
 									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
 								</div>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">Roll</button>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Use STR</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 70</p>
@@ -2022,7 +2026,7 @@
 									<p>DC Limit:</p>
 									<input type="number" name="attr_maneuverDCLimit" title="@{maneuverDCLimit}" step="1" min="1" max="20" value="5" tabindex="-1"/>
 								</div>
-
+								
 								<div class ="item-maneuver-line">
 									<label class="container-checkbox-small-dark">
 										<input type="checkbox" name="attr_checkBrace">
@@ -10093,7 +10097,7 @@
 				let weapon04 = "killing";
 				let weapon05 = "killing";
 				
-				if ((button === "strike") || (button === "haymaker") || (button === "multipleAttack")) {
+				if ((button === "strike") || (button === "haymaker") || (button === "multipleAttack") || (button === "moveBy") || (button === "moveThrough")) {
 					if (values.weaponNormalDamage01 === "on") {
 						weapon01 = "normal";
 					}
@@ -11270,7 +11274,7 @@
 					adjustedDC = theDC + damageLevels;
 				}
 				
-				// Prevent negative DC.
+				// Prevent a negative DC.
 				if (adjustedDC < 0) {
 					adjstedDC = 0;
 				}
@@ -11335,7 +11339,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponStrengthMin"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity"], function(values) {
+			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponStrengthMin"+weaponId,  "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
@@ -11363,6 +11367,8 @@
 				let netDCV = parseInt(values["currentDCV"])||0;
 				let maneuverOCV = 0;
 				let maneuverDCV = 0;
+				let penaltyOCV = 0;
+				let strengthPenalty = false;
 				let halfDCV = false;
 				let velocity = parseInt(values["moveVelocity"])||0;
 				let velocityDC = 0;
@@ -11403,23 +11409,52 @@
 					maneuverDCV = -2;
 					
 					// Move By reduces Strength by 1/2, which means recalculating the adjustedDC.
+					let strengthApplied = heroRoundHigh( (parseInt(values.strength)||0)/2);
+					let minStrength = parseInt(values["weaponStrengthMin"+weaponId])||0;
+					let strengthEnhanced = (values["weaponEnhancedByStr"+weaponId] === "on") ? true : false;
+					let damageLevels =  parseInt(values["weaponCSL"+weaponId]/2)||0;
+					
+					adjustedDC = baseDC;
+					
+					if (strengthApplied >= minStrength) {
+						strengthLevels = Math.floor((strengthApplied - minStrength)/5);
+						if (strengthEnhanced) {
+							damageLevels += strengthLevels;
+						}
+					} else {
+						strengthLevels = -heroRoundLow(-(strengthApplied - minStrength)/5);
+						penaltyOCV += strengthLevels;
+						strengthPenalty = true;
+						
+						if (strengthEnhanced) {
+							damageLevels += strengthLevels;
+						}
+					}
 					
 					// Recalculate damage with velocity and new strength.
 					velocityDC = Math.floor(velocity/10);
 					if (capDamage) {
-						if ((adjustedDC + velocityDC) > 2 * baseDC) {
+						if ((adjustedDC + velocityDC + damageLevels) > 2 * baseDC) {
 							adjustedDC = 2 * baseDC;
 						} else {
-							adjustedDC += velocityDC;
+							adjustedDC += velocityDC + damageLevels;
 						}
 					} else {
-						adjustedDC += velocityDC;
+						adjustedDC += velocityDC + damageLevels;
+						
+						// Prevent a negative DC.
+						if (adjustedDC < 0) {
+							adjstedDC = 0;
+						}
 					}
 					
 					isModified = true;
 					
 					setAttrs({
-						"hiddenSpecialDamage":getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign)
+						"hiddenSpecialDamage":getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
+						"rangeManeuver":0,
+						"checkSet":0,
+						"checkBrace":0
 					});
 				} else if (values.maneuverSelection === "moveThrough") {
 					
@@ -11445,7 +11480,10 @@
 					isModified = true;
 					
 					setAttrs({
-						"hiddenSpecialDamage":getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign)
+						"hiddenSpecialDamage":getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
+						"rangeManeuver":0,
+						"checkSet":0,
+						"checkBrace":0
 					});
 				} else if (values.maneuverSelection === "multipleAttack") {
 					rollMessage = "Multiple " + (isNormalDamage ? "" : "Killing ") + "Attack";
@@ -11461,7 +11499,9 @@
 					// The weapon Roll is a Strike, Multiple Attack, or Haymaker.
 					
 					// First, check to see if this is a ranged attack.
-					if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet) {
+					if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") ) {
+						isRangedAttack = false;
+					} else if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet) {
 						isRangedAttack = true;
 						rollMessage = "Ranged " + rollMessage;
 						
@@ -11506,9 +11546,9 @@
 						}
 					} else {
 						if (dispDoS) {
-							theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]"+ (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}} ";
+							theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}} ";
 						} else {
-							theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]"+ (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+							theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (areaOfEffect ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
 						}
 					}
 					
@@ -11692,9 +11732,14 @@
 				adjustedDC += velocityDC;
 				
 				isModified = true;
+				isBraced = false;
+				isSet = false;
 				
 				setAttrs({
-					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1)
+					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"rangeManeuver":0,
+					"checkSet":0,
+					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "moveThrough") {
 				
@@ -11710,9 +11755,14 @@
 				adjustedDC += velocityDC;
 				
 				isModified = true;
+				isBraced = false;
+				isSet = false;
 				
 				setAttrs({
-					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1)
+					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"rangeManeuver":0,
+					"checkSet":0,
+					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "multipleAttack") {
 				rollMessage = "Multiple Attack";
@@ -11738,7 +11788,9 @@
 			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "throw")) {
 				
 				// First, check to see if this is a ranged attack.
-				if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet || (values.maneuverSelection === "throw")) {
+				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") ) {
+					isRangedAttack = false;
+				} else if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet || (values.maneuverSelection === "throw")) {
 					isRangedAttack = true;
 					
 					if (values.maneuverSelection !== "throw") {
