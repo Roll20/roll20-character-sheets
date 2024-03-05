@@ -1,0 +1,3476 @@
+
+<script type="text/worker">const etats = ['affaibli', 'aveugle', 'etourdi', 'immobilise', 'paralyse', 'ralenti', 'renverse', 'surpris'];
+
+//DICE TYPES
+//0 = D20
+//-1 = D12
+const diceType = {
+    '0':'D20',
+    '-1':'D12'
+};
+
+const dataEtats = {
+    'affaibli':{
+        'dice':-1,
+        'initiative':0,
+        'defense':0,
+        'contact':0,
+        'distance':0,
+        'magique':0,
+    },
+    'aveugle':{
+        'dice':0,
+        'initiative':-5,
+        'defense':-5,
+        'contact':-5,
+        'distance':-10,
+        'magique':0,
+    },
+    'etourdi':{
+        'dice':0,
+        'initiative':0,
+        'defense':-5,
+        'contact':0,
+        'distance':0,
+        'magique':0,
+    },
+    'immobilise':{
+        'dice':-1,
+        'initiative':0,
+        'defense':0,
+        'contact':0,
+        'distance':0,
+        'magique':0,
+    },
+    'paralyse':{
+        'dice':0,
+        'initiative':0,
+        'defense':0,
+        'contact':0,
+        'distance':0,
+        'magique':0,
+    },
+    'ralenti':{
+        'dice':0,
+        'initiative':0,
+        'defense':0,
+        'contact':0,
+        'distance':0,
+        'magique':0,
+    },
+    'renverse':{
+        'dice':0,
+        'initiative':0,
+        'defense':-5,
+        'contact':-5,
+        'distance':-5,
+        'magique':-5,
+    },
+    'surpris':{
+        'dice':0,
+        'initiative':0,
+        'defense':-5,
+        'contact':0,
+        'distance':0,
+        'magique':0,
+    }
+};
+
+
+function setActiveCharacterId(charId){
+    var oldAcid=getActiveCharacterId();
+    var ev = new CustomEvent("message");
+    ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+    self.dispatchEvent(ev);
+    return oldAcid;
+}
+
+var _sIn=setInterval;
+setInterval=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sIn(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+
+var _sto=setTimeout
+setTimeout=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sto(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+
+function getAttrsAsync(props){
+    var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs
+    var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try{
+                getAttrs(props,(values)=>{  resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+    });
+}
+
+//use the same pattern for each of the following...
+function setAttrsAsync(propObj, options){
+    var acid=getActiveCharacterId();
+    var prevAcid=null;
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);
+            try{
+                setAttrs(propObj,options,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid);
+    });
+}
+
+function getDice(dice) {
+    let result;
+    switch(dice) {
+        case -1:
+            result = 'D12';
+            break;
+
+        default:
+            result = 'D20';
+            break;
+    }
+
+    return result;
+}
+
+function getFinalMod(data, clicked, isActive) {
+    let dice = 0;
+    let initiative = 0;
+    let defense = 0;
+    let contact = 0;
+    let distance = 0;
+    let magique = 0;
+
+    for (let etat of etats) {
+        let active = parseInt(data[etat]);
+        let d = dataEtats[etat];
+
+        if((active === 1 && etat !== clicked) || (etat === clicked && isActive === 1)) {
+            let nDice = d.dice;
+            let nInit = d.initiative;
+            let nDef = d.defense;
+            let nCon = d.contact;
+            let nDis = d.distance;
+            let nMag = d.magique;
+
+            dice = nDice < dice ? nDice : dice;
+            initiative += nInit;
+            defense += nDef;
+            contact += nCon;
+            distance += nDis;
+            magique += nMag;
+        }
+    }
+
+    return {
+        dice:dice,
+        init:initiative,
+        def:defense,
+        con:contact,
+        dis:distance,
+        mag:magique,
+    }
+}
+
+function getDistanceMod(luminosite, portee) {
+    let result = {
+        'luminosite':{
+            'text':'',
+            'mod':0
+        },
+        'portee':{
+            'text':'',
+            'mod':0
+        }
+    };
+
+    switch(luminosite) {
+        case 'std':
+            result.luminosite = {
+                'text':'',
+                'mod':0
+            }
+            break;
+        case 'pnbr':
+            result.luminosite = {
+                'text':'{{luminosite=^{penombre} (-5)}}',
+                'mod':-5
+            }
+            break;
+        case 'noir':
+            result.luminosite = {
+                'text':'{{luminosite=^{noir} (-10)}}',
+                'mod':-10
+            }
+            break;
+    }
+
+    switch(portee) {
+        case 'std':
+            result.portee = {
+                'text':'',
+                'mod':0
+            }
+            break;
+        case 'dbl':
+            result.portee = {
+                'text':'{{portee=^{portee-double} (-5)}}',
+                'mod':-5
+            }
+            break;
+        case 'trp':
+            result.portee = {
+                'text':'{{portee=^{portee-triple} (-10)}}',
+                'mod':-10
+            }
+            break;
+    }
+
+    return result;
+}const menu = ['traits-mental', 'combat', 'inventaire', 'vehicules', 'voies', 'profil'];
+const combat = ['initiative', 'contact', 'distance', 'magique', 'defense', 'reduction'];
+const combatData = {
+    'initiative':['armure', 'etat'],
+    'contact':['profil', 'niveau', 'etat'],
+    'distance':['profil', 'niveau', 'etat'],
+    'defense':['armure', 'action', 'etat'],
+    'magique':['niveau', 'etat']
+};
+const combatWithCarac = ['initiative', 'contact', 'distance', 'defense', 'magique'];
+const car = ['force', 'dexterite', 'constitution', 'perception', 'intelligence', 'charisme'];
+const derived = ['pv', 'maho', 'serenite', 'volonte', 'chance'];
+const std = ['mod', 'temp', 'etat'];
+
+//MODE EDITION
+on(`clicked:edition`, async function() {
+    const attrs = await getAttrsAsync(['edition']);
+    const getEdit = attrs.edition;
+
+    let update = {};
+    update['edition'] = getEdit === '1' ? '0' : '1';
+
+    setAttrsAsync(update);
+});
+
+//OPTIONS
+on(`clicked:options`, async function() {
+    const attrs = await getAttrsAsync(['options']);
+    const getEdit = attrs.options;
+
+    let update = {};
+    update['options'] = getEdit === '1' ? '0' : '1';
+
+    setAttrsAsync(update);
+});
+
+car.forEach(c => {
+    let changes = `change:${c}-base change:${c}-temp change:${c}-divers`;
+
+    for(let w of combatWithCarac) {
+        changes += ` change:${w}-carac`;
+    }
+
+    on(changes, async function() {
+        const list = [
+            `${c}-base`,
+            `${c}-temp`,
+            `${c}-divers`,
+            `initiative-carac`,
+            `contact-carac`,
+            `distance-carac`,
+            `defense-carac`,
+            `magique-carac`,
+        ];
+
+        if(c === 'intelligence') {
+            list.push(
+                `perception-mod`,
+                `profil-serenite`,
+                `mythos`
+            );
+        } else if(c === 'constitution') {
+            list.push(
+                'niveau',
+                'ki',
+            )
+        } else if(c === 'perception') {
+            list.push(
+                `intelligence-mod`,
+                `profil-serenite`,
+                `mythos`
+            );
+        } else if(c === 'charisme') {
+            list.push(
+                `profil-chance`
+            );
+        }
+
+        const attrs = await getAttrsAsync(list);
+        const caracList = ['initiative', 'contact', 'distance', 'magique', 'defense'];
+        const base = parseInt(attrs[`${c}-base`]);
+        const temp = parseInt(attrs[`${c}-temp`]);
+        const mod = parseInt(attrs[`${c}-divers`]);
+        const total = base+temp+mod;
+        const cMod = Math.floor((total-10)/2);
+
+        let update = {};
+
+        update[`${c}-total`] = total;
+        update[`${c}-mod`] = cMod
+
+        if(c === 'dexterite') {
+            getSectionIDs("repeating_vehicules", async function(idarray) {
+                let vehicule = {}
+
+                for(var i=0; i < idarray.length; i++) {
+                    vehicule[`repeating_vehicules_${idarray[i]}_defense-vehicule-dexterite`] = cMod;
+                }
+
+                setAttrsAsync(vehicule);
+            });
+
+        } else if(c === 'intelligence') {
+            const mod_perception = parseInt(attrs[`perception-mod`]);
+            const serenite = parseInt(attrs[`profil-serenite`]);
+            const mythos = parseInt(attrs['mythos']);
+
+            update['volonte-base'] = Math.floor((cMod+mod_perception)/2);
+            update['serenite-base'] = cMod+mod_perception+serenite+2-mythos;
+        } else if(c === 'constitution') {
+            const niveau = parseInt(attrs[`niveau`]);
+            const ki = parseInt(attrs[`ki`]);
+
+            if(niveau === 1) {
+                update['pv-con'] = Math.floor(((base+mod)-10)/2);
+            }
+
+            update['maho-base'] = cMod+niveau+ki;
+
+        } else if(c === 'perception') {
+            const mod_intelligence = parseInt(attrs[`intelligence-mod`]);
+            const serenite = parseInt(attrs[`profil-serenite`]);
+            const mythos = parseInt(attrs[`mythos`]);
+
+            update['volonte-base'] = Math.floor((cMod+mod_intelligence)/2);
+            update['serenite-base'] = cMod+mod_intelligence+serenite+2-mythos;
+        } else if(c === 'charisme') {
+            const chance = parseInt(attrs[`profil-chance`]);
+
+            update['chance-base'] = cMod+chance+2;
+        }
+
+        for(let l of caracList) {
+            const car = attrs[`${l}-carac`];
+
+            if(car === c) update[`${l}-carac-value`] = cMod;
+
+            console.warn(car, l, c, update);
+        }
+
+        setAttrsAsync(update);
+    });
+
+    on(`clicked:roll${c}`, async function() {
+        const list = [
+            `dice-special`,
+            `character_name`,
+            `${c}-mod`,
+            `roll-type`,
+        ];
+
+        const attrs = await getAttrsAsync(list);
+        let update = {};
+        update['popup-type'] = 'caracteristique';
+        update['popup-stringify'] = JSON.stringify(attrs);
+        update['popup-title'] =  getTranslationByKey(c).charAt(0).toUpperCase() + getTranslationByKey(c).slice(1);
+        update['popup-id'] =  c;
+        update['popup-dice'] = attrs[`dice-special`];
+        update['popup'] = 4;
+        await setAttrsAsync(update);
+
+        /*const rollType = attrs[`rollType`];
+        const name = attrs[`character_name`];
+        const mod = parseInt(attrs[`${c}-mod`]);
+        const dice = getDice(attrs[`dice-special`]);
+        let roll = `${rollType} &{template:std} {{name=${name}}} {{title=^{${c}}}} {{result=[[1${dice}cf4cs7cs20+${mod}]]}} {{echec=[[0]]}} {{critique=[[0]]}} {{destin=[[0]]}}`;
+        let stRoll = await startRoll(roll);
+        const diceResult = stRoll.results.result.dice[0];
+        let computed = {};
+
+        switch(diceResult) {
+            case 4:
+                computed.echec = 1;
+            break;
+            case 7:
+                computed.destin = 1;
+            break;
+            case 20:
+                computed.critique = 1;
+            break;
+        }
+        finishRoll(stRoll.rollId, computed);*/
+    });
+});
+
+//ATTRIBUTS DERIVES
+derived.forEach(d => {
+    let change = `change:${d}-mod change:${d}-temp change:${d}-base`;
+
+    on(change, async function() {
+        const list = [
+            `${d}-base`,
+            `${d}-temp`,
+            `${d}-mod`,
+        ];
+
+        if(d === 'pv') {
+            list.push(`${d}-dv`);
+            list.push(`${d}-con`);
+        }
+
+        const attrs = await getAttrsAsync(list);
+        const base = parseInt(attrs[`${d}-base`]);
+        const temp = parseInt(attrs[`${d}-temp`]);
+        const mod = parseInt(attrs[`${d}-mod`]);
+        let update = {};
+        let total = base+temp+mod;
+
+        if(d === 'volonte') update[`${d}`] = Math.max(total, 0);
+        else update[`${d}_max`] = Math.max(total, 0);
+
+        setAttrsAsync(update);
+    });
+
+    if(d === 'maho') {
+        on(`change:niveau change:ki`, async function() {
+            const list = [
+                `ki`,
+                `niveau`,
+                `constitution-mod`
+            ];
+
+            const attrs = await getAttrsAsync(list);
+            const ki = parseInt(attrs[`ki`]);
+            const niveau = parseInt(attrs[`niveau`]);
+            const con = parseInt(attrs[`constitution-mod`]);
+
+            let total = ki+niveau+con;
+            let update = {};
+
+            update[`${d}-base`] = total;
+
+            setAttrsAsync(update);
+        });
+    }
+
+    if(d === 'pv') {
+        on(`change:${d}-dv change:${d}-con`, async function() {
+            const list = [
+                `${d}-dv`,
+                `${d}-con`,
+            ];
+
+            const attrs = await getAttrsAsync(list);
+            const dv = parseInt(attrs[`${d}-dv`]);
+            const con = parseInt(attrs[`${d}-con`]);
+
+            let total = dv+con;
+            let update = {};
+
+            update[`${d}-base`] = total;
+
+            setAttrsAsync(update);
+        });
+    }
+
+    if(d !== 'volonte') {
+        on(`change:${d} change:${d}_max`, async function() {
+            const list = [
+                `${d}`,
+                `${d}_max`,
+            ];
+
+            const attrs = await getAttrsAsync(list);
+            const base = parseInt(attrs[`${d}`]);
+            const max = parseInt(attrs[`${d}_max`]);
+            let update = {};
+
+            if(base > max) {
+                update[d] = max;
+                setAttrsAsync(update);
+            }
+        });
+    }
+});
+
+//MENU
+menu.forEach(m => {
+    on(`clicked:${m}`, function() {
+        let update = {};
+        update['menu'] = m;
+
+        setAttrsAsync(update);
+    });
+});
+
+//mythos
+on(`change:mythos`, async function() {
+    const list = [
+        `perception-mod`,
+        `intelligence-mod`,
+        `profil-serenite`,
+        `mythos`
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const mod_perception = parseInt(attrs[`perception-mod`]);
+    const mod_intelligence = parseInt(attrs[`intelligence-mod`]);
+    const serenite = parseInt(attrs[`profil-serenite`]);
+    const mythos = parseInt(attrs[`mythos`]);
+    let update = {}
+    update['serenite-base'] = mod_perception+mod_intelligence+serenite+2-mythos;
+
+    setAttrsAsync(update);
+});
+
+//resistance-mentale
+on(`clicked:resistance-mentale`, async function() {
+    const list = [
+        `character_name`,
+        `volonte`,
+    ];
+
+    let attrs = await getAttrsAsync(list);
+    let update = {};
+
+    let title = getTranslationByKey('resistance-mentale');
+    title = title[0].toUpperCase() + title.slice(1);
+
+    update['popup-type'] = 'resistancementale';
+    update['popup-id'] = '';
+    update['popup-stringify'] = JSON.stringify(attrs);
+    update['popup-title'] =  title;
+    update['popup'] = 4;
+
+    await setAttrsAsync(update);
+});
+
+//STATS DE COMBATS - MODE EDITION
+combat.forEach(c => {
+
+    if(combatWithCarac.includes(c)) {
+        let changes = `change:${c}-temp change:${c}-mod change:${c}-carac-value`;
+        let list = [`${c}-temp`, `${c}-mod`, `${c}-carac-value`];
+
+        for(let t of combatData[c]) {
+            changes += ` change:${c}-${t}`;
+            list.push(`${c}-${t}`);
+        }
+
+        on(changes, async function() {
+            const attrs = await getAttrsAsync(list);
+            const temp = parseInt(attrs[`${c}-temp`]);
+            const mod = parseInt(attrs[`${c}-mod`]);
+            const carac = parseInt(attrs[`${c}-carac-value`]) || 0;
+            let update = {};
+            let total = 0;
+            let second = 0;
+            total += temp;
+            total += mod;
+            total += carac;
+
+            if(c === 'defense') total += 10;
+
+            for(let t of combatData[c]) {
+                const v = parseInt(attrs[`${c}-${t}`]);
+
+                if(c === 'defense' && t === 'action') second += v;
+                else total += v;
+            }
+
+            if(second !== 0) second += total;
+
+            update[c] = second !== 0 ? `${total} / ${second}` : total;
+
+            setAttrsAsync(update);
+        });
+    }
+
+
+    on(`clicked:${c}-edit`, async function() {
+        const list = [
+            `${c}-edit`,
+        ];
+
+        const attrs = await getAttrsAsync(list);
+        const value = parseInt(attrs[`${c}-edit`]);
+
+        let update = {};
+        update[`${c}-edit`] = value === 1 ? 0 : 1;
+
+        setAttrsAsync(update);
+    });
+
+    if(c !== 'defense' && c !== 'reduction') {
+        on(`clicked:${c}`, async function() {
+            const list = [
+                `character_name`,
+                `${c}`,
+                `dice-special`,
+                `roll-type`,
+            ];
+
+            const attrs = await getAttrsAsync(list);
+            let update = {};
+            update['popup-type'] = 'combat';
+            update['popup-id'] = c;
+            update['popup-stringify'] = JSON.stringify(attrs);
+            update['popup-title'] =  getTranslationByKey(c).charAt(0).toUpperCase() + getTranslationByKey(c).slice(1);;
+            update['popup'] = 4;
+            setAttrsAsync(update);
+        });
+    }
+
+    if(!combatWithCarac.includes(c)) {
+
+        std.forEach(s => {
+            let change = `change:${c}-${s}`;
+
+            if(c === 'reduction') change += ` change:reduction-armure`;
+
+            on(change, async function() {
+                const list = [
+                    `${c}-temp`,
+                    `${c}-mod`,
+                    `${c}-etat`,
+                ];
+
+                if(c === 'reduction') {
+                    list.push(
+                        `reduction-armure`,
+                    );
+                }
+
+                const attrs = await getAttrsAsync(list);
+                const temp = parseInt(attrs[`${c}-temp`]);
+                const mod = parseInt(attrs[`${c}-mod`]);
+                const etat = c !== 'reduction' ? parseInt(attrs[`${c}-etat`]) : 0;
+
+                let reductionArmure = 0;
+                let total = temp+mod+etat;
+                let update = {};
+
+                if(c === 'reduction') {
+                    reductionArmure = parseInt(attrs[`reduction-armure`]);
+
+                    total += reductionArmure;
+                }
+
+                update[`${c}`] = total;
+
+                setAttrsAsync(update);
+            });
+        });
+    }
+});
+
+on(`change:action-defensive`, async function() {
+    const list = [
+        'action-defensive'
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const ad = attrs[`action-defensive`];
+    let update = {}
+
+    switch(ad) {
+        case 'simple':
+            update['defense-action'] = 2;
+            break;
+
+        case 'totale':
+            update['defense-action'] = 4;
+            break;
+
+        default:
+            update['defense-action'] = 0;
+            break;
+    }
+
+    setAttrsAsync(update);
+});
+
+etats.forEach(e => {
+    on(`clicked:${e}`, async function() {
+        const list = etats;
+
+        const attrs = await getAttrsAsync(list);
+        const clicked = attrs[e] === 1 ? 0 : 1;
+        const allMod = getFinalMod(attrs, e, clicked);
+
+        let update = {};
+        update[e] = clicked;
+        update['dice-special'] = allMod.dice;
+        update['initiative-etat'] = allMod.init;
+        update['defense-etat'] = allMod.def;
+        update['contact-etat'] = allMod.con;
+        update['distance-etat'] = allMod.dis;
+        update['magique-etat'] = allMod.mag;
+
+        setAttrsAsync(update);
+    });
+});
+
+//NIVEAUX
+const populateSelectNiveau = async () => {
+    const list = [
+        `contact-niveau`,
+        `distance-niveau`,
+        `magique-niveau`,
+    ];
+    const options = [{
+        label:'choisir',
+        value:'choisir',
+        i18n:'choisir',
+        selected:true
+    }];
+
+    const attrs = await getAttrsAsync(list);
+    const contact = parseInt(attrs['contact-niveau']);
+    const distance = parseInt(attrs['distance-niveau']);
+    const magique = parseInt(attrs['magique-niveau']);
+
+    if(contact < 6) options.push({
+        label:'contact',
+        value:'contact',
+        i18n:'attaque-contact'
+    });
+
+    if(distance < 6) options.push({
+        label:'distance',
+        value:'distance',
+        i18n:'attaque-distance'
+    });
+
+    if(magique < 6) options.push({
+        label:'magique',
+        value:'magique',
+        i18n:'attaque-magique'
+    });
+
+    populateListOptions({
+        elemSelector: '.popupniveau-select',
+        optionsArray: options,
+    });
+};
+
+on(`clicked:uplvl`, async function() {
+    const list = [
+        `niveau`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const niveau = parseInt(attrs['niveau']);
+    let nivSup = niveau+1;
+    let update = {};
+
+    update['popup'] = 1;
+    setAttrsAsync(update);
+
+    if(nivSup%2 === 0) {
+        populateSelectNiveau();
+        $20('.popup .lvlup label').removeClass('hidden');
+    } else {
+        $20('.popup .lvlup label').addClass('hidden');
+    }
+});
+
+on(`clicked:popup-annuler`, async function() {
+    let update = {};
+    update['popup'] = 0;
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:popupniveau-confirmer`, async function() {
+    const list = [
+        `character_name`,
+        `niveau`,
+        `popupniveau`,
+        `contact-niveau`,
+        `distance-niveau`,
+        `magique-niveau`,
+        `historique`,
+        `pv-base`,
+        `pv-mod`,
+        `pv-temp`,
+        `pv-dv`,
+        `pv-con`,
+        `profil-dv`,
+        `ptscapacites_max`,
+        `constitution-mod`,
+        `roll-type`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const rollType = attrs['roll-type'];
+    const name = attrs['character_name'];
+    const niveau = parseInt(attrs['niveau']);
+    const dv = attrs['profil-dv'];
+    const pvDv = parseInt(attrs['pv-dv']);
+    const pvCon = parseInt(attrs['pv-con']);
+    const pvMod = parseInt(attrs['pv-mod']);
+    const pvTemp = parseInt(attrs['pv-temp']);
+    const pvMax = pvDv+pvCon+pvMod+pvTemp;
+    const historique = attrs['historique'];
+    const attaque = attrs['popupniveau'];
+    const contact = parseInt(attrs['contact-niveau']);
+    const distance = parseInt(attrs['distance-niveau']);
+    const magique = parseInt(attrs['magique-niveau']);
+    const ptsCapacites = parseInt(attrs['ptscapacites_max']);
+    const constitution = parseInt(attrs['constitution-mod']);
+    let toAdd = ``;
+    let nivSup = niveau+1;
+    let nivContact = contact;
+    let nivDistance = distance;
+    let nivMagique = magique;
+    let nivDv = pvDv;
+    let nivCon = pvCon;
+    let rollPv;
+    let update = {};
+    let roll = `${rollType} &{template:niveau} {{name=${name}}} {{title=^{passage-niveau}}} {{oldniveau=[[${niveau}]]}} {{newniveau=[[${nivSup}]]}} {{oldpv=[[${pvMax}]]}} {{oldcapacite=[[${ptsCapacites}]]}} {{newcapacite=[[${ptsCapacites+2}]]}}`;
+    update['popup'] = 0;
+    update['niveau'] = nivSup;
+
+    if(nivSup > 10) {
+        if(dv === 6 || dv === 8) {
+            update['pv-dv'] = nivDv += 1;
+            roll += ` {{newpv=[[${pvMax}+1]]}}`;
+
+            rollPv = await startRoll(roll);
+        }
+        else if(dv === 10) {
+            update['pv-dv'] = nivDv += 2;
+            roll += ` {{newpv=[[${pvMax}+2]]}}`;
+
+            rollPv = await startRoll(roll);
+        }
+    } else {
+        if(nivSup%2 === 0) {
+            switch(attaque) {
+                case 'contact':
+                    nivContact += 1;
+                    roll += ` {{oldcontact=[[${contact}]]}} {{newcontact=[[${nivContact}]]}}`;
+                    break;
+
+                case 'distance':
+                    nivDistance += 1;
+                    roll += ` {{olddistance=[[${distance}]]}} {{newdistance=[[${nivDistance}]]}}`;
+                    break;
+
+                case 'magique':
+                    nivMagique += 1;
+                    roll += ` {{oldmagique=[[${magique}]]}} {{newmagique=[[${nivMagique}]]}}`;
+                    break;
+            }
+
+            if(constitution < 0) {
+                roll += ` {{newpv=[[${pvMax}+[[{1d${dv}${constitution}, 1d0}kh1]]]]}}`;
+            } else {
+                roll += ` {{newpv=[[${pvMax}+1d${dv}]]}}`;
+            }
+
+            rollPv = await startRoll(roll);
+            nivDv += rollPv.results.newpv.result-pvMax;
+            update['pv-dv'] = nivDv;
+        } else if(constitution >= 0) {
+            roll += ` {{newpv=[[${pvMax}+${constitution}]]}}`;
+
+            rollPv = await startRoll(roll);
+            nivCon += constitution;
+            update['pv-con'] = nivCon;
+        } else {
+            roll += ` {{newpv=[[${pvMax}]]}}`;
+
+            rollPv = await startRoll(roll);
+        }
+    }
+
+    finishRoll(rollPv.rollId);
+
+    update['contact-niveau'] = nivContact;
+    update['distance-niveau'] = nivDistance;
+    update['magique-niveau'] = nivMagique;
+
+    toAdd = `{"contact":"${contact}","distance":"${distance}","magique":"${magique}","dv":"${pvDv}","con":"${pvCon}"}`;
+
+    update['historique'] = historique.length === 0 ? toAdd : historique+`;${toAdd}`;
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:popupniveaudown-confirmer`, async function() {
+    const list = [
+        `character_name`,
+        `niveau`,
+        `historique`,
+        `contact-niveau`,
+        `distance-niveau`,
+        `magique-niveau`,
+        `pv-base`,
+        `pv-mod`,
+        `pv-temp`,
+        `pv-dv`,
+        `pv-con`,
+        `profil-dv`,
+        `ptscapacites_max`,
+        `roll-type`,
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const rollType = attrs['roll-type'];
+    const historique = attrs['historique'];
+    const lvl = parseInt(attrs.niveau);
+    let newLvl = lvl-1;
+    let historiqueSplit = historique.split(';');
+    let historiqueActuel = JSON.parse(`${historiqueSplit[newLvl-1]}`);
+    const name = attrs['character_name'];
+    const pvDv = parseInt(attrs['pv-dv']);
+    const pvCon = parseInt(attrs['pv-con']);
+    const pvMod = parseInt(attrs['pv-mod']);
+    const pvTemp = parseInt(attrs['pv-temp']);
+    const pvMax = pvDv+pvCon+pvMod+pvTemp;
+    const oldContact = parseInt(attrs['contact-niveau']);
+    const oldDistance = parseInt(attrs['distance-niveau']);
+    const oldMagique = parseInt(attrs['magique-niveau']);
+    const ptsCapacites = parseInt(attrs['ptscapacites_max']);
+    let contact = parseInt(historiqueActuel.contact);
+    let distance = parseInt(historiqueActuel.distance);
+    let magique = parseInt(historiqueActuel.magique);
+    let pv = pvMod+pvTemp;
+    let dv = parseInt(historiqueActuel.dv);
+    let con = parseInt(historiqueActuel.con);
+    let update = {};
+    update['popup'] = 0;
+
+    if(newLvl >= 10) {
+        pv = dv+pvCon;
+    } else {
+        if(newLvl%2 === 0) pv += con+pvDv
+        else pv += dv+pvCon;
+    }
+
+    let roll = `${rollType} &{template:niveau} {{name=${name}}} {{title=^{diminution-niveau}}} {{oldniveau=[[${lvl}]]}} {{newniveau=[[${newLvl}]]}} {{oldpv=[[${pvMax}]]}} {{newpv=[[${pv}]]}} {{oldcapacite=[[${ptsCapacites}]]}} {{newcapacite=[[${ptsCapacites-2}]]}}`;
+    if(contact != oldContact) roll += ` {{oldcontact=[[${oldContact}]]}} {{newcontact=[[${contact}]]}}`;
+    if(distance != oldDistance) roll += ` {{olddistance=[[${oldDistance}]]}} {{newdistance=[[${distance}]]}}`;
+    if(magique != oldMagique) roll += ` {{olddistance=[[${oldMagique}]]}} {{newdistance=[[${magique}]]}}`;
+
+    update['niveau'] = newLvl;
+    update['contact-niveau'] = contact;
+    update['distance-niveau'] = distance;
+    update['magique-niveau'] = magique;
+    update['pv-con'] = con;
+    update['pv-dv'] = dv;
+    historiqueSplit.pop();
+    let newHistorique = historiqueSplit.join(';');
+
+    update['historique'] = newHistorique === "" ? "" : newHistorique;
+
+    let getRoll = await startRoll(roll);
+    finishRoll(getRoll.rollId);
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:downlvl`, async function() {
+    let update = {};
+
+    update['popup'] = 6;
+    setAttrsAsync(update);
+});
+
+on(`sheet:opened`, async function() {
+    const list = [
+        `niveau`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const niveau = parseInt(attrs['niveau']);
+    const nivSup = niveau+1;
+
+    if(nivSup%2 === 0) {
+        populateSelectNiveau();
+        $20('.popup .lvlup label').removeClass('hidden');
+    } else {
+        $20('.popup .lvlup label').addClass('hidden');
+    }
+});const rangs = [1, 2, 3, 4, 5];
+
+on(`change:profil-capacite change:niveau`, async function() {
+    const list = [
+        `profil-capacite`,
+        `niveau`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const capacite = parseInt(attrs['profil-capacite']);
+    const niveau = parseInt(attrs['niveau']);
+
+    let update = {};
+    update['ptscapacites_max'] = 2+capacite+(niveau*2);
+
+    setAttrsAsync(update);
+});
+
+on(`change:ptscapacites change:ptscapacites_max sheet:opened`, async function() {
+    const list = [
+        `ptscapacites`,
+        `ptscapacites_max`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const value = parseInt(attrs['ptscapacites']);
+    const max = parseInt(attrs['ptscapacites_max']);
+
+    if(value > max) $20('div.voies div.ptsCapacites').addClass('red');
+    else  $20('div.voies div.ptsCapacites').removeClass('red');
+});
+
+rangs.forEach(r => {
+    on(`clicked:repeating_voies:rang${r}`, async function(info) {
+        const repeating = info.sourceAttribute.split('_')[2];
+        const rang = r;
+        const list = [
+            `repeating_voies_${repeating}_rang${rang}`,
+        ];
+        const attrs = await getAttrsAsync(list);
+        const vRang = parseInt(attrs[`repeating_voies_${repeating}_rang${rang}`]);
+        let update = {};
+
+        if(vRang === 1) update[`repeating_voies_${repeating}_rang${rang}`] = 0;
+        else update[`repeating_voies_${repeating}_rang${rang}`] = 1;
+
+        setAttrsAsync(update);
+    });
+
+    on(`clicked:repeating_voies:rang${r} change:repeating_voies:type remove:repeating_voies`, async function() {
+        getSectionIDs("repeating_voies", async function(idarray) {
+            const lRepeat = [];
+
+            for(var i=0; i < idarray.length; i++) {
+                lRepeat.push(
+                    `repeating_voies_${idarray[i]}_type`,
+                    `repeating_voies_${idarray[i]}_rang1`,
+                    `repeating_voies_${idarray[i]}_rang2`,
+                    `repeating_voies_${idarray[i]}_rang3`,
+                    `repeating_voies_${idarray[i]}_rang4`,
+                    `repeating_voies_${idarray[i]}_rang5`,
+                );
+            }
+
+            const lRangs = await getAttrsAsync(lRepeat);
+            let type = '';
+            let v = 0;
+            let update = {};
+
+            _.each(lRangs, (value, key) => {
+                const val = value;
+                const name = key.split('_')[3];
+
+                switch(name) {
+                    case 'type':
+                        type = val;
+                        break;
+
+                    case 'rang1':
+                    case 'rang2':
+                        if((type === 'predilection' || type === 'memefamille') && val === 1) v += 1;
+                        else if((type === 'horsfamille' || type === 'horsprofil' || type === 'prestige') && val === 1) v += 2;
+                        break;
+
+                    case 'rang3':
+                    case 'rang4':
+                    case 'rang5':
+                        if((type === 'predilection' || type === 'memefamille') && val === 1) v += 2;
+                        else if((type === 'horsfamille' || type === 'horsprofil' || type === 'prestige') && val === 1) v += 2;
+                        break;
+                }
+            });
+
+            update['ptscapacites'] = v;
+            setAttrsAsync(update);
+        });
+    });
+});on(`clicked:repeating_armures:equip`, async function(info) {
+    const repeating = info.sourceAttribute.split('_')[2];
+    const list = [
+        `repeating_armures_${repeating}_equip`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const vEquip = parseInt(attrs[`repeating_armures_${repeating}_equip`]);
+    let update = {};
+
+    if(vEquip === 1) update[`repeating_armures_${repeating}_equip`] = 0;
+    else update[`repeating_armures_${repeating}_equip`] = 1;
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:repeating_armures:equip change:repeating_armures:defense change:repeating_armures:reduction remove:repeating_armures`, async function() {
+    getSectionIDs("repeating_armures", async function(idarray) {
+        const lRepeat = [];
+
+        for(var i=0; i < idarray.length; i++) {
+            lRepeat.push(
+                `repeating_armures_${idarray[i]}_equip`,
+                `repeating_armures_${idarray[i]}_defense`,
+                `repeating_armures_${idarray[i]}_reduction`,
+            );
+        }
+
+        const lArmure = await getAttrsAsync(lRepeat);
+        let e = 0;
+        let d = 0;
+        let r = 0;
+        let update = {};
+
+        _.each(lArmure, (value, key) => {
+            const val = parseInt(value);
+            const name = key.split('_')[3];
+
+            switch(name) {
+                case 'equip':
+                    if(val === 1) e = 1;
+                    else e = 0;
+                    break;
+
+                case 'defense':
+                    if(e === 1) d += val;
+                    break;
+
+                case 'reduction':
+                    if(e === 1) r += val;
+                    break;
+            }
+        });
+
+        update['defense-armure'] = d;
+        update['reduction-armure'] = r;
+        update['initiative-armure'] = d === 0 ? d : `-${d}`;
+        setAttrsAsync(update);
+    });
+});const carVehicule = ['force', 'agilite', 'defense'];
+
+on(`clicked:repeating_vehicules:vehicule-edit`, async function(info) {
+    const repeating = info.sourceAttribute.split('_')[2];
+    const list = [
+        `repeating_vehicules_${repeating}_edit`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const edit = parseInt(attrs[`repeating_vehicules_${repeating}_edit`]);
+
+    let update = {};
+    update[`repeating_vehicules_${repeating}_edit`] = edit === 1 ? 0 : 1;
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:repeating_vehicules:vehicule-roll`, async function(info) {
+    const repeating = info.sourceAttribute.split('_')[2];
+    const base = `repeating_vehicules_${repeating}`;
+    const list = [
+        `character_name`,
+        `${base}_agilite-vehicule`,
+        `dexterite-mod`,
+        `${base}_vehicule-name`
+    ];
+    let attrs = await getAttrsAsync(list);
+    let update = {};
+
+    update['popup-type'] = 'vehicule';
+    update['popup-id'] = base;
+    update['popup-stringify'] = JSON.stringify(attrs);
+    update['popup-title'] =  attrs[`${base}_vehicule-name`] !== '' ? attrs[`${base}_vehicule-name`] : '';
+    update['popup'] = 4;
+
+    await setAttrsAsync(update);
+});
+
+carVehicule.forEach(c => {
+    let onChange = `change:repeating_vehicules:${c}-vehicule-base change:repeating_vehicules:${c}-vehicule-temp change:repeating_vehicules:${c}-vehicule-divers`;
+
+    if(c === 'defense') onChange += ` change:repeating_vehicules:${c}-vehicule-dexterite`
+
+    on(onChange, async function(info) {
+        const repeating = info.sourceAttribute.split('_')[2];
+        const list = [
+            `repeating_vehicules_${repeating}_${c}-vehicule-base`,
+            `repeating_vehicules_${repeating}_${c}-vehicule-temp`,
+            `repeating_vehicules_${repeating}_${c}-vehicule-divers`,
+        ];
+
+        if(c === 'defense') list.push(`repeating_vehicules_${repeating}_${c}-vehicule-dexterite`);
+
+        const attrs = await getAttrsAsync(list);
+        const base = parseInt(attrs[`repeating_vehicules_${repeating}_${c}-vehicule-base`]);
+        const temp = parseInt(attrs[`repeating_vehicules_${repeating}_${c}-vehicule-temp`]);
+        const divers = parseInt(attrs[`repeating_vehicules_${repeating}_${c}-vehicule-divers`]);
+        let total = base+temp+divers;
+
+        if(c === 'defense') {
+            const dex = parseInt(attrs[`repeating_vehicules_${repeating}_${c}-vehicule-dexterite`]);
+
+            total += dex;
+        }
+
+        let update = {};
+        update[`repeating_vehicules_${repeating}_${c}-vehicule`] = total;
+
+        if(c === 'force') update[`repeating_vehicules_${repeating}_places-vehicule`] = Math.max(total+4, 1);
+
+        setAttrsAsync(update);
+    });
+});
+
+on(`change:repeating_vehicules:pv-vehicule change:repeating_vehicules:pv-vehicule_max`, async function(info) {
+    const repeating = info.sourceAttribute.split('_')[2];
+    const list = [
+        `repeating_vehicules_${repeating}_pv-vehicule`,
+        `repeating_vehicules_${repeating}_pv-vehicule_max`,
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const base = parseInt(attrs[`repeating_vehicules_${repeating}_pv-vehicule`]);
+    const max = parseInt(attrs[`repeating_vehicules_${repeating}_pv-vehicule_max`]);
+    let update = {};
+
+    if(base > max) {
+        update[`repeating_vehicules_${repeating}_pv-vehicule`] = max;
+        setAttrsAsync(update);
+    }
+});
+
+on(`change:repeating_vehicules:pv-vehicule-mod change:repeating_vehicules:pv-vehicule-temp change:repeating_vehicules:pv-vehicule-base`, async function(info) {
+    const repeating = info.sourceAttribute.split('_')[2];
+    const list = [
+        `repeating_vehicules_${repeating}_pv-vehicule-mod`,
+        `repeating_vehicules_${repeating}_pv-vehicule-temp`,
+        `repeating_vehicules_${repeating}_pv-vehicule-base`,
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const base = parseInt(attrs[`repeating_vehicules_${repeating}_pv-vehicule-base`]);
+    const mod = parseInt(attrs[`repeating_vehicules_${repeating}_pv-vehicule-mod`]);
+    const temp = parseInt(attrs[`repeating_vehicules_${repeating}_pv-vehicule-temp`]);
+
+    let update = {};
+    update[`repeating_vehicules_${repeating}_pv-vehicule_max`] = base+mod+temp;
+
+    setAttrsAsync(update);
+});const dFamille = {
+    'action':{
+        'dv':10,
+        'attaque':2,
+        'capacite':0,
+        'serenite':0,
+        'chance':0
+    },
+    'reflexion':{
+        'dv':6,
+        'attaque':0,
+        'capacite':2,
+        'serenite':2,
+        'chance':0
+    },
+    'societe':{
+        'dv':8,
+        'attaque':1,
+        'capacite':0,
+        'serenite':0,
+        'chance':2
+    }
+};
+
+on(`change:profil-famille`, async function() {
+    const list = [
+        `profil-famille`,
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const famille = attrs['profil-famille'];
+
+    if(famille === '') return;
+
+    const dataFamille = dFamille[famille];
+
+    let update = {};
+    update['profil-dv'] = dataFamille['dv'];
+    update['profil-attaque'] = dataFamille['attaque'];
+    update['profil-attaque-contact'] = 0;
+    update['profil-attaque-distance'] = 0;
+    update['profil-capacite'] = dataFamille['capacite'];
+    update['profil-serenite'] = dataFamille['serenite'];
+    update['profil-chance'] = dataFamille['chance'];
+
+    setAttrsAsync(update);
+});
+
+on(`change:profil-attaque-contact`, async function() {
+    const list = [
+        `profil-attaque`,
+        `profil-attaque-contact`,
+        `profil-attaque-distance`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const attaque = parseInt(attrs['profil-attaque']);
+    const attaqueScore = parseInt(attrs['profil-attaque-contact']);
+    const attaqueDistance = parseInt(attrs['profil-attaque-distance']);
+    const diff = attaque-attaqueScore;
+
+    let update = {};
+
+    if(attaqueScore > attaque) {
+        update['profil-attaque-contact'] = attaque;
+        update['profil-attaque-distance'] = 0;
+    } else if(attaqueDistance > diff) {
+        update['profil-attaque-distance'] = diff;
+    }
+
+    update['distance-profil'] = attaqueScore;
+
+    setAttrsAsync(update);
+});
+
+on(`change:profil-attaque-distance`, async function() {
+    const list = [
+        `profil-attaque`,
+        `profil-attaque-contact`,
+        `profil-attaque-distance`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const attaque = parseInt(attrs['profil-attaque']);
+    const attaqueContact = parseInt(attrs['profil-attaque-contact']);
+    const attaqueScore = parseInt(attrs['profil-attaque-distance']);
+    const diff = attaque-attaqueScore;
+
+    let update = {};
+
+    if(attaqueScore > attaque) {
+        update['profil-attaque-contact'] = 0;
+        update['profil-attaque-distance'] = attaque;
+    } else if(attaqueContact > diff) {
+        update['profil-attaque-contact'] = diff;
+    }
+
+    update['contact-profil'] = attaqueScore;
+
+    setAttrsAsync(update);
+});
+
+on(`change:profil-dv`, async function() {
+    const list = [
+        `profil-dv`,
+        `niveau`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const dv = parseInt(attrs['profil-dv']);
+    const niveau = parseInt(attrs['niveau']);
+
+    let update = {};
+    if(niveau === 1) update['pv-dv'] = dv;
+
+    setAttrsAsync(update);
+});
+
+on(`change:profil-serenite`, async function() {
+    const list = [
+        `profil-serenite`,
+        `intelligence-mod`,
+        `perception-mod`,
+        `mythos`
+    ];
+    const attrs = await getAttrsAsync(list);
+    const serenite = parseInt(attrs['profil-serenite']);
+    const intelligence = parseInt(attrs['intelligence-mod']);
+    const perception = parseInt(attrs['perception-mod']);
+    const mythos = parseInt(attrs['mythos']);
+
+    let update = {};
+    update['serenite-base'] = 2+serenite+intelligence+perception-mythos;
+
+    setAttrsAsync(update);
+});
+
+on(`change:profil-chance`, async function() {
+    const list = [
+        `profil-chance`,
+        `charisme-mod`,
+    ];
+    const attrs = await getAttrsAsync(list);
+    const chance = parseInt(attrs['profil-chance']);
+    const charisme = parseInt(attrs['charisme-mod']);
+
+    let update = {};
+    update['chance-base'] = 2+chance+charisme;
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:switchvoie`, async function() {
+    let update = {};
+    update['voie-selshow'] = 'voie';
+
+    setAttrsAsync(update);
+});
+
+on(`clicked:switchcapacite`, async function() {
+    let update = {};
+    update['voie-selshow'] = 'capacite';
+
+    setAttrsAsync(update);
+});const wpn = ['contact', 'distance', 'sortilege', 'grenade', 'artillerie'];
+const modki = ['positif', 'negatif', 'positifdgts', 'negatifdgts'];
+
+wpn.forEach(c => {
+    on(`clicked:show${c}`, async function() {
+        let show = `show${c}`;
+
+        const attrs = await getAttrsAsync([show]);
+        const getShow = attrs[show];
+
+        let update = {};
+        update[show] = getShow === '1' ? '0' : '1';
+
+        setAttrsAsync(update);
+    });
+
+    on(`clicked:repeating_wpn${c}:wpnshow`, async function(info) {
+        const repeating = info.sourceAttribute.split('_')[2];
+        const list = [
+            `repeating_wpn${c}_${repeating}_wpnshow`,
+        ];
+
+        const attrs = await getAttrsAsync(list);
+        const getShow = attrs[list[0]];
+
+        let update = {};
+        update[list[0]] = getShow === '1' ? '0' : '1';
+
+        setAttrsAsync(update);
+    });
+
+    on(`clicked:repeating_wpn${c}:wpnroll`, async function(info) {
+        const repeating = info.sourceAttribute.split('_')[2];
+        const base = `repeating_wpn${c}_${repeating}`;
+        const list = [
+            `character_name`,
+            `${base}_name`,
+            `ki`,
+            `dice-special`,
+            `dice-atk`,
+        ];
+
+        let diceSpe = 0;
+        let diceAtk = 0;
+        let attrs;
+        let update = {};
+
+        update['popup-type'] = c;
+
+        switch(c) {
+            case 'contact':
+                list.push(
+                    `contact`,
+                    `${base}_dm`,
+                    `${base}_modatt`,
+                    `${base}_moddgts`,
+                    `${base}_modkipositif`,
+                    `${base}_modkinegatif`,
+                    `${base}_modkipositifdgts`,
+                    `${base}_modkinegatifdgts`,
+                    `${base}_description`
+                );
+                attrs = await getAttrsAsync(list);
+                diceSpe = attrs['dice-special'];
+                diceAtk = attrs['dice-atk'];
+                update['popup-id'] = base;
+                update['popup-stringify'] = JSON.stringify(attrs);
+                update['popup-title'] = attrs[`${base}_name`];
+                update['popup-dice-atk'] = Math.min(diceSpe, diceAtk);
+                update['popup'] = 2;
+                break;
+            case 'grenade':
+                list.push(
+                    `distance`,
+                    `${base}_dm`,
+                    `${base}_portee`,
+                    `${base}_modatt`,
+                    `${base}_moddgts`,
+                    `${base}_modkipositif`,
+                    `${base}_modkinegatif`,
+                    `${base}_modkipositifdgts`,
+                    `${base}_modkinegatifdgts`,
+                    `${base}_description`,
+                );
+                attrs = await getAttrsAsync(list);
+                diceSpe = attrs['dice-special'];
+                diceAtk = attrs['dice-atk'];
+                update['popup-id'] = base;
+                update['popup-stringify'] = JSON.stringify(attrs);
+                update['popup-title'] = attrs[`${base}_name`];
+                update['popup-dice-atk'] = Math.min(diceSpe, diceAtk);
+                update['popup'] = 2;
+                break;
+            case 'artillerie':
+                list.push(
+                    `distance`,
+                    `${base}_dm`,
+                    `${base}_portee`,
+                    `${base}_aire-effet`,
+                    `${base}_modatt`,
+                    `${base}_moddgts`,
+                    `${base}_modkipositif`,
+                    `${base}_modkinegatif`,
+                    `${base}_modkipositifdgts`,
+                    `${base}_modkinegatifdgts`,
+                    `${base}_description`,
+                );
+                attrs = await getAttrsAsync(list);
+                diceSpe = attrs['dice-special'];
+                diceAtk = attrs['dice-atk'];
+                update['popup-id'] = base;
+                update['popup-stringify'] = JSON.stringify(attrs);
+                update['popup-title'] = attrs[`${base}_name`];
+                update['popup-dice-atk'] = Math.min(diceSpe, diceAtk);
+                update['popup'] = 2;
+                break;
+            case 'distance':
+                list.push(
+                    `distance`,
+                    `${base}_dm`,
+                    `${base}_portee`,
+                    `${base}_modatt`,
+                    `${base}_moddgts`,
+                    `${base}_modkipositif`,
+                    `${base}_modkinegatif`,
+                    `${base}_modkipositifdgts`,
+                    `${base}_modkinegatifdgts`,
+                    `${base}_description`,
+                    `${base}_incident-tir`,
+                );
+                attrs = await getAttrsAsync(list);
+                diceSpe = attrs['dice-special'];
+                diceAtk = attrs['dice-atk'];
+                update['popup-id'] = base;
+                update['popup-stringify'] = JSON.stringify(attrs);
+                update['popup-title'] = attrs[`${base}_name`];
+                update['popup-dice-atk'] = Math.min(diceSpe, diceAtk);
+                update['popup'] = 3;
+                break;
+            case 'sortilege':
+                list.push(
+                    `force-mod`,
+                    `dexterite-mod`,
+                    `constitution-mod`,
+                    `intelligence-mod`,
+                    `sagesse-mod`,
+                    `charisme-mod`,
+                    `${base}_type-magie`,
+                    `${base}_forme-magie`,
+                    `${base}_rang`,
+                    `${base}_caracteristique`,
+                    `${base}_description`,
+                );
+                attrs = await getAttrsAsync(list);
+                diceSpe = attrs['dice-special'];
+                diceAtk = attrs['dice-atk'];
+                update['popup-id'] = base;
+                update['popup-stringify'] = JSON.stringify(attrs);
+                update['popup-title'] = attrs[`${base}_name`];
+                update['popup-dice-atk'] = Math.min(diceSpe, diceAtk);
+                update['popup'] = 5;
+                break;
+        }
+
+        await setAttrsAsync(update);
+    });
+
+    switch(c) {
+        case 'contact':
+        case 'distance':
+        case 'grenade':
+        case 'artillerie':
+            modki.forEach(m => {
+                on(`clicked:repeating_wpn${c}:modki${m}`, async function(info) {
+                    const repeating = info.sourceAttribute.split('_')[2];
+                    const list = [
+                        `repeating_wpn${c}_${repeating}_modki${m}`,
+                    ];
+
+                    const attrs = await getAttrsAsync(list);
+                    const getShow = parseInt(attrs[list[0]]);
+
+                    let update = {};
+                    update[list[0]] = getShow === 1 ? 0 : 1;
+
+                    setAttrsAsync(update);
+                });
+            });
+            break;
+        case 'sortilege':
+            on(`clicked:repeating_wpn${c}:spellroll`, async function(info) {
+                const repeating = info.sourceAttribute.split('_')[2];
+                const base = `repeating_wpn${c}_${repeating}`;
+                const list = [
+                    `character_name`,
+                    `${base}_name`,
+                    `ki`,
+                ];
+
+                let attrs;
+                let update = {};
+
+                update['popup-type'] = `${c}-atk`;
+
+                list.push(
+                    `magique`,
+                    `${base}_type-magie`,
+                    `${base}_forme-magie`,
+                    `${base}_rang`,
+                    `${base}_difficulte`,
+                    `${base}_description`,
+                );
+                attrs = await getAttrsAsync(list);
+                update['popup-id'] = base;
+                update['popup-stringify'] = JSON.stringify(attrs);
+                update['popup-title'] = attrs[`${base}_name`];
+                update['popup'] = 2;
+
+                await setAttrsAsync(update);
+            });
+            break;
+    }
+});
+
+on(`clicked:deux-armes`, async function() {
+    let list = [
+        'deux-armes'
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const deuxarmes = parseInt(attrs['deux-armes']);
+    const newR = deuxarmes === 1 ? 0 : 1;
+
+
+    let update = {};
+    update['deux-armes'] = newR;
+    update['dice-atk'] = 0-newR;
+
+    setAttrsAsync(update);
+});on(`clicked:arcdefeu`, async function() {
+    const list = [
+        'arcdefeu'
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const clicked = attrs['arcdefeu'] === 1 ? 0 : 1;
+    let update = {};
+    update['arcdefeu'] = clicked;
+    await setAttrsAsync(update);
+});
+
+on(`clicked:popupcombat-confirmer`, async function() {
+    const list = [
+        `popup-id`,
+        `popup-stringify`,
+        `popup-type`,
+        `popup-luminosite`,
+        `popup-portee`,
+        `popup-dice-atk`,
+        `nbre-dice`,
+        `arcdefeu`,
+        `rang-voie`,
+        `divers`,
+        `roll-type`,
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const rollType = attrs['roll-type'];
+    const type = attrs['popup-type'];
+    const base = attrs['popup-id'];
+    const json = JSON.parse(attrs['popup-stringify']);
+    const cName = json[`character_name`];
+    const name = json[`${base}_name`];
+    const dm = json[`${base}_dm`] ? json[`${base}_dm`] : 0;
+    const splitDm = dm === 0 ? [''] : dm.split('+');
+    const ki = parseInt(json['ki']);
+    const rang = parseInt(attrs['rang-voie']);
+    const modDivers = parseInt(attrs['divers']);
+    const nbreDice = parseInt(attrs['nbre-dice']);
+    const dice = getDice(attrs['popup-dice-atk']);
+
+    let attaque = 0;
+    let diceDm = splitDm[0] === "" ? '1D6' : splitDm[0];
+    let otherDm = 0;
+    let modAtt = 0;
+    let modDgt = 0;
+    let description;
+    let modKiAtt = 0;
+    let modKiDgt = 0;
+    let isModkiAttPos = 0;
+    let isModkiAttNeg = 0;
+    let isModkiDgtPos = 0;
+    let isModkiDgtNeg = 0;
+    let portee = 0;
+    let luminosite = 0;
+    let incidentTir = 0;
+    let arcdefeu = parseInt(attrs['arcdefeu']);
+    let empty = 1;
+    let aireEffet = '';
+    let difficulte = 0;
+    let typeMagie = '';
+    let formeMagie = '';
+    let roll = type === 'sortilege' ? `${rollType} &{template:std} {{name=${cName}}} {{title=${name}}}` : `${rollType} &{template:combat} {{name=${cName}}} {{title=${name}}}`;
+    roll += rang !== 0 ? `{{^{rang-voie}=[[${rang}]]}}` : '';
+    roll += modDivers !== 0 ? `{{^{mod-divers}=[[${modDivers}]]}}` : '';
+
+    splitDm.shift();
+    otherDm = splitDm.reduce(
+        (accumulator, currentValue) => parseInt(accumulator) + parseInt(currentValue),
+        0,
+    );
+
+    switch(type) {
+        case 'contact':
+            attaque += parseInt(json['contact']);
+            modAtt += parseInt(json[`${base}_modatt`]);
+            modDgt += parseInt(json[`${base}_moddgts`]);
+            isModkiAttPos = parseInt(json[`${base}_modkipositif`]);
+            isModkiAttNeg = parseInt(json[`${base}_modkinegatif`]);
+            isModkiDgtPos = parseInt(json[`${base}_modkipositifdgts`]);
+            isModkiDgtNeg = parseInt(json[`${base}_modkinegatifdgts`]);
+            description = json[`${base}_description`];
+            break;
+        case 'grenade':
+            attaque += parseInt(json['distance']);
+            modAtt += parseInt(json[`${base}_modatt`]);
+            modDgt += parseInt(json[`${base}_moddgts`]);
+            isModkiAttPos = parseInt(json[`${base}_modkipositif`]);
+            isModkiAttNeg = parseInt(json[`${base}_modkinegatif`]);
+            isModkiDgtPos = parseInt(json[`${base}_modkipositifdgts`]);
+            isModkiDgtNeg = parseInt(json[`${base}_modkinegatifdgts`]);
+            description = json[`${base}_description`];
+            break;
+        case 'artillerie':
+            attaque += parseInt(json['distance']);
+            modAtt += parseInt(json[`${base}_modatt`]);
+            modDgt += parseInt(json[`${base}_moddgts`]);
+            aireEffet += parseInt(json[`${base}_aire-effet`]);
+            isModkiAttPos = parseInt(json[`${base}_modkipositif`]);
+            isModkiAttNeg = parseInt(json[`${base}_modkinegatif`]);
+            isModkiDgtPos = parseInt(json[`${base}_modkipositifdgts`]);
+            isModkiDgtNeg = parseInt(json[`${base}_modkinegatifdgts`]);
+            description = json[`${base}_description`];
+
+            roll += `{{aireeffet=[[${aireEffet}]]}}`;
+            break;
+        case 'distance':
+            const getMDistance = getDistanceMod(attrs['popup-luminosite'], attrs['popup-portee']);
+
+            attaque += parseInt(json['distance']);
+            modAtt += parseInt(json[`${base}_modatt`]);
+            modDgt += parseInt(json[`${base}_moddgts`]);
+            isModkiAttPos = parseInt(json[`${base}_modkipositif`]);
+            isModkiAttNeg = parseInt(json[`${base}_modkinegatif`]);
+            isModkiDgtPos = parseInt(json[`${base}_modkipositifdgts`]);
+            isModkiDgtNeg = parseInt(json[`${base}_modkinegatifdgts`]);
+            incidentTir = parseInt(json[`${base}_incident-tir`]);
+            description = json[`${base}_description`];
+
+            if(getMDistance.luminosite.mod !== 0) {
+                roll += getMDistance.luminosite.text;
+                luminosite = getMDistance.luminosite.mod;
+            }
+
+            if(getMDistance.portee.mod !== 0) {
+                roll += getMDistance.portee.text;
+                portee = getMDistance.portee.mod;
+            }
+
+            if(arcdefeu !== 0) {
+                roll += `{{^{arc-de-feu}=[[-3]]}}`;
+                incidentTir += 1;
+                empty = 0;
+            }
+
+            roll += `{{incident=[[0]]}}`;
+            break;
+        case 'sortilege':
+            const rangSort = parseInt(json[`${base}_rang`]);
+            typeMagie = json[`${base}_type-magie`];
+            formeMagie = json[`${base}_forme-magie`];
+            description = json[`${base}_description`];
+            difficulte = rangSort*5;
+            empty = 0;
+
+            roll += `{{typemagie=${typeMagie}}}`;
+            roll += `{{formemagie=${formeMagie}}}`;
+            roll += `{{^{rang-sort}=[[${rangSort}]]}}`;
+            roll += `{{^{difficulte}=[[${difficulte}]]}}`;
+            roll += `{{difficulte=[[0]]}}`;
+            roll += `{{result=[[${nbreDice}${dice}kh1cf4cs7cs20+${parseInt(json[`${json[`${base}_caracteristique`]}-mod`])+rang+modDivers}]]}}`;
+            roll += `{{echec=[[0]]}} {{destin=[[0]]}} {{critique=[[0]]}}`;
+            break;
+        case 'sortilege-atk':
+            attaque += parseInt(json['magique']);
+            description = json[`${base}_description`];
+            break;
+    }
+    let stRoll;
+    let computed = {};
+
+    if(rang !== 0 || modDivers !== 0) empty = 0;
+
+    if(type === 'sortilege') {
+        if(description !== '') {
+            roll += `{{description=${description}}}`;
+        }
+
+        roll += `{{empty=[[${empty}]]}}`;
+
+        stRoll = await startRoll(roll);
+        const result = Math.max(...stRoll.results.result.dice);
+
+        switch(result) {
+            case 4:
+                computed.echec = 1;
+            break;
+            case 7:
+                computed.destin = 1;
+            break;
+            case 20:
+                computed.critique = 1;
+            break;
+        }
+
+        if(stRoll.results.result.result >= difficulte && result !== 4) computed.difficulte = 1;
+        else computed.difficulte = 0;
+
+        finishRoll(stRoll.rollId, computed);
+    } else {
+        attaque += modAtt;
+        attaque += rang;
+        attaque += modDivers;
+
+        if(isModkiAttPos && ki > 0) modKiAtt += ki;
+        if(isModkiAttNeg && ki < 0) modKiAtt += ki;
+        if(isModkiDgtPos && ki > 0) modKiDgt += ki;
+        if(isModkiDgtNeg && ki < 0) modKiDgt += ki;
+
+        if(modAtt !== 0) {
+            roll += `{{^{modificateur-attaque-short}=[[${modAtt}]]}}`;
+            empty = 0;
+        }
+        if(modKiAtt !== 0) {
+            roll += `{{^{modificateur-ki-attaque-short}=[[${modKiAtt}]]}}`;
+            empty = 0;
+        }
+        if(modDgt !== 0) {
+            roll += `{{^{modificateur-degats-short}=[[${modDgt}]]}}`;
+            empty = 0;
+        }
+        if(modKiDgt !== 0) {
+            roll += `{{^{modificateur-ki-degats-short}=[[${modKiDgt}]]}}`;
+            empty = 0;
+        }
+        if(description !== '') {
+            roll += `{{description=${description}}}`;
+        }
+        roll += `{{empty=[[${empty}]]}}`;
+
+        attaque += modKiAtt;
+        attaque += luminosite;
+        attaque += portee;
+        modDgt += modKiDgt;
+        modDgt += otherDm;
+
+        if(arcdefeu !== 0) {
+            attaque -= 3;
+            modDgt -= 3;
+        }
+
+        if(type === 'artillerie')
+            roll += ` {{attaque=[[${nbreDice}${dice}kh1cf1cf2cf4cs7cs20+${attaque}]]}} {{degats=[[{${diceDm}!!}+${modDgt}]]}} {{destin=[[0]]}} {{echec=[[0]]}} {{critique=[[0]]}}`;
+        else if(type === 'sortilege-atk') roll += ` {{attaque=[[${nbreDice}${dice}kh1cf4cs7cs20+${attaque}]]}} {{destin=[[0]]}} {{echec=[[0]]}} {{critique=[[0]]}}`;
+        else roll += ` {{attaque=[[${nbreDice}${dice}kh1cf4cs7cs20+${attaque}]]}} {{degats=[[{${diceDm}!!}+${modDgt}]]}} {{destin=[[0]]}} {{echec=[[0]]}} {{critique=[[0]]}}`;
+
+        stRoll = await startRoll(roll);
+        const diceAttaque = Math.max(...stRoll.results.attaque.dice);
+        let totalDgts = 0;
+        if(type !== 'sortilege-atk') totalDgts = stRoll.results.degats.result;
+        computed = {};
+
+        if(diceAttaque >= 1 && diceAttaque <= incidentTir) {
+            computed.incident = 1;
+        }
+
+        switch(diceAttaque) {
+            case 1:
+            case 2:
+                if(type === 'artillerie') computed.echec = 1;
+            break;
+            case 4:
+                computed.echec = 1;
+            break;
+            case 7:
+                computed.destin = 1;
+            break;
+            case 20:
+                computed.critique = 1;
+            break;
+        }
+
+        if(totalDgts < 1) totalDgts = 1;
+
+        if(diceAttaque === 20) computed.degats = totalDgts*2;
+        else computed.degats = totalDgts;
+
+        finishRoll(stRoll.rollId, computed);
+
+        if(type === 'artillerie' && (diceAttaque === 1 || diceAttaque === 2 || diceAttaque === 4)) {
+            let rollArtillerie = `${rollType} &{template:std} {{name=${cName}}} {{title=${name}}} {{subtitle=^{relance-echec-critique}}} {{result=[[${nbreDice}${dice}]]}} {{echec=[[0]]}}`;
+            let artillerieRoll = await startRoll(rollArtillerie);
+            const diceArtillerie = artillerieRoll.results.result.dice[0];
+            let computedArtillerie = {};
+            if(diceArtillerie === 1 || diceArtillerie === 2 || diceArtillerie === 4) computedArtillerie.echec = 1;
+            finishRoll(artillerieRoll.rollId, computedArtillerie);
+        }
+    }
+
+    let update = {};
+    update['popup'] = 0;
+    update['nbre-dice'] = 1;
+    await setAttrsAsync(update);
+});
+
+on(`clicked:popupstd-confirmer`, async function() {
+    const list = [
+        `popup-id`,
+        `popup-stringify`,
+        `popup-type`,
+        `popup-title`,
+        `nbre-dice`,
+        `rang-voie`,
+        `divers`,
+        `dice-special`,
+        `roll-type`,
+    ];
+
+    const attrs = await getAttrsAsync(list);
+    const rollType = attrs['roll-type'];
+    const diceSpe = attrs['dice-special'];
+    const nbreDice = attrs[`nbre-dice`];
+    const type = attrs['popup-type'];
+    const base = attrs['popup-id'];
+    const json = JSON.parse(attrs['popup-stringify']);
+    const cName = json[`character_name`];
+    const title = attrs['popup-title'];
+    const rang = parseInt(attrs['rang-voie']);
+    const modDivers = parseInt(attrs['divers']);
+    const dice = getDice(diceSpe);
+    let name = '';
+    let rollBase = 0;
+    let empty = 1;
+    let roll = `${rollType} &{template:std}`;
+    roll += rang !== 0 ? `{{^{rang-voie}=[[${rang}]]}}` : '';
+    roll += modDivers !== 0 ? `{{^{mod-divers}=[[${modDivers}]]}}` : '';
+
+    switch(type) {
+        case 'resistancementale':
+            name = title;
+            rollBase = parseInt(json[`volonte`]);
+            break;
+        case 'vehicule':
+            let dexterite = parseInt(json[`dexterite-mod`]);
+            let agilite = parseInt(json[`${base}_agilite-vehicule`]);
+
+            name = title !== '' ? '' : title;
+            rollBase = dexterite;
+            rollBase += agilite;
+
+            roll += `{{subtitle=^{pilotage-roll}}}`;
+            roll += `{{^{dexterite}=[[${dexterite}]]}} {{^{agilite}=[[${agilite}]]}}`;
+            break;
+        case 'caracteristique':
+            name = getTranslationByKey(base).charAt(0).toUpperCase() + getTranslationByKey(base).slice(1);
+            let caracteristique = parseInt(json[`${base}-mod`]);
+            rollBase += caracteristique;
+            break;
+        case 'combat':
+            name = getTranslationByKey(base).charAt(0).toUpperCase() + getTranslationByKey(base).slice(1);
+            rollBase += parseInt(json[base]);
+            break;
+    }
+
+    roll += `{{name=${cName}}} {{title=${name}}}`;
+    roll += `{{result=[[${nbreDice}${dice}kh1cf4cs7cs20+${parseInt(rollBase+rang+modDivers)}]]}}`;
+    roll += `{{echec=[[0]]}} {{destin=[[0]]}} {{critique=[[0]]}}`;
+
+    if(rang !== 0 || modDivers !== 0) empty = 0;
+
+    roll += `{{empty=[[${empty}]]}}`;
+
+    let stRoll = await startRoll(roll);
+    let computed = {};
+    const diceResult = Math.max(...stRoll.results.result.dice);
+
+    switch(diceResult) {
+        case 4:
+            computed.echec = 1;
+        break;
+        case 7:
+            computed.destin = 1;
+        break;
+        case 20:
+            computed.critique = 1;
+        break;
+    }
+
+    finishRoll(stRoll.rollId, computed);
+    let update = {};
+    update['popup'] = 0;
+    update['nbre-dice'] = 1;
+    await setAttrsAsync(update);
+});</script>
+<div class="content">
+  <input type="hidden" name="attr_volonte" value="0"/>
+  <input type="hidden" name="attr_historique"/>
+  <input class="popup" type="hidden" value="0" name="attr_popup"/>
+  <input class="menu" type="hidden" value="traits-mental" name="attr_menu"/>
+  <input class="mode-edition" type="hidden" value="0" name="attr_edition"/>
+  <input class="parametres" type="hidden" value="0" name="attr_options"/>
+  <div class="popup">
+    <div class="lvlup">
+      <h1 data-i18n="confirmation-niveau"></h1>
+      <label><span data-i18n="confirmation-attaque"></span>
+        <select class="popupniveau-select" name="attr_popupniveau"></select>
+      </label>
+      <button class="annuler" type="action" name="act_popup-annuler" data-i18n="annuler"></button>
+      <button class="confirmer" type="action" name="act_popupniveau-confirmer" data-i18n="confirmer"></button>
+    </div>
+    <div class="lvldown">
+      <h1 data-i18n="confirmation-niveau-down"></h1>
+      <button class="annuler" type="action" name="act_popup-annuler" data-i18n="annuler"></button>
+      <button class="confirmer" type="action" name="act_popupniveaudown-confirmer" data-i18n="confirmer"></button>
+    </div>
+    <div class="popupcombat">
+      <h1 data-i18n="ask-modificateurs"></h1><span class="subtitle" name="attr_popup-title"></span>
+      <div class="contact">
+        <label>
+          <div><span data-i18n="dice-attaque"></span><span> : </span></div>
+          <select name="attr_popup-dice-atk">
+            <option value="0">D20</option>
+            <option value="-1">D12</option>
+          </select>
+        </label>
+        <label>
+          <div><span data-i18n="nbre-dice"></span><span> : </span></div>
+          <input type="number" name="attr_nbre-dice" value="1" min="1"/>
+        </label>
+        <label>
+          <div><span data-i18n="rang-voie"></span><span> : </span></div>
+          <input type="number" name="attr_rang-voie" value="0" min="0"/>
+        </label>
+        <label>
+          <div><span data-i18n="divers"></span><span> : </span></div>
+          <input type="number" name="attr_divers" value="0"/>
+        </label>
+      </div>
+      <div class="sortilege">
+        <label>
+          <div><span data-i18n="dice-attaque"></span><span> : </span></div>
+          <select name="attr_popup-dice-atk">
+            <option value="0">D20</option>
+            <option value="-1">D12</option>
+          </select>
+        </label>
+        <label>
+          <div><span data-i18n="nbre-dice"></span><span> : </span></div>
+          <input type="number" name="attr_nbre-dice" value="1" min="1"/>
+        </label>
+        <label>
+          <div><span data-i18n="rang-voie"></span><span> : </span></div>
+          <input type="number" name="attr_rang-voie" value="0" min="0"/>
+        </label>
+        <label>
+          <div><span data-i18n="divers"></span><span> : </span></div>
+          <input type="number" name="attr_divers" value="0"/>
+        </label>
+      </div>
+      <div class="distance">
+        <label>
+          <div><span data-i18n="dice-attaque"></span><span> : </span></div>
+          <select name="attr_popup-dice-atk">
+            <option value="0">D20</option>
+            <option value="-1">D12</option>
+          </select>
+        </label>
+        <label>
+          <div><span data-i18n="nbre-dice"></span><span> : </span></div>
+          <input type="number" name="attr_nbre-dice" value="1" min="1"/>
+        </label>
+        <label>
+          <div><span data-i18n="rang-voie"></span><span> : </span></div>
+          <input type="number" name="attr_rang-voie" value="0" min="0"/>
+        </label>
+        <label>
+          <div><span data-i18n="divers"></span><span> : </span></div>
+          <input type="number" name="attr_divers" value="0"/>
+        </label>
+        <div class="checkbtn">
+          <input type="hidden" name="attr_arcdefeu" value="0"/>
+          <button type="action" name="act_arcdefeu"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="arc-de-feu"></span>
+        </div>
+        <div class="list"><span data-i18n="luminosite"></span>
+          <select name="attr_popup-luminosite">
+            <option value="std" data-i18n="standard"></option>
+            <option value="pnbr" data-i18n="penombre"></option>
+            <option value="noir" data-i18n="noir-total"></option>
+          </select>
+        </div>
+        <div class="list"><span data-i18n="portee"></span>
+          <select name="attr_popup-portee">
+            <option value="std" data-i18n="portee-normale"></option>
+            <option value="dbl" data-i18n="portee-double"></option>
+            <option value="trp" data-i18n="portee-triple"></option>
+          </select>
+        </div>
+      </div>
+      <button class="annuler" type="action" name="act_popup-annuler" data-i18n="annuler"></button>
+      <button class="confirmer" type="action" name="act_popupcombat-confirmer"><span data-i18n="jet"></span><span> !</span></button>
+    </div>
+    <div class="popupstd">
+      <h1 data-i18n="ask-modificateurs"></h1><span class="subtitle" name="attr_popup-title"></span>
+      <div>
+        <label>
+          <div><span data-i18n="dice-utilise"></span><span> : </span></div>
+          <select name="attr_popup-dice">
+            <option value="0">D20</option>
+            <option value="-1">D12</option>
+          </select>
+        </label>
+        <label>
+          <div><span data-i18n="nbre-dice"></span><span> : </span></div>
+          <input type="number" name="attr_nbre-dice" value="1" min="1"/>
+        </label>
+        <label>
+          <div><span data-i18n="rang-voie"></span><span> : </span></div>
+          <input type="number" name="attr_rang-voie" value="0" min="0"/>
+        </label>
+        <label>
+          <div><span data-i18n="divers"></span><span> : </span></div>
+          <input type="number" name="attr_divers" value="0"/>
+        </label>
+      </div>
+      <button class="annuler" type="action" name="act_popup-annuler" data-i18n="annuler"></button>
+      <button class="confirmer" type="action" name="act_popupstd-confirmer"><span data-i18n="jet"></span><span> !</span></button>
+    </div>
+  </div>
+  <div class="options">
+    <button class="mode_edition" type="action" name="act_edition">
+      <p data-i18n="mode-edition">mode edition</p>
+    </button>
+    <button class="parametres" type="action" name="act_options">
+      <p>y</p>
+    </button>
+  </div>
+  <div class="data-options">
+    <select name="attr_roll-type">
+      <option value="" data-i18n="roll-public">Jet public</option>
+      <option value="/w gm" data-i18n="roll-prive">Jet privé</option>
+    </select>
+  </div>
+  <div class="attributs">
+    <!--Création de la liste des attributs-->
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollforce" data-i18n="force-short">force</button>
+      <div class="attr-block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_force-total">10</span><span class="score s2" name="attr_force-mod">0</span></div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rolldexterite" data-i18n="dexterite-short">dexterite</button>
+      <div class="attr-block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_dexterite-total">10</span><span class="score s2" name="attr_dexterite-mod">0</span></div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollconstitution" data-i18n="constitution-short">constitution</button>
+      <div class="attr-block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_constitution-total">10</span><span class="score s2" name="attr_constitution-mod">0</span></div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollperception" data-i18n="perception-short">perception</button>
+      <div class="attr-block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_perception-total">10</span><span class="score s2" name="attr_perception-mod">0</span></div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollintelligence" data-i18n="intelligence-short">intelligence</button>
+      <div class="attr-block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_intelligence-total">10</span><span class="score s2" name="attr_intelligence-mod">0</span></div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollcharisme" data-i18n="charisme-short">charisme</button>
+      <div class="attr-block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_charisme-total">10</span><span class="score s2" name="attr_charisme-mod">0</span></div>
+    </div>
+  </div>
+  <div class="edit_attributs">
+    <!--Création de la liste des attributs en MODE EDITION-->
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollforce" data-i18n="force-short">force</button>
+      <div class="block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_force-total">10</span><span class="score s2" name="attr_force-mod">0</span><span class="toedit" data-i18n="base">base</span>
+        <input type="number" name="attr_force-base" value="10" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+        <input type="number" name="attr_force-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+        <input type="number" name="attr_force-temp" value="0"/>
+        <input type="hidden" name="attr_force-total" value="10"/>
+        <input type="hidden" name="attr_force-mod" value="0"/>
+      </div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rolldexterite" data-i18n="dexterite-short">dexterite</button>
+      <div class="block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_dexterite-total">10</span><span class="score s2" name="attr_dexterite-mod">0</span><span class="toedit" data-i18n="base">base</span>
+        <input type="number" name="attr_dexterite-base" value="10" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+        <input type="number" name="attr_dexterite-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+        <input type="number" name="attr_dexterite-temp" value="0"/>
+        <input type="hidden" name="attr_dexterite-total" value="10"/>
+        <input type="hidden" name="attr_dexterite-mod" value="0"/>
+      </div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollconstitution" data-i18n="constitution-short">constitution</button>
+      <div class="block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_constitution-total">10</span><span class="score s2" name="attr_constitution-mod">0</span><span class="toedit" data-i18n="base">base</span>
+        <input type="number" name="attr_constitution-base" value="10" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+        <input type="number" name="attr_constitution-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+        <input type="number" name="attr_constitution-temp" value="0"/>
+        <input type="hidden" name="attr_constitution-total" value="10"/>
+        <input type="hidden" name="attr_constitution-mod" value="0"/>
+      </div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollperception" data-i18n="perception-short">perception</button>
+      <div class="block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_perception-total">10</span><span class="score s2" name="attr_perception-mod">0</span><span class="toedit" data-i18n="base">base</span>
+        <input type="number" name="attr_perception-base" value="10" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+        <input type="number" name="attr_perception-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+        <input type="number" name="attr_perception-temp" value="0"/>
+        <input type="hidden" name="attr_perception-total" value="10"/>
+        <input type="hidden" name="attr_perception-mod" value="0"/>
+      </div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollintelligence" data-i18n="intelligence-short">intelligence</button>
+      <div class="block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_intelligence-total">10</span><span class="score s2" name="attr_intelligence-mod">0</span><span class="toedit" data-i18n="base">base</span>
+        <input type="number" name="attr_intelligence-base" value="10" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+        <input type="number" name="attr_intelligence-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+        <input type="number" name="attr_intelligence-temp" value="0"/>
+        <input type="hidden" name="attr_intelligence-total" value="10"/>
+        <input type="hidden" name="attr_intelligence-mod" value="0"/>
+      </div>
+    </div>
+    <div class="main_block">
+      <button class="title" type="action" name="act_rollcharisme" data-i18n="charisme-short">charisme</button>
+      <div class="block"><span class="header h1" data-i18n="valeur-short">val.</span><span class="header h2" data-i18n="modificateur-short"></span><span class="score s1" name="attr_charisme-total">10</span><span class="score s2" name="attr_charisme-mod">0</span><span class="toedit" data-i18n="base">base</span>
+        <input type="number" name="attr_charisme-base" value="10" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+        <input type="number" name="attr_charisme-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+        <input type="number" name="attr_charisme-temp" value="0"/>
+        <input type="hidden" name="attr_charisme-total" value="10"/>
+        <input type="hidden" name="attr_charisme-mod" value="0"/>
+      </div>
+    </div>
+  </div>
+  <div class="subattributs">
+      <div class="mainsa unsimple">
+        <div class="main red"><span class="title" data-i18n="pv"></span>
+          <div class="value">
+            <input class="score" type="number" name="attr_pv" value="0" min="0"/><span class="separator">/</span><span class="score_max" name="attr_pv_max">10</span>
+          </div>
+        </div>
+        <div class="submain">
+          <label class="demi"><span class="title" data-i18n="modificateur-short">mod.</span>
+            <input type="number" name="attr_pv-mod" value="0"/>
+          </label>
+          <label class="demi"><span class="title" data-i18n="temporaire-short">mod.</span>
+            <input type="number" name="attr_pv-temp" value="0"/>
+          </label>
+          <label class="full lock"><span class="title" data-i18n="base">base</span><span class="score" name="attr_pv-base">0</span>
+            <input type="hidden" name="attr_pv-base" value="0"/>
+          </label>
+          <label class="demi lock"><span class="title" data-i18n="des-de-vie-short">Dv</span><span class="score" name="attr_pv-dv" value="10"></span>
+            <input type="hidden" name="attr_pv-dv" value="10"/>
+          </label>
+          <label class="demi lock"><span class="title" data-i18n="constitution-short">con</span><span class="score" name="attr_pv-con" value="0"></span>
+            <input type="hidden" name="attr_pv-con" value="0"/>
+          </label>
+        </div>
+      </div>
+      <div class="mainsa unsimple">
+        <div class="main red"><span class="title" data-i18n="maho"></span>
+          <div class="value">
+            <input class="score" type="number" name="attr_maho" value="0" min="0"/><span class="separator">/</span><span class="score_max" name="attr_maho_max">0</span>
+          </div>
+        </div>
+        <div class="submain">
+          <label class="demi"><span class="title" data-i18n="modificateur-short">mod.</span>
+            <input type="number" name="attr_maho-mod" value="0"/>
+          </label>
+          <label class="demi"><span class="title" data-i18n="temporaire-short">mod.</span>
+            <input type="number" name="attr_maho-temp" value="0"/>
+          </label>
+          <label class="full lock"><span class="title" data-i18n="base">base</span><span class="score" name="attr_maho-base">0</span>
+            <input type="hidden" name="attr_maho-base" value="0"/>
+          </label>
+        </div>
+      </div>
+      <div class="mainsa ">
+        <div class="main blue"><span class="title" data-i18n="folie"></span>
+          <div class="svalue">
+            <input class="score" type="number" name="attr_folie" value="0"/>
+          </div>
+        </div>
+      </div>
+      <div class="mainsa unsimple">
+        <div class="main blue"><span class="title" data-i18n="serenite"></span>
+          <div class="value">
+            <input class="score" type="number" name="attr_serenite" value="0" min="0"/><span class="separator">/</span><span class="score_max" name="attr_serenite_max">2</span>
+          </div>
+        </div>
+        <div class="submain">
+          <label class="demi"><span class="title" data-i18n="modificateur-short">mod.</span>
+            <input type="number" name="attr_serenite-mod" value="0"/>
+          </label>
+          <label class="demi"><span class="title" data-i18n="temporaire-short">mod.</span>
+            <input type="number" name="attr_serenite-temp" value="0"/>
+          </label>
+          <label class="full lock"><span class="title" data-i18n="base">base</span><span class="score" name="attr_serenite-base">2</span>
+            <input type="hidden" name="attr_serenite-base" value="2"/>
+          </label>
+        </div>
+      </div>
+      <div class="mainsa unsimple">
+        <div class="main yellow"><span class="title" data-i18n="volonte"></span>
+          <div class="svalue"><span class="score" name="attr_volonte">0</span>
+          </div>
+        </div>
+        <div class="submain">
+          <label class="demi"><span class="title" data-i18n="modificateur-short">mod.</span>
+            <input type="number" name="attr_volonte-mod" value="0"/>
+          </label>
+          <label class="demi"><span class="title" data-i18n="temporaire-short">mod.</span>
+            <input type="number" name="attr_volonte-temp" value="0"/>
+          </label>
+          <label class="full lock"><span class="title" data-i18n="base">base</span><span class="score" name="attr_volonte-base">0</span>
+            <input type="hidden" name="attr_volonte-base" value="0"/>
+          </label>
+        </div>
+      </div>
+      <div class="mainsa unsimple">
+        <div class="main yellow"><span class="title" data-i18n="chance"></span>
+          <div class="value">
+            <input class="score" type="number" name="attr_chance" value="0" min="0"/><span class="separator">/</span><span class="score_max" name="attr_chance_max">2</span>
+          </div>
+        </div>
+        <div class="submain">
+          <label class="demi"><span class="title" data-i18n="modificateur-short">mod.</span>
+            <input type="number" name="attr_chance-mod" value="0"/>
+          </label>
+          <label class="demi"><span class="title" data-i18n="temporaire-short">mod.</span>
+            <input type="number" name="attr_chance-temp" value="0"/>
+          </label>
+          <label class="full lock"><span class="title" data-i18n="base">base</span><span class="score" name="attr_chance-base">0</span>
+            <input type="hidden" name="attr_chance-base" value="0"/>
+          </label>
+        </div>
+      </div>
+  </div>
+  <div class="subattributs2">
+      <div class="mainsa">
+        <div class="main red"><span class="title" data-i18n="blessure"></span>
+          <div class="undefined">
+            <input class="score" type="number" name="attr_blessure" value="0"/>
+          </div>
+        </div>
+      </div>
+      <div class="mainsa">
+        <div class="main green"><span class="title" data-i18n="ki"></span>
+          <div class="undefined">
+            <input class="score" type="number" name="attr_ki" value="0"/>
+          </div>
+        </div>
+      </div>
+      <div class="mainsa">
+        <button class="btn yellow" type="action" name="act_resistance-mentale"><span data-i18n="roll-resistance-mentale"></span></button>
+      </div>
+  </div>
+  <div class="mainSheet">
+    <div class="leftprofil">
+      <div class="mainBlockData">
+        <select name="attr_type">
+          <option value="eiyu" data-i18n="eiyu" selected="selected"></option>
+        </select>
+        <div class="data">
+          <label><span><span data-i18n="nom">Nom</span><span> : </span></span>
+            <input type="text" name="attr_character_name"/>
+          </label>
+          <label><span><span data-i18n="profil">Profil</span><span> : </span></span>
+            <input type="text" name="attr_profil"/>
+          </label>
+          <label><span><span data-i18n="origine">Origine</span><span> : </span></span>
+            <input type="text" name="attr_origine"/>
+          </label>
+          <label><span><span data-i18n="religion">Religion</span><span> : </span></span>
+            <input type="text" name="attr_religion"/>
+          </label>
+          <input class="getLvl" type="hidden" name="attr_niveau" value="1"/>
+          <div class="niveau"><span><span data-i18n="niveau">Niveau</span><span> : </span></span>
+            <div class="downlvl">
+              <button class="downlvl" type="action" name="act_downlvl"><img src="https://image.noelshack.com/fichiers/2023/47/2/1700573454-arrow.png" data-i18n-title="lvldown"/></button>
+            </div>
+            <input type="niveau" name="attr_niveau" value="1" readonly="readonly"/>
+            <div class="uplvl">
+              <button class="uplvl" type="action" name="act_uplvl"><img src="https://image.noelshack.com/fichiers/2023/47/2/1700573454-arrow.png" data-i18n-title="lvlup"/></button>
+            </div>
+          </div>
+        </div>
+        <div class="eqData">
+          <!--Création de la liste de combat-->
+          <input class="initiative-edit" type="hidden" name="attr_initiative-edit" value="0"/>
+          <div class="initiative">
+            <div class="main">
+              <button class="label" type="action" name="act_initiative" data-i18n-title="initiative-roll"><img src="https://image.noelshack.com/fichiers/2023/47/3/1700660998-initiative.png"/></button><span class="value" name="attr_initiative" data-i18n-title="initiative">0</span>
+              <button class="edit" type="action" name="act_initiative-edit" data-i18n-title="initiative-edit">y</button>
+            </div>
+            <div class="submain">
+              <input type="hidden" name="attr_initiative-armure" value="0"/>
+                <label>
+                  <select name="attr_initiative-carac">
+                    <option value="force" data-i18n="force"></option>
+                    <option value="dexterite" data-i18n="dexterite" selected="selected"></option>
+                    <option value="constitution" data-i18n="constitution"></option>
+                    <option value="perception" data-i18n="perception"></option>
+                    <option value="intelligence" data-i18n="intelligence"></option>
+                    <option value="charisme" data-i18n="charisme"></option>
+                  </select><span class="score" name="attr_initiative-carac-value">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="armure">armure</span><span class="score" name="attr_initiative-armure">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="etat">etat</span><span class="score" name="attr_initiative-etat">0</span>
+                </label>
+                <label><span class="label" data-i18n="modificateur">mod</span>
+                  <input class="score" type="number" name="attr_initiative-mod" value="0"/>
+                </label>
+                <label><span class="label" data-i18n="temporaire">temp</span>
+                  <input class="score" type="number" name="attr_initiative-temp" value="0"/>
+                </label>
+            </div>
+          </div>
+          <input class="contact-edit" type="hidden" name="attr_contact-edit" value="0"/>
+          <div class="contact">
+            <div class="main">
+              <button class="label" type="action" name="act_contact" data-i18n-title="contact-roll"><img src="https://image.noelshack.com/fichiers/2023/47/3/1700660998-contact.png"/></button><span class="value" name="attr_contact" data-i18n-title="contact">0</span>
+              <button class="edit" type="action" name="act_contact-edit" data-i18n-title="contact-edit">y</button>
+            </div>
+            <div class="submain">
+              <input type="hidden" name="attr_contact-profil" value="0"/>
+              <input type="hidden" name="attr_contact-niveau" value="0"/>
+                <label class="lock"><span class="label" data-i18n="profil">profil</span><span class="score" name="attr_contact-profil">0</span>
+                </label>
+                <label>
+                  <select name="attr_contact-carac">
+                    <option value="force" data-i18n="force" selected="selected"></option>
+                    <option value="dexterite" data-i18n="dexterite"></option>
+                    <option value="constitution" data-i18n="constitution"></option>
+                    <option value="perception" data-i18n="perception"></option>
+                    <option value="intelligence" data-i18n="intelligence"></option>
+                    <option value="charisme" data-i18n="charisme"></option>
+                  </select><span class="score" name="attr_contact-carac-value">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="niveau">niveau</span><span class="score" name="attr_contact-niveau">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="etat">etat</span><span class="score" name="attr_contact-etat">0</span>
+                </label>
+                <label><span class="label" data-i18n="modificateur">mod</span>
+                  <input class="score" type="number" name="attr_contact-mod" value="0"/>
+                </label>
+                <label><span class="label" data-i18n="temporaire">temp</span>
+                  <input class="score" type="number" name="attr_contact-temp" value="0"/>
+                </label>
+            </div>
+          </div>
+          <input class="distance-edit" type="hidden" name="attr_distance-edit" value="0"/>
+          <div class="distance">
+            <div class="main">
+              <button class="label" type="action" name="act_distance" data-i18n-title="distance-roll"><img src="https://image.noelshack.com/fichiers/2023/47/3/1700660998-distance.png"/></button><span class="value" name="attr_distance" data-i18n-title="distance">0</span>
+              <button class="edit" type="action" name="act_distance-edit" data-i18n-title="distance-edit">y</button>
+            </div>
+            <div class="submain">
+              <input type="hidden" name="attr_distance-profil" value="0"/>
+              <input type="hidden" name="attr_distance-niveau" value="0"/>
+                <label class="lock"><span class="label" data-i18n="profil">profil</span><span class="score" name="attr_distance-profil">0</span>
+                </label>
+                <label>
+                  <select name="attr_distance-carac">
+                    <option value="force" data-i18n="force"></option>
+                    <option value="dexterite" data-i18n="dexterite" selected="selected"></option>
+                    <option value="constitution" data-i18n="constitution"></option>
+                    <option value="perception" data-i18n="perception"></option>
+                    <option value="intelligence" data-i18n="intelligence"></option>
+                    <option value="charisme" data-i18n="charisme"></option>
+                  </select><span class="score" name="attr_distance-carac-value">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="niveau">niveau</span><span class="score" name="attr_distance-niveau">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="etat">etat</span><span class="score" name="attr_distance-etat">0</span>
+                </label>
+                <label><span class="label" data-i18n="modificateur">mod</span>
+                  <input class="score" type="number" name="attr_distance-mod" value="0"/>
+                </label>
+                <label><span class="label" data-i18n="temporaire">temp</span>
+                  <input class="score" type="number" name="attr_distance-temp" value="0"/>
+                </label>
+            </div>
+          </div>
+          <input class="magique-edit" type="hidden" name="attr_magique-edit" value="0"/>
+          <div class="magique">
+            <div class="main">
+              <button class="label" type="action" name="act_magique" data-i18n-title="magique-roll"><img src="https://image.noelshack.com/fichiers/2023/47/3/1700660998-magique.png"/></button><span class="value" name="attr_magique" data-i18n-title="magique">0</span>
+              <button class="edit" type="action" name="act_magique-edit" data-i18n-title="magique-edit">y</button>
+            </div>
+            <div class="submain">
+              <input type="hidden" name="attr_magique-niveau" value="0"/>
+                <label>
+                  <select name="attr_magique-carac">
+                    <option value="force" data-i18n="force"></option>
+                    <option value="dexterite" data-i18n="dexterite"></option>
+                    <option value="constitution" data-i18n="constitution"></option>
+                    <option value="perception" data-i18n="perception"></option>
+                    <option value="intelligence" data-i18n="intelligence" selected="selected"></option>
+                    <option value="charisme" data-i18n="charisme"></option>
+                  </select><span class="score" name="attr_magique-carac-value">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="niveau">niveau</span><span class="score" name="attr_magique-niveau">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="etat">etat</span><span class="score" name="attr_magique-etat">0</span>
+                </label>
+                <label><span class="label" data-i18n="modificateur">mod</span>
+                  <input class="score" type="number" name="attr_magique-mod" value="0"/>
+                </label>
+                <label><span class="label" data-i18n="temporaire">temp</span>
+                  <input class="score" type="number" name="attr_magique-temp" value="0"/>
+                </label>
+            </div>
+          </div>
+          <input class="defense-edit" type="hidden" name="attr_defense-edit" value="0"/>
+          <div class="defense">
+            <div class="main">
+              <button class="label" type="action" name="act_defense" data-i18n-title="defense-title"><img src="https://image.noelshack.com/fichiers/2023/47/3/1700660998-defense.png"/></button><span class="value" name="attr_defense" data-i18n-title="defense-title">10</span>
+              <button class="edit" type="action" name="act_defense-edit" data-i18n-title="defense-edit">y</button>
+            </div>
+            <div class="submain">
+              <input type="hidden" name="attr_defense-armure" value="0"/>
+              <input type="hidden" name="attr_defense-action" value="0"/>
+                <label>
+                  <select name="attr_defense-carac">
+                    <option value="force" data-i18n="force"></option>
+                    <option value="dexterite" data-i18n="dexterite" selected="selected"></option>
+                    <option value="constitution" data-i18n="constitution"></option>
+                    <option value="perception" data-i18n="perception"></option>
+                    <option value="intelligence" data-i18n="intelligence"></option>
+                    <option value="charisme" data-i18n="charisme"></option>
+                  </select><span class="score" name="attr_defense-carac-value">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="armure">armure</span><span class="score" name="attr_defense-armure">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="action-defensive-short">action</span><span class="score" name="attr_defense-action">0</span>
+                </label>
+                <label class="lock"><span class="label" data-i18n="etat">etat</span><span class="score" name="attr_defense-etat">0</span>
+                </label>
+                <label><span class="label" data-i18n="modificateur">mod</span>
+                  <input class="score" type="number" name="attr_defense-mod" value="0"/>
+                </label>
+                <label><span class="label" data-i18n="temporaire">temp</span>
+                  <input class="score" type="number" name="attr_defense-temp" value="0"/>
+                </label>
+            </div>
+          </div>
+          <input class="reduction-edit" type="hidden" name="attr_reduction-edit" value="0"/>
+          <div class="reduction">
+            <div class="main">
+              <button class="label" type="action" name="act_reduction" data-i18n-title="reduction-degats"><img src="https://image.noelshack.com/fichiers/2024/03/5/1705677051-resistance.png"/></button><span class="value" name="attr_reduction" data-i18n-title="reduction-degats">0</span>
+              <button class="edit" type="action" name="act_reduction-edit" data-i18n-title="reduction-edit">y</button>
+            </div>
+            <div class="submain">
+              <input type="hidden" name="attr_reduction-armure" value="0"/>
+                <label class="lock"><span class="label" data-i18n="armure">armure</span><span class="score" name="attr_reduction-armure">0</span>
+                </label>
+                <label><span class="label" data-i18n="modificateur">mod</span>
+                  <input class="score" type="number" name="attr_reduction-mod" value="0"/>
+                </label>
+                <label><span class="label" data-i18n="temporaire">temp</span>
+                  <input class="score" type="number" name="attr_reduction-temp" value="0"/>
+                </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="menu">
+        <!--Création du menu-->
+        <button class="menu_traits-mental" type="action" name="act_traits-mental">
+          <p data-i18n="tab-traits-mental">tab-traits-mental</p>
+        </button>
+        <button class="menu_combat" type="action" name="act_combat">
+          <p data-i18n="tab-combat">tab-combat</p>
+        </button>
+        <button class="menu_inventaire" type="action" name="act_inventaire">
+          <p data-i18n="tab-inventaire">tab-inventaire</p>
+        </button>
+        <button class="menu_vehicules" type="action" name="act_vehicules">
+          <p data-i18n="tab-vehicules">tab-vehicules</p>
+        </button>
+        <button class="menu_voies" type="action" name="act_voies">
+          <p data-i18n="tab-voies">tab-voies</p>
+        </button>
+        <button class="menu_profil" type="action" name="act_profil">
+          <p data-i18n="tab-profil">tab-profil</p>
+        </button>
+      </div>
+      <div class="traits-mental">
+        <div class="col"><span class="header" data-i18n="phobies"></span>
+          <fieldset class="repeating_phobies">
+            <input type="text" name="attr_name" data-i18n-placeholder="nom" placeholder="nom"/>
+            <div class="autoex"><span name="attr_description"></span>
+              <textarea name="attr_description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="col"><span class="header" data-i18n="folies"></span>
+          <fieldset class="repeating_folies">
+            <input type="text" name="attr_name" data-i18n-placeholder="nom" placeholder="nom"/>
+            <div class="autoex"><span name="attr_description"></span>
+              <textarea name="attr_description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="traits"><span class="header" data-i18n="avantages"></span><span class="header" data-i18n="desavantages"></span>
+          <div>
+            <fieldset class="repeating_avantages">
+              <div class="dataTraits">
+                <input type="text" name="attr_name" data-i18n-placeholder="nom" placeholder="nom"/>
+                <label class="cout"><span class="title"><span data-i18n="cout">cout</span><span> : </span></span>
+                  <input type="number" name="attr_cout" value="0"/>
+                </label>
+                <div class="autoex"><span name="attr_description"></span>
+                  <textarea name="attr_description"></textarea>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div>
+            <fieldset class="repeating_desavantages">
+              <div class="dataTraits">
+                <input type="text" name="attr_name" data-i18n-placeholder="nom" placeholder="nom"/>
+                <label class="cout"><span class="title"><span data-i18n="cout">cout</span><span> : </span></span>
+                  <input type="number" name="attr_cout" value="0"/>
+                </label>
+                <div class="autoex"><span name="attr_description"></span>
+                  <textarea name="attr_description"></textarea>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <label class="mythos"><span data-i18n="mythos"></span>
+          <input type="number" name="attr_mythos" value="0" min="0"/>
+        </label>
+      </div>
+      <div class="voies">
+        <div class="ptsCapacites">
+          <input type="hidden" name="attr_ptscapacites" value="0"/>
+          <input type="hidden" name="attr_ptscapacites_max" value="4"/><span class="label" data-i18n="points-capacites-short">pts-capacites</span>
+          <div class="score"><span class="value" name="attr_ptscapacites">0</span><span class="separator">/</span><span class="max" name="attr_ptscapacites_max">4</span></div>
+        </div>
+        <input class="voie-selshow" type="hidden" name="attr_voie-selshow" value="capacite"/>
+        <button class="btnswitchc" type="action" name="act_switchcapacite"><span data-i18n="capacites"></span></button>
+        <button class="btnswitchv" type="action" name="act_switchvoie"><span data-i18n="voies"></span></button>
+        <div class="listCapacites"><span class="title" data-i18n="capacites"></span>
+          <fieldset class="repeating_voies"><span class="namevoie" name="attr_name"></span>
+            <div class="subtitle"><span class="subtitle" data-i18n="rang"></span><span>1</span></div>
+            <div class="subtitle"><span class="subtitle" data-i18n="rang"></span><span>2</span></div>
+            <div class="subtitle"><span class="subtitle" data-i18n="rang"></span><span>3</span></div>
+            <div class="subtitle"><span class="subtitle" data-i18n="rang"></span><span>4</span></div>
+            <div class="subtitle"><span class="subtitle" data-i18n="rang"></span><span>5</span></div>
+            <input class="rang-checked" type="hidden" name="attr_rang1" value="0"/>
+            <div class="voierang"><span name="attr_rang-1-name"></span><span class="description">?</span><span class="reveal-description" name="attr_rang-1-description"></span></div>
+            <input class="rang-checked" type="hidden" name="attr_rang2" value="0"/>
+            <div class="voierang"><span name="attr_rang-2-name"></span><span class="description">?</span><span class="reveal-description" name="attr_rang-2-description"></span></div>
+            <input class="rang-checked" type="hidden" name="attr_rang3" value="0"/>
+            <div class="voierang"><span name="attr_rang-3-name"></span><span class="description">?</span><span class="reveal-description" name="attr_rang-3-description"></span></div>
+            <input class="rang-checked" type="hidden" name="attr_rang4" value="0"/>
+            <div class="voierang"><span name="attr_rang-4-name"></span><span class="description">?</span><span class="reveal-description" name="attr_rang-4-description"></span></div>
+            <input class="rang-checked" type="hidden" name="attr_rang5" value="0"/>
+            <div class="voierang5"><span name="attr_rang-5-name"></span><span class="description">?</span><span class="reveal-description" name="attr_rang-5-description"></span></div>
+          </fieldset>
+        </div>
+        <div class="listRangs">
+          <fieldset class="repeating_voies">
+            <input type="text" name="attr_name" data-i18n-placeholder="nom" placeholder="nom"/>
+            <select name="attr_type">
+              <option value="predilection" data-i18n="voiepredilection" selected="selected"></option>
+              <option value="memefamille" data-i18n="voiememefamille"></option>
+              <option value="horsfamille" data-i18n="voiehorsfamille"></option>
+              <option value="horsprofil" data-i18n="voiehorsprofil"></option>
+              <option value="prestige" data-i18n="voieprestige"></option>
+            </select>
+            <div class="rang">
+              <input class="rang-checked" type="hidden" name="attr_rang1" value="0"/>
+              <button class="borderTop" type="action" name="act_rang1"><span class="checked">✓</span><span class="unchecked">✕</span></button>
+              <div class="header"><span class="lRang" data-i18n="rang"></span><span class="vRang">1 : </span>
+                <input type="text" name="attr_rang-1-name"/>
+              </div>
+              <div class="autoex"><span name="attr_rang-1-description"></span>
+                <textarea name="attr_rang-1-description"></textarea>
+              </div>
+            </div>
+            <div class="rang">
+              <input class="rang-checked" type="hidden" name="attr_rang2" value="0"/>
+              <button type="action" name="act_rang2"><span class="checked">✓</span><span class="unchecked">✕</span></button>
+              <div class="header"><span class="lRang" data-i18n="rang"></span><span class="vRang">2 : </span>
+                <input type="text" name="attr_rang-2-name"/>
+              </div>
+              <div class="autoex"><span name="attr_rang-2-description"></span>
+                <textarea name="attr_rang-2-description"></textarea>
+              </div>
+            </div>
+            <div class="rang">
+              <input class="rang-checked" type="hidden" name="attr_rang3" value="0"/>
+              <button type="action" name="act_rang3"><span class="checked">✓</span><span class="unchecked">✕</span></button>
+              <div class="header"><span class="lRang" data-i18n="rang"></span><span class="vRang">3 : </span>
+                <input type="text" name="attr_rang-3-name"/>
+              </div>
+              <div class="autoex"><span name="attr_rang-3-description"></span>
+                <textarea name="attr_rang-3-description"></textarea>
+              </div>
+            </div>
+            <div class="rang">
+              <input class="rang-checked" type="hidden" name="attr_rang4" value="0"/>
+              <button type="action" name="act_rang4"><span class="checked">✓</span><span class="unchecked">✕</span></button>
+              <div class="header"><span class="lRang" data-i18n="rang"></span><span class="vRang">4 : </span>
+                <input type="text" name="attr_rang-4-name"/>
+              </div>
+              <div class="autoex"><span name="attr_rang-4-description"></span>
+                <textarea name="attr_rang-4-description"></textarea>
+              </div>
+            </div>
+            <div class="rang">
+              <input class="rang-checked" type="hidden" name="attr_rang5" value="0"/>
+              <button type="action" name="act_rang5"><span class="checked">✓</span><span class="unchecked">✕</span></button>
+              <div class="header"><span class="lRang" data-i18n="rang"></span><span class="vRang">5 : </span>
+                <input type="text" name="attr_rang-5-name"/>
+              </div>
+              <div class="autoex"><span name="attr_rang-5-description"></span>
+                <textarea name="attr_rang-5-description"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="inventaire">
+        <div class="armure">
+          <h1 data-i18n="armures"></h1>
+          <fieldset class="repeating_armures">
+            <input class="equipped" type="hidden" name="attr_equip" value="0"/>
+            <div class="header">
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+              <label class="rd" data-i18n-title="reduction-degats"><span>t</span>
+                <input type="number" name="attr_reduction" value="0" min="0"/>
+              </label>
+              <label class="defense" data-i18n-title="defense"><span>b</span>
+                <input type="number" name="attr_defense" value="0"/>
+              </label>
+              <button class="equipped" type="action" name="act_equip" data-i18n="equipe">equipe</button>
+            </div>
+            <div class="autoex"><span name="attr_description"></span>
+              <textarea name="attr_description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="objets">
+          <h1 data-i18n="objets"></h1>
+          <fieldset class="repeating_objets">
+            <div class="header">
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+            </div>
+            <div class="autoex"><span name="attr_description"></span>
+              <textarea name="attr_description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="combat">
+        <div class="top">
+          <input type="hidden" name="attr_dice-atk" value="0"/>
+          <div class="action-defensive"><span class="title" data-i18n="action-defensive"></span>
+            <select name="attr_action-defensive">
+              <option value="standard" data-i18n="defense-standard" selected="selected"></option>
+              <option value="simple" data-i18n="defense-simple"></option>
+              <option value="totale" data-i18n="defense-totale"></option>
+            </select>
+          </div>
+          <div class="deux-armes">
+            <input type="hidden" name="attr_deux-armes" value="0"/><span class="title" data-i18n="combat-deux-armes"></span>
+            <button type="action" name="act_deux-armes"><span class="checked">✓</span><span class="unchecked">✕</span></button>
+          </div>
+        </div>
+        <div class="contact">
+          <input class="show" type="hidden" name="attr_showcontact" value="0"/>
+          <div class="header">
+            <button type="action" name="act_showcontact"><span class="plus">+</span><span class="minus">-</span></button>
+            <h1 data-i18n="armes-contact"></h1>
+          </div>
+          <fieldset class="repeating_wpncontact">
+            <input class="modkipositif" type="hidden" name="attr_modkipositif" value="0"/>
+            <input class="modkinegatif" type="hidden" name="attr_modkinegatif" value="0"/>
+            <input class="modkipositifdgts" type="hidden" name="attr_modkipositifdgts" value="0"/>
+            <input class="modkinegatifdgts" type="hidden" name="attr_modkinegatifdgts" value="0"/>
+            <input class="wpnshow" type="hidden" name="attr_wpnshow" value="1"/>
+            <div class="wpnheader triple">
+              <button class="wpnshow" type="action" name="act_wpnshow"><span class="plus">&amp;</span><span class="minus">_</span></button>
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+              <button class="wpnroll" type="action" name="act_wpnroll"><span></span></button>
+            </div>
+            <label class="std"><span data-i18n="utilisation"></span>
+              <input type="text" name="attr_utilisation" data-i18n-placeholder="une-main"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="dm"></span>
+              <input type="text" name="attr_dm" data-i18n-placeholder="1d6"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="for-min"></span>
+              <input type="number" name="attr_for-min" value="0"/>
+            </label><span class="triple subheader" data-i18n="mod-attaque"></span>
+            <input class="modatt" type="number" name="attr_modatt" value="0"/>
+            <div class="checkbtn borderleft modkipositif">
+              <button type="action" name="act_modkipositif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn borderleft modkinegatif">
+              <button type="action" name="act_modkinegatif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div><span class="triple subheader" data-i18n="mod-degats"></span>
+            <input class="modatt" type="number" name="attr_moddgts" value="0"/>
+            <div class="checkbtn borderleft modkipositifdgts">
+              <button type="action" name="act_modkipositifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn borderleft modkinegatifdgts">
+              <button type="action" name="act_modkinegatifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div>
+            <div class="triple autoex"><span name="attr_description"></span>
+              <textarea name="attr_description" data-i18n-placeholder="description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="distance">
+          <input class="show" type="hidden" name="attr_showdistance" value="0"/>
+          <div class="header">
+            <button type="action" name="act_showdistance"><span class="plus">+</span><span class="minus">-</span></button>
+            <h1 data-i18n="armes-distance"></h1>
+          </div>
+          <fieldset class="repeating_wpndistance">
+            <input class="modkipositif" type="hidden" name="attr_modkipositif" value="0"/>
+            <input class="modkinegatif" type="hidden" name="attr_modkinegatif" value="0"/>
+            <input class="modkipositifdgts" type="hidden" name="attr_modkipositifdgts" value="0"/>
+            <input class="modkinegatifdgts" type="hidden" name="attr_modkinegatifdgts" value="0"/>
+            <input class="wpnshow" type="hidden" name="attr_wpnshow" value="1"/>
+            <div class="wpnheader quintuple">
+              <button class="wpnshow" type="action" name="act_wpnshow"><span class="plus">&amp;</span><span class="minus">_</span></button>
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+              <button class="wpnroll" type="action" name="act_wpnroll"><span></span></button>
+            </div>
+            <label class="std"><span data-i18n="utilisation"></span>
+              <input type="text" name="attr_utilisation" data-i18n-placeholder="une-main"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="dm"></span>
+              <input type="text" name="attr_dm" data-i18n-placeholder="1d6"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="portee"></span>
+              <input type="text" name="attr_portee" value="0"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="rechargement"></span>
+              <input type="text" name="attr_rechargement" data-i18n-placeholder="action-simple"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="for-min"></span>
+              <input type="number" name="attr_for-min" value="0"/>
+            </label><span class="quintuple subheader" data-i18n="mod-attaque"></span>
+            <input class="modatt" type="number" name="attr_modatt" value="0"/>
+            <div class="checkbtn doublemid borderleft modkipositif">
+              <button type="action" name="act_modkipositif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn doubleend borderleft modkinegatif">
+              <button type="action" name="act_modkinegatif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div><span class="quintuple subheader" data-i18n="mod-degats"></span>
+            <input class="modatt" type="number" name="attr_moddgts" value="0"/>
+            <div class="checkbtn doublemid borderleft modkipositifdgts">
+              <button type="action" name="act_modkipositifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn doubleend borderleft modkinegatifdgts">
+              <button type="action" name="act_modkinegatifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div>
+            <label class="std bordertop"><span data-i18n="incident-tir"></span>
+              <input type="number" name="attr_incident-tir" value="1" min="0"/>
+            </label>
+            <div class="quadrupleend autoex"><span name="attr_description"></span>
+              <textarea name="attr_description" data-i18n-placeholder="description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="sortilege">
+          <input class="show" type="hidden" name="attr_showsortilege" value="0"/>
+          <div class="header">
+            <button type="action" name="act_showsortilege"><span class="plus">+</span><span class="minus">-</span></button>
+            <h1 data-i18n="sortileges"></h1>
+          </div>
+          <fieldset class="repeating_wpnsortilege">
+            <input class="wpnshow" type="hidden" name="attr_wpnshow" value="1"/>
+            <div class="wpnheader triple">
+              <button class="wpnshow" type="action" name="act_wpnshow"><span class="plus">&amp;</span><span class="minus">_</span></button>
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+              <button class="wpnroll" type="action" name="act_wpnroll" data-i18n-title="sort-lancer"><span data-i18n-title="sort-lancer"></span></button>
+              <button class="spellroll" type="action" name="act_spellroll" data-i18n-title="magique-roll"><img src="https://image.noelshack.com/fichiers/2023/47/3/1700660998-magique.png" data-i18n-title="magique-roll"/></button>
+            </div>
+            <input type="text" name="attr_type-magie" data-i18n-placeholder="type-magie-plh"/>
+            <input class="borderleft" type="text" name="attr_forme-magie" data-i18n-placeholder="forme-magie"/>
+            <label class="std center wseparation borderleft"><span data-i18n="rang"></span>
+              <input type="number" name="attr_rang" value="1" min="0"/>
+            </label>
+            <div class="triple duo">
+              <label class="std wseparation"><span data-i18n="caracteristique-utilisee"></span>
+                <select name="attr_caracteristique">
+                  <option value="force" data-i18n="force"></option>
+                  <option value="dexterite" data-i18n="dexterite"></option>
+                  <option value="constitution" data-i18n="constitution"></option>
+                  <option value="perception" data-i18n="perception"></option>
+                  <option value="intelligence" data-i18n="intelligence"></option>
+                  <option value="charisme" data-i18n="charisme"></option>
+                </select>
+              </label>
+              <label class="std wseparation borderleft"><span data-i18n="difficulte-base"></span>
+                <input type="number" name="attr_difficulte" value="5" min="0"/>
+              </label>
+            </div>
+            <div class="triple autoex"><span name="attr_description"></span>
+              <textarea name="attr_description" data-i18n-placeholder="description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="grenade">
+          <input class="show" type="hidden" name="attr_showgrenade" value="0"/>
+          <div class="header">
+            <button type="action" name="act_showgrenade"><span class="plus">+</span><span class="minus">-</span></button>
+            <h1 data-i18n="grenades"></h1>
+          </div>
+          <fieldset class="repeating_wpngrenade">
+            <input class="modkipositif" type="hidden" name="attr_modkipositif" value="0"/>
+            <input class="modkinegatif" type="hidden" name="attr_modkinegatif" value="0"/>
+            <input class="modkipositifdgts" type="hidden" name="attr_modkipositifdgts" value="0"/>
+            <input class="modkinegatifdgts" type="hidden" name="attr_modkinegatifdgts" value="0"/>
+            <input class="wpnshow" type="hidden" name="attr_wpnshow" value="1"/>
+            <div class="wpnheader quintuple">
+              <button class="wpnshow" type="action" name="act_wpnshow"><span class="plus">&amp;</span><span class="minus">_</span></button>
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+              <button class="wpnroll" type="action" name="act_wpnroll"><span></span></button>
+            </div>
+            <label class="std"><span data-i18n="utilisation"></span>
+              <input type="text" name="attr_utilisation" data-i18n-placeholder="une-main"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="dm"></span>
+              <input type="text" name="attr_dm" data-i18n-placeholder="dm"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="portee"></span>
+              <input type="text" name="attr_portee" data-i18n-placeholder="portee"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="rechargement"></span>
+              <input type="text" name="attr_rechargement" data-i18n-placeholder="action-simple"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="for-min"></span>
+              <input type="number" name="attr_for-min" value="0"/>
+            </label><span class="quintuple subheader" data-i18n="mod-attaque"></span>
+            <input class="modatt" type="number" name="attr_modatt" value="0"/>
+            <div class="checkbtn doubleMiddle borderleft modkipositif">
+              <button type="action" name="act_modkipositif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn doubleEnd borderleft modkinegatif">
+              <button type="action" name="act_modkinegatif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div><span class="quintuple subheader" data-i18n="mod-degats"></span>
+            <input class="modatt" type="number" name="attr_moddgts" value="0"/>
+            <div class="checkbtn doubleMiddle borderleft modkipositifdgts">
+              <button type="action" name="act_modkipositifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn doubleEnd borderleft modkinegatifdgts">
+              <button type="action" name="act_modkinegatifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div>
+            <div class="quintuple autoex"><span name="attr_description"></span>
+              <textarea name="attr_description" data-i18n-placeholder="description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+        <div class="artillerie">
+          <input class="show" type="hidden" name="attr_showartillerie" value="0"/>
+          <div class="header">
+            <button type="action" name="act_showartillerie"><span class="plus">+</span><span class="minus">-</span></button>
+            <h1 data-i18n="artillerie"></h1>
+          </div>
+          <fieldset class="repeating_wpnartillerie">
+            <input class="modkipositif" type="hidden" name="attr_modkipositif" value="0"/>
+            <input class="modkinegatif" type="hidden" name="attr_modkinegatif" value="0"/>
+            <input class="modkipositifdgts" type="hidden" name="attr_modkipositifdgts" value="0"/>
+            <input class="modkinegatifdgts" type="hidden" name="attr_modkinegatifdgts" value="0"/>
+            <input class="wpnshow" type="hidden" name="attr_wpnshow" value="1"/>
+            <div class="wpnheader quintuple">
+              <button class="wpnshow" type="action" name="act_wpnshow"><span class="plus">&amp;</span><span class="minus">_</span></button>
+              <input type="text" name="attr_name" data-i18n-placeholder="nom"/>
+              <button class="wpnroll" type="action" name="act_wpnroll"><span></span></button>
+            </div>
+            <label class="std"><span data-i18n="utilisation"></span>
+              <input type="text" name="attr_utilisation" data-i18n-placeholder="une-main"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="dm"></span>
+              <input type="text" name="attr_dm" data-i18n-placeholder="dm"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="portee"></span>
+              <input type="text" name="attr_portee" data-i18n-placeholder="portee"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="rechargement"></span>
+              <input type="text" name="attr_rechargement" data-i18n-placeholder="action-simple"/>
+            </label>
+            <label class="std borderleft"><span data-i18n="aire-effet"></span>
+              <input type="number" name="attr_aire-effet" value="0"/>
+            </label><span class="quintuple subheader" data-i18n="mod-attaque"></span>
+            <input class="modatt" type="number" name="attr_modatt" value="0"/>
+            <div class="checkbtn doubleMiddle borderleft modkipositif">
+              <button type="action" name="act_modkipositif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn doubleEnd borderleft modkinegatif">
+              <button type="action" name="act_modkinegatif"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div><span class="quintuple subheader" data-i18n="mod-degats"></span>
+            <input class="modatt" type="number" name="attr_moddgts" value="0"/>
+            <div class="checkbtn doubleMiddle borderleft modkipositifdgts">
+              <button type="action" name="act_modkipositifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-positif"></span>
+            </div>
+            <div class="checkbtn doubleEnd borderleft modkinegatifdgts">
+              <button type="action" name="act_modkinegatifdgts"><span class="checked">✓</span><span class="unchecked">✕</span></button><span data-i18n="add-mod-ki-negatif"></span>
+            </div>
+            <div class="quintuple autoex"><span name="attr_description"></span>
+              <textarea name="attr_description" data-i18n-placeholder="description"></textarea>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="vehicules">
+        <fieldset class="repeating_vehicules">
+          <input class="vehicule-edit" type="hidden" name="attr_edit" value="0"/>
+          <input class="name" type="text" name="attr_vehicule-name" data-i18n-placeholder="nom"/>
+          <button class="edit" type="action" name="act_vehicule-edit">
+            <p data-i18n="editer"></p>
+          </button>
+          <div class="mainleft">
+            <div class="mainsa unsimple">
+              <div class="main red"><span class="title" data-i18n="pv"></span>
+                <div class="value">
+                  <input class="score" type="number" name="attr_pv-vehicule" value="0" min="0"/><span class="separator">/</span><span class="score_max" name="attr_pv-vehicule_max">0</span>
+                  <input type="hidden" name="attr_pv-vehicule_max" value="0"/>
+                </div>
+              </div>
+              <div class="submain">
+                <label class="demi"><span class="title" data-i18n="modificateur-short">mod.</span>
+                  <input type="number" name="attr_pv-vehicule-mod" value="0"/>
+                </label>
+                <label class="demi"><span class="title" data-i18n="temporaire-short">mod.</span>
+                  <input type="number" name="attr_pv-vehicule-temp" value="0"/>
+                </label>
+                <label class="full"><span class="title" data-i18n="base">base</span>
+                  <input type="number" name="attr_pv-vehicule-base" value="0"/>
+                </label>
+              </div>
+            </div>
+            <div class="mainsa simple">
+              <div class="main blue"><span class="title" data-i18n="places"></span>
+                <div class="svalue"><span class="score" name="attr_places-vehicule">4</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="vehicule_attributs">
+            <!--Création de la liste des attributs-->
+            <div class="main_block"><span class="title" data-i18n="force-short">force</span>
+              <div class="attr-block"><span class="score s2" name="attr_force-vehicule">0</span></div>
+            </div>
+            <div class="main_block"><span class="title" data-i18n="agilite-short">agilite</span>
+              <div class="attr-block"><span class="score s2" name="attr_agilite-vehicule">0</span></div>
+            </div>
+            <div class="main_block"><span class="title" data-i18n="defense-short">defense</span>
+              <div class="attr-block"><span class="score s2" name="attr_defense-vehicule">0</span></div>
+            </div>
+          </div>
+          <div class="vehicule_edit_attributs">
+            <!--Création de la liste des attributs en MODE EDITION-->
+            <div class="main_block"><span class="title" data-i18n="force-short">force</span>
+              <div class="attr-block"><span class="score s2" name="attr_force-vehicule">0</span><span class="toedit" data-i18n="base">base</span>
+                <input type="number" name="attr_force-vehicule-base" value="0" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+                <input type="number" name="attr_force-vehicule-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+                <input type="number" name="attr_force-vehicule-temp" value="0"/>
+                <input type="hidden" name="attr_force-vehicule" value="0"/>
+              </div>
+            </div>
+            <div class="main_block"><span class="title" data-i18n="agilite-short">agilite</span>
+              <div class="attr-block"><span class="score s2" name="attr_agilite-vehicule">0</span><span class="toedit" data-i18n="base">base</span>
+                <input type="number" name="attr_agilite-vehicule-base" value="0" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+                <input type="number" name="attr_agilite-vehicule-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+                <input type="number" name="attr_agilite-vehicule-temp" value="0"/>
+                <input type="hidden" name="attr_agilite-vehicule" value="0"/>
+              </div>
+            </div>
+            <div class="main_block"><span class="title" data-i18n="defense-short">defense</span>
+              <div class="attr-block"><span class="score s2" name="attr_defense-vehicule">0</span><span class="toedit" data-i18n="dexterite-short">dexterite</span><span class="noedit" name="attr_defense-vehicule-dexterite">0</span><span class="toedit" data-i18n="base">base</span>
+                <input type="number" name="attr_defense-vehicule-base" value="0" min="0"/><span class="toedit" data-i18n="divers">divers</span>
+                <input type="number" name="attr_defense-vehicule-divers" value="0"/><span class="toedit" data-i18n="temporaire-short">temp.</span>
+                <input type="number" name="attr_defense-vehicule-temp" value="0"/>
+                <input type="hidden" name="attr_defense-vehicule" value="0"/>
+              </div>
+            </div>
+          </div>
+          <button class="roll" type="action" name="act_vehicule-roll">
+            <p data-i18n="pilotage-roll"></p>
+          </button>
+        </fieldset>
+      </div>
+      <div class="profil">
+        <div class="col">
+          <label class="famille"><span data-i18n="famille"></span>
+            <select name="attr_profil-famille">
+              <option value="" selected="selected"></option>
+              <option value="action" data-i18n="action">action</option>
+              <option value="reflexion" data-i18n="reflexion">reflexion</option>
+              <option value="societe" data-i18n="societe">societe</option>
+            </select>
+          </label>
+          <label class="attaque"><span data-i18n="attaque"></span>
+            <input type="number" name="attr_profil-attaque" value="0" min="0"/>
+          </label>
+          <div class="subcol">
+            <label class="attaque-contact"><span data-i18n="attaque-contact"></span>
+              <input type="number" name="attr_profil-attaque-contact" value="0" min="0"/>
+            </label>
+            <label class="attaque-distance"><span data-i18n="attaque-distance"></span>
+              <input type="number" name="attr_profil-attaque-distance" value="0" min="0"/>
+            </label>
+          </div>
+        </div>
+        <div class="col">
+          <label class="dv"><span data-i18n="de-de-vie"></span>
+            <select name="attr_profil-dv">
+              <option value="10" data-i18n="d10" selected="selected"></option>
+              <option value="8" data-i18n="d8"></option>
+              <option value="6" data-i18n="d6"></option>
+            </select>
+          </label>
+          <label class="capacite"><span data-i18n="capacite"></span>
+            <input type="number" name="attr_profil-capacite" value="0" min="0"/>
+          </label>
+          <label class="serenite"><span data-i18n="serenite"></span>
+            <input type="number" name="attr_profil-serenite" value="0" min="0"/>
+          </label>
+          <label class="chance"><span data-i18n="chance"></span>
+            <input type="number" name="attr_profil-chance" value="0" min="0"/>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="listetats">
+      <input type="hidden" name="attr_dice-special" value="0"/>
+      <input type="hidden" name="attr_initiative-etat" value="0"/>
+      <input type="hidden" name="attr_defense-etat" value="0"/>
+      <input type="hidden" name="attr_resistance-etat" value="0"/>
+      <input type="hidden" name="attr_contact-etat" value="0"/>
+      <input type="hidden" name="attr_distance-etat" value="0"/>
+      <input type="hidden" name="attr_magique-etat" value="0"/>
+      <h1 class="title" data-i18n="etats-prejudiciables"></h1>
+      <div class="etat">
+        <input type="hidden" name="attr_affaibli" value="0"/>
+        <button type="action" name="act_affaibli"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="affaibli"></span><span class="data" data-i18n="affaibli-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_aveugle" value="0"/>
+        <button type="action" name="act_aveugle"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="aveugle"></span><span class="data" data-i18n="aveugle-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_etourdi" value="0"/>
+        <button type="action" name="act_etourdi"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="etourdi"></span><span class="data" data-i18n="etourdi-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_immobilise" value="0"/>
+        <button type="action" name="act_immobilise"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="immobilise"></span><span class="data" data-i18n="immobilise-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_paralyse" value="0"/>
+        <button type="action" name="act_paralyse"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="paralyse"></span><span class="data" data-i18n="paralyse-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_ralenti" value="0"/>
+        <button type="action" name="act_ralenti"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="ralenti"></span><span class="data" data-i18n="ralenti-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_renverse" value="0"/>
+        <button type="action" name="act_renverse"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="renverse"></span><span class="data" data-i18n="renverse-description"></span>
+      </div>
+      <div class="etat">
+        <input type="hidden" name="attr_surpris" value="0"/>
+        <button type="action" name="act_surpris"><span class="checked">✓</span><span class="unchecked">✕</span></button><span class="labeletat" data-i18n="surpris"></span><span class="data" data-i18n="surpris-description"></span>
+      </div>
+    </div>
+  </div>
+</div><rolltemplate class="sheet-rolltemplate-niveau">
+    <h1 class="header">{{name}}</h1>
+    <h2 class="header">{{title}}</h2>
+
+    {{#newniveau}}
+        <div class="block">
+            <span class="label" data-i18n="niveau">niveau</span>
+            <div class="subBlock">
+                <span class="start">{{oldniveau}} </span>
+                <span class="separator">7</span>
+                <span class="end">{{newniveau}}</span>
+            </div>
+        </div>
+    {{/newniveau}}
+
+    {{#newpv}}
+        <div class="block">
+            <span class="label" data-i18n="pv-long">pv</span>
+            <div class="subBlock">
+                <span class="start">{{oldpv}} </span>
+                <span class="separator">7</span>
+                <span class="end">{{newpv}}</span>
+            </div>
+        </div>
+    {{/newpv}}
+
+    {{#newcapacite}}
+        <div class="block">
+            <span class="label" data-i18n="points-capacites-long">pc</span>
+            <div class="subBlock">
+                <span class="start">{{oldcapacite}} </span>
+                <span class="separator">7</span>
+                <span class="end">{{newcapacite}}</span>
+            </div>
+        </div>
+    {{/newcapacite}}
+
+    {{#newcontact}}
+        <div class="block">
+            <span class="label" data-i18n="attaque-contact">pv</span>
+            <div class="subBlock">
+                <span class="start">{{oldcontact}} </span>
+                <span class="separator">7</span>
+                <span class="end">{{newcontact}}</span>
+            </div>
+        </div>
+    {{/newcontact}}
+
+    {{#newdistance}}
+        <div class="block">
+            <span class="label" data-i18n="attaque-distance">pv</span>
+            <div class="subBlock">
+                <span class="start">{{olddistance}} </span>
+                <span class="separator">7</span>
+                <span class="end">{{newdistance}}</span>
+            </div>
+        </div>
+    {{/newdistance}}
+
+    {{#newmagique}}
+        <div class="block">
+            <span class="label" data-i18n="attaque-magique">pv</span>
+            <div class="subBlock">
+                <span class="start">{{oldmagique}} </span>
+                <span class="separator">7</span>
+                <span class="end">{{newmagique}}</span>
+            </div>
+        </div>
+    {{/newmagique}}
+</rolltemplate><rolltemplate class="sheet-rolltemplate-std">
+    <h1 class="header">{{name}}</h1>
+    <h2 class="header">{{title}}</h2>
+    {{#subtitle}}
+        <h3 class="header">{{subtitle}}</h3>
+    {{/subtitle}}
+
+    {{#rollTotal() empty 0}}
+    <div class="allProps">
+        {{#typemagie}}
+        <div class="subBlock">
+            <span class="full">{{typemagie}}</span>
+        </div>
+        {{/typemagie}}
+        {{#formemagie}}
+        <div class="subBlock">
+            <span class="full">{{formemagie}}</span>
+        </div>
+        {{/formemagie}}
+
+        {{#allprops() name title subtitle typemagie formemagie difficulte description result destin echec critique empty}}
+            <div class="subBlock">
+                <span class="label">{{key}}</span>
+                {{value}}
+            </div>
+        {{/allprops() name title subtitle typemagie formemagie difficulte description result destin echec critique empty}}
+    </div>
+    {{/rollTotal() empty 0}}
+
+    {{result}}
+
+    {{#rollTotal() computed::destin 1}}
+        <div class="coupdepouce">
+            <span data-i18n="coup-de-pouce">Coup de pouce du destin</span>
+        </div>
+    {{/rollTotal() computed::destin 1}}
+
+    {{#rollTotal() computed::echec 1}}
+        <div class="echeccritique">
+            <span data-i18n="echec-critique">Échec critique</span>
+        </div>
+    {{/rollTotal() computed::echec 1}}
+
+    {{#rollTotal() computed::critique 1}}
+        <div class="critique">
+            <span data-i18n="critique">Critique</span>
+        </div>
+    {{/rollTotal() computed::critique 1}}
+
+    {{#difficulte}}
+        {{#rollTotal() computed::echec 0}}
+            {{#rollTotal() computed::critique 0}}
+                {{#rollTotal() computed::difficulte 1}}
+                    <div class="critique">
+                        <span data-i18n="succes">Succès</span>
+                    </div>
+                {{/rollTotal() computed::difficulte 1}}
+            {{/rollTotal() computed::critique 0}}
+        {{/rollTotal() computed::echec 0}}
+
+        {{#rollTotal() computed::echec 0}}
+            {{#rollTotal() computed::critique 0}}
+                {{#rollTotal() computed::difficulte 0}}
+                    <div class="echeccritique">
+                        <span data-i18n="echec">Échec</span>
+                    </div>
+                {{/rollTotal() computed::difficulte 0}}
+            {{/rollTotal() computed::critique 0}}
+        {{/rollTotal() computed::echec 0}}
+    {{/difficulte}}
+
+    {{#description}}
+        <span class="text">{{description}}</span>
+    {{/description}}
+</rolltemplate><rolltemplate class="sheet-rolltemplate-combat">
+    <h1 class="header">{{name}}</h1>
+    <h2 class="header">{{title}}</h2>
+
+    {{#luminosite}}
+        <div class="doubleBlock">
+            <span class="label" data-i18n="luminosite">Luminosité</span>
+            <span class="value">{{luminosite}}</span>
+        </div>
+    {{/luminosite}}
+
+    {{#portee}}
+        <div class="doubleBlock">
+            <span class="label" data-i18n="portee">Portée</span>
+            <span class="value">{{portee}}</span>
+        </div>
+    {{/portee}}
+
+    {{#aireeffet}}
+        <div class="doubleBlock">
+            <span class="label" data-i18n="aire-effet">Aire d'effet</span>
+            <span class="value">{{aireeffet}}</span>
+        </div>
+    {{/aireeffet}}
+
+    {{#rollTotal() empty 0}}
+    <div class="allProps">
+        {{#allprops() name title attaque degats description luminosite portee incident destin echec critique empty aireeffet btn}}
+            <div class="subBlock">
+                <span class="label">{{key}}</span>
+                {{value}}
+            </div>
+        {{/allprops() name title attaque degats description luminosite portee incident destin echec critique empty aireeffet btn}}
+    </div>
+    {{/rollTotal() empty 0}}
+
+    {{#attaque}}
+        <div class="block attaque">
+            <span class="label" data-i18n="roll-attaque">jet d'attaque</span>
+            {{attaque}}
+        </div>
+
+        {{#incident}}
+            {{#rollTotal() computed::incident 1}}
+            <div class="incident">
+                <span data-i18n="incident-tir">Incident de tir</span>
+            </div>
+            {{/rollTotal() computed::incident 1}}
+        {{/incident}}
+
+        {{#rollTotal() computed::destin 1}}
+            <div class="coupdepouce">
+                <span data-i18n="coup-de-pouce">Coup de pouce du destin</span>
+            </div>
+        {{/rollTotal() computed::destin 1}}
+
+        {{#rollTotal() computed::echec 1}}
+            <div class="echeccritique">
+                <span data-i18n="echec-critique">Échec critique</span>
+            </div>
+        {{/rollTotal() computed::echec 1}}
+
+        {{#rollTotal() computed::critique 1}}
+            <div class="critique">
+                <span data-i18n="critique">Critique</span>
+            </div>
+        {{/rollTotal() computed::critique 1}}
+    {{/attaque}}
+
+    {{#degats}}
+        <div class="block">
+            {{#rollTotal() computed::critique 1}}
+                <span class="label" data-i18n="roll-degats-critique">jet de dégâts (Critique)</span>
+                <div class='dgtsCritique'>
+                    {{computed::degats}}
+                    <span class="sublabel">{{degats}}x2</s>
+                </div>
+            {{/rollTotal() computed::critique 1}}
+            {{#rollTotal() computed::critique 0}}
+                <span class="label" data-i18n="roll-degats">jet de dégâts</span>
+                {{computed::degats}}
+            {{/rollTotal() computed::critique 0}}
+        </div>
+    {{/degats}}
+
+    {{#description}}
+        <span class="text">{{description}}</span>
+    {{/description}}
+</rolltemplate>
