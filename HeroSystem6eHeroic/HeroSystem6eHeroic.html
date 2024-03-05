@@ -2061,7 +2061,13 @@
 							</div>
 							<div class ="item-maneuver-block-text">
 								<p>Knock target down prone with a successful attack roll.  A moving target takes (velocity/20)d6 damage.</p>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">Roll</button>
+								<div class ="item-maneuver-line-flex">
+									<p>Velocity:</p>
+									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="0" max="100" value="0" tabindex="-1"/>
+								</div>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Use STR</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 83</p>
@@ -11479,6 +11485,9 @@
 					halfDCV = true;
 				} else if (values.maneuverSelection === "strike") {
 					rollMessage = (isNormalDamage ? "" : "Killing ") + "Strike";
+				} else {
+					isDefense = true;
+					subtractENDAmt = 1;
 				}
 				
 				// Create dice rolling text to send to a roll dialog.
@@ -11545,8 +11554,6 @@
 						
 				} else if (values.maneuverSelection === "block") {
 					// Blocking Roll
-					isDefense = true;
-					
 					theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Blocks with @{weaponName"+weaponId+"}}} ";
 					
 					theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]]]}}";
@@ -11556,10 +11563,9 @@
 					} else {
 						theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]+@{weaponPenalty"+weaponId+"}[Strength]+?{Modifiers|0}[Modifier]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 					}
+					theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 				} else if (values.maneuverSelection === "disarm") {
 					// Initiate Disarm dialog.
-				} else {
-					// Do nothing. Weapons are not used for other standard maneuvers.
 				}
 				
 				if (!isDefense) {
@@ -11600,7 +11606,12 @@
 				} else {
 					startRoll(theRoll, (results) => {
 						let theResult = new Object();
-							
+						
+						// Subtract END cost if option checked.
+						if (values.optionAutoSubtractEND != 0) {
+							subtractEndurance(subtractENDAmt);
+						}
+						
 						finishRoll(results.rollId, theResult);
 					});
 				}
@@ -11615,13 +11626,21 @@
 		getAttrs(["currentDCV", "whisperToGM"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let maneuverDCV = +3;
+			let subtractENDAmt = 1;
 			
 			theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Dodges}} ";
 			
 			theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV+"[ManeuverDCV]]]}}";
 			
+			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
+				
+				// Subtract END cost if option checked.
+				if (values.optionAutoSubtractEND != 0) {
+					subtractEndurance(subtractENDAmt);
+				}
 					
 				finishRoll(results.rollId, theResult);
 			});
@@ -11635,11 +11654,13 @@
 		getAttrs(["currentDCV", "whisperToGM"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let maneuverDCV = 0;
+			let subtractENDAmt = 1;
 			
 			theRoll += "&{template:custom} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Set}} ";
 			
 			theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV+"[ManeuverDCV]]]}}";
 			
+			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			
 			setAttrs({
 				"checkSet":"on"
@@ -11647,6 +11668,11 @@
 			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
+				
+				// Subtract END cost if option checked.
+				if (values.optionAutoSubtractEND != 0) {
+					subtractEndurance(subtractENDAmt);
+				}
 					
 				finishRoll(results.rollId, theResult);
 			});
@@ -11684,6 +11710,7 @@
 			let velocity = parseInt(values["moveVelocity"])||0;
 			let velocityDC = 0;
 			let isDefense = false;
+			let noDamage = false;
 			
 			// Maneuver message and DCV mods.
 			
@@ -11769,7 +11796,33 @@
 				setAttrs({
 					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1)
 				});
+			} else if (values.maneuverSelection === "trip") {
+				// Message
+				rollMessage = "Trip Attack";
+				
+				// CV
+				maneuverOCV = -1;
+				maneuverDCV = -2;
+				
+				// Damage
+				velocityDC = Math.floor(velocity/20);
+				if (velocityDC === 0) {
+					noDamage = true;
+				}
+				isModified = true;
+				
+				// Endurance
+				subtractENDAmt = 1;
+				
+				setAttrs({
+					"hiddenSpecialDamage":getDamageDice(velocityDC, 0, true, 1)
+				});
+			} else {
+				isDefense = true;
+				noDamage = true;
+				subtractENDAmt = 1;
 			}
+			
 			
 			// Create dice rolling text to send to a roll dialog.
 			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "throw")) {
@@ -11831,13 +11884,12 @@
 				}
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
-				if (useHitLocations)
+				if (useHitLocations) {
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
+				}
 					
 			} else if (values.maneuverSelection === "block") {
 				// Blocking Roll
-				isDefense = true;
-				
 				theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Unarmed Block}} ";
 				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]]]}}";
 				
@@ -11846,30 +11898,48 @@
 				} else {
 					theRoll += "{{OCV=[[@{ocv}[OCV]+?{Modifiers|0}[Modifier]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 				}
+				
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			} else if (values.maneuverSelection === "disarm") {
 				// Initiate Disarm dialog.
-			} else {
-				// Do nothing. Weapons are not used for other standard maneuvers.
+			} else if (values.maneuverSelection === "trip") {
+				theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
+				
+				if (dispDoS) {
+					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} ";
+				} else {
+					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
+				}
+				
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+				
+				theRoll += (noDamage ? "" : "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}");
+				
+				if ( (useHitLocations) && (!noDamage) ) {
+					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
+				}
 			}
 			
 			if (!isDefense) {
 				startRoll(theRoll, (results) => {
-					var computed = parseInt(results.results[dmgType].result)||0;
-					let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 					let theResult = new Object();
 					
-					
-					// Get hit location message if system used.
-					if (useHitLocations) {
-						let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
-						theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
-						theSTUNMultiplier = theHitLocation.STUNx;
+					if (!noDamage) {
+						var computed = parseInt(results.results[dmgType].result)||0;
+						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
+						
+						// Get hit location message if system used.
+						if (useHitLocations) {
+							let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+							theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
+							theSTUNMultiplier = theHitLocation.STUNx;
+						}
+						
+						computed = convertStunToBody(results.results.STUN.rolls);
+						theResult[otherDmgType] = computed;
+						theResult.HITLOC = theMessage;
 					}
 					
-					computed = convertStunToBody(results.results.STUN.rolls);
-					theResult[otherDmgType] = computed;
-					theResult.HITLOC = theMessage;
-						
 					// Subtract END cost if option checked.
 					if (values.optionAutoSubtractEND != 0) {
 						subtractEndurance(subtractENDAmt);
@@ -11880,7 +11950,12 @@
 			} else {
 				startRoll(theRoll, (results) => {
 					let theResult = new Object();
-						
+					
+					// Subtract END cost if option checked.
+					if (values.optionAutoSubtractEND != 0) {
+						subtractEndurance(subtractENDAmt);
+					}
+					
 					finishRoll(results.rollId, theResult);
 				});
 			}
