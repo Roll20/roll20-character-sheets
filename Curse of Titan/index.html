@@ -47,13 +47,12 @@
 		<div>
 			<button type="roll" min="0"
 				value="&{template:rolls}{{header=Action roll}}{{dice=[[?{# d6s|1}d6cs0cf0]]}}"><span>L</span></button>
-			<label for="exhausted" data-i18n="exhausted">Exhausted</label><input type="number" name="attr_exhausted"
-				value="0" min="0" />
+			<label for="exhausted" data-i18n="exhausted">Exhausted</label><input type="number" readonly
+				name="attr_exhausted" value="0" min="0" />
 			<label for="injury" data-i18n="injury">injury</label><input type="number" name="attr_injury" value="0"
 				min="0" />
 
 			<div class="dice-row">
-				<label for="available" data-i18n="available">Available: </label>
 				<input type="hidden" class="damage" name="attr_damage" value="0" />
 				<div class="square"><input type="checkbox" class="die-radio"
 						name="attr_die1" /><span>L</span><span>X</span></div>
@@ -68,22 +67,11 @@
 				<div class="square"><input type="checkbox" class="die-radio"
 						name="attr_die6" /><span>L</span><span>X</span></div>
 			</div>
-			<!-- <div class="dice-row">
-				<label for="exhausted" data-i18n="exhausted">Exhausted: </label>
-				<input type="hidden" class="damage" name="attr_damage" value="0" />
-				<div class="square"><input type="radio" class="die-radio"
-						name="attr_die1" /><span>L</span><span>X</span></div>
-				<div class="square"><input type="radio" class="die-radio"
-						name="attr_die2" /><span>L</span><span>X</span></div>
-				<div class="square"><input type="radio" class="die-radio"
-						name="attr_die3" /><span>L</span><span>X</span></div>
-				<div class="square"><input type="radio" class="die-radio"
-						name="attr_die4" /><span>L</span><span>X</span></div>
-				<div class="square"><input type="radio" class="die-radio"
-						name="attr_die5" /><span>L</span><span>X</span></div>
-				<div class="square"><input type="radio" class="die-radio"
-						name="attr_die6" /><span>L</span><span>X</span></div>
-			</div> -->
+			<div class="reset-dice">
+				<div><button type="action" name="act_die_reset"><span style="font-family:Pictos;">t</span></button>
+				</div>
+			</div>
+
 
 			<div class="repeating">
 				<label for="abilities" data-i18n="abilities">Abilities:</label>
@@ -238,40 +226,59 @@
 	<!--*********************************************************************************************************-->
 	<!--***************************              SCRIPTS                              ***************************-->
 	<!--*********************************************************************************************************-->
+
+
 	<script type="text/worker">
-	on("clicked:sheet", function(eventinfo) {
-		getAttrs(["sheet_type"], function(v) {
-			const sheet = (v.sheet_type === "pc") ? "titan" : "pc";
-			setAttrs({
-				sheet_type: sheet
+		function exhaustedDieCounter(dieValue){
+			getAttrs(["exhausted"], function(values) {
+				const exhaustedValue = parseInt(values.exhausted)
+				if(dieValue == 0){
+					setAttrs({	
+						exhausted: exhaustedValue +1
+					});					
+				} else { 
+				const newExhaustedValue = Math.max(0, exhaustedValue - 1);
+					setAttrs({
+						exhausted: newExhaustedValue
+					});
+		}})};
+		on("clicked:sheet", function(eventinfo) {
+			getAttrs(["sheet_type"], function(v) {
+				const sheet = (v.sheet_type === "pc") ? "titan" : "pc";
+				setAttrs({
+					sheet_type: sheet
+				});
 			});
 		});
-	});
-	on("change:die1", function(eventinfo){
-		getAttrs(["exhausted"], function(a) {
-			const die1Value = eventinfo.newValue
-			const newExhausted = parseInt(a.exhausted)
-			if(die1Value == 0){
-				setAttrs(
-					{
-					exhausted: newExhausted +1
-				}) 
-			}else{
-				setAttrs(
-					{
-						exhausted: newExhausted -1
-					}
-				)
-			}
-			console.log(a.exhausted);
-			console.log(newExhausted);
-			console.log(eventinfo);
-			console.log("Die1 Value", die1Value)
-		})
-	});
-
-
-	
+		on("change:die1", function(eventinfo){
+			exhaustedDieCounter(eventinfo.newValue); 
+		});
+		on("change:die2", function(eventinfo){
+			exhaustedDieCounter(eventinfo.newValue);
+		});		
+		on("change:die3", function(eventinfo){
+			exhaustedDieCounter(eventinfo.newValue);
+		});
+		on("change:die4", function(eventinfo){
+			exhaustedDieCounter(eventinfo.newValue);
+		});
+		on("change:die5", function(eventinfo){
+			exhaustedDieCounter(eventinfo.newValue);
+		});
+		on("change:die6", function(eventinfo){
+			exhaustedDieCounter(eventinfo.newValue);
+		});
+		on("clicked:die_reset", function(){
+			setAttrs({	
+				exhausted: 0,
+				die1: "on",
+				die2: "on",
+				die3: "on",
+				die4: "on",
+				die5: "on",
+				die6: "on"
+			});
+		});
 </script>
 </body>
 
