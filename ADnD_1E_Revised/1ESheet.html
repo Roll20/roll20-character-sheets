@@ -6805,6 +6805,16 @@
     setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
+  // One-time update: ensures warning flag is correct
+  const recalcAC = (current_version, final_version) => {
+    const output = {};
+    const recalc = 0;
+    calcAC(recalc);
+    output.sheet_version = current_version;
+    clog(`VERSION UPDATE: recalcAC completed`);
+    setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  };
+
   // Check and set Ability defaults to 8 on new sheets
   const newSheet = () => {
     getAttrs(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character'], (v) => {
@@ -6914,6 +6924,8 @@
       migrateSetSpellsCasterClass(1.65, final_version);
     } else if (current_version < 1.652) {
       abilityMacroUpdate(1.652, final_version);
+    } else if (current_version < 1.654) {
+      recalcAC(1.654, final_version);
       // all updates completed
     } else if (current_version < final_version) {
       setAttrs({
@@ -6927,13 +6939,16 @@
   // Versioning
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-    const final_version = 1.653;
+    const final_version = 1.655;
     getAttrs(['sheet_version', 'old_character'], (v) => {
+      const output = {};
       let current_version = float(v.sheet_version);
       // prevent new sheets from stepping through versionator
-      if (+v.old_character === 0) {
+      if (+v.old_character === 0 && current_version === 0) {
         // clog(`New Sheet:${v.old_character}`);
         current_version = final_version;
+        output.sheet_version = final_version;
+        setAttrs(output, {silent: true});
       }
       clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
       versionator(current_version, final_version);
@@ -8233,7 +8248,7 @@
   on('change:repeating_weapon:weapon_dual', (eventInfo) => {
     const output = {};
     getAttrs(['dual_pen_primary', 'dual_pen_secondary', 'repeating_weapon_weapon_dual'], (v) => {
-      clog('this weapon attack Type has been re-calculated');
+      // clog('this weapon attack Type has been re-calculated');
       const primary = +v.dual_pen_primary || 0;
       const secondary = +v.dual_pen_secondary || 0;
       const attack_type = v.repeating_weapon_weapon_dual;
@@ -8645,7 +8660,7 @@
   };
 
   on(
-    'change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
+    'change:armor_details_show change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
     (eventInfo) => {
       // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
       const recalc = 0;
