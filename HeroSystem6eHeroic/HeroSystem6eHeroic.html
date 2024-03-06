@@ -1814,12 +1814,14 @@
 								<h2>DCV: -4</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Grab object while making a Full Move. Adds +v/10 to STR for the purpose of making Strength checks.</p>
+								<p>Grab object while making a Full Move. Adds velocity/10 to STR for the purpose of making Strength checks.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
-									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
+									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="100" value="12" tabindex="-1"/>
 								</div>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">Roll</button>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonManeuver" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Grab By</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 67</p>
@@ -1873,7 +1875,7 @@
 								<p>Attack while making a Full Move past opponent. Strength is halved, but maneuver adds (velocity/10) DCs. Attacker or weapon takes 1/3 of this damage.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
-									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
+									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="2" max="100" value="12" tabindex="-1"/>
 								</div>
 								<div class="item-maneuver-button-line">
 									<button type="action" class="button buttonAttackStrength" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Use STR</button>
@@ -7675,6 +7677,35 @@
 </rolltemplate>
 
 <!-- Jackob's Roll Template used for showing talents, perks, and complications -->
+<rolltemplate class="sheet-rolltemplate-custom-strength">
+	<div class="sheet-template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+			</div>
+			<div class="sheet-content">
+				{{#allprops() title subtitle desc color STR PIPS}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle desc color STR PIPS}}
+				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+				
+				<!-- STR and Body Pips go at the end -->
+				{{#STR}}
+				<div class="sheet-key">STR</div>
+				<div class="sheet-value">{{computed::STR}}</div>
+				{{/STR}}
+				{{#PIPS}}
+				<div class="sheet-key">PIPS</div>
+				<div class="sheet-value">{{computed::PIPS}}</div>
+				{{/PIPS}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Jackob's Roll Template used for showing talents, perks, and complications -->
 <rolltemplate class="sheet-rolltemplate-custom-show">
 	<div class="sheet-template-wrapper">
 		<div class="sheet-container sheet-color-{{color}}">
@@ -11720,6 +11751,7 @@
 			let velocityDC = 0;
 			let isDefense = false;
 			let noDamage = false;
+			let targetObject = false;
 			
 			// Maneuver message and DCV mods.
 			
@@ -11801,8 +11833,30 @@
 				maneuverDCV = -2;
 				
 				noDamage = true;
+				subtractENDAmt = 1;
 				
 				setAttrs({
+					"rangeManeuver":0,
+					"checkSet":0,
+					"checkBrace":0
+				});
+			} else if (values.maneuverSelection === "grabBy") {
+				rollMessage = "Grab By";
+				
+				maneuverOCV = -3;
+				maneuverDCV = -4;
+				
+				// Recalculate damage with velocity and new strength.
+				adjustedDC = Math.floor( (parseInt(values.strength)||0)/5 + velocity/50);
+				
+				targetObject = true;
+				
+				isModified = true;
+				isBraced = false;
+				isSet = false;
+				
+				setAttrs({
+					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1),
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
@@ -11929,7 +11983,7 @@
 				if (useHitLocations) {
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 				}
-					
+				
 			} else if (values.maneuverSelection === "block") {
 				// Blocking Roll
 				theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Unarmed Block}} ";
@@ -11958,7 +12012,23 @@
 					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+			} else if (values.maneuverSelection === "grabBy") {
+				dmgType = "STR";
+				otherDmgType = "PIPS";
+				
+				// Grab By Roll
+				theRoll += "&{template:custom-strength} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Grab By}} ";
+				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
+				
+				if (dispDoS) {
+					theRoll	+= "{{Grabs DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
+				} else {
+					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
+				}
+				
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+				
 			} else if (values.maneuverSelection === "trip") {
 				theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
 				
@@ -11983,7 +12053,13 @@
 				startRoll(theRoll, (results) => {
 					let theResult = new Object();
 					
-					if (!noDamage) {
+					if (targetObject) {
+						var computed = parseInt(results.results[dmgType].result)||0;
+						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
+						
+						computed = convertStunToBody(results.results[dmgType].rolls);
+						theResult[otherDmgType] = computed;
+					} else if (!noDamage) {
 						var computed = parseInt(results.results[dmgType].result)||0;
 						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 						
@@ -11994,7 +12070,7 @@
 							theSTUNMultiplier = theHitLocation.STUNx;
 						}
 						
-						computed = convertStunToBody(results.results.STUN.rolls);
+						computed = convertStunToBody(results.results[dmgType].rolls);
 						theResult[otherDmgType] = computed;
 						theResult.HITLOC = theMessage;
 					}
