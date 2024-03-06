@@ -1795,7 +1795,9 @@
 							</div>
 							<div class ="item-maneuver-block-text">
 								<p>Grab opponent with two limbs with successful attack roll, who may attempt escape. May follow with Squeeze, Slam, or Throw. Both characters are at 1/2 DCV and suffer various OCV penalties.</p>
-								<button type="action" class="button buttonRollAttack" tabindex="-1" name="act_attackTrip" title="@{attackTrip}">Roll</button>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonManeuver" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Grab</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 62</p>
@@ -2028,7 +2030,7 @@
 								<h2>DCV: +0</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Throw object or character. Does STR damage. Damage limited by object PD + BODY.</p>
+								<p>Throw object or character. STR damage limited to object PD plus BODY.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>DC Limit:</p>
 									<input type="number" name="attr_maneuverDCLimit" title="@{maneuverDCLimit}" step="1" min="1" max="20" value="5" tabindex="-1"/>
@@ -11792,15 +11794,38 @@
 				halfDCV = true;
 			} else if (values.maneuverSelection === "strike") {
 				rollMessage = "Strike";
-			} else if ( (values.maneuverSelection === "shove") || (values.maneuverSelection === "throw") ) {
-				if (values.maneuverSelection === "shove") {
-					maneuverOCV = -1;
-					maneuverDCV = -1;
-					
-					rollMessage = "Shove up to " + Math.floor((parseInt(values.strength)||0)/5) + " m";
-				} else {
-					rollMessage = "Throw Object";
+			} else if (values.maneuverSelection === "grab") {
+				rollMessage = "Grab";
+				
+				maneuverOCV = -1;
+				maneuverDCV = -2;
+				
+				noDamage = true;
+				
+				setAttrs({
+					"rangeManeuver":0,
+					"checkSet":0,
+					"checkBrace":0
+				});
+			} else if (values.maneuverSelection === "shove") {
+				maneuverOCV = -1;
+				maneuverDCV = -1;
+				
+				rollMessage = "Shove up to " + Math.floor((parseInt(values.strength)||0)/5) + " m";
+				
+				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
+					isModified = true;
+					adjustedDC = parseInt(values.maneuverDCLimit)||0;
 				}
+				
+				setAttrs({
+					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"rangeManeuver":0,
+					"checkSet":0,
+					"checkBrace":0
+				});
+			} else if (values.maneuverSelection === "throw") {
+				rollMessage = "Throw Object";
 				
 				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
 					isModified = true;
@@ -11845,7 +11870,7 @@
 			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") || (values.maneuverSelection === "throw")) {
 				
 				// First, check to see if this is a ranged attack.
-				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") ) {
+				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") ) {
 					isRangedAttack = false;
 				} else if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet || (values.maneuverSelection === "throw")) {
 					isRangedAttack = true;
@@ -11919,6 +11944,21 @@
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			} else if (values.maneuverSelection === "disarm") {
 				// Initiate Disarm dialog.
+			} else if (values.maneuverSelection === "grab") {
+				// A success drops the attacker's DCV to half.
+				netDCV = heroRoundHigh( (netDCV + maneuverDCV)/2);
+				
+				// Grab Roll
+				theRoll += "&{template:custom} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Grab}} ";
+				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]] or [["+netDCV.toString()+"]]}}";
+				
+				if (dispDoS) {
+					theRoll	+= "{{Grabs DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} ";
+				} else {
+					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
+				}
+				
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "");
 			} else if (values.maneuverSelection === "trip") {
 				theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
 				
