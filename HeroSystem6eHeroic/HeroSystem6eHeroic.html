@@ -1757,7 +1757,24 @@
 								<h2>DCV: +0</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Disarm opponent if attack roll and a Strength vs Strength contest succeed.</p>
+								<p>Disarm opponent if attack roll and a STR vs STR contest succeed. Additional OCV modifiers may apply (0 to -3 for HTH and more for ranged).</p>
+								<div class ="item-maneuver-line">
+									<label class="container-checkbox-small-dark">
+										<input type="checkbox" name="attr_checkBrace">
+										<span class="checkmark-small-dark" title="@{checkBrace}"></span>
+									</label>
+									<p>Brace for +2 RMod at 1/2 DCV.</p>
+								</div>
+								<div class ="item-maneuver-line">
+									<label class="container-checkbox-small-dark">
+										<input type="checkbox" name="attr_checkSet">
+										<span class="checkmark-small-dark" title="@{checkSet}"></span>
+									</label>
+									<p>Set adds +1 OCV to ranged attacks.</p>
+								</div>
+								<div class="item-maneuver-button-line">
+									<button type="action" class="button buttonManeuver" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Unarmed</button>
+								</div>
 							</div>
 							<div class ="item-maneuver-block-source">
 								<p>6E2 60</p>
@@ -10159,13 +10176,19 @@
 					if (values.weaponNormalDamage05 === "on") {
 						weapon05 = "normal";
 					}
-				} else if ((button === "block") || (button === "disarm")) {
+				} else if (button === "block") {
 					weapon01 = "defense";
 					weapon02 = "defense";
 					weapon03 = "defense";
 					weapon04 = "defense";
 					weapon05 = "defense";
-				} else {
+				} else if (button === "disarm") {
+					weapon01 = "maneuver";
+					weapon02 = "maneuver";
+					weapon03 = "maneuver";
+					weapon04 = "maneuver";
+					weapon05 = "maneuver";
+				}else {
 					weapon01 = "override";
 					weapon02 = "override";
 					weapon03 = "override";
@@ -11385,7 +11408,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponStrengthMin"+weaponId,  "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity"], function(values) {
+			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
@@ -11419,6 +11442,8 @@
 				let velocity = parseInt(values["moveVelocity"])||0;
 				let velocityDC = 0;
 				let isDefense = false;
+				let noDamage = false;
+				let targetObject = false;
 
 				// Maneuver message and DCV and damage mods.
 				
@@ -11525,19 +11550,36 @@
 					halfDCV = true;
 				} else if (values.maneuverSelection === "strike") {
 					rollMessage = (isNormalDamage ? "" : "Killing ") + "Strike";
-				} else {
-					isDefense = true;
-					subtractENDAmt = 1;
+				} else if (values.maneuverSelection === "disarm") {
+					rollMessage = "Disarm";
+					
+					maneuverOCV = -2;
+					maneuverDCV = 0;
+					
+					dmgType = "STR";
+					otherDmgType = "PIPS";
+					
+					if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
+						isRangedAttack = true;
+					}
+					
+					targetObject = true;
+					noDamage = true;
+					isModified = true;
+					
+					setAttrs({
+						"hiddenSpecialDamage": isRangedAttack ? getDamageDice(baseDC, 0, true, 1) : values.hiddenBasicDamage
+					});
 				}
 				
 				// Create dice rolling text to send to a roll dialog.
-				if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy")) {
+				if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "disarm")) {
 					// The weapon Roll is a Strike, Multiple Attack, or Haymaker.
 					
 					// First, check to see if this is a ranged attack.
 					if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") ) {
 						isRangedAttack = false;
-					} else if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet) {
+					} else if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
 						isRangedAttack = true;
 						rollMessage = "Ranged " + rollMessage;
 						
@@ -11553,8 +11595,13 @@
 						hasRangePenalty = false;
 					}
 					
-					// If isNormalDamage is TRUE, use the Normal Damage template.
-					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with @{weaponName"+weaponId+"}}} ";
+					if (values.maneuverSelection === "disarm") {
+						theRoll += "&{template:custom-strength} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
+						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
+					} else {
+						// If isNormalDamage is TRUE, use the Normal Damage template.
+						theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
+					}
 					
 					// Character DCV after maneuver.
 					
@@ -11588,10 +11635,13 @@
 						}
 					}
 					
-					theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenWeaponDamage"+weaponId+"}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
-					if (useHitLocations)
+					theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "");
+					theRoll += "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenWeaponDamage"+weaponId+"}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+					
+					if ( (useHitLocations) && (!noDamage) ) {
 						theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
-						
+					}
+					
 				} else if (values.maneuverSelection === "block") {
 					// Blocking Roll
 					theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Blocks with @{weaponName"+weaponId+"}}} ";
@@ -11610,31 +11660,39 @@
 				
 				if (!isDefense) {
 					startRoll(theRoll, (results) => {
+						let theResult = new Object();
+						
 						var computed = parseInt(results.results[dmgType].result)||0;
 						let theMessage = "AOE";
 						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 						
-						
-						// Get hit location message if system used.
-						if (useHitLocations && !areaOfEffect) {
-							let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
-							theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
-							theSTUNMultiplier = theHitLocation.STUNx;
-						}
-						
-						if (isNormalDamage) {
-							// Convert dice roll to equivalent BODY damage.
-							computed = convertStunToBody(results.results.STUN.rolls);
-						} else {
-							theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
-							computed *= theSTUNMultiplier;
+						if (targetObject) {
+							var computed = parseInt(results.results[dmgType].result)||0;
+							let theSTUNMultiplier = Math.floor(Math.random()*3+1);
 							
-							computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+							computed = convertStunToBody(results.results[dmgType].rolls);
+							theResult[otherDmgType] = computed;
+						} else {
+							// Get hit location message if system used.
+							if (useHitLocations && !areaOfEffect) {
+								let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+								theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
+								theSTUNMultiplier = theHitLocation.STUNx;
+							}
+							
+							if (isNormalDamage) {
+								// Convert dice roll to equivalent BODY damage.
+								computed = convertStunToBody(results.results.STUN.rolls);
+							} else {
+								theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
+								computed *= theSTUNMultiplier;
+								
+								computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+							}
+							
+							theResult[otherDmgType] = computed;
+							theResult.HITLOC = theMessage;
 						}
-						
-						let theResult = new Object();
-						theResult[otherDmgType] = computed;
-						theResult.HITLOC = theMessage;
 							
 						// Subtract END cost if option checked.
 						if (values.optionAutoSubtractEND != 0) {
@@ -11913,18 +11971,33 @@
 					"checkSet":0,
 					"checkBrace":0
 				});
-			} else {
-				isDefense = true;
+			} else if (values.maneuverSelection === "disarm") {
+				rollMessage = "Unarmed Disarm";
+				
+				maneuverOCV = -2;
+				maneuverDCV = 0;
+				
+				dmgType = "STR";
+				otherDmgType = "PIPS";
+				
+				targetObject = true;
 				noDamage = true;
-				subtractENDAmt = 1;
+				isModified = true;
+				
+				setAttrs({
+					"hiddenSpecialDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"rangeManeuver":0,
+					"checkSet":0,
+					"checkBrace":0
+				});
 			}
 			
 			
 			// Create dice rolling text to send to a roll dialog.
-			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") || (values.maneuverSelection === "throw")) {
+			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") || (values.maneuverSelection === "throw") || (values.maneuverSelection === "disarm")) {
 				
 				// First, check to see if this is a ranged attack.
-				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") ) {
+				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") || (values.maneuverSelection === "disarm") ) {
 					isRangedAttack = false;
 				} else if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet || (values.maneuverSelection === "throw")) {
 					isRangedAttack = true;
@@ -11945,8 +12018,12 @@
 					hasRangePenalty = false;
 				}
 				
-				// If isNormalDamage is TRUE, use the Normal Damage template.
-				theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with Strength}} ";
+				if (values.maneuverSelection === "disarm") {
+					theRoll += "&{template:custom-strength} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
+				} else {
+					// If isNormalDamage is TRUE, use the Normal Damage template.
+					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with Strength}} ";
+				}
 				
 				// Character DCV after maneuver.
 				if (halfDCV) {
@@ -11980,7 +12057,8 @@
 				}
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenSpecialDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
-				if (useHitLocations) {
+				
+				if ( (useHitLocations) && (!noDamage) ) {
 					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 				}
 				
