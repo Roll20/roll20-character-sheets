@@ -399,3 +399,57 @@ on("clicked:levelup", () =>{
     });
     //console.dir(update);
 });
+
+
+const isJSONString = (string) => {
+	let json= {};
+	try {
+		json = JSON.parse(string);
+	} catch (e) {
+		return false;
+	}
+	return json;
+}
+
+const dropWeapon = (data) => {
+	const updateAttrs = {};
+	const fields = ["weapons", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo"];
+	const UIDD = generateRowID();
+	const prefix=`repeating_weapons_${UIDD}`;
+	for (const field in fields){
+		if (data[`repeating_weapons_${field}`]){
+			updateAttrs[`${prefix}_${field}`] = data[`${prefix}_${field}`];
+		}
+	}
+	console.log(updateAttrs);
+	return updateAttrs;
+}
+
+const getDropType = data => data.Category || false;
+
+const handleDragandDrop = () => {
+	getAttrs(["drop_name","drop_data"], (v) => {
+		const {drop_name, drop_data} = v;
+		if (drop_name==="" || drop_data===""){return;}
+		const dropDataParsed =JSON.parse(drop_data);
+		const dropType = getDropType(dropDataParsed);
+		console.log(dropType);
+		console.log(dropDataParsed);
+		let updateAttrs = (dropType === "Weapons") ? dropWeapon(dropDataParsed[`repeating_weapons`]) : false;
+		console.log(updateAttrs);
+		if (updateAttrs===false) return	console.warn("Drag and drop could not identify the type of drop");
+
+		if (typeof updateAttrs !== "object") return console.warn("Drag and drop returned  broken value");
+
+		updateAttrs = {...updateAttrs, ...{drop_name:"", drop_data:"",drop_category:""}};
+		console.log(updateAttrs);
+		setAttrs(updateAttrs);
+
+	});
+}
+
+on("sheet:compendium-drop", (eventInfo) => {
+	const jsonData = JSON.parse(eventInfo.newValue);
+	console.log(jsonData);
+	// do something with data
+   });
