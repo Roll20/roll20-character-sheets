@@ -7703,103 +7703,112 @@ on("change:repeating_zauber:magieschulen change:hiddenausstrahlungmod change:hid
 
 on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:waffenattr1 change:repeating_nahkampfwaffen:waffenattr2 change:repeating_fernkampfwaffen:waffenskillfern change:repeating_fernkampfwaffen:waffenattr1fern change:repeating_fernkampfwaffen:waffenattr2fern change:handgemengepunkte change:handgemengebonus change:hiebwaffenpunkte change:hiebwaffenbonus change:kettenwaffenpunkte change:kettenwaffenbonus change:klingenwaffenpunkte change:klingenwaffenbonus change:stangenwaffenpunkte change:stangenwaffenbonus change:schusswaffenpunkte change:schusswaffenbonus change:wurfwaffenpunkte change:wurfwaffenbonus change:ausstrahlung change:beweglichkeit change:intuition change:konstitution change:mystik change:staerke change:verstand change:willenskraft change:hiddenausstrahlung change:hiddenbeweglichkeit change:hiddenintuition change:hiddenkonstitution change:hiddenmystik change:hiddenstaerke change:hiddenverstand change:hiddenwillenskraft change:hiddenausstrahlungmod change:hiddenbeweglichkeitmod change:hiddenintuitionmod change:hiddenkonstitutionmod change:hiddenmystikmod change:hiddenstaerkemod change:hiddenverstandmod change:hiddenwillenskraftmod", function() {
     
+   
+    //Globally used Attrs 
+    let baseAttr = getAttrsAsync(["ausstrahlung", "beweglichkeit", "intuition", "konstitution", "mystik", "staerke", "verstand", "willenskraft", "hiddenausstrahlung", "hiddenbeweglichkeit", "hiddenintuition", "hiddenkonstitution", "hiddenmystik", "hiddenstaerke", "hiddenverstand", "hiddenwillenskraft", "hiddenausstrahlungmod", "hiddenbeweglichkeitmod", "hiddenintuitionmod", "hiddenkonstitutionmod", "hiddenmystikmod", "hiddenstaerkemod", "hiddenverstandmod", "hiddenwillenskraftmod"]);
+    let nhkAttr = getAttrsAsync(["handgemengepunkte", "handgemengebonus", "hiebwaffenpunkte", "hiebwaffenbonus", "kettenwaffenpunkte", "kettenwaffenbonus", "klingenwaffenpunkte", "klingenwaffenbonus", "stangenwaffenpunkte", "stangenwaffenbonus"]);
+    let fnkAttr = getAttrsAsync(["schusswaffenpunkte", "schusswaffenbonus", "wurfwaffenpunkte", "wurfwaffenbonus", "bannmagiepunkte", "bannmagiebonus", "beherrschungsmagiepunkte", "beherrschungsmagiebonus", "bewegungsmagiepunkte", "bewegungsmagiebonus", "erkenntnismagiepunkte", "erkenntnismagiebonus", "felsmagiepunkte", "felsmagiebonus", "feuermagiepunkte", "feuermagiebonus", "heilungsmagiepunkte", "heilungsmagiebonus", "illusionsmagiepunkte", "illusionsmagiebonus", "kampfmagiepunkte", "kampfmagiebonus", "lichtmagiepunkte", "lichtmagiebonus", "naturmagiepunkte", "naturmagiebonus", "schattenmagiepunkte", "schattenmagiebonus", "schicksalsmagiepunkte", "schicksalsmagiebonus", "schutzmagiepunkte", "schutzmagiebonus", "staerkungsmagiepunkte", "staerkungsmagiebonus", "todesmagiepunkte", "todesmagiebonus", "verwandlungsmagiepunkte", "verwandlungsmagiebonus", "wassermagiepunkte", "wassermagiebonus", "windmagiepunkte", "windmagiebonus", "arkanekundepunkte", "arkanekundebonus"]);
+
     // Nahkampfwaffen
-    getSectionIDs("repeating_nahkampfwaffen", function(idarray) {
+    getSectionIDs("repeating_nahkampfwaffen", async function(idarray) {
         var temp1 = 0;
         var temp2 = 0;
         var temp3 = 0; 
         if (idarray.length > 0)
         {
-            _.each(idarray, function(currentID, i) {
+            _.each(idarray, async function(currentID, i) {
                 let attrmod = 0;
-                getAttrs(["repeating_nahkampfwaffen_" + currentID +"_waffenskill", "repeating_nahkampfwaffen_" + currentID +"_waffenattr1", "repeating_nahkampfwaffen_" + currentID +"_waffenattr2", "handgemengepunkte", "handgemengebonus", "hiebwaffenpunkte", "hiebwaffenbonus", "kettenwaffenpunkte", "kettenwaffenbonus", "klingenwaffenpunkte", "klingenwaffenbonus", "stangenwaffenpunkte", "stangenwaffenbonus", "ausstrahlung", "beweglichkeit", "intuition", "konstitution", "mystik", "staerke", "verstand", "willenskraft", "hiddenausstrahlung", "hiddenbeweglichkeit", "hiddenintuition", "hiddenkonstitution", "hiddenmystik", "hiddenstaerke", "hiddenverstand", "hiddenwillenskraft", "hiddenausstrahlungmod", "hiddenbeweglichkeitmod", "hiddenintuitionmod", "hiddenkonstitutionmod", "hiddenmystikmod", "hiddenstaerkemod", "hiddenverstandmod", "hiddenwillenskraftmod"], function(v) { 
+                getAttrs(["repeating_nahkampfwaffen_" + currentID +"_waffenskill", "repeating_nahkampfwaffen_" + currentID +"_waffenattr1", "repeating_nahkampfwaffen_" + currentID +"_waffenattr2"], async function(v) { 
+
+                    await Promise.all([baseAttr, nhkAttr]);
+
                     var skill = v["repeating_nahkampfwaffen_" + currentID +"_waffenskill"];
                     var attr1 = v["repeating_nahkampfwaffen_" + currentID +"_waffenattr1"];
                     var attr2 = v["repeating_nahkampfwaffen_" + currentID +"_waffenattr2"];
                     var update = {};
                     switch (skill) {
                         case "hiebwaffen":
-                            temp1 = +v.hiebwaffenpunkte + +v.hiebwaffenbonus;
+                            temp1 = +nhkAttr.hiebwaffenpunkte + +nhkAttr.hiebwaffenbonus;
                             break;
                         case "handgemenge":
-                            temp1 = +v.handgemengepunkte + +v.handgemengebonus;
+                            temp1 = +nhkAttr.handgemengepunkte + +nhkAttr.handgemengebonus;
                             break;
                         case "kettenwaffen":
-                            temp1 = +v.kettenwaffenpunkte + +v.kettenwaffenbonus;
+                            temp1 = +nhkAttr.kettenwaffenpunkte + +nhkAttr.kettenwaffenbonus;
                             break;
                         case "klingenwaffen":
-                            temp1 = +v.klingenwaffenpunkte + +v.klingenwaffenbonus;
+                            temp1 = +nhkAttr.klingenwaffenpunkte + +nhkAttr.klingenwaffenbonus;
                             break;
                         case "stangenwaffen":
-                            temp1 = +v.stangenwaffenpunkte + +v.stangenwaffenbonus;
+                            temp1 = +nhkAttr.stangenwaffenpunkte + +nhkAttr.stangenwaffenbonus;
                             break; 
                     }
                     switch (attr1) {
                         case "aus":
-                            temp2 = +v.ausstrahlung + +v.hiddenausstrahlung;
-                            attrmod += v.hiddenausstrahlungmod;
+                            temp2 = +baseAttr.ausstrahlung + +baseAttr.hiddenausstrahlung;
+                            attrmod += baseAttr.hiddenausstrahlungmod;
                             break;
                         case "bew":
-                            temp2 = +v.beweglichkeit + +v.hiddenbeweglichkeit;
-                            attrmod += v.hiddenbeweglichkeitmod;
+                            temp2 = +baseAttr.beweglichkeit + +baseAttr.hiddenbeweglichkeit;
+                            attrmod += baseAttr.hiddenbeweglichkeitmod;
                             break;
                         case "int":
-                            temp2 = +v.intuition + +v.hiddenintuition; 
-                            attrmod += v.hiddenintuitionmod;
+                            temp2 = +baseAttr.intuition + +baseAttr.hiddenintuition; 
+                            attrmod += baseAttr.hiddenintuitionmod;
                             break;
                         case "kon":
-                            temp2 = +v.konstitution + +v.hiddenkonstitution; 
-                            attrmod += v.hiddenkonstitutionmod;
+                            temp2 = +baseAttr.konstitution + +baseAttr.hiddenkonstitution; 
+                            attrmod += baseAttr.hiddenkonstitutionmod;
                             break;
                         case "mys":
-                            temp2 = +v.mystik + +v.hiddenmystik; 
-                            attrmod += v.hiddenmystikmod;
+                            temp2 = +baseAttr.mystik + +baseAttr.hiddenmystik; 
+                            attrmod += baseAttr.hiddenmystikmod;
                             break;
                         case "stae":
-                            temp2 = +v.staerke + +v.hiddenstaerke; 
-                            attrmod += v.hiddenstaerkemod
+                            temp2 = +baseAttr.staerke + +baseAttr.hiddenstaerke; 
+                            attrmod += baseAttr.hiddenstaerkemod
                             break;
                         case "ver":
-                            temp2 = +v.verstand + +v.hiddenverstand; 
-                            attrmod += v.hiddenverstandmod;
+                            temp2 = +baseAttr.verstand + +baseAttr.hiddenverstand; 
+                            attrmod += baseAttr.hiddenverstandmod;
                             break;
                         case "wil":
-                            temp2 = +v.willenskraft + +v.hiddenwillenskraft;
-                            attrmod += v.hiddenwillenskraftmod;
+                            temp2 = +baseAttr.willenskraft + +baseAttr.hiddenwillenskraft;
+                            attrmod += baseAttr.hiddenwillenskraftmod;
                             break;
                     }
                     switch (attr2) {
                         case "aus":
-                            temp3 = +v.ausstrahlung + +v.hiddenausstrahlung;
-                            attrmod += v.hiddenausstrahlungmod;
+                            temp3 = +baseAttr.ausstrahlung + +baseAttr.hiddenausstrahlung;
+                            attrmod += baseAttr.hiddenausstrahlungmod;
                             break;
                         case "bew":
-                            temp3 = +v.beweglichkeit + +v.hiddenbeweglichkeit;
-                            attrmod += v.hiddenbeweglichkeitmod;
+                            temp3 = +baseAttr.beweglichkeit + +baseAttr.hiddenbeweglichkeit;
+                            attrmod += baseAttr.hiddenbeweglichkeitmod;
                             break;
                         case "int":
-                            temp3 = +v.intuition + +v.hiddenintuition;
-                            attrmod += v.hiddenintuitionmod;
+                            temp3 = +baseAttr.intuition + +baseAttr.hiddenintuition;
+                            attrmod += baseAttr.hiddenintuitionmod;
                             break;
                         case "kon":
-                            temp3 = +v.konstitution + +v.hiddenkonstitution; 
-                            attrmod += v.hiddenkonstitutionmod;
+                            temp3 = +baseAttr.konstitution + +baseAttr.hiddenkonstitution; 
+                            attrmod += baseAttr.hiddenkonstitutionmod;
                             break;
                         case "mys":
-                            temp3 = +v.mystik + +v.hiddenmystik;
-                            attrmod += v.hiddenmystikmod;
+                            temp3 = +baseAttr.mystik + +baseAttr.hiddenmystik;
+                            attrmod += baseAttr.hiddenmystikmod;
                             break;
                         case "stae":
-                            temp3 = +v.staerke + +v.hiddenstaerke; 
-                            attrmod += v.hiddenstaerkemod
+                            temp3 = +baseAttr.staerke + +baseAttr.hiddenstaerke; 
+                            attrmod += baseAttr.hiddenstaerkemod
                             break;
                         case "ver":
-                            temp3 = +v.verstand + +v.hiddenverstand;
-                            attrmod += v.hiddenverstandmod;
+                            temp3 = +baseAttr.verstand + +baseAttr.hiddenverstand;
+                            attrmod += baseAttr.hiddenverstandmod;
                             break;
                         case "wil":
-                            temp3 = +v.willenskraft + +v.hiddenwillenskraft;
-                            attrmod += v.hiddenwillenskraftmod;
+                            temp3 = +baseAttr.willenskraft + +baseAttr.hiddenwillenskraft;
+                            attrmod += baseAttr.hiddenwillenskraftmod;
                             break;
                     }
                     update["repeating_nahkampfwaffen_" + currentID + "_waffenwert"] = +temp1 + +temp2 + +temp3;
@@ -7811,7 +7820,7 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
     });
     
     // Fernkampfwaffen
-    getSectionIDs("repeating_fernkampfwaffen", function(idarray) {
+    getSectionIDs("repeating_fernkampfwaffen", async function(idarray) {
         var temp1 = 0;
         var temp2 = 0;
         var temp3 = 0; 
@@ -7819,7 +7828,10 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
         {
             _.each(idarray, function(currentID, i) {
                 let attrmod = 0;
-                getAttrs(["repeating_fernkampfwaffen_" + currentID +"_waffenskillfern", "repeating_fernkampfwaffen_" + currentID +"_waffenattr1fern", "repeating_fernkampfwaffen_" + currentID +"_waffenattr2fern", "schusswaffenpunkte", "schusswaffenbonus", "wurfwaffenpunkte", "wurfwaffenbonus", "ausstrahlung", "beweglichkeit", "intuition", "konstitution", "mystik", "staerke", "verstand", "willenskraft", "hiddenausstrahlung", "hiddenbeweglichkeit", "hiddenintuition", "hiddenkonstitution", "hiddenmystik", "hiddenstaerke", "hiddenverstand", "hiddenwillenskraft", "hiddenausstrahlungmod", "hiddenbeweglichkeitmod", "hiddenintuitionmod", "hiddenkonstitutionmod", "hiddenmystikmod", "hiddenstaerkemod", "hiddenverstandmod", "hiddenwillenskraftmod", "bannmagiepunkte", "bannmagiebonus", "beherrschungsmagiepunkte", "beherrschungsmagiebonus", "bewegungsmagiepunkte", "bewegungsmagiebonus", "erkenntnismagiepunkte", "erkenntnismagiebonus", "felsmagiepunkte", "felsmagiebonus", "feuermagiepunkte", "feuermagiebonus", "heilungsmagiepunkte", "heilungsmagiebonus", "illusionsmagiepunkte", "illusionsmagiebonus", "kampfmagiepunkte", "kampfmagiebonus", "lichtmagiepunkte", "lichtmagiebonus", "naturmagiepunkte", "naturmagiebonus", "schattenmagiepunkte", "schattenmagiebonus", "schicksalsmagiepunkte", "schicksalsmagiebonus", "schutzmagiepunkte", "schutzmagiebonus", "staerkungsmagiepunkte", "staerkungsmagiebonus", "todesmagiepunkte", "todesmagiebonus", "verwandlungsmagiepunkte", "verwandlungsmagiebonus", "wassermagiepunkte", "wassermagiebonus", "windmagiepunkte", "windmagiebonus", "arkanekundepunkte", "arkanekundebonus"], function(v) { 
+                getAttrs(["repeating_fernkampfwaffen_" + currentID +"_waffenskillfern", "repeating_fernkampfwaffen_" + currentID +"_waffenattr1fern", "repeating_fernkampfwaffen_" + currentID +"_waffenattr2fern"], async function(v) { 
+
+                    await Promise.all([baseAttr, fnkAttr]);
+
                     var skill = v["repeating_fernkampfwaffen_" + currentID +"_waffenskillfern"];
                     var attr1 = v["repeating_fernkampfwaffen_" + currentID +"_waffenattr1fern"];
                     var attr2 = v["repeating_fernkampfwaffen_" + currentID +"_waffenattr2fern"];
@@ -7827,82 +7839,82 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
                     var update = {};
                     var attrupdate = {};
                     if (skill == "schusswaffen") {
-                        temp1 = +v.schusswaffenpunkte + +v.schusswaffenbonus;
+                        temp1 = +fnkAttr.schusswaffenpunkte + +fnkAttr.schusswaffenbonus;
                     } else if (skill == "wurfwaffen") {
-                        temp1 = +v.wurfwaffenpunkte + +v.wurfwaffenbonus;
+                        temp1 = +fnkAttr.wurfwaffenpunkte + +fnkAttr.wurfwaffenbonus;
                     } else {
                         switch(skill) {
                             case "arkanekunde":
-                                temp1 = +v.arkanekundepunkte + +v.arkanekundebonus;
+                                temp1 = +fnkAttr.arkanekundepunkte + +fnkAttr.arkanekundebonus;
                                 setattr2 = "ver";
                             break;
                             case "bannmagie":
-                                temp1 = +v.bannmagiepunkte + +v.bannmagiebonus;
+                                temp1 = +fnkAttr.bannmagiepunkte + +fnkAttr.bannmagiebonus;
                                 setattr2 = "wil";
                             break;
                             case "beherrschungsmagie":
-                                temp1 = +v.beherrschungsmagiepunkte + +v.beherrschungsmagiebonus;
+                                temp1 = +fnkAttr.beherrschungsmagiepunkte + +fnkAttr.beherrschungsmagiebonus;
                                 setattr2 = "wil";
                                 break;
                             case "bewegungsmagie":
-                                temp1 = +v.bewegungsmagiepunkte + +v.bewegungsmagiebonus;
+                                temp1 = +fnkAttr.bewegungsmagiepunkte + +fnkAttr.bewegungsmagiebonus;
                                 setattr2 = "bew";
                                 break;
                             case "erkenntnismagie":
-                                temp1 = +v.erkenntnismagiepunkte + +v.erkenntnismagiebonus;
+                                temp1 = +fnkAttr.erkenntnismagiepunkte + +fnkAttr.erkenntnismagiebonus;
                                 setattr2 = "ver";
                                 break;
                             case "felsmagie":
-                                temp1 = +v.felsmagiepunkte + +v.felsmagiebonus;
+                                temp1 = +fnkAttr.felsmagiepunkte + +fnkAttr.felsmagiebonus;
                                 setattr2 = "kon";
                                 break;
                             case "feuermagie":
-                                temp1 = +v.feuermagiepunkte + +v.feuermagiebonus;
+                                temp1 = +fnkAttr.feuermagiepunkte + +fnkAttr.feuermagiebonus;
                                 break;
                             case "heilungsmagie":
-                                temp1 = +v.heilungsmagiepunkte + +v.heilungsmagiebonus;
+                                temp1 = +fnkAttr.heilungsmagiepunkte + +fnkAttr.heilungsmagiebonus;
                                 break;
                             case "illusionsmagie":
-                                temp1 = +v.illusionsmagiepunkte + +v.illusionsmagiebonus;
+                                temp1 = +fnkAttr.illusionsmagiepunkte + +fnkAttr.illusionsmagiebonus;
                                 break;
                             case "kampfmagie":
-                                temp1 = +v.kampfmagiepunkte + +v.kampfmagiebonus;
+                                temp1 = +fnkAttr.kampfmagiepunkte + +fnkAttr.kampfmagiebonus;
                                 setattr2 = "stae";
                                 break;
                             case "lichtmagie":
-                                temp1 = +v.lichtmagiepunkte + +v.lichtmagiebonus;
+                                temp1 = +fnkAttr.lichtmagiepunkte + +fnkAttr.lichtmagiebonus;
                                 break;
                             case "naturmagie":
-                                temp1 = +v.naturmagiepunkte + +v.naturmagiebonus;
+                                temp1 = +fnkAttr.naturmagiepunkte + +fnkAttr.naturmagiebonus;
                                 break;
                             case "schattenmagie":
-                                temp1 = +v.schattenmagiepunkte + +v.schattenmagiebonus;
+                                temp1 = +fnkAttr.schattenmagiepunkte + +fnkAttr.schattenmagiebonus;
                                 setattr2 = "int";
                                 break;
                             case "schicksalsmagie":
-                                temp1 = +v.schicksalsmagiepunkte + +v.schicksalsmagiebonus;
+                                temp1 = +fnkAttr.schicksalsmagiepunkte + +fnkAttr.schicksalsmagiebonus;
                                 break;
                             case "schutzmagie":
-                                temp1 = +v.schutzmagiepunkte + +v.schutzmagiebonus;
+                                temp1 = +fnkAttr.schutzmagiepunkte + +fnkAttr.schutzmagiebonus;
                                 break;
                             case "staerkungsmagie":
-                                temp1 = +v.staerkungsmagiepunkte + +v.staerkungsmagiebonus;
+                                temp1 = +fnkAttr.staerkungsmagiepunkte + +fnkAttr.staerkungsmagiebonus;
                                 setattr2 = "stae";
                                 break;
                             case "todesmagie":
-                                temp1 = +v.todesmagiepunkte + +v.todesmagiebonus;
+                                temp1 = +fnkAttr.todesmagiepunkte + +fnkAttr.todesmagiebonus;
                                 setattr2 = "ver";
                                 break;
                             case "verwandlungsmagie":
-                                temp1 = +v.verwandlungsmagiepunkte + +v.verwandlungsmagiebonus;
+                                temp1 = +fnkAttr.verwandlungsmagiepunkte + +fnkAttr.verwandlungsmagiebonus;
                                 setattr2 = "kon";
                                 break;
                             case "wassermagie":
-                                temp1 = +v.wassermagiepunkte + +v.wassermagiebonus;
+                                temp1 = +fnkAttr.wassermagiepunkte + +fnkAttr.wassermagiebonus;
                                 setattr2 = "int";
                                 break;
                             case "windmagie":
-                                temp1 = +v.windmagiepunkte + +v.windmagiebonus;
+                                temp1 = +fnkAttr.windmagiepunkte + +fnkAttr.windmagiebonus;
                                 setattr2 = "ver";
                                 break;
                         }    
@@ -7912,70 +7924,70 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
                     }
                     switch (attr1) {
                         case "aus":
-                            temp2 = +v.ausstrahlung + +v.hiddenausstrahlung;
-                            attrmod += v.hiddenausstrahlungmod;
+                            temp2 = +baseAttr.ausstrahlung + +baseAttr.hiddenausstrahlung;
+                            attrmod += baseAttr.hiddenausstrahlungmod;
                             break;
                         case "bew":
-                            temp2 = +v.beweglichkeit + +v.hiddenbeweglichkeit;
-                            attrmod += v.hiddenbeweglichkeitmod;
+                            temp2 = +baseAttr.beweglichkeit + +baseAttr.hiddenbeweglichkeit;
+                            attrmod += baseAttr.hiddenbeweglichkeitmod;
                             break;
                         case "int":
-                            temp2 = +v.intuition + +v.hiddenintuition; 
-                            attrmod += v.hiddenintuitionmod;
+                            temp2 = +baseAttr.intuition + +baseAttr.hiddenintuition; 
+                            attrmod += baseAttr.hiddenintuitionmod;
                             break;
                         case "kon":
-                            temp2 = +v.konstitution + +v.hiddenkonstitution; 
-                            attrmod += v.hiddenkonstitutionmod;
+                            temp2 = +baseAttr.konstitution + +baseAttr.hiddenkonstitution; 
+                            attrmod += baseAttr.hiddenkonstitutionmod;
                             break;
                         case "mys":
-                            temp2 = +v.mystik + +v.hiddenmystik; 
-                            attrmod += v.hiddenmystikmod;
+                            temp2 = +baseAttr.mystik + +baseAttr.hiddenmystik; 
+                            attrmod += baseAttr.hiddenmystikmod;
                             break;
                         case "stae":
-                            temp2 = +v.staerke + +v.hiddenstaerke; 
-                            attrmod += v.hiddenstaerkemod
+                            temp2 = +baseAttr.staerke + +baseAttr.hiddenstaerke; 
+                            attrmod += baseAttr.hiddenstaerkemod
                             break;
                         case "ver":
-                            temp2 = +v.verstand + +v.hiddenverstand; 
-                            attrmod += v.hiddenverstandmod;
+                            temp2 = +baseAttr.verstand + +baseAttr.hiddenverstand; 
+                            attrmod += baseAttr.hiddenverstandmod;
                             break;
                         case "wil":
-                            temp2 = +v.willenskraft + +v.hiddenwillenskraft;
-                            attrmod += v.hiddenwillenskraftmod;
+                            temp2 = +baseAttr.willenskraft + +baseAttr.hiddenwillenskraft;
+                            attrmod += baseAttr.hiddenwillenskraftmod;
                             break;
                     }
                     switch (attr2) {
                         case "aus":
-                            temp3 = +v.ausstrahlung + +v.hiddenausstrahlung;
-                            attrmod += v.hiddenausstrahlungmod;
+                            temp3 = +baseAttr.ausstrahlung + +baseAttr.hiddenausstrahlung;
+                            attrmod += baseAttr.hiddenausstrahlungmod;
                             break;
                         case "bew":
-                            temp3 = +v.beweglichkeit + +v.hiddenbeweglichkeit;
-                            attrmod += v.hiddenbeweglichkeitmod;
+                            temp3 = +baseAttr.beweglichkeit + +baseAttr.hiddenbeweglichkeit;
+                            attrmod += baseAttr.hiddenbeweglichkeitmod;
                             break;
                         case "int":
-                            temp3 = +v.intuition + +v.hiddenintuition;
-                            attrmod += v.hiddenintuitionmod;
+                            temp3 = +baseAttr.intuition + +baseAttr.hiddenintuition;
+                            attrmod += baseAttr.hiddenintuitionmod;
                             break;
                         case "kon":
-                            temp3 = +v.konstitution + +v.hiddenkonstitution; 
-                            attrmod += v.hiddenkonstitutionmod;
+                            temp3 = +baseAttr.konstitution + +baseAttr.hiddenkonstitution; 
+                            attrmod += baseAttr.hiddenkonstitutionmod;
                             break;
                         case "mys":
-                            temp3 = +v.mystik + +v.hiddenmystik;
-                            attrmod += v.hiddenmystikmod;
+                            temp3 = +baseAttr.mystik + +baseAttr.hiddenmystik;
+                            attrmod += baseAttr.hiddenmystikmod;
                             break;
                         case "stae":
-                            temp3 = +v.staerke + +v.hiddenstaerke; 
-                            attrmod += v.hiddenstaerkemod
+                            temp3 = +baseAttr.staerke + +baseAttr.hiddenstaerke; 
+                            attrmod += baseAttr.hiddenstaerkemod
                             break;
                         case "ver":
-                            temp3 = +v.verstand + +v.hiddenverstand;
-                            attrmod += v.hiddenverstandmod;
+                            temp3 = +baseAttr.verstand + +baseAttr.hiddenverstand;
+                            attrmod += baseAttr.hiddenverstandmod;
                             break;
                         case "wil":
-                            temp3 = +v.willenskraft + +v.hiddenwillenskraft;
-                            attrmod += v.hiddenwillenskraftmod;
+                            temp3 = +baseAttr.willenskraft + +baseAttr.hiddenwillenskraft;
+                            attrmod += baseAttr.hiddenwillenskraftmod;
                             break;
                     }
                     update["repeating_fernkampfwaffen_" + currentID + "_waffenwertfern"] = +temp1 + +temp2 + +temp3;
