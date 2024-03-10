@@ -86,9 +86,6 @@ GCS HTML Template v1
   "SuperJumpPoints": 0.0,
   "SpellBonus": 0.0,
   "CombatReflexes": "{{range .Traits}}{{if eq .Description "Combat Reflexes"}}true{{end}}{{end}}",
-  "Traits": "{{range .Traits }}{{$tags := join .Tags ", " -}}
-Description: {{.Description}} | Notes: {{.Notes}} | Points: {{.Points}} | Type: {{.Type}} | Tags: {{$tags}}
-{{end -}}",
   "RepeatingLanguages": [{{range $i, $v := .Traits}}{{if contains .Description "Language:" }}
     {
       "Idkey": "{{.ID}}",
@@ -148,4 +145,119 @@ Description: {{.Description}} | Notes: {{.Notes}} | Points: {{.Points}} | Type: 
     },{{end}}{{end}}
   ],
   "RepeatingRacial": [],
+  "RepeatingSkills": [{{range .Skills}}{{$tags := join .Tags ", "}}{{if not (contains $tags "Technique")}}
+    {
+      "Idkey": "{{.ID}}",
+      "Name": "{{.Description}}",
+      "Tl": "",
+      "Base": "{{if contains .Difficulty "ST"}}@{strength}{{else if contains .Difficulty "DX"}}@{dexterity}{{else if contains .Difficulty "IQ"}}@{intelligence}{{else if contains .Difficulty "HT"}}@{health}{{else if contains .Difficulty "Will"}}@{willpower}{{else if contains .Difficulty "Per"}}@{perception}{{else}}10{{end}}",
+      "Difficulty": "{{if contains .Difficulty "/E"}}E{{else if contains .Difficulty "/A"}}A{{else if contains .Difficulty "/H"}}H{{else if contains .Difficulty "/VH"}}VH{{else if contains .Difficulty "/WC"}}WC{{else}}A{{end}}",
+      "Bonus": 0,
+      "Points": {{.Points}},
+      "Skill": {{.Level}},
+      "Ref": "{{.PageRef}}",
+      "SkillModNotes": "",
+      "Notes": "{{.Notes}}\n{{.ModifierNotes}}"
+    },{{end}}{{end}}
+  ],
+  "RepeatingTechniquesrevised": [{{range .Skills}}{{$tags := join .Tags ", "}}{{if (contains $tags "Technique")}}
+    {
+      "Idkey": "{{.ID}}",
+      "Name": "{{.Description}}",
+      "Parent": "",
+      "BaseLevel": "0",
+      "Default": 0.0,
+      "MaxModifier": 0.0,
+      "Difficulty": "{{.Difficulty}}",
+      "SkillModifier": 0.0,
+      "Points": {{.Points}},
+      "Skill": {{.Level}},
+      "Ref": "{{.PageRef}}",
+      "SkillModNotes": "",
+      "Notes": "{{.Notes}}\n{{.ModifierNotes}}"
+    },{{end}}{{end}}
+  ],
+  "RepeatingDefense": [{{range $i, $me := .MeleeWeapons}}{{if not (eq $me.Parry "No")}}
+    {
+      "Idkey": "MeleeWapon-{{$i}}",
+      "Name": "{{.Description}}",
+      "Type": "Parry",
+      "Info": "",
+      "Skill": {{.Parry}},
+      "SkillMod": 0.0,
+      "DefenseModReason": "",
+      "InfoDescription": ""
+    },{{end}}{{end}}
+  ],
+  "RepeatingMelee": [{{range $i, $me := .MeleeWeapons}}
+    {{$damageDesc := replace .Damage "d" "d6" -}}
+    {
+      "Idkey": "MeleeWapon-{{$i}}",
+      "Name": "{{.Description}} ({{.Usage}})",
+      "Damage": "{{if contains .Damage " cr"}}{{replace $damageDesc " cr" ""}}{{else if contains .Damage " pi"}}{{replace $damageDesc " pi" ""}}{{else if contains .Damage " imp"}}{{replace $damageDesc " imp" ""}}{{else if contains .Damage " cut"}}{{replace $damageDesc " cut" ""}}{{else if contains .Damage " burn"}}{{replace $damageDesc " burn" ""}}{{else if contains .Damage " tox"}}{{replace $damageDesc " tox" ""}}{{else if contains .Damage " aff"}}{{replace $damageDesc " aff" ""}}{{else if contains .Damage " cor"}}{{replace $damageDesc " cor" ""}}{{else if contains .Damage " fat"}}{{replace $damageDesc " fat" ""}}{{else if contains .Damage " spec"}}{{replace $damageDesc " spec" ""}}{{else}}{{$damageDesc}}{{end}}",
+      "Type": "{{if contains .Damage " cr"}}cr{{else if contains .Damage " pi"}}pi{{else if contains .Damage " imp"}}imp{{else if contains .Damage " cut"}}cut{{else if contains .Damage " burn"}}burn{{else if contains .Damage " tox"}}tox{{else if contains .Damage " aff"}}aff{{else if contains .Damage " cor"}}cor{{else if contains .Damage " fat"}}fat{{else if contains .Damage " spec"}}spec{{else}}cr{{end}}",
+      "Reach": "{{.Reach}}",
+      "Skill": {{.Level}},
+      "ArmorDivisor": 1,
+      "Notes": "{{.Notes}}\nMinimum ST: {{.Strength}}",
+      "Block": "{{.Block}}",
+      "Parry": "{{.Parry}}"
+    },{{end}}
+  ],
+  "RepeatingRanged": [{{range $i, $me := .RangedWeapons}}
+    {{$damageDesc := replace .Damage "d" "d6" -}}
+    {
+      "Idkey": "RangedWeapon-{{$i}}",
+      "Name": "{{.Description}}",
+      "Damage": "{{if contains .Damage " cr"}}{{replace $damageDesc " cr" ""}}{{else if contains .Damage " pi"}}{{replace $damageDesc " pi" ""}}{{else if contains .Damage " imp"}}{{replace $damageDesc " imp" ""}}{{else if contains .Damage " cut"}}{{replace $damageDesc " cut" ""}}{{else if contains .Damage " burn"}}{{replace $damageDesc " burn" ""}}{{else if contains .Damage " tox"}}{{replace $damageDesc " tox" ""}}{{else if contains .Damage " aff"}}{{replace $damageDesc " aff" ""}}{{else if contains .Damage " cor"}}{{replace $damageDesc " cor" ""}}{{else if contains .Damage " fat"}}{{replace $damageDesc " fat" ""}}{{else if contains .Damage " spec"}}{{replace $damageDesc " spec" ""}}{{else}}{{$damageDesc}}{{end}}",
+      "Type": "{{if contains .Damage " cr"}}cr{{else if contains .Damage " pi"}}pi{{else if contains .Damage " imp"}}imp{{else if contains .Damage " cut"}}cut{{else if contains .Damage " burn"}}burn{{else if contains .Damage " tox"}}tox{{else if contains .Damage " aff"}}aff{{else if contains .Damage " cor"}}cor{{else if contains .Damage " fat"}}fat{{else if contains .Damage " spec"}}spec{{else}}cr{{end}}",
+      "Acc": "{{.Accuracy}}",
+      "Range": "{{.Range}}",
+      "Rof": "{{.RateOfFire }}",
+      "Shots": "{{.Shots}}",
+      "Bulk": "{{.Bulk}}",
+      "Recoil": "{{.Recoil}}",
+      "Skill": {{.Level}},
+      "Malfunction": false,
+      "MalfunctionVerify": false,
+      "MalfunctionVeryReliable": false,
+      "ArmorDivisor": "1",
+      "Notes": "{{.Notes}}\nMinimum ST: {{.Strength}}"
+    },{{end}}
+  ],
+  "RepeatingItem": [{{range .Equipment.Carried}}
+    {
+      "Idkey": "{{.ID}}",
+      "Name": "{{.Description}}",
+      "Tl": "{{.TechLevel}}",
+      "LegalityClass": "{{.LegalityClass}}",
+      "Ref": "{{.PageRef}}",
+      "Count": {{.Quantity}},
+      "Cost": {{.Cost}},
+      "Weight": "{{replace .Weight " lb" ""}}",
+      "Carried": "{{if .Equipped}}1{{else}}0{{end}}",
+      "Notes": "{{.Notes}}\n{{.ModifierNotes}}\nUses: {{.Uses}}\nMax Uses: {{.MaxUses}}\nType: {{.Type}}"
+    },{{end}}
+  ],
+  "RepeatingSpells": [{{range .Spells}}
+    {
+      "Idkey": "{{.ID}}",
+      "Name": "{{.Description }}",
+      "Difficulty": "{{if contains .Difficulty "/E"}}E{{else if contains .Difficulty "/A"}}A{{else if contains .Difficulty "/H"}}H{{else if contains .Difficulty "/VH"}}VH{{else if contains .Difficulty "/WC"}}WC{{else}}A{{end}}",
+      "SpellModifier": 0,
+      "Points": {{.Points}},
+      "SpellResistedBy": "{{.Resist}}",
+      "Duration": "{{.Duration}}",
+      "Cost": "{{.Mana}}",
+      "Skill": {{.Level}},
+      "Ref": "{{.PageRef}}",
+      "Casttime": "{{.TimeToCast}}",
+      "Maintain": "",
+      "SpellClass": "{{.Class}}",
+      "SpellCollege": "{{range $i, $c := .Colleges}}{{if eq $i 0}}{{.}}{{end}}{{end}}",
+      "SpellCollegeSecondary": "{{range $i, $c := .Colleges}}{{if gt $i 0}}{{.}}{{end}}{{end}}",
+      "SpellModNotes": "",
+      "SpellNotes": "{{.Notes}}\nRituals: {{.Rituals}}\nType: {{.Type}}"
+    },{{end}}
+  ]
 }
