@@ -249,14 +249,16 @@ GCS Text Template v1
       "Points": {{.Points}},
       "SpellResistedBy": {{printf "%q" .Resist}},
       "Duration": {{printf "%q" .Duration}},
-      "Cost": {{printf "%q" .Mana}},
+      "Cost": {{printf "%q" .Mana.Cast}},
       "Skill": {{.Level}},
       "Ref": {{printf "%q" .PageRef}},
       "Casttime": "{{.TimeToCast}}",
-      "Maintain": "",
+      "Maintain": {{printf "%q" .Mana.Maintain}},
       "SpellClass": {{printf "%q" .Class}},
-      "SpellCollege": {{printf "%q" (range $i, $c := .Colleges)}}{{if eq $i 0}}{{.}}{{end}}{{end}},
-      "SpellCollegeSecondary": {{printf "%q" (range $i, $c := .Colleges)}}{{if gt $i 0}}{{.}}{{end}}{{end}},
+      {{range $i, $c := .Colleges}}{{if eq $i 0}}"SpellCollege": {{printf "%q" .}}{{end}}{{end}},
+      {{if ge (len .Colleges) 2 -}}
+        {{range $i, $c := .Colleges}}{{if eq $i 1}}"SpellCollegeSecondary": {{printf "%q" .}}{{end}}{{end}},
+      {{end -}}
       "SpellModNotes": "",
       "SpellNotes": {{printf "%q" (print .Notes "\\nRituals: " .Rituals "\\nType: " .Type)}}
     },{{end}}
