@@ -1,4 +1,4 @@
-GCS HTML Template v1
+GCS Text Template v1
 {
   "CharacterName": "{{.Name}}",
   "Fullname": "{{.Name}}",
@@ -21,10 +21,10 @@ GCS HTML Template v1
   "CostOfLiving": 0,
   "Stash": 0,
   "Age": "{{.Age}}",
-  "Height": "{{.Height}}",
+  "Height": {{printf "%q" .Height}},
   "Weight": "0",
   "Appearance": "{{range .Traits}}{{if eq .Description "Appearance"}}{{.Points}}{{end}}{{end}}",
-  "GeneralAppearance": "Body Type: {{.BodyType.Name}}. Hair: {{.Hair}}. Eyes: {{.Eyes}}. Skin: {{.Skin}}. Handedness: {{.Handedness}}. Weight: {{.Weight}}.",
+  "GeneralAppearance": {{printf "%q" (print "Body Type: " .BodyType.Name ". Hair: " .Hair ". Eyes: " .Eyes ". Skin: " .Skin ". Handedness: " .Handedness ". Weight: " .Weight)}},
   "StrengthMod": 0,
   "StrengthPoints": "{{range .Attributes.Primary}}{{if eq .Name "ST"}}{{.Points}}{{end}}{{end}}",
   "DexterityMod": 0.0,
@@ -89,7 +89,7 @@ GCS HTML Template v1
   "RepeatingLanguages": [{{range $i, $v := .Traits}}{{if contains .Description "Language:" }}
     {
       "Idkey": "{{.ID}}",
-      "Language": "{{trimPrefix .Description "Language: "}} {{.Points}} points",
+      "Name": {{printf "%q" (print (trimPrefix .Description "Language: ") " " .Points " points")}},
       "Spoken": 0.0,
       "Written": 0.0,
       "IsNative": {{if eq .Points 0}}true{{else}}false{{end}}
@@ -98,72 +98,73 @@ GCS HTML Template v1
   "RepeatingCultures": [{{range $i, $v := .Traits}}{{if contains .Description "Cultural Familiarity (" }}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{$c := trimPrefix .Description "Cultural Familiarity ("}}{{trimSuffix $c ")"}}",
+      "Name": {{printf "%q" (trimSuffix (trimPrefix .Description "Cultural Familiarity (") ")")}},
       "Points": {{.Points}}
     },{{end}}{{end}}
   ],
   "RepeatingTraits": [{{range .Traits}}{{$tags := join .Tags ", "}}{{if and (eq .Type "item") (gt .Points 0) (not (contains $tags "Perk")) (not (contains .Description "Language:")) (not (contains .Description "Cultural Familiarity ("))}}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "TraitLevel": 0,
       "Foa": "",
       "Points": {{.Points}},
-      "Ref": "{{.PageRef}}",
-      "Notes": "{{.Notes}}\n{{.UserDescription}}"
+      "Ref": {{printf "%q" .PageRef}},
+      "Notes": {{printf "%q" (print .Notes "\n" .UserDescription)}}
     },{{end}}{{end}}
   ],
   "RepeatingPerks": [{{range .Traits}}{{$tags := join .Tags ", "}}{{if and (eq .Type "item") (contains $tags "Perk")}}
     {
         "Idkey": "{{.ID}}",
-        "Name": "{{.Description}}",
+        "Name": {{printf "%q" .Description}},
         "Foa": "",
         "Points": {{.Points}},
-        "Ref": "{{.PageRef}}",
-        "Notes": "{{.Notes}}\n{{.UserDescription}}"
+        "Ref": {{printf "%q" .PageRef}},
+        "Notes": {{printf "%q" (print .Notes "\n" .UserDescription)}}
     },{{end}}{{end}}
   ],
   "RepeatingQuirks": [{{range .Traits}}{{$tags := join .Tags ", "}}{{if and (eq .Type "item") (contains $tags "Quirk")}}
     {
         "Idkey": "{{.ID}}",
-        "Name": "{{.Description}}",
+        "Name": {{printf "%q" .Description}},
         "Foa": "",
         "Points": {{.Points}},
-        "Ref": "{{.PageRef}}",
-        "Notes": "{{.Notes}}\n{{.UserDescription}}"
+        "Ref": {{printf "%q" .PageRef}},
+        "Notes": {{printf "%q" (print .Notes "\n" .UserDescription)}}
     },{{end}}{{end}}
   ],
   "RepeatingDisadvantages": [{{range .Traits}}{{$tags := join .Tags ", "}}{{if and (eq .Type "item") (lt .Points 0) (not (contains $tags "Quirk"))}}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "TraitLevel": 0,
       "Foa": "",
+      "ControlRating": "",
       "Points": {{.Points}},
-      "Ref": "{{.PageRef}}",
-      "Notes": "{{.Notes}}\n{{.UserDescription}}"
+      "Ref": {{printf "%q" .PageRef}},
+      "Notes": {{printf "%q" (print .Notes "\n" .UserDescription)}}
     },{{end}}{{end}}
   ],
   "RepeatingRacial": [],
   "RepeatingSkills": [{{range .Skills}}{{$tags := join .Tags ", "}}{{if not (contains $tags "Technique")}}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "Tl": "",
       "Base": "{{if contains .Difficulty "ST"}}@{strength}{{else if contains .Difficulty "DX"}}@{dexterity}{{else if contains .Difficulty "IQ"}}@{intelligence}{{else if contains .Difficulty "HT"}}@{health}{{else if contains .Difficulty "Will"}}@{willpower}{{else if contains .Difficulty "Per"}}@{perception}{{else}}10{{end}}",
       "Difficulty": "{{if contains .Difficulty "/E"}}E{{else if contains .Difficulty "/A"}}A{{else if contains .Difficulty "/H"}}H{{else if contains .Difficulty "/VH"}}VH{{else if contains .Difficulty "/WC"}}WC{{else}}A{{end}}",
       "Bonus": 0,
       "Points": {{.Points}},
       "Skill": {{.Level}},
-      "Ref": "{{.PageRef}}",
+      "Ref": {{printf "%q" .PageRef}},
       "SkillModNotes": "",
-      "Notes": "{{.Notes}}\n{{.ModifierNotes}}"
+      "Notes": {{printf "%q" (print .Notes "\n" .ModifierNotes)}}
     },{{end}}{{end}}
   ],
   "RepeatingTechniquesrevised": [{{range .Skills}}{{$tags := join .Tags ", "}}{{if (contains $tags "Technique")}}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "Parent": "",
       "BaseLevel": "0",
       "Default": 0.0,
@@ -172,15 +173,15 @@ GCS HTML Template v1
       "SkillModifier": 0.0,
       "Points": {{.Points}},
       "Skill": {{.Level}},
-      "Ref": "{{.PageRef}}",
+      "Ref": {{printf "%q" .PageRef}},
       "SkillModNotes": "",
-      "Notes": "{{.Notes}}\n{{.ModifierNotes}}"
+      "Notes": {{printf "%q" (print .Notes "\n" .ModifierNotes)}}
     },{{end}}{{end}}
   ],
   "RepeatingDefense": [{{range $i, $me := .MeleeWeapons}}{{if not (eq $me.Parry "No")}}
     {
       "Idkey": "MeleeWapon-{{$i}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "Type": "Parry",
       "Info": "",
       "Skill": {{.Parry}},
@@ -199,7 +200,7 @@ GCS HTML Template v1
       "Reach": "{{.Reach}}",
       "Skill": {{.Level}},
       "ArmorDivisor": 1,
-      "Notes": "{{.Notes}}\nMinimum ST: {{.Strength}}",
+      "Notes": {{printf "%q" (print .Notes "\\nMinimum ST: " .Strength)}},
       "Block": "{{.Block}}",
       "Parry": "{{.Parry}}"
     },{{end}}
@@ -208,7 +209,7 @@ GCS HTML Template v1
     {{$damageDesc := replace .Damage "d" "d6" -}}
     {
       "Idkey": "RangedWeapon-{{$i}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "Damage": "{{if contains .Damage " cr"}}{{replace $damageDesc " cr" ""}}{{else if contains .Damage " pi"}}{{replace $damageDesc " pi" ""}}{{else if contains .Damage " imp"}}{{replace $damageDesc " imp" ""}}{{else if contains .Damage " cut"}}{{replace $damageDesc " cut" ""}}{{else if contains .Damage " burn"}}{{replace $damageDesc " burn" ""}}{{else if contains .Damage " tox"}}{{replace $damageDesc " tox" ""}}{{else if contains .Damage " aff"}}{{replace $damageDesc " aff" ""}}{{else if contains .Damage " cor"}}{{replace $damageDesc " cor" ""}}{{else if contains .Damage " fat"}}{{replace $damageDesc " fat" ""}}{{else if contains .Damage " spec"}}{{replace $damageDesc " spec" ""}}{{else}}{{$damageDesc}}{{end}}",
       "Type": "{{if contains .Damage " cr"}}cr{{else if contains .Damage " pi"}}pi{{else if contains .Damage " imp"}}imp{{else if contains .Damage " cut"}}cut{{else if contains .Damage " burn"}}burn{{else if contains .Damage " tox"}}tox{{else if contains .Damage " aff"}}aff{{else if contains .Damage " cor"}}cor{{else if contains .Damage " fat"}}fat{{else if contains .Damage " spec"}}spec{{else}}cr{{end}}",
       "Acc": "{{.Accuracy}}",
@@ -222,42 +223,42 @@ GCS HTML Template v1
       "MalfunctionVerify": false,
       "MalfunctionVeryReliable": false,
       "ArmorDivisor": "1",
-      "Notes": "{{.Notes}}\nMinimum ST: {{.Strength}}"
+      "Notes": {{printf "%q" (print .Notes "\\nMinimum ST: " .Strength)}},
     },{{end}}
   ],
   "RepeatingItem": [{{range .Equipment.Carried}}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{.Description}}",
+      "Name": {{printf "%q" .Description}},
       "Tl": "{{.TechLevel}}",
       "LegalityClass": "{{.LegalityClass}}",
-      "Ref": "{{.PageRef}}",
+      "Ref": {{printf "%q" .PageRef}},
       "Count": {{.Quantity}},
       "Cost": {{.Cost}},
       "Weight": "{{replace .Weight " lb" ""}}",
       "Carried": "{{if .Equipped}}1{{else}}0{{end}}",
-      "Notes": "{{.Notes}}\n{{.ModifierNotes}}\nUses: {{.Uses}}\nMax Uses: {{.MaxUses}}\nType: {{.Type}}"
+      "Notes": {{printf "%q" (print .Notes "\n" .ModifierNotes "\nUses: " .Uses "\nMax Uses: " .MaxUses "\nType: " .Type)}}
     },{{end}}
   ],
   "RepeatingSpells": [{{range .Spells}}
     {
       "Idkey": "{{.ID}}",
-      "Name": "{{.Description }}",
+      "Name": {{printf "%q" .Description}},
       "Difficulty": "{{if contains .Difficulty "/E"}}E{{else if contains .Difficulty "/A"}}A{{else if contains .Difficulty "/H"}}H{{else if contains .Difficulty "/VH"}}VH{{else if contains .Difficulty "/WC"}}WC{{else}}A{{end}}",
       "SpellModifier": 0,
       "Points": {{.Points}},
-      "SpellResistedBy": "{{.Resist}}",
-      "Duration": "{{.Duration}}",
-      "Cost": "{{.Mana}}",
+      "SpellResistedBy": {{printf "%q" .Resist}},
+      "Duration": {{printf "%q" .Duration}},
+      "Cost": {{printf "%q" .Mana}},
       "Skill": {{.Level}},
-      "Ref": "{{.PageRef}}",
+      "Ref": {{printf "%q" .PageRef}},
       "Casttime": "{{.TimeToCast}}",
       "Maintain": "",
-      "SpellClass": "{{.Class}}",
-      "SpellCollege": "{{range $i, $c := .Colleges}}{{if eq $i 0}}{{.}}{{end}}{{end}}",
-      "SpellCollegeSecondary": "{{range $i, $c := .Colleges}}{{if gt $i 0}}{{.}}{{end}}{{end}}",
+      "SpellClass": {{printf "%q" .Class}},
+      "SpellCollege": {{printf "%q" (range $i, $c := .Colleges)}}{{if eq $i 0}}{{.}}{{end}}{{end}},
+      "SpellCollegeSecondary": {{printf "%q" (range $i, $c := .Colleges)}}{{if gt $i 0}}{{.}}{{end}}{{end}},
       "SpellModNotes": "",
-      "SpellNotes": "{{.Notes}}\nRituals: {{.Rituals}}\nType: {{.Type}}"
+      "SpellNotes": {{printf "%q" (print .Notes "\\nRituals: " .Rituals "\\nType: " .Type)}}
     },{{end}}
   ]
 }
