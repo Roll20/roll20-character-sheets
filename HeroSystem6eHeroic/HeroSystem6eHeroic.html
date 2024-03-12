@@ -10957,9 +10957,14 @@
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
 				
+				let isRanged = false;
+				if (values.rangeMartial > 8) {
+					isRanged = true;
+				}
+				
 				if (!isBlocking) {
 					// If isNormalDamage is TRUE, use the Normal Damage template. Else use the killing template.
-					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= Makes a " + (isNormalDamage ? "normal" : "killing") + " attack with @{martialManeuverName"+maneuverId+"}}} ";
+					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= " + (isRanged ? "Ranged " : "") + (isNormalDamage ? "Normal" : "Killing") + " Attack with @{martialManeuverName"+maneuverId+"}}} ";
 					
 					if ((parseInt(values["currentDCV"])||0)+(parseInt(values["martialManeuverDCV"+maneuverId])||0) >= 0) {
 						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
@@ -10979,6 +10984,14 @@
 				} else {
 					// Use the Blocking template.
 					theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}}" + "{{subtitle=Blocks with @{martialManeuverName"+maneuverId+"}}} ";
+					
+					if ((parseInt(values["currentDCV"])||0)+(parseInt(values["martialManeuverDCV"+maneuverId])||0) >= 0) {
+						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
+					} else {
+						// Minimum DCV is zero.
+						theRoll +=  "{{DCV=[[0[Minimum]]]}}";
+					}
+					
 					if (values.displayDegreeOfSuccess != 0) {
 						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
 					} else {
@@ -11996,7 +12009,7 @@
 					theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]]]}}";
 					
 					if (dispDoS) {
-						theRoll	+= "{{Blocks OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+?{Modifiers|0}[Modifier]]]}} ";
+						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+?{Modifiers|0}[Modifier]]]}} ";
 					} else {
 						theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+?{Modifiers|0}[Modifier]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 					}
@@ -12428,7 +12441,7 @@
 				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]]]}}";
 				
 				if (dispDoS) {
-					theRoll	+= "{{Blocks OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+?{Modifiers|0}[Modifier]]]}} ";
+					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+?{Modifiers|0}[Modifier]]]}} ";
 				} else {
 					theRoll += "{{OCV=[[@{ocv}[OCV]+?{Modifiers|0}[Modifier]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 				}
