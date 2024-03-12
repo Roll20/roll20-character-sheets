@@ -12,7 +12,8 @@ var versionsWithMigrations = [
 		20220604,
 		20220821,
 		20230618,
-		20240414
+		20240414,
+		20240510
 ];
 
 /*
@@ -898,6 +899,40 @@ function migrateTo20240414(migrationChain) {
 		}
 		debugLog(caller, attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function(){
+			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Migrate "subtag1" to sf_representations
+*/
+function migrateTo20240510(migrationChain) {
+	var caller = "migrateTo20240510";
+	debugLog(caller, "Invoked.");
+	let valueMap = {
+		"---": "",
+		"gildenmagisch": "Mag",
+		"elfisch": "Elf",
+		"druidisch": "Dru",
+		"satuarisch": "Hex",
+		"geodisch": "Geo",
+		"schelmisch": "Sch",
+		"scharlatanisch": "Srl",
+		"borbaradianisch": "Bor",
+		"kristallomantisch": "Ach"
+	};
+
+	safeGetAttrs(["subtag1"], function (v) {
+		var attrsToChange = {};
+
+		if (valueMap.hasOwnProperty(v["subtag1"]))
+		{
+			attrsToChange["sf_representations"] = valueMap[v["subtag1"]];
+		}
+		debugLog(caller, attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function () {
 			callNextMigration(migrationChain);
 		});
 	});
