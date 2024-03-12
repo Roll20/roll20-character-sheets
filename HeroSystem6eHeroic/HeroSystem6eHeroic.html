@@ -8482,6 +8482,15 @@
 			var liftCapability;
 			var freeCarry;
 			
+			// Basic damage
+			let theNumberOfD6 = (parseInt((statValue - (statValue%5))/5)||0).toString();
+			let theNumberOfD3 = 0;
+			if (statValue%5 > 2) {
+				theNumberOfD3 = 1;
+			}
+			var hiddenDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
+			
+			// Characteristic maximums trigger cost recalculation.
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
 				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
 			} else {
@@ -8509,7 +8518,8 @@
 				"strengthCP":statCP,
 				"strengthChance":calculateRoll(statValue),
 				"liftWeight":liftCapability,
-				"encumbranceFreeCarry":freeCarry
+				"encumbranceFreeCarry":freeCarry,
+				"hiddenBasicDamage":hiddenDamage
 			});
 			
 			// Update costs
@@ -10644,7 +10654,7 @@
 			if (optionSuperHeroic != 0) {
 				enduranceCostFactor = 10;
 			}
-
+			
 			let enduranceCost01 = heroRoundLow( (parseInt(values.weaponStrength01)||0)/enduranceCostFactor );
 			if ( (enduranceCost01<1) && (parseInt(values.weaponStrength01)||0)>0) {
 				enduranceCost01=1
@@ -10880,27 +10890,27 @@
 		
 		var maneuverId = String(num).padStart(2,'0');
 		
-		on(`change:hiddenBasicDamage change:hiddenBasicEndurance change:martialManeuverNormal${maneuverId}`, function() {
-			getAttrs(["hiddenBasicEndurance", "hiddenBasicDamage", "martialManeuverEffect"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverDamage"+maneuverId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId], function(values) {
+		on(`change:hiddenBasicDamage change:hiddenBasicEndurance change:martialManeuverNormal${maneuverId} change:martialManeuverDamage${maneuverId} change:martialManeuverCP${maneuverId} change:martialManeuverBlock${maneuverId}`, function() {
+			getAttrs(["hiddenBasicEndurance", "hiddenBasicDamage", "martialManeuverEffect"+maneuverId, "martialManeuverEndurance"+maneuverId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverBlock"+maneuverId, "martialManeuverCP"+maneuverId], function(values) {
 				var attributes = new Object();
 				
-				let keywordPhrase = "Damage by STR";
-				let currentEffect = values["martialManeuverEffect"+maneuverId]||"";
-				let theEndurance = parseInt(values["martialManeuverEndurance"+maneuverId])||0;
-				let theDamage = values["martialManeuverDamage"+maneuverId]||0;
-				let theHiddenDamage = values["hiddenMartialManeuverDamage"+maneuverId]||0;
-				let isNormalDamage = values["martialManeuverNormal"+maneuverId] != 0;
+				let keywordPhrase = "damage by str";
+				let hasKeywordPhrase =  (values["martialManeuverEffect"+maneuverId].toLowerCase()).includes(keywordPhrase);
+				let isNormalDamage = (values["martialManeuverNormal"+maneuverId] === "on") ? true : false;
+				let isAttack = (values["martialManeuverBlock"+maneuverId] === "on") ? false : true;
 				
-				if (currentEffect.includes(keywordPhrase) && isNormalDamage) {
-					// The effect includes the keyword phrase and the maneuver is still a normal damage attack.
-					theEndurance = parseInt(values.hiddenBasicEndurance)||0;
-					theDamage = values.hiddenBasicDamage;
-					theHiddenDamage = values.hiddenBasicDamage;
+				if (hasKeywordPhrase && isNormalDamage && isAttack) {
+					attributes["martialManeuverDamage"+maneuverId] = values.hiddenBasicDamage;
+					attributes["hiddenMartialManeuverDamage"+maneuverId] = values.hiddenBasicDamage;
+					
+					// Martial maneuvers have zero END.
+					if ( (parseInt(values["martialManeuverCP"+maneuverId])||0) === 0 ) {
+						attributes["martialManeuverEndurance"+maneuverId] = parseInt(values["hiddenBasicEndurance"])||0;
+					} else {
+						attributes["martialManeuverEndurance"+maneuverId] = 0;
+					}
 				}
 				
-				attributes["martialManeuverEndurance"+maneuverId] = theEndurance;
-				attributes["martialManeuverDamage"+maneuverId] = theDamage;
-				attributes["hiddenMartialManeuverDamage"+maneuverId] = theHiddenDamage;
 				setAttrs(attributes);
 			});
 		});
@@ -11263,18 +11273,10 @@
 		normalMessage = hitLocation + ": " + theMessage;
 		killMessage = normalMessage;
 
-		// This is already included in calculations shown
-		//	if (STUNx != 1) {
-		//		killMessage += "";
-		//		killMessage += " x" + STUNx + "STUN*";
-		//	}
 		if (NSTUN != 1) {
-			// normalMessage += " x" + NSTUN + "STUN";
 			normalMessage += " STUNx" + NSTUN;
 		}
 		if (BODYx != 1) {
-			// normalMessage += " x" + BODYx + "BODY";
-			// killMessage += " x" + BODYx + "BODY";
 			normalMessage += " BODYx" + BODYx;
 			killMessage += " BODYx" + BODYx;
 		}
@@ -11345,8 +11347,6 @@
 		// Return positive value. We'll make it negative in the roll.
 		return -thePenalty;
 	}
-	
-	
 
 
 	/* ------------------------ */
