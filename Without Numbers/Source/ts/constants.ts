@@ -1,8 +1,8 @@
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on, removeRepeatingRow, _, getTranslationByKey */
 
 /* Data constants */
-const sheetName = "Stars Without Number (revised)";
-const sheetVersion = "2.6.5";
+const sheetName = "Without Number";
+const sheetVersion = "1.0.0";
 const translate = getTranslationByKey;
 const attributes = [
   "strength",
