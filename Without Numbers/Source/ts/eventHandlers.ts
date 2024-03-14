@@ -129,7 +129,6 @@ on(
 );
 
 /* Ship sheet */
-on("change:ship_calculate_price", calculateShipStats);
 on("change:ship_class", () => setShipClass());
 on(shipStatEvent, calculateShipStats);
 on(

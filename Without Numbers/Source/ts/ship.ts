@@ -69,7 +69,6 @@ const calculateShipStats = () => {
       "ship_hardpoints",
       "ship_price",
       "ship_hull_price",
-      "ship_calculate_price",
     ];
     getAttrs(oldAttrs, (v) => {
       const ship_power =
@@ -115,24 +114,6 @@ const calculateShipStats = () => {
         ship_hardpoints,
         ship_price: "",
       };
-      if (v.ship_calculate_price === "1") {
-        setting.ship_price = new Intl.NumberFormat().format(
-          (parseInt(v.ship_hull_price) || 0) +
-            sum(
-              [
-                ...weaponIDs.map(
-                  (id) => `repeating_ship-weapons_${id}_weapon_price`
-                ),
-                ...fittingIDs.map(
-                  (id) => `repeating_ship-fittings_${id}_fitting_price`
-                ),
-                ...defenseIDs.map(
-                  (id) => `repeating_ship-defenses_${id}_defense_price`
-                ),
-              ].map((x) => v[x])
-            )
-        );
-      }
       mySetAttrs(setting, v, {
         silent: true,
       });
