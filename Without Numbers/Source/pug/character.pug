@@ -156,7 +156,7 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 							span(name="attr_weapon_description")
 					.edit.flex-wrap.grey-box-bordered
 						+text-input("weapon_name", "NAME").grow.name.ellipsis
-						+text-input("weapon_attack", "ATTACK_BONUS_SHORT")(type="number", value="0").ab.center
+						+text-input("weapon_attack", "AB")(type="number", value="0").ab.center
 						+fake-text-input("SKILL").skills-either.weapon-skill.center
 							select(name="attr_weapon_skill_bonus")
 								each val in skills.combatRevised
@@ -171,7 +171,7 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 						+fake-text-input("ATTRIBUTE").attribute.center
 							select(name="attr_weapon_attribute_mod")
 								each attr in attributes
-									option(value=`@{${attr}_mod}`, data-i18n=`${attr.toUpperCase()}_SHORT`)
+									option(value=`@{${attr}_mod}`, data-i18n=`${attr.slice(0, 3).toUpperCase()}`)
 								option(value=`@{str_dex_mod}`, data-i18n=`STR_DEX`)
 						+fake-text-input("BURST").burst.center.swn
 							select(name="attr_weapon_burst")
@@ -192,7 +192,7 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 							label.label
 								input(type="checkbox", name="attr_weapon_use_ammo", value!="{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}")
 								span(data-i18n="AMMO")
-						+text-input("weapon_encumbrance", "ENCUMBRANCE_SHORT")(type="number", value="0").enc.center
+						+text-input("weapon_encumbrance", "ENC")(type="number", value="0").enc.center
 						.w-full
 							.table-header.rep-grid
 								.weapon-description(data-i18n="DESCRIPTION")
@@ -207,9 +207,8 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 					h3(data-i18n="SHELLS")
 				.table-header.shells-grid.rep-grid.notdetails
 					.active(data-i18n="ACTIVE?").notdetails
-					.str(data-i18n="STRENGTH_SHORT").notdetails
-					.dex(data-i18n="DEXTERITY_SHORT").notdetails
-					.con(data-i18n="CONSTITUTION_SHORT").notdetails
+					each attr in ["str", "dex", "con"]
+						div(classname=`${attr}` data-i18n=`${attr.toUpperCase()}`).notdetails
 					.affinity(data-i18n="AFFINITY?").notdetails
 					.name.ellipsis(data-i18n="NAME").notdetails
 				fieldset.repeating_shells
@@ -218,17 +217,15 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 						button.display.invisible-button(name="roll_Shell", type="roll", value!="&{template:swn-default} {{charname=@{character_name}}} {{info=^{SHELL} — STR @{shell_strength} - DEX @{shell_dexterity} - CON @{shell_constitution}}} {{title=@{shell_name}}} {{desc=^{BASIC_ABILITIES}:\n @{shell_ability} @{shell_affinity_active}}}")
 						.table-header.shells-grid.rep-grid.details.no-highlight
 							.active(data-i18n="ACTIVE?")
-							.str(data-i18n="STRENGTH_SHORT")
-							.dex(data-i18n="DEXTERITY_SHORT")
-							.con(data-i18n="CONSTITUTION_SHORT")
+						each attr in ["str", "dex", "con"]
+							div(classname=`${attr}` data-i18n=`${attr.toUpperCase()}`)
 							.affinity(data-i18n="AFFINITY?")
 							.name.ellipsis(data-i18n="NAME")
 						.shells-grid.rep-grid
 							+fake-text-input().center
 								input(type="checkbox", name="attr_shell_active", value="1").inline-input.rep-radio
-							+text-input("shell_strength")(type="number", value="0").center.inline-input
-							+text-input("shell_dexterity")(type="number", value="0").center.inline-input
-							+text-input("shell_constitution")(type="number", value="0").center.inline-input
+							each attr in ["shell_strength", "shell_dexterity", "shell_constitution"]
+								+text-input(attr)(type="number", value="0").center.inline-input
 							+fake-text-input().center
 								input(type="checkbox", name="attr_shell_affinity_active" value="\n\n^{AFFINITY_ABILITIES}:\n @{shell_affinity}").inline-input
 							+text-input("shell_name").inline-input.edit
@@ -272,7 +269,7 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 				each skill in skills.cwn
 					+makeSkill(skill, !!customSkills[skill], customSkills[skill])
 			input(type="hidden", name="attr_homebrew_extra_skills", value="0").hider
-			.skills-repeating
+			.skills-repeating.mt
 				fieldset.repeating_skills
 					+makeSkill("", true)
 			.skill-container
@@ -306,7 +303,7 @@ include components/ai.pug
 				.table-header.gear-grid.grid
 					.amount #
 					.name.ellipsis(data-i18n="NAME")
-					.enc(data-i18n="ENCUMBRANCE_SHORT" data-i18n-title="ENCUMBRANCE")
+					.enc(data-i18n="ENC" data-i18n-title="ENCUMBRANCE")
 					.status(data-i18n="STATUS")
 					.bundled(data-i18n="BUNDLED")
 						Bundled
@@ -337,7 +334,7 @@ include components/ai.pug
 					.name.ellipsis(data-i18n="NAME")
 					.ac(data-i18n="AC")
 					.type(data-i18n="TYPE")
-					.enc(data-i18n="ENCUMBRANCE_SHORT")
+					.enc(data-i18n="ENC")
 					.enc-bonus(data-i18n="+STR")
 					.status(data-i18n="STATUS")
 				.armor-grid.rep-grid.edit

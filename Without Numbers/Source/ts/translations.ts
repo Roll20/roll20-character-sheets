@@ -33,13 +33,15 @@ const setTranslatedDefaults = () => {
 const handleAttributeQueries = () => {
   // Attribute query magic to set the global query variables according to
   // translations and the state of the setting_skill_query attribute.
+  const getAttributeTranslation = (attr: string) =>
+    translate(attr.toUpperCase());
+
   const attrQueries = attributes.map((attr) => {
-    const translated = translate(attr.toUpperCase());
-    return (
-      `${translated},+ @{${attr}_mod}[${translated}]]]&#125;&#125; ` +
-      `{{attribute= + ${translate(`${attr.toUpperCase()}_SHORT`)}&#125;&#125;`
-    );
+    const translated = getAttributeTranslation(attr);
+    return `${translated},+ @{${attr}_mod}[${translated}]]]&#125;&#125; {{attribute= + ${translated})}&#125;&#125;`;
   });
+
+  const queryPrefix = `?{${translate("ATTRIBUTE")}|`;
 
   getAttrs(
     [
@@ -48,69 +50,65 @@ const handleAttributeQueries = () => {
       ...attributes.map((a) => `attribute_query_${a.slice(0, 3)}`),
     ],
     (v) => {
+      const translatedString = (attr: string) => {
+        const translated = getAttributeTranslation(attr);
+        const abbr = translated && translate(translated.slice(0, 3));
+        return `+ @{${attr}_mod}[${`${translated}`}]]]}} {{attribute= + ${abbr}}}`;
+      };
+
+      const attributeObject: { [key: string]: string } = {};
+      attributes.forEach((a) => {
+        attributeObject[
+          `attribute_query_${a.slice(0, 3)}` as keyof typeof attributeObject
+        ] = translatedString(a);
+      });
+
       if (
         v.setting_skill_query === "hover" ||
         v.setting_skill_query === "hide"
       ) {
         mySetAttrs(
           {
-            attribute_query: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query: `${queryPrefix}${[
               attrQueries[0],
               ...attrQueries.slice(1),
             ].join("|")}}`,
-            attribute_query_str: `+ @{strength_mod}[${translate(
-              "STRENGTH"
-            )}]]]}} {{attribute= + ${translate("STRENGTH_SHORT")}}}`,
-            attribute_query_dex: `+ @{dexterity_mod}[${translate(
-              "DEXTERITY"
-            )}]]]}} {{attribute= + ${translate("DEXTERITY_SHORT")}}}`,
-            attribute_query_con: `+ @{constitution_mod}[${translate(
-              "CONSTITUTION"
-            )}]]]}} {{attribute= + ${translate("CONSTITUTION_SHORT")}}}`,
-            attribute_query_int: `+ @{intelligence_mod}[${translate(
-              "INTELLIGENCE"
-            )}]]]}} {{attribute= + ${translate("INTELLIGENCE_SHORT")}}}`,
-            attribute_query_wis: `+ @{wisdom_mod}[${translate(
-              "WISDOM"
-            )}]]]}} {{attribute= + ${translate("WISDOM_SHORT")}}}`,
-            attribute_query_cha: `+ @{charisma_mod}[${translate(
-              "CHARISMA"
-            )}]]]}} {{attribute= + ${translate("CHARISMA_SHORT")}}}`,
+            ...attributeObject,
           },
           v
         );
       } else if (v.setting_skill_query === "query") {
         mySetAttrs(
           {
-            attribute_query: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query: `${queryPrefix}${[
               attrQueries[0],
               ...attrQueries.slice(1),
             ].join("|")}}`,
-            attribute_query_str: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query_str: `${queryPrefix}${[
               attrQueries[0],
               ...attrQueries.slice(1),
             ].join("|")}}`,
-            attribute_query_dex: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query_dex: `${queryPrefix}${[
               attrQueries[1],
               attrQueries[0],
               ...attrQueries.slice(2),
             ].join("|")}}`,
-            attribute_query_con: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query_con: `${queryPrefix}${[
               attrQueries[2],
               ...attrQueries.slice(0, 2),
               ...attrQueries.slice(3),
             ].join("|")}}`,
-            attribute_query_int: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query_int: `${queryPrefix}${[
               attrQueries[3],
               ...attrQueries.slice(0, 3),
               ...attrQueries.slice(4),
             ].join("|")}}`,
-            attribute_query_wis: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query_wis: `${queryPrefix}${[
               attrQueries[4],
               ...attrQueries.slice(0, 4),
               ...attrQueries.slice(5),
             ].join("|")}}`,
-            attribute_query_cha: `?{${translate("ATTRIBUTE")}|${[
+            attribute_query_cha: `${queryPrefix}${[
               attrQueries[5],
               ...attrQueries.slice(0, 5),
             ].join("|")}}`,
@@ -127,7 +125,7 @@ const handleModifierQuery = () => {
       mySetAttrs(
         {
           modifier_query: `+ ?{${translate("MODIFIER")}|0}[${translate(
-            "MODIFIER_SHORT"
+            "MOD"
           )}]`,
         },
         v
