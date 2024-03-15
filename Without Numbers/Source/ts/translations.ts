@@ -53,6 +53,7 @@ const handleAttributeQueries = () => {
       const translatedString = (attr: string) => {
         const translated = getAttributeTranslation(attr);
         const abbr = translated && translate(translated.slice(0, 3));
+
         return `+ @{${attr}_mod}[${`${translated}`}]]]}} {{attribute= + ${abbr}}}`;
       };
 
