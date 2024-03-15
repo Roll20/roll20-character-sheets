@@ -1,25 +1,152 @@
 /* magic begin */
-on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) => {
-	var func = "Action Listener for Spell Roll Buttons";
+
+/*
+	Adapt Spell Stats Based on Spell Representation
+	Three representations offer the special feature of exchanging stats of spell checks.
+
+	Elvish Representation (Elf)
+		IN can replace KL
+		Check must not be IN/IN/IN after exchange
+	Crystallomantic Representation (Ach)
+		IN can replace KL and vice versa
+		Check must contain at least two times KL or IN
+	Kophtanic Representation (Kop)
+		CH can replace KL
+		Check must not be CH/CH/CH after exchange
+*/
+function replaceSpellStats(spellData, stats) {
+	const func = "replaceSpellStats";
+	debugLog(func, spellData, stats);
+
+	let modified = false;
+	switch (spellData["representation"]) {
+		case "Ach":
+		// Block required to encapsulate consts
+		{
+			debugLog(func, "Adapting for achaz rep");
+			// Replacement is not improving anything, so break
+			if (stats['KL'] === stats['IN']) break;
+
+			// Stat occurring at least twice
+			var multiStat = "";
+			// Stat occuring once or zero times, the stat that shall be checked for replacing one instance of the multiStat
+			var otherStat = "";
+
+			const relevantStats = [ "KL", "IN" ];
+			const spellStatFreq = countStats(spellData["stats"]);
+
+			// Determine whether spell has potentially beneficial stat situation
+			for (stat of relevantStats){
+				if (spellStatFreq[stat] >= 2)
+				{
+					multiStat = stat;
+				} else {
+					otherStat = stat;
+				}
+			}
+
+			// No stat occurring at least twice? No replacement possible, so break
+			if (multiStat === "") break;
+
+			// KL = IN case can be excluded, see check above
+			var betterStat = stats["KL"] > stats["IN"] ? "KL" : "IN";
+
+			// Act only if the other stat is also better than the multi stat
+			if (otherStat === betterStat)
+			{
+				for (i in spellData["stats"])
+				{
+					if (spellData["stats"][i] === multiStat)
+					{
+						spellData["stats"][i] = otherStat;
+						modified = true;
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case "Elf":
+		// Block required to encapsulate consts
+		{
+			debugLog(func, "Adapting for elven rep");
+			if (stats['KL'] >= stats['IN'])
+			{
+				break;
+			}
+			const replacement = { "replaceable": "KL", "replacer": "IN" };
+			const relevantStats = [ "KL", "IN" ];
+			const spellStatFreq = countStats(spellData["stats"]);
+
+			// Nothing to replace
+			if (spellStatFreq[replacement["replaceable"]] === 0)
+			{
+				break;
+			}
+
+			// Already two IN, third would not be allowed
+			// If it were 3, the previous check would have fired already
+			if (spellStatFreq[replacement["replacer"]] === 2)
+			{
+				break;
+			}
+
+			// Replacement
+			for (stat in spellData["stats"])
+			{
+				if (spellData["stats"][stat] === replacement["replaceable"])
+				{
+					spellData["stats"][stat] = replacement["replacer"];
+					modified = true;
+					break;
+				}
+			}
+			break;
+		}
+		case "Kop":
+			debugLog(func, "Adapting for kophtan rep");
+			//TODO
+			break;
+		default:
+			break;
+	}
+	return modified;
+}
+
+on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
+	const func = "Action Listener for Spell Roll Buttons";
 	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
 	var nameInternal = spellsData[trigger]["internal"];
 	var nameUI = spellsData[trigger]["ui"];
-	var stats = spellsData[trigger]["stats"];
+	var stats = [spellsData[trigger]["stats"]];
+	var spellRep = "z_" + nameInternal + "_representation";
 	debugLog(func, trigger, spellsData[trigger]);
-	safeGetAttrs(["KL", "IN", "z_repraesentation", "v_festematrix", "n_spruchhemmung"], async function (v) {
-		/* deal with elven representation:
-			if representation is elven and KL > IN, replace first KL with IN
-		*/
-		if (v["subtag1"] === "Elf" && v["KL"] < v["IN"]) {
-			if (stats[0] === "KL" && (stats[1] !== "IN" || stats[2] !== "IN")) {
-				stats[0] = "IN";
-			} else if (stats[1] === "KL") {
-				stats[1] = "IN";
-			} else if (stats[2] === "KL") {
-				stats[2] = "IN";
+	safeGetAttrs(["sf_representations", spellRep, "v_festematrix", "n_spruchhemmung", "KL", "IN", "CH"], function (v) {
+		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop" ]);
+		let characterStats = { "KL": v["KL"], "IN": v["IN"], "CH": v["CH"] };
+		let spellData = {};
+		spellData["stats"] = stats;
+
+		// Regex matches everything that is known to not be included in the (German) representations strings
+		// firstRep = first result element
+		let firstRep = v["sf_representations"].split(/[^a-zäöüßA-ZÄÖÜ\/]+/)[0];
+		// Spell representation: use specific value given for each spell, fall back: first representation
+		spellData["representation"] = String(v[spellRep]).split(/[^a-zäöüßA-ZÄÖÜ\/]+/)[0];
+		if (
+			( spellData["representation"] === "" ) ||
+			( spellData["representation"] === 0 )
+		)
+		{
+			if ( firstRep !== "" ) {
+				spellData["representation"] = firstRep;
 			}
 		}
 
+		let repModified = false;
+		if  (relevantRepresentations.has(spellData["representation"]) )
+		{
+			repModified = replaceSpellStats(spellData, characterStats);
+		}
 		// Build Roll Macro
 		var rollMacro = "";
 
@@ -37,7 +164,8 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) =
 			"{{roll=[[3d20cs<@{cs_zauber}cf>@{cf_zauber}]]}} " +
 			"{{result=[[0]]}} " +
 			"{{criticality=[[0]]}} " +
-			"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} ";
+			"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} " + 
+			"{{repmod=" + (repModified ? "Die verwendeten Attribute wurden durch die Repräsentation modifiziert" : "") + "}} ";
 		debugLog(func, rollMacro);
 
 		// Execute Roll
@@ -89,31 +217,37 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) =
 				let festeMatrix = v["v_festematrix"] === "0" ? false : true;
 				let spruchhemmung = v["n_spruchhemmung"] === "0" ? false : true;
 
-				for (roll of rolls) {
-					if (roll <= success) {
+				for (roll of rolls)
+				{
+					if (roll <= success)
+					{
 						successes += 1;
 					} else if (roll >= failure) {
 						failures += 1;
 					}
-					if (successes >= 2) {
+					if (successes >= 2)
+					{
 						criticality = successes;
 					} else if (failures >= 2) {
 						criticality = -failures;
 					}
 				}
 				// feste Matrix
-				if (festeMatrix && criticality === -2) {
+				if (festeMatrix && criticality === -2)
+				{
 					criticality = -1;
 					festeMatrixSave = true;
 
-					for (roll of rolls) {
+					for (roll of rolls)
+					{
 						if (
 							(roll > success) &&
 							(roll < failure) &&
 							(
 								roll === 18 || roll === 19
 							)
-						) {
+						)
+						{
 							criticality -= 1;
 							festeMatrixSave = false;
 						}
@@ -142,19 +276,23 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) =
 			var TaPstar = effTaW;
 
 			// Negativer TaW: |effTaW| zu Teilwürfen addieren
-			if (criticality >= 2) {
+			if (criticality >= 2)
+			{
 				TaPstar = TaW;
 				result = 1;
 			} else {
-				if (effTaW < 0) {
-					for (roll in rolls) {
+				if (effTaW < 0)
+				{
+					for (roll in rolls)
+					{
 						effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 					}
 					TaPstar = 0;
 				}
 
 				// TaP-Verbrauch für jeden Wurf
-				for (roll in effRolls) {
+				for (roll in effRolls)
+				{
 					TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 				}
 
@@ -162,11 +300,14 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) =
 				TaPstar = Math.min(TaW, TaPstar);
 
 				// Ergebnis an Doppel/Dreifach-20 anpassen
-				if (Math.abs(criticality) <= 1) {
+				if (Math.abs(criticality) <= 1)
+				{
 					result = TaPstar < 0 ? 0 : 1;
-					if (festeMatrixSave && result === 0) {
+					if (festeMatrixSave && result === 0)
+					{
 						result = -1;
-					} else if (festeMatrixSave && result === 1) {
+					} else if (festeMatrixSave && result === 1)
+					{
 						result = 2;
 					}
 				} else if (criticality <= -2) {
