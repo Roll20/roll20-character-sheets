@@ -141,8 +141,11 @@ const calculateAC = () => {
   getSectionIDs("repeating_armor", (idArray) => {
     const sourceAttrs = [
       ...idArray.map((id) => `repeating_armor_${id}_armor_ac`),
+      ...idArray.map((id) => `repeating_armor_${id}_armor_ranged_ac`),
+      ...idArray.map((id) => `repeating_armor_${id}_armor_melee_ac`),
       ...idArray.map((id) => `repeating_armor_${id}_armor_active`),
       ...idArray.map((id) => `repeating_armor_${id}_armor_type`),
+      "system",
       "npc",
       "AC",
       "innate_ac",
@@ -150,30 +153,54 @@ const calculateAC = () => {
     ];
     getAttrs(sourceAttrs, (v) => {
       if (v.npc === "1") return;
+
+      const activeIDs = idArray.filter(
+        (id) => v[`repeating_armor_${id}_armor_active`] === "1"
+      );
+
       const baseAC = Math.max(
         parseInt(v.innate_ac) || 0,
-        ...idArray
-          .filter((id) => v[`repeating_armor_${id}_armor_active`] === "1")
+        ...activeIDs
           .filter((id) => v[`repeating_armor_${id}_armor_type`] !== "SHIELD")
           .map((id) => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
       );
+
       const shieldAC = Math.max(
         0,
-        ...idArray
-          .filter((id) => v[`repeating_armor_${id}_armor_active`] === "1")
+        ...activeIDs
           .filter((id) => v[`repeating_armor_${id}_armor_type`] === "SHIELD")
           .map((id) => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
       );
+
       const AC =
         (shieldAC > 0 ? (shieldAC <= baseAC ? baseAC + 1 : shieldAC) : baseAC) +
         (parseInt(v.dexterity_mod) || 0);
 
-      mySetAttrs(
-        {
-          AC,
-        },
-        v
-      );
+      let update: { [key: string]: number } = { AC };
+
+      if (v.system === "cwn") {
+        const ranged_armor_class = Math.max(
+          parseInt(v.innate_ac) || 0,
+          ...activeIDs.map(
+            (id) => parseInt(v[`repeating_armor_${id}_armor_ranged_ac`]) || 0
+          )
+        );
+
+        const melee_armor_class = Math.max(
+          parseInt(v.innate_ac) || 0,
+          ...activeIDs.map(
+            (id) => parseInt(v[`repeating_armor_${id}_armor_melee_ac`]) || 0
+          )
+        );
+
+        update = {
+          ...update,
+          ranged_armor_class,
+          melee_armor_class,
+        };
+      }
+
+      mySetAttrs(update, v);
     });
   });
 };
