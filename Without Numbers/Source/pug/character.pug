@@ -16,8 +16,9 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 			+text-input(val, val.toUpperCase()).col25.swn
 		each val in core.wwnInfo
 			+text-input(val, val.toUpperCase()).col25.wwn
-		each val in ["first", "second", "third"]
-			+text-input(`edge_${val}`, `EDGE_${val.toUpperCase()}`).col25.cwn
+		.grid.w-full.grid-flow-col.cwn
+			each val in ["first", "second", "third"]
+				+text-input(`edge_${val}`, `EDGE_${val.toUpperCase()}`).
 	.saves.core-box
 		h3(data-i18n="SAVING_THROWS")
 		.flex-between
@@ -45,7 +46,8 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 			input(type="hidden" name="attr_strain_above_max", value="0").strain-above-max
 			+text-input-trio("strain_extra", "strain", "strain_max", "SYSTEM_STRAIN_/_MAX", {readonly: true, title: "Total Strain", "data-i18n-title": "TOTAL_STRAIN", class: "total-strain"}, {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"}, "", "=")(min="0", value="0", data-i18n-title="STRAIN_EXTRA", title: "Strain Extra") System Strain / Max
 			+text-input-duo("xp", "xp_next", "XP_NEXT_LEVEL", {min: "0", value: "3"})(min="0", value="0")
-			+text-input("AC", "ARMOR_CLASS")(type="number", value="10", readonly, data-i18n-title="AC_DESC").center
+			.swn.wwn
+				+text-input("AC", "ARMOR_CLASS")(type="number", value="10", readonly, data-i18n-title="AC_DESC").center
 			.swn.cwn
 				+text-input("attack_bonus", "ATTACK_BONUS")(type="number", min="0", value="0").center
 			.wwn
@@ -327,47 +329,7 @@ include components/ai.pug
 				h3(data-i18n="OTHER_EQUIPMENT")
 				textarea(name="attr_gear_other").other-gear
 		.column
-			.armor.grey-box
-				.flex-center
-					h3
-						| #[span(data-i18n="ARMOR")] – #[span(data-i18n="AC")] #[span(name="attr_AC")]
-				.table-header.armor-grid.rep-grid
-					.active.center(data-i18n="ACTIVE?")
-					.name.ellipsis(data-i18n="NAME")
-					.ac(data-i18n="AC")
-					.type(data-i18n="TYPE")
-					.enc(data-i18n="ENC")
-					.enc-bonus(data-i18n="+STR")
-					.status(data-i18n="STATUS")
-				.armor-grid.rep-grid.edit
-					+text-input("innate_ac_name")(value="Innate AC", data-i18n="INNATE_AC").col-2
-					+text-input("innate_ac")(type="number", value="10").center
-				input(type="hidden", name="attr_show_armor_details", value="1").input-details
-				fieldset.repeating_armor
-					.armor-grid.rep-grid
-						+fake-text-input().center
-							input(type="checkbox", name="attr_armor_active", value="1")
-						+text-input("armor_name")
-						+text-input("armor_ac")(type="number", value="0").center
-						+fake-text-input()
-							select(name="attr_armor_type")
-								option(value="none", data-i18n="NONE")
-								each val in armorTypes
-									- const selected = val === "STREET";
-									option(value=val, data-i18n=val selected=selected)
-						+text-input("armor_encumbrance")(type="number", value="0").center
-						+text-input("armor_encumbrance_bonus")(type="number", value="0").center
-						+fake-text-input()
-							select(name="attr_armor_status")
-								option(value="", data-i18n="OTHER", selected)
-								each val in armorStatus
-									option(value=val, data-i18n=val)
-					input(type="hidden", name="attr_armor_description", value="").hide-empty
-					.armor-grid.rep-grid.details
-						.display
-							span(name="attr_armor_description")
-						+fake-text-input().edit
-							textarea(name="attr_armor_description")
+			include components/armor.pug
 			.cyberware.simple-repsection.grey-box
 				.flex-center
 					h3
@@ -398,14 +360,14 @@ include components/ai.pug
 					.show-chevron.simple-repsection 
 						+collapseChevron()
 						.display
-							.grid.grid-flow-col.goal.mb.name.ellipsis
+							.grid.grid-flow-col.goal.mb.name
 								span(name="attr_goal_name")
 								span.level #[span(data-i18n="XP")]:#[span(name="attr_goal_xp")]
 							.details
 								span(name="attr_goal_description")
 						.edit
 							.grid.grid-flow-col.goal.mb
-								+text-input("goal_name").name.ellipsis.grow
+								+text-input("goal_name").name.grow
 								+text-input("goal_xp")(type="number", min="0", data-i18n-placeholder="XP").xp.center
 							.grid
 								textarea(name="attr_goal_description", data-i18n-placeholder="DESCRIPTION")
@@ -413,31 +375,28 @@ include components/ai.pug
 				h3(data-i18n="LANGUAGES")
 				fieldset.repeating_languages
 					+text-input("language")
-		.grid.wwn.mt.gap-1.proj-ally
-			.projects.grey-box
-				.grid.grid-flow-col.name.ellipsis
-					h3(data-i18n="PROJECTS")
-					+text-input("renown", "RENOWN")
-				fieldset.repeating_projects
-					.show-chevron.simple-repsection 
-						+collapseChevron()
-						.display
-							.grid.grid-flow-col.mb.name.ellipsis
-								span(name="attr_name")
-							.details
-								span(name="attr_description")
-						.edit
-							.grid.grid-flow-col.mb
-								+text-input("name").name.ellipsis
-							.grid
-								textarea(name="attr_description", data-i18n-placeholder="DESCRIPTION")
-			.allies.grey-box
+		.grid.mt.gap-1.proj-ally
+			.grid.gap-1
+				.projects.grey-box.wwn
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="PROJECTS")
+						+text-input("renown", "RENOWN")
+					+simpleRepeating("projects")
+				.grey-box.cwn
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="ALIASES_IDS")
+					+simpleRepeating("alias")
+				.grey-box.cwn
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="ASSETS_OWNED_PROPERTY")
+					+simpleRepeating("property")
+			.allies.grey-box.wwn.cwn
 				.div
-					h3(data-i18n="ALLIES_ENEMIES")
+					h3(data-i18n="ALLIES_ENEMIES").wwn
+					h3(data-i18n="FRIENDS_AND_ACQUAINTANCES").cwn
 				.grid.grid-flow-col.subheaders.gap-1
-					.name.ellipsis(data-i18n="NAME")
-					.location(data-i18n="LOCATION")
-					.status(data-i18n="STATUS")
+					each val in ["name", "location", "status"]
+						.ellipsis(data-i18n=val.toUpperCase())
 				fieldset.repeating_allies
 					.grid.grid-flow-col.subheaders.gap-1
 						each val in ["name", "location", "status"]

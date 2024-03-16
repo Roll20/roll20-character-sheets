@@ -1,0 +1,56 @@
+.armor.grey-box
+    .flex-center
+        h3.swn.wwn
+            | #[span(data-i18n="ARMOR")] – #[span(data-i18n="AC")] #[span(name="attr_AC")]
+        .cwn.w-full.grid.grid-flow-col.gap-1.mb.bottom-border.mt
+            h3
+                span(data-i18n="ARMOR")
+            each val in ["melee_armor_class", "ranged_armor_class", "armor_soak", "trauma_target"]
+                +text-input(val, val.toUpperCase())(type="number", value="1", min="0").center
+
+    .table-header.armor-grid.rep-grid
+        .ellipsis.center(data-i18n="ACTIVE?")
+        .ellipsis(data-i18n="NAME")
+        each val in armor.cwn
+            .cwn.ellipsis(data-i18n=val.toUpperCase())
+        each val in ["AC", "TYPE"]
+            .swn.wwn.ellipsis(data-i18n=val)
+        .ellipsis(data-i18n="ENC")
+        .cwn.ellipsis(data-i18n="TRAUMA_TARGET_MOD")
+        .cwn.ellipsis(data-i18n="SUBTLE")
+        .swn.wwn.ellipsis(data-i18n="+STR")
+        .swn.wwn.ellipsis(data-i18n="STATUS")
+    .armor-grid.rep-grid.edit
+        +text-input("innate_ac_name")(value="Innate AC", data-i18n="INNATE_AC").col-2
+        +text-input("innate_ac")(type="number", value="10").center
+    input(type="hidden", name="attr_show_armor_details", value="1").input-details
+    fieldset.repeating_armor
+        .armor-grid.rep-grid
+            +fake-text-input().center
+                input(type="checkbox", name="attr_armor_active", value="1")
+            +text-input("armor_name")
+            .wwn.swn
+                +text-input("armor_ac")(type="number", value="0").center
+            each val in armor.cwn
+                +text-input(val)(type="number", value="0").center.cwn
+            +fake-text-input().wwn.swn
+                select(name="attr_armor_type")
+                    option(value="none", data-i18n="NONE")
+                    each val in armor.types
+                        - const selected = val === "STREET";
+                        option(value=val, data-i18n=val selected=selected)
+            +text-input("armor_encumbrance")(type="number", value="0").center
+            +text-input("armor_encumbrance_bonus")(type="number", value="0").center.swn.wwn
+            +fake-text-input().swn.wwn
+                select(name="attr_armor_status")
+                    option(value="", data-i18n="OTHER", selected)
+                    each val in armor.status
+                        option(value=val, data-i18n=val)
+            +text-input("trauma_target_mod")(type="number", value="0").center.cwn
+            +text-input("armor_subtle").cwn
+        input(type="hidden", name="attr_armor_description", value="").hide-empty
+        .armor-grid.rep-grid.details
+            .display
+                span(name="attr_armor_description")
+            +fake-text-input().edit
+                textarea(name="attr_armor_description")
