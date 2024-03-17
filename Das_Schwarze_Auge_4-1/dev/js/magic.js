@@ -105,7 +105,16 @@ function replaceSpellStats(spellData, stats) {
 		}
 		case "Kop":
 			debugLog(func, "Adapting for kophtan rep");
-			//TODO
+			if (charData['KL'] >= charData['CH']) {
+				break;
+			}
+			for (let i = 0; i < 3; i++) {
+				if (spellAttrs[i] === "KL" && (spellAttrs[(i+1) % 3] !== "CH" || spellAttrs[(i + 2) % 3] !== "CH")) {
+					spellAttrs[i] = "CH";
+					modified = true;
+					break;
+				}
+			}
 			break;
 		default:
 			break;
@@ -118,7 +127,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
 	var nameInternal = spellsData[trigger]["internal"];
 	var nameUI = spellsData[trigger]["ui"];
-	var stats = [spellsData[trigger]["stats"]];
+	var stats = [...spellsData[trigger]["stats"]];
 	var spellRep = "z_" + nameInternal + "_representation";
 	debugLog(func, trigger, spellsData[trigger]);
 	safeGetAttrs(["sf_representations", spellRep, "v_festematrix", "n_spruchhemmung", "KL", "IN", "CH"], function (v) {
