@@ -1,0 +1,385 @@
+GCS Text Template v1
+{
+  "CharacterName": "{{.Name}}",
+  "Fullname": "{{.Name}}",
+  "Playername": "{{.Player}}",
+  "Nickname": "",
+  "Race": "",
+  "RaceRef": "",
+  "TemplateNames": "",
+  "Gender": "{{.Gender}}",
+  "Size": "{{.SizeModifier}}",
+  "ApplySizeModifier": false,
+  "Reactions": "{{range $i, $v := .Reactions}}{{if $i}}, {{end}}{{.Situation}} {{if lt .Total 1}}{{.Total}}{{else}}+{{.Total}}{{end}}{{end}}",
+  "CampaignTl": "{{.TechLevel}}",
+  "TotalPoints": "{{.Points.Total}}",
+  "Tl": "{{.TechLevel}}",
+  "TlPts": 0.0,
+  "Status": "0",
+  "Wealth": "Average",
+  "Income": 0,
+  "CostOfLiving": 0,
+  "Stash": 0,
+  "Age": "{{.Age}}",
+  "Height": {{printf "%q" .Height}},
+  "Weight": "0",
+  "Appearance": "{{range .Traits}}{{if eq .Description "Appearance"}}{{.Points}}{{end}}{{end}}",
+  "GeneralAppearance": {{printf "%q" (print "Body Type: " .BodyType.Name ". Hair: " .Hair ". Eyes: " .Eyes ". Skin: " .Skin ". Handedness: " .Handedness ". Weight: " .Weight)}},
+  "StrengthMod": 0,
+  "StrengthPoints": "{{range .Attributes.Primary}}{{if eq .Name "ST"}}{{.Points}}{{end}}{{end}}",
+  "DexterityMod": 0.0,
+  "DexterityPoints": "{{range .Attributes.Primary}}{{if eq .Name "DX"}}{{.Points}}{{end}}{{end}}",
+  "IntelligenceMod": 0.0,
+  "IntelligencePoints": "{{range .Attributes.Primary}}{{if eq .Name "IQ"}}{{.Points}}{{end}}{{end}}",
+  "HealthMod": 0.0,
+  "HealthPoints": "{{range .Attributes.Primary}}{{if eq .Name "HT"}}{{.Points}}{{end}}{{end}}",
+  "PerceptionMod": 0.0,
+  "PerceptionPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Per"}}{{.Points}}{{end}}{{end}}",
+  "VisionMod": 0.0,
+  "VisionPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Per"}}{{.Points}}{{end}}{{end}}",
+  "HearingMod": 0.0,
+  "HearingPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Hearing"}}{{.Points}}{{end}}{{end}}",
+  "TasteSmellMod": 0.0,
+  "TasteSmellPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Taste & Smell"}}{{.Points}}{{end}}{{end}}",
+  "TouchMod": 0.0,
+  "TouchPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Touch"}}{{.Points}}{{end}}{{end}}",
+  "WillpowerMod": 0.0,
+  "WillpowerPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Will"}}{{.Points}}{{end}}{{end}}",
+  "FearCheckMod": 0.0,
+  "FearCheckPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Fright Check"}}{{.Points}}{{end}}{{end}}",
+  "StunCheckMod": 0.0,
+  "KnockdownCheckMod": 0.0,
+  "UnconsciousCheckMod": 0.0,
+  "UnconsciousCheckPoints": 0.0,
+  "DeathCheckMod": 0.0,
+  "DeathCheckPoints": 0.0,
+  "BasicSpeedMod": 0.0,
+  "BasicSpeedPoints": "{{range .Attributes.Secondary}}{{if eq .Name "Basic Speed"}}{{.Points}}{{end}}{{end}}",
+  "BasicMoveMod": 0.0,
+  "BasicMovePoints": "{{range .Attributes.Secondary}}{{if eq .Name "Basic Move"}}{{.Points}}{{end}}{{end}}",
+  "EnhancedGroundMoveMod": 0.0,
+  "EnhancedGroundMovePoints": 0.0,
+  "DodgeMod": 0.0,
+  "LiftStMod": 2.0,
+  "LiftStPoints": 0.0,
+  "StrikingStMod": 0.0,
+  "StrikingStPoints": 0.0,
+  "HitPointsMod": 0.0,
+  "HitPointsPoints": "{{range .Attributes.Pools}}{{if eq .Name "HP"}}{{.Points}}{{end}}{{end}}",
+  "HitPoints": "{{range .Attributes.Pools}}{{if eq .Name "HP"}}{{.Value}}{{end}}{{end}}",
+  "FatiguePointsMod": 0.0,
+  "FatiguePointsPoints": "{{range .Attributes.Pools}}{{if eq .Name "FP"}}{{.Points}}{{end}}{{end}}",
+  "FatiguePoints": "{{range .Attributes.Pools}}{{if eq .Name "FP"}}{{.Value}}{{end}}{{end}}",
+  "FlightChecked": false,
+  "FlightPoints": 0.0,
+  "BasicAirMoveMod": 0.0,
+  "BasicAirMovePoints": 0.0,
+  "EnhancedAirLevel": 0.0,
+  "EnhancedAirMovePoints": 0.0,
+  "AmphibiousChecked": false,
+  "AmphibiousPoints": 0.0,
+  "BasicWaterMoveMod": 0.0,
+  "BasicWaterMovePoints": 0.0,
+  "EnhancedWaterLevel": 0.0,
+  "EnhancedWaterMovePoints": 0.0,
+  "SuperJumpEnteredLevel": 0.0,
+  "SuperJumpPoints": 0.0,
+  "SpellBonus": 0.0,
+  "CombatReflexes": "{{range .Traits}}{{if eq .Description "Combat Reflexes"}}true{{end}}{{end}}",
+  "RepeatingLanguages": [
+    {{- $last := "" -}}
+    {{- range $i, $v := .Traits -}}
+      {{- if contains .Description "Language:" -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Spoken\": 0.0,\n      \"Written\": 0.0,\n      \"IsNative\": %t\n    }" .ID (print (trimPrefix .Description "Language: ") " " .Points " points") (eq .Points 0) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingCultures": [
+    {{- $last := "" -}}
+    {{- range $i, $v := .Traits -}}
+      {{- if contains .Description "Cultural Familiarity (" -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Points\": %s\n    }" .ID (trimSuffix (trimPrefix .Description "Cultural Familiarity (") ")") .Points -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingTraits": [
+    {{- $last := "" -}}
+    {{- range .Traits -}}
+      {{- $tags := join .Tags ", " -}}
+      {{- if and (eq .Type "item") (gt .Points 0) (not (contains $tags "Perk")) (not (contains .Description "Language:")) (not (contains .Description "Cultural Familiarity (")) -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"TraitLevel\": 0,\n      \"Foa\": \"\",\n      \"Points\": %s,\n      \"Ref\": %q,\n      \"Notes\": %q\n    }" .ID .Description .Points .PageRef (print .Notes "\n" .UserDescription) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingPerks": [
+    {{- $last := "" -}}
+    {{- range .Traits -}}
+      {{- $tags := join .Tags ", " -}}
+      {{- if and (eq .Type "item") (contains $tags "Perk") -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Foa\": \"\",\n      \"Points\": %s,\n      \"Ref\": %q,\n      \"Notes\": %q\n    }" .ID .Description .Points .PageRef (print .Notes "\n" .UserDescription) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingQuirks": [
+    {{- $last := "" -}}
+    {{- range .Traits -}}
+      {{- $tags := join .Tags ", " -}}
+      {{- if and (eq .Type "item") (contains $tags "Quirk") -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Foa\": \"\",\n      \"ControlRating\": \"\",\n      \"Points\": %s,\n      \"Ref\": %q,\n      \"Notes\": %q\n    }" .ID .Description .Points .PageRef (print .Notes "\n" .UserDescription) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingDisadvantages": [
+    {{- $last := "" -}}
+    {{- range .Traits -}}
+      {{- $tags := join .Tags ", " -}}
+      {{- if and (eq .Type "item") (lt .Points 0) (not (contains $tags "Quirk")) -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"TraitLevel\": 0,\n      \"Foa\": \"\",\n      \"ControlRating\": \"\",\n      \"Points\": %s,\n      \"Ref\": %q,\n      \"Notes\": %q\n    }" .ID .Description .Points .PageRef (print .Notes "\n" .UserDescription) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingRacial": [],
+  "RepeatingSkills": [
+    {{- $last := "" -}}
+    {{- range .Skills -}}
+      {{- $tags := join .Tags ", " -}}
+      {{- if not (contains $tags "Technique") -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $base := "" -}}
+        {{- if contains .Difficulty "ST" -}}
+          {{- $base = "@{strength}" -}}
+        {{- else if contains .Difficulty "DX" -}}
+          {{- $base = "@{dexterity}" -}}
+        {{- else if contains .Difficulty "IQ" -}}
+          {{- $base = "@{intelligence}" -}}
+        {{- else if contains .Difficulty "HT" -}}
+          {{- $base = "@{health}" -}}
+        {{- else if contains .Difficulty "Will" -}}
+          {{- $base = "@{willpower}" -}}
+        {{- else if contains .Difficulty "Per" -}}
+          {{- $base = "@{perception}" -}}
+        {{- else -}}
+          {{- $base = "10" -}}
+        {{- end -}}
+        {{- $difficulty := "" -}}
+        {{- if contains .Difficulty "/E" -}}
+          {{- $difficulty = "E" -}}
+        {{- else if contains .Difficulty "/A" -}}
+          {{- $difficulty = "A" -}}
+        {{- else if contains .Difficulty "/H" -}}
+          {{- $difficulty = "H" -}}
+        {{- else if contains .Difficulty "/VH" -}}
+          {{- $difficulty = "VH" -}}
+        {{- else if contains .Difficulty "/WC" -}}
+          {{- $difficulty = "WC" -}}
+        {{- else -}}
+          {{- $difficulty = "A" -}}
+        {{- end -}}
+        {{- $level := "10" -}}
+        {{- if .Level -}}
+          {{- $level = .Level -}}
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Tl\": \"\",\n      \"Base\": \"%s\",\n      \"Difficulty\": \"%s\",\n      \"Bonus\": 0,\n      \"Points\": %s,\n      \"Skill\": %s,\n      \"Ref\": %q,\n      \"SkillModNotes\": \"\",\n      \"Notes\": %q\n    }" .ID .Description $base $difficulty .Points $level .PageRef (print .Notes "\n" .ModifierNotes) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingTechniquesrevised": [
+    {{- $last := "" -}}
+    {{- range .Skills -}}
+      {{- $tags := join .Tags ", " -}}
+      {{- if contains $tags "Technique" -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Parent\": \"\",\n      \"BaseLevel\": \"0\",\n      \"Default\": 0.0,\n      \"MaxModifier\": 0.0,\n      \"Difficulty\": \"%s\",\n      \"SkillModifier\": 0.0,\n      \"Points\": %s,\n      \"Skill\": %s,\n      \"Ref\": %q,\n      \"SkillModNotes\": \"\",\n      \"Notes\": %q\n    }" .ID .Description .Difficulty .Points .Level .PageRef (print .Notes "\n" .ModifierNotes) -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingDefense": [
+    {{- $last := "" -}}
+    {{- range $i, $me := .MeleeWeapons -}}
+      {{- if not (eq $me.Parry "No") -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"MeleeWapon-%d\",\n      \"Name\": %q,\n      \"Type\": \"Parry\",\n      \"Info\": \"\",\n      \"Skill\": %s,\n      \"SkillMod\": 0.0,\n      \"DefenseModReason\": \"\",\n      \"InfoDescription\": \"\"\n    }" $i .Description .Parry -}}
+      {{- end -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingMelee": [
+    {{- $last := "" -}}
+    {{- range $i, $me := .MeleeWeapons -}}
+      {{- $damageDesc := replace .Damage "d" "d6" -}}
+      {{- $damage := "" -}}
+      {{- $type := "" -}}
+      {{- if contains .Damage " cr" -}}
+        {{- $damage = replace $damageDesc " cr" "" -}}
+        {{- $type = "cr" -}}
+      {{- else if contains .Damage " pi" -}}
+        {{- $damage = replace $damageDesc " pi" "" -}}
+        {{- $type = "pi" -}}
+      {{- else if contains .Damage " imp" -}}
+        {{- $damage = replace $damageDesc " imp" "" -}}
+        {{- $type = "imp" -}}
+      {{- else if contains .Damage " cut" -}}
+        {{- $damage = replace $damageDesc " cut" "" -}}
+        {{- $type = "cut" -}}
+      {{- else if contains .Damage " burn" -}}
+        {{- $damage = replace $damageDesc " burn" "" -}}
+        {{- $type = "burn" -}}
+      {{- else if contains .Damage " tox" -}}
+        {{- $damage = replace $damageDesc " tox" "" -}}
+        {{- $type = "tox" -}}
+      {{- else if contains .Damage " aff" -}}
+        {{- $damage = replace $damageDesc " aff" "" -}}
+        {{- $type = "aff" -}}
+      {{- else if contains .Damage " cor" -}}
+        {{- $damage = replace $damageDesc " cor" "" -}}
+        {{- $type = "cor" -}}
+      {{- else if contains .Damage " fat" -}}
+        {{- $damage = replace $damageDesc " fat" "" -}}
+        {{- $type = "fat" -}}
+      {{- else if contains .Damage " spec" -}}
+        {{- $damage = replace $damageDesc " spec" "" -}}
+        {{- $type = "spec" -}}
+      {{- else -}}
+        {{- $damage = $damageDesc -}}
+        {{- $type = "cr" -}}
+      {{- end -}}
+      {{- if $last -}}
+        {{$last}},
+      {{- end -}}
+      {{- $last = printf "\n    {\n      \"Idkey\": \"MeleeWapon-%d\",\n      \"Name\": \"%s (%s)\",\n      \"Damage\": \"%s\",\n      \"Type\": \"%s\",\n      \"Reach\": \"%s\",\n      \"Skill\": %s,\n      \"ArmorDivisor\": 1,\n      \"Notes\": %q,\n      \"Block\": \"%s\",\n      \"Parry\": \"%s\"\n    }" $i .Description .Usage $damage $type .Reach .Level (print .Notes "\\nMinimum ST: " .Strength) .Block .Parry -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingRanged": [
+      {{- $last := "" -}}
+      {{- range $i, $me := .RangedWeapons -}}
+        {{- $damageDesc := replace .Damage "d" "d6" -}}
+        {{- $damage := "" -}}
+        {{- $type := "" -}}
+        {{- if contains .Damage " cr" -}}
+          {{- $damage = replace $damageDesc " cr" "" -}}
+          {{- $type = "cr" -}}
+        {{- else if contains .Damage " pi" -}}
+          {{- $damage = replace $damageDesc " pi" "" -}}
+          {{- $type = "pi" -}}
+        {{- else if contains .Damage " imp" -}}
+          {{- $damage = replace $damageDesc " imp" "" -}}
+          {{- $type = "imp" -}}
+        {{- else if contains .Damage " cut" -}}
+          {{- $damage = replace $damageDesc " cut" "" -}}
+          {{- $type = "cut" -}}
+        {{- else if contains .Damage " burn" -}}
+          {{- $damage = replace $damageDesc " burn" "" -}}
+          {{- $type = "burn" -}}
+        {{- else if contains .Damage " tox" -}}
+          {{- $damage = replace $damageDesc " tox" "" -}}
+          {{- $type = "tox" -}}
+        {{- else if contains .Damage " aff" -}}
+          {{- $damage = replace $damageDesc " aff" "" -}}
+          {{- $type = "aff" -}}
+        {{- else if contains .Damage " cor" -}}
+          {{- $damage = replace $damageDesc " cor" "" -}}
+          {{- $type = "cor" -}}
+        {{- else if contains .Damage " fat" -}}
+          {{- $damage = replace $damageDesc " fat" "" -}}
+          {{- $type = "fat" -}}
+        {{- else if contains .Damage " spec" -}}
+          {{- $damage = replace $damageDesc " spec" "" -}}
+          {{- $type = "spec" -}}
+        {{- else -}}
+          {{- $damage = $damageDesc -}}
+          {{- $type = "cr" -}}
+        {{- end -}}
+        {{- $level := "10" -}}
+        {{- if .Level -}}
+          {{- $level = .Level -}}
+        {{- end -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"RangedWeapon-%d\",\n      \"Name\": %q,\n      \"Damage\": \"%s\",\n      \"Type\": \"%s\",\n      \"Acc\": \"%s\",\n      \"Range\": \"%s\",\n      \"Rof\": \"%s\",\n      \"Shots\": \"%s\",\n      \"Bulk\": \"%s\",\n      \"Recoil\": \"%s\",\n      \"Skill\": %s,\n      \"Malfunction\": false,\n      \"MalfunctionVerify\": false,\n      \"MalfunctionVeryReliable\": false,\n      \"ArmorDivisor\": \"1\",\n      \"Notes\": %q\n    }" $i .Description $damage $type .Accuracy .Range .RateOfFire .Shots .Bulk .Recoil $level (print .Notes "\\nMinimum ST: " .Strength) -}}
+      {{- end -}}
+      {{$last}}
+    ],
+  "RepeatingItem": [
+    {{- $last := "" -}}
+    {{- range .Equipment.Carried -}}
+      {{- if $last -}}
+        {{$last}},
+      {{- end -}}
+      {{- $carried := "0" -}}
+      {{- if .Equipped -}}
+        {{- $carried = "1" -}}
+      {{- end -}}
+      {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Tl\": \"%s\",\n      \"LegalityClass\": \"%s\",\n      \"Ref\": %q,\n      \"Count\": %s,\n      \"Cost\": %s,\n      \"Weight\": \"%s\",\n      \"Carried\": \"%s\",\n      \"Notes\": %q\n    }" .ID .Description .TechLevel .LegalityClass .PageRef .Quantity .Cost (replace .Weight " lb" "") $carried (print .Notes "\\n" .ModifierNotes "\\nUses: " .Uses "\\nMax Uses: " .MaxUses "\\nType: " .Type) -}}
+    {{- end -}}
+    {{$last}}
+  ],
+  "RepeatingSpells": [
+    {{- $last := "" -}}
+    {{- range .Spells -}}
+      {{- if $last -}}
+        {{$last}},
+      {{- end -}}
+      {{- $difficulty := "A" -}}
+      {{- if contains .Difficulty "/E" -}}
+        {{- $difficulty = "E" -}}
+      {{- else if contains .Difficulty "/A" -}}
+        {{- $difficulty = "A" -}}
+      {{- else if contains .Difficulty "/H" -}}
+        {{- $difficulty = "H" -}}
+      {{- else if contains .Difficulty "/VH" -}}
+        {{- $difficulty = "VH" -}}
+      {{- else if contains .Difficulty "/WC" -}}
+        {{- $difficulty = "WC" -}}
+      {{- end -}}
+      {{- $college := "" -}}
+      {{- range $i, $c := .Colleges -}}
+        {{- if eq $i 0 -}}
+          {{- $college = printf "%q" . -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $secondaryCollege := "" -}}
+      {{- range $i, $c := .Colleges -}}
+        {{- if eq $i 1 -}}
+          {{- $secondaryCollege = printf "%q" . -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $spellNotes := print .Notes "\n" .Rituals "\nType:" .Type -}}
+      {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Difficulty\": \"%s\",\n      \"SpellModifier\": 0,\n      \"Points\": %s,\n      \"SpellResistedBy\": %q,\n      \"Duration\": %q,\n      \"Cost\": %q,\n      \"Skill\": %s,\n      \"Ref\": %q,\n      \"Casttime\": \"%s\",\n      \"Maintain\": %q,\n      \"SpellClass\": %q,\n      \"SpellCollege\": %q,\n      \"SpellCollegeSecondary\": %q,\n      \"SpellModNotes\": \"\",\n      \"SpellNotes\": %q\n    }" .ID .Description $difficulty .Points .Resist .Duration .Mana.Cast .Level .PageRef .TimeToCast .Mana.Maintain .Class $college $secondaryCollege $spellNotes -}}
+    {{- end -}}
+    {{$last}}
+  ]
+}

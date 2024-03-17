@@ -1629,10 +1629,13 @@
 							<span data-i18n="grade"></span>
 							<select name="attr_grade" title="@{repeating_augmentations_${x}_grade}">
 								<option data-i18n="used" value="Used">Used</option>
+								<option data-i18n="omega" value="Omega">Omega</option>
+								<option data-i18n="exoware" vaue="Exoware">Exoware</option>
 								<option data-i18n="standard" value="Standard" selected="selected">Standard</option>
 								<option data-i18n="alphaware" value="Alphaware">Alphaware</option>
 								<option data-i18n="betaware" value="Betaware">Betaware</option>
 								<option data-i18n="deltaware" value="Deltaware">Deltaware</option>
+								<option data-i18n="gammaware" value="Gammaware">Gammaware</option>
 							</select>
 						 </label>
 					  </div>
@@ -3477,6 +3480,11 @@
 						<div class="notes-changelog">
 							<div name="changelog" class="changelog">
 								<h1 class="changelog-header">Most Recent Updates</h1>
+								<span class="changelog-entry">**2024-03-03 ** v.86 Chuz (James Culp)
+ 								<ul>
+									<li><span class="bullet">A</span><b>Bugfix</b> - Essence Mod works again
+									<li><span class="bullet">F</span><b>New Feature</b> - Added Omega, Exoware and Gammaware to Augmentation grade drop downs and essence calculations.  They do not however add the bad luck quality or extra condition monitor boxes when selected.
+								</ul>
 								<span class="changelog-entry">**2023-09-04 ** v.85 Chuz (James Culp)</span>
 								<ul>
 									<li><span class="bullet">F</span><b>New Feature</b> - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
@@ -6346,7 +6354,7 @@
 <input type="hidden" name="attr_stealth" value="-1" />
 <input type="hidden" name="attr_tasking" value="-1" />
 
-<input type="hidden" name="attr_sheet_version" value="0.85">
+<input type="hidden" name="attr_sheet_version" value="0.86">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 // Sheet workers
@@ -8472,7 +8480,7 @@ var update_attributes = (attr) => {
 };
 
 
-// Update the essence count (6 - aug_mods - calculated augmentation costs = total)
+// Update the essence count (6 + essence_mod - aug_mods - calculated augmentation costs = total)
 var update_essence = (eventInfo) => {
 	let ess = 6;
 
@@ -8515,9 +8523,12 @@ var update_essence = (eventInfo) => {
 					// Update the essence cost based on the selected grade
 					switch(grade) {
 						case 'Standard':
+						case 'Gammaware':
 							ess_cost = parseFloat(ess_cost * 1).toFixed(2);
 							break;
 						case 'Used':
+						case 'Omega':
+						case 'Exoware':
 							ess_cost = parseFloat(ess_cost * 1.1).toFixed(2);
 							break;
 						case 'Alphaware':
@@ -8556,8 +8567,8 @@ var update_essence = (eventInfo) => {
 			if(! isNaN(a['essence_mod']) && a['essence_mod'] !== '') {
 				ess_mod = a['essence_mod'];
 			}
-			ess += parseFloat(ess_mod);
-			ess -= parseFloat(a['matrix_device_essence_cost']) || 0;
+			ess = parseFloat(ess) + parseFloat(ess_mod);
+			ess = parseFloat(ess) - parseFloat(a['matrix_device_essence_cost']) || 0;
 
 			setAttrs({
 				essence: parseFloat(ess).toFixed(2)
