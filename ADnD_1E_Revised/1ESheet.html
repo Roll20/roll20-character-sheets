@@ -52,9 +52,10 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version"></span>.beta</span>
             </span>
-            <span class="right">3/12/24'</span>
+            <span class="right">3/18/24'</span>
           </h5>
           <ul>
+            <li>Added an auto-fill option for the Attack matrix tables. By default, the to-hit tables will auto-fill the table based on the class and level selected.</li>
             <li>Added "Light Greyhawk" and "Greyhawk" to background colors.</li>
             <li>Added "In Use" checkbox to attacks to better distinguish weapons that are armed, and on-the-ready.</li>
             <li>Added a warning indicator if the attack matrix values have not been filled out. to-Hit table values default to all "20's" otherwise.</li>
@@ -2016,7 +2017,10 @@
               <span>HD/Lvl</span>
             </label>
             <span></span>
-            <h4>Autofill Table:</h4>
+            <label class="inline-label" title="@{autofill_matrix} | Let the sheet auto-fill the to-hit tables when the class and level selectors are changed in the attack Matrix window.">
+              <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
+              <h4>Autofill Table:</h4>
+            </label>
             <label class="center width-large">
               <select class="width-fill border" name="attr_matrix_class" title="@{matrix_class}">
                 <option value="0" selected>Select a Class or Monster</option>
@@ -3755,6 +3759,10 @@
             <label title="@{autocalc_movement_flag} | Let the sheet calculate Movement/Speed. Uses base movement and the current encumbrance(STR vs total_weight carried). Note: Load can can be set manually but any changes to base movement, encumbrance, or opening the sheet will trigger a re-calc.">
               <span>Auto-Calc Movement:</span>
               <input type="checkbox" name="attr_autocalc_movement_flag" value="1" checked />
+            </label>
+            <label title="@{autofill_matrix} | Let the sheet auto-fill the to-hit tables when the class and level selectors are changed in the attack Matrix window.">
+              <span>Auto-fill ToHit:</span>
+              <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
             </label>
           </span>
         </span>
@@ -9628,8 +9636,11 @@
 
   // THAC0
   function calcThac0() {
-    getAttrs(['thac00'], (v) => {
+    getAttrs(['thac00', 'autofill_matrix'], (v) => {
       const output = {};
+      const autocalcFill = +v.autofill_matrix || 0;
+      // bail out if auto-fill is not enabled.
+      if (!autocalcFill) return;
       const baseThac0 = +v.thac00 || 20;
       output[`thac0-10`] = baseThac0 + 10;
       output[`thac0-9`] = baseThac0 + 9;
@@ -9656,10 +9667,13 @@
   }
 
   // Attack Matrix Autofill To-Hit table
-  on('change:matrix_class change:matrix_level change:matrix_hitdice', (eventInfo) => {
+  on('change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix', (eventInfo) => {
     // clog(`Matrix Autofill Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice'], (v) => {
+    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix'], (v) => {
       const output = {};
+      const autocalcFill = +v.autofill_matrix || 0;
+      // bail out if auto-fill is not enabled.
+      if (!autocalcFill) return;
       const classSelected = +v.matrix_class || 0;
       const levelSelected = +v.matrix_level || 0;
       const hitdiceSelected = +v.matrix_hitdice || 0;
@@ -10623,9 +10637,12 @@
     });
   });
 
-  on('sheet:opened change:thac0 change:thac00', (eventInfo) => {
-    getAttrs(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02'], (v) => {
+  on('sheet:opened change:thac0 change:thac00 change:autofill_matrix', (eventInfo) => {
+    getAttrs(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix'], (v) => {
       const output = {};
+      const autocalcFill = +v.autofill_matrix || 0;
+      // bail out if auto-fill is not enabled.
+      if (!autocalcFill) return;
       const attack_matrix_flag = +v.attack_matrix_flag || 0;
       const matrix_class = +v.matrix_class || 0;
       if (attack_matrix_flag === 0 || matrix_class > 0) {
