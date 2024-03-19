@@ -1,3 +1,11 @@
+2024-03-17
+
+ - Add specialisations
+ - Edit specialisations
+ - Add Spell lists on sheet
+ - Edit spells
+ - Bug: Fix skill ranks purchase for specialized skills
+
 2024-03-10
 
 - Skill specialisations now work in Favourite skills
@@ -10,7 +18,9 @@
     - Variance added to racial data
  - Race previews
  - Culture previews
+ - Fancy buttons
  - Edit skills (including fixed specialisations)
  - Edit stats
  - Use icons for edit/info
+ - Other misc fixes.
 
