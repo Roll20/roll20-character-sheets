@@ -11378,14 +11378,15 @@
 	/* ------------------------ */
 	
 	
-	function getDamageDice(damageClass, advantage, isNormal, theSign) {
-		// Converts Damage Class into Damage Dice following the tables of 6E2 101.
+	function getDamageDice(damageClass, advantage, isNormal, thePip) {
+		// Converts Damage Class into Damage Dice following the tables of 6E2 101 and the Expanded Damage Tables.
 		// This is not exactly straightforward and requires special cases.
-		let reducedDC = (damageClass/(1+advantage)).toFixed(3);
+		let normDC = (damageClass/(1+advantage)).toFixed(3);
+		let integerPart = Math.floor(normDC);
+		let remainder = (normDC - integerPart).toFixed(3);
 		let numberOfD6 = 0;
 		let numberOfD3 = 0;
 		let theAdds = 0;
-		let remainder = 0;
 		let divisor = 3; 
 		let limitPlusOne = 0;
 		let limitD3 = 0;
@@ -11395,67 +11396,81 @@
 		
 		if (isNormal) {
 			// Conditions leading to zero, half, or full d6 rounding differs by advantage.
-			if (advantage === 0.75) {
-				limitD6 = 0.72;
-				limitD3 = 0.29;
-			} else if (advantage === 0.25) {
-				limitD6 = 0.70;
-				limitD3 = 0.41;
-			} else {
-				limitD6 = 0.67;
-				limitD3 = 0.34;
-			}
-		} else {
-			// Killing damage dice conditions.
-			if (advantage === 0) {
-				limitPlusOne = 0.3;
-				limitD3 = 0.6;
-			} else if (advantage === 0.25) {
-				limitD6 = 1;
-				limitPlusOne = 0.20;
-				limitD3 = 0.45;
-				limitMinusOne = 0.70;
-				divisor = 4;
-			} else if (advantage === 0.50) {
-				limitD6 = 0.85;
-				limitPlusOne = 0.20;
-				limitD3 = 0.50;
-				limitMinusOne = 0.75;
-				divisor = 4.5;
-			} else if (advantage === 0.75) {
-				limitD6 = 0.95;
-				limitPlusOne = 0.15;
-				limitD3 = 0.55;
-				limitMinusOne = 0.75;
-				divisor = 5.25;
-			} else {
-				limitD6 = 1;
-				limitPlusOne = 0.30;
+			if (advantage === 0.25) {
+				limitD3 = 0.75;
+			} else if (advantage === 0.5) {
 				limitD3 = 0.60;
-				limitMinusOne = 0.75;
-				divisor = 6;
+			} else if (advantage === 0.75) {
+				limitD3 = 0.55;
+			} else if (advantage === 1) {
+				limitD3 = 0.45;
+			} else if (advantage === 1.25) {
+				limitD3 = 0.55;
+			} else if (advantage === 1.5) {
+				limitD3 = 0.55;
+			} else if (advantage === 1.75) {
+				limitD3 = 0.50;
+			} else if (advantage === 2) {
+				limitD3 = 0.50;
 			}
 		}
+		// } else {
+		// 	// Killing damage dice conditions.
+		// 	if (advantage === 0) {
+		// 		limitPlusOne = 0.3;
+		// 		limitD3 = 0.6;
+		// 	} else if (advantage === 0.25) {
+		// 		limitD6 = 1;
+		// 		limitPlusOne = 0.20;
+		// 		limitD3 = 0.45;
+		// 		limitMinusOne = 0.70;
+		// 		divisor = 4;
+		// 	} else if (advantage === 0.50) {
+		// 		limitD6 = 0.85;
+		// 		limitPlusOne = 0.20;
+		// 		limitD3 = 0.50;
+		// 		limitMinusOne = 0.75;
+		// 		divisor = 4.5;
+		// 	} else if (advantage === 0.75) {
+		// 		limitD6 = 0.95;
+		// 		limitPlusOne = 0.15;
+		// 		limitD3 = 0.55;
+		// 		limitMinusOne = 0.75;
+		// 		divisor = 5.25;
+		// 	} else {
+		// 		limitD6 = 1;
+		// 		limitPlusOne = 0.30;
+		// 		limitD3 = 0.60;
+		// 		limitMinusOne = 0.75;
+		// 		divisor = 6;
+		// 	}
+		// }
+		// 
 		
 		// Construct Hero standard dice string.
 		if (isNormal) {
 			// Determine xd6 + (0 or 1)d3.
-			if ((advantage === 0.25) && (damageClass === 1)) {
-				numberOfD6 = 0;
-				numberOfD3 = 1;
-			} else if ((advantage === 0.25) && (damageClass === 2)) {
-				numberOfD6 = 1;
+			if (advantage === 0) {
+				numberOfD6 = damageClass;
 				numberOfD3 = 0;
-			} else {
-				numberOfD6 = Math.floor(reducedDC);
-				remainder = (reducedDC % 1).toFixed(3);
+			} else if (advantage === 0.25) {
+				numberOfD6 = Math.floor(normDC);
 				
-				if (remainder >= limitD6) {
-					numberOfD6 += 1;
-					numberOfD3 = 0;
-				} else if (remainder < limitD3) {
-					numberOfD3 = 0;
+				if (damageClass < 21) {
+					if (remainder > limitD3) {
+						numberOfD3 = 1;
+					}
 				} else {
+					if ( (damageClass === 21) || (damageClass === 26)) {
+						numberOfD6 += 1;
+					} else if ( (damageClass === 22) || (damageClass === 27)) {
+						numberOfD3 += 1;
+					}
+				}
+			} else {
+				numberOfD6 = Math.floor(normDC);
+				
+				if (remainder > limitD3) {
 					numberOfD3 = 1;
 				}
 			}
@@ -11468,70 +11483,75 @@
 				}
 			} else if ((numberOfD6 === 0) && (numberOfD3 !== 0)) {
 				dice = numberOfD3.toString() + "d3";
-			}		
-		} else {
-			// Killing dice.
-			numberOfD6 = Math.floor(damageClass / divisor);
-			remainder = ((damageClass / divisor) % 1).toFixed(3);
-			
-			if (advantage === 0) {
-				if ((remainder > limitD3) && (theSign > 0)) {
-					numberOfD3 = 1;
-				} else if ((remainder > limitD3) && (theSign < 0)) {
-					numberOfD3 = 0;
-					numberOfD6 += 1;
-					theAdds = -1;
-				} else if (remainder > limitPlusOne) {
-					numberOfD3 = 0;
-					theAdds = 1;
-				} else {
-					numberOfD3 = 0;
-					theAdds = 0;
-				}
-			} else {		
-				if (remainder > limitD6) {
-					numberOfD6 += 1;
-					numberOfD3 = 0;
-					theAdds = 0;
-				} else if (remainder > limitMinusOne) {
-					numberOfD6 += 1;
-					numberOfD3 = 0;
-					theAdds = -1;
-				} else if (remainder > limitD3) {
-					numberOfD3 = 1;
-					theAdds = 0;
-				} else if (remainder > limitPlusOne) {
-					numberOfD3 = 0;
-					theAdds = 1;
-				}
 			}
-			
-			// Assemble standard hero killing damage string.
-			if (numberOfD6 !== 0) {
-				dice = numberOfD6.toString() + "d6";
-				if (numberOfD3 !== 0) {
-					dice += "+" + numberOfD3.toString() + "d3";
-				}
-				if (theAdds > 0) {
-					dice += "+1";
-				} else if (theAdds < 0) {
-					dice += "-1";
-				}
-			} else if (numberOfD3 !== 0) {
-				dice = numberOfD3.toString() + "d3";
-				if (theAdds > 0) {
-					dice += "+1";
-				} else if (theAdds < 0) {
-					dice += "-1";
-				}
-			} else {
-				if (theAdds > 0) {
-					dice = "+1";
-				} else {
-					dice = "0"
-				}
-			}
-		}
+		}		
+		// } else {
+		// 	// Killing dice.
+		// 	numberOfD6 = Math.floor(damageClass / divisor);
+		// 	remainder = ((damageClass / divisor) % 1).toFixed(3);
+		// 	
+		// 	if (advantage === 0) {
+		// 		if ((remainder > limitD3) && (theSign > 0)) {
+		// 			numberOfD3 = 1;
+		// 		} else if ((remainder > limitD3) && (theSign < 0)) {
+		// 			numberOfD3 = 0;
+		// 			numberOfD6 += 1;
+		// 			theAdds = -1;
+		// 		} else if (remainder > limitPlusOne) {
+		// 			numberOfD3 = 0;
+		// 			theAdds = 1;
+		// 		} else {
+		// 			numberOfD3 = 0;
+		// 			theAdds = 0;
+		// 		}
+		// 	} else {		
+		// 		if (remainder > limitD6) {
+		// 			numberOfD6 += 1;
+		// 			numberOfD3 = 0;
+		// 			theAdds = 0;
+		// 		} else if (remainder > limitMinusOne) {
+		// 			numberOfD6 += 1;
+		// 			numberOfD3 = 0;
+		// 			theAdds = -1;
+		// 		} else if (remainder > limitD3) {
+		// 			numberOfD3 = 1;
+		// 			theAdds = 0;
+		// 		} else if (remainder > limitPlusOne) {
+		// 			numberOfD3 = 0;
+		// 			theAdds = 1;
+		// 		}
+		// 	}
+		// 	
+		// 	// Assemble standard hero killing damage string.
+		// 	if (numberOfD6 !== 0) {
+		// 		dice = numberOfD6.toString() + "d6";
+		// 		if (numberOfD3 !== 0) {
+		// 			dice += "+" + numberOfD3.toString() + "d3";
+		// 		}
+		// 		if (theAdds > 0) {
+		// 			dice += "+1";
+		// 		} else if (theAdds < 0) {
+		// 			dice += "-1";
+		// 		}
+		// 	} else if (numberOfD3 !== 0) {
+		// 		dice = numberOfD3.toString() + "d3";
+		// 		if (theAdds > 0) {
+		// 			dice += "+1";
+		// 		} else if (theAdds < 0) {
+		// 			dice += "-1";
+		// 		}
+		// 	} else {
+		// 		if (theAdds > 0) {
+		// 			dice = "+1";
+		// 		} else {
+		// 			dice = "0"
+		// 		}
+		// 	}
+		// }
+		
+		setAttrs({
+			treasures: dice + " DC " + damageClass.toString() + " remainder " + remainder.toString()
+		});
 		
 		// Return text string.
 		return dice;
@@ -11619,7 +11639,7 @@
 					thePip = 0;
 				}
 				
-				attributes.treasures = dice.toString() + " " + halfDice.toString() + " " + thePip + '\n';
+				// attributes.treasures = dice.toString() + " " + halfDice.toString() + " " + thePip + '\n';
 				
 				// Calculate damage class, trying to match HERO DC tables.
 				
@@ -11685,52 +11705,52 @@
 					}
 				}
 				
-				attributes.treasures += theDC.toString();
+				// attributes.treasures += theDC.toString();
 				
-				// 
-				// // Prevent out of range strength.
-				// if (minStrength < 1) {
-				// 	// Avoid division by zero.
-				// 	minStrength = 1;
-				// 	attributes["weaponStrengthMin"+weaponId] = 1;
-				// } else if (strengthApplied > values.strength) {
-				// 	strengthApplied = values.strength;
-				// 	attributes["weaponStrength"+weaponId] = strengthApplied;
-				// }
-				// 
-				// // Determine DCs increased by strength.
-				// if (strengthApplied >= minStrength) {
-				// 	strengthLevels = Math.floor((strengthApplied - minStrength)/5);
-				// 	if (strengthEnhanced) {
-				// 		damageLevels += strengthLevels;
-				// 	}
-				// } else {
-				// 	strengthLevels = -heroRoundLow(-(strengthApplied - minStrength)/5);
-				// 	penaltyOCV = strengthLevels;
-				// 	if (strengthEnhanced) {
-				// 		damageLevels += strengthLevels;
-				// 	}
-				// }
-				// 
-				// // Adjust DC due to Strength levels and CSLs.
-				// if (damageLevels > theDC) {
-				// 	adjustedDC = 2*theDC;
-				// } else {
-				// 	adjustedDC = theDC + damageLevels;
-				// }
-				// 
-				// // Prevent a negative DC.
-				// if (adjustedDC < 0) {
-				// 	adjstedDC = 0;
-				// }
-				// 
-				// // Make preference for d6-1 over d3 where ambiguous.
-				// if ( (optionMinusOne) && (!isNormal) && (halfDice !== "1") && (theAdvantage === 0) ) {
-				// 	thePip = -1;
-				// }
-				// 
-				// adjustedDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, thePip);
-				// 
+				
+				// Prevent out of range strength.
+				if (minStrength < 1) {
+					// Avoid division by zero.
+					minStrength = 1;
+					attributes["weaponStrengthMin"+weaponId] = 1;
+				} else if (strengthApplied > values.strength) {
+					strengthApplied = values.strength;
+					attributes["weaponStrength"+weaponId] = strengthApplied;
+				}
+				
+				// Determine DCs increased by strength.
+				if (strengthApplied >= minStrength) {
+					strengthLevels = Math.floor((strengthApplied - minStrength)/5);
+					if (strengthEnhanced) {
+						damageLevels += strengthLevels;
+					}
+				} else {
+					strengthLevels = -heroRoundLow(-(strengthApplied - minStrength)/5);
+					penaltyOCV = strengthLevels;
+					if (strengthEnhanced) {
+						damageLevels += strengthLevels;
+					}
+				}
+				
+				// Adjust DC due to Strength levels and CSLs.
+				if (damageLevels > theDC) {
+					adjustedDC = 2*theDC;
+				} else {
+					adjustedDC = theDC + damageLevels;
+				}
+				
+				// Prevent a negative DC.
+				if (adjustedDC < 0) {
+					adjstedDC = 0;
+				}
+				
+				// Make preference for d6-1 over d3 where ambiguous.
+				if ( (optionMinusOne) && (!isNormal) && (halfDice !== "1") && (theAdvantage === 0) ) {
+					thePip = -1;
+				}
+				
+				adjustedDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, thePip);
+				
 				// attributes["hiddenWeaponSign"+weaponId] = thePip;
 				// attributes["hiddenWeaponDamage"+weaponId] = adjustedDamage;
 				// attributes["weaponAdjustedDamage"+weaponId] = adjustedDamage;
