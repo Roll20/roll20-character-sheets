@@ -11392,16 +11392,18 @@
 		let minusPipHigh = 0;
 		let minusPipLow = 0;
 		let limitD3 = 0;
+		let limitD6 = 0;
 		let dice = "0";
 		
 		if (isNormal) {
 			// Conditions leading to zero, half, or full d6 rounding differs by advantage.
 			if (advantage === 0.25) {
-				limitD3 = 0.75;
+				limitD3 = 0.55;
 			} else if (advantage === 0.5) {
 				limitD3 = 0.60;
 			} else if (advantage === 0.75) {
-				limitD3 = 0.55;
+				limitD3 = 0.4;
+				limitD6 = 0.8;
 			} else if (advantage === 1) {
 				limitD3 = 0.45;
 			} else if (advantage === 1.25) {
@@ -11473,16 +11475,19 @@
 			} else if (advantage === 0.25) {
 				numberOfD6 = Math.floor(normDC);
 				
-				if (damageClass < 21) {
-					if (remainder > limitD3) {
-						numberOfD3 = 1;
-					}
-				} else {
-					if ( (damageClass === 21) || (damageClass === 26)) {
-						numberOfD6 += 1;
-					} else if ( (damageClass === 22) || (damageClass === 27)) {
-						numberOfD3 += 1;
-					}
+				// Special cases.
+				if ( (damageClass % 5) === 1) {
+					numberOfD3 = 1;
+				} else if (damageClass === 2) {
+					numberOfD6 = 1;
+				}
+			} if (advantage === 0.75) {
+				numberOfD6 = Math.floor(normDC);
+				
+				if ((remainder > limitD3) && (remainder < limitD6)) {
+					numberOfD3 = 1;
+				} else if (remainder > limidD6) {
+					numberOfD6 += 1;
 				}
 			} else {
 				numberOfD6 = Math.floor(normDC);
@@ -11613,6 +11618,7 @@
 			}
 		}	
 		
+		/* Debug code */
 		setAttrs({
 			treasures: dice + " DC " + damageClass.toString() + " remainder " + remainder.toString() + " Pip " + thePip.toString()
 		});
@@ -11710,12 +11716,13 @@
 				if (isNormal) {
 					theDC = (1 + theAdvantage) * (Number(dice) + 0.5 * Number(halfDice));	
 					if (theAdvantage === 0.25) {
-						if (theDC < 21) {
-							theDC = Math.ceil(theDC);
-						} else {
-							theDC = Math.round(theDC);
-						}
-					} else if (theAdvantage <= 2.0) {
+						theDC = Math.round(theDC);
+						if (Number(dice) === 1) {
+							theDC = 2;
+						} 
+					} else if (theAdvantage === 0.75) {
+						theDC = Math.floor(theDC + 0.5);
+					} else {
 						theDC = Math.ceil(theDC);
 					}
 				} else {
