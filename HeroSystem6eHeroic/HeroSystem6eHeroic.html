@@ -774,7 +774,7 @@
 						</label>
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>DMG modified by STR:</h2>
+						<h2>DMG Enhanced by STR:</h2>
 						<label class="container-checkbox-small">
 							<input type="checkbox" name="attr_weaponEnhancedByStr01">
 							<span class="checkmark-small" title="@{weaponEnhancedByStr01}"></span>
@@ -876,7 +876,7 @@
 						</label>
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>DMG modified by STR:</h2>
+						<h2>DMG Enhanced by STR:</h2>
 						<label class="container-checkbox-small">
 							<input type="checkbox" name="attr_weaponEnhancedByStr02">
 							<span class="checkmark-small" title="@{weaponEnhancedByStr02}"></span>
@@ -978,7 +978,7 @@
 						</label>
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>DMG modified by STR:</h2>
+						<h2>DMG Enhanced by STR:</h2>
 						<label class="container-checkbox-small">
 							<input type="checkbox" name="attr_weaponEnhancedByStr03">
 							<span class="checkmark-small" title="@{weaponEnhancedByStr03}"></span>
@@ -1080,7 +1080,7 @@
 						</label>
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>DMG modified by STR:</h2>
+						<h2>DMG Enhanced by STR:</h2>
 						<label class="container-checkbox-small">
 							<input type="checkbox" name="attr_weaponEnhancedByStr04">
 							<span class="checkmark-small" title="@{weaponEnhancedByStr04}"></span>
@@ -1182,7 +1182,7 @@
 						</label>
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>DMG modified by STR:</h2>
+						<h2>DMG Enhanced by STR:</h2>
 						<label class="container-checkbox-small">
 							<input type="checkbox" name="attr_weaponEnhancedByStr05">
 							<span class="checkmark-small" title="@{weaponEnhancedByStr05}"></span>
@@ -1276,14 +1276,7 @@
 						<h1>Adjustments</h1>
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>Range Based on STR:</h2>
-						<label class="container-checkbox-small">
-							<input type="checkbox" name="attr_rangeBasedOnStr06">
-							<span class="checkmark-small" title="@{rangeBasedOnStr06}"></span>
-						</label>
-					</div>
-					<div class="subitem-tab-gear-flex-container-set-damage-row">
-						<h2>DMG modified by STR:</h2>
+						<h2>DMG Enhanced by STR:</h2>
 						<label class="container-checkbox-small">
 							<input type="checkbox" name="attr_weaponEnhancedByStr06">
 							<span class="checkmark-small" title="@{weaponEnhancedByStr06}"></span>
@@ -1313,6 +1306,9 @@
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>Adjusted DC:</h2>
 						<input type="number" name="attr_weaponAdjustedDC06" title="@{weaponAdjustedDC06}" readonly step="1" min="0" value="0" tabindex="-1"/>
+					</div>
+					<div class="subitem-tab-gear-flex-container-set-damage-row">
+						<h1>&#8205;</h1>
 					</div>
 				</div>
 				
@@ -8520,7 +8516,7 @@
 	// Update Strength related stats and skills
 	on("change:strength change:useCharacteristicMaximums", function () {
 		getAttrs(["strength","useCharacteristicMaximums"], function(values) {
-	
+			
 			const statValue = parseInt(values.strength)||0;
 			const useMaximums = values.useCharacteristicMaximums;
 			const baseStat = 10;
@@ -11902,6 +11898,56 @@
 		});
 	});
 	
+	
+	// Range Based on Strength
+	arrayOf(maxWeaponNum-1).forEach(num => {
+		var weaponId = String(num).padStart(2,'0');	
+		on(`change:rangeBasedOnStr${weaponId} change:weaponMass${weaponId} change:weaponStrength${weaponId}`, (info) => {
+			getAttrs(["rangeBasedOnStr"+weaponId, "weaponMass"+weaponId, "weaponStrength"+weaponId], function(values) {
+				
+				var attributes = new Object();
+				
+				let getRange = (values["rangeBasedOnStr"+weaponId] === "on") ? true : false;
+				let mass = parseInt(values["weaponMass"+weaponId])||0;
+				let strengthUsed = parseInt(values["weaponStrength"+weaponId])||0;
+				let range = 0;
+				let strMin = 0;
+				let delta = 0;
+				
+				if (mass <= 8) {
+					strMin = 1;
+				} else if (mass <= 16) {
+					strMin = 2;
+				} else if (mass <= 25) {
+					strMin = 3;
+				} else if (mass <= 38) {
+					strMin = 4;
+				} else {
+					strMin = 5 * Math.log2(mass/25);
+				}
+				
+				delta = Math.floor(strengthUsed - strMin);
+				
+				if ((getRange) && (delta > 0)) {
+					for (let i = 1; i < delta; i++) {
+						if (i < 4) {
+							range += 2;
+						} else if ( (i % 5) < 2) {
+							range += 1;
+						} else {
+							range += 2;
+						}
+					}	
+				}
+				
+				attributes["weaponRange"+weaponId] = range/2;
+				
+				setAttrs(attributes);
+			});
+		});
+	});
+	
+	
 	// Show weapons
 	on("clicked:buttonSetOK", function () {
 		setAttrs({
@@ -12913,7 +12959,7 @@
 				attributes["complicationText"+highId] = values["complicationText"+lowId];
 				attributes["complicationCP"+lowId] = values["complicationCP"+highId];
 				attributes["complicationCP"+highId] = values["complicationCP"+lowId];
-							
+				
 				setAttrs(attributes);
 			});
 		});
