@@ -1,3 +1,3 @@
-# Medievo_Oscuro
-Medievo Oscuro roll20-character-sheets.
-Puedes descargar los archivos para jugar a Medievo Oscuro en Roll20
+# VIKINGOS_El juego de Rolf
+VIKINGOS el juego de Rolf Roll20-character-sheets.
+Ficha oficial de Vikingos el Juego de Rolf para Roll20, creada por Victore Jané, uno de los autores del juego.
