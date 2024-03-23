@@ -3,8 +3,8 @@
         | #[span(data-i18n="ARMOR")] – #[span(data-i18n="AC")] #[span(name="attr_AC")]
     .cwn.w-full.grid.grid-flow-col.gap-1.mb.border-bottom.mt.pb-5
         h3(data-i18n="ARMOR")
-        each val in ["melee_armor_class", "ranged_armor_class", "armor_soak", "trauma_target"]
-            +text-input(val, val.toUpperCase())(type="number", value="1", min="0").center
+        each val in ["melee_ac", "ranged_ac", "armor_soak", "trauma_target"]
+            +text-input(`armor_${val}`, `${val.toUpperCase()}`)(type="number", value="1", min="0").center
 
     .table-header.armor-grid.rep-grid
         .ellipsis.center(data-i18n="ACTIVE?")
@@ -17,10 +17,10 @@
         +text-input("innate_ac")(type="number", value="10").center
     input(type="hidden", name="attr_show_armor_details", value="1").input-details
     fieldset.repeating_armor
-        .show-chevron
+        .show-chevron.mb
             +collapseChevron
             button.swn.wwn.display.invisible-button(name="roll_Armor", type="roll", value!="&{template:swn-default} {{charname=@{character_name}}} {{title=@{armor_name}}} {{info=^{ARMOR}: @{armor_ac}}} {{desc=@{armor_description}}}")
-            button.cwn.display.invisible-button(name="roll_Armor", type="roll", value!="&{template:swn-default} {{charname=@{character_name}}} {{title=@{armor_name}}} {{info=^{RANGED_ARMOR_CLASS}: @{armor_ranged_ac}, ^{MELEE_ARMOR_CLASS}: @{armor_melee_ac}, ^{DAMAGE_SOAK}: @{armor_damage_soak}, ^{TRAUMA_TARGET_MOD}: @{armor_trauma_target_mod}}}  {{desc=@{armor_description}}}")
+            button.cwn.display.invisible-button(name="roll_Armor", type="roll", value!="&{template:swn-default} {{charname=@{character_name}}} {{title=@{armor_name}}} {{info=^{RANGED_ARMOR_CLASS}: @{armor_ranged_ac}, ^{MELEE_ARMOR_CLASS}: @{armor_melee_ac}, ^{ARMOR_DAMAGE_SOAK}: @{armor_damage_soak}, ^{ARMOR_TRAUMA_TARGET_MOD}: @{armor_trauma_target_mod}}}  {{desc=@{armor_description}}}")
             .display
                 .grid.armor-grid.border-bottom
                     +fake-text-input().relative
@@ -50,10 +50,14 @@
                 .grid.grid-flow-col.gap-1
                     +fake-text-input("TYPE")
                         select(name="attr_armor_type")
-                            option(value="none", data-i18n="NONE" selected=selected).center
+                            option(value="none", data-i18n="NONE" selected)
                             each val in armor.types
-                                - const selected = val === "STREET";
-                                option(value=val, data-i18n=val).center
+                                option(value=val, data-i18n=val).swn
+                            each val in armor.cwnTypes
+                                option(value=val, data-i18n=val).cwn
+                            each val in armor.wwnTypes
+                                option(value=val, data-i18n=val).wwn
+
                     +text-input("armor_encumbrance", "ENC")(type="number", value="0").center
                     +text-input("armor_encumbrance_bonus", "+STR")(type="number", value="0").center.swn.wwn
                     +fake-text-input("STATUS")
@@ -62,4 +66,4 @@
                             each val in armor.status
                                 option(value=val, data-i18n=val)
                     +text-input("armor_subtle", "SUBTLE").cwn
-                textarea(name="attr_armor_description", data-i18n-placeholder="DESCRIPTION").details
+                textarea(name="attr_armor_description", data-i18n-placeholder="DESCRIPTION")

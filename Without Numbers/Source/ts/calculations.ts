@@ -157,46 +157,51 @@ const calculateAC = () => {
       const activeIDs = idArray.filter(
         (id) => v[`repeating_armor_${id}_armor_active`] === "1"
       );
+      const stackingType = (type: string) =>
+        type === "SHIELD" || type === "ACCESSORY";
 
-      const baseAC = Math.max(
-        parseInt(v.innate_ac) || 0,
-        ...activeIDs
-          .filter((id) => v[`repeating_armor_${id}_armor_type`] !== "SHIELD")
-          .map((id) => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
-      );
+      const calculateArmorClass = (acType: string): number => {
+        return Math.max(
+          parseInt(v.innate_ac) || 0,
+          ...activeIDs
+            .filter(
+              (id) => !stackingType(v[`repeating_armor_${id}_armor_type`])
+            )
+            .map((id) => parseInt(v[`repeating_armor_${id}_${acType}_ac`]) || 0)
+        );
+      };
 
-      const shieldAC = Math.max(
-        0,
-        ...activeIDs
-          .filter((id) => v[`repeating_armor_${id}_armor_type`] === "SHIELD")
-          .map((id) => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
-      );
+      const calculateStackedArmor = (acType: string): number => {
+        return Math.max(
+          0,
+          ...activeIDs
+            .filter((id) => stackingType(v[`repeating_armor_${id}_armor_type`]))
+            .map((id) => parseInt(v[`repeating_armor_${id}_${acType}_ac`]) || 0)
+        );
+      };
 
-      const AC =
-        (shieldAC > 0 ? (shieldAC <= baseAC ? baseAC + 1 : shieldAC) : baseAC) +
-        (parseInt(v.dexterity_mod) || 0);
+      const baseAC = calculateArmorClass("armor");
+      const shieldAC = calculateStackedArmor("armor");
+
+      const base = shieldAC <= baseAC ? baseAC + 1 : shieldAC;
+      const withShield = shieldAC > 0 ? base + 1 : base;
+      const AC = withShield + (parseInt(v.dexterity_mod) || 0);
 
       let update: { [key: string]: number } = { AC };
 
       if (v.system === "cwn") {
-        const ranged_armor_class = Math.max(
-          parseInt(v.innate_ac) || 0,
-          ...activeIDs.map(
-            (id) => parseInt(v[`repeating_armor_${id}_armor_ranged_ac`]) || 0
-          )
-        );
+        const rangedBase = calculateArmorClass("armor_ranged");
+        const rangedStack = calculateStackedArmor("armor_ranged");
+        const armor_ranged_ac = rangedBase + rangedStack;
 
-        const melee_armor_class = Math.max(
-          parseInt(v.innate_ac) || 0,
-          ...activeIDs.map(
-            (id) => parseInt(v[`repeating_armor_${id}_armor_melee_ac`]) || 0
-          )
-        );
+        const meleeBase = calculateArmorClass("armor_melee");
+        const meleeStack = calculateStackedArmor("armor_melee");
+        const armor_melee_ac = meleeBase + meleeStack;
 
         update = {
           ...update,
-          ranged_armor_class,
-          melee_armor_class,
+          armor_ranged_ac,
+          armor_melee_ac,
         };
       }
 
