@@ -56,7 +56,9 @@ function setTenacity(obj, prev, isMax) {
                         targetChars.push(char.get('name'));
                     }
                 });
-                targetChars.push(npcOwner);
+                if(findObjs({ type: 'character', name: npcOwner })[0]) {
+                    targetChars.push(npcOwner);
+                }
             }
         }
         
