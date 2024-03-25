@@ -55,7 +55,7 @@
             <span class="right">3/24/24'</span>
           </h5>
           <ul>
-            <li>Refined the Turn/Command Undead roll to check a given type of Undead vs all possible Undead. While the Turn Undead roll can be found in Settings|Misc., add the chat menu button <code>[Turn Undead](~selected|turn_undead_roll)</code> to a Special Ability description, custom macros, etc. to make the Turn/Command Undead roll directly from the chat window.</li>
+            <li>Refined the Turn/Command Undead roll to check a given type of Undead vs all possible Undead. While the Turn Undead roll can be found in Settings|Misc. use the '+Add' to create a unique, non-synced, Special Ability that includes a chat menu button to roll the Turn Undead check from chat.</li>
             <li>Added a Turn Undead roll. Located in Settings|Misc. Reminder: nearly all the buttons on the sheet can be dragged to the macrobar and/or used in other macros to execute a sheet roll without having to open the sheet.</li>
             <li>Added dice icon to ability row rolls.</li>
             <li>Added Suprise Others roll.</li>
@@ -3746,10 +3746,13 @@
                 <option value="@{whisper_pc} &{template:general} {{name=@{character_name}}} {{subtag=Turn/Command Undead Lvl: 14+}} {{color=@{color_option}}} {{# & Type Effected}} {{?{Undead Type?|Skeleton,[[1d6+6 [D&dagger;]]]Skeleton's=D&dagger;|Zombie,[[1d6+6 [D&dagger;]]]Zombie's=D&dagger;|Ghoul,[[1d6+6 [D&dagger;]]]Ghoul's=D&dagger;|Shadow,[[1d6+6 [D&dagger;]]]Shadow's=D&dagger;|Wight,[[1d12 [D]]]Wight's=D|Ghast,[[1d12 [D]]]Ghast's=D|Wraith,[[1d12 [D]]]Wraith's=D|Mummy,[[1d12 [T]]]Mummy's=T|Spectre,[[1d12 [T]]]Spectre's=T|Vampire,[[1d12]]Vampire's=[[1d20cs>4cf<4]]|Ghost,[[1d12]]Ghost's=[[1d20cs>7cf<7]]|Lich,[[1d12]]Lich's=[[1d20cs>10cf<10]]|Special,[[1d2 [Special]]]Special=[[1d20cs>13cf<13]]}}} {{Turned for [[3d4]]rounds}}">14+</option>
               </select>
             </label>
-            <label title="%{turn_undead_roll} | Hint: add the chat menu button `[Turn Undead](~selected|turn_undead_roll)` to a Special Ability description, custom macros, etc. to make the Turn/Command Undead roll directly from the chat window.">
+            <label title="%{turn_undead_roll}">
               <button type="roll" name="roll_turn_undead_roll" value="@{turn_undead_macro}">
                 <span>Turn Undead</span>
               </button>
+            </label>
+            <label title="Add to Special Abilities. Creates a unique, non-synced, ability.">
+              <button type="action" name="act_addturnundead"><span>+Add</span></button>
             </label>
           </span>
         </span>
@@ -8057,6 +8060,14 @@
   on('clicked:repeating_equipment:addattack', (eventInfo) => {
     const id = eventInfo.sourceAttribute.split('_')[2];
     createAttack(id);
+  });
+
+  on('clicked:addturnundead', (eventInfo) => {
+    const output = {};
+    const newID = generateUniqueRowID();
+    output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead Check';
+    output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead](~selected|turn_undead_roll)';
+    setAttrs(output, {silent: true});
   });
 
   // resets the matching Armor Detail row attributes if removed
