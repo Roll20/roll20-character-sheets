@@ -254,8 +254,8 @@ on(talents.map(talent => "clicked:" + talent + "-action").join(" "), async (info
 			TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 		}
 
-		// Max. TaP* = TaW
-		TaPstar = Math.min(TaW, TaPstar);
+		// Max. TaP* = TaW, mindestens aber 0
+		TaPstar = Math.min(Math.max(TaW, 0), TaPstar);
 
 		// Ergebnis an Doppel/Dreifach-20 anpassen
 		if (Math.abs(criticality) <= 1)
@@ -400,8 +400,8 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 			TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 		}
 
-		// Max. TaP* = TaW
-		TaPstar = Math.min(TaW, TaPstar);
+		// Max. TaP* = TaW, mindestens aber 0
+		TaPstar = Math.min(Math.max(TaW, 0), TaPstar);
 
 		// Ergebnis an Doppel/Dreifach-20 anpassen
 		if (Math.abs(criticality) <= 1)
