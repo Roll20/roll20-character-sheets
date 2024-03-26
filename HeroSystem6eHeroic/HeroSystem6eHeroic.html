@@ -7896,25 +7896,6 @@
 </rolltemplate>
 
 <!-- Jackob's Roll Template used for showing talents, perks, and complications -->
-<rolltemplate class="sheet-rolltemplate-custom-contest">
-	<div class="sheet-template-wrapper">
-		<div class="sheet-container sheet-color-{{color}}">
-			<div class="sheet-header">
-				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
-				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
-			</div>
-			<div class="sheet-content">
-				{{#allprops() title subtitle desc color STR PIPS}}
-				<div class="sheet-key">{{key}}</div>
-				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color STR PIPS}}
-				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
-			</div>
-		</div>
-	</div>
-</rolltemplate>
-
-<!-- Jackob's Roll Template used for showing talents, perks, and complications -->
 <rolltemplate class="sheet-rolltemplate-custom-show">
 	<div class="sheet-template-wrapper">
 		<div class="sheet-container sheet-color-{{color}}">
@@ -7956,6 +7937,26 @@
 
 <!-- Jackob's Roll Template for killing damage attacks -->
 <rolltemplate class="sheet-rolltemplate-custom-attack">
+	<div class="sheet-template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+			</div>
+			<div class="sheet-content">
+				{{#allprops() title subtitle desc color}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle desc color}}
+				
+				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Jackob's Roll Template used for showing talents, perks, and complications -->
+<rolltemplate class="sheet-rolltemplate-custom-contest">
 	<div class="sheet-template-wrapper">
 		<div class="sheet-container sheet-color-{{color}}">
 			<div class="sheet-header">
@@ -8052,10 +8053,10 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color HITLOC STUN BODY}}
+				{{#allprops() title subtitle desc color CHAR PIPS}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color HITLOC STUN BODY}}
+				{{/allprops() title subtitle desc color CHAR PIPS}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 				
 				<!-- Attribute and "Body" Pips -->
@@ -12051,13 +12052,8 @@
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 			}
 			
-			setAttrs({
-				"treasures": theRoll
-			});
-			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
-				
 				var computed = parseInt(results.results[dmgType].result)||0;
 				
 				if (!isContest) {
@@ -12071,9 +12067,12 @@
 					theSTUNMultiplier = theHitLocation.STUNx;
 				}
 				
-				if (isNormalDamage || isContest) {
+				if (isNormalDamage) {
 					// Convert dice roll to equivalent BODY damage.
 					computed = convertStunToBody(results.results.STUN.rolls);
+				} else if (isContest) {
+					// Convert dice roll to equivalent BODY damage.
+					computed = convertStunToBody(results.results.CHAR.rolls);
 				} else {
 					theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
 					computed *= theSTUNMultiplier;
@@ -12089,6 +12088,11 @@
 				
 				finishRoll(results.rollId, theResult);
 			});
+			
+			
+			// setAttrs({
+			// 	"treasures": JSON.stringify(results.results[dmgType].result)
+			// });
 		});
 	});
 
