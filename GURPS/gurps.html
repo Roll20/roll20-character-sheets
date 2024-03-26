@@ -19950,6 +19950,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<div class="container-label-input grid__gap_small">
 										<span>
 											<input type="number" name="attr_cold_exposure_temperature" value="32" step="1" class="medium-width" />
+											<input type="hidden" name="attr_cold_exposure_temperature_fahrenheit" value="32" />
 										</span>
 										<span>
 											<select name="attr_cold_exposure_temperature_unit_type">
@@ -20008,10 +20009,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 										</span>
 										<span>
 											<select name="attr_cold_exposure_clothing">
-												<option value="light" data-i18n="clothing-option-light">Light or no clothing, -5</option>
-												<option value="winter" data-i18n="clothing-option-winter" selected>Winter clothing, +0</option>
-												<option value="arctic" data-i18n="clothing-option-arctic">"Arctic" clothing, +5</option>
-												<option value="heated" data-i18n="clothing-option-heated">Heated suit, +10</option>
+												<option value="-5" data-i18n="clothing-option-light">Light or no clothing, -5</option>
+												<option value="0" data-i18n="clothing-option-winter" selected>Winter clothing, +0</option>
+												<option value="5" data-i18n="clothing-option-arctic">"Arctic" clothing, +5</option>
+												<option value="10" data-i18n="clothing-option-heated">Heated suit, +10</option>
 											</select>
 										</span>
 									</div>
@@ -20030,6 +20031,21 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 							</div>
 							<div class="grid-2-column-auto grid__gap_large grid__align_center">
+
+								<div class="grid-cell">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="temperature-modifier-label">Temperature Modifier</span>
+											<span class="tooltiptext">
+												<span data-i18n="temperature-modifier-tooltip">Effective temperature modifier, for every 10° below 0°F or 5° below -18°C, apply a -1 modifier.</span>
+											</span>
+										</div>
+									</label>
+								</div>
+								<div class="grid-cell">
+									<input type="hidden" name="attr_cold_exposure_temperature_modifier" value="0" />
+									<span name="attr_cold_exposure_temperature_modifier"></span>
+								</div>
 								
 								<div class="grid-cell">
 									<label>
@@ -20045,12 +20061,10 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<div class="container-label-input grid__gap_small">
 										<span>
 											<input type="number" name="attr_cold_exposure_lower_comfort_zone" value="35" step="1" class="medium-width" />
+											<input type="hidden" name="attr_cold_exposure_lower_comfort_zone_fahrenheit" value="35" />
 										</span>
 										<span>
-											<select name="attr_cold_exposure_lower_comfort_zone_unit_type">
-												<option value="fahrenheit" data-i18n="unit-type-fahrenheit" selected>Fahrenheit</option>
-												<option value="celsius" data-i18n="unit-type-celsius">Celcius</option>
-											</select>
+											<span name="attr_cold_exposure_current_unit_type_display"></span>
 										</span>
 									</div>
 								</div>
@@ -20070,11 +20084,31 @@ Select the indent level of the inventory item. This is handy to help show the it
 								</div>
 
 								<div class="grid-cell">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="temperature-tolerance-health-label">Temperature Tolerance HT</span>
+											<span class="tooltiptext">
+												<span data-i18n="temperature-tolerance-health-tooltip">Enter the character's HT that will be used with Temperature Tolerance.</span>
+											</span>
+										</div>
+									</label>
+								</div>
+								<div class="grid-cell">
+									<input type="number" name="attr_cold_exposure_temperature_tolerance_health" value="10" min="1" step="1" class="medium-width" />
+								</div>
+
+								<div class="grid-cell">
 									<span data-i18n="effective-comfort-zone-label">Effective Comfort Zone</span>
 								</div>
 								<div class="grid-cell">
 									<input type="hidden" name="attr_cold_exposure_effective_comfort_zone" value="35" />
-									<span name="attr_cold_exposure_effective_comfort_zone"></span>
+									<input type="hidden" name="attr_cold_exposure_effective_comfort_zone_display" value="35 °F" />
+									<input type="hidden" name="attr_cold_exposure_effective_comfort_zone_modifier" value="0" />
+									<input type="hidden" name="attr_cold_exposure_must_roll" value="1" />
+									<input type="hidden" name="attr_cold_exposure_must_roll_text" value="must roll" />
+									<input type="hidden" name="attr_cold_exposure_current_unit_type" value="fahrenheit" />
+									<span name="attr_cold_exposure_effective_comfort_zone_display"></span>
+									<i>(<span name="attr_cold_exposure_must_roll_text"></span>)</i>
 								</div>
 
 							</div>
@@ -20139,8 +20173,14 @@ Select the indent level of the inventory item. This is handy to help show the it
 												<input type="hidden" name="attr_cold_exposure_effective_health_level" value="10" />
 												<span name="attr_cold_exposure_effective_health_level"></span>
 											</span>
-											<span>
-												<button type="action" name="act_roll_skill_cold" class="button-roll-template sheet-btn sheet-ui-draggable" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[0]]}} {{characterName=Cold Exposure}} {{skillName=HT}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{cold_exposure_effective_health_level}]]}} {{showNotes=[[0]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[1]]}}"></button>
+											<input type="hidden" name="attr_cold_exposure_must_roll" />
+											<span class="cold-exposure-roll">
+												<input type="hidden" name="attr_cold_exposure_success_note" value="No fatigue loss." />
+												<input type="hidden" name="attr_cold_exposure_critical_success_note" value="No fatigue loss." />
+												<input type="hidden" name="attr_cold_exposure_fail_note" value="Lose 1 FP." />
+												<input type="hidden" name="attr_cold_exposure_critical_fail_note" value="Lose 1 FP." />
+												<input type="hidden" name="attr_cold_exposure_modifier_summary" value="" />
+												<button type="action" name="act_roll_skill_cold" class="button-roll-template sheet-btn sheet-ui-draggable" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=Cold Exposure}} {{skillName=Health Roll}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{cold_exposure_effective_health_level}]]}} {{showNotes=[[0]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifier=[[@{cold_exposure_health_modifier_total}]]}} {{rollModifierSummary=@{cold_exposure_modifier_summary}}} {{customSuccessNote=@{cold_exposure_success_note}}} {{customCriticalSuccessNote=@{cold_exposure_critical_success_note}}} {{customFailNote=@{cold_exposure_fail_note}}} {{customCriticalFailNote=@{cold_exposure_critical_fail_note}}}"></button>
 											</span>
 										</div>
 									</div>
@@ -46922,6 +46962,7 @@ Characters with Skill: ${knowsSkill}`;
 		"roll_skill_stealth",
 		"roll_skill_vision",
 		"roll_skill_hearing",
+		"roll_skill_cold",
 	];
 
 	rollButtons.forEach( button => {
@@ -46972,7 +47013,12 @@ Characters with Skill: ${knowsSkill}`;
 				
 				await rollAttackRangedSkillRoll(event);
 
-			} else if (source.includes("roll_skill")) {
+			} else if (source.includes("roll_skill_cold")) {
+				
+				// TODO: change if we need custom stuff for skills
+				await rollColdSkillRollCold(event);
+
+			}else if (source.includes("roll_skill")) {
 				
 				// TODO: change if we need custom stuff for skills
 				await rollAttributeSkillRoll(event);
@@ -46990,6 +47036,35 @@ Characters with Skill: ${knowsSkill}`;
 		if (!rollData) {
 			// something's wrong
 			console.log("rollAttributeSkillRoll: Data Error", event);
+			return;
+		}
+
+		// append the rollDifference
+		rollData += " {{rollDifference=[[0]]}}";
+
+		const skillRoll = await startRoll(rollData);
+
+		const effectiveSkill = skillRoll.results.effectiveSkill.result;
+
+		const roll = skillRoll.results.rollResult.result;
+
+		const difference = effectiveSkill - roll;
+
+		let customData = {
+			rollDifference: difference
+		};
+
+		finishRoll(skillRoll.rollId, customData);
+
+	}
+
+	const rollColdSkillRollCold = async (event) => {
+
+		let rollData = event.htmlAttributes.value ?? "";
+
+		if (!rollData) {
+			// something's wrong
+			console.log("rollColdSkillRollCold: Data Error", event);
 			return;
 		}
 
@@ -50220,6 +50295,358 @@ Characters with Skill: ${knowsSkill}`;
 			});
 
 		});
+	}
+
+	on("change:cold_exposure_temperature change:cold_exposure_lower_comfort_zone", event => {
+
+		if (event.sourceType == "player" ) {
+
+			let fieldName = event.sourceAttribute;
+
+			let fieldValue = event.newValue;
+			
+			updateColdExposureFahrenheitValues(fieldName, fieldValue);
+			
+		}
+
+	});
+
+	const updateColdExposureFahrenheitValues = (fieldName, fieldValue) => {
+
+		let fields = ["cold_exposure_temperature_unit_type"];
+
+		getAttrs(fields, values => {
+
+			let unitType = values.cold_exposure_temperature_unit_type;
+
+			if (unitType == "celsius") {
+				// convert fieldValue from celsius to farhenheit
+				fieldValue = Math.round((fieldValue * 9/5) + 32);
+			}
+
+			let keyValues = {};
+
+			keyValues[`${fieldName}_fahrenheit`] = fieldValue;
+
+			setAttrs(keyValues);
+
+		});
+	}
+
+	on("change:cold_exposure_temperature_unit_type", event => {
+
+		const unitType = event.newValue;
+
+		updateColdExposureUnitType(unitType);
+	});
+
+	const updateColdExposureUnitType = unitType => {
+
+		let unitTypeDisplay = "";
+
+		if (unitType == "fahrenheit") {
+			unitTypeDisplay = "°F";
+		} else if (unitType == "celsius") {
+			unitTypeDisplay = "°C";	
+		}
+
+		let fields = ["cold_exposure_temperature", "cold_exposure_lower_comfort_zone"];
+
+		getAttrs(fields, values => {
+			
+			let currentTemp = Number(values.cold_exposure_temperature) ?? 34;
+
+			let currentTempFahrenheit = 34;
+
+			let comfortZone = Number(values.cold_exposure_lower_comfort_zone) ?? 35;
+
+			let comfortZoneFahrenheit = 35;
+
+			if (unitType == "fahrenheit") {
+				// convert currentTemp from celsius to fahrenheit and round to nearest integer
+				currentTemp = Math.round((currentTemp * 9/5) + 32);
+				comfortZone = Math.round((comfortZone * 9/5) + 32);
+
+				// store the fahrenheit values
+				currentTempFahrenheit = currentTemp;
+				comfortZoneFahrenheit = comfortZone;
+
+			} else if (unitType == "celsius") {
+				
+				// store the fahrenheit values
+				currentTempFahrenheit = currentTemp;
+				comfortZoneFahrenheit = comfortZone;
+
+				// convert currentTemp from fahrenheit to celsius and round to nearest integer
+				currentTemp = Math.round((currentTemp - 32) * 5/9);
+				comfortZone = Math.round((comfortZone - 32) * 5/9);
+				
+			}
+
+			let keyValues = {
+				cold_exposure_temperature: currentTemp,
+				cold_exposure_temperature_fahrenheit: currentTempFahrenheit,
+				cold_exposure_lower_comfort_zone: comfortZone,
+				cold_exposure_lower_comfort_zone_fahrenheit: comfortZoneFahrenheit,
+				cold_exposure_current_unit_type: unitType,
+				cold_exposure_current_unit_type_display: unitTypeDisplay
+			};
+	
+			setAttrs(keyValues);
+		});
+
+	}
+
+	on("change:cold_exposure_wind change:cold_exposure_thermal_shock", event => {
+
+		updateColdExposureFrequency();
+
+		if (event.sourceAttribute == "cold_exposure_thermal_shock") {
+
+			let applyThermalShock = event.newValue == "1";
+
+			updateColdExposureSuccessFailNotes(applyThermalShock);
+		}
+
+	});
+
+	const updateColdExposureFrequency = () => {
+
+		let fields = ["cold_exposure_wind", "cold_exposure_thermal_shock"];
+
+		getAttrs(fields, values => {
+
+			let applyThermalShock = values.cold_exposure_thermal_shock == "1";
+
+			let windLevel = values.cold_exposure_wind;
+
+			let frequency = "30";
+
+			if (applyThermalShock) {
+				frequency = "1";
+			} else if (windLevel == "calm") {
+				frequency = "30";
+			} else if (windLevel == "light") {
+				frequency = "15";
+			} else if (windLevel == "strong") {
+				frequency = "10";
+			} 
+			
+			let keyValues = {
+				cold_exposure_frequency: frequency
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	const updateColdExposureSuccessFailNotes = (applyThermalShock) => {
+
+		let successNote = "No fatigue loss.";
+
+		let criticalSuccessNote = "No fatigue loss.";
+
+		let failNote = "Lose 1 FP.";
+
+		let criticalFailNote = "Lose 1 FP.";
+
+		if (applyThermalShock) {
+			successNote = "Lose 1 FP.";
+			criticalSuccessNote = "Lose 1 FP or GM discretion.";
+			failNote = "Lose 1 FP per margin of failure.";
+			criticalFailNote = "Lose 1 FP per margin of failure.";
+		}
+
+		let keyValues = {
+			cold_exposure_success_note: successNote,
+			cold_exposure_critical_success_note: criticalSuccessNote,
+			cold_exposure_fail_note: failNote,
+			cold_exposure_critical_fail_note: criticalFailNote
+		};
+
+		setAttrs(keyValues);
+
+	}
+
+	on("change:cold_exposure_current_unit_type change:cold_exposure_temperature_fahrenheit change:cold_exposure_lower_comfort_zone_fahrenheit change:cold_exposure_temperature_tolerance change:cold_exposure_temperature_tolerance_health", event => {
+		updateColdExposureEffectiveComfortZone();
+	});
+
+	const updateColdExposureEffectiveComfortZone = () => {
+
+		let fields = [
+			"cold_exposure_lower_comfort_zone_fahrenheit", 
+			"cold_exposure_temperature_tolerance",
+			"cold_exposure_current_unit_type_display",
+			"cold_exposure_temperature_tolerance_health",
+			"cold_exposure_temperature_fahrenheit",
+			"cold_exposure_current_unit_type"
+		];
+
+		getAttrs(fields, values => {
+
+			let unitType = values.cold_exposure_current_unit_type;
+
+			let lowerComfortZone = Number(values.cold_exposure_lower_comfort_zone_fahrenheit) ?? 35;
+
+			let tolerance = Number(values.cold_exposure_temperature_tolerance) ?? 0;
+
+			let health = Number(values.cold_exposure_temperature_tolerance_health) ?? 10;
+
+			let unitTypeDisplay = values.cold_exposure_current_unit_type_display;
+
+			let toleranceModifier = -1 * tolerance * health;
+
+			let effectiveComfortZone = lowerComfortZone + toleranceModifier;
+
+			let currentTemp = Number(values.cold_exposure_temperature_fahrenheit) ?? 34;
+
+			let effectiveComfortZoneDisplay = `${effectiveComfortZone} ${unitTypeDisplay}`;
+
+			if (unitType == "celsius") {
+				let effectiveComfortZoneCelsius = Math.floor((effectiveComfortZone - 32) * 5/9);
+				effectiveComfortZoneDisplay = `${effectiveComfortZoneCelsius} °C`;
+			}
+
+			let mustRoll = "1";
+
+			let mustRollText = "must roll";
+
+			if (currentTemp >= effectiveComfortZone) {
+				mustRoll = "0";
+				mustRollText = "no roll needed";
+			}
+
+			let keyValues = {
+				cold_exposure_effective_comfort_zone: effectiveComfortZone,
+				cold_exposure_effective_comfort_zone_display: effectiveComfortZoneDisplay,
+				cold_exposure_must_roll: mustRoll,
+				cold_exposure_must_roll_text: mustRollText
+			};
+
+			setAttrs(keyValues);
+
+		});
+	}
+
+	on("change:cold_exposure_temperature change:cold_exposure_temperature_unit_type", event => {
+		updateTemperatureModifier();
+	});
+
+	const updateTemperatureModifier = () => {
+
+		let fields = ["cold_exposure_temperature", "cold_exposure_temperature_unit_type"];
+
+		getAttrs(fields, values => {
+
+			let baseTemp = Number(values.cold_exposure_temperature) ?? 34;
+
+			let unitType = values.cold_exposure_temperature_unit_type;
+
+			if (unitType == "celsius") {
+				// convert baseTemp from celsius to fahrenheit
+				baseTemp = (baseTemp * 9/5) + 32;
+			}
+
+			let tempMod = 0;
+
+			// formula: if baseTemp is less 0°F, than subtract 1 from tempMod for every full 10° below 0°F
+			if (baseTemp < 0) {
+				tempMod = Math.ceil(baseTemp / 10);
+			}
+
+			let keyValues = {
+				cold_exposure_temperature_modifier: tempMod
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	on("change:cold_exposure_temperature_modifier change:cold_exposure_clothing change:cold_exposure_wet_clothes change:cold_exposure_health_modifier", event => {
+		updateColdExposureTotalModifier();
+	});
+
+	const updateColdExposureTotalModifier = () => {
+
+		let fields = [
+			"cold_exposure_temperature_modifier",
+			"cold_exposure_clothing",
+			"cold_exposure_wet_clothes",
+			"cold_exposure_health_modifier"
+		];
+
+		getAttrs(fields, values => {
+
+			let tempMod = Number(values.cold_exposure_temperature_modifier) ?? 0;
+
+			let clothing = Number(values.cold_exposure_clothing) ?? 0;
+
+			let wetClothes = values.cold_exposure_wet_clothes == "1" ? -5 : 0;
+
+			let healthMod = Number(values.cold_exposure_health_modifier) ?? 0;
+
+			let totalMod = tempMod + clothing + wetClothes + healthMod;
+
+			let arrSummary = [];
+
+			if (tempMod < 0) {
+				arrSummary.push(`Temperature: ${tempMod}`);
+			}
+
+			if (clothing != 0) {
+				arrSummary.push(`Clothing: ${clothing}`);
+			}
+
+			if (wetClothes != 0) {
+				arrSummary.push(`Wet Clothes: ${wetClothes}`);
+			}
+
+			if (healthMod != 0) {
+				arrSummary.push(`Health: ${healthMod}`);
+			}
+
+			let summary = arrSummary.join(", ");
+
+			let keyValues = {
+				cold_exposure_health_modifier_total: totalMod,
+				cold_exposure_modifier_summary: summary
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	on("change:cold_exposure_health_level change:cold_exposure_health_modifier_total", event => {
+		updateColdExposureEffectiveHealth();
+	});
+
+	const updateColdExposureEffectiveHealth = () => {
+
+		let fields = ["cold_exposure_health_level", "cold_exposure_health_modifier_total"];
+	
+		getAttrs(fields, values => {
+
+			let healthLevel = Number(values.cold_exposure_health_level) ?? 10;
+
+			let healthMod = Number(values.cold_exposure_health_modifier_total) ?? 0;
+
+			let effectiveHealth = healthLevel + healthMod;
+
+			let keyValues = {
+				cold_exposure_effective_health_level: effectiveHealth
+			};
+
+			setAttrs(keyValues);
+
+		});
+
 	}
 
 </script>
