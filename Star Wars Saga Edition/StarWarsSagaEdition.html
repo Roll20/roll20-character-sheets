@@ -6763,6 +6763,10 @@ on("sheet:opened", function() {
 on("change:level", function() {
 	ArmorUpdate();
 	SkillUpdate();
+	ForceDieUpdate();
+});
+on("change:nonlevel", function() {
+	ForceDieUpdate();
 });
 on("change:size", function() {
 	SizeUpdate();
@@ -7546,6 +7550,44 @@ var SecondWindUpdate = function() {
             // changes the "Second_Wind" sheet attribute to be the value of our temporary variable "SecondWindValue"
 		});
 	});
+}
+var ForceDieUpdate = function() {
+    getAttrs(["level","nonlevel","FP_max"], function(values) {
+        // The current roll code as a string. E.g. "1d6", "2d6" etcetera.
+        let force_dice = values.FP_max;
+
+        // Parse the different character sheet levels.
+        let heroic_level = parseInt(values.level);
+        let nonheroic_level = parseInt(values.nonlevel);
+        
+        // Log the initial value.
+        console.log(force_dice);
+        
+        // Extract the current die size (e.g d6, d8)
+        force_dice = force_dice.split("d").slice(-1);
+
+        // Set the number of die rolled.
+        if(heroic_level + nonheroic_level >=15) {
+            // Append the die magnitude.
+            force_dice = "3d" + force_dice;
+        }
+        else if(heroic_level + nonheroic_level >=8) {
+            // Append the die magnitude.
+            force_dice = "2d" + force_dice;
+
+        }
+        else {
+            // Append the die magnitude.
+            force_dice = "1d" + force_dice;
+        }
+        // log the new value.
+        console.log(force_dice);
+
+        // Set the new force die roll formula.
+        setAttrs({
+            "FP_max": force_dice
+        });
+    });
 }
 var SkillUpdate = function() {
 	getAttrs(["AcrobaticsFormula","AthleticsFormula","ClimbFormula","DeceptionFormula","EnduranceFormula","GatherInformationFormula","InitiativeFormula","JumpFormula","Knowledge-BureaucracyFormula","Knowledge-GalacticLoreFormula","Knowledge-LifeSciencesFormula","Knowledge-PhysicalScienceFormula","Knowledge-SocialScienceFormula","Knowledge-TacticsFormula","Knowledge-TechnologyFormula","MechanicsFormula","PerceptionFormula","PersuasionFormula","PilotFormula","RideFormula","StealthFormula","SurvivalFormula","SwimFormula","TreatInjuryFormula","UseComputerFormula","UsetheForceFormula"], function(values) {
