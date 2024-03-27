@@ -7736,6 +7736,7 @@
 <input type="hidden" name="attr_hiddenDamage"  value="4d6"/>
 <input type="hidden" name="attr_hiddenIsNormal"  value="true"/>
 <input type="hidden" name="attr_hiddenIsContest"  value="false"/>
+<input type="hidden" name="attr_hiddenIsAoE" value="false"/>
 <input type="hidden" name="attr_hiddenStunMod"  value="0"/>
 <input type="hidden" name="attr_hiddenMessage"  value="Test"/>
 
@@ -11442,7 +11443,7 @@
 		return computed;
 	}
 	
-		
+	
 	function getRangePenalty(range) {
 		// Uses a lookup table or for longer ranges calculates the range penalty for an attack.
 		let thePenalty = 0;
@@ -11711,12 +11712,7 @@
 				}
 			}
 		}	
-		
-		/* Debug code */
-		// setAttrs({
-		// 	treasures: dice + " DC " + damageClass.toString() + " remainder " + remainder.toString() + " Pip " + thePip.toString()
-		// });
-		
+
 		// Return text string.
 		return dice;
 	}
@@ -11803,9 +11799,6 @@
 					thePip = 0;
 				}
 				
-				/* Debug code */
-				// attributes.treasures = dice.toString() + " " + halfDice.toString() + " " + thePip + '\n';
-				
 				// Calculate damage class, trying to match HERO DC tables.
 				if (isNormal) {
 					theDC = (1 + theAdvantage) * (Number(dice) + 0.5 * Number(halfDice));	
@@ -11880,10 +11873,6 @@
 						theDC = Math.ceil(theDC);
 					}
 				}
-				
-				/* Debug code */
-				// attributes.treasures = theAdvantage.toString() + " " + Number(dice).toString() + " " + Number(halfDice).toString() + " " + thePip.toString() + " " + theDC.toString();
-				
 				
 				// Prevent out of range strength.
 				if (minStrength < 1) {
@@ -11973,6 +11962,25 @@
 	});
 	
 	
+	// Correct out of range STUNx
+	arrayOf(maxWeaponNum).forEach(num => {
+		var weaponId = String(num).padStart(2,'0');	
+		on(`change:weaponStunMod${weaponId}`, (info) => {
+			getAttrs(["weaponStunMod"+weaponId], function(values) {
+				var attributes = new Object();
+				
+				let min = 0;
+				let max = 2;
+				let STUNx = parseInt(values["weaponStunMod"+weaponId]||0);
+				
+				attributes["weaponStunMod"+weaponId] = Math.min(Math.max(STUNx, min), max);
+				
+				setAttrs(attributes);
+			});
+		});
+	});
+	
+	
 	// Range Based on Strength
 	arrayOf(maxWeaponNum-1).forEach(num => {
 		var weaponId = String(num).padStart(2,'0');	
@@ -12032,18 +12040,19 @@
 	
 	// Roll weapon damage
 	on("clicked:hiddenDamageRoll", function () {
-		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "whisperToGM"], function(values) {
+		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "whisperToGM"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			// let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormalDamage = (values.hiddenIsNormal === "true") ? true : false;
 			let isContest = (values.hiddenIsContest === "true") ? true : false;
+			let isAoE = (values.hiddenIsAoE === "true") ? true : false;
 			let dmgType = isContest ? "ATTR" : (isNormalDamage ? "STUN" : "BODY");
 			let otherDmgType = isContest ? "PIPS" : (isNormalDamage ? "BODY" : "STUN");
 			let stunMod = parseInt(values.hiddenStunMod)||0;
 			let theMessage;
 			let theHitLocation;
-			let theSTUNMultiplier;
+			let theSTUNMultiplier = Math.floor(Math.random()*3 + 1);
 			
 			theRoll += "&{template:custom" + (isNormalDamage ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} {{title=@{character_name} - @{character_title}}} ";
 			theRoll += "{{subtitle=" + values.hiddenMessage + "}} ";
@@ -12055,19 +12064,21 @@
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 			}
 			
+			setAttrs({
+				"treasures": theSTUNMultiplier
+			});
+			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
 				var computed = parseInt(results.results[dmgType].result)||0;
 				
-				if (!isContest) {
-					theSTUNMultiplier = Math.floor(Math.random()*3 + 1) + parseInt(values.hiddenSTUNx)||0;
-				}
-				
 				// Get hit location message if system used.
-				if (useHitLocations && !isContest) {
+				if (useHitLocations && !isContest && !isAoE) {
 					theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.STUNx;
+				} else if (isAoE) {
+					theMessage = "AoE";
 				}
 				
 				if (isContest || isNormalDamage) {
@@ -12096,21 +12107,18 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "hiddenBasicDamage"], function(values) {
+			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "hiddenBasicDamage"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 				let isNormalDamage = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
-				let isBraced = (values.checkBrace === "on") ? true : false;
-				let isSet = (values.checkSet === "on") ? true : false;
-				let isRangedAttack = false;
-				let hasRangePenalty = true;
-				let braceMod = 0;
 				let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 				let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
 				let subtractENDAmt = parseInt(values["weaponEndurance"+weaponId])||0;
 				let dmgType = isNormalDamage ? "STUN" : "BODY";
 				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
+				let rollMessage = "attack";
+				let damageLabel = "Damage";
 				
 				// Update weapon damage for maneuvers that add damage.				
 				let adjustedDC = parseInt(values["weaponAdjustedDC"+weaponId])||0;
@@ -12119,28 +12127,30 @@
 				let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
 				let theSign = parseInt(values["hiddenWeaponSign"+weaponId])||0;
 				let capDamage = (values.optionWeaponDamageCap === "on") ? true : false;
-				let isModified = false;
-				let rollMessage = "attack";
+				let strengthApplied = parseInt(values["weaponStrength"+weaponId])||0;
+				let minStrength = parseInt(values["weaponStrengthMin"+weaponId])||0;
+				let strengthEnhanced = (values["weaponEnhancedByStr"+weaponId] === "on") ? true : false;
+				let damageLevels =  parseInt(values["weaponCSL"+weaponId]/2)||0;
+				let velocity = parseInt(values["moveVelocity"])||0;
+				let velocityDC = 0;
+				
+				// CV
 				let netDCV = parseInt(values["currentDCV"])||3;
 				let maneuverOCV = 0;
 				let maneuverDCV = 0;
 				let penaltyOCV = 0;
 				let strengthPenalty = false;
 				let halfDCV = false;
-				let velocity = parseInt(values["moveVelocity"])||0;
-				let velocityDC = 0;
-				let isDefense = false;
-				let noDamage = false;
-				let targetObject = false;
-				let damageLabel = "Damage";
-				let isShield = (weaponId === "06") ? true : false;
 				
-				// Limit stunMod to HERO valid range.
-				if (stunMod < 0) {
-					stunMod = 0;
-				} else if (stunMod > 2) {
-					stunMod = 2;
-				}
+				// Modifiers
+				let targetObject = false;
+				let isShield = (weaponId === "06") ? true : false;
+				let isSet = (values.checkSet === "on") ? true : false;
+				let isBraced = (values.checkBrace === "on") ? true : false;
+				let braceMod = 0;
+				let isRangedAttack = false;
+				let hasRangePenalty = true;
+				let noDamage = false;
 				
 				// Maneuver message and DCV and damage mods.
 				if (values.maneuverSelection === "haymaker") {
@@ -12161,21 +12171,15 @@
 						adjustedDC += 4;
 					}
 					
-					isModified = true;
-					
 					setAttrs({
 						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
-						"hiddenMessage": rollMessage
+						"hiddenMessage": rollMessage,
+						"hiddenIsAoE": areaOfEffect ? "true" : "false"
 					});
 				} else if ( (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "moveThrough") ) {
-					
-					let strengthApplied = heroRoundHigh( (parseInt(values.strength)||0)/2);
-					let minStrength = parseInt(values["weaponStrengthMin"+weaponId])||0;
-					let strengthEnhanced = (values["weaponEnhancedByStr"+weaponId] === "on") ? true : false;
-					let damageLevels =  parseInt(values["weaponCSL"+weaponId]/2)||0;
 					
 					if (values.maneuverSelection === "moveBy") {
 						// Message
@@ -12202,6 +12206,9 @@
 					
 					// Move By reduces Strength by 1/2, which means we need to recalculate the weapon's DC.
 					adjustedDC = baseDC;
+					if (heroRoundHigh( (parseInt(values.strength)||0)/2) < strengthApplied) {
+						strengthApplied = heroRoundHigh( (parseInt(values.strength)||0)/2);
+					}
 					
 					if (strengthApplied >= minStrength) {
 						strengthLevels = Math.floor((strengthApplied - minStrength)/5);
@@ -12227,14 +12234,12 @@
 						}
 					} else {
 						adjustedDC += velocityDC + damageLevels;
-						
-						// Prevent a negative DC.
-						if (adjustedDC < 0) {
-							adjstedDC = 0;
-						}
 					}
 					
-					isModified = true;
+					// Prevent a negative DC.
+					if (adjustedDC < 0) {
+						adjstedDC = 0;
+					}
 					
 					setAttrs({
 						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
@@ -12242,6 +12247,7 @@
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
 						"hiddenMessage": rollMessage,
+						"hiddenIsAoE": "false",
 						"rangeManeuver": 0,
 						"checkSet": 0,
 						"checkBrace": 0
@@ -12257,7 +12263,8 @@
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
-						"hiddenMessage": rollMessage
+						"hiddenMessage": rollMessage,
+						"hiddenIsAoE": areaOfEffect ? "true" : "false"
 					});
 				} else if (values.maneuverSelection === "strike") {
 					rollMessage = (isNormalDamage ? "" : "Killing ") + "Strike";
@@ -12267,7 +12274,8 @@
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
-						"hiddenMessage": rollMessage
+						"hiddenMessage": rollMessage,
+						"hiddenIsAoE": areaOfEffect ? "true" : "false"
 					});
 				} else if (values.maneuverSelection === "disarm") {
 					rollMessage = "Disarm";
@@ -12275,16 +12283,12 @@
 					maneuverOCV = -2;
 					maneuverDCV = 0;
 					
-					// dmgType = "CHAR";
-					// otherDmgType = "PIPS";
-					
 					if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
 						isRangedAttack = true;
 					}
 					
 					targetObject = true;
 					noDamage = true;
-					isModified = true;
 					
 					setAttrs({
 						"hiddenDamage": isRangedAttack ? getDamageDice(baseDC, 0, true, 1) : values.hiddenBasicDamage,
@@ -12293,8 +12297,6 @@
 						"hiddenMessage": rollMessage
 					});
 				} else if (values.maneuverSelection === "block") {
-					isDefense = true;
-					
 					setAttrs({
 						"hiddenMessage": rollMessage,
 						"rangeManeuver":0,
@@ -12305,7 +12307,6 @@
 				
 				// Create dice rolling text to send to a roll dialog.
 				if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "disarm")) {
-					// The weapon Roll is a Strike, Multiple Attack, or Haymaker.
 					
 					// First, check to see if this is a ranged attack.
 					if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") ) {
@@ -12336,7 +12337,6 @@
 					}
 					
 					// Character DCV after maneuver.
-					
 					if (halfDCV) {
 						netDCV = heroRoundHigh(netDCV/2);
 					} else {
