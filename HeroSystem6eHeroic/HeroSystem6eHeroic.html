@@ -2066,7 +2066,7 @@
 								<h2>DCV: -3</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Collide with opponent at the end of a Full or Half Move. Does full STR or weapon at half STR plus (velocity/6)d6. Attacker takes 1/2 damage or full damage if attack does no Knockback or Knockdown.</p>
+								<p>Collide with opponent at the end of a Full or Half Move. Does full STR or weapon at half STR plus (velocity/6) DCs. Attacker takes 1/2 damage or full damage if attack does no Knockback or Knockdown.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
 									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
@@ -8546,7 +8546,7 @@
 	function sumCharacteristicPoints() {
 		// Add up points spent on characteristics. 
 		// All character attributes added in one function to avoid getAttrs() limitations.
-	
+		
 		// Add attribute costs in one go
 		getAttrs(["strengthCP","dexterityCP","constitutionCP","intelligenceCP","egoCP","presenceCP","ocvCP","dcvCP","omcvCP","dmcvCP","speedCP","pdCP","edCP","bodyCP","stunCP","enduranceCP","recoveryCP","runningCP","leapingCP","swimmingCP"], function(values) {
 				const strengthCost = parseInt(values.strengthCP)||0;
@@ -8588,6 +8588,7 @@
 		});
 	}
 	
+	
 	// Update Strength related stats and skills
 	on("change:strength change:useCharacteristicMaximums", function () {
 		getAttrs(["strength","useCharacteristicMaximums"], function(values) {
@@ -8602,12 +8603,7 @@
 			var freeCarry;
 			
 			// Basic damage
-			let theNumberOfD6 = (parseInt((statValue - (statValue%5))/5)||0).toString();
-			let theNumberOfD3 = 0;
-			if (statValue%5 > 2) {
-				theNumberOfD3 = 1;
-			}
-			var hiddenDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
+			var hiddenDamage = calculateBasicDamage(statValue);
 			
 			// Characteristic maximums trigger cost recalculation.
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
@@ -8645,6 +8641,17 @@
 			sumCharacteristicPoints();
 		});
 	});
+	
+	
+	function calculateBasicDamage (statValue) {
+		let theNumberOfD6 = (parseInt((statValue - (statValue%5))/5)||0).toString();
+		let theNumberOfD3 = 0;
+		if (statValue%5 > 2) {
+			theNumberOfD3 = 1;
+		}
+		return theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
+	}
+	
 	
 	// Update Dexterity
 	on("change:dexterity change:useCharacteristicMaximums", function () {
@@ -12143,7 +12150,7 @@
 				let halfDCV = false;
 				
 				// Modifiers
-				let targetObject = false;
+				// let targetObject = false;
 				let isShield = (weaponId === "06") ? true : false;
 				let isSet = (values.checkSet === "on") ? true : false;
 				let isBraced = (values.checkBrace === "on") ? true : false;
@@ -12279,6 +12286,7 @@
 					});
 				} else if (values.maneuverSelection === "disarm") {
 					rollMessage = "Disarm";
+					damageLabel = "Contest";
 					
 					maneuverOCV = -2;
 					maneuverDCV = 0;
@@ -12287,7 +12295,7 @@
 						isRangedAttack = true;
 					}
 					
-					targetObject = true;
+					// targetObject = true;
 					noDamage = true;
 					
 					setAttrs({
@@ -12329,7 +12337,6 @@
 					
 					if (values.maneuverSelection === "disarm") {
 						theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
-						damageLabel = "Contest";
 						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
 					} else {
 						// If isNormalDamage is TRUE, use the Normal Damage template.
@@ -12478,27 +12485,21 @@
 			let isRangedAttack = false;
 			let hasRangePenalty = true;
 			let braceMod = 0;
-			let stunMod = 0;
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
-			let dmgType = "STUN";
-			let otherDmgType = "BODY";
+			let rollMessage = "attack";
+			let damageLabel = "Damage";
 			
 			// Update weapon damage for maneuvers that add damage.				
 			let baseDC = Math.floor( ((values.strength)||0)/5 );
 			let adjustedDC = baseDC;
-			let isModified = false;
-			let rollMessage = "attack";
+			let velocity = parseInt(values["moveVelocity"])||0;
+			let velocityDC = 0;
+			
+			// CV
 			let netDCV = parseInt(values["currentDCV"])||3;
 			let maneuverOCV = 0;
 			let maneuverDCV = 0;
 			let halfDCV = false;
-			let velocity = parseInt(values["moveVelocity"])||0;
-			let velocityDC = 0;
-			let isDefense = false;
-			let noDamage = false;
-			let targetObject = false;
-			
-			// Maneuver message and DCV mods.
 			
 			if (values.maneuverSelection === "haymaker") {
 				rollMessage = "Haymaker Attack";
@@ -12510,10 +12511,14 @@
 				// Damage
 				adjustedDC += 4;
 				
-				isModified = true;
+				// isModified = true;
 				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1)
+					"hiddenDamage": getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false"
 				});
 			} else if (values.maneuverSelection === "moveBy") {
 				
@@ -12524,19 +12529,15 @@
 				maneuverOCV = -2;
 				maneuverDCV = -2;
 				
-				// Move By reduces Strength by 1/2, which means recalculating the adjustedDC.
-				adjustedDC = Math.floor( (values.strength||0)/10 );
-				
-				// Recalculate damage with velocity and new strength.
-				velocityDC = Math.floor(velocity/10);
-				adjustedDC += velocityDC;
-				
-				isModified = true;
 				isBraced = false;
 				isSet = false;
 				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenDamage": calculateBasicDamage(heroRoundHigh( (parseInt(values.strength)||0)/2) + Math.floor(velocity/10)*5),
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false",
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
@@ -12550,16 +12551,15 @@
 				maneuverDCV = -3;
 				maneuverOCV = -1 * Math.floor(velocity/10);
 				
-				// Damage
-				velocityDC = Math.floor(velocity/6);
-				adjustedDC += velocityDC;
-				
-				isModified = true;
 				isBraced = false;
 				isSet = false;
 				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenDamage": calculateBasicDamage( (parseInt(values.strength)||0) + Math.floor(velocity/6)*5),
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false",
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
@@ -12569,15 +12569,30 @@
 				
 				// CV
 				halfDCV = true;
+				
+				setAttrs({
+					"hiddenDamage": values.hiddenBasicDamage,
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false"
+				});
 			} else if (values.maneuverSelection === "strike") {
 				rollMessage = "Strike";
+				
+				setAttrs({
+					"hiddenDamage": values.hiddenBasicDamage,
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false"
+				});
 			} else if (values.maneuverSelection === "grab") {
 				rollMessage = "Grab";
 				
 				maneuverOCV = -1;
 				maneuverDCV = -2;
 				
-				noDamage = true;
 				subtractENDAmt = 1;
 				
 				setAttrs({
@@ -12587,21 +12602,19 @@
 				});
 			} else if (values.maneuverSelection === "grabBy") {
 				rollMessage = "Grab By";
+				damageLabel = "Contest";
 				
 				maneuverOCV = -3;
 				maneuverDCV = -4;
 				
-				// Recalculate damage with velocity and new strength.
-				adjustedDC = Math.floor( (parseInt(values.strength)||0)/5 + velocity/50);
-				
-				targetObject = true;
-				
-				isModified = true;
 				isBraced = false;
 				isSet = false;
 				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenDamage": calculateBasicDamage(parseInt(values.strength) + Math.floor(velocity/10)),
+					"hiddenIsNormal": "false",
+					"hiddenIsContest": "true",
+					"hiddenMessage": rollMessage,
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
@@ -12613,12 +12626,15 @@
 				rollMessage = "Shove up to " + Math.floor((parseInt(values.strength)||0)/5) + " m";
 				
 				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
-					isModified = true;
 					adjustedDC = parseInt(values.maneuverDCLimit)||0;
 				}
 				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenDamage": getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false",
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
@@ -12627,12 +12643,15 @@
 				rollMessage = "Throw Object";
 				
 				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
-					isModified = true;
 					adjustedDC = parseInt(values.maneuverDCLimit)||0;
 				}
 				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1)
+					"hiddenDamage": getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false"
 				});
 			} else if (values.maneuverSelection === "trip") {
 				// Message
@@ -12644,41 +12663,36 @@
 				
 				// Damage
 				velocityDC = Math.floor(velocity/20);
-				if (velocityDC === 0) {
-					noDamage = true;
-				}
-				isModified = true;
 				
 				// Endurance
 				subtractENDAmt = 1;
 				
 				setAttrs({
 					"hiddenDamage":getDamageDice(velocityDC, 0, true, 1),
+					"hiddenIsNormal": "true",
+					"hiddenIsContest": "false",
+					"hiddenMessage": rollMessage,
+					"hiddenIsAoE": "false",
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "disarm") {
 				rollMessage = "Unarmed Disarm";
+				damageLabel = "Contest";
 				
 				maneuverOCV = -2;
 				
-				dmgType = "STR";
-				otherDmgType = "PIPS";
-				
-				targetObject = true;
-				noDamage = true;
-				isModified = true;
-				
 				setAttrs({
-					"hiddenDamage":getDamageDice(adjustedDC, 0, true, 1),
+					"hiddenDamage": values.hiddenBasicDamage,
+					"hiddenIsNormal": "false",
+					"hiddenIsContest": "true",
+					"hiddenMessage": rollMessage,
 					"rangeManeuver":0,
 					"checkSet":0,
 					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "block") {
-				isDefense = true;
-				
 				setAttrs({
 					"rangeManeuver":0,
 					"checkSet":0,
@@ -12713,7 +12727,7 @@
 				}
 				
 				if (values.maneuverSelection === "disarm") {
-					theRoll += "&{template:custom-strength} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
+					theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
 				} else {
 					// If isNormalDamage is TRUE, use the Normal Damage template.
 					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with Strength}} ";
@@ -12750,11 +12764,8 @@
 					}
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
-				
-				if ( (useHitLocations) && (!noDamage) ) {
-					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
-				}
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "");
+				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 			} else if (values.maneuverSelection === "block") {
 				// Blocking Roll
@@ -12786,11 +12797,9 @@
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			} else if (values.maneuverSelection === "grabBy") {
-				dmgType = "STR";
-				otherDmgType = "PIPS";
 				
 				// Grab By Roll
-				theRoll += "&{template:custom-strength} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Grab By}} ";
+				theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Grab By}} ";
 				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
 				
 				if (dispDoS) {
@@ -12799,7 +12808,8 @@
 					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "") + "{{"+dmgType+"=[["+(isModified ? "@{hiddenDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "");
+				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 			} else if (values.maneuverSelection === "trip") {
 				theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
@@ -12813,59 +12823,19 @@
 				}
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
-				
-				theRoll += (noDamage ? "" : "{{"+dmgType+"=[["+(isModified ? "@{hiddenDamage}" : "@{hiddenBasicDamage}") + "]]}} " + "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}");
-				
-				if ( (useHitLocations) && (!noDamage) ) {
-					theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
-				}
+				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 			}
 			
-			if (!isDefense) {
-				startRoll(theRoll, (results) => {
-					let theResult = new Object();
-					
-					if (targetObject) {
-						var computed = parseInt(results.results[dmgType].result)||0;
-						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
-						
-						computed = convertStunToBody(results.results[dmgType].rolls);
-						theResult[otherDmgType] = computed;
-					} else if (!noDamage) {
-						var computed = parseInt(results.results[dmgType].result)||0;
-						let theSTUNMultiplier = Math.floor(Math.random()*3+1);
-						
-						// Get hit location message if system used.
-						if (useHitLocations) {
-							let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
-							theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
-							theSTUNMultiplier = theHitLocation.STUNx;
-						}
-						
-						computed = convertStunToBody(results.results[dmgType].rolls);
-						theResult[otherDmgType] = computed;
-						theResult.HITLOC = theMessage;
-					}
-					
-					// Subtract END cost if option checked.
-					if (values.optionAutoSubtractEND != 0) {
-						subtractEndurance(subtractENDAmt);
-					}
-					
-					finishRoll(results.rollId, theResult);
-				});
-			} else {
-				startRoll(theRoll, (results) => {
-					let theResult = new Object();
-					
-					// Subtract END cost if option checked.
-					if (values.optionAutoSubtractEND != 0) {
-						subtractEndurance(subtractENDAmt);
-					}
-					
-					finishRoll(results.rollId, theResult);
-				});
-			}
+			startRoll(theRoll, (results) => {
+				let theResult = new Object();
+				
+				// Subtract END cost if option checked.
+				if (values.optionAutoSubtractEND != 0) {
+					subtractEndurance(subtractENDAmt);
+				}
+				
+				finishRoll(results.rollId, theResult);
+			});
 		});
 	});
 
