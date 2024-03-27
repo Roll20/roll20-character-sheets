@@ -1,5 +1,5 @@
 # Patient 13 RPG Roll20 Character Sheet
-Official Character Sheet Template for "Patient 13" tabletop game, [Patient 13 édité Mister Franckenstein](https://www.misterfrankenstein.com/wordpress/?p=4051).
+Inspired by the official Character Sheet Template for "Patient 13" tabletop game, [Patient 13 édité Mister Franckenstein](https://www.misterfrankenstein.com/wordpress/?p=4051).
 
 ## Version 1.0
 (Evilbram) Mar.2024
