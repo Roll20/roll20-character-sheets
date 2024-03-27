@@ -59,7 +59,7 @@
 <div class="row 2autocolumn">
 <h2 data-i18n="name"></h2>
 <label data-i18n-title="enter name" title="enter name">
-<input data-i18n-placeholder="name" name="attr_name" placeholder="name" title="@{name}" type="text" value=""/>
+<input data-i18n-placeholder="name" name="attr_character_name" placeholder="name" title="@{character_name}" type="text" value=""/>
 </label>
 </div>
 <div class="row 2column">
@@ -2435,12 +2435,13 @@ attributes.gentlewoman.forEach(attr => {
 
 on('sheet:opened', async (info) => {
   getAttrs(['version','name'],(attributes) => {
-    const setObj = {};
-    if(attributes.version === '2' && attributes.name){
-      setObj.character_name = attributes.name;
+    const setObj = { version: parseFloat(attributes.version || '2') };
+    if(setObj.version < 2.1) {
+      if (attributes.name) setObj.character_name = attributes.name;
+      setObj.version = 2.1;
     }
     setAttrs(setObj,{silent:true});
-    });
+  });
 })
 
 //When performing calculations in King Arthur Pendragon / Paladin, round
