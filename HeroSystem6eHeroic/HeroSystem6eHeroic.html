@@ -8053,19 +8053,19 @@
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color CHAR PIPS}}
+				{{#allprops() title subtitle desc color ATTR PIPS}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color CHAR PIPS}}
-				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+				{{/allprops() title subtitle desc color ATTR PIPS}}
+				<!-- {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}} -->
 				
-				<!-- Attribute and "Body" Pips -->
-				{{#CHAR}}
-				<div class="sheet-key">CHAR</div>
-				<div class="sheet-value">{{computed::CHAR}}</div>
-				{{/CHAR}}
+				<!-- Stun, Body, and Hit Location go at the end -->
+				{{#ATTR}}
+				<div class="sheet-key">Result</div>
+				<div class="sheet-value">{{computed::ATTR}}</div>
+				{{/ATTR}}
 				{{#PIPS}}
-				<div class="sheet-key">PIPS</div>
+				<div class="sheet-key">Pips</div>
 				<div class="sheet-value">{{computed::PIPS}}</div>
 				{{/PIPS}}
 			</div>
@@ -12038,9 +12038,12 @@
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormalDamage = (values.hiddenIsNormal === "true") ? true : false;
 			let isContest = (values.hiddenIsContest === "true") ? true : false;
-			let dmgType = isContest ? "CHAR" : (isNormalDamage ? "STUN" : "BODY");
+			let dmgType = isContest ? "ATTR" : (isNormalDamage ? "STUN" : "BODY");
 			let otherDmgType = isContest ? "PIPS" : (isNormalDamage ? "BODY" : "STUN");
 			let stunMod = parseInt(values.hiddenStunMod)||0;
+			let theMessage;
+			let theHitLocation;
+			let theSTUNMultiplier;
 			
 			theRoll += "&{template:custom" + (isNormalDamage ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} {{title=@{character_name} - @{character_title}}} ";
 			theRoll += "{{subtitle=" + values.hiddenMessage + "}} ";
@@ -12057,42 +12060,33 @@
 				var computed = parseInt(results.results[dmgType].result)||0;
 				
 				if (!isContest) {
-					let theSTUNMultiplier = Math.floor(Math.random()*3+1) + parseInt(values.hiddenSTUNx)||0;
+					theSTUNMultiplier = Math.floor(Math.random()*3 + 1) + parseInt(values.hiddenSTUNx)||0;
 				}
 				
 				// Get hit location message if system used.
-				if (useHitLocations) {
-					let theHitLocation = hitLocationDetails(results.results.HITLOC.result);
+				if (useHitLocations && !isContest) {
+					theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.STUNx;
 				}
 				
-				if (isNormalDamage) {
+				if (isContest || isNormalDamage) {
 					// Convert dice roll to equivalent BODY damage.
-					computed = convertStunToBody(results.results.STUN.rolls);
-				} else if (isContest) {
-					// Convert dice roll to equivalent BODY damage.
-					computed = convertStunToBody(results.results.CHAR.rolls);
+					computed = convertStunToBody(results.results[dmgType].rolls);
 				} else {
-					theSTUNMultiplier = Math.max(1,theSTUNMultiplier + stunMod);
-					computed *= theSTUNMultiplier;
-					
+					theSTUNMultiplier = Math.max(1, theSTUNMultiplier + stunMod);
+					computed *= theSTUNMultiplier;	
 					computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
 				}
 				
 				theResult[otherDmgType] = computed;
 				
-				if (useHitLocations) {
+				if (useHitLocations && !isContest) {
 					theResult.HITLOC = theMessage;
 				}
 				
 				finishRoll(results.rollId, theResult);
 			});
-			
-			
-			// setAttrs({
-			// 	"treasures": JSON.stringify(results.results[dmgType].result)
-			// });
 		});
 	});
 
@@ -12102,7 +12096,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity"], function(values) {
+			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "hiddenBasicDamage"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
@@ -12127,7 +12121,7 @@
 				let capDamage = (values.optionWeaponDamageCap === "on") ? true : false;
 				let isModified = false;
 				let rollMessage = "attack";
-				let netDCV = parseInt(values["currentDCV"])||0;
+				let netDCV = parseInt(values["currentDCV"])||3;
 				let maneuverOCV = 0;
 				let maneuverDCV = 0;
 				let penaltyOCV = 0;
@@ -12278,7 +12272,7 @@
 					maneuverOCV = -2;
 					maneuverDCV = 0;
 					
-					// dmgType = "STR";
+					// dmgType = "CHAR";
 					// otherDmgType = "PIPS";
 					
 					if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
@@ -12491,7 +12485,7 @@
 			let adjustedDC = baseDC;
 			let isModified = false;
 			let rollMessage = "attack";
-			let netDCV = parseInt(values["currentDCV"])||0;
+			let netDCV = parseInt(values["currentDCV"])||3;
 			let maneuverOCV = 0;
 			let maneuverDCV = 0;
 			let halfDCV = false;
