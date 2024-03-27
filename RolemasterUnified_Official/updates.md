@@ -1,3 +1,10 @@
+2024-03-26
+
+ - Improvements to the roll template layout
+ - Charactermancer fix realm
+ - Fix open ended rolls from skills
+ - Handle rmuasync errors by continuing
+
 2024-03-24
 
  - Skill rolls
