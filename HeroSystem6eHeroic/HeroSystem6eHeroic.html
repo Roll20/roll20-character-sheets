@@ -11022,10 +11022,10 @@
 				
 				let keywordPhrase = "damage by str";
 				let hasKeywordPhrase =  (values["martialManeuverEffect"+maneuverId].toLowerCase()).includes(keywordPhrase);
-				let isNormalDamage = (values["martialManeuverNormal"+maneuverId] === "on") ? true : false;
+				let isNormal = (values["martialManeuverNormal"+maneuverId] === "on") ? true : false;
 				let isAttack = (values["martialManeuverBlock"+maneuverId] === "on") ? false : true;
 				
-				if (hasKeywordPhrase && isNormalDamage && isAttack) {
+				if (hasKeywordPhrase && isNormal && isAttack) {
 					attributes["martialManeuverDamage"+maneuverId] = values.hiddenBasicDamage;
 					attributes["hiddenMartialManeuverDamage"+maneuverId] = values.hiddenBasicDamage;
 					
@@ -11049,7 +11049,7 @@
 		on(`clicked:showManeuverRoll${maneuverId}`, (info) => {
 			getAttrs(["whisperToGM", "martialManeuverNormal"+maneuverId, "martialManeuverStunMod"+maneuverId], function(values) {
 				var theRoll = values.whisperToGM||"";
-				let isNormalDamage = values["martialManeuverNormal"+maneuverId] != 0;
+				let isNormal = values["martialManeuverNormal"+maneuverId] != 0;
 				let theStunMod = parseInt(values["martialManeuverStunMod"+maneuverId])||0;
 				
 				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
@@ -11059,11 +11059,11 @@
 					+ "{{OCV = @{martialManeuverOCV"+maneuverId+"}}} "
 					+ "{{DCV = @{martialManeuverDCV"+maneuverId+"}}} ";
 					
-				if (!isNormalDamage && (theStunMod > 0) ) {
+				if (!isNormal && (theStunMod > 0) ) {
 					theRoll += "{{STUNx = @{martialManeuverStunMod"+maneuverId+"}}} ";
 				}
 					
-					theRoll += "{{Damage = @{martialManeuverDamage"+maneuverId+"}" + (isNormalDamage ? " N" : " K") + "}} "
+					theRoll += "{{Damage = @{martialManeuverDamage"+maneuverId+"}" + (isNormal ? " N" : " K") + "}} "
 					+ "{{desc=@{martialManeuverEffect"+maneuverId+"}}}";
 				
 				startRoll(theRoll, (results) => {
@@ -12039,17 +12039,17 @@
 			var theRoll = values.whisperToGM||"";
 			// let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
-			let isNormalDamage = (values.hiddenIsNormal === "true") ? true : false;
+			let isNormal = (values.hiddenIsNormal === "true") ? true : false;
 			let isContest = (values.hiddenIsContest === "true") ? true : false;
 			let isAoE = (values.hiddenIsAoE === "true") ? true : false;
-			let dmgType = isContest ? "ATTR" : (isNormalDamage ? "STUN" : "BODY");
-			let otherDmgType = isContest ? "PIPS" : (isNormalDamage ? "BODY" : "STUN");
+			let dmgType = isContest ? "ATTR" : (isNormal ? "STUN" : "BODY");
+			let otherDmgType = isContest ? "PIPS" : (isNormal ? "BODY" : "STUN");
 			let stunMod = parseInt(values.hiddenStunMod)||0;
 			let theMessage;
 			let theHitLocation;
 			let theSTUNMultiplier = Math.floor(Math.random()*3 + 1);
 			
-			theRoll += "&{template:custom" + (isNormalDamage ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} {{title=@{character_name} - @{character_title}}} ";
+			theRoll += "&{template:custom" + (isNormal ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} {{title=@{character_name} - @{character_title}}} ";
 			theRoll += "{{subtitle=" + values.hiddenMessage + "}} ";
 			
 			theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
@@ -12070,13 +12070,13 @@
 				// Get hit location message if system used.
 				if (useHitLocations && !isContest && !isAoE) {
 					theHitLocation = hitLocationDetails(results.results.HITLOC.result);
-					theMessage = isNormalDamage ? theHitLocation.normalMessage : theHitLocation.killMessage;
+					theMessage = isNormal ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.STUNx;
 				} else if (isAoE) {
 					theMessage = "AoE";
 				}
 				
-				if (isContest || isNormalDamage) {
+				if (isContest || isNormal) {
 					// Convert dice roll to equivalent BODY damage.
 					computed = convertStunToBody(results.results[dmgType].rolls);
 				} else {
@@ -12106,11 +12106,12 @@
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
+				let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
 				let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 				let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
 				let subtractENDAmt = parseInt(values["weaponEndurance"+weaponId])||0;
-				let dmgType = isNormalDamage ? "STUN" : "BODY";
-				let otherDmgType = isNormalDamage ? "BODY" : "STUN";
+				let dmgType = isNormal ? "STUN" : "BODY";
+				let otherDmgType = isNormal ? "BODY" : "STUN";
 				let rollMessage = "attack";
 				let damageLabel = "Damage";
 				
@@ -12118,7 +12119,7 @@
 				let adjustedDC = parseInt(values["weaponAdjustedDC"+weaponId])||0;
 				let baseDC = parseInt(values["weaponDC"+weaponId])||0;
 				let theAdvantage = parseFloat(values["weaponAdvantage"+weaponId])||0;
-				let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
+				// let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
 				let theSign = parseInt(values["hiddenWeaponSign"+weaponId])||0;
 				let capDamage = (values.optionWeaponDamageCap === "on") ? true : false;
 				let strengthApplied = parseInt(values["weaponStrength"+weaponId])||0;
@@ -12148,7 +12149,7 @@
 				
 				// Maneuver message and DCV and damage mods.
 				if (values.maneuverSelection === "haymaker") {
-					rollMessage = "Haymaker " + (isNormalDamage ? "" : "Killing ") + " Attack";
+					rollMessage = "Haymaker " + (isNormal ? "" : "Killing ") + " Attack";
 					
 					// CV
 					maneuverOCV = 0;
@@ -12166,7 +12167,7 @@
 					}
 					
 					setAttrs({
-						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
+						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
@@ -12177,7 +12178,7 @@
 					
 					if (values.maneuverSelection === "moveBy") {
 						// Message
-						rollMessage = "Move By " + (isNormalDamage ? "" : "Killing ") + " Attack";
+						rollMessage = "Move By " + (isNormal ? "" : "Killing ") + " Attack";
 						
 						// CV
 						maneuverOCV = -2;
@@ -12188,7 +12189,7 @@
 					
 					} else {
 						// Message
-						rollMessage = "Move Through " + (isNormalDamage ? "" : "Killing ") + " Attack";
+						rollMessage = "Move Through " + (isNormal ? "" : "Killing ") + " Attack";
 						
 						// CV
 						maneuverDCV = -3;
@@ -12236,7 +12237,7 @@
 					}
 					
 					setAttrs({
-						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
+						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
@@ -12247,13 +12248,13 @@
 						"checkBrace": 0
 					});
 				} if (values.maneuverSelection === "multipleAttack") {
-					rollMessage = "Multiple " + (isNormalDamage ? "" : "Killing ") + "Attack";
+					rollMessage = "Multiple " + (isNormal ? "" : "Killing ") + "Attack";
 					
 					// CV
 					halfDCV = true;
 					
 					setAttrs({
-						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormalDamage, theSign),
+						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
@@ -12261,7 +12262,7 @@
 						"hiddenIsAoE": areaOfEffect ? "true" : "false"
 					});
 				} else if (values.maneuverSelection === "strike") {
-					rollMessage = (isNormalDamage ? "" : "Killing ") + "Strike";
+					rollMessage = (isNormal ? "" : "Killing ") + "Strike";
 					
 					setAttrs({
 						"hiddenDamage": values["weaponDamage"+weaponId]||0,
@@ -12326,8 +12327,8 @@
 						theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
 						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
 					} else {
-						// If isNormalDamage is TRUE, use the Normal Damage template.
-						theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
+						// If isNormal is TRUE, use the Normal Damage template.
+						theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
 					}
 					
 					// Character DCV after maneuver.
@@ -12465,7 +12466,7 @@
 		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "maneuverDCLimit"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
-			let isNormalDamage = true;
+			let isNormal = true;
 			let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 			let isBraced = (values.checkBrace === "on") ? true : false;
 			let isSet = (values.checkSet === "on") ? true : false;
@@ -12565,7 +12566,7 @@
 					"hiddenIsAoE": "false"
 				});
 			} else if (values.maneuverSelection === "strike") {
-				rollMessage = "Strike";
+				rollMessage = "Normal Strike";
 				
 				setAttrs({
 					"hiddenDamage": values.hiddenBasicDamage,
@@ -12716,8 +12717,8 @@
 				if (values.maneuverSelection === "disarm") {
 					theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
 				} else {
-					// If isNormalDamage is TRUE, use the Normal Damage template.
-					theRoll += "&{template:custom"+(isNormalDamage ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with Strength}} ";
+					// If isNormal is TRUE, use the Normal Damage template.
+					theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with Strength}} ";
 				}
 				
 				// Character DCV after maneuver.
