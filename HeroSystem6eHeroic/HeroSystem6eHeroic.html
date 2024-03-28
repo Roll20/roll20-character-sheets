@@ -1970,7 +1970,7 @@
 								<h2>DCV: -2*</h2>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Grab opponent with two limbs with successful attack roll, who may attempt escape. May follow with Squeeze, Slam, or Throw. Both characters are at 1/2 DCV and suffer various OCV penalties.</p>
+								<p>Grab opponent with two limbs with successful attack roll, who may attempt escape. May follow with Squeeze, Slam, or Throw. *Success causes both characters to be at 1/2 DCV and each suffers various OCV penalties.</p>
 								<div class="item-maneuver-button-line">
 									<button type="action" class="button buttonManeuver" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Grab</button>
 								</div>
@@ -7744,6 +7744,7 @@
 <input type="hidden" name="attr_hiddenDamage"  value="4d6"/>
 <input type="hidden" name="attr_hiddenIsNormal"  value="true"/>
 <input type="hidden" name="attr_hiddenIsContest"  value="false"/>
+<input type="hidden" name="attr_hiddenIsPower"  value="false"/>
 <input type="hidden" name="attr_hiddenIsAoE" value="false"/>
 <input type="hidden" name="attr_hiddenStunMod"  value="0"/>
 <input type="hidden" name="attr_hiddenMessage"  value="Test"/>
@@ -7884,6 +7885,8 @@
 			<div class="sheet-header">
 				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+				{{#label}}<div class="sheet-label">{{label}}</div>{{/label}}
+				{{#data}}<div class="sheet-data">{{data}}</div>{{/data}}
 			</div>
 			<div class="sheet-content">
 				{{#SUCCESS}}
@@ -7896,10 +7899,10 @@
 					<div class="sheet-value">{{SUCCESS}}</div>
 					{{/rollLess() computed::SUCCESS 0}}
 				{{/SUCCESS}}
-				{{#allprops() title subtitle desc color SUCCESS}}
+				{{#allprops() title subtitle label data desc color SUCCESS}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color SUCCESS}}
+				{{/allprops() title subtitle label data desc color SUCCESS}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 			</div>
 		</div>
@@ -8054,6 +8057,36 @@
 				<div class="sheet-key">Hit Location</div>
 				<div class="sheet-value">{{computed::HITLOC}}</div>
 				{{/HITLOC}}
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Jackob's Roll Template for power "damage" -->
+<!-- This will likely be modified in future updates. -->
+<rolltemplate class="sheet-rolltemplate-custom-power-damage">
+	<div class="sheet-template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+			</div>
+			<div class="sheet-content">
+				{{#allprops() title subtitle desc color ATTR PIPS}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle desc color ATTR PIPS}}
+				<!-- {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}} -->
+				
+				<!-- Stun, Body, and Hit Location go at the end -->
+				{{#ATTR}}
+				<div class="sheet-key">Result</div>
+				<div class="sheet-value">{{computed::ATTR}}</div>
+				{{/ATTR}}
+				{{#PIPS}}
+				<div class="sheet-key">Pips</div>
+				<div class="sheet-value">{{computed::PIPS}}</div>
+				{{/PIPS}}
 			</div>
 		</div>
 	</div>
@@ -9584,6 +9617,7 @@
 		});
 	});
 	
+	
 	/* Use Power XX Endurance */
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
@@ -9594,43 +9628,74 @@
 		});
 	});
 	
+	
 	/* Activate Power XX */
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEND"+powerId], function(values) {
 				var theRoll = values.whisperToGM||"";
-
-				theRoll += "&{template:custom-power-attack} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= @{powerName"+powerId+"} - @{powerEffect"+powerId+"}}} {{desc=@{powerText"+powerId+"}}} ";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+				const lesserDingbat = " ⬩ ";
+				let damageLabel = "Effect";
+				let subtractEND = (values.optionAutoSubtractEND === "on") ? true : false;
+				let subtractENDAmt = parseInt(values["powerEND"+powerId])||0;
+				
+				let netDCV = parseInt(values["currentDCV"])||3;
+				let maneuverDCV = 0; // This needs to be added to powers.
+				
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
+				
+				setAttrs({
+					"hiddenDamage": values["hiddenPowerDice" + powerId],
+					"hiddenStunMod": 0,
+					"hiddenIsPower": "true",
+					"hiddenIsNormal": "false",
+					"hiddenIsContest": "false",
+					"hiddenMessage": values["powerName"+powerId],
+					"hiddenIsAoE": "false"
+				});
+				
+				theRoll += "&{template:custom-power-attack} ";
+				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+				theRoll += "{{subtitle= @{powerName"+powerId+"}" + lesserDingbat + "@{powerEffect"+powerId+"}}} ";
+				theRoll += "{{label=DCV}}";
+				theRoll += "{{data="+netDCV+"}}";
+				
+				theRoll += "{{desc=@{powerText"+powerId+"}}} ";
+				
 				if (values.displayDegreeOfSuccess != 0) {
 					theRoll += "{{SUCCESS=[[@{powerSkillRoll"+powerId+"}[Activation]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]]}} "
 				} else {
-					theRoll += "{{Activate On = [[@{powerSkillRoll"+powerId+"}[Activation]+?{Modifiers|0}[Modifiers]]] **or less**}} "
-						+ "{{Success Roll=[[3d6cf6cs1]]}} {{Attack Roll=[[3d6cf6cs1]]}} ";
+					theRoll += "{{Activate On = [[@{powerSkillRoll"+powerId+"}[Activation]+?{Modifiers|0}[Modifiers]]] **or less**}} ";
+					theRoll += "{{Success Roll=[[3d6cf6cs1]]}} {{Attack Roll=[[3d6cf6cs1]]}} ";
 				}
-				theRoll += "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} "
-					+ "{{END=[[@{powerEND"+powerId+"}]] (@{CurrentEND})}}";
-
+				// theRoll += "{{Effect Roll=[[@{hiddenPowerDice"+powerId+"}sd]]}} ";
+				theRoll += "{{END=[[@{powerEND"+powerId+"}]] (@{CurrentEND})}}";
+				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
+				
 				startRoll(theRoll, (results) => {
 					// Roll activation and effect dice. If the option to auto apply endurance is TRUE, subtract the power's END once from endurance.
-					getAttrs(["optionAutoSubtractEND", "powerEND"+powerId], function(values) {
-						let powerEND = parseInt(values["powerEND"+powerId])||0;
-
-						if (values.optionAutoSubtractEND != 0)
-							subtractEndurance(powerEND);
-					});
-
+					
+					let theResult = new Object();
+					
+					// Subtract END cost if option checked.
+					if (subtractEND) {
+						subtractEndurance(subtractENDAmt);
+					}
+					
 					finishRoll(results.rollId, {});
 				});
 			});
 		});
 	});
 	
+	
 	// Update Tally Bar after change to any Power's CP cost.
 	on("change:powerCP01 change:powerCP02 change:powerCP03 change:powerCP04 change:powerCP05 change:powerCP06 change:powerCP07 change:powerCP08 change:powerCP09 change:powerCP10 change:powerCP11 change:powerCP12 change:powerCP13 change:powerCP14 change:powerCP15 change:powerCP16 change:powerCP17", function () {
 		sumPowersPerksTalents();
 	});	
+	
 	
 	/* -------------- */
 	/* Power Movers   */
@@ -9935,12 +10000,16 @@
 	var characteristics = ['strength', 'dexterity', 'constitution', 'intelligence', 'ego', 'presence']
 	characteristics.forEach(characteristic => {
 		on (`clicked:${characteristic}`, (info) => {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				var displayName = characteristic.charAt(0).toUpperCase() + characteristic.slice(1);
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 				
 				if (values.displayDegreeOfSuccess != 0) {
-					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses "+displayName+" }} ";
+					theRoll += "&{template:custom-success-roll} ";
+					theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+					theRoll += "{{subtitle= Uses "+displayName+" }} ";
+					
 					if (characteristic == 'dexterity') {
 						theRoll += "{{SUCCESS=[[@{dexterityChance}[Dexterity Chance]+@{weightDexDCVPenalty}[Weight Penalty]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
 					} else {
@@ -9966,25 +10035,31 @@
 
 	var perceptionTypes = ['', 'Vision', 'Hearing', 'Smell']
 	perceptionTypes.forEach(percType => {
-		var subtitleExt = (percType != '') ? " - @{perception"+percType+"Label}" : "";
+		var subtitleExt = (percType != '') ? "@{perception"+percType+"Label}" : "";
 		on (`clicked:perceptionRoll${percType}`, (info) => {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title"], function(values) {
 				var theRoll = values.whisperToGM||"";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+				const lesserDingbat = (percType != '') ? " ⬩ " : "";
 				
 				if (values.displayDegreeOfSuccess != 0) {
-					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
-						+ "{{SUCCESS= [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]-3d6cf6cs1[Roll]";
+					theRoll += "&{template:custom-success-roll} ";
+					theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+					theRoll += "{{subtitle= Uses Perception" + lesserDingbat + subtitleExt + " }} ";
+					theRoll += "{{SUCCESS= [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]-3d6cf6cs1[Roll]";
 					if (percType != '') {
-						theRoll += "+@{perceptionModifier"+percType+"}[@{perception"+percType+"Label} Modifier]";
+						theRoll += "+@{perceptionModifier" + percType + "}[@{perception" + percType + "Label} Modifier]";
 					}
-					theRoll += "+?{Modifiers|0}[Modifier]]] }}"
+					theRoll += "+?{Modifiers|0}[Modifier]]]}}"
 				} else {
-					theRoll += "&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception"+subtitleExt+" }} "
-						+ "{{Base Chance = [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]";
+					theRoll += "&{template:custom} ";
+					theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+					theRoll += "{{subtitle= Uses Perception" + lesserDingbat + subtitleExt + " }} ";
+					theRoll += "{{Base Chance = [[@{intelligenceChance}[Intelligence Chance]+@{enhancedPerceptionModifier}[Perception Modifier]";
 					if (percType != '') {
-						theRoll += "+@{perceptionModifier"+percType+"}[@{perception"+percType+"Label} Modifier]";
+						theRoll += "+@{perceptionModifier" + percType + "}[@{perception" + percType + "Label} Modifier]";
 					}
-					theRoll += "+?{Modifiers|0}[Modifier]]] }} {{Roll=[[3d6cf6cs1]]}}"
+					theRoll += "+?{Modifiers|0}[Modifier]]]}} {{Roll=[[3d6cf6cs1]]}}"
 				}
 				
 				startRoll(theRoll, (results) => {
@@ -9998,15 +10073,20 @@
 	arrayOf(maxSkillNum).forEach(num => {
 		var skillId = String(num).padStart(2,'0');	
 		on(`clicked:testSkill${skillId}`, (info) => {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title"], function(values) {
 				var theRoll = values.whisperToGM||"";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 				
 				if (values.displayDegreeOfSuccess != 0) {
-					theRoll += "&{template:custom-success-roll} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
-						+ "{{SUCCESS=[[@{skillRollChance"+skillId+"}[Skill Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}"
+					theRoll += "&{template:custom-success-roll} ";
+					theRoll += "{{title=@{character_name}" + dingbat + "@{character_title} }} ";
+					theRoll += "{{subtitle= Uses @{skillName" + skillId + "}}} ";
+					theRoll += "{{SUCCESS=[[@{skillRollChance" + skillId + "}[Skill Chance]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
 				} else {
-					theRoll += "&{template:custom} {{title=@{character_name} - @{character_title} }} {{subtitle= Uses @{skillName"+skillId+"}}} "
-						+ "{{Base Chance = [[@{skillRollChance"+skillId+"}[Skill Chance]+?{Modifiers|0}[Modifiers]]] }} {{Roll=[[3d6cf6cs1]]}}"
+					theRoll += "&{template:custom} ";
+					theRoll += "{{title=@{character_name}" + dingbat + "@{character_title} }} ";
+					theRoll += "{{subtitle= Uses @{skillName" + skillId + "}}} ";
+					theRoll += "{{Base Chance = [[@{skillRollChance" + skillId + "}[Skill Chance]+?{Modifiers|0}[Modifiers]]] }} {{Roll=[[3d6cf6cs1]]}}";
 				}
 				
 				startRoll(theRoll, (results) => {
@@ -10891,13 +10971,16 @@
 	arrayOf(maxArmorNum).forEach(num => {
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:armorActivation${armorId}`, (info) => {
-			getAttrs(["whisperToGM", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId, "totalPD"+armorId, "totalED"+armorId], function(values) {
+			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId, "totalPD"+armorId, "totalED"+armorId], function(values) {
 				var theRoll = values.whisperToGM||"";
 				var actOn = values["armorActivation"+armorId]||18;
 				var locations = values["armorLocations"+armorId]||"";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 				
-				theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Defends with @{armorName"+armorId+"}**}} ";
+				theRoll += "&{template:custom-activate} ";
+				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+				theRoll += "{{subtitle= Defends with @{armorName"+armorId+"}**}} ";
+				
 				if (actOn >= 18 && locations != "") {
 					theRoll += "{{Locations=@{armorLocations"+armorId+"}}}";
 				} else if (values.displayDegreeOfSuccess != 0) {
@@ -11034,17 +11117,19 @@
 	arrayOf(maxManeuverNum).forEach(num => {
 		var maneuverId = String(num).padStart(2,'0');	
 		on(`clicked:showManeuverRoll${maneuverId}`, (info) => {
-			getAttrs(["whisperToGM", "martialManeuverNormal"+maneuverId, "martialManeuverStunMod"+maneuverId], function(values) {
+			getAttrs(["whisperToGM", "character_title", "martialManeuverNormal"+maneuverId, "martialManeuverStunMod"+maneuverId], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let isNormal = values["martialManeuverNormal"+maneuverId] != 0;
 				let theStunMod = parseInt(values["martialManeuverStunMod"+maneuverId])||0;
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+				const lesserDingbat = " ⬩ ";
 				
-				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Maneuver - @{martialManeuverName"+maneuverId+"}}} "
-					+ "{{Phases=@{martialManeuverPhase"+maneuverId+"}}} "
-					+ "{{END = @{martialManeuverEndurance"+maneuverId+"}}} "
-					+ "{{OCV = @{martialManeuverOCV"+maneuverId+"}}} "
-					+ "{{DCV = @{martialManeuverDCV"+maneuverId+"}}} ";
+				theRoll += "&{template:custom-show} {{title=@{character_name}" + dingbat + "@{character_title}}} ";
+				theRoll += "{{subtitle= Maneuver" + lesserDingbat + "@{martialManeuverName"+maneuverId+"}}} ";
+				theRoll += "{{Phases=@{martialManeuverPhase"+maneuverId+"}}} ";
+				theRoll += "{{END = @{martialManeuverEndurance"+maneuverId+"}}} ";
+				theRoll += "{{OCV = @{martialManeuverOCV"+maneuverId+"}}} ";
+				theRoll += "{{DCV = @{martialManeuverDCV"+maneuverId+"}}} ";
 					
 				if (!isNormal && (theStunMod > 0) ) {
 					theRoll += "{{STUNx = @{martialManeuverStunMod"+maneuverId+"}}} ";
@@ -11067,7 +11152,7 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX.
 			
-			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "displayDegreeOfSuccess", "rangeMartial", "currentDCV"], function(values) {
+			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverBlock"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "character_title",  "displayDegreeOfSuccess", "rangeMartial", "currentDCV"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
 				let isNormal = (values["martialManeuverNormal"+maneuverId] === "on") ? true : false;
@@ -11075,6 +11160,10 @@
 				let stunMod = parseInt(values["martialManeuverStunMod"+maneuverId])||0;
 				let rollMessage = (isNormal ? "Normal" : "Killing") + " Attack";
 				let damageLabel = "Damage";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+				
+				let netDCV = parseInt(values["currentDCV"])||3;
+				let maneuverDCV = parseInt(values["martialManeuverDCV"+maneuverId])||0;
 				
 				// Martial maneuvers by default cost no endurance. Endurance costs used for flexibility.
 				let subtractENDAmt =  parseInt(values["martialManeuverEndurance"+maneuverId])||0;	
@@ -11083,6 +11172,8 @@
 				if (values.rangeMartial > 8) {
 					isRanged = true;
 				}
+				
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				setAttrs({
 					"hiddenDamage": values["hiddenMartialManeuverDamage"+maneuverId],
@@ -11095,14 +11186,11 @@
 				
 				if (!isBlocking) {
 					// If isNormal is TRUE, use the Normal Damage template. Else use the killing template.
-					theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle= " + (isRanged ? "Ranged " : "") + (isNormal ? "Normal" : "Killing") + " Attack with @{martialManeuverName"+maneuverId+"}}} ";
-					
-					if ((parseInt(values["currentDCV"])||0)+(parseInt(values["martialManeuverDCV"+maneuverId])||0) >= 0) {
-						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
-					} else {
-						// Minimum DCV is zero.
-						theRoll +=  "{{DCV=[[0[Minimum]]]}}";
-					}
+					theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} ";
+					theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
+					theRoll += "{{subtitle= " + (isRanged ? "Ranged " : "") + (isNormal ? "Normal" : "Killing") + " Attack with @{martialManeuverName"+maneuverId+"}}} ";
+					theRoll += "{{label=DCV}}";
+					theRoll += "{{data="+netDCV+"}}";
 					
 					if (values.displayDegreeOfSuccess != 0) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}";
@@ -11112,15 +11200,12 @@
 					theRoll	+= (subtractENDAmt ? "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{currentEND})}}" : "");
 					theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				} else {
-					// Use the Blocking template.
-					theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}}" + "{{subtitle=Blocks with @{martialManeuverName"+maneuverId+"}}} ";
-					
-					if ((parseInt(values["currentDCV"])||0)+(parseInt(values["martialManeuverDCV"+maneuverId])||0) >= 0) {
-						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+@{martialManeuverDCV"+maneuverId+"}[ManeuverDCV]]]}}";
-					} else {
-						// Minimum DCV is zero.
-						theRoll +=  "{{DCV=[[0[Minimum]]]}}";
-					}
+					// Use the Blocking template.					
+					theRoll += "&{template:custom-defense}";
+					theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
+					theRoll += "{{subtitle=Blocks with @{martialManeuverName"+maneuverId+"}}} ";
+					theRoll += "{{label=DCV}}";
+					theRoll += "{{data="+netDCV+"}}";
 					
 					if (values.displayDegreeOfSuccess != 0) {
 						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
@@ -12022,27 +12107,29 @@
 	
 	// Roll weapon damage
 	on("clicked:hiddenDamageRoll", function () {
-		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "whisperToGM"], function(values) {
+		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "whisperToGM", "character_title"], function(values) {
 			var theRoll = values.whisperToGM||"";
-			// let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormal = (values.hiddenIsNormal === "true") ? true : false;
 			let isContest = (values.hiddenIsContest === "true") ? true : false;
+			let isPower = (values.hiddenIsPower === "true") ? true : false;
 			let isAoE = (values.hiddenIsAoE === "true") ? true : false;
-			let dmgType = isContest ? "ATTR" : (isNormal ? "STUN" : "BODY");
-			let otherDmgType = isContest ? "PIPS" : (isNormal ? "BODY" : "STUN");
+			let dmgType = (isContest || isPower) ? "ATTR" : (isNormal ? "STUN" : "BODY");
+			let otherDmgType = (isContest || isPower) ? "PIPS" : (isNormal ? "BODY" : "STUN");
 			let stunMod = parseInt(values.hiddenStunMod)||0;
 			let theMessage;
 			let theHitLocation;
 			let theSTUNMultiplier = Math.floor(Math.random()*3 + 1);
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 			
-			theRoll += "&{template:custom" + (isNormal ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} {{title=@{character_name} - @{character_title}}} ";
-			theRoll += "{{subtitle=" + values.hiddenMessage + "}} ";
+			theRoll += "&{template:custom"+ (isPower ? "-power" : "") + (isNormal ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} ";
+			theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
+			theRoll += "{{subtitle=" + values.hiddenMessage + (isContest ? " Strength Contest " : (isPower ? " Effect " : " Damage ")) + "}} ";
 			
 			theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
 			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
 			
-			if (useHitLocations && !isContest) {
+			if (useHitLocations && !isContest & !isPower) {
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
 			}
 			
@@ -12051,7 +12138,7 @@
 				var computed = parseInt(results.results[dmgType].result)||0;
 				
 				// Get hit location message if system used.
-				if (useHitLocations && !isContest && !isAoE) {
+				if (useHitLocations && !isContest && !isAoE && !isPower) {
 					theHitLocation = hitLocationDetails(results.results.HITLOC.result);
 					theMessage = isNormal ? theHitLocation.normalMessage : theHitLocation.killMessage;
 					theSTUNMultiplier = theHitLocation.STUNx;
@@ -12059,7 +12146,7 @@
 					theMessage = "AoE";
 				}
 				
-				if (isContest || isNormal) {
+				if (isPower || isContest || isNormal) {
 					// Convert dice roll to equivalent BODY damage.
 					computed = convertStunToBody(results.results[dmgType].rolls);
 				} else {
@@ -12070,7 +12157,7 @@
 				
 				theResult[otherDmgType] = computed;
 				
-				if (useHitLocations && !isContest) {
+				if (useHitLocations && !isContest && !isPower) {
 					theResult.HITLOC = theMessage;
 				}
 				
@@ -12085,7 +12172,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "hiddenBasicDamage"], function(values) {
+			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "hiddenBasicDamage"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
@@ -12097,13 +12184,12 @@
 				let otherDmgType = isNormal ? "BODY" : "STUN";
 				let rollMessage = "attack";
 				let damageLabel = "Damage";
-				const dingbat = " ☸ "
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 				
 				// Update weapon damage for maneuvers that add damage.				
 				let adjustedDC = parseInt(values["weaponAdjustedDC"+weaponId])||0;
 				let baseDC = parseInt(values["weaponDC"+weaponId])||0;
 				let theAdvantage = parseFloat(values["weaponAdvantage"+weaponId])||0;
-				// let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
 				let theSign = parseInt(values["hiddenWeaponSign"+weaponId])||0;
 				let capDamage = (values.optionWeaponDamageCap === "on") ? true : false;
 				let strengthApplied = parseInt(values["weaponStrength"+weaponId])||0;
@@ -12399,15 +12485,17 @@
 	on('clicked:maneuverDodge', (info) => {
 		// Display chat message and add DCV.
 			
-		getAttrs(["currentDCV", "whisperToGM"], function(values) {
+		getAttrs(["currentDCV", "whisperToGM", "character_title"], function(values) {
 			var theRoll = values.whisperToGM||"";
-			let maneuverDCV = +3;
-			let subtractENDAmt = 1;
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+			const maneuverDCV = +3;
+			const subtractENDAmt = 1;
+			let netDCV = getNetDCV (parseInt(values.currentDCV)||0, maneuverDCV, false);
 			
-			theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Dodges}} ";
-			
-			theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV+"[ManeuverDCV]]]}}";
-			
+			theRoll += "&{template:custom-defense} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+			theRoll += "{{subtitle=Dodges}} ";
+			theRoll += "{{label=DCV}}";
+			theRoll += "{{data="+netDCV+"}}";
 			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			
 			setAttrs({
@@ -12433,15 +12521,17 @@
 	on('clicked:maneuverSet', (info) => {
 		// Display chat message and add DCV.
 			
-		getAttrs(["currentDCV", "whisperToGM"], function(values) {
+		getAttrs(["currentDCV", "whisperToGM", "character_title"], function(values) {
 			var theRoll = values.whisperToGM||"";
-			let maneuverDCV = 0;
-			let subtractENDAmt = 1;
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+			const maneuverDCV = 0;
+			const subtractENDAmt = 1;
+			let netDCV = getNetDCV (parseInt(values.currentDCV)||0, maneuverDCV, false);
 			
-			theRoll += "&{template:custom} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Set}} ";
-			
-			theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV+"[ManeuverDCV]]]}}";
-			
+			theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+			theRoll += "{{subtitle=Set}} ";
+			theRoll += "{{label=DCV}}";
+			theRoll += "{{data="+netDCV+"}}";
 			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			
 			setAttrs({
@@ -12465,7 +12555,7 @@
 	// Roll attack and damage dice for Weapon XX.
 	on(`clicked:attackStrength`, (info) => {
 		
-		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "maneuverDCLimit"], function(values) {
+		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "maneuverDCLimit"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormal = true;
@@ -12478,6 +12568,7 @@
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
 			let rollMessage = "attack";
 			let damageLabel = "Damage";
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 			
 			// Update weapon damage for maneuvers that add damage.				
 			let baseDC = Math.floor( ((values.strength)||0)/5 );
@@ -12497,6 +12588,7 @@
 				// CV
 				maneuverOCV = 0;
 				maneuverDCV = -5;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				// Damage
 				adjustedDC += 4;
@@ -12518,6 +12610,7 @@
 				// CV
 				maneuverOCV = -2;
 				maneuverDCV = -2;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				isBraced = false;
 				isSet = false;
@@ -12540,6 +12633,7 @@
 				// CV
 				maneuverDCV = -3;
 				maneuverOCV = -1 * Math.floor(velocity/10);
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				isBraced = false;
 				isSet = false;
@@ -12558,7 +12652,10 @@
 				rollMessage = "Multiple Attack";
 				
 				// CV
+				maneuverOCV = 0;
+				maneuverDCV = 0;
 				halfDCV = true;
+				netDCV = getNetDCV(netDCV, maneuverDCV, halfDCV);
 				
 				setAttrs({
 					"hiddenDamage": values.hiddenBasicDamage,
@@ -12569,6 +12666,11 @@
 				});
 			} else if (values.maneuverSelection === "strike") {
 				rollMessage = "Normal Strike";
+				
+				// CV
+				maneuverOCV = 0;
+				maneuverDCV = 0;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				setAttrs({
 					"hiddenDamage": values.hiddenBasicDamage,
@@ -12582,6 +12684,7 @@
 				
 				maneuverOCV = -1;
 				maneuverDCV = -2;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				subtractENDAmt = 1;
 				
@@ -12594,8 +12697,10 @@
 				rollMessage = "Grab By";
 				damageLabel = "Contest";
 				
+				// CV
 				maneuverOCV = -3;
 				maneuverDCV = -4;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				isBraced = false;
 				isSet = false;
@@ -12610,11 +12715,14 @@
 					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "shove") {
-				maneuverOCV = -1;
-				maneuverDCV = -1;
-				
 				rollMessage = "Shove up to " + Math.floor((parseInt(values.strength)||0)/5) + " m";
 				
+				// CV
+				maneuverOCV = -1;
+				maneuverDCV = -1;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
+				
+				// Damage
 				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
 					adjustedDC = parseInt(values.maneuverDCLimit)||0;
 				}
@@ -12632,6 +12740,12 @@
 			} else if (values.maneuverSelection === "throw") {
 				rollMessage = "Throw Object";
 				
+				// CV
+				maneuverOCV = 0;
+				maneuverDCV = 0;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
+				
+				// Damage
 				if (adjustedDC > (parseInt(values.maneuverDCLimit)||0) ) {
 					adjustedDC = parseInt(values.maneuverDCLimit)||0;
 				}
@@ -12650,6 +12764,7 @@
 				// CV
 				maneuverOCV = -1;
 				maneuverDCV = -2;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				// Damage
 				velocityDC = Math.floor(velocity/20);
@@ -12671,7 +12786,10 @@
 				rollMessage = "Unarmed Disarm";
 				damageLabel = "Contest";
 				
+				// CV
 				maneuverOCV = -2;
+				maneuverDCV = 0;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
 				
 				setAttrs({
 					"hiddenDamage": values.hiddenBasicDamage,
@@ -12683,6 +12801,11 @@
 					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "block") {
+				// CV
+				maneuverOCV = 0;
+				maneuverDCV = 0;
+				netDCV = getNetDCV(netDCV, maneuverDCV, false);
+				
 				setAttrs({
 					"rangeManeuver":0,
 					"checkSet":0,
@@ -12716,27 +12839,20 @@
 					hasRangePenalty = false;
 				}
 				
+				// Begin roll template
 				if (values.maneuverSelection === "disarm") {
-					theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
+					theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+					theRoll += "{{subtitle=" + rollMessage + "}}";
+					theRoll += "{{label=DCV}}";
+					theRoll += "{{data="+netDCV+"}}";
 				} else {
 					// If isNormal is TRUE, use the Normal Damage template.
-					theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with Strength}} ";
-				}
-				
-				// Character DCV after maneuver.
-				if (halfDCV) {
-					netDCV = heroRoundHigh(netDCV/2);
-				} else {
-					netDCV = netDCV + maneuverDCV;
-				}
-				
-				if ((netDCV > 0) && (! halfDCV)) {
-					theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"[ManeuverDCV]]]}}";
-				} else if ((netDCV > 0) && (halfDCV)) {
-					theRoll +=  "{{DCV=[["+netDCV.toString()+"[HalfDCV]]]}}";
-				} else {
-					// Minimum DCV is zero.
-					theRoll +=  "{{DCV=[[0[Minimum]]]}}";
+					theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack}";
+					theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}}";
+					theRoll += "{{subtitle=" + rollMessage + " with Strength}} ";
+					theRoll += "{{label=DCV}}";
+					theRoll += "{{data="+netDCV+"}}";
+					// theRoll += "{{data=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
 				}
 				
 				// Attack and damage rolls.
@@ -12759,8 +12875,10 @@
 				
 			} else if (values.maneuverSelection === "block") {
 				// Blocking Roll
-				theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Unarmed Block}} ";
-				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]]]}}";
+				theRoll += "&{template:custom-defense} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+				theRoll += "{{subtitle=Unarmed Block}} ";
+				theRoll += "{{label=DCV}}";
+				theRoll += "{{data="+netDCV+"}}";
 				
 				if (dispDoS) {
 					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+?{Modifiers|0}[Modifier]]]}} ";
@@ -12769,15 +12887,12 @@
 				}
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
-			} else if (values.maneuverSelection === "disarm") {
-				// Initiate Disarm dialog.
 			} else if (values.maneuverSelection === "grab") {
-				// A success drops the attacker's DCV to half.
-				netDCV = heroRoundHigh( (netDCV + maneuverDCV)/2);
-				
 				// Grab Roll
-				theRoll += "&{template:custom} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Grab}} ";
-				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]] or [["+netDCV.toString()+"]]}}";
+				theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+				theRoll += "{{subtitle=Grab}} ";
+				theRoll += "{{label=DCV}}";
+				theRoll += "{{data="+netDCV+"}}";
 				
 				if (dispDoS) {
 					theRoll	+= "{{Grabs DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} ";
@@ -12787,10 +12902,11 @@
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			} else if (values.maneuverSelection === "grabBy") {
-				
 				// Grab By Roll
-				theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Grab By}} ";
-				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
+				theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+				theRoll += "{{subtitle=Grab By}} ";
+				theRoll += "{{label=DCV}}";
+				theRoll += "{{data="+netDCV+"}}";
 				
 				if (dispDoS) {
 					theRoll	+= "{{Grabs DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
@@ -12802,9 +12918,11 @@
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 			} else if (values.maneuverSelection === "trip") {
-				theRoll += "&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + "}} ";
-				
-				theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"[ManeuverDCV]]]}}";
+				// Trip Roll	
+				theRoll += "&{template:custom-normal-attack} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+				theRoll += "{{subtitle=" + rollMessage + "}} ";
+				theRoll += "{{label=DCV}}";
+				theRoll += "{{data="+netDCV+"}}";
 				
 				if (dispDoS) {
 					theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManeuverOCV]-[[@{targetOCVPenalty}]][TargetOCV]+?{Modifiers|0}[Modifier]]]}} ";
@@ -12992,12 +13110,15 @@
 	arrayOf(maxTalentNum).forEach(num => {
 		var talentId = String(num).padStart(2,'0');	
 		on(`clicked:showTalentRoll${talentId}`, (info) => {
-			getAttrs(["whisperToGM"], function(values) {
+			getAttrs(["whisperToGM", "character_title"], function(values) {
 				var theRoll = values.whisperToGM||"";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+				const lesserDingbat = " ⬩ ";
 				
-				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Perks & Talents - @{talentName"+talentId+"}}} "
-					+ "{{desc=@{talentText"+talentId+"}}}";
+				theRoll += "&{template:custom-show} ";
+				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+				theRoll += "{{subtitle= Perks & Talents" + lesserDingbat + "@{talentName"+talentId+"}}} ";
+				theRoll += "{{desc=@{talentText"+talentId+"}}}";
 				
 				startRoll(theRoll, (results) => {
 					finishRoll(results.rollId, {});
@@ -13047,12 +13168,15 @@
 	arrayOf(maxComplicationNum).forEach(num => {
 		var complicationId = String(num).padStart(2,'0');	
 		on(`clicked:showComplicationRoll${complicationId}`, (info) => {
-			getAttrs(["whisperToGM"], function(values) {
+			getAttrs(["whisperToGM", "character_title"], function(values) {
 				var theRoll = values.whisperToGM||"";
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
+				const lesserDingbat = " ⬩ ";
 				
-				theRoll += "&{template:custom-show} {{title=@{character_name} - @{character_title}}} "
-					+ "{{subtitle= Complication - @{complicationName"+complicationId+"}}} "
-					+ "{{desc=@{complicationText"+complicationId+"}}}";
+				theRoll += "&{template:custom-show} ";
+				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+				theRoll += "{{subtitle= Complication" + lesserDingbat +"@{complicationName"+complicationId+"}}} ";
+				theRoll += "{{desc=@{complicationText"+complicationId+"}}}";
 				
 				startRoll(theRoll, (results) => {
 					finishRoll(results.rollId, {});
