@@ -59,7 +59,7 @@
 <div class="row 2autocolumn">
 <h2 data-i18n="name"></h2>
 <label data-i18n-title="enter name" title="enter name">
-<input data-i18n-placeholder="name" name="attr_name" placeholder="name" title="@{name}" type="text" value=""/>
+<input data-i18n-placeholder="name" name="attr_character_name" placeholder="name" title="@{character_name}" type="text" value=""/>
 </label>
 </div>
 <div class="row 2column">
@@ -148,9 +148,7 @@
 </div>
 <div class="row 2autocolumn woman">
 <h2 data-i18n="Gentle Woman Bonus[*](total=80+)"></h2>
-<label data-i18n-title="enter gentle woman bonus" title="enter gentle woman bonus">
-<input data-i18n-placeholder="gentle woman bonus" name="attr_gentle_woman_bonus" placeholder="gentle woman bonus" title="@{gentle_woman_bonus}" type="text" value=""/>
-</label>
+<span class="text-center display" name="attr_gentle_woman_bonus"></span>
 </div>
 <div class="row 2autocolumn">
 <h2 data-i18n="Religious Bonus(total=90+, Love (God) 16+)"></h2>
@@ -2327,7 +2325,7 @@ round 4" title="enter round 4"><input name="attr_round_4" placeholder="#" title=
 <div class="col grid 2autocolumn"><h2 data-i18n="location"></h2><label data-i18n-title="enter location" title="enter location"><input data-i18n-placeholder="location" name="attr_location" placeholder="location" title="@{location}" type="text" value=""/></label></div>
 <div class="col grid 2autocolumn">
 <h2 data-i18n="size"></h2>
-<label data-i18n-title="enter size" title="enter size"><input data-i18n-placeholder="size" name="attr_size" placeholder="size" title="@{size}" type="text" value=""/></label>
+<label data-i18n-title="enter feast size" title="enter feast size"><input data-i18n-placeholder="feast size" name="attr_feast_size" placeholder="feast size" title="@{feast_size}" type="text" value=""/></label>
 </div>
 <div class="col grid 2autocolumn">
 <h2 data-i18n="date"></h2>
@@ -2418,7 +2416,8 @@ data-i18n="courtesy" name="roll_courtesy" type="roll" value="&{template:rolls} {
 	annualglory: ['annual_glory_rewards_traits', 'annual_glory_rewards_passions', 'annual_glory_rewards_skills', 'annual_glory_rewards_attributes', 'annual_glory_rewards_attitudes', 'annual_glory_rewards_chivalry', 'annual_glory_rewards_romance', 'annual_glory_rewards_religion', 'annual_glory_rewards_maintenance', 'annual_glory_rewards_luxury_spendings', 'annual_glory_rewards_holdings', 'annual_glory_rewards_enchanted_items'],
 	chivalry: ['energetic', 'generous', 'just', 'merciful', 'modest', 'valorous'],
 	religious: ['chaste', 'forgiving', 'merciful', 'modest', 'temperate', 'trusting'],
-	romantic: ['chaste', 'forgiving', 'generous', 'honest', 'prudent', 'trusting']
+	romantic: ['chaste', 'forgiving', 'generous', 'honest', 'prudent', 'trusting'],
+	gentlewoman: ['chaste', 'energetic', 'honest', 'modest', 'prudent', 'temperate']
 }
 
 
@@ -2480,6 +2479,23 @@ attributes.romantic.forEach(attr => {
 	on(`change:${attr}`, (eventinfo) => {
 		sumOfCalculator(attributes.romantic, 'romance_bonus');
 	});
+})
+
+attributes.gentlewoman.forEach(attr => {
+	on(`change:${attr}`, (eventinfo) => {
+		sumOfCalculator(attributes.gentlewoman, 'gentle_woman_bonus');
+	});
+})
+
+on('sheet:opened', async (info) => {
+  getAttrs(['version','name'],(attributes) => {
+    const setObj = { version: parseFloat(attributes.version || '2') };
+    if(setObj.version < 2.1) {
+      if (attributes.name) setObj.character_name = attributes.name;
+      setObj.version = 2.1;
+    }
+    setAttrs(setObj,{silent:true});
+  });
 })
 
 //When performing calculations in King Arthur Pendragon / Paladin, round
