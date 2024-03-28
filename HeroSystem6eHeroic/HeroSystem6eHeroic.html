@@ -7815,20 +7815,22 @@
 
 <!-- Jackob's Roll Template for defensive actions (blocks)-->
 <rolltemplate class="sheet-rolltemplate-custom-defense">
-	<div class="template-wrapper">
-	  <div class="sheet-container sheet-color-{{color}}">
-		<div class="sheet-header">
-		  {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
-		  {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+	<div class="sheet-template-wrapper">
+		<div class="sheet-container sheet-color-{{color}}">
+			<div class="sheet-header">
+				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+				{{#label}}<div class="sheet-label">{{label}}</div>{{/label}}
+				{{#data}}<div class="sheet-data">{{data}}</div>{{/data}}
+			</div>
+			<div class="sheet-content">
+				{{#allprops() title subtitle label data desc color}}
+				<div class="sheet-key">{{key}}</div>
+				<div class="sheet-value">{{value}}</div>
+				{{/allprops() title subtitle label data desc color}}
+				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+			</div>
 		</div>
-		<div class="sheet-content">
-		  {{#allprops() title subtitle desc color}}
-		  <div class="sheet-key">{{key}}</div>
-		  <div class="sheet-value">{{value}}</div>
-		  {{/allprops() title subtitle desc color}}
-		  {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
-		</div>
-	  </div>
 	</div>
 </rolltemplate>
 
@@ -7932,12 +7934,14 @@
 			<div class="sheet-header">
 				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+				{{#label}}<div class="sheet-label">{{label}}</div>{{/label}}
+				{{#data}}<div class="sheet-data">{{data}}</div>{{/data}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color}}
+				{{#allprops() title subtitle label data desc color}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color}}
+				{{/allprops() title subtitle label data desc color}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 			</div>
 		</div>
@@ -7951,13 +7955,14 @@
 			<div class="sheet-header">
 				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+				{{#label}}<div class="sheet-label">{{label}}</div>{{/label}}
+				{{#data}}<div class="sheet-data">{{data}}</div>{{/data}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color}}
+				{{#allprops() title subtitle label data desc color}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color}}
-				
+				{{/allprops() title subtitle label data desc color}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 			</div>
 		</div>
@@ -7971,13 +7976,14 @@
 			<div class="sheet-header">
 				{{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
 				{{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+				{{#label}}<div class="sheet-label">{{label}}</div>{{/label}}
+				{{#data}}<div class="sheet-data">{{data}}</div>{{/data}}
 			</div>
 			<div class="sheet-content">
-				{{#allprops() title subtitle desc color}}
+				{{#allprops() title subtitle label data desc color}}
 				<div class="sheet-key">{{key}}</div>
 				<div class="sheet-value">{{value}}</div>
-				{{/allprops() title subtitle desc color}}
-				
+				{{/allprops() title subtitle label data desc color}}
 				{{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 			</div>
 		</div>
@@ -12091,6 +12097,7 @@
 				let otherDmgType = isNormal ? "BODY" : "STUN";
 				let rollMessage = "attack";
 				let damageLabel = "Damage";
+				const dingbat = " ☸ "
 				
 				// Update weapon damage for maneuvers that add damage.				
 				let adjustedDC = parseInt(values["weaponAdjustedDC"+weaponId])||0;
@@ -12131,6 +12138,7 @@
 					// CV
 					maneuverOCV = 0;
 					maneuverDCV = -5;
+					netDCV = getNetDCV(netDCV, maneuverDCV, false);
 					
 					// Damage
 					if (capDamage) {
@@ -12160,6 +12168,7 @@
 						// CV
 						maneuverOCV = -2;
 						maneuverDCV = -2;
+						netDCV = getNetDCV(netDCV, maneuverDCV, false);
 						
 						// Velocity DC added
 						velocityDC = Math.floor(velocity/10);
@@ -12171,6 +12180,7 @@
 						// CV
 						maneuverDCV = -3;
 						maneuverOCV = -1 * Math.floor(velocity/10);
+						netDCV = getNetDCV(netDCV, maneuverDCV, false);
 						
 						// Velocity DC added
 						velocityDC = Math.floor(velocity/6);	
@@ -12228,7 +12238,10 @@
 					rollMessage = "Multiple " + (isNormal ? "" : "Killing ") + "Attack";
 					
 					// CV
+					maneuverOCV = 0;
+					maneuverDCV = 0;
 					halfDCV = true;
+					netDCV = getNetDCV(netDCV, maneuverDCV, halfDCV);
 					
 					setAttrs({
 						"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
@@ -12240,6 +12253,11 @@
 					});
 				} else if (values.maneuverSelection === "strike") {
 					rollMessage = (isNormal ? "" : "Killing ") + "Strike";
+					
+					// CV
+					maneuverOCV = 0;
+					maneuverDCV = 0;
+					netDCV = getNetDCV(netDCV, maneuverDCV, false);
 					
 					setAttrs({
 						"hiddenDamage": values["weaponDamage"+weaponId]||0,
@@ -12255,6 +12273,7 @@
 					
 					maneuverOCV = -2;
 					maneuverDCV = 0;
+					netDCV = getNetDCV(netDCV, maneuverDCV, false);
 					
 					if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
 						isRangedAttack = true;
@@ -12270,6 +12289,12 @@
 						"hiddenMessage": rollMessage
 					});
 				} else if (values.maneuverSelection === "block") {
+					
+					// CV
+					maneuverOCV = 0;
+					maneuverDCV = 0;
+					netDCV = getNetDCV(netDCV, maneuverDCV, false);
+					
 					setAttrs({
 						"hiddenMessage": rollMessage,
 						"rangeManeuver":0,
@@ -12300,28 +12325,20 @@
 						hasRangePenalty = false;
 					}
 					
+					// Begin roll template
 					if (values.maneuverSelection === "disarm") {
-						theRoll += "&{template:custom-contest} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
-						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
+						theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+						theRoll += "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}}";
+						theRoll += "{{label=DCV}}";
+						theRoll += "{{data="+netDCV+"}}";
 					} else {
 						// If isNormal is TRUE, use the Normal Damage template.
-						theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} {{title=@{character_name} - @{character_title}}} " + "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
-					}
-					
-					// Character DCV after maneuver.
-					if (halfDCV) {
-						netDCV = heroRoundHigh(netDCV/2);
-					} else {
-						netDCV = netDCV + maneuverDCV;
-					}
-					
-					if ((netDCV > 0) && (! halfDCV)) {
-						theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"[ManeuverDCV]]]}}";
-					} else if ((netDCV > 0) && (halfDCV)) {
-						theRoll +=  "{{DCV=[["+netDCV.toString()+"[HalfDCV]]]}}";
-					} else {
-						// Minimum DCV is zero.
-						theRoll +=  "{{DCV=[[0[Minimum]]]}}";
+						theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack}";
+						theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}}";
+						theRoll += "{{subtitle=" + rollMessage + " with " + values["weaponName"+weaponId] + "}} ";
+						theRoll += "{{label=DCV}}";
+						theRoll += "{{data="+netDCV+"}}";
+						// theRoll += "{{data=[[@{currentDCV}[CurrentDCV]+"+maneuverDCV.toString()+"]]}}";
 					}
 					
 					// Attack and damage rolls.
@@ -12343,10 +12360,11 @@
 					theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 					
 				} else if (values.maneuverSelection === "block") {
-					// Blocking Roll
-					theRoll += "&{template:custom-defense} {{title=@{character_name}-@{character_title}}} " + "{{subtitle=Blocks with @{weaponName"+weaponId+"}}} ";
-					
-					theRoll +=  "{{DCV=[[@{currentDCV}[CurrentDCV]]]}}";
+					// Blocking Roll				
+					theRoll += "&{template:custom-defense} {{title=@{character_name}"+dingbat+"@{character_title}}}";
+					theRoll += "{{subtitle=Blocks with @{weaponName"+weaponId+"}}} ";
+					theRoll += "{{label=DCV}}";
+					theRoll += "{{data="+netDCV+"}}";
 					
 					if (dispDoS) {
 						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+?{Modifiers|0}[Modifier]]]}} ";
@@ -12369,6 +12387,13 @@
 			});
 		});
 	});
+	
+	
+	function getNetDCV (base, mods, isHalved) {
+		let DCV = Math.max(0, base + mods);
+		
+		return isHalved ? Math.round(DCV/2) : DCV;
+	}
 	
 	
 	on('clicked:maneuverDodge', (info) => {
