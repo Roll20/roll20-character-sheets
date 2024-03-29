@@ -83,7 +83,10 @@
 <input type="hidden" name="attr_skill_science_2" value="0"/>
 <input type="hidden" name="attr_skill_science_3" value="0"/>
 <input type="hidden" name="attr_skill_science_4" value="0"/>
-
+<div class="pe-dynamic-modifiers">
+    <input type="checkbox" value="1" name="attr_use_dynamic_modifiers"/>
+    <span data-i18n="use-dynamic-modifiers">Use dynamic modifiers</span>
+</div>
 <div class="pe-header">
     <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Private%20Eye/images/privateeye_banner.png" alt="Private Eye">
 </div>
@@ -118,7 +121,7 @@
             <input type="text" name="attr_place_of_birth"  class="pe-grow"/>
         </div>
     </div>
-    <div class="pe-sheet-section pe-width-25 pe-borderless pe-centered">
+    <div class="pe-sheet-section pe-width-25 pe-borderless pe-centered avatar-widthfix">
         <img name="attr_character_avatar" class="img-fit-content"/>
     </div>
 </div>
@@ -917,18 +920,24 @@
         const weapon = "weapon_" + e["htmlAttributes"]["data-weapon-number"]
         const crType = e["htmlAttributes"]["data-combat-roll-type"]
 
-        getAttrs([weapon + '_name', weapon + '_type', weapon + '_' + crType + '_probability'], function(attrs) {
+        getAttrs(['use_dynamic_modifiers', weapon + '_name', weapon + '_type', weapon + '_' + crType + '_probability'], function(attrs) {
             const rollMacro = attrs[weapon + '_' + crType + '_probability'] < 6 ? "[[1d100cf>98cs<1]]" : "[[1d100cf>98cs<3]]"
             const damageMacro = attrs[weapon + '_type'] == 'blunt' ? "[[1d5cs<10cf>13]]" : "[[1d10cs<12cf>13]]"
             const damageCritMacro = attrs[weapon + '_type'] == 'blunt' ? "[[1d5+1cs<10cf>13]]" : "[[1d10+2cs<12cf>13]]"
             const attackType = crType == "attack" ? "{{attack=true}}" : ""
+
+            let dynamicModifier = ""
+            if (attrs['use_dynamic_modifiers'] == 1) {
+                let dynamicModifierPrompt = getTranslationByKey('dynamic-modifiers-prompt')
+                dynamicModifier = "+ ?{" + dynamicModifierPrompt + "|0}"
+            }
 
             startRoll(
                 "&{template:pe-roll} "
                 + "{{name=" + attrs[weapon + '_name'] + " (^{weapon-roll-type-" + crType + "})}}"
                 + attackType
                 + "{{roll=" + rollMacro + "}}"
-                + "{{success=[[" + attrs[weapon + '_' + crType + '_probability'] + "]]}}"
+                + "{{success=[[" + attrs[weapon + '_' + crType + '_probability'] + dynamicModifier + "]]}}"
                 + "{{damage_roll=" + damageMacro + "}}"
                 + "{{damage_crit_roll=" + damageCritMacro + "}}"
                 , function(rollResult) {
@@ -947,13 +956,19 @@
     $20('button.skill-roll-dn').on('click', function(e){
         const attribute = e["htmlAttributes"]["name"].replace('roll_', '')
 
-        getAttrs([attribute, attribute+'_name'], function(attrs){
+        getAttrs(['use_dynamic_modifiers', attribute, attribute+'_name'], function(attrs){
+            let dynamicModifier = ""
+            if (attrs['use_dynamic_modifiers'] == 1) {
+                let dynamicModifierPrompt = getTranslationByKey('dynamic-modifiers-prompt')
+                dynamicModifier = "+ ?{" + dynamicModifierPrompt + "|0}"
+            }
+
             const rollMacro = attrs[attribute] < 6 ? "[[1d100cf>98cs<1]]" : "[[1d100cf>98cs<3]]"
             startRoll(
                 "&{template:pe-roll} "
                 + "{{name=" + attrs[attribute+'_name'] +"}}"
                 + "{{roll=" + rollMacro + "}}"
-                + "{{success=[[" + attrs[attribute] + "]]}}"
+                + "{{success=[[" + attrs[attribute] + dynamicModifier + "]]}}"
                 , function(rollResult) {
                     finishRoll(rollResult["rollId"])
                 }
@@ -964,13 +979,19 @@
     $20('button.skill-roll').on('click', function(e){
         const attribute = e["htmlAttributes"]["name"].replace('roll_', '')
 
-        getAttrs([attribute], function(attrs){
+        getAttrs(['use_dynamic_modifiers', attribute], function(attrs){
+            let dynamicModifier = ""
+            if (attrs['use_dynamic_modifiers'] == 1) {
+                let dynamicModifierPrompt = getTranslationByKey('dynamic-modifiers-prompt')
+                dynamicModifier = "+ ?{" + dynamicModifierPrompt + "|0}"
+            }
+
             const rollMacro = attrs[attribute] < 6 ? "[[1d100cf>98cs<1]]" : "[[1d100cf>98cs<3]]"
             startRoll(
                 "&{template:pe-roll} "
                 + "{{name=^{" + attribute.replaceAll('_', '-') +"}}}"
                 + "{{roll=" + rollMacro + "}}"
-                + "{{success=[[" + attrs[attribute] + "]]}}"
+                + "{{success=[[" + attrs[attribute] + dynamicModifier + "]]}}"
                 , function(rollResult) {
                     finishRoll(rollResult["rollId"])
                 }
@@ -981,13 +1002,19 @@
     $20('button.character-roll').on('click', function(e){
         const attribute = e["htmlAttributes"]["name"].replace('roll_character_', '')
 
-        getAttrs([attribute], function(attrs){
+        getAttrs(['use_dynamic_modifiers', attribute], function(attrs){
+            let dynamicModifier = ""
+            if (attrs['use_dynamic_modifiers'] == 1) {
+                let dynamicModifierPrompt = getTranslationByKey('dynamic-modifiers-prompt')
+                dynamicModifier = "+ ?{" + dynamicModifierPrompt + "|0}"
+            }
+
             const rollMacro = attrs[attribute] < 6 ? "[[1d100cf>98cs<1]]" : "[[1d100cf>98cs<3]]"
             startRoll(
                 "&{template:pe-roll} "
                 + "{{name=^{character-" + attribute +"}}}"
                 + "{{roll=" + rollMacro + "}}"
-                + "{{success=[[" + attrs[attribute] + "]]}}"
+                + "{{success=[[" + attrs[attribute] + dynamicModifier + "]]}}"
                 , function(rollResult) {
                     finishRoll(rollResult["rollId"])
                 }

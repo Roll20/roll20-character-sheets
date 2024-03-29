@@ -1,3 +1,18 @@
+2024-03-26
+
+ - Improvements to the roll template layout
+ - Charactermancer fix realm
+ - Fix open ended rolls from skills
+ - Handle rmuasync errors by continuing
+ - Sort translations.json to reduce deltas
+
+2024-03-24
+
+ - Skill rolls
+ - Fix height and weight craziness
+ - Lots of creation bug fixes.
+ - Fix some update function on derived/frontpage
+
 2024-03-17
 
  - Add specialisations

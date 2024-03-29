@@ -9,6 +9,9 @@ This is a character sheet for use on Roll20.net with the latest Private Eye Edit
 
 ### 2024-03-18:
 - Initial character-sheet submission
+#### 2024-03-26:
+- Bugfix: fix avatar-height crashing layout.
+- Feature: add toggable dynamic modifiers: if active, user will be asked to input a modifier at the start of each roll.
 
 ## Feedback
 If you have an issue then let me know, either by opening an issue and tagging me in Github or by sending me a
