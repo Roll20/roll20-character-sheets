@@ -828,6 +828,36 @@
 
 <!-- Old Dragon 2e Script -->
 <script type="text/worker">
+  // Initialize attributes and modifiers
+  on("sheet:opened", () => {
+    const stats = ["forca", "destreza", "constituicao", "sabedoria", "inteligencia", "carisma"];
+    const additionalAttrs = ["jpd_class", "jpd_race", "jpc_class", "jpc_race", "jps_class", "jps_race", "ca_base", "ca_armor", "ca_shield", "ca_magic_weapon", "ba_base"];
+    const attrsToGet = stats.concat(stats.map(stat => `mod_${stat}`)).concat(additionalAttrs);
+  
+    getAttrs(attrsToGet, values => {
+      const initialAttrs = {};
+  
+      stats.forEach(stat => {
+        if (!values[stat]) {
+          initialAttrs[stat] = "10";
+        }
+        if (!values[`mod_${stat}`]) {
+          initialAttrs[`mod_${stat}`] = "+0";
+        }
+      });
+  
+      additionalAttrs.forEach(attr => {
+        if (!values[attr]) {
+          initialAttrs[attr] = "0";
+        }
+      });
+  
+      if (Object.keys(initialAttrs).length > 0) {
+        setAttrs(initialAttrs);
+      }
+    });
+  });
+
   // Calculate modifiers
   const int = score => parseInt(score, 10) || 0;
   const stats = ["forca", "destreza", "constituicao", "sabedoria", "inteligencia", "carisma"];
