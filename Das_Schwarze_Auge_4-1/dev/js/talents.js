@@ -1,6 +1,6 @@
 /* talents begin */
 
-function generatTalentRollMacro(template, systemName, readableName, attributes, ebeMacro="") {
+function generateTalentRollMacro(template, systemName, readableName, attributes, ebeMacro="") {
 	let rollMacro = 
 		"@{gm_roll_opt} " +
 		"&{template:" + template + "} " +
