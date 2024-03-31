@@ -1,5 +1,5 @@
 # Notre Tombeau RPG Roll20 Character Sheet
-Inspired by the official Character Sheet Template for "Notre" tabletop game, [Notre Tombeau](https://johndoe-rpg.com/catalogue/notre-tombeau/).
+Inspired by the official Character Sheet Template for "Notre Tombeau" tabletop game, [Notre Tombeau](https://johndoe-rpg.com/catalogue/notre-tombeau/).
 
 ## Version 1.0
 (Evilbram) Mar.2024
