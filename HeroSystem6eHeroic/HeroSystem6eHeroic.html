@@ -10804,7 +10804,7 @@
 	/* Functions used for powers tab                      */
 	/* -------------------------------------------------- */
 	
-	function calculatePowerEND(powerActiveCost,powerReducedEND) {
+	function calculatePowerEND(powerActiveCost, powerReducedEND) {
 		// Calculates power endurance given active cost and reduced, standard, or increased endurance limitation.
 		var powerEND=0;
 		var found=1;
@@ -10827,7 +10827,7 @@
 		return powerEND;
 	}
 	
-	function calculateActiveCost(powerBaseCost,powerAdvantages,powerReducedEND) {
+	function calculateActiveCost(powerBaseCost, powerAdvantages, powerReducedEND) {
 		var powerActiveCost=0;
 		
 		switch (powerReducedEND) {
@@ -10952,18 +10952,27 @@
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEND"+powerId, "hiddenPowerDice"+powerId], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEND"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId], function(values) {
 				var theRoll = values.whisperToGM||"";
 				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? " ☸ " : "";
 				const lesserDingbat = " ⬩ ";
 				let damageLabel = "Result";
 				let subtractEND = (values.optionAutoSubtractEND === "on") ? true : false;
 				let subtractENDAmt = parseInt(values["powerEND"+powerId])||0;
-				
 				let netDCV = parseInt(values["currentDCV"])||3;
-				let maneuverDCV = 0; // This needs to be added to powers.
+				let isAoE = (values["powerAoE"+powerId] === "on") ? "true" : "false";
+				let isAttack = (values["powerAttack"+powerId] === "on") ? "true" : "false";
+				let isRangedAttack = false;
+				let hasRangePenalty = true;
 				
-				netDCV = getNetDCV(netDCV, maneuverDCV, false);
+				// Modify DCV if needed.
+				switch (values["powerDCV"+powerId]) {
+					case 'zero':	netDCV = 0;
+									break;
+					case 'half':	netDCV = Math.round(netDCV/2);
+									break;
+					default:		netDCV = netDCV;
+				}
 				
 				setAttrs({
 					"hiddenDamage": values["hiddenPowerDice" + powerId],
@@ -13660,7 +13669,6 @@
 				let braceMod = 0;
 				let isRangedAttack = false;
 				let hasRangePenalty = true;
-				let noDamage = false;
 				
 				// Maneuver message and DCV and damage mods.
 				if (values.maneuverSelection === "haymaker") {
@@ -13813,9 +13821,6 @@
 					if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
 						isRangedAttack = true;
 					}
-					
-					// targetObject = true;
-					noDamage = true;
 					
 					setAttrs({
 						"hiddenDamage": isRangedAttack ? getDamageDice(baseDC, 0, true, 1) : values.hiddenBasicDamage,
