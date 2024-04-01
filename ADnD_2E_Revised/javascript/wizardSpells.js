@@ -1307,7 +1307,7 @@ wiz2['Invisibility'] = {
     'reference': 'p. 184',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 464',
-    'errata': 'Dungeon Master Guide p. 161\nSage Advice #176 p. 93-94\nSage Advice #206 p. 89+90\nSage Advice #253 p. 22\nSage Advice #268 p. 112\nDungeon Master Option: High-Level Campaigns p. 72',
+    'errata': 'Sage Advice #206 p. 89+90\nSage Advice #253 p. 22\nSage Advice #268 p. 112\nDungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -2046,12 +2046,13 @@ wiz3['Haste'] = {
     'reference': '192',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 425',
-    'errata': 'Player’s Handbook p. 33\nSage Advice #154 p. 7\nSage Advice #249 p. 20\nSage Advice #258 p. 22-23\nDungeon Master Option: High-Level Campaigns p. 71-72',
+    'errata': 'Sage Advice #154 p. 7\nSage Advice #176 p. 93\nDungeon Master Option: High-Level Campaigns p. 71-72',
     'damage': '',
     'damage-type': '',
     'healing': '',
     'special-conditions': ['magical-aging'],
-    'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a –2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number  of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by *haste* must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell instantly ages the recipient by one year, the moment they receive the spell (i.e. during the first round of the spell’s effect), because of sped-up metabolic processes (like all magical aging, this requires a system shock roll). This spell is not cumulative with itself. If multiple *haste* effects are cast, only the best take effect and aging only happens once, unless the effects overlap, then aging happens again when the first effect expires and the next take effect. A *haste* never magnifies the effect of magical items or similar magic (including *boots of speed*, *potion of speed*, *broom of flying* or *carpet of flying*). A *Haste* spell does not increase the movement rate of a *fly* spell.\n&emsp;Aging from *haste* does not affect other spell durations, poisons, wounds, bleeding, mummy rot, healing, hair or fingernail length.'
+    'psionics': 'A *hasted* psionicist or wild talent psionic user can only activate one power per round.',
+    'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a –2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number  of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by *haste* must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell instantly ages the recipient by one year, the moment they receive the spell (i.e. during the first round of the spell’s effect), because of sped-up metabolic processes (like all magical aging, this requires a system shock roll). This spell is not cumulative with itself. If multiple *haste* effects are cast, only the best take effect and aging only happens once, unless the effects overlap, then aging happens again when the first effect expires and the next take effect. A *haste* never magnifies the effect of magical items or similar magic (including *boots of speed*, *potion of speed*, *broom of flying* or *carpet of flying*). A *Haste* spell does not increase the movement rate of a *fly* spell.'
 };
 
 wiz3['Hold Person'] = {
