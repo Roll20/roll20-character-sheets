@@ -4329,6 +4329,7 @@
 				<ul>
 					<li><b>ENHANCEMENT:</b> Bio/Misc tab, physical description, Added Skin field, requested by Demented Avenger.</li>
 					<li><b>NEW:</b> Added the <b>Heat Exposure</b> tool, which can be found under Tools > Environmental.</li>
+					<li><b>BUGFIX:</b> Default setting for <b>Use Custom Layer Labels</b> was not setting correctly, this should fix it.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -10819,7 +10820,7 @@ visualize what it will look like in chat.
 									<span data-i18n="hitlocation-disabled-tooltip">Disabled/Crippled Threshold.<br />If a <b>single</b> injury meets or exceeds this value, the extremity or structure is disabled.<br /><b>NOTE:</b> In most cases, if disabled/crippled in one injury, the excess damage is lost, except where noted, such as the <b>eyes.</b><br /><b>Dismemberment:</b> If injury is <i>twice</i> the threshold, then extremity is destroyed. <i>Cutting</i> or <i>Explosion</i> will sever the limb.<br />See B421</span>
 								</span>
 							</div>
-							<input type="hidden" name="attr_hit_location_layer_use_custom_labels" />
+							<input type="hidden" name="attr_hit_location_layer_use_custom_labels" value="0" />
 							<div class="item grid-header layer layer-1">
 								<div class="popup layer-label">
 									<span data-i18n="layer-1-label" class="default">Layer 1</span>
@@ -20730,6 +20731,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 			<ul>
 				<li><b>ENHANCEMENT:</b> Bio/Misc tab, physical description, Added Skin field, requested by Demented Avenger.</li>
 				<li><b>NEW:</b> Added the <b>Heat Exposure</b> tool, which can be found under Tools > Environmental.</li>
+				<li><b>BUGFIX:</b> Default setting for <b>Use Custom Layer Labels</b> was not setting correctly, this should fix it.</li>
 			</ul>
 			
 			<h4>Version: 2.12.0</h4>
@@ -27285,6 +27287,8 @@ B378
 				loadRepeating('repeating_cultures', 'points', 1);
 				loadRepeating('repeating_techniques', 'points', 1);
 				loadRepeating('repeating_spells', 'points', 1);
+
+				fixArmorLayerLabels();
 	
 				// initialize all calculated stats
 				resetAll(v.mod_cascade, !v.sheet_version, hasCombatReflexes, hasReflexesBeenConverted);
@@ -27304,6 +27308,16 @@ B378
 			resetAll(v.mod_cascade, false, false, false);
 		})
 	});
+
+	const fixArmorLayerLabels = () => {
+
+		getAttrs("hit_location_layer_use_custom_labels", (values) => {
+			if (values.hit_location_layer_use_custom_labels === undefined) {
+				setAttrs({ hit_location_layer_use_custom_labels: "0" });
+			}
+		});
+
+	}
 	
 	/**
 	 * Resets values for the sheet
