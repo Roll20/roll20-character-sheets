@@ -4328,6 +4328,7 @@
 				<!-- current version notes: 2.14.0 -->
 				<ul>
 					<li><b>ENHANCEMENT:</b> Grimoire tab, spell tables. Added parent/child relationship and sorting, similar to inventory items. You could create a parent college (remember to set points to zero!) and then set spells to be children of that college. Helps with organizing spell lists.</li>
+					<li><b>ENHANCEMENT:</b> Heat Exposure tool, added formula to determine <b>Intense Heat Threshold</b>.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -20249,7 +20250,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						</div>
 					</div>
 
-					<div class="grid-cell">
+					<div class="grid-cell" style="margin-bottom: 50px;">
 						<div class="tools-container">
 							<div class="section-header">
 								<div class="standard-tooltip">
@@ -20289,7 +20290,11 @@ Select the indent level of the spell. This is handy to help show the spell belon
 									</label>
 									<div>
 										<input type="hidden" name="attr_heat_exposure_frequency" value="30" />
-										<span name="attr_heat_exposure_frequency"></span> <span data-i18n="minutes-label">minutes</span>
+										<span name="attr_heat_exposure_frequency"></span> 
+										
+										<input type="hidden" name="attr_is_intense_heat" value="0" />
+										<span class="frequency-minutes" data-i18n="minutes-label">minutes</span>
+										<span class="frequency-intense-heat" data-i18n="intense-heat-frequency-label">second, armor protects DR x 3 seconds.</span>
 									</div>
 								</div>	
 
@@ -20334,6 +20339,29 @@ Select the indent level of the spell. This is handy to help show the spell belon
 									<span name="attr_heat_exposure_temperature_modifier"></span>
 								</div>
 								
+								<div class="grid-cell">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="lower-comfort-zone-label">Lower Comfort Zone</span>
+											<span class="tooltiptext">
+												<span data-i18n="lower-comfort-zone-tooltip">Enter the lower temperature of the comfort zone. Humans have a comfort zone of 35 to 90°F (2 to 32°C). See Temperature Tolerance B93.</span><br />
+												<span data-i18n="heat-exposure-lower-comfort-zone-tooltip"><b>Note:</b> Use the <b>Cold Exposure</b> tool to determine the effective lower comfort zone and enter the value here. In order to determine if the character is experiencing <b>Intense Heat</b> we the final range based on temperature tolerance. Intense is calculate as the difference between the lower comfort zone and the upper comfort zone, then multiply by 6. For humans, with tolerance of 35 to 90 °F, <b>Intense Heat</b> occurs at 330°F. (90 - 35) * 6 = 330. B434.</span>
+											</span>
+										</div>
+									</label>
+								</div>
+								<div class="grid-cell">
+									<div class="container-label-input grid__gap_small">
+										<span>
+											<input type="number" name="attr_heat_exposure_lower_comfort_zone" value="35" step="1" class="medium-width" />
+											<input type="hidden" name="attr_heat_exposure_lower_comfort_zone_fahrenheit" value="35" />
+										</span>
+										<span>
+											<span name="attr_heat_exposure_current_unit_type_display"></span>
+										</span>
+									</div>
+								</div>
+
 								<div class="grid-cell">
 									<label>
 										<div class="standard-tooltip">
@@ -20382,6 +20410,22 @@ Select the indent level of the spell. This is handy to help show the spell belon
 								</div>
 								<div class="grid-cell">
 									<input type="number" name="attr_heat_exposure_temperature_tolerance_health" value="10" min="1" step="1" class="medium-width" />
+								</div>
+
+								<div class="grid-cell">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="intense-heat-threshold-label">Intense Heat Threshold</span>
+											<span class="tooltiptext">
+												<span data-i18n="intense-heat-threshold-tooltip">The temperature at which the character will start to suffer from intense heat. B434.</span>
+											</span>
+										</div>
+									</label>
+								</div>
+								<div class="grid-cell">
+									<input type="hidden" name="attr_heat_exposure_intense_heat_threshold" value="330" />
+									<input type="hidden" name="attr_heat_exposure_intense_heat_threshold_display" value="330 °F" />
+									<span name="attr_heat_exposure_intense_heat_threshold_display"></span>
 								</div>
 
 								<div class="grid-cell">
@@ -20434,7 +20478,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 									<label>
 										<div class="standard-tooltip">
 											<span data-i18n="total-label">TOTAL</span>
-											<span class="tooltiptext">
+											<span class="tooltiptext move-left">
 												<span data-i18n="heat-exposure-health-modifier-total-tooltip">The total modifier that will be applied to the final roll.</span>
 											</span>
 										</div>
@@ -20449,7 +20493,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 									<label>
 										<div class="standard-tooltip">
 											<span data-i18n="effective-health-label">Effective HT</span>
-											<span class="tooltiptext">
+											<span class="tooltiptext move-left">
 												<span data-i18n="heat-exposure-effective-health-tooltip">The effective health of the character.</span>
 											</span>
 										</div>
@@ -20775,6 +20819,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 			<!-- current version notes: 2.14.0 -->
 			<ul>
 				<li><b>ENHANCEMENT:</b> Grimoire tab, spell tables. Added parent/child relationship and sorting, similar to inventory items. You could create a parent college (remember to set points to zero!) and then set spells to be children of that college. Helps with organizing spell lists.</li>
+				<li><b>ENHANCEMENT:</b> Heat Exposure tool, added formula to determine <b>Intense Heat Threshold</b>.</li>
 			</ul>
 			
 			<h4>Version: 2.13.0</h4>
@@ -50995,7 +51040,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	on("change:heat_exposure_temperature change:heat_exposure_upper_comfort_zone", event => {
+	on("change:heat_exposure_temperature change:heat_exposure_upper_comfort_zone change:heat_exposure_lower_comfort_zone", event => {
 
 		if (event.sourceType == "player" ) {
 
@@ -51048,7 +51093,7 @@ Characters with Skill: ${knowsSkill}`;
 			unitTypeDisplay = "°C";	
 		}
 
-		let fields = ["heat_exposure_temperature", "heat_exposure_upper_comfort_zone"];
+		let fields = ["heat_exposure_temperature", "heat_exposure_upper_comfort_zone", "heat_exposure_lower_comfort_zone"];
 
 		getAttrs(fields, values => {
 			
@@ -51060,24 +51105,32 @@ Characters with Skill: ${knowsSkill}`;
 
 			let comfortZoneFahrenheit = 90;
 
+			let lowerComfortZone = Number(values.heat_exposure_lower_comfort_zone) ?? 35;
+
+			let lowerComfortZoneFahrenheit = 35;
+
 			if (unitType == "fahrenheit") {
 				// convert currentTemp from celsius to fahrenheit and round to nearest integer
 				currentTemp = Math.round((currentTemp * 9/5) + 32);
 				comfortZone = Math.round((comfortZone * 9/5) + 32);
+				lowerComfortZone = Math.round((lowerComfortZone * 9/5) + 32);
 
 				// store the fahrenheit values
 				currentTempFahrenheit = currentTemp;
 				comfortZoneFahrenheit = comfortZone;
+				lowerComfortZoneFahrenheit = lowerComfortZone;
 
 			} else if (unitType == "celsius") {
 				
 				// store the fahrenheit values
 				currentTempFahrenheit = currentTemp;
 				comfortZoneFahrenheit = comfortZone;
+				lowerComfortZoneFahrenheit = lowerComfortZone;
 
 				// convert currentTemp from fahrenheit to celsius and round to nearest integer
 				currentTemp = Math.round((currentTemp - 32) * 5/9);
 				comfortZone = Math.round((comfortZone - 32) * 5/9);
+				lowerComfortZone = Math.round((lowerComfortZone - 32) * 5/9);
 				
 			}
 
@@ -51086,6 +51139,8 @@ Characters with Skill: ${knowsSkill}`;
 				heat_exposure_temperature_fahrenheit: currentTempFahrenheit,
 				heat_exposure_upper_comfort_zone: comfortZone,
 				heat_exposure_upper_comfort_zone_fahrenheit: comfortZoneFahrenheit,
+				heat_exposure_lower_comfort_zone: lowerComfortZone,
+				heat_exposure_lower_comfort_zone_fahrenheit: lowerComfortZoneFahrenheit,
 				heat_exposure_current_unit_type: unitType,
 				heat_exposure_current_unit_type_display: unitTypeDisplay
 			};
@@ -51095,7 +51150,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	on("change:heat_exposure_current_unit_type change:heat_exposure_temperature_fahrenheit change:heat_exposure_upper_comfort_zone_fahrenheit change:heat_exposure_temperature_tolerance change:heat_exposure_temperature_tolerance_health", event => {
+	on("change:heat_exposure_current_unit_type change:heat_exposure_temperature_fahrenheit change:heat_exposure_lower_comfort_zone_fahrenheit change:heat_exposure_upper_comfort_zone_fahrenheit change:heat_exposure_temperature_tolerance change:heat_exposure_temperature_tolerance_health", event => {
 		updateHeatExposureEffectiveComfortZone();
 	});
 
@@ -51103,6 +51158,7 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = [
 			"heat_exposure_upper_comfort_zone_fahrenheit", 
+			"heat_exposure_lower_comfort_zone_fahrenheit", 
 			"heat_exposure_temperature_tolerance",
 			"heat_exposure_current_unit_type_display",
 			"heat_exposure_temperature_tolerance_health",
@@ -51114,7 +51170,9 @@ Characters with Skill: ${knowsSkill}`;
 
 			let unitType = values.heat_exposure_current_unit_type;
 
-			let upperComfortZone = Number(values.heat_exposure_upper_comfort_zone_fahrenheit) ?? 35;
+			let lowerComfortZone = Number(values.heat_exposure_lower_comfort_zone_fahrenheit) ?? 35;
+
+			let upperComfortZone = Number(values.heat_exposure_upper_comfort_zone_fahrenheit) ?? 90;
 
 			let tolerance = Number(values.heat_exposure_temperature_tolerance) ?? 0;
 
@@ -51144,8 +51202,19 @@ Characters with Skill: ${knowsSkill}`;
 				mustRollText = "no roll needed";
 			}
 
+			let intenseHeatThreshold = 6 * (upperComfortZone - lowerComfortZone);
+
+			let intenseHeatThresholdDisplay = `${intenseHeatThreshold} ${unitTypeDisplay}`;
+
+			if (unitType == "celsius") {
+				let intenseHeatThresholdCelsius = Math.floor((intenseHeatThreshold - 32) * 5/9);
+				intenseHeatThresholdDisplay = `${intenseHeatThresholdCelsius} °C`;
+			}
+
 			let keyValues = {
 				heat_exposure_effective_comfort_zone: effectiveComfortZone,
+				heat_exposure_intense_heat_threshold: intenseHeatThreshold,
+				heat_exposure_intense_heat_threshold_display: intenseHeatThresholdDisplay,
 				heat_exposure_effective_comfort_zone_display: effectiveComfortZoneDisplay,
 				heat_exposure_must_roll: mustRoll,
 				heat_exposure_must_roll_text: mustRollText
@@ -51170,11 +51239,13 @@ Characters with Skill: ${knowsSkill}`;
 
 			let effectiveTempZone = Number(values.heat_exposure_effective_comfort_zone) ?? 90;
 
+			let modifierTempZone = effectiveTempZone - 10;
+
 			let tempMod = 0;
 
 			// formula: if baseTemp is over the effectiveTempZone, than subtract 1 from tempMod for every full 10° above the effectiveTempZone
-			if (baseTemp > effectiveTempZone - 10) {
-				tempMod = Math.floor((baseTemp - effectiveTempZone - 10) / 10);
+			if (baseTemp > modifierTempZone) {
+				tempMod = -1 * Math.floor((baseTemp - modifierTempZone) / 10);
 			}
 
 			let keyValues = {
@@ -51254,6 +51325,42 @@ Characters with Skill: ${knowsSkill}`;
 
 			let keyValues = {
 				heat_exposure_effective_health_level: effectiveHealth
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	on("change:heat_exposure_temperature change:heat_exposure_intense_heat_threshold", event => {
+
+		updateHeatExposureFrequency();
+
+	});
+
+	const updateHeatExposureFrequency = () => {
+
+		let fields = ["heat_exposure_temperature", "heat_exposure_intense_heat_threshold"];
+
+		getAttrs(fields, values => {
+
+			let currentTemp = Number(values.heat_exposure_temperature) ?? 90;
+
+			let intenseHeatThreshold = Number(values.heat_exposure_intense_heat_threshold) ?? 90;
+
+			let frequency = "30";
+
+			let isIntenseHeat = 0;
+
+			if (currentTemp > intenseHeatThreshold) {
+				frequency = "1";
+				isIntenseHeat = 1;
+			}
+
+			let keyValues = {
+				heat_exposure_frequency: frequency,
+				is_intense_heat: isIntenseHeat
 			};
 
 			setAttrs(keyValues);
