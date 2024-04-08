@@ -4325,11 +4325,9 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.13.0 -->
+				<!-- current version notes: 2.14.0 -->
 				<ul>
-					<li><b>ENHANCEMENT:</b> Bio/Misc tab, physical description, Added Skin field, requested by Demented Avenger.</li>
-					<li><b>NEW:</b> Added the <b>Heat Exposure</b> tool, which can be found under Tools > Environmental.</li>
-					<li><b>BUGFIX:</b> Default setting for <b>Use Custom Layer Labels</b> was not setting correctly, this should fix it.</li>
+					<li><b>ENHANCEMENT:</b> Grimoire tab, spell tables. Added parent/child relationship and sorting, similar to inventory items. You could create a parent college (remember to set points to zero!) and then set spells to be children of that college. Helps with organizing spell lists.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -16599,7 +16597,8 @@ Select the indent level of the inventory item. This is handy to help show the it
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
-							<input type="text" name="attr_name" title="Macro: @{NAME|repeating_spells_$[row #]_name}" />
+							<input type="hidden" class="indent-field" name="attr_indent_level" value="0" />
+							<input type="text" class="field-to-indent" name="attr_name" title="Macro: @{NAME|repeating_spells_$[row #]_name}" />
 							<input type="hidden" name="attr_idkey" />
 						</div>
 						<div class="cell col1">
@@ -16685,6 +16684,46 @@ Select the indent level of the inventory item. This is handy to help show the it
 										PU2:126 = Power-Ups 2. Page 126
 									</span>
 								</div>
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="parent-id-label">Parent ID</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="spell-parent-id-tooltip">
+For spells, the row id can used to link a spell to a parent spell.<br /><b>Tip:</b> You could name the parent a college name or some other group name.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<input type="text" name="attr_parent_id" value="" />
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="indent-label">Indent</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="spell-indent-tooltip">
+Select the indent level of the spell. This is handy to help show the spell belongs to a parent spell.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<select name="attr_indent_level">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+									<option>5</option>
+									<option>6</option>									
+								</select>
 							</div>
 						</div> <!-- .row -->
 
@@ -16888,6 +16927,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 						
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_spells -->
+				<div class="sort-control">
+					<button type="action" name="act_sort_spells" class="btn sort">Sort & Indent</button>
+					<div>
+						<i>After sorting, please open/close the notes for one spell. This will fix the weirdness caused by the Roll20 sorter.</i>
+					</div>
+				</div>
 			</div> <!-- .table -->
 		</div> <!-- .box .spells -->
 	</div> <!-- .tab6 -->
@@ -20727,7 +20772,13 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.13.0 -->
+			<!-- current version notes: 2.14.0 -->
+			<ul>
+				<li><b>ENHANCEMENT:</b> Grimoire tab, spell tables. Added parent/child relationship and sorting, similar to inventory items. You could create a parent college (remember to set points to zero!) and then set spells to be children of that college. Helps with organizing spell lists.</li>
+			</ul>
+			
+			<h4>Version: 2.13.0</h4>
+			<p>Pull Request: 4/1/2024</p>
 			<ul>
 				<li><b>ENHANCEMENT:</b> Bio/Misc tab, physical description, Added Skin field, requested by Demented Avenger.</li>
 				<li><b>NEW:</b> Added the <b>Heat Exposure</b> tool, which can be found under Tools > Environmental.</li>
@@ -26163,9 +26214,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.13.0";
+	const version = "2.14.0";
 	
-	const latestChangesDate = "4/1/2024";
+	const latestChangesDate = "4/8/2024";
 	
 	let modCascade = true;
 	
@@ -33304,9 +33355,9 @@ B378
 	 */
 	let updateCarriedStatusOfChildrenAsync = async (parentId, checked) => {
 
-		const treeData = await getInventoryTreeData();
+		const treeData = await getTreeData("item");
 
-		const inventoryTree = getInventoryTree(treeData);
+		const inventoryTree = getTreeStructure(treeData);
 
 		const parentItem = searchTree(inventoryTree, parentId);
 
@@ -33333,7 +33384,7 @@ B378
 
 	let sortIndentInventoryAsync = async () => {
 
-		let treeData = await getInventoryTreeData();
+		let treeData = await getTreeData("item");
 
 		// before making the tree, let's sort everything
 		// see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
@@ -33356,15 +33407,15 @@ B378
 
 		});
 
-		const inventoryTree = getInventoryTree(treeData);
+		const inventoryTree = getTreeStructure(treeData);
 
 		// this will get the row ids in the correct order.
-		const inventoryRowIds = getInventoryRowIdsUsingTree([], inventoryTree);
+		const inventoryRowIds = getRowIdsUsingTree([], inventoryTree);
 
 		// get all the indent levels of each item.
 		// indent must start at -1 because we have a "root" level that 
 		// is the base of the tree but not used.
-		const inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree({}, inventoryTree, -1);
+		const inventoryItemIndentLevels = getIndentLevelsUsingTree("item", {}, inventoryTree, -1);
 
 		// now update the indent levels
 		await setAttrsAsync(inventoryItemIndentLevels);
@@ -33379,7 +33430,7 @@ B378
 	 * 
 	 * @return array
 	 */
-	let getInventoryTreeData = async () => {
+	let getTreeData = async (section) => {
 
 		// this is our root of our tree. They key is setting parentId = null
 		let baseRoot = {
@@ -33391,7 +33442,7 @@ B378
 
 		let treeData = [baseRoot];
 
-		let ids = await getSectionIDsAsync("repeating_item");
+		let ids = await getSectionIDsAsync(`repeating_${section}`);
 
 		if (ids === undefined || ids.length == 0) {
 			return treeData;
@@ -33402,9 +33453,9 @@ B378
 
 		ids.forEach( id => {
 
-			let itemNameField = `repeating_item_${id}_name`;
+			let itemNameField = `repeating_${section}_${id}_name`;
 
-			let itemParentIdField = `repeating_item_${id}_parent_id`;
+			let itemParentIdField = `repeating_${section}_${id}_parent_id`;
 
 			fieldsToGet.push(itemNameField);
 
@@ -33417,9 +33468,9 @@ B378
 		// now we can loop through ids again and find the values we need.
 		ids.forEach( id => {
 
-			let itemNameField = `repeating_item_${id}_name`;
+			let itemNameField = `repeating_${section}_${id}_name`;
 
-			let itemParentIdField = `repeating_item_${id}_parent_id`;
+			let itemParentIdField = `repeating_${section}_${id}_parent_id`;
 
 			let nameValue = values[itemNameField];
 
@@ -33450,7 +33501,7 @@ B378
 	 * Generates a tree structure based on array of objects; id, name, parentId
 	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
 	 */
-	let getInventoryTree = (treeData) => {
+	let getTreeStructure = (treeData) => {
 
 		// Making an ID-to-Array Position Map
 		const idMapping = treeData.reduce((acc, el, i) => {
@@ -33659,7 +33710,7 @@ B378
 		
 	}
 
-	let getInventoryRowIdsUsingTree = (rowIds, itemNode) => {
+	let getRowIdsUsingTree = (rowIds, itemNode) => {
 
 		// ignore the root level
 		if (itemNode.id != "root") {
@@ -33674,7 +33725,7 @@ B378
 			
 			itemNode.children.forEach(childNode => {
 
-				rowIds = getInventoryRowIdsUsingTree(rowIds, childNode);
+				rowIds = getRowIdsUsingTree(rowIds, childNode);
 
 			});
 
@@ -33683,13 +33734,13 @@ B378
 		return rowIds;
 	}
 
-	let getInventoryIndentLevelsUsingTree = (inventoryItemIndentLevels, itemNode, indentLevel) => {
+	let getIndentLevelsUsingTree = (section, inventoryItemIndentLevels, itemNode, indentLevel) => {
 
 		// ignore the root level
 		if (itemNode.id != "root") {
 
 			// set the indent level
-			inventoryItemIndentLevels[`repeating_item_${itemNode.id}_indent_level`] = indentLevel;
+			inventoryItemIndentLevels[`repeating_${section}_${itemNode.id}_indent_level`] = indentLevel;
 
 		}
 
@@ -33699,7 +33750,7 @@ B378
 	
 			itemNode.children.forEach(childNode => {
 
-				inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree(inventoryItemIndentLevels, childNode, indentLevel + 1);
+				inventoryItemIndentLevels = getIndentLevelsUsingTree(section, inventoryItemIndentLevels, childNode, indentLevel + 1);
 
 			});
 
@@ -51210,5 +51261,101 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	}
+
+	on("clicked:sort_spells", async (event) => {
+
+		await sortIndentSpellsAsync();
+		
+	});
+
+	/**
+	 * We're going to generate a spell tree and use that to find
+	 * child items of the parentId and then update the indent level
+	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
+	 */
+	let sortIndentSpellsAsync = async () => {
+
+		let treeData = await getTreeData("spells");
+
+		// before making the tree, let's sort everything
+		// see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+		treeData = treeData.sort((item1, item2) => {
+
+			const item1Name = item1.name.toUpperCase();
+
+			const item2Name = item2.name.toUpperCase();
+
+			if (item1Name < item2Name) {
+				return -1;
+			}
+
+			if (item1Name > item2Name) {
+				return 1;
+			}
+
+			// names must be equeal
+			return 0;
+
+		});
+
+		const spellTree = getTreeStructure(treeData);
+
+		// this will get the row ids in the correct order.
+		const spellRowIds = getRowIdsUsingTree([], spellTree);
+
+		// get all the indent levels of each item.
+		// indent must start at -1 because we have a "root" level that 
+		// is the base of the tree but not used.
+		const spellIndentLevels = getIndentLevelsUsingTree("spells", {}, spellTree, -1);
+
+		// now update the indent levels
+		await setAttrsAsync(spellIndentLevels);
+
+		setSectionOrder("spells", spellRowIds);
+
+	};
+
+	on("change:repeating_spells:parent_id", event => {
+
+		if (event.sourceType === "player") {
+
+			let parentId = event.newValue;
+
+			let childId = getRowIdFromEventInfo(event, "repeating_spells");
+
+			if (!isEmpty(parentId) && !isEmpty(childId)) {
+
+				updateSpellIndentLevel(parentId, childId);
+			}
+
+		}		
+		
+	});
+
+	function updateSpellIndentLevel(parentId, childId) {
+
+		const parentNameField = `repeating_spells_${parentId}_name`;
+
+		const childIndentField = `repeating_spells_${childId}_indent_level`;
+
+		getAttrs([parentNameField], values => {
+
+			const parentName = values[parentNameField];
+
+			if (!isEmpty(parentName)) {
+
+				let updateFields = {};
+
+				// for now just indent one level
+				updateFields[childIndentField] = 1;
+
+				setAttrs(updateFields);
+
+			}
+			
+		});
+
+	}
+
 
 </script>
