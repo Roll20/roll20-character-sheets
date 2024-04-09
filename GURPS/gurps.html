@@ -4325,11 +4325,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.13.0 -->
+				<!-- current version notes: 2.14.0 -->
 				<ul>
-					<li><b>ENHANCEMENT:</b> Bio/Misc tab, physical description, Added Skin field, requested by Demented Avenger.</li>
-					<li><b>NEW:</b> Added the <b>Heat Exposure</b> tool, which can be found under Tools > Environmental.</li>
-					<li><b>BUGFIX:</b> Default setting for <b>Use Custom Layer Labels</b> was not setting correctly, this should fix it.</li>
+					<li><b>ENHANCEMENT:</b> Grimoire tab, spell tables. Added parent/child relationship and sorting, like inventory items. You could create a parent college (remember to set points to zero!) and then set spells to be children of that college. Helps with organizing spell lists.</li>
+					<li><b>ENHANCEMENT:</b> Heat Exposure tool, added formula to determine <b>Intense Heat Threshold</b>.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -16599,7 +16598,8 @@ Select the indent level of the inventory item. This is handy to help show the it
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
-							<input type="text" name="attr_name" title="Macro: @{NAME|repeating_spells_$[row #]_name}" />
+							<input type="hidden" class="indent-field" name="attr_indent_level" value="0" />
+							<input type="text" class="field-to-indent" name="attr_name" title="Macro: @{NAME|repeating_spells_$[row #]_name}" />
 							<input type="hidden" name="attr_idkey" />
 						</div>
 						<div class="cell col1">
@@ -16685,6 +16685,46 @@ Select the indent level of the inventory item. This is handy to help show the it
 										PU2:126 = Power-Ups 2. Page 126
 									</span>
 								</div>
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="parent-id-label">Parent ID</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="spell-parent-id-tooltip">
+For spells, the row id can used to link a spell to a parent spell.<br /><b>Tip:</b> You could name the parent a college name or some other group name.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<input type="text" name="attr_parent_id" value="" />
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc">
+							<div class="cell label">
+								<div class="popup">
+									<span data-i18n="indent-label">Indent</span>:
+								</div>
+								<span class="tooltip">
+									<span data-i18n="spell-indent-tooltip">
+Select the indent level of the spell. This is handy to help show the spell belongs to a parent spell.
+									</span>
+								</span> 
+							</div>
+							<div class="cell">
+								<select name="attr_indent_level">
+									<option>0</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+									<option>5</option>
+									<option>6</option>									
+								</select>
 							</div>
 						</div> <!-- .row -->
 
@@ -16888,6 +16928,12 @@ Select the indent level of the inventory item. This is handy to help show the it
 						
 					</div> <!-- .row -->
 				</fieldset> <!-- .repeating_spells -->
+				<div class="sort-control">
+					<button type="action" name="act_sort_spells" class="btn sort">Sort & Indent</button>
+					<div>
+						<i>After sorting, please open/close the notes for one spell. This will fix the weirdness caused by the Roll20 sorter.</i>
+					</div>
+				</div>
 			</div> <!-- .table -->
 		</div> <!-- .box .spells -->
 	</div> <!-- .tab6 -->
@@ -20204,7 +20250,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						</div>
 					</div>
 
-					<div class="grid-cell">
+					<div class="grid-cell" style="margin-bottom: 50px;">
 						<div class="tools-container">
 							<div class="section-header">
 								<div class="standard-tooltip">
@@ -20244,7 +20290,11 @@ Select the indent level of the inventory item. This is handy to help show the it
 									</label>
 									<div>
 										<input type="hidden" name="attr_heat_exposure_frequency" value="30" />
-										<span name="attr_heat_exposure_frequency"></span> <span data-i18n="minutes-label">minutes</span>
+										<span name="attr_heat_exposure_frequency"></span> 
+										
+										<input type="hidden" name="attr_is_intense_heat" value="0" />
+										<span class="frequency-minutes" data-i18n="minutes-label">minutes</span>
+										<span class="frequency-intense-heat" data-i18n="intense-heat-frequency-label">second, armor protects DR x 3 seconds.</span>
 									</div>
 								</div>	
 
@@ -20289,6 +20339,29 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<span name="attr_heat_exposure_temperature_modifier"></span>
 								</div>
 								
+								<div class="grid-cell">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="lower-comfort-zone-label">Lower Comfort Zone</span>
+											<span class="tooltiptext">
+												<span data-i18n="lower-comfort-zone-tooltip">Enter the lower temperature of the comfort zone. Humans have a comfort zone of 35 to 90°F (2 to 32°C). See Temperature Tolerance B93.</span><br />
+												<span data-i18n="heat-exposure-lower-comfort-zone-tooltip"><b>Note:</b> Use the <b>Cold Exposure</b> tool to determine the effective lower comfort zone and enter the value here. In order to determine if the character is experiencing <b>Intense Heat</b> we the final range based on temperature tolerance. Intense is calculate as the difference between the lower comfort zone and the upper comfort zone, then multiply by 6. For humans, with tolerance of 35 to 90 °F, <b>Intense Heat</b> occurs at 330°F. (90 - 35) * 6 = 330. B434.</span>
+											</span>
+										</div>
+									</label>
+								</div>
+								<div class="grid-cell">
+									<div class="container-label-input grid__gap_small">
+										<span>
+											<input type="number" name="attr_heat_exposure_lower_comfort_zone" value="35" step="1" class="medium-width" />
+											<input type="hidden" name="attr_heat_exposure_lower_comfort_zone_fahrenheit" value="35" />
+										</span>
+										<span>
+											<span name="attr_heat_exposure_current_unit_type_display"></span>
+										</span>
+									</div>
+								</div>
+
 								<div class="grid-cell">
 									<label>
 										<div class="standard-tooltip">
@@ -20337,6 +20410,22 @@ Select the indent level of the inventory item. This is handy to help show the it
 								</div>
 								<div class="grid-cell">
 									<input type="number" name="attr_heat_exposure_temperature_tolerance_health" value="10" min="1" step="1" class="medium-width" />
+								</div>
+
+								<div class="grid-cell">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="intense-heat-threshold-label">Intense Heat Threshold</span>
+											<span class="tooltiptext">
+												<span data-i18n="intense-heat-threshold-tooltip">The temperature at which the character will start to suffer from intense heat. B434.</span>
+											</span>
+										</div>
+									</label>
+								</div>
+								<div class="grid-cell">
+									<input type="hidden" name="attr_heat_exposure_intense_heat_threshold" value="330" />
+									<input type="hidden" name="attr_heat_exposure_intense_heat_threshold_display" value="330 °F" />
+									<span name="attr_heat_exposure_intense_heat_threshold_display"></span>
 								</div>
 
 								<div class="grid-cell">
@@ -20389,7 +20478,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<label>
 										<div class="standard-tooltip">
 											<span data-i18n="total-label">TOTAL</span>
-											<span class="tooltiptext">
+											<span class="tooltiptext move-left">
 												<span data-i18n="heat-exposure-health-modifier-total-tooltip">The total modifier that will be applied to the final roll.</span>
 											</span>
 										</div>
@@ -20404,7 +20493,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 									<label>
 										<div class="standard-tooltip">
 											<span data-i18n="effective-health-label">Effective HT</span>
-											<span class="tooltiptext">
+											<span class="tooltiptext move-left">
 												<span data-i18n="heat-exposure-effective-health-tooltip">The effective health of the character.</span>
 											</span>
 										</div>
@@ -20727,7 +20816,14 @@ Select the indent level of the inventory item. This is handy to help show the it
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.13.0 -->
+			<!-- current version notes: 2.14.0 -->
+			<ul>
+				<li><b>ENHANCEMENT:</b> Grimoire tab, spell tables. Added parent/child relationship and sorting, like inventory items. You could create a parent college (remember to set points to zero!) and then set spells to be children of that college. Helps with organizing spell lists.</li>
+				<li><b>ENHANCEMENT:</b> Heat Exposure tool, added formula to determine <b>Intense Heat Threshold</b>.</li>
+			</ul>
+			
+			<h4>Version: 2.13.0</h4>
+			<p>Pull Request: 4/1/2024</p>
 			<ul>
 				<li><b>ENHANCEMENT:</b> Bio/Misc tab, physical description, Added Skin field, requested by Demented Avenger.</li>
 				<li><b>NEW:</b> Added the <b>Heat Exposure</b> tool, which can be found under Tools > Environmental.</li>
@@ -26163,9 +26259,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.13.0";
+	const version = "2.14.0";
 	
-	const latestChangesDate = "4/1/2024";
+	const latestChangesDate = "4/8/2024";
 	
 	let modCascade = true;
 	
@@ -33304,9 +33400,9 @@ B378
 	 */
 	let updateCarriedStatusOfChildrenAsync = async (parentId, checked) => {
 
-		const treeData = await getInventoryTreeData();
+		const treeData = await getTreeData("item");
 
-		const inventoryTree = getInventoryTree(treeData);
+		const inventoryTree = getTreeStructure(treeData);
 
 		const parentItem = searchTree(inventoryTree, parentId);
 
@@ -33333,7 +33429,7 @@ B378
 
 	let sortIndentInventoryAsync = async () => {
 
-		let treeData = await getInventoryTreeData();
+		let treeData = await getTreeData("item");
 
 		// before making the tree, let's sort everything
 		// see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
@@ -33356,15 +33452,15 @@ B378
 
 		});
 
-		const inventoryTree = getInventoryTree(treeData);
+		const inventoryTree = getTreeStructure(treeData);
 
 		// this will get the row ids in the correct order.
-		const inventoryRowIds = getInventoryRowIdsUsingTree([], inventoryTree);
+		const inventoryRowIds = getRowIdsUsingTree([], inventoryTree);
 
 		// get all the indent levels of each item.
 		// indent must start at -1 because we have a "root" level that 
 		// is the base of the tree but not used.
-		const inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree({}, inventoryTree, -1);
+		const inventoryItemIndentLevels = getIndentLevelsUsingTree("item", {}, inventoryTree, -1);
 
 		// now update the indent levels
 		await setAttrsAsync(inventoryItemIndentLevels);
@@ -33379,7 +33475,7 @@ B378
 	 * 
 	 * @return array
 	 */
-	let getInventoryTreeData = async () => {
+	let getTreeData = async (section) => {
 
 		// this is our root of our tree. They key is setting parentId = null
 		let baseRoot = {
@@ -33391,7 +33487,7 @@ B378
 
 		let treeData = [baseRoot];
 
-		let ids = await getSectionIDsAsync("repeating_item");
+		let ids = await getSectionIDsAsync(`repeating_${section}`);
 
 		if (ids === undefined || ids.length == 0) {
 			return treeData;
@@ -33402,9 +33498,9 @@ B378
 
 		ids.forEach( id => {
 
-			let itemNameField = `repeating_item_${id}_name`;
+			let itemNameField = `repeating_${section}_${id}_name`;
 
-			let itemParentIdField = `repeating_item_${id}_parent_id`;
+			let itemParentIdField = `repeating_${section}_${id}_parent_id`;
 
 			fieldsToGet.push(itemNameField);
 
@@ -33417,9 +33513,9 @@ B378
 		// now we can loop through ids again and find the values we need.
 		ids.forEach( id => {
 
-			let itemNameField = `repeating_item_${id}_name`;
+			let itemNameField = `repeating_${section}_${id}_name`;
 
-			let itemParentIdField = `repeating_item_${id}_parent_id`;
+			let itemParentIdField = `repeating_${section}_${id}_parent_id`;
 
 			let nameValue = values[itemNameField];
 
@@ -33450,7 +33546,7 @@ B378
 	 * Generates a tree structure based on array of objects; id, name, parentId
 	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
 	 */
-	let getInventoryTree = (treeData) => {
+	let getTreeStructure = (treeData) => {
 
 		// Making an ID-to-Array Position Map
 		const idMapping = treeData.reduce((acc, el, i) => {
@@ -33659,7 +33755,7 @@ B378
 		
 	}
 
-	let getInventoryRowIdsUsingTree = (rowIds, itemNode) => {
+	let getRowIdsUsingTree = (rowIds, itemNode) => {
 
 		// ignore the root level
 		if (itemNode.id != "root") {
@@ -33674,7 +33770,7 @@ B378
 			
 			itemNode.children.forEach(childNode => {
 
-				rowIds = getInventoryRowIdsUsingTree(rowIds, childNode);
+				rowIds = getRowIdsUsingTree(rowIds, childNode);
 
 			});
 
@@ -33683,13 +33779,13 @@ B378
 		return rowIds;
 	}
 
-	let getInventoryIndentLevelsUsingTree = (inventoryItemIndentLevels, itemNode, indentLevel) => {
+	let getIndentLevelsUsingTree = (section, inventoryItemIndentLevels, itemNode, indentLevel) => {
 
 		// ignore the root level
 		if (itemNode.id != "root") {
 
 			// set the indent level
-			inventoryItemIndentLevels[`repeating_item_${itemNode.id}_indent_level`] = indentLevel;
+			inventoryItemIndentLevels[`repeating_${section}_${itemNode.id}_indent_level`] = indentLevel;
 
 		}
 
@@ -33699,7 +33795,7 @@ B378
 	
 			itemNode.children.forEach(childNode => {
 
-				inventoryItemIndentLevels = getInventoryIndentLevelsUsingTree(inventoryItemIndentLevels, childNode, indentLevel + 1);
+				inventoryItemIndentLevels = getIndentLevelsUsingTree(section, inventoryItemIndentLevels, childNode, indentLevel + 1);
 
 			});
 
@@ -50944,7 +51040,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	on("change:heat_exposure_temperature change:heat_exposure_upper_comfort_zone", event => {
+	on("change:heat_exposure_temperature change:heat_exposure_upper_comfort_zone change:heat_exposure_lower_comfort_zone", event => {
 
 		if (event.sourceType == "player" ) {
 
@@ -50997,7 +51093,7 @@ Characters with Skill: ${knowsSkill}`;
 			unitTypeDisplay = "°C";	
 		}
 
-		let fields = ["heat_exposure_temperature", "heat_exposure_upper_comfort_zone"];
+		let fields = ["heat_exposure_temperature", "heat_exposure_upper_comfort_zone", "heat_exposure_lower_comfort_zone"];
 
 		getAttrs(fields, values => {
 			
@@ -51009,24 +51105,32 @@ Characters with Skill: ${knowsSkill}`;
 
 			let comfortZoneFahrenheit = 90;
 
+			let lowerComfortZone = Number(values.heat_exposure_lower_comfort_zone) ?? 35;
+
+			let lowerComfortZoneFahrenheit = 35;
+
 			if (unitType == "fahrenheit") {
 				// convert currentTemp from celsius to fahrenheit and round to nearest integer
 				currentTemp = Math.round((currentTemp * 9/5) + 32);
 				comfortZone = Math.round((comfortZone * 9/5) + 32);
+				lowerComfortZone = Math.round((lowerComfortZone * 9/5) + 32);
 
 				// store the fahrenheit values
 				currentTempFahrenheit = currentTemp;
 				comfortZoneFahrenheit = comfortZone;
+				lowerComfortZoneFahrenheit = lowerComfortZone;
 
 			} else if (unitType == "celsius") {
 				
 				// store the fahrenheit values
 				currentTempFahrenheit = currentTemp;
 				comfortZoneFahrenheit = comfortZone;
+				lowerComfortZoneFahrenheit = lowerComfortZone;
 
 				// convert currentTemp from fahrenheit to celsius and round to nearest integer
 				currentTemp = Math.round((currentTemp - 32) * 5/9);
 				comfortZone = Math.round((comfortZone - 32) * 5/9);
+				lowerComfortZone = Math.round((lowerComfortZone - 32) * 5/9);
 				
 			}
 
@@ -51035,6 +51139,8 @@ Characters with Skill: ${knowsSkill}`;
 				heat_exposure_temperature_fahrenheit: currentTempFahrenheit,
 				heat_exposure_upper_comfort_zone: comfortZone,
 				heat_exposure_upper_comfort_zone_fahrenheit: comfortZoneFahrenheit,
+				heat_exposure_lower_comfort_zone: lowerComfortZone,
+				heat_exposure_lower_comfort_zone_fahrenheit: lowerComfortZoneFahrenheit,
 				heat_exposure_current_unit_type: unitType,
 				heat_exposure_current_unit_type_display: unitTypeDisplay
 			};
@@ -51044,7 +51150,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	on("change:heat_exposure_current_unit_type change:heat_exposure_temperature_fahrenheit change:heat_exposure_upper_comfort_zone_fahrenheit change:heat_exposure_temperature_tolerance change:heat_exposure_temperature_tolerance_health", event => {
+	on("change:heat_exposure_current_unit_type change:heat_exposure_temperature_fahrenheit change:heat_exposure_lower_comfort_zone_fahrenheit change:heat_exposure_upper_comfort_zone_fahrenheit change:heat_exposure_temperature_tolerance change:heat_exposure_temperature_tolerance_health", event => {
 		updateHeatExposureEffectiveComfortZone();
 	});
 
@@ -51052,6 +51158,7 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = [
 			"heat_exposure_upper_comfort_zone_fahrenheit", 
+			"heat_exposure_lower_comfort_zone_fahrenheit", 
 			"heat_exposure_temperature_tolerance",
 			"heat_exposure_current_unit_type_display",
 			"heat_exposure_temperature_tolerance_health",
@@ -51063,7 +51170,9 @@ Characters with Skill: ${knowsSkill}`;
 
 			let unitType = values.heat_exposure_current_unit_type;
 
-			let upperComfortZone = Number(values.heat_exposure_upper_comfort_zone_fahrenheit) ?? 35;
+			let lowerComfortZone = Number(values.heat_exposure_lower_comfort_zone_fahrenheit) ?? 35;
+
+			let upperComfortZone = Number(values.heat_exposure_upper_comfort_zone_fahrenheit) ?? 90;
 
 			let tolerance = Number(values.heat_exposure_temperature_tolerance) ?? 0;
 
@@ -51093,8 +51202,19 @@ Characters with Skill: ${knowsSkill}`;
 				mustRollText = "no roll needed";
 			}
 
+			let intenseHeatThreshold = 6 * (upperComfortZone - lowerComfortZone);
+
+			let intenseHeatThresholdDisplay = `${intenseHeatThreshold} ${unitTypeDisplay}`;
+
+			if (unitType == "celsius") {
+				let intenseHeatThresholdCelsius = Math.floor((intenseHeatThreshold - 32) * 5/9);
+				intenseHeatThresholdDisplay = `${intenseHeatThresholdCelsius} °C`;
+			}
+
 			let keyValues = {
 				heat_exposure_effective_comfort_zone: effectiveComfortZone,
+				heat_exposure_intense_heat_threshold: intenseHeatThreshold,
+				heat_exposure_intense_heat_threshold_display: intenseHeatThresholdDisplay,
 				heat_exposure_effective_comfort_zone_display: effectiveComfortZoneDisplay,
 				heat_exposure_must_roll: mustRoll,
 				heat_exposure_must_roll_text: mustRollText
@@ -51119,11 +51239,13 @@ Characters with Skill: ${knowsSkill}`;
 
 			let effectiveTempZone = Number(values.heat_exposure_effective_comfort_zone) ?? 90;
 
+			let modifierTempZone = effectiveTempZone - 10;
+
 			let tempMod = 0;
 
 			// formula: if baseTemp is over the effectiveTempZone, than subtract 1 from tempMod for every full 10° above the effectiveTempZone
-			if (baseTemp > effectiveTempZone - 10) {
-				tempMod = Math.floor((baseTemp - effectiveTempZone - 10) / 10);
+			if (baseTemp > modifierTempZone) {
+				tempMod = -1 * Math.floor((baseTemp - modifierTempZone) / 10);
 			}
 
 			let keyValues = {
@@ -51210,5 +51332,137 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	}
+
+	on("change:heat_exposure_temperature change:heat_exposure_intense_heat_threshold", event => {
+
+		updateHeatExposureFrequency();
+
+	});
+
+	const updateHeatExposureFrequency = () => {
+
+		let fields = ["heat_exposure_temperature", "heat_exposure_intense_heat_threshold"];
+
+		getAttrs(fields, values => {
+
+			let currentTemp = Number(values.heat_exposure_temperature) ?? 90;
+
+			let intenseHeatThreshold = Number(values.heat_exposure_intense_heat_threshold) ?? 90;
+
+			let frequency = "30";
+
+			let isIntenseHeat = 0;
+
+			if (currentTemp > intenseHeatThreshold) {
+				frequency = "1";
+				isIntenseHeat = 1;
+			}
+
+			let keyValues = {
+				heat_exposure_frequency: frequency,
+				is_intense_heat: isIntenseHeat
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	on("clicked:sort_spells", async (event) => {
+
+		await sortIndentSpellsAsync();
+		
+	});
+
+	/**
+	 * We're going to generate a spell tree and use that to find
+	 * child items of the parentId and then update the indent level
+	 * see: https://typeofnan.dev/an-easy-way-to-build-a-tree-with-object-references/
+	 */
+	let sortIndentSpellsAsync = async () => {
+
+		let treeData = await getTreeData("spells");
+
+		// before making the tree, let's sort everything
+		// see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+		treeData = treeData.sort((item1, item2) => {
+
+			const item1Name = item1.name.toUpperCase();
+
+			const item2Name = item2.name.toUpperCase();
+
+			if (item1Name < item2Name) {
+				return -1;
+			}
+
+			if (item1Name > item2Name) {
+				return 1;
+			}
+
+			// names must be equeal
+			return 0;
+
+		});
+
+		const spellTree = getTreeStructure(treeData);
+
+		// this will get the row ids in the correct order.
+		const spellRowIds = getRowIdsUsingTree([], spellTree);
+
+		// get all the indent levels of each item.
+		// indent must start at -1 because we have a "root" level that 
+		// is the base of the tree but not used.
+		const spellIndentLevels = getIndentLevelsUsingTree("spells", {}, spellTree, -1);
+
+		// now update the indent levels
+		await setAttrsAsync(spellIndentLevels);
+
+		setSectionOrder("spells", spellRowIds);
+
+	};
+
+	on("change:repeating_spells:parent_id", event => {
+
+		if (event.sourceType === "player") {
+
+			let parentId = event.newValue;
+
+			let childId = getRowIdFromEventInfo(event, "repeating_spells");
+
+			if (!isEmpty(parentId) && !isEmpty(childId)) {
+
+				updateSpellIndentLevel(parentId, childId);
+			}
+
+		}		
+		
+	});
+
+	function updateSpellIndentLevel(parentId, childId) {
+
+		const parentNameField = `repeating_spells_${parentId}_name`;
+
+		const childIndentField = `repeating_spells_${childId}_indent_level`;
+
+		getAttrs([parentNameField], values => {
+
+			const parentName = values[parentNameField];
+
+			if (!isEmpty(parentName)) {
+
+				let updateFields = {};
+
+				// for now just indent one level
+				updateFields[childIndentField] = 1;
+
+				setAttrs(updateFields);
+
+			}
+			
+		});
+
+	}
+
 
 </script>
