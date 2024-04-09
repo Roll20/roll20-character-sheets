@@ -11709,8 +11709,12 @@
 		on("change:powerEffect"+powerId, function() {
 			getAttrs(["powerEffect"+powerId], function(values) {
 				var attributes = new Object();
-				
+				var emptySet = new Set(["multipower", "vpp", "variable power pool"]);
 				let isEmpty = ((values["powerEffect"+powerId]).replace(/\s/g, '') !== '') ? false : true;
+				
+				if ( emptySet.has( ((values["powerEffect"+powerId]).toLowerCase()).trim() ) ) {
+					isEmpty = true;
+				}
 				
 				if (isEmpty) {
 					attributes["powerAction"+powerId] = "false";
@@ -11727,7 +11731,7 @@
 	/* -------------------------------------------------- */
 	/* Functions used for skills tab                      */
 	/* -------------------------------------------------- */
-			
+	
 	function calculateLanguageSkillCost(skillFluency, skillLiteracy, enhancerLinguist, literacyCost) {
 		var enhancerBonus=0;
 		var languageCP=0;
@@ -11740,7 +11744,7 @@
 		if (enhancerLinguist!=0) {
 			enhancerBonus=1;
 		}
-	
+		
 		switch (skillFluency) {
 			case "native": languageCP = literacyCP;
 			break;
@@ -11766,12 +11770,13 @@
 		return languageCP;
 	}
 	
+	
 	function standardSkillChance(theBaseSkillRoll,skillCP,additionalLevels) {
 		var skillCost=3;
 		var skillLevelCost=2;
 		var theSkillRollChance;
 		var theSkillBonus;
-	
+		
 		if (skillCP==0) {
 			theSkillRollChance=0;
 		} else if (skillCP==1) {
@@ -11784,6 +11789,7 @@
 		} 
 		return theSkillRollChance;
 	}
+	
 	
 	function knowledgeSkillChance(enhancer,skillCP,additionalLevels) {
 		// Calculate KS, PS, or AK-type skill roll chance.
@@ -11807,6 +11813,7 @@
 		}
 		return theSkillRollChance;
 	}
+	
 	
 	function knowledgeIntSkillChance(theBaseSkillRoll, enhancer, skillCP, additionalLevels) {
 		// Knowledge, Professional, and Science Skills can be purchased as Intelligence-based skills. In such a case 
@@ -11836,6 +11843,7 @@
 		}
 		return theSkillRollChance;
 	}
+	
 	
 	function calculateSkillChance(skillType,skillCP,enhancerJack,enhancerSch,enhancerSci,enhancerTrav,strengthChance,dexterityChance,constitutionChance,intelligenceChance,egoChance,presenceChance,interactionSkillLevels,intellectSkillLevels,agilitySkillLevels,bonusLevels) {
 		// Calculates the skill roll chance for a general skill.
