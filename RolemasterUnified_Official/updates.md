@@ -1,3 +1,16 @@
+2024-03-31
+
+ - More roll template improvements
+    - Generalize
+    - Fix dynamic specializations
+ - Initiative roller
+ - Spell & Spell Mastery rolls
+ - Add support for scr_misc
+    - support for eloquence and friends.
+ - Info and edit buttons merge
+ - Can edit names of Skill specialisations
+ - Levelup stat gain fix
+ 
 2024-03-26
 
  - Improvements to the roll template layout
