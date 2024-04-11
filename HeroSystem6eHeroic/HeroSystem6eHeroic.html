@@ -10317,9 +10317,9 @@
 	// Reset endurance and stun in item-characteristics-health when the reset action button is clicked.
 	// Also resets targeting choices if that option is checked.
 	on("clicked:resetHealth", function () {
-		getAttrs(["endurance", "stun", "optionResetTargeting", "targetSelection", "rangeMartial", "rangeManeuver", "maneuverSelection", "running"], function(values) {
-			const maxEND = parseInt(values.endurance);
-			const maxSTUN = parseInt(values.stun);
+		getAttrs(["enduranceNet", "stunNet", "optionResetTargeting", "targetSelection", "rangeMartial", "rangeManeuver", "maneuverSelection", "running"], function(values) {
+			const maxEND = parseInt(values.enduranceNet);
+			const maxSTUN = parseInt(values.stunNet);
 			
 			// If optionResetTargeting is false reset only STUN and END.
 			
@@ -10363,8 +10363,8 @@
 
 			theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
 			+ "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
-			+ "{{STUN Recovery=[[@{recovery}[Recovery]]] (@{CurrentSTUN})}} "
-			+ "{{END Recovery=[[@{recovery}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
+			+ "{{STUN Recovery=[[@{recoveryNet}[Recovery]]] (@{CurrentSTUN})}} "
+			+ "{{END Recovery=[[@{recoveryNet}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
 
 			startRoll(theRoll, (results) => {
 				recoverSTUN = results.results["STUN Recovery"].result;
@@ -13870,7 +13870,7 @@
 		var weaponId = String(num).padStart(2,'0');
 		
 		on(`change:weaponDamage${weaponId} change:weaponAdvantage${weaponId} change:weaponNormalDamage${weaponId} change:weaponCSL${weaponId} change:weaponEnhancedByStr${weaponId} change:weaponStrengthMin${weaponId} change:weaponStrength${weaponId} change:optionD6MinusOne`, function () {
-			getAttrs(["weaponDamage"+weaponId, "weaponAdvantage"+weaponId, "weaponNormalDamage"+weaponId, "weaponCSL"+weaponId, "optionWeaponDamageCap", "optionD6MinusOne", "weaponEnhancedByStr"+weaponId, "weaponStrengthMin"+weaponId, "weaponStrength"+weaponId, "strength"], function(values) {
+			getAttrs(["weaponDamage"+weaponId, "weaponAdvantage"+weaponId, "weaponNormalDamage"+weaponId, "weaponCSL"+weaponId, "optionWeaponDamageCap", "optionD6MinusOne", "weaponEnhancedByStr"+weaponId, "weaponStrengthMin"+weaponId, "weaponStrength"+weaponId, "strengthNet"], function(values) {
 				
 				var attributes = new Object();
 				
@@ -14022,8 +14022,8 @@
 					// Avoid division by zero.
 					minStrength = 1;
 					attributes["weaponStrengthMin"+weaponId] = 1;
-				} else if (strengthApplied > values.strength) {
-					strengthApplied = values.strength;
+				} else if (strengthApplied > values.strengthNet) {
+					strengthApplied = values.strengthNet;
 					attributes["weaponStrength"+weaponId] = strengthApplied;
 				}
 				
@@ -14258,7 +14258,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat"], function(values) {
+			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
@@ -14360,8 +14360,8 @@
 					
 					// Move By reduces Strength by 1/2, which means we need to recalculate the weapon's DC.
 					adjustedDC = baseDC;
-					if (heroRoundHigh( (parseInt(values.strength)||0)/2) < strengthApplied) {
-						strengthApplied = heroRoundHigh( (parseInt(values.strength)||0)/2);
+					if (heroRoundHigh( (parseInt(values.strengthNet)||0)/2) < strengthApplied) {
+						strengthApplied = heroRoundHigh( (parseInt(values.strengthNet)||0)/2);
 					}
 					
 					if (strengthApplied >= minStrength) {
@@ -14642,7 +14642,7 @@
 	// Roll attack and damage dice for Weapon XX.
 	on(`clicked:attackStrength`, (info) => {
 		
-		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strength", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat"], function(values) {
+		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormal = true;
@@ -14658,7 +14658,7 @@
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			
 			// Update weapon damage for maneuvers that add damage.				
-			let baseDC = Math.floor( ((values.strength)||0)/5 );
+			let baseDC = Math.floor( ((values.strengthNet)||0)/5 );
 			let adjustedDC = baseDC;
 			let velocity = parseInt(values["moveVelocity"])||0;
 			let velocityDC = 0;
@@ -14702,7 +14702,7 @@
 				isSet = false;
 				
 				setAttrs({
-					"hiddenDamage": calculateBasicDamage(heroRoundHigh( (parseInt(values.strength)||0)/2) + Math.floor(velocity/10)*5),
+					"hiddenDamage": calculateBasicDamage(heroRoundHigh( (parseInt(values.strengthNet)||0)/2) + Math.floor(velocity/10)*5),
 					"hiddenIsNormal": "true",
 					"hiddenIsContest": "false",
 					"hiddenIsPower": "false",
@@ -14726,7 +14726,7 @@
 				isSet = false;
 				
 				setAttrs({
-					"hiddenDamage": calculateBasicDamage( (parseInt(values.strength)||0) + Math.floor(velocity/6)*5),
+					"hiddenDamage": calculateBasicDamage( (parseInt(values.strengthNet)||0) + Math.floor(velocity/6)*5),
 					"hiddenIsNormal": "true",
 					"hiddenIsContest": "false",
 					"hiddenIsPower": "false",
@@ -14796,7 +14796,7 @@
 				isSet = false;
 				
 				setAttrs({
-					"hiddenDamage": calculateBasicDamage(parseInt(values.strength) + Math.floor(velocity/10)),
+					"hiddenDamage": calculateBasicDamage(parseInt(values.strengthNet) + Math.floor(velocity/10)),
 					"hiddenIsNormal": "false",
 					"hiddenIsContest": "true",
 					"hiddenIsPower": "false",
@@ -14806,7 +14806,7 @@
 					"checkBrace":0
 				});
 			} else if (values.maneuverSelection === "shove") {
-				rollMessage = "Shove up to " + Math.floor((parseInt(values.strength)||0)/5) + " m";
+				rollMessage = "Shove up to " + Math.floor((parseInt(values.strengthNet)||0)/5) + " m";
 				
 				// CV
 				maneuverOCV = -1;
