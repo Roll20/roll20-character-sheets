@@ -1,24 +1,40 @@
 
 
 
-<rolltemplate class="sheet-rolltemplate-rm">
-   <span>Roll=
-      {{#rollLess() roll1 fumble}}{{roll2}}{{/rollLess() roll1 fumble}}
-      {{#^rollLess() roll1 fumble}}{{roll1}}{{/^rollLess() roll1 fumble}}
-   </span>
-</rolltemplate>
-
 
 <rolltemplate class="sheet-rolltemplate-rmu">
   <div class='sheet-rolltemplate-rmurollbox'>
     <em>{{actor}} {{verb}} {{action}}:</em><br>
-    Result: 
+    Result:
     {{#rollLess() um 5}}
       {{rolll}} (= {{bonus}} + {{um}} - {{rollsub}})
       (Open Ended Low)
     {{/rollLess() um 5}}
     {{#^rollLess() um 5}}
       {{rollh}} (= {{bonus}} + {{um}})
+    {{/^rollLess() um 5}}
+    {{#rollTotal() um 33}}
+      <br>Breakage check? (33)
+    {{/rollTotal() um 33}}
+    {{#rollTotal() um 77}}
+      <br>Breakage check? (77)
+    {{/rollTotal() um 77}}
+    {{#rollTotal() um 66}}
+      <br>Unusual event! (66)
+    {{/rollTotal() um 66}}
+   </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-rmumod">
+  <div class='sheet-rolltemplate-rmurollbox'>
+    <em>{{actor}} {{verb}} {{action}}:</em><br>
+    Result:
+    {{#rollLess() um 5}}
+      {{rolll}} (= {{bonus}} + {{mod}} + {{um}} - {{rollsub}})
+      (Open Ended Low)
+    {{/rollLess() um 5}}
+    {{#^rollLess() um 5}}
+      {{rollh}} (= {{bonus}} + {{mod}} + {{um}})
     {{/^rollLess() um 5}}
     {{#rollTotal() um 33}}
       <br>Breakage check? (33)
@@ -39,18 +55,8 @@
   </div>
 </rolltemplate>
 
-<!--
-  &{template:rm} [[ [[1d00!>96 + ?{score|50}]] - 1d100!>96]] {{roll1=$[[0]] }} {{roll2=$[[1]] }}
-  {{fumble=[[5+?{score}]] }}
 
-  &{template:rm2} [[ [[1d100!>96 + @{perception_bonus]] - 1d100!>96 ]]  {{rollh=$[[0]]}} {{rolll=$[[1]]}} {{fumble=[[5+{perception_bonus}]] }}
-
-  &{template:rm2} [[ [[1d100]] - 1d10 ]]  {{rollh=$[[0]]}} {{rolll=$[[1]]}} {{fumble=[[50]] }
-  {{Character = @}
-
-  &{template:default} {{title=A Skill Roll}} {{roll=[[1d100+@{selected|perception_bonus}]]}}
-
--->
+<!-- vim: set sw=2 sts=2 :-->
 
 
 
@@ -796,8 +802,9 @@
 <h2>Level Up</h2>
 
 <div class='sticktop'>
-  <span class='levelupdp'>0</span>
+  DP Spent: <span class='levelupdp'>0</span>
   
+  Dp Available:
   <span class='dpinfo'></span>
 </div>
 
@@ -1900,15 +1907,17 @@
 <charmancer class="sheet-repeating-talent">
   <div class='cmtalent'>
     <select name='comp_talent'></select>
-    <span class='choice talent_tier_show'>
+    <span class='choice talent_tier_show talent_inline'>
       <select name='comp_tier'></select>
     </span>
-    <span class='choice talent_choice_show'>
+    <span class='choice talent_choice_show talent_inline'>
       <select name='comp_choice'></select>
     </span>
-    <span class='talent_cost'></span>
+    <button type='action' style="float:right" name='act_deletetalent'>Remove</button>
+    <br>
+
+    <b>Cost: <span class='talent_cost'></span></b><br>
     <span class='talent_description'></span>
-    <button type='action' name='act_delete_talent'>Remove</button>
   </div>
 </charmancer>
 
@@ -2048,7 +2057,8 @@ Name <input name="attr_character_name">
 <div class='prop_pair'><span class='prop_prop_plain'>Build</span><span class='prop_value' name='attr_build'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Height</span><span class='prop_value' name='attr_height'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Weight</span><span class='prop_value' name='attr_weight'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Weight allowance</span><span class='prop_value' name='attr_weightallowance'></span></div>
+<div class='prop_pair'><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
+<span class='prop_value' name='attr_weightallowance'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encpenalty'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span></div>
@@ -3700,7 +3710,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3721,7 +3731,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3742,7 +3752,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3763,7 +3773,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3784,7 +3794,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3805,7 +3815,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3826,7 +3836,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -3847,7 +3857,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton" name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
         <div class='knownspells'><span name='attr_knownspells'></span></div>
@@ -4748,6 +4758,7 @@ RMUCosts.reset = function() {
   return true;
 }
 
+
 RMUCosts.update = function(key, cost, ranks) {
   if (cost == 0) {
     delete RMUCosts.costs[key];
@@ -5627,7 +5638,6 @@ function _spellDoQuery(savedlists, listtype, filter, subtarget, cost) {
     savedlists = [];
   }
   var data = getCharmancerData();
-  console.log("listtype", listtype);
 
   getCompendiumQuery(`Category:SpellList ${listtype}`, (lists) => {
       // So on error we get 1 element and it has an expansion set to 0.
@@ -5661,7 +5671,6 @@ function _spellDoQuery(savedlists, listtype, filter, subtarget, cost) {
 	      continue;
 	    }
 	    // Filter is currently on ListType
-	    console.log(filter, list)
 	    if (filter && filter.length > 0) {
 	      if (list.data.ListType == filter) {
 		continue;
@@ -5671,7 +5680,6 @@ function _spellDoQuery(savedlists, listtype, filter, subtarget, cost) {
 	    addRepeatingSection(`cmspelllistspell${subtarget}`, 'spelllist',
 		`${subtarget}spelllist`,
 		(sectionname) => {
-		  console.log('sectionname', sectionname, costarray, list.name);
 		  cmPopulateListOptions(`${sectionname}_cmranks`, costarray,
 		      costarray[0]);
 		  setAttrsPending({[`${sectionname}_listname`]: list.name});
@@ -5684,8 +5692,6 @@ function _spellDoQuery(savedlists, listtype, filter, subtarget, cost) {
 
 function initSpellListsCM(savedlists, profession, realm, costs) {
   // Set the costs cmcategory-spellownbase-cost
-  console.log("Saved Data", getCharmancerData());
-  console.log("realm", realm);
   setCharmancerText({
       "cmcategory-spellownbase-cost": costs.Base,
       "cmcategory-spellopen-cost": costs.Open,
@@ -5908,19 +5914,28 @@ onCheck("clicked:showlevelup", (ev) => {
 
 /** CLick on the add extra talent button */
 function addExtraTalent(ev) {
-  console.log("Add extra talent", ev);
-
   addRepeatingSection('added_talents', 'talent', (id) => {
-    console.log("New section is ", id);
     setCharmancerOptions(`${id}_talent`, "Category:Talent");
   });
 }
 
+function removeTalent(ev) {
+  RMUCosts.update(ev.sourceSection, 0, 0);
+  {
+    let dpspent = RMUCosts.getTotalCost();
+    setCharmancerText({"levelupdp": `${dpspent} DP`});
+  }
+  clearRepeatingSectionById([ev.sourceSection], console.log)
+}
+
+
 onCheck("mancerchange:repeating_cmskill", changeSkillPurchase);
 
 onCheck("mancerchange:repeating_talent_talent", changeTalentPurchase);
+onCheck("mancerchange:repeating_talent_tier", changeTalentPurchaseTier);
 
 onCheck("clicked:talent_add", addExtraTalent);
+onCheck("clicked:repeating_talent", removeTalent);
 
 // Generate our set of skill purchase events
 onCheck("mancerchange:repeating_cmskill_animalhandling_specializations_cmskillranks", changeSkillPurchase);
@@ -6149,28 +6164,22 @@ function changeSkillPurchase(ev) {
   let [ranks, costs] = optionDecodeIntPair(ev.newValue);
 
   RMUCosts.update(ev.sourceAttribute, costs, ranks);
-
   dpspent = RMUCosts.getTotalCost();
-
   setCharmancerText({"levelupdp": `${dpspent} DP`});
 }
 
 /**/
 function changeTalentPurchase(ev) {
-  console.log("talent change", ev);
   const basename = ev.sourceSection;
   getCompendiumPage(ev.newValue, (tdata) => {
-      console.log(tdata);
       const tiers = parseIntDefault(tdata.data.Tiers, 1);
       const cost = parseIntDefault(tdata.data.Cost, -1);
-      console.log(tdata.data.Tiers, tiers)
       let list = []
       if (tiers > 1) {
 	showChoices([`${basename} .talent_tier_show`])
-	console.log("Set cmoptions: ", `${basename}_tiers`);
 	for (let i = 1 ; i <= tiers ; i ++) {
 	  x = i * cost;
-	  list.push(`Tier ${i}: ${x} dp`);
+	  list.push(`Tier ${i}: ${x} dp~${x}`);
 	}
       } else {
 	hideChoices([`${basename} .talent_tier_show`]);
@@ -6181,17 +6190,35 @@ function changeTalentPurchase(ev) {
       let selectList = RMUTalents.getSelectList(tdata)
       setCharmancerOptions(`${basename}_choice`, selectList);
 
-      console.log({"talent_cost": tdata.data.cost, "talent_description": tdata.data.descriptions});;
-      setCharmancerText({[`${basename} .talent_cost`]: tdata.data.Cost,
-			 [`${basename} .talent_description`]: tdata.data.Description});;
+      RMUCosts.update(basename, cost, 1);
+      let dpspent = RMUCosts.getTotalCost();
+      setCharmancerText({"levelupdp": `${dpspent} DP`});
+
+      setCharmancerText({[`${basename} .talent_cost`]: cost,
+			 [`${basename} .talent_description`]: tdata.data.Description,
+			 "levelupdp": `${dpspent} DP`});
   });
+}
+
+function changeTalentPurchaseTier(ev) {
+  let cost = parseIntDefault(ev.newValue.split("~")[1], -111);
+  if (cost == -111) {
+    console.log(ev.newValue.split("~"));
+    rmuerror("Unable to extract cost from ", ev.newValue);
+    cost = 0;
+  }
+  RMUCosts.update(ev.sourceSection, cost, 1);
+  {
+    let dpspent = RMUCosts.getTotalCost();
+    setCharmancerText({"levelupdp": `${dpspent} DP`});
+  }
 }
 
 onCheck("page:levelup", (ev) => {
     console.log("********** Level up start **********");
     pendingInfo();
+    RMUCosts.reset();
     getAttrsPending(["level", "xp", "xplevel", "dp_misc", "dp_used_misc"], (ev) => {
-	console.log(`Level ${ev.level}, ${ev.xp} ${ev.xplevel}`);
 	// If we are at any level but 0, we get 2 free statgains.
 	const level = parseIntDefault(ev.level, 0);
 	if (level > 0){
@@ -6208,20 +6235,17 @@ onCheck("page:levelup", (ev) => {
 	    /**/
 	const dpavil = Math.min(85, dpreceived - dpspent);
 
-	setCharmancerText({"dpinfo": `${dpavil} (${dpreceived} (${newlevel} * 60) + ` +
-		`${dpmisc}) - ${dpspent} (Max of 85 per level`})
-	console.log(`${dpavil} (${dpreceived} (${newlevel} * 60) + ` +
-		`${dpmisc}) - ${dpspent} (Max of 85 per level`)
+	setCharmancerText({"dpinfo": `${dpavil} ` +
+		`(= Total received ${dpreceived} ` +
+		` (Level ${newlevel} * 60) + ` +
+		`Other ${dpmisc}) - Previously spent ${dpspent} (Max of 85 per level)`})
  
     });
 
     // So we need to get the profession & Costs
     const data = getCharmancerData();
-    console.log("skills", data);
 
-    console.log(data.knacks.values);
     const costs = getCostsWithWeapons(data.knacks.values);
-    console.log("Weapon costs", costs);
     dpspent = 0;
 
     let catupdates = {}
@@ -6230,7 +6254,6 @@ onCheck("page:levelup", (ev) => {
     }
     catupdates['cmcategory-combattraining-cost'] = '-';
     catupdates['cmcategory-spellcasting-cost'] = '-';
-    console.log("catupdates", catupdates);
     setCharmancerText(catupdates);
 
     // Update each of the cost fields and the selectors.
@@ -6247,8 +6270,9 @@ onCheck("page:levelup", (ev) => {
 	cmPopulateListOptions('cmskill' + skill.aname + 'ranks', costarray); 
     });
 
-    // Global scope as the other is a pending funtion.
+    // Global scope; as the other is a pending funtion.
     let savedspelllists = [];
+    let savedtalents = [];
     // On load I should check the list of repeating sections and add
     // them
     if (data?.levelup?.repeating) {
@@ -6260,6 +6284,10 @@ onCheck("page:levelup", (ev) => {
 	// See if it's spell list.
 	if (prefix.includes("spelllist")) {
 	  savedspelllists.push(prefix);
+	  continue;
+	}
+	if (prefix.endsWith("_talent")) {
+	  savedtalents.push(prefix);
 	  continue;
 	}
 	const match = prefix.match(/cmskill_(.*)_specializations/)
@@ -6283,9 +6311,17 @@ onCheck("page:levelup", (ev) => {
       }
     }
 
+    addPendingFunction('Talents add', () => {
+      for (obj of savedtalents) {
+	addRepeatingSection('added_talents', 'talent', (id) => {
+	    setCharmancerOptions(`${id}_talent`, "Category:Talent",
+		{ selected: data.levelup.data[obj] });
+	});
+      }
+
+    });
 
     addPendingFunction('Spell List add', () => {
-	console.log(data.profession.data);
 	getAttrsPending(["realm"], (realm) => {
 	    initSpellListsCM(
 		savedspelllists,
@@ -6293,10 +6329,6 @@ onCheck("page:levelup", (ev) => {
 		realm.realm,
 		data.profession.data.profession['data-Spellcasting']);
 	});
-    });
-
-    addPendingFunction("Levelup: Add first talent slot", () => {
-	setCharmancerOptions("talent", "Category:Talent"); //, cmdata?.race?.values?.race);
     });
 
     // Specialisations; get existing ones and ones from cultures page
@@ -6910,7 +6942,6 @@ var RMUTalents = function() {
       "rr": { apply:  x.applyTalentNotImplemented, },
       "melee": { apply:  x.applyTalentNotImplemented, },
       "ranged": { apply:  x.applyTalentNotImplemented, }
-      
     };
 
     x.getSelectList = function(talentObj) {
@@ -7892,7 +7923,7 @@ console.log("done cultures");
 
 
 
-// - Maybe call this Movement?
+// - Maybe call this Movement
 
 // Update all the crud on the frontpage of the charcter sheet.  
 //
@@ -7933,9 +7964,17 @@ frontpage = {}
 frontpage.updateWeightAllowance = function () {
   getAttrsPending(["st", "weight"], (ev) => {
       let st = parseIntDefault(ev.st, -10);
+      let st2 = st * 2;
       let weight = parseIntDefault(ev.weight, -100);
-      let wa = Math.floor(weight * 0.15 + 2 * st);
-      setAttrsPending({weightallowance: wa});
+      let wa15 = Math.floor(weight * 0.15);
+      let wa = wa15 + 2 * st;
+      let info = `Weight Allowance\n` +
+	    `${wa15}  15% of Weight\n` +
+	    `         ${weight} Weight\n` +
+	    `${st2}   Twice Strength\n` +
+	    `= ${wa}  Weight Allowance\n`;
+
+      setAttrsPending({weightallowance: wa, weightallowance_info: info});
   });
 }
 onCheck("change:st change:weight", frontpage.updateWeightAllowance);
@@ -8137,7 +8176,7 @@ frontpage.updateDB = function () {
     }
 
     {
-      updates.db_fullblock = basedb + shielddb + Math.max(0, shield_bonus);
+      updates.db_fullblock = basedb + shielddb + Math.max(0, shield_bonus) + passivedodgebonus;
       updates.db_fullblock_info = "Full Block\n" +
 				  `${F(basedb)} Base DB\n` +
 				  `${F(shielddb)} Shield DB\n` +
@@ -8807,13 +8846,31 @@ function dX(x) {
     return Math.floor(Math.random() * x) + 1;
 }
 
+/*
+$20('button.roll').on('click', async (e) => {
+        const roll = e.altKey ? '[[1d100+30]]' : '[[1d20]]';
+        const results = await startRoll(roll);
+        finishRoll(results.rollId);
+    });*/
+
+
+$20('button').on('click', (e) => {
+    $20('button').addClass('jq');
+});
+
+/*
+$20('button.rollbutton').on('mouseleave', (e) => {
+    $20('button.rollbutton').removeClass('jq');
+});
+    */
+
 
 </script>
 
 
 
 
-Revision bc7546705a0b894be77c0f7961bdec4cd5fa07a9
+Revision d6fd12d54ba0b44048a7f32e27b4f6430cf400b2
 
 
 </div>

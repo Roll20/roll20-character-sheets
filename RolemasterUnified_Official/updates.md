@@ -1,3 +1,14 @@
+2024-04-07
+
+  - Fix grammar when casting spells; "cast from Spells List, not casts Spell List"
+  - Weight Allowance calculation now shows
+  - Fix DB blocking calculation
+  - Talents:
+    - Fix change of tier tracking
+    - Make removal work
+    - Levelup Talents now persist
+  - Fix typo on 'received'
+
 2024-03-31
 
  - More roll template improvements
