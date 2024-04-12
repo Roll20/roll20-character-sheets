@@ -49,7 +49,6 @@ const weaponSkills = [
   "skill_shoot",
   "skill_stab",
   "skill_telekinesis",
-  "skill_sunblade",
 ];
 const weaponDisplayEvent = [
   ...[
@@ -118,7 +117,8 @@ const skills: { [key: string]: string[] } = {
     "telepathy",
     "teleportation",
   ],
-  magic: ["know_magic", "use_magic", "sunblade"],
+  magic: ["cast", "summon"],
+  spaceMagic: ["magic"],
   wwn: [
     "administer",
     "connect",
