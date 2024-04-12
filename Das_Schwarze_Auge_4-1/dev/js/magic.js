@@ -109,8 +109,8 @@ function replaceSpellStats(spellData, stats) {
 				break;
 			}
 			for (let i = 0; i < 3; i++) {
-				if (spellAttrs[i] === "KL" && (spellAttrs[(i+1) % 3] !== "CH" || spellAttrs[(i + 2) % 3] !== "CH")) {
-					spellAttrs[i] = "CH";
+				if (spellStats[i] === "KL" && (spellStats[(i+1) % 3] !== "CH" || spellStats[(i + 2) % 3] !== "CH")) {
+					spellStats[i] = "CH";
 					modified = true;
 					break;
 				}
@@ -127,6 +127,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
 	var nameInternal = spellsData[trigger]["internal"];
 	var nameUI = spellsData[trigger]["ui"];
+	//Copy array, or we get a reference and modify the database
 	var stats = [...spellsData[trigger]["stats"]];
 	var spellRep = "z_" + nameInternal + "_representation";
 	debugLog(func, trigger, spellsData[trigger]);
@@ -272,7 +273,8 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 						(rolls[1] === rolls[2]) ||
 						(rolls[2] === rolls[0])
 					)
-				) {
+				)
+				{
 					criticality = -4;
 				}
 			}
@@ -305,8 +307,8 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 					TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 				}
 
-				// Max. TaP* = TaW
-				TaPstar = Math.min(TaW, TaPstar);
+				// Max. TaP* = TaW, mindestens aber 0
+				TaPstar = Math.min(Math.max(TaW, 0), TaPstar);
 
 				// Ergebnis an Doppel/Dreifach-20 anpassen
 				if (Math.abs(criticality) <= 1)
