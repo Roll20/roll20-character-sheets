@@ -171,11 +171,6 @@ const calculateAC = () => {
         );
       };
 
-      //Shields grant a base AC to their user; 13 for primitive and riot shields, and 15 for a force pavis. If the
-      // bearer’s AC is already equal or better, the shield simply
-      // grants a +1 AC bonus. Primitive and riot shields are
-      // ignored by all weapons that ignore primitive armor.
-
       const calculateStackedArmor = (acType: string): number => {
         return Math.max(
           0,
