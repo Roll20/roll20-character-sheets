@@ -1,24 +1,33 @@
 input(type="hidden", name="attr_setting_individual_hidden", value="1").input-individual-hide
 
 //- Name etc
-.core-box-text.info
-	+text-input("npc_name", "NAME").cols-3.important
-	+text-input("stat_block", "STAT_BLOCK").cols-3
-	+text-input("npc_move", "MOVE")
-	+text-input("npc_hd", "HD")(type="number", value="1").center
-	+text-input("npc_saves", "SAVES")(type="number", value="15").center
-	each val in ["skills", "morale", "attack_bonus"]
-		+text-input(`npc_${val}`, val.toUpperCase())(type="number", value="0").center
+.core-box-text.info.grid
+	.grid.gap-1.grid-flow-col.name
+		+text-input("npc_name", "NAME").important
+		+text-input("stat_block", "STAT_BLOCK")
+	.grid.gap-1.grid-flow-col
+		+text-input("npc_move", "MOVE")
+		+text-input("npc_hd", "HD")(type="number", value="1").center
+		+text-input("npc_saves", "SAVES")(type="number", value="15").center
+		each val in ["skills", "morale"]
+			+text-input(`npc_${val}`, val.toUpperCase())(type="number", value="0").center
+		+text-input("npc_attack_bonus", "ATTACK_BONUS")(type="number", value="0").center.swn.wwn
+	.grid.gap-1.grid-flow-col.cwn
+		+text-input("npc_ranged_attack_bonus", "RANGED_ATTACK_BONUS")(type="number", value="0").center
+		+text-input("npc_melee_attack_bonus", "MELEE_ATTACK_BONUS")(type="number", value="0").center
 
 //- HP and AC
-.core-box-text.npc-hp
-	+text-input-duo("npc_hp", "npc_hp_max", "HIT_POINTS").cols-2.important
-	+text-input("npc_ac", "AC")(type="number", value="10").center
-	+fake-text-input("TYPE").center
-		select(name="attr_npc_armor_type")
-			option(value="", data-i18n="NONE")
-			each val in ["PRIMITIVE", "STREET", "COMBAT", "POWERED"]
-				option(value=val, data-i18n=val)
+.core-box-text.grid.gap-1
+	+text-input-duo("npc_hp", "npc_hp_max", "HIT_POINTS").important
+	.grid.grid-flow-col.gap-1
+		+text-input("npc_ac", "AC")(type="number", value="10").center.swn.wwn
+		+text-input("npc_armor_ranged", "ARMOR_RANGED_AC").center.cwn
+		+text-input("npc_armor_melee", "ARMOR_MELEE_AC").center.cwn
+		+fake-text-input("TYPE").center.swn
+			select(name="attr_npc_armor_type")
+				option(value="", data-i18n="NONE")
+				each val in ["PRIMITIVE", "STREET", "COMBAT", "POWERED"]
+					option(value=val, data-i18n=val)
 
 //- Quick rolls
 .core-box.rolls
@@ -97,26 +106,31 @@ input(type="hidden", name="attr_setting_individual_hidden", value="1").input-ind
 					span(data-i18n="DAMAGE").space-after
 					span(name="attr_attack_damage")
 			.edit.flex.grey-box-bordered
-				+text-input("attack_name", "NAME").name.ellipsis
-				+text-input("attack_range", "RANGE").range.center
-				+text-input("attack_ab", "AB")(type="number", value="0").ab.center
-				+text-input("attack_damage", "DAMAGE")(value="0").damage.center
-				+fake-text-input("BURST").burst.center
-					select(name="attr_attack_burst")
-						option(value="", data-i18n="NO", selected)
-						option(value="@{burst_query}", data-i18n="ASK")
-						option(value="+ 2[Burst]", data-i18n="ALWAYS")
-				+text-input("attack_number", "NUM_ATTACKS")(type="number", value="1").attacks.center
-				.text-input.shock-damage.center
-					input(type="text", name="attr_attack_shock_damage", value="0")
-					label.label
-						input(type="checkbox", name="attr_attack_shock", value!="{{shock=[[@{attack_shock_damage}]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{attack_shock_ac}!}}")
-						span(data-i18n="SHOCK")
-				+text-input("attack_shock_ac", "SHOCK_AC")(type="number", value="10").shock-ac.center
+				.grid.grid-flow-col.gap-1
+					+text-input("attack_name", "NAME").name.ellipsis
+					+text-input("attack_range", "RANGE").range.center
+					+text-input("attack_ab", "AB")(type="number", value="0").ab.center
+					+text-input("attack_damage", "DAMAGE")(value="0").damage.center
+				.grid.grid-flow-col.gap-1
+					+fake-text-input("BURST").burst.center
+						select(name="attr_attack_burst")
+							option(value="", data-i18n="NO", selected)
+							option(value="@{burst_query}", data-i18n="ASK")
+							option(value="+ 2[Burst]", data-i18n="ALWAYS")
+					+text-input("attack_number", "NUM_ATTACKS")(type="number", value="1").attacks.center
+					.text-input.shock-damage.center
+						input(type="text", name="attr_attack_shock_damage", value="0")
+						label.label
+							input(type="checkbox", name="attr_attack_shock", value!="{{shock=[[@{attack_shock_damage}]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{attack_shock_ac}!}}")
+							span(data-i18n="SHOCK")
+					+text-input("attack_shock_ac", "SHOCK_AC")(type="number", value="10").shock-ac.center
 
 //- Abilities
 .section.cols-2
-	+sectionheader("show_npc_abilities", "ABILITIES")
+	.swn.wwn
+		+sectionheader("show_npc_abilities", "ABILITIES")
+	.cwn
+		+sectionheader("show_npc_abilities", "ABILITIES_CYBERWARE")
 	.npc-abilities
 		.npc-rep-header.flex
 			label.npc-checkbox
