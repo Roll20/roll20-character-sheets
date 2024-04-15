@@ -1,5 +1,6 @@
 #!/bin/bash
 # Delete unused JSON keys
+# sh ./delete_keys.sh ../Without_Number.html ../translation.json 
 # Check if both HTML and JSON files are provided
 if [ $# -ne 2 ]; then
     echo "Usage: $0 <html_file> <json_file>"
@@ -36,3 +37,4 @@ for key in $json_keys; do
 done
 
 echo "Done"
+
