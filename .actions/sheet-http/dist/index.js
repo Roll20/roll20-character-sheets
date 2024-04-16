@@ -32075,7 +32075,6 @@ const core = __importStar(__nccwpck_require__(1163));
 const processSheet_1 = __nccwpck_require__(6947);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Action Start");
-    console.log("\n");
     const files = core.getInput("file-list").split(core.getInput("separator"));
     console.log("Changed Files in last push: ", files, "\n\n\n");
     const sheet_wrk_space = [];
@@ -32399,13 +32398,13 @@ const getSettings = () => {
     // Env vars are a mess in the way we have github actions.
     // Going to just use the branch as our test.
     let branch = github.context.ref.replace("refs/heads/", "");
-    let repo = github.context.repo.repo;
+    let repoName = github.context.repo.repo;
     let retval = {};
-    if (["staging", "feature/CSC-2163"].includes(branch)) {
+    if (["staging"].includes(branch)) {
         retval = {
             apiKey: process.env["STAGING_API_KEY"],
             sheetHttpUrl: "https://sheet-http.staging.roll20preflight.net",
-            repoName: repo,
+            repoName: repoName,
             simulate: false,
         };
     }
@@ -32413,7 +32412,7 @@ const getSettings = () => {
         retval = {
             apiKey: process.env["PRODUCTION_API_KEY"],
             sheetHttpUrl: "https://sheet-http.production.roll20preflight.net",
-            repoName: repo,
+            repoName: repoName,
             simulate: false,
         };
     }
