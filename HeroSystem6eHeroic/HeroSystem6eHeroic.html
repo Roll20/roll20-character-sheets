@@ -10691,7 +10691,7 @@
 			<div class="sheet-content">
 				{{#SUCCESS}}
 					{{#^rollLess() computed::SUCCESS 0}}
-					<div class="sheet-key">Activate Power</div>
+					<div class="sheet-key">Activation</div>
 					<div class="sheet-value">{{SUCCESS}}</div>
 					{{/^rollLess() computed::SUCCESS 0}}
 					{{#rollLess() computed::SUCCESS 0}}
@@ -12664,15 +12664,15 @@
 				}
 				
 				if (isAttack) {
-				if  (isRangedAttack && hasRangePenalty) {
-					if (dispDoS) {
-						theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}} ";
-					} else {
-						theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
+					if  (isRangedAttack && hasRangePenalty) {
+						if (dispDoS) {
+							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}} ";
+						} else {
+							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
 						}
 					} else {
 						if (dispDoS) {
-						theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRangedAttack ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}} ";
+							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRangedAttack ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}} ";
 						} else {
 							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRangedAttack ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifier]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
 						}
@@ -13125,9 +13125,9 @@
 		});
 	});
 
-	/* ------------------- */
-	/* Success Rolls       */
-	/* ------------------- */
+	/* -------------------------- */
+	/* Characteristic Rolls       */
+	/* -------------------------- */
 	
 	var characteristics = ['strength', 'dexterity', 'constitution', 'intelligence', 'ego', 'presence']
 	characteristics.forEach(characteristic => {
@@ -16315,14 +16315,79 @@
 	arrayOf(maxTalentNum).forEach(num => {
 		var talentId = String(num).padStart(2,'0');	
 		on(`clicked:showTalentRoll${talentId}`, (info) => {
-			getAttrs(["whisperToGM", "character_title", "dingbat"], function(values) {
+			getAttrs(["whisperToGM", "character_title", "dingbat", "talentDice"+talentId, "talentActivate"+talentId], function(values) {
 				var theRoll = values.whisperToGM||"";
 				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 				const lesserDingbat = " ⬩ ";
+				const needsActivation = (values["talentActivate"+talentId] === "on") ? true : false;
+				const hasDice = (values["talentDice"+talentId] !== "") ? true : false;
+				let talentDice = values["talentDice"+talentId];
 				
 				theRoll += "&{template:custom-show} ";
 				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
 				theRoll += "{{subtitle= Perks & Talents" + lesserDingbat + "@{talentName"+talentId+"}}} ";
+				
+				if (needsActivation) {
+					theRoll += "{{Activate On=@{talentRollChance"+talentId+"}}}";
+				}
+				
+				if (hasDice) {
+					theRoll += "{{Talent Dice=@{talentDice"+talentId+"}}}";
+				}
+				
+				theRoll += "{{desc=@{talentText"+talentId+"}}}";
+				
+				startRoll(theRoll, (results) => {
+					finishRoll(results.rollId, {});
+				});
+			});
+		});
+	});
+	
+	
+	// Activate Talent XX
+	arrayOf(maxTalentNum).forEach(num => {
+		var talentId = String(num).padStart(2,'0');	
+		on(`clicked:talentRoll${talentId}`, (info) => {
+			getAttrs(["whisperToGM", "character_title", "dingbat", "displayDegreeOfSuccess", "talentName"+talentId, "talentDice"+talentId, "talentActivate"+talentId], function(values) {
+				var attributes = new Object();
+				
+				var theRoll = values.whisperToGM||"";
+				const dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
+				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
+				const lesserDingbat = " ⬩ ";
+				const needsActivation = (values["talentActivate"+talentId] === "on") ? true : false;
+				const hasDice = ((values["talentDice"+talentId] === "") || (values["talentDice"+talentId] === "0")) ? false : true;
+				let talentDice = values["talentDice"+talentId];
+				let damageLabel = "Result";
+				
+				theRoll += "&{template:custom-power-attack} ";
+				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+				theRoll += "{{subtitle= Perks & Talents " + lesserDingbat + "@{talentName"+talentId+"}}} ";
+				
+				if (needsActivation) {
+					if (dispDoS) {
+						theRoll += "{{SUCCESS=[[@{talentRollChance" + talentId + "}[Talent Activation]-3d6cf6cs1[Roll]+?{Modifiers|0}[Modifiers]]] }}";
+					} else {
+						theRoll += "{{Activate On = [[@{talentRollChance" + talentId + "}[Talent Activation]+?{Modifiers|0}[Modifiers]]] }} {{Roll=[[3d6cf6cs1]]}}";
+					}
+				}
+				
+				if (hasDice) {
+					talentDice = talentDice.replace(/[^\ddD\\+\\-]/g,"");
+					
+					attributes.hiddenDamage = talentDice;
+					attributes.hiddenDamageType = "power";
+					attributes.hiddenMessage = values["talentName"+talentId];
+					attributes.hiddenIsNormal = "false";
+					attributes.hiddenIsPower = "true";
+					attributes.hiddenIsMental = "false";
+					
+					setAttrs(attributes);
+					
+					theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
+				}
+				
 				theRoll += "{{desc=@{talentText"+talentId+"}}}";
 				
 				startRoll(theRoll, (results) => {
@@ -16412,7 +16477,7 @@
 		});
 	});
 
-
+	/* Show selected complication details. */
 	arrayOf(maxComplicationNum).forEach(num => {
 		var complicationId = String(num).padStart(2,'0');	
 		on(`clicked:showComplicationRoll${complicationId}`, (info) => {
