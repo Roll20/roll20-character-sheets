@@ -32224,7 +32224,8 @@ const processFiles = (sheetName, dataObj, sheetJsonObj) => __awaiter(void 0, voi
             // (as we really have no way of knowing) without polling the server so might as well send
             // we also know if sheet.json was touched we should do a meta update at end
             updateMeta = true;
-            yield processUserOptions(sheetName, sheetJsonObj.useroptions);
+            const jsonObj = !sheetJsonObj.useroptions ? {} : sheetJsonObj.useroptions;
+            yield processUserOptions(sheetName, jsonObj);
         }
     }
     // We always do meta last if needed
