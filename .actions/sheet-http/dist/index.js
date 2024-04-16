@@ -32224,14 +32224,12 @@ const processFiles = (sheetName, dataObj, sheetJsonObj) => __awaiter(void 0, voi
             // (as we really have no way of knowing) without polling the server so might as well send
             // we also know if sheet.json was touched we should do a meta update at end
             updateMeta = true;
-            const r = yield processUserOptions(sheetName, sheetJsonObj.useroptions);
-            console.log("useropt", r);
+            yield processUserOptions(sheetName, sheetJsonObj.useroptions);
         }
     }
     // We always do meta last if needed
     if (updateMeta) {
-        const r = yield processMetaData(sheetName, sheetJsonObj);
-        console.log("update meta", r);
+        yield processMetaData(sheetName, sheetJsonObj);
     }
     const settings = (0, settings_1.getSettings)();
     // Purge cache after we're done
@@ -32342,7 +32340,7 @@ const makeServerCall = (fullUrl, dataObj) => __awaiter(void 0, void 0, void 0, f
     console.log("🚀 ~ payload:", dataObj);
     const s = (0, settings_1.getSettings)();
     if (s.simulate) {
-        console.log(`\tdata being sent ${dataObj}`);
+        console.log(`\tSIMULATE IS ON: data being sent ${dataObj}`);
         return {};
     }
     else {
@@ -32407,7 +32405,7 @@ const getSettings = () => {
             apiKey: process.env["STAGING_API_KEY"],
             sheetHttpUrl: "https://sheet-http.staging.roll20preflight.net",
             repoName: repo,
-            simulate: true,
+            simulate: false,
         };
     }
     else if (["master"].includes(branch)) {
