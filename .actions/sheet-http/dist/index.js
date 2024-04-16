@@ -32224,15 +32224,18 @@ const processFiles = (sheetName, dataObj, sheetJsonObj) => __awaiter(void 0, voi
             // (as we really have no way of knowing) without polling the server so might as well send
             // we also know if sheet.json was touched we should do a meta update at end
             updateMeta = true;
-            yield processUserOptions(sheetName, sheetJsonObj.useroptions);
+            const r = yield processUserOptions(sheetName, sheetJsonObj.useroptions);
+            console.log("useropt", r);
         }
     }
     // We always do meta last if needed
     if (updateMeta) {
-        yield processMetaData(sheetName, sheetJsonObj);
+        const r = yield processMetaData(sheetName, sheetJsonObj);
+        console.log("update meta", r);
     }
     const settings = (0, settings_1.getSettings)();
     // Purge cache after we're done
+    console.log("Clearing cache on sheet-http");
     yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${sheetName}&repo=${settings.repoName}`, {});
 });
 exports.processFiles = processFiles;
