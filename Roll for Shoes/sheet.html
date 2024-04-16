@@ -1,0 +1,67 @@
+<div class="main">
+  <section>
+    <label>
+      <span>Name:</span>
+      <input name="attr_name" type="text" />
+    </label>
+    <label>
+      <span>XP:</span>
+      <input min="0" name="attr_xp" type="number" />
+    </label>
+    <h3>Skills</h3>
+    <fieldset class="repeating_skills">
+      <input name="attr_name" placeholder="Enter skill name" type="text" />
+      <input max="10" min="-10" name="attr_rating" type="number" value="2" />
+      <button class="btn" name="act_skillcheck" type="action"></button>
+    </fieldset>
+  </section>
+  <section>
+    <textarea name="attr_notes" placeholder="Enter notes" rows="2"></textarea>
+    <h3>Statuses</h3>
+    <fieldset class="repeating_statuses">
+      <input max="10" min="-10" name="attr_rating" type="number" value="0" />
+      <input name="attr_name" placeholder="Enter status name" type="text" />
+    </fieldset>
+  </section>
+</div>
+
+<script type="text/worker">
+  function useAttr(key, cb) {
+    useAttrs([key], (attrs) => {
+      cb(attrs.at(0))
+    })
+  }
+
+  function useAttrs(keys, cb) {
+    getAttrs(keys, (attrs) => {
+      cb(Object.values(attrs))
+    })
+  }
+
+  on('clicked:repeating_skills:skillcheck', () => {
+    useAttrs(['repeating_skills_name', 'repeating_skills_rating'], ([skillName, ratingString]) => {
+      const rating = parseInt(ratingString)
+      if (rating === 0) return
+
+      const rollQuery = rating > 0
+        ? `${rating}d6`
+        : `${Math.abs(rating)}d6kl1`
+
+      startRoll(`&{template:default} {{name=${skillName} ${rating}}} {{result=[[${rollQuery}+?{Modifier}]]}}`, ({ rollId }) => {
+        finishRoll(rollId)
+      })
+    })
+  })
+
+  on('sheet:opened', () => {
+    useAttr('initialized', (initialized) => {
+      if (initialized) return
+
+      const attrs = { initialized: true, xp: 0 }
+      const id = generateRowID()
+      attrs[`repeating_skills_${id}_name`] = 'Do Anything'
+      attrs[`repeating_skills_${id}_rating`] = 1
+      setAttrs(attrs)
+    })
+  })
+</script>
