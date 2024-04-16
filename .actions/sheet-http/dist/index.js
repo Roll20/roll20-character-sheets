@@ -32397,12 +32397,13 @@ const getSettings = () => {
     // Env vars are a mess in the way we have github actions.
     // Going to just use the branch as our test.
     let branch = github.context.ref.replace("refs/heads/", "");
+    let repo = github.context.repo.repo;
     let retval = {};
     if (["staging", "feature/CSC-2163"].includes(branch)) {
         retval = {
             apiKey: process.env["STAGING_API_KEY"],
             sheetHttpUrl: "https://sheet-http.staging.roll20preflight.net",
-            repoName: "roll20-private-sheets",
+            repoName: repo,
             simulate: true,
         };
     }
@@ -32410,7 +32411,7 @@ const getSettings = () => {
         retval = {
             apiKey: process.env["PRODUCTION_API_KEY"],
             sheetHttpUrl: "https://sheet-http.production.roll20preflight.net",
-            repoName: "roll20-private-sheets",
+            repoName: repo,
             simulate: false,
         };
     }
