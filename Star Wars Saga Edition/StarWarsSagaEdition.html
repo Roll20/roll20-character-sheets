@@ -3110,7 +3110,56 @@
 					<span data-i18n="force_powers" >Force Powers</span>
 					<button type="roll" name="roll_UsetheForceCheck" class="small-roll-button" value="@{UsetheForceFormula|max}" title="Roll Use the Force %{UsetheForceCheck}">Use the Force</button>
 				</label>
-				<textarea type="text" name="attr_ForcePowers" rows="2" class="ActionNotes sect" title="Force Power Suite @{ForcePowers}"></textarea>
+				<div class="sect">
+					<div class="powers-flex-container">
+						<div>
+							<input type="radio" value="1" name="attr_force-power-style" id="individual-powers" class="visible-checkbox" style="vertical-align: text-bottom;">
+							<label for="individual-powers">Individual Powers</label>
+						</div>
+						<div>
+							<input type="radio" value="0" name="attr_force-power-style" checked id="power-suite" class="visible-checkbox" style="vertical-align: text-bottom;">
+							<label for="power-suite">Force Power Suite</label>
+						</div>
+					</div>
+					<input type="checkbox" value="1" name="attr_force-power-style" id="individual-powers" class="hidden">
+					<input type="checkbox" value="0" name="attr_force-power-style" id="power-suite" class="hidden">
+					<textarea type="text" name="attr_ForcePowers" rows="2" class="ActionNotes sect" title="Force Power Suite @{ForcePowers}"></textarea>
+					<fieldset class="repeating_powers">
+						<div class="powers-grid">
+							<!-- First row of grid -->
+							<button type="roll" name="roll_PowerCheck" value="@{power-formula}" title="Use Power"></button>
+							<input type="text" name="attr_power-name" placeholder="Name" title="Name of Force Power" />
+							<input type="number" name="attr_power-uses" value="1" title="Number of uses left" />
+							<span class="center vertical-center">/</span>
+							<input type="number" name="attr_power-uses_max" value="1" title="Number of uses total" />
+							<!-- Second row of grid -->
+							<div class="powers-flex-container powers-notes-title">
+								<span>
+									<span>Notes</span>
+									<input type="checkbox" class="sect-show showhidetoggle" value="1" name="attr_power-notes-show" style="left: 30px;">
+									<!-- Empty span used for rendering the [show/hide] button. -->
+									<span style="margin-left: 30px;"/>
+								</span>
+								<span>
+									<span>Template Formula</span>
+									<input type="checkbox" class="sect-show showhidetoggle" value="1" title="Show/Hide Template Formula" name="attr_power-formula-show" style="left: 30px;">
+									<!-- Empty span used for rendering the [show/hide] button. -->
+									<span style="margin-left: 30px;"/>
+								</span>
+							</div>
+							<!-- Third row of grid -->
+							<div style="grid-column:2/7;">
+								<input type="checkbox" class="sect-show hidden" value="1" name="attr_power-notes-show">
+								<input type="text" class="sect" placeholder="Power notes" title="Force power notes" name="attr_power-notes" style="width:100%;">
+							</div>
+							<!-- Fourth row of grid -->
+							<div style="grid-column:2/7;">
+								<input type="checkbox" class="sect-show hidden" value="1" name="attr_power-formula-show">
+								<textarea class="sect" name="attr_power-formula" placeholder="Power formula" style="width:100%; resize:vertical; box-sizing: border-box;" title="See the Settings tab for a link to the wiki, where you can find another link to a document containing macros">&{template:sagadefault} {{header=[Name]}} {{subheader=[Description]}} {{Time:=[Time]]}} {{Target:=[Target]}} {{skillname=Use the Force}} {{skillcheck=[[1d20+@{UsetheForceformula}+?{Other Modifiers|0}[Other]]]}} {{less15=Nothing happens!}} {{15=...}} {{20=...}}{{more25=...}} {{?{Force Point to ...|No, **No Force Point Used**|Yes, **Force Point Used:**=...} }}</textarea>
+							</div>
+						</div>
+					</fieldset>
+				</div>
 			</div>
 			<div>
 				<input type="checkbox" class="sect-show hidden" value="1" name="attr_StarshipManeuvers-Show" />
@@ -3410,7 +3459,7 @@
 			<div class="sheet-col" style="width:calc(38% - 15px)">
 				<div class="sheet-table">
 					<div class="sheet-table-row">
-						<div class="sheet-table-header">Special Orders <input type="checkbox" class="sect-show showhidetoggle" title="Show Special Orders" name="attr_SpecialOrders-show" value="1"  style="left: 30px;"/>
+						<div class="sheet-table-header">Special Orders <input type="checkbox" class="sect-show showhidetoggle" title="Show Special Orders" name="attr_SpecialOrders-show" value="1" style="left: 30px;"/>
 							<!-- Empty span used for rendering the [show/hide] button -->
 							<span style="margin-left: 30px;"/>
 						</div>
@@ -5906,13 +5955,14 @@
 				<div class="sheet-table">
 					<div class="sheet-table-data">
 						<input type="checkbox" class="visible-checkbox" value="1" name="attr_force-Show" title="Force Sensitive character?" />&nbsp;<span class="not-show">Force sections</span><br/>
+						<input type="checkbox" class="visible-checkbox" value="1" name="attr_force-power-style" title="Fill out individual Force Powers?" />&nbsp;<span class="not-show">Individual Force Powers</span><br/>
 						<input type="checkbox" class="visible-checkbox" value="1" name="attr_StarshipManeuvers-Show" title="Starship Maneuvers" />&nbsp;<span class="not-show">Starship Maneuvers</span><br/>
 						<input type="checkbox" class="visible-checkbox" value="1" name="attr_organization-Show" title="Organization Information"/>&nbsp;<span class="not-show">Organizations (Rank and Privilege)</span><br/>
 						<input type="checkbox" class="visible-checkbox" value="1" name="attr_droid-Show" title="Droid character?" />&nbsp;<span class="not-show">Droid systems</span><br/>
 						<input type="checkbox" class="visible-checkbox" value="1" name="attr_NoConstitution" title="For characters which do not have a Constitution score, such as droids. @{NoConstitution}" />&nbsp;<span class="not-show">No Constitution score</span><br/>
 						<input type="checkbox" class="visible-checkbox" value="1" name="attr_FocusHouseRule" title="Skill Focus will increase a skill's modifier at odd levels. (This may not work if you have modified the skill formulas.)"/>&nbsp;<span class="not-show">Skill Focus as 1/2 level (house rule)</span><br/>
-						<!--The line below should be included if the number of settings in the left and right sheet-table-data are different.-->
-						<span>&nbsp;</span>
+						<!--The line below should be included if the number of settings in the left and right sheet-table-data are different.
+						<span>&nbsp;</span>-->
 					</div>
 					<div class="sheet-table-data">
 						<!--In some cases, a sheetworker changes the formula to remove the "Other Modifiers" prompt. In other cases, there is a duplicate button which is hidden.-->
@@ -6003,7 +6053,7 @@
 		<input type="text" disabled="true" name="wiki_URL" style="width:30em" title="Wiki URL" value="https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet"/>
 		<button type="roll" class="sheet-wiki-url" value="https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet">Send to chat</button>
 		<br/>
-		<b><span data-i18n="last_updated">Last updated</span>:</b> 16 April 2024
+		<b><span data-i18n="last_updated">Last updated</span>:</b> 18 April 2024
 	</div>
 </div>
 
@@ -7446,6 +7496,30 @@ on("change:QuerySkillModifier", function() {
 		});
 	});
 });
+//Autogenerate Force Power Name
+on('change:repeating_powers:power-formula', function(eventInfo) {
+    const changedField = eventInfo.sourceAttribute;
+    const characterId = eventInfo.sourceId;
+
+    const forcepowernameField = changedField.replace('_power-formula', '_power-name');
+    console.log(forcepowernameField);
+    getAttrs([changedField], function(values) {
+        const text = values[changedField];
+
+		const regex = /header=(.*?)}}/;
+		const match = text.match(regex);	
+		if (match && match[1]) {
+			const extractedValue = match[1].trim();
+			console.log(extractedValue);
+			const updateObject = {};
+			updateObject[forcepowernameField] = extractedValue;
+			setAttrs(updateObject);
+		} else {
+			console.log("No match found");
+		}
+    });
+});
+
 // ====== Vehicle Sheet ====== \\
 
 on("change:vehicle-size change:vehicle-CapitalGrapple change:vehicle-alternateStealth", function() {
