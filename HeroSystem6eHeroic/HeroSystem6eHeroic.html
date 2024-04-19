@@ -10514,6 +10514,14 @@
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
+					<input type="checkbox" name="attr_optionUntiring">
+					<span class="checkmark" title="@{optionUntiring}"></span>
+				</label>
+				<h1>Untiring (STR uses Zero END)</h1>
+			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
 					<input type="checkbox" checked="checked" name="attr_optionAutoSubtractEND">
 					<span class="checkmark" title="@{optionAutoSubtractEND}"></span>
 				</label>
@@ -10549,7 +10557,7 @@
 					<input type="checkbox" checked="checked" name="attr_optionD6MinusOne">
 					<span class="checkmark" title="@{optionD6MinusOne}"></span>
 				</label>
-				<h1>Chose d6-1 over d3 when adjusted damage is ambiguous</h1>
+				<h1>Choose d6-1 over d3 when Adjusted Damage is ambiguous</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -10557,7 +10565,7 @@
 					<input type="checkbox" checked="checked" name="attr_optionResetTargeting">
 					<span class="checkmark" title="@{optionResetTargeting}"></span>
 				</label>
-				<h1>Health Reset Buttons Also Reset Combat Choices</h1>
+				<h1>Health Reset Buttons also Reset Combat Choices</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -11640,17 +11648,19 @@
 	
 	
 	// Update Strength related stats and skills
-	on("change:strength change:strengthMod change:useCharacteristicMaximums change:optionSuperHeroicEndurance", function () {
-		getAttrs(["strength", "strengthMod", "useCharacteristicMaximums", "optionSuperHeroicEndurance"], function(values) {
+	on("change:strength change:strengthMod change:useCharacteristicMaximums change:optionSuperHeroicEndurance change:optionUntiring", function () {
+		getAttrs(["strength", "strengthMod", "useCharacteristicMaximums", "optionSuperHeroicEndurance", "optionUntiring"], function(values) {
 			
 			const statValue = parseInt(values.strength)||0;
-			const useMaximums = values.useCharacteristicMaximums;
+			const useMaximums = (values.useCharacteristicMaximums === "on") ? true : false;
+			const isUntiring = (values.optionUntiring === "on") ? true : false;
 			const baseStat = 10;
 			const maxStat = 20;
 			const statMod = parseInt(values.strengthMod)||0;
 			const costStat = 1;
 			const enduranceCostFactor = 5;
 			let statCP = 0;
+			let enduranceCostBasic = 0;
 			var liftCapability;
 			var freeCarry;
 			
@@ -11664,13 +11674,15 @@
 				enduranceCostFactor = 10;
 			}
 			
-			let enduranceCostBasic = heroRoundLow( (Math.max(0, statValue + statMod))/enduranceCostFactor );
-			if ( (enduranceCostBasic<1) && (statValue>0) ) {
-				enduranceCostBasic=1
+			if (!isUntiring) {
+				enduranceCostBasic = heroRoundLow( (Math.max(0, statValue + statMod))/enduranceCostFactor );
+				if ( (enduranceCostBasic<1) && (statValue>0) ) {
+					enduranceCostBasic=1
+				}
 			}
 			
 			// Characteristic maximums trigger cost recalculation.
-			if ( (statValue>maxStat) && (useMaximums != 0) ) {
+			if ( (statValue>maxStat) && (useMaximums) ) {
 				statCP=(statValue-maxStat)*costStat+(statValue-baseStat)*costStat;
 			} else {
 				statCP=(statValue-baseStat)*costStat;
@@ -14210,13 +14222,18 @@
 	arrayOf(maxWeaponNum).forEach(num => {
 		var weaponId = String(num).padStart(2,'0');
 		
-		on(`change:weaponStrength${weaponId} change:weaponEndMod${weaponId} change:optionSuperHeroicEndurance`, function () {
-			getAttrs(["weaponStrength"+weaponId, "weaponEndMod"+weaponId, "optionSuperHeroicEndurance"], function(values) {
+		on(`change:weaponStrength${weaponId} change:weaponEndMod${weaponId} change:optionSuperHeroicEndurance change:optionUntiring`, function () {
+			getAttrs(["weaponStrength"+weaponId, "weaponEndMod"+weaponId, "optionSuperHeroicEndurance", "optionUntiring"], function(values) {
 				var attributes = new Object();
-				let optionSuperHeroic = (values.optionSuperHeroicEndurance === "on") ? true : false;
-				let enduranceCostFactor = optionSuperHeroic ? 10 : 5;
+				const isUntiring = (values.optionUntiring === "on") ? true : false;
+				const optionSuperHeroic = (values.optionSuperHeroicEndurance === "on") ? true : false;
+				const enduranceCostFactor = optionSuperHeroic ? 10 : 5;
 				
-				attributes["weaponEndurance"+weaponId] = Math.max(0, heroRoundLow( (parseInt(values["weaponStrength"+weaponId])||0)/enduranceCostFactor ) + (parseInt(values["weaponEndMod"+weaponId])||0) );
+				if (isUntiring) {
+					attributes["weaponEndurance"+weaponId] = 0;
+				} else {
+					attributes["weaponEndurance"+weaponId] = Math.max(0, heroRoundLow( (parseInt(values["weaponStrength"+weaponId])||0)/enduranceCostFactor ) + (parseInt(values["weaponEndMod"+weaponId])||0) );
+				}
 			
 				setAttrs(attributes);
 			});
@@ -15510,7 +15527,7 @@
 		var weaponId = String(num).padStart(2,'0');	
 		on(`clicked:attackWeapon${weaponId}`, (info) => {
 			
-			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat"], function(values) {
+			getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let areaOfEffect = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 				let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
@@ -15686,7 +15703,7 @@
 					netDCV = getNetDCV(netDCV, maneuverDCV, false);
 					
 					setAttrs({
-						"hiddenDamage": values["weaponDamage"+weaponId]||0,
+						"hiddenDamage": values["hiddenWeaponDamage"+weaponId]||0,
 						"hiddenStunMod": stunMod,
 						"hiddenIsNormal": isNormal ? "true" : "false",
 						"hiddenIsContest": "false",
