@@ -1,3 +1,12 @@
+2024-04-14
+
+ - Fix bug in parseIntDefault to return the default if passed a 0
+ - Add test for parseIntDefault
+ - Roll buttons updated
+    - The die rolls with a modifier.
+    - The (skill) number rolls natural.
+ - Fix a layout issue on safari (I hope)
+
 2024-04-07
 
   - Fix grammar when casting spells; "cast from Spells List, not casts Spell List"
