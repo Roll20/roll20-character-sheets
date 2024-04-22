@@ -63,40 +63,35 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 		.grid.cwn.grid-flow-col.gap-1.mt
 			+text-input("major_injuries", "MAJOR_INJURIES")
 	.attributes.core-box
-		table
-			thead
-				tr
-					th
-					each val in ["BASE", "BOOSTS", "ATTR"]
-						th(data-i18n=val).edit
-					th(data-i18n="ATTRIBUTE").display
-					th(data-i18n="BONUS")
-					th.edit
-						span(data-i18n="MOD") Mod
-					th(data-i18n="MODIFIER").display
-			tbody
-				input(type="hidden", name="attr_str_dex_mod", value="0")
-				each attr in attributes
-					tr
-						td(data-i18n=attr.toUpperCase(), data-i18n-title=`${attr.toUpperCase()}_DESC`)
-						td.edit
-							if ["strength", "dexterity", "constitution"].includes(attr)
-								input(type="number", name=`attr_${attr}_base`, value="0").ai-disabled.transhuman-disabled
-							else
-								input(type="number", name=`attr_${attr}_base`, value="0")
-						td.edit
-							if ["strength", "dexterity", "constitution"].includes(attr)
-								input(type="number", name=`attr_${attr}_boosts`, value="0").ai-disabled.transhuman-disabled
-							else
-								input(type="number", name=`attr_${attr}_boosts`, value="0")
-						td
-							span(name=`attr_${attr}`)
-						td
-							input(type="number", name=`attr_${attr}_bonus`, value="0").edit
-							span(name=`attr_${attr}_bonus`).display
-						td.mod
-							input(type="hidden", name=`attr_${attr}_mod`, value="0").add-plus
-							span(name=`attr_${attr}_mod`)
+		.edit.grid.gap-1
+			.grid.grid-flow-col.gap-1.attr-grid
+				span.spacer
+				each val in ["BASE", "BOOSTS", "ATTRIBUTE", "BONUS", "MODIFIER"]
+					span(data-i18n=val).font-bold.ellipsis
+			each attr in attributes
+				.grid.grid-flow-col.gap-1.attr-grid
+					- const physical = ["strength", "dexterity", "constitution"].includes(attr)
+					- const classes = physical ? "ai-disabled transhuman-disabled" : ""
+					span(data-i18n=attr.toUpperCase()).font-bold.ellipsis
+					input(type="number", name=`attr_${attr}_base`, value="0" class=classes)
+					input(type="number", name=`attr_${attr}_boosts`, value="0" class=classes)
+					span(name=`attr_${attr}`).center
+					input(type="number", name=`attr_${attr}_bonus`, value="0")
+					.mod
+						input(type="hidden", name=`attr_${attr}_mod`, value="0")
+						span(name=`attr_${attr}_mod`).font-bold.mod.center
+		.display.grid.gap-1
+			.grid.grid-flow-col.gap-1.attr-display-grid
+				span.spacer
+				each val in ["ATTRIBUTE", "BONUS", "MODIFIER"]
+					span(data-i18n=val).font-bold.ellipsis.center
+			each attr in attributes
+				.grid.grid-flow-col.gap-1.attr-display-grid
+					- const physical = ["strength", "dexterity", "constitution"].includes(attr)
+					span(data-i18n=attr.toUpperCase()).font-bold.ellipsis
+					span(name=`attr_${attr}`).center
+					span(name=`attr_${attr}_bonus`).center
+					span(name=`attr_${attr}_mod`).center.mod.font-bold
 	.wealth.grid.core-box-text.wwn
 		h3(data-i18n="WEALTH")
 		.grid.grid-flow-col
