@@ -552,6 +552,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
                     </div>
                   </div>
                 </div><!-- fin des points de chance -->
+                <input type="checkbox" class="optional-block-switch" name="attr_option_mana_totale" value="1"><span></span>
                 <input type="checkbox" class="optional-block-switch" name="attr_option_pm" value="1" checked><span></span>
                 <input type="checkbox" class="optional-block-switch" name="attr_option_epuisement" value="1" ><span></span>
                 <div class="optional-block">
@@ -560,6 +561,33 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
                   <div class=block-show>
                     <span class="textfat-chance">&nbsp;&nbsp;&nbsp;MAGIE</span>
                     <div>
+                      <input type="checkbox" class="optional-block-switch" name="attr_option_mana_totale" value="1"><span></span>
+                      <div class="optional-block">
+                        <table class="tabsep">
+                          <tr>
+                            <td class="boxtitre-chance">
+                    <button class="boxtitre-pv" type="roll" name="roll_DM" title="Jet de Dé de Mana" value="@{jets_caches}&{template:co1} {{perso=@{displayname}}} {{name=Dé de Mana}} {{subtags=Magie}} {{DM=[[ 1d@{de_mana}[Dé] + [[@{carac_mana}]][caractéristique] ]]}}"> DM</button>
+                            </td>
+                    <td class="boxinput-chance">
+                      <select class="carac-chance" name="attr_de_mana" size="1" title="Dé de Mana">
+                        <option value="0" selected >-</option>
+                        <option value="4">d4</option>
+                        <option value="6">d6</option>
+                        <option value="8">d8</option>
+                        <option value="10">d10</option>
+                        <option value="12">d12</option>
+                      </select>
+                    </td>
+                    <td class="boxinput-chance">
+                      <select class="carac-chance" name="attr_carac_mana" size="1" title="Caractéritique associée à la mana">
+                        <option value="@{INT}" selected>INT</option>
+                        <option value="@{SAG}">SAG</option>
+                        <option value="@{CHA}">CHA</option>
+                      </select>
+                    </td>
+                          </tr>
+                        </table>
+                      </div>
                       <input type="checkbox" class="optional-block-switch" name="attr_option_pm" value="1" checked><span></span>
                       <div class="optional-block">
                         <table class="tabsep">
@@ -2409,7 +2437,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           <li>Magie :
             <ul>
               <li>Points de mana :
-                <input type="checkbox" name="attr_option_pm" value="1" title="@{option_pm}" checked />
+                <input type="checkbox" name="attr_option_pm" value="1" title="@{option_pm}" checked /> (avec dé de mana <input type="checkbox" name="attr_option_mana_totale" value="1" title="@{option_mana_totale}">)
               </li>
               <li> Épuisement magique :
                 <input type="checkbox" name="attr_option_epuisement" value="1" title="@{option_pr}" />
@@ -3212,6 +3240,12 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
     <td>{{DV}}</td>
   </tr>
   {{/DV}}
+  {{#DM}}
+  <tr>
+    <td class="sheet-rolltemplate-tcat">PM gagnés</td>
+    <td>{{DM}}</td>
+  </tr>
+  {{/DM}}
   {{#carac}}
   <tr>
     <td class="sheet-rolltemplate-tcat">Jet </td>
@@ -3295,7 +3329,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
 <!-- FIN TEMPLATES -->
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-  let silent = {
+    let silent = {
     silent: true
   };
 
@@ -4686,7 +4720,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
     typedegats: 'tranchant metal',
     modificateurs: 'metal'
   }, {
-    keys: ['lance'],
+    keys: ['lance', 'trident'],
     typeattaque: 'Arme 2 mains',
     typedegats: 'percant metal',
     modificateurs: ''
@@ -6433,7 +6467,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
   });
 
   //Consommables
-  var listeConsommables = [{
+  const listeConsommables = [{
     keys: ['agrandissement', "d'agrandissement"],
     effet: "!cof-effet-temp agrandissement 8",
   }, {
@@ -6480,6 +6514,12 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
     }, {
       keys: ['feu'],
       effet: "!cof-set-attribute resistanceA_feu true",
+    }],
+  }, {
+    keys:['trousse'],
+    variantes: [{
+      keys: ['soin', 'soins'],
+      effet: "!cof-soin @{selected|token_id} @{target|token_id} 1",
     }],
   }, {
     keys: ['soin', 'soins'],

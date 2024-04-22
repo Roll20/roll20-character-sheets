@@ -18,6 +18,7 @@ Relevant character sheet versions
 * 20220604: Visibili Vanitar spelling fixes
 * 20220821: Sheet Initialization
 * 20230618: Confirmation/Reaction Buttons
+* 20240414: Regeneration (Sleep)
 */
 function migrationCheck() {
 		safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {

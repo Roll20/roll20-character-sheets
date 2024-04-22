@@ -1208,6 +1208,10 @@ on(
 				defaultElements.push( { 'name': 'confirmationRoll0', 'value': `[[${data["rolls"][0]}]]` } );
 				defaultElements.push( { 'name': 'confirmationRoll1', 'value': `[[${data["rolls"][1]}]]` } );
 				defaultElements.push( { 'name': 'confirmationRoll2', 'value': `[[${data["rolls"][2]}]]` } );
+			} else {
+				defaultElements.push( { 'name': 'confirmationRoll0', 'value': "[[1d0]]" } );
+				defaultElements.push( { 'name': 'confirmationRoll1', 'value': "[[1d0]]" } );
+				defaultElements.push( { 'name': 'confirmationRoll2', 'value': "[[1d0]]" } );
 			}
 
 			// Roll Modifiers
@@ -1372,31 +1376,32 @@ on(
 					passthrough["isConfirmationRoll"] = 1;
 					passthrough["confirmationRollRequired"] = 1;
 					passthrough["showRollTag"] = allElementsObject["showRollTag"];
-					passthrough["rollMacro"] =
-						allElements[0]["prefix"] + " " +
-						"{{name=" + data["ui"] + "}} " +
-						"{{mod=[[" + mod + "]]}} " +
-						"{{ansage=[[" + ansage + "]]}} " +
-						"{{wert=[[" + wert + "]]}} " +
-						"{{taw=[[" + taw + "]]}} " +
-						allElementsObject["roll0"] +
-						allElementsObject["roll1"] +
-						allElementsObject["roll2"] +
-						allElementsObject["confirmationRoll0"] +
-						allElementsObject["confirmationRoll1"] +
-						allElementsObject["confirmationRoll2"] +
-						"{{msg=[[0]]}} " +
-						"{{characterid=" + v["character_id"] + "}} " +
-						"{{charactername=" + v["character_name"] + "}} " +
-						"{{result=[[0]]}} " +
-						"{{isConfirmationRoll=[[1]]}} " +
-						"{{confirmationRollRequired=[[1]]}} " +
-						"{{showRollTag=[[@{show_roll_tags}]]}} " +
-						"{{rollTag=[[0]]}} " +
-						"{{rollTime=[[0]]}} " +
-						"{{rollExpired=[[0]]}} " +
-						"{{rollTimeHuman=[[0]]}} " +
-						"{{passthrough=[[0]]}}";
+					passthrough["rollMacro"] = [
+						allElements[0]["prefix"],
+						"{{name=" + data["ui"] + "}}",
+						"{{mod=[[" + mod + "]]}}",
+						"{{ansage=[[" + ansage + "]]}}",
+						"{{wert=[[" + wert + "]]}}",
+						"{{taw=[[" + taw + "]]}}",
+						allElementsObject["roll0"],
+						allElementsObject["roll1"],
+						allElementsObject["roll2"],
+						allElementsObject["confirmationRoll0"],
+						allElementsObject["confirmationRoll1"],
+						allElementsObject["confirmationRoll2"],
+						"{{msg=[[0]]}}",
+						"{{characterid=" + v["character_id"] + "}}",
+						"{{charactername=" + v["character_name"] + "}}",
+						"{{result=[[0]]}}",
+						"{{isConfirmationRoll=[[1]]}}",
+						"{{confirmationRollRequired=[[1]]}}",
+						"{{showRollTag=[[@{show_roll_tags}]]}}",
+						"{{rollTag=[[0]]}}",
+						"{{rollTime=[[0]]}}",
+						"{{rollExpired=[[0]]}}",
+						"{{rollTimeHuman=[[0]]}}",
+						"{{passthrough=[[0]]}}"
+					].join(" ");
 					console.log("passthrough:", passthrough);
 				}
 			}

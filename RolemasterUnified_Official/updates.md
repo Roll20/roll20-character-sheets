@@ -1,3 +1,36 @@
+2024-04-14
+
+ - Fix bug in parseIntDefault to return the default if passed a 0
+ - Add test for parseIntDefault
+ - Roll buttons updated
+    - The die rolls with a modifier.
+    - The (skill) number rolls natural.
+ - Fix a layout issue on safari (I hope)
+
+2024-04-07
+
+  - Fix grammar when casting spells; "cast from Spells List, not casts Spell List"
+  - Weight Allowance calculation now shows
+  - Fix DB blocking calculation
+  - Talents:
+    - Fix change of tier tracking
+    - Make removal work
+    - Levelup Talents now persist
+  - Fix typo on 'received'
+
+2024-03-31
+
+ - More roll template improvements
+    - Generalize
+    - Fix dynamic specializations
+ - Initiative roller
+ - Spell & Spell Mastery rolls
+ - Add support for scr_misc
+    - support for eloquence and friends.
+ - Info and edit buttons merge
+ - Can edit names of Skill specialisations
+ - Levelup stat gain fix
+ 
 2024-03-26
 
  - Improvements to the roll template layout
