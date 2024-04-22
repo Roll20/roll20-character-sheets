@@ -32,3 +32,4 @@
 - All .standard-texts need to be spans
 - All .subtitle-texts need to be divs
 - All .title-texts need to be h2
+- Find way to check onload if an aspect should be burnt or not
