@@ -117,8 +117,10 @@ on("change:tend1 change:tend2 change:tend3", () => {
 });
 on("change:vault1 change:vault2 change:vault3", () => {
 	getAttrs(["vault1", "vault2", "vault3"], (values) => {
+		var newVal = parseValues(values, 'vault1') + parseValues(values, 'vault2') + parseValues(values, 'vault3');
+		console.log(`Valut: ${newVal}`);
 		setAttrs({
-			'vault': parseValues(values, 'vault1') + parseValues(values, 'vault2') + parseValues(values, 'vault3')
+			'vault': newVal
 		});
 	});
 });
@@ -128,4 +130,29 @@ on("change:wavewalk1 change:wavewalk2 change:wavewalk3", () => {
 			'wavewalk': parseValues(values, 'wavewalk1') + parseValues(values, 'wavewalk2') + parseValues(values, 'wavewalk3')
 		});
 	});
+});
+// This sets the burn on all aspects with the same number
+// The $20query isn't good for repeating things
+// Will have to look into how the 5e does adv/disadv to see if I can get something
+// like that to work here but for normal/burn
+//$20('.repitem .aspect_container .burnable').on('click', (e) => {
+//	console.log(e);
+//	const burn = e.shiftKey ? 'burn' : '';
+//	console.log(burn);
+//	var attr = e.htmlAttributes.name.replace('attr_', '');
+//	getAttrs([attr], (values) => {
+//		var is_checked = parseValues(values, attr) == 1;
+//		console.log(parseValues(values, attr))
+//		console.log(is_checked);
+//		if (is_checked) {
+//			$20(`.${attr}`).addClass(burn);
+//		} else {
+//			$20(`.${attr}`).removeClass('burn');
+//		}
+//	})
+//})
+$20('.header .tab_button').on('click', (e) => {
+	const tab = e.htmlAttributes['data-tab'];
+	$20('div[data-tab]').removeClass('active');
+	$20(`div[data-tab=${tab}]`).addClass('active');
 });
