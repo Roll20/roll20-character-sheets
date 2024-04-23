@@ -1,0 +1,2150 @@
+<script type="text/worker">
+	function parseBool(bool) { return bool == "on"; }
+	function positive(value) { return (value < 0)? 0 : value; }
+
+	function clamp(value, min = 6, max = 12) {
+		if (value < min) {return min;}
+		else if (value > max) {return max;}
+		else {return value;}
+	}
+
+	function diceParse(baseDie, buffs, debuffs) {
+		var baseValue = parseInt(baseDie.replace('d',''), 10);
+		var finalModifier = (buffs - debuffs) *2;
+		return clamp(baseValue + finalModifier, 6, 12);
+	}
+
+	on('clicked:reset-fabula-text', function(eventInfo) {
+		getAttrs(['fabulaPoints'], function(v) {
+			if(v['fabulaPoints']>0){
+				startRoll(eventInfo.htmlAttributes.value, function(results){
+					finishRoll(results.rollId);
+					setAttrs({
+						fabulaPoints: v['fabulaPoints']-1,
+						spendFabulaText: ''
+					});
+				});
+			} else {
+				startRoll("&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Fabula Point}} {{name=Attempt to Spend Fabula Point}} {{genericParam1=Current Points}} {{genericValue1=[[@{fabulaPoints}]]}} {{desc=@{character_name} tried to spend Fabula Points, but they have none...}}", function(results){
+					finishRoll(results.rollId);
+					setAttrs({
+						spendFabulaText: ''
+					});
+				});
+			}
+		});
+	});
+
+	on('change:dexterity change:dexterityincreases change:slow change:enraged sheet:opened', function() {
+		getAttrs(["dexterity", "dexterityIncreases", "slow", "enraged"], function(values) {
+			var debuffValue = (parseBool(values.slow)?1:0)+(parseBool(values.enraged)?1:0);
+			var buffValue = positive(parseInt(values.dexterityIncreases));
+			var finalDie = diceParse(values.dexterity, buffValue, debuffValue);
+			setAttrs({
+				dexterityIncreases: buffValue,
+				hiddenCurrentDexterity: String(finalDie)
+			});
+		});
+	});
+
+	on('change:insight change:insightincreases change:dazed change:enraged sheet:opened', function() {
+		getAttrs(["insight", "insightIncreases", "dazed", "enraged"], function(values) {
+			var debuffValue = (parseBool(values.dazed)?1:0)+(parseBool(values.enraged)?1:0);
+			var buffValue = positive(parseInt(values.insightIncreases));
+			var finalDie = diceParse(values.insight, buffValue, debuffValue);
+			setAttrs({
+				insightIncreases: buffValue,
+				hiddenCurrentInsight: String(finalDie)
+			});
+		});
+	});
+
+	on('change:might change:mightincreases change:weak change:poisoned sheet:opened', function(){
+		getAttrs(["might", "mightIncreases", "weak", "poisoned"], function(values) {
+			var debuffValue = (parseBool(values.weak)?1:0)+(parseBool(values.poisoned)?1:0);
+			var buffValue = positive(parseInt(values.mightIncreases));
+			var finalDie = diceParse(values.might, buffValue, debuffValue);
+			setAttrs({
+				mightIncreases: buffValue,
+				hiddenCurrentMight: String(finalDie)
+			});
+		});
+	});
+
+	on('change:willpower change:willpowerincreases change:shaken change:poisoned sheet:opened', function() {
+		getAttrs(["willpower", "willpowerIncreases", "shaken", "poisoned"], function(values) {
+			var debuffValue = (parseBool(values.shaken)?1:0)+(parseBool(values.poisoned)?1:0);
+			var buffValue = positive(parseInt(values.willpowerIncreases));
+			var finalDie = diceParse(values.willpower, buffValue, debuffValue);
+			setAttrs({
+				willpowerIncreases: buffValue,
+				hiddenCurrentWillpower: String(finalDie)
+			});
+		});
+	});
+
+	on('change:hiddencurrentdexterity change:addeddefense change:armordefense change:shielddefense sheet:opened', function(){
+		getAttrs(["hiddenCurrentDexterity", "addedDefense", "armorDefense", "shieldDefense"], function(values){
+			if (values.shieldDefense.startsWith("+")) {
+				values.shieldDefense = values.shieldDefense.substring(1);
+			}
+			if (values.armorDefense.startsWith("+")) {
+				//if armor start with '+'
+				var defenseBonus = values.armorDefense.substring(1);
+				setAttrs({
+					hiddenDefense: (parseInt(values.hiddenCurrentDexterity) + parseInt(values.addedDefense) + parseInt(defenseBonus) + parseInt(values.shieldDefense))
+				});
+			} else {
+				setAttrs({
+					hiddenDefense: (parseInt(values.armorDefense) + parseInt(values.addedDefense) + parseInt(values.shieldDefense))
+				});
+			}
+		});
+	});
+
+	on('change:hiddencurrentinsight change:addedmagicdefense change:armorresist change:shieldresist sheet:opened', function(){
+		getAttrs(["hiddenCurrentInsight", "addedMagicDefense", "armorResist", "shieldResist"], function(values) {
+			if (values.shieldResist.startsWith("+")) {
+				values.shieldResist = values.shieldResist.substring(1);
+			}
+			if (values.armorResist.startsWith("+")) {
+				//if magicArmor start with '+'
+				var resistBonus = values.armorResist.substring(1);
+				setAttrs({
+					hiddenMagicDefense: (parseInt(values.hiddenCurrentInsight) + parseInt(values.addedMagicDefense) + parseInt(resistBonus) + parseInt(values.shieldResist))
+				});
+			} else {
+				setAttrs({
+					hiddenMagicDefense: (parseInt(values.armorResist) + parseInt(values.addedMagicDefense) + parseInt(values.shieldResist))
+				});
+			}
+		});
+	});
+
+	on('change:repeating_charclasses remove:repeating_charclasses ', function() {
+		getSectionIDs("charClasses", function(idArray) {
+			var attributesToGet = [];
+			idArray.forEach(id => {
+				attributesToGet.push(`repeating_charClasses_${id}_firstSkillLevel`);
+				attributesToGet.push(`repeating_charClasses_${id}_secondSkillLevel`);
+				attributesToGet.push(`repeating_charClasses_${id}_thirdSkillLevel`);
+				attributesToGet.push(`repeating_charClasses_${id}_fourthSkillLevel`);
+				attributesToGet.push(`repeating_charClasses_${id}_fifthSkillLevel`);
+			});
+			getAttrs(attributesToGet, function(values) {
+				var totalLevel = 0;
+				for (let value of Object.values(values)){
+					totalLevel += parseInt(value);
+				}
+				setAttrs({
+					hiddenTotalLevel: totalLevel
+				});
+			});
+		});
+		getSectionIDs("charClasses", function(idArray) {
+			var attributesToGet = [];
+			idArray.forEach(id => attributesToGet.push(`repeating_charClasses_${id}_classBonus`));
+			getAttrs(attributesToGet, function(values) {
+				var hpoints = 0;
+				var mpoints = 0;
+				var ipoints = 0;
+				for (let value of Object.values(values)) {
+					if (value == "HP")
+						hpoints++;
+					else if (value == "MP")
+						mpoints++;
+					else if (value == "IP")
+						ipoints++;
+				}
+				setAttrs({
+					hiddenBonusHitPoints: hpoints,
+					hiddenBonusMindPoints: mpoints,
+					hiddenBonusInventoryPoints: ipoints
+				});
+			});
+		});
+	});
+
+	//Get FU attribute name by using option value:
+	var getAttributeName = function(v){
+		var attrName = "???";
+		switch(v){
+			case "@{hiddenCurrentDexterity}":
+				attrName = "DEX";
+				break;
+
+			case "@{hiddenCurrentInsight}":
+				attrName = "INS";
+				break;
+
+			case "@{hiddenCurrentMight}":
+				attrName = "MIG";
+				break;
+
+			case "@{hiddenCurrentWillpower}":
+				attrName = "WLP";
+				break;
+		}
+		return attrName;
+	};
+
+	//Makes several attributes for rolls knowable.
+	var targetDictionary = {
+		mainweaponfirstattribute: ["mainWeaponFirstAttribute","mainWeaponAttr1Name"],
+		mainweaponsecondattribute: ["mainWeaponSecondAttribute","mainWeaponAttr2Name"],
+		offweaponfirstattribute: ["offWeaponFirstAttribute","offWeaponAttr1Name"],
+		offweaponsecondattribute: ["offWeaponSecondAttribute","offWeaponAttr2Name"],
+		genericrollfirstattribute: ["genericRollFirstAttribute","genericRollAttr1Name"],
+		genericrollsecondattribute: ["genericRollSecondAttribute","genericRollAttr2Name"]
+    };
+	on('change:mainWeaponFirstAttribute change:mainWeaponSecondAttribute change:offWeaponFirstAttribute change:offWeaponSecondAttribute change:genericRollFirstAttribute change:genericRollSecondAttribute', function(eventInfo) {
+		source = eventInfo.sourceAttribute;
+		getAttrs([targetDictionary[source][0]], function(values) {
+			var attrName = getAttributeName(values[targetDictionary[source][0]]);
+			setAttrs({
+				[targetDictionary[source][1]]: attrName
+			});
+		});
+    });
+    //Same as above but for repeating fieldsets.
+    var targetRepeatingDictionary = {
+		additionalweaponfirstattribute: ["additionalWeaponFirstAttribute","additionalWeaponAttr1Name"],
+		additionalweaponsecondattribute: ["additionalWeaponSecondAttribute","additionalWeaponAttr2Name"],
+		offensivespellfirstattribute: ["offensiveSpellFirstAttribute","offensiveSpellAttr1Name"],
+		offensivespellsecondattribute: ["offensiveSpellSecondAttribute","offensiveSpellAttr2Name"],
+		ritualfirstattribute: ["ritualFirstAttribute","ritualAttr1Name"],
+		ritualsecondattribute: ["ritualSecondAttribute","ritualAttr2Name"],
+		genericrollfirstattribute: ["genericRollFirstAttribute","genericRollAttr1Name"],
+		genericrollsecondattribute: ["genericRollSecondAttribute","genericRollAttr2Name"]
+    };
+    on('change:repeating_weapons:additionalWeaponFirstAttribute change:repeating_weapons:additionalWeaponSecondAttribute change:repeating_offensivespells:offensiveSpellFirstAttribute change:repeating_offensivespells:offensiveSpellSecondAttribute change:repeating_rituals:ritualFirstAttribute change:repeating_rituals:ritualSecondAttribute change:repeating_rolls:genericRollFirstAttribute change:repeating_rolls:genericRollSecondAttribute', function(eventInfo) {
+        var sourceName = eventInfo.sourceAttribute.split('_');
+        getAttrs(["repeating_"+sourceName[1]+"_"+targetRepeatingDictionary[sourceName[3]][0]], function(values) {
+			var attrName = getAttributeName(values["repeating_"+sourceName[1]+"_"+targetRepeatingDictionary[sourceName[3]][0]]);
+			setAttrs({
+				["repeating_"+sourceName[1]+"_"+targetRepeatingDictionary[sourceName[3]][1]]: attrName
+			});
+		});
+    });
+
+    //Spare Equipment: hide the incorrect button.
+    on('change:repeating_spareEquipments:spareEquipType', function() {
+		getAttrs(["repeating_spareequipments_spareEquipType"], function(value) {
+			setAttrs({
+				repeating_spareequipments_spareEquipToggleSwapBtn: value["repeating_spareequipments_spareEquipType"]
+			});
+		});
+    });
+
+	//Tabs Handler
+	const buttonlist = ["character","stats","equipment","backpack","classes","magic","journal","ahf","rolls"];
+	buttonlist.forEach(button => {
+		on(`clicked:${button}`, function() {
+			setAttrs({
+				sheetTab: button
+			});
+		});
+	});
+
+	//Swap Spare Weapons
+	on('clicked:repeating_weapons:change-weapon-main clicked:repeating_weapons:change-weapon-off', function(eventInfo) {
+		var rowid = eventInfo.sourceAttribute.split('_')[2];
+		var hand = eventInfo.sourceAttribute.split('_')[3].split("-")[2];
+		getAttrs([hand+'WeaponName',hand+'WeaponCategory',hand+'WeaponMartial',hand+'WeaponFirstAttribute',hand+'WeaponSecondAttribute',hand+'WeaponAccuracy',hand+'WeaponDamage',hand+'WeaponDamageType',hand+'WeaponGrip',hand+'WeaponRange',hand+'WeaponDescription'], function(i) {
+			getAttrs(['repeating_weapons_'+rowid+'_additionalWeaponName','repeating_weapons_'+rowid+'_additionalWeaponCategory','repeating_weapons_'+rowid+'_additionalWeaponMartial','repeating_weapons_'+rowid+'_additionalWeaponFirstAttribute','repeating_weapons_'+rowid+'_additionalWeaponSecondAttribute','repeating_weapons_'+rowid+'_additionalWeaponAccuracy','repeating_weapons_'+rowid+'_additionalWeaponDamage','repeating_weapons_'+rowid+'_additionalWeaponDamageType','repeating_weapons_'+rowid+'_additionalWeaponGrip','repeating_weapons_'+rowid+'_additionalWeaponRange','repeating_weapons_'+rowid+'_additionalWeaponDescription'], function(j) {
+				setAttrs({
+					['repeating_weapons_'+rowid+'_additionalWeaponName']: i[hand+'WeaponName'],
+					['repeating_weapons_'+rowid+'_additionalWeaponCategory']: i[hand+'WeaponCategory'],
+					['repeating_weapons_'+rowid+'_additionalWeaponMartial']: i[hand+'WeaponMartial'],
+					['repeating_weapons_'+rowid+'_additionalWeaponFirstAttribute']: i[hand+'WeaponFirstAttribute'],
+					['repeating_weapons_'+rowid+'_additionalWeaponSecondAttribute']: i[hand+'WeaponSecondAttribute'],
+					['repeating_weapons_'+rowid+'_additionalWeaponAccuracy']: i[hand+'WeaponAccuracy'],
+					['repeating_weapons_'+rowid+'_additionalWeaponDamage']: i[hand+'WeaponDamage'],
+					['repeating_weapons_'+rowid+'_additionalWeaponDamageType']: i[hand+'WeaponDamageType'],
+					['repeating_weapons_'+rowid+'_additionalWeaponGrip']: i[hand+'WeaponGrip'],
+					['repeating_weapons_'+rowid+'_additionalWeaponRange']: i[hand+'WeaponRange'],
+					['repeating_weapons_'+rowid+'_additionalWeaponDescription']: i[hand+'WeaponDescription'],
+					[hand+'WeaponName']: j['repeating_weapons_'+rowid+'_additionalWeaponName'],
+					[hand+'WeaponCategory']: j['repeating_weapons_'+rowid+'_additionalWeaponCategory'],
+					[hand+'WeaponMartial']: j['repeating_weapons_'+rowid+'_additionalWeaponMartial'],
+					[hand+'WeaponFirstAttribute']: j['repeating_weapons_'+rowid+'_additionalWeaponFirstAttribute'],
+					[hand+'WeaponSecondAttribute']: j['repeating_weapons_'+rowid+'_additionalWeaponSecondAttribute'],
+					[hand+'WeaponAccuracy']: j['repeating_weapons_'+rowid+'_additionalWeaponAccuracy'],
+					[hand+'WeaponDamage']: j['repeating_weapons_'+rowid+'_additionalWeaponDamage'],
+					[hand+'WeaponDamageType']: j['repeating_weapons_'+rowid+'_additionalWeaponDamageType'],
+					[hand+'WeaponGrip']: j['repeating_weapons_'+rowid+'_additionalWeaponGrip'],
+					[hand+'WeaponRange']: j['repeating_weapons_'+rowid+'_additionalWeaponRange'],
+					[hand+'WeaponDescription']: j['repeating_weapons_'+rowid+'_additionalWeaponDescription']
+				});
+			});
+		});
+	});
+
+	//Swap Spare Equipments
+	on('clicked:repeating_spareEquipments:change-armor clicked:repeating_spareEquipments:change-shield clicked:repeating_spareAccessories:change-accessory', function(eventInfo) {
+		var rowid = eventInfo.sourceAttribute.split('_')[2];
+		var equipment = eventInfo.sourceAttribute.split('_')[3].split("-")[1];
+		if(equipment=="accessory"){
+			getAttrs(['accessoryName','accessoryDescription'], function(i) {
+				getAttrs(['repeating_spareaccessories_'+rowid+'_spareAccessoryName','repeating_spareaccessories_'+rowid+'_spareAccessoryDescription'], function(j) {
+					setAttrs({
+						['repeating_spareaccessories_'+rowid+'_spareAccessoryName']: i['accessoryName'],
+						['repeating_spareaccessories_'+rowid+'_spareAccessoryDescription']: i['accessoryDescription'],
+						accessoryName: j['repeating_spareaccessories_'+rowid+'_spareAccessoryName'],
+						accessoryDescription: j['repeating_spareaccessories_'+rowid+'_spareAccessoryDescription']
+					});
+				});
+			});
+		} else {
+			getAttrs([equipment+'Name',equipment+'Martial',equipment+'Initiative',equipment+'Defense',equipment+'Resist',equipment+'Description'], function(i) {
+				getAttrs(['repeating_spareequipments_'+rowid+'_spareEquipName','repeating_spareequipments_'+rowid+'_spareEquipMartial','repeating_spareequipments_'+rowid+'_spareEquipInitiative','repeating_spareequipments_'+rowid+'_spareEquipDefense','repeating_spareequipments_'+rowid+'_spareEquipResist','repeating_spareequipments_'+rowid+'_spareEquipDescription','repeating_spareequipments_'+rowid+'_spareEquipType'], function(j) {
+					if(equipment==j['repeating_spareequipments_'+rowid+'_spareEquipType'].toLowerCase()){
+						setAttrs({
+							['repeating_spareequipments_'+rowid+'_spareEquipName']: i[equipment+'Name'],
+							['repeating_spareequipments_'+rowid+'_spareEquipMartial']: i[equipment+'Martial'],
+							['repeating_spareequipments_'+rowid+'_spareEquipInitiative']: i[equipment+'Initiative'],
+							['repeating_spareequipments_'+rowid+'_spareEquipDefense']: i[equipment+'Defense'],
+							['repeating_spareequipments_'+rowid+'_spareEquipResist']: i[equipment+'Resist'],
+							['repeating_spareequipments_'+rowid+'_spareEquipDescription']: i[equipment+'Description'],
+							[equipment+'Name']: j['repeating_spareequipments_'+rowid+'_spareEquipName'],
+							[equipment+'Martial']: j['repeating_spareequipments_'+rowid+'_spareEquipMartial'],
+							[equipment+'Initiative']: j['repeating_spareequipments_'+rowid+'_spareEquipInitiative'],
+							[equipment+'Defense']: j['repeating_spareequipments_'+rowid+'_spareEquipDefense'],
+							[equipment+'Resist']: j['repeating_spareequipments_'+rowid+'_spareEquipResist'],
+							[equipment+'Description']: j['repeating_spareequipments_'+rowid+'_spareEquipDescription']
+						});
+					}
+				});
+			});
+		}
+	});
+</script>
+<rolltemplate class="sheet-rolltemplate-Attack">
+	<div class="sheet-template-nameplate">
+		<h6 class="sheet-text-center"><strong>{{charName}}</strong></h6>
+	</div>
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			{{#dice1}}<h2>**Weapon Attack**</h2>{{/dice1}}{{^dice1}}<h2>**Weapon Stats**</h2>{{/dice1}}
+			<h3 class="sheet-text-center">**{{weaponName}}**</h3>
+			<div class="sheet-template-line sheet-text-center">
+				<h4>
+				{{#weaponCategory}}
+				**{{weaponCategory}}**
+				{{#weaponRange}}
+				-
+				{{/weaponRange}}
+				{{/weaponCategory}}
+				{{#weaponRange}}
+				**{{weaponRange}}**
+				{{/weaponRange}}
+				</h4>
+				{{#weaponGrip}}
+				<h6>[{{weaponGrip}}{{#weaponMartial}} - {{weaponMartial}}{{/weaponMartial}}]</h6>
+				{{/weaponGrip}}
+			</div>
+		</div>
+		<hr />
+		<div class="Attack">**Attack:** {{^dice1}}<span class="sheet-gray-text">**{{/dice1}}{{attack}}{{^dice1}}**</span>{{/dice1}}</div>
+
+		{{^dice1}}
+		<hr /><div class="Damages">**Damage: <span class="sheet-gray-text">[HR + {{weaponDamage}}] &nbsp;({{damageType}})</span>**</div>
+		{{/dice1}}
+
+		{{#rollTotal() dice2 dice1}}
+		<br/>
+		{{#^rollWasFumble() dice1}}
+
+		{{#rollGreater() dice1 5}}
+		<div class="sheet-critical-success">**Critical Success!**</div>
+		{{/rollGreater() dice1 5}}
+
+		{{#^rollGreater() dice1 5}}
+		<div class="sheet-doubles-indicator">**Doubles!**</div>
+		{{/^rollGreater() dice1 5}}
+
+		<hr /><div class="Damages">**Damage: {{dice1}} + {{weaponDamage}} <span class="sheet-gray-text">&nbsp;({{damageType}})</span>**</div>
+
+		{{/^rollWasFumble() dice1}}
+
+		{{#rollWasFumble() dice1}}
+		<div class="sheet-critical-fail">**Critical Fail!**</div>
+		{{/rollWasFumble() dice1}}
+
+		{{/rollTotal() dice2 dice1}}
+
+		{{#rollGreater() dice1 dice2}}
+		<hr /><div class="Damages">**Damage: {{dice1}} + {{weaponDamage}} <span class="sheet-gray-text">&nbsp;({{damageType}})</span>**</div>
+		{{/rollGreater() dice1 dice2}}
+		{{#rollGreater() dice2 dice1}}
+		<hr /><div class="Damages">**Damage: {{dice2}} + {{weaponDamage}} <span class="sheet-gray-text">&nbsp;({{damageType}})</span>**</div>
+		{{/rollGreater() dice2 dice1}}
+
+		{{#desc}}<hr /><div class="description">**Description:** {{desc}}</div>{{/desc}}
+	</div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-Magic">
+	<div class="sheet-template-nameplate">
+		<h6 class="sheet-text-center"><strong>{{charName}}</strong></h6>
+	</div>
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			<h2>**{{magicTitle}}**</h2>
+			<h3 class="sheet-text-center">**{{spellName}}** </h3>
+			{{#spellCost}}
+			<br/>
+			<div class="sheet-template-line">
+				<h4>**MP Cost: {{spellCost}}**</h4>
+				{{#spellTarget}}<h4>**Target: {{spellTarget}}**</h4>{{/spellTarget}}
+				{{#spellDuration}}<h4>**Duration: {{spellDuration}}**</h4>{{/spellDuration}}
+			</div>
+			{{/spellCost}}
+		</div>
+
+		{{#magicAttack}}
+		<hr/>
+		<div class="Magic-Attack">**Magic Check:** {{^dice1}}<span class="sheet-gray-text">**{{/dice1}}{{magicAttack}}{{^dice1}}**</span>{{/dice1}}</div>
+
+		{{^dice1}}
+		{{#magicDamage}}
+		<hr /><div class="Damages">**Damage: <span class="sheet-gray-text">[HR + {{magicDamage}}] &nbsp;({{magicDamageType}})</span>**</div>
+		{{/magicDamage}}
+		{{/dice1}}
+
+		{{#dice1}}
+		{{#dice2}}
+
+		{{#rollTotal() dice2 dice1}}
+		<br/>
+		{{#^rollWasFumble() dice1}}
+
+		{{#rollGreater() dice1 5}}
+		<div class="sheet-critical-success">**Critical Success!**</div>
+		{{/rollGreater() dice1 5}}
+
+		{{#^rollGreater() dice1 5}}
+		<div class="sheet-doubles-indicator">**Doubles!**</div>
+		{{/^rollGreater() dice1 5}}
+
+		{{#magicDamage}}
+		<hr /><div class="Damages">**Damage: {{dice1}} + {{magicDamage}} <span class="sheet-gray-text">&nbsp;({{magicDamageType}})</span>**</div>
+		{{/magicDamage}}
+
+		{{/^rollWasFumble() dice1}}
+
+		{{#rollWasFumble() dice1}}
+		<div class="sheet-critical-fail">**Critical Fail!**</div>
+		{{/rollWasFumble() dice1}}
+
+		{{/rollTotal() dice2 dice1}}
+
+		{{#rollGreater() dice1 dice2}}
+		{{#magicDamage}}
+		<hr /><div class="Damages">**Damage: {{dice1}} + {{magicDamage}} <span class="sheet-gray-text">&nbsp;({{magicDamageType}})</span>**</div>
+		{{/magicDamage}}
+		{{/rollGreater() dice1 dice2}}
+		{{#rollGreater() dice2 dice1}}
+		{{#magicDamage}}
+		<hr /><div class="Damages">**Damage: {{dice2}} + {{magicDamage}} <span class="sheet-gray-text">&nbsp;({{magicDamageType}})</span>**</div>
+		{{/magicDamage}}
+		{{/rollGreater() dice2 dice1}}
+		{{/dice2}}
+		{{/dice1}}
+		{{/magicAttack}}
+
+		{{#magicEffect}}<hr /><div class="description">**Effect:** {{magicEffect}}</div>{{/magicEffect}}
+	</div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-Checks">
+	<div class="sheet-template-nameplate">
+		<h6 class="sheet-text-center"><strong>{{charName}}</strong></h6>
+	</div>
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			<h2>**Check**</h2>
+			<h3 class="sheet-text-center">**{{name}}**</h3>
+			{{#attrs}}
+			<div class="sheet-template-line sheet-text-center">
+				<h4>{{attrs}}</h4>
+			</div>
+			{{/attrs}}
+		</div>
+
+		<hr/>
+		<div class="Skill-Result">**Result:** {{total}}</div>
+
+		{{#rollTotal() dice2 dice1}}
+		<br/>
+		{{#^rollWasFumble() dice1}}
+
+		{{#rollGreater() dice1 5}}
+		<div class="sheet-critical-success">**Critical Success!**</div>
+		{{/rollGreater() dice1 5}}
+
+		{{#^rollGreater() dice1 5}}
+		<div class="sheet-doubles-indicator">**Doubles!**</div>
+		{{/^rollGreater() dice1 5}}
+
+		{{/^rollWasFumble() dice1}}
+
+		{{#rollWasFumble() dice1}}
+		<div class="sheet-critical-fail">**Critical Fail!**</div>
+		{{/rollWasFumble() dice1}}
+
+		{{/rollTotal() dice2 dice1}}
+	</div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-Generic">
+	<div class="sheet-template-nameplate">
+		<h6 class="sheet-text-center"><strong>{{charName}}</strong></h6>
+	</div>
+	<div class="sheet-template-container sheet-frame">
+		<div class="sheet-template-header">
+			<h2>**{{genericTitle}}**</h2>
+			<h3 class="sheet-text-center">
+				**{{name}}**
+			</h3>
+			{{#level}}
+			<div class="sheet-template-line sheet-text-center">
+				<h5><strong>[Lvl {{level}}]</strong></h5>
+			</div>
+			{{/level}}
+
+			{{#genericType}}
+			<div class="sheet-template-line sheet-text-center">
+				<h4>**{{genericType}}**</h4>
+				{{#genericType2}}
+				<h4>**{{genericType2}}**</h4>
+				{{/genericType2}}
+			</div>
+			{{/genericType}}
+
+			{{#genericValue1}}
+			<br/>
+			<div class="sheet-template-line">
+				<h4>**{{genericParam1}}: {{genericValue1}}**</h4>
+				{{#genericValue2}}
+				<h4>**{{genericParam2}}: {{genericValue2}}**</h4>
+				{{/genericValue2}}
+				{{#genericValue3}}
+				<h4>**{{genericParam3}}: {{genericValue3}}**</h4>
+				{{/genericValue3}}
+			</div>
+			{{/genericValue1}}
+		</div>
+
+		{{#genericRoll}}
+		<hr/>
+		<div class="Generic-Result">**Result:** {{genericRoll}}</div>
+		{{/genericRoll}}
+
+		{{#desc}}
+		<hr/>
+		<div class="description">**Description:** {{desc}}</div>
+		{{/desc}}
+
+		{{#trigger}}
+		<hr/>
+		{{#triggerType}}
+		<h4>**{{triggerType}}**</h4>
+		{{/triggerType}}
+		<div class="description">**Trigger:** {{trigger}}</div>
+		{{/trigger}}
+
+		{{#effect}}
+		<hr/>
+		{{#effectType}}
+		<h4>**{{effectType}}**</h4>
+		{{/effectType}}
+		<div class="description">**Effects:** {{effect}}</div>
+		{{/effect}}
+	</div>
+</rolltemplate>
+<div>
+	<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="character" />
+	<img class="leftfloat header-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/fabula-ultima-transparent-logo.png">
+	<img class="rightfloat header-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/fabula-ultima-transparent-logo.png">
+	<div class="sheet-tab-buttons">
+		<button type="action" class="toggle-button" name="act_character">Character</button>
+		<button type="action" class="toggle-button" name="act_stats">Stats</button>
+		<button type="action" class="toggle-button" name="act_equipment">Equipment</button>
+		<button type="action" class="toggle-button" name="act_backpack">Backpack</button>
+		<button type="action" class="toggle-button" name="act_classes">Classes</button>
+		<button type="action" class="toggle-button" name="act_magic">Magic</button>
+		<button type="action" class="toggle-button" name="act_journal">Journal</button>
+		<button type="action" class="toggle-button" name="act_ahf">AHF</button>
+		<button type="action" class="toggle-button" name="act_rolls">Rolls</button>
+	</div>
+	<div class="clearfloat"></div>
+	<div class="sheet-character">
+		<h1 class="tabs-title">Character</h1>
+		<div class="tab up">
+			<div class="column left">
+				<div class="frame charTraits">
+					<div>
+						<label class="button-label">Traits</label>
+						<button class="button-fix" type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Character Traits}} {{name=@{characterName}}} {{genericParam1=Identity}} {{genericValue1=@{characterIdentity}}} {{genericParam2=Theme}} {{genericValue2=@{characterTheme}}} {{genericParam3=Origin}} {{genericValue3=@{characterOrigin}}}"></button>
+					</div>
+					<div class="name"> Name <input type="text" name="attr_characterName" /></div>
+					<div class="identity">Identity <input type="text" name="attr_characterIdentity" value="" /></div>
+					<div class="theme">Theme <input type="text" name="attr_characterTheme" value="" /></div>
+					<div class="origin">Origin <input type="text" name="attr_characterOrigin" value="" /></div>
+				</div>
+				<div class="frame charBonds">
+					<label>Bonds</label>
+					<div class="grid">
+						<div class="tab">
+							<div class="inline-display">
+								<div class="full-width">
+									Bond 1
+									<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Bond 1}} {{name=@{firstBondName}}} {{genericParam1=Emotion 1}} {{genericValue1=@{firstBondEmotion1}}} {{genericParam2=Emotion 2}} {{genericValue2=@{firstBondEmotion2}}} {{genericParam3=Emotion 3}} {{genericValue3=@{firstBondEmotion3}}} {{desc=@{firstBondDescription}}}"></button>
+									<input type="text" name="attr_firstBondName" placeholder="Bond Name" />
+								</div>
+								<div>
+									<select name="attr_firstBondEmotion1">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_firstBondEmotion2">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_firstBondEmotion3">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+								</div>
+							</div>
+							<div class="textarea-wrapper">
+								Description <textarea name="attr_firstBondDescription"></textarea>
+							</div>
+							<hr/>
+							<div class="inline-display">
+								<div class="full-width">
+									Bond 2
+									<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Bond 2}} {{name=@{secondBondName}}} {{genericParam1=Emotion 1}} {{genericValue1=@{secondBondEmotion1}}} {{genericParam2=Emotion 2}} {{genericValue2=@{secondBondEmotion2}}} {{genericParam3=Emotion 3}} {{genericValue3=@{secondBondEmotion3}}} {{desc=@{secondBondDescription}}}"></button>
+									<input type="text" name="attr_secondBondName" placeholder="Bond Name" />
+								</div>
+								<div>
+									<select name="attr_secondBondEmotion1">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_secondBondEmotion2">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_secondBondEmotion3">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+								</div>
+							</div>
+							<div class="textarea-wrapper">
+								Description <textarea name="attr_secondBondDescription"></textarea>
+							</div>
+							<hr/>
+							<div class="inline-display">
+								<div class="full-width">
+									Bond 3
+									<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Bond 3}} {{name=@{thirdBondName}}} {{genericParam1=Emotion 1}} {{genericValue1=@{thirdBondEmotion1}}} {{genericParam2=Emotion 2}} {{genericValue2=@{thirdBondEmotion2}}} {{genericParam3=Emotion 3}} {{genericValue3=@{thirdBondEmotion3}}} {{desc=@{thirdBondDescription}}}"></button>
+									<input type="text" name="attr_thirdBondName" placeholder="Bond Name" />
+								</div>
+								<div>
+									<select name="attr_thirdBondEmotion1">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_thirdBondEmotion2">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_thirdBondEmotion3">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+								</div>
+							</div>
+							<div class="textarea-wrapper">
+								Description <textarea name="attr_thirdBondDescription"></textarea>
+							</div>
+						</div>
+						<div class="tab">
+							<div class="inline-display">
+								<div class="full-width">
+									Bond 4
+									<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Bond 4}} {{name=@{fourthBondName}}} {{genericParam1=Emotion 1}} {{genericValue1=@{fourthBondEmotion1}}} {{genericParam2=Emotion 2}} {{genericValue2=@{fourthBondEmotion2}}} {{genericParam3=Emotion 3}} {{genericValue3=@{fourthBondEmotion3}}} {{desc=@{fourthBondDescription}}}"></button>
+									<input type="text" name="attr_fourthBondName" placeholder="Bond Name" />
+								</div>
+								<div>
+									<select name="attr_fourthBondEmotion1">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_fourthBondEmotion2">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_fourthBondEmotion3">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+								</div>
+							</div>
+							<div class="textarea-wrapper">
+								Description <textarea name="attr_fourthBondDescription"></textarea>
+							</div>
+							<hr/>
+							<div class="inline-display">
+								<div class="full-width">
+									Bond 5
+									<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Bond 5}} {{name=@{fifthBondName}}} {{genericParam1=Emotion 1}} {{genericValue1=@{fifthBondEmotion1}}} {{genericParam2=Emotion 2}} {{genericValue2=@{fifthBondEmotion2}}} {{genericParam3=Emotion 3}} {{genericValue3=@{fifthBondEmotion3}}} {{desc=@{fifthBondDescription}}}"></button>
+									<input type="text" name="attr_fifthBondName" placeholder="Bond Name" />
+								</div>
+								<div>
+									<select name="attr_fifthBondEmotion1">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_fifthBondEmotion2">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_fifthBondEmotion3">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+								</div>
+							</div>
+							<div class="textarea-wrapper">
+								Description <textarea name="attr_fifthBondDescription"></textarea>
+							</div>
+							<hr/>
+							<div class="inline-display">
+								<div class="full-width">
+									Bond 6
+									<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Bond 6}} {{name=@{sixthBondName}}} {{genericParam1=Emotion 1}} {{genericValue1=@{sixthBondEmotion1}}} {{genericParam2=Emotion 2}} {{genericValue2=@{sixthBondEmotion2}}} {{genericParam3=Emotion 3}} {{genericValue3=@{sixthBondEmotion3}}} {{desc=@{sixthBondDescription}}}"></button>
+									<input type="text" name="attr_sixthBondName" placeholder="Bond Name" />
+								</div>
+								<div>
+									<select name="attr_sixthBondEmotion1">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_sixthBondEmotion2">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+									<br/>
+									<select name="attr_sixthBondEmotion3">
+										<option value="" selected="selected">---Select---</option>
+										<option class="fake-optgroup" disabled>Pairing 1</option>
+											<option value="Admiration">&nbsp;Admiration</option>
+											<option value="Inferiority">&nbsp;Inferiority</option>
+										<option class="fake-optgroup" disabled>Pairing 2</option>
+											<option value="Loyalty">&nbsp;Loyalty</option>
+											<option value="Mistrust">&nbsp;Mistrust</option>
+										<option class="fake-optgroup" disabled>Pairing 3</option>
+											<option value="Affection">&nbsp;Affection</option>
+											<option value="Hatred">&nbsp;Hatred</option>
+									</select>
+								</div>
+							</div>
+							<div class="textarea-wrapper">
+								Description <textarea name="attr_sixthBondDescription"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="charFabula no-frame">
+					<div class="grid">
+						<label>Fabula Points</label>
+						<input class="circle-container" type="number" name="attr_fabulaPoints" />
+						<ul class="info-left">
+							<li>+1 Fabula Point if you have none at the start of the session.</li>
+							<li>+1 Fabula Point when a Villain makes an entrance.</li>
+						</ul>
+						<ul class="info-right">
+							<li>+1 Fabula Point when you fumble a check.</li>
+							<li>+2 Fabula Point if you surrender at zero HP.</li>
+						</ul>
+					</div>
+					<ul>
+						<li>Spend 1 Fabula Point after performing a Check to invoke a trait to reroll one or both dice
+							(not a fumble).</li>
+						<li>Spend 1 Fabula Point after performing a Check to invoke a bond and add its strength to the
+							result (once per check).</li>
+						<li>Spend 1 Fabula Point to alter the story. If you alter an existing element, you need
+							permission from whoever introduced it.</li>
+					</ul>
+					<br/>
+					<div class="inline-display">
+						<input type="text" name="attr_spendFabulaText" value="" placeholder="Write here how you wish to spend a Fabula Point and click the button." />
+						<button class="act-roll width220" name="act_reset-fabula-text" type="action" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Fabula Point}} {{name=Spending Fabula Point}} {{genericParam1=Current Points}} {{genericValue1=[[@{fabulaPoints}]]}} {{genericParam2=After Spending}} {{genericValue2=[[@{fabulaPoints}-1]]}} {{desc=@{spendFabulaText}}}">Spend and Declare</button>
+					</div>
+				</div>
+				<div class="separation-line"></div>
+				<div class="charExperience no-frame">
+					<div class="grid">
+						<label>Experience Points</label>
+						<input type="number" class="circle-container" name="attr_experiencePoints" />
+						<div>
+							At the end of each session, you automatically gain 5 XP. Then :
+							<ul>
+								<li>Gain XP equal to [Fabula Points spent by the group / number of Player Characters]</li>
+								<li>Gain XP equal to [Ultima Points spent by Villains]</li>
+							</ul>
+							Finally if you have 10 or more XP, lose 10 XP and gain 1 level
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="sheet-stats">
+		<h1 class="tabs-title">Stats</h1>
+		<div class="tab down">
+			<div style="display: flex;">
+				<div class="half-width">
+					<div class="charGauges frame">
+						<label>Hit Points</label>
+						<div class="grid">
+							<div class="grid-current-hp">
+								<div>Current HP</div>
+								<input type="number" name="attr_HitPoints" value="0" />
+							</div>
+							<div class="grid-add-hp">
+								<div>Added HP</div>
+								<input type="number" name="attr_addedHitPoints" value="0" />
+								<input type="hidden" name="attr_hiddenBonusHitPoints" value="0" />
+							</div>
+							<div class="grid-crisis">
+								<div>Crisis</div>
+								<input type="number" name="attr_crisis" value="floor(@{HitPoints_max}/2)" disabled />
+							</div>
+							<div class="grid-hp">
+								<div>HP Max</div>
+								<input type="number" name="attr_HitPoints_max" value="(@{might}*5+@{addedHitPoints}+@{hiddenBonusHitPoints}*5+@{hiddenTotalLevel})" disabled />
+							</div>
+						</div>
+						<br/><br/>
+						<label>Mind Points</label>
+						<div class="grid">
+							<div class="grid-current-mp">
+								<div>Current MP</div>
+								<input type="number" name="attr_MindPoints" value="0" />
+							</div>
+							<div class="grid-add-mp">
+								<div>Added MP</div> <input type="number" name="attr_addedMindPoints" value="0" />
+								<input type="hidden" name="attr_hiddenBonusMindPoints" value="0" />
+							</div>
+							<div class="grid-mp">
+								<div>MP Max</div>
+								<input type="number" name="attr_MindPoints_max" value="(@{willpower}*5+@{addedMindPoints}+@{hiddenBonusMindPoints}*5+@{hiddenTotalLevel})" disabled />
+							</div>
+						</div>
+						<br/><br/>
+						<label>Inventory Points</label>
+						<div class="grid">
+							<div class="grid-current-ip">
+								<div>Current IP</div>
+								<input type="number" name="attr_InventoryPoints" value="0" />
+							</div>
+							<div class="grid-add-ip">
+								<div>Added IP</div> <input type="number" name="attr_addedInventoryPoints" value="0" />
+								<input type="hidden" name="attr_hiddenBonusInventoryPoints" value="0" />
+							</div>
+							<div class="grid-ip">
+								<div>IP Max</div>
+								<input type="number" name="attr_InventoryPoints_max" value="(6+@{addedInventoryPoints}+@{hiddenBonusInventoryPoints}*2)" disabled />
+							</div>
+						</div>
+					</div>
+					<div class="charDefenses frame">
+						<label>Initiative and Defenses</label><br/>
+						<div class="grid">
+							<div>
+								<div><button type="roll" name="roll_initiativeRoll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Initiative}} {{attrs=[DEX + INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + @{initiative}[baseInit] + @{shieldInitiative}[shieldInit] + ?{Modifier|0}[Modifier] ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}">Initiative</button></div>
+								<input type="number" name="attr_initiative" value="(@{addedInitiative}+@{armorInitiative})" disabled />
+							</div>
+							<div>
+								<div>Added Initiative</div>
+								<input type="number" name="attr_addedInitiative" value="0" />
+							</div>
+							<div>
+								<div>Defense</div>
+								<input type="number" name="attr_defense" value="(@{hiddenDefense})" disabled />
+							</div>
+							<div>
+								<div>Added Defense</div>
+								<input type="number" name="attr_addedDefense" value="0" />
+								<input type="hidden" name="attr_hiddenDefense" value="0" />
+							</div>
+							<div>
+								<div>Magic Defense</div>
+								<input type="number" name="attr_magicDefense" value="(@{hiddenMagicDefense})" disabled />
+							</div>
+							<div>
+								<div>Added Magical Def.</div>
+								<input type="number" name="attr_addedMagicDefense" value="0" />
+								<input type="hidden" name="attr_hiddenMagicDefense" value="0" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="half-width">
+					<div class="column right frame charAttribute">
+						<label>Attributes</label>
+						<div class="grid">
+							<div class="charAttribute char-dex">
+								<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Attribute Roll}} {{genericType=[d@{currentDexterity}]}} {{name=Dexterity}} {{genericRoll=[[d@{currentDexterity}]]}}"></button>
+								Dexterity <select name="attr_dexterity" value="8">
+									<option value="6">d6</option>
+									<option value="8" selected="selected">d8</option>
+									<option value="10">d10</option>
+									<option value="12">d12</option>
+								</select>
+								Buffs <input type="number" name="attr_dexterityIncreases" value="0" />
+								<input type="hidden" name="attr_hiddenCurrentDexterity" value="8" />
+								<br/>
+								Current Dexterity <input type="text" name="attr_currentDexterity" value="@{hiddenCurrentDexterity}" disabled title="Current Dexterity in use" />
+								<input type="hidden" name="attr_dexterityHiddenDebuffs" value="0" />
+								Slow <input type="checkbox" name="attr_slow" />
+							</div>
+							<div class="charAttribute char-ins">
+								<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Attribute Roll}} {{genericType=[d@{currentInsight}]}} {{name=Insight}} {{genericRoll=[[d@{currentInsight}]]}}"></button>
+								Insight <select name="attr_insight" value="8">
+									<option value="6">d6</option>
+									<option value="8" selected="selected">d8</option>
+									<option value="10">d10</option>
+									<option value="12">d12</option>
+								</select>
+								Buffs <input type="number" name="attr_insightIncreases" value="0" />
+								<input type="hidden" name="attr_hiddenCurrentInsight" value="8" />
+								<br/>
+								Current Insight <input type="text" name="attr_currentInsight" value="@{hiddenCurrentInsight}" disabled title="Current Insight in use" />
+								Dazed <input type="checkbox" name="attr_dazed" />
+							</div>
+							<div class="charAttribute char-might">
+								<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Attribute Roll}} {{genericType=[d@{currentMight}]}} {{name=Might}} {{genericRoll=[[d@{currentMight}]]}}"></button>
+								Might <select name="attr_might" value="8">
+									<option value="6">d6</option>
+									<option value="8" selected="selected">d8</option>
+									<option value="10">d10</option>
+									<option value="12">d12</option>
+								</select>
+								Buffs <input type="number" name="attr_mightIncreases" value="0" />
+								<input type="hidden" name="attr_hiddenCurrentMight" value="8" />
+								<br/>
+								Current Might <input type="text" name="attr_currentMight" value="@{hiddenCurrentMight}" disabled title="Current Might in use" />
+								Weak <input type="checkbox" name="attr_weak" />
+							</div>
+							<div class="charAttribute char-will">
+								<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Attribute Roll}} {{genericType=[d@{currentWillpower}]}} {{name=Willpower}} {{genericRoll=[[d@{currentWillpower}]]}}"></button>
+								Willpower <select name="attr_willpower" value="8">
+									<option value="6">d6</option>
+									<option value="8" selected="selected">d8</option>
+									<option value="10">d10</option>
+									<option value="12">d12</option>
+								</select>
+								Buffs <input type="number" name="attr_willpowerIncreases" value="0" />
+								<input type="hidden" name="attr_hiddenCurrentWillpower" value="8" />
+								<br/>
+								Current Willpower <input type="text" name="attr_currentWillpower" value="@{hiddenCurrentWillpower}" disabled title="Current Willpower in use" />
+								Shaken <input type="checkbox" name="attr_shaken" />
+							</div>
+							<div class="charAttribute char-rage">
+								Enraged <input type="checkbox" name="attr_enraged" />
+							</div>
+							<div class="charAttribute char-pois">
+								Poisoned <input type="checkbox" name="attr_poisoned" />
+							</div>
+						</div>
+					</div>
+					<div class="charAffinities frame">
+						<label>Affinities</label>
+						<div class="grid">
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg0_physical.png" />
+									Physical
+								</div>
+								<select name="attr_physicalAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg1_air.png" />
+									Air
+								</div>
+								<select name="attr_airAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg2_bolt.png" />
+									Bolt
+								</div>
+								<select name="attr_boltAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg3_dark.png" />
+									Dark
+								</div>
+								<select name="attr_darkAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg4_earth.png" />
+									Earth
+								</div>
+								<select name="attr_earthAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg5_fire.png" />
+									Fire
+								</div>
+								<select name="attr_fireAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg6_ice.png" />
+									Ice
+								</div>
+								<select name="attr_iceAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg7_light.png" />
+									Light
+								</div>
+								<select name="attr_lightAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+							<div>
+								<div>
+									<img class="affinity-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/dmg8_poison.png" />
+									Poison
+								</div>
+								<select name="attr_poisonAffinity">
+									<option value="Vulnerability">Vulnerability</option>
+									<option value="Normal" selected="selected">Normal</option>
+									<option value="Resistance">Resistance</option>
+									<option value="Immunity">Immunity</option>
+									<option value="Absorption">Absorption</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="charStatusImmunities frame">
+				<label>Status Immunities</label>
+				<div class="inline-display">
+					<div><input type="checkbox" name="attr_statusImmunitySlow" /> Slow</div>
+					<div><input type="checkbox" name="attr_statusImmunityDazed" /> Dazed</div>
+					<div><input type="checkbox" name="attr_statusImmunityWeak" /> Weak</div>
+					<div><input type="checkbox" name="attr_statusImmunityShaken" /> Shaken</div>
+					<div><input type="checkbox" name="attr_statusImmunityEnraged" /> Enraged</div>
+					<div><input type="checkbox" name="attr_statusImmunityPoisoned" /> Poisoned</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="sheet-equipment">
+		<h1 class="tabs-title">Equipment</h1>
+		<div class="charProficiencies frame">
+			<label>Allowed Equipment</label>
+			<div class="inline-display">
+				<div><input type="checkbox" name="attr_armorProficiency" /> Martial Armor</div>
+				<div><input type="checkbox" name="attr_shieldProficiency" /> Martial Shields</div>
+				<div><input type="checkbox" name="attr_meleeProficiency" /> Martial Melee Weapons</div>
+				<div><input type="checkbox" name="attr_rangedProficiency" /> Martial Ranged Weapons</div>
+			</div>
+		</div>
+		<div class="charWeapons frame">
+			<label>Weapons</label>
+			<div class="inline-display">
+				<div class="weapon no-frame half-width">
+					<label>Main Hand</label>
+					<input type="hidden" name="attr_mainWeaponAttr1Name" value="DEX" />
+					<input type="hidden" name="attr_mainWeaponAttr2Name" value="MIG" />
+					<div class="inline-display">
+						Name <input type="text" name="attr_mainWeaponName" value="" />
+						<button class="button-fix" type="roll" value="&{template:Attack} {{charName=@{character_name}}} {{weaponName=@{mainWeaponName}}} {{weaponCategory=@{mainWeaponCategory}}} {{weaponRange=@{mainWeaponRange}}} {{weaponGrip=@{mainWeaponGrip}}} {{weaponMartial=@{mainWeaponMartial}}} {{attack=[@{mainWeaponAttr1Name} + @{mainWeaponAttr2Name}] + @{mainWeaponAccuracy}}} {{weaponDamage=@{mainWeaponDamage}}} {{damageType=@{mainWeaponDamageType}}} {{desc=@{mainWeaponDescription}}}"></button>
+					</div>
+					<div class="inline-display">
+						Category <select class="full-width" name="attr_mainWeaponCategory">
+							<option value="Arcane">Arcane</option>
+							<option value="Brawling" selected="selected">Brawling</option>
+							<option value="Bow">Bow</option>
+							<option value="Dagger">Dagger</option>
+							<option value="Firearm">Firearm</option>
+							<option value="Flail">Flail</option>
+							<option value="Heavy">Heavy</option>
+							<option value="Spear">Spear</option>
+							<option value="Sword">Sword</option>
+							<option value="Thrown">Thrown</option>
+						</select>
+						<select name="attr_mainWeaponMartial">
+							<option value="" selected="selected">Non-Martial</option>
+							<option value="Martial">Martial</option>
+						</select>
+					</div>
+					<div class="inline-display">
+						<select class="full-width" name="attr_mainWeaponFirstAttribute" value="@{hiddenCurrentMight}">
+							<option value="@{hiddenCurrentDexterity}" selected>DEX</option>
+							<option value="@{hiddenCurrentInsight}">INS</option>
+							<option value="@{hiddenCurrentMight}">MIG</option>
+							<option value="@{hiddenCurrentWillpower}">WLP</option>
+						</select>
+						<select class="full-width" name="attr_mainWeaponSecondAttribute" value="@{hiddenCurrentDexterity}">
+							<option value="@{hiddenCurrentDexterity}">DEX</option>
+							<option value="@{hiddenCurrentInsight}">INS</option>
+							<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+							<option value="@{hiddenCurrentWillpower}">WLP</option>
+						</select>
+						+ <input type="number" name="attr_mainWeaponAccuracy" value="0" />
+						<button type="roll" value="&{template:Attack} [[ [[d@{mainWeaponFirstAttribute}]][d@{mainWeaponFirstAttribute}] + [[d@{mainWeaponSecondAttribute}]][d@{mainWeaponSecondAttribute}] + [[@{mainWeaponAccuracy}]][Acc.Bonus] ]] {{charName=@{character_name}}} {{weaponName=@{mainWeaponName}}} {{weaponCategory=@{mainWeaponCategory}}} {{weaponRange=@{mainWeaponRange}}} {{weaponGrip=@{mainWeaponGrip}}} {{weaponMartial=@{mainWeaponMartial}}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{attack=$[[3]]}} {{weaponDamage=@{mainWeaponDamage}}} {{damageType=@{mainWeaponDamageType}}} {{desc=@{mainWeaponDescription}}}">Accuracy</button>
+					</div>
+					<div class="inline-display">
+						<span class="width250">Damage [HR + <input type="number" name="attr_mainWeaponDamage" value="0" />]</span>
+						Type <select name="attr_mainWeaponDamageType">
+							<option value="Physical" selected="selected">Physical</option>
+							<option value="Air">Air</option>
+							<option value="Bolt">Bolt</option>
+							<option value="Dark">Dark</option>
+							<option value="Earth">Earth</option>
+							<option value="Fire">Fire</option>
+							<option value="Ice">Ice</option>
+							<option value="Light">Light</option>
+							<option value="Poison">Poison</option>
+							<option value="Typeless">Typeless</option>
+						</select>
+					</div>
+					<div class="inline-display">
+						Grip <select class="full-width" name="attr_mainWeaponGrip">
+							<option value="One-handed" selected>One-handed</option>
+							<option value="Two-handed">Two-handed</option>
+						</select>
+						Range <select class="full-width" name="attr_mainWeaponRange">
+							<option value="Melee" selected>Melee</option>
+							<option value="Ranged">Ranged</option>
+						</select>
+					</div>
+					<div>Description <br /><textarea name="attr_mainWeaponDescription"></textarea></div>
+				</div>
+				<div class="weapon no-frame half-width">
+					<label>Off-Hand</label>
+					<input type="hidden" name="attr_offWeaponAttr1Name" value="DEX" />
+					<input type="hidden" name="attr_offWeaponAttr2Name" value="MIG" />
+					<div class="inline-display">
+						Name <input type="text" name="attr_offWeaponName" value="" />
+						<button class="button-fix" type="roll" value="&{template:Attack} {{charName=@{character_name}}} {{weaponName=@{offWeaponName}}} {{weaponCategory=@{offWeaponCategory}}} {{weaponRange=@{offWeaponRange}}} {{weaponGrip=@{offWeaponGrip}}} {{weaponMartial=@{offWeaponMartial}}} {{attack=[@{offWeaponAttr1Name} + @{offWeaponAttr2Name}] + @{offWeaponAccuracy}}} {{weaponDamage=@{offWeaponDamage}}} {{damageType=@{offWeaponDamageType}}} {{desc=@{offWeaponDescription}}}"></button>
+					</div>
+					<div class="inline-display">Category <select class="full-width" name="attr_offWeaponCategory">
+							<option value="Arcane">Arcane</option>
+							<option value="Brawling" selected="selected">Brawling</option>
+							<option value="Bow">Bow</option>
+							<option value="Dagger">Dagger</option>
+							<option value="Firearm">Firearm</option>
+							<option value="Flail">Flail</option>
+							<option value="Heavy">Heavy</option>
+							<option value="Spear">Spear</option>
+							<option value="Sword">Sword</option>
+							<option value="Thrown">Thrown</option>
+						</select>
+						<select name="attr_offWeaponMartial">
+							<option value="" selected="selected">Non-Martial</option>
+							<option value="Martial">Martial</option>
+						</select>
+					</div>
+					<div class="offWeaponWeapon">
+						<div class="inline-display">
+							<select class="full-width" name="attr_offWeaponFirstAttribute">
+								<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+								<option value="@{hiddenCurrentInsight}">INS</option>
+								<option value="@{hiddenCurrentMight}">MIG</option>
+								<option value="@{hiddenCurrentWillpower}">WLP</option>
+							</select>
+							<select class="full-width" name="attr_offWeaponSecondAttribute">
+								<option value="@{hiddenCurrentDexterity}">DEX</option>
+								<option value="@{hiddenCurrentInsight}">INS</option>
+								<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+								<option value="@{hiddenCurrentWillpower}">WLP</option>
+							</select>
+							+ <input type="number" name="attr_offWeaponAccuracy" value="0" />
+							<button type="roll" value="&{template:Attack} [[ [[d@{offWeaponFirstAttribute}]][d@{offWeaponFirstAttribute}] + [[d@{offWeaponSecondAttribute}]][d@{offWeaponSecondAttribute}] + [[@{offWeaponAccuracy}]][Acc.Bonus] ]] {{charName=@{character_name}}} {{weaponName=@{offWeaponName}}} {{weaponCategory=@{offWeaponCategory}}} {{weaponRange=@{offWeaponRange}}} {{weaponGrip=@{offWeaponGrip}}} {{weaponMartial=@{offWeaponMartial}}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{attack=$[[3]]}} {{weaponDamage=@{offWeaponDamage}}} {{damageType=@{offWeaponDamageType}}} {{desc=@{offWeaponDescription}}}">Accuracy</button>
+						</div>
+						<div class="inline-display">
+							<span class="width250">Damage [HR + <input type="number" name="attr_offWeaponDamage" value="0" />]</span>
+							Type <select name="attr_offWeaponDamageType">
+								<option value="Physical" selected="selected">Physical</option>
+								<option value="Air">Air</option>
+								<option value="Bolt">Bolt</option>
+								<option value="Dark">Dark</option>
+								<option value="Earth">Earth</option>
+								<option value="Fire">Fire</option>
+								<option value="Ice">Ice</option>
+								<option value="Light">Light</option>
+								<option value="Poison">Poison</option>
+								<option value="Typeless">Typeless</option>
+							</select>
+						</div>
+						<div class="inline-display">
+							Grip <select class="full-width" name="attr_offWeaponGrip">
+								<option value="One-handed" selected>One-handed</option>
+								<option value="Two-handed">Two-handed</option>
+							</select>
+							Range <select class="full-width" name="attr_offWeaponRange">
+								<option value="Melee" selected>Melee</option>
+								<option value="Ranged">Ranged</option>
+							</select>
+						</div>
+					</div>
+					<div>
+						Description <br /><textarea class="full-width" name="attr_offWeaponDescription"></textarea>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div class="weapon no-frame">
+					<label>Other Weapons</label>
+					<fieldset class="repeating_weapons">
+						<div>
+							<input type="checkbox" class="sheet-arrow rightfloat" name="attr_classHide" checked /><span class="rightfloat"></span>
+							<input type="hidden" name="attr_additionalWeaponAttr1Name" value="DEX" />
+							<input type="hidden" name="attr_additionalWeaponAttr2Name" value="MIG" />
+							<div class="inline-display">
+								Name <input type="text" name="attr_additionalWeaponName" value="" />
+								<button class="button-fix" type="roll" value="&{template:Attack} {{charName=@{character_name}}} {{weaponName=@{additionalWeaponName}}} {{weaponCategory=@{additionalWeaponCategory}}} {{weaponRange=@{additionalWeaponRange}}} {{weaponGrip=@{additionalWeaponGrip}}} {{weaponMartial=@{additionalWeaponMartial}}} {{attack=[@{additionalWeaponAttr1Name} + @{additionalWeaponAttr2Name}] + @{additionalWeaponAccuracy}}} {{weaponDamage=@{additionalWeaponDamage}}} {{damageType=@{additionalWeaponDamageType}}} {{desc=@{additionalWeaponDescription}}}"></button>
+							</div>
+							<div class="swap-btn-wpn text-center">
+								<button class="swap-button" type="action" name="act_change-weapon-main">Swap Main Hand</button>
+								&nbsp;
+								<button class="swap-button" type="action" name="act_change-weapon-off">Swap Off-Hand</button>
+							</div>
+							<div class="inline-display sheet-hidden-flex">
+								Category <select class="full-width" name="attr_additionalWeaponCategory">
+									<option value="Arcane">Arcane</option>
+									<option value="Brawling" selected="selected">Brawling</option>
+									<option value="Bow">Bow</option>
+									<option value="Dagger">Dagger</option>
+									<option value="Firearm">Firearm</option>
+									<option value="Flail">Flail</option>
+									<option value="Heavy">Heavy</option>
+									<option value="Spear">Spear</option>
+									<option value="Sword">Sword</option>
+									<option value="Thrown">Thrown</option>
+								</select>
+								<select name="attr_additionalWeaponMartial">
+									<option value="" selected="selected">Non-Martial</option>
+									<option value="Martial">Martial</option>
+								</select>
+							</div>
+							<div class="inline-display sheet-hidden-flex">
+								<select name="attr_additionalWeaponFirstAttribute">
+									<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+									<option value="@{hiddenCurrentInsight}">INS</option>
+									<option value="@{hiddenCurrentMight}">MIG</option>
+									<option value="@{hiddenCurrentWillpower}">WLP</option>
+								</select>
+								<select name="attr_additionalWeaponSecondAttribute">
+									<option value="@{hiddenCurrentDexterity}">DEX</option>
+									<option value="@{hiddenCurrentInsight}">INS</option>
+									<option value="@{hiddenCurrentMight}" selected="selected">MIG</option>
+									<option value="@{hiddenCurrentWillpower}">WLP</option>
+								</select>
+								+ <input type="number" name="attr_additionalWeaponAccuracy" value="0" />
+								<button type="roll" value="&{template:Attack} [[ [[d@{additionalWeaponFirstAttribute}]][d@{additionalWeaponFirstAttribute}] + [[d@{additionalWeaponSecondAttribute}]][d@{additionalWeaponSecondAttribute}] + [[@{additionalWeaponAccuracy}]][Acc.Bonus] ]] {{charName=@{character_name}}} {{weaponName=@{additionalWeaponName}}} {{weaponCategory=@{additionalWeaponCategory}}} {{weaponRange=@{additionalWeaponRange}}} {{weaponGrip=@{additionalWeaponGrip}}} {{weaponMartial=@{additionalWeaponMartial}}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{attack=$[[3]]}} {{weaponDamage=@{additionalWeaponDamage}}} {{damageType=@{additionalWeaponDamageType}}} {{desc=@{additionalWeaponDescription}}}">Accuracy</button>
+							</div>
+							<div class="inline-display sheet-hidden-flex">
+								<span class="width250">Damage [HR + <input type="number" name="attr_additionalWeaponDamage" value="0" />]</span>
+								Type <select name="attr_additionalWeaponDamageType">
+									<option value="Physical" selected="selected">Physical</option>
+									<option value="Air">Air</option>
+									<option value="Bolt">Bolt</option>
+									<option value="Dark">Dark</option>
+									<option value="Earth">Earth</option>
+									<option value="Fire">Fire</option>
+									<option value="Ice">Ice</option>
+									<option value="Light">Light</option>
+									<option value="Poison">Poison</option>
+									<option value="Typeless">Typeless</option>
+								</select>
+							</div>
+							<div class="inline-display sheet-hidden-flex">
+								Grip <select class="full-width" name="attr_additionalWeaponGrip">
+									<option value="One-handed" selected>One-handed</option>
+									<option value="Two-handed">Two-handed</option>
+								</select>
+								Range <select class="full-width" name="attr_additionalWeaponRange">
+									<option value="Melee" selected>Melee</option>
+									<option value="Ranged">Ranged</option>
+								</select>
+							</div>
+							<div class="sheet-hidden-flex">
+								Description
+							</div>
+							<div class="sheet-hidden-flex">
+								<textarea name="attr_additionalWeaponDescription"></textarea>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+		<div class="charArmor frame">
+			<div class="label-button-display">
+				<label class="button-label">Armor</label>
+				<button class="button-fix" type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Armor}} {{name=@{armorName}}} {{genericType=@{armorMartial}}} {{genericParam1=Defense Bonus}} {{genericValue1=@{armorDefense}}} {{genericParam2=Magic Def. Bonus}} {{genericValue2=@{armorResist}}} {{genericParam3=Initiative Mod.}} {{genericValue3=@{armorInitiative}}} {{desc=@{armorDescription}}}"></button>
+			</div>
+			<div class="clearfloat"></div>
+			<div class="inline-display">
+				Name <input type="text" name="attr_armorName" value="" />
+				<select name="attr_armorMartial">
+					<option value="" selected="selected">Non-Martial</option>
+					<option value="[Martial]">Martial</option>
+				</select>
+				<span class="width150">Armor Initiative</span> <input type="number" name="attr_armorInitiative" value="0" />
+			</div>
+			<div class="inline-display">
+				<span class="width255">Bonus Defense</span> <input type="text" name="attr_armorDefense" value="+0" />
+				&nbsp;
+				<span class="width365">Bonus Magic Defense</span> <input type="text" name="attr_armorResist" value="+0" />
+			</div>
+			<br/>
+			Description <textarea name="attr_armorDescription"></textarea>
+		</div>
+		<div class="charAccessory frame">
+			<div class="label-button-display">
+				<label class="button-label">Accessory</label>
+				<button class="button-fix" type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Accessory}} {{name=@{accessoryName}}} {{desc=@{accessoryDescription}}}"></button>
+			</div>
+			<div class="inline-display">
+				Name <input type="text" name="attr_accessoryName" value="" />
+			</div>
+			<br />
+			Description <textarea name="attr_accessoryDescription"></textarea>
+		</div>
+		<div class="charShield frame">
+			<div class="label-button-display">
+				<label class="button-label">Shield (Defensive Settings)</label>
+				<button class="button-fix" type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Shield}} {{name=@{shieldName}}} {{genericType=@{shieldMartial}}} {{genericParam1=Defense Bonus}} {{genericValue1=@{shieldDefense}}} {{genericParam2=Magic Def. Bonus}} {{genericValue2=@{shieldResist}}} {{genericParam3=Initiative Mod.}} {{genericValue3=@{shieldInitiative}}} {{desc=@{shieldDescription}}}"></button>
+			</div>
+			<div class="clearfloat"></div>
+			<div class="inline-display">
+				Name <input type="text" name="attr_shieldName" value="" />
+				<select name="attr_shieldMartial">
+					<option value="" selected="selected">Non-Martial</option>
+					<option value="[Martial]">Martial</option>
+				</select>
+				<span class="width150">Shield Initiative</span> <input type="number" name="attr_shieldInitiative" value="0" />
+			</div>
+			<div class="inline-display">
+				<span class="width255">Bonus Defense</span> <input type="text" name="attr_shieldDefense" value="+0" />
+				&nbsp;
+				<span class="width365">Bonus Magic Defense</span> <input type="text" name="attr_shieldResist" value="+0" />
+			</div>
+			<br />
+			Description <textarea name="attr_shieldDescription"></textarea>
+		</div>
+	</div>
+	<div class="sheet-backpack">
+		<h1 class="tabs-title">Backpack</h1>
+		<div class="charMoney frame">
+			<label>Money</label>
+			<input class="width220 text-center" type="text" name="attr_moneyName" value="Zenits" />
+			<input class="round-container" type="number" name="attr_characterMoney" value="0" />
+		</div>
+		<div class="charItems frame">
+			<label>Inventory</label>
+			<div class="grid">
+				<div class="inline-display">
+					<div class="w23p column"><strong>Item</strong></div>
+					<div class="w9p column text-center"><strong>IP Cost</strong></div>
+					<div class="w68p column"><strong>Effect</strong></div>
+				</div>
+				<div class="inline-display">
+					<div class="w23p column">
+						<img class="line-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/elixir.png" />
+						Elixir
+					</div>
+					<div class="w9p column text-center">3</div>
+					<div class="w68p column">One creature recovers 50 Mind Points.</div>
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Inventory Item}} {{genericParam1=IP Cost}} {{genericValue1=3}} {{name=Elixir}} {{desc=One creature recovers 50 Mind Points.}}"></button>
+				</div>
+				<div class="inline-display">
+					<div class="w23p column">
+						<img class="line-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/remedy.png" />
+						Remedy
+					</div>
+					<div class="w9p column text-center">3</div>
+					<div class="w68p column">One creature recovers 50 Hit Points.</div>
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Inventory Item}} {{genericParam1=IP Cost}} {{genericValue1=3}} {{name=Remedy}} {{desc=One creature recovers 50 Hit Points.}}"></button>
+				</div>
+				<div class="inline-display">
+					<div class="w23p column">
+						<img class="line-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/tonic.png" />
+						Tonic
+					</div>
+					<div class="w9p column text-center">2</div>
+					<div class="w68p column">One creature recovers from a single status effect.</div>
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Inventory Item}} {{genericParam1=IP Cost}} {{genericValue1=2}} {{name=Tonic}} {{desc=One creature recovers from a single status effect.}}"></button>
+				</div>
+				<div class="inline-display">
+					<div class="w23p column">
+						<img class="line-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/elemental-shard.png" />
+						Elemental Shard
+					</div>
+					<div class="w9p column text-center">2</div>
+					<div class="w68p column">One creature suffers 10 damage of a type of your choice (<strong>air</strong>,
+						<strong>bolt</strong>, <strong>earth</strong>, <strong>fire</strong>, or <strong>ice</strong>).</div>
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Inventory Item}} {{genericParam1=IP Cost}} {{genericValue1=2}} {{name=Elemental Shard}} {{desc=One creature suffers 10 damage of a type of your choice (**air**, **bolt**, **earth**, **fire**, or **ice**).}}"></button>
+				</div>
+				<div class="inline-display">
+					<div class="w23p column">
+						<img class="line-img" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fabula%20Ultima/images/magic-tent.png" />
+						Magic Tent
+					</div>
+					<div class="w9p column text-center">4</div>
+					<div class="w68p column">Allows the entire group to rest in the wilderness.</div>
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Inventory Item}} {{genericParam1=IP Cost}} {{genericValue1=4}} {{name=Magic Tent}} {{desc=Allows the entire group to rest in the wilderness.}}"></button>
+				</div>
+				<fieldset class="repeating_inventoryItems">
+					<div class="inline-display">
+						<div class="w23p column"><input type="text" name="attr_inventoryItemName" /></div>
+						<div class="w9p column text-center"><input class="w9p text-center" type="number" name="attr_inventoryItemIPCost" /></div>
+						<div class="w68p column"><input type="text" name="attr_inventoryItemEffect" /></div>
+						<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Inventory Item}} {{genericParam1=IP Cost}} {{genericValue1=@{inventoryItemIPCost}}} {{name=@{inventoryItemName}}} {{desc=@{inventoryItemEffect}}}"></button>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+		<div class="charProjects frame">
+			<label>Projects</label>
+			<fieldset class="repeating_projects">
+				<div class="no-frame">
+					<input type="checkbox" class="sheet-arrow rightfloat" name="attr_projectHide" checked /><span class="rightfloat"></span>
+					<div class="inline-display">
+						<span class="medium-width">Project Name:</span>
+						<input type="text" name="attr_projectName" />
+						<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Project}} {{name=@{projectName}}} {{genericParam1=Cost}} {{genericValue1=@{projectCost} @{moneyName}}} {{genericParam2=Progress}} {{genericValue2=@{projectAdvancement} / @{projectTotalAdvance}}} {{desc=@{projectDescription}}}"></button>
+					</div>
+					<div class="sheet-hidden-content top-m10">
+						Cost <input class="medium-width" type="number" name="attr_projectCost" value="100" />
+						Advancement <input class="medium-width" type="number" name="attr_projectAdvancement" value="0" />
+						Max Advancement <input class="medium-width" type="number" name="attr_projectTotalAdvance" value="(@{projectCost}/100)" disabled />
+						<br/> Description: <textarea name="attr_projectDescription"></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div class="charSpareArmor frame">
+			<div class="label-button-display">
+				<label class="button-label">Spare Armors/Shields</label>
+			</div>
+			<fieldset class="repeating_spareEquipments">
+				<br/>
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_spareEquipHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display">
+					Name <input type="text" name="attr_spareEquipName" value="" />
+					<button class="button-fix" type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Spare @{spareEquipType} @{spareEquipMartial}}} {{name=@{spareEquipName}}} {{genericParam1=Defense Bonus}} {{genericValue1=@{spareEquipDefense}}} {{genericParam2=Magic Def. Bonus}} {{genericValue2=@{spareEquipResist}}} {{genericParam3=Initiative Mod.}} {{genericValue3=@{spareEquipInitiative}}} {{desc=@{spareEquipDescription}}}"></button>
+				</div>
+				<div class="swap-btn-equip text-center">
+					<input class="swap-toggle" type="hidden" name="attr_spareEquipToggleSwapBtn" value="" />
+					<button class="swap-button swap-btn-armor" type="action" name="act_change-armor">Swap Armor</button>
+					<button class="swap-button swap-btn-shield" type="action" name="act_change-shield">Swap Shield</button>
+				</div>
+				<div class="inline-display sheet-hidden-flex">
+					<select name="attr_spareEquipType">
+						<option value="" selected="selected">---Select Type Before Swaping---</option>
+						<option value="Armor">Armor</option>
+						<option value="Shield">Shield</option>
+					</select>
+					<select name="attr_spareEquipMartial">
+						<option value="" selected="selected">Non-Martial</option>
+						<option value="[Martial]">Martial</option>
+					</select>
+					<span class="spare-equipments-initiative text-center">Equipment Initiative <input type="number" name="attr_spareEquipInitiative" value="0" /></span>
+				</div>
+				<div class="inline-display sheet-hidden-flex">
+					<span class="width255">Bonus Defense</span> <input type="text" name="attr_spareEquipDefense" value="+0" />
+					<span class="width365">Bonus Magic Defense</span> <input type="text" name="attr_spareEquipResist" value="+0" />
+				</div>
+				<div class="sheet-hidden-content">
+					Description <textarea name="attr_spareEquipDescription"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="charSpareAccessory frame">
+			<div class="label-button-display">
+				<label class="button-label">Spare Accessories</label>
+			</div>
+			<fieldset class="repeating_spareAccessories">
+				<br/>
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_spareAccessoryHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display">
+					Name <input type="text" name="attr_spareAccessoryName" value="" />
+					<button class="button-fix" type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Spare Accessory}} {{name=@{spareAccessoryName}}} {{desc=@{spareAccessoryDescription}}}"></button>
+				</div>
+				<div class="swap-btn-equip text-center">
+					<button class="swap-button" type="action" name="act_change-accessory">Swap Accessory</button>
+				</div>
+				<div class="sheet-hidden-content">
+					Description <textarea name="attr_spareAccessoryDescription"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="items frame">
+			<label>Other Items</label>
+			<fieldset class="repeating_items">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Item: <input type="text" name="attr_itemName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Backpack}} {{genericType=Other Item}} {{name=@{itemName}}} {{desc=@{itemText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					Description <textarea name="attr_itemText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	<div class="sheet-classes">
+		<h1 class="tabs-title">Classes</h1>
+		<label>Character Level</label>
+		<input class="circle-container" type="number" name="attr_totalLevel" value="@{hiddenTotalLevel}" disabled />
+		<input type="hidden" name="attr_hiddenTotalLevel" value="0" />
+		<br/><br/>
+		<label class="tabs-title">Acquired Classes</label>
+		<fieldset class="repeating_charClasses">
+			<div class="frame">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_classHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display">
+					Name <input type="text" name="attr_className" value="" />
+					Level <input type="hidden" name="attr_hiddenClassLevel" />
+					<input type="number" name="attr_classLevel" value="@{firstSkillLevel} +@{secondSkillLevel} +@{thirdSkillLevel} +@{fourthSkillLevel} +@{fifthSkillLevel}" disabled />
+				</div>
+				<div>
+					Bonus <select name="attr_classBonus">
+						<option value="HP" selected="selected">+5 HP</option>
+						<option value="MP">+5 MP</option>
+						<option value="IP">+2 IP</option>
+					</select>
+				</div>
+				<div class="sheet-hidden-content">
+					Description <textarea name="attr_classDescription"></textarea>
+				</div>
+				<div class="skills indent-left indent-right sheet-hidden-content">
+					<br/>
+					<label>Skills </label>
+					<div class="skill">
+						<input type="checkbox" class="sheet-arrow rightfloat" name="attr_firstSkillHide" checked /><span class="rightfloat"></span>
+						<div class="inline-display">
+							Name <input type="text" name="attr_firstSkillName" />
+							Level <input type="number" name="attr_firstSkillLevel" value="0" />
+							<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Class Skill}} {{genericType=@{className}}} {{name=@{firstSkillName}}} {{level=@{firstSkillLevel}}} {{desc=@{firstSkillDescription}}}"></button>
+						</div>
+						<div class="sheet-hidden-content">
+							Description <textarea name="attr_firstSkillDescription"></textarea>
+						</div>
+					</div>
+					<div class="skill">
+						<input type="checkbox" class="sheet-arrow rightfloat" name="attr_secondSkillHide" checked /><span class="rightfloat"></span>
+						<div class="inline-display">
+							Name <input type="text" name="attr_secondSkillName" />
+							Level <input type="number" name="attr_secondSkillLevel" value="0" />
+							<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Class Skill}} {{genericType=@{className}}} {{name=@{secondSkillName}}} {{level=@{secondSkillLevel}}} {{desc=@{secondSkillDescription}}}"></button>
+						</div>
+						<div class="sheet-hidden-content">
+							Description <textarea name="attr_secondSkillDescription"></textarea>
+						</div>
+					</div>
+					<div class="skill">
+						<input type="checkbox" class="sheet-arrow rightfloat" name="attr_thirdSkillHide" checked /><span class="rightfloat"></span>
+						<div class="inline-display">
+							Name <input type="text" name="attr_thirdSkillName" />
+							Level <input type="number" name="attr_thirdSkillLevel" value="0" />
+							<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Class Skill}} {{genericType=@{className}}} {{name=@{thirdSkillName}}} {{level=@{thirdSkillLevel}}} {{desc=@{thirdSkillDescription}}}"></button>
+						</div>
+						<div class="sheet-hidden-content">
+							Description <textarea name="attr_thirdSkillDescription"></textarea>
+						</div>
+					</div>
+					<div class="skill">
+						<input type="checkbox" class="sheet-arrow rightfloat" name="attr_fourthSkillHide" checked /><span class="rightfloat"></span>
+						<div class="inline-display">
+							Name <input type="text" name="attr_fourthSkillName" />
+							Level <input type="number" name="attr_fourthSkillLevel" value="0" />
+							<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Class Skill}} {{genericType=@{className}}} {{name=@{fourthSkillName}}} {{level=@{fourthSkillLevel}}} {{desc=@{fourthSkillDescription}}}"></button>
+						</div>
+						<div class="sheet-hidden-content">
+							Description <textarea name="attr_fourthSkillDescription"></textarea>
+						</div>
+					</div>
+					<div class="skill">
+						<input type="checkbox" class="sheet-arrow rightfloat" name="attr_fifthSkillHide" checked /><span class="rightfloat"></span>
+						<div class="inline-display">
+							Name <input type="text" name="attr_fifthSkillName" />
+							Level <input type="number" name="attr_fifthSkillLevel" value="0" />
+							<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Class Skill}} {{genericType=@{className}}} {{name=@{fifthSkillName}}} {{level=@{fifthSkillLevel}}} {{desc=@{fifthSkillDescription}}}"></button>
+						</div>
+						<div class="sheet-hidden-content">
+							Description <textarea name="attr_fifthSkillDescription"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="heroicSkill indent-left indent-right sheet-hidden-content">
+					<br/>
+					<label>Heroic Skill </label>
+					<input type="checkbox" class="sheet-arrow rightfloat" name="attr_heroicSkillHide" checked /><span class="rightfloat"></span>
+					<div class="inline-display">
+						Name <input type="text" name="attr_heroicSkillName" />
+						<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Heroic Skill}} {{genericType=@{className}}} {{name=@{heroicSkillName}}} {{desc=@{heroicSkillDescription}}}"></button>
+					</div>
+					<div class="sheet-hidden-content">
+						Effect <textarea name="attr_heroicSkillDescription"></textarea>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+	<div class="sheet-magic">
+		<h1 class="tabs-title">Magic</h1>
+		<div class="spells tab frame">
+			<label>Offensive Spells </label>
+			<fieldset class="repeating_offensiveSpells">
+				<div>
+					<input type="checkbox" class="sheet-arrow rightfloat" name="attr_classHide" checked /><span class="rightfloat"></span>
+					<input type="hidden" name="attr_offensiveSpellAttr1Name" value="INS" />
+					<input type="hidden" name="attr_offensiveSpellAttr2Name" value="WLP" />
+					<div class="inline-display">
+						Name <input type="text" name="attr_offensiveSpellName" />
+						<button type="roll" value="&{template:Magic} {{charName=@{character_name}}} {{magicTitle=Spell Stats}} {{spellName=@{offensiveSpellName}}} {{spellCost=@{offensiveSpellCost}}} {{spellTarget=@{offensiveSpellTarget}}} {{spellDuration=@{offensiveSpellDuration}}} {{magicAttack=[@{offensiveSpellAttr1Name} + @{offensiveSpellAttr2Name}] + @{offensiveSpellCastBonus}}} {{magicDamage=@{offensiveSpellDamage}}} {{magicDamageType=@{offensiveSpellDamageType}}} {{magicEffect=@{offensiveSpellEffect}}}"></button>
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						<select name="attr_offensiveSpellFirstAttribute">
+							<option value="@{hiddenCurrentDexterity}">DEX</option>
+							<option value="@{hiddenCurrentInsight}" selected="selected">INS</option>
+							<option value="@{hiddenCurrentMight}">MIG</option>
+							<option value="@{hiddenCurrentWillpower}">WLP</option>
+						</select>
+						<select name="attr_offensiveSpellSecondAttribute">
+							<option value="@{hiddenCurrentDexterity}">DEX</option>
+							<option value="@{hiddenCurrentInsight}">INS</option>
+							<option value="@{hiddenCurrentMight}">MIG</option>
+							<option value="@{hiddenCurrentWillpower}" selected="selected">WLP</option>
+						</select>
+						+ <input type="number" name="attr_offensiveSpellCastBonus" value="0" />
+						<button type="roll" value="&{template:Magic} [[ [[d@{offensiveSpellFirstAttribute}]][d@{offensiveSpellFirstAttribute}] + [[d@{offensiveSpellSecondAttribute}]][d@{offensiveSpellSecondAttribute}] + [[@{offensiveSpellCastBonus}]][Magic Check Bonus] ]] {{charName=@{character_name}}} {{magicTitle=Spell Attack}} {{spellName=@{offensiveSpellName}}} {{spellCost=@{offensiveSpellCost}}} {{spellTarget=@{offensiveSpellTarget}}} {{spellDuration=@{offensiveSpellDuration}}} {{magicAttack=$[[3]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}} {{magicDamage=@{offensiveSpellDamage}}} {{magicDamageType=@{offensiveSpellDamageType}}} {{magicEffect=@{offensiveSpellEffect}}}">Magic Check</button>
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						<span class="width250">Damage [HR + <input type="number" name="attr_offensiveSpellDamage" />]</span>
+						Type <select name="attr_offensiveSpellDamageType">
+							<option value="" selected="selected">---Select---</option>
+							<option value="Physical">Physical</option>
+							<option value="Air">Air</option>
+							<option value="Bolt">Bolt</option>
+							<option value="Dark">Dark</option>
+							<option value="Earth">Earth</option>
+							<option value="Fire">Fire</option>
+							<option value="Ice">Ice</option>
+							<option value="Light">Light</option>
+							<option value="Poison">Poison</option>
+						</select>
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						Cost <input class="small-width" type="text" name="attr_offensiveSpellCost" />
+						Duration <input type="text" name="attr_offensiveSpellDuration" />
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						Target <input type="text" name="attr_offensiveSpellTarget" />
+					</div>
+					<div class="sheet-hidden-flex">
+						Effect
+					</div>
+					<div class="sheet-hidden-flex">
+						<textarea name="attr_offensiveSpellEffect"></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div class="spells tab frame">
+			<label>Other Spells </label>
+			<fieldset class="repeating_baseSpells">
+				<div>
+					<input type="checkbox" class="sheet-arrow rightfloat" name="attr_classHide" checked /><span class="rightfloat"></span>
+					<div class="inline-display">
+						Name <input type="text" name="attr_baseSpellName" placeholder="Spell Name" />
+						<button type="roll" value="&{template:Magic} {{charName=@{character_name}}} {{magicTitle=Spell Cast}} {{spellName=@{baseSpellName}}} {{spellCost=@{baseSpellCost}}} {{spellTarget=@{baseSpellTarget}}} {{spellDuration=@{baseSpellDuration}}} {{magicEffect=@{baseSpellEffect}}}"></button>
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						Cost <input class="small-width" type="text" name="attr_baseSpellCost" />
+						Duration <input type="text" name="attr_baseSpellDuration" />
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						Target <input type="text" name="attr_baseSpellTarget" />
+					</div>
+					<div class="sheet-hidden-flex">
+						Effect
+					</div>
+					<div class="sheet-hidden-flex">
+						<textarea name="attr_baseSpellEffect"></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<div class="frame">
+			<h2>Rituals</h2>
+			<br/>
+			<div class="rituals">
+				<label>Know Disciplines</label>
+				<div class="justify-element">
+					<div>Arcanism<input type="checkbox" name="attr_ritualArcanism" /></div>
+					<div>Chimerism<input type="checkbox" name="attr_ritualChimerism" /></div>
+					<div>Elementalism<input type="checkbox" name="attr_ritualElementalism" /></div>
+					<div>Entropism<input type="checkbox" name="attr_ritualEntropism" /></div>
+					<div>Ritualism<input type="checkbox" name="attr_ritualRitualism" /></div>
+					<div>Spiritism<input type="checkbox" name="attr_ritualSpiritism" /></div>
+				</div>
+				<fieldset class="repeating_ritualDisciplines">
+					<div class="inline-display">
+						<input type="text" name="attr_ritualCustomDisciplineName" placeholder="Discipline Name" />
+						<input type="checkbox" name="attr_ritualCustomDiscipline" />
+					</div>
+				</fieldset>
+			</div>
+			<br/>
+			<div class="clocks">
+				<label>Active Rituals</label>
+				<fieldset class="repeating_rituals">
+					<input type="checkbox" class="sheet-arrow rightfloat" name="attr_ritualHide" checked /><span class="rightfloat"></span>
+					<input type="hidden" name="attr_ritualAttr1Name" value="INS" />
+					<input type="hidden" name="attr_ritualAttr2Name" value="WLP" />
+					<div class="inline-display bottom-m10">
+						Name <input type="text" name="attr_ritualName" />
+						<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Ritual Stats}} {{name=@{ritualName}}} {{genericParam1=Cost}} {{genericValue1=@{ritualCost}}} {{genericParam2=Progress}} {{genericValue2=@{ritualAdvancement} / @{ritualMaxAdvancement}}} {{genericParam3=Check}} {{genericValue3=[@{ritualAttr1Name} + @{ritualAttr2Name}] + @{ritualCastBonus}}} {{desc=@{ritualEffect}}}"></button>
+					</div>
+					<div class="inline-display sheet-hidden-flex">
+						<div class="inline-display width400">
+							<select name="attr_ritualFirstAttribute">
+								<option value="@{hiddenCurrentDexterity}">DEX</option>
+								<option value="@{hiddenCurrentInsight}" selected="selected">INS</option>
+								<option value="@{hiddenCurrentMight}">MIG</option>
+								<option value="@{hiddenCurrentWillpower}">WLP</option>
+							</select>
+							<select name="attr_ritualSecondAttribute">
+								<option value="@{hiddenCurrentDexterity}">DEX</option>
+								<option value="@{hiddenCurrentInsight}">INS</option>
+								<option value="@{hiddenCurrentMight}">MIG</option>
+								<option value="@{hiddenCurrentWillpower}" selected="selected">WLP</option>
+							</select>
+							+ <input type="number" name="attr_ritualCastBonus" value="0" />
+							<button type="roll" value="&{template:Magic} [[ [[d@{ritualFirstAttribute}]][d@{ritualFirstAttribute}] + [[d@{ritualSecondAttribute}]][d@{ritualSecondAttribute}] + [[@{ritualCastBonus}]][Ritual Check Bonus] ]] {{charName=@{character_name}}} {{magicTitle=Ritual Cast}} {{spellName=@{ritualName}}} {{spellCost=@{ritualCost}}} {{magicAttack=$[[3]]}} {{magicEffect=@{ritualEffect}}}">Ritual Check</button>
+						</div>
+						<div class="width365">
+							Cost <input class="small-width" type="text" name="attr_ritualCost" />
+							Advancement <input type="number" name="attr_ritualAdvancement" value="0" />
+							Clock Max <input type="number" name="attr_ritualMaxAdvancement" value="4" />
+						</div>
+					</div>
+					<div class="sheet-hidden-content">Effect: <textarea name="attr_ritualEffect"></textarea></div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+	<div class="sheet-journal">
+		<h1 class="tabs-title">Journal</h1>
+		<div class="notes frame">
+			<label>Notes</label>
+			<fieldset class="repeating_notes">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_noteHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Title: <input type="text" name="attr_noteName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Note}} {{name=@{noteName}}} {{desc=@{noteText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_noteText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="quests frame">
+			<label>Quests</label>
+			<fieldset class="repeating_quests">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Quest: <input type="text" name="attr_questName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Quest}} {{name=@{questName}}} {{desc=@{questText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_questText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="jCharacters frame">
+			<label>Characters</label>
+			<fieldset class="repeating_jcharacters">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Character: <input type="text" name="attr_jCharacterName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Important Character}} {{name=@{jCharacterName}}} {{desc=@{jCharacterText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_jCharacterText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="creatures frame">
+			<label>Creatures</label>
+			<fieldset class="repeating_creatures">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Creature: <input type="text" name="attr_creatureName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Creature}} {{name=@{creatureName}}} {{desc=@{creatureText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_creatureText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="locations frame">
+			<label>Locations</label>
+			<fieldset class="repeating_locations">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Location: <input type="text" name="attr_locationName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Location}} {{name=@{locationName}}} {{desc=@{locationText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_locationText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="jItems frame">
+			<label>Artifacts/Objects</label>
+			<fieldset class="repeating_jitems">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Item: <input type="text" name="attr_jItemName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Important Item}} {{name=@{jItemName}}} {{desc=@{jItemText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_jItemText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+		<div class="jOtherDiscoveries frame">
+			<label>Other Discoveries</label>
+			<fieldset class="repeating_otherdiscoveries">
+				<input type="checkbox" class="sheet-arrow rightfloat" name="attr_itemHide" checked /><span class="rightfloat"></span>
+				<div class="inline-display bottom-m10">
+					Discovery: <input type="text" name="attr_otherDiscoveryName" />
+					<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Journal}} {{genericType=Discovery}} {{name=@{otherDiscoveryName}}} {{desc=@{otherDiscoveryText}}}"></button>
+				</div>
+				<div class="sheet-hidden-content">
+					<textarea name="attr_otherDiscoveryText"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	<div class="sheet-ahf">
+		<h1 class="tabs-title">Atlas High Fantasy</h1>
+		<h4 class="text-center">(Optional Content)</h4>
+		<div class="quirk frame">
+			<label>Quirk</label>
+			<input type="checkbox" class="sheet-arrow rightfloat" name="quirkHide" checked /><span class="rightfloat"></span>
+			<div class="inline-display">
+				Name: <input type="text" name="attr_quirkName" />
+				Type: <input type="text" name="attr_quirkType" />
+				<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Quirk}} {{genericType=Type: @{quirkType}}} {{name=@{quirkName}}} {{desc=@{quirkText}}} {{effect=@{quirkEffect}}}"></button>
+			</div>
+			<div class="sheet-hidden-content">
+				<br/>Description: <textarea name="attr_quirkText" placeholder="Describe your particular quirk, not the mechanical effect."></textarea>
+				<br/>Effects: <textarea name="attr_quirkEffect" placeholder="Describe the mechanical effects for the quirk."></textarea>
+			</div>
+		</div>
+		<br/>
+		<div class="zero-power frame">
+			<label>Zero Trigger</label>
+			<div class="inline-display">
+				Trigger: <input type="text" name="attr_zeroTrigger" />
+				Clock: <input type="number" name="attr_zeroClock" value="0" /> / <input type="number" name="attr_zeroClock_max" value="6" />
+				<div class="width400 inline-display">
+					Filled Sections: <input type="number" name="attr_zeroTriggerFS" value="0" /> per trigger
+				</div>
+			</div>
+			<br/>Mechanics: <textarea name="attr_zeroTriggerText" placeholder="Describe the power's trigger mechanics."></textarea>
+			<br/><br/>
+			<label>Zero Power(s)</label>
+			<fieldset class="repeating_zeroEffects">
+				<div class="frame">
+					<input type="checkbox" class="sheet-arrow rightfloat" name="attr_zeroPowerHide" checked /><span class="rightfloat"></span>
+					<div class="inline-display">
+						Name: <input type="text" name="attr_zeroName" />
+						<button type="roll" value="&{template:Generic} {{charName=@{character_name}}} {{genericTitle=Zero Power}} {{genericType=Clock: @{zeroClock}/@{zeroClock_max}}} {{name=@{zeroName}}} {{desc=@{zeroText}}} {{triggerType=@{zeroTrigger} (+@{zeroTriggerFS} per trigger)}} {{trigger=@{zeroTriggerText}}} {{effectType=@{zeroEffect}}} {{effect=@{zeroEffectText}}}"></button>
+					</div>
+					<div class="sheet-hidden-content">
+						<br/>Description: <textarea name="attr_zeroText" placeholder="Describe what your Zero Power looks like from a narrative point of view."></textarea>
+						<br/><br/>
+						<label>Zero Effect</label>
+						<div class="inline-display">
+							Effect: <input type="text" name="attr_zeroEffect" />
+						</div>
+						<br/>Mechanics: <textarea name="attr_zeroEffectText" placeholder="Describe the power's mechanical effects."></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	<div class="sheet-rolls">
+		<h1 class="tabs-title">Rolls</h1>
+		<div class="defaultRolls frame">
+			<label>Configurable Rolls</label>
+			<input type="hidden" name="attr_genericRollAttr1Name" value="DEX" />
+			<input type="hidden" name="attr_genericRollAttr2Name" value="DEX" />
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Generic Roll}} {{attrs=[@{genericRollAttr1Name} + @{genericRollAttr2Name}]}} {{total=[[ [[d@{genericRollFirstAttribute}]][d@{genericRollFirstAttribute}] + [[d@{genericRollSecondAttribute}]][d@{genericRollSecondAttribute}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}">Roll</button>
+			<select name="attr_genericRollFirstAttribute">
+				<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+				<option value="@{hiddenCurrentInsight}">INS</option>
+				<option value="@{hiddenCurrentMight}">MIG</option>
+				<option value="@{hiddenCurrentWillpower}">WLP</option>
+			</select>
+			<select name="attr_genericRollSecondAttribute">
+				<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+				<option value="@{hiddenCurrentInsight}">INS</option>
+				<option value="@{hiddenCurrentMight}">MIG</option>
+				<option value="@{hiddenCurrentWillpower}">WLP</option>
+			</select>
+			<br/><br/>
+			<fieldset class="repeating_rolls">
+				<div class="inline-display">
+					<input type="text" name="attr_genericRollName" placeholder="Action Name" />
+					<input type="hidden" name="attr_genericRollAttr1Name" value="DEX" />
+					<input type="hidden" name="attr_genericRollAttr2Name" value="INS" />
+					<select name="attr_genericRollFirstAttribute">
+						<option value="@{hiddenCurrentDexterity}" selected="selected">DEX</option>
+						<option value="@{hiddenCurrentInsight}">INS</option>
+						<option value="@{hiddenCurrentMight}">MIG</option>
+						<option value="@{hiddenCurrentWillpower}">WLP</option>
+					</select>
+					<select name="attr_genericRollSecondAttribute">
+						<option value="@{hiddenCurrentDexterity}">DEX</option>
+						<option value="@{hiddenCurrentInsight}" selected="selected">INS</option>
+						<option value="@{hiddenCurrentMight}">MIG</option>
+						<option value="@{hiddenCurrentWillpower}">WLP</option>
+					</select>
+					<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=@{genericRollName}}} {{attrs=[@{genericRollAttr1Name} + @{genericRollAttr2Name}]}} {{total=[[ [[d@{genericRollFirstAttribute}]][d@{genericRollFirstAttribute}] + [[d@{genericRollSecondAttribute}]][d@{genericRollSecondAttribute}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}"></button>
+				</div>
+			</fieldset>
+		</div>
+		<div class="basicRolls frame justify-element">
+			<label>Preset Rolls</label>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Discretion}} {{attrs=[DEX + DEX]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Moving silently, hiding and acting unnoticed.">Discretion [DEX + DEX]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Dodge}} {{attrs=[DEX +INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Avoiding a trap or finding a way to flee a collapsing building.">Dodge [DEX + INS]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Anticipate}} {{attrs=[DEX + INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Anticipating someone’s movements and catching them by surprise.">Anticipate [DEX + INS]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Craft}} {{attrs=[DEX + INS]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Completing a work of craftsmanship or repairing something.">Craft [DEX + INS]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Captivate}} {{attrs=[DEX + WLP]}} {{total=[[ [[d@{hiddenCurrentDexterity}]][d@{hiddenCurrentDexterity}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Moving gracefully to earn someone’s attention.">Captivate [DEX + WLP]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Inspect}} {{attrs=[INS + INS]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Examining or investigating someone or something.">Inspect [INS + INS]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Recall}} {{attrs=[INS + INS]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Remembering useful information about something.">Recall [INS + INS]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Interrogate}} {{attrs=[INS + WLP]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Getting information from someone during a conversation.">Interrogate [INS + WLP]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Persuade}} {{attrs=[INS + WLP]}} {{total=[[ [[d@{hiddenCurrentInsight}]][d@{hiddenCurrentInsight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Persuading someone through authority or diplomacy.">Persuade [INS + WLP]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Effort}} {{attrs=[MIG + MIG]}} {{total=[[ [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Hard work, such as lifting a portcullis or pushing a statue.">Effort [MIG + MIG]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Endure}} {{attrs=[MIG + WLP]}} {{total=[[ [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Resisting intense pain or fatigue.">Endure [MIG + WLP]</button>
+			<button type="roll" value="&{template:Checks} {{charName=@{character_name}}} {{name=Intimidate}} {{attrs=[MIG + WLP]}} {{total=[[ [[d@{hiddenCurrentMight}]][d@{hiddenCurrentMight}] + [[d@{hiddenCurrentWillpower}]][d@{hiddenCurrentWillpower}] + ?{Modifier|0} ]]}} {{dice1=$[[0]]}} {{dice2=$[[1]]}}" title="Intimidating someone with your strength.">Intimidate [MIG + WLP]</button>
+		</div>
+	</div>
+</div>

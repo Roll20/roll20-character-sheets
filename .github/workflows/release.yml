@@ -1,0 +1,43 @@
+name: Forces-updates all sheets
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+jobs:
+  deployment:
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      CDN_SHEETS_FOLDER: ${{ vars.CDN_SHEETS_FOLDER }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.SHEET_HTTP_GCP_KEYFILE }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+      - uses: oven-sh/setup-bun@v1
+
+      - run: bun install
+        working-directory: contrib/sheet-pixie
+
+      # Handles when a force-update has been requested (meaning all sheets will be re-built and deployed)
+      - run: make all
+        env:
+          DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}
+      - run: find ${{ env.DEST_DIR }} -maxdepth 1 -type d -exec sh -c 'cp -R --verbose "$(basename "{}")/translations" "{}/"' 2>/dev/null \;
+        env:
+          DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} 
+      - run: gcloud storage rsync --project=roll20-actual ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }} gs://roll20-cdn/${{ env.CDN_SHEETS_FOLDER }} --delete-unmatched-destination-objects --cache-control='no-cache' --recursive
+        env:
+          DEST_DIR: ${{ runner.temp }}/${{ env.CDN_SHEETS_FOLDER }}

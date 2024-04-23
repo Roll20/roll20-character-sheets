@@ -56,6 +56,7 @@ const globalAttributesByCategory = {
 };
 
 on("sheet:opened", function(eventinfo) {
+    lastDropID = "";
     versioning(function() {
         var getInfo = function(sections, callback, results) {
             results =  results || {};

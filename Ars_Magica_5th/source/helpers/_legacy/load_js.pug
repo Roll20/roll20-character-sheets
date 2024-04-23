@@ -1,0 +1,44 @@
+
+
+mixin __dummy()
+    p
+
+-
+    arm5.pug.js_loader = {
+
+        loaded_paths: [],
+
+        make_eval_context: (arm5_ref) => {
+            console.log("Building js_loader eval context...");
+            const arm5 = arm5_ref;
+            // Note: it is OK to use eval, this happens locally when we build
+            //       the sheet. Running PUG is already running arbitrary javascript
+            //       this is not worse.
+            return function(str) { eval(str) };
+        },
+
+        eval_context: null,
+
+        load_js: (path) => {
+            console.log(`Loading ${path}...`);
+            if (path.substring(0, 1) != "/") {
+                path = `${sourcedir}${path}`;
+            }
+            
+            const loaded_paths = arm5.pug.js_loader.loaded_paths;
+            if (loaded_paths.indexOf(path) > -1) {
+                console.log(`${path} is already loaded, skipping.`);
+            } else {
+                const fs = require("fs");
+                if (! fs.existsSync(path)) {
+                    throw new Error(`${path} doesn't exists`);
+                } else {
+                    if (arm5.pug.js_loader.eval_context === null) {
+                        arm5.pug.js_loader.eval_context = arm5.pug.js_loader.make_eval_context(arm5);
+                    }
+                    arm5.pug.js_loader.eval_context(fs.readFileSync(path, "utf8"));
+                    loaded_paths.push(path);
+                }
+            }
+        }
+    }

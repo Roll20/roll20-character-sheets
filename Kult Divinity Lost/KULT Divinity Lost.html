@@ -1,8 +1,10 @@
 <!--<div class="sheet-container">-->
+<input type="hidden" name="attr_version">
 <input type="radio" class="sheet-page1" name="attr_page" value="1" checked="checked" id="sheet-page1">
     <label for="sheet-page1" data-i18n="pageone-u">PAGE ONE</label>
 <input type="radio" class="sheet-page2" name="attr_page" value="2" id="sheet-page2">
     <label for="sheet-page2" data-i18n="pagetwo-u">PAGE TWO</label>
+<span class="sheet-modifier-popup-toggle"><span data-i18n="show-modifier-u">Show modifier popup for rolls?</span><input type="checkbox" name="attr_rollmod" checked="checked" value="?{Modifiers?|0}"><span></span></span>
 <br />
 <br />
 
@@ -10,306 +12,673 @@
     <div class="container1">
       <div class="basic">
           <div class="sheet-row">
-            <div class="sheet-label" style="width: 71px;" >&#x2B2A; <span data-i18n="name-u">Name</span></div><input type="text" name="attr_charname" style="width: 83%">
+            <div class="sheet-label">&#x2B2A; <span data-i18n="name-u">Name</span></div><input type="text" name="attr_character_name">
           </div>
           <div class="sheet-row">
-            <div class="sheet-label" style="width: 90px">&#x2B2A; <span data-i18n="archetype-u">Archetype</span></div><input type="text" name="attr_archetype" style="width: 80%">
+            <div class="sheet-label">&#x2B2A; <span data-i18n="archetype-u">Archetype</span></div><input type="text" name="attr_archetype">
           </div>
           <div class="sheet-row">
-            <div class="sheet-label" style="width: 90px">&#x2B2A; <span data-i18n="occupation-u">Occupation</span></div><input type="text" name="attr_occupation" style="width: 80%">
+            <div class="sheet-label">&#x2B2A; <span data-i18n="occupation-u">Occupation</span></div><input type="text" name="attr_occupation">
           </div>
       </div>
       <div class="logo">
           <img src="https://i.imgur.com/RcjkiYO.png"/>
       </div>
     <div class="appearance">
-        <div class="sheet-row">
-            <div class="sheet-label" style="width: 85px">&#x2B2A; <span data-i18n="appearance-u">Appearance</span></div>
-            <textarea name="attr_appearance" style="height: 68px"></textarea>
-        </div>
+		<div class="sheet-label">&#x2B2A; <span data-i18n="appearance-u">Appearance</span></div>
+		<div class="auto-expand">
+		  <span name="attr_appearance"></span>
+		  <textarea name="attr_appearance"></textarea>
+		</div>
     </div>
     
   <div class="attributes">
-      <div class="sheet-row">
 
-        <div style="margin-left: 33% ; width: 33% ; margin-bottom: 5% ; display: block ; text-align: center"
+        <div style="margin-left: 33%; width: 33%; display: block; text-align: center;"
           class="sheet-label">&#x2B2A; <span data-i18n="attributes-u">Attributes</span></div>
-        <!--<div class="sheet-leftatt">-->
-          <div class="sheet-passatt" style="position: absolute; top: 142px; left: 76px;"><input type="number" name="attr_fortitude" min="-5" max="5"></div>
-          <div class="sheet-attlabel" style="position: absolute; top: 210px; left: 9px;">
-            <h4 data-i18n="fortitude-u">Fortitude</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{fortitude-mv-u} }}{{valor=[[2d10+@{Fortitude}+?{@{modificator}|0}]]}}"
-              class="sheet-ui-draggable btn ui-draggable"><span data-i18n="fortitude-mv-u">Endure Injury</span></button>
-          </div>
-        <!--</div>-->
+		  
+		<div class="sephirot">
+		  <div class="sheet-passatt" style="position: absolute; top: 133px; left: 72px;"><input type="number" name="attr_fortitude" min="-5" max="5"></div>
+		  <div class="sheet-attlabel" style="position: absolute; top: 200px; left: 4px;">
+			<h4 data-i18n="fortitude-u">Fortitude</h4>
+			<button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{fortitude-mv-u} }}{{valor=[[2d10+@{Fortitude}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-fort-success}}} {{partial=@{moves-fort-partial}}} {{failure=@{moves-fort-failure}}}"
+			  class="sheet-ui-draggable btn ui-draggable"><span data-i18n="fortitude-mv-u">Endure Injury</span></button>
+		  </div>
 
-        <!--<div class="sheet-rightatt">-->
-          <div class="sheet-attlabel" style="position: absolute; top: 135px; left: 134px;">
+          <div class="sheet-attlabel" style="position: absolute; top: 125px; left: 120px;">
             <h4 data-i18n="willpower-u">Willpower</h4>
-            <button type="roll" style="margin-left:8px;" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{willpower-mv-u} }}{{valor=[[2d10+@{Willpower}+?{@{modificator}|0}]]}}"
+            <button type="roll" style="margin-left:8px;" 
+			  value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{willpower-mv-u} }}{{valor=[[2d10+@{Willpower}+@{condition_penalty}+@{wound_penalty}+@{kit_penalty}+@{rollmod}]]}} {{success=@{moves-will-success}}} {{partial=@{moves-will-partial}}} {{failure=@{moves-will-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="willpower-mv-u">Keep it Together</span></button>
           </div>
-          <div class="sheet-passatt" style="position: absolute; top: 66px; left: 201px;"><input type="number" name="attr_willpower" min="-5" max="5"></div>
-        <!--</div>-->
+          <div class="sheet-passatt" style="position: absolute; top: 62px; left: 190px;"><input type="number" name="attr_willpower" min="-5" max="5"></div>
 
-        <!--<br>-->
-
-        <!--<div class="sheet-leftatt">-->
-          <div class="sheet-passatt" style="position: absolute; top: 142px; left: 326px;"><input type="number" name="attr_reflexes" min="-5" max="5"></div>
-          <div class="sheet-attlabel" style="position: absolute; top: 210px; left: 259px;">
+          <div class="sheet-passatt" style="position: absolute; top: 133px; left: 307px;"><input type="number" name="attr_reflexes" min="-5" max="5"></div>
+          <div class="sheet-attlabel" style="position: absolute; top: 200px; left: 239px;">
             <h4 data-i18n="reflexes-u">Reflexes</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{reflexes-mv-u} }}{{valor=[[2d10+@{Reflexes}+?{@{modificator}|0}]]}}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{reflexes-mv-u} }}{{valor=[[2d10+@{Reflexes}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-reflex-success}}} {{partial=@{moves-reflex-partial}}} {{failure=@{moves-reflex-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="reflexes-mv-u">Avoid Harm</span></button>
           </div>
-        <!--</div>-->
 
-        <!--<div class="sheet-rightatt">-->
-          <div class="sheet-attlabel" style="position: absolute; top: 350px; left: 9px;">
+          <div class="sheet-attlabel" style="position: absolute; top: 334px; left: 4px;">
             <h4 data-i18n="reason-u">Reason</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{reason-mv-u} }}{{valor=[[2d10+@{Reason}+?{@{modificator}|0}]]}}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{reason-mv-u} }}{{valor=[[2d10+@{Reason}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-reason-success}}} {{partial=@{moves-reason-partial}}} {{failure=@{moves-reason-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="reason-mv-u">Investigate</span></button>
           </div>
-          <div class="sheet-actatt" style="position: absolute; top: 288px; left: 77px;"><input type="number" name="attr_reason" min="-5" max="5"></div>
-        <!--</div>-->
+          <div class="sheet-actatt" style="position: absolute; top: 271px; left: 72px;"><input type="number" name="attr_reason" min="-5" max="5"></div>
 
-        <!--<br>-->
-
-        <!--<div class="sheet-leftatt">-->
-          <div class="sheet-actatt" style="position: absolute; top: 288px; left: 326px;"><input type="number" name="attr_intuition" min="-5" max="5"></div>
-          <div class="sheet-attlabel" style="position: absolute; top: 350px; left: 259px;">
+          <div class="sheet-actatt" style="position: absolute; top: 271px; left: 307px;"><input type="number" name="attr_intuition" min="-5" max="5"></div>
+          <div class="sheet-attlabel" style="position: absolute; top: 334px; left: 239px;">
             <h4 data-i18n="intuition-u">Intuition</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{intuition-mv-u} }}{{valor=[[2d10+@{Intuition}+?{@{modificator}|0}]]}}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{intuition-mv-u} }}{{valor=[[2d10+@{Intuition}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-intuition-success}}} {{partial=@{moves-intuition-partial}}} {{failure=@{moves-intuition-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="intuition-mv-u">Read a Person</span></button>
           </div>
-        <!--</div>-->
 
-        <!--<div class="sheet-rightatt">-->
-          <div class="sheet-attlabel" style="position: absolute; top: 420px; left: 134px;">
+          <div class="sheet-attlabel" style="position: absolute; top: 398px; left: 120px;">
             <h4 data-i18n="perception-u">Perception</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{perception-mv-u} }}{{valor=[[2d10+@{Perception}+?{@{modificator}|0}]]}}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{perception-mv-u} }}{{valor=[[2d10+@{Perception}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-perception-success}}} {{partial=@{moves-perception-partial}}} {{failure=@{moves-perception-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="perception-mv-u">Observe a Situation</span></button>
           </div>
-          <div class="sheet-actatt" style="position: absolute; top: 357px; left: 202px;"><input type="number" name="attr_perception" min="-5" max="5"></div>
-        <!--</div>-->
+          <div class="sheet-actatt" style="position: absolute; top: 337px; left: 190px;"><input type="number" name="attr_perception" min="-5" max="5"></div>
 
-        <!--<br>-->
-
-        <!--<div class="sheet-leftatt">-->
-          <div class="sheet-actatt" style="position: absolute; top: 428px; left: 77px;"><input type="number" name="attr_coolness" min="-5" max="5"></div>
-          <div class="sheet-attlabel" style="position: absolute; top: 490px; left: 9px;">
+          <div class="sheet-actatt" style="position: absolute; top: 402px; left: 72px;"><input type="number" name="attr_coolness" min="-5" max="5"></div>
+          <div class="sheet-attlabel" style="position: absolute; top: 470px; left: 4px;">
             <h4 data-i18n="coolness-u">Coolness</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{coolness-mv-u} }}{{valor=[[2d10+@{Coolness}+?{@{modificator}|0}]]}}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{coolness-mv-u} }}{{valor=[[2d10+@{Coolness}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-cool-success}}} {{partial=@{moves-cool-partial}}} {{failure=@{moves-cool-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="coolness-mv-u">Act Under Pressure</span></button>
           </div>
-        <!--</div>-->
 
-        <!--<div class="sheet-rightatt">-->
-          <div class="sheet-attlabel" style="position: absolute; top: 490px; left: 259px;">
+          <div class="sheet-attlabel" style="position: absolute; top: 470px; left: 239px;">
             <h4 data-i18n="violence-u">Violence</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{violence-mv-u} }}{{valor=[[2d10+@{Violence}+?{@{modificator}|0}]]}}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{violence-mv-u} }}{{valor=[[2d10+@{Violence}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-violence-success}}} {{partial=@{moves-violence-partial}}} {{failure=@{moves-violence-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="violence-mv-u">Engage in Combat</span></button>
           </div>
-          <div class="sheet-actatt" style="position: absolute; top: 428px; left: 326px;"><input type="number" name="attr_violence" min="-5" max="5"></div>
-        <!--</div>-->
+          <div class="sheet-actatt" style="position: absolute; top: 402px; left: 307px;"><input type="number" name="attr_violence" min="-5" max="5"></div>
 
-        <!--<br>-->
-
-        <!--<div class="sheet-leftatt">-->
-          <div class="sheet-actatt" style="position: absolute; top: 495px; left: 202px;"><input type="number" name="attr_charisma" min="-5" max="5"></div>
-          <div class="sheet-attlabel" style="position: absolute; top: 560px; left: 134px;">
+          <div class="sheet-actatt" style="position: absolute; top: 467px; left: 190px;"><input type="number" name="attr_charisma" min="-5" max="5"></div>
+          <div class="sheet-attlabel" style="position: absolute; top: 530px; left: 120px;">
             <h4 data-i18n="charisma-u">Charisma</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{charisma-mv-u} }}{{valor=[[2d10+@{Charisma}+?{@{modificator}|0}]] }}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{charisma-mv-u} }}{{valor=[[2d10+@{Charisma}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]] }} {{success=@{moves-charisma-success}}} {{partial=@{moves-charisma-partial}}} {{failure=@{moves-charisma-failure}}}"
               class="sheet-ui-draggable btn ui-draggable"><span data-i18n="charisma-mv-u">Influence Other</span></button>
           </div>
-        <!--</div>-->
 
-        <!--<div class="sheet-rightatt">-->
-          <div class="sheet-attlabel" style="position: absolute; top: 700px; left: 134px;">
+          <div class="sheet-attlabel" style="position: absolute; top: 664px; left: 120px;">
             <h4 data-i18n="soul-u">Soul</h4>
-            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{soul-mv-u} }}{{valor=[[2d10+@{Soul}+?{@{modificator}|0}]] }}"
+            <button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{soul-mv-u} }}{{valor=[[2d10+@{Soul}+@{condition_penalty}+@{wound_penalty}+@{stti_bonus}+@{rollmod}]] }} {{success=@{moves-soul-success}}} {{partial=@{moves-soul-partial}}} {{failure=@{moves-soul-failure}}}"
               class="sheet-hidden-roll"><span data-i18n="soul-mv-u">See Through the Illusion</span></button>  
           </div>
-          <div class="sheet-actatt" style="position: absolute; top: 634px; left: 202px;"><input type="number" name="attr_soul" min="-5" max="5"></div>
-        <!--</div>-->
-      </div>
+          <div class="sheet-actatt" style="position: absolute; top: 598px; left: 190px;"><input type="number" name="attr_soul" min="-5" max="5"></div>
+		  
+		  
+          <div class="sheet-attlabel" style="position: absolute; top: 10px; left: -30px;">
+					<select name="attr_helphinder">
+					  <option value="Select">--attribute--</option>
+					  <option value="Fortitude" data-i18n="fortitude-u">Fortitude</option>
+					  <option value="Willpower" data-i18n="willpower-u">Willpower</option>
+					  <option value="Reflexes" data-i18n="reflexes-u">Reflexes</option>
+					  <option value="Reason" data-i18n="reason-u">Reason</option>
+					  <option value="Intuition" data-i18n="intuition-u">Intuition</option>
+					  <option value="Perception" data-i18n="perception-u">Perception</option>
+					  <option value="Coolness" data-i18n="coolness-u">Coolness</option>
+					  <option value="Violence" data-i18n="violence-u">Violence</option>
+					  <option value="Charisma" data-i18n="charisma-u">Charisma</option>
+					  <option value="Soul" data-i18n="soul-u">Soul</option>
+					</select>
+					<input type="hidden" name="attr_helphindermod" value="0"></input>
+					<button type="roll" value="&{template:kult}{{name=^{move-rt} }}{{subtags=^{helphinder-mv-u} @{helphinder} }}{{valor=[[2d10+@{helphindermod}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{moves-helphinder-success}}} {{partial=@{moves-helphinder-partial}}} {{failure=@{moves-helphinder-failure}}}"
+					  class="sheet-ui-draggable btn ui-draggable" data-i18n="helphinder-mv-u">Help or Hinder</button>
+          </div>
+
+		</div>
+  
+		<div class="relations">
+			<div class="sheet-label">&#x2B2A; <span data-i18n="relations-u">Relations</span></div>
+			<textarea name="attr_relations" style="height: 140px;width:400px;display:none;"></textarea>
+			  
+			<fieldset class="repeating_relations">
+				<input type="text" name="attr_relation_name" placeholder="Name"><span></span><input type="number" name="attr_relation_value" value="0" max="2" min="0">
+				<div class="auto-expand">
+				  <span name="attr_relation_description"></span>
+				  <textarea name="attr_relation_description" placeholder="Details"></textarea>
+			    </div>
+			</fieldset>        
+		</div>
   </div>
   
-  <div class="dark_secrets">
-      <div class="sheet-label">&#x2B2A; <span data-i18n="darksecrets-u">Dark Secrets</span></div>
-        <textarea name="attr_darksecrets" style="height: 140px"></textarea>
-  </div>
-  <div class="disadvantages">
-      <div class="sheet-label">&#x2B2A; <span data-i18n="disadvantages-u">Disadvantages</span></div>
-        <textarea name="attr_disadvantages" style="height: 140px"></textarea>
-  </div>
-  <div class="advantages">
-      <div class="sheet-label">&#x2B2A; <span data-i18n="advantages-u">Advantages</span></div>
-        <textarea name="attr_advantages" style="height: 140px"></textarea>
-  </div>
-  <div class="relations">
-      <div class="sheet-row">
-      <div class="sheet-label">&#x2B2A; <span data-i18n="relations-u">Relations</span></div>
-      <textarea name="attr_relations" style="height: 140px"></textarea>
-    </div>
-  </div>
+<!-- move possible outcomes -->
+<div class="hidden">
+	<!-- Fortitude -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-fort-success" class="sheet-actiondesc" placeholder="Success" title="Success">You ride out the pain and keep going.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-fort-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You are still standing, but the GM picks one condition:<ul><li>The injury throws you off balance.</li><li>You lose something.</li><li>You receive a <b>Serious Wound</b>.</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-fort-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">The injury is overwhelming. You choose if you:<ul><li>Are knocked out (the GM may also choose to inflict a <b>Serious Wound</b>).</li><li>Receive a <b>Critical Wound</b>, but may continue to act (if you already have a <b>Critical Wound</b>, you may not choose this option again).</li><li>Die.</li></ul></textarea>
+	</div>
+	<!-- Willpower -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-will-success" class="sheet-actiondesc" placeholder="Success" title="Success">You grit your teeth and stay the course.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-will-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">The effort to resist instills a condition, which remains with you until you have had time to recuperate. You get −1 in situations where this condition would be a hindrance to you.<br /><br />Choose one:<ul><li>You become angry (<b>−1 Stability</b>).</li><li>You become sad (<b>−1 Stability</b>).</li><li>You become scared (<b>−1 Stability</b>).</li><li>You become guilt-ridden (<b>−1 Stability</b>).</li><li>You become obsessed (<b>+1 Relation</b> to whatever caused the condition).</li><li>You become distracted (−2 in situations where the condition limits you).</li><li>You will be haunted by the experience at a later time.</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-will-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">The strain is too much for your mind to handle. The GM chooses your reaction: cower powerless in the threat’s presence, panic with no control of your actions, suffer emotional trauma (<b>−2 Stability</b>), or suffer life-changing trauma (<b>−4 Stability</b>).</textarea>
+	</div>
+	<!-- Reflexes -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-reflex-success" class="sheet-actiondesc" placeholder="Success" title="Success">You emerge completely unharmed.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-reflex-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You avoid the worst of it, but the GM decides if you end up in a bad spot, lose something, or partially sustain <b>Harm</b>.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-reflex-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">You were too slow to react or you made a bad judgment call. Perhaps you didn’t avoid any <b>Harm</b> at all, or you ended up in an even worse spot than before. The GM makes a Move.</textarea>
+	</div>
+	<!-- Reason -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-reason-success" class="sheet-actiondesc" placeholder="Success" title="Success">You may ask two questions.<br/><br/>Questions:<ul><li>How can I find out more about what I’m investigating?</li><li>What is my gut feel about what I’m investigating?</li><li>Is there anything weird about what I’m investigating?</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-reason-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You may ask one question. The information comes at a cost, determined by the GM, such as requiring someone or something for the answer, exposing yourself to danger, or needing to expend extra time or resources. Will you do what it takes?<br/><br/>Questions:<ul><li>How can I find out more about what I’m investigating?</li><li>What is my gut feel about what I’m investigating?</li><li>Is there anything weird about what I’m investigating?</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-reason-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">You may get some information anyway, but you pay a price for it. You may expose yourself to dangers or costs. The GM makes a Move.</textarea>
+	</div>
+	<!-- Intuition -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-intuition-success" class="sheet-actiondesc" placeholder="Success" title="Success">You may ask two questions.<br/><br/>Questions:<ul><li>Are you lying?</li><li>How do you feel right now?</li><li>What are you about to do?</li><li>What do you wish I would do?</li><li>How could I get you to […]?</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-intuition-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You may ask one question.<br/><br/>Questions:<ul><li>Are you lying?</li><li>How do you feel right now?</li><li>What are you about to do?</li><li>What do you wish I would do?</li><li>How could I get you to […]?</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-intuition-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">You accidentally reveal your own intentions to the person you’re trying to read. Tell the GM/player what these intentions are. The GM makes a Move.</textarea>
+	</div>
+	<!-- Perception -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-perception-success" class="sheet-actiondesc" placeholder="Success" title="Success">Ask two questions.<br/><br/>Questions:<ul><li>What is my best way through this?</li><li>What currently poses the biggest threat?</li><li>What can I use to my advantage?</li><li>What should I be on the lookout for?</li><li>What is being hidden from me?</li><li>What seems strange about this?</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-perception-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">Ask one question.<br/><br/>Questions:<ul><li>What is my best way through this?</li><li>What currently poses the biggest threat?</li><li>What can I use to my advantage?</li><li>What should I be on the lookout for?</li><li>What is being hidden from me?</li><li>What seems strange about this?</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-perception-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">You get to ask a question anyway, but you get no bonus for it and miss something, attract unwanted attention or expose yourself to danger. The GM makes a Move.<br/><br/>Questions:<ul><li>What is my best way through this?</li><li>What currently poses the biggest threat?</li><li>What can I use to my advantage?</li><li>What should I be on the lookout for?</li><li>What is being hidden from me?</li><li>What seems strange about this?</li></ul></textarea>
+	</div>
+	<!-- Coolness -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-cool-success" class="sheet-actiondesc" placeholder="Success" title="Success">You do what you intended.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-cool-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You do it, but hesitate, are delayed, or must deal with a complication – the GM reveals an unexpected outcome, a high price, or a difficult choice.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-cool-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">There are serious consequences, you make a mistake, or you’re exposed to the danger. The GM makes a Move.</textarea>
+	</div>
+	<!-- Violence -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-violence-success" class="sheet-actiondesc" placeholder="Success" title="Success">You inflict damage to your opponent and avoid counterattacks.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-violence-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You inflict damage, but at a cost. The GM chooses one:<ul><li>You’re subjected to a counterattack.</li><li>You do less damage than intended.</li><li>You lose something important.</li><li>You expend all your ammo.</li><li>You’re beset by a new threat.</li><li>You’ll be in trouble later on.</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-violence-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">Your attack doesn’t go as anticipated. You might be subjected to bad luck, miss your target, or pay a high price for your assault. The GM makes a Move.</textarea>
+	</div>
+	<!-- Charisma -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-charisma-success" class="sheet-actiondesc" placeholder="Success" title="Success"><i>When you influence an NPC:</i><br />She does what you ask.<br /><br /><i>When you influence another PC:</i><br />Both options below.<br /><br />Options:<ul><li>She’s motivated to do what you ask, and recieves <i>+1 for her next roll</i>, if she does it.</li><li>She’s worried of the consequences if she doesn’t do what you ask, and gets <b>−1 Stability</b> if she doesn’t do it.</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-charisma-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences"><i>When you influence an NPC:</i><br />She does what you ask, but the GM chooses one:<ul><li>She demands better compensation.</li><li>Complications will arise at a future time.</li><li>She gives in for the moment, but will change her mind and regret it later.</li></ul><br /><i>When you influence another PC:</i><br />Choose one option below.<br /><br />Options:<ul><li>She’s motivated to do what you ask, and recieves <i>+1 for her next roll</i>, if she does it.</li><li>She’s worried of the consequences if she doesn’t do what you ask, and gets <b>−1 Stability</b> if she doesn’t do it.</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-charisma-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure"><i>When you influence an NPC:</i><br />Your attempt has unintended repercussions. The GM makes a Move.<br /><br /><i>When you influence another PC:</i><br />The character gets <i>+1 on her next roll</i> against you. The GM makes a Move.</textarea>
+	</div>
+	<!-- Soul -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-soul-success" class="sheet-actiondesc" placeholder="Success" title="Success">You perceive things as they truly are.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-soul-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You see Reality, but you also affect the Illusion. The GM chooses one:<ul><li>Something senses you.</li><li>The Illusion tears around you.</li></ul></textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-soul-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">The GM explains what you see and makes a Move.</textarea>
+	</div>
+	<!-- Help/Hinder -->
+	<div class="sheet-action">
+		<span class="sheet-action">Result 15+ : </span>
+		<textarea name="attr_moves-helphinder-success" class="sheet-actiondesc" placeholder="Success" title="Success">You may modify the subsequent roll by +2/−2.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 10-14 : </span>
+		<textarea name="attr_moves-helphinder-partial" class="sheet-actiondesc" placeholder="Success With Consequences" title="Success With Consequences">You may modify the subsequent roll by +1/−1.</textarea>
+	</div>
+	<div class="sheet-action">
+		<span class="sheet-action">Result 9- : </span>
+		<textarea name="attr_moves-helphinder-failure" class="sheet-actiondesc" placeholder="Failure" title="Failure">Your interference has unintended consequences. The GM makes a Move.</textarea>
+	</div>
+</div>
+  
+  
+		<div class="traits">
+		  <div class="dark_secrets">
+			  <div class="sheet-label">&#x2B2A; <span data-i18n="darksecrets-u">Dark Secrets</span></div>			  
+			    <div class="auto-expand">
+				  <span name="attr_darksecrets"></span>
+				  <textarea name="attr_darksecrets"></textarea>
+			    </div>
+		  </div>
+		  <div class="disadvantages">
+			  <div class="sheet-label">&#x2B2A; <span data-i18n="disadvantages-u">Disadvantages</span></div>
+				<fieldset class="repeating_disadvantages">
+					<input type="checkbox" name="attr_disadvantage_rollable" value="1" checked="true" class="toggle-show-rollable" style="float:right;margin-right:0px;"><span style="float:right;margin-right:-15px;"></span><span style="float:right;margin-right:5px;">Rollable</span><br />
+					<input type="text" name="attr_disadvantage_name" placeholder="Name">
+					<button type="roll" value="&{template:kult}{{name=Disadvantage }}{{subtags=@{disadvantage_name} }}{{valor=[[2d10+@{disadvantage_penalty}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{disadvantage-success}}} {{partial=@{disadvantage-partial}}} {{failure=@{disadvantage-failure}}} {{options=@{disadvantage_options}}}"
+					  class="rollonly" data-i18n="disadvantages-roll-u">Roll Disadvantage</button>
+					<button type="roll" value="/w gm &{template:kult}{{name=Disadvantage }}{{subtags=@{disadvantage_name} }}{{valor=[[2d10+@{disadvantage_penalty}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]]}} {{success=@{disadvantage-success}}} {{partial=@{disadvantage-partial}}} {{failure=@{disadvantage-failure}}} {{options=@{disadvantage_options}}}"
+					  class="rollonly" data-i18n="disadvantages-roll-gm-u">Roll to GM</button>
+					  <div class="trait-section">
+						  <div class="auto-expand">
+							<span name="attr_disadvantage_description"></span>
+							<textarea name="attr_disadvantage_description" placeholder="Description"></textarea>
+						  </div>
+					  </div>
+					  <div class="trait-section rollonly">
+						  <div class="rollresult success"><div class="auto-expand"><span name="attr_disadvantage-success"></span><textarea name="attr_disadvantage-success" placeholder="Success"></textarea></div></div>
+						  <div class="rollresult partial"><div class="auto-expand"><span name="attr_disadvantage-partial"></span><textarea name="attr_disadvantage-partial" placeholder="Success With Consequences"></textarea></div></div>
+						  <div class="rollresult failure"><div class="auto-expand"><span name="attr_disadvantage-failure"></span><textarea name="attr_disadvantage-failure" placeholder="Failure"></textarea></div></div>
+					  </div>
+					  <div class="trait-section rollonly">
+						<div class="auto-expand"><span name="attr_disadvantage_options"></span><textarea name="attr_disadvantage_options" placeholder="Options/details"></textarea></div>
+					  </div>
+				</fieldset>        
+		  </div>
+		  <div class="advantages">
+			  <div class="sheet-label">&#x2B2A; <span data-i18n="advantages-u">Advantages</span></div>
+				<fieldset class="repeating_advantages">
+					<input type="checkbox" name="attr_advantage_rollable" value="1" checked="true" class="toggle-show-rollable" style="float:right;margin-right:0px;"><span style="float:right;margin-right:-15px;"></span><span style="float:right;margin-right:5px;">Rollable</span><br />
+					<input type="text" name="attr_advantage_name" placeholder="Name">
+					<select name="attr_advantage_attribute">
+					  <option value="Select">--attribute--</option>
+					  <option value="Fortitude" data-i18n="fortitude-u">Fortitude</option>
+					  <option value="Willpower" data-i18n="willpower-u">Willpower</option>
+					  <option value="Reflexes" data-i18n="reflexes-u">Reflexes</option>
+					  <option value="Reason" data-i18n="reason-u">Reason</option>
+					  <option value="Intuition" data-i18n="intuition-u">Intuition</option>
+					  <option value="Perception" data-i18n="perception-u">Perception</option>
+					  <option value="Coolness" data-i18n="coolness-u">Coolness</option>
+					  <option value="Violence" data-i18n="violence-u">Violence</option>
+					  <option value="Charisma" data-i18n="charisma-u">Charisma</option>
+					  <option value="Soul" data-i18n="soul-u">Soul</option>
+					</select>
+					<input type="hidden" name="attr_attributemod" value="0"></input>
+					<button type="roll" value="&{template:kult}{{name=Advantage }}{{subtags=@{advantage_name} }}{{valor=[[2d10+@{attributemod}+@{condition_penalty}+@{wound_penalty}+@{rollmod}]] }} {{success=@{advantage-success}}} {{partial=@{advantage-partial}}} {{failure=@{advantage-failure}}} {{options=@{advantage_options}}}" class="rollonly" data-i18n="advantages-roll-u">Roll Advantage</button>
+					  <div class="trait-section">
+						  <div class="auto-expand">
+							<span name="attr_advantage_description"></span>
+							<textarea name="attr_advantage_description" placeholder="Description"></textarea>
+						  </div>
+					  </div>
+					  <div class="trait-section rollonly">
+						  <div class="rollresult success"><div class="auto-expand"><span name="attr_advantage-success"></span><textarea name="attr_advantage-success" placeholder="Success"></textarea></div></div>
+						  <div class="rollresult partial"><div class="auto-expand"><span name="attr_advantage-partial"></span><textarea name="attr_advantage-partial" placeholder="Success With Consequences"></textarea></div></div>
+						  <div class="rollresult failure"><div class="auto-expand"><span name="attr_advantage-failure"></span><textarea name="attr_advantage-failure" placeholder="Failure"></textarea></div></div>
+					  </div>
+					  <div class="trait-section rollonly">
+						<div class="auto-expand"><span name="attr_advantage_options"></span><textarea name="attr_advantage_options" placeholder="Options/details"></textarea></div>
+					  </div>
+				</fieldset>
+		  </div>
+	  </div>
 </div>
 </div>
 
-  <br>
 
 <div class="sheet-page2">
     <div class="container2">
+	<div class="penalties">
       <div class="wounds">
         <div class="sheet-label">&#x2B2A; <span data-i18n="wounds-u">Wounds</span></div>
-        <br>
-        <div class="sheet-label2" style="float: left"><span data-i18n="wounds-serious-u">Serious Wounds (-1 ongoing)</span></div>
-        <div class="sheet-label2" style="float: right"><span data-i18n="wounds-stabilized-u">Stabilized</span></div>
-        <div class="sheet-bracket">
-          <input type="text" name="attr_swound1name">
-          <input type="checkbox" name="attr_swound1" value="1">
-          <span></span>
-          <input type="text" name="attr_swound2name">
-          <input type="checkbox" name="attr_swound2" value="1">
-          <span></span>
-          <input type="text" name="attr_swound3name">
-          <input type="checkbox" name="attr_swound3" value="1">
-          <span></span>
-          <input type="text" name="attr_swound4name">
-          <input type="checkbox" name="attr_swound4" value="1">
-          <span></span>
-        </div>
-        <div class="sheet-label2" style="float: left"><span data-i18n="wounds-critical-u">Critical Wound (-1 ongoing)</span></div>
-        <div class="sheet-label2" style="float: right"><span data-i18n="wounds-stabilized-u">Stabilized</span></div>
-        <div class="sheet-bracket" style="margin-bottom: 5%">
-          <input type="text" name="attr_cwound1name">
-          <input type="checkbox" name="attr_cwound1" value="1">
-          <span></span>
-        </div>
-      <!--</div>-->
+		<div class="sheet-wounds-list">
+			<div class="sheet-label2 sheet-wounds-label-left"><span data-i18n="wounds-serious-u">Serious Wounds (-1 ongoing)</span></div>
+			<div class="sheet-label2"><span data-i18n="wounds-stabilized-u">Stabilized</span></div>
+			<input type="text" name="attr_swound1name">
+			<input type="checkbox" name="attr_swound1" value="1"><span></span>
+			<input type="text" name="attr_swound2name">
+			<input type="checkbox" name="attr_swound2" value="1"><span></span>
+			<input type="text" name="attr_swound3name">
+			<input type="checkbox" name="attr_swound3" value="1"><span></span>
+			<input type="text" name="attr_swound4name">
+			<input type="checkbox" name="attr_swound4" value="1"><span></span>
+			<div class="sheet-label2 sheet-wounds-label-left"><span data-i18n="wounds-critical-u">Critical Wound (-1 ongoing)</span></div>
+			<div class="sheet-label2"><span data-i18n="wounds-stabilized-u">Stabilized</span></div>
+			<input type="text" name="attr_cwound1name">
+			<input type="checkbox" name="attr_cwound1" value="1"><span></span>
+		</div>
+		<div class="sheet-wounds-list">
+			<input type="checkbox" name="attr_applywoundpenalty" value="1" style="margin-left:10px;"><span></span>
+			<div class="sheet-label2" data-i18n="wounds-apply-u">Apply wound penalties to rolls</div>
+		</div>
+		<input type="hidden" name="attr_wound_penalty" value="0"></input>
       </div>
+	  
+
       <div class="stability">
           <div class="sheet-label">&#x2B2A; <span data-i18n="stability-u">Stability</span></div>
-          <table class="sheet-bracket" style="width:295px">
+          <table class="sheet-bracket">
             <tbody>
-              <tr style="border-bottom: 1px black solid">
-                <td style="border-bottom: 1px black solid">
-                  <input type="radio" name="attr_stability" value="0">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid"><span data-i18n="stability-lvl0-u">Composed</span></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td style="border-bottom: 1px black solid">
-                  <input type="radio" name="attr_stability" value="1">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid; border-right:1px black solid;"><span data-i18n="stability-lvl1-u">Uneasy</span></td>
-    
-                <td></td>
-                <td class="sheet-label4"><span data-i18n="stability-stress-moderate-u">Moderate stress:</span></td>
-    
-              </tr>
-              <tr style="border-bottom: 1px black solid">
-                <td>
-                  <input type="radio" name="attr_stability" value="2">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid; border-right:1px black solid;"><span data-i18n="stability-lvl2-u">Unfocused</span></td>
-                <td></td>
-                <td class="sheet-label2"><span data-i18n="stability-stress-moderate-disad-u">-1 to Disadvantage rolls</span></td>
-              </tr>
-              <tr>
-                <td style="border-bottom: 1px black solid;">
-                  <input type="radio" name="attr_stability" value="3" >
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid; border-right:1px black solid;"><span data-i18n="stability-lvl3-u">Shaken</span></td>
-                <td></td>
-                <td class="sheet-label4"><span data-i18n="stability-stress-serious-u">Serious stress:</span></td>
-              </tr>
-              <tr>
-                <td style="border-bottom: 1px black solid;">
-                  <input type="radio" name="attr_stability" value="4">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid; border-right:1px black solid;"><span data-i18n="stability-lvl4-u">Distressed</span></td>
-                <td style="width: 5%;"></td>
-                <td class="sheet-label4 sheet-label3"><span data-i18n="stability-stress-serious-kit-u">-1 Keep it Together</span></td>
-              </tr>
-              <tr style="border-bottom: 1px black solid">
-                <td>
-                  <input type="radio" name="attr_stability" value="5">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-right:1px black solid;"><span data-i18n="stability-lvl5-u">Neurotic</span></td>
-                <td></td>
-                <td class="sheet-label2"><span data-i18n="stability-stress-serious-disad-u">-2 to Disadvantage rolls</span></td>
-              </tr>
-              <tr>
-                <td style="border-bottom: 1px black solid;">
-                  <input type="radio" name="attr_stability" value="6">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid; border-right:1px black solid;"><span data-i18n="stability-lvl6-u">Anxious</span></td>
-                <td></td>
-                <td class="sheet-label4"><span data-i18n="stability-stress-critical-u">Critical stress:</span></td>
-              </tr>
-              <tr>
-                <td style="border-bottom: 1px black solid;">
-                  <input type="radio" name="attr_stability" value="7">
-                  <span></span>
-                </td>
-                <td class="sheet-label3" style="border-bottom: 1px black solid; border-right:1px black solid;"><span data-i18n="stability-lvl7-u">Irrational</span></td>
-                <td></td>
-                <td class="sheet-label4 sheet-label3"><span data-i18n="stability-stress-critical-kit-u">-2 Keep it Together</span></td>
-              </tr>
               <tr>
                 <td>
-                  <input type="radio" name="attr_stability" value="8">
+                  <input type="radio" name="attr_stability" value="10">
                   <span></span>
                 </td>
-                <td class="sheet-label3" style="border-right:1px black solid;"><span data-i18n="stability-lvl8-u">Unhinged</span></td>
-                <td></td>
-                <td class="sheet-label2"><span data-i18n="stability-stress-critical-disad-u">-3 to Disadvantage rolls</span></td>
-              </tr>
-              <tr style="border-bottom: 1px black solid">
-                <td></td>
-                <td style="border-right:1px black solid;"></td>
-                <td></td>
-                <td class="sheet-label3 sheet-label4"><span data-i18n="stability-stress-critical-sti-u">+1 See Through the Illusion</span></td>
+                <td class="sheet-label3" colspan="2"><span data-i18n="stability-lvl0-u">Composed</span></td>
               </tr>
               <tr>
                 <td>
                   <input type="radio" name="attr_stability" value="9">
                   <span></span>
                 </td>
-                <td class="sheet-label3" style="border-right:1px black solid;"><span data-i18n="stability-lvl9-u">Broken</span></td>
-                <td></td>
-                <td class="sheet-label2"><span data-i18n="stability-broken-mmv-u">The GM makes a Move</span></td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl1-u">Uneasy</span></td>
+    
+                <td rowspan="2" class="sheet-bracket-stress">
+					<span class="sheet-label4" data-i18n="stability-stress-moderate-u">Moderate stress:</span><br />
+					<span class="sheet-label2" data-i18n="stability-stress-moderate-disad-u">-1 to Disadvantage rolls</span>
+				</td>
+    
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="8">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl2-u">Unfocused</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="7" >
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl3-u">Shaken</span></td>
+
+                <td rowspan="3" class="sheet-bracket-stress">
+					<span class="sheet-label4" data-i18n="stability-stress-serious-u">Serious stress:</span><br />
+					<span class="sheet-label4 sheet-label3" data-i18n="stability-stress-serious-kit-u">-1 Keep it Together</span><br />
+					<span class="sheet-label2" data-i18n="stability-stress-serious-disad-u">-2 to Disadvantage rolls</span>
+				</td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="6">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl4-u">Distressed</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="5">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl5-u">Neurotic</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="4">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl6-u">Anxious</span></td>
+
+                <td rowspan="3" class="sheet-bracket-stress">
+					<span class="sheet-label4" data-i18n="stability-stress-critical-u">Critical stress:</span><br />
+					<span class="sheet-label4 sheet-label3" data-i18n="stability-stress-critical-kit-u">-2 Keep it Together</span><br />
+					<span class="sheet-label2" data-i18n="stability-stress-critical-disad-u">-3 to Disadvantage rolls</span><br />
+					<span class="sheet-label3 sheet-label4" data-i18n="stability-stress-critical-sti-u">+1 See Through the Illusion</span>
+				</td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="3">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl7-u">Irrational</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="2">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl8-u">Unhinged</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="radio" name="attr_stability" value="1">
+                  <span></span>
+                </td>
+                <td class="sheet-label3"><span data-i18n="stability-lvl9-u">Broken</span></td>
+                <td class="sheet-label2 sheet-bracket-stress"><span data-i18n="stability-broken-mmv-u">The GM makes a Move</span></td>
               </tr>
             </tbody>
           </table>
+		  
+		  <input type="hidden" name="attr_disadvantage_penalty" value="0"></input>
+		  <input type="hidden" name="attr_kit_penalty" value="0"></input>
+		  <input type="hidden" name="attr_stti_bonus" value="0"></input>
     
         <!--</div>-->
       </div>
-      <div class="dramatic_hooks">
-            <div class="sheet-label">&#x2B2A; <span data-i18n="dramatichooks-u">Dramatic Hooks</span></div>
-            <textarea style="height: 485px;" name="attr_dramatichooks"></textarea>
-      </div>
-      <div class="gears">
-            <div class="sheet-label">&#x2B2A; <span data-i18n="gear-u">Gear</span></div>
-            <textarea name="attr_gear" style="height: 260px; width:435px;"></textarea>
-      </div>
-      <div class="weapons">
-            <div class="sheet-label">&#x2B2A; <span data-i18n="weapons-u">Weapons</span></div>
-            <textarea name="attr_weapons" style="height: 260px; width:435px"></textarea>
-      </div>
-      <div class="notes">
-            <div class="sheet-label">&#x2B2A; <span data-i18n="notes-u">Notes</span></div>
-            <textarea name="attr_notes" style="height: 565px;"></textarea>
-      </div>
+	  
+
+	</div>
+	  
+	  <div class="other">
+		  <div class="conditions">
+			<div class="sheet-label">&#x2B2A; <span data-i18n="conditions-u">Conditions</span></div>
+			<div class="sheet-conditions-checks">
+				<input type="checkbox" name="attr_conditionangry" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-angry-u">Angry (-1 ongoing)</div>
+				<input type="checkbox" name="attr_conditionguiltridden" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-guilt-u">Guilt-ridden (-1 ongoing)</div>
+				<input type="checkbox" name="attr_conditionsad" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-sad-u">Sad (-1 ongoing)</div>
+				<input type="checkbox" name="attr_conditiondistracted" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-distracted-u">Distracted (-2 ongoing)</div>
+				<input type="checkbox" name="attr_conditionscared" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-scared-u">Scared (-1 ongoing)</div>
+				<input type="checkbox" name="attr_conditionobsessed" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-obsessed-u">Obsessed (+1 relation)</div>
+			</div>
+			<div class="sheet-conditions-checks">
+				<input type="checkbox" name="attr_applyconditionpenalty" value="1"><span></span>
+				<div class="sheet-label2" data-i18n="conditions-apply-u" style="width:300px;">Apply condition penalties to rolls</div>
+			</div>
+			<input type="hidden" name="attr_condition_penalty" value="0"></input>
+		  </div>
+		  <div class="dramatic_hooks">
+				<div class="sheet-label">&#x2B2A; <span data-i18n="dramatichooks-u">Dramatic Hooks</span></div>
+				<textarea name="attr_dramatichooks" style="height: 395px;width:100%;"></textarea>
+		  </div>
+	  
+	  </div>
+	  
+	  <div class="equipment">
+		  <div class="gears">
+				<div class="sheet-label">&#x2B2A; <span data-i18n="gear-u">Gear</span></div>						  
+					<div class="auto-expand">
+					  <span name="attr_gear"></span>
+					  <textarea name="attr_gear"></textarea>
+					</div>
+				
+		  </div>
+		  <div class="weapons">
+				<div class="sheet-label">&#x2B2A; <span data-i18n="weapons-u">Weapons</span></div>				
+				<fieldset class="repeating_weapons">
+					<input type="text" name="attr_weapon_name">
+					Ammo: <input type="number" name="attr_weapon_ammo"> / <input type="number" name="attr_weapon_ammo_max">								  
+					<div class="auto-expand">
+					  <span name="attr_weapon_description"></span>
+					  <textarea name="attr_weapon_description" placeholder="Details"></textarea>
+					</div>
+				</fieldset>				
+		  </div>
+	  </div>
+	  
+		  <div class="advancement">
+				<div class="sheet-label">&#x2B2A; <span data-i18n="advancement-u">Advancement</span></div>		
+				<p><span style="font-weight:bold;font-style:italic;vertical-align:middle;" data-i18n="experience-u">Experience</span> <input type="number" name="attr_experience"></input></p>
+				
+				<input type="radio" class="sheet-typesleeper" name="attr_type" value="1" id="sheet-typesleeper"></input>
+					<label for="sheet-typesleeper" data-i18n="sleeper-u">Sleeper</label>
+				<input type="radio" class="sheet-typeaware" name="attr_type" value="2" checked="checked" id="sheet-typeaware"></input>
+					<label for="sheet-typeaware" data-i18n="aware-u">Aware</label>
+				<input type="radio" class="sheet-typeenlightened" name="attr_type" value="3" id="sheet-typeenlightened"></input>
+					<label for="sheet-typeenlightened" data-i18n="enlightened-u">Enlightened</label>
+				<br /><br />
+				<div class="sheet-typesleeper">
+					<p><span data-i18n="sleeper-steps-u">Your sleeping PC advances in the following steps:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancesleeper1" value="1"><span></span>
+						[1] <span data-i18n="sleeper-remember-u">They remember something about their Dark Secret.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancesleeper2" value="1"><span></span>
+						[2] <span data-i18n="sleeper-remember-u">They remember something about their Dark Secret.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancesleeper3" value="1"><span></span>
+						[3] <span data-i18n="sleeper-remember-u">They remember something about their Dark Secret.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancesleeper4" value="1"><span></span>
+						[4] <span data-i18n="sleeper-remember-u">They remember something about their Dark Secret.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancesleeper5" value="1"><span></span>
+						[5] <span data-i18n="sleeper-remember-u">They remember something about their Dark Secret.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancesleeper6" value="1"><span></span>
+						[6] <span data-i18n="sleeper-awaken-u">They awaken. You choose an Aware Archetype. The PC keeps their Dark Secret and their Disadvantages, but the player picks three Advantages from their new Archetype.</span></p>
+				</div>
+				<div class="sheet-typeaware">
+					<p><span data-i18n="aware-intro-u">When your character advances you get to choose from the following advancements.</span></p>
+					<p class="sheet-advancement-header"><span data-i18n="aware-choose-u">Choose One of These:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceactive1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceactive2" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceactive3" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceactive4" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceactive5" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceactive6" value="1"><span></span>
+						<span data-i18n="aware-advance-active-u">Increase one active Attribute +1 (to max +3).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancepassive1" value="1"><span></span>
+						<input type="checkbox" name="attr_advancepassive2" value="1"><span></span>
+						<span data-i18n="aware-advance-passive-u">Increase one passive Attribute +1 (to max +3).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceany" value="1"><span></span>
+						<span data-i18n="aware-advance-any-u">Increase any one Attribute +1 (to max +4).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advancenewadvantage1" value="1"><span></span>
+						<input type="checkbox" name="attr_advancenewadvantage2" value="1"><span></span>
+						<input type="checkbox" name="attr_advancenewadvantage3" value="1"><span></span>
+						<span data-i18n="aware-advance-new-u">Select a new Advantage from your Archetype.</span></p>
+					<p class="sheet-advancement-header"><span data-i18n="aware-advance-5-u">After 5 Advancements You May Also Choose:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceafter5any1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceafter5any2" value="1"><span></span>
+						<span data-i18n="aware-advance-5-any-u">Increase any one Attribute +1 (to max +4).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceafter5newadvantage1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceafter5newadvantage2" value="1"><span></span>
+						<span data-i18n="aware-advance-5-new-u">Select a new Advantage from any Aware Archetype.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceafter5end" value="1"><span></span>
+						<span data-i18n="aware-advance-5-end-u">End your character's story arc as you see fit, and create a new Aware character, who starts with 2 Advancements.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceafter5replace" value="1"><span></span>
+						<span data-i18n="aware-advance-5-replace-u">Replace your current Archetype with another Aware Archetype, and erase one of your starting 3 Advantages.</span></p>
+					<p class="sheet-advancement-header"><span data-i18n="aware-advance-10-u">After 10 Advancements You May Also Choose:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceafter10enlightened" value="1"><span></span>
+						<span data-i18n="aware-advance-10-new-u">Advance your character to an Enlightened Archetype.</span></p>
+				</div>
+				<div class="sheet-typeenlightened">
+					<p class="sheet-advancement-header"><span data-i18n="enlightened-choose-u">Choose One of These:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedany" value="1"><span></span>
+						<span data-i18n="enlightened-advance-any-u">Add +1 to any Attribute (max +5).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedactive1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedactive2" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedactive3" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedactive4" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedactive5" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedactive6" value="1"><span></span>
+						<span data-i18n="enlightened-advance-active-u">Add +1 to an active Attribute (max +4).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedpassive1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedpassive2" value="1"><span></span>
+						<span data-i18n="enlightened-advance-passive-u">Add +1 to a passive Attribute (max +4).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedability1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedability2" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedability3" value="1"><span></span>
+						<span data-i18n="enlightened-advance-new-u">Gain an Ability available to your Archetype.</span></p>
+					<p class="sheet-advancement-header"><span data-i18n="enlightened-advance-5-u">After 5 Advancements You May Also Choose:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedafter5any1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedafter5any2" value="1"><span></span>
+						<span data-i18n="enlightened-advance-5-any-u">Add +1 to any Attribute (max +5).</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedafter5ability1" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedafter5ability2" value="1"><span></span>
+						<input type="checkbox" name="attr_advanceenlightenedafter5ability3" value="1"><span></span>
+						<span data-i18n="enlightened-advance-5-new-u">Gain an Ability or Advantage of your choosing.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedafter5end" value="1"><span></span>
+						<span data-i18n="enlightened-advance-5-end-u">Finish your character's story and make a new PC.</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedafter5replace" value="1"><span></span>
+						<span data-i18n="enlightened-advance-5-replace-u">Change your character's Archetype to a new Enlightened one.</span></p>
+					<p class="sheet-advancement-header"><span data-i18n="enlightened-advance-10-u">After 10 Advancements You May Also Choose:</span></p>
+					<p class="sheet-advancement-checks">
+						<input type="checkbox" name="attr_advanceenlightenedafter10awaken" value="1"><span></span>
+						<span data-i18n="enlightened-advance-10-awaken-u">Start your journey towards Awakening.</span></p>
+				</div>
+		  </div>
+
+	  <div class="notes">
+			<div class="sheet-label">&#x2B2A; <span data-i18n="notes-u">Notes</span></div>
+			<textarea name="attr_notes" style="height: 565px;width:815px;"></textarea>
+	  </div>
     </div>
 </div>
 <!--</div>-->
@@ -331,6 +700,22 @@
         {{#rollLess() valor 10}}
             <div class="ffailure"><h4 data-i18n="failure-rt">Falha!</h4></div>
         {{/rollLess() valor 10}}
+		
+                {{#success}}
+                    {{#rollGreater() valor 14}}
+                        <div class="movedesc">{{success}}<br/>{{options}}</div>
+                    {{/rollGreater() valor 14}}
+                {{/success}}
+                {{#partial}}
+                    {{#rollBetween() valor 10 14}}
+                        <div class="movedesc">{{partial}}<br/>{{options}}</div>
+                    {{/rollBetween() valor 10 14}}
+                {{/partial}}
+                {{#failure}}
+                    {{#rollLess() valor 10}}
+                        <div class="movedesc">{{failure}}<br/>{{options}}</div>
+                    {{/rollLess() valor 10}}
+                {{/failure}}
     </div>
 </rolltemplate>
 
@@ -341,7 +726,325 @@ on("sheet:opened", function(eventInfo){
     setAttrs({
         modificator: getTranslationByKey("modificator-rt")
     });     
-    
+	
+	// check the version
+	// if it's 0 either we need an upgrade or it's a new sheet
+	// check the attributes that need upgrading
+	// if they exist, do the upgrade
+	// then update the version to 2
+	getAttrs(["version"], function(values) {
+		var version = parseInt(values.version)||0;
+		if (version == 0){
+			getAttrs(["charname","stability","disadvantages","advantages","weapons","relations"], function(subvalues) {
+				var newrowattrs = {};
+				newrowattrs["version"] = 3;
+				
+				if (subvalues.charname != undefined){
+					newrowattrs["character_name"] = subvalues.charname;
+				}
+				
+				if (subvalues.stability != undefined){
+					let stab = 10 - (parseInt(subvalues.stability)||0);					
+					var kit = 0;
+					var stti = 0;
+					var disad = 0;
+					switch(stab){
+					  case 2:
+					  case 3:
+					  case 4:
+						kit = -2;
+						stti = 1;
+						disad = -3;
+						break;
+					  case 5:
+					  case 6:
+					  case 7:
+						kit = -1;
+						disad = -2;
+						break;
+					  case 8:
+					  case 9:
+						disad = -1;
+						break;
+					}
+					newrowattrs["stability"] = stab;
+					newrowattrs["kit_penalty"] = kit;
+					newrowattrs["stti_bonus"] = stti;
+					newrowattrs["disadvantage_penalty"] = disad;
+				}
+				
+				if (subvalues.disadvantages != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_disadvantages_" + newrowid + "_disadvantage_description"] = subvalues.disadvantages;
+				}
+				
+				if (subvalues.advantages != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_advantages_" + newrowid + "_advantage_description"] = subvalues.advantages;
+				}
+				
+				if (subvalues.weapons != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_weapons_" + newrowid + "_weapon_description"] = subvalues.weapons;
+				}
+				
+				if (subvalues.relations != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_relations_" + newrowid + "_relation_description"] = subvalues.relations;
+				}
+				
+				setAttrs(newrowattrs);
+			});
+		}
+		else if (version == 2)
+		{
+			// Just do the relations update
+			getAttrs(["relations"], function(subvalues) {
+				var newrowattrs = {};
+				newrowattrs["version"] = 3;
+				
+				if (subvalues.relations != undefined){
+					var newrowid = generateRowID();
+					newrowattrs["repeating_relations_" + newrowid + "_relation_description"] = subvalues.relations;
+				}
+				
+				setAttrs(newrowattrs);
+			});
+		}
+  });    
 });
 
+// Set advantage modifier when an attribute is selected.
+on('change:repeating_advantages:advantage_attribute', function() {  
+  getAttrs(["repeating_advantages_advantage_attribute","Fortitude","Willpower","Reflexes","Reason","Intuition","Perception","Coolness","Violence","Charisma","Soul"], function(values) {	
+    var modifier = 0;
+    switch(values.repeating_advantages_advantage_attribute){
+	  case "Fortitude":
+	    modifier = parseInt(values.Fortitude)||0;
+		break;
+	  case "Willpower":
+	    modifier = parseInt(values.Willpower)||0;
+		break;
+	  case "Reflexes":
+	    modifier = parseInt(values.Reflexes)||0;
+		break;
+	  case "Reason":
+	    modifier = parseInt(values.Reason)||0;
+		break;
+	  case "Intuition":
+	    modifier = parseInt(values.Intuition)||0;
+		break;
+	  case "Perception":
+	    modifier = parseInt(values.Perception)||0;
+		break;
+	  case "Coolness":
+	    modifier = parseInt(values.Coolness)||0;
+		break;
+	  case "Violence":
+	    modifier = parseInt(values.Violence)||0;
+		break;
+	  case "Charisma":
+	    modifier = parseInt(values.Charisma)||0;
+		break;
+	  case "Soul":
+	    modifier = parseInt(values.Soul)||0;
+		break;
+    }
+    setAttrs({                            
+      repeating_advantages_attributemod: modifier
+    });
+  });
+});
+
+// Set help/hinder modifier when an attribute is selected or when an attribute modifier is changed.
+on('change:helphinder change:fortitude change:willpower change:reflexes change:reason change:intuition change:perception change:coolness change:violence change:charisma change:soul', function() {  
+  getAttrs(["helphinder","Fortitude","Willpower","Reflexes","Reason","Intuition","Perception","Coolness","Violence","Charisma","Soul"], function(values) {	
+    var modifier = 0;
+    switch(values.helphinder){
+	  case "Fortitude":
+	    modifier = parseInt(values.Fortitude)||0;
+		break;
+	  case "Willpower":
+	    modifier = parseInt(values.Willpower)||0;
+		break;
+	  case "Reflexes":
+	    modifier = parseInt(values.Reflexes)||0;
+		break;
+	  case "Reason":
+	    modifier = parseInt(values.Reason)||0;
+		break;
+	  case "Intuition":
+	    modifier = parseInt(values.Intuition)||0;
+		break;
+	  case "Perception":
+	    modifier = parseInt(values.Perception)||0;
+		break;
+	  case "Coolness":
+	    modifier = parseInt(values.Coolness)||0;
+		break;
+	  case "Violence":
+	    modifier = parseInt(values.Violence)||0;
+		break;
+	  case "Charisma":
+	    modifier = parseInt(values.Charisma)||0;
+		break;
+	  case "Soul":
+	    modifier = parseInt(values.Soul)||0;
+		break;
+    }
+    setAttrs({                            
+      helphindermod: modifier
+    });
+  });
+});
+
+// Change advantage modifiers when an attribute modifier is changed.
+on("change:fortitude change:willpower change:reflexes change:reason change:intuition change:perception change:coolness change:violence change:charisma change:soul", function() {
+    getAttrs(["Fortitude","Willpower","Reflexes","Reason","Intuition","Perception","Coolness","Violence","Charisma","Soul"], function(values) {
+		getSectionIDs("repeating_advantages", function(idarray) {
+			for (let i = 0; i < idarray.length; i++) {
+				//Get the selected attribute
+				getAttrs([`repeating_advantages_${idarray[i]}_advantage_attribute`], function(attributeArray) {
+					//set the modifier based on the selected attribute
+					var modifier = 0;
+					switch(attributeArray[`repeating_advantages_${idarray[i]}_advantage_attribute`]){
+					  case "Fortitude":
+						modifier = parseInt(values.Fortitude)||0;
+						break;
+					  case "Willpower":
+						modifier = parseInt(values.Willpower)||0;
+						break;
+					  case "Reflexes":
+						modifier = parseInt(values.Reflexes)||0;
+						break;
+					  case "Reason":
+						modifier = parseInt(values.Reason)||0;
+						break;
+					  case "Intuition":
+						modifier = parseInt(values.Intuition)||0;
+						break;
+					  case "Perception":
+						modifier = parseInt(values.Perception)||0;
+						break;
+					  case "Coolness":
+						modifier = parseInt(values.Coolness)||0;
+						break;
+					  case "Violence":
+						modifier = parseInt(values.Violence)||0;
+						break;
+					  case "Charisma":
+						modifier = parseInt(values.Charisma)||0;
+						break;
+					  case "Soul":
+						modifier = parseInt(values.Soul)||0;
+						break;
+					}
+					
+					const output = {};
+					output[`repeating_advantages_${idarray[i]}_attributemod`] = modifier;
+					setAttrs(output);
+				});
+			}			 
+	   });
+    });
+});
+
+// Set condition penalty when conditions change
+on('change:conditionangry change:conditionguiltridden change:conditionsad change:conditiondistracted change:conditionscared change:applyconditionpenalty', function() {  
+  getAttrs(["conditionangry","conditionguiltridden","conditionsad","conditiondistracted","conditionscared","applyconditionpenalty"], function(values) {
+	var conditionpenalty = 0;
+	let apply = parseInt(values.applyconditionpenalty)||0;
+	if (apply == 1){
+		let angry = parseInt(values.conditionangry)||0;
+		let guiltridden = parseInt(values.conditionguiltridden)||0;
+		let sad = parseInt(values.conditionsad)||0;
+		let distracted = parseInt(values.conditiondistracted)||0;
+		let scared = parseInt(values.conditionscared)||0;
+		if (angry == 1){
+			conditionpenalty = conditionpenalty - 1;
+		}
+		if (guiltridden == 1){
+			conditionpenalty = conditionpenalty - 1;
+		}
+		if (sad == 1){
+			conditionpenalty = conditionpenalty - 1;
+		}
+		if (distracted == 1){
+			conditionpenalty = conditionpenalty - 2;
+		}
+		if (scared == 1){
+			conditionpenalty = conditionpenalty - 1;
+		}
+	}
+	
+    setAttrs({                            
+      "condition_penalty": conditionpenalty
+    });
+  });
+});
+
+// Set stability modifiers when stability changes.
+on('change:stability', function() {  
+  getAttrs(["stability"], function(values) {	
+    let stability = parseInt(values.stability)||0;
+	var kit = 0;
+	var stti = 0;
+	var disad = 0;
+    switch(stability){
+	  case 2:
+	  case 3:
+	  case 4:
+		kit = -2;
+		stti = 1;
+		disad = -3;
+		break;
+	  case 5:
+	  case 6:
+	  case 7:
+		kit = -1;
+		disad = -2;
+		break;
+	  case 8:
+	  case 9:
+		disad = -1;
+		break;
+    }
+    setAttrs({                            
+      kit_penalty: kit, stti_bonus: stti, disadvantage_penalty: disad
+    });
+  });
+});
+
+// Set wound penalty when wounds change
+on('change:swound1 change:swound1name change:swound2 change:swound2name change:swound3 change:swound3name change:swound4 change:swound4name change:cwound1 change:cwound1name change:applywoundpenalty', function() {  
+  getAttrs(["swound1","swound1name","swound2","swound2name","swound3","swound3name","swound4","swound4name","cwound1","cwound1name","applywoundpenalty"], function(values) {
+	var woundpenalty = 0;
+	let apply = parseInt(values.applywoundpenalty)||0;
+	if (apply == 1){
+		// If there's a critical wound that's not stabilised, -1
+		let critical = values.cwound1name||"";
+		let criticalstable = parseInt(values.cwound1)||0;
+		if (critical.length > 0 && criticalstable == 0){
+			woundpenalty = woundpenalty - 1;
+		}
+		
+		// If there are any serious wounds that aren't stabilised, -1
+		let serious1 = values.swound1name||"";
+		let serious1stable = parseInt(values.swound1)||0;
+		let serious2 = values.swound2name||"";
+		let serious2stable = parseInt(values.swound2)||0;
+		let serious3 = values.swound3name||"";
+		let serious3stable = parseInt(values.swound3)||0;
+		let serious4 = values.swound4name||"";
+		let serious4stable = parseInt(values.swound4)||0;
+		if ((serious1.length > 0 && serious1stable == 0) || (serious2.length > 0 && serious2stable == 0) || (serious3.length > 0 && serious3stable == 0) || (serious4.length > 0 && serious4stable == 0)){
+			woundpenalty = woundpenalty - 1;
+		}
+	}
+	
+    setAttrs({                            
+      "wound_penalty": woundpenalty
+    });
+  });
+});
 </script>

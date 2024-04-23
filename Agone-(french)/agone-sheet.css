@@ -1,12 +1,18 @@
 /* General */
 @import url('https://fonts.googleapis.com/css?family=Merienda+One&display=swap');
-.charsheet, .charsheet p { font-family: 'Merienda One', cursive; }
+.sheetform { width: 870px; }
+.sheet-darkmode .sheetform { background: none; }
+.charsheet, .charsheet p {
+	font-family: 'Merienda One', cursive;
+	margin-left: -10px;
+}
 
 :root {
 	--background-img: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/background.png');
 	--title-img: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/title.png');
 	--title2-img: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/title2.png');
 	--title3-img: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/title3.png');
+	--metal-img: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/metal.png');
 	--padding1-all: 5px 5px 5px 5px;
 	--padding2-all: 2px 2px 2px 2px;
 	--light-border: 2px solid #555;
@@ -93,6 +99,7 @@ input[type=number].border-white {
 	height: 20px;
 	width: 98%;
 	resize: none;
+	overflow: hidden;
 	transition-property: height;
 	transition-duration: 0.5s;
 }
@@ -141,7 +148,9 @@ button[type="roll"].dice {
 	border: none;
 	background-color: transparent;
 	box-shadow: none;
-	-webkit-box-shadow: none;
+	-webkit-filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.65));
+	-ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=3, OffY=3, Color='#000')";
+	filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=3, OffY=3, Color='#000')";
 }
 button[type="roll"].dice::before { content: ' ' !important; }
 button[type="roll"].dice:hover {
@@ -264,68 +273,12 @@ input[type="checkbox"].switch {
 .itemcontrol .repcontrol_del { border: 0; }
 
 /* Menu */
-#pc-menu,
-#companion-menu,
-#demon-menu,
-#npc-menu {
-	opacity: 0;
-	position: absolute;
-	height: 29px;
-	margin-top: -7px;
-	margin-left: -1px;
-	z-index: 3;
+.menu {
+	cursor: pointer;
+	display: inline-flex;
 }
-input[type=radio]:checked + span,
-input[type=radio]:hover + span,
-.summary-menu:checked ~ .summary-menu-lbl,
-.help-menu:checked ~ .help-menu-lbl {
-	box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.2); 
-}
-
-#pc-menu { width: 98.7px; }
-#companion-menu { width: 99.89px; }
-#demon-menu { width: 61px; }
-#npc-menu { width: 34.86px; }
-.summary-menu {
-	position: absolute;
-	left: 555px;
-	top: 75px;
-	z-index: 2;
-}
-.summary-menu-lbl {
-	text-align: right;
-	width: 80px;
-	position: absolute;
-	left: 550px;
-	top: 67px;
-}
-.lang-en .summary-menu-lbl { width: 95px; }
-.help-menu {
-	position: absolute;
-	left: 826px;
-	top: 75px;
-	z-index: 2;
-}
-.help-menu-lbl {
-	text-align: right;
-	width: 60px;
-	position: absolute;
-	left: 818px;
-	top: 67px;
-}
-.pc-menu-lbl,
-.companion-menu-lbl,
-.demon-menu-lbl,
-.npc-menu-lbl {
-	position: relative;
-	top: -3px;
-}
-.pc-menu-lbl,
-.companion-menu-lbl,
-.demon-menu-lbl,
-.npc-menu-lbl,
-.summary-menu-lbl,
-.help-menu-lbl {
+.tab-menu {
+	margin-right: 5px;
 	font-size: 16px;
 	background: var(--title2-img);
 	background-color: black;
@@ -335,18 +288,70 @@ input[type=radio]:hover + span,
 	text-shadow: 2px 2px 2px black;
 	padding: var(--padding2-all);
 	border: 1px solid black;
+	text-align: center;
 }
-#pc-menu:not(:checked) ~ .pc-sheet,
-#pc-menu:not(:checked) ~ .summary,
-#pc-menu:not(:checked) ~ .summary-menu,
-#pc-menu:not(:checked) ~ .summary-menu-lbl,
-#companion-menu:not(:checked) ~ .companion-sheet,
-#demon-menu:not(:checked) ~ .demon-sheet,
-#npc-menu:not(:checked) ~ .npc-sheet,
-.summary-menu:not(:checked) ~ .summary,
-.help-menu:not(:checked) ~ .help {
+.tab-menu.active { box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.2); }
+.tab-container { display: none; }
+.tab-container.active { display: block; }
+.summary-menu {
+	position: absolute;
+	left: 761px;
+}
+.help-menu {
+	position: absolute;
+	left: 832px;
+}
+.lang-en .summary-menu { left: 756px; }
+.lang-en .help-menu { left: 841px; }
+
+button.pc-sub-menu {
+	cursor: pointer;
+	background: var(--metal-img);
+	background-color: #29524a;
+	border: 1px solid rgba(0, 0, 0, 0.65);
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.65);
+	background-size: cover;
+	float: left;
+	height: 19px;
+	width: 10px;
+	position: absolute;
+	left: 41px;
+	margin-top: 10px;
+	border-radius: 50%;
+}
+button.pc-sub-menu.active {	box-shadow: inset 1px 1px 2px 2px rgba(0, 0, 0, 0.65); }
+.pc-attributes,
+.pc-secondary-attributes,
+.pc-skills,
+.pc-assets-faults,
+.pc-darkness-perfidy,
+.pc-flame-season-currency,
+.pc-stuff,
+.pc-combat,
+.pc-weapons,
+.pc-ascendancy,
+.pc-art,
+.pc-spells,
+.pc-invoking,
+.pc-notes {
 	display: none;
 }
+.pc-attributes.active,
+.pc-secondary-attributes.active,
+.pc-skills.active,
+.pc-assets-faults.active,
+.pc-darkness-perfidy.active,
+.pc-flame-season-currency.active,
+.pc-stuff.active,
+.pc-combat.active,
+.pc-weapons.active,
+.pc-ascendancy.active,
+.pc-art.active,
+.pc-spells.active,
+.pc-invoking.active {
+	display: grid;
+}
+.pc-notes.active { display: block; }
 
 /* Help */
 .help {
@@ -355,6 +360,7 @@ input[type=radio]:hover + span,
 	width: 840px;
 }
 .help h1 { font-size: 16px; }
+.help p { margin-left: 0px; }
 
 /* Summary */
 .summary {
@@ -1056,31 +1062,8 @@ input[type=radio]:hover + span,
 	grid-template-columns: 3fr 3fr repeat(12, 1fr) 2fr 2fr 1fr;	
 }
 
-/* Switches */
-.switch {
-	margin-top: 16px;
-	margin-left: 16px;
-	position: absolute;
-}
-.pc-attributes-switch:not(:checked) ~ .pc-attributes,
-.pc-secondary-attributes-switch:not(:checked) ~ .pc-secondary-attributes,
-.pc-skills-switch:not(:checked) ~ .pc-skills,
-.pc-assets-faults-switch:not(:checked) ~ .pc-assets-faults,
-.pc-darkness-perfidy-switch:not(:checked) ~ .pc-darkness-perfidy,
-.pc-flame-season-currency-switch:not(:checked) ~ .pc-flame-season-currency,
-.pc-stuff-switch:not(:checked) ~ .pc-stuff,
-.pc-combat-switch:not(:checked) ~ .pc-combat,
-.pc-weapons-switch:not(:checked) ~ .pc-weapons,
-.pc-ascendancy-switch:not(:checked) ~ .pc-ascendancy,
-.pc-art-switch:not(:checked) ~ .pc-art,
-.pc-spells-switch:not(:checked) ~ .pc-spells,
-.pc-invoking-switch:not(:checked) ~ .pc-invoking,
-.pc-notes-switch:not(:checked) ~ .pc-notes {
-	display: none;
-}
 
 /* Rolltemplates */
-
 .sheet-rolltemplate-agone-generic .sheet-template-container,
 .sheet-rolltemplate-agone-chars .sheet-template-container,
 .sheet-rolltemplate-agone-fumble .sheet-template-container,
@@ -1098,6 +1081,7 @@ input[type=radio]:hover + span,
 	width: 230px;
 	font-family: 'Merienda One', sans-serif;
 	color: #333;
+	font-size: 0.99em;
 }
 .sheet-rolltemplate-agone-generic .sheet-template-header,
 .sheet-rolltemplate-agone-chars .sheet-template-header,
@@ -1115,6 +1099,7 @@ input[type=radio]:hover + span,
 .sheet-rolltemplate-agone-invoking .sheet-template-header {
 	background: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/title.png');
 	background-color: black;
+	font-size: 0.99em;
 	color: white;
 	text-shadow: 2px 2px 2px black;
 	padding: 2px 2px 2px 2px;
@@ -1158,32 +1143,36 @@ input[type=radio]:hover + span,
 .sheet-rolltemplate-agone-art-intuitive .sheet-template-explode,
 .sheet-rolltemplate-agone-invoking .sheet-template-explode {
 	content: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/dice-crit.png');
+	vertical-align: middle;
 	width: 32px;
 	height: 32px;
-	float: right;
-	margin-top: -15px;
-	margin-right: 3px;
+	-webkit-filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.65));
+	-ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=3, OffY=3, Color='#000')";
+	filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=3, OffY=3, Color='#000')";
 }
-.sheet-rolltemplate-agone-generic .sheet-template-implode,
-.sheet-rolltemplate-agone-chars .sheet-template-implode,
-.sheet-rolltemplate-agone-fumble .sheet-template-implode,
-.sheet-rolltemplate-agone-skills .sheet-template-implode,
-.sheet-rolltemplate-agone-dodge .sheet-template-implode,
-.sheet-rolltemplate-agone-natural-defense .sheet-template-implode,
-.sheet-rolltemplate-agone-initiative .sheet-template-implode,
-.sheet-rolltemplate-agone-attack .sheet-template-implode,
-.sheet-rolltemplate-agone-defense .sheet-template-implode,
-.sheet-rolltemplate-agone-ascendancy .sheet-template-implode,
-.sheet-rolltemplate-agone-ascendancy-intuitive .sheet-template-implode,
-.sheet-rolltemplate-agone-art .sheet-template-implode,
-.sheet-rolltemplate-agone-art-intuitive .sheet-template-implode,
-.sheet-rolltemplate-agone-invoking .sheet-template-implode {
+.sheet-rolltemplate-agone-generic .sheet-template-implode a,
+.sheet-rolltemplate-agone-chars .sheet-template-implode a,
+.sheet-rolltemplate-agone-fumble .sheet-template-implode a,
+.sheet-rolltemplate-agone-skills .sheet-template-implode a,
+.sheet-rolltemplate-agone-dodge .sheet-template-implode a,
+.sheet-rolltemplate-agone-natural-defense .sheet-template-implode a,
+.sheet-rolltemplate-agone-initiative .sheet-template-implode a,
+.sheet-rolltemplate-agone-attack .sheet-template-implode a,
+.sheet-rolltemplate-agone-defense .sheet-template-implode a,
+.sheet-rolltemplate-agone-ascendancy .sheet-template-implode a,
+.sheet-rolltemplate-agone-ascendancy-intuitive .sheet-template-implode a,
+.sheet-rolltemplate-agone-art .sheet-template-implode a,
+.sheet-rolltemplate-agone-art-intuitive .sheet-template-implode a,
+.sheet-rolltemplate-agone-invoking .sheet-template-implode a {
 	content: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/dice-fail.png');
+	background: none;
+	border: none;
+	vertical-align: middle;
 	width: 32px;
 	height: 32px;
-	float: right;
-	margin-top: -15px;
-	margin-right: 3px;
+	-webkit-filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.65));
+	-ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=3, OffY=3, Color='#000')";
+	filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=3, OffY=3, Color='#000')";
 }
 .sheet-rolltemplate-agone-generic .inlinerollresult,
 .sheet-rolltemplate-agone-chars .inlinerollresult,
@@ -1199,8 +1188,8 @@ input[type=radio]:hover + span,
 .sheet-rolltemplate-agone-art .inlinerollresult,
 .sheet-rolltemplate-agone-art-intuitive .inlinerollresult,
 .sheet-rolltemplate-agone-invoking .inlinerollresult {
-	background: none;
-	border: none;
+	background: none !important;
+	border: none !important;
 	text-shadow: none;
 }
 .sheet-rolltemplate-agone-generic .inlinerollresult.fullcrit,
@@ -1217,8 +1206,8 @@ input[type=radio]:hover + span,
 .sheet-rolltemplate-agone-art .inlinerollresult.fullcrit,
 .sheet-rolltemplate-agone-art-intuitive .inlinerollresult.fullcrit,
 .sheet-rolltemplate-agone-invoking .inlinerollresult.fullcrit {
-	background: none;
-	border: none;
+	background: none !important;
+	border: none !important;
 	color: #333;
 	text-shadow: none;
 }
@@ -1236,8 +1225,8 @@ input[type=radio]:hover + span,
 .sheet-rolltemplate-agone-art .inlinerollresult.fullfail,
 .sheet-rolltemplate-agone-art-intuitive .inlinerollresult.fullfail,
 .sheet-rolltemplate-agone-invoking .inlinerollresult.fullfail {
-	background: none;
-	border: none;
+	background: none !important;
+	border: none !important;
 	color: #333;
 	text-shadow: none;
 }
@@ -1255,10 +1244,86 @@ input[type=radio]:hover + span,
 .sheet-rolltemplate-agone-art .inlinerollresult.importantroll,
 .sheet-rolltemplate-agone-art-intuitive .inlinerollresult.importantroll,
 .sheet-rolltemplate-agone-invoking .inlinerollresult.importantroll {
-	background: none;
-	border: none;
+	background: none !important;
+	border: none !important;
 	color: #333;
 	text-shadow: none;
+}
+.sheet-rolltemplate-agone-generic .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-chars .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-fumble .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-skills .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-dodge .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-natural-defense .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-initiative .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-attack .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-defense .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-ascendancy .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-ascendancy-intuitive .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-art .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-art-intuitive .sheet-template-header .inlinerollresult,
+.sheet-rolltemplate-agone-invoking .sheet-template-header .inlinerollresult {
+	position: relative;
+	box-shadow: inset 1px 1px 2px 2px rgba(0, 0, 0, 0.65);
+	color: black;
+	background: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/background.png') !important;
+}
+.sheet-rolltemplate-agone-generic .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-chars .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-fumble .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-skills .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-dodge .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-natural-defense .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-initiative .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-attack .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-defense .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-ascendancy .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-ascendancy-intuitive .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-art .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-art-intuitive .sheet-template-header .inlinerollresult.fullcrit,
+.sheet-rolltemplate-agone-invoking .sheet-template-header .inlinerollresult.fullcrit {
+	position: relative;
+	box-shadow: inset 1px 1px 2px 2px rgba(0, 0, 0, 0.65);
+	color: black;
+	background: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/background.png') !important;
+}
+.sheet-rolltemplate-agone-generic .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-chars .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-fumble .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-skills .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-dodge .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-natural-defense .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-initiative .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-attack .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-defense .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-ascendancy .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-ascendancy-intuitive .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-art .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-art-intuitive .sheet-template-header .inlinerollresult.fullfail,
+.sheet-rolltemplate-agone-invoking .sheet-template-header .inlinerollresult.fullfail {
+	position: relative;
+	box-shadow: inset 1px 1px 2px 2px rgba(0, 0, 0, 0.65);
+	color: black;
+	background: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/background.png') !important;
+}
+.sheet-rolltemplate-agone-generic .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-chars .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-fumble .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-skills .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-dodge .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-natural-defense .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-initiative .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-attack .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-defense .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-ascendancy .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-ascendancy-intuitive .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-art .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-art-intuitive .sheet-template-header .inlinerollresult.importantroll,
+.sheet-rolltemplate-agone-invoking .sheet-template-header .inlinerollresult.importantroll {
+	position: relative;
+	box-shadow: inset 1px 1px 2px 2px rgba(0, 0, 0, 0.65);
+	color: black;
+	background: url('https://imgsrv.roll20.net/?src=http%3A//legdf.free.fr/src/img/roll20-2/background.png') !important;
 }
 
 /* Animations */

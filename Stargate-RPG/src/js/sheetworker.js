@@ -1,11 +1,11 @@
 
 //current sheet version
-const currentversion = "1.72";
+const currentversion = "1.76";
 
 const int = score => parseInt(score, 10) || 0;
 
 const stats = ["str", "dex", "con", "wis", "int", "cha"];
-const skillslist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival"];
+const skillslist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival"];
 const statmods = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "prof"];
 
 // Sheet Version
@@ -116,7 +116,7 @@ skillslist.forEach(skillcheckbox => {
         console.log("xbox defined");
         console.log("xbox is " + xbox);
 
-        let getlist = [ xbox, "acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c", "prof"];
+        let getlist = [ xbox, "acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c", "prof"];
         console.log("def getlist");
 
         getAttrs(getlist, values => {
@@ -188,7 +188,7 @@ on(`change:prof`, eventInfo => {
     console.log("prof change");
     let profold = int(eventInfo.previousValue);
     console.log("eventinfo: " + eventInfo.previousValue);
-    let getlist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c", "str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save","str_save_c", "dex_save_c", "con_save_c", "wis_save_c", "int_save_c", "cha_save_c", "prof", "determination", "determination_max"];
+    let getlist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c", "str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save","str_save_c", "dex_save_c", "con_save_c", "wis_save_c", "int_save_c", "cha_save_c", "prof", "determination", "determination_max"];
 
     getAttrs(getlist, values => {
 
@@ -210,7 +210,7 @@ on(`change:prof`, eventInfo => {
 
         console.log("profold:" + profold + " profnew:" + profnew + " proffdiff: " + profdiff);
 
-        let xboxlist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival","str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save"];
+        let xboxlist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival","str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save"];
 
         xboxlist.forEach(number => {
             
@@ -250,7 +250,7 @@ statmods.forEach(statmod => {
 
         console.log("old mod: " + oldstatmod);
 
-        let getlist = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save", "prof", "init", "moxie", "ac", "ac_extra", "determination","determination_max"];
+        let getlist = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save", "prof", "init", "moxie", "ac", "ac_extra", "determination","determination_max"];
 
         getAttrs(getlist, values => {
 
@@ -289,7 +289,6 @@ statmods.forEach(statmod => {
                     break;
                 case "int_mod":
                     update["engineering"] = int(values["engineering"]) + moddiff;
-                    update["history"] = int(values["history"]) + moddiff;
                     update["investigation"] = int(values["investigation"]) + moddiff;
                     update["nature"] = int(values["nature"]) + moddiff;
                     update["science"] = int(values["science"]) + moddiff;

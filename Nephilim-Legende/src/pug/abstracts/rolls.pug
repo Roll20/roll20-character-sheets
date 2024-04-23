@@ -1,0 +1,70 @@
+//- Jets élémentaires
+- roll_feu = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=Ka-Feu}} {{seuil=[[(@{kafeu}+(?{Bonus/Malus ?|0}+@{KADFeu})-@{malusMag})*10]]}}`
+- roll_terre = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=Ka-Terre}} {{seuil=[[(@{katerre}+(?{Bonus/Malus ?|0}+@{KADTerre})-@{malusMag})*10]]}}`
+- roll_air = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=Ka-Air}} {{seuil=[[(@{kaair}+(?{Bonus/Malus ?|0}+@{KADAir})-@{malusMag})*10]]}}`
+- roll_lune = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=Ka-Lune}} {{seuil=[[(@{kalune}+(?{Bonus/Malus ?|0}+@{KADLune})-@{malusMag})*10]]}}`
+- roll_eau = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=Ka-Eau}} {{seuil=[[(@{kaeau}+(?{Bonus/Malus ?|0}+@{KADEau})-@{malusMag})*10]]}}`
+
+//- Approches
+- 
+    var approches = {
+        "kafeu": ["KADFeu", "Approche de Feu"],
+        "kaair": ["KADAir", "Approche d'Air"],
+        "kaeau": ["KADEau", "Approche d'Eau"],
+        "katerre": ["KADTerre", "Approche de Terre"],
+        "kalune": ["KADLune", "Approche de Lune"]
+    }
+
+//- Vécus de simulacre
+//- Reconversion, vécus tout court
+- var roll_simu_appr_null = `{{seuil=[[(@{__ATTR__}+0+?{Bonus/Malus ?|0}-@{malusPhy}__MNEMOS__)*10]]}} {{approche=Aucune approche}}`
+- var roll_simu_appr_elem = `{{seuil=[[(@{__ATTR__}+@{__KA__}+?{Bonus/Malus ?|0}+@{__KAD__}-@{malusPhy}-@{malusMag}__MNEMOS__)*10]]}} {{approche=__APPR__}}`
+- var roll_simu_appr_ksol = `{{seuil=[[(@{__ATTR__}+@{simu-kasoleil}+?{Bonus/Malus ?|0}-@{malusPhy}-@{malusMag}__MNEMOS__)*10]]}} {{approche=Approche Solaire}}`
+- var roll_simu_appr_kln = `{{seuil=[[(@{__ATTR__}+@{kaln}+?{Bonus/Malus ?|0}-@{malusPhy}-@{malusMag}__MNEMOS__)*10]]}} {{approche=Approche de Ka Lune Noire}}`
+- var roll_vecu_base = `@{gm} &{template:base} {{name=@{character_name}}} {{vecu=@{__VECU__}}} {{jet=[[1d100]]}} @{__APPR__}`
+
+//- Quetes et savoirs
+- var roll_quete_eso = `@{gm} &{template:base} {{name=@{character_name}}} {{vecu=@{quete_eso}}} {{jet=[[1d100]]}} {{@{quete_eso}=@{quete_eso}}} {{vecuP=@{quete_eso_perso}}} {{special=special}} {{seuil=[[(@{quete_eso_degres}+?{Bonus/Malus ?|0})*10]]}}`
+- var roll_savoir_eso = `@{gm} &{template:base} {{name=@{character_name}}} {{vecu=@{savoir_eso}}} {{jet=[[1d100]]}} {{vecuP=@{savoir_eso_perso}}} {{special=special}} {{seuil=[[(@{savoir_eso_degres}+?{Bonus/Malus ?|0})*10]]}}`
+
+//- Initiative
+- var roll_init = `@{gm} &{template:initiative} {{name=@{character_name}}} {{jet=[[ [[__INIT__]]+@{initiative_variable} &{tracker}]]}}`
+- var roll_init_neph = `@{kaeau}*2`
+- var roll_init_humain = `@{simu-kasoleil}`
+- var roll_init_selenim = `@{kaln}`
+
+//- Sciences occultes
+- var roll_magie = `&{template:sort} {{name=@{character_name}}} {{nom_sort=@{mag-sort-nom}}} {{descrip_sort=@{mag-sort-desc}}} {{porte_sort=@{mag-sort-portee}}} {{duree_sort=@{mag-sort-duree}}} {{degre=@{mag-sort-degre}}} {{jet=[[1d100]]}} {{seuil=[[(?{Bonus/malus ?|0}[ Bonus, malus, vécus, etc. ]+@{mag-sort-current}[ Cerce + Ka - Degré ])*10]]}}`
+- var roll_kabb_invoc = `&{template:invocation} {{name=@{character_name}}} {{nom_creature=@{kabb-invoc-nom}}} {{descrip_sort=@{kabb-invoc-desc}}} {{portee_sort@{kabb-invoc-portee}}} {{duree_sort=@{kabb-invoc-duree}}} {{degre=@{kabb-invoc-degre}}} {{jet=[[1d100]]}} {{seuil=[[(?{Bonus / malus ?|0}[ Bonus, malus, vécus, etc. ]+@{kabb-invoc-current}[ Kabbale + Ka + Ordonnances ])*10]]}}`
+- var roll_kabb_pacte = `&{template:opposition} {{name=@{character_name}}} {{creature=@{kabb-invoc-nom}}} {{jet=[[1d100]]}} {{seuil=[[(?{Bonus / malus ?|0}[Bonus, malus, vécus, etc.]+[[@{kabb-invoc-current}]][Kabbale + Ka)*10 ]]}} {{jet_creature=[[1d100]]}} {{degre=[[@{kabb-invoc-degre}[Degré]*10 ]]}}`
+- var roll_alch = `&{template:formule} {{name=@{character_name}}} {{nom_formule=@{alch-form-nom}}} {{nb_materia=@{alch-form-degre}}} {{jet=[[1d100]]}} {{seuil=[[(?{Bonus / malus ?|0}[Bonus, malus, vécus, etc.]+@{alch-form-current}[Oeuvre + Ka-Élément du Construct - Degré])*10]]}} {{aire_formule=@{alch-form-portee}}} {{duree_formule=@{alch-form-duree}}} {{description_formule=@{alch-form-desc}}}`
+
+
+//- Arcadia
+//- Approches arcadiennes
+-
+    var approcheArcadia = {
+        "kafeu": ["KADFeu", "Approche de Feu", "hideHumain hideSelenim"],
+        "kaair": ["KADAir", "Approche d'Air", "hideHumain hideSelenim"],
+        "kaeau": ["KADEau", "Approche d'Eau", "hideHumain hideSelenim"],
+        "katerre": ["KADTerre", "Approche de Terre", "hideHumain hideSelenim"],
+        "kalune": ["KADLune", "Approche de Lune", "hideHumain hideSelenim"],
+        "simu-kasoleil": ["simu-kasoleil", "Approche solaire", "hideNephilim hideSelenim"],
+        "kaln": ["kaln", "Approche de KLN", "hideHumain hideNephilim"]
+    }
+
+- var roll_arcadia_null = `0+?{Bonus/Malus ?|0})*10]]}} {{approche=Aucune approche}}`
+- var roll_arcadia_elem = `@{__KA__}+?{Bonus/Malus ?|0}+@{__KAD__}-@{malusMag})*10]]}} {{approche=__APPR__}}`
+- var roll_arcadia_base = `@{gm} &{template:base} {{name=@{character_name}}} {{vecu=@{vecuArcadien}}} {{jet=[[1d100]]}} {{seuil=[[(@{vecuArcadienScore}-@{malusPhy}+@{approche})*10]]}}`
+
+//- Selenim
+- var roll_pavane = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{approche=Aucune approche}} {{vecu=Pavane}} {{seuil=[[(@{pavane}+?{Bonus/Malus ?|0}-@{malusMag})*10]]}}`
+- var roll_chmtPeau = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{vecu=Changement de peau}} {{approche=Aucune approche}} {{seuil=[[(@{chmtPeau}+?{Bonus/Malus ?|0}-@{malusPhy})*10]]}}`
+- var roll_chmtPeauAppr = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{vecu=Changement de peau}} {{approche=Approche de KLN}} {{seuil=[[(@{chmtPeau}+@{kaln}+?{Bonus/Malus ?|0}-@{malusPhy}-@{malusMag})*10]]}}`
+- var roll_noyau = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=Noyau de KLN}} {{seuil=[[@{kaln}+?{Bonus/Malus ?|0}-@{malusMag})*10]]}}`
+- var roll_reserve = `@{gm} &{template:base} {{name=@{character_name}}} {{jet=[[1d100]]}} {{ka=KLN total}} {{seuil=[[@{kaln}+@{reserve}+?{Bonus/Malus ?|0}-@{malusMag})*10]]}}`
+
+//- Sciences occultes Selenim
+- var roll_rite = `@{gm} &{template:rite} {{name=@{character_name}}} {{nom_rite=@{nom}}} {{jet=[[1d100]]}} {{seuil=[[((@{necromancie}+?{Bonus/Malus ?|0}-@{malusMag})*10)]]}} {{duree_sort=@{duree}}} {{descrip_sort=@{rite_description}}}`
+- var roll_invoc = `@{gm} &{template:invocation} {{name=@{character_name}}} {{jet=[[1d100]]}} {{nom_creature=@{nom}}} {{seuil=[[(@{kabbNoire}+?{Bonus/Malus ?|0}-@{malusMag})*10]]}} {{degre=@{degre}}} {{descrip_sort=@{ent_description}}}`
+- var roll_invoc_control = `@{gm} &{template:opposition} {{name=@{character_name}}} {{creature=@{nom}}} {{jet=[[1d100]]}} {{seuil=[[@{kaln}+?{Bonus/Malus ?|0}-@{malusMag})*10]]}} {{jet_creature=[[1d100]]}} {{degre=[[@{degre}*10]]}} {{entite=1}}`

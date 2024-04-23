@@ -1,0 +1,366 @@
+<script type="text/worker">
+    on("change:exp", function() {  
+        getAttrs(["exp", "lvl", "prf"], function(values) {
+            let exp_val = values.exp;
+            let lvl_val = values.lvl;
+            let prf_val = values.prf;
+            if (exp_val < 100){
+                lvl_val = 1;
+                prf_val = 1;
+            }
+            if (exp_val >= 100){
+                lvl_val = 2;
+                prf_val = 1;
+            }
+            if (exp_val >= 500){
+                lvl_val = 3;
+                prf_val = 2;
+            }
+            if (exp_val >= 1000){
+                lvl_val = 4;
+                prf_val = 2;
+            }
+            if (exp_val >= 2000){
+                lvl_val = 5;
+                prf_val = 3;
+            }
+            if (exp_val >= 5000){
+                lvl_val = 6;
+                prf_val = 3;
+            }
+            if (exp_val >= 10000){
+                lvl_val = 7;
+                prf_val = 4;
+            }
+            if (exp_val >= 25000){
+                lvl_val = 8;
+                prf_val = 4;
+            }
+            if (exp_val >= 50000){
+                lvl_val = 9; 
+                prf_val = 5;
+            }
+            if (exp_val >= 100000){
+                lvl_val = 10;
+                prf_val = 5;
+            }
+            setAttrs({ lvl: lvl_val });
+            setAttrs({ prf: prf_val });
+        });
+    }); 
+    on("sheet:opened change:repeating_pack", function() { 
+        let counter = 0;
+        getSectionIDs("pack", function(idarray) {
+            for(var i=0; i < idarray.length; i++) {
+                let packId = "repeating_pack_" + idarray[i] + "_packamount";
+                let packSize = "repeating_pack_" + idarray[i] + "_packsize";
+                getAttrs([packId, packSize, "str"], function(values) {
+                    let amount_val = values[packId];
+                    let size_val = values[packSize];
+                    let str_val = values.str;
+                    if (size_val == "Large") {
+                        counter = parseInt(counter) + parseInt(amount_val)*10;
+                    }
+                    if (size_val == "Small") {
+                        counter = parseInt(counter) + parseInt(amount_val);
+                    }
+                    if (counter > 70 + parseInt(str_val*10)) {
+                        setAttrs({ heavy: 1 });
+                    }
+                    else {
+                        setAttrs({ heavy: 0 });
+                    }
+                });
+            }
+        });
+    });
+    on("change:sessions", function() { 
+        getSectionIDs("pack", function(idarray) {
+            for(var i=0; i < idarray.length; i++) {
+                let packId = "repeating_pack_" + idarray[i] + "_packuses";
+                getAttrs([packId], function(values) {
+                    let uses_val = values[packId];
+                    if(uses_val > 0){
+                        uses_val = uses_val - 1;
+                    }
+                    const changes = new Object();
+                    changes[packId] = uses_val;
+                    setAttrs(changes);
+                });
+            }
+        });
+    });
+    on('clicked:death', (info) => {
+        startRoll("&{template:exp} {{roll_name=Death Save}} {{name=@{charactername}}} {{attr=[[1d20]]}} {{death=1}}", (results) => {
+            const roll_val = results.results.attr.result
+            getAttrs(["deathUp", "deathDown"], function(values) {
+                let deathNote = "down."
+                let up_val = values.deathUp;
+                let down_val = values.deathDown;
+                if (up_val < 3 && down_val < 3) {
+                    if(roll_val < 10){
+                        down_val = down_val + 1;
+                    }
+                    if(roll_val >= 10){
+                        up_val = up_val + 1;
+                    }
+                }
+                if (up_val >= 3) {
+                    deathNote = "stable."
+                    down_val = 0;
+                    up_val = 0;
+                }
+                if (down_val >= 3) {
+                    deathNote = "dead."
+                    down_val = 0;
+                    up_val = 0;
+                }
+                if(roll_val == 1) {
+                    deathNote = "dead!"
+                    down_val = 0;
+                    up_val = 0;
+                }
+                if(roll_val == 20) {
+                    deathNote = "up!"
+                    down_val = 0;
+                    up_val = 0;
+                }
+                setAttrs({ deathUp: up_val });
+                setAttrs({ deathDown: down_val });
+                finishRoll(
+                    results.rollId,
+                    {
+                        attr: deathNote
+                    }
+                );
+            });
+        });
+    });
+</script>
+<div class="full-sheet">
+    
+	<!-- Set up the Tabs -->
+    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Lot5/images/400PngdpiLogoCropped.png" alt="Lot5" style="width: 150px;">
+	<input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Char Info" checked="checked"/>
+	<span class="sheet-tab sheet-tab1" style='line-height: 40px;'>Data</span>
+	<input type="radio" class="sheet-tab sheet-tab2" name="attr_core-tab" value="2" title="Abilities Info"/>
+	<span class="sheet-tab sheet-tab2" style='line-height: 40px;'>Abilities</span>
+	<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Pack Info"/>
+	<span class="sheet-tab sheet-tab3" style='line-height: 40px;'>Pack</span>
+    <br> <br>
+
+    <div class="sheet-section-char"><!-- Character Sheet Tab -->
+        <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Character Info</h3> <br>
+		<div class='sheet-2colrow'>
+		    <div class='sheet-col'>
+                <strong>Name: </strong><input type="text" name="attr_charactername"> <br> <br>
+                <strong>Surname: </strong><input type="text" name="attr_lastname"> <br> <br>
+                <strong>Race: </strong><select class="trait-input" name="attr_characterrace">
+                    <option value="Avian">Avian</option>
+                    <option value="Cat-Folk">Cat-Folk</option>
+                    <option value="Dwarf">Dwarf</option>
+                    <option value="Elf">Elf</option>
+                    <option value="Gnome">Gnome</option>
+                    <option value="Human">Human</option>
+                    <option value="Hydrian">Hydrian</option>
+                    <option value="Orc">Orc</option>
+                    <option value="Reptilian">Reptilian</option>
+                    <option value="Tyat">Tyat</option>
+                    <option value="Troll">Troll</option>
+                </select> <br> <br>
+                <strong>Arch: </strong><select class="trait-input" name="attr_arch">
+                    <option value="Warrior">Warrior</option>
+                    <option value="Rogue">Rogue</option>
+                    <option value="Mage">Mage</option>
+                </select> <br> <br>
+                <strong>Class: </strong><input type="text" name="attr_characterclass"> <br> <br> 
+                <input type="hidden" name="attr_sessions" value=0 />
+                
+            </div>
+		    <div class='sheet-col'>
+                <strong>Exp: </strong><input type="number" name="attr_exp" value=0 style="width: 20%;"> <strong> Lvl: </strong><input type="number" name="attr_lvl" value=0 > <strong> Prof: </strong><input type="number" name="attr_prf" value=0 ><br><br>
+                <strong>HP</strong> <input type="number" name="attr_hp" value=0 /> / <input type="number" name="attr_hp_max" value=0 /> <br><br>
+                <strong>AP</strong> <input type="number" name="attr_ap" value=0 /> / <input type="number" name="attr_ap_max" value=0 /> <br><br>
+                <strong>BH</strong> <input type="number" name="attr_bh" value=10 /> <strong> HB: </strong><input type="number" name="attr_hb" value=0 /> <br><br>
+                <strong>Death Saves: ⬆</strong><input type="number" name="attr_deathUp" value=0 /> 
+                <strong>⬇</strong><input type="number" name="attr_deathDown" value=0 /> 
+                <button type="action" name="act_death"><span style="font-family: 'dicefontd20'">t</span><strong> Save</strong></button> <br><br>
+            </div>
+        </div>
+		<div class='sheet-2colrow'>
+            <div class='sheet-col'>
+                <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Stats</h3> <br>
+                <div style="margin-left:auto; margin-right:auto;" class="sheet-flex-section4">
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_str" value=0> <br><strong>STR </strong>
+                    </div>
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_vit" value=0> <br><strong>VIT </strong>
+                    </div>
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_dex" value=0> <br><strong>DEX </strong>
+                    </div>
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_agi" value=0> <br><strong>AGI </strong>
+                    </div>
+                </div>
+                <div style="margin-left:auto; margin-right:auto;" class="sheet-flex-section3">
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_int" value=0> <br><strong>INT </strong>
+                    </div>
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_wis" value=0> <br><strong>WIS </strong>
+                    </div>
+                    <div style="text-align:center;">
+                        <input type="number" name="attr_cha" value=0> <br><strong>CHA </strong>
+                    </div>
+                </div>
+            </div>
+            <div class='sheet-col'>
+                <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Proficiencies</h3> <br>
+                <fieldset class="repeating_traits">
+                    <select class="trait-input" name="attr_TraitName">
+                        <option value="Accuracy">Accuracy</option>
+                        <option value="Acting">Acting</option>
+                        <option value="Agility">Agility</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Alchemy">Alchemy</option>
+                        <option value="Appraise">Appraise</option>
+                        <option value="Arcana">Arcana</option>
+                        <option value="Build">Build</option>
+                        <option value="Cooking">Cooking</option>
+                        <option value="Deception">Deception</option>
+                        <option value="Design">Design</option>
+                        <option value="Endurance">Endurance</option>
+                        <option value="Economy">Economy</option>
+                        <option value="Enchantment">Enchantment</option>
+                        <option value="Flora and Fauna">Flora and Fauna</option>
+                        <option value="Gathering">Gathering</option>
+                        <option value="Geography">Geography</option>
+                        <option value="History">History</option>
+                        <option value="Inspection">Inspection</option>
+                        <option value="Intimidation">Intimidation</option>
+                        <option value="Linguistics">Linguistics</option>
+                        <option value="Medicine">Medicine</option>
+                        <option value="Might">Might</option>
+                        <option value="Music">Music</option>
+                        <option value="Navigation">Navigation</option>
+                        <option value="Penmanship">Penmanship</option>
+                        <option value="Perception">Perception</option>
+                        <option value="Persuasion">Persuasion</option>
+                        <option value="Repair">Repair</option>
+                        <option value="Sense Motive">Sense Motive</option>
+                        <option value="Shelter">Shelter</option>
+                        <option value="Sleight of Hand">Sleight of Hand</option>
+                        <option value="Sneak">Sneak</option>
+                        <option value="Speech">Speech</option>
+                        <option value="Tracking">Tracking</option>
+                    </select>
+                    <button type='roll' value='&{template:exp}{{name=@{charactername}}}{{roll_name=@{TraitName}}}{{attr=[[1d20 + @{PRF} + ?{Stat | STR,@{STR} | VIT,@{VIT} | INT,@{INT} | DEX,@{DEX} | AGI,@{AGI} | WIS,@{WIS} | CHA,@{CHA}}]]}}' name='roll_TraitLevelCheck'> <b>Roll</b></button> 
+                </fieldset>
+            </div>
+        </div><br>
+        <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Notes</h3> <br>
+        <textarea name="attr_notes" rows="4" cols="50"></textarea>
+    </div>
+
+    <div class="sheet-section-abilities"><!-- Abilities Tab -->
+        <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Abilities</h3> <br>
+        <fieldset class="repeating_ability">
+            <div class='sheet-2colrow'>
+                <div style="background: rgba(51, 51, 51, .1); padding: 5px; border-style: inset;">
+                    <strong>Name: </strong><input type="text" name="attr_abilityname"> <br> <br>
+                    <strong>Type: </strong>
+                    <select class="trait-input" name="attr_abilitytype" style="width: 20%;">
+                        <option value="Passive">Passive</option>
+                        <option value="Active">Active</option>
+                        <option value="Free">Free</option>
+                    </select>
+                    <strong>Dice: </strong><input type="text" name="attr_abilitydice">
+                    <strong>Range: </strong><input type="text" name="attr_abilityrange"> <br>
+                    <strong>Effect: </strong><input type="text" name="attr_abilityeffect">
+                    <strong>Flair: </strong><input type="text" name="attr_abilityflair"> 
+                    <button type='roll' value='&{template:default} {{name=@{abilityname}}} {{type=@{abilitytype}}} {{range=@{abilityrange}}} {{roll=@{abilitydice}}} {{effect=@{abilityeffect}}} {{flair=@{abilityflair}}}' name='roll_abilityroll'> <b>Roll</b></button> <br>
+                </div>
+            </div> <br>
+        </fieldset>
+    </div>
+    
+    <div class="sheet-section-pack"><!-- Pack Tab -->
+        <div class='sheet-2colrow'>
+            <div class='sheet-col'>
+                <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Coin</h3> <br>
+                <div style="margin-left:auto; margin-right:auto;" class="sheet-flex-section4">
+                        <div style="text-align:center;">
+                            <input type="number"name="attr_copper" value=0> <br>
+                            <strong>CP </strong>
+                        </div>
+                        <div style="text-align:center;">
+                            <input type="number"name="attr_silver" value=0> <br>
+                            <strong>SP </strong>
+                        </div>
+                        <div style="text-align:center;">
+                            <input type="number"name="attr_gold" value=0> <br>
+                            <strong>GP </strong>
+                        </div>
+                        <div style="text-align:center;">
+                            <input type="number"name="attr_platinum" value=0> <br>
+                            <strong>PP </strong>
+                        </div>
+                </div>
+            </div>
+            <div class='sheet-col'>
+                <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Trinket</h3> <br>
+                <strong>Name: </strong><input type="text" name="attr_trinketname"> <br> <br>
+                <strong>Effect: </strong><input type="text" name="attr_trinketeffect">
+            </div>
+        </div> <br>
+        <h3 style="background: #000; color: #fff; text-align: center; margin-bottom: 10px;">Items</h3>
+        <div class="sheet-columns">
+            <div>
+                <input type="checkbox" name="attr_heavy" class="sheet-toggle-show" value="1" style="visibility: hidden;" />
+                <div class="sheet-body"><h3 style="color: red;">Encumbered</h3></div>
+            </div>
+          </div>
+        
+        <fieldset class="repeating_pack">
+            <div class='sheet-3colrow' style="background: rgba(51, 51, 51, .1); padding: 5px; border-style: inset;">
+                <div class='sheet-col'>
+                    <strong>Name: </strong> <br>
+                    <input type="text" name="attr_packitem" style="width: 90%;" > <br>
+                    <strong>Size: </strong> <br>
+                    <select class="trait-input" name="attr_packsize" style="width: 90%;" >
+                        <option value="Large">Large</option>
+                        <option value="Small">Small</option>
+                    </select> <br>
+                </div>
+                <div class='sheet-col'>
+                    <strong>Amount: </strong> <br>
+                    <input type="number" name="attr_packamount" value=1> <br>
+                    <strong>Durability: </strong> <br>
+                    <input type="number" name="attr_packuses"> / <input type="number" name="attr_packuses_max">
+                </div>
+                <div class='sheet-col'>
+                    <strong>Description: </strong> <br>
+                    <textarea name="attr_packdesc" style="height: 100%; width: 95%;"></textarea> <br>
+                </div>
+            </div> <br>
+        </fieldset>
+    </div>
+
+</div>
+<rolltemplate class="sheet-rolltemplate-exp">
+    <table>
+        <tr><th>{{name}} rolls: <br>
+        {{#roll_name}} {{roll_name}}{{/roll_name}}</th></tr>
+        <tr><td class="attr">
+            {{#attr}}
+                Roll: {{attr}} <br>
+            {{/attr}}
+            {{#death}}
+                {{name}} is {{computed::attr}}<br>
+            {{/death}}
+            <br>
+        </td></tr>
+    </table>
+</rolltemplate>

@@ -1,0 +1,1220 @@
+
+<script type="text/worker">// Behold, the Script Worker for Stewpot
+
+on("clicked:mark", function(event) {
+	var what = event.htmlAttributes.value;
+	var atname = "toggle_" + what;
+	var ats = {};
+	ats[atname] = 1;
+	setAttrs(ats);
+	log(what + " mark");
+});
+
+on("clicked:unmark", function(event) {
+	var what = event.htmlAttributes.value;
+	var atname = "toggle_" + what;
+	var ats = {};
+	ats[atname] = 0;
+	setAttrs(ats);
+	log(what + " unmark");
+});
+
+on("clicked:mark_cuisine clicked:mark_atmosphere clicked:mark_service", function(event) {
+	log(event);
+	var what = event.htmlAttributes.name;
+	what = what.replace(/act_mark_/,"radio_");
+	var val  = event.htmlAttributes.value;
+	var ats = {};
+	ats[what] = val;
+	setAttrs(ats);
+	log(ats);
+});
+
+on("change:select_character_weapon change:select_character_armor change:select_character_quirk change:select_axp1 change:select_axp2 change:select_axp3 change:select_txp0 change:select_txp1 change:select_txp2 change:select_txp3", function(event) {
+	log(event);
+	var atname = event.triggerName;
+	atname = atname.replace(/select_/,"");
+	var ats = {};
+	if ( typeof(event.newValue) !== "undefined" && event.newValue !== "" ) { 
+		ats[atname] = event.newValue; 
+		ats[event.triggerName] = "";
+		setAttrs(ats);
+		log(ats);
+	}
+});
+
+
+</script>
+<!-- Eventually I'll need to come up with a mode-selector where you choose whether this is a Character Sheet or a Tavern Sheet. -->
+<div class="wrapper">
+  <div class="modeblock">
+    <input class="shower" name="attr_sheetmode" type="hidden" value=""/>
+    <select name="attr_sheetmode">
+      <option value="" data-i18n="Which kind of sheet?"></option>
+      <option value="character" data-i18n="Character"></option>
+      <option value="tavern" data-i18n="Tavern"></option>
+    </select>
+  </div>
+  <input class="mhider" name="attr_sheetmode" type="hidden" value=""/>
+  <div class="character">
+    <div class="topline">
+      <div class="nameblock">
+        <div class="flabel"><span data-i18n="Name">Name</span> 
+        </div>
+        <input class="fillblank" type="text" name="attr_character_name"/>
+        <input class="fillblank" type="text" name="attr_character_pronouns"/>
+        <div class="sublabel"><span data-i18n="pronouns">pronouns</span> 
+        </div>
+      </div>
+      <div class="lookblock">
+        <div class="flabel"><span data-i18n="Look">Look</span> 
+        </div>
+        <input class="fillblank" type="text" name="attr_character_look"/>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column">
+        <div class="waqblock">
+          <div class="fbox">
+            <div class="flabel"><span data-i18n="Weapon">Weapon</span> 
+            </div>
+            <div class="blank">
+              <textarea class="fillblank" name="attr_character_weapon"></textarea>
+              <input class="shower" name="attr_character_weapon" type="hidden" value=""/>
+              <div class="tidy">
+                <select name="attr_select_character_weapon">
+                  <option value="" data-i18n="(pick an option or fill in the blank)"></option>
+                  <option data-i18n="A giant sword, all blunt edges and fierce"></option>
+                  <option data-i18n="A staff of dark wood, worn smooth"></option>
+                  <option data-i18n="A sturdy shield polished to a shine"></option>
+                  <option data-i18n="Twin jeweled daggers"></option>
+                  <option data-i18n="A bow that seems to hum when drawn"></option>
+                  <option data-i18n="Spiked gauntlets covered in dents"></option>
+                  <option data-i18n="A crossbow covered in unknown mechanisms"></option>
+                  <option data-i18n="A simple sabre"></option>
+                  <option data-i18n="A dirk with a curious carved hilt"></option>
+                  <option data-i18n="An enormous hammer carved from bone"></option>
+                  <option data-i18n="A sword that whispers in its scabbard"></option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="fbox">
+            <div class="flabel"><span data-i18n="Armor">Armor</span> 
+            </div>
+            <div class="blank">
+              <textarea class="fillblank" name="attr_character_armor"></textarea>
+              <input class="shower" name="attr_character_armor" type="hidden" value=""/>
+              <select name="attr_select_character_armor">
+                <option value="" data-i18n="(pick an option or fill in the blank)"></option>
+                <option data-i18n="A rusty suit of armor with a deadly curse"></option>
+                <option data-i18n="An iridescent cloak of feathers"></option>
+                <option data-i18n="Concealed leather and chainmail"></option>
+                <option data-i18n="Black boots with not a speck of dust on them"></option>
+                <option data-i18n="Gloves covered in runes"></option>
+                <option data-i18n="Clothes the color of deep forest"></option>
+                <option data-i18n="A mask"></option>
+                <option data-i18n="A well kept traveling cloak"></option>
+                <option data-i18n="A warm coat"></option>
+                <option data-i18n="Armor crafted from a giant insect shell"></option>
+                <option data-i18n="A tattered royal tunic"></option>
+              </select>
+            </div>
+          </div>
+          <div class="fbox">
+            <div class="flabel"><span data-i18n="Quirk">Quirk</span> 
+            </div>
+            <div class="blank">
+              <textarea class="fillblank" name="attr_character_quirk"></textarea>
+              <input class="shower" name="attr_character_quirk" type="hidden" value=""/>
+              <select name="attr_select_character_quirk">
+                <option value="" data-i18n="(pick an option or fill in the blank)"></option>
+                <option data-i18n="Eyes always watching"></option>
+                <option data-i18n="One hand hidden under a cloak"></option>
+                <option data-i18n="Hair cut short with a knife"></option>
+                <option data-i18n="Slow, measured movements"></option>
+                <option data-i18n="A smile that doesn’t reach your eyes"></option>
+                <option data-i18n="Shoulders that tense to the sound of metal"></option>
+                <option data-i18n="A preference for sitting in dark corners"></option>
+                <option data-i18n="Sleeping with one eye open "></option>
+                <option data-i18n="Perfectly straight posture"></option>
+                <option data-i18n="Always muttering wards of protection"></option>
+                <option data-i18n="A gleaming smile"></option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="keepblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Keepsakes">Keepsakes</span> 
+            </div>
+          </div>
+          <div class="kbody">
+            <fieldset class="repeating_keepsakes">
+              <textarea name="attr_keepsake"></textarea>
+            </fieldset>
+          </div>
+        </div>
+        <div class="listblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Notes">Notes</span> 
+            </div>
+          </div>
+          <div class="togglemode">
+            <div>
+              <input class="lhider" name="attr_toggle_notes" type="hidden" value="1"/><span>
+                <button class="ebox marked" type="action" name="act_unmark" value="notes"><span class="eboxtext" data-i18n="Display">Display</span> 
+                </button></span>
+              <input class="lshower" name="attr_toggle_notes" type="hidden" value="1"/><span>
+                <button class="ebox unmarked" type="action" name="act_mark" value="notes"><span class="eboxtext" data-i18n="Edit">Edit</span> 
+                </button></span>
+            </div>
+            <input class="state" name="attr_toggle_notes" type="hidden" value="0"/>
+            <input class="lhider" name="attr_toggle_notes" type="hidden" value="1"/>
+            <div class="content">
+              <fieldset class="repeating_notes">
+                <textarea name="attr_detail"></textarea>
+              </fieldset>
+            </div>
+            <input class="lshower" name="attr_toggle_notes" type="hidden" value="1"/>
+            <div class="readonly">
+              <ul>
+                <fieldset class="repeating_notes">
+                  <li><span name="attr_detail"></span>
+                  </li>
+                </fieldset>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="advblock">
+          <div class="shead">
+            <div class="flabel big"><span data-i18n="Adventurer Job">Adventurer Job</span> 
+            </div>
+          </div>
+          <div class="jbody">
+            <select class="job" name="attr_ajob">
+              <option value="" data-i18n="(pick an adventurer job)"></option>
+              <option value="Paladin" data-i18n="Paladin"></option>
+              <option value="Wizard" data-i18n="Wizard"></option>
+              <option value="Fighter" data-i18n="Fighter"></option>
+              <option value="Rogue" data-i18n="Rogue"></option>
+              <option value="Druid" data-i18n="Druid"></option>
+              <option value="Bard" data-i18n="Bard"></option>
+              <option value="Ranger" data-i18n="Ranger"></option>
+              <option value="Swashbuckler" data-i18n="Swashbuckler"></option>
+            </select>
+          </div>
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Adventurer Experiences">Adventurer Experiences</span> 
+            </div>
+          </div>
+          <div class="jbody">
+            <div class="markable">
+              <div>
+                <input class="thider" name="attr_toggle_axp1" type="hidden" value="0"/>
+                <button class="cbox marked" type="action" name="act_unmark" value="axp1"></button>
+                <input class="tshower" name="attr_toggle_axp1" type="hidden" value="0"/>
+                <button class="cbox unmarked" type="action" name="act_mark" value="axp1"></button>
+              </div>
+              <input class="state" name="attr_toggle_axp1" type="hidden" value="0"/>
+              <div class="blank">
+                <input class="tshower" name="attr_toggle_axp1" type="hidden" value="0"/>
+                <textarea name="attr_axp1"></textarea>
+                <input class="thider" name="attr_toggle_axp1" type="hidden" value="0"/>
+                <div class="crossout"><span name="attr_axp1"></span>
+                </div>
+                <input class="shower" name="attr_axp1" type="hidden" value=""/>
+                <div class="tidy">
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Paladin" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Paladin experience or fill in the blank)"></option>
+                    <option data-i18n="Guidance: A sign from your deity"></option>
+                    <option data-i18n="Holy Armor: Divine protection"></option>
+                    <option data-i18n="Healing Touch: Treat wounds"></option>
+                    <option data-i18n="Smite: Destroy the unholy"></option>
+                    <option data-i18n="Taunt: Draw enemies towards you"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Wizard" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Wizard experience or fill in the blank)"></option>
+                    <option data-i18n="Prestidigitation: Small wonders"></option>
+                    <option data-i18n="Fireball: Mastery of flame"></option>
+                    <option data-i18n="Invisibility: Move unseen"></option>
+                    <option data-i18n="Magic Missile: Projectiles of astounding accuracy"></option>
+                    <option data-i18n="Arcana: Vast knowledge of the magical and unusual"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Fighter" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Fighter experience or fill in the blank)"></option>
+                    <option data-i18n="Intimidation: Make them do what you want"></option>
+                    <option data-i18n="Master of Arms: Armed and dangerous with anything"></option>
+                    <option data-i18n="Brute Strength: Move the immovable"></option>
+                    <option data-i18n="Endurance: Nothing can stop you"></option>
+                    <option data-i18n="Legendary Weapon: An artifact of immense power"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Rogue" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Rogue experience or fill in the blank)"></option>
+                    <option data-i18n="Cat’s Grace: Extraordinary agility"></option>
+                    <option data-i18n="Nimble Fingers: No lock stays locked, no trap can catch you"></option>
+                    <option data-i18n="Lightfoot: Act undetected"></option>
+                    <option data-i18n="Adder’s Fangs: Deadly poisons and their antidotes"></option>
+                    <option data-i18n="Sixth Sense: Never be caught off guard"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Druid" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Druid experience or fill in the blank)"></option>
+                    <option data-i18n="Green Thumb: An affinity for plant magic"></option>
+                    <option data-i18n="Natural Armor: Skin becomes bark or stone"></option>
+                    <option data-i18n="Shapeshifter: Various animal forms"></option>
+                    <option data-i18n="Naturespeak: Understand plants and animals"></option>
+                    <option data-i18n="Force of Nature: Bend the land around you to your will"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Bard" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Bard experience or fill in the blank)"></option>
+                    <option data-i18n="Bag of Tricks: Card magic, juggling clubs, and other spectacles"></option>
+                    <option data-i18n="Devil’s Fingers: Prodigious skill with an instrument"></option>
+                    <option data-i18n="Alluring Voice: The voice of an angel"></option>
+                    <option data-i18n="Golden Words: Convince anyone of anything"></option>
+                    <option data-i18n="Inspiration: Power up your friends"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Ranger" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Ranger experience or fill in the blank)"></option>
+                    <option data-i18n="Deadeye: Pinpoint accuracy"></option>
+                    <option data-i18n="True North: Unerring sense of direction"></option>
+                    <option data-i18n="Animal Companion: A wild friend"></option>
+                    <option data-i18n="Tracking: Follow any trail"></option>
+                    <option data-i18n="Camouflage: Disappear into nature"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Swashbuckler" name="attr_select_axp1">
+                    <option value="" data-i18n="(pick a Swashbuckler experience or fill in the blank)"></option>
+                    <option data-i18n="Duellist: Master of the blade"></option>
+                    <option data-i18n="In the Rigging: Climbing and acrobatic feats"></option>
+                    <option data-i18n="Sea Legs: Balance on any surface"></option>
+                    <option data-i18n="Barbed Tongue: Your words hit where they hurt"></option>
+                    <option data-i18n="Bravado: Never falter"></option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="markable">
+              <div>
+                <input class="thider" name="attr_toggle_axp2" type="hidden" value="0"/>
+                <button class="cbox marked" type="action" name="act_unmark" value="axp2"></button>
+                <input class="tshower" name="attr_toggle_axp2" type="hidden" value="0"/>
+                <button class="cbox unmarked" type="action" name="act_mark" value="axp2"></button>
+              </div>
+              <input class="state" name="attr_toggle_axp2" type="hidden" value="0"/>
+              <div class="blank">
+                <input class="tshower" name="attr_toggle_axp2" type="hidden" value="0"/>
+                <textarea name="attr_axp2"></textarea>
+                <input class="thider" name="attr_toggle_axp2" type="hidden" value="0"/>
+                <div class="crossout"><span name="attr_axp2"></span>
+                </div>
+                <input class="shower" name="attr_axp2" type="hidden" value=""/>
+                <div class="tidy">
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Paladin" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Paladin experience or fill in the blank)"></option>
+                    <option data-i18n="Guidance: A sign from your deity"></option>
+                    <option data-i18n="Holy Armor: Divine protection"></option>
+                    <option data-i18n="Healing Touch: Treat wounds"></option>
+                    <option data-i18n="Smite: Destroy the unholy"></option>
+                    <option data-i18n="Taunt: Draw enemies towards you"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Wizard" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Wizard experience or fill in the blank)"></option>
+                    <option data-i18n="Prestidigitation: Small wonders"></option>
+                    <option data-i18n="Fireball: Mastery of flame"></option>
+                    <option data-i18n="Invisibility: Move unseen"></option>
+                    <option data-i18n="Magic Missile: Projectiles of astounding accuracy"></option>
+                    <option data-i18n="Arcana: Vast knowledge of the magical and unusual"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Fighter" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Fighter experience or fill in the blank)"></option>
+                    <option data-i18n="Intimidation: Make them do what you want"></option>
+                    <option data-i18n="Master of Arms: Armed and dangerous with anything"></option>
+                    <option data-i18n="Brute Strength: Move the immovable"></option>
+                    <option data-i18n="Endurance: Nothing can stop you"></option>
+                    <option data-i18n="Legendary Weapon: An artifact of immense power"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Rogue" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Rogue experience or fill in the blank)"></option>
+                    <option data-i18n="Cat’s Grace: Extraordinary agility"></option>
+                    <option data-i18n="Nimble Fingers: No lock stays locked, no trap can catch you"></option>
+                    <option data-i18n="Lightfoot: Act undetected"></option>
+                    <option data-i18n="Adder’s Fangs: Deadly poisons and their antidotes"></option>
+                    <option data-i18n="Sixth Sense: Never be caught off guard"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Druid" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Druid experience or fill in the blank)"></option>
+                    <option data-i18n="Green Thumb: An affinity for plant magic"></option>
+                    <option data-i18n="Natural Armor: Skin becomes bark or stone"></option>
+                    <option data-i18n="Shapeshifter: Various animal forms"></option>
+                    <option data-i18n="Naturespeak: Understand plants and animals"></option>
+                    <option data-i18n="Force of Nature: Bend the land around you to your will"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Bard" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Bard experience or fill in the blank)"></option>
+                    <option data-i18n="Bag of Tricks: Card magic, juggling clubs, and other spectacles"></option>
+                    <option data-i18n="Devil’s Fingers: Prodigious skill with an instrument"></option>
+                    <option data-i18n="Alluring Voice: The voice of an angel"></option>
+                    <option data-i18n="Golden Words: Convince anyone of anything"></option>
+                    <option data-i18n="Inspiration: Power up your friends"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Ranger" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Ranger experience or fill in the blank)"></option>
+                    <option data-i18n="Deadeye: Pinpoint accuracy"></option>
+                    <option data-i18n="True North: Unerring sense of direction"></option>
+                    <option data-i18n="Animal Companion: A wild friend"></option>
+                    <option data-i18n="Tracking: Follow any trail"></option>
+                    <option data-i18n="Camouflage: Disappear into nature"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Swashbuckler" name="attr_select_axp2">
+                    <option value="" data-i18n="(pick a Swashbuckler experience or fill in the blank)"></option>
+                    <option data-i18n="Duellist: Master of the blade"></option>
+                    <option data-i18n="In the Rigging: Climbing and acrobatic feats"></option>
+                    <option data-i18n="Sea Legs: Balance on any surface"></option>
+                    <option data-i18n="Barbed Tongue: Your words hit where they hurt"></option>
+                    <option data-i18n="Bravado: Never falter"></option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="markable">
+              <div>
+                <input class="thider" name="attr_toggle_axp3" type="hidden" value="0"/>
+                <button class="cbox marked" type="action" name="act_unmark" value="axp3"></button>
+                <input class="tshower" name="attr_toggle_axp3" type="hidden" value="0"/>
+                <button class="cbox unmarked" type="action" name="act_mark" value="axp3"></button>
+              </div>
+              <input class="state" name="attr_toggle_axp3" type="hidden" value="0"/>
+              <div class="blank">
+                <input class="tshower" name="attr_toggle_axp3" type="hidden" value="0"/>
+                <textarea name="attr_axp3"></textarea>
+                <input class="thider" name="attr_toggle_axp3" type="hidden" value="0"/>
+                <div class="crossout"><span name="attr_axp3"></span>
+                </div>
+                <input class="shower" name="attr_axp3" type="hidden" value=""/>
+                <div class="tidy">
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Paladin" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Paladin experience or fill in the blank)"></option>
+                    <option data-i18n="Guidance: A sign from your deity"></option>
+                    <option data-i18n="Holy Armor: Divine protection"></option>
+                    <option data-i18n="Healing Touch: Treat wounds"></option>
+                    <option data-i18n="Smite: Destroy the unholy"></option>
+                    <option data-i18n="Taunt: Draw enemies towards you"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Wizard" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Wizard experience or fill in the blank)"></option>
+                    <option data-i18n="Prestidigitation: Small wonders"></option>
+                    <option data-i18n="Fireball: Mastery of flame"></option>
+                    <option data-i18n="Invisibility: Move unseen"></option>
+                    <option data-i18n="Magic Missile: Projectiles of astounding accuracy"></option>
+                    <option data-i18n="Arcana: Vast knowledge of the magical and unusual"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Fighter" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Fighter experience or fill in the blank)"></option>
+                    <option data-i18n="Intimidation: Make them do what you want"></option>
+                    <option data-i18n="Master of Arms: Armed and dangerous with anything"></option>
+                    <option data-i18n="Brute Strength: Move the immovable"></option>
+                    <option data-i18n="Endurance: Nothing can stop you"></option>
+                    <option data-i18n="Legendary Weapon: An artifact of immense power"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Rogue" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Rogue experience or fill in the blank)"></option>
+                    <option data-i18n="Cat’s Grace: Extraordinary agility"></option>
+                    <option data-i18n="Nimble Fingers: No lock stays locked, no trap can catch you"></option>
+                    <option data-i18n="Lightfoot: Act undetected"></option>
+                    <option data-i18n="Adder’s Fangs: Deadly poisons and their antidotes"></option>
+                    <option data-i18n="Sixth Sense: Never be caught off guard"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Druid" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Druid experience or fill in the blank)"></option>
+                    <option data-i18n="Green Thumb: An affinity for plant magic"></option>
+                    <option data-i18n="Natural Armor: Skin becomes bark or stone"></option>
+                    <option data-i18n="Shapeshifter: Various animal forms"></option>
+                    <option data-i18n="Naturespeak: Understand plants and animals"></option>
+                    <option data-i18n="Force of Nature: Bend the land around you to your will"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Bard" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Bard experience or fill in the blank)"></option>
+                    <option data-i18n="Bag of Tricks: Card magic, juggling clubs, and other spectacles"></option>
+                    <option data-i18n="Devil’s Fingers: Prodigious skill with an instrument"></option>
+                    <option data-i18n="Alluring Voice: The voice of an angel"></option>
+                    <option data-i18n="Golden Words: Convince anyone of anything"></option>
+                    <option data-i18n="Inspiration: Power up your friends"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Ranger" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Ranger experience or fill in the blank)"></option>
+                    <option data-i18n="Deadeye: Pinpoint accuracy"></option>
+                    <option data-i18n="True North: Unerring sense of direction"></option>
+                    <option data-i18n="Animal Companion: A wild friend"></option>
+                    <option data-i18n="Tracking: Follow any trail"></option>
+                    <option data-i18n="Camouflage: Disappear into nature"></option>
+                  </select>
+                  <input class="hideunless" name="attr_ajob" type="hidden" value=""/>
+                  <select class="Swashbuckler" name="attr_select_axp3">
+                    <option value="" data-i18n="(pick a Swashbuckler experience or fill in the blank)"></option>
+                    <option data-i18n="Duellist: Master of the blade"></option>
+                    <option data-i18n="In the Rigging: Climbing and acrobatic feats"></option>
+                    <option data-i18n="Sea Legs: Balance on any surface"></option>
+                    <option data-i18n="Barbed Tongue: Your words hit where they hurt"></option>
+                    <option data-i18n="Bravado: Never falter"></option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="townblock">
+          <div class="shead">
+            <div class="flabel big"><span data-i18n="Town Job">Town Job</span> 
+            </div>
+          </div>
+          <div class="jbody">
+            <select class="job" name="attr_tjob">
+              <option value="" data-i18n="(pick a town job)"></option>
+              <option value="Farmer" data-i18n="Farmer"></option>
+              <option value="Healer" data-i18n="Healer"></option>
+              <option value="Chef" data-i18n="Chef"></option>
+              <option value="Poet" data-i18n="Poet"></option>
+              <option value="Merchant" data-i18n="Merchant"></option>
+              <option value="Crafter" data-i18n="Crafter"></option>
+              <option value="Scholar" data-i18n="Scholar"></option>
+              <option value="Lookout" data-i18n="Lookout"></option>
+              <option value="Apothecary" data-i18n="Apothecary"></option>
+              <option value="Hunter" data-i18n="Hunter"></option>
+            </select>
+          </div>
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Town Experiences">Town Experiences</span> 
+            </div>
+          </div>
+          <div class="jbody">
+            <div class="blank">
+              <textarea name="attr_txp0"></textarea>
+              <input class="shower" name="attr_txp0" type="hidden" value=""/>
+              <div class="tidy">
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Farmer" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Farmer experience or fill in the blank)"></option>
+                  <option data-i18n="Preservation: Make food taste better and last longer"></option>
+                  <option data-i18n="Weathervane: Predict the weather a few days in advance"></option>
+                  <option data-i18n="Bounty: Your harvests are large and exquisite"></option>
+                  <option data-i18n="Handler: Caring for and communicating with animals"></option>
+                  <option data-i18n="Home Remedies: Unconventional solutions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Healer" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Healer experience or fill in the blank)"></option>
+                  <option data-i18n="Warm Presence: You are comforting to be around"></option>
+                  <option data-i18n="Safe Haven: Know how to make a space feel welcoming"></option>
+                  <option data-i18n="Thanatologist: Help the dead find peace, help the living grieve"></option>
+                  <option data-i18n="Ritual: Know the traditions and customs of many "></option>
+                  <option data-i18n="Bandage Wounds: Treat injuries"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Chef" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Chef experience or fill in the blank)"></option>
+                  <option data-i18n="Clean Cut: Mince, dice, chop, slice"></option>
+                  <option data-i18n="Grillmaster: Expert at grilling food and subordinates"></option>
+                  <option data-i18n="Parts Unknown: Knowledge of ingredients from all over"></option>
+                  <option data-i18n="Refined Palate: A sense of taste second to none"></option>
+                  <option data-i18n="Call the Shots: Quick thinking and split-second decisions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Poet" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Poet experience or fill in the blank)"></option>
+                  <option data-i18n="Spin Straw into Gold: Tell enchanting stories"></option>
+                  <option data-i18n="Say the Right Thing: Tell them what they want or need to hear"></option>
+                  <option data-i18n="Chronicler: Make sure people will remember"></option>
+                  <option data-i18n="Parable: A lesson for every situation"></option>
+                  <option data-i18n="A Friend in Need: Know who to call for a favor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Merchant" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Merchant experience or fill in the blank)"></option>
+                  <option data-i18n="Trader: Something I need for something you need"></option>
+                  <option data-i18n="Network: Able to obtain anything "></option>
+                  <option data-i18n="The Back Room: Satisfy most everyday needs"></option>
+                  <option data-i18n="The Perfect Gift: Know exactly what people want"></option>
+                  <option data-i18n="Well-Traveled: Know the customs and languages of the world"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Crafter" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Crafter experience or fill in the blank)"></option>
+                  <option data-i18n="Finesse: Acute manual dexterity"></option>
+                  <option data-i18n="Repair: Fix anything, with enough time"></option>
+                  <option data-i18n="Artisan: Create beautiful things"></option>
+                  <option data-i18n="Mason: Build strong structures"></option>
+                  <option data-i18n="Patron: You have a wealthy benefactor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Scholar" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Scholar experience or fill in the blank)"></option>
+                  <option data-i18n="Well Read: You know it, or you know where to learn it "></option>
+                  <option data-i18n="Jury Rigging: Invent your way out of a sticky situation"></option>
+                  <option data-i18n="Keen Observation: Something only you could see"></option>
+                  <option data-i18n="Defuse: Handle something dangerous"></option>
+                  <option data-i18n="Streamline: Get it done faster"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Lookout" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Lookout experience or fill in the blank)"></option>
+                  <option data-i18n="Eyes on the Horizon: Spot trouble before it starts"></option>
+                  <option data-i18n="Ears on the Ground: You heard it first"></option>
+                  <option data-i18n="Organizer: Bring people together"></option>
+                  <option data-i18n="Garrison: You never have to work alone"></option>
+                  <option data-i18n="Shoulder Throw: Defend yourself when necessary"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Apothecary" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick an Apothecary experience or fill in the blank)"></option>
+                  <option data-i18n="Brewer: Concoct potions, salves, balms, and more"></option>
+                  <option data-i18n="Smell the Flowers: A keen nose, mastery of scents"></option>
+                  <option data-i18n="Pipeleaf: Calm the nerves"></option>
+                  <option data-i18n="Botanist: Know every plant in the area"></option>
+                  <option data-i18n="Distillation: Strengthen the good in something"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Hunter" name="attr_select_txp0">
+                  <option value="" data-i18n="(pick a Hunter experience or fill in the blank)"></option>
+                  <option data-i18n="The Usual Spot: Know the best areas for hunting and foraging"></option>
+                  <option data-i18n="Trapper: A steady supply of meat and furs"></option>
+                  <option data-i18n="Secret Paths: Know the area like the back of your hand"></option>
+                  <option data-i18n="Lying in Wait: Master of concealment"></option>
+                  <option data-i18n="Offerings: On good terms with the local spirits"></option>
+                </select>
+              </div>
+            </div>
+            <input class="thider" name="attr_toggle_axp1" type="hidden" value="0"/>
+            <div class="blank">
+              <textarea name="attr_txp1"></textarea>
+              <input class="shower" name="attr_txp1" type="hidden" value=""/>
+              <div class="tidy">
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Farmer" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Farmer experience or fill in the blank)"></option>
+                  <option data-i18n="Preservation: Make food taste better and last longer"></option>
+                  <option data-i18n="Weathervane: Predict the weather a few days in advance"></option>
+                  <option data-i18n="Bounty: Your harvests are large and exquisite"></option>
+                  <option data-i18n="Handler: Caring for and communicating with animals"></option>
+                  <option data-i18n="Home Remedies: Unconventional solutions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Healer" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Healer experience or fill in the blank)"></option>
+                  <option data-i18n="Warm Presence: You are comforting to be around"></option>
+                  <option data-i18n="Safe Haven: Know how to make a space feel welcoming"></option>
+                  <option data-i18n="Thanatologist: Help the dead find peace, help the living grieve"></option>
+                  <option data-i18n="Ritual: Know the traditions and customs of many "></option>
+                  <option data-i18n="Bandage Wounds: Treat injuries"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Chef" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Chef experience or fill in the blank)"></option>
+                  <option data-i18n="Clean Cut: Mince, dice, chop, slice"></option>
+                  <option data-i18n="Grillmaster: Expert at grilling food and subordinates"></option>
+                  <option data-i18n="Parts Unknown: Knowledge of ingredients from all over"></option>
+                  <option data-i18n="Refined Palate: A sense of taste second to none"></option>
+                  <option data-i18n="Call the Shots: Quick thinking and split-second decisions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Poet" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Poet experience or fill in the blank)"></option>
+                  <option data-i18n="Spin Straw into Gold: Tell enchanting stories"></option>
+                  <option data-i18n="Say the Right Thing: Tell them what they want or need to hear"></option>
+                  <option data-i18n="Chronicler: Make sure people will remember"></option>
+                  <option data-i18n="Parable: A lesson for every situation"></option>
+                  <option data-i18n="A Friend in Need: Know who to call for a favor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Merchant" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Merchant experience or fill in the blank)"></option>
+                  <option data-i18n="Trader: Something I need for something you need"></option>
+                  <option data-i18n="Network: Able to obtain anything "></option>
+                  <option data-i18n="The Back Room: Satisfy most everyday needs"></option>
+                  <option data-i18n="The Perfect Gift: Know exactly what people want"></option>
+                  <option data-i18n="Well-Traveled: Know the customs and languages of the world"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Crafter" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Crafter experience or fill in the blank)"></option>
+                  <option data-i18n="Finesse: Acute manual dexterity"></option>
+                  <option data-i18n="Repair: Fix anything, with enough time"></option>
+                  <option data-i18n="Artisan: Create beautiful things"></option>
+                  <option data-i18n="Mason: Build strong structures"></option>
+                  <option data-i18n="Patron: You have a wealthy benefactor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Scholar" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Scholar experience or fill in the blank)"></option>
+                  <option data-i18n="Well Read: You know it, or you know where to learn it "></option>
+                  <option data-i18n="Jury Rigging: Invent your way out of a sticky situation"></option>
+                  <option data-i18n="Keen Observation: Something only you could see"></option>
+                  <option data-i18n="Defuse: Handle something dangerous"></option>
+                  <option data-i18n="Streamline: Get it done faster"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Lookout" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Lookout experience or fill in the blank)"></option>
+                  <option data-i18n="Eyes on the Horizon: Spot trouble before it starts"></option>
+                  <option data-i18n="Ears on the Ground: You heard it first"></option>
+                  <option data-i18n="Organizer: Bring people together"></option>
+                  <option data-i18n="Garrison: You never have to work alone"></option>
+                  <option data-i18n="Shoulder Throw: Defend yourself when necessary"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Apothecary" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick an Apothecary experience or fill in the blank)"></option>
+                  <option data-i18n="Brewer: Concoct potions, salves, balms, and more"></option>
+                  <option data-i18n="Smell the Flowers: A keen nose, mastery of scents"></option>
+                  <option data-i18n="Pipeleaf: Calm the nerves"></option>
+                  <option data-i18n="Botanist: Know every plant in the area"></option>
+                  <option data-i18n="Distillation: Strengthen the good in something"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Hunter" name="attr_select_txp1">
+                  <option value="" data-i18n="(pick a Hunter experience or fill in the blank)"></option>
+                  <option data-i18n="The Usual Spot: Know the best areas for hunting and foraging"></option>
+                  <option data-i18n="Trapper: A steady supply of meat and furs"></option>
+                  <option data-i18n="Secret Paths: Know the area like the back of your hand"></option>
+                  <option data-i18n="Lying in Wait: Master of concealment"></option>
+                  <option data-i18n="Offerings: On good terms with the local spirits"></option>
+                </select>
+              </div>
+            </div>
+            <input class="thider" name="attr_toggle_axp2" type="hidden" value="0"/>
+            <div class="blank">
+              <textarea name="attr_txp2"></textarea>
+              <input class="shower" name="attr_txp2" type="hidden" value=""/>
+              <div class="tidy">
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Farmer" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Farmer experience or fill in the blank)"></option>
+                  <option data-i18n="Preservation: Make food taste better and last longer"></option>
+                  <option data-i18n="Weathervane: Predict the weather a few days in advance"></option>
+                  <option data-i18n="Bounty: Your harvests are large and exquisite"></option>
+                  <option data-i18n="Handler: Caring for and communicating with animals"></option>
+                  <option data-i18n="Home Remedies: Unconventional solutions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Healer" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Healer experience or fill in the blank)"></option>
+                  <option data-i18n="Warm Presence: You are comforting to be around"></option>
+                  <option data-i18n="Safe Haven: Know how to make a space feel welcoming"></option>
+                  <option data-i18n="Thanatologist: Help the dead find peace, help the living grieve"></option>
+                  <option data-i18n="Ritual: Know the traditions and customs of many "></option>
+                  <option data-i18n="Bandage Wounds: Treat injuries"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Chef" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Chef experience or fill in the blank)"></option>
+                  <option data-i18n="Clean Cut: Mince, dice, chop, slice"></option>
+                  <option data-i18n="Grillmaster: Expert at grilling food and subordinates"></option>
+                  <option data-i18n="Parts Unknown: Knowledge of ingredients from all over"></option>
+                  <option data-i18n="Refined Palate: A sense of taste second to none"></option>
+                  <option data-i18n="Call the Shots: Quick thinking and split-second decisions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Poet" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Poet experience or fill in the blank)"></option>
+                  <option data-i18n="Spin Straw into Gold: Tell enchanting stories"></option>
+                  <option data-i18n="Say the Right Thing: Tell them what they want or need to hear"></option>
+                  <option data-i18n="Chronicler: Make sure people will remember"></option>
+                  <option data-i18n="Parable: A lesson for every situation"></option>
+                  <option data-i18n="A Friend in Need: Know who to call for a favor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Merchant" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Merchant experience or fill in the blank)"></option>
+                  <option data-i18n="Trader: Something I need for something you need"></option>
+                  <option data-i18n="Network: Able to obtain anything "></option>
+                  <option data-i18n="The Back Room: Satisfy most everyday needs"></option>
+                  <option data-i18n="The Perfect Gift: Know exactly what people want"></option>
+                  <option data-i18n="Well-Traveled: Know the customs and languages of the world"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Crafter" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Crafter experience or fill in the blank)"></option>
+                  <option data-i18n="Finesse: Acute manual dexterity"></option>
+                  <option data-i18n="Repair: Fix anything, with enough time"></option>
+                  <option data-i18n="Artisan: Create beautiful things"></option>
+                  <option data-i18n="Mason: Build strong structures"></option>
+                  <option data-i18n="Patron: You have a wealthy benefactor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Scholar" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Scholar experience or fill in the blank)"></option>
+                  <option data-i18n="Well Read: You know it, or you know where to learn it "></option>
+                  <option data-i18n="Jury Rigging: Invent your way out of a sticky situation"></option>
+                  <option data-i18n="Keen Observation: Something only you could see"></option>
+                  <option data-i18n="Defuse: Handle something dangerous"></option>
+                  <option data-i18n="Streamline: Get it done faster"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Lookout" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Lookout experience or fill in the blank)"></option>
+                  <option data-i18n="Eyes on the Horizon: Spot trouble before it starts"></option>
+                  <option data-i18n="Ears on the Ground: You heard it first"></option>
+                  <option data-i18n="Organizer: Bring people together"></option>
+                  <option data-i18n="Garrison: You never have to work alone"></option>
+                  <option data-i18n="Shoulder Throw: Defend yourself when necessary"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Apothecary" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick an Apothecary experience or fill in the blank)"></option>
+                  <option data-i18n="Brewer: Concoct potions, salves, balms, and more"></option>
+                  <option data-i18n="Smell the Flowers: A keen nose, mastery of scents"></option>
+                  <option data-i18n="Pipeleaf: Calm the nerves"></option>
+                  <option data-i18n="Botanist: Know every plant in the area"></option>
+                  <option data-i18n="Distillation: Strengthen the good in something"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Hunter" name="attr_select_txp2">
+                  <option value="" data-i18n="(pick a Hunter experience or fill in the blank)"></option>
+                  <option data-i18n="The Usual Spot: Know the best areas for hunting and foraging"></option>
+                  <option data-i18n="Trapper: A steady supply of meat and furs"></option>
+                  <option data-i18n="Secret Paths: Know the area like the back of your hand"></option>
+                  <option data-i18n="Lying in Wait: Master of concealment"></option>
+                  <option data-i18n="Offerings: On good terms with the local spirits"></option>
+                </select>
+              </div>
+            </div>
+            <input class="thider" name="attr_toggle_axp3" type="hidden" value="0"/>
+            <div class="blank">
+              <textarea name="attr_txp3"></textarea>
+              <input class="shower" name="attr_txp3" type="hidden" value=""/>
+              <div class="tidy">
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Farmer" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Farmer experience or fill in the blank)"></option>
+                  <option data-i18n="Preservation: Make food taste better and last longer"></option>
+                  <option data-i18n="Weathervane: Predict the weather a few days in advance"></option>
+                  <option data-i18n="Bounty: Your harvests are large and exquisite"></option>
+                  <option data-i18n="Handler: Caring for and communicating with animals"></option>
+                  <option data-i18n="Home Remedies: Unconventional solutions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Healer" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Healer experience or fill in the blank)"></option>
+                  <option data-i18n="Warm Presence: You are comforting to be around"></option>
+                  <option data-i18n="Safe Haven: Know how to make a space feel welcoming"></option>
+                  <option data-i18n="Thanatologist: Help the dead find peace, help the living grieve"></option>
+                  <option data-i18n="Ritual: Know the traditions and customs of many "></option>
+                  <option data-i18n="Bandage Wounds: Treat injuries"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Chef" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Chef experience or fill in the blank)"></option>
+                  <option data-i18n="Clean Cut: Mince, dice, chop, slice"></option>
+                  <option data-i18n="Grillmaster: Expert at grilling food and subordinates"></option>
+                  <option data-i18n="Parts Unknown: Knowledge of ingredients from all over"></option>
+                  <option data-i18n="Refined Palate: A sense of taste second to none"></option>
+                  <option data-i18n="Call the Shots: Quick thinking and split-second decisions"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Poet" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Poet experience or fill in the blank)"></option>
+                  <option data-i18n="Spin Straw into Gold: Tell enchanting stories"></option>
+                  <option data-i18n="Say the Right Thing: Tell them what they want or need to hear"></option>
+                  <option data-i18n="Chronicler: Make sure people will remember"></option>
+                  <option data-i18n="Parable: A lesson for every situation"></option>
+                  <option data-i18n="A Friend in Need: Know who to call for a favor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Merchant" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Merchant experience or fill in the blank)"></option>
+                  <option data-i18n="Trader: Something I need for something you need"></option>
+                  <option data-i18n="Network: Able to obtain anything "></option>
+                  <option data-i18n="The Back Room: Satisfy most everyday needs"></option>
+                  <option data-i18n="The Perfect Gift: Know exactly what people want"></option>
+                  <option data-i18n="Well-Traveled: Know the customs and languages of the world"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Crafter" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Crafter experience or fill in the blank)"></option>
+                  <option data-i18n="Finesse: Acute manual dexterity"></option>
+                  <option data-i18n="Repair: Fix anything, with enough time"></option>
+                  <option data-i18n="Artisan: Create beautiful things"></option>
+                  <option data-i18n="Mason: Build strong structures"></option>
+                  <option data-i18n="Patron: You have a wealthy benefactor"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Scholar" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Scholar experience or fill in the blank)"></option>
+                  <option data-i18n="Well Read: You know it, or you know where to learn it "></option>
+                  <option data-i18n="Jury Rigging: Invent your way out of a sticky situation"></option>
+                  <option data-i18n="Keen Observation: Something only you could see"></option>
+                  <option data-i18n="Defuse: Handle something dangerous"></option>
+                  <option data-i18n="Streamline: Get it done faster"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Lookout" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Lookout experience or fill in the blank)"></option>
+                  <option data-i18n="Eyes on the Horizon: Spot trouble before it starts"></option>
+                  <option data-i18n="Ears on the Ground: You heard it first"></option>
+                  <option data-i18n="Organizer: Bring people together"></option>
+                  <option data-i18n="Garrison: You never have to work alone"></option>
+                  <option data-i18n="Shoulder Throw: Defend yourself when necessary"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Apothecary" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick an Apothecary experience or fill in the blank)"></option>
+                  <option data-i18n="Brewer: Concoct potions, salves, balms, and more"></option>
+                  <option data-i18n="Smell the Flowers: A keen nose, mastery of scents"></option>
+                  <option data-i18n="Pipeleaf: Calm the nerves"></option>
+                  <option data-i18n="Botanist: Know every plant in the area"></option>
+                  <option data-i18n="Distillation: Strengthen the good in something"></option>
+                </select>
+                <input class="hideunless" name="attr_tjob" type="hidden" value=""/>
+                <select class="Hunter" name="attr_select_txp3">
+                  <option value="" data-i18n="(pick a Hunter experience or fill in the blank)"></option>
+                  <option data-i18n="The Usual Spot: Know the best areas for hunting and foraging"></option>
+                  <option data-i18n="Trapper: A steady supply of meat and furs"></option>
+                  <option data-i18n="Secret Paths: Know the area like the back of your hand"></option>
+                  <option data-i18n="Lying in Wait: Master of concealment"></option>
+                  <option data-i18n="Offerings: On good terms with the local spirits"></option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input class="mhider" name="attr_sheetmode" type="hidden" value=""/>
+  <div class="tavern">
+    <div class="topline">
+      <div class="nameblock">
+        <div class="flabel"><span data-i18n="Name">Name</span> 
+        </div>
+        <input class="fillblank" type="text" name="attr_character_name"/>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column">
+        <div class="rateblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Tavern Ratings">Tavern Ratings</span> 
+            </div>
+          </div>
+          <div class="ratebox">
+            <div class="shead">
+              <div class="flabel"><span data-i18n="Cuisine">Cuisine</span> 
+              </div>
+            </div>
+            <div class="cuisine">
+              <div>
+                <input class="rhider" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_cuisine" value="1"></button>
+                <input class="rshower" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_cuisine" value="1"></button>
+              </div>
+              <input class="state" name="attr_radio_cuisine" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="1"/>
+              <div class="description"><span data-i18n="A cramped kitchen. Plenty of staples but nothing fancy.">A cramped kitchen. Plenty of staples but nothing fancy.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_cuisine" value="2"></button>
+                <input class="rshower" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_cuisine" value="2"></button>
+              </div>
+              <input class="state" name="attr_radio_cuisine" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="2"/>
+              <div class="description"><span data-i18n="A modest kitchen. New friends at the market.">A modest kitchen. New friends at the market.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_cuisine" value="3"></button>
+                <input class="rshower" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_cuisine" value="3"></button>
+              </div>
+              <input class="state" name="attr_radio_cuisine" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="3"/>
+              <div class="description"><span data-i18n="A bustling kitchen. Brand new cookware. A well-stocked spice cabinet.">A bustling kitchen. Brand new cookware. A well-stocked spice cabinet.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_cuisine" value="4"></button>
+                <input class="rshower" name="attr_radio_cuisine" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_cuisine" value="4"></button>
+              </div>
+              <input class="state" name="attr_radio_cuisine" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="4"/>
+              <div class="description"><span data-i18n="A splendid kitchen. Good deals on ingredients and fresh deliveries. Specialized tools.">A splendid kitchen. Good deals on ingredients and fresh deliveries. Specialized tools.</span> 
+              </div>
+            </div>
+          </div>
+          <div class="ratebox">
+            <div class="shead">
+              <div class="flabel"><span data-i18n="Atmosphere">Atmosphere</span> 
+              </div>
+            </div>
+            <div class="atmosphere">
+              <div>
+                <input class="rhider" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_atmosphere" value="1"></button>
+                <input class="rshower" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_atmosphere" value="1"></button>
+              </div>
+              <input class="state" name="attr_radio_atmosphere" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="1"/>
+              <div class="description"><span data-i18n="Comfortable enough, but a little boring. Things feel slightly off.">Comfortable enough, but a little boring. Things feel slightly off.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_atmosphere" value="2"></button>
+                <input class="rshower" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_atmosphere" value="2"></button>
+              </div>
+              <input class="state" name="attr_radio_atmosphere" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="2"/>
+              <div class="description"><span data-i18n="A little plain, but homey. Not a bad place to get a good night’s sleep.">A little plain, but homey. Not a bad place to get a good night’s sleep.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_atmosphere" value="3"></button>
+                <input class="rshower" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_atmosphere" value="3"></button>
+              </div>
+              <input class="state" name="attr_radio_atmosphere" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="3"/>
+              <div class="description"><span data-i18n="Furniture and decorations that highlight the area. Lots of personal touches. It’s really starting to come together.">Furniture and decorations that highlight the area. Lots of personal touches. It’s really starting to come together.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_atmosphere" value="4"></button>
+                <input class="rshower" name="attr_radio_atmosphere" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_atmosphere" value="4"></button>
+              </div>
+              <input class="state" name="attr_radio_atmosphere" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="4"/>
+              <div class="description"><span data-i18n="The comfiest beds you’ve ever slept in. Lots of light and good company. Adventurers seek you out after long journeys.">The comfiest beds you’ve ever slept in. Lots of light and good company. Adventurers seek you out after long journeys.</span> 
+              </div>
+            </div>
+          </div>
+          <div class="ratebox">
+            <div class="shead">
+              <div class="flabel"><span data-i18n="Service">Service</span> 
+              </div>
+            </div>
+            <div class="service">
+              <div>
+                <input class="rhider" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_service" value="1"></button>
+                <input class="rshower" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_service" value="1"></button>
+              </div>
+              <input class="state" name="attr_radio_service" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="1"/>
+              <div class="description"><span data-i18n="A former farmhand, an injured local guard.">A former farmhand, an injured local guard.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_service" value="2"></button>
+                <input class="rshower" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_service" value="2"></button>
+              </div>
+              <input class="state" name="attr_radio_service" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="2"/>
+              <div class="description"><span data-i18n="An experienced line cook, good wait staff.">An experienced line cook, good wait staff.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_service" value="3"></button>
+                <input class="rshower" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_service" value="3"></button>
+              </div>
+              <input class="state" name="attr_radio_service" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="3"/>
+              <div class="description"><span data-i18n="An interior decorator, a skilled executive chef.">An interior decorator, a skilled executive chef.</span> 
+              </div>
+              <div>
+                <input class="rhider" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox marked" type="action" name="act_unmark_service" value="4"></button>
+                <input class="rshower" name="attr_radio_service" type="hidden" value="1"/>
+                <button class="rbox unmarked" type="action" name="act_mark_service" value="4"></button>
+              </div>
+              <input class="state" name="attr_radio_service" type="hidden" value="1"/>
+              <input class="highlighter" type="hidden" value="4"/>
+              <div class="description"><span data-i18n="An accomplished head of staff, a prestigious sommelier.">An accomplished head of staff, a prestigious sommelier.</span> 
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="listblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Notes">Notes</span> 
+            </div>
+          </div>
+          <div class="togglemode">
+            <div>
+              <input class="lhider" name="attr_toggle_notes" type="hidden" value="1"/><span>
+                <button class="ebox marked" type="action" name="act_unmark" value="notes"><span class="eboxtext" data-i18n="Display">Display</span> 
+                </button></span>
+              <input class="lshower" name="attr_toggle_notes" type="hidden" value="1"/><span>
+                <button class="ebox unmarked" type="action" name="act_mark" value="notes"><span class="eboxtext" data-i18n="Edit">Edit</span> 
+                </button></span>
+            </div>
+            <input class="state" name="attr_toggle_notes" type="hidden" value="0"/>
+            <input class="lhider" name="attr_toggle_notes" type="hidden" value="1"/>
+            <div class="content">
+              <fieldset class="repeating_notes">
+                <textarea name="attr_detail"></textarea>
+              </fieldset>
+            </div>
+            <input class="lshower" name="attr_toggle_notes" type="hidden" value="1"/>
+            <div class="readonly">
+              <ul>
+                <fieldset class="repeating_notes">
+                  <li><span name="attr_detail"></span>
+                  </li>
+                </fieldset>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="npcblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="NPCs">NPCs</span> 
+            </div>
+          </div>
+          <div class="content">
+            <fieldset class="repeating_npcs">
+              <input class="left" type="text" name="attr_name"/>
+              <input class="right" type="text" name="attr_pronouns"/>
+              <div class="substruct left"><span data-i18n="name">name</span> 
+              </div>
+              <div class="substruct right"><span data-i18n="pronouns">pronouns</span> 
+              </div>
+              <textarea name="attr_description"></textarea>
+            </fieldset>
+          </div>
+        </div>
+        <div class="advblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Advancement Details">Advancement Details</span> 
+            </div>
+          </div>
+          <div class="instruction"><span data-i18n="Each time a Tavern Rating increases, each player may describe a new detail or feature for the tavern.">Each time a Tavern Rating increases, each player may describe a new detail or feature for the tavern.</span> 
+          </div>
+          <div class="togglemode">
+            <div>
+              <input class="lhider" name="attr_toggle_details" type="hidden" value="1"/><span>
+                <button class="ebox marked" type="action" name="act_unmark" value="details"><span class="eboxtext" data-i18n="Display">Display</span> 
+                </button></span>
+              <input class="lshower" name="attr_toggle_details" type="hidden" value="1"/><span>
+                <button class="ebox unmarked" type="action" name="act_mark" value="details"><span class="eboxtext" data-i18n="Edit">Edit</span> 
+                </button></span>
+            </div>
+            <input class="state" name="attr_toggle_details" type="hidden" value="0"/>
+            <input class="lhider" name="attr_toggle_details" type="hidden" value="1"/>
+            <div class="content">
+              <fieldset class="repeating_details">
+                <textarea name="attr_detail"></textarea>
+              </fieldset>
+            </div>
+            <input class="lshower" name="attr_toggle_details" type="hidden" value="1"/>
+            <div class="readonly">
+              <ul>
+                <fieldset class="repeating_details">
+                  <li><span name="attr_detail"></span>
+                  </li>
+                </fieldset>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="listblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Location">Location</span> 
+            </div>
+          </div>
+          <div class="togglemode">
+            <div>
+              <input class="lhider" name="attr_toggle_tavernlocation" type="hidden" value="1"/><span>
+                <button class="ebox marked" type="action" name="act_unmark" value="tavernlocation"><span class="eboxtext" data-i18n="Display">Display</span> 
+                </button></span>
+              <input class="lshower" name="attr_toggle_tavernlocation" type="hidden" value="1"/><span>
+                <button class="ebox unmarked" type="action" name="act_mark" value="tavernlocation"><span class="eboxtext" data-i18n="Edit">Edit</span> 
+                </button></span>
+            </div>
+            <input class="state" name="attr_toggle_tavernlocation" type="hidden" value="0"/>
+            <input class="lhider" name="attr_toggle_tavernlocation" type="hidden" value="1"/>
+            <div class="content">
+              <fieldset class="repeating_tavernlocation">
+                <textarea name="attr_detail"></textarea>
+              </fieldset>
+            </div>
+            <input class="lshower" name="attr_toggle_tavernlocation" type="hidden" value="1"/>
+            <div class="readonly">
+              <ul>
+                <fieldset class="repeating_tavernlocation">
+                  <li><span name="attr_detail"></span>
+                  </li>
+                </fieldset>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="listblock">
+          <div class="shead">
+            <div class="flabel"><span data-i18n="Look">Look</span> 
+            </div>
+          </div>
+          <div class="togglemode">
+            <div>
+              <input class="lhider" name="attr_toggle_tavernlook" type="hidden" value="1"/><span>
+                <button class="ebox marked" type="action" name="act_unmark" value="tavernlook"><span class="eboxtext" data-i18n="Display">Display</span> 
+                </button></span>
+              <input class="lshower" name="attr_toggle_tavernlook" type="hidden" value="1"/><span>
+                <button class="ebox unmarked" type="action" name="act_mark" value="tavernlook"><span class="eboxtext" data-i18n="Edit">Edit</span> 
+                </button></span>
+            </div>
+            <input class="state" name="attr_toggle_tavernlook" type="hidden" value="0"/>
+            <input class="lhider" name="attr_toggle_tavernlook" type="hidden" value="1"/>
+            <div class="content">
+              <fieldset class="repeating_tavernlook">
+                <textarea name="attr_detail"></textarea>
+              </fieldset>
+            </div>
+            <input class="lshower" name="attr_toggle_tavernlook" type="hidden" value="1"/>
+            <div class="readonly">
+              <ul>
+                <fieldset class="repeating_tavernlook">
+                  <li><span name="attr_detail"></span>
+                  </li>
+                </fieldset>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
