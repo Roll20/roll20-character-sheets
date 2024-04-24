@@ -11,7 +11,8 @@ var versionsWithMigrations = [
 		20220116,
 		20220604,
 		20220821,
-		20230618
+		20230618,
+		20240414
 ];
 
 /*
@@ -825,6 +826,79 @@ function migrateTo20230618(migrationChain) {
 			safeSetAttrs(attrsToChange, {}, function(){
 				callNextMigration(migrationChain);
 			});
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize sleep regeneration attributes
+*/
+function migrateTo20240414(migrationChain) {
+	var caller = "migrateTo20240414";
+	debugLog(caller, "Invoked.");
+
+	const attrsToGet = [
+		'MagieTab',
+		'LiturgienTab',
+		'verstecke_erschoepfung',
+		'verstecke_ueberanstrengung',
+		'KE'
+	];
+	var attrsToChange =	{
+		"reg_sleep_le_ko": "@{KO} - 1d20",
+		"reg_sleep_le_fixed": "off",
+		"reg_sleep_le_mod_advantages_disadvantages": 0,
+		"reg_sleep_le_mod_food_restriction": 0,
+		"reg_sleep_ae_base": "1d6",
+		"reg_sleep_ae_in": "@{IN} - 1d20",
+		"reg_sleep_ae_fixed": "off",
+		"reg_sleep_ae_mod_advantages_disadvantages": 0,
+		"reg_sleep_ae_mod_special_skills": 0,
+		"reg_sleep_ae_mod_food_restriction": 0,
+		"reg_sleep_ae_mod_homesickness": 0,
+		"reg_sleep_addiction_withdrawal_effect": 0,
+		"reg_sleep_food_restriction_effect": 0,
+		"reg_sleep_mod_somnambulism": 0,
+		"reg_sleep_sleep_disorder_effect": 0,
+		"reg_sleep_sleep_disorder_trigger": 0,
+		"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
+	};
+	safeGetAttrs(attrsToGet, function(values) {
+		// Migrate checkbox inputs which received a value="1" attribute
+		if (values["MagieTab"] === "on")
+		{
+			attrsToChange["MagieTab"] = "1";
+		} else if (values["MagieTab"] === "off") {
+			attrsToChange["MagieTab"] = "0";
+		}
+		if (values["LiturgienTab"] === "on")
+		{
+			attrsToChange["LiturgienTab"] = "1";
+		} else if (values["LiturgienTab"] === "off") {
+			attrsToChange["LiturgienTab"] = "0";
+		}
+		if (values["verstecke_erschoepfung"] === "on")
+		{
+			attrsToChange["verstecke_erschoepfung"] = "1";
+		} else if (values["verstecke_erschoepfung"] === "off") {
+			attrsToChange["verstecke_erschoepfung"] = "0";
+		}
+		if (values["verstecke_ueberanstrengung"] === "on")
+		{
+			attrsToChange["verstecke_ueberanstrengung"] = "1";
+		} else if (values["verstecke_ueberanstrengung"] === "off") {
+			attrsToChange["verstecke_ueberanstrengung"] = "0";
+		}
+
+		// KE gets used for the first time and needs to be usable
+		if (isNaN(parseInt(values["KE"])))
+		{
+			attrsToChange["KE"] = 0;
+		}
+		debugLog(caller, attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function(){
+			callNextMigration(migrationChain);
 		});
 	});
 }
