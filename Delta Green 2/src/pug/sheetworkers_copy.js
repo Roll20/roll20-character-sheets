@@ -1,168 +1,236 @@
 	// === ATTRIBUTE ARRAYS
 	// note: I had the underscore in front of the arrays key to distinguish it from the name of the attribute
-		const arrays = {
-			_stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
-			_hit_points: ['strength_score', 'constitution_score'],
-			_sanity_points: ['power_score'], //ALSO USED FOR BREAKING POINTS
-			_willpower_points: ['power_score'],
-			_toggles: ['settings'],
-			_sanity_loss: ['san_success', 'san_failure'],
-			_skills:['accounting', 'alertness', 'anthropology', 'archeology', 'art', 'artillery', 'athletics', 'bureaucracy', 'computer_science', 'craft', 'criminology', 'demolitions', 'disguise', 'dodge', 'drive', 'firearms','first_aid', 'forensics', 'heavy_machinery', 'heavy_weapons', 'history', 'humint', 'law', 'medicine', 'melee_weapons', 'military_science', 'navigate', 'occult', 'persuade', 'pharmacy', 'pilot', 'psychotherapy','ride', 'science', 'search' , 'sigint' , 'stealth' , 'surgery' , 'survival', 'swim', 'unarmed_combat']
-		};
+const arrays = {
+		_stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
+		_hit_points: ['strength_score', 'constitution_score'],
+		_sanity_points: ['power_score'], //ALSO USED FOR BREAKING POINTS
+		_willpower_points: ['power_score'],
+		_toggles: ['settings'],
+		_sanity_loss: ['san_success', 'san_failure'],
+		_skills:['accounting', 'alertness', 'anthropology', 'archeology', 'art', 'artillery', 'athletics', 'bureaucracy', 'computer_science', 'craft', 'criminology', 'demolitions', 'disguise', 'dodge', 'drive', 'firearms','first_aid', 'forensics', 'heavy_machinery', 'heavy_weapons', 'history', 'humint', 'law', 'medicine', 'melee_weapons', 'military_science', 'navigate', 'occult', 'persuade', 'pharmacy', 'pilot', 'psychotherapy','ride', 'science', 'search' , 'sigint' , 'stealth' , 'surgery' , 'survival', 'swim', 'unarmed_combat']
+};
+
 _additionalskills=[];
-		
 	
+
+
 	// === SHARED FUNCTIONS
-	const setAttributes = (update, silent) => { 
-		(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
-	};
+const setAttributes = (update, silent) => { 
+	(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
+};
+
+// === SHEET VERSIONING
+//on('sheet:opened', () => {
+//	getAttrs(['version'], values => { versioning(parseFloat(values.version) || 1); });
+//});
+
+on(`ready`, () => {
+    // == check the version of the sheet
+    getAttrs(['version'], values => { versioning(parseFloat(values.version) || 1); });
+    // == check the skills and stats
+
+
+});
+
 
 	// === STAT SCORES
-	arrays['_stats'].forEach(attr => {
-		on(`change:${attr}_score`, (eventinfo) => {
-			const score = parseInt(eventinfo.newValue) || 0;
-			setAttributes({[`${attr}`]: score * 5}, true);
-		});
+arrays['_stats'].forEach(stat => {
+	const stat_score = `${stat}_score`;        
+    on(`change:${stat_score}`, (eventInfo) => {
+        var update = {};
+
+        // stats are given as text
+        const value=  parseInt(eventInfo.newValue)||0; // parse as integer or 0
+
+        // note: there is no limit to the stat value for monster... I do not enforce the limit to PCs for now
+		const score = (value>0) ? Math.round(value) : 0; // round to the nearest integer or 0 if negative
+        
+        update[`${stat_score}`] = score;
+        update[`${stat}`] = score*5;
+
+        console.log(update);
+		setAttributes(update, true);
+
+        // I can add here the update of weapons and derived skills due to stats
 	});
+});
+	//= force the stats to be positive and the skills to be between 0 and 99
+	
+
 
 	// === HIT POINTS
 	// First time player set you
-	arrays['_hit_points'].forEach(attr => {
-		on(`change:${attr}`, (eventInfo) => {
-			// Check if STR or CON has been changed, if changed the relative initial flag is set to 0
-			if (eventInfo.sourceAttribute === 'strength_score'){
-				setAttributes({initial_str:0}, true);
-			} else if (eventInfo.sourceAttribute === 'constitution_score'){
-				setAttributes({initial_con:0}, true);
-			}
-			getAttrs(['initial_str','initial_con','initial_hp'],function(v){
-				let flag1=(parseInt(v.initial_con)||0);
-				let flag2=(parseInt(v.initial_str)||0);
+arrays['_hit_points'].forEach(attr => {
+	on(`change:${attr}`, (eventInfo) => {
+		// Check if STR or CON has been changed, if changed the relative initial flag is set to 0
+		if (eventInfo.sourceAttribute === 'strength_score'){
+			setAttributes({initial_str:0}, true);
+		} else if (eventInfo.sourceAttribute === 'constitution_score'){
+			setAttributes({initial_con:0}, true);
+		}
+		getAttrs(['initial_str','initial_con','initial_hp'],function(v){
+			let flag1=(parseInt(v.initial_con)||0);
+			let flag2=(parseInt(v.initial_str)||0);
 				// This flag is 0 if both CON and STR has been initialized, otherwise it is 1
-				let flag_stats = flag1+flag2;
-				// This flag is 0 if the initial value for current hp has already been initialized, otherwise it is 1
-				let flag_hp=(parseInt(v.initial_hp)||0);
-				if (flag_stats == 0){
-					const attributes = arrays['_hit_points'].concat(['hit_points']);
-					if (flag_hp == 1){
-						getAttrs(attributes, (values) => {
-							const strength = parseInt(values.strength_score) || 0, constitution = parseInt(values.constitution_score) || 0; 
-							const calculated = Math.ceil((strength + constitution)/2);
-							let update = {
-								hit_points_max: calculated,
-								hit_points    : calculated,
-								initial_hp    : 0
-							}
-							setAttributes(update, true);
-						});
-					} else {
-						getAttrs(attributes, (values) => {
-							const strength = parseInt(values.strength_score) || 0, constitution = parseInt(values.constitution_score) || 0; 
-							const calculated = Math.ceil((strength + constitution)/2);
-							let update = {
-								hit_points_max: calculated
-							}
-							setAttributes(update, true);
-						});
-					}
-					
-				} 
-			});
+			let flag_stats = flag1+flag2;
+			// This flag is 0 if the initial value for current hp has already been initialized, otherwise it is 1
+			let flag_hp=(parseInt(v.initial_hp)||0);
+			if (flag_stats == 0){
+				const attributes = arrays['_hit_points'].concat(['hit_points']);
+				if (flag_hp == 1){
+					getAttrs(attributes, (values) => {
+						const strength = parseInt(values.strength_score) || 0, constitution = parseInt(values.constitution_score) || 0; 
+						const calculated = Math.ceil((strength + constitution)/2);
+						let update = {
+							hit_points_max: calculated,
+							hit_points    : calculated,
+							initial_hp    : 0
+						}
+						setAttributes(update, true);
+					});
+				} else {
+					getAttrs(attributes, (values) => {
+						const strength = parseInt(values.strength_score) || 0, constitution = parseInt(values.constitution_score) || 0; 
+						const calculated = Math.ceil((strength + constitution)/2);
+						let update = {
+							hit_points_max: calculated
+						}
+						setAttributes(update, true);
+					});
+				}				
+			} 
 		});
 	});
+});
 
 	
 	// === WILLPOWER POINTS
-	arrays['_willpower_points'].forEach(attr => {
-		on(`change:${attr}`, (eventinfo) => {
-			const attributes = arrays['_willpower_points'].concat(['willpower_points']);
-			getAttrs(attributes, (values) => {
-				const calculated = parseInt(values.power_score) || 0; 
-				let update = { 
-					willpower_points_max: calculated 
-				}
-				setAttributes(update, true);
-			});
+arrays['_willpower_points'].forEach(attr => {
+	on(`change:${attr}`, (eventInfo) => {
+		const attributes = arrays['_willpower_points'].concat(['willpower_points']);
+		getAttrs(attributes, (values) => {
+			const calculated = parseInt(values.power_score) || 0; 
+			let update = { 
+				willpower_points_max: calculated 
+			}
+			setAttributes(update, true);
 		});
 	});
+});
 
 	// === SANITY POINTS & BREAKING POINT
-	arrays['_sanity_points'].forEach(attr => {
-		on(`change:${attr}`, (eventinfo) => {
-			const attributes = arrays['_sanity_points'].concat(['sanity_points', 'breaking_point','initial_san']);
-			getAttrs(attributes, (values) => {
-				const flag_initial_san=parseInt(values.initial_san)||0,zero=0;
-				// Only updated the BP and Current Sanity if it is a new character
-				if (flag_initial_san==1){
-					const power = parseInt(values.power_score) || 0, calculatedSanity = power*5, calculatedBreakingPoint = power*4; calculatedWillPower = power; 
-					let update = { 
-						willpower_points: calculatedWillPower,
-						sanity_points: calculatedSanity,
-						breaking_point: calculatedBreakingPoint,
-						breaking_point_max: calculatedBreakingPoint,
-						initial_san:zero
-					}
-					setAttributes(update, true);
+arrays['_sanity_points'].forEach(attr => {
+	on(`change:${attr}`, (eventInfo) => {
+		const attributes = arrays['_sanity_points'].concat(['sanity_points', 'breaking_point','initial_san']);
+		getAttrs(attributes, (values) => {
+			const flag_initial_san=parseInt(values.initial_san)||0,zero=0;
+			// Only updated the BP and Current Sanity if it is a new character
+			if (flag_initial_san==1){
+				const power = parseInt(values.power_score) || 0, calculatedSanity = power*5, calculatedBreakingPoint = power*4; calculatedWillPower = power; 
+				let update = { 
+					willpower_points: calculatedWillPower,
+					past_willpower: calculatedWillPower,
+					sanity_points: calculatedSanity,
+					past_sanity: calculatedSanity,
+					breaking_point: calculatedBreakingPoint,
+					breaking_point_max: calculatedBreakingPoint,
+					initial_san:zero
 				}
-			});
+				setAttributes(update, true);
+			}
 		});
 	});
-	// new function to compute san point max
-	on("sheet:opened change:unnatural", function() {
-		getAttrs(['unnatural'], function(values) {
-			setAttrs({sanity_points_max: 99-Math.floor(values.unnatural)});
-		});
+});
+
+// new function to compute san point max
+on("change:unnatural", function() {
+	getAttrs(['unnatural'], function(values) {
+		setAttrs({sanity_points_max: 99-Math.floor(values.unnatural)});
 	});
+});
+
+
+const skillboundaries=(value, attr) => {
+    if (value < 0) {
+        update[attr]= 0;
+    }
+    if (value > 99) {
+        update[attr]= 99;
+    }
+};
+
+
+arrays['_skills'].forEach(attr => {
+		on(`change:${attr}`, (eventInfo) => {
+			console.log(eventInfo);
+			console.log(eventInfo.newValue);
+            var update = {};
+			const value = parseInt(eventInfo.newValue) || 0;
+            skillboundaries(value, attr);
+            setAttributes(update, true);
+		});
+});
+
+on("ready change:repeating_skills:rank", function(eventInfo) {
+        console.log(eventInfo);
+        console.log(eventInfo.newValue);
+		const value = parseInt(eventInfo.newValue) || 0;
+        const attr = eventInfo.sourceAttribute;
+        skillboundaries(value, attr);
+        setAttributes(update, true);
+
+});
+
 	
 	// === SAN LOSS Button
-	arrays['_sanity_loss'].forEach(attr => {
-		on(`change:${attr}`, (eventinfo) => {
-			const value = eventinfo.newValue;
+arrays['_sanity_loss'].forEach(attr => {
+		on(`change:${attr}`, (eventInfo) => {
+			const value = eventInfo.newValue;
 			if (value ===""){
 				setAttributes({[`has_${attr}`]: 0}, true);
 			} else {
 				setAttributes({[`has_${attr}`]: 1}, true);
 			}
 		});
-	});
+});
 	
 	// === TOGGLE INPUT SETTINGS
-    arrays['_toggles'].forEach(attr => {
+arrays['_toggles'].forEach(attr => {
         on(`clicked:toggle_${attr}`, () => {
         	getAttrs(['toggles'], (values) => {
  				let string = toggleBuilder(attr, v['toggles']);
                 setAttributes({toggles: string}, true);
         	});
         });
-    });
+});
 
 	// === UPDATE TOGGLE STRING
-	const toggleBuilder = (attr, oldString) => {
+const toggleBuilder = (attr, oldString) => {
         let newString = (oldString.includes(`${attr}`)) ? oldString.replace(`${attr},`, '') : `${oldString}${attr},`;
         return newString
-	};
+};
 
 
-	// === SHEET VERSIONING
-	on('sheet:opened', () => {
-		getAttrs(['version'], values => { versioning(parseFloat(values.version) || 1); });
-	});			
+		
 
-	const versioning = (version) => {
-	   console.log(`%c Versioning, ${version}`, 'color: green; font-weight:bold');
-	   if (version < 1.05) {
+const versioning = (version) => {
+	    console.log(`%c Versioning, ${version}`, 'color: green; font-weight:bold');
+	    if (version < 1.05) {
 		   version_0_105();
 	    } 
-		else if (version <1.5) {
+		if (version <1.5) {
 			version_105_150();
 		}
-		else if (version<1.7) {
+		if (version<1.7) {
 			version_150_170();
 		}
-	};
+		if (version<2.0) {
+			version_170_200();
+		}
+};
 
 	// UPDATE TO VERSION 1.05
-	const version_0_105= () => {
+const version_0_105= () => {
 		getAttrs(['version'], function(v) {
 			let codeversion=1.05;
 			let update={version: codeversion,
@@ -175,10 +243,9 @@ _additionalskills=[];
 				{silent:true},  // will not trigger sheet workers
 				versioning(codeversion)); // call versioning again
 		});
-	};
+};
 	// UPDATE TO VERSION 1.5
-	// UPDATE TO VERSION 1.5
-	const version_105_150 = () => {
+const version_105_150 = () => {
 		
 		let codeversion=1.5;
 		let update={};
@@ -230,7 +297,7 @@ _additionalskills=[];
 	};
 
 	// UPDATE TO VERSION 1.7
-	const version_150_170 = () => {
+const version_150_170 = () => {
 		let codeversion=1.7;
 		let update={};
 		update['version']=codeversion;
@@ -241,21 +308,151 @@ _additionalskills=[];
 		setAttrs(update, //Update attributes
 				{silent:true},  // will not trigger sheet workers
 				versioning(codeversion)); // call versioning again
-	};
+};
+
+	// UPDATE TO VERSION 2.0
+const version_170_200 = () => {
+		let codeversion=2.0;
+		let update={};
+		update['version']=codeversion;
+		getAttrs([`motivations`,`sanity_points`,`willpower_points`],function(v){
+			let motivations=v["motivations"];
+			update["old_motivations"]=motivations.replace(/<br>/g,"\n");
+            getSectionIDs("repeating_bonds",function(idarray){
+				idarray.forEach(id=>{
+					update["repeating_bonds_"+id+"_willpower_points"]=value["willpower_points"];
+					update["repeating_bonds_"+id+"_sanity_points"]=value["sanity_points"];
+				});
+            });
+            update['past_willpower']=v["willpower_points"];
+            update['past_sanity']=v["sanity_points"];
+		
+		    console.log(`%c update`, 'color: green; font-weight:bold');
+		    console.info(update);
+		    setAttrs(update, //Update attributes
+				 {silent:true},  // will not trigger sheet workers
+				 versioning(codeversion)); // call versioning again
+        });
+};
 
 	
 // UPDATE THE VALUE OF THE BOND IN THE REPEATING SECTION WHEN CREATED
-	on("change:repeating_bonds",function(){
-		getAttrs(["repeating_bonds_flag","charisma_score"],function(value){
-			if (value["repeating_bonds_flag"]==0){
-				let update={
-							repeating_bond_score:value["charisma_score"],
-							repeating_bond_flag:1
-							};
-				setAttributes(update,true);
-			}
+on("change:repeating_bonds",function(eventInfo){
+        const isbondscore=eventInfo.triggerName.endWith("_score");
+        const isbondname=eventInfo.triggerName.endWith("_name");
+        const attributes = ["repeating_bonds_flag","repeating_bond_score","repeating_bond_past","charisma_score","willpower_points","sanity_points"];
+		getAttrs(attributes,function(value){
+            var update={};
+            const initial_score=value["charisma_score"];
+            
+			update["repeating_bonds_willpower_points"]=value["willpower_points"];
+			update["repeating_bonds_sanity_points"]=value["sanity_points"];
+            if (isbondname){
+                console.log("changed name");
+                if (value["repeating_bonds_flag"]==0){
+                    update[`repeating_bond_score`]=initial_score;
+                    update[`repeating_bond_past`] =initial_score;
+                    update[`repeating_bond_flag`]=1;
+                };
+            }
+
+            if (isbondscore) {
+                console.log("changed score");
+
+                var newscore=parseInt(eventInfo.newValue)||0;
+                const oldscore=value["repeating_bond_past"];
+                
+                if (value["repeating_bonds_flag"]==0){
+                    update[`repeating_bond_flag`]=1;
+                };
+
+                // if the score is higher than the initial score and the old score, then the score is updated
+                if (newscore>initial_score){
+                    if (oldscore>initial_score){
+                        newscore= (newscore>oldscore) ? oldscore : newscore; // if the new score is higher than the old score, then the old score is kept
+                    }else{
+                        newscore = initial_score;
+                    }
+                }
+                 
+
+                if (newscore<0) {
+                    newscore=0;
+                }
+
+                update[`repeating_bond_score`]=newscore;
+                update[`repeating_bond_past`]=newscore;
+            }
+            console.log('update will power')
+            console.log(update);
+            setAttributes(update,true);
+
 		});
-	});
+});
+
+
+
+// UPDATE THE WP INSIDE EACH BOND
+on("change:willpower_points change:sanity_points",function(){
+        const isSanity=eventInfo.triggerName==="sanity_points";
+        const isWillpower=eventInfo.triggerName==="willpower_points";
+        console.log('is sanity:'+isSanity);
+        console.log('is willpower:'+isWillpower);
+		getAttrs(["willpower_points","past_willpower","sanity_points","past_sanity","san_points_max","breaking_point", "breaking_point_max","power_score","power_score"],function(value){
+			let update={};
+			getSectionIDs("repeating_bonds",function(idarray){
+				idarray.forEach(id=>{
+					update["repeating_bonds_"+id+"_willpower_points"]=value["willpower_points"];
+					update["repeating_bonds_"+id+"_sanity_points"]=value["sanity_points"];
+				}
+				);
+			});
+
+            if (isSanity){
+                const sanity_points_max=value["san_points_max"];
+                var oldbreaking=value["breaking_point_max"];
+                var newbreaking=value["breaking_point"];
+                var newsanity=parseInt(eventInfo.newValue)||0;
+                var oldsanity=parseInt(value["past_sanity"])||0;
+                var power_score=parseInt(value["power_score"])||0;
+                if (newsanity>sanity_points_max) {
+                    if (oldsanity>sanity_points_max){
+                        newsanity= (newsanity>oldsanity) ? oldsanity : newsanity;
+                    } else {
+                        newsanity=sanity_points_max;
+                    }
+                }
+
+                if (newsanity<0) {
+                    newsanity=0;
+                }
+
+                const diffsan=newsanity-oldsanity;
+                console.log('diffsan:'+diffsan);
+
+                update['sanity_points']=newsanity;
+                update['past_sanity']=newsanity;
+
+                if (newsanity<=newbreaking) {
+                    oldbreaking=newbreaking;
+                    newbreaking=Math.max(newsanity-power_score,0);
+                    update['breaking_point']=newbreaking;
+                    update['breaking_point_max']=oldbreaking;
+                }
+                
+            }
+            if (isWillpower){
+                var newwillpower=parseInt(eventInfo.newValue)||0;
+                var oldwillpower=parseInt(value["past_willpower"])||0;
+                var power_score=parseInt(value["power_score"])||0;
+            if (newwillpower>power_score) {
+                
+
+
+            
+			setAttributes(update,true);
+		});
+});
 
 // CHECK IF DAMAGE OR LETHALITY EXISTS
 	on("change:repeating_weapons",function(){

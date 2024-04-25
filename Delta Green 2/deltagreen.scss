@@ -1,29 +1,55 @@
+
 // FUNCTIONS
 //=============================
-    @import 'src/scss/_functions';
-
+@import 'src/scss/mixins/_functions';
 // MIXINS
 //=============================
-    @import 'src/scss/_mixins';
+    @import 'src/scss/mixins/_mixins';
+
 
 // VARIABLES
 //=============================
-    @import 'src/scss/_variables';
-
+    @import 'src/scss/variables/_variables';
 // GLOBAL SETTINGS
 //=============================
-    @import 'src/scss/_globals';
+    @import 'src/scss/variables/_globals';
+
+
 
 // REPEATING SECTIONS
 //=============================
-    @import 'src/scss/_repcontrol';
-
-// ROLL TEMPLATE
+    @import 'src/scss/toggles/_repcontrol';
+// SWITCHES
+//============================= 
+    @import 'src/scss/toggles/_switch'; 
+// TOOLTIP
+//============================= 
+    @import 'src/scss/toggles/_tooltip';
+// EDITABLE BUTTON SECTIONS
 //=============================
-    @import 'src/scss/_rolltemplate';
+   @import 'src/scss/toggles/_editable_button';
+// POPUP BUTTON SECTIONS
+//=============================
+    @import 'src/scss/toggles/_popup';
+
+
+
+// COMPENDIUM
+//=============================
+    @import 'src/scss/compendium/_compendium';
+
+
+
+        
+// SETTINGS
+//=============================
+@import 'src/scss/_settings';
+
+
 
 /* HIDE DIFFERENT SHEET TYPES BY DEFAULT
 ============================= */
+
     div.npc {
         display: none;
     }
@@ -31,8 +57,70 @@
     input.type[value='npc'] ~ div.npc,
     div.pc  {
         display: grid;
+
+      //  .section-body{
+      //      grid-template-rows: min-content;
+      //  }
     }
 
+    #personal-data-pc,#statistical-data-pc,#applicable-skills-pc,#injuries-pc,
+    #equipment-pc,#remarks-pc,#psychological-data-pc {
+        scroll-margin-top: 9.2rem;
+      }
+    div.tabs{
+        position: sticky;
+        top: 0;
+        align-items: center;
+        padding-right: 0.0em;
+        height: 9rem;
+        clear: both;
+        z-index: 100;
+        margin-bottom:1 rem;
+        .first{
+            padding-left: 0.5em;
+            justify-self: start;
+            justify-content: center;
+        }
+        .last{
+            justify-self: end;
+        }
+
+        .navmenu{
+            grid-auto-flow: column;
+            align-items: center;
+            justify-content: space-evenly;
+            background-color: $maincolor;
+            a {
+                text-transform: capitalize;
+                color: $accent1;
+                &:hover{
+                    color: $accent3;
+                    text-shadow: 0 0 10px $accent1; 
+                }
+            }
+    
+            input.type[value='npc'] ~  a.pc, a.npc {
+                display: none;
+            }
+            input.type[value='npc'] ~  a.npc, a.pc {
+                display: block;
+            }
+            
+        }
+
+        input.setting_gear[value='settings'] ~ .empty,.navmenu{
+            display: grid;
+            grid-column: 1/4;
+            width: 100%;
+            height: 3rem;
+        }
+
+        input.setting_gear[value='settings'] + .navmenu,.empty{
+            display: none;
+        }
+
+
+    }
      /* HIDE PC SECTIONS NOT NEEDED ON NPC PAGE
     ----------------------------- */
     $pcSections: 'personal-data', 'statistical-data', 'pyschological-data', 'applicable-skill-sets', 'injuries', 'remarks', 'authorizing-officer', 'section-bottom-decor', 'equipment';
@@ -42,27 +130,6 @@
       }
     }
 
-
-     /* NPC PAGE IS NOT AS WIDE A PC
-    ----------------------------- */
-    div.npc,
-    input.type[value='npc'] ~ div.tabs {
-        min-width: 850px;
-        max-width: 950px;
-    }
-
-/* SWITCHES
-============================= */
-    @import 'src/scss/_switch'; 
-
-
-/* HIGHLIGHT BUTTONS
-============================= */
-    input.display_string[value*='settings'] ~ div.tabs button[name='act_toggle_settings'] {
-        @include back-color($gray);
-        box-shadow: inset 0px 0px 3px 1px $accent1;
-        color     : $accent1;
-    } 
 
 /* GRID
 ============================= */ 
@@ -82,11 +149,14 @@
             }
         }
     }
+    .tabs, .mainsheet, .settings{
+        width:100%;
+    }
 
 /* TABS & LOGO SECTION
 ============================= */
     div.tabs {
-        grid-template-columns: 8em 1fr 6em;
+        grid-template-columns: 8em 1fr 2em;
         margin-bottom: 0.5%;
         @include back-color($maincolor);
 
@@ -146,6 +216,7 @@
     .border { border: 0.15em solid $maincolor; }
     .border-bottom { border-bottom: 0.15em solid $maincolor; }
     .center { @include text-align(center); }
+    .center-items { align-items: center; justify-items: center; }
     .header-body { grid-template-columns: 3em 1fr; }
     .italic {font-style: italic;}
     .margin-left {margin-left: 2%; }
@@ -175,180 +246,18 @@
 
 /* NPC SHEET
 ============================= */
-div.npc {
-    input[type='text'],
-    input[type='number'] {
-        width: 100%;
-    }
-
-    div.section-header {
-        input[name='attr_name'] {
-            color: $maincolor;
-            font-size: 1.2em;
-            text-align: left;
-        }
-    }
-
-    div.section-body {
-         grid-template-columns: 4em 1fr 4em 1fr 4em 1fr 4em 1fr 4em 1fr 4em 1fr;
-         margin-left: 2%;
-         max-width: 98%;
-
-        h1 { font-size: 1em; }
-
-        h2 { 
-            text-align: center;
-            text-decoration: underline;
-        }
-
-        button > h1 {
-            font-size: 0.8em;
-            line-height: 1.8em;
-
-             &:hover,
-             &:focus {
-                color: $accent1;
-            }
-        }
-
-        input {
-            height: 100%;
-
-            &:placeholder-shown {
-                border: 0.1em dashed $accent3;
-            }
-
-            &[type='text'] {
-                text-align: left;
-                margin-left: 1%;
-            }
-        }
-
-        textarea {
-            grid-column: 1 / 13;
-            min-height: 4em;
-        }
-
-        div.repeating-container,
-        label.row {
-            grid-column: 1 / 13;
-        }
-
-        div.repeating-container {
-            width: 100%;
-            .repcontrol {
-                .repcontrol_add {
-                    left: 90%;
-                }
-            }
-        }
-        /* HIT POINTS & WILLPOWER POINTS & SAN LOSS
-        ----------------------------- */
-        h1[data-i18n='HP'] { @include grid-area(3, 1, 3, 1);  }
-        label[data-i18n-title='enter hit points']{ @include grid-area(3, 2, 3, 2); }
-        h1[data-i18n='WP'] { @include grid-area(3, 3, 3, 3);  }
-        label[data-i18n-title='enter willpower points']{ @include grid-area(3, 4, 3, 4); }
-        h1[data-i18n='SAN'] { @include grid-area(3, 5, 3, 5);  }
-        label[data-i18n-title='enter sanity points']{ @include grid-area(3, 6, 3, 6); }
-        h1[data-i18n='BP'] { @include grid-area(3, 7, 3, 7);  }
-        label[data-i18n-title='enter breaking point']{ @include grid-area(3, 8, 3, 8); }
-
-		div.sanloss{
-            @include grid-area(4, 1, 4, 11);
-			grid-template-columns: 7em 6em 1em 6em 8em 2em 15em;
-		    button[data-i18n-title='san loss roll']{  
-		       display: inline-block;
-		       height:90%;
-		    }
-		    h1[data-i18n='SAN LOSS'] { @include grid-area(3, 5, 3, 6);  }
-		    input[type=text]{
-		       height:100%;
-		       width: 5em;
-		       text-align: center;
-		    }
-		    select{
-		       height:100%;
-		       width: 8em;
-		    }
-		    span {
-		       &.slash {
-		          color: $maincolor;
-		          font-size: 1.2em;
-		          height: 100%;
-		          display: flex;
-		          justify-content: center;
-		          align-items: center;
-		       }
-		    }
-		}		
-
-        /* ARMOR
-        ----------------------------- */
-        h1[data-i18n='armor'] { @include grid-area(5, 1, 5, 1);  }
-        label[data-i18n-title='enter armor text']{ 
-            @include grid-area(5, 2, 5, 13); 
-            grid-column: 2 / 13;
-        }
-
-        /* SKILLS
-        ----------------------------- */
-        h1[data-i18n='skills'] { @include grid-area(6, 1, 6, 1);  }
-        div.skills {
-            grid-row: 6 / 6;
-            margin-left: 2%;
-
-            div.section-skills,
-            div.section-header {
-                grid-column-gap: 1%;
-                grid-template-columns: 1fr 4em 2.5em;
-            }
-        }
-
-        /* ATTACKS
-        ----------------------------- */
-        h1[data-i18n='attacks'] { @include grid-area(7, 1, 7, 3);  }
-        div.attacks { 
-            grid-row: 8 / 8;
-            margin-left: 2%;
-
-            input[type='text'][name='attr_damage'] {
-                text-align: center;
-            }
-
-			
-            div.section-weapons,
-            div.section-header {
-               grid-column-gap: 1%;
-               grid-template-columns: 6em 4em 7em 4em 8em 6em 6em 4em 1fr 2.5em;
-            }
-        }
-
-        /* OTHER NOTES
-        ----------------------------- */
-        h1[data-i18n='other notes'] { @include grid-area(9, 1, 9, 3);  }
-        div.notes { 
-            grid-row: 10 / 10;
-            margin-left: 2%;
-
-            div.section-header,
-            div.section {
-                grid-column-gap: 1%;
-                grid-template-columns: 10em 1fr;
-            }
-        }
-    }
-}
-    
+    @import 'src/scss/_npc';  
 /* PC SHEET
 ============================= */
     @import 'src/scss/_pc';
-
+   // @import 'src/scss/_npc';
 /* SETTINGS SHEET
 ============================= */
     button[name='act_sheet_select'] {
         height: 2em;
         width: 2em;
     }
+
 
 /* ACCESSIBILITY ADJUSTMENTS
 ============================= */
@@ -371,10 +280,17 @@ input[type=number]::-webkit-inner-spin-button {
     margin: 0;}
 
 input[type=number] {
-    -moz-appearance:textfield;}
+    -moz-appearance:textfield;
+    appearance: textfield;}
 
 	
 span.switch-a, input.switchblock:checked ~ span.switch-b{ display:grid;}
 span.switch-b, input.switchblock:checked ~ span.switch-a{ display:none;}
 
 .active-drop-target {background-color:rgba(255,0,0,0.125);}
+
+
+// ROLL TEMPLATE
+//=============================
+@import 'src/scss/rolltemplates/_rolltemplate';
+

@@ -1,14 +1,164 @@
+
+mixin betterbutton_npc(rollName,titleButton,classButton='pressable',flag=false)
+	.buttonwrapper
+		button.roll.two(type='action' class=classes name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 	
+			span.title
+				if (flag)
+					h3.aligned-left(data-i18n=key data-i18n-title=titleButton)= titleButton
+						span.nbsp :
+						span(name='attr_'+rollName+'_name')
+				else
+					h3.aligned-left(data-i18n=key data-i18n-title=titleButton)= titleButton
+			span.para(name='attr_'+rollName)
+			
+
+mixin editablebetterbutton_npc_rep(rollName,classButton='pressable')
+	.buttonwrapper 
+		button.repeating_roll.two(type='action' class=classes name='attr_'+rollName+'_r' value='@{'+rollName+'_action}')
+			span.title
+				h3.aligned-left
+					span(name='attr_name')
+			span.para(name='attr_rank')
+		
+
+
 .npc
-	.grid
+
+
+	.grid_npc.div.name-and-description.border
+		.header
+			h1.grid__item_last(data-i18n="name and description") name and description
+		.inner-grid.inner-main
+			.grid__item_last.colheader
+				h2(data-i18n="name:") name:
+			.grid__item_last
+				input(data-i18n-placeholder='character name' name='attr_character_name' placeholder='Character name' title='@{name}' type='text')
+			.grid__item_last.colheader.align_top
+				h2(data-i18n="description:") description:
+			.grid__item_last.align_top 
+				textarea(name='attr_npc_description' placeholder='description' title='@{npc_description}')
+	.grid_npc.sources-of-information.border
+		.header 
+			h1.grid__item_last(data-i18n="sources of information") sources of information
+		.right-grid
+				textarea.area(style="height:15rem;" name='attr_npc_sources' data-i18n-placeholder='sources of information' placeholder='sources of information')
+	
+	.grid_npc.stat-data.border
+		.header.stat-grid 
+			button.link.roll(type='action' name='attr_strength_r')
+				h1.grid__item STR 
+			button.link.roll(type='action' name='attr_constitution_r')
+				h1.grid__item CON 
+			button.link.roll(type='action' name='attr_dexterity_r')
+				h1.grid__item DEX 
+			button.link.roll(type='action' name='attr_intelligence_r')
+				h1.grid__item INT 
+			button.link.roll(type='action' name='attr_power_r')
+				h1.grid__item POW 
+			button.link.roll(type='action' name='attr_charisma_r')
+				h1.grid__item CHA 
+			h1.grid__item HP 
+			h1.grid__item_last WP
+			button.link.roll(type='action' name='attr_sanity_points_r')
+				h1.grid__item SAN 
+			h1.grid__item BP 
+		.inner-main.stat-grid
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_strength_score' placeholder='-' title='@{STR}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_constitution_score' placeholder='-' title='@{CON}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_dexterity_score' placeholder='-' title='@{DEX}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_intelligence_score' placeholder='-' title='@{INT}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_power_score' placeholder='-' title='@{POW}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_charisma_score' placeholder='-' title='@{CHA}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_hit_points' placeholder='-' title='@{HP}' type='text' )
+				span /
+				span(style='width:40%' name='attr_hit_points_max')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_willpower_points' placeholder='-' title='@{WP}' type='text' )
+				span /
+				span(style='width:40%' name='attr_willpower_points_max')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_sanity_points' placeholder='-' title='@{WP}' type='text' )
+				span /
+				span(style='width:40%' name='attr_sanity_points_max')
+			.grid__item_last
+				input(data-i18n-placeholder='0' name='attr_breaking_point' placeholder='-' title='@{WP}' type='text' )
+				span /
+				span(style='width:40%' name='attr_breaking_point_max')
+	
+	.grid_npc.armor-skills-abilities-other.border
+		.header
+			h1(data-i18n="armor, skills,abilities, and other notes") "armor, skills,abilities, and other notes
+		.inner-main
+			h2.colon(data-i18n='skills') skills
+			h3.formatted(data-i18n='general') general
+			.skill-summary-container 
+				each val, key in skills1
+					+npcskill(val, key,true)
+				each val, key in skills2
+					+npcskill(val, key,true)
+				each val, key in skills3
+					+npcskill(val, key,true)
+				+npcskill(0, 'unnatural',true)
+			h3.formatted(data-i18n='extra') extra
+
+			.skill-summary-repeat
+				fieldset.repeating_skills
+					.buttonwrapper_rep
+						+editablebetterbutton_npc_rep('skill','pressable additional_div')
+
+			details.arrow
+				summary.allskills(data-i18n='all skills') all skills 
+				.skill-container
+					each val, key in skills1
+						.section-skill-col
+							+npcskill(val, key,false)
+					each val, key in skills2
+						.section-skill-col
+							+npcskill(val, key,false)
+					each val, key in skills3
+						.section-skill-col
+							+npcskill(val, key,false)
+					.section-skill-col
+						+npcskill(0, 'unnatural',false)
+					.section-repeating-container
+						.section-title.border-bottom
+							h3.margin-left(data-i18n='foriegn languages and other skills:' data-i18n-title='foriegn languages and other skills:') foriegn languages and other skills:	
+						.section-body
+							fieldset.repeating_skills
+								.section-skill-col
+									.form-skill-group 
+										label.skill-button
+											input(type='hidden' class='edit_test' name='attr_test')
+											span.edit_text
+												input(style='width:100%;'  name='attr_name' title='@{repeating_skills_${x}__name}' type='text' value='skill' )
+											span.unedit_text
+												- const rskillrollName = `skill`;
+												+editablebetterbutton_rep(rskillrollName,'','pressable additional_div',`(${val}%)`,true)
+					
+										label.switch-edit
+											input(type='checkbox' name='attr_test' value='editable')
+											span.vslider
+									label.rank(data-i18n-title='skill rank' title='skill rank' )
+										input(data-i18n-placeholder='0' name='attr_rank' title='@{repeating_skills_${x}_rank}' placeholder='0' type='text' value='')
+			
+
+	//.grid
 		.section-header
 			label(data-i18n-title='enter a name for non-player character' title='enter a name for non-player character')
 				input(data-i18n-placeholder='character name' name='attr_name' placeholder='Character name' title='@{name}' type='text' value='')
 		.grid.section-body
 			label.row(data-i18n-title='enter npc description' title='enter npc description')
 				textarea(name='attr_npc_description' placeholder='description' title='@{npc_description}' value='')
-			each val, key in statsObject
-				//without modifiers - const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
-				- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{stat=[[@{${key+'_score'}}+round(?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}})]]}} {{score=[[@{${key}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}`;
+			each val, key in stat-dataObject
+				//without modifiers - const statRollValue = `@{gm_toggle} &{template:stat-data} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
+				- const statRollValue = `@{gm_toggle} &{template:stat-data} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{stat=[[@{${key+'_score'}}+round(?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}})]]}} {{score=[[@{${key}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}`;
 				button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
 					h1.align-left(data-i18n=val)=val
 				if (val === 'POW' || val === 'STR' || val === 'CON' )
@@ -139,3 +289,4 @@
 							input(data-i18n-placeholder='name' name='attr_name' placeholder='name' title='@{repeating_other_${x}_name}' type='text' value='')
 						label(data-i18n-title='other notes' title='other notes')
 							input(data-i18n-placeholder='notes' name='attr_notes' placeholder='notes' title='@{repeating_other_${x}_notes}' type='text' value='')
+//- SKILL ROWS

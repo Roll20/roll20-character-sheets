@@ -1,0 +1,435 @@
+//- MULTIPLE STYLED CHECKBOXES
+mixin multiCheckbox(attr, num)
+	- let i = 0;
+	while i < num
+		label.styled-checkbox(data-i18n-title=attr + ' ' + ++i title=attr + ' ' + i)
+			input(name='attr_' + attr + '_' + i title='@{' + attr + '_'+i+'}' type='checkbox' value='on')
+	input(type='hidden' name='attr_' + attr + '_adapted' value=0)
+
+
+mixin listskills(val)
+	- let attr = val.replace(' ', '_');
+	- const named_skills = ['art_1', 'craft_1', 'military science_1', 'pilot_1', 'science_1','art_2', 'craft_2', 'military science_2', 'pilot_2', 'science_2'];
+	- let caps = (val === 'humint' || val === 'sigint') ? val.toUpperCase() : val;
+	unless named_skills.includes(val)
+		option(value='@{'+attr+'}' )=caps
+
+//- SKILL ROWS
+//mixin skill(val, key)
+	- const attr = key.replace(' ', '_');
+	- const named_skills = ['art_1', 'craft_1', 'military science_1', 'pilot_1', 'science_1','art_2', 'craft_2', 'military science_2', 'pilot_2', 'science_2'];
+	- var key1=key;
+	if (named_skills.includes(key))
+		- key1 = key.replace('_1','').replace('_2','');
+	
+	- const caps = (key1 === 'humint' || key1 === 'sigint') ? key1.toUpperCase() : key1;
+
+	
+	label.styled-checkbox.center-items(data-i18n-title=caps + ' fail checkbox' title=caps + ' fail checkbox')
+		input(name='attr_' + attr + '_fail' title='@{' + attr + '_fail}' type='checkbox')
+	
+	if (named_skills.includes(key))
+	
+		
+		.form-skill-group 
+			label.skill-button
+				input(type='hidden' class='edit_test' name='attr_'+attr+'_test')
+				span.edit_text
+					div.special_div
+						h3
+							span(data-i18n=caps title=caps)= caps
+							span :
+					
+					input(style='width:100%;'  name='attr_' + attr +'_name' title='@{' + attr + '_name}' type='text' data-i18n-placeholder='choose one' placeholder='choose one' )
+				span.unedit_text
+					//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}} @{${attr}_name}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
+					
+					+editablebetterbutton(attr, caps,'pressable special_div roll',`(${val}%)`,false)
+					//button.pressable(data-i18n-title='skill_roll' type='roll' value=skillRollValue)
+						div.special_div
+							h3
+								span(data-i18n=caps title=caps)= caps
+								span.postspace :
+								span.postspace  
+								span(name='attr_' + attr +'_name' )
+								// span(data-i18n='(' + val + '%)')= '(' + val + '%)'
+			label.switch-edit
+				input(type='checkbox' name='attr_'+attr+'_test' value='editable')
+				span.vslider
+	else 
+		- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
+		//+betterbutton(attr, caps,'normal_div roll',`(${val}%)`,false)
+		+betterbutton(attr, caps,'normal_div',`(${val}%)`,false)
+		//button(data-i18n-title=caps + ' roll' name=key title=caps + ' roll' type='roll' value=skillRollValue)					
+			div.normal_div
+				h3(data-i18n=caps title=caps)= caps
+				span(data-i18n='(' + val + '%)')= '(' + val + '%)'
+	.vert-line
+	label.rank(data-i18n-title=caps + ' rank' title=caps + ' rank')
+		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='text' value=val)
+	.horz-line
+
+
+mixin pcskill(val, key)
+	- const attr = key.replace(' ', '_');
+	- const named_skills = ['art_1', 'craft_1', 'military science_1', 'pilot_1', 'science_1','art_2', 'craft_2', 'military science_2', 'pilot_2', 'science_2'];
+	- var key1=key;
+	if (named_skills.includes(key))
+		- key1 = key.replace('_1','').replace('_2','');
+	- const caps = (key1 === 'humint' || key1 === 'sigint') ? key1.toUpperCase() : key1;
+	.box
+		label.styled-checkbox.center-items(data-i18n-title=caps + ' fail checkbox' title=caps + ' fail checkbox')
+			if (key==='unnatural')
+				span.nbsp
+			else
+				input(name='attr_' + attr + '_fail' title='@{' + attr + '_fail}' type='checkbox')
+		if (named_skills.includes(key))			
+			.form-skill-group 
+				label.skill-button
+					input(type='hidden' class='edit_test' name='attr_'+attr+'_test')
+					span.edit_text
+						div.special_div
+							h3
+								span(data-i18n=caps title=caps)= caps
+								span :						
+						input(style='width:100%;'  name='attr_' + attr +'_name' title='@{' + attr + '_name}' type='text' data-i18n-placeholder='choose one' placeholder='choose one' )
+					span.unedit_text
+						+editablebetterbutton(attr, caps,'pressable special_div',`(${val}%)`,false)
+				label.switch-edit
+					input(type='checkbox' name='attr_'+attr+'_test' value='editable')
+					span.vslider
+		else 
+			+betterbutton(attr, caps,'normal_div',`(${val}%)`,false)
+			
+	label.rank(data-i18n-title=caps + ' rank' title=caps + ' rank')
+		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='text' value=val)
+
+
+
+mixin npcskill(val, key, hide)
+	- const attr = key.replace(' ', '_');
+	- const named_skills = ['art_1', 'craft_1', 'military science_1', 'pilot_1', 'science_1','art_2', 'craft_2', 'military science_2', 'pilot_2', 'science_2'];
+	- var key1=key;
+	if (named_skills.includes(key))
+		- key1 = key.replace('_1','').replace('_2','');
+	
+	- const caps = (key1 === 'humint' || key1 === 'sigint') ? key1.toUpperCase() : key1;
+
+	if (hide)
+		- let flag=false;
+		if (named_skills.includes(key))
+			- flag=true;
+		input.visible(name='attr_' + attr + '_visible' title='@{' + attr + '_visible}' type='hidden')
+		+betterbutton_npc(attr, caps,'normal_div',flag)
+
+	else
+		.box
+			label.styled-checkbox.center-items(data-i18n-title=caps + ' fail checkbox' title=caps + ' fail checkbox')
+				input.isvisible(name='attr_' + attr + '_visible' title='@{' + attr + '_visible}' type='checkbox' value='visible')
+				span
+			if (named_skills.includes(key))
+				.form-skill-group 
+					label.skill-button
+						input(type='hidden' class='edit_test' name='attr_'+attr+'_test')
+						span.edit_text
+							div.special_div
+								h3
+									span(data-i18n=caps title=caps)= caps
+									span :
+							
+							input(style='width:100%;'  name='attr_' + attr +'_name' title='@{' + attr + '_name}' type='text' data-i18n-placeholder='choose one' placeholder='choose one' )
+						span.unedit_text
+							//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}} @{${attr}_name}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
+							
+							+editablebetterbutton(attr, caps,'pressable special_div',`(${val}%)`,false)
+
+					label.switch-edit
+						input(type='checkbox' name='attr_'+attr+'_test' value='editable')
+						span.vslider
+			else 
+				- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
+				+betterbutton(attr, caps,'normal_div',`(${val}%)`,false)
+			
+		label.rank(data-i18n-title=caps + ' rank' title=caps + ' rank')
+			input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='text' value=val)
+
+
+// SKILL FOR UNNATURAL
+//mixin skillunnatural(val, key)
+	- const attr = key.replace(' ', '_');
+	- const caps = (key === 'humint' || key === 'sigint') ? key.toUpperCase() : key;
+	//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+	- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d100]]}}`;
+	label
+	+betterbutton(key, caps,'roll',`(${val}%)`,false)
+	//button(data-i18n-title=caps + ' roll' name=key title=caps + ' roll' type='roll' value=skillRollValue)
+		div.normal_div
+			h3(data-i18n=caps title=caps)= caps
+			span(data-i18n='(' + val + '%)')= '(' + val + '%)'
+	.vert-line
+	label(data-i18n-title=caps + ' rank' title=caps + ' rank')
+		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='number' value=val min=0 max=99)
+	.horz-line
+//-	DERIVED ATTRIBUTE INPUT OR SPAN
+mixin derived(val, attrName)
+	if val === 'SAN'
+		input(name='attr_' + attrName + '_max' placeholder='50' title='@{' + attrName + '_max}' type='number' value=presetValue)
+	else
+		span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+
+
+//- TRANSLATIONS
+mixin personal(val, key)
+	//- const transKey = val.replace(/\(/g, '').replace(/\)/g, '').replace(/\./g, '').replace(/\,/g, '').replace(/ /g, '-');
+	h2.aligned-left(data-i18n=val data-i18-title=val title=val)=val
+	label(data-i18-title=val title=val)
+		if (key==='name')
+			input(data-i18n-placeholder=val name='attr_character_name' placeholder=val title='@{' + key + '}' type='text' value='')
+		else
+			input(data-i18n-placeholder=val name='attr_' + key placeholder=val title='@{' + key + '}' type='text' value='')
+		
+mixin weapons(weaponsAttrs) 
+			//- without modifier - const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+			input(type='hidden' name='attr_weapons')
+			- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{skill_percent}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+			each weapon in weaponsAttrs
+				- const attrName = weapon.replace(' ', '_').replace('%', 'percent')
+				- const atype = weapon.includes('%') || weapon === 'ammo' ? 'number' : 'text';
+				input(name='attr_haslethality' type='hidden' value='0')
+				input(name='attr_hasdamage'  type='hidden' value='0')
+				input(name='attr_hasammo'  type='hidden' value='0')
+				if (attrName==='weapons')
+					.form-normal-group
+						label.weapon_button
+							input(type='hidden' class='edit_test' name='attr_test')
+							span.edit_text
+								input(style='width:100%; padding: 0px 0px; margin: 0px 0;box-sizing: border-box;'  type='text' name='attr_name' value='weapon' title='@{repeating_weapons_${x}_' + attrName + '}')
+							span.unedit_text
+								button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:damage} {{header=@{weapons}}} {{subheader=@{damage}}} {{damage=[[@{damage}]]}} {{AP=[[@{armor_piercing}+0]]}}')
+								button.none(name='roll_lethality' type='roll' value='@{gm_toggle} &{template:lethality} {{header=@{weapons}}} {{subheader=@{lethality_percent}}}{{lethality_rating=[[@{lethality_percent}]]}} {{lethality=[[1d100]]}} {{AP=[[@{armor_piercing}+0]]}}')
+								button.none(name='roll_damage_critical' type='roll' value='@{gm_toggle} &{template:damage} {{header=@{weapons}}} {{subheader=@{damage}}} {{damage=[[(@{damage})*2]]}} {{AP=[[@{armor_piercing}+0]]}}')
+								button.none(name='roll_lethality_critical' type='roll' value='@{gm_toggle} &{template:lethality_critical} {{header=@{weapons}}} {{subheader=@{lethality_percent}}} {{lethality_rating=[[@{lethality_percent}*2]]}} {{lethality=[[1d100]]}} {{AP=[[@{armor_piercing}+0]]}}')
+								-const weaponrollName='weapons';			
+								+editablebetterbutton(weaponrollName,'',`pressable special_div`,``,true)
+						label.switch-edit
+							input(type='checkbox' name='attr_test' value='editable')
+							span.vslider
+				else if (attrName==='lethality_percent')					
+					label.weapon_label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+						input(type='hidden' class='edit_test' name='attr_test')
+						span.edit_text
+							input.shotgun(name=`attr_shotgun` type='checkbox' value='active')
+							input.noshotgun(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=atype value='')
+							span.wshotgun -
+						span.unedit_text
+							input.shotgun(name=`attr_shotgun` type='checkbox' value='active')
+							span.noshotgun(data-i18n-placeholder=weapon name='attr_' + attrName )
+							span.wshotgun -
+				else if (attrName==='damage')
+					label.weapon_label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+						input(type='hidden' class='edit_test' name='attr_test')
+						span.edit_text
+							input.blast(name=`attr_blastradius` type='checkbox' value='active')
+							span.wblast
+								span - 
+							span.noblast
+								input.shotgun(name=`attr_double_damage` type='checkbox' value='active')
+								span.noshotgun
+									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=atype value='')
+								span.wshotgun
+									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=atype value='')
+									span /
+									input(data-i18n-placeholder=weapon name='attr_' + attrName +'_2' placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=atype value='')
+						span.unedit_text
+							input.blast(name=`attr_blastradius` type='checkbox' value='active')
+							span.wblast
+								span - 
+							span.noblast
+								input.shotgun(name=`attr_double_damage` type='checkbox' value='active')
+								span.noshotgun
+									span(data-i18n-placeholder=weapon name='attr_' + attrName )
+								span.wshotgun
+									span(data-i18n-placeholder=weapon name='attr_' + attrName )
+									span /
+									span(data-i18n-placeholder=weapon name='attr_' + attrName+'_2')
+				else if (attrName==='ammo')
+					label.weapon_label(data-i18n-title=weapon + ' input' title=weapon + ' input' style='display: grid; position:relative;')
+						input(type='hidden' class='edit_test' name='attr_test')
+						span.edit_text.allowpopup
+								input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=`number` value='')
+								.othergrid.advancedinfo
+									input.advanced(type='checkbox')
+									span
+									.modifiers 
+										//.modifiers-body 
+										+advanced_mod_weapons()
+						span.unedit_text
+							span(data-i18n-placeholder=weapon name='attr_' + attrName )
+				else
+					label.weapon_label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+						input(type='hidden' class='edit_test' name='attr_test')
+						span.edit_text
+							if (attrName==='skill_percent')
+								input(data-i18n-placeholder=weapon name='attr_' + attrName list='weaponskills' placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type='text'  value='')
+							else
+								input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=atype value='')
+						span.unedit_text
+							if (attrName === 'skill_percent')
+								span(name='attr_skill_span')
+							else
+								span(name='attr_' + attrName )
+			
+				if (attrName!=='ammo')							
+					.vert-line
+			
+mixin advanced_mod_weapons()
+	h2.title(data-i18n="advanced features") advanced features
+	.item-shotgun
+		input.fix-check(name='attr_shotgun' type='checkbox' value='active')
+		span
+			span(data-i18n='shotgun') shotgun
+			|  
+			span.para +20%
+		span.double_damage
+			input.fix-check(name=`attr_double_damage` type='checkbox' value='active')
+			span(data-i18n="double damage") double damage
+	.item-check
+		input.fix-check(name='attr_blastradius' type='checkbox' value='active')
+		span
+			span(data-i18n='blast radius') blast radius
+			|  
+			span.para +20%
+	.item-acc 
+		input.fix-check(name='attr_accessories' type='checkbox' value='active')
+		span(data-i18n='accessories') accessories
+		input.small-select(data-i18n-placeholder='Holographic sight Standard' type='text' name='attr_accessories_name' title='@{repeating_weapons_${x}_accessories_name}' placeholder='Holographic sight' value='')
+		span(style="display:inline;justify-self:end;")
+			span(data-i18n="modifier") modifier
+			input(type='text' list='common_modifiers' name='attr_accessories_mod' title='@{repeating_weapons_${x}_accessories_mod}' value='0' maxlength='2' size='3'  style="width: 3em;") 
+			span.perc %
+	.item-sel
+		input.fix-check(name='attr_selfire' type='checkbox' value='active')
+		span(data-i18n-value='selective fire') selective fire
+		select.small-select(name_='attr_selfire_type')
+			option(value='short_burst')
+				span.selfire 
+					span.first(data-i18n="short burst") short burst
+					|  
+					span (
+					span(data-i18n="3 ammo") 3 ammo
+					span )
+			option(value='long_burst')
+				span.selfire 
+					span.first(data-i18n="long burst")  long burst
+					|  
+					span (
+					span.para(data-i18n="5 ammo") 5 ammo
+					span )
+			option(value='short_spray')
+				span.selfire 
+					span.first(data-i18n="short spray") short spray
+					|  
+					span (
+					span.para(data-i18n="10 ammo") 10 ammo
+					span )
+			option(value='long_spray')  long spray
+				span.selfire 
+					span.first(data-i18n="long spray")  long spray
+					|  
+					span (
+					span.para(data-i18n="20 ammo") 20 ammo
+					span )
+		span(style="display:inline;justify-self:end;")
+			span(data-i18n="lethality") lethality
+			input(type='text' name='attr_selfire_lethality' title='@{repeating_weapons_${x}_selfire_lethality}' value='10' maxlength='2' size='3' style="width: 3em;")
+			span %
+			
+
+		
+
+
+
+
+mixin editablebetterLabel(rollName,titleButton,spanButton='',isPersonal=false)
+		h3.aligned-left
+			if (isPersonal)
+				if (titleButton==='')
+					span(name='attr_name' )
+				else
+					//if (rollName==='weapons')
+						span(name='attr_'+rollName )
+					//else 
+					span(name='attr_' + rollName +'_name' )
+			else
+				span(data-i18n=caps title=titleButton)= titleButton
+				span.postspace :
+				span.postspace  
+				span(name='attr_' + rollName +'_name' )
+		//if (spanButton != '')
+				span.para(data-i18n=spanButton title=spanButton)= spanButton
+
+
+mixin betterLabel(titleButton,spanButton='',isPersonal=false)
+		h3.aligned-left(data-i18n=key data-i18n-title=titleButton)= titleButton
+		if (spanButton != '')
+			if (isPersonal)
+				span.para(data-i18n=spanButton title=spanButton)= spanButton
+			else
+				span(data-i18n=spanButton title=spanButton)= spanButton
+
+mixin betterbutton(rollName,titleButton,classButton='pressable',spanButton='',personal=false)
+	.buttonwrapper
+		if spanButton === ''
+			button.roll.one(type='action' class=classButton name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 
+				+betterLabel(titleButton)
+			//button.one(type='roll' class=classButton name='roll_'+rollName value='@{'+rollName+'_action}') 
+			button.none.one(type='roll'  name='roll_'+rollName value='@{'+rollName+'_action}') 
+			
+		else
+			- const whatkind=(personal) ? 'inPersonal' : 'inSkills';
+			- const classes=classButton+' '+whatkind; 
+			button.roll.two(type='action' class=classes name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 	
+				+betterLabel(titleButton,spanButton,personal)
+			//button.two(type='roll' class=classes name='roll_'+rollName value='@{'+rollName+'_action}') 	
+			button.none.two(type='roll' name='roll_'+rollName value='@{'+rollName+'_action}') 	
+			
+		
+		button.none(type='action' name='act_'+rollName+'-action') 
+		input(type='hidden' name='attr_'+rollName+'_action' value='')
+
+mixin editablebetterbutton(rollName,titleButton,classButton='pressable',spanButton='',personal=false)
+	.buttonwrapper
+		if spanButton === ''
+			button.roll.one(type='roll' class=classButton name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 
+				+editablebetterLabel(rollName,titleButton,spanButton,personal)
+			//button.one(type='roll' class=classButton name='roll_'+rollName value='@{'+rollName+'_action}') 
+			button.none.one(type='roll'  name='roll_'+rollName value='@{'+rollName+'_action}') 
+			
+		else
+			//- const whatkind=(personal) ? 'inPersonal' : 'inSkills';
+			- const classes=classButton+' '+whatkind; 
+			button.roll.two(type='roll' class=classes name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 	
+				+editablebetterLabel(rollName,titleButton,spanButton,personal)
+			//button.two(type='roll' class=classes name='roll_'+rollName value='@{'+rollName+'_action}') 	
+			button.none.two(type='roll'  name='roll_'+rollName value='@{'+rollName+'_action}') 	
+			
+		button.none(type='action' name='act_'+rollName+'-action') 
+		input(type='hidden' name='attr_'+rollName+'_action' value='')
+
+
+mixin editablebetterbutton_rep(rollName,titleButton,classButton='pressable',spanButton='',personal=false)
+	.buttonwrapper
+		if spanButton === ''
+			button.repeating_roll.one(type='action' class=classButton name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 
+				+editablebetterLabel(rollName,titleButton,spanButton,personal)
+			button.none.one(type='action' class=classButton name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 
+			
+		else
+			//- const whatkind=(personal) ? 'inPersonal' : 'inSkills';
+			- const classes=classButton+' '+whatkind; 
+			button.repeating_roll.two(type='action' class=classes name='attr_'+rollName+'_r' value='@{'+rollName+'_action}') 	
+				+editablebetterLabel(rollName,titleButton,spanButton,personal)
+			button.two.none(type='roll' class=classes name='roll_'+rollName value='@{'+rollName+'_action}') 	
+			
+		button.none(type='action' name='act_'+rollName+'-action') 
+		input(type='hidden' name='attr_'+rollName+'_action' value='')
