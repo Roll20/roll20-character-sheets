@@ -182,33 +182,47 @@ The only trick to the Complications section is to remember that points gained fr
 
 The last page of this sheet contains a number of options:
 
-(1) `Use Characteristic Maximums` If checked, character point costs are doubled above the standard Hero System maximums.
+`Use Characteristic Maximums` 
+If checked, character point costs are doubled above the standard Hero System maximums.
 
-(2) `Literacy Costs Character Points` If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
+`Literacy Costs Character Points` 
+If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
-(3) `Takes No Stun` This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
+`Takes No Stun` 
+This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
 
-(4) `Untiring` Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
+`Untiring` 
+Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
 
-(5) `Attack and Power Buttons Apply END Costs` If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
+`Attack and Power Buttons Apply END Costs` 
+If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
 
-(6) `Super-heroic Campaign Endurance` If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
+`Super-heroic Campaign Endurance` 
+If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
-(7) `Use Hit Location System` Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
+`Use Hit Location System` 
+Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-(8) `Weapon Damage Limited to 2x Base Damage` Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
+`Weapon Damage Limited to 2x Base Damage` 
+Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
 
-(9) `Choose d6-1 over d3 when Adjusted Damage is ambiguous` HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
+`Choose d6-1 over d3 when Adjusted Damage is ambiguous` 
+HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
 
-(10) `Health Reset Buttons also reset Combat Choices` When checked a reset also returns maneuver and targeting selections to their default states.
+`Health Reset Buttons also reset Combat Choices` 
+When checked a reset also returns maneuver and targeting selections to their default states.
 
-(11) `Show Power Descriptions in Chat` Uncheck if you would like to tidy up powers in the chat area.
+`Show Power Descriptions in Chat` 
+Uncheck if you would like to tidy up powers in the chat area.
 
-(12) `Display Degree of Success` By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
+`Display Degree of Success` 
+By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
 
-(13) `Name-Title Separator` Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color.
+`Name-Title Separator` 
+Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color.
 
-(14) `Whisper Rolls to GM` This dropdown offers 3 options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
+`Whisper Rolls to GM` 
+This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
 # <a id="mods">Mod Support</a>
 
