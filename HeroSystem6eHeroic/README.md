@@ -118,17 +118,19 @@ An attack doing normal damage appears in chat with a green heading. The weapon's
 
 ![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)![Normal Attack Chat Message Expanded](/HeroSystem6eHeroic/images/GreenButtonChatRoll2.png)
 
-HERO combat provides a number of tactical options via maneuvers and is an important aspect of play. The Standard Maneuvers slide is accessible using the (S) button in the lower right pane that also includes targeting, martial maneuvers, and a text field. Click the name of a desired maneuver to show its action "card." Those that work with weapons will change the color of weapon's "Roll" button (blue for Block, orange for Disarm, red or green for attacks, and gray when unavailable). Each card also provides a button when unarmed combat is an option.
+HERO combat provides a number of tactical options via maneuvers and is an important aspect of play. The Standard Maneuvers slide is accessible using the (S) button in the lower right pane that also includes targeting, martial maneuvers, and a text field. Click the name of a desired maneuver to show its action "card." Those that work with weapons will a change the color the weapon's "Roll" button (blue for Block, orange for Disarm, red or green for attacks, and gray when unavailable). Each card also provides a button when unarmed combat is an option.
 
 ![Standard Maneuvers](/HeroSystem6eHeroic/images/standardManeuvers.png)
 
-The Martial and Custom Maneuvers slide (M) may be used to enter martial arts skills or create custom weapons or maneuvers that don't fit into the weapon plus Standard Maneuver framework. Here the attack dialog options are limited to killing or normal damage and third option to declare a blocking maneuver. The damage field does not use the Damage Class system at present and therefore cares less about unusual dice strings.
+The Martial and Custom Maneuvers slide (M) may be used to enter martial arts skills or create custom weapons or maneuvers that don't fit into the weapon plus Standard Maneuver framework. The damage field does not use the Damage Class system at present and therefore cares less about unusual dice strings if one is needed.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
 
-Basic information about a martial maneuver can be shared in the chat window via the 'show' buttons.
+The attack dialog options follow the choices checked for "N" (normal or killing) and "Block," which declares that the action is a blocking maneuver.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuversChat.png)
+
+Basic information about a martial maneuver can be shared in the chat window via the 'show' buttons.
 
 *Hit location system (Optional)*
 
@@ -168,7 +170,7 @@ The endurance cost shown can *optionally* be automatically deducted from the cha
 
 ![Page 5](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
 
-The "Perks & Talents" section on top can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. Press the "show" button to send the description text to chat. The "Roll" button allows for an activation roll as needed.
+The "Perks & Talents" section on top can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. The "Roll" button allows for an activation roll as needed. Press the "show" button to send the description text to chat.
 
 ![Show](/HeroSystem6eHeroic/images/GrayButtonChat.png)
 
@@ -180,33 +182,33 @@ The only trick to the Complications section is to remember that points gained fr
 
 The last page of this sheet contains a number of options:
 
-(1) Use Characteristic Maximums. If checked, character point costs are doubled above the standard Hero System maximums.
+(1) `Use Characteristic Maximums` If checked, character point costs are doubled above the standard Hero System maximums.
 
-(2) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
+(2) `Literacy Costs Character Points` If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
-(3) Takes No Stun is commonly used for automaton-type characters that cannot be stunned and do not use END.
+(3) `Takes No Stun` This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
 
-(4) Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
+(4) `Untiring` Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
 
-(5) Attack and Power Buttons Apply END Costs. If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
+(5) `Attack and Power Buttons Apply END Costs` If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
 
-(6) Super-heroic Campaign Endurance. If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
+(6) `Super-heroic Campaign Endurance` If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
-(7) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
+(7) `Use Hit Location System` Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-(8) Weapon Damage Limited to 2x Base Damage. Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
+(8) `Weapon Damage Limited to 2x Base Damage` Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
 
-(9) Choose d6-1 over d3 when Adjusted Damage is ambiguous. HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
+(9) `Choose d6-1 over d3 when Adjusted Damage is ambiguous` HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
 
-(10) Health Reset Buttons also reset Combat Choices. When checked a reset also returns maneuver and targeting selections to their default states.
+(10) `Health Reset Buttons also reset Combat Choices` When checked a reset also returns maneuver and targeting selections to their default states.
 
-(11) Show Power Descriptions in Chat. Uncheck if you would like to tidy up powers in the chat area.
+(11) `Show Power Descriptions in Chat` Uncheck if you would like to tidy up powers in the chat area.
 
-(12) Display Degree of Success. By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
+(12) `Display Degree of Success` By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
 
-(13) Name-Title Separator. Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color.
+(13) `Name-Title Separator` Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color.
 
-(14) Whisper Rolls to GM. This dropdown offers 3 options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
+(14) `Whisper Rolls to GM` This dropdown offers 3 options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
 # <a id="mods">Mod Support</a>
 
