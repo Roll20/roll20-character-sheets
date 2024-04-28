@@ -115,7 +115,7 @@ on(
 				regLEKOMod += 0;
 			}
 
-			attrsToChange["reg_sleep_le_ko"] = `@{KO} - (1d20 + (${regLEKOMod}))`;
+			attrsToChange["reg_sleep_le_ko"] = `@{KO} - (1d20cs1cf20 + (${regLEKOMod}))`;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -318,7 +318,7 @@ on(
 				regAEINMod += 0;
 			}
 
-			attrsToChange["reg_sleep_ae_in"] = `@{IN} - (1d20 + (${regAEINMod}))`;
+			attrsToChange["reg_sleep_ae_in"] = `@{IN} - (1d20cs1cf20 + (${regAEINMod}))`;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -690,19 +690,19 @@ on(
 			"&{template:reg-sleep}",
 			`{{charactername=${values["character_name"]}}}`,
 			`{{le=${values["LE"]}}}`,
-			`{{lebase=[[1d6 + (${values["reg_sleep_le_mod_advantages_disadvantages"]}) + (${values["reg_sleep_le_mod_food_restriction"]}) + (${values["reg_sleep_mod_general"]}) + (${values["reg_sleep_le_mod_general"]})]]}}`,
+			`{{lebase=[[1d6 + [Vor- und Nachteile](${values["reg_sleep_le_mod_advantages_disadvantages"]}) + [Nahrungsrestriktion](${values["reg_sleep_le_mod_food_restriction"]}) + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
 			`{{leko=[[${values["reg_sleep_le_ko"]}]]}}`,
 			"{{leneu=[[0d1]]}}"
 		];
 		const AERoll = [
 			`{{ae=${values["AE"]}}}`,
-			`{{aebase=[[${values["reg_sleep_ae_base"]} + (${values["reg_sleep_ae_mod_advantages_disadvantages"]}) + (${values["reg_sleep_ae_mod_homesickness"]}) + (${values["reg_sleep_ae_mod_food_restriction"]}) + (${values["reg_sleep_ae_mod_special_skills"]}) + (${values["reg_sleep_mod_general"]}) + (${values["reg_sleep_ae_mod_general"]})]]}}`,
+			`{{aebase=[[${values["reg_sleep_ae_base"]} + [Vor- und Nachteile](${values["reg_sleep_ae_mod_advantages_disadvantages"]}) + [Heimwehkrank](${values["reg_sleep_ae_mod_homesickness"]}) + [Nahrungsrestriktion](${values["reg_sleep_ae_mod_food_restriction"]}) + [Sonderfertigkeiten](${values["reg_sleep_ae_mod_special_skills"]}) + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für AE-Regeneration](${values["reg_sleep_ae_mod_general"]})]]}}`,
 			`{{aein=[[${values["reg_sleep_ae_in"]}]]}}`,
 			"{{aeneu=[[0d1]]}}"
 		];
 		const KERoll = [
 			`{{ke=${values["KE"]}}}`,
-			`{{kebase=[[1d1 + (${values["reg_sleep_ke_mod_general"]})]]}}`,
+			`{{kebase=[[1d1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
 			"{{keneu=[[0d1]]}}"
 		];
 		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}";
