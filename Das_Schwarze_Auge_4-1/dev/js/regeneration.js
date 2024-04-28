@@ -1005,7 +1005,9 @@ on('clicked:reg_sleep-action', async (info) => {
 				)
 			)
 			{
-				LERegTotal -= results["leschlafstoerung"]["result"];
+				// Roll is positive, but convention dictates regenerations reductions to be negative
+				results["leschlafstoerung"]["result"] = -results["leschlafstoerung"]["result"];
+				LERegTotal += results["leschlafstoerung"]["result"];
 			}
 			if (results.hasOwnProperty("schlafwandeln"))
 			{
@@ -1055,7 +1057,9 @@ on('clicked:reg_sleep-action', async (info) => {
 					)
 				)
 				{
-					AERegTotal -= results["aeschlafstoerung"]["result"];
+					// Roll is positive, but convention dictates regenerations reductions to be negative
+					results["aeschlafstoerung"]["result"] = -results["aeschlafstoerung"]["result"];
+					AERegTotal += results["aeschlafstoerung"]["result"];
 				}
 				if (results.hasOwnProperty("schlafwandeln"))
 				{
