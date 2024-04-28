@@ -786,12 +786,12 @@ on(
 		// Modifications if fixed regeneration
 		if (values["reg_sleep_le_fixed"] !== "off")
 		{
-			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=${values["reg_sleep_le_fixed"]}}}`;
+			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=[[${values["reg_sleep_le_fixed"]}d1]]}}`;
 			roll[roll.findIndex(value => /leko=/.test(value))] = "{{leko=[[0d1]]}}";
 		}
 		if (values["reg_sleep_ae_fixed"] !== "off")
 		{
-			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=${values["reg_sleep_ae_fixed"]}}}`;
+			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=[[${values["reg_sleep_ae_fixed"]}d1]]}}`;
 			roll[roll.findIndex(value => /aein=/.test(value))] = "{{aein=[[0d1]]}}";
 		}
 		safeSetAttrs({"reg_sleep_roll": roll.join(" ")});
@@ -1014,6 +1014,9 @@ on('clicked:reg_sleep-action', async (info) => {
 				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
 		} else {
+			// required for roll template
+			results["lebase"] = { "result": parseInt(values["reg_sleep_le_fixed"]) };
+			computed["leko"] = 0;
 			LERegTotal = parseInt(values["reg_sleep_le_fixed"]);
 		}
 		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
@@ -1027,10 +1030,10 @@ on('clicked:reg_sleep-action', async (info) => {
 
 		// AE Regeneration
 		var AERegTotal = 0;
+		var AEneu = parseInt(values["AE"]);
+
 		if (results["aebase"])
 		{
-			var AEneu = parseInt(values["AE"]);
-
 			if (values["reg_sleep_ae_fixed"] === "off")
 			{
 				// Additional regeneration from IN check
@@ -1066,6 +1069,9 @@ on('clicked:reg_sleep-action', async (info) => {
 					AERegTotal += parseInt(results["schlafwandeln"]["result"]);
 				}
 			} else {
+				// required for roll template
+				results["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
+				computed["aein"] = 0;
 				AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
 			}
 			computed["aeneu"] = attrsToChange["AE"];
@@ -1093,6 +1099,37 @@ on('clicked:reg_sleep-action', async (info) => {
 				attrsToChange["KE"] = KEneu;
 			}
 			computed["keneu"] = KEneu;
+		}
+
+		// Prettify certain output
+		{
+			let useComputed = [
+				"leko",
+				"aein"
+			];
+			let useResults = [
+				"lebase",
+				"aebase",
+				"kebase",
+				"nahrungsrestriktion",
+				"leschlafstoerung",
+				"aeschlafstoerung",
+				"schlafwandeln"
+			];
+			for (let part of useComputed)
+			{
+				if (computed.hasOwnProperty(part))
+				{
+					computed[part] = prettifyMod(computed[part]);
+				}
+			}
+			for (let part of useResults)
+			{
+				if (results.hasOwnProperty(part))
+				{
+					computed[part] = prettifyMod(parseInt(results[part].result));
+				}
+			}
 		}
 
 		debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
