@@ -2,12 +2,12 @@
 
 input.tab::before,
 label.clickable,
-.sheet-textHead > span,
-.sheet-textHead,
-.sheet-texthead2Col,
-.sheet-textHead2Col,
-.sheet-record {
-    font-family: 'Play';
+.textHead > span,
+.textHead,
+.textHead2Col,
+.character-record {
+    font-family: 'Play', 'Tahoma', sans-serif;
+    letter-spacing: 1px;
 }
 
 :root {
@@ -22,9 +22,18 @@ label.clickable,
   --input-disabled-bg:#e3e3e3;
   --input-disabled-border:#444;
   --input-disabled-border-top:#999;
+  --checkbox-accent: #606060; /* This is now unused */
+  --checkbox-bg:#eee;
+  --checkbox-checked-bg:#ddd;
+  --checkbox-border:#8f8f9d;
+  --checkbox-checked-border:#54545c;
+  --checkbox-check:#222;
+  --checkbox-disabled-bg:#cecece;
+  --checkbox-disabled-check:#606060;
   --header-bg: #000;
   --header-bg-highlight: #333;
   --col1-bg:#a7a8aa;
+  --col1-bg-2:#c6c7ca;
   --header-text: #fff;
   --header-text-highlight: #b9b9b9;
   --roll-button-border: #d0d0d0;
@@ -32,7 +41,6 @@ label.clickable,
   --button-inset: #ffffff80;
   --button-image: #000000;
   --button2-text: #333;
-  --checkbox-accent: #606060;
   --rule-borders: #777;
   --ct-checked-text: #fff;
   --ct-checked-bg: #888;
@@ -59,6 +67,10 @@ label.clickable,
     align-items: center;
 }
 
+.vertical-center2 {
+    align-self: center;
+}
+
 .left {
     text-align: left;
 }
@@ -71,13 +83,13 @@ label.clickable,
     margin-bottom:0;
 }
  
-.charsheet .sheet-small, 
-.charsheet .sheet-smallSkills {
+.charsheet .small, 
+.charsheet .smallSkills {
     font-size: 10px;
     line-height:9px;
 }
 
-.charsheet .sheet-smallSkills{
+.charsheet .smallSkills{
     margin-left:15px;
 }
  
@@ -102,14 +114,30 @@ label.clickable,
 
 .charsheet input[disabled],
 .charsheet input[readonly],
-.defaultCrew:not(:checked) ~ .defaultCrewLock {
-    appearance:textfield;
+.defaultCrew:not(:checked) ~ .defaultCrewLock:not([type="checkbox"]) {
+    appearance:textfield!important; /* Otherwise, this will get overridden by the input[type="number"]:hover selector rule */
 	cursor: default;
 	border-color: var(--input-disabled-border);
 	border-top-color: var(--input-disabled-border-top);
 	text-align: center;
 	background-color: var(--input-disabled-bg);
 	outline: none;
+}
+
+.charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"] {
+    background-color: var(--checkbox-disabled-bg);
+}
+
+.charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"]:before {
+    background-color: var(--checkbox-disabled-check);
+}
+
+input[type="number"] {
+    appearance:textfield;
+}
+
+input[type="number"]:hover {
+    appearance:initial;
 }
 
 .charsheet input[disabled]::-webkit-outer-spin-button,
@@ -128,7 +156,7 @@ label.clickable,
     width: calc(100% - 300px) !important; 
 }
  
-.charsheet div.sheet-record {
+.charsheet div.character-record {
     font-size: 14px;
     font-weight: bold;
     text-align:center;    
@@ -138,16 +166,236 @@ label.clickable,
 
 /* ******** GRIDS ******** */
 
-.grid-title {
+.flex-break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+.flex-texthead {
+    height:21.433px;
+    margin-right:-2px;
+}
+
+.charsheet .grid-title {
     font-weight: bold;
     text-align: center;
     justify-content: center;
+    align-self: end;
+    line-height: 15px;
+    margin-top:4px;
+}
+
+/* Vitals Grid (HP, Threshold, Condition Track, Second Wind) */
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    column-gap: 6px;
+    row-gap: 8px;
+    text-align: center;
+}
+
+.vitals-grid-hp,
+.vitals-grid-sw,
+.vitals-grid-dt {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+}
+
+.vitals-grid-hp {
+    grid-area: 1/1/span 1/span 1;
+}
+
+.vitals-grid-sw {
+    grid-area: 2/1/span 1/span 1;
+}
+
+.vitals-grid-ct {
+    grid-area: 1/2/span 2/span 1;
+}
+
+.vitals-grid-dt {
+    grid-area: 3/1/span 1/span 2;
+}
+
+/* Attacks grid section */
+.attacks-grid {
+    display:grid;
+    grid-template-columns:50px 3fr repeat(6,1fr) 2fr 1fr 2fr;
+    grid-template-rows:auto;
+    justify-content: center;
+    grid-row-gap: 1px;
+}
+
+.attacks-grid-attack-title.col1,
+.attacks-grid-damage-title.col1 {
+    background-color:var(--col1-bg-2);
+}
+
+.attacks-grid-weapon-name {
+    grid-column:2/9;
+    font-weight:bold;
+    width:calc(100% - 2px);
+    margin-right:2px;
+}
+
+.attacks-grid-damage-type {
+    grid-column:9/12;
+    width:100%;
+}
+
+.attacks-grid-full-details {
+    grid-column:1/2;
+}
+
+.attacks-grid-attack-title {
+    grid-column:2/3;
+    margin-right:2px;
+}
+
+.attacks-grid-attack-total {
+    grid-column:3/8;
+}
+
+.sectAttack-show:checked ~ .attacks-grid-attack-title,
+.sectAttack-show:checked ~ .attacks-grid-damage-title {
+    pointer-events: none;
+}
+
+.sectAttack-show:checked ~ .attacks-grid-attack-total {
+    grid-column:3/6;
+    text-align:left;
+}
+
+.attacks-grid-damage-title {
+    grid-column: 2/3;
+    margin-right:2px;
+}
+
+.sectAttack-show:checked ~ .attacks-grid-damage-title {
+    grid-column:6/9;
+}
+
+.attacks-grid-weapon-damage {
+    grid-column: 3/5;
+    width:100%;
+}
+
+.sectAttack-show:checked ~ .attacks-grid-weapon-damage {
+    grid-column:9/10;
+}
+
+.sectAttack-show:checked ~ .attacks-grid-damage-plus {
+    grid-column:10/11;
+}
+
+.attacks-grid-damage-total {
+    grid-column: 6/8;
+    width:100%;
+}
+
+.sectAttack-show:checked ~ .attacks-grid-damage-total {
+    grid-column: 11/12;
+}
+
+.attacks-grid-crit-info {
+    grid-column: 2/10; 
+    font-weight:bold; 
+    justify-content: space-around;
+}
+
+.attacks-grid-formulas {
+    grid-column: 2/12;
+}
+
+.repcontainer[data-groupname="repeating_attack"] .repitem:first-child {
+    margin-top: 2px;
+}
+
+.repcontainer[data-groupname="repeating_attack"] .repitem:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+/* Defenses grid section */
+.defenses-grid {
+    display:grid;
+    grid-template-columns:72px repeat(4,1fr) 1.5fr 1fr;
+    grid-template-rows:auto;
+    justify-content: center;
+    column-gap: 4px;
+    row-gap:1px;
+    margin-bottom: 18px;
+}
+
+.charsheet .defenses-grid input[type="number"] {
+    width:100%;
+}
+
+.charsheet .defenses-grid select.modtype {
+    width:auto;
+    min-width: 72px;
+}
+
+.defenses-grid textarea {
+    grid-column-start:span 7;
+}
+
+.defenses-grid .col1 {
+    padding-right: 5px;
+}
+
+.defenses-grid .shift-left {
+    margin-left: -3px;
+}
+
+/* Force Power/Suite Grid */
+.powers-flex-container {
+    display:flex;
+    justify-content:space-evenly;
+    padding: 2px;
+}
+
+.powers-flex-container label {
+    font-size:13px;
+}
+
+#individual-powers:checked ~ textarea,
+#power-suite:checked ~ .repcontainer,
+#power-suite:checked ~ .repcontrol {
+    display:none;
+}
+
+.powers-grid {
+    display:grid;
+    grid-template-columns:48px 1fr 45px 10px 45px;
+    grid-template-rows:auto;
+    justify-content: center;
+    grid-row-gap: 2px;
+    grid-column-gap: 2px;
+}
+
+.charsheet .powers-grid button {
+    width:fit-content;
+}
+
+.charsheet .powers-grid input[type="text"],
+.charsheet .powers-grid input[type="number"] {
+    width:auto;
+}
+
+.powers-notes-title {
+    grid-column:1/6;
+    font-size:12px;
+    font-weight:bold;
+    line-height:12px;
+    margin-bottom:-2px;
 }
 
 /* Equipment CSS-rules section */
 .EquipmentSection {
     width: 100%;
     overflow: hidden;
+    padding: 0px 2px;
 }
 
 .EquipmentSection .EquipmentSubSection {
@@ -178,7 +426,6 @@ label.clickable,
 .equipment-title-grid-container {
     display: grid;
     grid-template-columns: 4fr repeat(3, 1fr) repeat(4, 1.25fr);
-    grid-template-rows: 60px;
     width: 100%;
     /* The following code is for when bordered regions are implemented
     background-color: #952fbd4f;
@@ -201,39 +448,6 @@ label.clickable,
     /* Font/Text settings */
     text-align: center;
     font-weight: bold;
-}
-
-/* Defenses grid section */
-.defenses-grid {
-    display:grid;
-    grid-template-columns:72px repeat(4,1fr) 1.5fr 1fr;
-    grid-template-rows:auto;
-    justify-content: center;
-    column-gap: 4px;
-    row-gap:1px;
-    margin-bottom: 18px;
-}
-
-.charsheet .defenses-grid input[type="number"] {
-    width:100%;
-}
-
-.charsheet .defenses-grid select.modtype {
-    width:auto;
-    min-width: 72px;
-}
-
-.defenses-grid textarea {
-    grid-column-start:span 7;
-    resize: vertical;
-}
-
-.defenses-grid .sheet-col1 {
-    padding-right: 5px;
-}
-
-.defenses-grid .shift-left {
-    margin-left: -3px;
 }
 
 /* Equipment grid section */
@@ -330,7 +544,6 @@ textarea.equipment-note-field {
     min-height: 40px;
     height: 40px;
     margin: 0px 4px 0px 0px;
-    resize: vertical;
 }
 
 .equipment-note-container {
@@ -349,6 +562,73 @@ textarea.equipment-note-field {
     min-width:300px;
     float:right;
 }
+
+/* Hiding weight and encumbrance with house rule */
+.encumbrance-sectShow:checked ~ .encumbrance-sect,
+.encumbrance-sectShow:checked ~ div .encumbrance-sect {
+    display:none;
+}
+
+.encumbrance-sectShow:checked ~ div .equipment-details-container,
+.encumbrance-sectShow:checked ~ .equipment-title-grid-container,
+.encumbrance-sectShow:checked ~ .equipment-row-grid-container {
+    grid-template-columns: 4fr repeat(3, 1fr) repeat(2, 1.25fr);
+}
+
+/* Encumbrance grid section */
+
+.encumbrance-grid {
+    display:grid;
+    margin:1px;
+    justify-content: center;
+    grid-template-columns:2fr 1fr 10px 1fr;
+    grid-template-rows:auto;
+    column-gap: 4px;
+    row-gap:1px;
+}
+
+/* Alernative encumbrance grid
+.encumbrance-grid2 {
+    display:grid;
+    margin:1px;
+    justify-content: center;
+    grid-template-columns:1fr 1fr 10px repeat(4, 1fr);
+    grid-template-rows:auto;
+    column-gap: 4px;
+    row-gap:1px;
+}*/
+
+.ui-dialog .charsheet .encumbrance-grid input[type="number"],
+.ui-dialog .charsheet .encumbrance-grid input[type="text"] {
+    width:100%;
+}
+
+/* Alernative encumbrance grid
+.ui-dialog .charsheet .encumbrance-grid2 input[type="number"],
+.ui-dialog .charsheet .encumbrance-grid2 input[type="text"],
+.encumbrance-grid2 span {
+    width:100%;
+    grid-column: span 2;
+}*/
+    /* The button for heavy/light load is grouped with the CT buttons */
+
+/* Crew Skills grid */
+
+.crew-skills-grid {
+    display:grid;
+    margin:1px;
+    justify-content: center;
+    grid-template-columns:8fr 3fr 3fr 1fr 3fr 1fr 3fr;
+    grid-template-rows:auto;
+    row-gap:1px;
+}
+
+.crew-skills-grid div {
+    align-self: center;
+    text-align: center;
+}
+
+/* ******** END GRIDS ******** */
  
 .charsheet input.skills {
     width:42px !important; 
@@ -358,10 +638,10 @@ textarea.equipment-note-field {
     width: 72px;
 }
  
-.charsheet div.sheet-textHead, 
-.charsheet div.sheet-textHead2Col,
-.charsheet label.sheet-textHead,
-.charsheet label.sheet-textHead2Col {
+.charsheet div.textHead, 
+.charsheet div.textHead2Col,
+.charsheet label.textHead,
+.charsheet label.textHead2Col {
     background-color: var(--header-bg);
     color: var(--header-text);
     font-size: 15px;
@@ -373,11 +653,6 @@ textarea.equipment-note-field {
     border-spacing: 0px 4px;   
 	margin-left: -2px;
 }
-
-.charsheet div.sheet-textHead2Col, 
-.charsheet table.sheet-table2col {
-	min-width: 395px;
-}
  
 .charsheet textarea {
     width: calc(100% - 10px);
@@ -385,23 +660,21 @@ textarea.equipment-note-field {
     border-right: 1px solid var(--input-border);
     border-bottom: 1px solid var(--input-border);
     margin-bottom: 1px;
+    resize: vertical;
 }
 
 .charsheet textarea.atkFormula, 
 .charsheet input.skillFormula, 
 .charsheet textarea.atkNotes {
     font-size: 12px;
-    min-width:330px;
 }
 
-.skillFormula {
+.charsheet textarea.skillFormula {
 	width:100%;
+    height: 60px;
 }
 
-.charsheet textarea.atkFormula {
-    height: 80px; 
-}
-
+.charsheet textarea.atkFormula,
 .charsheet textarea.atkNotes {
     height: 40px;
 }
@@ -447,6 +720,11 @@ textarea.equipment-note-field {
 	display:none;
 }
 
+hr.small-hr {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
 /* ******** Buttons, Checkboxes, and Radio Buttons ******** */
 .charsheet button[type=roll] {
     padding: 6px 10px 4px !important;
@@ -461,21 +739,26 @@ textarea.equipment-note-field {
     box-shadow: 0 1px 0 var(--button-inset) inset;
 }
 
-.charsheet button[type=roll].blank-roll-button::before { content: "";}
+.charsheet button[type=roll].blank-roll-button::before,
+.charsheet button[type=roll].sheet-wiki-url::before {
+    content: "";
+}
  
 .charsheet button[type=roll].blank-roll-button, 
 .charsheet button[type=roll].small-roll-button {
     font-size: 12px !important;
     line-height:5px;
+    margin-top:-4px;
 }
 
 .btn.small-roll-button:hover {
     background-position: 0 -8px;
 }
 
-.charsheet button[type=action] {
-	/*The only button on the sheet that uses this right now is the button for taking second wind.*/
-	padding: 4px 6px;
+.charsheet button[type=action],
+.charsheet button[type=roll].sheet-wiki-url {
+	/*The only buttons that use this right now are the button for taking second wind, and the wiki button on the Settings tab.*/
+	padding: 2px 6px!important;
 	font-size: 13px;
 	line-height: 18px;
 	color: var(--button2-text);
@@ -488,6 +771,10 @@ textarea.equipment-note-field {
 	cursor: pointer;
 }
 
+.charsheet button[type=roll].sheet-wiki-url:hover {
+    background-position:0;
+}
+
 .charsheet select{
     margin:0;
 }
@@ -497,64 +784,144 @@ textarea.equipment-note-field {
 	accent-color: var(--checkbox-accent);
 }
 
-.charsheet input.ct-label {
+.ui-dialog .charsheet .visible-checkbox {
+    appearance: none;
+    background-color: var(--checkbox-bg);
+    color: currentColor;
+    box-sizing:content-box;
+    width: 1.153847em; /* For a font-size of 13px this is 15px */
+    height: 1.153847em; /* For a font-size of 13px this is 15px */
+    border: 0.077em solid var(--checkbox-border); /* For a font-size of 13px this is 1px */
+    border-radius: 33%;
+    display: inline-grid;
+    transition: 80ms all linear;
+}
+
+.ui-dialog .charsheet .visible-checkbox:focus {
+    outline:none;
+}
+
+.ui-dialog .charsheet .visible-checkbox::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    box-sizing:border-box;
+    border-radius:33%;
+    transform: scale(0);
+    transition: 80ms transform ease-in-out;
+    border: 1px solid var(--checkbox-border);  /*For a font-size of 13px this is 1px */
+    background: var(--checkbox-check);
+    box-shadow: inset 1px 1px var(--checkbox-bg), inset -1px 1px var(--checkbox-bg), inset 1px -1px var(--checkbox-bg), inset -1px -1px var(--checkbox-bg);
+}
+
+.ui-dialog .charsheet .small .visible-checkbox {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+}
+
+.ui-dialog .charsheet .visible-checkbox:checked::before {
+	transform: scale(1);
+}
+
+.ui-dialog .charsheet .visible-checkbox:checked {
+	border-color: var(--checkbox-checked-border);
+	background-color: var(--checkbox-checked-bg);
+	transition: 80ms all linear;
+}
+
+.ui-dialog .charsheet .visible-checkbox:hover::before {
+	filter: contrast(70%);
+}
+
+/* ******** END Buttons, Checkboxes, and Radio Buttons ******** */
+
+/* ********Condition Track and Heavy Load labels ******** */
+.charsheet input.ct-label,
+.charsheet input.encumbrance-load {
 	display:none;
 }
 
-/* Begin code for Condition Track labels */
-.charsheet input.ct-label + label {
-	width:80%;
-	padding: 0px 3px;
+.charsheet input.encumbrance-load:checked ~ .light-load,
+.charsheet input.encumbrance-load:not(:checked) ~ .heavy-load {
+    display:none;
+}
+
+.charsheet input.ct-label + label,
+.charsheet input.encumbrance-load ~ label {
 	text-align: center;
     font-family: 'Play';
-	font-size: 12px;
 	user-select: none;
-	line-height: 1.3em;
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
-	border-radius: 100px;
 	box-shadow: inset 0 2px 0 var(--button-shadow1), 0 2px 2px var(--button-shadow2);
-    margin-left:3px;
-    margin-top:2px;
 	cursor: pointer;
 }
 
-.charsheet input[type="checkbox"].ct-persistent + label {
+.charsheet input.ct-label + label {
+    width:80%;
+	padding: 0px 3px;
+    margin-left:3px;
+    margin-top:2px;
+    font-size: 12px;
+    line-height: 1.3em;
+    border-radius: 100px;
+}
+
+.charsheet input.encumbrance-load ~ label {
+    width:100%;
+    padding:10px;
+    border-radius:15px;
+    font-size:13px;
+    font-weight: bold!important;
+    letter-spacing: 1px;
+}
+
+.charsheet input[type="checkbox"].ct-persistent + label{
     margin-left:0px;
     margin-top:6px;
     width:89%;
     line-height: 1.6em;
 }
 
-.charsheet input.ct-label:checked + label {
+.charsheet input.ct-label:checked + label,
+.charsheet input.encumbrance-load ~ .heavy-load {
 	text-shadow: 0 1px 1px var(--ct-checked-textshadow);
-	background-image: none;
 	background-color: var(--ct-checked-bg);
-	/*color: var(--sheet-text);*/
     color:var(--ct-checked-text);
 	box-shadow: 1px 2px 2px var(--ct-checked-inset1) inset, -1px -1px 2px var(--ct-checked-inset2) inset;
 }
 
-.charsheet input.ct-label:hover + label {
+.charsheet input.encumbrance-load ~ .heavy-load {
+    font-size:15px;
+}
+
+.charsheet input.ct-label:hover + label,
+.charsheet input.encumbrance-load:hover ~ label {
 	filter: brightness(103%);
 }
 
-.charsheet input.ct-label:checked:hover + label {
+.charsheet input.ct-label:checked:hover + label,
+.charsheet input.encumbrance-load:checked:hover ~ label {
 	filter: brightness(109%);
 }
 
-.charsheet input.ct-label:active + label {
+.charsheet input.ct-label:active + label,
+.charsheet input.encumbrance-load:active ~ label {
 	filter: contrast(95%);
 }
 
-.charsheet input.ct-label:checked:active + label {
+.charsheet input.ct-label:checked:active + label,
+.charsheet input.encumbrance-load:checked:active ~ label {
 	filter: contrast(105%);
 }
 
-/* ******** Start code for hiding sections ******** */
+/* ********END Condition Track labels ******** */
+
+/* ******** Hiding sections and show/hide toggle ******** */
 .forceShow:not(:checked) ~ .forceBody,
 .organizationShow:not(:checked) ~ .organizationBody,
 .SRShow:not(:checked) ~ .SRBody,
@@ -576,7 +943,7 @@ textarea.equipment-note-field {
     display: none;
 }
 
-.sheet-hidden {
+.hidden {
     display: none !important;       
 }
  
@@ -615,7 +982,6 @@ textarea.equipment-note-field {
     height: 14px;
     font-size: 12px;
 }
-
 
 .charsheet input.sectAttack-show:checked + span:not(.not-show)::before {
     content: "[show]";
@@ -669,13 +1035,15 @@ textarea.equipment-note-field {
 	pointer-events:none;
 }
 
+/* ******** END Hiding sections and show/hide toggle ******** */
+
 /* Code for hideable sections */
-.charsheet label.sheet-textHead {
+.charsheet label.textHead {
     margin-right: 2px;
     padding: 2.5px 0px;
 }
 
-.charsheet label.sheet-textHead2Col {
+.charsheet label.textHead2Col {
     margin-right: 2px;
     padding: 2.5px 5px;
 }
@@ -736,11 +1104,16 @@ input:not(:checked) + label.clickable {
     width: 150px;
     height: 22px;
     font-size: 18px;
+    letter-spacing: 1px;
 }
 
 .charsheet input.tab:checked::before {
     background: var(--active-tab-bg1);
     background: linear-gradient(to top, var(--active-tab-bg2), var(--active-tab-bg1), var(--active-tab-bg2));
+}
+
+.charsheet input.tab:hover::before {
+    filter: brightness(105%);
 }
 
 .charsheet input.tab:not(:first-child)::before {
@@ -774,16 +1147,17 @@ input:not(:checked) + label.clickable {
 	margin-right: 30px;
 }
 
-.sheet-col1, 
+.col1, 
 .sheet-skillsCol1, 
-.sheet-skillsCrewCol1 {
+.sheet-skillsCrewCol1,
+.sheet-skillsCrewCol1b {
     font-size: 13px;
     font-weight: bold;
     text-align: left;
     padding-left: 5px;
 }
 
-.sheet-col1 {
+.col1 {
     background-color: var(--col1-bg);
     border-radius: 5px;
 }
@@ -796,6 +1170,12 @@ input:not(:checked) + label.clickable {
 .sheet-skillsCrewCol1 {
     width: 35%;
     min-width: 90px;
+}
+
+.charsheet .sheet-skillsCrewCol1b {
+    min-width:130px;
+    line-height:10px;
+    text-align:left;
 }
 
 .skillsHideCheckbox {   
@@ -812,13 +1192,13 @@ input:not(:checked) + label.clickable {
     min-width:250px;
 }
 
-.sheet-skillsFeats {
+.skillsFeats {
     min-width: 25px;
     text-align: center; 
     cursor: pointer;
 }
 
-.sheet-spacing {    
+.spacing {    
     border-spacing: 1px 1px;
     border-collapse: separate;
     padding: 0px 1px;
@@ -851,15 +1231,15 @@ input:not(:checked) + label.clickable {
 
 /* ******** LOGOS ******** */
 
-.charsheet div.sheet-record input + label img {
+.charsheet div.character-record input + label img {
 	cursor: pointer;
 }
 
-.sheet-darkmode .charsheet div.sheet-record label img {
+.sheet-darkmode .charsheet div.character-record label img {
 	content: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/SWSE%20dark%20mode%20title.png");
 }
 
-.charsheet div.sheet-record input[type="checkbox"]:checked + label img {
+.charsheet div.character-record input[type="checkbox"]:checked + label img {
 	content: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/SWSE%20yellow%20title.png");
 }
 
@@ -876,11 +1256,18 @@ input:not(:checked) + label.clickable {
   --dm-col1: #55555a;
   --dm-input-border: #707099;
   --dm-input-border-top: #44445c;
-  --dm-checkbox-accent: #668;
   --dm-input-disabled-bg: #334;
   --dm-input-disabled-text: #ddd;
   --dm-input-disabled-border: #444457;
   --dm-input-disabled-border-top: #393949;
+  --dm-checkbox-accent: #668;
+  --dm-checkbox-bg: #202055;
+  --dm-checkbox-bg-checked: #227;
+  --dm-checkbox-border: #4b4b8f;
+  --dm-checkbox-border-checked: #7497ea;
+  --dm-checkbox-check: #8cd0ff;
+  --dm-checkbox-disabled-bg: #303060;
+  --dm-checkbox-disabled-check: #719cbb;
   --dm-header-bg: #338;
   --dm-header-bg-highlight: #44a;
   --dm-header-text: #f5f5f5;
@@ -905,13 +1292,14 @@ input:not(:checked) + label.clickable {
   --dm-ct-checked-inset2: #fff9;
   --dm-ct-checked-border: #88a6;
   --dm-ct-checked-text:#f5f5f5;
-  --dm-ct-normal-bg:#00cc00;
-  --dm-ct-minus1-bg:#66cc00;
-  --dm-ct-minus2-bg:#cccc00;
-  --dm-ct-minus5-bg:#cc6600;
-  --dm-ct-minus10-bg:#cc0000;
-  --dm-ct-helpless-bg:#6600cc;
-  --dm-ct-persistent-bg:#00cccc; /* #474760; */
+  --dm-ct-normal:#00a000;
+  --dm-ct-minus1:#69a500;
+  --dm-ct-minus2:#b9ad00;
+  --dm-ct-minus5:#cc6600;
+  --dm-ct-minus10:#cc0000;
+  --dm-ct-helpless:#6600cc;
+  --dm-ct-persistent:#00bbbb;
+  --dm-heavy-load:#cc0000;
 }
 
 .sheet-darkmode .ui-dialog { 
@@ -920,6 +1308,7 @@ input:not(:checked) + label.clickable {
 
 .sheet-darkmode textarea {
 	scrollbar-color: var(--dm-scrollbar2-thumb) var(--dm-scrollbar2-shaft);
+    scrollbar-width: thin;
 }
 
 .sheet-darkmode .charsheet {
@@ -927,7 +1316,7 @@ input:not(:checked) + label.clickable {
 	color: var(--dark-primarytext);
 }
 
-.sheet-darkmode .charsheet .sheet-col1 {
+.sheet-darkmode .charsheet .col1 {
 	background-color: var(--dm-col1);
 }
 
@@ -959,6 +1348,23 @@ input:not(:checked) + label.clickable {
 	accent-color: var(--dm-checkbox-accent);
 }
 
+.sheet-darkmode .ui-dialog .charsheet .visible-checkbox {
+	background-color: var(--dm-checkbox-bg);
+	border-color: var(--dm-checkbox-border);
+}
+
+.sheet-darkmode .ui-dialog .charsheet .visible-checkbox::before {
+	border-color: var(--dm-checkbox-border-checked);
+    background: var(--dm-checkbox-check);
+    box-shadow: inset 0.077em 0.077em var(--dm-checkbox-bg), inset -0.077em 0.077em var(--dm-checkbox-bg), inset 0.077em -0.077em var(--dm-checkbox-bg), inset -0.077em -0.077em var(--dm-checkbox-bg);
+}
+
+.sheet-darkmode .ui-dialog .charsheet .visible-checkbox:checked {
+	background-color: var(--dm-checkbox-bg-checked);
+	border-color: var(--dm-checkbox-border-checked);
+	transition: 60ms all linear;
+}
+
 .sheet-darkmode .charsheet input[disabled],
 .sheet-darkmode .charsheet input[readonly],
 .sheet-darkmode .defaultCrew:not(:checked) ~ .defaultCrewLock {
@@ -968,10 +1374,26 @@ input:not(:checked) + label.clickable {
 	border-top-color: var(--dm-input-disabled-border-top);
 }
 
-.sheet-darkmode .charsheet div.sheet-textHead2Col,
-.sheet-darkmode .charsheet div.sheet-textHead,
-.sheet-darkmode .charsheet label.sheet-textHead,
-.sheet-darkmode .charsheet label.sheet-textHead2Col {
+.sheet-darkmode .charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"] {
+    background-color: var(--dm-checkbox-disabled-bg);
+}
+
+.sheet-darkmode .charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"]::before {
+    box-shadow: inset 1em 1em var(--dm-checkbox-disabled-check); /*The dimensions don't actually make a difference, as long as they are larger than the width and height. */
+}
+
+.sheet-darkmode .charsheet .visible-checkbox:hover {
+    filter: brightness(125%);
+}
+
+.sheet-darkmode .charsheet .visible-checkbox:hover::before {
+    filter:none; /* This gets rid of the contrast filter from light mode. */
+}
+
+.sheet-darkmode .charsheet div.textHead2Col,
+.sheet-darkmode .charsheet div.textHead,
+.sheet-darkmode .charsheet label.textHead,
+.sheet-darkmode .charsheet label.textHead2Col {
 	background-color: var(--dm-header-bg);
 	color: var(--dm-header-text);
     text-shadow: 1px 1px 1px black;
@@ -999,6 +1421,10 @@ input:not(:checked) + label.clickable {
     background: linear-gradient(to top, var(--dm-tab-active-gradient1), var(--dm-tab-active-gradient2), var(--dm-tab-active-gradient1));
 }
 
+.sheet-darkmode .charsheet input.tab:hover::before {
+    filter: brightness(120%);
+}
+
 .sheet-darkmode .charsheet button[type=roll] {
     background-color: var(--dm-button-bg);
     /* These do not use color variables because linear-gradients have problems with them as background-images. */
@@ -1012,51 +1438,65 @@ input:not(:checked) + label.clickable {
     box-shadow: 0 1px 0 var(--dm-button-shadow) inset;
 }
 
-/* Start section for condition track buttons */
-.sheet-darkmode .charsheet input.ct-label + label {
+/* Start section for condition track buttons and heavy load warning */
+.sheet-darkmode .charsheet input.ct-label + label,
+.sheet-darkmode .charsheet input.encumbrance-load ~ label {
 	background-color: var(--dm-ct-bg);
     color:var(--dm-ct-text);
     font-weight:400;
+    text-shadow: 0px 0px 2px black;
     box-shadow: 0px 1px 1px var(--dm-ct-checked-inset2) inset, -1px -2px 2px var(--dm-ct-checked-inset1) inset, 0 2px 2px var(--button-shadow2);
     border: 1px solid var(--dm-ct-border);
 }
 
-.sheet-darkmode .charsheet input.ct-label:checked + label {
+.sheet-darkmode .charsheet input.ct-label:checked + label,
+.sheet-darkmode .charsheet input.encumbrance-load:checked ~ label {
 	box-shadow: 1px 2px 2px var(--dm-ct-checked-inset1) inset, -1px -1px 2px var(--dm-ct-checked-inset2) inset;
 	border: 1px solid var(--dm-ct-checked-border);
     font-weight:bold;
+    text-shadow: 0px 0px 2px black, 0px 0px 5px black;
 }
 
 .sheet-darkmode .charsheet input.ct-normal:checked + label {
-	background-color: var(--dm-ct-normal-bg);
+	background-color: var(--dm-ct-normal);
 }
 
 .sheet-darkmode .charsheet input.ct-minus1:checked + label {
-	background-color: var(--dm-ct-minus1-bg);	
+	background-color: var(--dm-ct-minus1);	
 }
 
 .sheet-darkmode .charsheet input.ct-minus2:checked + label {
-	background-color: var(--dm-ct-minus2-bg);	
+	background-color: var(--dm-ct-minus2);	
 }
 
 .sheet-darkmode .charsheet input.ct-minus5:checked + label {
-	background-color: var(--dm-ct-minus5-bg);			
+	background-color: var(--dm-ct-minus5);			
 }
 
 .sheet-darkmode .charsheet input.ct-minus10:checked + label {
-	background-color: var(--dm-ct-minus10-bg);	
+	background-color: var(--dm-ct-minus10);	
 }
 
 .sheet-darkmode .charsheet input.ct-helpless:checked + label {
-	background-color: var(--dm-ct-helpless-bg);	
+	background-color: var(--dm-ct-helpless);	
 }
 
 .sheet-darkmode .charsheet input.ct-persistent:checked + label {
-	background-color: var(--dm-ct-persistent-bg);
+	background-color: var(--dm-ct-persistent);
 }
 
-.sheet-darkmode .charsheet input.ct-label:checked:hover + label {
-	filter: brightness(104%);
+.sheet-darkmode .charsheet input.encumbrance-load:checked ~ label {
+	background-color: var(--dm-heavy-load);
+}
+
+.sheet-darkmode .charsheet input.ct-label:hover + label,
+.sheet-darkmode .charsheet input.encumbrance-load:hover ~ label {
+	filter: brightness(105%);
+}
+
+.sheet-darkmode .charsheet input.ct-label:checked:hover + label,
+.sheet-darkmode .charsheet input.encumbrance-load:checked:hover ~ label {
+	filter: brightness(105%);
 }
 
 /* REMARK: This doesn't work right now, but hopefully it can be fixed eventually. */
@@ -1423,10 +1863,10 @@ input:not(:checked) + label.clickable {
 }
 
 	/* DARK MODE for Saga Default Roll Template */
-/*Nothing specific yet*/
+/* Nothing specific yet */
 
 	/* DARK MODE for Attack Roll Template*/
-/*Nothing specific yet*/
+/* Nothing specific yet */
 
 	/* DARK MODE for Skill Roll Template */
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr:first-child td {
@@ -1434,7 +1874,7 @@ input:not(:checked) + label.clickable {
 }
 
 	/* DARK MODE for Second Wind Roll Template */
-/*Nothing specific yet*/
+/* Nothing specific yet */
 
 	/* DARK MODE for statBlock Template*/
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode td,

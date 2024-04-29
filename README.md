@@ -81,7 +81,7 @@ A character sheet, at a minimum requires four files in an appropriately named su
 
 ### Submission Guidelines
 
-All contributions to this repository must meet the minimum requirements outlined in [this article](https://help.roll20.net/hc/en-us/articles/360037773453).
+All contributions to this repository must meet the minimum requirements outlined in [this article](https://help.roll20.net/hc/en-us/articles/360037773453). We additionally reccomend requesting approvals from a sheet's original author if you are submitting any large overhauls to actively-maintained sheets. This will speed up your approval process.
 
 ### Release Cadence
 

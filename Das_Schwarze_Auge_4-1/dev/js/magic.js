@@ -156,8 +156,8 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), async (info) =
 				TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 			}
 
-			// Max. TaP* = TaW
-			TaPstar = Math.min(TaW, TaPstar);
+			// Max. TaP* = TaW, mindestens aber 0
+			TaPstar = Math.min(Math.max(TaW, 0), TaPstar);
 
 			// Ergebnis an Doppel/Dreifach-20 anpassen
 			if (Math.abs(criticality) <= 1)
