@@ -70,12 +70,11 @@ function replaceSpellStats(spellData, stats) {
 		// Block required to encapsulate consts
 		{
 			debugLog(func, "Adapting for elven rep");
-			if (stats['KL'] >= stats['IN'])
+			const replacement = { "replaceable": "KL", "replacer": "IN" };
+			if (stats[replacement["replaceable"]] >= stats[replacement["replacer"]])
 			{
 				break;
 			}
-			const replacement = { "replaceable": "KL", "replacer": "IN" };
-			const relevantStats = [ "KL", "IN" ];
 			const spellStatFreq = countStats(spellData["stats"]);
 
 			// Nothing to replace
