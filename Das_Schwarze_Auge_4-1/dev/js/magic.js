@@ -19,11 +19,12 @@ function replaceSpellStats(spellData, stats) {
 	debugLog(func, spellData, stats);
 
 	let modified = false;
+	let replacement = { "replaceable": "", "replacer": "" };
 	switch (spellData["representation"]) {
 		case "Ach":
 		// Block required to encapsulate consts
 		{
-			debugLog(func, "Adapting for achaz rep");
+			debugLog(func, "Attempting replacement for Crystallomantic representation (Ach)");
 			// Replacement is not improving anything, so break
 			if (stats['KL'] === stats['IN']) break;
 
@@ -67,10 +68,19 @@ function replaceSpellStats(spellData, stats) {
 			break;
 		}
 		case "Elf":
+			debugLog(func, "Attempting replacement for Elvish representation (Elf)");
+			replacement["replaceable"] = "KL";
+			replacement["replacer"] = "IN";
+		case "Kop":
 		// Block required to encapsulate consts
 		{
-			debugLog(func, "Adapting for elven rep");
-			const replacement = { "replaceable": "KL", "replacer": "IN" };
+			// Prevent replacing replacement in "Elf" case
+			if (replacement["replaceable"] === "" && replacement["replacer"] === "")
+			{
+				debugLog(func, "Attempting replacement for Kophtanic representation (Kop)");
+				replacement["replaceable"] = "KL";
+				replacement["replacer"] = "CH";
+			}
 			if (stats[replacement["replaceable"]] >= stats[replacement["replacer"]])
 			{
 				break;
@@ -102,20 +112,8 @@ function replaceSpellStats(spellData, stats) {
 			}
 			break;
 		}
-		case "Kop":
-			debugLog(func, "Adapting for kophtan rep");
-			if (charData['KL'] >= charData['CH']) {
-				break;
-			}
-			for (let i = 0; i < 3; i++) {
-				if (spellStats[i] === "KL" && (spellStats[(i+1) % 3] !== "CH" || spellStats[(i + 2) % 3] !== "CH")) {
-					spellStats[i] = "CH";
-					modified = true;
-					break;
-				}
-			}
-			break;
 		default:
+			debugLog(func, "No representation suitable for replacements found:", spellData["representation"]);
 			break;
 	}
 	return modified;
