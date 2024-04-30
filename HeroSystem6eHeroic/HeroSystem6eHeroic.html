@@ -1064,7 +1064,7 @@
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>END Mod:</h2>
-						<input type="number" name="attr_weaponEndMod02" title="@{weaponEndMod02}" step="1" min="-20" max="20" value="0" tabindex="91"/>
+						<input type="number" name="attr_weaponEndMod03" title="@{weaponEndMod03}" step="1" min="-20" max="20" value="0" tabindex="91"/>
 					</div>
 				</div>
 				
@@ -1167,7 +1167,7 @@
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>END Mod:</h2>
-						<input type="number" name="attr_weaponEndMod02" title="@{weaponEndMod02}" step="1" min="-20" max="20" value="0" tabindex="91"/>
+						<input type="number" name="attr_weaponEndMod04" title="@{weaponEndMod04}" step="1" min="-20" max="20" value="0" tabindex="91"/>
 					</div>
 				</div>
 				
@@ -1270,7 +1270,7 @@
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>END Mod:</h2>
-						<input type="number" name="attr_weaponEndMod02" title="@{weaponEndMod02}" step="1" min="-20" max="20" value="0" tabindex="91"/>
+						<input type="number" name="attr_weaponEndMod05" title="@{weaponEndMod05}" step="1" min="-20" max="20" value="0" tabindex="91"/>
 					</div>
 				</div>
 				
@@ -10607,7 +10607,7 @@
 				
 				<div class="item-version-information">
 					<!-- Update version before release. -->
-					<input type="text" value="2.9" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+					<input type="text" value="2.91" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 				</div>
 			</div>
 		</div>
@@ -11302,6 +11302,13 @@
 			version = 2.9;
 		}
 		
+		if (version < 2.91) {
+			
+			// No updates needed.
+			
+			version = 2.91;
+		}
+		
 		if (version != origVersion) {
 			console.log(`Updated ${name} from ${origVersion} to ${version}`);
 			attributes.version = version;
@@ -11567,33 +11574,35 @@
 	
 	// Recover endurance and stun when the recover button in the item-characteristics-health box is clicked.
 	on("clicked:recoverHealth", function () {
-		getAttrs(["endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery"], function(values) {
+		getAttrs(["character_title", "endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			const currentEND = parseInt(values.CurrentEND)||0;
 			const currentSTUN = parseInt(values.CurrentSTUN)||0;
-
+			
 			// If character is boosted, than their max is what they are currently at
 			const maxEND = Math.max(parseInt(values.endurance), currentEND);
 			const maxSTUN = Math.max(parseInt(values.stun), currentSTUN);
-
-
-			theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
-			+ "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
+			
+			theRoll += "&{template:custom-activate} ";
+			theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+			
+			theRoll += "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
 			+ "{{STUN Recovery=[[@{recoveryNet}[Recovery]]] (@{CurrentSTUN})}} "
 			+ "{{END Recovery=[[@{recoveryNet}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
-
+			
 			startRoll(theRoll, (results) => {
 				recoverSTUN = results.results["STUN Recovery"].result;
 				recoverEND = results.results["END Recovery"].result;
-
+					
 				setAttrs({
 					CurrentSTUN:Math.min(currentSTUN + recoverSTUN, maxSTUN),
 					CurrentEND:Math.max(0,Math.min(currentEND + recoverEND, maxEND))
 				});
-
+				
 				finishRoll(results.rollId, {});
 			});
-
+			
 		});
 	});
 	
