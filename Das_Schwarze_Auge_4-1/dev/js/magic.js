@@ -131,6 +131,22 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 	var stats = [...spellsData[trigger]["stats"]];
 	var spellRep = "z_" + nameInternal + "_representation";
 	debugLog(func, trigger, spellsData[trigger]);
+
+	var attrsToGet = [
+		"sf_representations",
+		spellRep,
+		"v_festematrix",
+		"n_spruchhemmung",
+		"KL",
+		"IN",
+		"CH"
+	];
+	// Special treatment for Attributo (user-selectable third stat)
+	if (trigger === "z_attributo")
+	{
+		attrsToGet.push("Eigenschaft_Attributo");
+	}
+	safeGetAttrs(attrsToGet, function (v) {
 		const replacementUIString = {
 			"AchKL": `Kristallomantische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
 			"AchIN": `Kristallomantische Repräsentation hat IN (${v["IN"]}) einmal durch KL (${v["KL"]}) ersetzt.`,
@@ -138,6 +154,13 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			"Kop": `Kophtanische Repräsentation hat KL (${v["KL"]}) einmal durch CH (${v["CH"]}) ersetzt.`
 		};
 		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop" ]);
+		if (v.hasOwnProperty("Eigenschaft_Attributo"))
+		{
+			// Resolve the stat
+			let attributoVariableStat = v["Eigenschaft_Attributo"].replace(/^@\{([a-zA-Z]+)\}$/, "$1");
+			stats[stats.indexOf("Eigenschaft_Attributo")] = attributoVariableStat;
+			debugLog(func, "Attributo special case, stats after resolution:", stats);
+		}
 		let characterStats = { "KL": v["KL"], "IN": v["IN"], "CH": v["CH"] };
 		let spellData = {};
 		spellData["stats"] = stats;
