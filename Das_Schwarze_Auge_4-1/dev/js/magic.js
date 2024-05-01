@@ -3,6 +3,7 @@
 /*
 	Adapt Spell Stats Based on Spell Representation
 	Three representations offer the special feature of exchanging stats of spell checks.
+	Returns object with boolean property "modified" and exchange info string "replacement".
 
 	Elvish Representation (Elf)
 		IN can replace KL
@@ -18,7 +19,7 @@ function replaceSpellStats(spellData, stats) {
 	const func = "replaceSpellStats";
 	debugLog(func, spellData, stats);
 
-	let modified = false;
+	let result = { "modified": false, "replacementInfo": "" };
 	let replacement = { "replaceable": "", "replacer": "" };
 	switch (spellData["representation"]) {
 		case "Ach":
@@ -60,7 +61,8 @@ function replaceSpellStats(spellData, stats) {
 					if (spellData["stats"][i] === multiStat)
 					{
 						spellData["stats"][i] = otherStat;
-						modified = true;
+						result["modified"] = true;
+						result["replacementInfo"] = spellData["representation"] + multiStat;
 						break;
 					}
 				}
@@ -106,7 +108,8 @@ function replaceSpellStats(spellData, stats) {
 				if (spellData["stats"][stat] === replacement["replaceable"])
 				{
 					spellData["stats"][stat] = replacement["replacer"];
-					modified = true;
+					result["modified"] = true;
+					result["replacementInfo"] = spellData["representation"];
 					break;
 				}
 			}
@@ -116,7 +119,7 @@ function replaceSpellStats(spellData, stats) {
 			debugLog(func, "No representation suitable for replacements found:", spellData["representation"]);
 			break;
 	}
-	return modified;
+	return result;
 }
 
 on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
@@ -128,7 +131,12 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 	var stats = [...spellsData[trigger]["stats"]];
 	var spellRep = "z_" + nameInternal + "_representation";
 	debugLog(func, trigger, spellsData[trigger]);
-	safeGetAttrs(["sf_representations", spellRep, "v_festematrix", "n_spruchhemmung", "KL", "IN", "CH"], function (v) {
+		const replacementUIString = {
+			"AchKL": `Kristallomantische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
+			"AchIN": `Kristallomantische Repräsentation hat IN (${v["IN"]}) einmal durch KL (${v["KL"]}) ersetzt.`,
+			"Elf": `Elfische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
+			"Kop": `Kophtanische Repräsentation hat KL (${v["KL"]}) einmal durch CH (${v["CH"]}) ersetzt.`
+		};
 		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop" ]);
 		let characterStats = { "KL": v["KL"], "IN": v["IN"], "CH": v["CH"] };
 		let spellData = {};
@@ -149,10 +157,10 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			}
 		}
 
-		let repModified = false;
-		if  (relevantRepresentations.has(spellData["representation"]) )
+		let replacementResult = { "modified": false, "replacementInfo": "" };
+		if ( relevantRepresentations.has(spellData["representation"]) )
 		{
-			repModified = replaceSpellStats(spellData, characterStats);
+			replacementResult = replaceSpellStats(spellData, characterStats);
 		}
 		// Build Roll Macro
 		var rollMacro = "";
@@ -172,7 +180,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			"{{result=[[0]]}} " +
 			"{{criticality=[[0]]}} " +
 			"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} " + 
-			"{{repmod=" + (repModified ? "Die verwendeten Attribute wurden durch die Repräsentation modifiziert" : "") + "}} ";
+			"{{repmod=" + (replacementResult["modified"] ? replacementUIString[replacementResult["replacementInfo"]] : "") + "}} ";
 		debugLog(func, rollMacro);
 
 		// Execute Roll
