@@ -56,6 +56,27 @@
 </rolltemplate>
 
 
+<!--Name {{name}} Attack Roll {{attack}} {{critical}} {{location}} {{fluff}} {{result}}
+    Name {{name}} Attack Roll {{attack}} Crit {{critical}} Loc {{computed::location}} 
+    {{computed::fluff}} 
+    {{result}}
+-->
+<rolltemplate class="sheet-rolltemplate-rmuattack">
+  <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
+    <i>{{name}}</i> attacks <i>{{target}}</i> with a <i>{{weapon}}</i><br>
+    <i>Rolls</i> {{attackrollum}} + OB{{attackbonus}} - DB {{targetdb}} ⇒ {{computed::attackroll}}
+      <b>{{computed::attackresult}}!</b><br>
+    {{#rollTotal() computed::ishit 1}} 
+    Hits {{computed::hitlocation}} for {{computed::damage}}
+      {{#rollTotal() computed::hascritical 1}}
+        <br>Critical Roll {{computed::critical}}
+	<br><i>{{computed::critdescription}}</i>
+	<br>{{computed::criteffect}}
+      {{/rollTotal() computed::hascritical 1}}
+    {{/rollTotal() computed::ishit 1}} 
+  </div>
+</rolltemplate>
+
 <!-- vim: set sw=2 sts=2 :-->
 
 
@@ -102,7 +123,7 @@
       <option value="F">Female</option>
     </select>
   </div>
-  <div>
+  <div class='cm_info'>
     <div class="compendium-page race-info" accept='Rules:Race'></div>
   </div>
 </div>
@@ -1927,6 +1948,9 @@
 
 
 
+
+
+
 <div class='rmusheet compendium-drop-target'>
     
     <input name="attr_drop_name" type="hidden" accept="Name">
@@ -2210,6 +2234,45 @@ Name <input name="attr_character_name">
 
     <h2>Attacks</h2>
 
+    <div class='foe'>
+      <span style='grid-column: span 2'>
+        Target Name:
+      </span>
+      <input type='text'
+            style='padding: 1px; grid-column: span 2; width:100%; box-sizing: border-box'
+            name='attr_target_name'>
+      <span class='foe_target_db'>
+        DB
+      </span>
+      <input type='number' name='attr_target_db'>
+      <span class='foe_target_at'>
+        AT
+      </span>
+      <input type='text' style='width: 100%' name='attr_target_at' 
+  	pattern="\d|10|((\d,|10,){3}(\d|10))"
+        title='Use AT of target (1-10) or 4 ATs separated by commas'>
+      <span>Size</span>
+      <select style='width:100%' name='attr_target_size'>
+        <option value="1">Miniscule</option>
+        <option value="2">Diminutive</option>
+        <option value="3">Tiny</option>
+        <option value="4">Small</option>
+        <option value="5">Medium</option>
+        <option value="6">Big</option>
+        <option value="7">Large</option>
+        <option value="8">Huge</option>
+        <option value="9">Gigantic</option>
+        <option value="10">Enormous</option>
+      </select>
+      <span>Crit. Red.</span>
+      <select style='width:100%' name='attr_target_crit'>
+        <option value="0">None</option>
+        <option value="1">I</option>
+        <option value="2">II</option>
+        <option value="3">III</option>
+      </select>
+    </div>
+
     <div class='attacks'>
 	<span class='attack_name' name='attr_attackname'><b>Attack</b></span>
 	<span class='attack_ranks' name='attr_attackranks'><b>Rank</b></span>
@@ -2230,6 +2293,12 @@ Name <input name="attr_character_name">
 	    <span>F: <span class='attack_fumble' name='attr_attackfumble'></span></span>
 	    <span>RI: <span class='attack_ri' name='attr_attackri'></span></span>
 	    <span>Str: <span class='attack_str' name='attr_attackstr'></span></span>
+            <input type='hidden' name='attr_attackmin'>
+            <input type='hidden' name='attr_attackmax'>
+            <input type='hidden' name='attr_attackdata'>
+            <button type='action' name='act_rmuattackroll'
+                class='rollbutton fancybutton fancybuttoninline'>Attack
+            </button>
 	</div>
     </fieldset>
 
@@ -8524,7 +8593,7 @@ let RMUInventory = {}
 	[`${prefix}_itemweight`]: data.Weight,
 	[`${prefix}_itemcount`]: 1,
 	[`${prefix}_itemsystem`]: datastr,
-	[`${prefix}_itemnodes`]: data.Notes})
+	[`${prefix}_itemnotes`]: data.Notes})
    }
 
 
@@ -8576,12 +8645,12 @@ let RMUInventory = {}
   }
 
   /* Triggered when the weight of something changed  */
-  on(weight_event_list, (ev) => {
+  onCheck(weight_event_list, (ev) => {
       RMUInventory.updateEncumberance();
   });
 
   /* Something was deleted */
-  on("remove:repeating_stuff", function(_) {
+  onCheck("remove:repeating_stuff", function(_) {
       RMUInventory.updateEncumberance();
       RMUInventory.updateEquipped();
   });
@@ -8672,11 +8741,11 @@ let RMUInventory = {}
   }
 
 
-  on("change:repeating_stuff:itemsystem change:repeating_stuff:itemequipped", (ev) => {
+  onCheck("change:repeating_stuff:itemsystem change:repeating_stuff:itemequipped", (ev) => {
       RMUInventory.updateEquipped();
   });
 
-  on("clicked:money_level", (_) => {
+  onCheck("clicked:money_level", (_) => {
       getAttrs(["money_gp", "money_sp", "money_bp", "money_cp"], (money) => {
 	let gp = parseIntDefault(money.money_gp, 0);
 	let sp = parseIntDefault(money.money_sp, 0);
@@ -8715,18 +8784,30 @@ let RMUInventory = {}
 	// Range is either 'short' or 'RI'
 	const range = json['RI'] || json['short'] || '-';
 
-	//setAttrsPending({
-	VsetAttrs({
-	    [`${prefix}_attackname`]: name,
-	    [`${prefix}_attackranks`]: skillranks,
-	    [`${prefix}_attackbonus`]: skillbonus,
+	getCompendiumPage("AttackTable:" + json['Attack Table'],
+	    (cdata) => {
+		console.log("Attack data for", json['Attack Table'], cdata);
+		if (!cdata.data['data-attack']) {
+		  rmuerror("Data attack missing in ", json['Attack Table']);
+		}
+		let min = cdata.data.min.match(/\d+/)[0] || 0;
+		let max = cdata.data.max.match(/\d+/)[0] || 0;
+		let attack_table = cdata.data['data-attack'] || "";
+		VsetAttrs({
+		    [`${prefix}_attackname`]: name,
+		    [`${prefix}_attackranks`]: skillranks,
+		    [`${prefix}_attackbonus`]: skillbonus,
 
-	    [`${prefix}_attacktable`]: json['Attack Table'],
-	    [`${prefix}_attacksize`]: json['Size'] || "M",
+		    [`${prefix}_attacktable`]: json['Attack Table'],
+		    [`${prefix}_attacksize`]: json['Size'] || "M",
 
-	    [`${prefix}_attackfumble`]: fumble,
-	    [`${prefix}_atackri`]: range,
-	    [`${prefix}_attackstr`]: json['Strength']
+		    [`${prefix}_attackfumble`]: fumble,
+		    [`${prefix}_atackri`]: range,
+		    [`${prefix}_attackstr`]: json['Strength'],
+		    [`${prefix}_attackmin`]: min,
+		    [`${prefix}_attackmax`]: max,
+		    [`${prefix}_attackdata`]: attack_table
+		});
 	    });
     });
   }
@@ -9007,6 +9088,519 @@ onCheck("clicked:repeating_spelllistspellownbase clicked:repeating_spelllistspel
 
 /**/
 
+let attacks = {};
+
+attacks.missmessage = [
+    "Miss", "Miss", "Miss", "Miss", "Miss", "Miss", "Miss",
+    "Miss", "Miss", "Miss", "Miss", "Miss", "Miss", "Miss",
+    "Fails to makes contact",
+    "Swings wide",
+    "Not even close",
+    "Does not hit",
+    "Botches the attack",
+    "Chooses to avoid risk of damage to their weapon",
+    "Does not make contact",
+];
+
+attacks.critsToName = {
+    G: "Grapple",
+    H: "Heat",
+    I: "Impact",
+    K: "Krush",
+    L: "Electricity",
+    S: "Slash",
+    P: "Puncture",
+};
+
+
+function getMiss() {
+    return attacks.missmessage[Math.floor(Math.random()*attacks.missmessage.length)]
+}
+
+function numericToCritCode(num) {
+    if (num < -5) { num = -6 }
+    if (num > 10) { num = 9 }
+
+    switch (num) {
+	case -6: return 'T';
+	case -5: return 'U';
+	case -4: return 'V';
+	case -3: return 'X';
+	case -2: return 'Y';
+	case -1: return 'Z';
+	case 0: return 'A';
+	case 1: return 'B';
+	case 2: return 'C';
+	case 3: return 'D';
+	case 4: return 'E';
+	case 5: return 'F';
+	case 6: return 'G';
+	case 7: return 'H';
+	case 8: return 'I';
+	case 9: return 'J';
+
+    }
+}
+
+function sizeToNumeric(code) {
+    switch (code) {
+	case "Mi": return 1;
+	case "Di": return 2;
+	case "T": return 3;
+	case "S": return 4;
+	case "M": return 5;
+	case "B": return 6;
+	case "L": return 7;
+	case "H": return 8;
+	case "G": return 9;
+	case "E": return 10;
+    }
+    rmuerror("Unknown size: ", code);
+    return 5; 
+}
+
+/*
+F E + A
+G E + B
+H E + C
+I E + C + A
+J E + C + B
+*/
+
+(function() {
+    // FIXME: This should be structure
+    var hitLocation = [
+	/* 0-4 */   { location: "Australia", armorlocation: 1, rollindex: 0, down: 1 },
+	 	    { location: "Head", armorlocation: 2, rollindex: 0, down: 1 },
+		    { location: "Chest", armorlocation: 1, rollindex: 1, down: 1 },
+		    { location: "Chest", armorlocation: 1, rollindex: 1, down: 1 },
+		    { location: "Abdomen", armorlocation: 1, rollindex: 2, down: 1 },
+
+	/* 5-9 */   { location: "Abdomen", armorlocation: 1, rollindex: 2, down: 1 },
+		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
+		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
+		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
+		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
+		
+	/* 10-14 */ { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
+		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
+		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
+		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
+		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
+		
+	/* 15-19 */ { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
+		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
+		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
+		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
+		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
+		
+	/* 20-24 */ { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
+		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
+		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
+		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
+		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
+		
+	/* 25-29 */ { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		
+	/* 30-34 */ { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		
+	/* 35-39 */ { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		
+	/* 40-44 */ { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		
+	/* 45-49 */ { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		
+	/* 50-54 */ { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+
+	/* 55-59 */ { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
+		  { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		
+	/* 60-64 */ { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		
+	/* 65-69 */ { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 11, down: 35 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		
+	/* 70-74 */ { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		
+	/* 75-79 */ { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
+		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
+		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
+		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
+		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
+		
+	/* 80-84 */ { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
+		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
+		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
+		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
+		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
+		
+	/* 85-89 */ { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
+		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
+		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
+		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
+		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
+		
+	/* 90-94 */ { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
+		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
+		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
+		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
+		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
+		
+	/* 95-99 */ { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 17, down: 66 },
+		 { location: "Abdomen", armorlocation: 1, rollindex: 17, down: 66 },
+		 { location: "Chest", armorlocation: 1, rollindex: 18, down: 76 },
+		 { location: "Chest", armorlocation: 1, rollindex: 18, down: 76 },
+	/* 100 */ { location: "Head", armorlocation: 2, rollindex: 19, down: 81 },
+		
+    ];
+
+    /* Returns an obj of location, side, at  */
+    attacks.getLocation = function(roll) {
+	if (typeof(roll) != 'Number') {
+	    roll = parseIntDefault(roll, 0);
+	}
+	if (roll < 1) {
+	    rmuerror("Roll is < 1", roll);
+	    roll = 1;
+	}
+	if (roll > 100) {
+	    rmuerror("Roll is > 100", roll);
+	    roll = 100;
+	}
+	let side = "Right";
+	if ((roll & 1) == 1) {
+	    // Odd; left side
+	    side = "Left";
+	}
+	return {
+	    location: hitLocation[roll].location,
+	    side: side,
+	    atindex: hitLocation[roll].armorlocation,
+	    critindex: hitLocation[roll].rollindex,
+	    roll: roll,
+	};
+    }
+
+    attacks.knownCrits = {}
+
+    attacks.getCritical = function(severity, type, index, donefn) {
+	// Move to known sizes:
+	// FIXME: Clamping E+ for now.
+	if (severity > 5) severity = 4;
+
+	let sevcode = numericToCritCode(severity);
+
+	console.log("get crit", severity, type, index, donefn);
+	console.log(attacks.knownCrits);
+	console.log(attacks.knownCrits[type]);
+
+	// So need to A-effect & A-description
+	let effect = sevcode + "-effect";
+	let desc = sevcode + "-description";
+
+	if (attacks.knownCrits[type]) {
+	    console.log("cached");
+	    donefn(
+		attacks.knownCrits[type][index][desc],
+		attacks.knownCrits[type][index][effect],
+	    );
+	    return;
+	}
+	getCompendiumPage("Criticals:" + attacks.critsToName[type], (data) => {
+		let result = JSON.parse(data.data['data-critical'])
+		// Save this
+		console.log(result);
+		attacks.knownCrits[type] = result;
+		donefn(
+			attacks.knownCrits[type][index][desc],
+			attacks.knownCrits[type][index][effect],
+		);
+	});
+    }
+
+    // Returns an object:
+    //	    critical = true | false
+    //	    damage = the number of points of damage (Always present)
+    //	    if true then sets
+    //		severity - A-F
+    //		severitynumeric: Number from -2 to X for character codes.  A = 0
+    //		type = letter code
+    //		typename = Name of the critical table
+    attacks.parseCriticalResult = function(damage)  {
+	if (typeof(damage) != 'number' && typeof(damage) != 'string') {
+	    rmuerror("Invalid critical result; expect string or number", typeof(damage), damage);
+	    return { critical: false, damage: -1 };
+	}
+
+	if (typeof(damage) == 'number') {
+	    return { critical: false, damage: damage };
+	}
+
+	res = damage.match(/^(\d+)(([A-Z])([A-Z]))?$/);
+	if (!res) {
+	    rmuerror("Invalid critical result; neither \d or \dAK", typeof(damage), damage);
+	    return { critical: false, damage: -1 };
+	}
+
+	if (!res[2]) {
+	    // No critical
+	    return { critical: false, damage: +(res[1]) };
+	}
+
+	let sev = res[3];
+	let type = res[4];
+	let name = attacks.critsToName[type] || "Unknown";
+	if (name == 'Unknown') {
+	    rmuerror("Warning: Unknown crit code", name);
+	}
+
+	console.log("Sev/type/name", sev, type, name);
+	let numeric = sev.charCodeAt(0);
+	console.log("numeric", numeric);
+	if (numeric > 80) {
+	    // Back end of hte alphabet, subtrack from 'Z'
+	    numeric -= 'Z'.charCodeAt(0);
+	    numeric -= 1;
+	} else {
+	    numeric -= 'A'.charCodeAt(0);
+	}
+	console.log("numeric  - ", numeric);
+	console.log({critical: true, damage: +(res[1]), 
+		severity: sev, type: type, typename: name,
+		severitynumeric: numeric});
+
+	return { critical: true, damage: +(res[1]), 
+		severity: sev, type: type, typename: name,
+		severitynumeric: numeric, elvis: numeric};
+    }
+
+    // Params:
+    //	    - rolls.attackroll.result - Roll + Skillmod
+    //	    - rolls.attackrollum.result - Unmodfied attack roll
+    //	    - cdata.fumblerange - Fumble number (<= is fumble)
+    //	    - cdata.min - Minimum attack number to hit
+    //	    - cdata.max - Top of the attack table
+    //	    - cdata.targetat - The AT (single number) or ATs of the target
+    //			(if 4 numbers, Torso,Head,Arms,Leg)
+    //	    - cdata.attacksize - Attack size as number (0,1.. etc).  5 is medium
+    //	    - cdata.attackersize - Size of the attacker
+    //	    - cdata.targetsize = values.target_size || 0;
+    //	    - cdata.targetcrit = values.target_crit || '';
+    //		
+    // Results are:
+    //	    - attackresult -> "Hit/Miss/Fumble"
+    //	    - finalroll -> Either the UM if a fumble, else the modified attack roll
+    //	    - hitlocation -> Where the hit was if it was a hit, or ""
+    //	    - hitside -> Left or right
+    //	    - tableres -> '17E' or '8' or "" (on fumble/miss)
+    //	    - critical -> 88 or "" (on fumble/miss)
+    //	    - fluff -> coming soon
+    
+    attacks.resolveAttack = function(rollId, rolls, cdata) {
+	let result = {};
+	// Nil out the defined fields
+	result.attackresult = "??";
+	result.finalroll = "??";
+	// First check for a fumble
+	if (rolls.attackrollum.result <= cdata.fumblerange) {
+	    result.attackresult = "Fumble";
+	    result.finalroll = rolls.attackrollum.result;
+	    finishRoll(rollId, result);
+	    return;
+	}
+	    
+	result.finalroll = rolls.attackroll.result;
+
+	// Now did we hit or miss?
+	if (result.finalroll < cdata.min) {
+	    result.attackresult = getMiss();
+	    finishRoll(rollId, result);
+	    return;
+	}
+
+	result.attackresult = "Hit";
+	result.ishit = 1;
+
+	let critroll = rolls.critical.result;
+	// Did we break the top of the table?
+	if (result.finalroll > cdata.max) {
+	    let delta = Math.floor((result.finalroll - cdata.max) / 5);
+	    critroll += delta;
+	}
+
+	// We hit - Where?
+	let hit = attacks.getLocation(critroll);
+
+	// Attack data is a really big string - json it as late as we can
+	let attackdata = JSON.parse(cdata.attackdata);
+
+	// What is our row (need to clamp for top of the table)
+	let rowid = Math.floor((Math.min(result.finalroll, cdata.max) - cdata.min) / 3);
+	let row = attackdata[attackdata.length - rowid - 1]
+
+	// what is our column (at)
+	let at = 1;
+	if (cdata.targetat) {
+	    const res = cdata.targetat.match(/(\d+),(\d+),(\d+),(\d+)/)
+	    if (res) {
+		at = res[hit.atindex]
+		at = +at || 1; 
+	    } else {
+		at = +cdata.targetat || 1;
+	    }
+	}
+
+	let damage = row["AT" + at];
+	result.damage = damage;
+
+	// Was there a critical?
+	let critinfo = attacks.parseCriticalResult(damage);
+
+	// Scale critical from size
+	let critdelta = +cdata.attackersize - +cdata.targetsize;
+	// Scale critical for crit reduction (if supplied)
+	critdelta -= parseIntDefault(cdata.targetcrit, 0);
+
+	if (critinfo.critical && critdelta != 0) {
+	    critinfo.severitynumeric += critdelta;
+	}
+
+	// If we are less than 'A'/1 walk index down
+	if (critinfo.severitynumeric < 0) {
+	    let sev = critinfo.severitynumeric;
+	    // hit.roll contains the sanitised roll (1-100)
+	    let newroll = hit.roll;
+	    let side = hit.side;
+	    while (sev < 0) {
+		newroll = hitLocation[newroll].down;
+		sev ++;
+	    }
+	    console.log(`Roll adjust from ${hit.roll} to ${newroll}`);
+	    hit = attacks.getLocation(newroll);
+	    hit.side = side; // Adjust side back to the original
+	    critinfo.severitynumeric = 0; // It's now an 'A' (adjusted)
+	}
+
+	// Get the result ready: Last thing is the async crit.
+	result.hitlocation = hit.location;
+	result.hitside = hit.side
+	result.critical = critroll;
+
+	// Get critical
+	if (critinfo.critical) {
+	    console.log(critinfo);
+	    attacks.getCritical(critinfo.severitynumeric, critinfo.type, hit.critindex,  (desc,
+	    effect) => {
+		    console.log("Crit Done: ", desc, effect);
+		    result.criteffect = effect;
+		    result.critdescription = desc;
+		    result.hascritical = 1;
+		    console.log(result);
+		    finishRoll(rollId, result);
+	    });
+	    return;
+	}
+	finishRoll(rollId, result);
+    }
+
+    onCheck('clicked:repeating_attack:rmuattackroll', (ev) => {
+	const basename = ev.sourceAttribute.replace("_rmuattackroll", "");
+	getAttrs(['character_name', `${basename}_attackstr`, `${basename}_attackmin`,
+			`${basename}_attackmax`, `${basename}_attackdata`,
+			`${basename}_attackbonus`,
+			`${basename}_attackname`,
+			`${basename}_attackfumble`,
+			'size', `${basename}_attacksize`,
+			'target_name', 'target_db', 'target_at',
+			'target_size', 'target_crit',
+			], values => {
+		console.log('New attack: get attrs', values, ev);
+		cdata = {}
+		cdata.min = +values[`${basename}_attackmin`];
+		cdata.max = +values[`${basename}_attackmax`];
+		cdata.fumblerange = +values[`${basename}_attackfumble`];
+		cdata.character = values.character_name;
+		cdata.attackbonus = +values[`${basename}_attackbonus`];
+		cdata.attackdata = values[`${basename}_attackdata`];
+		cdata.attacksize = sizeToNumeric(values[`${basename}_attacksize`] || 'M');
+		cdata.attackersize = sizeToNumeric(values.size || 'M');
+		cdata.attackname = values[`${basename}_attackname`] || "Weapon";
+		cdata.str = +values.str || 0;
+		cdata.targetname = values.target_name || "Foe";
+		cdata.targetat = values.target_at || 1;
+		cdata.targetdb = values.target_db || '0';
+		cdata.targetsize = values.target_size || 5;
+		cdata.targetcrit = values.target_crit || '0';
+		const roll_string = "&{template:rmuattack} " +
+		    `[[ [[ 1d100!>96 ]] + [[${cdata.attackbonus}]] - [[${cdata.targetdb}]] ]] ` +
+		    "[[ 1d100 ]] " +
+		    `{\{name=${cdata.character}}} ` +
+		    `{\{target=${cdata.targetname}}} ` +
+		    `{\{weapon=${cdata.attackname}}} ` +
+		    "{\{hitlocation=[[1d7]] }} " +
+		    "{\{attackrollum=$[[0]]}} " +
+		    "{\{attackbonus=$[[1]]}} " +
+		    "{\{targetdb=$[[2]]}} " +
+		    "{\{attackroll=$[[3]]}} " +
+		    "{\{critical=$[[4]]}} " +
+		    "{\{hascritical=[[0]]}} " +
+		    "{\{critdescription=[[0]]}} " +
+		    "{\{criteffect=[[0]]}} " +
+		    "{\{attackresult=[[0]]}} " +
+		    "{\{damage=[[0]]}} " +
+		    "{\{ishit=[[0]]}} ";
+		console.log(roll_string);
+		startRoll(roll_string, roll => {
+			attacks.resolveAttack(roll.rollId, roll.results, cdata);
+		});
+	});
+    });
+
+
+})();
+
+
+// vim: set sw=4 sts=4 syn=javascript :
+
 
 function getStatFromAName(aname) {
 	for (let i = 0 ; i < StatInfo.length ; i ++) {
@@ -9058,7 +9652,7 @@ $20('button.rollbutton').on('mouseleave', (e) => {
 
 
 
-Revision 99680e872e738be4cecd2629a4c347c5b6db956b
+Revision 69e62ec3b66d6b9fc4eed0cade605439bbfe35d1
 
 
 </div>
