@@ -1925,7 +1925,7 @@ wiz3['Dispel Magic (expanded)'] = {
     'reference': 'p. 191',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume One p. 255',
-    'errata': 'Sage Advice #154 p. 6-7 (1E):\nSage Advice #157 p. 25\nSage Advice #179 p. 95\nSage Advice #214 p. 78\nSage Advice #217 p. 83\nSage Advice #228 p. 84-85\nSage Advice #237 p. 92\nSage Advice #241 p. 16\nSage Advice #245 p. 16\nSage Advice #252 p. 22\nSage Advice #253 p. 24\nSage Advice #273 p. 116\nDungeon Master Option: High-Level Campaigns p. 70+73+82\nWizard’s Spell Compendium Volume Three p. 656',
+    'errata': 'Sage Advice #154 p. 6-7:\nSage Advice #157 p. 25\nSage Advice #179 p. 95\nSage Advice #214 p. 78\nSage Advice #217 p. 83\nSage Advice #228 p. 84-85\nSage Advice #237 p. 92\nSage Advice #241 p. 16\nSage Advice #245 p. 16\nSage Advice #252 p. 22\nSage Advice #253 p. 24\nSage Advice #273 p. 116\nDungeon Master Option: High-Level Campaigns p. 70+73+82\nWizard’s Spell Compendium Volume Three p. 656',
     'damage': '',
     'damage-type': '',
     'healing': '',
