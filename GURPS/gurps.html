@@ -4327,7 +4327,7 @@
 
 				<!-- current version notes: 2.16.0 -->
 				<ul>
-					<li><b>NEW:</b> Added Vehicle Sheet.</li>
+					<li><b>ENHANCEMENT:</b> Update Combat Tab > Tools > Demolition > Fragmentation tool; added skill modifiers for hitting targets.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -15990,18 +15990,19 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			Base skill level for a fragmentation damage to hit a target.<br />
 			A hit is <b>automatic</b> if the explosive attack actually strikes the target.<br />
 			Only three modifiers apply: the <b>range modifier</b> for the distance from the center<br />
-			of the blast to the target, the modifier for the <b>target’s posture</b> (prone, etc.),<br />
-			and the target’s <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
+			of the blast to the target, the modifier for the <b>target's posture</b> (prone, etc.),<br />
+			and the target's <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
 			every <b>three points</b> by which the attack roll succeeds, one additional fragment
 			<br />strikes the target.
 											</span>
 										</span>
 									</div>
 									<div class="cell input">
-										<input type="number" value="15" step="1" name="attr_fragmentation_skill" />
+										<input type="number" value="15" step="1" name="attr_fragmentation_skill_final" readonly />
 									</div>
 									<div class="cell input">
-										<button type="action" name="act_roll_attack_ranged_fragmentation_damage" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{fragmentation_skill} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Fragmentation}} {{recoil=[[ @{fragmentation_recoil}]] }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" />
+										<input type="hidden" name="attr_fragmentation_modifier_summary" value="" />
+										<button type="action" name="act_roll_attack_ranged_fragmentation_damage" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{fragmentation_skill_final} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Fragmentation}} {{recoil=[[ @{fragmentation_recoil}]] }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[1]]}} {{rollModifierSummary=@{fragmentation_modifier_summary}}}" />
 									</div>
 									<div class="cell input">
 										<input type="text" value="1d6" name="attr_fragmentation_damage" title="Macro: @{NAME|fragmentation_damage}" />
@@ -16010,7 +16011,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<div class="cell damage">
 									</div>
 									<div class="cell roll-damage">
-										<input type="text" readonly="readonly" value="12" name="attr_fragmentation_radius" title="Macro: @{NAME|fragmentation_radius}" />
+										<input type="text" readonly="readonly" value="5" name="attr_fragmentation_radius" title="Macro: @{NAME|fragmentation_radius}" />
 									</div>
 									<div class="cell roll-damage">
 									</div>
@@ -16021,6 +16022,58 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 										<button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[{@{fragmentation_damage}, {1}}kh1]]}} {{damageType=Cutting (cut)}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
 									</div>
 									<div class="cell reset">
+									</div>
+								</div>
+
+								<div style="margin-bottom: 50px;">
+									<div class="grid-fragmentation-modifiers grid-standard grid__align_center grid__gap_medium">
+										<div class="grid-item">
+											<label>
+												<span data-i18n="to-hit-modifiers-label">To Hit Modifiers</span>
+											</label>
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<span data-i18n="base-skill-label">Base Skill</span>:
+											</label>
+											<input type="number" value="15" step="1" name="attr_fragmentation_skill" title=""Macro: @{NAME|fragmentation_skill}" />
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<div class="standard-tooltip">
+													<span data-i18n="range-label">Range</span> (<span name="attr_fragmentation_range_modifier">0</span>):
+													<span class="tooltiptext">
+														<span data-i18n="fragmentation-range-tooltip">Enter the number of yards/hexes from center of explosion to target.</span>
+													</span>
+												</div>
+											</label>
+											<input type="hidden" name="attr_fragmentation_range_modifier" value="0" />
+											<input type="number" value="0" name="attr_fragmentation_range" title="Macro: @{NAME|fragmentation_range}" />
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<div class="standard-tooltip">
+													<span data-i18n="posture-label">Posture</span>:
+													<span class="tooltiptext">
+														<span data-i18n="fragmentation-posture-tooltip">Select the posture of the target.</span>
+													</span>
+												</div>
+											</label>
+											<input type="hidden" name="attr_fragmentation_posture_modifier" value="0" />
+											<select name="attr_fragmentation_posture" title="Macro: @{NAME|fragmentation_to_hit_modifier}">
+												<option value="standing" selected><span data-i18n="option-standing">Standing</span> +0</option>
+												<option value="crouching"><span data-i18n="option-crouching">Crouching</span> -2</option>
+												<option value="kneeling"><span data-i18n="option-kneeling">Kneeling</span> -2</option>
+												<option value="sitting"><span data-i18n="option-sitting">Sitting</span> -2</option>
+												<option value="prone"><span data-i18n="option-prone">Prone</span> -2</option>
+											</select>
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<span data-i18n="size-modifier-label">Size Modifier</span>:
+											</label>
+											<input type="number" value="0" name="attr_fragmentation_size_modifier" title="Macro: @{NAME|fragmentation_size_modifier}" />
+										</div>
 									</div>
 								</div>
 								
@@ -20851,7 +20904,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<!-- current version notes: 2.16.0 -->
 			<ul>
-				<li><b>NEW:</b> Added Vehicle Sheet.</li>
+				<li><b>ENHANCEMENT:</b> Update Combat Tab > Tools > Demolition > Fragmentation tool; added skill modifiers for hitting targets.</li>
 			</ul>
 			
 			<h4>Version: 2.15.0</h4>
@@ -27457,6 +27510,8 @@ B378
 	
 		rawRollNotes = getRawNotes();
 
+		fixArmorLayerLabels();
+	
 		syncRollOptions();
 	
 		syncModifierPromptOptions();
@@ -27515,8 +27570,6 @@ B378
 				loadRepeating('repeating_techniques', 'points', 1);
 				loadRepeating('repeating_spells', 'points', 1);
 
-				fixArmorLayerLabels();
-	
 				// initialize all calculated stats
 				resetAll(v.mod_cascade, !v.sheet_version, hasCombatReflexes, hasReflexesBeenConverted);
 	
@@ -27539,7 +27592,7 @@ B378
 	const fixArmorLayerLabels = () => {
 
 		getAttrs("hit_location_layer_use_custom_labels", (values) => {
-			if (values.hit_location_layer_use_custom_labels === undefined) {
+			if (!values.hit_location_layer_use_custom_labels) {
 				setAttrs({ hit_location_layer_use_custom_labels: "0" });
 			}
 		});
@@ -51620,5 +51673,93 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	on("change:fragmentation_range", event => {
+
+		const range = Number(event.newValue) || 0;
+
+		updateFragmentationRangeModifier(range);
+
+	});
+
+	const updateFragmentationRangeModifier = range => {
+
+		const rangeModifier = getModBySpeedRange(range);
+
+		setAttrs({
+			fragmentation_range_modifier: rangeModifier
+		});
+
+	}
+
+	on("change:fragmentation_posture", event => {
+		
+		const posture = event.newValue;
+
+		updateFragmentationPostureModifier(posture);
+	});
+
+	const updateFragmentationPostureModifier = posture => {
+
+		let postureModifier = 0;
+
+		if (posture != "standing") {
+			postureModifier = -2;
+		}
+
+		setAttrs({
+			fragmentation_posture_modifier: postureModifier
+		});
+
+	}
+
+	on("change:fragmentation_skill change:fragmentation_range_modifier change:fragmentation_posture_modifier change:fragmentation_size_modifier", event => {
+
+		updateFragmentationTotalModifier();
+
+	});
+
+	const updateFragmentationTotalModifier = () => {
+
+		getAttrs([
+			"fragmentation_skill",
+			"fragmentation_range_modifier",
+			"fragmentation_posture_modifier",
+			"fragmentation_size_modifier"
+		], values => {
+
+			let skill = Number(values.fragmentation_skill) || 0;
+
+			let rangeModifier = Number(values.fragmentation_range_modifier) || 0;
+
+			let postureModifier = Number(values.fragmentation_posture_modifier) || 0;
+
+			let sizeModifier = Number(values.fragmentation_size_modifier) || 0;
+
+			let totalModifier = skill + rangeModifier + postureModifier + sizeModifier;
+
+			let modifierSummary = [];
+
+			if (rangeModifier != 0) {
+				modifierSummary.push(`Range: ${rangeModifier}`);
+			}
+
+			if (postureModifier != 0) {
+				modifierSummary.push(`Posture: ${postureModifier}`);
+			}
+
+			if (sizeModifier != 0) {
+				modifierSummary.push(`Size: ${sizeModifier}`);
+			}
+
+			let summary = modifierSummary.join(", ");
+
+			setAttrs({
+				fragmentation_skill_final: totalModifier,
+				fragmentation_modifier_summary: summary
+			});
+
+		});
+
+	}
 
 </script>
