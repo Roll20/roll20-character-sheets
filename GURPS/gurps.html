@@ -4325,16 +4325,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.15.0 -->
+				<!-- current version notes: 2.16.0 -->
 				<ul>
-					<li><b>NEW:</b> Chat results now have their own set of styles to select from, the value will default to the current character sheet style.</li>
-					<li>
-						<b>ENHANCEMENT:</b> Under Skills, a new subsection has been added named Familiarities.
-						<ul>
-							<li><b>USER ACTION:</b> Any skill used to operate equipment, for example - Guns (Pistol), Driving (Automobile), and Electronics Operation (Communications), take a penalty when you are faced with an unfamiliar type of item. You should start updating the appropriate skill equipment Familiarities. (See Familiarity B169).</li>
-						</ul>
-					</li>
-					<li><b>ENHANCEMENT:</b> Under Skills, added popup tooltip for <b>Show Skill Modifier notes (refer to the actual skill description)</b>.</li>
+					<li><b>ENHANCEMENT:</b> Update Combat Tab > Tools > Demolition > Fragmentation tool; added skill modifiers for hitting targets.</li>
+					<li><b>NEW:</b> Added Breaking Bindings to Tools > Structural tools tab. Based on Breaking Bindings rules from GURPS Low Tech Page 130.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -15997,18 +15991,19 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 			Base skill level for a fragmentation damage to hit a target.<br />
 			A hit is <b>automatic</b> if the explosive attack actually strikes the target.<br />
 			Only three modifiers apply: the <b>range modifier</b> for the distance from the center<br />
-			of the blast to the target, the modifier for the <b>target’s posture</b> (prone, etc.),<br />
-			and the target’s <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
+			of the blast to the target, the modifier for the <b>target's posture</b> (prone, etc.),<br />
+			and the target's <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
 			every <b>three points</b> by which the attack roll succeeds, one additional fragment
 			<br />strikes the target.
 											</span>
 										</span>
 									</div>
 									<div class="cell input">
-										<input type="number" value="15" step="1" name="attr_fragmentation_skill" />
+										<input type="number" value="15" step="1" name="attr_fragmentation_skill_final" readonly />
 									</div>
 									<div class="cell input">
-										<button type="action" name="act_roll_attack_ranged_fragmentation_damage" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{fragmentation_skill} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Fragmentation}} {{recoil=[[ @{fragmentation_recoil}]] }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}" />
+										<input type="hidden" name="attr_fragmentation_modifier_summary" value="" />
+										<button type="action" name="act_roll_attack_ranged_fragmentation_damage" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{fragmentation_skill_final} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Fragmentation}} {{recoil=[[ @{fragmentation_recoil}]] }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[1]]}} {{rollModifierSummary=@{fragmentation_modifier_summary}}}" />
 									</div>
 									<div class="cell input">
 										<input type="text" value="1d6" name="attr_fragmentation_damage" title="Macro: @{NAME|fragmentation_damage}" />
@@ -16017,7 +16012,7 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 									<div class="cell damage">
 									</div>
 									<div class="cell roll-damage">
-										<input type="text" readonly="readonly" value="12" name="attr_fragmentation_radius" title="Macro: @{NAME|fragmentation_radius}" />
+										<input type="text" readonly="readonly" value="5" name="attr_fragmentation_radius" title="Macro: @{NAME|fragmentation_radius}" />
 									</div>
 									<div class="cell roll-damage">
 									</div>
@@ -16028,6 +16023,58 @@ Slam uses either DX, Brawling, or Sumo Wrestling. Note that the -4 to hit and ef
 										<button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[{@{fragmentation_damage}, {1}}kh1]]}} {{damageType=Cutting (cut)}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
 									</div>
 									<div class="cell reset">
+									</div>
+								</div>
+
+								<div style="margin-bottom: 50px;">
+									<div class="grid-fragmentation-modifiers grid-standard grid__align_center grid__gap_medium">
+										<div class="grid-item">
+											<label>
+												<span data-i18n="to-hit-modifiers-label">To Hit Modifiers</span>
+											</label>
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<span data-i18n="base-skill-label">Base Skill</span>:
+											</label>
+											<input type="number" value="15" step="1" name="attr_fragmentation_skill" title=""Macro: @{NAME|fragmentation_skill}" />
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<div class="standard-tooltip">
+													<span data-i18n="range-label">Range</span> (<span name="attr_fragmentation_range_modifier">0</span>):
+													<span class="tooltiptext">
+														<span data-i18n="fragmentation-range-tooltip">Enter the number of yards/hexes from center of explosion to target.</span>
+													</span>
+												</div>
+											</label>
+											<input type="hidden" name="attr_fragmentation_range_modifier" value="0" />
+											<input type="number" value="0" name="attr_fragmentation_range" title="Macro: @{NAME|fragmentation_range}" />
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<div class="standard-tooltip">
+													<span data-i18n="posture-label">Posture</span>:
+													<span class="tooltiptext">
+														<span data-i18n="fragmentation-posture-tooltip">Select the posture of the target.</span>
+													</span>
+												</div>
+											</label>
+											<input type="hidden" name="attr_fragmentation_posture_modifier" value="0" />
+											<select name="attr_fragmentation_posture" title="Macro: @{NAME|fragmentation_to_hit_modifier}">
+												<option value="standing" selected><span data-i18n="option-standing">Standing</span> +0</option>
+												<option value="crouching"><span data-i18n="option-crouching">Crouching</span> -2</option>
+												<option value="kneeling"><span data-i18n="option-kneeling">Kneeling</span> -2</option>
+												<option value="sitting"><span data-i18n="option-sitting">Sitting</span> -2</option>
+												<option value="prone"><span data-i18n="option-prone">Prone</span> -2</option>
+											</select>
+										</div>
+										<div class="grid-item container-label-input">
+											<label>
+												<span data-i18n="size-modifier-label">Size Modifier</span>:
+											</label>
+											<input type="number" value="0" name="attr_fragmentation_size_modifier" title="Macro: @{NAME|fragmentation_size_modifier}" />
+										</div>
 									</div>
 								</div>
 								
@@ -18645,6 +18692,79 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						
 					</div>
 
+					<div class="grid-cell">
+						<div class="tools-container">
+
+							<div class="section-header">
+								<div class="standard-tooltip">
+									<h3><span data-i18n="breaking-bindings-label">Breaking Bindings</span></h3>
+									<span class="tooltiptext">
+										<span data-i18n="breaking-bindings-tooltip">Breaking bindings tool based on rules from GURPS Low Tech 130.</span>
+									</span>
+								</div>
+							</div>
+
+							<div class="grid-stanadard grid-3-column-auto grid__align_center grid__gap_large">
+								
+								<div class="grid-item">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="supports-label">Supports</span>
+											<span class="tooltiptext">
+												<span data-i18n="breaking-bindings-supports-tooltip">Enter how much the binding material can support. For example, a 1" hemp rope can support 2,000 pounds.</span>
+											</span>
+										</div>
+									</label>
+									<div>
+										<input type="hidden" name="attr_binding_supports_weight_pounds" value="2000" />
+										<input type="number" name="attr_binding_supports_weight" class="large-width" value="2000" min="0" step="1" title="Macro: @{NAME|binding_supports_weight}" />
+										<select name="attr_bindings_weight_units">
+											<option value="pounds" data-i18n="pounds-option" selected>Pounds</option>
+											<option value="kilograms" data-i18n="kilograms-option">Kilograms</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="grid-item">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="coils-label">Coils</span>
+											<span class="tooltiptext">
+												<span data-i18n="breaking-bindings-coils-tooltip">Number of coils around the prisoner, about 2 yards of rope for a normal-sized human. Each coil after the first gives +1 ST to the rope.</span>
+											</span>
+										</div>
+									</label>
+									<div>
+										<input type="hidden" name="attr_binding_coils_strength_mod" value="0" />
+										<input type="number" name="attr_binding_coils" value="1" min="1" step="1" title="Macro: @{NAME|binding_coils}" />
+									</div>
+								</div>
+
+								<div class="grid-item">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="abbreviation-strength">ST</span>
+											<span class="tooltiptext">
+												<span data-i18n="binding-strength-tooltip">Effective ST of rope based on the amount of weight it supports and the number of coils. GURPS Low-Tech 130.<br />Math: ST = (square root of dynamic load limit /2) plus +1 ST per extra coil. Dynamic load limit = ropes support weight / 2.</span>
+											</span>
+										</div>
+									</label>
+									<div>
+										<input type="hidden" name="attr_binding_supports_strength" value="22" />
+										<input type="number" name="attr_binding_strength" value="22" min="0" step="1" readonly class="input-disabled" />
+										<button type="action" name="act_roll_skill_breaking_bindings" class="button-roll-template sheet-btn sheet-ui-draggable" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[0]]}} {{characterName=Tool}} {{skillName=Rope ST}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{binding_strength}]]}} {{showNotes=[[0]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[1]]}}"></button>
+									</div>
+								</div>
+
+							</div>
+
+							<div>
+								<span data-i18n="breaking-bindings-contest-description">Prisoner must <i>win</i> a Quick Contest of their ST versus rope's ST. Each attempt takes a minute and costs 1 FP; repeated attempts have a cumulative -1 ST to the prisoner's ST. If prisoner loses and bindings are thin wire, prisoner suffers 1 HP of cutting damage. Critical Failure means a temporarily crippled arm. GURPS Low Tech 130.</span>
+							</div>
+
+						</div>
+					</div>
+					
 				</div>
 
 			</div>
@@ -20035,7 +20155,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 									</span>
 								</div>
 							</div>
-							<div class="grid-3-column-auto grid__align_center">
+							<div class="grid-3-column-auto grid__align_center grid__gap_medium">
 
 								<div class="grid-cell">
 									<label>
@@ -20856,7 +20976,14 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.15.0 -->
+			<!-- current version notes: 2.16.0 -->
+			<ul>
+				<li><b>ENHANCEMENT:</b> Update Combat Tab > Tools > Demolition > Fragmentation tool; added skill modifiers for hitting targets.</li>
+				<li><b>NEW:</b> Added Breaking Bindings to Tools > Structural tools tab. Based on Breaking Bindings rules from GURPS Low Tech Page 130.</li>
+			</ul>
+			
+			<h4>Version: 2.15.0</h4>
+			<p>Pull Request: 4/22/2024</p>
 			<ul>
 				<li><b>NEW:</b> Chat results now have their own set of styles to select from, the value will default to the current character sheet style.</li>
 				<li>
@@ -26391,9 +26518,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.15.0";
+	const version = "2.16.0";
 	
-	const latestChangesDate = "4/22/2024";
+	const latestChangesDate = "5/6/2024";
 	
 	let modCascade = true;
 	
@@ -27458,6 +27585,8 @@ B378
 	
 		rawRollNotes = getRawNotes();
 
+		fixArmorLayerLabels();
+	
 		syncRollOptions();
 	
 		syncModifierPromptOptions();
@@ -27516,8 +27645,6 @@ B378
 				loadRepeating('repeating_techniques', 'points', 1);
 				loadRepeating('repeating_spells', 'points', 1);
 
-				fixArmorLayerLabels();
-	
 				// initialize all calculated stats
 				resetAll(v.mod_cascade, !v.sheet_version, hasCombatReflexes, hasReflexesBeenConverted);
 	
@@ -27539,7 +27666,7 @@ B378
 
 	const fixArmorLayerLabels = () => {
 
-		getAttrs("hit_location_layer_use_custom_labels", (values) => {
+		getAttrs(["hit_location_layer_use_custom_labels"], (values) => {
 			if (values.hit_location_layer_use_custom_labels === undefined) {
 				setAttrs({ hit_location_layer_use_custom_labels: "0" });
 			}
@@ -47477,6 +47604,7 @@ Characters with Skill: ${knowsSkill}`;
 		"roll_skill_hearing",
 		"roll_skill_cold",
 		"roll_skill_heat",
+		"roll_skill_breaking_bindings"
 	];
 
 	rollButtons.forEach( button => {
@@ -51621,5 +51749,193 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	on("change:fragmentation_range", event => {
+
+		const range = Number(event.newValue) || 0;
+
+		updateFragmentationRangeModifier(range);
+
+	});
+
+	const updateFragmentationRangeModifier = range => {
+
+		const rangeModifier = getModBySpeedRange(range);
+
+		setAttrs({
+			fragmentation_range_modifier: rangeModifier
+		});
+
+	}
+
+	on("change:fragmentation_posture", event => {
+		
+		const posture = event.newValue;
+
+		updateFragmentationPostureModifier(posture);
+	});
+
+	const updateFragmentationPostureModifier = posture => {
+
+		let postureModifier = 0;
+
+		if (posture != "standing") {
+			postureModifier = -2;
+		}
+
+		setAttrs({
+			fragmentation_posture_modifier: postureModifier
+		});
+
+	}
+
+	on("change:fragmentation_skill change:fragmentation_range_modifier change:fragmentation_posture_modifier change:fragmentation_size_modifier", event => {
+
+		updateFragmentationTotalModifier();
+
+	});
+
+	const updateFragmentationTotalModifier = () => {
+
+		getAttrs([
+			"fragmentation_skill",
+			"fragmentation_range_modifier",
+			"fragmentation_posture_modifier",
+			"fragmentation_size_modifier"
+		], values => {
+
+			let skill = Number(values.fragmentation_skill) || 0;
+
+			let rangeModifier = Number(values.fragmentation_range_modifier) || 0;
+
+			let postureModifier = Number(values.fragmentation_posture_modifier) || 0;
+
+			let sizeModifier = Number(values.fragmentation_size_modifier) || 0;
+
+			let totalModifier = skill + rangeModifier + postureModifier + sizeModifier;
+
+			let modifierSummary = [];
+
+			if (rangeModifier != 0) {
+				modifierSummary.push(`Range: ${rangeModifier}`);
+			}
+
+			if (postureModifier != 0) {
+				modifierSummary.push(`Posture: ${postureModifier}`);
+			}
+
+			if (sizeModifier != 0) {
+				modifierSummary.push(`Size: ${sizeModifier}`);
+			}
+
+			let summary = modifierSummary.join(", ");
+
+			setAttrs({
+				fragmentation_skill_final: totalModifier,
+				fragmentation_modifier_summary: summary
+			});
+
+		});
+
+	}
+
+	on("change:binding_supports_weight change:bindings_weight_units", event => {
+		updateBindingWeight();
+	});
+
+	const updateBindingWeight = () => {
+
+		getAttrs([
+			"binding_supports_weight",
+			"bindings_weight_units"
+		], values => {
+
+			let supportsWeight = Number(values.binding_supports_weight) || 0;
+
+			let weightUnits = values.bindings_weight_units;
+
+			let weight = supportsWeight;
+
+			if (weightUnits == "kilograms") {
+				weight = Math.round(supportsWeight * 2.20462);
+			}
+
+			setAttrs({
+				binding_supports_weight_pounds: weight
+			});
+
+		});
+
+	}
+
+	on("change:binding_supports_weight_pounds", event => {
+
+		updateBindingSupportStrength();
+	});
+
+	const updateBindingSupportStrength = () => {
+
+		getAttrs([
+			"binding_supports_weight_pounds"
+		], values => {
+
+			let supportsWeight = Number(values.binding_supports_weight_pounds) || 0;
+
+			// strength = square root of (supporsWeight / 4)
+			let strength = Math.round(Math.sqrt(supportsWeight / 4));
+			
+			setAttrs({
+				binding_supports_strength: strength
+			});
+
+		});
+
+	}
+
+	on("change:binding_coils", event => {
+		updateBindingCoilStrengthModifier();
+	});
+
+	const updateBindingCoilStrengthModifier = () => {
+		
+		getAttrs([
+			"binding_coils"
+		], values => {
+
+			let coils = Number(values.binding_coils) || 0;
+
+			// for every coil after the first one, add one to strengthModifier
+			let strengthModifier = coils - 1;
+			
+			setAttrs({
+				binding_coils_strength_mod: strengthModifier
+			});
+
+		});
+	}
+
+	on("change:binding_supports_strength change:binding_coils_strength_mod", event => {
+		updateBindingTotalStrength();
+	});
+
+	const updateBindingTotalStrength = () => {
+
+		getAttrs([
+			"binding_supports_strength",
+			"binding_coils_strength_mod"
+		], values => {
+
+			let supportsStrength = Number(values.binding_supports_strength) || 0;
+
+			let coilsStrengthMod = Number(values.binding_coils_strength_mod) || 0;
+
+			let totalStrength = supportsStrength + coilsStrengthMod;
+
+			setAttrs({
+				binding_strength: totalStrength
+			});
+
+		});
+
+	}
 
 </script>

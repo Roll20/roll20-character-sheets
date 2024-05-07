@@ -1,3 +1,19 @@
+2024-05-06
+
+- Attacks:
+   - HP Scaling (based on size - beta rules)
+   - Add missing criticals to attack results.  So all crits on attack tables should resolve
+   - Add DB Bonus for small attacks
+   - Fix bug: Attack scaling based on Attack size not attacker size.
+- Fix bug finding attack types (eg Greater Hafted)
+- AP tracking
+   - With hacky messages!
+   - Update preview image to something a little more relevance.
+
+2024-04-29
+
+ - Attacks!
+
 2024-04-14
 
  - Fix bug in parseIntDefault to return the default if passed a 0
