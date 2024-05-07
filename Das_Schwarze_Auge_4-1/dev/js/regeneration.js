@@ -469,15 +469,46 @@ on(
 		});
 });
 
-on(
-	"change:sf_regeneration_i " +
-	"change:sf_regeneration_ii " +
-	"change:sf_meisterliche_regeneration ",
+on(statAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
 	function(eventInfo) {
-	safeGetAttrs([
-		"sf_meisterliche_regeneration_leiteigenschaft",
-		"MU", "KL", "IN", "CH", "FF", "GE", "KO", "KK"
-	], function(v) {
+	safeGetAttrs(
+		[
+			...statAttrs,
+			"sf_meisterliche_regeneration",
+			"sf_meisterliche_regeneration_leiteigenschaft"
+		] , function(v) {
+		const func = "Action Listener Masterly Regeneration Principal Stat";
+		debugLog(func, eventInfo, v);
+
+		if (v["sf_meisterliche_regeneration"] === "1")
+		{
+			const source = eventInfo.sourceAttribute.toUpperCase();
+			if (v["sf_meisterliche_regeneration_leiteigenschaft"] === "@{" + source + "}")
+			{
+				const principalStatValue = eventInfo.newValue;
+				var attrsToChange = {};
+				var AEBaseRegenerationRoll = parseInt(principalStatValue) / 3;
+				AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll);
+				AEBaseRegenerationRoll = AEBaseRegenerationRoll.toString() + "d1";
+				attrsToChange["reg_sleep_ae_base"] = AEBaseRegenerationRoll;
+
+				debugLog(func, "attrsToChange", attrsToChange);
+				safeSetAttrs(attrsToChange);
+			}
+		}
+	});
+});
+
+on(astralRegenerationAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			...astralRegenerationAttrs,
+			...statAttrs,
+			"reg_sleep_ae_mod_special_skills"
+		], function(v) {
+		const func = "Action Listener Astral Regeneration";
+		debugLog(func, eventInfo, v);
 		var attrsToChange = {};
 		var regenerationLevel = 0; // 0 to +3
 		const stats = {
@@ -490,10 +521,10 @@ on(
 			"@{KO}": v["KO"], 
 			"@{KK}": v["KK"]
 		};
-		const mainStat = stats[v["sf_meisterliche_regeneration_leiteigenschaft"]];
 		var AEBaseRegenerationRoll = "1d6";
 		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
+		const mainStat = stats[v["sf_meisterliche_regeneration_leiteigenschaft"]];
 
 		if (sourceType === "player") {
 			// Handle changes to degree of astral regeneration
@@ -507,10 +538,10 @@ on(
 				regenerationLevel = 1;
 			} else if (source === "sf_meisterliche_regeneration" && eventInfo.newValue === "1") {
 				regenerationLevel = 3;
-				AEBaseRegenerationRoll = parseInt(mainStat) / 3;
-				AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll).toString() + "d1";
 			} else if (source === "sf_meisterliche_regeneration" && eventInfo.newValue === "0") {
 				regenerationLevel = 2;
+			} else {
+				regenerationLevel = v["reg_sleep_ae_mod_special_skills"];
 			}
 
 			// Populate attrsToChange so we don't forget later on
@@ -534,12 +565,15 @@ on(
 					attrsToChange["sf_regeneration_i"] = "1";
 					attrsToChange["sf_regeneration_ii"] = "1";
 					attrsToChange["sf_meisterliche_regeneration"] = "1";
+					AEBaseRegenerationRoll = parseInt(mainStat) / 3;
+					AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll).toString() + "d1";
 					break;
 			}
 			attrsToChange["reg_sleep_ae_base"] = AEBaseRegenerationRoll;
 
 			// Regeneration mod from special skills
 			attrsToChange["reg_sleep_ae_mod_special_skills"] = regenerationLevel;	// regeneration, astral energy, modifier, special skills (Sonderfertigkeiten)
+			debugLog(func, "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
 		}
 	});
