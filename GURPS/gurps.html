@@ -4328,6 +4328,7 @@
 				<!-- current version notes: 2.16.0 -->
 				<ul>
 					<li><b>ENHANCEMENT:</b> Update Combat Tab > Tools > Demolition > Fragmentation tool; added skill modifiers for hitting targets.</li>
+					<li><b>NEW:</b> Added Breaking Bindings to Tools > Structural tools tab. Based on Breaking Bindings rules from GURPS Low Tech Page 130.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -18691,6 +18692,79 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						
 					</div>
 
+					<div class="grid-cell">
+						<div class="tools-container">
+
+							<div class="section-header">
+								<div class="standard-tooltip">
+									<h3><span data-i18n="breaking-bindings-label">Breaking Bindings</span></h3>
+									<span class="tooltiptext">
+										<span data-i18n="breaking-bindings-tooltip">Breaking bindings tool based on rules from GURPS Low Tech 130.</span>
+									</span>
+								</div>
+							</div>
+
+							<div class="grid-stanadard grid-3-column-auto grid__align_center grid__gap_large">
+								
+								<div class="grid-item">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="supports-label">Supports</span>
+											<span class="tooltiptext">
+												<span data-i18n="breaking-bindings-supports-tooltip">Enter how much the binding material can support. For example, a 1" hemp rope can support 2,000 pounds.</span>
+											</span>
+										</div>
+									</label>
+									<div>
+										<input type="hidden" name="attr_binding_supports_weight_pounds" value="2000" />
+										<input type="number" name="attr_binding_supports_weight" class="large-width" value="2000" min="0" step="1" title="Macro: @{NAME|binding_supports_weight}" />
+										<select name="attr_bindings_weight_units">
+											<option value="pounds" data-i18n="pounds-option" selected>Pounds</option>
+											<option value="kilograms" data-i18n="kilograms-option">Kilograms</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="grid-item">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="coils-label">Coils</span>
+											<span class="tooltiptext">
+												<span data-i18n="breaking-bindings-coils-tooltip">Number of coils around the prisoner, about 2 yards of rope for a normal-sized human. Each coil after the first gives +1 ST to the rope.</span>
+											</span>
+										</div>
+									</label>
+									<div>
+										<input type="hidden" name="attr_binding_coils_strength_mod" value="0" />
+										<input type="number" name="attr_binding_coils" value="1" min="1" step="1" title="Macro: @{NAME|binding_coils}" />
+									</div>
+								</div>
+
+								<div class="grid-item">
+									<label>
+										<div class="standard-tooltip">
+											<span data-i18n="abbreviation-strength">ST</span>
+											<span class="tooltiptext">
+												<span data-i18n="binding-strength-tooltip">Effective ST of rope based on the amount of weight it supports and the number of coils. GURPS Low-Tech 130.<br />Math: ST = (square root of dynamic load limit /2) plus +1 ST per extra coil. Dynamic load limit = ropes support weight / 2.</span>
+											</span>
+										</div>
+									</label>
+									<div>
+										<input type="hidden" name="attr_binding_supports_strength" value="22" />
+										<input type="number" name="attr_binding_strength" value="22" min="0" step="1" readonly class="input-disabled" />
+										<button type="action" name="act_roll_skill_breaking_bindings" class="button-roll-template sheet-btn sheet-ui-draggable" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[0]]}} {{characterName=Tool}} {{skillName=Rope ST}} {{rollResult=[[3d6cs<1cf>6]]}} {{effectiveSkill=[[@{binding_strength}]]}} {{showNotes=[[0]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{displayRollModifierSummary=[[1]]}}"></button>
+									</div>
+								</div>
+
+							</div>
+
+							<div>
+								<span data-i18n="breaking-bindings-contest-description">Prisoner must <i>win</i> a Quick Contest of their ST versus rope's ST. Each attempt takes a minute and costs 1 FP; repeated attempts have a cumulative -1 ST to the prisoner's ST. If prisoner loses and bindings are thin wire, prisoner suffers 1 HP of cutting damage. Critical Failure means a temporarily crippled arm. GURPS Low Tech 130.</span>
+							</div>
+
+						</div>
+					</div>
+					
 				</div>
 
 			</div>
@@ -20081,7 +20155,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 									</span>
 								</div>
 							</div>
-							<div class="grid-3-column-auto grid__align_center">
+							<div class="grid-3-column-auto grid__align_center grid__gap_medium">
 
 								<div class="grid-cell">
 									<label>
@@ -20905,6 +20979,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 			<!-- current version notes: 2.16.0 -->
 			<ul>
 				<li><b>ENHANCEMENT:</b> Update Combat Tab > Tools > Demolition > Fragmentation tool; added skill modifiers for hitting targets.</li>
+				<li><b>NEW:</b> Added Breaking Bindings to Tools > Structural tools tab. Based on Breaking Bindings rules from GURPS Low Tech Page 130.</li>
 			</ul>
 			
 			<h4>Version: 2.15.0</h4>
@@ -26445,7 +26520,7 @@ B378
 	
 	const version = "2.16.0";
 	
-	const latestChangesDate = "4/29/2024";
+	const latestChangesDate = "5/6/2024";
 	
 	let modCascade = true;
 	
@@ -47529,6 +47604,7 @@ Characters with Skill: ${knowsSkill}`;
 		"roll_skill_hearing",
 		"roll_skill_cold",
 		"roll_skill_heat",
+		"roll_skill_breaking_bindings"
 	];
 
 	rollButtons.forEach( button => {
@@ -51756,6 +51832,106 @@ Characters with Skill: ${knowsSkill}`;
 			setAttrs({
 				fragmentation_skill_final: totalModifier,
 				fragmentation_modifier_summary: summary
+			});
+
+		});
+
+	}
+
+	on("change:binding_supports_weight change:bindings_weight_units", event => {
+		updateBindingWeight();
+	});
+
+	const updateBindingWeight = () => {
+
+		getAttrs([
+			"binding_supports_weight",
+			"bindings_weight_units"
+		], values => {
+
+			let supportsWeight = Number(values.binding_supports_weight) || 0;
+
+			let weightUnits = values.bindings_weight_units;
+
+			let weight = supportsWeight;
+
+			if (weightUnits == "kilograms") {
+				weight = Math.round(supportsWeight * 2.20462);
+			}
+
+			setAttrs({
+				binding_supports_weight_pounds: weight
+			});
+
+		});
+
+	}
+
+	on("change:binding_supports_weight_pounds", event => {
+
+		updateBindingSupportStrength();
+	});
+
+	const updateBindingSupportStrength = () => {
+
+		getAttrs([
+			"binding_supports_weight_pounds"
+		], values => {
+
+			let supportsWeight = Number(values.binding_supports_weight_pounds) || 0;
+
+			// strength = square root of (supporsWeight / 4)
+			let strength = Math.round(Math.sqrt(supportsWeight / 4));
+			
+			setAttrs({
+				binding_supports_strength: strength
+			});
+
+		});
+
+	}
+
+	on("change:binding_coils", event => {
+		updateBindingCoilStrengthModifier();
+	});
+
+	const updateBindingCoilStrengthModifier = () => {
+		
+		getAttrs([
+			"binding_coils"
+		], values => {
+
+			let coils = Number(values.binding_coils) || 0;
+
+			// for every coil after the first one, add one to strengthModifier
+			let strengthModifier = coils - 1;
+			
+			setAttrs({
+				binding_coils_strength_mod: strengthModifier
+			});
+
+		});
+	}
+
+	on("change:binding_supports_strength change:binding_coils_strength_mod", event => {
+		updateBindingTotalStrength();
+	});
+
+	const updateBindingTotalStrength = () => {
+
+		getAttrs([
+			"binding_supports_strength",
+			"binding_coils_strength_mod"
+		], values => {
+
+			let supportsStrength = Number(values.binding_supports_strength) || 0;
+
+			let coilsStrengthMod = Number(values.binding_coils_strength_mod) || 0;
+
+			let totalStrength = supportsStrength + coilsStrengthMod;
+
+			setAttrs({
+				binding_strength: totalStrength
 			});
 
 		});
