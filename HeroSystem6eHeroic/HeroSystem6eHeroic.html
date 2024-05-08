@@ -1064,7 +1064,7 @@
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>END Mod:</h2>
-						<input type="number" name="attr_weaponEndMod02" title="@{weaponEndMod02}" step="1" min="-20" max="20" value="0" tabindex="91"/>
+						<input type="number" name="attr_weaponEndMod03" title="@{weaponEndMod03}" step="1" min="-20" max="20" value="0" tabindex="91"/>
 					</div>
 				</div>
 				
@@ -1167,7 +1167,7 @@
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>END Mod:</h2>
-						<input type="number" name="attr_weaponEndMod02" title="@{weaponEndMod02}" step="1" min="-20" max="20" value="0" tabindex="91"/>
+						<input type="number" name="attr_weaponEndMod04" title="@{weaponEndMod04}" step="1" min="-20" max="20" value="0" tabindex="91"/>
 					</div>
 				</div>
 				
@@ -1270,7 +1270,7 @@
 					</div>
 					<div class="subitem-tab-gear-flex-container-set-damage-row">
 						<h2>END Mod:</h2>
-						<input type="number" name="attr_weaponEndMod02" title="@{weaponEndMod02}" step="1" min="-20" max="20" value="0" tabindex="91"/>
+						<input type="number" name="attr_weaponEndMod05" title="@{weaponEndMod05}" step="1" min="-20" max="20" value="0" tabindex="91"/>
 					</div>
 				</div>
 				
@@ -5734,6 +5734,7 @@
 					<input type="checkbox" name="attr_checkMultipleAttack">
 					<span class="checkmark-small-dark" title="@{checkMultipleAttack}"></span>
 				</label>
+				<button type="action" class="button buttonRollPowerArmor" tabindex="-1" name="act_armorActivation01" title="%{armorActivation01}">Armor</button>
 			</div>
 			
 			<!-- Range Modifier Table -->
@@ -10607,7 +10608,7 @@
 				
 				<div class="item-version-information">
 					<!-- Update version before release. -->
-					<input type="text" value="2.9" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+					<input type="text" value="2.93" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 				</div>
 			</div>
 		</div>
@@ -11288,7 +11289,7 @@
 			version = 2.82;
 		}
 		
-		if (version < 2.9) {
+		if (version < 2.90) {
 			
 			values = await _getAttrs(["strength", "dexterity", "constitution", "intelligence", "ego", "presence"]);
 			
@@ -11299,7 +11300,38 @@
 			attributes.egoNet = parseInt(values.ego)||0;
 			attributes.presenceNet = parseInt(values.presence)||0;
 			
-			version = 2.9;
+			// Initialize attribute mods to 0.
+			attributes.strengthMod = 0;
+			attributes.dexterityMod = 0;	
+			attributes.constitutionMod = 0;
+			attributes.intelligenceMod = 0;
+			attributes.egoMod = 0;
+			
+			attributes.ocvMod = 0;
+			attributes.dcvMod = 0;	
+			attributes.omcvMod = 0;
+			attributes.dmcvMod = 0;
+			attributes.speedMod = 0;
+			
+			attributes.pdMod = 0;
+			attributes.edMod = 0;	
+			attributes.bodyMod = 0;
+			attributes.stunMod = 0;
+			attributes.enduranceMod = 0;
+			attributes.recoveryMod = 0;
+			
+			attributes.runningMod = 0;
+			attributes.leapingMod = 0;
+			attributes.swimmingMod = 0;
+			
+			version = 2.90;
+		}
+		
+		if (version < 2.93) {
+			
+			// No updates needed.
+			
+			version = 2.93;
 		}
 		
 		if (version != origVersion) {
@@ -11567,33 +11599,35 @@
 	
 	// Recover endurance and stun when the recover button in the item-characteristics-health box is clicked.
 	on("clicked:recoverHealth", function () {
-		getAttrs(["endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery"], function(values) {
+		getAttrs(["character_title", "endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			const currentEND = parseInt(values.CurrentEND)||0;
 			const currentSTUN = parseInt(values.CurrentSTUN)||0;
-
+			
 			// If character is boosted, than their max is what they are currently at
 			const maxEND = Math.max(parseInt(values.endurance), currentEND);
 			const maxSTUN = Math.max(parseInt(values.stun), currentSTUN);
-
-
-			theRoll += "&{template:custom-activate} {{title=@{character_name} - @{character_title}}} "
-			+ "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
+			
+			theRoll += "&{template:custom-activate} ";
+			theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+			
+			theRoll += "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
 			+ "{{STUN Recovery=[[@{recoveryNet}[Recovery]]] (@{CurrentSTUN})}} "
 			+ "{{END Recovery=[[@{recoveryNet}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
-
+			
 			startRoll(theRoll, (results) => {
 				recoverSTUN = results.results["STUN Recovery"].result;
 				recoverEND = results.results["END Recovery"].result;
-
+					
 				setAttrs({
 					CurrentSTUN:Math.min(currentSTUN + recoverSTUN, maxSTUN),
 					CurrentEND:Math.max(0,Math.min(currentEND + recoverEND, maxEND))
 				});
-
+				
 				finishRoll(results.rollId, {});
 			});
-
+			
 		});
 	});
 	
@@ -12769,7 +12803,7 @@
 				
 				// Braced modifiers.
 				if (isBraced) {
-				braceMod = 2;
+					braceMod = 2;
 					halfDCV = true;
 					
 					// Check to see if Brace nullifies the RMod penalty.
@@ -15578,7 +15612,8 @@
 					// CV
 					maneuverOCV = 0;
 					maneuverDCV = -5;
-					netDCV = getNetDCV(netDCV, maneuverDCV, false);
+					halfDCV = isBraced ? true : false;
+					netDCV = getNetDCV(netDCV, maneuverDCV, halfDCV);
 					
 					// Damage
 					if (capDamage) {
@@ -15700,7 +15735,8 @@
 					// CV
 					maneuverOCV = 0;
 					maneuverDCV = 0;
-					netDCV = getNetDCV(netDCV, maneuverDCV, false);
+					halfDCV = isBraced ? true : false;
+					netDCV = getNetDCV(netDCV, maneuverDCV, halfDCV);
 					
 					setAttrs({
 						"hiddenDamage": values["hiddenWeaponDamage"+weaponId]||0,
@@ -15758,7 +15794,6 @@
 						// Braced modifiers.
 						if (isBraced) {
 							braceMod = 2;
-							halfDCV = true;
 						}
 					}
 					
