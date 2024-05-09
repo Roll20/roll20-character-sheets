@@ -1,4 +1,15 @@
 /* constants begin */
+const statAttrs = [
+	"MU",
+	"KL",
+	"IN",
+	"CH",
+	"FF",
+	"GE",
+	"KO",
+	"KK"
+];
+
 const combatTechniques = {
 		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
 		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
@@ -925,6 +936,16 @@ const regLimitLower = {
 	'ae': 0,
 	'ke': 0
 };
+
+// Astral regeneration-related attributes
+const astralRegenerationAttrs =
+[
+	"sf_regeneration_i",
+	"sf_regeneration_i",
+	"sf_regeneration_ii",
+	"sf_meisterliche_regeneration",
+	"sf_meisterliche_regeneration_leiteigenschaft"
+];
 
 /*
 	Constants for translating (new) internal name to (old) internal name and UI name
