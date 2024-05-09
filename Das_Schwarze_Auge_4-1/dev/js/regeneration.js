@@ -469,6 +469,22 @@ on(
 		});
 });
 
+function generateAEBaseMasterlyRegenerationRoll (statValue) {
+	const func = "generateAEBaseMasterlyRegenerationRoll";
+	debugLog(func, "statValue", statValue);
+
+	var roll = parseInt(statValue) / 3;
+	if (isNaN(roll))
+	{
+		debugLog(func, "statValue cannot be parsed as integer. Using default value.");
+		roll = defaultValues["reg_sleep_ae_base"];
+	} else {
+		roll = DSAround(roll);
+		roll = roll.toString() + "d1cs2cf0";
+	}
+	return roll;
+}
+
 on(statAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
 	function(eventInfo) {
 	safeGetAttrs(
