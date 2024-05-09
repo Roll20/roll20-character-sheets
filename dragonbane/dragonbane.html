@@ -3355,7 +3355,7 @@ const addToInitiative = async (attributes,cards,character_name,sections,casc) =>
   // sort the cards
   cards.sort((a,b) => a - b);
   sections.repeating_initiative.forEach(id => {
-    if(attributes[`repeating_initiative_${id}_name`] === character_name || attributes[`repeating_initiative_${id}_name`] === undefined){
+    if(attributes[`repeating_initiative_${id}_name`] === character_name){
       k.removeRepeatingRow(`repeating_initiative_${id}`,attributes,sections);
     }
   });
@@ -4550,13 +4550,6 @@ const switchInitiative = async function({trigger,attributes,sections,casc}){
   const sourceCard = attributes[`${row}_card`];
   attributes[`${row}_card`] = swapCard;
   attributes[`${swapRow}_card`] = sourceCard;
-
-  sections.repeating_initiative.forEach(id => {
-    if(attributes[`repeating_initiative_${id}_name`] === undefined){
-      k.removeRepeatingRow(`repeating_initiative_${id}`,attributes,sections);
-    }
-  });
-
   sortInitiative({sections,attributes})
   attributes.set()
 };
@@ -4570,6 +4563,13 @@ k.registerFuncs({switchInitiative});
  * @param {string} [character_name] - the name of the character currently being worked on. REQUIRED IF cards is provided
  */
 const sortInitiative = ({sections,attributes,cards=[],character_name}) => {
+  // remove/ignore ids that do not actualy exist
+  sections.repeating_initiative.forEach(id => {
+    if(attributes[`repeating_initiative_${id}_name`] === undefined){
+      k.removeRepeatingRow(`repeating_initiative_${id}`,attributes,sections);
+    }
+  });
+
   sections.repeating_initiative.reduce((arr,id) => {
       const row = `repeating_initiative_${id}`;
       arr.push({name:attributes[`${row}_name`],card:attributes[`${row}_card`],row,hold:attributes[`${row}_hold`]})
