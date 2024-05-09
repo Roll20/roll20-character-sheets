@@ -3351,10 +3351,11 @@ k.registerFuncs({rollInitiative});
 
 // Adds the drawn initiative to the tracker and sorts the tracker.
 const addToInitiative = async (attributes,cards,character_name,sections,casc) => {
+  debugger;
   // sort the cards
   cards.sort((a,b) => a - b);
   sections.repeating_initiative.forEach(id => {
-    if(attributes[`repeating_initiative_${id}_name`] === character_name){
+    if(attributes[`repeating_initiative_${id}_name`] === character_name || attributes[`repeating_initiative_${id}_name`] === undefined){
       k.removeRepeatingRow(`repeating_initiative_${id}`,attributes,sections);
     }
   });
@@ -4530,12 +4531,14 @@ k.registerFuncs({calcDeckSize});/**
  * @param {object} casc - Expanded cascade object
  */
 const switchInitiative = async function({trigger,attributes,sections,casc}){
+  debugger;
   const [section,rowID] = k.parseTriggerName(trigger.name);
   const row = `${section}_${rowID}`;
   const options = sections.repeating_initiative.reduce((arr,id) => {
     if(
       attributes[`repeating_initiative_${id}_name`] !== attributes[`${row}_name`] &&
-      !attributes[`repeating_initiative_${id}_used`]
+      !attributes[`repeating_initiative_${id}_used`] &&
+      attributes[`repeating_initiative_${id}_name`] !== undefined
     ){
       arr.push(`${attributes[`repeating_initiative_${id}_name`]} - ${attributes[`repeating_initiative_${id}_card`]},${id}`)
     }
@@ -4547,6 +4550,13 @@ const switchInitiative = async function({trigger,attributes,sections,casc}){
   const sourceCard = attributes[`${row}_card`];
   attributes[`${row}_card`] = swapCard;
   attributes[`${swapRow}_card`] = sourceCard;
+
+  sections.repeating_initiative.forEach(id => {
+    if(attributes[`repeating_initiative_${id}_name`] === undefined){
+      k.removeRepeatingRow(`repeating_initiative_${id}`,attributes,sections);
+    }
+  });
+
   sortInitiative({sections,attributes})
   attributes.set()
 };
