@@ -503,10 +503,7 @@ on(statAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
 			{
 				const principalStatValue = eventInfo.newValue;
 				var attrsToChange = {};
-				var AEBaseRegenerationRoll = parseInt(principalStatValue) / 3;
-				AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll);
-				AEBaseRegenerationRoll = AEBaseRegenerationRoll.toString() + "d1";
-				attrsToChange["reg_sleep_ae_base"] = AEBaseRegenerationRoll;
+				attrsToChange["reg_sleep_ae_base"] = generateAEBaseMasterlyRegenerationRoll(principalStatValue);
 
 				debugLog(func, "attrsToChange", attrsToChange);
 				safeSetAttrs(attrsToChange);
@@ -581,8 +578,7 @@ on(astralRegenerationAttrs.map(attr => "change:" + attr.toLowerCase()).join(" ")
 					attrsToChange["sf_regeneration_i"] = "1";
 					attrsToChange["sf_regeneration_ii"] = "1";
 					attrsToChange["sf_meisterliche_regeneration"] = "1";
-					AEBaseRegenerationRoll = parseInt(mainStat) / 3;
-					AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll).toString() + "d1";
+					AEBaseRegenerationRoll = generateAEBaseMasterlyRegenerationRoll(mainStat);
 					break;
 			}
 			attrsToChange["reg_sleep_ae_base"] = AEBaseRegenerationRoll;
