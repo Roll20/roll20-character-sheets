@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.29';
+const sheetVersion = '1.00.30';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -584,6 +584,11 @@ const upgradeSheet = function (
     }
     if (versionthree < 0.29) {
       updateBackgroundImage();
+      setattrvals['newcontent'] = 'unread';
+    }
+    if (versionthree < 0.3) {
+      log('Sheet Version', 'Upgrading to version 0.0.30', '#CCCCFF');
+      fauxChange(`repeating_weapons:weaponskill`, 'fighting');
       setattrvals['newcontent'] = 'unread';
     }
     setAttrs(setattrvals);
@@ -3359,21 +3364,14 @@ on('change:CompendiumCategory', function (eventInfo) {
   log('Compendium Drop', eventInfo.newValue, '#E948C9');
   log('Compendium Change Source', eventInfo.sourceType, r20color);
   debug(eventInfo);
-  debugger;
-  if (eventInfo.newValue && eventInfo.newValue !== '') {
+  if (eventInfo.newValue !== '') {
     let cCategory = eventInfo.newValue;
+    let resetFields;
     if(cCategory === 'Bestiary' ||cCategory === 'Archetypes' || cCategory === 'SWADE Archetypes'){
       compendiumBestiary();
     }else{
       compendiumDrop(cCategory);
     }
-    // clear the fields
-    setAttrs({
-      compendiumname:'',
-      compendiumcategory:'',
-      compendiumcontent:'',
-      compendiumdata:''
-    },{silent:true});
   } else {
     log('Compendium Drop', 'Nothing dropped', '#E948C9');
   }
@@ -3394,7 +3392,11 @@ weaponlist.forEach(weapon => {
   on(
     `change:${weapon}:weaponbutton change:${weapon}:weaponskill change:${weapon}:weaponAttackBonus`,
     function (eventInfo) {
-      log("Weapon Button Config Triggered",eventInfo.sourceAttribute, "#CCCCFF");
+      log(
+        'Weapon Button Config Triggered',
+        eventInfo.sourceAttribute,
+        '#CCCCFF'
+      );
       //console.log(eventInfo.sourceAttribute);
       let pa = '';
       let wbutton = 'repeating_weapons_weaponbutton';
@@ -3409,7 +3411,7 @@ weaponlist.forEach(weapon => {
         wskill = 'repeating_raweapons_weaponskill';
       }
       const templateCommon = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{source=@{weapon}}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}`;
-      
+
       const skillUn = `${templateCommon} {{name=@{character_name} }} @{rolltUnskilled} {{skill_roll=&{noerror} [[ @{weaponUnskilledFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ @{weaponUnskilledWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{trait=^{unskilled}}} @{unskilledencumbrancebutton}`;
       const skillFi = `${templateCommon} {{trait=@{fightingname}}} @{rolltFighting} {{skill_roll=&{noerror} [[ @{weaponFightingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponFightingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}`;
 
@@ -3475,8 +3477,8 @@ weaponlist.forEach(weapon => {
                 skillToUse = skillSpi;
                 break;
               case 'focus':
-                  skillToUse = skillFo;
-                  break;
+                skillToUse = skillFo;
+                break;
               case 'unskilled':
                 skillToUse = skillUn;
                 break;
@@ -3618,6 +3620,24 @@ weaponlist.forEach(weaponSection => {
                 break;
               case 'weirdscience':
                 x = 'Weirdscience';
+                break;
+              case 'faith':
+                x = 'faith';
+                break;
+              case 'focus':
+                x = 'focus';
+                break;
+              case 'performance':
+                x = 'performance';
+                break;
+              case 'psionics':
+                x = 'psionics';
+                break;
+              case 'spellcasting':
+                x = 'spellcasting';
+                break;
+              case 'spirit':
+                x = 'spirit';
                 break;
               default:
                 x = 'Unskilled';
@@ -4396,7 +4416,17 @@ function setSkillDropdown(section, field, value, rowid) {
   }
 }
 
-const weaponsskilllist = ['fighting', 'athletics', 'shooting', 'weirdscience','faith','focus','performance','psionics','spellcasting'];
+const weaponsskilllist = [
+  'fighting',
+  'athletics',
+  'shooting',
+  'weirdscience',
+  'faith',
+  'focus',
+  'performance',
+  'psionics',
+  'spellcasting',
+];
 weaponsskilllist.forEach(weaponsskill => {
   on(`change:${weaponsskill}name`, function (eventInfo) {
     log('Weapon Skill List', 'Skill Name Change', 'lime');
@@ -4436,7 +4466,7 @@ const weaponsskillnamelist = [
   'focusname',
   'performancename',
   'psionicsname',
-  'spellcastingname'
+  'spellcastingname',
 ]; // Considering a refactor here
 const spellskillnamelist = [
   'faithname',
@@ -6634,7 +6664,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.29"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.30"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -6681,7 +6711,7 @@ on(
 <input type="hidden" name="attr_unshakeTemplate" value="{{shaken=[[0d6+@{isShaken}]]}} {{unshake=[&lt;span data-i18n='roll-unshake-button'&gt;&lt;/span&gt;](~unshakeroll)}}"/>
 <input type="hidden" name="attr_templateConditions" value="{{wildcard=[[@{is_npc}d1]]}} {{wcicon=@{WCI}}} {{vulnerable=[[0d6+@{vulnerable}]]}} {{stunned=[[0d6+@{stunned}]]}} {{distracteds=[[0d6+@{distracted}]]}}"/>
 <div class="version"><span name="attr_character_sheet"></span></div>
-<div class="maindiv compendium-drop-target bestiary swade_archetypes">
+<div class="maindiv compendium-drop-target bestiary">
   <!--Compendium Fields-->
   <input class="hiddenInput" type="text" name="attr_CompendiumName" accept="Name"/>
   <input class="hiddenInput" type="text" name="attr_CompendiumCategory" accept="Category"/>
@@ -12000,15 +12030,15 @@ on(
                 </div>
                 <!--input(type="hidden", value=`${name}`)-->
                 <!--input(type="hidden", value=`${skillAbbr}`)-->
-                <input type="hidden" value="false" name="attr_survival_cla"/>
+                <input type="hidden" value="true" name="attr_survival_cla"/>
                 <!--input(type="hidden", value=`${chooseLinkedAttribute}`)-->
-                <input type="hidden" value="sma" name="attr_survival_lao"/>
+                <input type="hidden" value="sma,spi" name="attr_survival_lao"/>
                 <!--input(type="hidden", value=`${vartype}`)-->
                 <!-- Begin the Actual HTML for the Character Sheet-->
                 <input class="StaticSkill hiddenInput" type="checkbox" name="attr_staticsurvival"/>
                 <div class="basetrait staticSurvival" data-i18n-list-item="survival">
                   <input class="deltabutton" type="hidden" name="attr_survival_delta" value="0"/>
-                  <input type="hidden" value="false" name="attr_survival_makeButton"/>
+                  <input type="hidden" value="true" name="attr_survival_makeButton"/>
                   <input type="hidden" value="string" name="attr_survival_mbVarType"/>
                   <button class="skillbutton skillflexattbutton" type="roll" name="roll_tSurvivalRoll" value="@{survivalRollValue} {{skill_roll=[[ @{survivalSkillRollFormula} ]]}} {{wild_die=[[ @{survivalWildDieFormula} ]]}}" title="@{tSurvivalRoll}">&nbsp;<span name="attr_survivalname"></span>
                     <!--
@@ -12019,9 +12049,9 @@ on(
                     else
                         span(name=`attr_${skill}name`) 
                     
-                    -->&nbsp;<span class="linkedAtt" data-i18n="sma-u"></span><span class="statblock">(<span name="attr_survival_display"></span>)</span>
+                    -->&nbsp;<span class="linkedAtt" name="attr_linkedsurvivalatt" data-i18n-dynamic="data-i18n-dynamic"></span><span class="statblock">(<span name="attr_survival_display"></span>)</span>
                   </button>
-                  <input type="hidden" name="attr_survivalRollValue" value="@{whispersurvival} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~tSurvivalRoll)}} {{trait=@{survivalname}}} @{rolltSurvival} @{setmods} @{showtraitmods} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
+                  <input type="hidden" name="attr_survivalRollValue" value="@{whispersurvival} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~tSurvivalRoll)}} {{trait=@{survivalname}}} @{rolltSurvival} @{linkedsurvivalattbutton} @{showtraitmods} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                   <div class="skillRankContainer">
                     <div class="skillRankChild">
                       <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
@@ -12068,7 +12098,12 @@ on(
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
                       <input class="ModDesc" type="text" name="attr_survivalModType" placeholder="Modifier due to edges, hindrances, etc" data-i18n-placeholder="att-mod-description"/>+
-                      <input class="otraitmod" type="number" name="attr_SurvivalskillMod" title="@{Survivalskillmod}" value="0"/>
+                      <input class="otraitmod" type="number" name="attr_SurvivalskillMod" title="@{Survivalskillmod}" value="0"/><span class="ModDesc" data-i18n="linked-attribute">Linked Attribute</span>
+                      <select class="LinkedAttSelect" name="attr_linkedsurvivalatt">
+                        <option value="sma-u" data-i18n="smarts">Smarts</option>
+                        <option value="spi-u" data-i18n="spirit">Spirit</option>
+                      </select>
+                      <!-- The following IF/Else was at this indentation...-->
                       <input type="hidden" name="attr_linkedsurvivalattbutton" value="@{setmods}"/>
                       <input type="hidden" name="attr_linkedsurvivalattformula" value="@{ModSum}[Distracted, Wounds, Fatigue]"/>
                       <hr class="modsection"/>
@@ -15915,6 +15950,22 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.30-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10030" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.30</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10030" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="nature-sense">Added support for Druid Ability <em>Nature Sense</em> from Pathfinder for Savage Worlds; Survival can now be linked with Spirit instead of Smarts only.</span></li>
+            <li> <span class="black" data-i18n="weapon-rate-of-fire-for-spellcasters">Fixed an issue with Rates of Fire greater than 2 for spellcasting skills (e.g. Faith, Focus, Spellcasting, etc). You may need to change the skill and change it back again for the change to take effect.</span></li>
+            <li> <span class="black" data-i18n="firefox-alphanumer-trait-display">Fixed a bug in Firefox when using the Alphanumeric labels that caused the trait modifier box to wrap to the next line.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.29-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10029" value="1"/><span class="releasenotesVersion">
