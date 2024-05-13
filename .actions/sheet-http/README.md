@@ -1,8 +1,4 @@
-# Dependencies
+# Note
+As this code is exactly the same as the code in the private character sheet repo
+We are using that repo as the source for the uncompiled versio of this code
 
-* You will need to install the correct asdf node js listed in the root of this repo's .tools-version file
-* Then you will need to run `npm i -g @vercel/ncc`
-* Then run `npm run build`
-
-NOTE: You will need to run `npm run build` and commit that change every time you make file changes 
-in `index.ts`
