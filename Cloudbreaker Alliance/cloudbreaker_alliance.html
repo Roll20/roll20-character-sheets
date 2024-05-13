@@ -16,6 +16,18 @@
 			setAttrs(output, {silent: true});
 		});
 	});
+
+	on("change:character_level", function() {
+		getAttrs(["character_level"], function(v) {
+			var output = {};
+			var level = parseInt(v["character_level"]);
+
+			output["character_level"] = level < 1 ? 1 : level;
+			output["adventuring_grade"] = level > 8 ? "gold" : level > 4 ? "silver" : "copper";
+
+			setAttrs(output, {silent: true});
+		});
+	});
 </script>
 
 <html>
@@ -44,13 +56,20 @@
 		<div class="sheet-playerinfo">
 			<div><span>Player Name :</span><input type="text" name="attr_player_name"/></div>
 			<div>
-				<div><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
-				<div>
-					<span>Level :</span><input type="number" name="attr_charlevel">
-					<span>(</span><input type="number" name="attr_charxp" /><span>) exp</span>
+				<div style="display: flex; flex-grow: 1; flex-shrink: 0;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
+				<div style="flex-shrink: 0; width: 183px;">
+					<span>Level :</span><input type="number" name="attr_character_level" value="1">
+					<span>(</span><input type="number" name="attr_character_xp" /><span>) exp</span>
 				</div>
 			</div>
-			<div><span>Lifeform :</span><input type="text" name="attr_character_lifeform"/></div>
+			<div>
+				<div style="display: flex; flex-grow: 1; flex-shrink: 0;"><span>Lifeform :</span><input type="text" name="attr_character_lifeform"/></div>
+				<div style="flex-shrink: 0; width: 183px; display: flex;">
+					<span style="flex-shrink: 0;">Grade :</span>
+					<input type="hidden" class="sheet-adventuringRank" name="attr_adventuring_grade" value="copper" />
+					<span class="sheet-adventuringRank" name="attr_adventuring_grade"/>
+				</div>
+			</div>
 			<div><span>⬖ Primary Class :</span><input type="text" name="attr_character_primary_class"/></div>
 			<div><span>⬗ Secondary Class :</span><input type="text" name="attr_character_secondary_class"/></div>
 		</div>
@@ -60,7 +79,7 @@
 			<!-- Quirks (repeating sections) -->
 			<fieldset class="repeating_quirks" style="flex-flow: row wrap;">
 				<!-- Name + Lvl + foldable section -->
-				<div">
+				<div>
 					<div>
 						<input type="text" name="attr_quirk_name" title="Quirk name" placeholder="Quirk name" />
 						<input type="number" name="attr_quirk_level" title="Quirk level" value="1" />
