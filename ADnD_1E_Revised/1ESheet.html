@@ -53,9 +53,13 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version">
             </span>
-            <span class="right">5/08/24'</span>
+            <span class="right">5/12/24'</span>
           </h5>
           <ul>
+            <li>Fixed a bug in the Attack Matrix class drop-down selector where the "Cleric, Druid, and Monk" selection incorrectly used the Fighter table data. This was related to last week's change to the class dropdown. Big apologies.</li>
+            <li>Attacks that have the "In-Use" box enabled will auto-fill the global attributes @{weapon_in_use} (shows the weapon's name), @{weapon_in_use_speed} and @{weapon_in_use_misc}. You can see these in the Misc. Attack Info section found just above the repeating attacks. I believe these attributes could be used for those of you that wish to modify/customize their initiative rolls and/or other macros.</li>
+            <li>Added a "Misc." attribute to repeating attacks. @{repeating_weapon_$X_weapon_misc} this attribute will also be used to auto-fill @{weapon_in_use_misc} when the weapon is marked "In-Use".</li>
+            <li>Adjusted roll template to limit the image size to max-height of 100px if placed within the {{subtag}} key. Images posted included within other keys will still have a max-height of 300px.</li>
             <li>Fixed THAC0 table output alignment issue.</li>
             <li>Fixed the Class/Monster dropdown selector in the Attack Matrix to be less confusing.</li>
             <li>The Revised sheet is now live! While roll20 would not permit both versions of the 1e sheet to coexist, they have agreed to deprecate the old sheet. It will remain as-is for anyone that is currently using that sheet in their existing games and could possibly get future updates/changes. It will not show up as an available sheet for new games however. Only the Revised 1e sheet will be listed for new games going forward. Game creators using the old sheet can convert to the Revised sheet if/when they desire by changing the game settings character template to the "Advanced Dungeons & Dragons 1e sheet".</li>
@@ -272,7 +276,8 @@
     </section>
     <!-- NPC/Monster statblock1-4 -->
     <section class="npc-box statblock1">
-      <input type="text" class="height-short text-large left" name="attr_character_name" title="@{character_name}" placeholder="Character Name" style="width: calc(50vw - 3em);min-width:17.5em;" />
+      <input type="checkbox" name="attr_character_name_error" class="hidden toggle-input-error" value="1" checked />
+      <input type="text" class="height-short text-large left" name="attr_character_name" title="@{character_name} | NOTE: Including any non-alpha-numeric characters may break sheet rolls/macros." placeholder="Character Name" style="width: calc(50vw - 3em);min-width:17.5em;" />
       <span class="inline-label">
         <label>
           <span>TYPE:</span>
@@ -569,7 +574,8 @@
     <section class="header-box">
       <!--Details-->
       <div class="heading-box">
-        <input type="text" class="width-fill border text-large" name="attr_character_name" title="@{character_name}" placeholder="Character Name">
+        <input type="checkbox" name="attr_character_name_error" class="hidden toggle-input-error" value="1" checked/>
+        <input type="text" class="width-fill border text-large" name="attr_character_name" title="@{character_name} | NOTE: Including any non-alpha-numeric characters may break sheet rolls/macros." placeholder="Character Name">
         <label class="inline-label">
           <span>Race:</span>
           <input type="text" class="width-fill" name="attr_race" title="@{race}" placeholder="Description" />
@@ -2044,6 +2050,18 @@
             <input type="text" class="width-smaller" name="attr_dual_pen_secondary" value="0" readonly>
           </label>
         </span>
+        <label class="span-two inline-label" title="@{weapon_in_use} | Current weapon In-Use/Armed.">
+          <span>Weapon In-Use:</span>
+          <input type="text" class="width-large" name="attr_weapon_in_use" value="" placeholder="n/a" readonly />
+        </label>
+        <label class="inline-label" title="@{weapon_in_use_speed} | Weapon Speed Factor.">
+          <span>Weapon Speed:</span>
+          <input type="text" class="width-small" name="attr_weapon_in_use_speed" value="" placeholder="n/a" readonly />
+        </label>
+        <label class="inline-label" title="@{weapon_in_use_misc} | Weapon Misc.">
+          <span>Weapon Misc.:</span>
+          <input type="text" class="width-small" name="attr_weapon_in_use_misc" value="" placeholder="n/a" readonly />
+        </label>
       </div>
       <div class="sect" style="margin: 5px 0 22px 0;">
         <input type="checkbox" class="hidden toggle-to-hit-table" name="attr_toggle_to_hit_table" value="1" />
@@ -2318,7 +2336,7 @@
             <span class="weapons-row2 center">
               <span class="inline-label" style="position: absolute; top: 2.1em;">
                 <input type="checkbox" name="attr_weapon_use" title="@{repeating_weapon_$X_weapon_use} | Weapon is armed." value="1" />
-                <span class="label-under-small">In Use</span>
+                <span class="label-under-small">In-Use</span>
               </span>
               <details class="small-damage">
                 <summary>
@@ -2445,6 +2463,7 @@
                 <input type="text" class="width-small" name="attr_weapon_speed" title="@{repeating_weapon_$X_weapon_speed}" value="" placeholder="-" />
                 <input type="text" class="width-small" name="attr_weapon_length" title="@{repeating_weapon_$X_weapon_length}" value="" placeholder="-" />
                 <input type="text" class="width-small" name="attr_weapon_space" title="@{repeating_weapon_$X_weapon_space}" value="" placeholder="-" />
+                <input type="text" class="width-small" name="attr_weapon_misc" title="@{repeating_weapon_$X_weapon_misc}" value="" placeholder="-" />
                 <h5>Armor Type:</h5>
                 <span>0</span>
                 <span>1</span>
@@ -2464,6 +2483,7 @@
                 <label class="label-under-small">SPD</label>
                 <label class="label-under-small">LEN</label>
                 <label class="label-under-small">SPC</label>
+                <label class="label-under-small">MISC</label>
                 <h5>Adjustment:</h5>
                 <span><input type="text" name="attr_weapon_thac_adj0" title="@{repeating_weapon_$x_weapon_thac_adj0}" value="0" /></span>
                 <span><input type="text" name="attr_weapon_thac_adj1" title="@{repeating_weapon_$x_weapon_thac_adj1}" value="0" /></span>
@@ -2704,6 +2724,10 @@
                   <label class="label-under-small hide-melee">
                     <input type="text" class="width-small" name="attr_equipment_weapon_space" title="@{repeating_equipment_$X_equipment_weapon_space}" value="" placeholder="-" />
                     <span>SPC</span>
+                  </label>
+                  <label class="label-under-small hide-melee">
+                    <input type="text" class="width-small" name="attr_equipment_weapon_misc" title="@{repeating_equipment_$X_equipment_weapon_misc}" value="" placeholder="-" />
+                    <span>MISC</span>
                   </label>
                   <label class="label-under-small">
                     <input type="text" class="width-medium" name="attr_equipment_weapon_damagesmallmedium" title="@{repeating_equipment_$X_equipment_weapon_damagesmallmedium}" value="" placeholder="1d4" />
@@ -4697,6 +4721,14 @@
     return modifiedAttr;
   };
 
+  // Character Name Validation
+  /*
+  const isAlphaNumeric = (attr) => {
+    // only alpha-numeric characters are allowed
+    return /^[a-zA-Z0-9]+$/.test(attr) ? 1 : 0;
+  };
+  */
+
   // Number Validation
   const numbersOnly = (attr) => {
     // numbers and/or - + symbols before number are allowed
@@ -4716,6 +4748,23 @@
     uniqueids[generated] = true;
     return generated;
   };
+
+  // Validate input for illegal characters
+  /*
+  on('change:character_name', (eventInfo) => {
+    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    getAttrs(['character_name'], (v) => {
+      const output = {};
+      const attr = v[`${eventInfo.sourceAttribute}`];
+      // validate input
+      const isText = isAlphaNumeric(attr);
+      clog(`Valid Input?: ${isText}`);
+      // write to a hidden checkbox in html ie 'X_error', CSS to style
+      output[`${eventInfo.sourceAttribute}_error`] = isText;
+      setAttrs(output, {silent: true});
+    });
+  });
+  */
 
   // Validate input for +/- adjustment
   on(
@@ -4798,6 +4847,7 @@
   let thiefmisc2Calc = '';
   let thiefmiscCalc = '';
   let versionator = '';
+  let weaponInUse = '';
   let wisdomCalcs = '';
 
   const armorRowIDs = [
@@ -6776,6 +6826,7 @@
         fields.push(section_attribute('weapon', id, 'weapon_length'));
         fields.push(section_attribute('weapon', id, 'weapon_space'));
         fields.push(section_attribute('weapon', id, 'weapon_speed'));
+        fields.push(section_attribute('weapon', id, 'weapon_misc'));
         fields.push(section_attribute('weapon', id, 'weapon_thac_adj0'));
         fields.push(section_attribute('weapon', id, 'weapon_thac_adj1'));
         fields.push(section_attribute('weapon', id, 'weapon_thac_adj2'));
@@ -6825,6 +6876,7 @@
           output[`repeating_weapon_${id}_weapon_length`] = v[section_attribute('weapon', id, 'weapon_length')];
           output[`repeating_weapon_${id}_weapon_space`] = v[section_attribute('weapon', id, 'weapon_space')];
           output[`repeating_weapon_${id}_weapon_speed`] = v[section_attribute('weapon', id, 'weapon_speed')];
+          output[`repeating_weapon_${id}_weapon_misc`] = v[section_attribute('weapon', id, 'weapon_misc')];
           output[`repeating_weapon_${id}_weapon_thac_adj0`] = +v[section_attribute('weapon', id, 'weapon_thac_adj0')] || 0;
           output[`repeating_weapon_${id}_weapon_thac_adj1`] = +v[section_attribute('weapon', id, 'weapon_thac_adj1')] || 0;
           output[`repeating_weapon_${id}_weapon_thac_adj2`] = +v[section_attribute('weapon', id, 'weapon_thac_adj2')] || 0;
@@ -8050,6 +8102,7 @@
         `repeating_equipment_${id}_equipment_weapon_speed`,
         `repeating_equipment_${id}_equipment_weapon_length`,
         `repeating_equipment_${id}_equipment_weapon_space`,
+        `repeating_equipment_${id}_equipment_weapon_misc`,
         `repeating_equipment_${id}_equipment_weapon_damagesmallmedium`,
         `repeating_equipment_${id}_equipment_weapon_damagelarge`,
         `repeating_equipment_${id}_equipment_weapon_attackdmgtype`,
@@ -8066,6 +8119,7 @@
         output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
         output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
         output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
+        output[`repeating_weapon_${newID}_weapon_misc`] = v[`repeating_equipment_${id}_equipment_weapon_misc`];
         output[`repeating_weapon_${newID}_weapon_damagesmallmedium`] = v[`repeating_equipment_${id}_equipment_weapon_damagesmallmedium`];
         output[`repeating_weapon_${newID}_weapon_damagelarge`] = v[`repeating_equipment_${id}_equipment_weapon_damagelarge`];
         output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
@@ -8990,6 +9044,7 @@
       section_attribute('weapon', id, 'weapon_length'),
       section_attribute('weapon', id, 'weapon_space'),
       section_attribute('weapon', id, 'weapon_speed'),
+      section_attribute('weapon', id, 'weapon_misc'),
       section_attribute('weapon', id, 'weapon_thac_adj0'),
       section_attribute('weapon', id, 'weapon_thac_adj1'),
       section_attribute('weapon', id, 'weapon_thac_adj2'),
@@ -9044,6 +9099,7 @@
       output.repeating_weapon_weapon_length = v[section_attribute('weapon', id, 'weapon_length')];
       output.repeating_weapon_weapon_space = v[section_attribute('weapon', id, 'weapon_space')];
       output.repeating_weapon_weapon_speed = v[section_attribute('weapon', id, 'weapon_speed')];
+      output.repeating_weapon_weapon_misc = v[section_attribute('weapon', id, 'weapon_misc')];
       output.repeating_weapon_weapon_thac_adj0 = +v[section_attribute('weapon', id, 'weapon_thac_adj0')] || 0;
       output.repeating_weapon_weapon_thac_adj1 = +v[section_attribute('weapon', id, 'weapon_thac_adj1')] || 0;
       output.repeating_weapon_weapon_thac_adj2 = +v[section_attribute('weapon', id, 'weapon_thac_adj2')] || 0;
@@ -9094,6 +9150,7 @@
       section_attribute('equipment', id, 'equipment_macro_text'),
       section_attribute('equipment', id, 'equipment_weapon_type'),
       section_attribute('equipment', id, 'equipment_weapon_speed'),
+      section_attribute('equipment', id, 'equipment_weapon_misc'),
       section_attribute('equipment', id, 'equipment_weapon_length'),
       section_attribute('equipment', id, 'equipment_weapon_space'),
       section_attribute('equipment', id, 'equipment_weapon_damagesmallmedium'),
@@ -9127,6 +9184,7 @@
       output.repeating_equipment_equipment_macro_text = v[section_attribute('equipment', id, 'equipment_macro_text')];
       output.repeating_equipment_equipment_weapon_type = +v[section_attribute('equipment', id, 'equipment_weapon_type')] || 0;
       output.repeating_equipment_equipment_weapon_speed = v[section_attribute('equipment', id, 'equipment_weapon_speed')];
+      output.repeating_equipment_equipment_weapon_misc = v[section_attribute('equipment', id, 'equipment_weapon_misc')];
       output.repeating_equipment_equipment_weapon_length = v[section_attribute('equipment', id, 'equipment_weapon_length')];
       output.repeating_equipment_equipment_weapon_space = v[section_attribute('equipment', id, 'equipment_weapon_space')];
       output.repeating_equipment_equipment_weapon_damagesmallmedium = v[section_attribute('equipment', id, 'equipment_weapon_damagesmallmedium')];
@@ -9971,16 +10029,16 @@
           output[`thac-8`] = 20;
           output[`thac-7`] = 20;
           output[`thac-6`] = 20;
-          output[`thac-5`] = 20;
-          output[`thac-4`] = 19;
-          output[`thac-3`] = 18;
-          output[`thac-2`] = 17;
-          output[`thac-1`] = 16;
-          output.thac00 = 16;
-          output.thac0 = 15;
-          output.thac1 = 14;
-          output.thac2 = 13;
-          output.thac3 = 12;
+          output[`thac-5`] = 19;
+          output[`thac-4`] = 18;
+          output[`thac-3`] = 17;
+          output[`thac-2`] = 16;
+          output[`thac-1`] = 15;
+          output.thac00 = 14;
+          output.thac0 = 14;
+          output.thac1 = 13;
+          output.thac2 = 12;
+          output.thac3 = 11;
           output.thac4 = 10;
           output.thac5 = 9;
           output.thac6 = 8;
@@ -10061,7 +10119,7 @@
         output.attack_matrix_flag = 0;
       }
       // fighters table
-      if (classSelected === 2 || 6) {
+      if (classSelected === 2 || classSelected === 6) {
         if (levelSelected === 0) {
           output[`thac-10`] = 26;
           output[`thac-9`] = 25;
@@ -11453,5 +11511,51 @@
       output.psionic_defense_max = float(strengthMax / 2).toFixed(1);
       setAttrs(output, {silent: true});
     });
+  });
+
+  weaponInUse = (id) => {
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const output = {};
+      const weaponFields = [];
+      const inUseWeaponFields = [
+        `repeating_weapon_${id}_weapon_use`,
+        `repeating_weapon_${id}_weapon_speed`,
+        `repeating_weapon_${id}_weapon_misc`,
+        `repeating_weapon_${id}_weapon_name`,
+      ];
+      const fields = [...weaponFields, ...inUseWeaponFields];
+      idArray.forEach((rowID) => {
+        weaponFields.push(section_attribute('weapon', rowID, 'weapon_use'));
+      });
+      getAttrs(fields, (v) => {
+        const name = v[`repeating_weapon_${id}_weapon_name`];
+        const inUse = +v[`repeating_weapon_${id}_weapon_use`] || 0;
+        const speed = v[`repeating_weapon_${id}_weapon_speed`];
+        const misc = v[`repeating_weapon_${id}_weapon_misc`];
+        // console.log(`~~~~| name:${name} inUse:${inUse} speed factor:${speed} |~~~~`);
+        // reset other rows to unchecked
+        idArray.forEach((rowID) => {
+          output[`repeating_weapon_${rowID}_weapon_use`] = 0;
+        });
+        if (inUse === 0) {
+          output[`repeating_weapon_${id}_weapon_use`] = 0;
+          output.weapon_in_use = '';
+          output.weapon_in_use_speed = '';
+          output.weapon_in_use_misc = '';
+        } else if (inUse === 1) {
+          output[`repeating_weapon_${id}_weapon_use`] = 1;
+          output.weapon_in_use = name;
+          output.weapon_in_use_speed = speed;
+          output.weapon_in_use_misc = misc;
+        }
+        setAttrs(output, {silent: true});
+      });
+    });
+  };
+
+  on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
+    clog(eventInfo.sourceAttribute);
+    const id = eventInfo.sourceAttribute.split('_')[2];
+    weaponInUse(id);
   });
 </script>
