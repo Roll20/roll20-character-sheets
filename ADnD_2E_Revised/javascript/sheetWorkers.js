@@ -1332,6 +1332,31 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 }
 //#endregion
 
+//#region Wizard and Priest Dispel Magic button
+on('clicked:dispel-setup-wiz', async function (eventInfo) {
+    await dispelRoll(eventInfo, '[[@{level-wizard}]]')
+});
+
+on('clicked:dispel-setup-pri', async function (eventInfo) {
+    await dispelRoll(eventInfo, '[[@{level-priest}]]')
+});
+
+async function dispelRoll(eventInfo, classLevel) {
+    let visibility = await extractQueryResult(`?{Are dispel rolls public or only to GM?|Public, |GM only,/w gm }`);
+
+    let rollBuilder = new RollTemplateBuilder('2Edefault');
+    rollBuilder.push('name=Dispel Roll',`desc=@{character_name} dispels effects and potions of level [[1d20+${classLevel}-11]] and below`, `desc1=[Roll again](~@{character_name}|dispel)`, 'align1=center', 'color=dark-blue');
+
+    let roll = visibility + rollBuilder.string();
+
+    let newValue = {};
+    newValue['dispel-macro'] = roll;
+    setAttrs(newValue);
+
+    await printRoll(roll);
+}
+//#endregion
+
 //#region Wizard and Priest spells and Powers setup
 function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     if (!spellsTable[section])
