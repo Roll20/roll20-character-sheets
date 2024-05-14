@@ -12,16 +12,30 @@ Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données tech
 
 # Version courante
 
-V4.4.1 [Screenshot](cog_v4.png)
+V4.5.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
 
+## V4.5.0 (2024.05.01)
+
+- Fiche de personnage
+  - Modification de l'onglet "Capacités", avec 4 sous-onglets
+    - Jets de capacités
+    - Traits & Relations
+    - Modificateurs de situation
+    - Buffs
+  - Prise en compte des virgules dans le texte d'un MOD de situation
+    La "roll-query" affiche une ligne pour chaque situation séparée
+  - Ajout de boutons "Information" pour afficher des textes d'aide dans le chat
+    - Onglet Capacités - Buffs
+    - Onglet Equipement
+
 ## V4.4.1 (2023.10.31)
 
 - Fiche de personnage
-  - Correction d'un bug empêchant l'exécution du code Javascript de la fiche
+  - Correction d'un bug empêchant l'exécution du Javascript de la fiche
 
 ## V4.4.0 (2023.09.30)
 

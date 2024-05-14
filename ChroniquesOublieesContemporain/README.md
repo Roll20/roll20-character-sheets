@@ -10,9 +10,17 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.16.1 [Screenshot](coc_v2.png)
+v3.17.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.17.0 (2024-05-01)
+
+- Fiche de personnage
+  - Modification de l'onglet "Capacités", avec 3 sous-onglets
+    - Jets de capacités
+    - Traits
+    - Buffs
 
 ## v3.16.1 (2023-10-22)
 

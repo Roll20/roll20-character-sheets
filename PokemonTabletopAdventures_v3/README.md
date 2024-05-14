@@ -23,6 +23,10 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Apr 10, 2024
+- Added support for collapsing the character avatar/stat grid section to show only the stat grid when collapsed
+- Resolved a small issue with the background when the sheet scrolled sideways for the mobile app
+
 ### Apr 5, 2024
 - Added support for collapsing the entire trainer features section
 - Added support for showing the character avatar in the stat grid section
