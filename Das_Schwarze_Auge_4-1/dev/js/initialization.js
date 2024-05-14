@@ -5,12 +5,12 @@ function initializeSheet(migrationChain) {
 	var attrsToInit = [
 		// Stats and derived values
 		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK", "GS",
-		"legrundw", "LE_max",
-		"AU_max", "ausgrundw", "aus_max",
+		"LE", "legrundw", "LE_max",
+		"AU", "AU_max", "ausgrundw", "aus_max",
 		"erschoepfung_basis", "erschoepfung_max",
 		"ueberanstrengung_max",
 		"mrgrundw", "MR", "wundschwelle",
-		"AE_max", "aspgrundw", "asp_max", "sf_meisterliche_regeneration_leiteigenschaft",
+		"AE", "AE_max", "aspgrundw", "asp_max", "sf_meisterliche_regeneration_leiteigenschaft",
 		"KE", "KE_max",
 		"ap_verfuegbar",
 
