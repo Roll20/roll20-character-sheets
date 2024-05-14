@@ -86,6 +86,17 @@
   </div>
 </rolltemplate>
 
+<!-- Message for selecting a taget.
+  Params we care about are:
+    who
+    targetname
+-->
+<rolltemplate class="sheet-rolltemplate-rmuattacktarget">
+  <div class='sheet-rolltemplate-rmumsg'>
+    <i>{{who}}</i> is now targetting <i>{{computed::targetname}}</i>
+  </div>
+</rolltemplate>
+
 <!-- vim: set sw=2 sts=2 :-->
 
 
@@ -2260,12 +2271,13 @@ Name <input name="attr_character_name">
     <h2>Attacks</h2>
 
     <div class='foe'>
-      <span style='grid-column: span 2'>
-        Target Name:
+
+      <span style='grid-column: span 1'>
+        Target:
       </span>
-      <input type='text'
-            style='padding: 1px; grid-column: span 2; width:100%; box-sizing: border-box'
-            name='attr_target_name'>
+      <span name='attr_target_name' style='grid-column: span 2'></span>
+      <button type='action' name='act_rmuattackgettarget'
+                class='rollbutton fancybutton fancybuttoninline'>Select</button>
       <span class='foe_target_db'>
         DB
       </span>
@@ -9748,6 +9760,52 @@ J E + C + B
 		});
 	});
     });
+    attacks.datarollregex = /^0\[(.*)\]\s*$/;
+    attacks.getDataFromRoll = function (str) {
+	return str.match(attacks.datarollregex)[1]
+    }
+
+    onCheck('clicked:rmuattackgettarget', (ev) => {
+
+	const roll_string = "&{template:rmuattacktarget} [[3d8]]  " +
+		"{\{who=@{character_name}}} " +
+		"{\{targetname=[[0[@{target|character_name}] ]]}} " +
+		"{\{targetsize=[[0[@{target|size}] ]]}} " +
+		"{\{targetathead=[[0[@{target|at_head}] ]]}} " +
+		"{\{targetattorso=[[0[@{target|at_torso}] ]]}} " +
+		"{\{targetatarms=[[0[@{target|at_arms}] ]]}} " +
+		"{\{targetatlegs=[[0[@{target|at_legs}] ]]}} " +
+		"{\{targetdodge=[[0[@{target|db_passivedodge}] ]]}} " +
+		"{\{targetdodgemissile=[[0[@{target|db_passivedodgemissile}] ]]}} " +
+		"{\{targetblock=[[0[@{target|db_passiveblock}] ]]}} " +
+		"{\{targetcritred=[[0[@{target|critreduction}] ]]}} " +
+		"";
+	    startRoll(roll_string, roll => {
+		const tsize = attacks.getDataFromRoll(roll.results.targetsize.expression);
+		const tname = attacks.getDataFromRoll(roll.results.targetname.expression);
+		const athead = attacks.getDataFromRoll(roll.results.targetathead.expression);
+		const attorso= attacks.getDataFromRoll(roll.results.targetattorso.expression);
+		const atarms = attacks.getDataFromRoll(roll.results.targetatarms.expression);
+		const atlegs = attacks.getDataFromRoll(roll.results.targetatlegs.expression);
+		const dodge = attacks.getDataFromRoll(roll.results.targetdodge.expression);
+		const dodgem = attacks.getDataFromRoll(roll.results.targetdodgemissile.expression);
+		const block = attacks.getDataFromRoll(roll.results.targetblock.expression);
+		const critred = attacks.getDataFromRoll(roll.results.targetcritred.expression);
+		let atstr = athead
+		if (athead != attorso || athead != atarms || athead != atlegs) {
+		    atstr = `${attorso},${athead},${atarms},${atlegs}`
+		}
+		console.log(attorso, athead, atarms, atlegs);
+		console.log(dodge, block);
+		const db = Math.max(dodge, block);
+		VsetAttrs({target_at: atstr,
+			target_name: tname,
+			target_db: db,
+			target_size: sizeToNumeric(tsize),
+			target_crit: critred});
+		finishRoll(roll.rollId, { targetname: tname })
+	    });
+    });
 
 
 })();
@@ -9878,7 +9936,7 @@ $20('button.rollbutton').on('mouseleave', (e) => {
 
 
 
-Revision ea4544173bb89b336cb331da6f59caef2c46667f
+Revision f24cf42870595de31b5001a50a2052030fd16245
 
 
 </div>

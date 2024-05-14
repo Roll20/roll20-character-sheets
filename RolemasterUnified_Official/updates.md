@@ -1,3 +1,7 @@
+2024-04-13
+
+- Add support for the targetting button.
+
 2024-05-06
 
 - Attacks:
