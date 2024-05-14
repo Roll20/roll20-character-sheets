@@ -53,9 +53,13 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version">
             </span>
-            <span class="right">5/08/24'</span>
+            <span class="right">5/12/24'</span>
           </h5>
           <ul>
+            <li>Fixed a bug in the Attack Matrix class drop-down selector where the "Cleric, Druid, and Monk" selection incorrectly used the Fighter table data. This was related to last week's change to the class dropdown. Big apologies.</li>
+            <li>Attacks that have the "In-Use" box enabled will auto-fill the global attributes @{weapon_in_use} (shows the weapon's name), @{weapon_in_use_speed} and @{weapon_in_use_misc}. You can see these in the Misc. Attack Info section found just above the repeating attacks. I believe these attributes could be used for those of you that wish to modify/customize their initiative rolls and/or other macros.</li>
+            <li>Added a "Misc." attribute to repeating attacks. @{repeating_weapon_$X_weapon_misc} this attribute will also be used to auto-fill @{weapon_in_use_misc} when the weapon is marked "In-Use".</li>
+            <li>Adjusted roll template to limit the image size to max-height of 100px if placed within the {{subtag}} key. Images posted included within other keys will still have a max-height of 300px.</li>
             <li>Fixed THAC0 table output alignment issue.</li>
             <li>Fixed the Class/Monster dropdown selector in the Attack Matrix to be less confusing.</li>
             <li>The Revised sheet is now live! While roll20 would not permit both versions of the 1e sheet to coexist, they have agreed to deprecate the old sheet. It will remain as-is for anyone that is currently using that sheet in their existing games and could possibly get future updates/changes. It will not show up as an available sheet for new games however. Only the Revised 1e sheet will be listed for new games going forward. Game creators using the old sheet can convert to the Revised sheet if/when they desire by changing the game settings character template to the "Advanced Dungeons & Dragons 1e sheet".</li>
@@ -272,7 +276,8 @@
     </section>
     <!-- NPC/Monster statblock1-4 -->
     <section class="npc-box statblock1">
-      <input type="text" class="height-short text-large left" name="attr_character_name" title="@{character_name}" placeholder="Character Name" style="width: calc(50vw - 3em);min-width:17.5em;" />
+      <input type="checkbox" name="attr_character_name_error" class="hidden toggle-input-error" value="1" checked />
+      <input type="text" class="height-short text-large left" name="attr_character_name" title="@{character_name} | NOTE: Including any non-alpha-numeric characters may break sheet rolls/macros. Underscores, dashes, and apostrophes should also be fine." placeholder="Character Name" style="width: calc(50vw - 3em);min-width:17.5em;" />
       <span class="inline-label">
         <label>
           <span>TYPE:</span>
@@ -357,14 +362,14 @@
           <input type="text" class="width-small" name="attr_hitpoints_max" title="@{hitpoints_max}" value="0" />
         </label>
       </span>
-    <span class="inline-label split" style="margin-left: 15%;">
-      <label class="label-percent">
-        <button class="dice-button text-only btn ui-draggable" type="roll" name="attr_morale-roll" title="%{selected|morale-roll} | NPC Roll" value="@{whisper_npc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Morale Check}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{morale_base}[BASE] + ( ?{Modifier?|0}[MOD] ) ]]%}} {{mod_applied=[[ ?{Modifier?|0} ]]%}}">
-        <span>MORALE</span>
-        </button>
-        <input type="text" class="width-smaller" name="attr_morale_base" title="@{morale_base} | Base is 50%. Adjust +/- per circumstances." value="50">
-      </label>
-    </span>
+      <span class="inline-label split" style="margin-left: 15%;">
+        <label class="label-percent">
+          <button class="dice-button text-only btn ui-draggable" type="roll" name="attr_morale-roll" title="%{selected|morale-roll} | NPC Roll" value="@{whisper_npc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Morale Check}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{morale_base}[BASE] + ( ?{Modifier?|0}[MOD] ) ]]%}} {{mod_applied=[[ ?{Modifier?|0} ]]%}}">
+            <span>MORALE</span>
+          </button>
+          <input type="text" class="width-smaller" name="attr_morale_base" title="@{morale_base} | Base is 50%. Adjust +/- per circumstances." value="50">
+        </label>
+      </span>
       <span class="inline-label split">
         <label>
           <span>% IN LAIR:</span>
@@ -554,10 +559,10 @@
           </select>
         </label>
         <label class="auto-width">
-            <button type="roll" class="dice-button text-only" name="roll_surprise_others-roll" title="%{selected|surprise_others-roll}" value="@{whisper_npc} @{surprise_others_macro_text}">
-              <span>Surprise Others</span>
-            </button>
-            <span>Adj.</span>
+          <button type="roll" class="dice-button text-only" name="roll_surprise_others-roll" title="%{selected|surprise_others-roll}" value="@{whisper_npc} @{surprise_others_macro_text}">
+            <span>Surprise Others</span>
+          </button>
+          <span>Adj.</span>
           <input type="text" class="width-smaller" name="attr_surprise_others_mod" title="@{surprise_others_mod} | The modifier is typically indicated as bonus although the value is SUBTRACTED from the opponents Surprise check." value="0" />
         </label>
       </span>
@@ -569,7 +574,8 @@
     <section class="header-box">
       <!--Details-->
       <div class="heading-box">
-        <input type="text" class="width-fill border text-large" name="attr_character_name" title="@{character_name}" placeholder="Character Name">
+        <input type="checkbox" name="attr_character_name_error" class="hidden toggle-input-error" value="1" checked/>
+        <input type="text" class="width-fill border text-large" name="attr_character_name" title="@{character_name} | NOTE: Including any non-alpha-numeric characters may break sheet rolls/macros. Underscores, dashes, and apostrophes should also be fine." placeholder="Character Name">
         <label class="inline-label">
           <span>Race:</span>
           <input type="text" class="width-fill" name="attr_race" title="@{race}" placeholder="Description" />
@@ -1375,7 +1381,7 @@
               <span>Defensive Notes:</span>
             </button>
           </label>
-            <textarea name="attr_defensive_notes" class="height-short" title="@{defensive_notes}" placeholder="Enter Defensive Notes..."></textarea>
+          <textarea name="attr_defensive_notes" class="height-short" title="@{defensive_notes}" placeholder="Enter Defensive Notes..."></textarea>
         </span>
       </div>
     </section>
@@ -1465,12 +1471,12 @@
           </span>
         </span>
         <span class="details-row">
-            <label class="inline-label width-auto">
-              <button type="roll" name="roll_racial_notes_roll" class="dice-button text-only" title="%{selected|racial_notes_roll}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Racial Notes}} {{freetext=@{racial_notes}}}">
-                <span>Racial Notes:</span>
-              </button>
-            </label>
-            <textarea name="attr_racial_notes" class="height-short" title="@{racial_notes}" placeholder="Enter Racial Notes..."></textarea>
+          <label class="inline-label width-auto">
+            <button type="roll" name="roll_racial_notes_roll" class="dice-button text-only" title="%{selected|racial_notes_roll}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Racial Notes}} {{freetext=@{racial_notes}}}">
+              <span>Racial Notes:</span>
+            </button>
+          </label>
+          <textarea name="attr_racial_notes" class="height-short" title="@{racial_notes}" placeholder="Enter Racial Notes..."></textarea>
         </span>
         <span class="details-row">
           <label class="inline-label width-auto">
@@ -1969,9 +1975,9 @@
         </div>
         <span class="inline-label width-fill">
           <label class="inline-label width-auto">
-          <button type="roll" name="roll_savingthrow_notes_roll" class="dice-button text-only" title="%{selected|savingthrow_notes_roll}" value="@{whisper_pc} &amp;{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Saving Throw Notes}} {{freetext=@{savingthrow_notes}}}">
-            <span>Saving Throw Notes:</span>
-          </button>
+            <button type="roll" name="roll_savingthrow_notes_roll" class="dice-button text-only" title="%{selected|savingthrow_notes_roll}" value="@{whisper_pc} &amp;{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Saving Throw Notes}} {{freetext=@{savingthrow_notes}}}">
+              <span>Saving Throw Notes:</span>
+            </button>
           </label>
           <textarea name="attr_savingthrow_notes" class="height-short" title="@{savingthrow_notes}" placeholder="Resistances, Immunities, Saving Throw adjustments, etc."></textarea>
         </span>
@@ -2044,6 +2050,18 @@
             <input type="text" class="width-smaller" name="attr_dual_pen_secondary" value="0" readonly>
           </label>
         </span>
+        <label class="span-two inline-label" title="@{weapon_in_use} | Current weapon In-Use/Armed.">
+          <span>Weapon In-Use:</span>
+          <input type="text" class="width-large" name="attr_weapon_in_use" value="" placeholder="n/a" readonly />
+        </label>
+        <label class="inline-label" title="@{weapon_in_use_speed} | Weapon Speed Factor.">
+          <span>Weapon Speed:</span>
+          <input type="text" class="width-small" name="attr_weapon_in_use_speed" value="" placeholder="n/a" readonly />
+        </label>
+        <label class="inline-label" title="@{weapon_in_use_misc} | Weapon Misc.">
+          <span>Weapon Misc.:</span>
+          <input type="text" class="width-small" name="attr_weapon_in_use_misc" value="" placeholder="n/a" readonly />
+        </label>
       </div>
       <div class="sect" style="margin: 5px 0 22px 0;">
         <input type="checkbox" class="hidden toggle-to-hit-table" name="attr_toggle_to_hit_table" value="1" />
@@ -2318,7 +2336,7 @@
             <span class="weapons-row2 center">
               <span class="inline-label" style="position: absolute; top: 2.1em;">
                 <input type="checkbox" name="attr_weapon_use" title="@{repeating_weapon_$X_weapon_use} | Weapon is armed." value="1" />
-                <span class="label-under-small">In Use</span>
+                <span class="label-under-small">In-Use</span>
               </span>
               <details class="small-damage">
                 <summary>
@@ -2445,6 +2463,7 @@
                 <input type="text" class="width-small" name="attr_weapon_speed" title="@{repeating_weapon_$X_weapon_speed}" value="" placeholder="-" />
                 <input type="text" class="width-small" name="attr_weapon_length" title="@{repeating_weapon_$X_weapon_length}" value="" placeholder="-" />
                 <input type="text" class="width-small" name="attr_weapon_space" title="@{repeating_weapon_$X_weapon_space}" value="" placeholder="-" />
+                <input type="text" class="width-small" name="attr_weapon_misc" title="@{repeating_weapon_$X_weapon_misc}" value="" placeholder="-" />
                 <h5>Armor Type:</h5>
                 <span>0</span>
                 <span>1</span>
@@ -2464,6 +2483,7 @@
                 <label class="label-under-small">SPD</label>
                 <label class="label-under-small">LEN</label>
                 <label class="label-under-small">SPC</label>
+                <label class="label-under-small">MISC</label>
                 <h5>Adjustment:</h5>
                 <span><input type="text" name="attr_weapon_thac_adj0" title="@{repeating_weapon_$x_weapon_thac_adj0}" value="0" /></span>
                 <span><input type="text" name="attr_weapon_thac_adj1" title="@{repeating_weapon_$x_weapon_thac_adj1}" value="0" /></span>
@@ -2504,8 +2524,8 @@
         <input type="radio" class="tab-hidden tab" name="attr_equipment_tabs_carry" value="-1" checked /><span class="tab">All</span>
       </div>
       <div class="section">
-        <input type="hidden" class="hidden equipment-display-type" name="attr_equipment_tabs_type" value="-1"/>
-        <input type="hidden" class="hidden equipment-display-carry" name="attr_equipment_tabs_carry" value="-1"/>
+        <input type="hidden" class="hidden equipment-display-type" name="attr_equipment_tabs_type" value="-1" />
+        <input type="hidden" class="hidden equipment-display-carry" name="attr_equipment_tabs_carry" value="-1" />
         <span class="equipment-columns column-header">
           <span></span>
           <span>Item</span>
@@ -2704,6 +2724,10 @@
                   <label class="label-under-small hide-melee">
                     <input type="text" class="width-small" name="attr_equipment_weapon_space" title="@{repeating_equipment_$X_equipment_weapon_space}" value="" placeholder="-" />
                     <span>SPC</span>
+                  </label>
+                  <label class="label-under-small hide-melee">
+                    <input type="text" class="width-small" name="attr_equipment_weapon_misc" title="@{repeating_equipment_$X_equipment_weapon_misc}" value="" placeholder="-" />
+                    <span>MISC</span>
                   </label>
                   <label class="label-under-small">
                     <input type="text" class="width-medium" name="attr_equipment_weapon_damagesmallmedium" title="@{repeating_equipment_$X_equipment_weapon_damagesmallmedium}" value="" placeholder="1d4" />
@@ -2915,19 +2939,19 @@
           <span class="inline-label">
             <label class="inline-label" title="@{psionic_attack_modes} | Add Modes as Special Abilities below.">
               <span>Attack Modes:</span>
-              <input type="text" name="attr_psionic_attack_modes" value="" class="width-medium" placeholder="A,B,C,D,E"/>
+              <input type="text" name="attr_psionic_attack_modes" value="" class="width-medium" placeholder="A,B,C,D,E" />
             </label>
             <label class="inline-label" title="@{psionic_defensive_modes} | Add Modes as Special Abilities below.">
               <span>Defensive Modes:</span>
-              <input type="text" name="attr_psionic_defensive_modes" value="" class="width-medium" placeholder="F,G,H,I,J"/>
+              <input type="text" name="attr_psionic_defensive_modes" value="" class="width-medium" placeholder="F,G,H,I,J" />
             </label>
             <label class="inline-label right" title="@{psionic_minor} | Add Disciplines as Special Abilities below."">
               <span>Minor Disciplines:</span>
-              <input type="text" name="attr_psionic_minor" value="0" class="width-smallest" />
+              <input type=" text" name="attr_psionic_minor" value="0" class="width-smallest" />
             </label>
             <label class="inline-label" title="@{psionic_major} | Add Disciplines as Special Abilities below."">
               <span>Major Disciplines:</span>
-              <input type="text" name="attr_psionic_major" value="0" class="width-smallest" />
+              <input type=" text" name="attr_psionic_major" value="0" class="width-smallest" />
             </label>
           </span>
         </div>
@@ -3029,7 +3053,7 @@
     </section>
     <!-- Non Weapon Proficiencies (NWP) -->
     <section class="nonweapon-proficiencies-box">
-      <input type="checkbox" class="sect-show" name="attr_nonweapon_proficiencies_info_show" value="1" style="max-width:18em;"/>
+      <input type="checkbox" class="sect-show" name="attr_nonweapon_proficiencies_info_show" value="1" style="max-width:18em;" />
       <div class="header">NON WEAPON PROFICIENCIES</div><span class="material-icons"></span>
       <div class="sect">
         <span class="nonweapon-proficiencies-row1 column-header">
@@ -3858,7 +3882,7 @@
             <span>Thief Skills:</span>
             <input type="checkbox" name="attr_toggle_thief_skills" value="1" checked />
           </label>
-          <label class="inline-label" title="@{toggle_spells} | Hides the Spells section." >
+          <label class="inline-label" title="@{toggle_spells} | Hides the Spells section.">
             <span>Spells:</span>
             <input type="checkbox" name="attr_toggle_spells" value="1" />
           </label>
@@ -4314,19 +4338,19 @@
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
           {{#damagetype}}<span class="sheet-bold">Type:&nbsp;</span>{{damagetype}}&nbsp;{{/damagetype}}
-          {{#rate}}<span class="sheet-bold">RoF:&nbsp;</span>{{rate}}&nbsp;{{/rate}}
-          {{#range}}<span class="sheet-bold">Range:&nbsp;</span>{{range}}&nbsp;{{/range}}
-          {{#length}}<span class="sheet-bold">Length:&nbsp;</span>{{length}}&nbsp;{{/length}}
-          {{#space}}<span class="sheet-bold">Space:&nbsp;</span>{{space}}&nbsp;{{/space}}
-          {{#speed}}<span class="sheet-bold">Speed:&nbsp;</span>{{speed}}&nbsp;{{/speed}}
-          {{#range}}
-            {{#rollGreater() ammo 0}}
-              {{#ammo}}<span class="sheet-bold">Ammo:&nbsp;</span>{{ammo}}&nbsp;{{/ammo}}
-            {{/rollGreater() ammo 0}}
-            {{#rollTotal() ammo 0}}
-              {{#ammo}}<span class="sheet-bold">No Ammo!</span>&nbsp;{{/ammo}}
-            {{/rollTotal() ammo 0}}
-          {{/range}}
+            {{#rate}}<span class="sheet-bold">RoF:&nbsp;</span>{{rate}}&nbsp;{{/rate}}
+              {{#range}}<span class="sheet-bold">Range:&nbsp;</span>{{range}}&nbsp;{{/range}}
+                {{#length}}<span class="sheet-bold">Length:&nbsp;</span>{{length}}&nbsp;{{/length}}
+                  {{#space}}<span class="sheet-bold">Space:&nbsp;</span>{{space}}&nbsp;{{/space}}
+                    {{#speed}}<span class="sheet-bold">Speed:&nbsp;</span>{{speed}}&nbsp;{{/speed}}
+                      {{#range}}
+                        {{#rollGreater() ammo 0}}
+                          {{#ammo}}<span class="sheet-bold">Ammo:&nbsp;</span>{{ammo}}&nbsp;{{/ammo}}
+                        {{/rollGreater() ammo 0}}
+                        {{#rollTotal() ammo 0}}
+                          {{#ammo}}<span class="sheet-bold">No Ammo!</span>&nbsp;{{/ammo}}
+                        {{/rollTotal() ammo 0}}
+                      {{/range}}
         </span>
       </span>
 
@@ -4572,26 +4596,26 @@
       <span class="sheet-row">
         <span class="sheet-span-two smaller-text">
           {{#nwp_mod_applied}}<span class="sheet-bold">NWP Mod Applied:</span>{{nwp_mod_applied}}&nbsp;{{/nwp_mod_applied}}
-          {{#mod_applied}}<span class="sheet-bold">Mod Applied:</span>{{mod_applied}}&nbsp;{{/mod_applied}}
-          {{#wis_applied}}<span class="sheet-bold">Wis Applied:</span>{{wis_applied}}&nbsp;{{/wis_applied}}
-          {{#dex_adjustment}}<span class="sheet-bold">Dex Adj:</span>{{dex_adjustment}}&nbsp;{{/dex_adjustment}}
-          {{#encumbrance}}<span class="sheet-bold">Encumbrance:</span>{{encumbrance}}&nbsp;{{/encumbrance}}
-          {{#rollTotal() current_encumbrance 0}}
-            {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Normal</span>
-              &nbsp;<span>None</span>{{/current_encumbrance}}
-          {{/rollTotal() current_encumbrance 0}}
-          {{#rollTotal() current_encumbrance 1}}
-            {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Heavy</span>
-              &nbsp;<span>No DEX Bonus to Init.</span>{{/current_encumbrance}}
-          {{/rollTotal() current_encumbrance 1}}
-          {{#rollTotal() current_encumbrance 2}}
-            {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Very Heavy</span>
-              &nbsp;<span>No DEX Bonus to Init, Delayed, +1 Segment if Surprised.</span>{{/current_encumbrance}}
-          {{/rollTotal() current_encumbrance 2}}
-          {{#rollTotal() current_encumbrance 3}}
-            {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Encumbered</span>
-              &nbsp;<span>No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, Enemies get +2 to-hit.</span>{{/current_encumbrance}}
-          {{/rollTotal() current_encumbrance 3}}
+            {{#mod_applied}}<span class="sheet-bold">Mod Applied:</span>{{mod_applied}}&nbsp;{{/mod_applied}}
+              {{#wis_applied}}<span class="sheet-bold">Wis Applied:</span>{{wis_applied}}&nbsp;{{/wis_applied}}
+                {{#dex_adjustment}}<span class="sheet-bold">Dex Adj:</span>{{dex_adjustment}}&nbsp;{{/dex_adjustment}}
+                  {{#encumbrance}}<span class="sheet-bold">Encumbrance:</span>{{encumbrance}}&nbsp;{{/encumbrance}}
+                    {{#rollTotal() current_encumbrance 0}}
+                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Normal</span>
+                        &nbsp;<span>None</span>{{/current_encumbrance}}
+                    {{/rollTotal() current_encumbrance 0}}
+                    {{#rollTotal() current_encumbrance 1}}
+                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Heavy</span>
+                        &nbsp;<span>No DEX Bonus to Init.</span>{{/current_encumbrance}}
+                    {{/rollTotal() current_encumbrance 1}}
+                    {{#rollTotal() current_encumbrance 2}}
+                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Very Heavy</span>
+                        &nbsp;<span>No DEX Bonus to Init, Delayed, +1 Segment if Surprised.</span>{{/current_encumbrance}}
+                    {{/rollTotal() current_encumbrance 2}}
+                    {{#rollTotal() current_encumbrance 3}}
+                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Encumbered</span>
+                        &nbsp;<span>No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, Enemies get +2 to-hit.</span>{{/current_encumbrance}}
+                    {{/rollTotal() current_encumbrance 3}}
         </span>
       </span>
 
@@ -4607,9 +4631,9 @@
         </span>
       {{/freetext}}
       {{#link}}
-        <span class="sheet-row">
-          <span class="sheet-span-two sheet-right">[LINK]({{link}})</span>
-        </span>
+      <span class="sheet-row">
+        <span class="sheet-span-two sheet-right">[LINK]({{link}})</span>
+      </span>
       {{/link}}
       <span class="sheet-row">
         <span class="sheet-template-footer sheet-span-two">{{#footer}}{{footer}}{{/footer}}</span>
@@ -4697,6 +4721,14 @@
     return modifiedAttr;
   };
 
+  // Character Name Validation
+  /*
+  const isAlphaNumeric = (attr) => {
+    // only alpha-numeric characters are allowed
+    return /^[a-zA-Z0-9]+$/.test(attr) ? 1 : 0;
+  };
+  */
+
   // Number Validation
   const numbersOnly = (attr) => {
     // numbers and/or - + symbols before number are allowed
@@ -4716,6 +4748,23 @@
     uniqueids[generated] = true;
     return generated;
   };
+
+  // Validate input for illegal characters
+  /*
+  on('change:character_name', (eventInfo) => {
+    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    getAttrs(['character_name'], (v) => {
+      const output = {};
+      const attr = v[`${eventInfo.sourceAttribute}`];
+      // validate input
+      const isText = isAlphaNumeric(attr);
+      clog(`Valid Input?: ${isText}`);
+      // write to a hidden checkbox in html ie 'X_error', CSS to style
+      output[`${eventInfo.sourceAttribute}_error`] = isText;
+      setAttrs(output, {silent: true});
+    });
+  });
+  */
 
   // Validate input for +/- adjustment
   on(
@@ -4764,41 +4813,42 @@
   );
 
   // Global Variables
-  let versionator = '';
+  let armorDetailsRowidArray;
+  let autoCalcAbilityRows = '';
   let autoCalcSaveRows = '';
   let autoCalcThiefRows = '';
-  let autoCalcAbilityRows = '';
-  let calcRange = '';
-  let calcHP = '';
   let calcAC = '';
-  let damageMacro = '';
-  let strengthCalcs = '';
-  let intelligenceCalcs = '';
-  let wisdomCalcs = '';
-  let dexterityCalcs = '';
-  let constitutionCalcs = '';
+  let calcHP = '';
+  let calcRange = '';
   let charismaCalcs = '';
-  let armorDetailsRowidArray;
+  let climbwallsCalc = '';
+  let constitutionCalcs = '';
+  let damageMacro = '';
+  let dexterityCalcs = '';
+  let findtrapsCalc = '';
+  let hearnoiseCalc = '';
+  let hideinshadowsCalc = '';
+  let intelligenceCalcs = '';
+  let movequietlyCalc = '';
+  let openlocksCalc = '';
+  let pickpocketsCalc = '';
+  let readlanguagesCalc = '';
+  let savebreathweaponsCalc = '';
+  let savemisc1Calc = '';
+  let savemisc2Calc = '';
+  let savemiscCalc = '';
   let saveparalysispoisondeathCalc = '';
   let savepetrificationpolymorphCalc = '';
   let saverodsstaveswandsCalc = '';
-  let savebreathweaponsCalc = '';
   let savespellsCalc = '';
-  let savemiscCalc = '';
-  let savemisc1Calc = '';
-  let savemisc2Calc = '';
-  let pickpocketsCalc = '';
-  let openlocksCalc = '';
-  let findtrapsCalc = '';
-  let movequietlyCalc = '';
-  let hideinshadowsCalc = '';
-  let hearnoiseCalc = '';
-  let climbwallsCalc = '';
-  let readlanguagesCalc = '';
-  let thiefmiscCalc = '';
+  let setSpellsCasterClass = '';
+  let strengthCalcs = '';
   let thiefmisc1Calc = '';
   let thiefmisc2Calc = '';
-  let setSpellsCasterClass = '';
+  let thiefmiscCalc = '';
+  let versionator = '';
+  let weaponInUse = '';
+  let wisdomCalcs = '';
 
   const armorRowIDs = [
     'unarmored_row_id',
@@ -6776,6 +6826,7 @@
         fields.push(section_attribute('weapon', id, 'weapon_length'));
         fields.push(section_attribute('weapon', id, 'weapon_space'));
         fields.push(section_attribute('weapon', id, 'weapon_speed'));
+        fields.push(section_attribute('weapon', id, 'weapon_misc'));
         fields.push(section_attribute('weapon', id, 'weapon_thac_adj0'));
         fields.push(section_attribute('weapon', id, 'weapon_thac_adj1'));
         fields.push(section_attribute('weapon', id, 'weapon_thac_adj2'));
@@ -6825,6 +6876,7 @@
           output[`repeating_weapon_${id}_weapon_length`] = v[section_attribute('weapon', id, 'weapon_length')];
           output[`repeating_weapon_${id}_weapon_space`] = v[section_attribute('weapon', id, 'weapon_space')];
           output[`repeating_weapon_${id}_weapon_speed`] = v[section_attribute('weapon', id, 'weapon_speed')];
+          output[`repeating_weapon_${id}_weapon_misc`] = v[section_attribute('weapon', id, 'weapon_misc')];
           output[`repeating_weapon_${id}_weapon_thac_adj0`] = +v[section_attribute('weapon', id, 'weapon_thac_adj0')] || 0;
           output[`repeating_weapon_${id}_weapon_thac_adj1`] = +v[section_attribute('weapon', id, 'weapon_thac_adj1')] || 0;
           output[`repeating_weapon_${id}_weapon_thac_adj2`] = +v[section_attribute('weapon', id, 'weapon_thac_adj2')] || 0;
@@ -8050,6 +8102,7 @@
         `repeating_equipment_${id}_equipment_weapon_speed`,
         `repeating_equipment_${id}_equipment_weapon_length`,
         `repeating_equipment_${id}_equipment_weapon_space`,
+        `repeating_equipment_${id}_equipment_weapon_misc`,
         `repeating_equipment_${id}_equipment_weapon_damagesmallmedium`,
         `repeating_equipment_${id}_equipment_weapon_damagelarge`,
         `repeating_equipment_${id}_equipment_weapon_attackdmgtype`,
@@ -8066,6 +8119,7 @@
         output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
         output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
         output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
+        output[`repeating_weapon_${newID}_weapon_misc`] = v[`repeating_equipment_${id}_equipment_weapon_misc`];
         output[`repeating_weapon_${newID}_weapon_damagesmallmedium`] = v[`repeating_equipment_${id}_equipment_weapon_damagesmallmedium`];
         output[`repeating_weapon_${newID}_weapon_damagelarge`] = v[`repeating_equipment_${id}_equipment_weapon_damagelarge`];
         output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
@@ -8990,6 +9044,7 @@
       section_attribute('weapon', id, 'weapon_length'),
       section_attribute('weapon', id, 'weapon_space'),
       section_attribute('weapon', id, 'weapon_speed'),
+      section_attribute('weapon', id, 'weapon_misc'),
       section_attribute('weapon', id, 'weapon_thac_adj0'),
       section_attribute('weapon', id, 'weapon_thac_adj1'),
       section_attribute('weapon', id, 'weapon_thac_adj2'),
@@ -9044,6 +9099,7 @@
       output.repeating_weapon_weapon_length = v[section_attribute('weapon', id, 'weapon_length')];
       output.repeating_weapon_weapon_space = v[section_attribute('weapon', id, 'weapon_space')];
       output.repeating_weapon_weapon_speed = v[section_attribute('weapon', id, 'weapon_speed')];
+      output.repeating_weapon_weapon_misc = v[section_attribute('weapon', id, 'weapon_misc')];
       output.repeating_weapon_weapon_thac_adj0 = +v[section_attribute('weapon', id, 'weapon_thac_adj0')] || 0;
       output.repeating_weapon_weapon_thac_adj1 = +v[section_attribute('weapon', id, 'weapon_thac_adj1')] || 0;
       output.repeating_weapon_weapon_thac_adj2 = +v[section_attribute('weapon', id, 'weapon_thac_adj2')] || 0;
@@ -9094,6 +9150,7 @@
       section_attribute('equipment', id, 'equipment_macro_text'),
       section_attribute('equipment', id, 'equipment_weapon_type'),
       section_attribute('equipment', id, 'equipment_weapon_speed'),
+      section_attribute('equipment', id, 'equipment_weapon_misc'),
       section_attribute('equipment', id, 'equipment_weapon_length'),
       section_attribute('equipment', id, 'equipment_weapon_space'),
       section_attribute('equipment', id, 'equipment_weapon_damagesmallmedium'),
@@ -9127,6 +9184,7 @@
       output.repeating_equipment_equipment_macro_text = v[section_attribute('equipment', id, 'equipment_macro_text')];
       output.repeating_equipment_equipment_weapon_type = +v[section_attribute('equipment', id, 'equipment_weapon_type')] || 0;
       output.repeating_equipment_equipment_weapon_speed = v[section_attribute('equipment', id, 'equipment_weapon_speed')];
+      output.repeating_equipment_equipment_weapon_misc = v[section_attribute('equipment', id, 'equipment_weapon_misc')];
       output.repeating_equipment_equipment_weapon_length = v[section_attribute('equipment', id, 'equipment_weapon_length')];
       output.repeating_equipment_equipment_weapon_space = v[section_attribute('equipment', id, 'equipment_weapon_space')];
       output.repeating_equipment_equipment_weapon_damagesmallmedium = v[section_attribute('equipment', id, 'equipment_weapon_damagesmallmedium')];
@@ -9971,16 +10029,16 @@
           output[`thac-8`] = 20;
           output[`thac-7`] = 20;
           output[`thac-6`] = 20;
-          output[`thac-5`] = 20;
-          output[`thac-4`] = 19;
-          output[`thac-3`] = 18;
-          output[`thac-2`] = 17;
-          output[`thac-1`] = 16;
-          output.thac00 = 16;
-          output.thac0 = 15;
-          output.thac1 = 14;
-          output.thac2 = 13;
-          output.thac3 = 12;
+          output[`thac-5`] = 19;
+          output[`thac-4`] = 18;
+          output[`thac-3`] = 17;
+          output[`thac-2`] = 16;
+          output[`thac-1`] = 15;
+          output.thac00 = 14;
+          output.thac0 = 14;
+          output.thac1 = 13;
+          output.thac2 = 12;
+          output.thac3 = 11;
           output.thac4 = 10;
           output.thac5 = 9;
           output.thac6 = 8;
@@ -10061,7 +10119,7 @@
         output.attack_matrix_flag = 0;
       }
       // fighters table
-      if (classSelected === 2 || 6) {
+      if (classSelected === 2 || classSelected === 6) {
         if (levelSelected === 0) {
           output[`thac-10`] = 26;
           output[`thac-9`] = 25;
@@ -11444,6 +11502,7 @@
     });
   });
 
+  // psionic calcs
   on('change:psionic_ability_strength_max change:psionic_attack change:psionic_defense', (eventInfo) => {
     getAttrs(['psionic_ability_strength_max'], (v) => {
       const output = {};
@@ -11452,5 +11511,51 @@
       output.psionic_defense_max = float(strengthMax / 2).toFixed(1);
       setAttrs(output, {silent: true});
     });
+  });
+
+  weaponInUse = (id) => {
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const output = {};
+      const weaponFields = [];
+      const inUseWeaponFields = [
+        `repeating_weapon_${id}_weapon_use`,
+        `repeating_weapon_${id}_weapon_speed`,
+        `repeating_weapon_${id}_weapon_misc`,
+        `repeating_weapon_${id}_weapon_name`,
+      ];
+      const fields = [...weaponFields, ...inUseWeaponFields];
+      idArray.forEach((rowID) => {
+        weaponFields.push(section_attribute('weapon', rowID, 'weapon_use'));
+      });
+      getAttrs(fields, (v) => {
+        const name = v[`repeating_weapon_${id}_weapon_name`];
+        const inUse = +v[`repeating_weapon_${id}_weapon_use`] || 0;
+        const speed = v[`repeating_weapon_${id}_weapon_speed`];
+        const misc = v[`repeating_weapon_${id}_weapon_misc`];
+        // console.log(`~~~~| name:${name} inUse:${inUse} speed factor:${speed} |~~~~`);
+        // reset other rows to unchecked
+        idArray.forEach((rowID) => {
+          output[`repeating_weapon_${rowID}_weapon_use`] = 0;
+        });
+        if (inUse === 0) {
+          output[`repeating_weapon_${id}_weapon_use`] = 0;
+          output.weapon_in_use = '';
+          output.weapon_in_use_speed = '';
+          output.weapon_in_use_misc = '';
+        } else if (inUse === 1) {
+          output[`repeating_weapon_${id}_weapon_use`] = 1;
+          output.weapon_in_use = name;
+          output.weapon_in_use_speed = speed;
+          output.weapon_in_use_misc = misc;
+        }
+        setAttrs(output, {silent: true});
+      });
+    });
+  };
+
+  on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
+    clog(eventInfo.sourceAttribute);
+    const id = eventInfo.sourceAttribute.split('_')[2];
+    weaponInUse(id);
   });
 </script>
