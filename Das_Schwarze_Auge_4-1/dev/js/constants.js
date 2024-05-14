@@ -1,4 +1,15 @@
 /* constants begin */
+const statAttrs = [
+	"MU",
+	"KL",
+	"IN",
+	"CH",
+	"FF",
+	"GE",
+	"KO",
+	"KK"
+];
+
 const combatTechniques = {
 		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
 		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
@@ -53,9 +64,11 @@ const defaultValues = {
 	"KK": 8,
 	"GS": 8,
 
+	"LE": 12,
 	"legrundw": 12,
 	"LE_max": 12,
 
+	"AU": 12,
 	"AU_max": 12,
 	"ausgrundw": 12,
 	"aus_max": 12, // Old attributes kept for compatibility (used in token bars)
@@ -69,6 +82,7 @@ const defaultValues = {
 	"MR": 5,
 	"wundschwelle": 4,
 
+	"AE": 12,
 	"AE_max": 12,
 	"aspgrundw": 12,
 	"asp_max": 12, // Old attributes kept for compatibility (used in token bars)
@@ -294,7 +308,7 @@ const defaultValues = {
 	"reg_sleep_ae_mod_food_restriction": 0,
 	"reg_sleep_ae_mod_homesickness": 0,
 	"reg_sleep_addiction_withdrawal_effect": "0",
-	"reg_sleep_food_restriction_effect": "0",
+	"reg_sleep_food_restriction_effect": 0,
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
 	"reg_sleep_sleep_disorder_trigger": "1d0",
@@ -922,6 +936,16 @@ const regLimitLower = {
 	'ae': 0,
 	'ke': 0
 };
+
+// Astral regeneration-related attributes
+const astralRegenerationAttrs =
+[
+	"sf_regeneration_i",
+	"sf_regeneration_i",
+	"sf_regeneration_ii",
+	"sf_meisterliche_regeneration",
+	"sf_meisterliche_regeneration_leiteigenschaft"
+];
 
 /*
 	Constants for translating (new) internal name to (old) internal name and UI name

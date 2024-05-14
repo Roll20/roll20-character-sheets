@@ -115,7 +115,7 @@ on(
 				regLEKOMod += 0;
 			}
 
-			attrsToChange["reg_sleep_le_ko"] = `@{KO} - (1d20 + (${regLEKOMod}))`;
+			attrsToChange["reg_sleep_le_ko"] = `@{KO} - (1d20cs1cf20 + (${regLEKOMod}))`;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -318,7 +318,7 @@ on(
 				regAEINMod += 0;
 			}
 
-			attrsToChange["reg_sleep_ae_in"] = `@{IN} - (1d20 + (${regAEINMod}))`;
+			attrsToChange["reg_sleep_ae_in"] = `@{IN} - (1d20cs1cf20 + (${regAEINMod}))`;
 
 			safeSetAttrs(attrsToChange);
 		});
@@ -469,15 +469,59 @@ on(
 		});
 });
 
-on(
-	"change:sf_regeneration_i " +
-	"change:sf_regeneration_ii " +
-	"change:sf_meisterliche_regeneration ",
+function generateAEBaseMasterlyRegenerationRoll (statValue) {
+	const func = "generateAEBaseMasterlyRegenerationRoll";
+	debugLog(func, "statValue", statValue);
+
+	var roll = parseInt(statValue) / 3;
+	if (isNaN(roll))
+	{
+		debugLog(func, "statValue cannot be parsed as integer. Using default value.");
+		roll = defaultValues["reg_sleep_ae_base"];
+	} else {
+		roll = DSAround(roll);
+		roll = roll.toString() + "d1cs2cf0";
+	}
+	return roll;
+}
+
+on(statAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
 	function(eventInfo) {
-	safeGetAttrs([
-		"sf_meisterliche_regeneration_leiteigenschaft",
-		"MU", "KL", "IN", "CH", "FF", "GE", "KO", "KK"
-	], function(v) {
+	safeGetAttrs(
+		[
+			...statAttrs,
+			"sf_meisterliche_regeneration",
+			"sf_meisterliche_regeneration_leiteigenschaft"
+		] , function(v) {
+		const func = "Action Listener Masterly Regeneration Principal Stat";
+		debugLog(func, eventInfo, v);
+
+		if (v["sf_meisterliche_regeneration"] === "1")
+		{
+			const source = eventInfo.sourceAttribute.toUpperCase();
+			if (v["sf_meisterliche_regeneration_leiteigenschaft"] === "@{" + source + "}")
+			{
+				const principalStatValue = eventInfo.newValue;
+				var attrsToChange = {};
+				attrsToChange["reg_sleep_ae_base"] = generateAEBaseMasterlyRegenerationRoll(principalStatValue);
+
+				debugLog(func, "attrsToChange", attrsToChange);
+				safeSetAttrs(attrsToChange);
+			}
+		}
+	});
+});
+
+on(astralRegenerationAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			...astralRegenerationAttrs,
+			...statAttrs,
+			"reg_sleep_ae_mod_special_skills"
+		], function(v) {
+		const func = "Action Listener Astral Regeneration";
+		debugLog(func, eventInfo, v);
 		var attrsToChange = {};
 		var regenerationLevel = 0; // 0 to +3
 		const stats = {
@@ -490,10 +534,10 @@ on(
 			"@{KO}": v["KO"], 
 			"@{KK}": v["KK"]
 		};
-		const mainStat = stats[v["sf_meisterliche_regeneration_leiteigenschaft"]];
 		var AEBaseRegenerationRoll = "1d6";
 		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
+		const mainStat = stats[v["sf_meisterliche_regeneration_leiteigenschaft"]];
 
 		if (sourceType === "player") {
 			// Handle changes to degree of astral regeneration
@@ -507,10 +551,10 @@ on(
 				regenerationLevel = 1;
 			} else if (source === "sf_meisterliche_regeneration" && eventInfo.newValue === "1") {
 				regenerationLevel = 3;
-				AEBaseRegenerationRoll = parseInt(mainStat) / 3;
-				AEBaseRegenerationRoll = DSAround(AEBaseRegenerationRoll).toString() + "d1";
 			} else if (source === "sf_meisterliche_regeneration" && eventInfo.newValue === "0") {
 				regenerationLevel = 2;
+			} else {
+				regenerationLevel = v["reg_sleep_ae_mod_special_skills"];
 			}
 
 			// Populate attrsToChange so we don't forget later on
@@ -534,12 +578,14 @@ on(
 					attrsToChange["sf_regeneration_i"] = "1";
 					attrsToChange["sf_regeneration_ii"] = "1";
 					attrsToChange["sf_meisterliche_regeneration"] = "1";
+					AEBaseRegenerationRoll = generateAEBaseMasterlyRegenerationRoll(mainStat);
 					break;
 			}
 			attrsToChange["reg_sleep_ae_base"] = AEBaseRegenerationRoll;
 
 			// Regeneration mod from special skills
 			attrsToChange["reg_sleep_ae_mod_special_skills"] = regenerationLevel;	// regeneration, astral energy, modifier, special skills (Sonderfertigkeiten)
+			debugLog(func, "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
 		}
 	});
@@ -690,19 +736,19 @@ on(
 			"&{template:reg-sleep}",
 			`{{charactername=${values["character_name"]}}}`,
 			`{{le=${values["LE"]}}}`,
-			`{{lebase=[[1d6 + (${values["reg_sleep_le_mod_advantages_disadvantages"]}) + (${values["reg_sleep_le_mod_food_restriction"]}) + (${values["reg_sleep_mod_general"]}) + (${values["reg_sleep_le_mod_general"]})]]}}`,
+			`{{lebase=[[1d6 + [Vor- und Nachteile](${values["reg_sleep_le_mod_advantages_disadvantages"]}) + [Nahrungsrestriktion](${values["reg_sleep_le_mod_food_restriction"]}) + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
 			`{{leko=[[${values["reg_sleep_le_ko"]}]]}}`,
 			"{{leneu=[[0d1]]}}"
 		];
 		const AERoll = [
 			`{{ae=${values["AE"]}}}`,
-			`{{aebase=[[${values["reg_sleep_ae_base"]} + (${values["reg_sleep_ae_mod_advantages_disadvantages"]}) + (${values["reg_sleep_ae_mod_homesickness"]}) + (${values["reg_sleep_ae_mod_food_restriction"]}) + (${values["reg_sleep_ae_mod_special_skills"]}) + (${values["reg_sleep_mod_general"]}) + (${values["reg_sleep_ae_mod_general"]})]]}}`,
+			`{{aebase=[[${values["reg_sleep_ae_base"]} + [Vor- und Nachteile](${values["reg_sleep_ae_mod_advantages_disadvantages"]}) + [Heimwehkrank](${values["reg_sleep_ae_mod_homesickness"]}) + [Nahrungsrestriktion](${values["reg_sleep_ae_mod_food_restriction"]}) + [Sonderfertigkeiten](${values["reg_sleep_ae_mod_special_skills"]}) + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für AE-Regeneration](${values["reg_sleep_ae_mod_general"]})]]}}`,
 			`{{aein=[[${values["reg_sleep_ae_in"]}]]}}`,
 			"{{aeneu=[[0d1]]}}"
 		];
 		const KERoll = [
 			`{{ke=${values["KE"]}}}`,
-			`{{kebase=[[1d1 + (${values["reg_sleep_ke_mod_general"]})]]}}`,
+			`{{kebase=[[1d1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
 			"{{keneu=[[0d1]]}}"
 		];
 		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}";
@@ -786,12 +832,12 @@ on(
 		// Modifications if fixed regeneration
 		if (values["reg_sleep_le_fixed"] !== "off")
 		{
-			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=${values["reg_sleep_le_fixed"]}}}`;
+			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=[[${values["reg_sleep_le_fixed"]}d1]]}}`;
 			roll[roll.findIndex(value => /leko=/.test(value))] = "{{leko=[[0d1]]}}";
 		}
 		if (values["reg_sleep_ae_fixed"] !== "off")
 		{
-			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=${values["reg_sleep_ae_fixed"]}}}`;
+			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=[[${values["reg_sleep_ae_fixed"]}d1]]}}`;
 			roll[roll.findIndex(value => /aein=/.test(value))] = "{{aein=[[0d1]]}}";
 		}
 		safeSetAttrs({"reg_sleep_roll": roll.join(" ")});
@@ -1005,13 +1051,18 @@ on('clicked:reg_sleep-action', async (info) => {
 				)
 			)
 			{
-				LERegTotal -= results["leschlafstoerung"]["result"];
+				// Roll is positive, but convention dictates regenerations reductions to be negative
+				results["leschlafstoerung"]["result"] = -results["leschlafstoerung"]["result"];
+				LERegTotal += results["leschlafstoerung"]["result"];
 			}
 			if (results.hasOwnProperty("schlafwandeln"))
 			{
 				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
 		} else {
+			// required for roll template
+			results["lebase"] = { "result": parseInt(values["reg_sleep_le_fixed"]) };
+			computed["leko"] = 0;
 			LERegTotal = parseInt(values["reg_sleep_le_fixed"]);
 		}
 		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
@@ -1025,10 +1076,10 @@ on('clicked:reg_sleep-action', async (info) => {
 
 		// AE Regeneration
 		var AERegTotal = 0;
+		var AEneu = parseInt(values["AE"]);
+
 		if (results["aebase"])
 		{
-			var AEneu = parseInt(values["AE"]);
-
 			if (values["reg_sleep_ae_fixed"] === "off")
 			{
 				// Additional regeneration from IN check
@@ -1055,13 +1106,18 @@ on('clicked:reg_sleep-action', async (info) => {
 					)
 				)
 				{
-					AERegTotal -= results["aeschlafstoerung"]["result"];
+					// Roll is positive, but convention dictates regenerations reductions to be negative
+					results["aeschlafstoerung"]["result"] = -results["aeschlafstoerung"]["result"];
+					AERegTotal += results["aeschlafstoerung"]["result"];
 				}
 				if (results.hasOwnProperty("schlafwandeln"))
 				{
 					AERegTotal += parseInt(results["schlafwandeln"]["result"]);
 				}
 			} else {
+				// required for roll template
+				results["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
+				computed["aein"] = 0;
 				AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
 			}
 			computed["aeneu"] = attrsToChange["AE"];
@@ -1089,6 +1145,37 @@ on('clicked:reg_sleep-action', async (info) => {
 				attrsToChange["KE"] = KEneu;
 			}
 			computed["keneu"] = KEneu;
+		}
+
+		// Prettify certain output
+		{
+			let useComputed = [
+				"leko",
+				"aein"
+			];
+			let useResults = [
+				"lebase",
+				"aebase",
+				"kebase",
+				"nahrungsrestriktion",
+				"leschlafstoerung",
+				"aeschlafstoerung",
+				"schlafwandeln"
+			];
+			for (let part of useComputed)
+			{
+				if (computed.hasOwnProperty(part))
+				{
+					computed[part] = prettifyMod(computed[part]);
+				}
+			}
+			for (let part of useResults)
+			{
+				if (results.hasOwnProperty(part))
+				{
+					computed[part] = prettifyMod(parseInt(results[part].result));
+				}
+			}
 		}
 
 		debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
