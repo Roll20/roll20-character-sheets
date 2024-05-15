@@ -24,8 +24,8 @@ characteristics.brawlDamage.forEach((attr) => {
       //Brawl Damage =  (STR+SIZ)/6
       const damage = round(total(values) / 6);
       setAttrs({
-        brawl_damage: damage,
-        brawl_damage_open: round(damage / 2),
+        brawling_damage: damage,
+        brawling_damage_open: round(damage / 2),
       });
     });
   });
