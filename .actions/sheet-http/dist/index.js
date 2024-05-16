@@ -32075,6 +32075,7 @@ const core = __importStar(__nccwpck_require__(1163));
 const processSheet_1 = __nccwpck_require__(6947);
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Action Start");
+    console.log("\n");
     const files = core.getInput("file-list").split(core.getInput("separator"));
     console.log("Changed Files in last push: ", files, "\n\n\n");
     const sheet_wrk_space = [];
@@ -32248,6 +32249,9 @@ const processMetaData = (sheetName, jsonObj) => __awaiter(void 0, void 0, void 0
     optionsHash["legacy_sanitization"] = jsonObj.legacy ? jsonObj.legacy : false;
     optionsHash["advanced"] = jsonObj.advanced ? jsonObj.advanced : false;
     optionsHash["printable"] = jsonObj.printable;
+    optionsHash["requestedsize"] = jsonObj.requestedsize
+        ? jsonObj.requestedsize
+        : "";
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
         sheet_folder: sheetName,
@@ -32398,13 +32402,13 @@ const getSettings = () => {
     // Env vars are a mess in the way we have github actions.
     // Going to just use the branch as our test.
     let branch = github.context.ref.replace("refs/heads/", "");
-    let repoName = github.context.repo.repo;
+    let repo = github.context.repo.repo;
     let retval = {};
-    if (["staging"].includes(branch)) {
+    if (["staging", "feature/CSC-2163"].includes(branch)) {
         retval = {
             apiKey: process.env["STAGING_API_KEY"],
             sheetHttpUrl: "https://sheet-http.staging.roll20preflight.net",
-            repoName: repoName,
+            repoName: repo,
             simulate: false,
         };
     }
@@ -32412,7 +32416,7 @@ const getSettings = () => {
         retval = {
             apiKey: process.env["PRODUCTION_API_KEY"],
             sheetHttpUrl: "https://sheet-http.production.roll20preflight.net",
-            repoName: repoName,
+            repoName: repo,
             simulate: false,
         };
     }
