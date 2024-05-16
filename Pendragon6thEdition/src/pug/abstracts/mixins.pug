@@ -1,6 +1,6 @@
 - const templateHeader = name => `&{template:rolls} {{header=^{${name}}}}`
-- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Mod.|0}),0}kl1)]]}}`
-- const damageForumla = attrName => `{{damage=[[(@{${attrName}}+(?{Mod.|0}))d6]]}}`;
+- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Modifier|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Modifier|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Modifier|0}),0}kl1)]]}}`
+- const damageFormula = attrName => `{{damage=[[(@{${attrName}}+(?{Modifier|0}))d6]]}}`;
 - const buttonName = name => name.replace(/ /g, '-');
 - const attrName = name => name.replace(/ /g, '_');
 
@@ -35,21 +35,21 @@ mixin rollButton(name)
   button.capitalize(data-i18n=name title=name name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${rollFormula(attrName(name))}`)
 
 mixin squireButton(name)
-  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=^{squire} ^{skill}}} ${rollFormula(attrName(`${name}`))}`) t
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader("squire")}  ^{skill}}} ${rollFormula(attrName(`${name}`))}`) t
 
 mixin damageButton(name, i18n)
   - i18n = i18n ? i18n : name
-  button.capitalize(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${damageForumla(attrName(name))}`)
+  button.capitalize(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${damageFormula(attrName(name))}`)
 
 mixin brawlDamageRollButton(name, i18n)
   - i18n = i18n ? i18n : name
-  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} ${templateHeader(i18n)} (Damage)}} {{damage=[[(@{${attrName(name)}}+(?{Mod.|0}))]]}}`) t
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(i18n)} ${rollFormula("brawling")} {{damage=[[(@{${attrName(name)}}+(?{Modifier|0}))]]}}`) t
 
 mixin repeatingRollButton(name)
   button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula(attrName(name))}`) t
 
 mixin repeatingAttackRollButton(name)
-  button.d20.capitalize(name=`roll_damage` type='roll' value!=`&{template:rolls} {{header=@{name} (Damage)}} {{damage=[[(@{damage}+(?{Mod.|0}))]]}}`) t
+  button.d20.capitalize(name=`roll_attack` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula("skill")} ${damageFormula("damage")}`) t
 
 mixin tabButtons(value, className, selected)
   - const selectedKeyWord = selected ? 'selected' : ''
