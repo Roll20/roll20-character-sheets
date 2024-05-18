@@ -14,25 +14,90 @@ mixin ability(asset, ability, number, name)
       )
     - var translationAbility = `asset-${name}-ability-${number}`
     - var assetBodyPlaceholder=translation[translationAbility]
-    .asset-ability
-      div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
-      if ability.Input
-        each field in ability.Input
-          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field)}`
-          span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
-          input.border-bottom.no-border(type='text' name=`attr_ability_field${field}` value='')
+    - var hasClock = ability.Inputs?.find((field) => {  return field['Input Type'] === 'Clock' })
+    if hasClock
+      .asset-ability.flex
+        +ability-inputs(asset, ability, number, name, translationAbility, assetBodyPlaceholder)
+    else
+      .asset-ability
+        +ability-inputs(asset, ability, number, name, translationAbility, assetBodyPlaceholder)
 
-mixin description(asset, key)
-  .asset-description
-    - var translationDesc = `asset-${key}-description`
-    .asset-description-text(data-i18n=translationDesc) !{translation[translationDesc]}
+mixin ability-inputs(asset, ability, number, name, translationAbility, assetBodyPlaceholder)
+  div.i18n-text(data-i18n=translationAbility) !{assetBodyPlaceholder}
+  if ability.Inputs
+    each field in ability.Inputs
+      if field['Input Type'] === 'Text'
+        - var translationAbilityField = `asset-${name}-ability-${number}-${_.kebabCase(field.Name)}`
+        span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
+        input.border-bottom.no-border(type='text' name=`attr_ability_field${_.kebabCase(field.Name)}` value='')
+      if field['Input Type'] === 'Clock'
+        +clock(field, name)
+      if field['Input Type'] === 'Number'
+        //- +number(field, name)
+        - var translationAbilityField = `asset-${name}-ability-${number}-${_.kebabCase(field.Name)}`
+        span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField) !{translation[translationAbilityField]}
+        input.border-bottom.no-border(type='text' name=`attr_ability_field${_.kebabCase(field.Name)}` value='')
+
+mixin requirement(asset, key)
+  .asset-requirement
+    - var translationDesc = `asset-${key}-requirement`
+    .asset-requirement-text(data-i18n=translationDesc) !{translation[translationDesc]}
 
 mixin field(field, assetName)
   .write-in-container
     .i18n-text.asset-write-in.asset-name(
-      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field)}`
-    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field)}`]
-    input.border-bottom.no-border(type='text' name=`attr_field-${field}` value='')
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`]
+    input.border-bottom.no-border(type='text' name=`attr_field-${_.kebabCase(field.Name)}` value='')
+
+mixin clock(field, assetName)
+  .harm-section
+    if field.Segments === 4
+      .grid-4
+        label(class="segment-grid segment-1")
+          input(type="checkbox" name="attr_clock_1" class=`hide-element segment-input segment-input-1`)
+          .segment-background.segment-background-1
+        label(class="segment-grid segment-2")
+          input(type="checkbox" name="attr_clock_2" class=`hide-element segment-input segment-input-2`)
+          .segment-background.segment-background-2
+        label(class="segment-grid segment-3")
+          input(type="checkbox" name="attr_clock_3" class=`hide-element segment-input segment-input-3`)
+          .segment-background.segment-background-3
+        label(class="segment-grid segment-4")
+          input(type="checkbox" name="attr_clock_4" class=`hide-element segment-input segment-input-4`)
+          .segment-background.segment-background-4
+
+    if field.Segments === 6
+      .clock
+        .hex-container-6
+          label(class="segment-hex segment-1")
+            input(type="checkbox" name="attr_clock_6" class=`hide-element hex-input hex-input-1`)
+            .hex-background.hex-background-1
+          label(class="segment-hex segment-2")
+            input(type="checkbox" name="attr_clock_1" class=`hide-element hex-input hex-input-2`)
+            .hex-background.hex-background-2
+          label(class="segment-hex segment-3")
+            input(type="checkbox" name="attr_clock_5" class=`hide-element hex-input hex-input-3`)
+            .hex-background.hex-background-3
+          label(class="segment-hex segment-0")
+            .hex-background.hex-background-0
+          label(class="segment-hex segment-4")
+            input(type="checkbox" name="attr_clock_2" class=`hide-element hex-input hex-input-4`)
+            .hex-background.hex-background-4
+          label(class="segment-hex segment-5")
+            input(type="checkbox" name="attr_clock_4" class=`hide-element hex-input hex-input-5`)
+            .hex-background.hex-background-5
+          label(class="segment-hex segment-6")
+            input(type="checkbox" name="attr_clock_3" class=`hide-element hex-input hex-input-6`)
+            .hex-background.hex-background-6
+
+//- TODO: Turn into number field
+mixin number(field, assetName)
+  .write-in-container
+    .i18n-text.asset-write-in.asset-name(
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field.Name)}`]
+    input.border-bottom.no-border(type='text' name=`attr_field-${_.kebabCase(field.Name)}` value='')
 
 mixin track(track, assetName)
   .asset-track-wrapper
@@ -47,21 +112,20 @@ mixin track(track, assetName)
         - currentTrack++
 
 mixin assetTemplate(asset, options)
-  - let id = asset.id
-  - let name = `${id.replace(/asset-/i, "")}`
-  - let category = _.kebabCase(asset["Asset Type"])
+  - let name = _.kebabCase(asset.Name)
+  - let category = _.kebabCase(asset["Asset Type"].replace('Starforged/Assets/', '').replace('_', ' '))
   if options.visiblityToggle === true
     input(class=`${options.classes} asset-${name} asset-toggle` type='checkbox' name=`attr_${name}`)
   div(class=`${options.classes} asset-card asset-${name} category-${category}`)
     .asset-content-header
       .asset-details
-        .category=asset["Asset Type"]
+        .category=asset["Asset Type"].replace('Starforged/Assets/', '')
         span.asset-name=asset.Name
       .background-svg
-    if asset.Description
-      +description(asset, name)
-    if asset.Input
-      each field in asset.Input
+    if asset.Requirement
+      +requirement(asset, name)
+    if asset.Inputs
+      each field in asset.Inputs
         +field(field, name)
     .flex-wrapper
       each ability, index in asset.Abilities
@@ -76,11 +140,11 @@ mixin genericAssetBuilder(assetsArray, listId)
   datalist(id=listId)
     - console.log("Generating", assetsArray.length, "assets")
     each asset in assetsArray
-      - let assetNameClass = asset.id.replace(/asset-/i, "")
-      - console.log("Generating", asset.id)
+      - let assetId = asset.Name.replace(" ", "-").toLowerCase()
+      - console.log("Generating", assetId)
       //- generates classes and outputs to stdout
-      //- - console.log(`input[type=checkbox].${assetNameClass}:checked ~ div.${assetNameClass},`)
-      option.i18n-text(data-i18n=`${asset.id}-name` value=assetNameClass) !{translation[`${asset.id}-name`]}
+      //- - console.log(`input[type=checkbox].${assetId}:checked ~ div.${assetId},`)
+      option.i18n-text(data-i18n=`asset-${assetId}-name` value=assetId) !{translation[`asset-${assetId}-name`]}
     option.i18n-text(data-i18n=`asset-custom-name` value='custom') !{translation["asset-custom-name"]}
 
   //- Asset Content

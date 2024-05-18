@@ -1,96 +1,79 @@
 /* Use ChatSetAttr mod to set attributes from chat https://github.com/Roll20/roll20-api-scripts/tree/master/ChatSetAttr#readme */
-/* Track attribute _current changes */
+
+/* Listen for attribute _current changes */
 on('change:attribute:current', function(obj, prev) {
-    let prevVal = prev.current;
-    let newVal = parseInt(obj.get('current'));
-    if(newVal != prevVal) {
-        let targetChars = [];
-        let allCharacters = findObjs({
-            _type: 'character',
-            archived: false
-        }, {caseInsensitive: true});
-        let originChar = getObj('character', obj.get('_characterid'));
-        let originCharName = originChar.get('name');
-        let npcOwner = getAttrByName(originChar.id, 'npc_owner');
-        let sheetType = getAttrByName(originChar.id, 'sheet_type');
-        
-        /* In case of tenacity_current attribute, set the same value to every character with common owner */
-        if(obj.get('name') == 'tenacity_current') {
-            log(`sheet_type = ${sheetType}, npc_owner = ${npcOwner}`);
-            log(`\'${obj.get('name')}\' of character \'${originChar.get('name')}\' changed from ${prevVal} to ${newVal}`);
-            if(sheetType == 'pc') {
-                if(originCharName) {
-                    allCharacters.forEach(char => {
-                        if(getAttrByName(char.id, 'npc_owner') == originCharName){
-                            targetChars.push(char.get('name'));
-                        }
-                    });
-                }
-            }else if (sheetType == 'npc') {
-                if(npcOwner) {
-                    allCharacters.forEach(char => {
-                        if(getAttrByName(char.id, 'npc_owner') == npcOwner){
-                            targetChars.push(char.get('name'));
-                        }
-                    });
-                    if(findObjs({ type: 'character', name: npcOwner })[0]) {
-                        targetChars.push(npcOwner);
-                    }
-                }
-            }
-            
-            if(Array.isArray(targetChars) && targetChars.length){
-                sendChat('API', `!setattr --name ${targetChars} --tenacity_current|${newVal} --silent --nocreate`, null, {noarchive:true} );
-                log(`!setattr --name ${targetChars} --tenacity_current|${newVal} --silent --nocreate`);
-            }
-        }
+    if(obj.get('name') === 'tenacity_current') {
+        setTenacity(obj, prev, false);
+    }
+});
+/* Listen for attribute _max changes */
+on('change:attribute:max', function(obj, prev) {
+    if(obj.get('name') === 'tenacity_current') {
+        setTenacity(obj, prev, true);
     }
 });
 
-/* Track attribute _max changes */
-on('change:attribute:max', function(obj, prev) {
-    let prevVal = prev.max;
-    let newVal = parseInt(obj.get('max'));
-    if(newVal != prevVal) {
-        let targetChars = [];
-        let allCharacters = findObjs({
+/* When 'tenacity' attribute of NPC or PC changes, update this value in all sheets connected by 'npc_owner') */
+function setTenacity(obj, prev, isMax) {
+    var prevVal, newVal = 0;
+    if(isMax){
+        prevVal = parseInt(prev.max)||0;
+        newVal = parseInt(obj.get('max'))||0;
+    }else {
+        prevVal = parseInt(prev.current)||0;
+        newVal = parseInt(obj.get('current'))||0;
+    }
+    if(newVal !== prevVal) {
+        var targetChars = [];
+        var allCharacters = findObjs({
             _type: 'character',
             archived: false
         }, {caseInsensitive: true});
-        let originChar = getObj('character', obj.get('_characterid'));
-        let originCharName = originChar.get('name');
-        let npcOwner = getAttrByName(originChar.id, 'npc_owner');
-        let sheetType = getAttrByName(originChar.id, 'sheet_type');
+        var originChar = getObj('character', obj.get('_characterid'));
+        var originCharName = originChar.get('name');
+        var sheetType = getAttrByName(originChar.id, 'sheet_type');
+        var npcOwner = getAttrByName(originChar.id, 'npc_owner');
         
-        /* In case of tenacity_current_max attribute, set the same value to every character with common owner */
-        if(obj.get('name') == 'tenacity_current') {
-            log(`sheet_type = ${sheetType}, npc_owner = ${npcOwner}`);
-            log(`\'${obj.get('name')}\' (max) of character \'${originChar.get('name')}\' changed from ${prevVal} to ${newVal}`);
-            if(sheetType == 'pc') {
-                if(originCharName) {
-                    allCharacters.forEach(char => {
-                        if(getAttrByName(char.id, 'npc_owner') == originCharName){
-                            targetChars.push(char.get('name'));
-                        }
-                    });
+        log(`sheet_type = \'${sheetType}\', npc_owner = \'${npcOwner}\'`);
+        if(isMax) {
+            log(`\'${obj.get('name')}\' (max) of character \'${originCharName}\' changed from ${prevVal} to ${newVal}`);
+        }else {
+            log(`\'${obj.get('name')}\' of character \'${originCharName}\' changed from ${prevVal} to ${newVal}`);
+        }
+
+        if((sheetType === 'pc') && originCharName) {
+            /* If PC, add ID of every character owned by this PC to array */
+            allCharacters.forEach(char => {
+                if(getAttrByName(char.id, 'npc_owner') === originCharName){
+                    targetChars.push(char.id);
                 }
-            }else if (sheetType == 'npc') {
-                if(npcOwner) {
-                    allCharacters.forEach(char => {
-                        if(getAttrByName(char.id, 'npc_owner') == npcOwner){
-                            targetChars.push(char.get('name'));
-                        }
-                    });
-                    if(findObjs({ type: 'character', name: npcOwner })[0]) {
-                        targetChars.push(npcOwner);
-                    }
+            });
+        }else if ((sheetType === 'npc') && npcOwner) {
+            /* If NPC, add ID of every character with same owner to array */
+            allCharacters.forEach(char => {
+                if(getAttrByName(char.id, 'npc_owner') === npcOwner){
+                    targetChars.push(char.id);
                 }
-            }
-            
-            if(Array.isArray(targetChars) && targetChars.length){
-                sendChat('API', `!setattr --name ${targetChars} --tenacity_current||${newVal} --silent --nocreate`, null, {noarchive:true} );
-                log(`!setattr --name ${targetChars} --tenacity_current||${newVal} --silent --nocreate`);
+            });
+            /* 
+             * If character sheet with same name as 'npc_owner' exists, add its ID to array
+             * If there are multiple sheets with the same name, add their IDs too just in case
+             */
+            _.each(allCharacters, function(obj) {
+                if(obj.get('name') === npcOwner) {
+                    targetChars.push(obj.id);
+                }
+            });
+        }
+        
+        if(Array.isArray(targetChars) && targetChars.length){
+            if(isMax){
+                log(`!setattr --charid ${targetChars} --tenacity_current||${newVal} --silent --nocreate`);
+                sendChat('API', `!setattr --charid ${targetChars} --tenacity_current||${newVal} --silent --nocreate`, null, {noarchive:true} );
+            }else {
+                log(`!setattr --charid ${targetChars} --tenacity_current|${newVal} --silent --nocreate`);
+                sendChat('API', `!setattr --charid ${targetChars} --tenacity_current|${newVal} --silent --nocreate`, null, {noarchive:true} );
             }
         }
     }
-});
+}

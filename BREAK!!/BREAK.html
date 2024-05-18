@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+
+<script type="text/worker">
+	// Worker
+	//tabs handler
+	const buttonlist = ["stats","notes"];
+	buttonlist.forEach(button => {
+		on(`clicked:${button}`, function() {
+			setAttrs({
+				sheetTab: button
+			});
+		});
+	});
+
+	on("change:might_base change:might_trait change:might_modifier change:size", function() {
+		getAttrs(["might_base", "might_trait", "might_modifier", "size"], function(values) {
+			var output = {};
+			var might_total = 0;
+
+			might_total = parseInt(values["might_base"])||6;
+			might_total += parseInt(values["might_trait"])||0;
+			might_total += parseInt(values["might_modifier"])||0;
+
+			switch (values["size"]) {
+				case "0":
+					might_total -= 1;
+					break;
+				case "2":
+					might_total += 1;
+					break;
+			}
+
+			output["might_total"] = might_total;
+
+			for (let i = 1; i <= 20; i++) {
+				output[`mightSquare${i}`] = (i <= might_total) ? 1 : 0;
+			}
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:deftness_base change:deftness_trait change:deftness_modifier change:size", function() {
+		getAttrs(["deftness_base", "deftness_trait", "deftness_modifier", "size"], function(values) {
+			var output = {};
+			var deftness_total = 0;
+
+			deftness_total = parseInt(values["deftness_base"])||6;
+			deftness_total += parseInt(values["deftness_trait"])||0;
+			deftness_total += parseInt(values["deftness_modifier"])||0;
+			deftness_total += values["size"] == "0" ? 1 : 0;
+
+			output["deftness_total"] = deftness_total;
+
+			for (let i = 1; i <= 20; i++) {
+				output[`deftnessSquare${i}`] = (i <= deftness_total) ? 1 : 0;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:grit_base change:grit_trait change:grit_modifier", function() {
+		getAttrs(["grit_base", "grit_trait", "grit_modifier"], function(values) {
+			var output = {};
+			var grit_total = 0;
+
+			grit_total = parseInt(values["grit_base"])||6;
+			grit_total += parseInt(values["grit_trait"])||0;
+			grit_total += parseInt(values["grit_modifier"])||0;
+
+			output["grit_total"] = grit_total;
+
+			for (let i = 1; i <= 20; i++) {
+				output[`gritSquare${i}`] = (i <= grit_total) ? 1 : 0;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:insight_base change:insight_trait change:insight_modifier", function() {
+		getAttrs(["insight_base", "insight_trait", "insight_modifier"], function(values) {
+			var output = {};
+			var insight_total = 0;
+
+			insight_total = parseInt(values["insight_base"])||6;
+			insight_total += parseInt(values["insight_trait"])||0;
+			insight_total += parseInt(values["insight_modifier"])||0;
+
+			output["insight_total"] = insight_total;
+
+			for (let i = 1; i <= 20; i++) {
+				output[`insightSquare${i}`] = (i <= insight_total) ? 1 : 0;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:aura_base change:aura_trait change:aura_modifier", function() {
+		getAttrs(["aura_base", "aura_trait", "aura_modifier"], function(values) {
+			var output = {};
+			var aura_total = 0;
+
+			aura_total = parseInt(values["aura_base"])||6;
+			aura_total += parseInt(values["aura_trait"])||0;
+			aura_total += parseInt(values["aura_modifier"])||0;
+
+			output["aura_total"] = aura_total;
+
+			for (let i = 1; i <= 20; i++) {
+				output[`auraSquare${i}`] = (i <= aura_total) ? 1 : 0;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:attack_bonus change:attack_bonus_modifier", function() {
+		getAttrs(["attack_bonus", "attack_bonus_modifier"], function(values) {
+			var output = {};
+			const base = parseInt(values["attack_bonus"])||0;
+			const modifier = parseInt(values["attack_bonus_modifier"])||0;
+
+			var total = base + modifier;
+
+			output["attack_bonus_total"] = total;
+			output["attack_bonus_withPlus"] = "+" + total;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+
+	function Max(values) {
+		if (values.length == 0)
+		return 0;
+		var max = values[0];
+		for (var i = 1; i < values.length; i++) {
+			if (values[i] > max)
+				max = values[i];
+			}
+		return max;
+	}
+
+	function GetClosest(values, attribute, modifier) {
+		// Generate the dice array
+		var dice = [];
+		attribute = parseInt(attribute)||0;
+		modifier = parseInt(modifier)||0;
+
+		for (var i = 0; i < values.length; i++) {
+			values[i] = parseInt(values[i])||20;
+			// Compute the final modifier to apply to each roll
+			var finalModifier = 0;
+			if (modifier < 0) {
+				finalModifier = (values[i] - modifier > attribute) ? -modifier : modifier;
+			} else {
+				if (values[i] > attribute) {
+					finalModifier = Max([-modifier, attribute - values[i]]);
+				} else if (values[i] <= attribute) {
+					finalModifier = Max([modifier, values[i] - attribute]);
+				}
+			}
+
+			// Add the dice to the array
+			dice.push({
+				original: values[i],
+				result: values[i] + finalModifier,
+				index: i,
+				diff: attribute - (values[i] + finalModifier),
+				success: (values[i] + finalModifier) <= attribute
+			});
+		}
+
+		// If there is a critical, select it
+		var anyCrit = dice.some((die) => die.original == attribute);
+		var succi = dice.filter((die) => die.success);
+		var fails = dice.filter((die) => !die.success);
+		if (anyCrit)
+			return {
+				selected: dice.find((die) => die.original == attribute),
+				dice: dice,
+				succi: succi,
+				fails: fails
+			};
+
+		// Select dice with success and the closest result
+		if (succi.length > 0) {
+			succi.sort((a, b) => a.diff - b.diff);
+			return {selected: succi[0], dice: dice, succi: succi, fails: fails};
+		} else {
+			dice.sort((a, b) => b.diff - a.diff);
+			return {selected: dice[0], dice: dice, succi: succi, fails: fails};
+		}
+	}
+
+
+	function GetFarthest(values, attribute, modifier) {
+		// Generate the dice array
+		var dice = [];
+		attribute = parseInt(attribute)||0;
+		modifier = parseInt(modifier)||0;
+
+		for (var i = 0; i < values.length; i++) {
+			values[i] = parseInt(values[i])||20;
+			// Compute the final modifier to apply to each roll
+			var finalModifier = 0;
+			if (modifier < 0) {
+				finalModifier = (values[i] - modifier > attribute) ? -modifier : modifier;
+			} else {
+				if (values[i] > attribute && values[i] - modifier <= attribute) {
+					finalModifier = attribute - values[i];
+				} else if (values[i] > attribute && values[i] - modifier > attribute) {
+					finalModifier = -modifier;
+				} else if (values[i] <= attribute) {
+					finalModifier = Max([modifier, values[i] - attribute]);
+				}
+			}
+
+
+			// Add the dice to the array
+			dice.push({
+				original: values[i],
+				result: values[i] + finalModifier,
+				index: i,
+				diff: attribute - (values[i] + finalModifier),
+				success: values[i] + finalModifier <= attribute
+			});
+		}
+
+		// If there is a fumble, select it
+		var anyFumble = dice.some((die) => die.original == 20);
+		var succi = dice.filter((die) => die.success);
+		var fails = dice.filter((die) => !die.success);
+		if (anyFumble)
+			return {
+				selected: dice.find((die) => die.original == 20),
+				dice: dice,
+				succi: succi,
+				fails: fails
+			};
+
+		// Select dice with success and the closest result
+		if (fails.length > 0) {
+			fails.sort((a, b) => b.result - a.result);
+			return {selected: fails[0], dice: dice};
+		} else {
+			dice.sort((a, b) => a.result - b.result);
+			if (dice.filter((die) => die.diff == 0).some((die) => die.original == attribute))
+				return {selected: dice.find((die) => die.diff == 0 && die.original == attribute), dice: dice};
+			else
+				return {selected: dice[0], dice: dice};
+			}
+	}
+
+	function ComputeOneDieResult(value, attribute, modifier) {
+		// In case of a critical or a fumble, we don't care about the modifier
+
+		// Critical
+		if (value == attribute) {
+			return {total: value, result: "Critical!"};
+		}
+		// Fumble
+		else if (value == 20) {
+			return {total: value, result: "Fumble…"};
+		}
+		// Failure before modifier
+		else if (value > attribute) {
+			// Negative modifier result in a harsher failure
+			if (modifier < 0) {
+				return {total: value - modifier, result: "Failure"};
+			}
+			// Positive modifier may result in a success
+			else {
+				// Success if the modifier is enough to reach the attribute
+				if (value - modifier <= attribute) {
+					return {total: attribute, result: "Success"};
+				}
+				// Failure if the modifier is not enough to reach the attribute
+				else {
+					return {total: value - modifier, result: "Failure"};
+				}
+			}
+		}
+		// Success before modifier
+		else {
+			// Negative modifier may result in a failure
+			if (modifier < 0) {
+				// Failure if the modifier is enough to overshoot the attribute
+				if (value - modifier > attribute) {
+					return {total: value - modifier, result: "Failure"};
+				}
+				// If it's still a success, reduce the roll to make it less good
+				else {
+					return {total: value + modifier, result: "Success"};
+				}
+			}
+			else {
+				// Positive modifier result in a better success
+				if (value + modifier >= attribute) {
+					return {total: attribute, result: "Success"};
+				}
+				// In any case, increase the roll to make it better
+				else {
+					return {total: value + modifier, result: "Success"};
+				}
+			}
+		}
+	}
+
+	function ComputeWithEdge(values, attribute, modifier) {
+		var result = GetClosest(values, attribute, modifier);
+
+		if (result.selected.original == attribute) {
+			return {total: result.selected.original, result: "Critical!"};
+		} else if (result.selected.original == 20) {
+			return {total: result.selected.original, result: "Fumble…"};
+		} else if (result.selected.success) {
+			return {total: result.selected.result, result: "Success"};
+		} else {
+			return {total: result.selected.result, result: "Failure"};
+		}
+	}
+
+	function ComputeWithSnag(values, attribute, modifier) {
+		var result = GetFarthest(values, attribute, modifier);
+
+		if (result.selected.original == attribute) {
+			return {total: result.selected.original, result: "Critical!"};
+		} else if (result.selected.original == 20) {
+			return {total: result.selected.original, result: "Fumble…"};
+		} else if (result.selected.success) {
+			return {total: result.selected.result, result: "Success"};
+		} else {
+			return {total: result.selected.result, result: "Failure"};
+		}
+	}
+
+	const rollCarac = ["might", "deftness", "grit", "insight", "aura"].flatMap(name => {
+		return Array.from({ length: 20 }, (_, i) => `clicked:${name}Square${i + 1}`);
+	}).join(' ');
+	on(`${rollCarac}`, function(eventInfo) {
+		const squareNumber = parseInt(eventInfo.triggerName.replace(/\D/g, "")) || -1;
+		if (squareNumber == -1) {
+			return;
+		}
+		var attribute = eventInfo.triggerName.replace("clicked:", "").replace("square", "").replace(squareNumber, "");
+		attribute = attribute.charAt(0).toUpperCase() + attribute.slice(1);
+
+		getAttrs(["character_name"], function(values) {
+			var character_name = values["character_name"]||"";
+
+			const rollString = "@{rollWhisperType} &{template:carac} {{charName=" + character_name + "}} {{rollName=" + attribute + " " + squareNumber + "}} {{roll1=[[2d20]]}} {{modifier=[[?{Modifiers|0}]]}} {{rollType=[[?{Roll Type|Basic, 0|Edge, 1|Snag, -1}]]}} {{total=[[0]]}} {{attribute=[[0]]}} {{result=[[0]]}}";
+
+			startRoll(rollString, function(results) {
+				const l_roll1 = results.results.roll1;
+				const modifier = parseInt(results.results.modifier.result)||0;
+				const rollType = parseInt(results.results.rollType.result)||0;
+
+				var l_selectedDie = 0;
+				if (rollType == 0) {
+					l_selectedDie = ComputeOneDieResult(l_roll1.dice[0], squareNumber, modifier);
+				} else if (rollType == 1) {
+					l_selectedDie = ComputeWithEdge(l_roll1.dice, squareNumber, modifier);
+				} else {
+					l_selectedDie = ComputeWithSnag(l_roll1.dice, squareNumber, modifier);
+				}
+
+				var l_rollType = "";
+				if (rollType == 0) {
+					l_rollType = "Basic";
+				} else if (rollType == 1) {
+					l_rollType = "Edge";
+				} else {
+					l_rollType = "Snag";
+				}
+
+				const computed = {
+					total: l_selectedDie.total,
+					result: l_selectedDie.result,
+					modifier: modifier,
+					rollType: l_rollType,
+					attribute: squareNumber
+				};
+
+				finishRoll(results.rollId, computed);
+			});
+		});
+	});
+
+	const rollAttributes = ["might", "deftness", "grit", "insight", "aura"].map(name => `clicked:${name}`).join(' ');
+	on(`${rollAttributes}`, function(eventInfo) {
+		const attributeName = eventInfo.triggerName.replace("clicked:", "");
+		getAttrs([`${attributeName}_total`, "character_name"], function(values) {
+			var attribute = parseInt(values[`${attributeName}_total`])||0;
+			var character_name = values["character_name"]||"";
+
+			const rollString = "@{rollWhisperType} &{template:carac} {{charName=" + character_name + "}} {{rollName=" + attributeName + "}} {{roll1=[[2d20]]}} {{modifier=[[?{Modifiers|0}]]}} {{attribute=[[0]]}} {{rollType=[[?{Roll Type|Basic, 0|Edge, 1|Snag, -1}]]}} {{total=[[0]]}} {{result=[[0]]}}";
+
+			startRoll(rollString, function(results) {
+				const l_roll1 = results.results.roll1;
+				const modifier = parseInt(results.results.modifier.result)||0;
+				const rollType = parseInt(results.results.rollType.result)||0;
+
+				var l_selectedDie = 0;
+				if (rollType == 0) {
+					l_selectedDie = ComputeOneDieResult(l_roll1.dice[0], attribute, modifier);
+				} else if (rollType == 1) {
+					l_selectedDie = ComputeWithEdge(l_roll1.dice, attribute, modifier);
+				} else {
+					l_selectedDie = ComputeWithSnag(l_roll1.dice, attribute, modifier);
+				}
+
+				var l_rollType = "";
+				if (rollType == 0) {
+					l_rollType = "Basic";
+				} else if (rollType == 1) {
+					l_rollType = "Edge";
+				} else {
+					l_rollType = "Snag";
+				}
+
+				const computed = {
+					total: l_selectedDie.total,
+					result: l_selectedDie.result,
+					modifier: modifier,
+					rollType: l_rollType,
+					attribute: attribute
+				};
+
+				finishRoll(results.rollId, computed);
+			});
+		});
+	});
+
+	on("clicked:health", function() {
+		getAttrs(["health_total"], function(values) {
+			var healthTotal = parseInt(values["health_total"])||0;
+			var output = {};
+			output["health_hearts"] = healthTotal;
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:health_base change:health_modifier sheet:opened", function() {
+		getAttrs(["health_base", "health_modifier", "health_hearts"], function(values) {
+			const output = {};
+
+			var base = parseInt(values["health_base"])||0;
+			var modifier = parseInt(values["health_modifier"])||0;
+			var hearts = parseInt(values["health_hearts"])||0;
+			var total = base + modifier;
+			output["health_total"] = total;
+
+			for (let i = 1; i <= total; i++) {
+				output[`health_heart_${i}`] = (i <= hearts) ? 1 : 0;
+			}
+
+			for (let i = total + 1; i <= 10; i++) {
+				output[`health_heart_${i}`] = -1;
+			}
+
+			if (hearts > total) {
+				output["health_hearts"] = total;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	const damageButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => `clicked:health_heart_${i}`).join(' ');
+	on(`${damageButtons}`, function(eventInfo) {
+		const triggerName = eventInfo.triggerName.replace("clicked:", "");
+		const eventSource = triggerName.replace("health_heart_", "");
+		const getAttrsParameters = ["health_total", "health_hearts", triggerName]
+		getAttrs(getAttrsParameters, function(values) {
+			const lastHearts = parseInt(values["health_hearts"])||0;
+			const clicked = parseInt(eventSource) || 3;
+			const lastValue = values[triggerName];
+			const total = parseInt(values["health_total"])||0;
+			const output = {};
+
+			if (clicked > lastHearts)
+			{
+				for (let i = 1; i <= clicked; i++) {
+					output[`health_heart_${i}`] = "1";
+				}
+				output["health_hearts"] = clicked;
+			}
+			else if (clicked < lastHearts)
+			{
+				for (let i = total; i > clicked; i--) {
+					output[`health_heart_${i}`] = "0";
+				}
+				output["health_hearts"] = clicked;
+			}
+			else
+			{
+				output[`health_heart_${clicked}`] = (lastValue == "1") ? "0" : "1";
+				output["health_hearts"] = clicked - (lastValue == "1" ? 1 : 0);
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:health_hearts", function() {
+		getAttrs(["health_hearts", "health_total"], function(values) {
+			const hearts = parseInt(values["health_hearts"])||0;
+			const total = parseInt(values["health_total"])||0;
+			const output = {};
+
+			for (let i = 1; i <= 10; i++) {
+				if (i <= total)
+					output[`health_heart_${i}`] = (i <= hearts) ? "1" : "0";
+				else
+					output[`health_heart_${i}`] = "-1";
+			}
+
+			if (hearts > total) {
+				output["health_hearts"] = total;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:defense_rating change:defense_rating_modifier change:speed_rating_total change:size", function() {
+		getAttrs(["defense_rating", "defense_rating_modifier", "speed_rating_total", "size"], function(values) {
+			var output = {};
+			var base = parseInt(values["defense_rating"])||0;
+			var modifier = parseInt(values["defense_rating_modifier"])||0;
+			var speed = parseInt(values["speed_rating_total"])||0;
+
+			var speed_defense_modifier = 0;
+			if (speed <= 1) {
+				speed_defense_modifier = 0;
+			} else if (speed == 2) {
+				speed_defense_modifier = 2;
+			} else if (speed >= 3) {
+				speed_defense_modifier = 4;
+			}
+
+			var size_defense_modifier = 0;
+			switch (values["size"]) {
+				case "0":
+					size_defense_modifier = 1;
+					break;
+				case "2":
+					size_defense_modifier = -1;
+					break;
+			}
+
+			var total = base + modifier + speed_defense_modifier + size_defense_modifier;
+
+			output["defense_rating_total"] = total;
+			output["speed_defense_modifier"] = speed_defense_modifier;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	const speedButtons = [0, 1, 2, 3].map(i => `clicked:speed_rating_${i}`).join(' ');
+	on(speedButtons, function(eventInfo) {
+		var output = {};
+		const eventSource = eventInfo.triggerName.replace("clicked:speed_rating_", "");
+		const eventSourceInt = parseInt(eventSource) || 1;
+
+		output["speed_rating"] = eventSourceInt;
+		output["speed_rating_modifier"] = 0;
+
+		setAttrs(output, {silent: false});
+	});
+
+	on("change:speed_rating change:speed_rating_modifier", function(eventInfo) {
+		getAttrs(["speed_rating", "speed_rating_modifier"], function(values) {
+			var output = {};
+			var base = parseInt(values["speed_rating"])||0;
+			var modifier = parseInt(values["speed_rating_modifier"])||0;
+			var total = base + modifier;
+
+			var speed_rating_name = "";
+			if (total <= 0)
+				speed_rating_name = "Slow";
+			else if (total == 1)
+				speed_rating_name = "Average";
+			else if (total == 2)
+				speed_rating_name = "Fast";
+			else if (total >= 3)
+				speed_rating_name = "Very Fast";
+
+			output["speed_rating_name"] = speed_rating_name;
+			output["speed_rating_total"] = total;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:size", function() {
+		getAttrs(["size"], function(values) {
+			var output = {};
+			switch (values["size"]) {
+				case "0":
+					output["inventory_base"] = 8;
+					break;
+				case "1":
+					output["inventory_base"] = 10;
+					break;
+				case "2":
+					output["inventory_base"] = 12;
+					break;
+			}
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:inventory_base change:inventory_modifier", function() {
+		getAttrs(["inventory_base", "inventory_modifier"], function(values) {
+			var output = {};
+			var inventory = parseInt(values["inventory_base"])||0;
+			var modifier = parseInt(values["inventory_modifier"])||0;
+
+			var total = inventory + modifier;
+
+			output["inventory_total"] = total;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	const repeatingSum = (destinations, section, fields) => {
+		if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
+		if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+		getSectionIDs(`repeating_${section}`, idArray => {
+			const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+			getAttrs([...attrArray], v => {
+				const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
+				const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
+				const output = {};
+				destinations.forEach((destination, index) => {
+					output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
+				});
+				setAttrs(output, {silent: false});
+			});
+		});
+	};
+
+	on("change:repeating_inventory change:repeating_inventory:inventory_size change:repeating_inventory:inventory_quantity remove:repeating_inventory", function() {
+		repeatingSum("total_weight", 'inventory', ['inventory_size', 'inventory_quantity']);
+	});
+
+	on("change:total_weight change:inventory_total", function() {
+		getAttrs(["total_weight", "inventory_total"], function(values) {
+			var output = {};
+			var total_weight = parseInt(values["total_weight"])||0;
+			var inventory_total = parseInt(values["inventory_total"])||0;
+
+			output["inventory_left"] = inventory_total - total_weight;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:repeating_weapons:weapon_attack_bonus", function() {
+		getAttrs(["repeating_weapons_weapon_attack_bonus", "attack_bonus_total"], function(values) {
+			var output = {};
+			const weapon_attack_bonus = parseInt(values["repeating_weapons_weapon_attack_bonus"])||0;
+			const attack_bonus_total = parseInt(values["attack_bonus_total"])||0;
+
+			var total_attack_bonus = weapon_attack_bonus + attack_bonus_total;
+
+			output["repeating_weapons_weapon_attack_bonus_label"] = "+" + total_attack_bonus;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:repeating_weapons:weapon_name change:repeating_weapons:weapon_attack_bonus change:repeating_weapons:weapon_damage change:repeating_weapons:weapon_critical_range change:repeating_weapons:weapon_extra_damage_value change:repeating_weapons:weapon_notes change:repeating_weapons:weapon_type", function() {
+		getAttrs(["repeating_weapons_weapon_damage_bonus", "damage_bonus_total"], function(values) {
+			var output = {};
+			const weapon_damage_bonus = parseInt(values["repeating_weapons_weapon_damage_bonus"])||0;
+			const damage_bonus_total = parseInt(values["damage_bonus_total"])||0;
+
+			var total_damage_bonus = weapon_damage_bonus + damage_bonus_total;
+
+			output["repeating_weapons_weapon_damage_bonus_label"] = "+" + total_damage_bonus;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:repeating_weapons:weapon_type", function(eventInfo) {
+		const weapon_type = eventInfo.newValue;
+
+		var output = {};
+		switch (weapon_type) {
+			case "-1":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 20;
+				output["repeating_weapons_weapon_damage_bonus"] = 0;
+				output["repeating_weapons_weapon_notes"] = "Desperate situations sometimes call for adventurers to strike out with their bare hands.<br>Unarmed strikes suffer a Snag on their Attack roll when directed at armed or armored enemies.";
+				break;
+			case "0":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 20;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Standard Weapons are simple yet practical death dealing implements with no added frills.";
+				break;
+			case "1":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 22;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Concealed Weapons are usually small so that they can be hidden about your person with ease.<br> Unlike other arms, Concealed Weapons are not immediately visible.<br>During a Fight, drawing and striking with a Concealed Weapon can be performed in one Action.<br>Weapon Ability, Sneaky Swipe: If your target isn’t aware of your Concealed Weapon you may attempt to Ambush them, even when you are in plain sight.<br>Your Target must be in the same Battlefeld Area as you, but otherwise this attack works like a normal Ambush (´ p252).<br>If your Ambush is successful, others using Concealed or Thrown weapons can join in the Ambush.";
+				break;
+			case "2":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 22;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Quick Weapons are lighter arms that emphasize speed over power, prized by those who prefer evasive fghting.<br>Weapon Ability, Darting Style: You gain a +1 to your Defense Rating when using a Quick Weapon.";
+				break;
+			case "3":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 18;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "These fnely crafted weapons are often diffcult to use and rather expensive. As such, they are favored by the warrior elite.<br>Weapon Ability, Perfect Strike: You gain a +1 to your Attack rolls when using a Master Weapon.";
+				break;
+			case "4":
+				output["repeating_weapons_weapon_damage"] = 2;
+				output["repeating_weapons_weapon_critical_range"] = 20;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "These heavy weapons require both hands to use. Enjoyed by warriors who wish to quickly dispatch their enemies.<br>When wielding one-handed you suffer a Minor Penalty (-2) on Attack rolls, Attack Stunts, & Combat Tricks. <br>Weapon Ability, Crushing Blow: You do 2 Hearts of damage, instead of 1, on a successful Attack.";
+				break;
+			case "5":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 20;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Long weapons that allow their wielders to make wide, dangerous strokes that hit several enemies at once.<br>When wielding one-handed you suffer a Minor Penalty (-2) on Attack rolls, Attack Stunts, & Combat Tricks. <br>Weapon Ability, Deadly Sweep: You can hit two enemies in the same Battlefeld Area with one Attack. <br>Make a single Attack roll, and apply the result to both enemies.";
+				break;
+			case "6":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 22;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Weapons that incorporate a chain or cord, capable of reaching foes a considerable distance away. <br>Weapon Ability, Crack!: You can Attack an enemy up to 1 Battlefeld Area away.";
+				break;
+			case "7":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 22;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "These small, hand-held weapons are shaped and balanced specifcally for throwing. Sneaks love them.<br>Range: 1 Battlefeld Area away.<br>Loading Time: None, but the weapon must be retrieved before reuse.<br>Weapon Ability, Hidden Fangs: If your target isn’t aware of your Thrown Weapon, you may attempt to Ambush them, even when you are in plain sight.<br>Targets must be in Range, but otherwise this attack works like a normal Ambush (´ p252).<br>If your Ambush is successful, others using Concealed or Thrown weapons can join in the Ambush.";
+				break;
+			case "8":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 20;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Drawn Weapons include slingshots, bows, and other projectiles that require you to manually maintain tension.<br>Range: 2 Battlefeld Areas away.<br>Loading Time: These can be both loaded and fred in 1 Action.<br>You must use two hands while wielding a Drawn Missile Weapon.";
+				break;
+			case "9":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 18;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Mechanical Weapons are complex devices that require a lot of maintenance and upkeep. <br>They are often used by the military and other organizations that can afford to keep them in good repair.<br>Range: 2 Battlefeld Areas away.<br>Loading Time: These can be both loaded and fred in 1 Action.<br>You must use two hands while wielding a Mechanical Weapon.";
+				break;
+			case "10":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 18;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "While more accurate than their smaller cousins, these bombastic weapons are more cumbersome to operate.<br>Range: 2 Battlefeld Areas away.<br>Loading Time: 1 Action.<br>You must use two hands to load and fre these Weapons.<br>Weapon Ability, Thunderous Shot: You gain a +2 to your Attack roll.";
+				break;
+			case "11":
+				output["repeating_weapons_weapon_damage"] = 1;
+				output["repeating_weapons_weapon_critical_range"] = 20;
+				output["repeating_weapons_weapon_damage_bonus"] = 1;
+				output["repeating_weapons_weapon_notes"] = "Combination merges the benefts of two Weapon Types, making them diffcult and expensive to forge. <br>Combination Weapons inherit the properties of their two constituent weapons in the following way: <br>The Weapon Abilities of both. <br>The usage restrictions of both. <br>Take up the Inventory Slots from the largest of the two weapons. <br>The Extra Damage of the most effective weapon. <br>For example, a Master-Arc Combination Weapon would gain a +1 to Attack rolls (Master), be able to target two foes in the same area (Arc), require both hands to use without penalty (Arc), and take up 3 Inventory Slots (Arc). <br>If any Missile and Melee Weapon Types are combined, you must choose which mode of attack you are using for your Action (i.e Melee or Missile). <br>These weapons only beneft from Missile Weapon Abilities when making Missile attacks. <br>These weapons only beneft from Melee Weapon Abilities when making Melee attacks. <br>The Extra Damage value used is taken from the base weapon appropriate to your chosen mode of attack. <br>Concealed and Thrown Weapons can only be combined with each other, due to their small size. <br>Combining two weapons that each have an inherent Weapon Ability will take you to the 3 Ability limit. <br>Your GM may deem some combinations impossible. Common sense should be the guide.";
+				break;
+			default:
+				// Code for default case
+				break;
+		}
+
+		output["repeating_weapons_weapon_notes"] = output["repeating_weapons_weapon_notes"].replace(/<br>/g, "\n");
+
+		setAttrs(output, {silent: true});
+	});
+
+	on("change:attack_bonus_total", function() {
+		getSectionIDs("repeating_weapons", function(idArray) {
+			const attrArray = idArray.reduce((m, id) => [...m, `repeating_weapons_${id}_weapon_attack_bonus`], []);
+			getAttrs([...attrArray, "attack_bonus_total"], function(values) {
+				var output = {};
+				const attack_bonus_total = parseInt(values["attack_bonus_total"])||0;
+
+				idArray.forEach(id => {
+					const weapon_attack_bonus = parseInt(values[`repeating_weapons_${id}_weapon_attack_bonus`])||0;
+					var total_attack_bonus = weapon_attack_bonus + attack_bonus_total;
+
+					output[`repeating_weapons_${id}_weapon_attack_bonus_label`] = "+" + total_attack_bonus;
+				});
+
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+</script>
+
+<html>
+<div class="charsheet">
+	<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="stats" />
+	<div class="sheet-flexRow">
+		<div>
+			<button type="action" class="sheet-tabButton" name="act_stats">Stats</button>
+			<button type="action" class="sheet-tabButton" name="act_notes">Notes</button>
+		</div>
+		<div class="sheet-flexGrow sheet-flexEnd">
+			<select name="attr_rollWhisperType">
+				<option value="" selected><span>Show rolls</span></option>
+				<option value="?{Whisper?|Public Roll,|Whisper Roll,/w gm }"><span>Ask each time</span></option>
+				<option value="/w gm"><span>Always whisper</span></option>
+			</select>
+		</div>
+	</div>
+
+	<div class="sheet-stats">
+		<div class="sheet-mainPageUpperSide">
+			<div class="sheet-flexIdentity sheet-flexColumnNoGap">
+				<h1>Identity</h1>
+				<div class="sheet-oneLineInfo"><span>Name</span><input type="text" name="attr_character_name" /></div>
+				<div class="sheet-oneLineInfo">
+						<span>Calling</span>
+						<input type="text" name="attr_calling" />
+						<span class="sheet-verticalLine">Rank
+							<span name="attr_rank"></span>
+						</span>
+				</div>
+				<div class="sheet-flexColumn">
+					<div class="sheet-oneLineInfo">
+						<span>Species</span>
+						<input type="text" name="attr_specie" />
+						<input type="checkbox" name="attr_specie_fold" class="sheet-arrow sheet-rightFloat" checked />
+						<span class="sheet-rightFloat"></span>
+					</div>
+					<input type="hidden" class="sheet-arrow" name="attr_specie_fold" value="on" />
+					<div class="sheet-oneLineInfo sheet-foldable" style="flex-flow: column wrap;">
+						<div style="display: flex; flex-flow: row wrap;">
+							<span>Size</span>
+							<select name="attr_size">
+								<option value="0">Small</option>
+								<option value="1" selected>Medium</option>
+								<option value="2">Large</option>
+							</select>
+						</div>
+						<textarea name="attr_specie_description" placeholder="Specie notes"></textarea>
+					</div>
+				</div>
+				<div class="sheet-oneLineInfo"><span>Homeland</span><input type="text" name="attr_homeland" /></div>
+				<div class="sheet-oneLineInfo"><span>Languages</span><input type="text" name="attr_languages" value="Low speech" /></div>
+				<div class="sheet-oneLineInfo"><span>History</span><input type="text" name="attr_history" /></div>
+				<div class="sheet-multiLineInfo"><span>Purviews</span><textarea name="attr_purviews" placeholder="My background grants me a minor bonus on..."></textarea></div>
+				<div class="sheet-multiLineInfo"><span>Description</span><textarea name="attr_description"></textarea></div>
+			</div>
+			<div class="sheet-flexIdentity sheet-flexColumnNoGap">
+				<h1>Aptitudes</h1>
+				<div class="sheet-box">
+					<div class="sheet-attributeHeader">
+						<div>
+							<h2>Might</h2>
+							<h6>Smash, crush, lift</h6>
+						</div>
+						<div class="sheet-attributeBase">
+							<span>Base</span>
+							<input type="number" name="attr_might_base" value="6" />
+						</div>
+					</div>
+					<div>
+						<input type="hidden" name="attr_might_total" />
+						<div>
+							<div class="sheet-statButtons">
+								<button type="action" name="act_might" class="sheet-attributeButton">
+									<span name="attr_might_total"></span>
+								</button>
+								<div>
+									<div class="sheet-traitsList">
+										<span><b>TRAIT</b></span>
+										<div><span>-2</span><input type="radio" name="attr_might_trait" value="-2" /></div>
+										<div><span>-1</span><input type="radio" name="attr_might_trait" value="-1" /></div>
+										<div><span>0</span><input type="radio" name="attr_might_trait" value="0" checked /></div>
+										<div><span>1</span><input type="radio" name="attr_might_trait" value="1" /></div>
+										<div><span>2</span><input type="radio" name="attr_might_trait" value="2" /></div>
+									</div>
+									<div class="sheet-squares">
+										<input type="hidden" name="attr_mightSquare1" class="sheet-squareInput" value="1">
+											<button type="action" name="act_mightSquare1" class="sheet-square" title="Roll Might 1"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare2" class="sheet-squareInput" value="1">
+											<button type="action" name="act_mightSquare2" class="sheet-square" title="Roll Might 2"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare3" class="sheet-squareInput" value="1">
+											<button type="action" name="act_mightSquare3" class="sheet-square" title="Roll Might 3"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare4" class="sheet-squareInput" value="1">
+											<button type="action" name="act_mightSquare4" class="sheet-square" title="Roll Might 4"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare5" class="sheet-squareInput" value="1">
+											<button type="action" name="act_mightSquare5" class="sheet-square sheet-squareSeparation" title="Roll Might 5"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare6" class="sheet-squareInput" value="1">
+											<button type="action" name="act_mightSquare6" class="sheet-square" title="Roll Might 6"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare7" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare7" class="sheet-square" title="Roll Might 7"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare8" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare8" class="sheet-square" title="Roll Might 8"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare9" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare9" class="sheet-square" title="Roll Might 9"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare10" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare10" class="sheet-square sheet-squareSeparation" title="Roll Might 10"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare11" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare11" class="sheet-square" title="Roll Might 11"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare12" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare12" class="sheet-square" title="Roll Might 12"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare13" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare13" class="sheet-square" title="Roll Might 13"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare14" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare14" class="sheet-square" title="Roll Might 14"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare15" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare15" class="sheet-square sheet-squareSeparation" title="Roll Might 15"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare16" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare16" class="sheet-square" title="Roll Might 16"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare17" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare17" class="sheet-square" title="Roll Might 17"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare18" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare18" class="sheet-square" title="Roll Might 18"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare19" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare19" class="sheet-square" title="Roll Might 19"></button>
+										</input>
+										<input type="hidden" name="attr_mightSquare20" class="sheet-squareInput" value="0">
+											<button type="action" name="act_mightSquare20" class="sheet-square" title="Roll Might 20"></button>
+										</input>
+									</div>
+									<div class="sheet-attributeModifier">
+										<span>Bonuses/Penalties</span>
+										<input type="number" name="attr_might_modifier" value="0" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="sheet-box">
+					<div class="sheet-attributeHeader">
+						<div>
+							<h2>Deftness</h2>
+							<h6>Dodge, sneak, leap</h6>
+						</div>
+						<div class="sheet-attributeBase">
+							<span>Base</span>
+							<input type="number" name="attr_deftness_base" value="6" />
+						</div>
+					</div>
+					<div>
+						<input type="hidden" name="attr_deftness_total" />
+						<div>
+							<div class="sheet-statButtons">
+								<button type="action" name="act_deftness" class="sheet-attributeButton">
+									<span name="attr_deftness_total"></span>
+								</button>
+								<div>
+									<div class="sheet-traitsList">
+										<span><b>TRAIT</b></span>
+										<div><span>-2</span><input type="radio" name="attr_deftness_trait" value="-2" /></div>
+										<div><span>-1</span><input type="radio" name="attr_deftness_trait" value="-1" /></div>
+										<div><span>0</span><input type="radio" name="attr_deftness_trait" value="0" checked /></div>
+										<div><span>1</span><input type="radio" name="attr_deftness_trait" value="1" /></div>
+										<div><span>2</span><input type="radio" name="attr_deftness_trait" value="2" /></div>
+									</div>
+									<div class="sheet-squares">
+										<input type="hidden" name="attr_deftnessSquare1" class="sheet-squareInput" value="1">
+											<button type="action" name="act_deftnessSquare1" class="sheet-square" title="Roll Deftness 1"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare2" class="sheet-squareInput" value="1">
+											<button type="action" name="act_deftnessSquare2" class="sheet-square" title="Roll Deftness 2"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare3" class="sheet-squareInput" value="1">
+											<button type="action" name="act_deftnessSquare3" class="sheet-square" title="Roll Deftness 3"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare4" class="sheet-squareInput" value="1">
+											<button type="action" name="act_deftnessSquare4" class="sheet-square" title="Roll Deftness 4"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare5" class="sheet-squareInput" value="1">
+											<button type="action" name="act_deftnessSquare5" class="sheet-square sheet-squareSeparation" title="Roll Deftness 5"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare6" class="sheet-squareInput" value="1">
+											<button type="action" name="act_deftnessSquare6" class="sheet-square" title="Roll Deftness 6"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare7" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare7" class="sheet-square" title="Roll Deftness 7"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare8" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare8" class="sheet-square" title="Roll Deftness 8"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare9" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare9" class="sheet-square" title="Roll Deftness 9"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare10" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare10" class="sheet-square sheet-squareSeparation" title="Roll Deftness 10"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare11" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare11" class="sheet-square" title="Roll Deftness 11"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare12" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare12" class="sheet-square" title="Roll Deftness 12"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare13" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare13" class="sheet-square" title="Roll Deftness 13"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare14" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare14" class="sheet-square" title="Roll Deftness 14"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare15" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare15" class="sheet-square sheet-squareSeparation" title="Roll Deftness 15"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare16" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare16" class="sheet-square" title="Roll Deftness 16"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare17" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare17" class="sheet-square" title="Roll Deftness 17"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare18" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare18" class="sheet-square" title="Roll Deftness 18"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare19" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare19" class="sheet-square" title="Roll Deftness 19"></button>
+										</input>
+										<input type="hidden" name="attr_deftnessSquare20" class="sheet-squareInput" value="0">
+											<button type="action" name="act_deftnessSquare20" class="sheet-square" title="Roll Deftness 20"></button>
+										</input>
+									</div>
+									<div class="sheet-attributeModifier">
+										<span>Bonuses/Penalties</span>
+										<input type="number" name="attr_deftness_modifier" value="0" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="sheet-box">
+					<div class="sheet-attributeHeader">
+						<div>
+							<h2>Grit</h2>
+							<h6>Cling, persist, press on</h6>
+						</div>
+						<div class="sheet-attributeBase">
+							<span>Base</span>
+							<input type="number" name="attr_grit_base" value="6" />
+						</div>
+					</div>
+					<div>
+						<input type="hidden" name="attr_grit_total" />
+						<div>
+							<div class="sheet-statButtons">
+								<button type="action" name="act_grit" class="sheet-attributeButton">
+									<span name="attr_grit_total"></span>
+								</button>
+								<div>
+									<div class="sheet-traitsList">
+										<span><b>TRAIT</b></span>
+										<div><span>-2</span><input type="radio" name="attr_grit_trait" value="-2" /></div>
+										<div><span>-1</span><input type="radio" name="attr_grit_trait" value="-1" /></div>
+										<div><span>0</span><input type="radio" name="attr_grit_trait" value="0" checked /></div>
+										<div><span>1</span><input type="radio" name="attr_grit_trait" value="1" /></div>
+										<div><span>2</span><input type="radio" name="attr_grit_trait" value="2" /></div>
+									</div>
+									<div class="sheet-squares">
+										<input type="hidden" name="attr_gritSquare1" class="sheet-squareInput" value="1">
+											<button type="action" name="act_gritSquare1" class="sheet-square" title="Roll Grit 1"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare2" class="sheet-squareInput" value="1">
+											<button type="action" name="act_gritSquare2" class="sheet-square" title="Roll Grit 2"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare3" class="sheet-squareInput" value="1">
+											<button type="action" name="act_gritSquare3" class="sheet-square" title="Roll Grit 3"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare4" class="sheet-squareInput" value="1">
+											<button type="action" name="act_gritSquare4" class="sheet-square" title="Roll Grit 4"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare5" class="sheet-squareInput" value="1">
+											<button type="action" name="act_gritSquare5" class="sheet-square sheet-squareSeparation" title="Roll Grit 5"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare6" class="sheet-squareInput" value="1">
+											<button type="action" name="act_gritSquare6" class="sheet-square" title="Roll Grit 6"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare7" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare7" class="sheet-square" title="Roll Grit 7"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare8" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare8" class="sheet-square" title="Roll Grit 8"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare9" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare9" class="sheet-square" title="Roll Grit 9"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare10" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare10" class="sheet-square sheet-squareSeparation" title="Roll Grit 10"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare11" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare11" class="sheet-square" title="Roll Grit 11"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare12" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare12" class="sheet-square" title="Roll Grit 12"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare13" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare13" class="sheet-square" title="Roll Grit 13"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare14" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare14" class="sheet-square" title="Roll Grit 14"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare15" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare15" class="sheet-square sheet-squareSeparation" title="Roll Grit 15"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare16" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare16" class="sheet-square" title="Roll Grit 16"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare17" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare17" class="sheet-square" title="Roll Grit 17"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare18" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare18" class="sheet-square" title="Roll Grit 18"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare19" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare19" class="sheet-square" title="Roll Grit 19"></button>
+										</input>
+										<input type="hidden" name="attr_gritSquare20" class="sheet-squareInput" value="0">
+											<button type="action" name="act_gritSquare20" class="sheet-square" title="Roll Grit 20"></button>
+										</input>
+									</div>
+									<div class="sheet-attributeModifier">
+										<span>Bonuses/Penalties</span>
+										<input type="number" name="attr_grit_modifier" value="0" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="sheet-box">
+					<div class="sheet-attributeHeader">
+						<div>
+							<h2>Insight</h2>
+							<h6>Notice, know, remember</h6>
+						</div>
+						<div class="sheet-attributeBase">
+							<span>Base</span>
+							<input type="number" name="attr_insight_base" value="6" />
+						</div>
+					</div>
+					<div>
+						<input type="hidden" name="attr_insight_total" />
+						<div>
+							<div class="sheet-statButtons">
+								<button type="action" name="atc_insight" class="sheet-attributeButton" >
+									<span name="attr_insight_total"></span>
+								</button>
+								<div>
+									<div class="sheet-traitsList">
+										<span><b>TRAIT</b></span>
+										<div><span>-2</span><input type="radio" name="attr_insight_trait" value="-2" /></div>
+										<div><span>-1</span><input type="radio" name="attr_insight_trait" value="-1" /></div>
+										<div><span>0</span><input type="radio" name="attr_insight_trait" value="0" checked /></div>
+										<div><span>1</span><input type="radio" name="attr_insight_trait" value="1" /></div>
+										<div><span>2</span><input type="radio" name="attr_insight_trait" value="2" /></div>
+									</div>
+									<div class="sheet-squares">
+										<input type="hidden" name="attr_insightSquare1" class="sheet-squareInput" value="1">
+											<button type="action" name="act_insightSquare1" class="sheet-square" title="Roll Insight 1"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare2" class="sheet-squareInput" value="1">
+											<button type="action" name="act_insightSquare2" class="sheet-square" title="Roll Insight 2"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare3" class="sheet-squareInput" value="1">
+											<button type="action" name="act_insightSquare3" class="sheet-square" title="Roll Insight 3"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare4" class="sheet-squareInput" value="1">
+											<button type="action" name="act_insightSquare4" class="sheet-square" title="Roll Insight 4"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare5" class="sheet-squareInput" value="1">
+											<button type="action" name="act_insightSquare5" class="sheet-square sheet-squareSeparation" title="Roll Insight 5"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare6" class="sheet-squareInput" value="1">
+											<button type="action" name="act_insightSquare6" class="sheet-square" title="Roll Insight 6"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare7" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare7" class="sheet-square" title="Roll Insight 7"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare8" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare8" class="sheet-square" title="Roll Insight 8"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare9" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare9" class="sheet-square" title="Roll Insight 9"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare10" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare10" class="sheet-square sheet-squareSeparation" title="Roll Insight 10"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare11" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare11" class="sheet-square" title="Roll Insight 11"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare12" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare12" class="sheet-square" title="Roll Insight 12"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare13" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare13" class="sheet-square" title="Roll Insight 13"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare14" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare14" class="sheet-square" title="Roll Insight 14"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare15" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare15" class="sheet-square sheet-squareSeparation" title="Roll Insight 15"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare16" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare16" class="sheet-square" title="Roll Insight 16"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare17" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare17" class="sheet-square" title="Roll Insight 17"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare18" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare18" class="sheet-square" title="Roll Insight 18"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare19" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare19" class="sheet-square" title="Roll Insight 19"></button>
+										</input>
+										<input type="hidden" name="attr_insightSquare20" class="sheet-squareInput" value="0">
+											<button type="action" name="act_insightSquare20" class="sheet-square" title="Roll Insight 20"></button>
+										</input>
+									</div>
+									<div class="sheet-attributeModifier">
+										<span>Bonuses/Penalties</span>
+										<input type="number" name="attr_insight_modifier" value="0" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="sheet-box">
+					<div class="sheet-attributeHeader">
+						<div>
+							<h2>Aura</h2>
+							<h6>Persuade, inspire, terrify</h6>
+						</div>
+						<div class="sheet-attributeBase">
+							<span>Base</span>
+							<input type="number" name="attr_aura_base" value="6" />
+						</div>
+					</div>
+					<div>
+						<input type="hidden" name="attr_aura_total" />
+						<div>
+							<div class="sheet-statButtons">
+								<button type="action" name="act_aura" class="sheet-attributeButton">
+									<span name="attr_aura_total"></span>
+								</button>
+								<div>
+									<div class="sheet-traitsList">
+										<span><b>TRAIT</b></span>
+										<div><span>-2</span><input type="radio" name="attr_aura_trait" value="-2" /></div>
+										<div><span>-1</span><input type="radio" name="attr_aura_trait" value="-1" /></div>
+										<div><span>0</span><input type="radio" name="attr_aura_trait" value="0" checked /></div>
+										<div><span>1</span><input type="radio" name="attr_aura_trait" value="1" /></div>
+										<div><span>2</span><input type="radio" name="attr_aura_trait" value="2" /></div>
+									</div>
+									<div class="sheet-squares">
+										<input type="hidden" name="attr_auraSquare1" class="sheet-squareInput" value="1">
+											<button type="action" name="act_auraSquare1" class="sheet-square" title="Roll Aura 1"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare2" class="sheet-squareInput" value="1">
+											<button type="action" name="act_auraSquare2" class="sheet-square" title="Roll Aura 2"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare3" class="sheet-squareInput" value="1">
+											<button type="action" name="act_auraSquare3" class="sheet-square" title="Roll Aura 3"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare4" class="sheet-squareInput" value="1">
+											<button type="action" name="act_auraSquare4" class="sheet-square" title="Roll Aura 4"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare5" class="sheet-squareInput" value="1">
+											<button type="action" name="act_auraSquare5" class="sheet-square sheet-squareSeparation" title="Roll Aura 5"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare6" class="sheet-squareInput" value="1">
+											<button type="action" name="act_auraSquare6" class="sheet-square" title="Roll Aura 6"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare7" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare7" class="sheet-square" title="Roll Aura 7"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare8" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare8" class="sheet-square" title="Roll Aura 8"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare9" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare9" class="sheet-square" title="Roll Aura 9"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare10" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare10" class="sheet-square sheet-squareSeparation" title="Roll Aura 10"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare11" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare11" class="sheet-square" title="Roll Aura 11"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare12" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare12" class="sheet-square" title="Roll Aura 12"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare13" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare13" class="sheet-square" title="Roll Aura 13"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare14" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare14" class="sheet-square" title="Roll Aura 14"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare15" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare15" class="sheet-square sheet-squareSeparation" title="Roll Aura 15"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare16" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare16" class="sheet-square" title="Roll Aura 16"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare17" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare17" class="sheet-square" title="Roll Aura 17"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare18" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare18" class="sheet-square" title="Roll Aura 18"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare19" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare19" class="sheet-square" title="Roll Aura 19"></button>
+										</input>
+										<input type="hidden" name="attr_auraSquare20" class="sheet-squareInput" value="0">
+											<button type="action" name="act_auraSquare20" class="sheet-square" title="Roll Aura 20"></button>
+										</input>
+									</div>
+									<div class="sheet-attributeModifier">
+										<span>Bonuses/Penalties</span>
+										<input type="number" name="attr_aura_modifier" value="0" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="sheet-flexGrowFull">
+			<h1>Combat Values</h1>
+			<div class="sheet-2Row">
+				<div class="sheet-flexColumn sheet-box sheet-2RowItem">
+					<div class="sheet-flexRowNoGap">
+						<div class="sheet-flexColumn">
+							<h2>Attack bonus</h2>
+							<h6>Add to my attack rolls</h6>
+						</div>
+						<div class="sheet-flexRow sheet-flexGrow sheet-attributeBase">
+							<span>Base</span>
+							<input type="number" name="attr_attack_bonus" value="0" />
+						</div>
+					</div>
+					<input type="hidden" name="attr_attack_bonus_total" value="0" />
+					<input type="hidden" name="attr_attack_bonus_withPlus" />
+					<div class="sheet-flexRow">
+						<button type="roll" name="roll_attack_bonus" class="sheet-attributeButton" value="@{rollWhisperType} &{template:generic} {{charName=@{character_name}}} {{rollName=Attack}} {{subLabel= total}} {{total=[[?{Roll type|Basic,d20|Edge,2d20kh1|Snag,2d20kl1} +@{attack_bonus_total} +?{Modifier|0}]]}}"><span name="attr_attack_bonus_withPlus"></span></button>
+						<div class="sheet-flexColumn sheet-attributeModifier">
+							<span>Bonuses/Penalties</span>
+							<input type="number" name="attr_attack_bonus_modifier" class="sheet-flexGrowFull" value="0" />
+						</div>
+					</div>
+				</div>
+				<div class="sheet-flexColumn sheet-box sheet-2RowItem">
+					<div class="sheet-flexRow">
+						<div class="sheet-flexColumn">
+							<h2>Health total</h2>
+							<h6>Protecting me from injury</h6>
+						</div>
+						<div class="sheet-attributeBase sheet-flexGrow">
+							<span>Base</span>
+							<input type="number" name="attr_health_base" value="2" />
+						</div>
+					</div>
+					<div class="sheet-flexRow">
+						<input type="hidden" name="attr_health_total" value="2" />
+						<button type="action" class="sheet-attributeButton" name="act_health" title="Click to refill hearts ♥"><span name="attr_health_hearts"></span></button>
+						<div class="sheet-flexColumn">
+							<div class="sheet-flexRow sheet-attributeModifier">
+								<span>Hearts</span>
+								<input type="number" name="attr_health_hearts" value="2" />/<span name="attr_health_total"></span>
+								<div class="sheet-flexRowNoGap sheet-wrap sheet-smallGap sheet-leftSeparation">
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_1" value="1" >
+										<button type="action" class="health-heart" name="act_health_heart_1"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_2" value="1" >
+										<button type="action" class="health-heart" name="act_health_heart_2"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_3" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_3"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_4" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_4"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_5" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_5"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_6" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_6"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_7" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_7"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_8" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_8"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_9" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_9"></button>
+									</input>
+									<input type="hidden" class="health-heart-input" name="attr_health_heart_10" value="-1" >
+										<button type="action" class="health-heart" name="act_health_heart_10"></button>
+									</input>
+								</div>
+							</div>
+							<div class="sheet-flexRow sheet-attributeModifier">
+								<span>Bonuses/Penalties</span>
+								<input type="number" name="attr_health_modifier" value="0" />
+							</div>
+							<div class="sheet-flexRow">
+								<span>Injury</span>
+								<input type="text" name="attr_injuries" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-flexColumn sheet-box sheet-2RowItem">
+					<input type="hidden" name="attr_defense_rating_total" value="10" />
+					<input type="hidden" name="attr_speed_defense_modifier" value="Average" />
+					<div class="sheet-flexColumn">
+						<div class="sheet-flexRow">
+							<div class="sheet-flexColumn">
+								<h2>Defense rating</h2>
+								<h6>Best this to strike me</h6>
+							</div>
+							<div class="sheet-flexRow sheet-attributeBase sheet-flexGrow">
+								<span>Base</span>
+								<input type="number" name="attr_defense_rating" value="10" />
+							</div>
+						</div>
+						<div class="sheet-flexRow">
+							<button type="roll" class="sheet-attributeButton" name="roll_defense_rating_button" value="&{template:generic} {{charName=@{character_name}}} {{rollName=Defense}} {{subLabel= total}} {{total=[[@{defense_rating}+@{defense_rating_modifier}+@{speed_defense_modifier}]]}}"><span name="attr_defense_rating_total"></span></button>
+							<div class="sheet-flexColumn sheet-attributeModifier">
+								<span>Bonuses/Penalties</span>
+								<input type="number" name="attr_defense_rating_modifier" value="0" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-flexColumn sheet-box sheet-2RowItem">
+					<div class="sheet-flexColumn">
+						<h2>Speed rating</h2>
+						<h6>Decides how many Areas I can move</h6>
+						<input type="hidden" name="attr_speed_rating" value="0"/>
+						<div class="sheet-flexRowNoGap">
+							<input type="hidden" class="sheet-speedBox" name="attr_speed_rating_total" value="1" />
+							<button type="action" class="sheet-flexColumnNoGap sheet-speedBox" name="act_speed_rating_0" value="0" title="+0 Defense ; Must spend action to move">
+								<span>Slow</span>
+								<span>0 Area</span>
+							</button>
+							<button type="action" class="sheet-flexColumnNoGap sheet-speedBox" name="act_speed_rating_1" value="1" title="+0 Defense ; Can move 1 battlefield, 2 by spending an action">
+								<span>Average</span>
+								<span>1 Area</span>
+							</button>
+							<button type="action" class="sheet-flexColumnNoGap sheet-speedBox" name="act_speed_rating_2" value="2" title="+2 Defense ; Can move 2 battlefields, 3 by spending an action">
+								<span>Fast</span>
+								<span>2 Area</span>
+							</button>
+							<button type="action" class="sheet-flexColumnNoGap sheet-speedBox" name="act_speed_rating_3" value="3" title="+4 Defense ; Can move 2 battlefields, 3 by spending an action">
+								<span>Very Fast</span>
+								<span>2 Area</span>
+							</button>
+						</div>
+						<div class="sheet-flexRow sheet-attributeModifier">
+							<div>
+								<span>Bonuses/Penalties</span>
+								<input type="number" name="attr_speed_rating_modifier" value="0" />
+							</div>
+							<div>
+								<span>Total</span>
+								<input type="hidden" name="attr_speed_rating_name" value="Average" />
+								<span name="attr_speed_rating_name" class="sheet-bold"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<h1>Weapons</h1>
+			<fieldset class="repeating_weapons">
+				<div class="sheet-flexColumn sheet-box">
+					<input type="hidden" name="attr_weapon_attack_bonus_label" value="+0" />
+					<div class="sheet-flexRow">
+						<input type="text" name="attr_weapon_name" placeholder="Weapon name" />
+						<span>Attack bonus</span>
+						<input type="number" name="attr_weapon_attack_bonus" value="0" />
+						<input type="checkbox" name="attr_weapon_fold" class="sheet-arrow sheet-rightFloat" checked />
+						<span class="sheet-rightFloat"></span>
+						<div class="sheet-flexGrow sheet-flexEnd">
+							<button type="roll" name="roll_weapon" value="@{rollWhisperType} &{template:weapon}  [[ceil(floor([[?{Roll type|Basic,d20|Edge,2d20kh1|Snag,2d20kl1} + @{weapon_attack_bonus}+@{attack_bonus_total}+?{Modifier|0}]]/@{weapon_critical_range})/(21+ @{weapon_attack_bonus}+@{attack_bonus_total}+?{Modifier|0})) *@{weapon_extra_damage_value} +@{weapon_damage}]] {{charName=@{character_name}}} {{rollName=Attack}} {{subLabel=@{weapon_name}}} {{total=$[[0]]}} {{damages=$[[1]]}}"><span name="attr_weapon_attack_bonus_label"></span></button>
+						</div>
+					</div>
+					<input type="hidden" name="attr_weapon_fold" class="sheet-arrow" />
+					<div class="sheet-flexColumn sheet-foldable">
+						<div class="sheet-flexRowNoGap sheet-bigGap">
+							<div class="sheet-flexRow">
+								<span>Weapon damage </span>
+								<input type="number" name="attr_weapon_damage" value="1" />
+							</div>
+							<div class="sheet-flexRow">
+								<span>Extra damage threshold </span>
+								<input type="number" name="attr_weapon_critical_range" value="20" />
+							</div>
+							<div class="sheet-flexRow">
+								<span>Extra damage </span>
+								<input type="number" name="attr_weapon_extra_damage_value" value="1" />
+							</div>
+							<div class="sheet-flexRow">
+								<span>Weapon type</span>
+								<select name="attr_weapon_type">
+									<option value="-1">Unarmed</option>
+									<option value="0" selected>Standard</option>
+									<option value="1">Concealed</option>
+									<option value="2">Quick</option>
+									<option value="3">Master</option>
+									<option value="4">Mighty</option>
+									<option value="5">Arc</option>
+									<option value="6">Lash</option>
+									<option value="7">Thrown</option>
+									<option value="8">Drawn</option>
+									<option value="9">Mechanical (Small)</option>
+									<option value="10">Mechanical (Large)</option>
+									<option value="11">Combination</option>
+								</select>
+							</div>
+						</div>
+						<textarea name="attr_weapon_notes" class="sheet-autoWidth" placeholder="Weapon notes"></textarea>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	<div class="sheet-notes">
+		<div class="sheet-2Row">
+			<div class="sheet-flexColumn sheet-2RowItem">
+				<div>
+					<h1>Quirk</h1>
+					<div class="sheet-flexRow">
+						<input type="text" name="attr_quirk" placeholder="Quirk name" />
+						<input type="checkbox" name="attr_quirk_fold" class="sheet-arrow sheet-rightFloat" checked />
+						<span class="sheet-rightFloat"></span>
+						<div class="sheet-flexGrow sheet-flexEnd">
+							<button type="roll" name="roll_quirk" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=Quirk}} {{infos=@{quirk_notes}}}"></button>
+						</div>
+					</div>
+					<input type="hidden" name="attr_quirk_fold" class="sheet-arrow" />
+					<textarea name="attr_quirk_notes" class="sheet-scalableTextArea sheet-foldable" placeholder="Quirk description"></textarea>
+				</div>
+				<div>
+					<h1>Abilities</h1>
+					<fieldset class="repeating_abilities">
+						<div class="sheet-box sheet-flexColumn">
+							<div class="sheet-flexRow">
+								<input type="text" name="attr_ability_name" placeholder="Ability name" />
+								<input type="checkbox" name="attr_ability_fold" class="sheet-arrow sheet-rightFloat" checked />
+								<span class="sheet-rightFloat"></span>
+								<div class="sheet-flexGrow sheet-flexEnd">
+									<button type="roll" name="roll_ability" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=Ability}} {{infos=@{ability_notes}}}"></button>
+								</div>
+							</div>
+							<input type="hidden" name="attr_ability_fold" class="sheet-arrow" />
+							<textarea name="attr_ability_notes" class="sheet-autoWidth sheet-foldable" placeholder="Ability description"></textarea>
+						</div>
+					</fieldset>
+				</div>
+				<div>
+					<h1>Social Bonds & Reputation</h1>
+					<fieldset class="repeating_socialBonds">
+						<div class="sheet-box sheet-flexColumn">
+							<div class="sheet-flexRow">
+								<input type="text" name="attr_socialBond_name" placeholder="Social bond name" />
+								<input type="checkbox" name="attr_socialBond_fold" class="sheet-arrow sheet-rightFloat" checked />
+								<span class="sheet-rightFloat"></span>
+								<div class="sheet-flexGrow sheet-flexEnd">
+									<button type="roll" name="roll_socialBond" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=Social Bond}} {{infos=@{socialBond_notes}}}"></button>
+								</div>
+							</div>
+							<input type="hidden" name="attr_socialBond_fold" class="sheet-arrow" />
+							<textarea name="attr_socialBond_notes" class="sheet-autoWidth sheet-foldable" placeholder="Bond/Reputation description"></textarea>
+						</div>
+					</fieldset>
+				</div>
+				<div>
+					<h1>Allegiance</h1>
+					<div class="sheet-flexRow">
+						<div class="sheet-flexGrow sheet-rightSeparation">
+							<div class="sheet-flexRow sheet-attributeBase">
+								<input type="number" name="attr_allegiance_dark" value="0" />
+								<span>
+									Dark<br>
+									Allegiance<br>
+									Points
+								</span>
+							</div>
+							<div class="sheet-flexRow sheet-attributeBase">
+								<input type="number" name="attr_allegiance_bright" value="0" />
+								<span>
+									Bright<br>
+									Allegiance<br>
+									Points
+								</span>
+							</div>
+						</div>
+						<div class="sheet-flexGrow sheet-flexColumn">
+							<div class="sheet-flexRow">
+								<input type="radio" name="attr_alignment" value="None" />
+								<span>None</span>
+							</div>
+							<div class="sheet-flexRow">
+								<input type="radio" name="attr_alignment" value="Dark" />
+								<span>Dark</span>
+							</div>
+							<div class="sheet-flexRow">
+								<input type="radio" name="attr_alignment" value="Twilight" />
+								<span>Twilight</span>
+							</div>
+							<div class="sheet-flexRow">
+								<input type="radio" name="attr_alignment" value="Light" />
+								<span>Light</span>
+							</div>
+						</div>
+						<div class="sheet-flexGrow">
+							<span>Gifts</span>
+							<textarea name="attr_gifts" class="sheet-unscaledTextArea"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="sheet-flexColumn sheet-2RowItem">
+				<div>
+					<h1>Gear</h1>
+					<div class="sheet-downSeparation">
+						<div class="sheet-flexColumn">
+							<div class="sheet-flexRow">
+								<span>Worn outfit</span>
+								<input type="text" name="attr_outfit" placeholder="Functional outfit" />
+								<input type="checkbox" name="attr_outfit_fold" class="sheet-arrow sheet-rightFloat" checked />
+								<span class="sheet-rightFloat"></span>
+								<div class="sheet-flexGrow sheet-flexEnd">
+									<button type="roll" name="roll_outfit" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=@{outfit}}} {{infos=@{outfit_notes}}}"></button>
+								</div>
+							</div>
+							<input type="hidden" name="attr_outfit_fold" class="sheet-arrow" />
+							<textarea name="attr_outfit_notes" class="sheet-autoWidth sheet-foldable" placeholder="These outfits are plain and practical.
+	► This Outfit does not provide any bonuses or penalties when worn."></textarea>
+						</div>
+					</div>
+					<div class="sheet-flexRow sheet-downGap sheet-upGap">
+						<div class="sheet-flexGrow sheet-flexColumn">
+							<div>
+								<input type="hidden" name="attr_inventory_total" value="10" />
+								<button type="roll" name="roll_inventory" value="&{template:generic} {{charName=@{character_name}}} {{rollName=Inventory}} {{subLabel= total}} {{total=[[@{inventory_base}+@{inventory_modifier}]]}}"><span name="attr_inventory_total"></span></button>
+								<span>Inventory slots</span>
+							</div>
+							<div>
+								<input type="hidden" name="attr_inventory_left" value="10" />
+								<button type="roll" name="roll_inventory_left" value="&{template:generic} {{charName=@{character_name}}} {{rollName=Inventory}} {{subLabel= left}} {{total=[[@{inventory_base}+@{inventory_modifier}-@{total_weight}]]}}"><span name="attr_inventory_left"></span></button>
+								<span>Inventory left</span>
+							</div>
+						</div>
+						<div class="sheet-flexGrow sheet-flexEnd sheet-flexColumn">
+							<div class="sheet-flexEnd sheet-attributeBase">
+								<span>Base</span>
+								<input type="number" name="attr_inventory_base" />
+							</div>
+							<div class="sheet-flexEnd sheet-attributeBase">
+								<span>Bonuses/Penalties</span>
+								<input type="number" name="attr_inventory_modifier" />
+							</div>
+						</div>
+					</div>
+					<div>
+						<input type="hidden" name="attr_total_weight" value="0" />
+						<fieldset class="repeating_inventory">
+							<div class="sheet-flexColumn sheet-downGap sheet-box">
+								<div class="sheet-flexRow">
+									<input type="text" name="attr_inventory_name" value="Item name" />
+									<span>Quantity</span>
+									<input type="number" name="attr_inventory_quantity" value="1"/>
+									<input type="checkbox" name="attr_inventory_fold" class="sheet-arrow sheet-rightFloat" checked />
+									<span class="sheet-rightFloat"></span>
+									<div class="sheet-flexGrow sheet-flexEnd">
+										<button type="roll" name="roll_inventory_item" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=@{inventory_name}}} {{infos=@{inventory_notes}}}"></button>
+									</div>
+								</div>
+								<input type="hidden" name="attr_inventory_fold" class="sheet-arrow" />
+								<div class="sheet-flexColumn sheet-foldable">
+									<div class="sheet-flexRow">
+										<span>Object size</span>
+										<input type="number" name="attr_inventory_size" value="1"/>
+									</div>
+									<textarea name="attr_inventory_notes" class="sheet-autoWidth sheet-foldable" placeholder="Item description"></textarea>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+				</div>
+				<div>
+					<h6>Retrieving items takes...</h6>
+					<h6>2 Actions from a <b>BACKPACK</b></h6>
+					<h6>1 Action from a <b>TRAVELER’S BAG</b></h6>
+				</div>
+				<div>
+					<h1>Wealth</h1>
+					<h6>100 stones = 1 coin, 100 coins = 1 gem</h6>
+					<div class="sheet-flexRow">
+						<div class="sheet-flexGrow">
+							<span>Stones</span>
+							<input type="number" name="attr_wealth_stones" value="0" />
+						</div>
+						<div class="sheet-flexGrow">
+							<span>Coins</span>
+							<input type="number" name="attr_wealth_coins" value="0" />
+						</div>
+						<div class="sheet-flexGrow">
+							<span>Gems</span>
+							<input type="number" name="attr_wealth_gems" value="0" />
+						</div>
+					</div>
+				</div>
+				<div>
+					<h1>Rank & XP</h1>
+					<div class="sheet-flexRow">
+						<div class="sheet-flexGrow">
+							<span>Rank</span>
+							<input type="number" name="attr_rank" value="1" />
+						</div>
+						<div class="sheet-flexGrow">
+							<span>Current XP</span>
+							<input type="number" name="attr_xp_current" value="0" />
+						</div>
+						<div class="sheet-flexGrow">
+							<span>XP for next rank</span>
+							<input type="number" name="attr_xp_next" value="6" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div>
+			<h1>Notes</h1>
+			<div class="sheet-flexColumn">
+				<textarea name="attr_notes" class="sheet-scalableTextArea"></textarea>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- End Of Characters Sheet -->
+
+<!-- Rolls Templates  -->
+<rolltemplate class="sheet-rolltemplate-carac">
+	<div class="sheet-template-container">
+		<div class="sheet-template-header"><h1>{{charName}} {{rollName}}</h1></div>
+		<div class="sheet-template-contents">
+			<div class="sheet-template-row"><span>Total = </span>{{computed::total}} / {{computed::attribute}}</div>
+			<div class="sheet-template-row"><span></span>{{computed::result}}</div>
+			<div class="sheet-rolls">
+				<div class="sheet-template-row"><span>Modifier = </span>{{computed::modifier}}</div>
+				<div class="sheet-template-row"><span>Roll Type = </span>{{computed::rollType}}</div>
+				<div class="sheet-template-row">{{#attribute}}<span>Target = </span>{{computed::attribute}}{{/attribute}}</div>
+			</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-generic">
+	<div class="sheet-template-container">
+		<div class="sheet-template-header"><h1>{{charName}} {{rollName}}</h1></div>
+		<div class="sheet-template-contents">
+			<div class="sheet-template-row">{{rollName}}{{subLabel}} = {{total}}</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-weapon">
+	<div class="sheet-template-container">
+		<div class="sheet-template-header"><h1>{{charName}} {{rollName}}</h1></div>
+		<div class="sheet-template-contents">
+			<div class="sheet-template-row"><span>Attack with </span>{{subLabel}} = {{total}}</div>
+			<div class="sheet-template-row"><span>Damages = </span>{{damages}}♥</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-infos">
+	<div class="sheet-template-container">
+		<div class="sheet-template-header"><h1>{{charName}} {{rollName}}</h1></div>
+		<div class="sheet-template-contents">
+			<div class="sheet-template-row"><span>{{infos}}</span></div>
+		</div>
+	</div>
+</rolltemplate>
+
+<!-- Rolls Templates End -->
+
+</html>

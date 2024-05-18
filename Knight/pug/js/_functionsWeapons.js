@@ -132,6 +132,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isTirSecurite = false;
   let isUltraviolence = false;
 
   let isBourreau = false;
@@ -515,7 +516,10 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eReaction) { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
-  if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
+  if (eTirSecurite) {
+    autresEffets.push(i18n_tirSecurite);
+    isTirSecurite = true;
+  }
 
   if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
 
@@ -583,6 +587,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isAmbidextrie = isAmbidextrie;
   result.isDeuxMains = isDeuxMains;
   result.isLourd = isLourd;
+  result.isTirSecurite = isTirSecurite;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -3746,7 +3751,7 @@ async function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion,
   return result;
 }
 
-function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd) {
+function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -3769,11 +3774,14 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
 
       if (isAAgressive) { autresAmeliorationsS.push(i18n_agressive); }
       break;
@@ -3926,7 +3934,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
   return result;
 }
 
-function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
+function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -3946,11 +3954,14 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
       break;
 
     case 'agressif':

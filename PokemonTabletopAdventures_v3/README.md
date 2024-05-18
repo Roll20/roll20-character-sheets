@@ -23,6 +23,21 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Apr 10, 2024
+- Added support for collapsing the character avatar/stat grid section to show only the stat grid when collapsed
+- Resolved a small issue with the background when the sheet scrolled sideways for the mobile app
+
+### Apr 5, 2024
+- Added support for collapsing the entire trainer features section
+- Added support for showing the character avatar in the stat grid section
+- Improved visibility of section headers
+
+<details>
+  <summary><u>Expand for 2023 Changes</u></summary>
+
+### Sep 23, 2023
+- Added an Advanced Class section to the Hybrid sheet's character details section
+
 ### Feb 22, 2023
 - It's the Form Changes update!
   - Added Terastallization, Dynamax/Gigantamax, Mega Evolution, and 3 fully customizable form changes
@@ -41,6 +56,8 @@ Things we want to add to the character sheet, presented in no particular order o
   - Updated the scatter selection to change the attack rolls, so that lower-hit moves aren't rolling many sets of dice
   - Added support for scatter attacks that hit up to 10 times
   - Clarified the intent of each scatter type selection by explicitly stating how many hits are in each roll
+
+</details>
 
 <details>
   <summary><u>Expand for 2022 Changes</u></summary>

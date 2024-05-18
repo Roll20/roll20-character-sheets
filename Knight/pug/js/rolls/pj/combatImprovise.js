@@ -268,9 +268,9 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let getStyle;
 
     if (type.includes('&{template:combat} {{portee=^{portee-contact}}}')) {
-      getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
+      getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false, false);
     } else {
-      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, hasArmure, oTir, false, false, false, false);
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, 0, hasArmure, oTir, false, false, false, false, false);
     }
 
     exec = exec.concat(getStyle.exec);

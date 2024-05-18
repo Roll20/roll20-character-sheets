@@ -1,0 +1,1595 @@
+<script type="text/worker">
+	/* CONTANTES */
+	/* ------------------------------ */
+	/*           CONTANTES            */
+	/* ------------------------------ */
+	
+	const gaiaParametros = ['precisao','brutalidade','destreza','agilidade','canalizacao','arcanismo','espirito','vigor','ofensivos','defensivos'];
+	const gaiaConhecimentos = ['carisma','mistico','exploracao','furtividade','historia','intimidacao','intuicao','medicina','percepcao','performance','religiao','sobrevivencia','tecnologia','vontade'];
+
+	/* ------------------------------ */
+	/*            HELPERS             */
+	/* ------------------------------ */
+	
+	/* HELPERS */
+	function getListener(inputs = [], prefixes = [''], sufixes = ['']) {
+		// Example ([...gaiaParametros], ['change:']) => change:precicao change:brutalidade, ..., change:vigor
+		// Example ([...gaiaParametros], ['change:'], ['','temp']) => change:precicao change:precicaotemp, ..., change:vigortemp
+		let listeners = [];
+		for( let inp of inputs ) {
+			for( let pre of prefixes ) {
+				preinp = `${pre}${inp}`
+				for( let suf of sufixes ) {
+					preinpsuf = `${preinp}${suf}`;
+					listeners.push(preinpsuf);
+				}
+			}
+		}
+		return listeners.join(' ');
+	}
+	
+	/* ------------------------------ */
+	/*        AUTO-CALCULATED         */
+	/* ------------------------------ */
+	
+	// RECURSO MAX
+	on("change:vidatotal, change:vidatemp", function(e){
+		getAttrs(['vidatotal','vidatemp'], function( attb ){
+			setAttrs({
+				vida_max: Math.max(0,attb.vidatotal) + Math.max(attb.vidatemp)
+			});
+		});
+	});
+	on("change:energiatotal, change:energiatemp", function(e){
+		getAttrs(['energiatotal','energiatemp'], function( attb ){
+			setAttrs({
+				energia_max: Math.max(0,attb.energiatotal) + Math.max(attb.energiatemp)
+			});
+		});
+	});
+
+	//PARÂMETROS/CONHECIMENTOS
+	on(getListener([...gaiaParametros, ...gaiaConhecimentos], ['change:'], ['_box','_temp']), function(e){
+		let parametro = e.triggerName.replace(/_\w+$/, '');
+		getAttrs([`${parametro}_box`, `${parametro}_temp`], function( v ){
+			let updateData = {};
+			let total = Object.values(v).reduce((acc, valor) => acc += Number(valor), 0 );
+			updateData[ parametro ] = Math.min(total, 6);
+			setAttrs(updateData);
+		});
+	});
+
+	//EXAUSTÃO
+	on("change:exaustao_box", function(e){
+		getAttrs(["exaustao_box"], function( v ){
+			console.log(v);
+			setAttrs({
+				"exaustao": v.exaustao_box * -1
+			});
+		});
+	});
+
+	//BLOQUEIO
+	on("change:armadura_bloqueio change:escudo_bloqueio change:bloqueio_bonus", function(e){
+		getAttrs(["armadura_bloqueio", "escudo_bloqueio", "bloqueio_bonus"], function( v ){
+			let bloqueio = 0;
+			bloqueio += (Number(v.armadura_bloqueio) ?? 0);
+			bloqueio += (Number(v.escudo_bloqueio) ?? 0);
+			bloqueio += (Number(v.bloqueio_bonus) ?? 0);
+			setAttrs({
+				"bloqueio": bloqueio
+			});
+		}); 
+	});
+
+	//Movimento
+	on("change:agilidade change:movimento_bonus change:exaustao change:homuncularium change:defensivo", function(e){
+		getAttrs(["agilidade", "movimento_bonus", "exaustao", "homuncularium", "defensivo"], function( v ){
+			let movimento = 6;
+			if ( v.homuncularium == '1' ) {
+				movimento += ( Math.floor(Number(v.defensivo) / 2) ?? 0);
+			} else {
+				movimento += ( Math.floor(Number(v.agilidade) / 2) ?? 0);
+			}
+			movimento += (Number(v.movimento_bonus) ?? 0);
+			movimento += (Number(v.exaustao) ?? 0);
+			
+			setAttrs({
+				"movimento": movimento
+			});
+		}); 
+	});
+
+	//UNIDADE
+	on(getListener(['brutalidade'], ['change:'], ['_box','_temp']), function(e){
+		getAttrs(['brutalidade_box'], function( v ){
+			console.log(v);
+			setAttrs({
+				"unidade_max": 100 + ( v.brutalidade_box * 25 )
+			});
+		});
+	});
+
+	//EQUIPAMENTO
+	on('change:repeating_inventory remove:repeating_inventory', function() {
+		repeatingSum("encumbrance_total","inventory",["item_weight","item_number"]);
+	});
+
+	const repeatingSum = (destinations, section, fields) => {
+		if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
+		if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+		getSectionIDs(`repeating_${section}`, idArray => {
+			const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+			getAttrs([...attrArray], v => {
+				const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
+				const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
+				const output = {};
+				destinations.forEach((destination, index) => {
+					output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
+				});
+				setAttrs(output);
+			}); 
+		}); 
+	};
+
+	on('change:repeating_inventario remove:repeating_inventario', function() {
+		repeatingSum("unidade","inventario",["item_quantidade","item_unidade"]);
+	});
+
+
+	/* Habilidades e Características */
+	on("change:repeating_abilities:habilidade_custo change:repeating_abilities:habilidade_alvo change:repeating_abilities:habilidade_alcance change:repeating_abilities:habilidade_acao change:repeating_abilities:habilidade_tipo change:repeating_abilities:habilidade_duracao", function(e) {
+		let campos = ['_custo','_alvo','_alcance','_acao','_tipo','_duracao'];
+		let attrs = campos.map((c) => `repeating_abilities_habilidade${c}`);
+		getAttrs(attrs, function(v){
+			let header = '';
+			if( v['repeating_abilities_habilidade_custo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_abilities_habilidade_custo'];
+			}
+			if( v['repeating_abilities_habilidade_alcance'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_abilities_habilidade_alcance'];
+			}
+			if( v['repeating_abilities_habilidade_alvo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_abilities_habilidade_alvo'];
+			}
+			if( v['repeating_abilities_habilidade_acao'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_abilities_habilidade_acao'];
+			}
+			if( v['repeating_abilities_habilidade_tipo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_abilities_habilidade_tipo'];
+			}
+			if( v['repeating_abilities_habilidade_duracao'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_abilities_habilidade_duracao'];
+			}
+			setAttrs({
+				'repeating_abilities_habilidade_header': header
+			});
+		});
+	});
+
+	on("change:repeating_abilities:habilidade_rolagem", function(e){
+		getAttrs(['repeating_abilities_habilidade_rolagem'], function(v){
+			let rollformula = v['repeating_abilities_habilidade_rolagem'];
+			setAttrs({
+				'repeating_abilities_habilidade_rollformula': (rollformula ? '[['+rollformula+']]' : '')
+			});
+		});
+	});
+
+	on("change:repeating_caracteristicas:caracteristica_rolagem", function(e){
+		getAttrs(['repeating_caracteristicas_caracteristica_rolagem'], function(v){
+			let rollformula = v['repeating_caracteristicas_caracteristica_rolagem'];
+			setAttrs({
+				'repeating_caracteristicas_caracteristica_rollformula': (rollformula ? '[['+rollformula+']]' : '')
+			});
+		});
+	});
+
+	on("change:repeating_caracteristicas:caracteristica_custo change:repeating_caracteristicas:caracteristica_alvo change:repeating_caracteristicas:caracteristica_alcance change:repeating_caracteristicas:caracteristica_acao change:repeating_caracteristicas:caracteristica_tipo change:repeating_caracteristicas:caracteristica_duracao", function(e) {
+		let campos = ['_custo','_alvo','_alcance','_acao','_tipo','_duracao'];
+		let attrs = campos.map((c) => `repeating_caracteristicas_caracteristica${c}`);
+		getAttrs(attrs, function(v){
+			let header = '';
+			if( v['repeating_caracteristicas_caracteristica_custo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_custo'];
+			}
+			if( v['repeating_caracteristicas_caracteristica_alvo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_alvo'];
+			}
+			if( v['repeating_caracteristicas_caracteristica_alcance'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_alcance'];
+			}
+			if( v['repeating_caracteristicas_caracteristica_acao'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_acao'];
+			}
+			if( v['repeating_caracteristicas_caracteristica_tipo'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_tipo'];
+			}
+			if( v['repeating_caracteristicas_caracteristica_duracao'] ) {
+				header += ( header ? ' | ' : ' ' ) + v['repeating_caracteristicas_caracteristica_duracao'];
+			}
+			setAttrs({
+				'repeating_caracteristicas_caracteristica_header': header
+			});
+		});
+	});
+
+	/* ------------------------------ */
+	/*      CONDITIONAL STYLING       */
+	/* ------------------------------ */
+
+	on("sheet:opened " + getListener([...gaiaParametros, ...gaiaConhecimentos], ['change:']), function(e){
+		let selector; 
+		// Aumento Temporario de Parâmetro/Conhecimento
+		getAttrs([...gaiaParametros, ...gaiaConhecimentos], function( v ){
+			for( let [key, valor] of Object.entries(v) ) {
+				selector = `input[name='attr_${key}_box']`
+				$20(selector).removeClass('temporario');
+				selector = `input[name='attr_${key}_box']:nth-of-type(-n+${valor})`;
+				//selector = `:nth-child( -n+${valor} of .gaia-radio )`;
+				$20(selector).addClass('temporario');
+			}
+		});
+	});
+</script>
+
+<div class="gaia-sheet">
+	<nav class="sheet-nav">
+		<label>HOMUNCULARIUM <input type="checkbox" class="homuncularium" name="attr_homuncularium" value="1" style="display: inline;"></label>
+	</nav>
+	<div class="tab-1">
+		<!-- INFOS DO PERSONAGEM -->
+		<div class="flexrow spaced no-wrap gaia-character-info">
+			<div class="form-group text-center">
+				<label class="title">Jogador</label>
+				<div class="gaia-border">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<input type="text" class="gaia-input" name="attr_player_name">
+				</div>
+			</div>
+			<div class="form-group text-center">
+				<label class="title">Personagem</label>
+				<div class="gaia-border">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<div>
+						<input type="text" class="gaia-input" name="attr_character_name">
+					</div>
+				</div>
+			</div>
+			<div class="form-group text-center legado">
+				<label class="title">Legado</label>
+				<div class="gaia-border">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<input type="text" class="gaia-input" name="attr_legado">
+				</div>
+			</div>
+			<div class="form-group text-center legado">
+				<label class="title">PDA</label>
+				<div class="gaia-border">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<input type="text" class="gaia-input pda-value" name="attr_pda" title="Ponto de Aprendizado">
+				</div>
+			</div>
+			<img src="https://raw.githubusercontent.com/VHPaiva/roll20-character-sheets/master/Gaia/assets/gaia-logo.png" class="gaia-logo" style="height: 70px;max-width: 150px;">
+		</div>
+		<!-- RECURSOS -->
+		<div class="flexrow space-around">
+			<div class="form-group recurso">
+				<span class="recurso-nome">Pontos de Vida</span>
+				<div class="gaia-border flexrow">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<div class="gaia-border-magic">
+						<input type="text" class="resource-max" name="attr_vidatotal" value="0" placeholder="Máximo" title="Máximo">
+						<input type="hidden" name="attr_vida_max" value="@{vidatotal} + @{vidatemp}" readonly/>
+					</div>
+					<div class="input-placeholder" data-placeholder="Atual">
+						<input type="text" class="resource-value" name="attr_vida" value="0">
+						<span class="placeholder">Atual</span>
+					</div>
+					<div class="input-placeholder" data-placeholder="Temp">
+						<input type="text" class="resource-temp" name="attr_vidatemp" value="0">
+						<span class="placeholder">Temp</span>
+					</div>
+				</div>
+			</div>
+			<div class="form-group recurso">
+				<span class="recurso-nome">Pontos de Energia</span>
+				<div class="gaia-border flexrow">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<div class="gaia-border-magic">
+						<input type="text" class="resource-max" name="attr_energiatotal" value="0" placeholder="Máximo" title="Máximo">
+						<input type="hidden" name="attr_energia_max" value="@{energiatotal} + @{energiatemp}" readonly/>
+					</div>
+					<div class="input-placeholder" data-placeholder="Atual">
+						<input type="text" class="resource-value" name="attr_energia" value="0" >
+						<span class="placeholder">Atual</span>
+					</div>
+					<div class="input-placeholder" data-placeholder="Temp">
+						<input type="text" class="resource-temp" name="attr_energiatemp" value="0">
+						<span class="placeholder">Temp</span>
+					</div>
+				</div>
+			</div>
+			<div class="form-group exaustao legado">
+				<span class="recurso-nome">Exaustão</span>
+				<div class="gaia-border flexcol">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<div class="flexrow">
+						<!-- ( exaustao * -1 )m de movimentação -->
+						<!-- ( exaustao * -1 ) em testes de parâmetro -->
+						<input type="hidden" name="attr_exaustao" value="0" class="">
+						<!-- <input type="hidden" name="attr_exaustao_box" value="0" class=""> -->
+						<input type="checkbox" name="attr_exaustao_box" value="1" class="gaia-radio">
+						<input type="checkbox" name="attr_exaustao_box" value="2" class="gaia-radio">
+						<input type="checkbox" name="attr_exaustao_box" value="3" class="gaia-radio">
+						<input type="checkbox" name="attr_exaustao_box" value="4" class="gaia-radio">
+						<input type="checkbox" name="attr_exaustao_box" value="5" class="gaia-radio">
+						<input type="checkbox" name="attr_exaustao_box" value="6" class="gaia-radio gaia-morte">
+						<!-- <input type="text" class="number-field" name="attr_exaustao" max="5" min="0"> -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- REMOVER? -->
+		<div class="flexrow hidden">
+			<div class="form-group text-center gaia-dados-morte">
+				<div class="text-center" style="display: inline-block;"><label class="title">Dados de Morte</label></div>
+				<div class="flexrow">
+					<div class="form-group flexrow reverse">
+						<!-- <input type="text" class="number-field" name="attr_dadiva"> -->
+						<!-- <div class="flexrow"> -->
+							<input type="hidden" name="attr_dadiva" value="0" class="">
+							<input type="checkbox" name="attr_dadiva_box" value="1" class="gaia-radio">
+							<input type="checkbox" name="attr_dadiva_box" value="2" class="gaia-radio">
+							<label>Dádiva</label>
+						<!-- </div> -->
+					</div>
+					<span class="separator"></span>
+					<div class="form-group flexrow">
+						<!-- <div class="flexrow"> -->
+							<input type="hidden" name="attr_sentenca" value="0" class="">
+							<input type="checkbox" name="attr_sentenca_box" value="1" class="gaia-radio">
+							<input type="checkbox" name="attr_sentenca_box" value="2" class="gaia-radio">
+						<!-- </div> -->
+						<!-- <input type="text" class="number-field" name="attr_sentenca"> -->
+						<label>Sentença</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- CORPO -->
+		<div class="flexrow">
+			<!-- SEÇÃO ESQUERDA -->
+			<div class="section-left flexcol chflex0">
+				<div class="flexrow spaced">
+					<!-- MOVIMENTAÇÃO -->
+					<div class="movimentacao sheet-section flexrow space-around">
+						<h4 class="section-title">Movimentação</h4>
+						<div class="gaia-border flexrow space-around">
+							<div class="gaia-border-corner-container">
+								<span class="gaia-border-corner topleft"></span>
+								<span class="gaia-border-corner topright"></span>
+								<span class="gaia-border-corner botleft"></span>
+								<span class="gaia-border-corner botright"></span>
+							</div>
+							<!-- <input type="text" readonly class="number-field" name="attr_movimento" title="6 + ( Agi / 2 )"> -->
+							<div class="input-placeholder" data-placeholder="Metros" >
+								<input type="text" disabled class="number-field" name="attr_movimentofinal" value="@{movimento}" title="6 + ( Agi / 2 )">
+								<span class="placeholder">Metros</span>
+							</div>
+							<div class="input-placeholder" data-placeholder="Bônus" >
+								<input type="text" class="number-field" name="attr_movimento_bonus" value="0" title="Bônus">
+								<span class="placeholder">Bônus</span>
+							</div>
+						</div>
+					</div>
+					<!-- BLOQUEIO -->
+					<div class="sheet-section flexrow space-around legado">
+						<h4 class="section-title">Bloqueio</h4>
+						
+						<div class="gaia-border flexrow no-wrap spaced">
+							<div class="gaia-border-corner-container">
+								<span class="gaia-border-corner topleft"></span>
+								<span class="gaia-border-corner topright"></span>
+								<span class="gaia-border-corner botleft"></span>
+								<span class="gaia-border-corner botright"></span>
+							</div>
+							<!-- <button type="roll" class="rollbtn" name="roll_bloqueio" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Bloqueio}}{{rollformula=[[?{Tipo| Normal, 1d12 | Aptidão, 2d12kh1 | Inaptidão, 2d12kl1} + @{bloqueio}]]}}"></button> -->
+							<button type="roll" class="" name="roll_bloqueio" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Bloqueio}}{{rollformula=[[@{bloqueio_dado} + @{bloqueio}]]}}"></button>
+							<div class="input-placeholder" data-placeholder="Total" >
+								<input type="text" class="item-bonus" name="attr_bloqueiofinal" value="@{bloqueio}" disabled >
+								<span class="placeholder">Total</span>
+								<!-- <input type="text" class="item-formula" name="attr_bloqueio_bonus" value="0" title="Bônus"> -->
+							</div>
+							<!-- <input type="text" class="item-formula" name="attr_bloqueio_bonus" > -->
+							<div class="input-placeholder" data-placeholder="Bônus" >
+								<input type="text" class="item-formula" name="attr_bloqueio_bonus" value="0" title="Bônus">
+								<span class="placeholder">Bônus</span>
+							</div>
+							<select class="aptidao" name="attr_bloqueio_dado" title="Aptidão/Inaptidão">
+								<option value="1d12">-</option>
+								<option value="2d12kh1">Aptidão</option>
+								<option value="2d12kl1">Inaptidão</option>
+							</select>
+						</div>
+					</div>
+					<!-- DEFESA -->
+					<div class="sheet-section flexrow space-around homuncularium">
+						<h4 class="section-title">Defesa</h4>
+						
+						<div class="gaia-border flexrow no-wrap spaced">
+							<div class="gaia-border-corner-container">
+								<span class="gaia-border-corner topleft"></span>
+								<span class="gaia-border-corner topright"></span>
+								<span class="gaia-border-corner botleft"></span>
+								<span class="gaia-border-corner botright"></span>
+							</div>
+							<button type="roll" class="" name="roll_defesa" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Defesa}}{{rollformula=[[@{defesa_dado} + @{defesa} + @{defesa_bonus}]]}}"></button>
+							<div class="input-placeholder" data-placeholder="Valor" >
+								<input type="text" class="item-bonus" name="attr_defesa" value="0">
+								<span class="placeholder"></span>
+							</div>
+							<div class="input-placeholder" data-placeholder="Bônus" >
+								<input type="text" class="item-formula" name="attr_defesa_bonus" value="0" title="Bônus">
+								<span class="placeholder">Bônus</span>
+							</div>
+							<select class="aptidao" name="attr_defesa_dado" title="Aptidão/Inaptidão">
+								<option value="1d12">-</option>
+								<option value="2d12kh1">Aptidão</option>
+								<option value="2d12kl1">Inaptidão</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<!-- PARÂMETROS -->
+				<div class="sheet-section flexrow space-around legado">
+					<h4 class="section-title">Parâmetros</h4>
+					<div class="gaia-border attb-list flexrow">
+						<div class="gaia-border-corner-container">
+							<span class="gaia-border-corner topleft"></span>
+							<span class="gaia-border-corner topright"></span>
+							<span class="gaia-border-corner botleft"></span>
+							<span class="gaia-border-corner botright"></span>
+						</div>
+						<div class="flexcol">
+							<div class="form-group parametro-linha flexrow" title="@{precisao}">
+								<button type="roll" class="roll-parametro" name="roll_precisao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Precisão}}{{rollformula=[[@{precisao_dado} + @{precisao} + @{precisao_bonus} + @{exaustao} ]]}}">Precisão</button>
+								<!-- <label>Precisão</label> -->
+								<!-- <input type="text" class="number-field" name="attr_precisao"> -->
+								<input type="checkbox" name="attr_precisao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_precisao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_precisao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_precisao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_precisao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_precisao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_precisao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_precisao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_precisao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_precisao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_brutalidade" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Brutalidade}}{{rollformula=[[@{brutalidade_dado} + @{brutalidade} + @{brutalidade_bonus} + @{exaustao} ]]}}">Brutalidade</button>
+								<!-- <label>Brutalidade</label> -->
+								<!-- <input type="text" class="number-field" name="attr_brutalidade"> -->
+								<input type="checkbox" name="attr_brutalidade_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_brutalidade_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_brutalidade_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_brutalidade_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_brutalidade_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_brutalidade_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_brutalidade" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_brutalidade_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_brutalidade_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_brutalidade_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_destreza" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Destreza}}{{rollformula=[[@{destreza_dado} + @{destreza} + @{destreza_bonus} + @{exaustao} ]]}}">Destreza</button>
+								<!-- <label>Destreza</label> -->
+								<!-- <input type="text" class="number-field" name="attr_destreza"> -->
+								<input type="checkbox" name="attr_destreza_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_destreza_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_destreza_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_destreza_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_destreza_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_destreza_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_destreza" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_destreza_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_destreza_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_destreza_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_agilidade" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Agilidade}}{{rollformula=[[@{agilidade_dado} + @{agilidade} + @{agilidade_bonus} + @{exaustao}]]}}">Agilidade</button>
+								<!-- <label>Agilidade</label> -->
+								<!-- <input type="text" class="number-field" name="attr_agilidade"> -->
+								<input type="checkbox" name="attr_agilidade_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_agilidade_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_agilidade_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_agilidade_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_agilidade_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_agilidade_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_agilidade" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_agilidade_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_agilidade_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_agilidade_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+								<div class="parametros-extra iniciativa flexrow">
+									<button type="roll" class="roll-parametro" name="roll_agilidade" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Agilidade (Iniciativa)}}{{rollformula=[[@{agilidade_dado} + @{agilidade} + @{agilidade_bonus} + @{exaustao} &{tracker}]]}}">Iniciativa</button>
+								</div>
+							</div>
+						</div>
+						<div class="flexcol">
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_canalizacao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Canalização}}{{rollformula=[[@{canalizacao_dado} + @{canalizacao} + @{canalizacao_bonus} + @{exaustao} ]]}}">Canalização</button>
+								<!-- <label>Canalização</label> -->
+								<!-- <input type="text" class="number-field" name="attr_canalizacao"> -->
+								<input type="checkbox" name="attr_canalizacao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_canalizacao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_canalizacao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_canalizacao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_canalizacao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_canalizacao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_canalizacao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_canalizacao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_canalizacao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_canalizacao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_arcanismo" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Arcanismo}}{{rollformula=[[@{arcanismo_dado} + @{arcanismo} + @{arcanismo_bonus} + @{exaustao} ]]}}">Arcanismo</button>
+								<!-- <label>Arcanismo</label> -->
+								<!-- <input type="text" class="number-field" name="attr_arcanismo"> -->
+								<input type="checkbox" name="attr_arcanismo_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_arcanismo_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_arcanismo_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_arcanismo_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_arcanismo_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_arcanismo_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_arcanismo" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_arcanismo_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_arcanismo_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_arcanismo_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_espirito" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Espírito}}{{rollformula=[[@{espirito_dado} + @{espirito} + @{espirito_bonus} + @{exaustao} ]]}}">Espírito</button>
+								<!-- <label>Espírito</label> -->
+								<!-- <input type="text" class="number-field" name="attr_espirito"> -->
+								<input type="checkbox" name="attr_espirito_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_espirito_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_espirito_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_espirito_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_espirito_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_espirito_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_espirito" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_espirito_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_espirito_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_espirito_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_vigor" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Vigor}}{{rollformula=[[@{vigor_dado} + @{vigor} + @{vigor_bonus} + @{exaustao} ]]}}">Vigor</button>
+								<!-- <label>Vigor</label> -->
+								<!-- <input type="text" class="number-field" name="attr_vigor"> -->
+								<input type="checkbox" name="attr_vigor_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_vigor_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_vigor_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_vigor_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_vigor_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_vigor_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_vigor" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_vigor_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_vigor_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_vigor_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- CONHECIMENTOS -->
+				<div class="sheet-section flexrow space-around legado">
+					<h4 class="section-title">Conhecimentos</h4>
+					<div class="gaia-border attb-list flexrow">
+						<div class="gaia-border-corner-container">
+							<span class="gaia-border-corner topleft"></span>
+							<span class="gaia-border-corner topright"></span>
+							<span class="gaia-border-corner botleft"></span>
+							<span class="gaia-border-corner botright"></span>
+						</div>
+						<div class="flexcol">
+							<!-- CARISMA -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_carisma" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Carisma}}{{rollformula=[[@{carisma_dado} + @{carisma} + @{carisma_bonus} ]]}}">Carisma</button>
+								<!-- <label>Carisma</label> -->
+								<!-- <input type="text" class="number-field" name="attr_carisma"> -->
+								<input type="checkbox" name="attr_carisma_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_carisma_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_carisma_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_carisma_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_carisma_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_carisma_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_carisma" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_carisma_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_carisma_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_carisma_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- CONHECIMENTO MISTICO -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_mistico" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Conhecimento Místico}}{{rollformula=[[@{mistico_dado} + @{mistico} + @{mistico_bonus} ]]}}">C. Místico</button>
+								<!-- <label>Místico</label> -->
+								<!-- <input type="text" class="number-field" name="attr_mistico"> -->
+								<input type="checkbox" name="attr_mistico_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_mistico_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_mistico_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_mistico_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_mistico_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_mistico_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_mistico" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_mistico_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_mistico_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_mistico_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- EXPLORAÇÃO -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_exploracao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Exploração}}{{rollformula=[[@{exploracao_dado} + @{exploracao} + @{exploracao_bonus} ]]}}">Exploração</button>
+								<!-- <label>Exploração</label> -->
+								<!-- <input type="text" class="number-field" name="attr_exploracao"> -->
+								<input type="checkbox" name="attr_exploracao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_exploracao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_exploracao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_exploracao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_exploracao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_exploracao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_exploracao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_exploracao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_exploracao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_exploracao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- FURTIVIDADE -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_furtividade" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Furtividade}}{{rollformula=[[@{furtividade_dado} + @{furtividade} + @{furtividade_bonus} ]]}}">Furtividade</button>
+								<!-- <label>Furtividade</label> -->
+								<!-- <input type="text" class="number-field" name="attr_furtividade"> -->
+								<input type="checkbox" name="attr_furtividade_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_furtividade_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_furtividade_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_furtividade_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_furtividade_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_furtividade_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_furtividade" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_furtividade_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_furtividade_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_furtividade_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- HISTÓRIA -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_historia" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=História}}{{rollformula=[[@{historia_dado} + @{historia} + @{historia_bonus} ]]}}">História</button>
+								<!-- <label>História</label> -->
+								<!-- <input type="text" class="number-field" name="attr_historia"> -->
+								<input type="checkbox" name="attr_historia_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_historia_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_historia_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_historia_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_historia_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_historia_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_historia" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_historia_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_historia_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_historia_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- INTIMIDAÇÃO -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_intimidacao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Intimidação}}{{rollformula=[[@{intimidacao_dado} + @{intimidacao} + @{intimidacao_bonus} ]]}}">Intimidação</button>
+								<!-- <label>Intimidação</label> -->
+								<!-- <input type="text" class="number-field" name="attr_intimidacao"> -->
+								<input type="checkbox" name="attr_intimidacao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_intimidacao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_intimidacao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_intimidacao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_intimidacao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_intimidacao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_intimidacao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_intimidacao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_intimidacao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_intimidacao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- INTUIÇÃO -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_intuicao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Intuição}}{{rollformula=[[@{intuicao_dado} + @{intuicao} + @{intuicao_bonus} ]]}}">Intuição</button>
+								<!-- <label>Intuição</label> -->
+								<!-- <input type="text" class="number-field" name="attr_intuicao"> -->
+								<input type="checkbox" name="attr_intuicao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_intuicao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_intuicao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_intuicao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_intuicao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_intuicao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_intuicao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_intuicao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_intuicao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_intuicao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="flexcol">
+							<!-- MEDICINA -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_medicina" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Medicina}}{{rollformula=[[@{medicina_dado} + @{medicina} + @{medicina_bonus} ]]}}">Medicina</button>
+								<!-- <label>Medicina</label> -->
+								<!-- <input type="text" class="number-field" name="attr_medicina"> -->
+								<input type="checkbox" name="attr_medicina_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_medicina_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_medicina_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_medicina_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_medicina_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_medicina_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_medicina" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_medicina_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_medicina_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_medicina_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- PERCEPÇÃO -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_percepcao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Percepção}}{{rollformula=[[@{percepcao_dado} + @{percepcao} + @{percepcao_bonus} ]]}}">Percepção</button>
+								<!-- <label>Percepção</label> -->
+								<!-- <input type="text" class="number-field" name="attr_percepcao"> -->
+								<input type="checkbox" name="attr_percepcao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_percepcao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_percepcao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_percepcao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_percepcao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_percepcao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_percepcao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_percepcao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_percepcao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_percepcao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- PERFORMANCE -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_performance" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Performance}}{{rollformula=[[@{performance_dado} + @{performance} + @{performance_bonus} ]]}}">Performance</button>
+								<!-- <label>Performance</label> -->
+								<!-- <input type="text" class="number-field" name="attr_performance"> -->
+								<input type="checkbox" name="attr_performance_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_performance_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_performance_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_performance_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_performance_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_performance_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_performance" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_performance_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_performance_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_performance_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- RELIGIÃO -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_religiao" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Religião}}{{rollformula=[[@{religiao_dado} + @{religiao} + @{religiao_bonus} ]]}}">Religião</button>
+								<!-- <label>Religião</label> -->
+								<!-- <input type="text" class="number-field" name="attr_religiao"> -->
+								<input type="checkbox" name="attr_religiao_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_religiao_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_religiao_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_religiao_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_religiao_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_religiao_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_religiao" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_religiao_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_religiao_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_religiao_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- SOBREVIVÊNCIA -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_sobrevivencia" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Sobrevivência}}{{rollformula=[[@{sobrevivencia_dado} + @{sobrevivencia} + @{sobrevivencia_bonus} ]]}}">Sobrevivência</button>
+								<!-- <label>Percepção</label> -->
+								<!-- <input type="text" class="number-field" name="attr_sobrevivencia"> -->
+								<input type="checkbox" name="attr_sobrevivencia_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_sobrevivencia_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_sobrevivencia_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_sobrevivencia_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_sobrevivencia_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_sobrevivencia_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_sobrevivencia" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_sobrevivencia_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_sobrevivencia_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_sobrevivencia_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- TECNOLOGIA -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_tecnologia" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Tecnologia}}{{rollformula=[[@{tecnologia_dado} + @{tecnologia} + @{tecnologia_bonus} ]]}}">Tecnologia</button>
+								<!-- <label>Tecnologia</label> -->
+								<!-- <input type="text" class="number-field" name="attr_tecnologia"> -->
+								<input type="checkbox" name="attr_tecnologia_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_tecnologia_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_tecnologia_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_tecnologia_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_tecnologia_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_tecnologia_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_tecnologia" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_tecnologia_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_tecnologia_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_tecnologia_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+							<!-- VONTADE -->
+							<div class="form-group parametro-linha flexrow">
+								<button type="roll" class="roll-parametro" name="roll_vontade" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Vontade}}{{rollformula=[[@{vontade_dado} + @{vontade} + @{vontade_bonus} ]]}}">Vontade</button>
+								<!-- <label>Vontade</label> -->
+								<!-- <input type="text" class="number-field" name="attr_vontade"> -->
+								<input type="checkbox" name="attr_vontade_box" value="1" class="gaia-radio">
+								<input type="checkbox" name="attr_vontade_box" value="2" class="gaia-radio">
+								<input type="checkbox" name="attr_vontade_box" value="3" class="gaia-radio">
+								<input type="checkbox" name="attr_vontade_box" value="4" class="gaia-radio">
+								<input type="checkbox" name="attr_vontade_box" value="5" class="gaia-radio">
+								<input type="checkbox" name="attr_vontade_box" value="6" class="gaia-radio">
+								<input type="hidden" name="attr_vontade" value="0" class="">
+								<div class="parametros-extra flexrow">
+									<div class="input-placeholder" data-placeholder="Temp">
+										<input type="text" class="number-field" name="attr_vontade_temp" value="0" title="Temporário">
+										<span class="placeholder">Temp</span>
+									</div>
+									<div class="input-placeholder" data-placeholder="Bônus" >
+										<input type="text" class="number-field" name="attr_vontade_bonus" value="0" title="Bônus">
+										<span class="placeholder">Bônus</span>
+									</div>
+									<select class="aptidao" name="attr_vontade_dado" title="Aptidão/Inaptidão">
+										<option value="1d12">-</option>
+										<option value="2d12kh1">Aptidão</option>
+										<option value="2d12kl1">Inaptidão</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="form-group flexrow flex100">
+							<label for="">Especializações</label>
+							<input type="text" name="attr_especializacao">
+						</div>
+					</div>
+				</div>
+				<!-- CARACTERISTICAS HOMUNCULARIUM -->
+				<div class="sheet-section flexrow space-around homuncularium">
+					<div class="gaia-border flexcol">
+						<div class="gaia-border-corner-container">
+							<span class="gaia-border-corner topleft"></span>
+							<span class="gaia-border-corner topright"></span>
+							<span class="gaia-border-corner botleft"></span>
+							<span class="gaia-border-corner botright"></span>
+						</div>
+						<div class="form-group flexrow">
+							<label>Dificuldade</label>
+							<select name="attr_dificuldade">
+								<option value="Fácil">Fácil</option>
+								<option value="Normal">Normal</option>
+								<option value="Difícil">Difícil</option>
+								<option value="Extrema">Extrema</option>
+							</select>
+						</div>
+						<div class="form-group flexrow">
+							<label style="max-width: 60%;">Poder</label>
+							<button type="roll" class="flex0" name="roll_poder" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Poder}}{{rollformula=[[@{poder_dado} + @{poder} + @{poder_temp}]]}}"></button>
+							<input type="text" name="attr_poder" class="item-bonus" value="0" min="0">
+							<div class="input-placeholder flex0" data-placeholder="Temporário" >
+								<input type="text" class="number-field" name="attr_poder_temp" value="0" min="0" title="Temporário">
+								<span class="placeholder">Temp</span>
+							</div>
+							<select class="aptidao" name="attr_poder_dado" title="Aptidão/Inaptidão">
+								<option value="1d12">-</option>
+								<option value="2d12kh1">Aptidão</option>
+								<option value="2d12kl1">Inaptidão</option>
+							</select>
+						</div>
+						<div class="form-group flexrow">
+							<label style="max-width: 60%;">Parâmetros Ofensivos</label>
+							<button type="roll" class="flex0" name="roll_ofensivo" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Parâmetros Ofensivos}}{{rollformula=[[@{ofensivo_dado} + @{ofensivo} + @{ofensivo_temp}]]}}"></button>
+							<input type="text" name="attr_ofensivo" class="item-bonus" value="0" min="0">
+							<div class="input-placeholder flex0" data-placeholder="Temporário" >
+								<input type="text" class="number-field" name="attr_ofensivo_temp"  value="0" min="0" title="Temporário">
+								<span class="placeholder">Temp</span>
+							</div>
+							<select class="aptidao" name="attr_ofensivo_dado" title="Aptidão/Inaptidão">
+								<option value="1d12">-</option>
+								<option value="2d12kh1">Aptidão</option>
+								<option value="2d12kl1">Inaptidão</option>
+							</select>
+						</div>
+						<div class="form-group flexrow">
+							<label style="max-width: 60%;">Parâmetros Defensivos</label>
+							<button type="roll" class="flex0" name="roll_defensivo" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Parâmetros Defensivos}}{{rollformula=[[@{defensivo_dado} + @{defensivo} + @{defensivo_temp}]]}}"></button>
+							<input type="text" name="attr_defensivo" class="item-bonus" value="0" min="0">
+							<div class="input-placeholder flex0" data-placeholder="Temporário" >
+								<input type="text" class="number-field" name="attr_defensivo_temp"  value="0" min="0" title="Temporário">
+								<span class="placeholder">Temp</span>
+							</div>
+							<select class="aptidao" name="attr_defensivo_dado" title="Aptidão/Inaptidão">
+								<option value="1d12">-</option>
+								<option value="2d12kh1">Aptidão</option>
+								<option value="2d12kl1">Inaptidão</option>
+							</select>
+						</div>
+						<div class="form-group flexrow reverse">
+							<button type="roll" class="flex0" name="roll_iniciativa" value="&{template:gaia-roll}{{character=@{character_name}}}{{rollname=Iniciativa}}{{rollformula=[[@{defensivo_dado} + @{defensivo} + @{defensivo_temp} &{tracker}]]}}">Iniciativa</button>
+						</div>
+						<div class="flexrow ">
+							<button type="roll" class="rollbtn" name="roll_ataque" value="&{template:gaia-attack}{{character=@{character_name}}}{{rollname=Ataque @{ataque_hom_tipo}}}{{rollataque=[[@{ataque_hom_dado} + @{ofensivo} + @{ofensivo_temp} + @{exaustao}]]}}{{rolldano=[[@{poder}d8 + @{ataque_hom_dano} ]]}} {{tipodano=@{ataque_hom_dano_tipo}}} {{alcance=@{ataque_hom_alcance}}} {{propriedades=@{ataque_hom_propriedade}}}"></button>
+							<select class="" name="attr_ataque_hom_tipo">
+								<option value="Físico">Ataque Físico</option>
+								<option value="Mágico">Ataque Mágico</option>
+							</select>
+							<input type="text" class="item-formula" name="attr_ataque_hom_dano" value="">
+							<input type="hidden" name="attr_ataque_hom_alcance">
+							<input type="hidden" name="attr_ataque_hom_dano_tipo">
+							<input type="hidden" name="attr_ataque_hom_propriedade" value="">
+							
+							<select class="aptidao" name="attr_ataque_hom_dado" title="Aptidão/Inaptidão">
+								<option value="1d12">-</option>
+								<option value="2d12kh1">Aptidão</option>
+								<option value="2d12kl1">Inaptidão</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div style="flex:0 0 1em"></div>
+			<!-- SEÇÃO DIREITA -->
+			<div class="section-right sheet-section flexcol legado">
+				<nav class="sheet-nav-1 flexrow">
+					<label>Equipamento <input type="radio" class="equipamento" name="secondary-tab" value="equipamento" checked></label>
+					<label>Habilidades <input type="radio" class="habilidades" name="secondary-tab" value="habilidades" ></label>
+					<label>Inventário <input type="radio" class="inventario" name="secondary-tab" value="inventario" ></label>
+					<label>Notas <input type="radio" class="notas" name="secondary-tab" value="notas" ></label>
+				</nav>
+				<!-- TAB EQUIPAMENTO -->
+				<div class="secondary-tab equipamento gaia-border flexcol chflex0">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<!-- <h3 class="text-center">EQUIPAMENTO</h3> -->
+					<!-- Condições e Efeitos OLD -->
+					<div class="armamentos">
+						<div class="flexrow no-wrap spaced">
+							<button type="roll" class="rollbtn colbutton" disabled ></button>
+							<div class="list-header-col item-name">Armamento</div>
+							<div class="list-header-col item-bonus">Dano<br>Base</div>
+							<div class="list-header-col item-formula">Dano<br>Bônus</div>
+							<div class="list-header-col item-bonus" title="Bônus no Teste de Parâmetro">Bônus<br>Pre/Can</div>
+							<div class="rollbtn item-edit"></div>
+						</div>
+						<div class="arma">
+							<fieldset class="repeating_attacks">
+								<div class="flexrow attack">
+									<div class="flexrow spaced">
+										<button type="roll" class="rollbtn" name="roll_ataque" value="&{template:gaia-attack}{{character=@{character_name}}}{{rollname=@{arma_nome}}}{{rollataque=[[@{arma_dado} + @{arma_ataque_parametro} + @{arma_ataque_bonus} + @{exaustao}]]}}{{rolldano=[[@{arma_dano_base} + (@{arma_dano_base}*[[@{arma_dano_parametro}]]) + @{arma_dano_bonus} ]]}} {{tipodano=@{arma_dano_tipo}}} {{alcance=@{arma_alcance}}} {{propriedades=@{arma_propriedade}}}"></button>
+										
+										<input type="text" class="item-name" name="attr_arma_nome">
+										<input type="text" class="item-bonus" name="attr_arma_dano_base" min="0" value="0">
+										<input type="text" class="item-formula" name="attr_arma_dano_bonus" min="0" value="0">
+										<input type="text" class="item-bonus" name="attr_arma_ataque_bonus" min="0" value="0">
+										<input type="checkbox" class="sheet-controls item-edit">
+										<div class="flexrow space-around hiddenattr">
+											<div class="input-placeholder flex0" data-placeholder="Parâmetro Ataque" >
+												<select class="item-param" name="attr_arma_ataque_parametro">
+													<option value="(@{precisao} + @{precisao_bonus})">Precisão</option>
+													<option value="(@{canalizacao} + @{canalizacao_bonus})">Canalização</option>
+													<option value="(@{brutalidade} + @{brutalidade_bonus})">Brutalidade</option>
+													<option value="(@{destreza} + @{destreza_bonus})">Destreza</option>
+													<option value="(@{agilidade} + @{agilidade_bonus})">Agilidade</option>
+													<option value="(@{arcanismo} + @{arcanismo_bonus})">Arcanismo</option>
+													<option value="(@{espirito} + @{espirito_bonus})">Espírito</option>
+													<option value="(@{vigor} + @{vigor_bonus})">Vigor</option>
+												</select>
+												<span class="placeholder">Parâmetro Ataque</span>
+											</div>
+											<div class="input-placeholder flex0" data-placeholder="Parâmetro Dano" >
+												<select class="item-param" name="attr_arma_dano_parametro">
+													<option value="@{brutalidade}">Brutalidade</option>
+													<option value="@{precisao}">Precisão</option>
+													<option value="@{destreza}">Destreza</option>
+													<option value="@{agilidade}">Agilidade</option>
+													<option value="@{canalizacao}">Canalização</option>
+													<option value="@{arcanismo}">Arcanismo</option>
+													<option value="@{espirito}">Espírito</option>
+													<option value="@{vigor}">Vigor</option>
+												</select>
+												<span class="placeholder">Parâmetro Dano</span>
+											</div>
+											<div class="input-placeholder flex0" data-placeholder="Tipo Dano" >
+												<input type="text" class="item-param" name="attr_arma_dano_tipo">
+												<span class="placeholder">Tipo Dano</span>
+											</div>
+											<div class="input-placeholder flex0" data-placeholder="Alcance (m)" >
+												<input type="text" class="item-bonus" name="attr_arma_alcance">
+												<span class="placeholder">Alcance (m)</span>
+											</div>
+											<div class="input-placeholder flex0" data-placeholder="Propriedades" >
+												<input type="text" class="item-text1" name="attr_arma_propriedade">
+												<span class="placeholder">Propriedades</span>
+											</div>
+											<div class="attr flex0">
+												<select class="aptidao" name="attr_arma_dado" title="Aptidão/Inaptidão">
+													<option value="1d12">-</option>
+													<option value="2d12kh1">Aptidão</option>
+													<option value="2d12kl1">Inaptidão</option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+							</fieldset>
+						</div>
+					</div>
+					<br>
+					<div>
+						<div class="flexrow no-wrap spaced">
+							<div class="list-header-col item-name">Armadura<br>/Escudo</div>
+							<div class="list-header-col item-bonus">Bloqueio</div>
+							<div class="list-header-col item-param">Inaptidão</div>
+							<div class="list-header-col item-param">Propriedade</div>
+						</div>
+						<div class="flexrow spaced">
+							<input type="text" class="item-name" name="attr_armadura_nome">
+							<input type="text" class="item-bonus" name="attr_armadura_bloqueio">
+							<input type="text" class="item-param" name="attr_armadura_inapitidao">
+							<input type="text" class="item-param" name="attr_armadura_propmistica">
+						</div>
+						<div class="flexrow spaced">
+							<input type="text" class="item-name" name="attr_escudo_nome">
+							<input type="text" class="item-bonus" name="attr_escudo_bloqueio">
+							<input type="text" class="item-param" name="attr_escudo_inapitidao">
+							<input type="text" class="item-param" name="attr_escudo_propmistica">
+						</div>
+						
+					</div>
+					<br>
+					<div class="form-group flexrow">
+						<h3 class="text-center">Condições e Efeitos</h3>
+						<textarea name="attr_efeitos"></textarea>
+					</div>
+					<!-- Tesouros OLD -->
+					<!-- Idiomas OLD -->
+				</div>
+				<!-- TAB HABILIDADES -->
+				<div class="secondary-tab habilidades gaia-border flexcol">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<!-- <h3 class="text-center">Habilidades</h3> -->
+					<div class="habilidades">
+						<fieldset class="repeating_abilities">
+							<div class="flexrow ability spaced">
+								<button type="roll" class="rollbtn" name="roll_habilidade" value="&{template:gaia-ability}{{character=@{character_name}}}{{rollname=@{habilidade_nome}}} {{custo=@{habilidade_custo}}} {{alvo=@{habilidade_alvo}}} {{alcance=@{habilidade_alcance}}} {{acao=@{habilidade_acao}}} {{tipo=@{habilidade_tipo}}} {{descricao=@{habilidade_descricao}}} {{aprimoramento=@{habilidade_aprimoramento}}} {{header=@{habilidade_header}}} {{rolagem= @{habilidade_rollformula} }}"></button>
+								<input type="text" class="item-name2" name="attr_habilidade_nome" placeholder="Nome">
+								<input type="text" class="item-name2" name="attr_habilidade_origem" placeholder="Origem">
+								<input type="checkbox" class="sheet-controls item-edit">
+								<div class="flexrow spaced hiddenattr">
+									<input type="hidden" name="attr_habilidade_header" value="">
+									<input type="hidden" name="attr_habilidade_rollformula" value="">
+									<div class="flexrow space-around">
+										<div class="input-placeholder flex0" data-placeholder="Custo" >
+											<input type="text" class="item-header" name="attr_habilidade_custo" value="" title="Custo">
+											<span class="placeholder">Custo</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Alcance" >
+											<input type="text" class="item-header" name="attr_habilidade_alcance" value="" title="Alcance">
+											<span class="placeholder">Alcance</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Alvo" >
+											<input type="text" class="item-header" name="attr_habilidade_alvo" value="" title="Alvo">
+											<span class="placeholder">Alvo/Área</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Ação" >
+											<input type="text" class="item-header" name="attr_habilidade_acao" value="" title="Ação">
+											<span class="placeholder">Ação</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Tipo" >
+											<input type="text" class="item-header" name="attr_habilidade_tipo" value="" title="Tipo">
+											<span class="placeholder">Tipo</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Duração" >
+											<input type="text" class="item-header" name="attr_habilidade_duracao" value="" title="Duração">
+											<span class="placeholder">Duração</span>
+										</div>
+										<div class="input-placeholder flex" data-placeholder="Rolagem" >
+											<input type="text" class="item-rollformula" name="attr_habilidade_rolagem" value="" title="Rolagem">
+											<span class="placeholder">Rolagem</span>
+										</div>
+									</div>
+									<div class="form-group flexcol flex100">
+										<label>Descrição</label>
+										<textarea name="attr_habilidade_descricao"></textarea>
+									</div>
+									<div class="form-group flexcol flex100">
+										<label>Aprimoramento</label>
+										<textarea name="attr_habilidade_aprimoramento"></textarea>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+				</div>
+				<!-- TAB INVENTARIO -->
+				<div class="secondary-tab inventario gaia-border flexcol chflex0">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<!-- <h3 class="text-center">Tesouros</h3> -->
+					<div class="form-group dinheiro flexrow space-around">
+						<div class="input-placeholder flex0" data-placeholder="MP" >
+							<input type="text" class="number-field" name="attr_mp" value="0" title="Moeda de Prata">
+							<span class="placeholder">MP</span>
+						</div>
+						<div class="input-placeholder flex0" data-placeholder="MO" >
+							<input type="text" class="number-field" name="attr_mo" value="0" title="Moeda de Ouro">
+							<span class="placeholder">MO</span>
+						</div>
+						<div class="input-placeholder flex0" data-placeholder="MI" >
+							<input type="text" class="number-field" name="attr_mi" value="0" title="Moeda Imperial">
+							<span class="placeholder">MI</span>
+						</div>
+					</div>
+					<div class="form-group flexrow">
+						<textarea name="attr_tesouros"></textarea>
+					</div>
+					<div class="inventarios">
+						<div class="flexrow intentario">
+							<div class="list-header-col item-name2">Nome</div>
+							<div class="list-header-col item-bonus">QTD</div>
+							<div class="list-header-col item-bonus">Unidade</div>
+							<div class="list-header-col item-edit"></div>
+						</div>
+						<fieldset class="repeating_inventario">
+							<div class="flexrow intentario">
+								<input type="text" class="item-name2" name="attr_item_nome" placeholder="Nome">
+								<input type="text" class="item-bonus" name="attr_item_quantidade" placeholder="QTD" value="0" title="Quantidade">
+								<input type="text" class="item-bonus" name="attr_item_unidade" placeholder="Unidade" value="0" title="Unidade">
+								<input type="checkbox" class="sheet-controls item-edit">
+								<div class="flexrow spaced hiddenattr">
+									<div class="form-group flexcol flex100">
+										<label>Descrição</label>
+										<textarea name="attr_item_descricao"></textarea>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="form-group flexrow space-around">
+						<label for="">Unidade</label>
+						<div class="input-placeholder flex0" data-placeholder="Max" >
+							<input type="text" class="number-field" name="attr_unidade_max" value="0" title="Unidade Máxima">
+							<span class="placeholder">Max</span>
+						</div>
+						<div class="input-placeholder flex0" data-placeholder="Atual" >
+							<input type="text" class="number-field" name="attr_unidade" value="0" title="Unidade Atual">
+							<span class="placeholder">Atual</span>
+						</div>
+					</div>
+				</div>
+				<!-- TAB NOTAS -->
+				<div class="secondary-tab notas gaia-border flexcol">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<!-- <h3 class="text-center">Notas</h3> -->
+					<h3 class="text-center">Idiomas</h3>
+					<div class="form-group text-center">
+						<input type="text" name="attr_idiomas">
+					</div>
+					<div class="form-group flexrow">
+						<h3 class="text-center">Resumo de Habilidades</h3>
+						<textarea name="attr_infohabilidades"></textarea>
+					</div>
+					<div class="form-group flexrow">
+						<!-- <label>Anotações Rápidas</label> -->
+						<h3 class="text-center">Anotações Rápidas</h3>
+						<textarea name="attr_notes"></textarea>
+					</div>
+					<div class="form-group flexrow">
+						<h3 class="text-center">Aparência</h3>
+						<textarea name="attr_aparencia"></textarea>
+					</div>
+				</div>
+			</div>
+			<!-- TAB HABILIDADES HOMUNCULARIUM -->
+			<div class="section-right sheet-section flexrow space-around homuncularium">
+				<h4 class="section-title">Características</h4>
+				<div class="gaia-border flexcol ">
+					<div class="gaia-border-corner-container">
+						<span class="gaia-border-corner topleft"></span>
+						<span class="gaia-border-corner topright"></span>
+						<span class="gaia-border-corner botleft"></span>
+						<span class="gaia-border-corner botright"></span>
+					</div>
+					<div class="habilidades">
+						<fieldset class="repeating_caracteristicas">
+							<div class="flexrow ability spaced">
+								<button type="roll" class="rollbtn" name="roll_caracteristicas" value="&{template:gaia-ability}{{character=@{character_name}}}{{rollname=@{caracteristica_nome}}}  {{header=@{caracteristica_header}}} {{custo=@{caracteristica_custo}}} {{alvo=@{caracteristica_alvo}}} {{alcance=@{caracteristica_alcance}}} {{acao=@{caracteristica_acao}}} {{propriedades=@{caracteristica_tipo}}} {{duracao=@{caracteristica_duracao}}} {{descricao=@{caracteristica_descricao}}} {{rolagem= @{caracteristica_rollformula} }}"></button>
+								<input type="text" class="item-name2" name="attr_caracteristica_nome" placeholder="Nome">
+								<input type="text" class="item-name2" name="attr_caracteristica_origem" placeholder="Livro">
+								<input type="checkbox" class="sheet-controls item-edit">
+								<div class="flexrow spaced hiddenattr">
+									<input type="hidden" name="attr_caracteristica_header" value="">
+									<input type="hidden" name="attr_caracteristica_rollformula" value="">
+									<div class="form-group flexrow space-around ">
+										<div class="input-placeholder flex0" data-placeholder="Custo" >
+											<input type="text" class="item-header" name="attr_caracteristica_custo" value="" title="Custo">
+											<span class="placeholder">Custo</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Alvo" >
+											<input type="text" class="item-header" name="attr_caracteristica_alvo" value="" title="Alvo">
+											<span class="placeholder">Alvo/Área</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Alcance" >
+											<input type="text" class="item-header" name="attr_caracteristica_alcance" value="" title="Alcance">
+											<span class="placeholder">Alcance</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Ação" >
+											<input type="text" class="item-header" name="attr_caracteristica_acao" value="" title="Ação">
+											<span class="placeholder">Ação</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Tipo" >
+											<input type="text" class="item-header" name="attr_caracteristica_tipo" value="" title="Tipo">
+											<span class="placeholder">Tipo</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Duração" >
+											<input type="text" class="item-header" name="attr_caracteristica_duracao" value="" title="Duração">
+											<span class="placeholder">Duração</span>
+										</div>
+										<div class="input-placeholder flex0" data-placeholder="Rolagem" >
+											<input type="text" class="item-rollformula" name="attr_caracteristica_rolagem" value="" title="Rolagem">
+											<span class="placeholder">Rolagem</span>
+										</div>
+									</div>
+									<div class="form-group flexcol flex100">
+										<label>Descrição</label>
+										<textarea name="attr_caracteristica_descricao"></textarea>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="form-group flexrow">
+						<h3 class="text-center">Anotações Rápidas</h3>
+						<textarea name="attr_notes"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+
+
+
+<rolltemplate class="sheet-rolltemplate-gaia-roll">
+	<div class="sheet-rolltemplate">
+		<div class="sheet-rolltemplate_header">
+			{{rollname}}
+		</div>
+		<div class="sheet-rolltemplate_rolls">
+			<div class="roll-result">{{rollformula}}</div>
+		</div>
+		<div class="sheet-rolltemplate_extra"></div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-gaia-attack">
+	<div class="sheet-rolltemplate">
+		<!-- {{character}}: -->
+		<div class="sheet-rolltemplate_header">
+			{{rollname}}
+		</div>
+		<div class="sheet-rolltemplate_rolls">
+			<div class="roll-result"><span class="rolllabel">Ataque</span> {{rollataque}}</div>
+			<div class="roll-result"><span class="rolllabel">Dano</span> {{rolldano}}</div>
+		</div>
+		<div class="sheet-rolltemplate_propriedades">{{#tipodano}}{{ tipodano }}{{/tipodano}} {{#alcance}}{{ alcance }}{{/alcance}} {{#propriedades}}{{ propriedades }}{{/propriedades}}&nbsp;</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-gaia-ability">
+	<div class="sheet-rolltemplate">
+		<!-- {{character}}: -->
+		<div class="sheet-rolltemplate_header">
+			{{rollname}}
+		</div>
+		{{#header}}
+		<div class="sheet-rolltemplate_propriedades"><i>{{header}}</i></div>
+		{{/header}}
+		
+		{{#rolagem}}
+		<div class="sheet-rolltemplate_rolls">
+			<div class="roll-result">{{rolagem}}</div>
+		</div>
+		{{/rolagem}}
+		<div class="sheet-rolltemplate_extra">{{descricao}}&nbsp;</div>
+		<div class="sheet-rolltemplate_extra">{{aprimoramento}}</div>
+	</div>
+</rolltemplate>

@@ -1,10 +1,28 @@
-- function getScrollName(spellName) {return `Scroll of ${spellName}`}
-- function getDisplayLevel(spell,type){let displayLevel;switch(spell.level){case"1":displayLevel="1st level";break;case"2":displayLevel="2nd level";break;case"3":displayLevel="3rd level";break;case"q":displayLevel="Quest Spell";break;default:displayLevel=`${spell.level}th level`}return displayLevel+=` ${type}`,spell.category&&(displayLevel+=`, ${spell.category}`),"PHB"!==spell.book&&(displayLevel+=`, ${spell.book}`),displayLevel}
+-
+    function getScrollName(spellName) {
+        return `${spellName} scroll`
+    }
+    function getDisplayLevel(spell) {
+        switch (spell.level) {
+            case"1": return "1st level";
+            case"2": return "2nd level";
+            case"3": return "3rd level";
+            case"q": return "Quest Spell";
+            default: return `${spell.level}th level`
+        }
+    }
+    function getLabel(spell, type) {
+        let label = [`${getDisplayLevel(spell)} ${type}`, spell.category];
+        if (spell.book !== "PHB")
+            label.push(spell.book);
+
+        return label.filter(Boolean).join(', ');
+    }
 datalist(id=`scroll-spells`)
     each spell, spellName in wizardSpells['wizmonster']
-        option(value!=getScrollName(spellName))= getDisplayLevel(spell, 'Wizard')
+        option(value!=getScrollName(spellName))= getLabel(spell, 'Wizard')
     each spell, spellName in priestSpells['primonster']
-        option(value!=getScrollName(spellName))= getDisplayLevel(spell, 'Priest')
+        option(value!=getScrollName(spellName))= getLabel(spell, 'Priest')
 
 - let processedSpells = new Set()
 datalist(id=`scroll-spells-ff`)
