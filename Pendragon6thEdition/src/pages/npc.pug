@@ -1,55 +1,73 @@
-.npc
+.npc.grid
   .grid.name
-    +textInput('character name')
-    h2(data-i18n='glory won')
-    +textInput('glory won')
+    +dropInput({name: 'character name'})
   .row
     textarea(data-i18n-placeholder='description' name='attr_description')
-  .grid.characteristics.5column
-    each value in ['size', 'dexterity', 'strength', 'constitution', 'appearance']
-      .grid.2autocolumn
-        +attributeButton(value)
-        +numberInput(value)
-  .grid.ml.mb
-    .grid.move.auto-flow-col
-      .grid.stat-col
-        h2(data-i18n='move')
-        +numberInput('move')
-      .grid.2autocolumn
-        h2(data-i18n='description')
-        +textInput('move description')
-    .grid.stats
-      each value in ['armor', 'unconscious', 'major wound', 'knockdown', 'hit points', 'healing rate', "morale loss", "knight value", "ransom"]
-        .grid.stat-col.auto-flow-col
-          h2(data-i18n=value data-i18n-title=`${value}`)
-          +numberInput(value)
-  .grid.row
+  .characteristics.grid.mb
+    .header
+        h1(data-i18n='characteristics')
+    .grid.core.auto-flow-col
+        each value in ['size', 'dexterity', 'strength', 'constitution', 'appearance']
+            .grid.row.centered
+                +attributeButton(value)
+                .shield.mt
+                    +hoverSpan(value)
+    .grid.statistic.auto-flow-col
+
+        .col
+            +primarySubheader('health')
+            +npcTable(healthRows)
+        .col
+            +primarySubheader('other')
+            +npcTable(npcOtherRows)
+    .grid.statistic.auto-flow-col
+        .col
+            +primarySubheader('knight')
+            +npcTable(["knight value", "ransom"])
+        .col
+            +primarySubheader('other')
+            +npcTable(["morale loss", "valorous"])
+  .grid.row.attacks
     h2.italic(data-i18n='attacks')
     .repeating-container
-        fieldset(class='repeating_attacks')
-          .grid.row.weapons 
+      fieldset(class='repeating_attacks')
+          .row.grid
+              +textInput('name')
+              select(name="attr_skill"  title="@{battle}" value="@{battle}")
+                  each val in combatSkills
+                      option(data-i18n=val value=`@{${attrName(val)}}`)
+              label(data-i18n-title=`enter damage` title=`enter damage`)
+                  input(name=`attr_damage` placeholder='5d6+5' title=`@{damage}` type='text' value='') 
+              +repeatingAttackRollButton('name')
+  .grid.row.traits
+    h2.italic(data-i18n='traits')
+    .repeating-container
+        fieldset(class='repeating_traits')
+          .row
             +textInput('name')
-            .skill
-              span (
-              +numberInput('skill')
-              span )
-            +textInput('damage')
-            +textInput('description')
-            +repeatingAttackRollButton('damage')
+            +numberInput('traits')
+            +repeatingRollButton('traits')
+  .grid.row.passions
+    h2.italic(data-i18n='passions')
+    .repeating-container
+        fieldset(class='repeating_passions')
+          .row
+            +textInput('name')
+            +numberInput('passion')
+            +repeatingRollButton('passion')
   .grid.row.skills
-    h2.italic(data-i18n='skills / passions')
+    h2.italic(data-i18n='skills')
     .repeating-container
         fieldset(class='repeating_skills')
           .row
             +textInput('name')
             +numberInput('skill')
-            +textInput('description')
             +repeatingRollButton('skill')
   .grid.row.abilities
     h2.italic(data-i18n='abilities')
     .repeating-container
         fieldset(class='repeating_abilities')
-          .row
+          .row.mb
             +textInput('name')
           .row
             textarea(data-i18n-placeholder='description' name='attr_description')
