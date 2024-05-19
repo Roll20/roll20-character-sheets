@@ -1,11 +1,7 @@
 .npc.grid
   .grid.name
     +dropInput({name: 'character name'})
-  .row
-    textarea(data-i18n-placeholder='description' name='attr_description')
   .characteristics.grid.mb
-    .header
-        h1(data-i18n='characteristics')
     .grid.core.auto-flow-col
         each value in ['size', 'dexterity', 'strength', 'constitution', 'appearance']
             .grid.row.centered
@@ -27,9 +23,14 @@
         .col
             +primarySubheader('other')
             +npcTable(["morale loss", "valorous"])
-  .grid.row.attacks
-    h2.italic(data-i18n='attacks')
-    .repeating-container
+  .grid.attacks
+    .header
+      h1(data-i18n='attacks')
+    .repeating-container.table
+      .grid.header
+        h3.small-caps.text-left(data-i18n='weapon')
+        each value in ['skill', 'damage']
+            h3.small-caps.text-left(data-i18n=value)(class=value)
       fieldset(class='repeating_attacks')
           .row.grid
               +textInput('name')
@@ -39,35 +40,58 @@
               label(data-i18n-title=`enter damage` title=`enter damage`)
                   input(name=`attr_damage` placeholder='5d6+5' title=`@{damage}` type='text' value='') 
               +repeatingAttackRollButton('name')
-  .grid.row.traits
-    h2.italic(data-i18n='traits')
-    .repeating-container
-        fieldset(class='repeating_traits')
-          .row
-            +textInput('name')
-            +numberInput('traits')
-            +repeatingRollButton('traits')
-  .grid.row.passions
-    h2.italic(data-i18n='passions')
-    .repeating-container
-        fieldset(class='repeating_passions')
-          .row
-            +textInput('name')
-            +numberInput('passion')
-            +repeatingRollButton('passion')
-  .grid.row.skills
-    h2.italic(data-i18n='skills')
+  .grid.skills
+    .header
+      h1(data-i18n='skills')
+    .grid.combat-skills
+        each val in combatSkills
+          .row.grid
+              +rollButton(val)
+              +numberInput(val)
+    .row
+      +subHeader('other')
     .repeating-container
         fieldset(class='repeating_skills')
-          .row
+          .grid.auto-flow-col.3columns
             +textInput('name')
             +numberInput('skill')
             +repeatingRollButton('skill')
-  .grid.row.abilities
-    h2.italic(data-i18n='abilities')
+  .grid.2column.align-start
+    .grid.traits
+      .header
+        h1(data-i18n='traits')
+      .repeating-container
+          fieldset(class='repeating_traits')
+            .grid.auto-flow-col.3columns
+              +textInput('name')
+              +numberInput('traits')
+              +repeatingRollButton('traits')
+    .grid.passions
+      .header
+        h1(data-i18n='passions')
+      .repeating-container
+          fieldset(class='repeating_passions')
+            .grid.auto-flow-col.3columns
+              +textInput('name')
+              +numberInput('passion')
+              +repeatingRollButton('passion')
+  
+  .grid.abilities
+    .header
+      h1(data-i18n='abilities')
     .repeating-container
         fieldset(class='repeating_abilities')
-          .row.mb
-            +textInput('name')
-          .row
-            textarea(data-i18n-placeholder='description' name='attr_description')
+          .row.grid.flags
+            +repeatingFlags()
+            .row.grid.2autocolumn
+                h2(data-i18n='name')
+                span.display.bottom-border(name='attr_name')
+                +textInput('name')
+            .row.notes
+                span.display(name='attr_notes')
+                +textArea('notes')
+
+  .grid
+    .header
+      h1(data-i18n='description')
+    textarea(data-i18n-placeholder='description' name='attr_description')
