@@ -230,7 +230,7 @@ GCS Text Template v1
         {{- if $last -}}
           {{$last}},
         {{- end -}}
-        {{- $last = printf "\n    {\n      \"Idkey\": \"MeleeWapon-%d\",\n      \"Name\": %q,\n      \"Type\": \"Parry\",\n      \"Info\": \"\",\n      \"Skill\": %s,\n      \"SkillMod\": 0.0,\n      \"DefenseModReason\": \"\",\n      \"InfoDescription\": \"\"\n    }" $i .Description .Parry -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"MeleeWapon-%d\",\n      \"Name\": %q,\n      \"Type\": \"Parry\",\n      \"Info\": \"\",\n      \"Skill\": %s,\n      \"SkillMod\": 0.0,\n      \"DefenseModReason\": \"\",\n      \"InfoDescription\": \"\"\n    }" $i .Description (replace .Parry "U" "") -}}
       {{- end -}}
     {{- end -}}
     {{$last}}
@@ -333,19 +333,35 @@ GCS Text Template v1
       {{- end -}}
       {{$last}}
     ],
-  "RepeatingItem": [
-    {{- $last := "" -}}
-    {{- range .Equipment.Carried -}}
-      {{- if $last -}}
+    "RepeatingItem": [
+      {{- $last := "" -}}
+      {{- range .Equipment.Carried -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $carried := "0" -}}
+        {{- if .Equipped -}}
+          {{- $carried = "1" -}}
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Tl\": \"%s\",\n      \"LegalityClass\": \"%s\",\n      \"Ref\": %q,\n      \"Count\": %s,\n      \"Cost\": %s,\n      \"Weight\": \"%s\",\n      \"Carried\": \"%s\",\n      \"Notes\": %q\n    }" .ID .Description .TechLevel .LegalityClass .PageRef .Quantity .Cost (replace .Weight " lb" "") $carried (print .Notes "\\n" .ModifierNotes "\\nUses: " .Uses "\\nMax Uses: " .MaxUses "\\nType: " .Type) -}}
+      {{- end -}}
+      {{- if and $last (len .Equipment.Other) -}}
         {{$last}},
+      {{- else -}}
+        {{$last}}
       {{- end -}}
-      {{- $carried := "0" -}}
-      {{- if .Equipped -}}
-        {{- $carried = "1" -}}
+      {{- $last = "" -}}
+      {{- range $index, $item := .Equipment.Other -}}
+        {{- if $last -}}
+          {{$last}},
+        {{- end -}}
+        {{- $carried := "0" -}}
+        {{- if .Equipped -}}
+          {{- $carried = "1" -}}
+        {{- end -}}
+        {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Tl\": \"%s\",\n      \"LegalityClass\": \"%s\",\n      \"Ref\": %q,\n      \"Count\": %s,\n      \"Cost\": %s,\n      \"Weight\": \"%s\",\n      \"Carried\": \"%s\",\n      \"Notes\": %q\n    }" .ID .Description .TechLevel .LegalityClass .PageRef .Quantity .Cost (replace .Weight " lb" "") $carried (print .Notes "\\n" .ModifierNotes "\\nUses: " .Uses "\\nMax Uses: " .MaxUses "\\nType: " .Type) -}}
       {{- end -}}
-      {{- $last = printf "\n    {\n      \"Idkey\": \"%s\",\n      \"Name\": %q,\n      \"Tl\": \"%s\",\n      \"LegalityClass\": \"%s\",\n      \"Ref\": %q,\n      \"Count\": %s,\n      \"Cost\": %s,\n      \"Weight\": \"%s\",\n      \"Carried\": \"%s\",\n      \"Notes\": %q\n    }" .ID .Description .TechLevel .LegalityClass .PageRef .Quantity .Cost (replace .Weight " lb" "") $carried (print .Notes "\\n" .ModifierNotes "\\nUses: " .Uses "\\nMax Uses: " .MaxUses "\\nType: " .Type) -}}
-    {{- end -}}
-    {{$last}}
+      {{$last}}
   ],
   "RepeatingSpells": [
     {{- $last := "" -}}
