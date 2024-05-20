@@ -21,8 +21,8 @@ const versionTwoThree = () => {
     //Brawl Damage =  (STR+SIZ)/6
     const damage = round(total(values) / 6);
     setAttrs({
-      brawling_damage: damage,
-      brawling_damage_open: round(damage / 2),
+      brawling_damage: `${damage}d6`,
+      brawling_damage_open: `${round(damage / 2)}d6`,
     });
   });
 };
