@@ -1,3 +1,21 @@
+2024-04-20
+
+- Fatigue rolls
+- Track HP
+- Calculate total maneuver:
+  - Fatigue
+  - Injury
+  - HP Loss
+- RR rolls
+- (internal) Async calls now timeout and unblock if too long
+- Charactermancer:
+  - Toggle button dissapears more often (when it should)
+  - Back from languages goes back one, not two.
+  - Show region selectors in culture ranks
+  - Fix selection of Region Lore Skills
+  - Fancy navigation buttons
+  - Fix most skills (not Material Lore and Languages)
+
 2024-04-13
 
 - Add support for the targetting button.
