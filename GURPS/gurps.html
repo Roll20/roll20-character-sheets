@@ -4325,9 +4325,18 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.17.0 -->
+				<!-- current version notes: 2.18.0 -->
 				<ul>
-					<li><b>NEW:</b> Added <b>Drinking and Intoxication</b> tool, located under Tools > General.</li>
+					<li><b>NEW:</b> Melee and Ranged damage rolls automatically calculate Blunt Trauma Damage based on rules from <b>Flexible Armor and Blunt Trauma</b> B379.</li>
+					<li><b>ENHANCEMENTS:</b>Updated GCS Roll20 Export Code
+						<ul>
+							<li>Added GCS Equipment.Other to Roll20 Inventory Export.</li>
+							<li>Updated Active Defense to replace "F" and "U" with an empty string. Example, "11U" is updated to "11" for a parry defense. Roll20 only allows numbers for defenses, otherwise the roll will not work.</li>
+							<li>Fix bug with Vision Points.</li>
+							<li><b>ACTION:</b> Please update your Roll20.js file, see Gear Icon > Import > GCS Instructions.</li>
+						</ul>
+					</li>
+					<li><b>BUGFIX:</b> Fixed issue with adding hit locations, size modifier was incorrectly being applied.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13352,7 +13361,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col2">
 										<input type="hidden" name="attr_damage_dice_icon" class="melee-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Melee Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[ { @{damage}, {@{minimum_damage}} }kh1 ]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
+										<button type="action" name="act_rolldamage" class="roll_damage" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Melee Damage}} {{characterName=@{character_name}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}}"></button>
 									</div>
 									<div class="cell col3">
 										<select name="attr_type" title="Macro: @{NAME|repeating_melee_$[row #]_type}">
@@ -14120,7 +14129,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col2">
 										<input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[ { @{damage}, {@{minimum_damage}} }kh1 ]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
+										<button type="action" name="act_rolldamage" class="roll_damage" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}}" />
 									</div>
 									<div class="cell col3">
 										<select name="attr_type" title="Macro: @{NAME|repeating_ranged_$[row #]_type}">
@@ -21251,8 +21260,23 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.17.0 -->
+			<!-- current version notes: 2.18.0 -->
 			<ul>
+				<li><b>NEW:</b> Melee and Ranged damage rolls automatically calculate Blunt Trauma Damage based on rules from <b>Flexible Armor and Blunt Trauma</b> B379.</li>
+				<li><b>ENHANCEMENTS:</b>Updated GCS Roll20 Export Code
+					<ul>
+						<li>Added GCS Equipment.Other to Roll20 Inventory Export.</li>
+						<li>Updated Active Defense to replace the "F" and "U" with an empty string. Example, "11U" is updated to "11" for a parry defense. Roll20 only allows numbers for defenses, otherwise the roll will not work.</li>
+						<li>Fix bug with Vision Points.</li>
+						<li><b>ACTION:</b> Please update your Roll20.js file, see Gear Icon > Import > GCS Instructions.</li>
+					</ul>
+				</li>
+				<li><b>BUGFIX:</b> Fixed issue with adding hit locations, size modifier was incorrectly being applied.</li>
+			</ul>
+
+			<h4>Version: 2.17.0</h4>
+			<p>Pull Request: 5/14/2024</p>
+				<ul>
 				<li><b>NEW:</b> Added <b>Drinking and Intoxication</b> tool, located under Tools > General.</li>
 			</ul>
 			
@@ -26537,6 +26561,14 @@ B378
                 </tr>
 				{{/minDamageNote}}
 				{{/rollTotal() showMinimumDmgNote 1}}
+				{{#rollGreater() computed::bluntTrauma 0}}
+				<tr>
+					<td class="label"></td>
+					<td class="damage-roll">
+						{{computed::bluntTrauma}} 
+						<span data-i18n="trauma-description">Blunt Trauma B379.</span>
+					</td>
+				{{/rollGreater() computed::bluntTrauma 0}}
 				{{/damageRoll}}
 				
 				<!-- only show AD if value is greater than zero and isn't a one or a zero -->
@@ -26799,9 +26831,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.16.0";
+	const version = "2.18.0";
 	
-	const latestChangesDate = "5/6/2024";
+	const latestChangesDate = "5/20/2024";
 	
 	let modCascade = true;
 	
@@ -39609,7 +39641,6 @@ B378
 		let fields = [
 			"armor_hit_location_type",
 			"hit_points_max",
-			"size",
 		];
 	
 		getAttrs(fields, values => {
@@ -39617,8 +39648,6 @@ B378
 			let type = values.armor_hit_location_type;
 	
 			let hitPoints = Number(values.hit_points_max);
-	
-			let sizeMod = Number(values.size);
 	
 			let locations = HIT_LOCATIONS_JSON.get(type);
 	
@@ -39630,7 +39659,7 @@ B378
 	
 				let id = generateRowID();
 	
-				let penalty = sizeMod + Number(location.penalty);
+				let penalty = Number(location.penalty);
 	
 				let divisor = Number(location.hp_divisor);
 	
@@ -39662,7 +39691,7 @@ B378
 	
 			});
 	
-			setAttrs(rows, { silent: true });
+			setAttrs(rows);
 	
 		});
 	
@@ -39851,7 +39880,7 @@ B378
 	
 					let propName = `repeating_hitlocation_layer_${layerNo}_${direction}`;
 	
-					let armor = values[propName] || "";
+					let armor = String(values[propName]) || "";
 	
 					let firstDR = 0;
 	
@@ -52405,5 +52434,150 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	});
+
+	/** Roll Damage Button. Used to calculate Blunt Trauma Damage. */
+	const damageButtons = [
+		"repeating_melee:rolldamage",
+		"repeating_ranged:rolldamage",
+	];
+
+	damageButtons.forEach(button => {
+
+		on(`clicked:${button}`, async (event) => {
+
+			const source = event.triggerName ?? "";
+			
+			if (source.includes("repeating_melee")) {
+				await rollMeleeRangedDamageRoll(event);
+			} else if (source.includes("repeating_ranged")) {
+				await rollMeleeRangedDamageRoll(event);
+			}
+
+		}); // closing parenthesis for the 'on' function
+
+	}); // closing parenthesis for the 'forEach' function
+	
+
+	// Melee and Ranged tables use the same fields
+	const rollMeleeRangedDamageRoll = async (event) => {
+
+		if (!event.triggerName) {
+			return;
+		}
+
+		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
+		
+		let rollData = event.htmlAttributes.value ?? "";
+
+		if (!rollData) {
+			// something's wrong
+			console.log("rollMeleeDamageRoll: Data Error", event);
+			return;
+		}
+
+		// get the roll fields and add to rollData
+		let [meleeDamageRollData, damageType] = await getRepeatingMeleeDamageRollData(rowId, section);
+
+		rollData += meleeDamageRollData;
+
+		// append the rollDifference
+		rollData += " {{bluntTrauma=[[0]]}}";
+
+		const damageRoll = await startRoll(rollData);
+
+		const damage = damageRoll.results.damageRoll.result;
+
+		const bluntTraumaDamage = getBluntTrauma(damageType, damage);
+
+		let customData = {
+			bluntTrauma: bluntTraumaDamage
+		};
+
+		finishRoll(damageRoll.rollId, customData);
+	}
+
+	const getBluntTrauma = (damageType, damageAmount) => {
+		let bluntTrauma;
+		if (damageType.includes("(cr)")) {
+			bluntTrauma = Math.floor(damageAmount / 5);
+		} else if (damageType.includes("(cut)") || damageType.includes("(imp)") || damageType.includes("(pi")) {
+			bluntTrauma = Math.floor(damageAmount / 10);
+		} else {
+			bluntTrauma = 0;
+		}
+		return bluntTrauma;
+	}
+
+	// NOTE: These fields should not be present in the button value.
+	const meleeDamageFields = [
+		"name",
+		"damage",
+		"minimum_damage",
+		"type",
+		"damage_type_note",
+		"damage_notes",
+		"armor_divisor"
+	];
+
+	const getRepeatingMeleeDamageRollData = async (rowId, section) => {
+
+		console.log("section:", section);
+
+		let fields = meleeDamageFields.map(field => `${section}_${rowId}_${field}`);
+
+		let values = await getAttrsAsync(fields);
+
+		// get all the values we need
+		let name = values[`${section}_${rowId}_name`] ?? "";
+
+		let damage = values[`${section}_${rowId}_damage`] ?? "";
+
+		let minDamage = values[`${section}_${rowId}_minimum_damage`] ?? "";
+
+		let type = values[`${section}_${rowId}_type`] ?? "";
+
+		let damageTypeNote = values[`${section}_${rowId}_damage_type_note`] ?? "";
+
+		let damageNotes = values[`${section}_${rowId}_damage_notes`] ?? "";
+		damageNotes = damageNotes.replace(/\n/g, '\\n');
+
+		let armorDivisor = values[`${section}_${rowId}_armor_divisor`] ?? "";
+
+		let rollDataArray = [];
+
+		if (name) {
+			rollDataArray.push(`{{skillName=${name}}}`);
+		} else {
+			rollDataArray.push(`{{skillName=Melee Damage}}`);
+		}
+
+		if (damage && minDamage) {
+			// {{damageRoll=[[ { 1d6-2, {0} }kh1 ]]}} 
+			rollDataArray.push(`{{damageRoll=[[ { ${damage}, {${minDamage}} }kh1 ]]}}`);
+		} else if (damage) {
+			rollDataArray.push(`{{damageRoll=[[ ${damage} ]]}}`);
+		}
+
+		if (type) {
+			rollDataArray.push(`{{damageType=${type}}}`);
+		}
+
+		if (damageTypeNote) {
+			rollDataArray.push(`{{damageTypeNote=${damageTypeNote}}}`);
+		}
+
+		if (damageNotes) {
+			rollDataArray.push(`{{notes=${damageNotes}}}`);
+		}
+
+		if (armorDivisor) {
+			rollDataArray.push(`{{armorDivisor=[[${armorDivisor}]]}}`);
+		}
+		
+		let rollData = rollDataArray.join(" ");
+
+		return [rollData, type];
+
+	}
 
 </script>
