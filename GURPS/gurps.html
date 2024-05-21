@@ -13360,7 +13360,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col2">
 										<input type="hidden" name="attr_damage_dice_icon" class="melee-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Melee Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[ { @{damage}, {@{minimum_damage}} }kh1 ]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
+										<button type="action" name="act_rolldamage" class="roll_damage" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Melee Damage}} {{characterName=@{character_name}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}}"></button>
 									</div>
 									<div class="cell col3">
 										<select name="attr_type" title="Macro: @{NAME|repeating_melee_$[row #]_type}">
@@ -26559,6 +26559,14 @@ B378
                 </tr>
 				{{/minDamageNote}}
 				{{/rollTotal() showMinimumDmgNote 1}}
+				{{#rollGreater() computed::bluntTrauma 0}}
+				<tr>
+					<td class="label"></td>
+					<td class="damage-roll">
+						{{computed::bluntTrauma}} 
+						<span data-i18n="trauma-description">Blunt Trauma B379.</span>
+					</td>
+				{{/rollGreater() computed::bluntTrauma 0}}
 				{{/damageRoll}}
 				
 				<!-- only show AD if value is greater than zero and isn't a one or a zero -->
@@ -52424,5 +52432,144 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	});
+
+	/** Roll Damage Button. Used to calculate Blunt Trauma Damage. */
+	const damageButtons = [
+		"repeating_melee:rolldamage",
+	];
+
+	damageButtons.forEach(button => {
+
+		on(`clicked:${button}`, async (event) => {
+
+			const source = event.triggerName ?? "";
+			
+			if (source.includes("repeating_melee")) {
+				await rollMeleeDamageRoll(event);
+			}
+
+		}); // closing parenthesis for the 'on' function
+
+	}); // closing parenthesis for the 'forEach' function
+	
+
+	const rollMeleeDamageRoll = async (event) => {
+
+		if (!event.triggerName) {
+			return;
+		}
+
+		let [section, rowId, fieldName] = getSectionRowIdFromChangeEvent(event);
+		
+		let rollData = event.htmlAttributes.value ?? "";
+
+		if (!rollData) {
+			// something's wrong
+			console.log("rollMeleeDamageRoll: Data Error", event);
+			return;
+		}
+
+		// get the roll fields and add to rollData
+		let [meleeDamageRollData, damageType] = await getRepeatingMeleeDamageRollData(rowId);
+
+		rollData += meleeDamageRollData;
+
+		// append the rollDifference
+		rollData += " {{bluntTrauma=[[0]]}}";
+
+		const damageRoll = await startRoll(rollData);
+
+		const damage = damageRoll.results.damageRoll.result;
+
+		const bluntTraumaDamage = getBluntTrauma(damageType, damage);
+
+		let customData = {
+			bluntTrauma: bluntTraumaDamage
+		};
+
+		finishRoll(damageRoll.rollId, customData);
+	}
+
+	const getBluntTrauma = (damageType, damageAmount) => {
+		let bluntTrauma;
+		if (damageType.includes("(cr)")) {
+			bluntTrauma = Math.floor(damageAmount / 5);
+		} else if (damageType.includes("(cut)") || damageType.includes("(imp)") || damageType.includes("(pi")) {
+			bluntTrauma = Math.floor(damageAmount / 10);
+		} else {
+			bluntTrauma = 0;
+		}
+		return bluntTrauma;
+	}
+
+	// NOTE: These fields should not be present in the button value.
+	const meleeDamageFields = [
+		"name",
+		"damage",
+		"minimum_damage",
+		"type",
+		"damage_type_note",
+		"damage_notes",
+		"armor_divisor"
+	];
+
+	const getRepeatingMeleeDamageRollData = async (rowId) => {
+
+		let fields = meleeDamageFields.map(field => `repeating_melee_${rowId}_${field}`);
+
+		let values = await getAttrsAsync(fields);
+
+		// get all the values we need
+		let name = values[`repeating_melee_${rowId}_name`] ?? "";
+
+		let damage = values[`repeating_melee_${rowId}_damage`] ?? "";
+
+		let minDamage = values[`repeating_melee_${rowId}_minimum_damage`] ?? "";
+
+		let type = values[`repeating_melee_${rowId}_type`] ?? "";
+
+		let damageTypeNote = values[`repeating_melee_${rowId}_damage_type_note`] ?? "";
+
+		let damageNotes = values[`repeating_melee_${rowId}_damage_notes`] ?? "";
+		damageNotes = damageNotes.replace(/\n/g, '\\n');
+
+		let armorDivisor = values[`repeating_melee_${rowId}_armor_divisor`] ?? "";
+
+		let rollDataArray = [];
+
+		if (name) {
+			rollDataArray.push(`{{skillName=${name}}}`);
+		} else {
+			rollDataArray.push(`{{skillName=Melee Damage}}`);
+		}
+
+		if (damage && minDamage) {
+			// {{damageRoll=[[ { 1d6-2, {0} }kh1 ]]}} 
+			rollDataArray.push(`{{damageRoll=[[ { ${damage}, {${minDamage}} }kh1 ]]}}`);
+		} else if (damage) {
+			rollDataArray.push(`{{damageRoll=[[ ${damage} ]]}}`);
+		}
+
+		if (type) {
+			rollDataArray.push(`{{damageType=${type}}}`);
+		}
+
+		if (damageTypeNote) {
+			rollDataArray.push(`{{damageTypeNote=${damageTypeNote}}}`);
+		}
+
+		if (damageNotes) {
+			rollDataArray.push(`{{damageNotes=${damageNotes}}}`);
+		}
+
+		if (armorDivisor) {
+			rollDataArray.push(`{{armorDivisor=[[${armorDivisor}]]}}`);
+		}
+		
+		let rollData = rollDataArray.join(" ");
+
+		return [rollData, type];
+
+	}
 
 </script>
