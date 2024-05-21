@@ -14128,7 +14128,7 @@ visualize what it will look like in chat.
 									</div>
 									<div class="cell col2">
 										<input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[ { @{damage}, {@{minimum_damage}} }kh1 ]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}} {{notes=@{damage_notes}}} {{armorDivisor=[[@{armor_divisor}]]}}" name="roll_damage" class="roll_damage" />
+										<button type="action" name="act_rolldamage" class="roll_damage" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{showNotes=[[1]]}} {{notesTitlePrefix=Damage}}" />
 									</div>
 									<div class="cell col3">
 										<select name="attr_type" title="Macro: @{NAME|repeating_ranged_$[row #]_type}">
@@ -52436,6 +52436,7 @@ Characters with Skill: ${knowsSkill}`;
 	/** Roll Damage Button. Used to calculate Blunt Trauma Damage. */
 	const damageButtons = [
 		"repeating_melee:rolldamage",
+		"repeating_ranged:rolldamage",
 	];
 
 	damageButtons.forEach(button => {
@@ -52445,7 +52446,9 @@ Characters with Skill: ${knowsSkill}`;
 			const source = event.triggerName ?? "";
 			
 			if (source.includes("repeating_melee")) {
-				await rollMeleeDamageRoll(event);
+				await rollMeleeRangedDamageRoll(event);
+			} else if (source.includes("repeating_ranged")) {
+				await rollMeleeRangedDamageRoll(event);
 			}
 
 		}); // closing parenthesis for the 'on' function
@@ -52453,7 +52456,8 @@ Characters with Skill: ${knowsSkill}`;
 	}); // closing parenthesis for the 'forEach' function
 	
 
-	const rollMeleeDamageRoll = async (event) => {
+	// Melee and Ranged tables use the same fields
+	const rollMeleeRangedDamageRoll = async (event) => {
 
 		if (!event.triggerName) {
 			return;
@@ -52470,7 +52474,7 @@ Characters with Skill: ${knowsSkill}`;
 		}
 
 		// get the roll fields and add to rollData
-		let [meleeDamageRollData, damageType] = await getRepeatingMeleeDamageRollData(rowId);
+		let [meleeDamageRollData, damageType] = await getRepeatingMeleeDamageRollData(rowId, section);
 
 		rollData += meleeDamageRollData;
 
@@ -52513,27 +52517,29 @@ Characters with Skill: ${knowsSkill}`;
 		"armor_divisor"
 	];
 
-	const getRepeatingMeleeDamageRollData = async (rowId) => {
+	const getRepeatingMeleeDamageRollData = async (rowId, section) => {
 
-		let fields = meleeDamageFields.map(field => `repeating_melee_${rowId}_${field}`);
+		console.log("section:", section);
+
+		let fields = meleeDamageFields.map(field => `${section}_${rowId}_${field}`);
 
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
-		let name = values[`repeating_melee_${rowId}_name`] ?? "";
+		let name = values[`${section}_${rowId}_name`] ?? "";
 
-		let damage = values[`repeating_melee_${rowId}_damage`] ?? "";
+		let damage = values[`${section}_${rowId}_damage`] ?? "";
 
-		let minDamage = values[`repeating_melee_${rowId}_minimum_damage`] ?? "";
+		let minDamage = values[`${section}_${rowId}_minimum_damage`] ?? "";
 
-		let type = values[`repeating_melee_${rowId}_type`] ?? "";
+		let type = values[`${section}_${rowId}_type`] ?? "";
 
-		let damageTypeNote = values[`repeating_melee_${rowId}_damage_type_note`] ?? "";
+		let damageTypeNote = values[`${section}_${rowId}_damage_type_note`] ?? "";
 
-		let damageNotes = values[`repeating_melee_${rowId}_damage_notes`] ?? "";
+		let damageNotes = values[`${section}_${rowId}_damage_notes`] ?? "";
 		damageNotes = damageNotes.replace(/\n/g, '\\n');
 
-		let armorDivisor = values[`repeating_melee_${rowId}_armor_divisor`] ?? "";
+		let armorDivisor = values[`${section}_${rowId}_armor_divisor`] ?? "";
 
 		let rollDataArray = [];
 
@@ -52559,7 +52565,7 @@ Characters with Skill: ${knowsSkill}`;
 		}
 
 		if (damageNotes) {
-			rollDataArray.push(`{{damageNotes=${damageNotes}}}`);
+			rollDataArray.push(`{{notes=${damageNotes}}}`);
 		}
 
 		if (armorDivisor) {
