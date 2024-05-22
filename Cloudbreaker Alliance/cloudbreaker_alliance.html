@@ -5,7 +5,8 @@
 		"character",
 		"combat",
 		"magic",
-		"notes"
+		"notes",
+		"options"
 	];
 	tabs.forEach(tab => {
 		on(`clicked:${tab}`, function() {
@@ -17,16 +18,55 @@
 		});
 	});
 
-	on("change:character_level", function() {
-		getAttrs(["character_level"], function(v) {
+	on("change:character_level", function(eventInfo) {
+		var output = {};
+		var level = 1;
+		if (eventInfo.newValue != undefined || eventInfo.newValue != "")
+			level = parseInt(eventInfo.newValue);
+		var new_level = level < 1 ? 1 : level;
+		const capped_level = new_level > 12 ? 12 : new_level;
+		const grade_ranked = Math.floor((capped_level + 1) / 4);
+
+		const grade = new_level == 89 ? "platinum" : new_level > 8 ? "gold" : new_level > 4 ? "silver" : "copper";
+		const total_attributes = 7 + grade_ranked;
+
+		output["character_level"] = new_level;
+		output["adventuring_grade"] = grade;
+		output["total_attributes"] = total_attributes;
+		output["mastery_bonus"] = 2 + grade_ranked;
+
+		setAttrs(output, {silent: false});
+
+		getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunement_amount", "added_mp", "added_resolve"], function(v) {
 			var output = {};
-			var level = parseInt(v["character_level"]);
 
-			output["character_level"] = level < 1 ? 1 : level;
-			output["adventuring_grade"] = level > 8 ? "gold" : level > 4 ? "silver" : "copper";
+			const armor_hp = parseInt(v["armor_hp"]);
+			const unarmored_toughness = v["unarmored_toughness"];
+			const added_hp = parseInt(v["added_hp"]);
+			const attunement_amount = parseInt(v["attunement_amount"]);
+			const added_mp = parseInt(v["added_mp"]);
+			const added_resolve = parseInt(v["added_resolve"]);
 
-			if (level == 89)
-			output["adventuring_grade"] = "platinum";
+			var hp_max = 15 + (capped_level - 1) * 2 + added_hp + armor_hp;
+			if (unarmored_toughness == "on")
+				hp_max = 20 + (capped_level - 1) * 3 + added_hp;
+
+			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunement_amount;
+			const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
+
+			output["hp_max"] = hp_max;
+			output["mp_max"] = mp_max;
+			output["resolve_max"] = resolve_max;
+
+			setAttrs(output, {silent: true});
+		});
+
+		getAttrs(["added_quirk", "quirk_total"], function(v) {
+			var output = {};
+			const quirk_total = parseInt(v["quirk_total"]);
+			const quirk_max = 2 + grade_ranked + parseInt(v["added_quirk"]);
+
+			output["quirk_points_label"] = `${quirk_total}/${quirk_max}`;
 
 			setAttrs(output, {silent: true});
 		});
@@ -39,20 +79,644 @@
 			getAttrs(attrs_to_get, function(v) {
 				var output = {};
 				var quirk_value_pair = "";
+				var total_quirk_points = 0;
 
 				ids.forEach(id => {
 					var quirkName = v[`repeating_quirks_${id}_quirk_name`];
 					const quirkLevel = v[`repeating_quirks_${id}_quirk_level`];
 					if (quirkName == undefined || quirkName == "")
 						quirkName = "Unnamed Quirk";
+					total_quirk_points += parseInt(quirkLevel);
 					quirk_value_pair += `${quirkName}: ${quirkLevel}\n`;
 				});
 
 				quirk_value_pair = quirk_value_pair.trimEnd();
 
 				output["all_quirks"] = quirk_value_pair;
+				output["quirk_total"] = total_quirk_points;
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+	on("change:quirk_total", function(eventInfo) {
+		getAttrs(["added_quirk", "character_level"], function(v) {
+			var output = {};
+
+			const character_level = parseInt(v["character_level"]);
+			const capped_level = character_level > 12 ? 12 : character_level;
+			const grade_ranked = Math.floor((capped_level + 1) / 4);
+
+			const added_quirk = parseInt(v["added_quirk"]);
+			const quirk_max = 2 + grade_ranked + added_quirk;
+
+			output["quirk_points_label"] = `${eventInfo.newValue}/${quirk_max}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:strength change:mastery_bonus", function(eventInfo) {
+		getAttrs(["strength", "mastery_bonus", "brute", "brute_bns", "endurance", "endurance_bns", "intimidation", "intimidation_bns"], function(v) {
+			var output = {};
+
+			const strength = parseInt(v["strength"]);
+
+			const brute = v["brute"] == "on";
+			const endurance = v["endurance"] == "on";
+			const intimidation = v["intimidation"] == "on";
+
+			const brute_bns = parseInt(v["brute_bns"]);
+			const endurance_bns = parseInt(v["endurance_bns"]);
+			const intimidation_bns = parseInt(v["intimidation_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
+			const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
+			const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
+
+			output["brute_total"] = brute_total;
+			output["endurance_total"] = endurance_total;
+			output["intimidation_total"] = intimidation_total;
+
+			output["brute_total_label"] = `+${brute_total}`;
+			output["endurance_total_label"] = `+${endurance_total}`;
+			output["intimidation_total_label"] = `+${intimidation_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:brute change:brute_bns", function(eventInfo) {
+		getAttrs(["strength", "mastery_bonus", "brute", "brute_bns"], function(v) {
+			var output = {};
+
+			const strength = parseInt(v["strength"]);
+
+			const brute = v["brute"] == "on";
+			const brute_bns = parseInt(v["brute_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
+
+			output["brute_total"] = brute_total;
+			output["brute_total_label"] = `+${brute_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:endurance change:endurance_bns", function(eventInfo) {
+		getAttrs(["strength", "mastery_bonus", "endurance", "endurance_bns"], function(v) {
+			var output = {};
+
+			const strength = parseInt(v["strength"]);
+
+			const endurance = v["endurance"] == "on";
+			const endurance_bns = parseInt(v["endurance_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
+
+			output["endurance_total"] = endurance_total;
+			output["endurance_total_label"] = `+${endurance_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:intimidation change:intimidation_bns", function(eventInfo) {
+		getAttrs(["strength", "mastery_bonus", "intimidation", "intimidation_bns"], function(v) {
+			var output = {};
+
+			const strength = parseInt(v["strength"]);
+
+			const intimidation = v["intimidation"] == "on";
+			const intimidation_bns = parseInt(v["intimidation_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
+
+			output["intimidation_total"] = intimidation_total;
+			output["intimidation_total_label"] = `+${intimidation_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:agility change:mastery_bonus", function(eventInfo) {
+		getAttrs(["agility", "mastery_bonus", "sports", "sports_bns", "thievery", "thievery_bns", "deception", "deception_bns"], function(v) {
+			var output = {};
+
+			const agility = parseInt(v["agility"]);
+
+			const sports = v["sports"] == "on";
+			const thievery = v["thievery"] == "on";
+			const deception = v["deception"] == "on";
+
+			const sports_bns = parseInt(v["sports_bns"]);
+			const thievery_bns = parseInt(v["thievery_bns"]);
+			const deception_bns = parseInt(v["deception_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
+			const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
+			const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
+
+			output["sports_total"] = sports_total;
+			output["thievery_total"] = thievery_total;
+			output["deception_total"] = deception_total;
+
+			output["sports_total_label"] = `+${sports_total}`;
+			output["thievery_total_label"] = `+${thievery_total}`;
+			output["deception_total_label"] = `+${deception_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:sports change:sports_bns", function(eventInfo) {
+		getAttrs(["agility", "mastery_bonus", "sports", "sports_bns"], function(v) {
+			var output = {};
+
+			const agility = parseInt(v["agility"]);
+
+			const sports = v["sports"] == "on";
+			const sports_bns = parseInt(v["sports_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
+
+			output["sports_total"] = sports_total;
+			output["sports_total_label"] = `+${sports_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:thievery change:thievery_bns", function(eventInfo) {
+		getAttrs(["agility", "mastery_bonus", "thievery", "thievery_bns"], function(v) {
+			var output = {};
+
+			const agility = parseInt(v["agility"]);
+
+			const thievery = v["thievery"] == "on";
+			const thievery_bns = parseInt(v["thievery_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
+
+			output["thievery_total"] = thievery_total;
+			output["thievery_total_label"] = `+${thievery_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:deception change:deception_bns", function(eventInfo) {
+		getAttrs(["agility", "mastery_bonus", "deception", "deception_bns"], function(v) {
+			var output = {};
+
+			const agility = parseInt(v["agility"]);
+
+			const deception = v["deception"] == "on";
+			const deception_bns = parseInt(v["deception_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
+
+			output["deception_total"] = deception_total;
+			output["deception_total_label"] = `+${deception_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:awareness change:mastery_bonus", function(eventInfo) {
+		getAttrs(["awareness", "mastery_bonus", "detect", "detect_bns", "information", "information_bns", "reason", "reason_bns"], function(v) {
+			var output = {};
+
+			const awareness = parseInt(v["awareness"]);
+
+			const detect = v["detect"] == "on";
+			const information = v["information"] == "on";
+			const reason = v["reason"] == "on";
+
+			const detect_bns = parseInt(v["detect_bns"]);
+			const information_bns = parseInt(v["information_bns"]);
+			const reason_bns = parseInt(v["reason_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
+			const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
+			const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
+
+			output["detect_total"] = detect_total;
+			output["information_total"] = information_total;
+			output["reason_total"] = reason_total;
+
+			output["detect_total_label"] = `+${detect_total}`;
+			output["information_total_label"] = `+${information_total}`;
+			output["reason_total_label"] = `+${reason_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:detect change:detect_bns", function(eventInfo) {
+		getAttrs(["awareness", "mastery_bonus", "detect", "detect_bns"], function(v) {
+			var output = {};
+
+			const awareness = parseInt(v["awareness"]);
+
+			const detect = v["detect"] == "on";
+			const detect_bns = parseInt(v["detect_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
+
+			output["detect_total"] = detect_total;
+			output["detect_total_label"] = `+${detect_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:information change:information_bns", function(eventInfo) {
+		getAttrs(["awareness", "mastery_bonus", "information", "information_bns"], function(v) {
+			var output = {};
+
+			const awareness = parseInt(v["awareness"]);
+
+			const information = v["information"] == "on";
+			const information_bns = parseInt(v["information_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
+
+			output["information_total"] = information_total;
+			output["information_total_label"] = `+${information_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:reason change:reason_bns", function(eventInfo) {
+		getAttrs(["awareness", "mastery_bonus", "reason", "reason_bns"], function(v) {
+			var output = {};
+
+			const awareness = parseInt(v["awareness"]);
+
+			const reason = v["reason"] == "on";
+			const reason_bns = parseInt(v["reason_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
+
+			output["reason_total"] = reason_total;
+			output["reason_total_label"] = `+${reason_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:empathy change:mastery_bonus", function(eventInfo) {
+		getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns", "artistry", "artistry_bns", "charm", "charm_bns"], function(v) {
+			var output = {};
+
+			const empathy = parseInt(v["empathy"]);
+
+			const psychology = v["psychology"] == "on";
+			const artistry = v["artistry"] == "on";
+			const charm = v["charm"] == "on";
+
+			const psychology_bns = parseInt(v["psychology_bns"]);
+			const artistry_bns = parseInt(v["artistry_bns"]);
+			const charm_bns = parseInt(v["charm_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
+			const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
+			const charm_total = empathy + (charm ? mastery_bonus : 0) + charm_bns;
+
+			output["psychology_total"] = psychology_total;
+			output["artistry_total"] = artistry_total;
+			output["charm_total"] = charm_total;
+
+			output["psychology_total_label"] = `+${psychology_total}`;
+			output["artistry_total_label"] = `+${artistry_total}`;
+			output["charm_total_label"] = `+${charm_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:psychology change:psychology_bns", function(eventInfo) {
+		getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns"], function(v) {
+			var output = {};
+
+			const empathy = parseInt(v["empathy"]);
+
+			const psychology = v["psychology"] == "on";
+			const psychology_bns = parseInt(v["psychology_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
+
+			output["psychology_total"] = psychology_total;
+			output["psychology_total_label"] = `+${psychology_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:artistry change:artistry_bns", function(eventInfo) {
+		getAttrs(["empathy", "mastery_bonus", "artistry", "artistry_bns"], function(v) {
+			var output = {};
+
+			const empathy = parseInt(v["empathy"]);
+
+			const artistry = v["artistry"] == "on";
+			const artistry_bns = parseInt(v["artistry_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
+
+			output["artistry_total"] = artistry_total;
+			output["artistry_total_label"] = `+${artistry_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:charm change:charm_bns", function(eventInfo) {
+		getAttrs(["empathy", "mastery_bonus", "charm", "charm_bns"], function(v) {
+			var output = {};
+
+			const empathy = parseInt(v["empathy"]);
+
+			const charm = v["charm"] == "on";
+			const charm_bns = parseInt(v["charm_bns"]);
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const charm_total = empathy + (charm ? mastery_bonus : 0) + charm_bns;
+
+			output["charm_total"] = charm_total;
+			output["charm_total_label"] = `+${charm_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	/*
+	Arcanist
+	Chemist
+	Climbing
+	Impersonation
+
+	Infiltration
+	Mechanic
+	Navigation
+	Thaumaturgist
+
+	Free Toolkit places
+	*/
+	on("change:mastery_bonus", function(eventInfo) {
+		const mastery_bonus = parseInt(eventInfo.newValue);
+		const kit_list = [
+			"arcanist",
+			"chemist",
+			"climbing",
+			"impersonation",
+			"infiltration",
+			"mechanic",
+			"navigation",
+			"thaumaturgist"
+		];
+		var attrs_to_get = kit_list.map(kit => `${kit}`).concat(kit_list.map(kit => `${kit}_bns`)).concat(kit_list.map(kit => `${kit}_quality`));
+		getAttrs(attrs_to_get, function(v) {
+			var output = {};
+
+			for (let i = 0; i < kit_list.length; i++) {
+				const kit = kit_list[i];
+				const kit_mastered = v[`${kit}`] == "on";
+				if (!kit_mastered)
+					continue;
+				const kit_bns = parseInt(v[`${kit}_bns`]);
+				const kit_quality = parseInt(v[`${kit}_quality`]);
+
+				const kit_total = kit_quality + (kit_mastered ? mastery_bonus : 0) + kit_bns;
+
+				output[`${kit}_total`] = kit_total;
+				output[`${kit}_total_label`] = `+${kit_total}`;
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:arcanist change:arcanist_bns change:arcanist_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "arcanist", "arcanist_bns", "arcanist_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const arcanist = v["arcanist"] == "on";
+			const arcanist_bns = parseInt(v["arcanist_bns"]);
+			const arcanist_quality = parseInt(v["arcanist_quality"]);
+
+			const arcanist_total = arcanist_quality + (arcanist ? mastery_bonus : 0) + arcanist_bns;
+
+			output["arcanist_total"] = arcanist_total;
+			output["arcanist_total_label"] = `+${arcanist_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:chemist change:chemist_bns change:chemist_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "chemist", "chemist_bns", "chemist_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const chemist = v["chemist"] == "on";
+			const chemist_bns = parseInt(v["chemist_bns"]);
+			const chemist_quality = parseInt(v["chemist_quality"]);
+
+			const chemist_total = chemist_quality + (chemist ? mastery_bonus : 0) + chemist_bns;
+
+			output["chemist_total"] = chemist_total;
+			output["chemist_total_label"] = `+${chemist_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:climbing change:climbing_bns change:climbing_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "climbing", "climbing_bns", "climbing_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const climbing = v["climbing"] == "on";
+			const climbing_bns = parseInt(v["climbing_bns"]);
+			const climbing_quality = parseInt(v["climbing_quality"]);
+
+			const climbing_total = climbing_quality + (climbing ? mastery_bonus : 0) + climbing_bns;
+
+			output["climbing_total"] = climbing_total;
+			output["climbing_total_label"] = `+${climbing_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:impersonation change:impersonation_bns change:impersonation_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "impersonation", "impersonation_bns", "impersonation_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const impersonation = v["impersonation"] == "on";
+			const impersonation_bns = parseInt(v["impersonation_bns"]);
+			const impersonation_quality = parseInt(v["impersonation_quality"]);
+
+			const impersonation_total = impersonation_quality + (impersonation ? mastery_bonus : 0) + impersonation_bns;
+
+			output["impersonation_total"] = impersonation_total;
+			output["impersonation_total_label"] = `+${impersonation_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:infiltration change:infiltration_bns change:infiltration_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "infiltration", "infiltration_bns", "infiltration_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const infiltration = v["infiltration"] == "on";
+			const infiltration_bns = parseInt(v["infiltration_bns"]);
+			const infiltration_quality = parseInt(v["infiltration_quality"]);
+
+			const infiltration_total = infiltration_quality + (infiltration ? mastery_bonus : 0) + infiltration_bns;
+
+			output["infiltration_total"] = infiltration_total;
+			output["infiltration_total_label"] = `+${infiltration_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:mechanic change:mechanic_bns change:mechanic_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "mechanic", "mechanic_bns", "mechanic_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const mechanic = v["mechanic"] == "on";
+			const mechanic_bns = parseInt(v["mechanic_bns"]);
+			const mechanic_quality = parseInt(v["mechanic_quality"]);
+
+			const mechanic_total = mechanic_quality + (mechanic ? mastery_bonus : 0) + mechanic_bns;
+
+			output["mechanic_total"] = mechanic_total;
+			output["mechanic_total_label"] = `+${mechanic_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:navigation change:navigation_bns change:navigation_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "navigation", "navigation_bns", "navigation_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const navigation = v["navigation"] == "on";
+			const navigation_bns = parseInt(v["navigation_bns"]);
+			const navigation_quality = parseInt(v["navigation_quality"]);
+
+			const navigation_total = navigation_quality + (navigation ? mastery_bonus : 0) + navigation_bns;
+
+			output["navigation_total"] = navigation_total;
+			output["navigation_total_label"] = `+${navigation_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:thaumaturgist change:thaumaturgist_bns change:thaumaturgist_quality", function(eventInfo) {
+		getAttrs(["mastery_bonus", "thaumaturgist", "thaumaturgist_bns", "thaumaturgist_quality"], function(v) {
+			var output = {};
+
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+			const thaumaturgist = v["thaumaturgist"] == "on";
+			const thaumaturgist_bns = parseInt(v["thaumaturgist_bns"]);
+			const thaumaturgist_quality = parseInt(v["thaumaturgist_quality"]);
+
+			const thaumaturgist_total = thaumaturgist_quality + (thaumaturgist ? mastery_bonus : 0) + thaumaturgist_bns;
+
+			output["thaumaturgist_total"] = thaumaturgist_total;
+			output["thaumaturgist_total_label"] = `+${thaumaturgist_total}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:mastery_bonus", function(eventInfo) {
+		const mastery_bonus = parseInt(eventInfo.newValue);
+		getSectionIDs("toolkits", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_toolkits_${id}_toolkit`).concat(ids.map(id => `repeating_toolkits_${id}_toolkit_bns`)).concat(ids.map(id => `repeating_toolkits_${id}_toolkit_quality`));
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+
+				for (let id of ids) {
+					const toolkit = v[`repeating_toolkits_${id}_toolkit`];
+					const toolkit_mastered = toolkit == "on";
+					if (!toolkit_mastered)
+						continue;
+					const toolkit_bns = parseInt(v[`repeating_toolkits_${id}_toolkit_bns`]);
+					const toolkit_quality = parseInt(v[`repeating_toolkits_${id}_toolkit_quality`]);
+
+					const toolkit_total = toolkit_quality + (toolkit_mastered ? mastery_bonus : 0) + toolkit_bns;
+
+					output[`repeating_toolkits_${id}_toolkit_total`] = toolkit_total;
+					output[`repeating_toolkits_${id}_toolkit_total_label`] = `+${toolkit_total}`;
+				}
+
 				setAttrs(output, {silent: true});
 			});
+		});
+	});
+
+	on("change:repeating_toolkits", function(eventInfo) {
+		getAttrs(["repeating_toolkits_toolkit", "repeating_toolkits_toolkit_bns", "repeating_toolkits_toolkit_quality", "mastery_bonus"], function(v) {
+			var output = {};
+
+			const toolkit = v["repeating_toolkits_toolkit"];
+			const toolkit_mastered = toolkit == "on";
+			const toolkit_bns = parseInt(v["repeating_toolkits_toolkit_bns"]);
+			const toolkit_quality = parseInt(v["repeating_toolkits_toolkit_quality"]);
+			const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+			const toolkit_total = toolkit_quality + (toolkit_mastered ? mastery_bonus : 0) + toolkit_bns;
+
+			output["repeating_toolkits_toolkit_total"] = toolkit_total;
+			output["repeating_toolkits_toolkit_total_label"] = `+${toolkit_total}`;
+
+			setAttrs(output, {silent: true});
 		});
 	});
 </script>
@@ -66,9 +730,10 @@
 			<button type="action" class="sheet-tabButton" name="act_combat">Combat</button>
 			<button type="action" class="sheet-tabButton" name="act_magic">Magic</button>
 			<button type="action" class="sheet-tabButton" name="act_notes">Notes</button>
+			<button type="action" class="sheet-tabButton" name="act_options">Options</button>
 		</div>
 		<div class="sheet-flexGrow sheet-flexEnd">
-			<select name="attr_rollWhisperType" title="Select roll visibility">
+			<select name="attr_roll_whisper_type" title="Select roll visibility">
 				<option value="" title="Rolls are visible by everyone" selected><span>Show rolls</span></option>
 				<option value="?{Whisper?|Public Roll,|Whisper Roll,/w gm }" title="Select your roll visibility each time you roll"><span>Ask each time</span></option>
 				<option value="/w gm" title="Only you and the GM will see your rolls"><span>Always whisper</span></option>
@@ -81,7 +746,7 @@
 
 		<!-- Player Info -->
 		<div class="sheet-playerinfo">
-			<div><span>Player Name :</span><input type="text" name="attr_player_name"/></div>
+			<!-- <div><span>Player Name :</span><input type="text" name="attr_player_name"/></div> -->
 			<div>
 				<div style="display: flex; flex-grow: 1; flex-shrink: 0;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
 				<div style="flex-shrink: 0; width: 183px;">
@@ -102,11 +767,14 @@
 		</div>
 
 		<div>
+			<input type="hidden" name="attr_quirk_total" value="0" />
+			<input type="hidden" name="attr_quirk_points_label" value="0/2" />
 			<div style="display: flex; flex-flow: column wrap; justify-content: stretch;">
-				<div class="sheet-section-title" style="flex-grow: 1;">
+				<div class="sheet-section-title" style="display: flex; flex-grow: 1; gap: 4px;">
 					<span class="sheet-section-title">Character quirks</span>
 					<input type="checkbox" name="attr_quirk_fold" class="sheet-folder" />
 					<span class="sheet-folder"></span>
+					<span class="sheet-section-title" style="flex-grow: 1; text-align: end;" name="attr_quirk_points_label"></span>
 				</div>
 				<input type="hidden" name="attr_quirk_fold" class="sheet-folder" />
 				<div style="flex-flow: column wrap;" class="sheet-foldable">
@@ -128,178 +796,493 @@
 						</div>
 					</fieldset>
 				</div>
-				<div class="sheet-reverseFoldable" style="border: 2px solid var(--light-theme-line-color); border-top: 0; border-radius: 0 0 8px 8px; padding: 4px;">
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
 					<input type="hidden" name="attr_all_quirks" />
 					<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_quirks"></span>
 				</div>
 			</div>
 		</div>
 
-		<!-- Character Stats -->
-		<div style="display: flex; flex-flow: column wrap; gap: 4px;">
+		<div>
 			<div>
-				<!-- HP/MP -->
-				<!--
-				<div>
-					<table style="border-radius: 8px; padding: 4px; border: 2px;">
-						<tr style="background-color: var(--light-theme-header-color);">
-							<th colspan="2" style="color: white; font-weight: bold; font-size: large; text-transform: uppercase;">Hit Points</th>
-							<th colspan="2" style="color: white; font-weight: bold; font-size: large; text-transform: uppercase;">Mind points</th>
-						</tr>
-						<tr style="border: 2px solid var(--light-theme-line-color); border-top: 0;">
-							<td><input type="number" name="attr_hp_current"></input></td>
-							<td><input type="number" name="attr_hp_max"></input></td>
-							<td><input type="number" name="attr_mp_current"></input></td>
-							<td><input type="number" name="attr_mp_max"></input></td>
-						</tr>
-					</table>
-				</div>
-				-->
-				<div  style="display: flex; flex-flow: row wrap; gap: 8px;">
-					<div class="sheet-guardPoint">
-						<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
-							<span>Spirit</span>
-							<div>
-								<input type="checkbox" name="attr_spirit1" />
-								<input type="checkbox" name="attr_spirit2" />
-								<input type="checkbox" name="attr_spirit3" />
-								<input type="checkbox" name="attr_spirit4" />
-								<input type="checkbox" name="attr_spirit5" />
-							</div>
-						</div>
-						<div class="sheet-sectionTitle">
-							<span>Resolve Points</span>
-						</div>
-						<div class="sheet-counterPoint">
-							<div class="sheet-inputPoint">
-								<input type="number" name="attr_resolveCurrent" value="30" />
-							</div>
-							<div>
-								<span>Max Resolve</span>
-								<input type="hidden" name="attr_resolveMax" value="30" />
-								<span class="sheet-replicateInput" name="attr_resolveMax"></span>
-							</div>
+				<table>
+					<tr>
+						<th>Hit Points</th>
+						<th>Mind Points</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="diagonal"></div>
+							<div class="top-left"><input type="number" name="attr_hp_current" placeholder="0"></div>
+							<div class="bottom-right"><input type="number" name="attr_hp_max" placeholder="0"></div>
+						</td>
+						<td>
+							<div class="diagonal"></div>
+							<div class="top-left"><input type="number" name="attr_mp_current" placeholder="0"></div>
+							<div class="bottom-right"><input type="number" name="attr_mp_max" placeholder="0"></div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div  style="display: flex; flex-flow: row wrap; gap: 8px;">
+				<div class="sheet-guardPoint">
+					<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
+						<span>Spirit</span>
+						<div>
+							<input type="checkbox" name="attr_spirit1" />
+							<input type="checkbox" name="attr_spirit2" />
+							<input type="checkbox" name="attr_spirit3" />
+							<input type="checkbox" name="attr_spirit4" />
+							<input type="checkbox" name="attr_spirit5" />
 						</div>
 					</div>
-					<div class="sheet-guardPoint">
-						<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
-							<span>Barrier</span>
-							<div>
-								<input type="checkbox" name="attr_barrier1" />
-								<input type="checkbox" name="attr_barrier2" />
-								<input type="checkbox" name="attr_barrier3" />
-							</div>
-						</div>
-						<div class="sheet-sectionTitle">
-							<span>Hit Points</span>
-						</div>
-						<div class="sheet-counterPoint">
-							<div class="sheet-inputPoint">
-								<input type="number" name="attr_hpCurrent" value="15" />
-							</div>
-							<div>
-								<span>Max HP</span>
-								<input type="hidden" name="attr_hpMax" value="15" />
-								<span class="sheet-replicateInput" name="attr_hpMax"></span>
-							</div>
-						</div>
+					<div class="sheet-sectionTitle">
+						<span>Resolve Points</span>
 					</div>
-					<div class="sheet-guardPoint">
-						<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
-							<span>Spellglyphs</span>
-							<div>
-								<input type="checkbox" name="attr_glyph1" />
-								<input type="checkbox" name="attr_glyph2" />
-								<input type="checkbox" name="attr_glyph3" />
-							</div>
-						</div>
-						<div class="sheet-sectionTitle">
-							<span>Mind Points</span>
-						</div>
-						<div class="sheet-counterPoint">
-							<div class="sheet-inputPoint">
-								<input type="number" name="attr_mpCurrent" value="15" />
-							</div>
-							<div>
-								<span>Max MP</span>
-								<input type="hidden" name="attr_mpMax" value="15" />
-								<span class="sheet-replicateInput" name="attr_mpMax"></span>
-							</div>
-						</div>
-					</div>
-					<!-- Destiny End Points -->
-					<div class="sheet-statPill">
-						<div class="sheet-sectionTitle">
-							<span>Destiny's</span>
-							<span style="font-size: small;">End Points</span>
+					<div class="sheet-counterPoint">
+						<div class="sheet-inputPoint">
+							<input type="number" name="attr_resolve_current" value="30" />
 						</div>
 						<div>
-							<input type="number" name="attr_destinyCurrent" value="0" />
-							<div style="display: flex;
-							flex-flow: column;
-							height: auto;
-							border: 0;
-							border-radius: 0;
-							padding: 0;">
-								<span>Max DEP</span>
-								<span style="text-align: center; font-weight: bold;">12</span>
-							</div>
+							<span>Max Resolve</span>
+							<input type="hidden" name="attr_resolve_max" value="30" />
+							<span class="sheet-replicateInput" name="attr_resolve_max"></span>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div style="display: flex; align-items: center; justify-content: center;">
-				<!-- Mastery bonus -->
+				<div class="sheet-guardPoint">
+					<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
+						<span>Barrier</span>
+						<div>
+							<input type="checkbox" name="attr_barrier1" />
+							<input type="checkbox" name="attr_barrier2" />
+							<input type="checkbox" name="attr_barrier3" />
+						</div>
+					</div>
+					<div class="sheet-sectionTitle">
+						<span>Hit Points</span>
+					</div>
+					<div class="sheet-counterPoint">
+						<div class="sheet-inputPoint">
+							<input type="number" name="attr_hp_current" value="15" />
+						</div>
+						<div>
+							<span>Max HP</span>
+							<input type="hidden" name="attr_hp_max" value="15" />
+							<span class="sheet-replicateInput" name="attr_hp_max"></span>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-guardPoint">
+					<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
+						<span>Spellglyphs</span>
+						<div>
+							<input type="checkbox" name="attr_glyph1" />
+							<input type="checkbox" name="attr_glyph2" />
+							<input type="checkbox" name="attr_glyph3" />
+						</div>
+					</div>
+					<div class="sheet-sectionTitle">
+						<span>Mind Points</span>
+					</div>
+					<div class="sheet-counterPoint">
+						<div class="sheet-inputPoint">
+							<input type="number" name="attr_mp_current" value="15" />
+						</div>
+						<div>
+							<span>Max MP</span>
+							<input type="hidden" name="attr_mp_max" value="15" />
+							<span class="sheet-replicateInput" name="attr_mp_max"></span>
+						</div>
+					</div>
+				</div>
+				<!-- Destiny End Points -->
 				<div class="sheet-statPill">
 					<div class="sheet-sectionTitle">
-						<span style="font-size: small;">Mastery</span>
-						<span>Bonus</span>
+						<span>Destiny's</span>
+						<span style="font-size: small;">End Points</span>
 					</div>
 					<div>
-						<span style="font-size: x-large; font-weight: bold;">+</span>
-						<input type="number" name="attr_masteryBonus" style="width: 7em; border-radius: 0 8px 8px 0;" value="0" />
-					</div>
-				</div>
-			</div>
-			<div>
-				<!-- Attributes & Skills tableau -->
-				<div class="sheet-attributeTable">
-					<!-- Header -->
-					<div class="sheet-sectionTitle">
-						<span class="sheet-sectionTitle">Attributes</span>
-						<span class="sheet-sectionTitle">Skills</span>
-						<span class="sheet-sectionTitle">BNS</span>
-					</div>
-					<div>
-						<!-- Strength -->
-						<div>
-							<div class="sheet-statBlock">
-								<input type="number" name="attr_strength" value="0" />
-								<button type="roll" name="act_rollStrength">
-									<span style="text-transform: uppercase;">Strength</span>
-								</button>
-							</div>
+						<input type="number" name="attr_destinyCurrent" value="0" />
+						<div style="display: flex;
+						flex-flow: column;
+						height: auto;
+						border: 0;
+						border-radius: 0;
+						padding: 0;
+						margin-right: 2px;">
+							<span>Max DEP</span>
+							<span style="text-align: center; font-weight: bold;">12</span>
 						</div>
 					</div>
-					<!-- Attributes -->
-					<div></div>
-					<!-- Skills -->
-					<div></div>
-					<!-- BNS -->
-					<div></div>
-				</div>
-				<!-- Toolkits -->
-				<div>
-					<!-- Toolkit -->
-					<div></div>
-					<!-- Quality -->
-					<div></div>
-					<!-- BNS -->
-					<div></div>
 				</div>
 			</div>
 		</div>
 
+		<div style="align-items: center; justify-content: center;">
+			<!-- Mastery bonus -->
+			<div class="sheet-statPill">
+				<div class="sheet-sectionTitle">
+					<span style="font-size: small;">Mastery</span>
+					<span>Bonus</span>
+				</div>
+				<div>
+					<span style="font-size: x-large; font-weight: bold;">+</span>
+					<input type="hidden" name="attr_mastery_bonus" value="2" />
+					<span class="sheet-replicateInput" name="attr_mastery_bonus" style="width: 3em;""></span>
+				</div>
+			</div>
+		</div>
+
+		<div style="flex-flow: row wrap; gap: 4px;">
+			<!-- Attributes & Skills tableau -->
+			<div class="sheet-attributeTable">
+				<!-- Header -->
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="width: 148px;">Attributes</span>
+					<span class="sheet-sectionTitle" style="width: 120px;">Skills</span>
+					<span class="sheet-sectionTitle" style="width: 45.5px;">BNS</span>
+				</div>
+				<div>
+					<!--
+						Strength
+							Brute
+							Endurance
+							Intimidation
+						Agility
+							Sports
+							Thievery
+							Deception
+						Awareness
+							Detect
+							Information
+							Reason
+						Empathy
+							Psychology
+							Artistry
+							Charm
+					-->
+					<!-- Strength -->
+					<div class="sheet-abilityBlock">
+						<div class="sheet-statBlock">
+							<input type="number" name="attr_strength" value="0" />
+							<button type="roll" name="act_rollStrength">
+								<span>Strength</span>
+							</button>
+						</div>
+						<div class="sheet-compBlock">
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_brute" />
+								<span>Brute</span>
+								<input type="number" name="attr_brute_bns" value="0" />
+								<input type="hidden" name="attr_brute_total" value="0" />
+								<input type="hidden" name="attr_brute_total_label" value="0" />
+								<button type="roll" name="act_rollBrute" value="@{roll_whisper_type}">
+									<span name="attr_brute_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_endurance" />
+								<span>Endurance</span>
+								<input type="number" name="attr_endurance_bns" value="0" />
+								<input type="hidden" name="attr_endurance_total" value="0" />
+								<input type="hidden" name="attr_endurance_total_label" value="0" />
+								<button type="roll" name="act_rollEndurance">
+									<span name="attr_endurance_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_intimidation" />
+								<span>Intimidation</span>
+								<input type="number" name="attr_intimidation_bns" value="0" />
+								<input type="hidden" name="attr_intimidation_total" value="0" />
+								<input type="hidden" name="attr_intimidation_total_label" value="0" />
+								<button type="roll" name="act_rollIntimidation">
+									<span name="attr_intimidation_total_label"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- Agility -->
+					<div class="sheet-abilityBlock">
+						<div class="sheet-statBlock">
+							<input type="number" name="attr_agility" value="0" />
+							<button type="roll" name="act_rollAgility">
+								<span>Agility</span>
+							</button>
+						</div>
+						<div class="sheet-compBlock">
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_sports" />
+								<span>Sports</span>
+								<input type="number" name="attr_sports_bns" value="0" />
+								<input type="hidden" name="attr_sports_total" value="0" />
+								<input type="hidden" name="attr_sports_total_label" value="0" />
+								<button type="roll" name="act_rollSports">
+									<span name="attr_sports_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_thievery" />
+								<span>Thievery</span>
+								<input type="number" name="attr_thievery_bns" value="0" />
+								<input type="hidden" name="attr_thievery_total" value="0" />
+								<input type="hidden" name="attr_thievery_total_label" value="0" />
+								<button type="roll" name="act_rollThievery">
+									<span name="attr_thievery_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_deception" />
+								<span>Deception</span>
+								<input type="number" name="attr_deception_bns" value="0" />
+								<input type="hidden" name="attr_deception_total" value="0" />
+								<input type="hidden" name="attr_deception_total_label" value="0" />
+								<button type="roll" name="act_rollDeception">
+									<span name="attr_deception_total_label"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- Awareness -->
+					<div class="sheet-abilityBlock">
+						<div class="sheet-statBlock">
+							<input type="number" name="attr_awareness" value="0" />
+							<button type="roll" name="act_rollAwareness">
+								<span>Awareness</span>
+							</button>
+						</div>
+						<div class="sheet-compBlock">
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_detect" />
+								<span>Detect</span>
+								<input type="number" name="attr_detect_bns" value="0" />
+								<input type="hidden" name="attr_detect_total" value="0" />
+								<input type="hidden" name="attr_detect_total_label" value="0" />
+								<button type="roll" name="act_rollDetect">
+									<span name="attr_detect_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_information" />
+								<span>Information</span>
+								<input type="number" name="attr_information_bns" value="0" />
+								<input type="hidden" name="attr_information_total" value="0" />
+								<input type="hidden" name="attr_information_total_label" value="0" />
+								<button type="roll" name="act_rollInformation">
+									<span name="attr_information_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_reason" />
+								<span>Reason</span>
+								<input type="number" name="attr_reason_bns" value="0" />
+								<input type="hidden" name="attr_reason_total" value="0" />
+								<input type="hidden" name="attr_reason_total_label" value="0" />
+								<button type="roll" name="act_rollReason">
+									<span name="attr_reason_total_label"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- Empathy -->
+					<div class="sheet-abilityBlock">
+						<div class="sheet-statBlock">
+							<input type="number" name="attr_empathy" value="0" />
+							<button type="roll" name="act_rollEmpathy">
+								<span>Empathy</span>
+							</button>
+						</div>
+						<div class="sheet-compBlock">
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_psychology" />
+								<span>Psychology</span>
+								<input type="number" name="attr_psychology_bns" value="0" />
+								<input type="hidden" name="attr_psychology_total" value="0" />
+								<input type="hidden" name="attr_psychology_total_label" value="0" />
+								<button type="roll" name="act_rollPsychology">
+									<span name="attr_psychology_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_artistry" />
+								<span>Artistry</span>
+								<input type="number" name="attr_artistry_bns" value="0" />
+								<input type="hidden" name="attr_artistry_total" value="0" />
+								<input type="hidden" name="attr_artistry_total_label" value="0" />
+								<button type="roll" name="act_rollArtistry">
+									<span name="attr_artistry_total_label"></span>
+								</button>
+							</div>
+							<div class="sheet-compLine">
+								<span>+</span>
+								<input type="checkbox" name="attr_charm" />
+								<span>Charm</span>
+								<input type="number" name="attr_charm_bns" value="0" />
+								<input type="hidden" name="attr_charm_total" value="0" />
+								<input type="hidden" name="attr_charm_total_label" value="0" />
+								<button type="roll" name="act_rollCharm">
+									<span name="attr_charm_total_label"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Toolkits -->
+			<div class="sheet-toolkitTable">
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Toolkits</span>
+					<span class="sheet-sectionTitle">Quality</span>
+					<span class="sheet-sectionTitle">BNS</span>
+				</div>
+				<div>
+					<!--
+						Arcanist
+						Chemist
+						Climbing
+						Impersonation
+
+						Infiltration
+						Mechanic
+						Navigation
+						Thaumaturgist
+
+						Free Toolkit places
+					-->
+					<!-- Arcanist -->
+					<div class="sheet-toolkitBlock">
+						<span>Arcanist kit</span>
+						<input type="number" name="attr_arcanist_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_arcanist" />
+						<input type="number" name="attr_arcanist_bns" value="0" />
+						<input type="hidden" name="attr_arcanist_total" value="0" />
+						<input type="hidden" name="attr_arcanist_total_label" value="0" />
+						<button type="roll" name="act_rollArcanist">
+							<span name="attr_arcanist_total_label"></span>
+						</button>
+					</div>
+					<!-- Chemist -->
+					<div class="sheet-toolkitBlock">
+						<span>Chemist kit</span>
+						<input type="number" name="attr_chemist_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_chemist" />
+						<input type="number" name="attr_chemist_bns" value="0" />
+						<input type="hidden" name="attr_chemist_total" value="0" />
+						<input type="hidden" name="attr_chemist_total_label" value="0" />
+						<button type="roll" name="act_rollChemist">
+							<span name="attr_chemist_total_label"></span>
+						</button>
+					</div>
+					<!-- Climbing -->
+					<div class="sheet-toolkitBlock">
+						<span>Climbing kit</span>
+						<input type="number" name="attr_climbing_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_climbing" />
+						<input type="number" name="attr_climbing_bns" value="0" />
+						<input type="hidden" name="attr_climbing_total" value="0" />
+						<input type="hidden" name="attr_climbing_total_label" value="0" />
+						<button type="roll" name="act_rollClimbing">
+							<span name="attr_climbing_total_label"></span>
+						</button>
+					</div>
+					<!-- Impersonation -->
+					<div class="sheet-toolkitBlock" style="margin-bottom: 4px;">
+						<span>Impersonation kit</span>
+						<input type="number" name="attr_impersonation_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_impersonation" />
+						<input type="number" name="attr_impersonation_bns" value="0" />
+						<input type="hidden" name="attr_impersonation_total" value="0" />
+						<input type="hidden" name="attr_impersonation_total_label" value="0" />
+						<button type="roll" name="act_rollImpersonation">
+							<span name="attr_impersonation_total_label"></span>
+						</button>
+					</div>
+					<!-- Infiltration -->
+					<div class="sheet-toolkitBlock">
+						<span>Infiltration kit</span>
+						<input type="number" name="attr_infiltration_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_infiltration" />
+						<input type="number" name="attr_infiltration_bns" value="0" />
+						<input type="hidden" name="attr_infiltration_total" value="0" />
+						<input type="hidden" name="attr_infiltration_total_label" value="0" />
+						<button type="roll" name="act_rollInfiltration">
+							<span name="attr_infiltration_total_label"></span>
+						</button>
+					</div>
+					<!-- Mechanic -->
+					<div class="sheet-toolkitBlock">
+						<span>Mechanic kit</span>
+						<input type="number" name="attr_mechanic_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_mechanic" />
+						<input type="number" name="attr_mechanic_bns" value="0" />
+						<input type="hidden" name="attr_mechanic_total" value="0" />
+						<input type="hidden" name="attr_mechanic_total_label" value="0" />
+						<button type="roll" name="act_rollMechanic">
+							<span name="attr_mechanic_total_label"></span>
+						</button>
+					</div>
+					<!-- Navigation -->
+					<div class="sheet-toolkitBlock">
+						<span>Navigation kit</span>
+						<input type="number" name="attr_navigation_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_navigation" />
+						<input type="number" name="attr_navigation_bns" value="0" />
+						<input type="hidden" name="attr_navigation_total" value="0" />
+						<input type="hidden" name="attr_navigation_total_label" value="0" />
+						<button type="roll" name="act_rollNavigation">
+							<span name="attr_navigation_total_label"></span>
+						</button>
+					</div>
+					<!-- Thaumaturgist -->
+					<div class="sheet-toolkitBlock" style="margin-bottom: 4px;">
+						<span>Thaumaturgist kit</span>
+						<input type="number" name="attr_thaumaturgist_quality" value="0" />
+						<span>+</span>
+						<input type="checkbox" name="attr_thaumaturgist" />
+						<input type="number" name="attr_thaumaturgist_bns" value="0" />
+						<input type="hidden" name="attr_thaumaturgist_total" value="0" />
+						<input type="hidden" name="attr_thaumaturgist_total_label" value="0" />
+						<button type="roll" name="act_rollThaumaturgist">
+							<span name="attr_thaumaturgist_total_label"></span>
+						</button>
+					</div>
+					<!-- Free Toolkit places -->
+					<fieldset class="repeating_toolkits">
+						<div>
+							<input type="text" name="attr_toolkit_name" placeholder="Toolkit name" />
+							<input type="number" name="attr_toolkit_quality" value="0" />
+							<span>+</span>
+							<input type="checkbox" name="attr_toolkit" />
+							<input type="number" name="attr_toolkit_bns" value="0" />
+							<input type="hidden" name="attr_toolkit_total" value="0" />
+							<input type="hidden" name="attr_toolkit_total_label" value="0" />
+							<button type="roll" name="act_rollToolkit">
+								<span name="attr_toolkit_total_label"></span>
+							</button>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</div>
 		<!-- Character Equipment -->
 		<div>
 			<!-- Title & Slots -->
@@ -343,6 +1326,17 @@
 
 	<div class="sheet-notes sheet-tab">
 		<h1>Notes</h1>
+	</div>
+
+	<div class="sheet-options sheet-tab">
+		<h1>Options</h1>
+		<input type="number" name="attr_armor_hp" value="0" />
+		<input type="checkbox" name="attr_unarmored_toughness" />
+		<input type="number" name="attr_added_hp" value="0" />
+		<input type="number" name="attr_attunement_amount" value="0" />
+		<input type="number" name="attr_added_mp" value="0" />
+		<input type="number" name="attr_added_resolve" value="0" />
+		<input type="hidden" name="attr_added_quirk" value="0" />
 	</div>
 </div>
 
