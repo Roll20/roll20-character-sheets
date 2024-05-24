@@ -61,12 +61,67 @@
 			setAttrs(output, {silent: true});
 		});
 
+
 		getAttrs(["added_quirk", "quirk_total"], function(v) {
 			var output = {};
 			const quirk_total = parseInt(v["quirk_total"]);
 			const quirk_max = 2 + grade_ranked + parseInt(v["added_quirk"]);
 
 			output["quirk_points_label"] = `${quirk_total}/${quirk_max}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:added_resolve", function(eventInfo) {
+		getAttrs(["added_resolve", "character_level"], function(v) {
+			var output = {};
+
+			const character_level = parseInt(v["character_level"]);
+			const capped_level = character_level > 12 ? 12 : character_level;
+
+			const added_resolve = parseInt(v["added_resolve"]);
+			const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
+
+			output["resolve_max"] = resolve_max;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:added_hp change:armor_hp change:unarmored_toughness", function(eventInfo) {
+		getAttrs(["added_hp", "armor_hp", "unarmored_toughness", "character_level"], function(v) {
+			var output = {};
+
+			const character_level = parseInt(v["character_level"]);
+			const capped_level = character_level > 12 ? 12 : character_level;
+
+			const added_hp = parseInt(v["added_hp"]);
+			const armor_hp = parseInt(v["armor_hp"]);
+			const unarmored_toughness = v["unarmored_toughness"];
+
+			var hp_max = 15 + (capped_level - 1) * 2 + added_hp + armor_hp;
+			if (unarmored_toughness == "on")
+				hp_max = 20 + (capped_level - 1) * 3 + added_hp;
+
+			output["hp_max"] = hp_max;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:added_mp change:attunement_amount", function(eventInfo) {
+		getAttrs(["added_mp", "attunement_amount", "character_level"], function(v) {
+			var output = {};
+
+			const character_level = parseInt(v["character_level"]);
+			const capped_level = character_level > 12 ? 12 : character_level;
+
+			const added_mp = parseInt(v["added_mp"]);
+			const attunement_amount = parseInt(v["attunement_amount"]);
+			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunement_amount;
+
+			output["mp_max"] = mp_max;
 
 			setAttrs(output, {silent: true});
 		});
@@ -87,7 +142,7 @@
 					if (quirkName == undefined || quirkName == "")
 						quirkName = "Unnamed Quirk";
 					total_quirk_points += parseInt(quirkLevel);
-					quirk_value_pair += `${quirkName}: ${quirkLevel}\n`;
+					quirk_value_pair += `${quirkName} (Rank ${quirkLevel})\n`;
 				});
 
 				quirk_value_pair = quirk_value_pair.trimEnd();
@@ -777,8 +832,6 @@
 					var primary_features = [];
 					var secondary_features = [];
 
-					console.log("Primary class", primary_class);
-					console.log("Secondary class", secondary_class);
 					for (let i = 0; i < ids.length; i++) {
 						const id = ids[i];
 						const featureClass = v[`repeating_features_${id}_feature_class`];
@@ -817,21 +870,95 @@
 					if (primary_features.length > 0) {
 						final_string += `Primary Class (${primary_features[0].feature_discipline} ${primary_features[0].feature_class}) features\n`;
 						for (let feature of primary_features) {
-							final_string += `  ${feature.feature_name} (${feature.feature_level})\n`;
+							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
 					}
 					if (secondary_features.length > 0) {
 						final_string += `Secondary Class (${secondary_features[0].feature_discipline} ${secondary_features[0].feature_class}) features\n`;
 						for (let feature of secondary_features) {
-							final_string += `  ${feature.feature_name} (${feature.feature_level})\n`;
+							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
 					}
 
 					output["all_features"] = final_string.trimEnd();
 
-					setAttrs(output, {silent: true});
+					setAttrs(output, {silent: false});
 				});
 			});
+		});
+	});
+
+	on("change:all_quirks change:all_traits change:all_features", function(eventInfo) {
+		getAttrs(["all_quirks", "all_traits", "all_features"], function(v) {
+			var output = {};
+
+			const all_quirks = v["all_quirks"];
+			const all_traits = v["all_traits"];
+			const all_features = v["all_features"];
+
+			var all_text = "";
+			if (all_quirks != undefined && all_quirks != "")
+				all_text += "Quirks\n" + all_quirks.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (all_traits != undefined && all_traits != "")
+				all_text += "Traits\n" + all_traits.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (all_features != undefined && all_features != "")
+				all_text += "Features\n" + all_features.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+
+			output["all_quirks_traits_features"] = all_text.trimEnd();
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:repeating_equipment", function(eventInfo) {
+		getSectionIDs("equipment", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_equipment_${id}_equipment_name`).concat(ids.map(id => `repeating_equipment_${id}_equipment_quantity`)).concat(ids.map(id => `repeating_equipment_${id}_equipment_weight`)).concat("added_slots");
+
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+				var equipment_value_pair = "";
+				var total_weight = 0;
+				const added_slots = parseInt(v["added_slots"]);
+				const total_slots = 8 + added_slots;
+
+				for (const id of ids) {
+					const equipmentName = v[`repeating_equipment_${id}_equipment_name`];
+					const equipmentQuantity = parseInt(v[`repeating_equipment_${id}_equipment_quantity`]);
+					if (equipmentName == undefined || equipmentName == "")
+						continue;
+					equipment_value_pair += `${equipmentName} (${equipmentQuantity})\n`;
+				}
+
+				equipment_value_pair = equipment_value_pair.trimEnd();
+
+				output["all_equipment"] = equipment_value_pair;
+
+				for (const id of ids) {
+					const equipmentWeight = parseFloat(v[`repeating_equipment_${id}_equipment_weight`]);
+					const equipmentQuantity = parseFloat(v[`repeating_equipment_${id}_equipment_quantity`]);
+					if (equipmentQuantity == 0 || equipmentWeight == 0)
+						continue;
+					total_weight += equipmentQuantity * equipmentWeight;
+				}
+
+				output["equipment_weight_label"] = `${parseInt(total_weight)}/${total_slots}`;
+
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+	on("change:added_slots", function(eventInfo) {
+		getAttrs(["added_slots", "equipment_weight_label"], function(v) {
+			var output = {};
+			const added_slots = parseInt(v["added_slots"]);
+			const total_slots = 8 + added_slots;
+			const equipment_weight_label = v["equipment_weight_label"];
+			const total_weight = parseInt(equipment_weight_label.split("/")[0]);
+
+			output["equipment_weight_label"] = `${total_weight}/${total_slots}`;
+
+			setAttrs(output, {silent: true});
 		});
 	});
 </script>
@@ -863,14 +990,14 @@
 		<div class="sheet-playerinfo">
 			<!-- <div><span>Player Name :</span><input type="text" name="attr_player_name"/></div> -->
 			<div>
-				<div style="display: flex; flex-grow: 1; flex-shrink: 0;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
+				<div style="display: flex; flex: 1 0 auto;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
 				<div style="flex-shrink: 0; width: 183px;">
 					<span>Level :</span><input type="number" name="attr_character_level" style="text-align: end;" value="1" />
 					<span>(</span><input type="number" name="attr_character_xp" /><span>) exp</span>
 				</div>
 			</div>
 			<div>
-				<div style="display: flex; flex-grow: 1; flex-shrink: 0;"><span>Lifeform :</span><input type="text" name="attr_character_lifeform"/></div>
+				<div style="display: flex; flex: 1 0 auto;"><span>Lifeform :</span><input type="text" name="attr_character_lifeform"/></div>
 				<div style="flex-shrink: 0; width: 183px; display: flex;">
 					<span style="flex-shrink: 0;">Grade :</span>
 					<input type="hidden" class="sheet-adventuringRank" name="attr_adventuring_grade" value="copper" />
@@ -881,15 +1008,16 @@
 			<div><span>⬗ Secondary Class :</span><input type="text" name="attr_character_secondary_class"/></div>
 		</div>
 
-		<div>
+		<!-- Quirks -->
+		<div class="sheet-botSpace">
 			<input type="hidden" name="attr_quirk_total" value="0" />
 			<input type="hidden" name="attr_quirk_points_label" value="0/2" />
 			<div style="display: flex; flex-flow: column wrap; justify-content: stretch;">
-				<div class="sheet-sectionTitle" style="display: flex; flex-grow: 1; gap: 4px;">
+				<div class="sheet-sectionTitle" style="display: flex; flex: 1 1 auto; gap: 4px;">
 					<span class="sheet-sectionTitle">Character quirks</span>
 					<input type="checkbox" name="attr_quirk_fold" class="sheet-folder" />
 					<span class="sheet-folder"></span>
-					<span class="sheet-sectionTitle" style="flex-grow: 1; text-align: end;" name="attr_quirk_points_label"></span>
+					<span class="sheet-sectionTitle" style="flex: 1 0 auto; text-align: end;" name="attr_quirk_points_label"></span>
 				</div>
 				<input type="hidden" name="attr_quirk_fold" class="sheet-folder" />
 				<div style="flex-flow: column wrap;" class="sheet-foldable">
@@ -913,11 +1041,12 @@
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
 					<input type="hidden" name="attr_all_quirks" />
-					<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_quirks"></span>
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
 				</div>
 			</div>
 		</div>
 
+		<!-- Resolve HP MP -->
 		<div>
 			<!-- HP/MP -->
 			<!--
@@ -950,15 +1079,26 @@
 					</div>
 					<div class="sheet-sectionTitle">
 						<span>Resolve Points</span>
+						<input type="checkbox" name="attr_resolve_fold" class="sheet-folder" />
+						<span class="sheet-folder"></span>
 					</div>
-					<div class="sheet-counterPoint">
-						<div class="sheet-inputPoint">
-							<input type="number" name="attr_resolve_current" value="30" />
+					<div class="sheet-extendedCounterPoint">
+						<input type="hidden" name="attr_resolve_fold" class="sheet-folder" />
+						<div class="sheet-counterPoint">
+							<div class="sheet-inputPoint">
+								<input type="number" name="attr_resolve_current" value="30" />
+							</div>
+							<div>
+								<span>Max Resolve</span>
+								<input type="hidden" name="attr_resolve_max" value="30" />
+								<span class="sheet-replicateInput" name="attr_resolve_max"></span>
+							</div>
 						</div>
-						<div>
-							<span>Max Resolve</span>
-							<input type="hidden" name="attr_resolve_max" value="30" />
-							<span class="sheet-replicateInput" name="attr_resolve_max"></span>
+						<div class="sheet-foldable">
+							<div>
+								<span>Max Resolve Bonus</span>
+								<input type="number" name="attr_added_resolve" value="0" />
+							</div>
 						</div>
 					</div>
 				</div>
@@ -973,15 +1113,34 @@
 					</div>
 					<div class="sheet-sectionTitle">
 						<span>Hit Points</span>
+						<input type="checkbox" name="attr_hp_fold" class="sheet-folder" />
+						<span class="sheet-folder"></span>
 					</div>
-					<div class="sheet-counterPoint">
-						<div class="sheet-inputPoint">
-							<input type="number" name="attr_hp_current" value="15" />
+					<div class="sheet-extendedCounterPoint">
+						<input type="hidden" name="attr_hp_fold" class="sheet-folder" />
+						<div class="sheet-counterPoint">
+							<div class="sheet-inputPoint">
+								<input type="number" name="attr_hp_current" value="15" />
+							</div>
+							<div>
+								<span>Max HP</span>
+								<input type="hidden" name="attr_hp_max" value="15" />
+								<span class="sheet-replicateInput" name="attr_hp_max"></span>
+							</div>
 						</div>
-						<div>
-							<span>Max HP</span>
-							<input type="hidden" name="attr_hp_max" value="15" />
-							<span class="sheet-replicateInput" name="attr_hp_max"></span>
+						<div class="sheet-foldable">
+							<div>
+								<span>Unarmored Toughness</span>
+								<input type="checkbox" name="attr_unarmored_toughness" />
+							</div>
+							<div>
+								<span>Armor HP</span>
+								<input type="number" name="attr_armor_hp" value="0" />
+							</div>
+							<div>
+								<span>Max HP Bonus</span>
+								<input type="number" name="attr_added_hp" value="0" />
+							</div>
 						</div>
 					</div>
 				</div>
@@ -996,22 +1155,34 @@
 					</div>
 					<div class="sheet-sectionTitle">
 						<span>Mind Points</span>
+						<input type="checkbox" name="attr_mp_fold" class="sheet-folder" />
+						<span class="sheet-folder"></span>
 					</div>
-					<div class="sheet-counterPoint">
-						<div class="sheet-inputPoint">
-							<input type="number" name="attr_mp_current" value="15" />
+					<div class="sheet-extendedCounterPoint">
+						<input type="hidden" name="attr_mp_fold" class="sheet-folder" />
+						<div class="sheet-counterPoint">
+							<div class="sheet-inputPoint">
+								<input type="number" name="attr_mp_current" value="15" />
+							</div>
+							<div>
+								<span>Max MP</span>
+								<input type="hidden" name="attr_mp_max" value="15" />
+								<span class="sheet-replicateInput" name="attr_mp_max"></span>
+							</div>
 						</div>
-						<div>
-							<span>Max MP</span>
-							<input type="hidden" name="attr_mp_max" value="15" />
-							<span class="sheet-replicateInput" name="attr_mp_max"></span>
+						<div class="sheet-foldable">
+							<div>
+								<span>Max MP Bonus</span>
+								<input type="number" name="attr_added_mp" value="0" />
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div style="align-items: center; flex-flow: row wrap; justify-content: space-evenly;">
+		<!-- Stat pills -->
+		<div class="sheet-botSpace" style="align-items: center; flex-flow: row wrap; justify-content: space-evenly;">
 			<!-- Fond memories -->
 			<div class="sheet-statPill">
 				<div class="sheet-sectionTitle">
@@ -1066,7 +1237,8 @@
 			</div>
 		</div>
 
-		<div style="flex-flow: row wrap; gap: 4px;">
+		<!-- Comps and Toolkits -->
+		<div class="sheet-botSpace" style="flex-flow: row wrap; gap: 4px;">
 			<!-- Attributes & Skills tableau -->
 			<div class="sheet-attributeTable">
 				<!-- Header -->
@@ -1422,10 +1594,13 @@
 		<div style="display: flex; flex-flow: row wrap; gap: 4px; justify-content: stretch;">
 			<!-- Traits & Features -->
 			<div style="flex-flow: column; flex: 1 1 auto;">
-				<div class="sheet-sectionTitle" style="border-radius: 8px 8px 0 0;">
-					<span class="sheet-sectionTitle">Traits & Features</span>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Traits & Features</span>
+					<input type="checkbox" name="attr_all_traits_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
 				</div>
-				<div class="sheet-sectionContainer" style="gap: 4px;">
+				<input type="hidden" name="attr_all_traits_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
 					<div>
 						<!-- Quirks -->
 						<!-- as a repeating section -->
@@ -1454,7 +1629,7 @@
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
 							<input type="hidden" name="attr_all_quirks" />
-							<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_quirks"></span>
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
 						</div>
 					</div>
 					<div>
@@ -1492,7 +1667,7 @@
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
 							<input type="hidden" name="attr_all_traits" />
-							<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_traits"></span>
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_traits"></span>
 						</div>
 					</div>
 					<!-- Features -->
@@ -1529,22 +1704,26 @@
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
 							<input type="hidden" name="attr_all_features" />
-							<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_features"></span>
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_features"></span>
 						</div>
 					</div>
+				</div>
+				<input type="hidden" name="attr_all_quirks_traits_features" />
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks_traits_features"></span>
 				</div>
 			</div>
 
 			<!-- Character Equipment -->
-			<div style="flex-flow: column; flex: 1 0 auto;">
-				<div class="sheet-sectionTitle" style="justify-content: space-evenly; gap: 4px; flex: 1 0 auto;">
+			<div style="flex-flow: column; flex: 1 1 auto;">
+				<div class="sheet-sectionTitle" style="gap: 4px;">
 					<span class="sheet-sectionTitle">Equipment</span>
-					<div>
+					<div style="flex: 1 0 auto; display: flex; justify-content: center; gap: 4px;">
 						<span class="sheet-sectionTitle">Cred</span>
 						<input type="number" name="attr_equipment_cred" value="0" />
 					</div>
 					<input type="hidden" name="attr_equipment_weight_label" value="0/8" />
-					<span class="sheet-sectionTitle" style="flex: 1 0 auto; text-align: end;" name="attr_equipment_weight_label"></span>
+					<span class="sheet-sectionTitle" name="attr_equipment_weight_label"></span>
 					<input type="checkbox" name="attr_equipment_fold" class="sheet-folder" />
 					<span class="sheet-folder"></span>
 				</div>
@@ -1571,13 +1750,372 @@
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
 					<input type="hidden" name="attr_all_equipment" />
-					<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_equipment"></span>
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_equipment"></span>
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="sheet-combat sheet-tab">
 		<h1>Combat</h1>
+
+		<!-- Player Info -->
+		<div class="sheet-playerinfo sheet-botSpace">
+			<!-- <div><span>Player Name :</span><input type="text" name="attr_player_name"/></div> -->
+			<div>
+				<div style="display: flex; flex: 1 0 auto;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
+				<div style="flex-shrink: 0; width: 183px;">
+					<span>Level :</span><input type="number" name="attr_character_level" style="text-align: end;" value="1" />
+					<span>(</span><input type="number" name="attr_character_xp" /><span>) exp</span>
+				</div>
+			</div>
+			<div>
+				<div style="display: flex; flex: 1 0 auto;"><span>Lifeform :</span><input type="text" name="attr_character_lifeform"/></div>
+				<div style="flex-shrink: 0; width: 183px; display: flex;">
+					<span style="flex-shrink: 0;">Grade :</span>
+					<input type="hidden" class="sheet-adventuringRank" name="attr_adventuring_grade" value="copper" />
+					<span class="sheet-adventuringRank sheet-replicateInput" name="attr_adventuring_grade"></span>
+				</div>
+			</div>
+			<div><span>⬖ Primary Class :</span><input type="text" name="attr_character_primary_class"/></div>
+			<div><span>⬗ Secondary Class :</span><input type="text" name="attr_character_secondary_class"/></div>
+		</div>
+
+		<!-- Stat pills -->
+		<div style="align-items: center; flex-flow: row wrap; justify-content: space-evenly;">
+			<!-- Fond memories -->
+			<div class="sheet-statPill">
+				<div class="sheet-sectionTitle">
+					<span>Fond</span>
+					<span style="font-size: small;">Memories</span>
+				</div>
+				<div>
+					<input type="number" style="text-align: center;" name="attr_fond_memories" value="0" />
+					<div style="display: flex;
+					flex-flow: column;
+					height: auto;
+					border: 0;
+					border-radius: 0;
+					padding: 0;
+					margin-right: 2px;">
+						<span>Max</span>
+						<span style="text-align: center; font-weight: bold;">50</span>
+					</div>
+				</div>
+			</div>
+			<!-- Mastery bonus -->
+			<div class="sheet-statPill">
+				<div class="sheet-sectionTitle">
+					<span style="font-size: small;">Mastery</span>
+					<span>Bonus</span>
+				</div>
+				<div>
+					<span style="font-size: x-large; font-weight: bold;">+</span>
+					<input type="hidden" name="attr_mastery_bonus" value="2" />
+					<span class="sheet-replicateInput" name="attr_mastery_bonus" style="width: 3em;"></span>
+				</div>
+			</div>
+			<!-- Destiny End Points -->
+			<div class="sheet-statPill">
+				<div class="sheet-sectionTitle">
+					<span>Destiny's</span>
+					<span style="font-size: small;">End Points</span>
+				</div>
+				<div>
+					<input type="number" style="text-align: center;" name="attr_destiny_current" value="0" />
+					<div style="display: flex;
+					flex-flow: column;
+					height: auto;
+					border: 0;
+					border-radius: 0;
+					padding: 0;
+					margin-right: 2px;">
+						<span>Max</span>
+						<span style="text-align: center; font-weight: bold;">12</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Combat stats -->
+		<div>
+			<!-- Resolve HP MP -->
+			<div>
+				<div  style="display: flex; flex-flow: row wrap; gap: 4px; justify-content: space-evenly;">
+					<div class="sheet-guardPoint">
+						<div class="sheet-sectionTitle">
+							<span>Spirit</span>
+							<div>
+								<input type="checkbox" name="attr_spirit1" />
+								<input type="checkbox" name="attr_spirit2" />
+								<input type="checkbox" name="attr_spirit3" />
+								<input type="checkbox" name="attr_spirit4" />
+								<input type="checkbox" name="attr_spirit5" />
+							</div>
+						</div>
+						<div class="sheet-sectionTitle">
+							<span>Resolve Points</span>
+							<input type="checkbox" name="attr_resolve_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<div class="sheet-extendedCounterPoint">
+							<input type="hidden" name="attr_resolve_fold" class="sheet-folder" />
+							<div class="sheet-counterPoint">
+								<div class="sheet-inputPoint">
+									<input type="number" name="attr_resolve_current" value="30" />
+								</div>
+								<div>
+									<span>Max Resolve</span>
+									<input type="hidden" name="attr_resolve_max" value="30" />
+									<span class="sheet-replicateInput" name="attr_resolve_max"></span>
+								</div>
+							</div>
+							<div class="sheet-foldable">
+								<div>
+									<span>Max Resolve Bonus</span>
+									<input type="number" name="attr_added_resolve" value="0" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="sheet-guardPoint">
+						<div class="sheet-sectionTitle">
+							<span>Barrier</span>
+							<div>
+								<input type="checkbox" name="attr_barrier1" />
+								<input type="checkbox" name="attr_barrier2" />
+								<input type="checkbox" name="attr_barrier3" />
+							</div>
+						</div>
+						<div class="sheet-sectionTitle">
+							<span>Hit Points</span>
+							<input type="checkbox" name="attr_hp_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<div class="sheet-extendedCounterPoint">
+							<input type="hidden" name="attr_hp_fold" class="sheet-folder" />
+							<div class="sheet-counterPoint">
+								<div class="sheet-inputPoint">
+									<input type="number" name="attr_hp_current" value="15" />
+								</div>
+								<div>
+									<span>Max HP</span>
+									<input type="hidden" name="attr_hp_max" value="15" />
+									<span class="sheet-replicateInput" name="attr_hp_max"></span>
+								</div>
+							</div>
+							<div class="sheet-foldable">
+								<div>
+									<span>Unarmored Toughness</span>
+									<input type="checkbox" name="attr_unarmored_toughness" />
+								</div>
+								<div>
+									<span>Armor HP</span>
+									<input type="number" name="attr_armor_hp" value="0" />
+								</div>
+								<div>
+									<span>Max HP Bonus</span>
+									<input type="number" name="attr_added_hp" value="0" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="sheet-guardPoint">
+						<div class="sheet-sectionTitle">
+							<span>Spellglyphs</span>
+							<div>
+								<input type="checkbox" name="attr_glyph1" />
+								<input type="checkbox" name="attr_glyph2" />
+								<input type="checkbox" name="attr_glyph3" />
+							</div>
+						</div>
+						<div class="sheet-sectionTitle">
+							<span>Mind Points</span>
+							<input type="checkbox" name="attr_mp_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<div class="sheet-extendedCounterPoint">
+							<input type="hidden" name="attr_mp_fold" class="sheet-folder" />
+							<div class="sheet-counterPoint">
+								<div class="sheet-inputPoint">
+									<input type="number" name="attr_mp_current" value="15" />
+								</div>
+								<div>
+									<span>Max MP</span>
+									<input type="hidden" name="attr_mp_max" value="15" />
+									<span class="sheet-replicateInput" name="attr_mp_max"></span>
+								</div>
+							</div>
+							<div class="sheet-foldable">
+								<div>
+									<span>Max MP Bonus</span>
+									<input type="number" name="attr_added_mp" value="0" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<!-- Defense -->
+				<!-- Fortitude -->
+				<!-- Willpower -->
+			</div>
+
+			<div>
+				<!-- Turn speed -->
+				<div>
+
+				</div>
+				<!-- Movement -->
+				<div>
+
+				</div>
+			</div>
+
+			<!-- Combat Actions -->
+			<div>
+				<!-- Major Action is flex 1 height wise -->
+				<div>
+
+				</div>
+				<!-- Minor Action is flex 0 height wise -->
+				<div>
+
+				</div>
+			</div>
+		</div>
+
+		<!-- Combat options-->
+		<div class="sheet-botSpace">
+			<!-- Combat masteries -->
+			<div></div>
+			<!-- Attacks & Effects -->
+			<div></div>
+		</div>
+
+		<!-- Quirks, Traits, Features -->
+		<div style="flex-flow: column;">
+			<div class="sheet-sectionTitle">
+				<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Traits & Features</span>
+				<input type="checkbox" name="attr_all_traits_fold" class="sheet-folder" />
+				<span class="sheet-folder"></span>
+			</div>
+			<input type="hidden" name="attr_all_traits_fold" class="sheet-folder" />
+			<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
+				<div>
+					<!-- Quirks -->
+					<!-- as a repeating section -->
+					<div class="sheet-sectionTitle" style="gap: 4px;">
+						<span class="sheet-sectionTitle">Quirks</span>
+						<input type="checkbox" name="attr_quirk_trait_fold" class="sheet-folder" />
+						<span class="sheet-folder"></span>
+					</div>
+					<input type="hidden" name="attr_quirk_trait_fold" class="sheet-folder" />
+					<div class="sheet-foldable sheet-sectionContainer">
+						<fieldset class="repeating_quirks">
+							<div>
+								<div>
+									<input type="text" name="attr_quirk_name" title="Quirk name" placeholder="Quirk name" />
+									<input type="number" name="attr_quirk_level" title="Quirk level" value="1" />
+									<input type="checkbox" name="attr_quirk_fold" class="sheet-folder" />
+									<span class="sheet-folder"></span>
+								</div>
+								<!-- Text area for quirk description -->
+								<input type="hidden" name="attr_quirk_fold" class="sheet-folder" />
+								<div class="sheet-foldable">
+									<textarea name="attr_quirk_description" style="width: 100%;"></textarea>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="sheet-reverseFoldable sheet-sectionContainer">
+						<input type="hidden" name="attr_all_quirks" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+					</div>
+				</div>
+				<div>
+					<!-- Traits -->
+					<!-- as a repeating section -->
+					<div class="sheet-sectionTitle" style="gap: 4px;">
+						<span class="sheet-sectionTitle">Lifeform traits</span>
+						<input type="checkbox" name="attr_trait_fold" class="sheet-folder" />
+						<span class="sheet-folder"></span>
+					</div>
+					<input type="hidden" name="attr_trait_fold" class="sheet-folder" />
+					<div class="sheet-foldable sheet-sectionContainer">
+						<fieldset class="repeating_traits">
+							<div>
+								<div class="sheet-repeatingTrait">
+									<div>
+										<input type="text" name="attr_trait_name" title="Trait name" placeholder="Trait name" />
+										<input type="text" name="attr_trait_lifeform" title="Lifeform" placeholder="Lifeform" />
+										<input type="checkbox" name="attr_trait_fold" class="sheet-folder" />
+										<span class="sheet-folder"></span>
+									</div>
+									<!-- Text area for trait description -->
+									<input type="hidden" name="attr_trait_fold" class="sheet-folder" />
+									<div class="sheet-foldable">
+										<select name="attr_trait_type" title="Trait type">
+											<option value="major">Major</option>
+											<option value="minor">Minor</option>
+											<option value="xtra">Xtra</option>
+										</select>
+										<textarea name="attr_trait_description" style="width: 100%;" placeholder="Trait description"></textarea>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="sheet-reverseFoldable sheet-sectionContainer">
+						<input type="hidden" name="attr_all_traits" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_traits"></span>
+					</div>
+				</div>
+				<!-- Features -->
+				<!-- as a repeating section -->
+				<div>
+					<div class="sheet-sectionTitle" style="gap: 4px;">
+						<span class="sheet-sectionTitle">Discipline & Class features</span>
+						<input type="checkbox" name="attr_feature_fold" class="sheet-folder" />
+						<span class="sheet-folder"></span>
+					</div>
+					<input type="hidden" name="attr_feature_fold" class="sheet-folder" />
+					<div class="sheet-foldable sheet-sectionContainer">
+						<fieldset class="repeating_features">
+							<div>
+								<div class="sheet-repeatingFeature">
+									<div>
+										<input type="text" name="attr_feature_name" title="Feature name" placeholder="Feature name" />
+										<input type="text" name="attr_feature_discipline" title="Feature discipline" placeholder="Discipline" />
+										<input type="checkbox" name="attr_feature_fold" class="sheet-folder" />
+										<span class="sheet-folder"></span>
+									</div>
+									<!-- Text area for feature description -->
+									<input type="hidden" name="attr_feature_fold" class="sheet-folder" />
+									<div class="sheet-foldable">
+										<div>
+											<input type="text" name="attr_feature_class" title="Class" placeholder="Class" />
+											<input type="number" name="attr_feature_level" title="Feature level" value="1" />
+										</div>
+										<textarea name="attr_feature_description" style="width: 100%;" placeholder="Feature description"></textarea>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="sheet-reverseFoldable sheet-sectionContainer">
+						<input type="hidden" name="attr_all_features" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_features"></span>
+					</div>
+				</div>
+			</div>
+			<input type="hidden" name="attr_all_quirks_traits_features" />
+			<div class="sheet-reverseFoldable sheet-sectionContainer">
+				<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks_traits_features"></span>
+			</div>
+		</div>
 	</div>
 
 	<div class="sheet-magic sheet-tab">
