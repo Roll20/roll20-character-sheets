@@ -38053,21 +38053,18 @@
 										{{/rollGreater() critv2 126}}
 										{{/rollBetween() critlocation 80 100}}
 										{{/rollGreater() critdmgbonus 0}}
-										{{/rollTotal() table 0}}
-											
+										{{/rollTotal() table 0}}	
 										{{#rollGreater() table 0}}
 										
 										
 										<div class="row">
-											<div class="col-1-1 pad-l-md pad-r-md rt-key-wide no-yellow-bg3" style="font-size: 12px;">{{computed::critname}}</div>
+											<div class="col-1-1 pad-l-md pad-r-md rt-key-wide no-yellow-bg4" style="font-size: 12px;">{{computed::critname}}</div>
 											<div class="col-1-1 pad-l-md pad-r-md rt-value no-yellow-bg3"><span style="color: black; font-size: 12px; font-weight: normal;"></span>{{computed::critdisc}}</div>
 										</div>
 										<div class="row">
 											<div class="col-11-24 pad-l-md pad-r-md rt-key" data-i18n="WOUNDS"></div>
 											<div class="col-13-24 pad-r-sm smaller-letter-spacing no-yellow-bg2 rt-value"><span style="color: black; font-size: 14px; font-weight: bold;"></span>{{computed::critdmg}}</div>
 										</div>
-										
-									
 										{{/rollGreater() table 0}}
 										{{#rollTotal() table 2}}
 										{{/rollTotal() table 2}}
@@ -38075,8 +38072,6 @@
 										{{/critv2}}
 							
 										
-
-
 										<!-- FUMBLE / OOPS ROLL -->
 										{{#fumbleroll}}
 										<div class="row">
@@ -38163,10 +38158,6 @@
 											<div class="col-1 pad-l-md pad-r-md rt-value" data-i18n="AMPUTATION-4-DESC">SL -4 or worse Gain Unconscious Condition  </div>
 										</div>
 										{{/amputationroll}}
-
-
-
-
 
 				{{#talent}}
 				<div class="row">
@@ -49972,7 +49963,7 @@ on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
 	
    if (v.CritTable == 2) {roll = '{{table=[[?{Crit Type|Weapon,0|Unarmed,1|Elemental/Magic,2}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}' ;} else {roll = ' ';}
 	
-   roll += ' {{unconscious=[[@{prefix-UnconsciousNPC}]]}} {{title=Critical Roll}} {{character_name=@{prefix-npc_name}}} {{attacktype=^{CRITICAL}}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{prefix-NPC_StriketoInjureLvl} [STRIKE TO INJURE]]]}} {{critname=[[0]]}} {{critdisc=[[0]]}} {{critdmg=[[0]]}}';
+   roll += ' {{unconscious=[[@{prefix-UnconsciousNPC}]]}} {{title=Critical Roll}} {{character_name=@{prefix-npc_name}}} {{attacktype=[[0]]}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{prefix-NPC_StriketoInjureLvl} [STRIKE TO INJURE]]]}} {{critname=[[0]]}} {{critdisc=[[0]]}} {{critdmg=[[0]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -49982,17 +49973,23 @@ on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
 
                console.log(rollPart);					
         startRoll(rollBegins + rollPart, (results) => {
+			const atype = results.results.attacktype.result
 			const table = results.results.table.result
             const critloc = results.results.critlocation.result
             const critroll = results.results.critroll.result
             const modvalue = results.results.modvalue.result
 
+	atname = '';
 	critname = '';
 	critdisc = '';
 	critdmg = '';
 	
  if (v.CritTable == 2) {	
+   if (table == 0) {
+	atname = getTranslationByKey('WEAPON');
+   }
    if (table == 1) {	
+	atname = getTranslationByKey('UNDAMAGING');
 	if (critloc > 0 && critloc < 10) {
 
 	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('DYNAMIC-INJURY'); critdisc += getTranslationByKey('DYNAMIC-INJURY-DESC-UNARMED'); critdmg +=  'Trivial' ;}
@@ -50095,7 +50092,9 @@ on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
 	}	
    }
 	
-   if (table == 2) {	
+   if (table == 2) {
+
+	atname = getTranslationByKey('ELEMENTAL');
    
 	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('SINGED'); critdisc += getTranslationByKey('SINGED-DESC-UNARMED'); critdmg +=  'Trivial' ;}
 	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('SCORCHED'); critdisc += getTranslationByKey('SCORCHED-DESC-UNARMED'); critdmg +=  'Trivial' ;}
@@ -50124,6 +50123,7 @@ on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
    }
 
 	console.log("Test");
+	console.log(atname);
 	console.log(critname);
 	console.log(critdisc);
 	console.log(critdmg);
@@ -50137,13 +50137,13 @@ on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
             finishRoll(
                 results.rollId,
                 {
+					attacktype: atname,
                     critname: critname,
                     critdisc: critdisc,
                     critdmg: critdmg,
                 }
             );
         });
-		
     });
     });
 	
