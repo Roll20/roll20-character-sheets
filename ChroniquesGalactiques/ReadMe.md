@@ -12,11 +12,16 @@ Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données tech
 
 # Version courante
 
-V4.5.0 [Screenshot](cog_v4.png)
+V4.5.1 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+## V4.5.1 (2024.05.26)
+
+Fix du bug Roll20 des styles CSS in-line
+Pas de changement fonctionnel
 
 ## V4.5.0 (2024.05.01)
 
