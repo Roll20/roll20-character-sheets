@@ -20,8 +20,8 @@ ___Chroniques Oubliées Galactiques Version 2___
 
 ## V4.5.1 (2024.05.26)
 
-Fix du bug Roll20 des styles CSS in-line
-Pas de changement fonctionnel
+- Fix du bug Roll20 des styles CSS in-line
+- Pas de changement fonctionnel
 
 ## V4.5.0 (2024.05.01)
 
