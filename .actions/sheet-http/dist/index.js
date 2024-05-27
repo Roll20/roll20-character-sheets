@@ -33342,6 +33342,34 @@ const path = __importStar(__nccwpck_require__(1017));
 const fs = __importStar(__nccwpck_require__(7561));
 const axios_1 = __importDefault(__nccwpck_require__(4082));
 const settings_1 = __nccwpck_require__(24);
+const LANGUAGE_CODES = [
+    "af",
+    "ca",
+    "cs",
+    "da",
+    "de",
+    "el",
+    "en",
+    "es",
+    "fi",
+    "fr",
+    "he",
+    "hu",
+    "it",
+    "ja",
+    "ko",
+    "nl",
+    "pb",
+    "pl",
+    "pt",
+    "ru",
+    "sl",
+    "sv",
+    "tr",
+    "uk",
+    "zh",
+    "zu",
+];
 const constructFilePath = (sheetName, moreParts) => {
     return path.join(process.env["GITHUB_WORKSPACE"], sheetName, ...moreParts);
 };
@@ -33365,6 +33393,13 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
     //  const jsonObj = !sheetJsonObj.useroptions ? {} : sheetJsonObj.useroptions;
     yield processUserOptions(sheetName, sheetJsonObj);
     const fnames = yield getFileNamesObj(sheetName);
+    let hasTranslationsFolder = false;
+    // Okay first we need to see if we have a translations folder
+    if (!fnames.includes("translations")) {
+        // Okay there isn't a translations folder.
+        // We need to fake out translations
+        yield uploadFakeTranslations(sheetName, LANGUAGE_CODES);
+    }
     // Walk through files and lets get this rolling
     for (const fn of fnames) {
         // We only are looking for specific files.
@@ -33383,12 +33418,11 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
             // We have a translations directory so lets do translations
             yield processTranslations(sheetName, fn);
         }
-        // Otherwise we are skipping an unknown file or directory
     }
     const settings = (0, settings_1.getSettings)();
     // Purge cache after we're done
     console.log("Clearing cache on sheet-http");
-    yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${sheetName}&repo=${settings.repoName}`, {});
+    yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${encodeURIComponent(sheetName)}&repo=${settings.repoName}`, {});
 });
 exports.processFiles = processFiles;
 const processMetaData = (sheetName, jsonObj) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33467,6 +33501,27 @@ const processUserOptions = (sheetName, userOptionsObj) => __awaiter(void 0, void
         data: userOptionsObj,
     });
 });
+const uploadFakeTranslations = (sheetName, codesToUpload) => __awaiter(void 0, void 0, void 0, function* () {
+    console.warn("Uploading fake translations");
+    // Okay so we basically need to send translations.json for each potential 
+    // translations
+    const settings = (0, settings_1.getSettings)();
+    const fullUrl = [
+        settings.sheetHttpUrl,
+        "sheet-mod",
+        "send-translation-data",
+    ].join("/");
+    const tdata = yield getSheetRootTranslationJsonObj(sheetName);
+    console.warn(tdata);
+    for (const lc of codesToUpload) {
+        yield makeServerCall(fullUrl, {
+            repo: settings.repoName,
+            sheet_folder: sheetName,
+            language_code: lc,
+            data: tdata,
+        });
+    }
+});
 const processTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("\nProcess Translations");
     // We are going to rip through the translation files and get them updated
@@ -33476,21 +33531,31 @@ const processTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0,
         "sheet-mod",
         "send-translation-data",
     ].join("/");
+    let remainingCodes = LANGUAGE_CODES;
     const fnames = yield getTranslationFileNames(sheetName, tdirecname);
     for (let i = 0; i < fnames.length; i++) {
         const fname = fnames[i];
-        const filePath = constructFilePath(sheetName, [tdirecname, fname]);
         const language_code = fname.split(".")[0];
+        const extension = fname.split(".")[1];
+        if (!LANGUAGE_CODES.includes(language_code))
+            continue; // skip things not in LANGUAGE CODES
+        if (extension !== "json")
+            continue; // we skip any non json
+        const filePath = constructFilePath(sheetName, [tdirecname, fname]);
         // Endpoint expects it as json send
         const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
         const jsObj = JSON.parse(jsonFile);
         console.log("\nTranslation File", sheetName, language_code);
+        remainingCodes = remainingCodes.filter((elem) => elem != language_code);
         yield makeServerCall(fullUrl, {
             repo: settings.repoName,
             sheet_folder: sheetName,
             language_code,
             data: jsObj,
         });
+    }
+    if (remainingCodes.length > 0) {
+        yield uploadFakeTranslations(sheetName, remainingCodes);
     }
 });
 const makeServerCall = (fullUrl, dataObj) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33517,6 +33582,12 @@ const getSheetJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, functio
     return jsObj;
 });
 exports.getSheetJsonObj = getSheetJsonObj;
+const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
+    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
+    const jsObj = JSON.parse(jsonFile);
+    return jsObj;
+});
 const getFileNamesObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
     const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName);
     const data = yield fs.readdirSync(dirPath);
