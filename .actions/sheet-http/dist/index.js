@@ -33408,7 +33408,12 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
             yield processCSSFile(sheetName, fn);
         }
         else if (fn.toLowerCase().includes(".html")) {
-            yield processHTMLFile(sheetName, fn);
+            if (!sheetJsonObj.html) {
+                yield processHTMLFile(sheetName, fn);
+            }
+            else if (sheetJsonObj.html && sheetJsonObj.html == fn) {
+                yield processHTMLFile(sheetName, fn);
+            }
         }
         else if (fn.toLowerCase().includes(".png") ||
             fn.toLocaleLowerCase().includes(".jpg")) {
@@ -33512,7 +33517,10 @@ const uploadFakeTranslations = (sheetName, codesToUpload) => __awaiter(void 0, v
         "send-translation-data",
     ].join("/");
     const tdata = yield getSheetRootTranslationJsonObj(sheetName);
-    console.warn(tdata);
+    if (tdata == null) {
+        console.log("Missing Translation file moving on");
+        return;
+    }
     for (const lc of codesToUpload) {
         yield makeServerCall(fullUrl, {
             repo: settings.repoName,
@@ -33584,9 +33592,14 @@ const getSheetJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, functio
 exports.getSheetJsonObj = getSheetJsonObj;
 const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
     const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
-    const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
-    const jsObj = JSON.parse(jsonFile);
-    return jsObj;
+    try {
+        const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
+        const jsObj = JSON.parse(jsonFile);
+        return jsObj;
+    }
+    catch (err) {
+        return null;
+    }
 });
 const getFileNamesObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
     const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName);
