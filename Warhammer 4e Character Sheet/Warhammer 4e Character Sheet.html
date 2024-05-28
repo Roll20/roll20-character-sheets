@@ -31271,6 +31271,7 @@
 					<select class="select-no-arrow" name="attr_CritTable">
 						<option value="0" selected="selected" data-i18n="HOUSERULE1-CRIT-TABLE">Houserule 1: Core Rule Book (Default)</option>
 						<option value="1" data-i18n="HOUSERULE2-CRIT-TABLE">Houserule 2: Up in Arms</option>
+						<option value="2" data-i18n="HOUSERULE3-CRIT-TABLE">Houserule 3: Up in Arms + Custom Unarmed & Elemental/Magic</option>
 					</select>
 				</div>
 			</div>
@@ -31417,7 +31418,7 @@
 		<div class="spacer-xl"></div>
 		<!-- FOOTER -->
 		<div class="row footer">
-			<div class="col-1 small-label center">Sheet version 1.71 : Mar 29th 2024 | by Djjus & Pote</div>
+			<div class="col-1 small-label center">Sheet version 1.72 : May 25th 2024 | by Djjus & Pote</div>
 		</div>
 			</div>
 		</div>
@@ -31469,7 +31470,7 @@
 				<div class="rt-subheader"><span style="font-weight: bold">{{attacktype}}</span> {{#ammo}} &bullet; {{ammo}} {{ammotype}}{{/ammo}}</div>
 				{{/reload}}
 				{{#critroll}}
-				<div class="rt-subheader">{{attacktype}}</div>
+				<div class="rt-subheader">{{#table}}{{computed::attacktype}}{{/table}}</div>
 				{{/critroll}}
 				{{#bloodloss}}
 				<div class="rt-subheader"><span data-i18n="BLOOD-LOSS">Blood Loss</span></div>
@@ -33467,6 +33468,9 @@
 							{{#rollGreater() menacing 0}}
 								<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #858585">+{{sitfail}}SL <span  data-i18n="MENACING"></span></div>
 							{{/rollGreater() menacing 0}}
+							{{#rollGreater() pharmacist 0}}
+								<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #858585"><span  data-i18n="PHARMACIST"></span>: <span  data-i18n="USE-REVERSE-DICE"></span></div>
+							{{/rollGreater() pharmacist 0}}
 							{{#rollGreater() fielddressing 0}}
 								<div class="col-1 pad-l-md pad-r-md rt-effects" style="color: #858585"><span  data-i18n="FIELD-DRESSING"></span>: <span  data-i18n="USE-REVERSE-DICE"></span></div>
 							{{/rollGreater() fielddressing 0}}
@@ -36432,6 +36436,9 @@
 											<div class="col-11-24 pad-l-md pad-r-md rt-key" data-i18n="CRITICAL-ROLL">Critical Roll</div>
 											<div class="col-13-24 pad-r-sm smaller-letter-spacing yellow-bg rt-value">{{critroll}}</div>
 										</div>
+										
+										
+										{{#rollTotal() table 0}}
 										{{#rollBetween() critlocation 01 09}}
 										{{#rollBetween() critroll 01 03}}
 										<div class="row">
@@ -38046,9 +38053,24 @@
 										{{/rollGreater() critv2 126}}
 										{{/rollBetween() critlocation 80 100}}
 										{{/rollGreater() critdmgbonus 0}}
+										{{/rollTotal() table 0}}	
+										{{#rollGreater() table 0}}
+										
+										<div class="row">
+											<div class="col-1-1 pad-l-md pad-r-md rt-key-wide no-yellow-bg4" style="font-size: 12px;">{{computed::critname}}</div>
+											<div class="col-1-1 pad-l-md pad-r-md rt-value no-yellow-bg3"><span style="color: black; font-size: 12px; font-weight: normal;"></span>{{computed::critdisc}}</div>
+										</div>
+										<div class="row">
+											<div class="col-11-24 pad-l-md pad-r-md rt-key" data-i18n="WOUNDS"></div>
+											<div class="col-13-24 pad-r-sm smaller-letter-spacing no-yellow-bg2 rt-value"><span style="color: black; font-size: 14px; font-weight: bold;"></span>{{computed::critdmg}}</div>
+										</div>
+										{{/rollGreater() table 0}}
+										{{#rollTotal() table 2}}
+										{{/rollTotal() table 2}}
+										
 										{{/critv2}}
-
-
+							
+										
 										<!-- FUMBLE / OOPS ROLL -->
 										{{#fumbleroll}}
 										<div class="row">
@@ -38135,10 +38157,6 @@
 											<div class="col-1 pad-l-md pad-r-md rt-value" data-i18n="AMPUTATION-4-DESC">SL -4 or worse Gain Unconscious Condition  </div>
 										</div>
 										{{/amputationroll}}
-
-
-
-
 
 				{{#talent}}
 				<div class="row">
@@ -49485,7 +49503,8 @@ on('clicked:repeating_divinemiracles:miracle clicked:repeating_divinemiracles:mi
 	sitmods = '+@{Talent_PharmacistLvl}+@{Talent_TinkerLvl}';
 	addsl = '+@{Talent_Craftsman1Lvl}+@{Talent_Craftsman2Lvl}+@{Talent_Craftsman3Lvl}';
 	addtak= '*@{prefix-Taken}';
-	rollPart2 = roll.replaceAll('cond-', `(@{condgen_see})`).replaceAll('>addtak<', addtak).replaceAll('>addsl<', addsl).replaceAll('>sitmod<', sitmods);}
+	sitfail = '+@{Talent_PharmacistLvl}';
+	rollPart2 = roll.replaceAll('cond-', `(@{condgen_see})`).replaceAll('>addtak<', addtak).replaceAll('>addsl<', addsl).replaceAll('>sitmod<', sitmods).replaceAll('>sitfail<', sitfail);}
 	
 	else {cond = ''}
 	
@@ -49751,20 +49770,170 @@ on('clicked:hypnotismroll', (eventInfo) => {
 on('clicked:criticalroll', (eventInfo) => {
 	getAttrs(["initiative_houserule", "CritTable"], function(v) {	
 	
+   if (v.CritTable == 2) {roll = '{{table=[[?{Crit Type|Weapon,0|Unarmed,1|Elemental/Magic,2}]]}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}' ;} else {roll = ' {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}}';}
 	
-   let roll = '{{unconscious=[[@{UnconsciousMod}]]}} {{title=Critical Roll}} {{character_name=@{character_name}}} {{attacktype=^{CRITICAL}}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{Talent_StrikeToInjureLvl} [STRIKE TO INJURE]]]}}';
+   roll += ' {{unconscious=[[@{UnconsciousMod}]]}} {{title=Critical Roll}} {{character_name=@{character_name}}} {{attacktype=[[0]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{Talent_StrikeToInjureLvl} [STRIKE TO INJURE]]]}} {{critname=[[0]]}} {{critdisc=[[0]]}} {{critdmg=[[0]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
    let rollPart = roll;
-   
-   if (v.CritTable == 1) {rollPart += ' {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}';}
+  
+   if (v.CritTable == 1) {rollPart += ' {{table=[[0]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}';}
+   if (v.CritTable == 0) {rollPart += ' {{table=[[0]]}}';}
 
                console.log(rollPart);					
         startRoll(rollBegins + rollPart, (results) => {
+			const atype = results.results.attacktype.result
+			const table = results.results.table.result
+            const critloc = results.results.critlocation.result
             const critroll = results.results.critroll.result
             const modvalue = results.results.modvalue.result
 
+	atname = '';
+	critname = '';
+	critdisc = '';
+	critdmg = '';
+	
+ if (v.CritTable == 2) {	
+   if (table == 0) {
+	atname = getTranslationByKey('WEAPON');
+   }
+   if (table == 1) {	
+	atname = getTranslationByKey('UNDAMAGING');
+	if (critloc > 0 && critloc < 10) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('DYNAMIC-INJURY'); critdisc += getTranslationByKey('DYNAMIC-INJURY-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('RATTLING-BLOW'); critdisc += getTranslationByKey('RATTLING-BLOW-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('EAR-BASH'); critdisc += getTranslationByKey('EAR-BASH-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('RINGING-STRIKE'); critdisc += getTranslationByKey('RINGING-STRIKE-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('BLACK-EYE'); critdisc += getTranslationByKey('BLACK-EYE-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('BRUISED-JAW'); critdisc += getTranslationByKey('BRUISED-JAW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('HEAVY-BRUISING'); critdisc += getTranslationByKey('HEAVY-BRUISING-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('EYE-POKE'); critdisc += getTranslationByKey('EYE-POKE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('FRACTURED-JAW'); critdisc += getTranslationByKey('FRACTURED-JAW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('BAD-CUT'); critdisc += getTranslationByKey('BAD-CUT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('SMASHED-EAR'); critdisc += getTranslationByKey('SMASHED-EAR-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('FLASH-KO'); critdisc += getTranslationByKey('FLASH-KO-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('CLEANED-CLOCK'); critdisc += getTranslationByKey('CLEANED-CLOCK-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('TEETH-KNOCKED'); critdisc += getTranslationByKey('TEETH-KNOCKED-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('BROKEN-NOSE'); critdisc += getTranslationByKey('BROKEN-NOSE-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('BROKEN-JAW'); critdisc += getTranslationByKey('BROKEN-JAW-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('TEMPLE-STRIKE'); critdisc += getTranslationByKey('TEMPLE-STRIKE-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('DISFIGURING-BLOW'); critdisc += getTranslationByKey('DISFIGURING-BLOW-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('MANGLED-JAW'); critdisc += getTranslationByKey('MANGLED-JAW-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('KO'); critdisc += getTranslationByKey('KO-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('THIS-LOOKS-SERIOUS'); critdisc += getTranslationByKey('THIS-LOOKS-SERIOUS-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}
+	
+	if (critloc > 9 && critloc < 45) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('JOLTED-WRIST'); critdisc += getTranslationByKey('JOLTED-WRIST-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('JARRED-ARM'); critdisc += getTranslationByKey('JARRED-ARM-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('SPRAIN'); critdisc += getTranslationByKey('SPRAIN-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('DEAD-ARM'); critdisc += getTranslationByKey('DEAD-ARM-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('STRONG-BLOW'); critdisc += getTranslationByKey('STRONG-BLOW-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('HEAVY-BRUISING'); critdisc += getTranslationByKey('HEAVY-BRUISING-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('CRUSHED-HAND'); critdisc += getTranslationByKey('CRUSHED-HAND-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('TORN-MUSCLES'); critdisc += getTranslationByKey('TORN-MUSCLES-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('CRUNCHING-BLOW'); critdisc += getTranslationByKey('CRUNCHING-BLOW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('WRENCHED-ARM'); critdisc += getTranslationByKey('WRENCHED-ARM-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('HEAVY-HIT'); critdisc += getTranslationByKey('HEAVY-HIT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('SEVERE-BRUISING'); critdisc += getTranslationByKey('SEVERE-BRUISING-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('BAD-CUT'); critdisc += getTranslationByKey('BAD-CUT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('THUNDEROUS-BLOW'); critdisc += getTranslationByKey('THUNDEROUS-BLOW-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('CLEAN-BREAK'); critdisc += getTranslationByKey('CLEAN-BREAK-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('BROKEN-FINGERS'); critdisc += getTranslationByKey('BROKEN-FINGERS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('CRUSHED-ELBOW'); critdisc += getTranslationByKey('CRUSHED-ELBOW-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('RUPTURED-LIGAMENT'); critdisc += getTranslationByKey('RUPTURED-LIGAMENT-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('DISLOCATED-SHOULDER'); critdisc += getTranslationByKey('DISLOCATED-SHOULDER-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('KO'); critdisc += getTranslationByKey('KO-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('THIS-LOOKS-SERIOUS'); critdisc += getTranslationByKey('THIS-LOOKS-SERIOUS-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}	
+	
+	if (critloc > 44 && critloc < 80) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('GLANCING-BLOW'); critdisc += getTranslationByKey('GLANCING-BLOW-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('PAINFUL-HIT'); critdisc += getTranslationByKey('PAINFUL-HIT-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('FIERCE-BLOW'); critdisc += getTranslationByKey('FIERCE-BLOW-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('BRUISED'); critdisc += getTranslationByKey('BRUISED-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('GUT-BLOW'); critdisc += getTranslationByKey('GUT-BLOW-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('WINDED'); critdisc += getTranslationByKey('WINDED-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('WRENCHED-MUSCLES'); critdisc += getTranslationByKey('WRENCHED-MUSCLES-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('OFF-BALANCE'); critdisc += getTranslationByKey('OFF-BALANCE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('LOW-BLOW'); critdisc += getTranslationByKey('LOW-BLOW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('BRUISED-RIBS'); critdisc += getTranslationByKey('BRUISED-RIBS-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('SWEET-SPOT'); critdisc += getTranslationByKey('SWEET-SPOT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('MY-CHEST'); critdisc += getTranslationByKey('MY-CHEST-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('WRENCHED-COLLAR-BONE'); critdisc += getTranslationByKey('WRENCHED-COLLAR-BONE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('CRACKED-RIBS'); critdisc += getTranslationByKey('CRACKED-RIBS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('PULLED-BACK'); critdisc += getTranslationByKey('PULLED-BACK-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('KIDNEY-BLOW'); critdisc += getTranslationByKey('KIDNEY-BLOW-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('LIVER-SHOT'); critdisc += getTranslationByKey('LIVER-SHOT-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('SMASHED-RIB-CAGE'); critdisc += getTranslationByKey('SMASHED-RIB-CAGE-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('FRACTURED-HIP'); critdisc += getTranslationByKey('FRACTURED-HIP-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('TAKEN-OUT'); critdisc += getTranslationByKey('KO-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('BODIED'); critdisc += getTranslationByKey('THIS-LOOKS-SERIOUS-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}		
+	
+	if (critloc > 79 && critloc < 101) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('STUBBED-TOE'); critdisc += getTranslationByKey('STUBBED-TOE-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('LOST-FOOTING'); critdisc += getTranslationByKey('LOST-FOOTING-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('TWISTED-ANKLE'); critdisc += getTranslationByKey('TWISTED-ANKLE-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('DEAD-LEG'); critdisc += getTranslationByKey('DEAD-LEG-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('THIGH-STRIKE'); critdisc += getTranslationByKey('THIGH-STRIKE-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('SPRAINED-ANKLE'); critdisc += getTranslationByKey('SPRAINED-ANKLE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('TWISTED-KNEE'); critdisc += getTranslationByKey('TWISTED-KNEE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('CUT-LEGS'); critdisc += getTranslationByKey('CUT-LEGS-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('BUCKLED'); critdisc += getTranslationByKey('BUCKLED-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('CRACKED-SHIN'); critdisc += getTranslationByKey('CRACKED-SHIN-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('BADLY-TWISTED-KNEE'); critdisc += getTranslationByKey('BADLY-TWISTED-KNEE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('DEEP-BRUISING'); critdisc += getTranslationByKey('DEEP-BRUISING-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('SWEPT'); critdisc += getTranslationByKey('SWEPT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('CRACKED-KNEE'); critdisc += getTranslationByKey('CRACKED-KNEE-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('MANGLED-LEG'); critdisc += getTranslationByKey('MANGLED-LEG-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('HARD-KNOCKDOWN'); critdisc += getTranslationByKey('HARD-KNOCKDOWN-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('CRUSHED-FOOT'); critdisc += getTranslationByKey('CRUSHED-FOOT-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('BROKEN-KNEE'); critdisc += getTranslationByKey('BROKEN-KNEE-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('RUPTURED-TENDON'); critdisc += getTranslationByKey('RUPTURED-TENDON-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('ITS-TOO-MUCH'); critdisc += getTranslationByKey('ITS-TOO-MUCH-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('OH-HES-HURT'); critdisc += getTranslationByKey('OH-HES-HURT-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}	
+   }
+	
+   if (table == 2) {
+	atname = getTranslationByKey('ELEMENTAL');
+   
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('SINGED'); critdisc += getTranslationByKey('SINGED-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('SCORCHED'); critdisc += getTranslationByKey('SCORCHED-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('FLASHED'); critdisc += getTranslationByKey('FLASHED-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('SHOCKED'); critdisc += getTranslationByKey('SHOCKED-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('SET-ALIGHT'); critdisc += getTranslationByKey('SET-ALIGHT-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('MINOR-BURNS'); critdisc += getTranslationByKey('MINOR-BURNS-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('PANIC'); critdisc += getTranslationByKey('PANIC-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('FLASHBANG'); critdisc += getTranslationByKey('FLASHBANG-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('DISORIENTING-BLAST'); critdisc += getTranslationByKey('DISORIENTING-BLAST-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('BOWLED-OVER'); critdisc += getTranslationByKey('BOWLED-OVER-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('BADLY-BURNT'); critdisc += getTranslationByKey('BADLY-BURNT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('ABLAZE'); critdisc += getTranslationByKey('ABLAZE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('SEVERE-TISSUE-DAMAGE'); critdisc += getTranslationByKey('SEVERE-TISSUE-DAMAGE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('BURST-BLOOD-VESSELS'); critdisc += getTranslationByKey('BURST-BLOOD-VESSELS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('CRACKED-BONES'); critdisc += getTranslationByKey('CRACKED-BONES-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('SEVERE-BURNS'); critdisc += getTranslationByKey('SEVERE-BURNS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('PARTIAL-DISINTEGRATION'); critdisc += getTranslationByKey('PARTIAL-DISINTEGRATION-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('CONCUSSIVE-SHOCK'); critdisc += getTranslationByKey('CONCUSSIVE-SHOCK-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('HORRIBLE-BURNS'); critdisc += getTranslationByKey('HORRIBLE-BURNS-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('ERUPTION'); critdisc += getTranslationByKey('ERUPTION-DESC-UNARMED'); critdmg += "Death" ;}
+	if (critroll > 125  && critroll < 136) {critname += getTranslationByKey('EXPLOSION'); critdisc += getTranslationByKey('EXPLOSION-DESC-UNARMED'); critdmg += "Death" ;}
+	if (critroll > 135) {critname += getTranslationByKey('DISINTEGRATED'); critdisc += getTranslationByKey('DISINTEGRATED-DESC-UNARMED'); critdmg += "Death" ;} 
+   }
+   }
+
+	console.log(atname);
+	console.log(critname);
+	console.log(critdisc);
+	console.log(critdmg);
+	
 	setAttrs(
 	{
 		"LastCritRoll": critroll - modvalue
@@ -49774,6 +49943,10 @@ on('clicked:criticalroll', (eventInfo) => {
             finishRoll(
                 results.rollId,
                 {
+					attacktype: atname,
+                    critname: critname,
+                    critdisc: critdisc,
+                    critdmg: critdmg,
                 }
             );
         });
@@ -49784,8 +49957,9 @@ on('clicked:criticalroll', (eventInfo) => {
 on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
 	getAttrs(["initiative_houserule", "CritTable"], function(v) {	
 	
+   if (v.CritTable == 2) {roll = '{{table=[[?{Crit Type|Weapon,0|Unarmed,1|Elemental/Magic,2}]]}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}' ;} else {roll = ' {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}}';}
 	
-   let roll = '{{unconscious=[[@{prefix-UnconsciousNPC}]]}} {{title=Critical Roll}} {{character_name=@{prefix-npc_name}}} {{attacktype=^{CRITICAL}}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{prefix-NPC_StriketoInjureLvl} [STRIKE TO INJURE]]]}}';
+   roll += ' {{unconscious=[[@{prefix-UnconsciousNPC}]]}} {{title=Critical Roll}} {{character_name=@{prefix-npc_name}}} {{attacktype=[[0]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{prefix-NPC_StriketoInjureLvl} [STRIKE TO INJURE]]]}} {{critname=[[0]]}} {{critdisc=[[0]]}} {{critdmg=[[0]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -49793,24 +49967,179 @@ on('clicked:repeating_npc-tab-page:criticalrollnpc', (eventInfo) => {
    
    if (v.CritTable == 1) {rollPart += ' {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}';}
 
+               console.log(rollPart);					
         startRoll(rollBegins + rollPart, (results) => {
+			const atype = results.results.attacktype.result
+			const table = results.results.table.result
+            const critloc = results.results.critlocation.result
             const critroll = results.results.critroll.result
             const modvalue = results.results.modvalue.result
 
+	atname = '';
+	critname = '';
+	critdisc = '';
+	critdmg = '';
+	
+ if (v.CritTable == 2) {	
+   if (table == 0) {
+	atname = getTranslationByKey('WEAPON');
+   }
+   if (table == 1) {	
+	atname = getTranslationByKey('UNDAMAGING');
+	if (critloc > 0 && critloc < 10) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('DYNAMIC-INJURY'); critdisc += getTranslationByKey('DYNAMIC-INJURY-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('RATTLING-BLOW'); critdisc += getTranslationByKey('RATTLING-BLOW-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('EAR-BASH'); critdisc += getTranslationByKey('EAR-BASH-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('RINGING-STRIKE'); critdisc += getTranslationByKey('RINGING-STRIKE-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('BLACK-EYE'); critdisc += getTranslationByKey('BLACK-EYE-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('BRUISED-JAW'); critdisc += getTranslationByKey('BRUISED-JAW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('HEAVY-BRUISING'); critdisc += getTranslationByKey('HEAVY-BRUISING-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('EYE-POKE'); critdisc += getTranslationByKey('EYE-POKE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('FRACTURED-JAW'); critdisc += getTranslationByKey('FRACTURED-JAW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('BAD-CUT'); critdisc += getTranslationByKey('BAD-CUT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('SMASHED-EAR'); critdisc += getTranslationByKey('SMASHED-EAR-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('FLASH-KO'); critdisc += getTranslationByKey('FLASH-KO-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('CLEANED-CLOCK'); critdisc += getTranslationByKey('CLEANED-CLOCK-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('TEETH-KNOCKED'); critdisc += getTranslationByKey('TEETH-KNOCKED-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('BROKEN-NOSE'); critdisc += getTranslationByKey('BROKEN-NOSE-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('BROKEN-JAW'); critdisc += getTranslationByKey('BROKEN-JAW-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('TEMPLE-STRIKE'); critdisc += getTranslationByKey('TEMPLE-STRIKE-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('DISFIGURING-BLOW'); critdisc += getTranslationByKey('DISFIGURING-BLOW-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('MANGLED-JAW'); critdisc += getTranslationByKey('MANGLED-JAW-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('KO'); critdisc += getTranslationByKey('KO-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('THIS-LOOKS-SERIOUS'); critdisc += getTranslationByKey('THIS-LOOKS-SERIOUS-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}
+	
+	
+	if (critloc > 9 && critloc < 45) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('JOLTED-WRIST'); critdisc += getTranslationByKey('JOLTED-WRIST-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('JARRED-ARM'); critdisc += getTranslationByKey('JARRED-ARM-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('SPRAIN'); critdisc += getTranslationByKey('SPRAIN-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('DEAD-ARM'); critdisc += getTranslationByKey('DEAD-ARM-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('STRONG-BLOW'); critdisc += getTranslationByKey('STRONG-BLOW-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('HEAVY-BRUISING'); critdisc += getTranslationByKey('HEAVY-BRUISING-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('CRUSHED-HAND'); critdisc += getTranslationByKey('CRUSHED-HAND-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('TORN-MUSCLES'); critdisc += getTranslationByKey('TORN-MUSCLES-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('CRUNCHING-BLOW'); critdisc += getTranslationByKey('CRUNCHING-BLOW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('WRENCHED-ARM'); critdisc += getTranslationByKey('WRENCHED-ARM-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('HEAVY-HIT'); critdisc += getTranslationByKey('HEAVY-HIT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('SEVERE-BRUISING'); critdisc += getTranslationByKey('SEVERE-BRUISING-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('BAD-CUT'); critdisc += getTranslationByKey('BAD-CUT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('THUNDEROUS-BLOW'); critdisc += getTranslationByKey('THUNDEROUS-BLOW-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('CLEAN-BREAK'); critdisc += getTranslationByKey('CLEAN-BREAK-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('BROKEN-FINGERS'); critdisc += getTranslationByKey('BROKEN-FINGERS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('CRUSHED-ELBOW'); critdisc += getTranslationByKey('CRUSHED-ELBOW-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('RUPTURED-LIGAMENT'); critdisc += getTranslationByKey('RUPTURED-LIGAMENT-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('DISLOCATED-SHOULDER'); critdisc += getTranslationByKey('DISLOCATED-SHOULDER-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('KO'); critdisc += getTranslationByKey('KO-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('THIS-LOOKS-SERIOUS'); critdisc += getTranslationByKey('THIS-LOOKS-SERIOUS-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}	
+	
+	if (critloc > 44 && critloc < 80) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('GLANCING-BLOW'); critdisc += getTranslationByKey('GLANCING-BLOW-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('PAINFUL-HIT'); critdisc += getTranslationByKey('PAINFUL-HIT-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('FIERCE-BLOW'); critdisc += getTranslationByKey('FIERCE-BLOW-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('BRUISED'); critdisc += getTranslationByKey('BRUISED-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('GUT-BLOW'); critdisc += getTranslationByKey('GUT-BLOW-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('WINDED'); critdisc += getTranslationByKey('WINDED-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('WRENCHED-MUSCLES'); critdisc += getTranslationByKey('WRENCHED-MUSCLES-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('OFF-BALANCE'); critdisc += getTranslationByKey('OFF-BALANCE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('LOW-BLOW'); critdisc += getTranslationByKey('LOW-BLOW-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('BRUISED-RIBS'); critdisc += getTranslationByKey('BRUISED-RIBS-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('SWEET-SPOT'); critdisc += getTranslationByKey('SWEET-SPOT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('MY-CHEST'); critdisc += getTranslationByKey('MY-CHEST-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('WRENCHED-COLLAR-BONE'); critdisc += getTranslationByKey('WRENCHED-COLLAR-BONE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('CRACKED-RIBS'); critdisc += getTranslationByKey('CRACKED-RIBS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('PULLED-BACK'); critdisc += getTranslationByKey('PULLED-BACK-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('KIDNEY-BLOW'); critdisc += getTranslationByKey('KIDNEY-BLOW-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('LIVER-SHOT'); critdisc += getTranslationByKey('LIVER-SHOT-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('SMASHED-RIB-CAGE'); critdisc += getTranslationByKey('SMASHED-RIB-CAGE-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('FRACTURED-HIP'); critdisc += getTranslationByKey('FRACTURED-HIP-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('TAKEN-OUT'); critdisc += getTranslationByKey('KO-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('BODIED'); critdisc += getTranslationByKey('THIS-LOOKS-SERIOUS-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}		
+	
+	if (critloc > 79 && critloc < 101) {
+
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('STUBBED-TOE'); critdisc += getTranslationByKey('STUBBED-TOE-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('LOST-FOOTING'); critdisc += getTranslationByKey('LOST-FOOTING-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('TWISTED-ANKLE'); critdisc += getTranslationByKey('TWISTED-ANKLE-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('DEAD-LEG'); critdisc += getTranslationByKey('DEAD-LEG-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('THIGH-STRIKE'); critdisc += getTranslationByKey('THIGH-STRIKE-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('SPRAINED-ANKLE'); critdisc += getTranslationByKey('SPRAINED-ANKLE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('TWISTED-KNEE'); critdisc += getTranslationByKey('TWISTED-KNEE-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('CUT-LEGS'); critdisc += getTranslationByKey('CUT-LEGS-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('BUCKLED'); critdisc += getTranslationByKey('BUCKLED-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('CRACKED-SHIN'); critdisc += getTranslationByKey('CRACKED-SHIN-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('BADLY-TWISTED-KNEE'); critdisc += getTranslationByKey('BADLY-TWISTED-KNEE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('DEEP-BRUISING'); critdisc += getTranslationByKey('DEEP-BRUISING-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('SWEPT'); critdisc += getTranslationByKey('SWEPT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('CRACKED-KNEE'); critdisc += getTranslationByKey('CRACKED-KNEE-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('MANGLED-LEG'); critdisc += getTranslationByKey('MANGLED-LEG-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('HARD-KNOCKDOWN'); critdisc += getTranslationByKey('HARD-KNOCKDOWN-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('CRUSHED-FOOT'); critdisc += getTranslationByKey('CRUSHED-FOOT-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('BROKEN-KNEE'); critdisc += getTranslationByKey('BROKEN-KNEE-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('RUPTURED-TENDON'); critdisc += getTranslationByKey('RUPTURED-TENDON-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('ITS-TOO-MUCH'); critdisc += getTranslationByKey('ITS-TOO-MUCH-DESC-UNARMED'); critdmg += "Knocked out" ;}
+	if (critroll > 125) {critname += getTranslationByKey('OH-HES-HURT'); critdisc += getTranslationByKey('OH-HES-HURT-DESC-UNARMED'); critdmg += "Knocked out AND..." ;}
+	}	
+   }
+	
+   if (table == 2) {
+
+	atname = getTranslationByKey('ELEMENTAL');
+   
+	if (critroll > 0  && critroll < 4) {critname +=  getTranslationByKey('SINGED'); critdisc += getTranslationByKey('SINGED-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 3  && critroll < 7) {critname += getTranslationByKey('SCORCHED'); critdisc += getTranslationByKey('SCORCHED-DESC-UNARMED'); critdmg +=  'Trivial' ;}
+	if (critroll > 6  && critroll < 10) {critname += getTranslationByKey('FLASHED'); critdisc += getTranslationByKey('FLASHED-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 9  && critroll < 16) {critname += getTranslationByKey('SHOCKED'); critdisc += getTranslationByKey('SHOCKED-DESC-UNARMED'); critdmg += 1 ;}
+	if (critroll > 15  && critroll < 21) {critname += getTranslationByKey('SET-ALIGHT'); critdisc += getTranslationByKey('SET-ALIGHT-DESC-UNARMED'); critdmg = 1 ;}
+	if (critroll > 20  && critroll < 26) {critname += getTranslationByKey('MINOR-BURNS'); critdisc += getTranslationByKey('MINOR-BURNS-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 25  && critroll < 31) {critname += getTranslationByKey('PANIC'); critdisc += getTranslationByKey('PANIC-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 30  && critroll < 36) {critname += getTranslationByKey('FLASHBANG'); critdisc += getTranslationByKey('FLASHBANG-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 35  && critroll < 41) {critname += getTranslationByKey('DISORIENTING-BLAST'); critdisc += getTranslationByKey('DISORIENTING-BLAST-DESC-UNARMED'); critdmg += 2 ;}
+	if (critroll > 40  && critroll < 46) {critname += getTranslationByKey('BOWLED-OVER'); critdisc += getTranslationByKey('BOWLED-OVER-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 45  && critroll < 51) {critname += getTranslationByKey('BADLY-BURNT'); critdisc += getTranslationByKey('BADLY-BURNT-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 50  && critroll < 56) {critname += getTranslationByKey('ABLAZE'); critdisc += getTranslationByKey('ABLAZE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 55  && critroll < 61) {critname += getTranslationByKey('SEVERE-TISSUE-DAMAGE'); critdisc += getTranslationByKey('SEVERE-TISSUE-DAMAGE-DESC-UNARMED'); critdmg += 3 ;}
+	if (critroll > 60  && critroll < 66) {critname += getTranslationByKey('BURST-BLOOD-VESSELS'); critdisc += getTranslationByKey('BURST-BLOOD-VESSELS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 65  && critroll < 76) {critname += getTranslationByKey('CRACKED-BONES'); critdisc += getTranslationByKey('CRACKED-BONES-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 75  && critroll < 81) {critname += getTranslationByKey('SEVERE-BURNS'); critdisc += getTranslationByKey('SEVERE-BURNS-DESC-UNARMED'); critdmg += 4 ;}
+	if (critroll > 80  && critroll < 86) {critname += getTranslationByKey('PARTIAL-DISINTEGRATION'); critdisc += getTranslationByKey('PARTIAL-DISINTEGRATION-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 85  && critroll < 95) {critname += getTranslationByKey('CONCUSSIVE-SHOCK'); critdisc += getTranslationByKey('CONCUSSIVE-SHOCK-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 94  && critroll < 100) {critname += getTranslationByKey('HORRIBLE-BURNS'); critdisc += getTranslationByKey('HORRIBLE-BURNS-DESC-UNARMED'); critdmg += 5 ;}
+	if (critroll > 99  && critroll < 126) {critname += getTranslationByKey('ERUPTION'); critdisc += getTranslationByKey('ERUPTION-DESC-UNARMED'); critdmg += "Death" ;}
+	if (critroll > 125  && critroll < 136) {critname += getTranslationByKey('EXPLOSION'); critdisc += getTranslationByKey('EXPLOSION-DESC-UNARMED'); critdmg += "Death" ;}
+	if (critroll > 135) {critname += getTranslationByKey('DISINTEGRATED'); critdisc += getTranslationByKey('DISINTEGRATED-DESC-UNARMED'); critdmg += "Death" ;} 
+   
+   }
+   }
+
+	console.log(atname);
+	console.log(critname);
+	console.log(critdisc);
+	console.log(critdmg);
+	
 	setAttrs(
 	{
 		"LastCritRoll": critroll - modvalue
 	}, {silent: true});		
-		
+
+						
             finishRoll(
                 results.rollId,
                 {
+					attacktype: atname,
+                    critname: critname,
+                    critdisc: critdisc,
+                    critdmg: critdmg,
                 }
             );
         });
-		
     });
-		
     });
 	
 on('clicked:fumbletest', (eventInfo) => {
@@ -51352,3 +51681,5 @@ on('clicked:resetQuickPray', function(event){
 });
 		
 </script>
+
+
