@@ -53,12 +53,14 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version">
             </span>
-            <span class="right">5/19/24'</span>
+            <span class="right">5/26/24'</span>
           </h5>
           <ul>
+            <li>Sheet Settings: "Exceptional" will now display the exceptional attribute fields for all abilities regardless of the Ability score. Previously these fields would only show if the score was 18+. Exceptional Strength will always be shown as well.</li>
+            <li>Adjusted the "In-Use" checkbox to allow multiple attack rows to be selected at the same time. If multiple "In-Use" attack rows are selected simultaneously, the global values for the "Weapon In-Use" will use the weapon with the fastest weapon speed for the name, speed and misc. attributes.</li>
             <li>Small adjustment to the roll templates that allows text after a "forced line-break" within a macro, to be center-aligned. Works in the header, subheader, and allprops keys. ie {{name}}, {{subtag}} {{}}</li>
-           <li>Adjusted inline roll appearance when the roll is in the header or sub-header.</li>
-           <li>Alignment adjustment for the weapon vs armor type table.</li>
+            <li>Adjusted inline roll appearance when the roll is in the header or sub-header.</li>
+            <li>Alignment adjustment for the weapon vs armor type table.</li>
             <li>Fixed a bug in the Attack Matrix class drop-down selector where the "Cleric, Druid, and Monk" selection incorrectly used the Fighter table data. This was related to last week's change to the class dropdown. Big apologies.</li>
             <li>Attacks that have the "In-Use" box enabled will auto-fill the global attributes @{weapon_in_use} (shows the weapon's name), @{weapon_in_use_speed} and @{weapon_in_use_misc}. You can see these in the Misc. Attack Info section found just above the repeating attacks. I believe these attributes could be used for those of you that wish to modify/customize their initiative rolls and/or other macros.</li>
             <li>Added a "Misc." attribute to repeating attacks. @{repeating_weapon_$X_weapon_misc} this attribute will also be used to auto-fill @{weapon_in_use_misc} when the weapon is marked "In-Use".</li>
@@ -2053,7 +2055,7 @@
             <input type="text" class="width-smaller" name="attr_dual_pen_secondary" value="0" readonly>
           </label>
         </span>
-        <label class="span-two inline-label" title="@{weapon_in_use} | Current weapon In-Use/Armed.">
+        <label class="span-two inline-label" title="@{weapon_in_use} | Current weapon In-Use/Armed. If multiple attack rows are 'In-Use', the fastest weapon will be used here.">
           <span>Weapon In-Use:</span>
           <input type="text" class="width-large" name="attr_weapon_in_use" value="" placeholder="n/a" readonly />
         </label>
@@ -2337,10 +2339,10 @@
               <label></label>
             </span>
             <span class="weapons-row2 center">
-              <span class="inline-label" style="position: absolute; top: 2.1em;">
-                <input type="checkbox" name="attr_weapon_use" title="@{repeating_weapon_$X_weapon_use} | Weapon is armed." value="1" />
+              <label class="inline-label" title="@{repeating_weapon_$X_weapon_use} | Weapon is armed.">
+                <input type="checkbox" name="attr_weapon_use" value="1" />
                 <span class="label-under-small">In-Use</span>
-              </span>
+              </label>
               <details class="small-damage">
                 <summary>
                   <span class="material-icons custom-btn-nav toggle-critdamage"></span>
@@ -3758,7 +3760,7 @@
             <textarea class="height-half" name="attr_surprise_macro_text" title="@{surprise_macro_text} | Caution: modifying the macro-text can break the roll.  Deleting the macro-text will safely reset the roll to the sheet's default macro.">&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Surprised 1-?{Surprised on?(enter upper limit)|@{surprise}} on 1d@{surprise_die}}} {{roll=[[ 1d@{surprise_die}cf&lt;?{Surprised on?(enter upper limit)|@{surprise}}cs&gt;?{Surprised on?(enter upper limit)|@{surprise}} ]] }} {{Segment Adjustments}} {{dex_adjustment=[[ @{surprisebonus} ]]}} {{current_encumbrance=[[ @{current_encumbrance_move} ]]}}</textarea>
         </span>
         <span class="inline-label width-fill" title="@{surprise_others_die} | Choose the die used for the Surprise Others rolls.">
-          <h4 class="stack-text">Surprise die:</h4>
+          <h4 class="stack-text">Surprise Others die:</h4>
           <label style="width:auto;">
             <select name="attr_surprise_others_die" class="width-small">
               <option value="6" selected>1d6</option>
@@ -3901,7 +3903,7 @@
             <span>Costs:</span>
             <input type="checkbox" name="attr_toggle_costs" value="1" />
           </label>
-          <label class="inline-label" title="@{toggle_exceptional} | Hides the exceptional ability column. caveat: exceptional Strength of 18+ will be shown regardless of this setting.">
+          <label class="inline-label" title="@{toggle_exceptional} | Hides the exceptional ability column. caveat: exceptional Strength will be shown regardless of this setting.">
             <span>Exceptional:</span>
             <input type="checkbox" name="attr_toggle_exceptional" value="1" checked />
           </label>
@@ -7239,18 +7241,12 @@
       const output = {};
       const toggle_exceptional = +v.toggle_exceptional || 0;
       if (toggle_exceptional === 1) return;
-      const intelligence = +v.intelligence || 0;
-      const wisdom = +v.wisdom || 0;
-      const dexterity = +v.dexterity || 0;
-      const constitution = +v.constitution || 0;
-      const charisma = +v.charisma || 0;
-      const comeliness = +v.comeliness || 0;
-      output.exceptional_intelligence_flag = intelligence >= 18 ? 1 : 0;
-      output.exceptional_wisdom_flag = wisdom >= 18 ? 1 : 0;
-      output.exceptional_dexterity_flag = dexterity >= 18 ? 1 : 0;
-      output.exceptional_constitution_flag = constitution >= 18 ? 1 : 0;
-      output.exceptional_charisma_flag = charisma >= 18 ? 1 : 0;
-      output.exceptional_comeliness_flag = comeliness >= 18 ? 1 : 0;
+      output.exceptional_intelligence_flag = 1;
+      output.exceptional_wisdom_flag = 1;
+      output.exceptional_dexterity_flag = 1;
+      output.exceptional_constitution_flag = 1;
+      output.exceptional_charisma_flag = 1;
+      output.exceptional_comeliness_flag = 1;
       setAttrs(output, {silent: true});
     });
   });
@@ -7258,8 +7254,7 @@
   on('change:abilities_info_show change:toggle_exceptional change:strength', (eventInfo) => {
     getAttrs(['strength'], (v) => {
       const output = {};
-      const strength = +v.strength || 0;
-      output.exceptional_strength_flag = strength >= 18 ? 1 : 0;
+      output.exceptional_strength_flag = 1;
       setAttrs(output, {silent: true});
     });
   });
@@ -11516,40 +11511,48 @@
     });
   });
 
-  weaponInUse = (id) => {
+  weaponInUse = () => {
     getSectionIDs('repeating_weapon', (idArray) => {
       const output = {};
-      const weaponFields = [];
-      const inUseWeaponFields = [
-        `repeating_weapon_${id}_weapon_use`,
-        `repeating_weapon_${id}_weapon_speed`,
-        `repeating_weapon_${id}_weapon_misc`,
-        `repeating_weapon_${id}_weapon_name`,
-      ];
-      const fields = [...weaponFields, ...inUseWeaponFields];
+      const fields = [];
+      const weaponsInUse = [];
+      // Array to store weapons with inUse === 1
       idArray.forEach((rowID) => {
-        weaponFields.push(section_attribute('weapon', rowID, 'weapon_use'));
+        fields.push(section_attribute('weapon', rowID, 'weapon_name'));
+        fields.push(section_attribute('weapon', rowID, 'weapon_use'));
+        fields.push(section_attribute('weapon', rowID, 'weapon_speed'));
+        fields.push(section_attribute('weapon', rowID, 'weapon_misc'));
       });
       getAttrs(fields, (v) => {
-        const name = v[`repeating_weapon_${id}_weapon_name`];
-        const inUse = +v[`repeating_weapon_${id}_weapon_use`] || 0;
-        const speed = v[`repeating_weapon_${id}_weapon_speed`];
-        const misc = v[`repeating_weapon_${id}_weapon_misc`];
-        // console.log(`~~~~| name:${name} inUse:${inUse} speed factor:${speed} |~~~~`);
-        // reset other rows to unchecked
         idArray.forEach((rowID) => {
-          output[`repeating_weapon_${rowID}_weapon_use`] = 0;
+          const inUse = +v[section_attribute('weapon', rowID, 'weapon_use')] || 0;
+          if (inUse === 0) return;
+          const name = v[section_attribute('weapon', rowID, 'weapon_name')];
+          // default to 0 if empty otherwise grab the first integer entered
+          const speedStr = v[section_attribute('weapon', rowID, 'weapon_speed')] || '0';
+          const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
+          const misc = v[section_attribute('weapon', rowID, 'weapon_misc')];
+          weaponsInUse.push({rowID, name, inUse, speed, misc});
         });
-        if (inUse === 0) {
-          output[`repeating_weapon_${id}_weapon_use`] = 0;
-          output.weapon_in_use = '';
-          output.weapon_in_use_speed = '';
-          output.weapon_in_use_misc = '';
-        } else if (inUse === 1) {
-          output[`repeating_weapon_${id}_weapon_use`] = 1;
+
+        // Find fastest(ie lowest) speed factor
+        if (weaponsInUse.length > 0) {
+          let lowestSpeedWeapon = weaponsInUse[0];
+          weaponsInUse.forEach((weapon) => {
+            if (weapon.speed < lowestSpeedWeapon.speed) {
+              lowestSpeedWeapon = weapon;
+            }
+          });
+          // set global attr with lowest speed weapon/attack
+          const {name, speed, misc} = lowestSpeedWeapon;
+          // console.log(`Lowest speed weapon - name: ${name}, speed: ${speed}, misc: ${misc}`);
           output.weapon_in_use = name;
           output.weapon_in_use_speed = speed;
           output.weapon_in_use_misc = misc;
+        } else {
+          output.weapon_in_use = '';
+          output.weapon_in_use_speed = '';
+          output.weapon_in_use_misc = '';
         }
         setAttrs(output, {silent: true});
       });
@@ -11557,9 +11560,8 @@
   };
 
   on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
-    clog(eventInfo.sourceAttribute);
-    const id = eventInfo.sourceAttribute.split('_')[2];
-    weaponInUse(id);
+    // clog(eventInfo.sourceAttribute);
+    weaponInUse();
   });
 </script>
 
