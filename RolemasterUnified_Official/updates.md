@@ -1,3 +1,31 @@
+2024-04-27
+
+- Charactermancer:
+  - Fix material and creature lore specializations
+  - Really hit with a hammer the hide chaactermancer button.
+    Hide directly at end of charactermancer.
+- Direct critical roll (eg roll an C Electricity)
+- Rest to recover Fatigue penalties
+- Count the weight of items < 1 lbs
+- Update total maneuver penalty when fatigue changes
+- Stat info show potential (clearly)
+- Fix Talents applying on level up
+- Bugs:
+  - Fix some internal calls using terrible way of saving ranks
+  - Fix for targets smaller than attacker (no more insane DBs)
+  - Update Weight Allowance when strength changes.
+  - Fix alignment of stat info hover
+  - Fix adding skills failing on error
+- Stat gain:
+  - Show the potential and temporary for stat gains
+  - Add and remove stat gains tracked correctly
+  - Extra stat gains are now required
+  - Stat gains persist through level up
+- Internal:
+  - Remove unused charmancer.html.gvz
+  - Less logging on feats of strength
+  - RMU Async functions a bit more verbose on error
+
 2024-04-20
 
 - Fatigue rolls
