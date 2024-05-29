@@ -81,6 +81,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+May 29th 2024 v1.72a
+
+- New Crit tables now work as normal with Strike to Injure (UiA version).
+
+
 May 25th 2024 v1.72
 
 - Adding new optional Crit tables suitable for Unarmed/undamaging and Elemental/Magic Damage types to compliment the standard Up in arms Crit tables. Adding flavor and a non-leathal option for certian situations. This new option can be activated by select new Crit Rule: Houserule #3 in the setting tab. When enabled clicking crit roll button will have show a new dropdown to choose between Weapon(Default), Unarmed and Elemental crit tables. 
