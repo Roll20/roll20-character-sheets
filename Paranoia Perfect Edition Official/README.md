@@ -6,6 +6,10 @@ This is the Official Mongoose Paranoia Perfect Edition Character Sheet
 
 - Please report any issues on the Mongoose Publishing forums
 
+### Version 1.04.01
+
+- Text corrections - no noticeable changes
+
 ### Version 1.04.00
 
 - NPC Header updated to include a space for an Avatar. The Avatar should be 175px wide and 175px high for best results
