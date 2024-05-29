@@ -961,6 +961,79 @@
 			setAttrs(output, {silent: true});
 		});
 	});
+
+	on("change:repeating_bonds", function(eventInfo) {
+		const valueDelta = eventInfo.newValue != eventInfo.previousValue ? parseInt(eventInfo.newValue) - parseInt(eventInfo.previousValue) : parseInt(eventInfo.newValue);
+		var output = {};
+
+		getSectionIDs("bonds", function(ids) {
+			getAttrs(["bond_strength", "fond_memories"], function(v) {
+				const fond_memories = parseInt(v["fond_memories"]);
+				var bond_strength = parseInt(v["bond_strength"]);
+				bond_strength += valueDelta;
+
+				const bond_amount = ids.length;
+
+				var bond_label = "";
+				bond_label += `Bonds: ${bond_amount}\n`;
+				bond_label += `Bond points: ${bond_strength}\n`;
+				bond_label += `Fond memories: ${fond_memories}/50`;
+
+				output["bond_strength"] = bond_strength;
+				output["bond_amount"] = bond_amount;
+				output["bond_amount_label"] = bond_label;
+
+				setAttrs(output, {silent: true});
+			});
+		});
+	});
+
+	var getSectionIDsOrdered = function(sectionName, callback) {
+		'use strict';
+		getAttrs([`_reporder_${sectionName}`], function(v) {
+			getSectionIDs(sectionName, function(idArray) {
+				let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+					ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+				callback(ids);
+			});
+		});
+	};
+
+	on("change:repeating_ranks change:_reporder:ranks remove:repeating_ranks", function(eventInfo) {
+		getSectionIDsOrdered("repeating_ranks", function(ids) {
+			var output = {};
+
+			for (var i = 0; i < ids.length; i++) {
+				var id = ids[i];
+
+				output[`repeating_ranks_${id}_rank_level`] = i + 1;
+				output[`repeating_ranks_${id}_rank_level_label`] = `Rank ${i + 1}`;
+			}
+
+			setAttrs(output, {silent: true});
+
+			const name_ranks_attributes = ids.map(id => `repeating_ranks_${id}_rank_name`).concat(ids.map(id => `repeating_ranks_${id}_rank_level`));
+			getAttrs(name_ranks_attributes, function(v) {
+				var output = {};
+				var ranks_value_pair = "";
+
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					const rankName = v[`repeating_ranks_${id}_rank_name`];
+					const rankLevel = v[`repeating_ranks_${id}_rank_level`];
+					if (rankName == undefined || rankName == "")
+						continue;
+					ranks_value_pair += `Level ${rankLevel}: ${rankName}\n`;
+				}
+
+				ranks_value_pair = ranks_value_pair.trimEnd();
+
+				output["all_ranks"] = ranks_value_pair;
+
+				setAttrs(output, {silent: true});
+			});
+		});
+	});
 </script>
 
 <html>
@@ -1013,7 +1086,7 @@
 			<input type="hidden" name="attr_quirk_total" value="0" />
 			<input type="hidden" name="attr_quirk_points_label" value="0/2" />
 			<div style="display: flex; flex-flow: column wrap; justify-content: stretch;">
-				<div class="sheet-sectionTitle" style="display: flex; flex: 1 1 auto; gap: 4px;">
+				<div class="sheet-sectionTitle" style="display: flex; flex: 1 1 auto;">
 					<span class="sheet-sectionTitle">Character quirks</span>
 					<input type="checkbox" name="attr_quirk_fold" class="sheet-folder" />
 					<span class="sheet-folder"></span>
@@ -1608,7 +1681,7 @@
 					<div>
 						<!-- Quirks -->
 						<!-- as a repeating section -->
-						<div class="sheet-sectionTitle" style="gap: 4px;">
+						<div class="sheet-sectionTitle">
 							<span class="sheet-sectionTitle">Quirks</span>
 							<input type="checkbox" name="attr_quirk_trait_fold" class="sheet-folder" />
 							<span class="sheet-folder"></span>
@@ -1639,7 +1712,7 @@
 					<div>
 						<!-- Traits -->
 						<!-- as a repeating section -->
-						<div class="sheet-sectionTitle" style="gap: 4px;">
+						<div class="sheet-sectionTitle">
 							<span class="sheet-sectionTitle">Lifeform traits</span>
 							<input type="checkbox" name="attr_trait_fold" class="sheet-folder" />
 							<span class="sheet-folder"></span>
@@ -1677,7 +1750,7 @@
 					<!-- Features -->
 					<!-- as a repeating section -->
 					<div>
-						<div class="sheet-sectionTitle" style="gap: 4px;">
+						<div class="sheet-sectionTitle">
 							<span class="sheet-sectionTitle">Discipline & Class features</span>
 							<input type="checkbox" name="attr_feature_fold" class="sheet-folder" />
 							<span class="sheet-folder"></span>
@@ -1720,7 +1793,7 @@
 
 			<!-- Character Equipment -->
 			<div style="flex-flow: column; flex: 1 1 auto;">
-				<div class="sheet-sectionTitle" style="gap: 4px;">
+				<div class="sheet-sectionTitle">
 					<span class="sheet-sectionTitle">Equipment</span>
 					<div style="flex: 1 0 auto; display: flex; justify-content: center; gap: 4px;">
 						<span class="sheet-sectionTitle">Cred</span>
@@ -2011,7 +2084,7 @@
 				<div>
 					<!-- Quirks -->
 					<!-- as a repeating section -->
-					<div class="sheet-sectionTitle" style="gap: 4px;">
+					<div class="sheet-sectionTitle">
 						<span class="sheet-sectionTitle">Quirks</span>
 						<input type="checkbox" name="attr_quirk_trait_fold" class="sheet-folder" />
 						<span class="sheet-folder"></span>
@@ -2042,7 +2115,7 @@
 				<div>
 					<!-- Traits -->
 					<!-- as a repeating section -->
-					<div class="sheet-sectionTitle" style="gap: 4px;">
+					<div class="sheet-sectionTitle">
 						<span class="sheet-sectionTitle">Lifeform traits</span>
 						<input type="checkbox" name="attr_trait_fold" class="sheet-folder" />
 						<span class="sheet-folder"></span>
@@ -2080,7 +2153,7 @@
 				<!-- Features -->
 				<!-- as a repeating section -->
 				<div>
-					<div class="sheet-sectionTitle" style="gap: 4px;">
+					<div class="sheet-sectionTitle">
 						<span class="sheet-sectionTitle">Discipline & Class features</span>
 						<input type="checkbox" name="attr_feature_fold" class="sheet-folder" />
 						<span class="sheet-folder"></span>
@@ -2128,6 +2201,343 @@
 
 	<div class="sheet-notes sheet-tab">
 		<h1>Notes</h1>
+
+		<div style="display: flex; flex-flow: row wrap; gap: 4px;">
+			<!-- Details -->
+				<!-- Background -->
+				<!-- Personality -->
+				<!-- Appearance -->
+				<!-- Goals -->
+				<!-- Beliefs -->
+				<!-- Relationships -->
+					<!-- Family -->
+					<!-- Friends -->
+					<!-- Enemies -->
+				<!-- Hobbies -->
+				<!-- Secrets -->
+				<!-- Fears -->
+				<!-- Hometown -->
+				<!-- Current Residence -->
+				<!-- Occupation -->
+
+			<!-- Fond Memories & Bonds -->
+			<!-- Equipement -->
+			<!-- Class Ranks list -->
+
+			<!-- Details -->
+			<div class="sheet-details">
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Details</span>
+					<input type="checkbox" name="attr_all_details_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<input type="hidden" name="attr_all_details_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Background</span>
+							<input type="checkbox" name="attr_background_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_background_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_background" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Personality</span>
+							<input type="checkbox" name="attr_personality_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_personality_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_personality" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Appearance</span>
+							<input type="checkbox" name="attr_appearance_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_appearance_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_appearance" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Goals</span>
+							<input type="checkbox" name="attr_goals_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_goals_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_goals" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Beliefs</span>
+							<input type="checkbox" name="attr_beliefs_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_beliefs_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_beliefs" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Relationships</span>
+							<input type="checkbox" name="attr_relationships_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_relationships_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer" style="gap: 4px;">
+							<div>
+								<span style="font-weight: bold;">Family</span>
+								<textarea name="attr_family" style="width: 100%;"></textarea>
+							</div>
+							<div>
+								<span style="font-weight: bold;">Friends</span>
+								<textarea name="attr_friends" style="width: 100%;"></textarea>
+							</div>
+							<div>
+								<span style="font-weight: bold;">Enemies</span>
+								<textarea name="attr_enemies" style="width: 100%;"></textarea>
+							</div>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Hobbies</span>
+							<input type="checkbox" name="attr_hobbies_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_hobbies_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_hobbies" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Secrets</span>
+							<input type="checkbox" name="attr_secrets_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_secrets_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_secrets" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Fears</span>
+							<input type="checkbox" name="attr_fears_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_fears_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_fears" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Hometown</span>
+							<input type="checkbox" name="attr_hometown_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_hometown_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_hometown" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Current Residence</span>
+							<input type="checkbox" name="attr_residence_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_residence_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_residence" style="width: 100%;"></textarea>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle">Occupation</span>
+							<input type="checkbox" name="attr_occupation_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_occupation_fold" class="sheet-folder" />
+						<div class="sheet-foldable sheet-sectionContainer">
+							<textarea name="attr_occupation" style="width: 100%;"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<span class="sheet-replicateInput sheet-contentSummary"></span>
+				</div>
+			</div>
+
+			<!-- Fond Memories & Bonds -->
+			<div>
+				<input type="hidden" name="attr_bond_amount" value="0" />
+				<input type="hidden" name="attr_bond_strength" value="0" />
+				<input type="hidden" name="attr_bond_amount_label" value="Bonds: 0
+Bond points: 0
+Fond memories: 0/50" />
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Fond Memories & Bonds</span>
+					<input type="checkbox" name="attr_all_fond_memories_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<div>
+					<input type="hidden" name="attr_all_fond_memories_fold" class="sheet-folder" />
+					<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
+						<div>
+							<div class="sheet-sectionTitle">
+								<span class="sheet-sectionTitle" style="font-size: small;">Fond Memories</span>
+							</div>
+							<div class="sheet-sectionContainer" style="flex-flow: row;">
+								<input type="number" name="attr_fond_memories" style="text-align: end; flex: 1 1 auto;" value="0" />
+								<span>/50</span>
+							</div>
+						</div>
+						<div>
+							<div class="sheet-sectionTitle">
+								<span class="sheet-sectionTitle" style="font-size: small;">Bonds</span>
+							</div>
+							<div class="sheet-sectionContainer" style="gap: 4px;">
+								<fieldset class="repeating_bonds">
+									<div class="sheet-repeatingBond">
+										<div>
+											<input type="text" name="attr_bond_name" title="Bond name" placeholder="Bond name" />
+											<input type="number" name="attr_bond_level" style="text-align: end;" title="Bond level" value="1" />
+											<input type="checkbox" name="attr_bond_fold" class="sheet-folder" />
+											<span class="sheet-folder"></span>
+										</div>
+										<!-- Text area for bond description -->
+										<input type="hidden" name="attr_bond_fold" class="sheet-folder" />
+										<div class="sheet-foldable" style="flex-flow: column wrap;">
+											<input type="text" name="attr_bond_type" title="Bond type" placeholder="Bond type" />
+											<textarea name="attr_bond_description" style="width: 100%;" placeholder="Bond description"></textarea>
+										</div>
+									</div>
+								</fieldset>
+							</div>
+						</div>
+					</div>
+					<div class="sheet-reverseFoldable sheet-sectionContainer">
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_bond_amount_label"></span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Equipement -->
+			<div style="flex-flow: column; flex: 1 1 auto;">
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Equipment</span>
+					<div style="flex: 1 0 auto; display: flex; justify-content: center; gap: 4px;">
+						<span class="sheet-sectionTitle">Cred</span>
+						<input type="number" name="attr_equipment_cred" value="0" />
+					</div>
+					<input type="hidden" name="attr_equipment_weight_label" value="0/8" />
+					<span class="sheet-sectionTitle" name="attr_equipment_weight_label"></span>
+					<input type="checkbox" name="attr_equipment_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<input type="hidden" name="attr_equipment_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable">
+					<fieldset class="repeating_equipment">
+						<div>
+							<div class="sheet-repeatingEquipment">
+								<div>
+									<input type="text" name="attr_equipment_name" title="Equipment name" placeholder="Equipment name" />
+									<input type="number" name="attr_equipment_weight" title="Equipment weight" value="0" />
+									<input type="number" name="attr_equipment_quantity" title="Equipment quantity" value="1" />
+									<input type="checkbox" name="attr_equipment_fold" class="sheet-folder" />
+									<span class="sheet-folder"></span>
+								</div>
+								<!-- Text area for equipment description -->
+								<input type="hidden" name="attr_equipment_fold" class="sheet-folder" />
+								<div class="sheet-foldable">
+									<textarea name="attr_equipment_description" style="width: 100%;" placeholder="Equipment description"></textarea>
+								</div>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<input type="hidden" name="attr_all_equipment" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_equipment"></span>
+				</div>
+			</div>
+
+			<!-- Class Ranks list -->
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Class Ranks</span>
+					<input type="checkbox" name="attr_all_class_ranks_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<input type="hidden" name="attr_all_class_ranks_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
+					<fieldset class="repeating_ranks">
+						<div class="sheet-repeatingRank">
+							<div>
+								<input type="text" name="attr_rank_name" title="Discipline / Class" placeholder="Discipline / Class" style="flex: 1 1 auto;" />
+								<input type="hidden" name="attr_rank_level" />
+								<input type="hidden" name="attr_rank_level_label" />
+								<span style="font-weight: bold;" name="attr_rank_level_label"></span>
+								<input type="checkbox" name="attr_rank_fold" class="sheet-folder" />
+								<span class="sheet-folder"></span>
+							</div>
+							<!-- Text area for rank description -->
+							<input type="hidden" name="attr_rank_fold" class="sheet-folder" />
+							<div class="sheet-foldable">
+								<textarea name="attr_rank_description" style="width: 100%;" placeholder="Rank description"></textarea>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<input type="hidden" name="attr_all_ranks" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_ranks"></span>
+				</div>
+			</div>
+
+			<!-- Notes -->
+			<div style="flex: 1 1 auto;">
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Notes</span>
+					<input type="checkbox" name="attr_all_notes_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<input type="hidden" name="attr_all_notes_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable">
+					<fieldset class="repeating_notes">
+						<div class="sheet-repeatingNote">
+							<div>
+								<input type="text" name="attr_note_name" title="Note name" placeholder="Note name" />
+								<input type="checkbox" name="attr_note_fold" class="sheet-folder" />
+								<span class="sheet-folder"></span>
+							</div>
+							<!-- Text area for note description -->
+							<input type="hidden" name="attr_note_fold" class="sheet-folder" />
+							<div class="sheet-foldable">
+								<textarea name="attr_note_description" placeholder="Note description"></textarea>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<span class="sheet-replicateInput sheet-contentSummary"></span>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<div class="sheet-options sheet-tab">
