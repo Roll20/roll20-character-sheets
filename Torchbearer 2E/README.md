@@ -7,5 +7,8 @@ Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E director
 
 ## To Do
 
+- Clean up white space issues (conditions, advancement bubbles)
+- Fix clicking on skills to do tests
+- Fix bug with the disposition test and exhausted
 - Move to grid and flexbox instead of absolute positions
 - Fix up discrepancies between the original and new version
