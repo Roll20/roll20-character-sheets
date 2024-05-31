@@ -8,3 +8,4 @@ Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E director
 ## To Do
 
 - Move to grid and flexbox instead of absolute positions
+- Fix up discrepancies between the original and new version
