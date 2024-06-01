@@ -53,7 +53,7 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version">
             </span>
-            <span class="right">5/26/24'</span>
+            <span class="right">5/30/24'</span>
           </h5>
           <ul>
             <li>Sheet Settings: "Exceptional" will now display the exceptional attribute fields for all abilities regardless of the Ability score. Previously these fields would only show if the score was 18+. Exceptional Strength will always be shown as well.</li>
@@ -1829,6 +1829,32 @@
     <section class="saves-box">
       <input type="checkbox" class="sect-show" name="attr_saves_info_show" value="1" checked />
       <div class="header">SAVES</div><span class="material-icons"></span>
+      <div class="saves-class section">
+        <label></label>
+        <label class="center">
+          <span>Class</span>
+        </label>
+        <label class="spell-level center">
+          <span>Level</span>
+        </label>
+        <label class="inline-label" title="@{autofill_saves} | Let the sheet auto-fill the Base Saves when the class and level selectors are changed.">
+          <input type="checkbox" name="attr_autofill_saves" value="1" checked />
+          <h4>Autofill Base:</h4>
+        </label>
+        <label class="center">
+          <select class="width-fill border" name="attr_saves_class" title="@{saves_class}">
+            <option value="0" selected style="font-weight: bold;">~ Select a Class ~</option>
+            <option value="1">Cleric or Druid</option>
+            <option value="2">Fighter, Paladin, or Ranger</option>
+            <option value="3">Magic-User or Illusionist</option>
+            <option value="4">Thief, Monk, or Assassin</option>
+            <option value="5">Other 0-lvl Types</option>
+          </select>
+        </label>
+        <label class="saves-level center">
+          <input class="width-small border" type="number" min="0" name="attr_saves_level" value="1" title="@{saves_level}">
+        </label>
+      </div>
       <div class="sect">
         <span class="saves-columns column-header">
           <span></span>
@@ -9891,6 +9917,101 @@
   on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_mod change:savemisc2_misc_mod change:savemisc2_temp_mod', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     savemisc2Calc();
+  });
+
+  // Saves Autofill Base Column
+  on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) => {
+    clog(`Saves Autofill Change Detected:${eventInfo.sourceAttribute}`);
+    getAttrs(['saves_class', 'saves_level', 'autofill_saves'], (v) => {
+      const output = {};
+      const autocalcFill = +v.autofill_saves || 0;
+      // bail out if auto-fill is not enabled.
+      if (!autocalcFill) return;
+      const classSelected = +v.saves_class || 0;
+      const levelSelected = +v.saves_level || 0;
+      clog(`Class:${classSelected} Level:${levelSelected}`);
+      // do saves per class and level here
+      if (classSelected === 0) return;
+      // Cleric or Druid
+      if (classSelected === 1) {
+        if (levelSelected === 0) {
+          // clog('Need to choose a class level greater than 0 to continue.');
+        } else if (levelSelected < 4) {
+          //
+        } else if (levelSelected < 7) {
+          //
+        } else if (levelSelected < 10) {
+          //
+        } else if (levelSelected < 13) {
+          //
+        } else if (levelSelected < 16) {
+          //
+        } else if (levelSelected < 19) {
+          //
+        } else if (levelSelected >= 19) {
+          //
+        }
+      }
+      // Fighter, Paladin, or Ranger or Other 0-lvl Types
+      if (classSelected === 2 || classSelected === 5) {
+        if (levelSelected === 0) {
+          //
+        } else if (levelSelected < 3) {
+          //
+        } else if (levelSelected < 5) {
+          //
+        } else if (levelSelected < 7) {
+          //
+        } else if (levelSelected < 9) {
+          //
+        } else if (levelSelected < 11) {
+          //
+        } else if (levelSelected < 13) {
+          //
+        } else if (levelSelected < 15) {
+          //
+        } else if (levelSelected < 17) {
+          //
+        } else if (levelSelected >= 17) {
+          //
+        }
+      }
+      // Magic-User or Illusionist
+      if (classSelected === 3) {
+        if (levelSelected === 0) {
+          // clog('Need to choose a class level greater than 0 to continue.');
+        } else if (levelSelected < 6) {
+          //
+        } else if (levelSelected < 11) {
+          //
+        } else if (levelSelected < 16) {
+          //
+        } else if (levelSelected < 21) {
+          //
+        } else if (levelSelected >= 21) {
+          //
+        }
+      }
+      // Thief, Monk, or Assassin
+      if (classSelected === 4) {
+        if (levelSelected === 0) {
+          // clog('Need to choose a class level greater than 0 to continue.');
+        } else if (levelSelected < 5) {
+          //
+        } else if (levelSelected < 9) {
+          //
+        } else if (levelSelected < 13) {
+          //
+        } else if (levelSelected < 17) {
+          //
+        } else if (levelSelected < 21) {
+          //
+        } else if (levelSelected >= 21) {
+          //
+        }
+      }
+      // setAttrs(output, {silent: true});
+    });
   });
 
   // toggle monster HD selector
