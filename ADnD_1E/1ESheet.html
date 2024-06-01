@@ -1066,7 +1066,7 @@
 <script type="text/worker">
   // type="text/worker"
 
-  'use strict';
+  // 'use strict';
 
   // custom handling for number type and logs
   const int = (score, error = 0) => parseInt(score) || error;
@@ -1077,21 +1077,22 @@
   };
 
   // during version updates, we need to check that an attribute exists and is not equal to its default, before updating it.
-  const doUpdate = (stat, def = 0) => typeof stat != 'undefined' && stat != def;
+  const doUpdate = (stat, def = 0) => typeof stat !== 'undefined' && stat !== def;
 
   // handles regex for testing and replacing macrotext attributes
   const replaceSet = (attr, set) => {
     // set must be an object, with key: value pairs of 'itemToReplace': 'replaceWith'.
-    Object.entries(set).forEach(([toReplace, replaceWith]) => {
-      attr = attr.replace(new RegExp(toReplace.replace('{', '{'), 'gi'), replaceWith);
+    let modifiedAttr = attr; // Create a new variable to store the modified string
+    _.each(Object.entries(set), ([toReplace, replaceWith]) => {
+      modifiedAttr = modifiedAttr.replace(new RegExp(toReplace.replace('{', '{'), 'gi'), replaceWith);
     });
-    return attr;
+    return modifiedAttr;
   };
 
   /* ===== Repeating Sum PARAMETERS ==========
   destinations = the name of the attribute that stores the total quantity
-        section = name of repeating fieldset, WITHOUT "repeating_"
-        fields = the name of the attribute field to be summed
+  section = name of repeating fieldset, WITHOUT "repeating_"
+  fields = the name of the attribute field to be summed
   destination and fields both can be a single attribute: 'weight'
   or an array of attributes: ['weight','number','equipped']
   */
@@ -1114,21 +1115,27 @@
       });
     });
   };
+
+  let versionator = '';
+
   // weapon weight
   on('change:repeating_weapon:weapon_weight change:repeating_weapon:weapon_quantity remove:repeating_weapon', function () {
     repeatingSum('total_weapon_weight', 'weapon', ['weapon_weight', 'weapon_quantity']);
   });
+
   // weapon cost
   on('change:repeating_weapon:weapon_cost change:repeating_weapon:weapon_quantity remove:repeating_weapon', function () {
     repeatingSum('total_weapon_cost', 'weapon', ['weapon_cost', 'weapon_quantity']);
   });
+
   // equipment weight
   on(
     'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried remove:repeating_equipment',
     function () {
       repeatingSum('total_equipment_weight', 'equipment', ['equipment_weight', 'equipment_quantity', 'equipment_carried']);
     }
-);
+  );
+
   // equipment cost
   on('change:repeating_equipment:equipment_cost change:repeating_equipment:equipment_quantity remove:repeating_equipment', function () {
     repeatingSum('total_equipment_cost', 'equipment', ['equipment_cost', 'equipment_quantity']);
@@ -1157,7 +1164,7 @@
         }
       );
     }
-);
+  );
 
   /* check and set encumbrance */
   on('sheet:opened change:normal_load change:heavy_load change:very_heavy_load change:max_load change:total_weight', function () {
@@ -1204,66 +1211,6 @@
       });
     });
   });
-
-  // Versioning
-  on('sheet:opened', () => {
-    // SET LATEST VERSION HERE. needs to be => the last update made in versionator below
-    const final_version = 1.6;
-    getAttrs(['sheet_version'], function (v) {
-      const current_version = float(v.sheet_version);
-      clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
-      versionator(current_version, final_version);
-    });
-  });
-
-  // versioning routine to handle attribute migration
-  const versionator = (current_version, final_version) => {
-    if (current_version < 0.1) {
-      dmgSwap(0.1, final_version);
-    } else if (current_version < 1.2) {
-      maxSwap(1.2, final_version);
-    } else if (current_version < 1.5) {
-      nwpMacroUpdate(1.5, final_version);
-    } else if (current_version < 1.52) {
-      weaponNameFix(1.52, final_version);
-    } else if (current_version < 1.53) {
-      spellNameFix(1.53, final_version);
-    } else if (current_version < 1.54) {
-      equipmentNameFix(1.54, final_version);
-    } else if (current_version < 1.55) {
-      abilityNameFix(1.55, final_version);
-    } else if (current_version < 1.56) {
-      nwpNameFix(1.56, final_version);
-    } else if (current_version < 1.57) {
-      macroColorUpdate(1.57, final_version);
-    }
-
-    // all updates completed
-    else if (current_version < final_version) {
-      setAttrs({
-        sheet_version: final_version,
-      });
-    }
-  };
-
-  // START use blankUpdateTemplate below as a guide to add updates to versionator.
-  const blankUpdateTemplate = function (current_version, final_version) {
-    // have this line up near the start
-    const update = {};
-    // do your stuff = geSectionIDs, getAttrs, all the various calculations
-
-    // then end the worker
-    update.sheet_version = current_version;
-    setAttrs(
-      update,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
-    // dont forget any close brackets for getattrs, etc.
-  };
-  // END blankUpdateTemplate
 
   // fix duplicated repeating attribute names. Replaces old attribute names in macro_text
   const nwpNameFix = function (current_version, final_version) {
@@ -1742,4 +1689,63 @@
       });
     });
   };
+  // Versioning
+  on('sheet:opened', () => {
+    // SET LATEST VERSION HERE. needs to be => the last update made in versionator below
+    const final_version = 1.6;
+    getAttrs(['sheet_version'], function (v) {
+      const current_version = float(v.sheet_version);
+      clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
+      versionator(current_version, final_version);
+    });
+  });
+
+  // versioning routine to handle attribute migration
+  versionator = (current_version, final_version) => {
+    if (current_version < 0.1) {
+      dmgSwap(0.1, final_version);
+    } else if (current_version < 1.2) {
+      maxSwap(1.2, final_version);
+    } else if (current_version < 1.5) {
+      nwpMacroUpdate(1.5, final_version);
+    } else if (current_version < 1.52) {
+      weaponNameFix(1.52, final_version);
+    } else if (current_version < 1.53) {
+      spellNameFix(1.53, final_version);
+    } else if (current_version < 1.54) {
+      equipmentNameFix(1.54, final_version);
+    } else if (current_version < 1.55) {
+      abilityNameFix(1.55, final_version);
+    } else if (current_version < 1.56) {
+      nwpNameFix(1.56, final_version);
+    } else if (current_version < 1.57) {
+      macroColorUpdate(1.57, final_version);
+    }
+
+    // all updates completed
+    else if (current_version < final_version) {
+      setAttrs({
+        sheet_version: final_version,
+      });
+    }
+  };
+
+  // START use blankUpdateTemplate below as a guide to add updates to versionator.
+  const blankUpdateTemplate = function (current_version, final_version) {
+    // have this line up near the start
+    const update = {};
+    // do your stuff = geSectionIDs, getAttrs, all the various calculations
+
+    // then end the worker
+    update.sheet_version = current_version;
+    setAttrs(
+      update,
+      {
+        silent: true,
+      },
+      versionator(current_version, final_version)
+    );
+    // dont forget any close brackets for getattrs, etc.
+  };
+  // END blankUpdateTemplate
 </script>
