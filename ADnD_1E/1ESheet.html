@@ -1208,10 +1208,10 @@
   // Versioning
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator below
-    let final_version = 1.6;
+    const final_version = 1.6;
     getAttrs(['sheet_version'], function (v) {
-      let current_version = float(v.sheet_version);
-      clog('Current sheet data version:' + current_version + ', Sheet code version:' + final_version);
+      const current_version = float(v.sheet_version);
+      clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
       versionator(current_version, final_version);
     });
   });
@@ -1316,7 +1316,7 @@
             update[`repeating_nonweaponproficiencies_${id}_nwp_description`] = v[`repeating_nonweaponproficiencies_${id}_description`];
         });
         update.sheet_version = current_version;
-        clog('nwpNameFix check completed on: ' + fieldnames);
+        clog(`nwpNameFix check completed on: ${fieldnames}`);
         setAttrs(
           update,
           {
@@ -1368,7 +1368,7 @@
             update[`repeating_ability_${id}_ability_description_show`] = int(v[`repeating_ability_${id}_description-show`]);
         });
         update.sheet_version = current_version;
-        clog('abilityNameFix check completed on: ' + fieldnames);
+        clog(`abilityNameFix check completed on: ${fieldnames}`);
         setAttrs(
           update,
           {
@@ -1408,7 +1408,7 @@
           if (doUpdate(v[`repeating_equipment_${id}_cost`])) update[`repeating_equipment_${id}_equipment_cost`] = float(v[`repeating_equipment_${id}_cost`]);
         });
         update.sheet_version = current_version;
-        clog('equipmentNameFix check completed on: ' + fieldnames);
+        clog(`equipmentNameFix check completed on: ${fieldnames}`);
         setAttrs(
           update,
           {
@@ -1477,7 +1477,7 @@
           if (doUpdate(v[`repeating_spells_${id}_description-show`])) update[`repeating_spells_${id}_spell_description_show`] = int(v[`repeating_spells_${id}_description-show`]);
         });
         update.sheet_version = current_version;
-        clog('spellNameFix check completed on: ' + fieldnames);
+        clog(`spellNameFix check completed on: ${fieldnames}`);
         setAttrs(
           update,
           {
@@ -1553,7 +1553,7 @@
           if (doUpdate(v[`repeating_weapon_${id}_weaponnotes`])) update[`repeating_weapon_${id}_weapon_notes`] = v[`repeating_weapon_${id}_weaponnotes`];
         });
         update.sheet_version = current_version;
-        clog('weaponNameFix check completed on: ' + fieldnames);
+        clog(`weaponNameFix check completed on: ${fieldnames}`);
         setAttrs(
           update,
           {
@@ -1567,12 +1567,12 @@
 
   // replace default macro-text of non-weapon proficiencies ONLY IF they haven't been edited
   const nwpMacroUpdate = function (current_version, final_version) {
-    var update = {},
-      updateNwps = {};
+    const update = {};
+    const updateNwps = {};
     getSectionIDs('repeating_nonweaponproficiencies', function (idnwps) {
       const attrsNWPs = [];
       _.each(idnwps, function (itemid) {
-        attrsNWPs.push('repeating_nonweaponproficiencies_' + itemid + '_macro-text');
+        attrsNWPs.push(`repeating_nonweaponproficiencies_${itemid}_macro-text`);
       });
       getAttrs([...attrsNWPs], function (v) {
         const replacements = {
@@ -1582,12 +1582,9 @@
             '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20 + [[@{rmodifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{rAttribute}[ATTR] ]]}}{{freetext=@{short_description}}}',
         };
         _.each(idnwps, function (id) {
-          if (v['repeating_nonweaponproficiencies_' + id + '_macro-text']) {
-            update['repeating_nonweaponproficiencies_' + id + '_macro-text'] = v['repeating_nonweaponproficiencies_' + id + '_macro-text'].replace(
-              replacements.nwp_old,
-              replacements.nwp_new
-            );
-            clog('nwpMacroUpdate check completed on: ' + attrsNWPs);
+          if (v[`repeating_nonweaponproficiencies_${id}_macro-text`]) {
+            update[`repeating_nonweaponproficiencies_${id}_macro-text`] = v[`repeating_nonweaponproficiencies_${id}_macro-text`].replace(replacements.nwp_old, replacements.nwp_new);
+            clog(`nwpMacroUpdate check completed on: ${attrsNWPs}`);
           }
         });
         update.sheet_version = current_version;
@@ -1604,30 +1601,30 @@
 
   // add {{color=@{color}}} to all repeating macro-text
   const macroColorUpdate = function (current_version, final_version) {
-    var update = {},
-      updateNwp = {},
-      updateWeapon = {},
-      updateAbility = {},
-      updateSpells = {};
+    const update = {};
+    const updateNwp = {};
+    const updateWeapon = {};
+    const updateAbility = {};
+    const updateSpells = {};
     getSectionIDs('repeating_nonweaponproficiencies', function (idnwps) {
       getSectionIDs('repeating_weapon', function (idweapons) {
         getSectionIDs('repeating_ability', function (idabilities) {
           getSectionIDs('repeating_spells', function (idspells) {
-            const attrsNWP = [],
-              attrsWeapon = [],
-              attrsAbility = [],
-              attrsSpells = [];
+            const attrsNWP = [];
+            const attrsWeapon = [];
+            const attrsAbility = [];
+            const attrsSpells = [];
             _.each(idnwps, function (itemid) {
-              attrsNWP.push('repeating_nonweaponproficiencies_' + itemid + '_nwp_macro_text');
+              attrsNWP.push(`repeating_nonweaponproficiencies_${itemid}_nwp_macro_text`);
             });
             _.each(idweapons, function (itemid) {
-              attrsWeapon.push('repeating_weapon_' + itemid + '_weapon_macro_text');
+              attrsWeapon.push(`repeating_weapon_${itemid}_weapon_macro_text`);
             });
             _.each(idabilities, function (itemid) {
-              attrsAbility.push('repeating_ability_' + itemid + '_ability_macro_text');
+              attrsAbility.push(`repeating_ability_${itemid}_ability_macro_text`);
             });
             _.each(idspells, function (itemid) {
-              attrsSpells.push('repeating_spells_' + itemid + '_spell_macro_text');
+              attrsSpells.push(`repeating_spells_${itemid}_spell_macro_text`);
             });
             getAttrs([...attrsNWP, ...attrsWeapon, ...attrsAbility, ...attrsSpells], function (v) {
               const replacements = {
@@ -1641,33 +1638,30 @@
                 spl_new: '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}}',
               };
               _.each(idnwps, function (id) {
-                if (v['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text']) {
-                  update['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text'] = v['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text'].replace(
+                if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`]) {
+                  update[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
                     replacements.nwp_old,
                     replacements.nwp_new
                   );
-                  clog('nwpMacroUpdate check completed on: ' + attrsNWP);
+                  clog(`nwpMacroUpdate check completed on: ${attrsNWP}`);
                 }
               });
               _.each(idweapons, function (id) {
-                if (v['repeating_weapon_' + id + '_weapon_macro_text']) {
-                  update['repeating_weapon_' + id + '_weapon_macro_text'] = v['repeating_weapon_' + id + '_weapon_macro_text'].replace(replacements.wpn_old, replacements.wpn_new);
-                  clog('colorUpdate check completed on: ' + attrsWeapon);
+                if (v[`repeating_weapon_${id}_weapon_macro_text`]) {
+                  update[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.wpn_old, replacements.wpn_new);
+                  clog(`colorUpdate check completed on: ${attrsWeapon}`);
                 }
               });
               _.each(idabilities, function (id) {
-                if (v['repeating_ability_' + id + '_ability_macro_text']) {
-                  update['repeating_ability_' + id + '_ability_macro_text'] = v['repeating_ability_' + id + '_ability_macro_text'].replace(
-                    replacements.abl_old,
-                    replacements.abl_new
-                  );
-                  clog('colorUpdate check completed on: ' + attrsAbility);
+                if (v[`repeating_ability_${id}_ability_macro_text`]) {
+                  update[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.abl_old, replacements.abl_new);
+                  clog(`colorUpdate check completed on: ${attrsAbility}`);
                 }
               });
               _.each(idspells, function (id) {
-                if (v['repeating_spells_' + id + '_spell_macro_text']) {
-                  update['repeating_spells_' + id + '_spell_macro_text'] = v['repeating_spells_' + id + '_spell_macro_text'].replace(replacements.spl_old, replacements.spl_new);
-                  clog('colorUpdate check completed on: ' + attrsSpells);
+                if (v[`repeating_spells_${id}_spell_macro_text`]) {
+                  update[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spl_old, replacements.spl_new);
+                  clog(`colorUpdate check completed on: ${attrsSpells}`);
                 }
               });
               update.sheet_version = current_version;
@@ -1694,17 +1688,17 @@
     getSectionIDs('repeating_weapon', function (idarray) {
       const fieldnames = [];
       _.each(idarray, function (currentID) {
-        fieldnames.push('repeating_weapon_' + currentID + '_DmgBonus', 'repeating_weapon_' + currentID + '_macro-text');
+        fieldnames.push(`repeating_weapon_${currentID}_DmgBonus`, `repeating_weapon_${currentID}_macro-text`);
       });
       getAttrs([...fieldnames], function (v) {
         const update = {};
         const macrodefault =
           '&{template:attacks} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}';
         _.each(idarray, function (currentID) {
-          const macrotext = v['repeating_weapon_' + currentID + '_macro-text'] || macrodefault;
+          const macrotext = v[`repeating_weapon_${currentID}_macro-text`] || macrodefault;
           // replaces old attribute value with new
-          update['repeating_weapon_' + currentID + '_macro-text'] = macrotext.replace(new RegExp('@{DmgBonus}', 'g'), '@{AttackDmgBonus}');
-          update['repeating_weapon_' + currentID + '_AttackDmgBonus'] = int(v['repeating_weapon_' + currentID + '_DmgBonus']);
+          update[`repeating_weapon_${currentID}_macro-text`] = macrotext.replace(new RegExp('@{DmgBonus}', 'g'), '@{AttackDmgBonus}');
+          update[`repeating_weapon_${currentID}_AttackDmgBonus`] = int(v[`repeating_weapon_${currentID}_DmgBonus`]);
         });
         update.sheet_version = current_version;
         setAttrs(
@@ -1715,7 +1709,7 @@
           },
           versionator(current_version, final_version)
         );
-        clog('dmgSwap check completed on: ' + fieldnames);
+        clog(`dmgSwap check completed on: ${fieldnames}`);
       });
     });
   };
@@ -1726,14 +1720,14 @@
     getSectionIDs('repeating_ability', function (idarray) {
       const fieldnames = [];
       _.each(idarray, function (currentID) {
-        fieldnames.push('repeating_ability_' + currentID + '_max');
+        fieldnames.push(`repeating_ability_${currentID}_max`);
       });
 
       getAttrs([...fieldnames], (v) => {
-        var update = {};
+        const update = {};
         _.each(idarray, function (currentID) {
           // replaces old attribute value with new
-          update['repeating_ability_' + currentID + '_current_max'] = int(v['repeating_ability_' + currentID + '_max']);
+          update[`repeating_ability_${currentID}_current_max`] = int(v[`repeating_ability_${currentID}_max`]);
         });
         update.sheet_version = current_version;
         setAttrs(
@@ -1744,7 +1738,7 @@
           },
           versionator(current_version, final_version)
         );
-        clog('maxSwap check completed on: ' + fieldnames);
+        clog(`maxSwap check completed on: ${fieldnames}`);
       });
     });
   };
