@@ -4325,18 +4325,13 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.18.0 -->
+				<!-- current version notes: 2.19.0 -->
 				<ul>
-					<li><b>NEW:</b> Melee and Ranged damage rolls automatically calculate Blunt Trauma Damage based on rules from <b>Flexible Armor and Blunt Trauma</b> B379.</li>
-					<li><b>ENHANCEMENTS:</b>Updated GCS Roll20 Export Code
-						<ul>
-							<li>Added GCS Equipment.Other to Roll20 Inventory Export.</li>
-							<li>Updated Active Defense to replace "F" and "U" with an empty string. Example, "11U" is updated to "11" for a parry defense. Roll20 only allows numbers for defenses, otherwise the roll will not work.</li>
-							<li>Fix bug with Vision Points.</li>
-							<li><b>ACTION:</b> Please update your Roll20.js file, see Gear Icon > Import > GCS Instructions.</li>
-						</ul>
-					</li>
-					<li><b>BUGFIX:</b> Fixed issue with adding hit locations, size modifier was incorrectly being applied.</li>
+					<li><b>BUGFIX:</b> Skill roll was not setting values for max 9, and summary.</li>
+					<li><b>BUGFIX:</b> Technique skill roll was not setting values for max 9, and summary.</li>
+					<li><b>BUGFIX:</b> Defense roll was not setting values summary.</li>
+					<li><b>BUGFIX:</b> Melee skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
+					<li><b>BUGFIX:</b> Ranged skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -21260,7 +21255,17 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.18.0 -->
+			<!-- current version notes: 2.19.0 -->
+			<ul>
+				<li><b>BUGFIX:</b> Skill roll was not setting values for max 9, and summary.</li>
+				<li><b>BUGFIX:</b> Technique skill roll was not setting values for max 9, and summary.</li>
+				<li><b>BUGFIX:</b> Defense roll was not setting values summary.</li>
+				<li><b>BUGFIX:</b> Melee skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
+				<li><b>BUGFIX:</b> Ranged skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
+			</ul>
+			
+			<h4>Version: 2.18.0</h4>
+			<p>Pull Request: 5/20/2024</p>
 			<ul>
 				<li><b>NEW:</b> Melee and Ranged damage rolls automatically calculate Blunt Trauma Damage based on rules from <b>Flexible Armor and Blunt Trauma</b> B379.</li>
 				<li><b>ENHANCEMENTS:</b>Updated GCS Roll20 Export Code
@@ -21276,7 +21281,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<h4>Version: 2.17.0</h4>
 			<p>Pull Request: 5/14/2024</p>
-				<ul>
+			<ul>
 				<li><b>NEW:</b> Added <b>Drinking and Intoxication</b> tool, located under Tools > General.</li>
 			</ul>
 			
@@ -26831,9 +26836,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.18.0";
+	const version = "2.19.0";
 	
-	const latestChangesDate = "5/20/2024";
+	const latestChangesDate = "6/4/2024";
 	
 	let modCascade = true;
 	
@@ -48180,13 +48185,16 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	const globalSkillFields = [
+		"skill_roll_max_nine_value",
+		"skill_roll_max_nine",
+		"skill_roll_trait_summary",	
+	];
+
 	const skillFields = [
 		"name",
 		"tl",
 		"level",
-		"skill_roll_max_nine_value",
-		"skill_roll_max_nine",
-		"skill_roll_trait_summary",
 		"notes",
 		"show_notes",
 		"ref",
@@ -48216,6 +48224,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = skillFields.map(field => `repeating_skills_${rowId}_${field}`);
 
+		let globalValues = await getAttrsAsync(globalSkillFields);
+
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
@@ -48225,11 +48235,11 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = values[`repeating_skills_${rowId}_level`] ?? "10";
 
-		let skillRollMaxNine = values[`repeating_skills_${rowId}_skill_roll_max_nine`] ?? "0";
+		let skillRollMaxNine = globalValues[`skill_roll_max_nine`] ?? "0";
 
-		let skillRollMaxNineValue = values[`repeating_skills_${rowId}_skill_roll_max_nine_value`] ?? "100";
+		let skillRollMaxNineValue = globalValues[`skill_roll_max_nine_value`] ?? "100";
 
-		let skillRollTraitSummary = values[`repeating_skills_${rowId}_skill_roll_trait_summary`] ?? "";
+		let skillRollTraitSummary = globalValues[`skill_roll_trait_summary`] ?? "";
 
 		let notes = values[`repeating_skills_${rowId}_notes`] ?? "";
 		notes = notes.replace(/\n/g, '\\n');
@@ -48434,13 +48444,16 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	const globalTechniqueFields = [
+		"technique_roll_max_nine_value",
+		"technique_roll_max_nine",
+		"technique_roll_trait_summary",	
+	];
+
 	const techniqueFields = [
 		"name",
 		"parent",
 		"level",
-		"technique_roll_max_nine_value",
-		"technique_roll_max_nine",
-		"technique_roll_trait_summary",
 		"notes",
 		"show_notes_revised",
 		"ref",
@@ -48468,6 +48481,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = techniqueFields.map(field => `${sectionName}_${field}`);
 
+		let globalValues = await getAttrsAsync(globalTechniqueFields);
+
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
@@ -48477,11 +48492,11 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = values[`${sectionName}_level`] ?? "10";
 
-		let techniqueRollMaxNine = values[`${sectionName}_technique_roll_max_nine`] ?? "0";
+		let techniqueRollMaxNine = globalValues[`technique_roll_max_nine`] ?? "0";
 
-		let techniqueRollMaxNineValue = values[`${sectionName}_technique_roll_max_nine_value`] ?? "100";
+		let techniqueRollMaxNineValue = globalValues[`technique_roll_max_nine_value`] ?? "100";
 
-		let techniqueRollTraitSummary = values[`${sectionName}_technique_roll_trait_summary`] ?? "";
+		let techniqueRollTraitSummary = globalValues[`technique_roll_trait_summary`] ?? "";
 
 		let notes = values[`${sectionName}_notes`] ?? "";
 		notes = notes.replace(/\n/g, '\\n');
@@ -48657,17 +48672,20 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	const globalDefenseFields = [
+		"defense_roll_max_nine_value",
+		"defense_roll_max_nine",
+		"defense_roll_trait_summary",	
+	];
+
 	const defenseFields = [
 		"defense_type",
+		"defense_combat_reflexes_bonus",
 		"type",
 		"name",
 		"skill",
 		"skill_mod",
-		"defense_combat_reflexes_bonus",
 		"level",
-		"defense_roll_max_nine_value",
-		"defense_roll_max_nine",
-		"defense_roll_trait_summary",
 		"show_notes",
 		"info_description",
 		"notes",
@@ -48699,6 +48717,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = defenseFields.map(field => `${sectionName}_${field}`);
 
+		let globalValues = await getAttrsAsync(globalDefenseFields);
+
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
@@ -48716,11 +48736,11 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = baseSkillLevel + skillLevelMod + combatReflexes;
 
-		let defenseRollMaxNine = values[`${sectionName}_defense_roll_max_nine`] ?? "0";
+		let defenseRollMaxNine = globalValues[`defense_roll_max_nine`] ?? "0";
 
-		let defenseRollMaxNineValue = values[`${sectionName}_defense_roll_max_nine_value`] ?? "100";
+		let defenseRollMaxNineValue = globalValues[`defense_roll_max_nine_value`] ?? "100";
 
-		let defenseRollTraitSummary = values[`${sectionName}_defense_roll_trait_summary`] ?? "";
+		let defenseRollTraitSummary = globalValues[`defense_roll_trait_summary`] ?? "";
 
 		let showNotes = values[`${sectionName}_show_notes`] ?? "0";
 
@@ -48933,16 +48953,19 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	const meleeFields = [
-		"name",
-		"ref",
-		"skill",
+	const globalMeleeFields = [
 		"melee_roll_max_nine_value",
 		"melee_roll_max_nine",
 		"melee_roll_trait_summary",
 		"melee_roll_hit_location",
 		"melee_roll_maneuver",
 		"melee_roll_allout_attack",
+	];
+
+	const meleeFields = [
+		"name",
+		"ref",
+		"skill",
 		"reach",
 		"notes",
 		"success_notes",
@@ -48974,6 +48997,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = meleeFields.map(field => `${sectionName}_${field}`);
 
+		let globalValues = await getAttrsAsync(globalMeleeFields);
+
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
@@ -48983,17 +49008,17 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = values[`${sectionName}_skill`] ?? "10";
 
-		let meleeRollMaxNine = values[`${sectionName}_melee_roll_max_nine`] ?? "0";
+		let meleeRollMaxNine = globalValues[`melee_roll_max_nine`] ?? "0";
 
-		let meleeRollMaxNineValue = values[`${sectionName}_melee_roll_max_nine_value`] ?? "100";
+		let meleeRollMaxNineValue = globalValues[`melee_roll_max_nine_value`] ?? "100";
 
-		let meleeRollTraitSummary = values[`${sectionName}_melee_roll_trait_summary`] ?? "";
+		let meleeRollTraitSummary = globalValues[`melee_roll_trait_summary`] ?? "";
 
-		let hitLocation = values[`${sectionName}_melee_roll_hit_location`] ?? "";
+		let hitLocation = globalValues[`melee_roll_hit_location`] ?? "";
 
-		let maneuver = values[`${sectionName}_melee_roll_maneuver`] ?? "";
+		let maneuver = globalValues[`melee_roll_maneuver`] ?? "";
 
-		let allOutAttack = values[`${sectionName}_melee_roll_allout_attack`] ?? "";
+		let allOutAttack = globalValues[`melee_roll_allout_attack`] ?? "";
 
 		let reach = values[`${sectionName}_reach`] ?? "";
 
@@ -49201,16 +49226,19 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	const rangedFields = [
-		"name",
-		"ref",
-		"skill",
+	const globalRangedFields = [
 		"ranged_roll_max_nine_value",
 		"ranged_roll_max_nine",
 		"ranged_roll_trait_summary",
 		"ranged_roll_hit_location",
 		"ranged_roll_maneuver",
 		"ranged_roll_allout_attack",
+	];
+
+	const rangedFields = [
+		"name",
+		"ref",
+		"skill",
 		"notes",
 		"rof",
 		"shots_fired_macro",
@@ -49247,6 +49275,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let fields = rangedFields.map(field => `${sectionName}_${field}`);
 
+		let globalValues = await getAttrsAsync(globalRangedFields);
+
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
@@ -49256,17 +49286,17 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = values[`${sectionName}_skill`] ?? "10";
 
-		let rangedRollMaxNine = values[`${sectionName}_ranged_roll_max_nine`] ?? "0";
+		let rangedRollMaxNine = globalValues[`ranged_roll_max_nine`] ?? "0";
 
-		let rangedRollMaxNineValue = values[`${sectionName}_ranged_roll_max_nine_value`] ?? "100";
+		let rangedRollMaxNineValue = globalValues[`ranged_roll_max_nine_value`] ?? "100";
 
-		let rangedRollTraitSummary = values[`${sectionName}_ranged_roll_trait_summary`] ?? "";
+		let rangedRollTraitSummary = globalValues[`ranged_roll_trait_summary`] ?? "";
 
-		let hitLocation = values[`${sectionName}_ranged_roll_hit_location`] ?? "";
+		let hitLocation = globalValues[`ranged_roll_hit_location`] ?? "";
 
-		let maneuver = values[`${sectionName}_ranged_roll_maneuver`] ?? "";
+		let maneuver = globalValues[`ranged_roll_maneuver`] ?? "";
 
-		let allOutAttack = values[`${sectionName}_ranged_roll_allout_attack`] ?? "";
+		let allOutAttack = globalValues[`ranged_roll_allout_attack`] ?? "";
 
 		let notes = values[`${sectionName}_notes`] ?? "";
 		notes = notes.replace(/\n/g, '\\n');
