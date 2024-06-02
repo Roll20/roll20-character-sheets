@@ -354,7 +354,7 @@ const updateSuccessMod = trigger_attribute => {
       modifiers.push(val + "[Other Modifiers]");
     };
     update["success_mod"] = modifiers.length ? "[[" + modifiers.join(" ") + "]]" : "0";
-    update["success_mod_rolltemplate"] = modifiers?.length > 0 ? "{{disposition=[[@{success_mod_base}+" + modifiers.join(" ") + "]]}}" : "{{disposition=[[@{success_mod_base}]]}}";
+    update["success_mod_rolltemplate"] = "{{disposition=[[@{success_mod_base}]]}}";
     setAttrs(update, { silent: true });
   });
 }
