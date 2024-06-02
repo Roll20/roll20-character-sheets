@@ -5,10 +5,7 @@ Use `npm install` to download dependancies and `npm install pug-cli -g` to downl
 
 Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E directory.
 
-## To Do
+## Feature Requests and Known Bugs
 
-- Clean up white space issues (conditions, advancement bubbles)
-- Fix clicking on skills to do tests
-- Fix bug with the disposition test and exhausted
-- Move to grid and flexbox instead of absolute positions
-- Fix up discrepancies between the original and new version
+- Backpacks have a bug requiring toggling twice to make it work
+- Zooming in at 67% can break the styling on some browsers
