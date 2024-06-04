@@ -1,3 +1,25 @@
+2024-05-03
+
+- Add attacks: Fully(?) customisable:
+ - Any pubished attack table
+ - Any listed attack skill
+ - Modifiers
+ - Fumble
+ - etc
+- Default skill values for Dynamic Specialisations
+- Clear levelup purchases option (button - click it!)
+- most buttons are now styled
+- Added settings tab to character.
+- Added discord link
+- Bugs:
+ - Handle missing regions and lores for culture ranks.
+ - Fix subskill rolls
+ - Remove "Immortal" talent from Elves - it's not a thing
+- Internal
+ - Add test framework for level up
+ - Remove some dead code
+- (Need to do rake)
+
 2024-04-27
 
 - Charactermancer:
