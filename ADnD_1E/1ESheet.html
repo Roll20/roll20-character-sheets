@@ -1670,82 +1670,24 @@
         fieldnames.push(`repeating_ability_${currentID}_max`);
       });
 
-      getAttrs([...fieldnames], (v) => {
-        const update = {};
-        _.each(idarray, function (currentID) {
-          // replaces old attribute value with new
-          update[`repeating_ability_${currentID}_current_max`] = int(v[`repeating_ability_${currentID}_max`]);
-        });
-        update.sheet_version = current_version;
-        setAttrs(
-          update,
-          {
-            silent: true,
-            // Update
-          },
-          versionator(current_version, final_version)
-        );
-        clog(`maxSwap check completed on: ${fieldnames}`);
-      });
-    });
-  };
-  // Versioning
-  on('sheet:opened', () => {
-    // SET LATEST VERSION HERE. needs to be => the last update made in versionator below
-    const final_version = 1.6;
-    getAttrs(['sheet_version'], function (v) {
-      const current_version = float(v.sheet_version);
-      clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
-      versionator(current_version, final_version);
-    });
-  });
+					getAttrs([...fieldnames], v => {
+							var update = {};
+							_.each(idarray, function (currentID) {
+		//replaces old attribute value with new
+									update['repeating_ability_' + currentID + '_current_max'] = int(v['repeating_ability_' + currentID + '_max']);
+							});
+							update.sheet_version = current_version;
+							setAttrs(update, {
+									silent: true
+		//Update
+							}, versionator(current_version, final_version));
+							clog('maxSwap check completed on: ' + fieldnames);
+					});
+			});
+	};
 
-  // versioning routine to handle attribute migration
-  versionator = (current_version, final_version) => {
-    if (current_version < 0.1) {
-      dmgSwap(0.1, final_version);
-    } else if (current_version < 1.2) {
-      maxSwap(1.2, final_version);
-    } else if (current_version < 1.5) {
-      nwpMacroUpdate(1.5, final_version);
-    } else if (current_version < 1.52) {
-      weaponNameFix(1.52, final_version);
-    } else if (current_version < 1.53) {
-      spellNameFix(1.53, final_version);
-    } else if (current_version < 1.54) {
-      equipmentNameFix(1.54, final_version);
-    } else if (current_version < 1.55) {
-      abilityNameFix(1.55, final_version);
-    } else if (current_version < 1.56) {
-      nwpNameFix(1.56, final_version);
-    } else if (current_version < 1.57) {
-      macroColorUpdate(1.57, final_version);
-    }
-
-    // all updates completed
-    else if (current_version < final_version) {
-      setAttrs({
-        sheet_version: final_version,
-      });
-    }
-  };
-
-  // START use blankUpdateTemplate below as a guide to add updates to versionator.
-  const blankUpdateTemplate = function (current_version, final_version) {
-    // have this line up near the start
-    const update = {};
-    // do your stuff = geSectionIDs, getAttrs, all the various calculations
-
-    // then end the worker
-    update.sheet_version = current_version;
-    setAttrs(
-      update,
-      {
-        silent: true,
-      },
-      versionator(current_version, final_version)
-    );
-    // dont forget any close brackets for getattrs, etc.
-  };
-  // END blankUpdateTemplate
 </script>
+
+
+
+
