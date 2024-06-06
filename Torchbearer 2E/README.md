@@ -5,7 +5,16 @@ Use `npm install` to download dependancies and `npm install pug-cli -g` to downl
 
 Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E directory.
 
-## Feature Requests and Known Bugs
+## Feature Log
 
-- Backpacks have a bug requiring toggling twice to make it work
+- Make the sheet responsive
+- Redo the rolling modal
+- Add wises help text
+
+## Known Bugs
+
 - Zooming in at 67% can break the styling on some browsers
+- Backpacks have a bug requiring toggling twice to make it work
+- Using a trait against yourself gives you a die rather than 2D for the opponent
+- Beginner's luck doesn't halve the correct dice
+- Fresh does not get counted for a new character
