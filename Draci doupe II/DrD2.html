@@ -54,7 +54,7 @@
                         </span>
                     </span>
                 </span>
-                <input type="number" name="attr_character_level" min="0" value="0" readonly tabindex="-1" title="@{character_level}" />
+                <input type="number" class="drd-noedit" name="attr_character_level" min="0" value="0" readonly tabindex="-1" title="@{character_level}" />
                 <span class="drd-label">Nevyužité zk.:</span>
                 <input type="number" name="attr_experience_free" min="0" value="0" title="@{experience_free}"/>
             </div>
@@ -63,12 +63,12 @@
                 <input type="number" name="attr_danger" min="0" value="0" title="@{danger}"/>
                 <span class="drd-label">Rituální předmět(y):<span class="drd-hint" tabindex="-1">
                         <span class="drd-hint-text">
-                            <p>Zdroje rituálních předmětů lze upravovat pouze u jednotlivých předmětů v záložce <b>Inventář</b>.</p>
-                            <p>Tato hodnota představuje součet zdrojů všech rituálních předmětů.</p>
+                            <p>V <span style="font-family: pictos;">y</span> lze odemknout volbu více rituálních předmětů. Poté však lze jejich zdroje upravovat pouze u jednotlivých předmětů v záložce <b>Inventář</b>. Tato hodnota bude následně představovat součet zdrojů všech rituálních předmětů.</p>
                         </span>
                     </span>
                 </span>
-                <input type="number" name="attr_amulets_total" min="0" value="0" title="@{amulets_total}" readonly tabindex="-1"/>
+                <input type="number" class="drd-noedit drd-hidden" name="attr_amulets_total" min="0" value="0" title="@{amulets_total}" readonly tabindex="-1"/>
+                <input type="number" name="attr_amulet_charge" min="0" max="5" value="0" title="@{amulet_charge}"/>
                 <span class="drd-label">Výhody:</span>
                 <input type="number" name="attr_advantages" min="0" value="0" title="@{advantages}"/>
             </div>
@@ -463,7 +463,7 @@
                 <span class="drd-editable"><input type="text" class="drd-custom-title" name="attr_inv_sec2_name" placeholder="Vlastní sekce"/></span>
                 <textarea name="attr_inv_sec2" placeholder=""></textarea>
             </div>
-            <div class="drd-inv-amulets">
+            <div class="drd-inv-amulets drd-hidden">
                 <h2>Rituální předměty</h2>
                 <fieldset class="repeating_amulets">
                     <div class="drd-flex">
@@ -474,6 +474,16 @@
                     </div>
                     <textarea name="attr_amulet_desc" placeholder="Popis rituálního předmětu"></textarea>
                 </fieldset>
+            </div>
+            <div class="drd-inv-amulet">
+                <h2>Rituální předmět</h2>
+                <div class="drd-flex">
+                    <div class="drd-flex">
+                        <span class="drd-label">Zdroje:</span>
+                        <input type="number" name="attr_amulet_charge" min="0" max="5" value="0" title="@{amulet_charge}"/>
+                    </div>
+                </div>
+                <textarea name="attr_amulet_desc" placeholder="Popis rituálního předmětu"></textarea>
             </div>
             <div class="drd-inv-runic-objects">
                 <h2>Runové předměty</h2>
@@ -2676,6 +2686,13 @@
                     <option value="0">skrýt</option>
                 </select>
             </div>
+            <div class="drd-flex">
+                <span class="drd-label">Rituální předmět:</span>
+                <select name="attr_amulets_option" value="single" title="@{amulets_option}">
+                    <option value="single">jeden</option>
+                    <option value="multiple">více</option>
+                </select>
+            </div>
             <h4>
                 Obrázky organizací<span class="drd-hint" tabindex="-1">
                     <span class="drd-hint-text">
@@ -2892,6 +2909,26 @@
         }, {silent: true});
     });
 
+    on('change:amulets_option', function(eventInfo){
+        let newVal = eventInfo.newValue;
+        switch(newVal) {
+            case 'single':
+                $20('.drd-inv-amulets').addClass('drd-hidden');
+                $20('.drd-inv-amulet').removeClass('drd-hidden');
+                $20('input[name="attr_amulets_total"]').addClass('drd-hidden');
+                $20('input[name="attr_amulet_charge"]').removeClass('drd-hidden');
+                break;
+            case 'multiple':
+                $20('.drd-inv-amulets').removeClass('drd-hidden');
+                $20('.drd-inv-amulet').addClass('drd-hidden');
+                $20('input[name="attr_amulets_total"]').removeClass('drd-hidden');
+                $20('.drd-pc-danger-amulet-adv input[name="attr_amulet_charge"]').addClass('drd-hidden');
+                break;
+            default:
+                break;
+        }
+    });
+
     /*
      * https://wiki.roll20.net/Building_Character_Sheets#Storing_User_Data
      * Attributes are only created after having been edited for the first time
@@ -2933,7 +2970,7 @@
 
         calculateLevel();
 
-        prePopulateSection("amulets", 1, "amulet_charge");
+        /*prePopulateSection("amulets", 1, "amulet_charge");*/
 
         getAttrs(['group_size'], function(v) {
             showGroupCount(v.group_size);
@@ -2946,6 +2983,19 @@
         });
         getAttrs(['categories_sorted'], function(v) {
             if(v.categories_sorted === '1') {$20(`button[name="act_azSort"]`).addClass('drd-toggled'); sortCategories();}
+        });
+        getAttrs(['amulets_option'], function(v) {
+            if(v.amulets_option == 'single') {
+                $20('.drd-inv-amulets').addClass('drd-hidden');
+                $20('.drd-inv-amulet').removeClass('drd-hidden');
+                $20('input[name="attr_amulets_total"]').addClass('drd-hidden');
+                $20('input[name="attr_amulet_charge"]').removeClass('drd-hidden');
+            } else if (v.amulets_option == 'multiple') {
+                $20('.drd-inv-amulets').removeClass('drd-hidden');
+                $20('.drd-inv-amulet').addClass('drd-hidden');
+                $20('input[name="attr_amulets_total"]').removeClass('drd-hidden');
+                $20('.drd-pc-danger-amulet-adv input[name="attr_amulet_charge"]').addClass('drd-hidden');
+            }
         });
     });
 
