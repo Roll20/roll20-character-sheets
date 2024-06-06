@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2024-06-05 ** v.87 Chuz (James Culp)
+	Bugfix - Found an issue with imports where items would be dropped mysteriously.  This affected anything that was in a repeating list and was tied to unique ids within Roll20.  Added another check to prevent duplicate ids.
 **2024-03-03 ** v.86 Chuz (James Culp)
 	Bugfix - Essence Mod works again
 	Added Omega, Exoware and Gammaware to Augmentation grade drop downs and essence calculations.  They do not however add the bad luck quality or extra condition monitor boxes when selected.
