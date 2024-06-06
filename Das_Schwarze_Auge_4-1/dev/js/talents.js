@@ -1,29 +1,60 @@
 /* talents begin */
 
-function generateTalentRollMacro(template, systemName, readableName, attributes, ebeMacro="") {
-	let rollMacro = 
-		"@{gm_roll_opt} " +
-		"&{template:" + template + "} " +
-		"{{name=" + readableName + "}} " +
-		"{{wert=[[@{TaW_" + systemName + "}d1cs0cf2]]}} " +
-		"{{mod=" +
-			(ebeMacro === "" ?
-				"[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]" : 
-				"[[ 0d1 + ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 + [[{0d1 + " + ebeMacro + ", 0d1}kh1]]d1cs0cf2 ]]"
-			) +
-		"}} " +
-		"{{stats=[[ " +
-			"[Eigenschaft 1:] [[@{"+ attributes[0] +"}]]d1cs0cf2 + " +
-			"[Eigenschaft 2:] [[@{"+ attributes[1] +"}]]d1cs0cf2 + " +
-			"[Eigenschaft 3:] [[@{"+ attributes[2] +"}]]d1cs0cf2" +
-		"]]}} " +
-		"{{roll=[[3d20cs<@{cs_talent}cf>@{cf_talent}]]}} " +
-		"{{result=[[0]]}} " +
-		"{{criticality=[[0]]}} " +
-		"{{critThresholds=[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]}} ";
-	if (ebeMacro !== "") {
-		rollMacro += "{{ebe=[[{0d1 + " + ebeMacro + ", 0d1}kh1]]}} ";
+function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, ebeMacro = "") {
+	const func = "generateTalentRollMacro";
+
+	var ebeRoll = "";
+	var modRoll = "";
+
+	const statsRoll = [
+		"{{stats=",
+		[
+			"[[",
+			[
+				"[Eigenschaft 1:] [[@{" + statAttrs[0] + "}]]d1cs0cf2",
+				"[Eigenschaft 2:] [[@{" + statAttrs[1] + "}]]d1cs0cf2",
+				"[Eigenschaft 3:] [[@{" + statAttrs[2] + "}]]d1cs0cf2",
+			].join(" + "),
+			"]]"
+		].join(" "),
+		"}}"
+	].join("");
+
+	if (ebeMacro === "")
+	{
+		ebeRoll = ebeMacro;
+		modRoll = "[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]";
+	} else {
+		ebeRoll = [
+			"{{ebe=",
+			"[[{0d1 + ",
+			ebeMacro,
+			", 0d1}kh1]]",
+			"}}"
+		].join("");
+		modRoll = [
+			"{{mod=",
+			"[[ 0d1 + ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 + [[{0d1 + ",
+			ebeMacro,
+			", 0d1}kh1]]d1cs0cf2 ]]",
+			"}}"
+		].join("");
 	}
+	const rollMacro = [
+		"@{gm_roll_opt}",
+		"&{template:" + template + "}",
+		"{{name=" + nameUI + "}}",
+		"{{wert=[[@{TaW_" + nameInternal + "}d1cs0cf2]]}}",
+		modRoll,
+		ebeRoll,
+		statsRoll,
+		"{{roll=[[3d20cs<@{cs_talent}cf>@{cf_talent}]]}}",
+		"{{result=[[0]]}}",
+		"{{criticality=[[0]]}}",
+		"{{critThresholds=[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]}}"
+	].join(" ");
+
+	debugLog(func, "rollMacro", rollMacro);
 	return rollMacro;
 }
 
