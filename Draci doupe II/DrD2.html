@@ -2854,9 +2854,9 @@
     });
     
     /*
-    * Tab switching
-    * https://wiki.roll20.net/CSS_Wizardry#Tabs
-    */
+     * Tab switching
+     * https://wiki.roll20.net/CSS_Wizardry#Tabs
+     */
     const tabButtons = [
     'pc_character', 'pc_skills', 'pc_journal', 'pc_networks', 'pc_organisations', 'pc_inventory',
     'npc_character', 'npc_journal',
@@ -2891,7 +2891,6 @@
         });
     });
     on('change:sheet_type', function(eventInfo){
-        let prevVal = eventInfo.previousValue;
         let newVal = eventInfo.newValue;
         let tab = '';
         switch(newVal) {
@@ -2949,7 +2948,7 @@
         });
         
         getAttrs(['professions_total', 'character_level', 'tenacity_current', 'tenacity_current_max', 'amulets_total', 'npc_owner', 'group_size', 'npc_characteristic'], function(v) {
-            workerLog(`Initializing\n[${Object.getOwnPropertyNames(v)}] = [${Object.values(v)}]`);
+            //workerLog(`Initializing\n[${Object.getOwnPropertyNames(v)}] = [${Object.values(v)}]`);
             setAttrs({
                 professions_total: parseInt(v.professions_total)||0,
                 character_level: parseInt(v.character_level)||0,
@@ -3133,7 +3132,7 @@
     on('change:body_level change:spirit_level change:influence_level change:professions_total', function(eventInfo){
         let prevVal = parseInt(eventInfo.previousValue)||0;
         let newVal = parseInt(eventInfo.newValue)||0;
-        workerLog(`change:${eventInfo.sourceAttribute}`, { eventInfo });
+        //workerLog(`change:${eventInfo.sourceAttribute}`, { eventInfo });
         if(newVal != prevVal) {
             calculateLevel();
         }
@@ -3200,7 +3199,7 @@
         if(array.length !== values.length){
             console.error(`initializeAttrs() failed: arrays must be same length:\nattrs=${array.length}\nvalues=${values.length}`);
         }else{
-            workerLog(`Initializing\n[${array}] = [${values}]`);
+            //workerLog(`Initializing\n[${array}] = [${values}]`);
             for(let i = 0; i<array.length; i++){
                 setAttrs({
                     [array[i]]: values[i]
@@ -3224,7 +3223,7 @@
             let prevVal = parseInt(eventInfo.previousValue)||0;
             let newVal = parseInt(eventInfo.newValue)||0;
             if(newVal != prevVal || (srcAttr.includes('current'))){
-                workerLog(`change:${srcAttr}`, { eventInfo });
+                //workerLog(`change:${srcAttr}`, { eventInfo });
                 let attrs = [`${group}_level`, `${group}_pool`, `${group}_current`, `${group}_scarred`, `${group}_exhausted`, 'sheet_type'];
                 getAttrs(attrs, function(v){
                     let level = parseInt(Object.values(v)[0]);
@@ -3245,10 +3244,10 @@
                     
                     if(srcAttr.includes('level')){
                         if(srcAttr.includes('bond') && level > 5) {
-                            workerLog(`${srcAttr} exceeded its max, resetting`);
+                            //workerLog(`${srcAttr} exceeded its max, resetting`);
                             level = 5;
                         }else if(level > 16) {
-                            workerLog(`${srcAttr} exceeded its max, resetting`);
+                            //workerLog(`${srcAttr} exceeded its max, resetting`);
                             level = 16;
                         }
                         pool = level;
@@ -3257,7 +3256,7 @@
                     }else if(srcAttr.includes('current')){
                         exhausted = currentMax - current;
                         if(current > currentMax) {
-                            workerLog(`${srcAttr} exceeded its max, resetting`);
+                            //workerLog(`${srcAttr} exceeded its max, resetting`);
                             current = currentMax;
                         }
                     }else if(srcAttr.includes('scarred')){
@@ -3297,7 +3296,7 @@
                 let current = parseInt(values[1]);
                 let scarred = parseInt(values[2]);
                 let sheetType = String(values[3]);
-                workerLog(`(${sheetType}) ${button} square clicked`);
+                //workerLog(`(${sheetType}) ${button} square clicked`);
                 if (prevChar == '/') {
                     newChar = 'X';
                     scarred++;
@@ -3345,7 +3344,7 @@
                 let current = parseInt(values[1]);
                 let scarred = parseInt(values[2]);
                 let sheetType = String(values[3]);
-                workerLog(`[${sheetType}] ${button} square clicked`);
+                //workerLog(`[${sheetType}] ${button} square clicked`);
                 if (prevChar == '/') {
                     newChar = 'X';
                     scarred++;
@@ -3387,7 +3386,7 @@
                 let newChar = '';
                 let current = parseInt(values[1]);
                 let scarred = parseInt(values[2]);
-                workerLog(`(${sheetType}) ${button} square clicked`);
+                //workerLog(`${button} square clicked`);
                 if (prevChar == '/') {
                     newChar = 'X';
                     scarred++;
@@ -3456,7 +3455,7 @@
      * Clear every square of passed square group
      */
     function clearSquares(squareGroup){
-        workerLog(`Clearing all “${squareGroup}” squares`);
+        //workerLog(`Clearing all “${squareGroup}” squares`);
         if(squareGroup.includes('network')){
             for(let i = 1; i <= 5; i++) {
                 setAttrs({
@@ -3538,15 +3537,15 @@
             }
         }
         if (Array.isArray(scarSquares) && scarSquares.length) {
-            workerLog(`Squares to write “X” to: [${scarSquares}]`);
+            //workerLog(`Squares to write “X” to: [${scarSquares}]`);
             writeToButtons(scarSquares, 'X');
         }
         if (Array.isArray(exhaustedSquares) && exhaustedSquares.length) {
-            workerLog(`Squares to write “/” to: [${exhaustedSquares}]`);
+            //workerLog(`Squares to write “/” to: [${exhaustedSquares}]`);
             writeToButtons(exhaustedSquares, '/');
         }
         if (Array.isArray(blankSquares) && blankSquares.length) {
-            workerLog(`Squares to write “ ” to: [${blankSquares}]`);
+            //workerLog(`Squares to write “ ” to: [${blankSquares}]`);
             writeToButtons(blankSquares, ' ');
         }
     }
@@ -3583,7 +3582,7 @@
         let prevVal = parseInt(eventInfo.previousValue)||0;
         let newVal = parseInt(eventInfo.newValue)||0;
         let sourceType = eventInfo.sourceType;
-        workerLog('change:amulets_total', { eventInfo });
+        //workerLog('change:amulets_total', { eventInfo });
         if(sourceType == 'player') {
             repeatingSum('amulets_total', 'amulets', 'amulet_charge');
         }
@@ -3603,25 +3602,25 @@
         </div>
         <div class="template-content">
                 {{#profession}}
-                {{#level}}
-                <div class="template-label">
-                    <span>+{{level}} [{{profession}}]</span>
-                </div>
-                {{/level}}
+                    {{#level}}
+                    <div class="template-label">
+                        <span>+{{level}} [{{profession}}]</span>
+                    </div>
+                    {{/level}}
                 {{/profession}}
                 {{^profession}}
-                {{#level}}
-                <div class="template-label">
-                    <span>+{{level}}</span>
-                </div>
-                {{/level}}
+                    {{#level}}
+                    <div class="template-label">
+                        <span>+{{level}}</span>
+                    </div>
+                    {{/level}}
                 {{/profession}}
                 {{#profession}}
-                {{^level}}
-                <div class="template-label">
-                    <span>{{profession}}</span>
-                </div>
-                {{/level}}
+                    {{^level}}
+                    <div class="template-label">
+                        <span>{{profession}}</span>
+                    </div>
+                    {{/level}}
                 {{/profession}}
             {{#allprops() title subtitle profession level character_name character_id}}
             {{#rollGreater() result 8}}
