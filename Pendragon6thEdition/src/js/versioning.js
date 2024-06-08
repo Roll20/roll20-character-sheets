@@ -33,10 +33,10 @@ const versioning = async (version) => {
       versionTwoFour();
       versioning(2.4);
       break;
-    case version < 2.5:
-      updateMessage(2.5);
+    case version < 2.41:
+      updateMessage(2.41);
       updateBrawling();
-      versioning(2.5);
+      versioning(2.41);
       break;
     default:
       console.log(
