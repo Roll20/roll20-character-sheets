@@ -23,8 +23,6 @@ const versioning = async (version) => {
       "color: orange; font-weight:bold"
     );
 
-  console.log(version);
-
   switch (true) {
     case version < 1:
       versioning(1);
