@@ -16,17 +16,6 @@ const versionTwoFour = () => {
   });
 };
 
-const versionTwoThree = () => {
-  getAttrs(characteristics.brawlDamage, (values) => {
-    //Brawl Damage =  (STR+SIZ)/6
-    const damage = round(total(values) / 6);
-    setAttrs({
-      brawling_damage: `${damage}d6`,
-      brawling_damage_open: `${round(damage / 2)}d6`,
-    });
-  });
-};
-
 const versioning = async (version) => {
   const updateMessage = (v) =>
     console.log(
@@ -34,21 +23,22 @@ const versioning = async (version) => {
       "color: orange; font-weight:bold"
     );
 
+  console.log(version);
+
   switch (true) {
     case version < 1:
       versioning(1);
-      console.log(updateMessage(1));
-      break;
-    case version < 2.3:
-      console.log(updateMessage(2.3));
-      versionTwoThree();
-      versioning(2.3);
+      updateMessage(1);
       break;
     case version < 2.4:
-      console.log(updateMessage(2.4));
-      versionTwoThree();
+      updateMessage(2.4);
       versionTwoFour();
       versioning(2.4);
+      break;
+    case version < 2.41:
+      updateMessage(2.41);
+      updateBrawling();
+      versioning(2.41);
       break;
     default:
       console.log(
