@@ -4363,11 +4363,14 @@
 					<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Melee attacks. Added a modifier for attacking through unfriendly hex. B388.</li>
 					<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Active Defenses. Added a modifier for attack from a side hex. B390.</li>
 					<li><b>ENHANCEMENT:</b> Tools > General > Drinking and Intoxication Tool. If drinks consumed is less than ST/4, the die button is replaced by the text "No roll needed." Requested by Demented Avenger.</li>
+					<li><b>ENHANCEMENT:</b> Active Defenses. Added a new field for weight of the parrying weapon and tool to calculate weapon breakage. B376.</li>
+					<li><b>ENHANCEMENT:</b> Melee Attacks. Added a new field for weight of the attacking weapon and tool to show the parrying weapon's breaking point. B376.</li>
 					<li><b>BUGFIX:</b> Skill roll was not setting values for max 9, and summary.</li>
 					<li><b>BUGFIX:</b> Technique skill roll was not setting values for max 9, and summary.</li>
 					<li><b>BUGFIX:</b> Defense roll was not setting values summary.</li>
 					<li><b>BUGFIX:</b> Melee skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
 					<li><b>BUGFIX:</b> Ranged skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
+					<li><b>BUGFIX:</b> Fixed the styling for the <b>Duplicate</b> button for melee and ranged attacks.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -5494,6 +5497,7 @@ Unmodified: <input class="sheet-inline" type="number" name="attr_lift_st_base" r
 					</div>
 					<div class="cell col1">
 						<input type="number" name="attr_basic_lift" value="0" readonly="readonly" title="Macro: @{NAME|basic_lift}" />
+						<input type="hidden" name="attr_basic_lift_x2" value="0" />
 					</div>
 				</div> <!-- .row -->
 
@@ -12813,6 +12817,47 @@ visualize what it will look like in chat.
 										</div>
 									</div>
 
+									<div class="row weapon-parry">
+										<div class="cell label">
+											<div class="popup">
+												<span data-i18n="weapon-weight-label">Weapon Weight</span>:
+											</div>
+											<span class="tooltip">
+												<span data-i18n="weapon-weight-tooltip">Enter the weight of the weapon. Used to calculate the maximum weight the weapon can parry before it must check for breakage. B376.</span>
+											</span> 
+										</div>
+										<div class="cell col-input-wide">
+											<input type="text" name="attr_weapon_weight" value="1" class="medium-width" title="Macro: @{NAME|repeating_defense_$[row #]_weapon_weight}" />
+											<input type="hidden" name="attr_attacking_weapon_weight_x3" value="3"/>
+											<input type="hidden" name="attr_attacking_weapon_weight_x4" value="4"/>
+											<input type="hidden" name="attr_attacking_weapon_weight_x5" value="5"/>
+											<input type="hidden" name="attr_attacking_weapon_weight_x6" value="6"/>
+											<input type="hidden" name="attr_attacking_weapon_weight_x7" value="7"/>
+											<input type="hidden" name="attr_attacking_weapon_basic_lift" value="39"/>
+											<input type="hidden" name="attr_attacking_weapon_basic_lift_x2" value="78"/>
+										</div>
+									</div>
+
+									<div class="row weapon-parry weapon-parry-summary">
+										<div class="cell label">
+											<div class="popup">
+												<span data-i18n="parry-heavy-weapon-label">Parry Heavy Weapon</span>:
+											</div>
+											<span class="tooltip">
+												<span data-i18n="parry-heavy-weapon-tooltip">If the attacking weapon is three times heavier or more, your weapon may break.<br /> If weapon breaks, parry <i>counts</i> <b>unless</b> the odds of breakage exceeds 6 in 6. B376.<br />Modifiers: <ul><li>+2 cheap weapon</li><li>-1 fine weapon</li><li>-2 very fine weapon</li></ul></span>
+											</span> 
+										</div>
+										<div class="cell col-input-wide">
+											<span name="attr_attacking_weapon_weight_x3"></span> up to <span name="attr_attacking_weapon_weight_x4"></span> lbs. <b class="alert">2</b> in 6 | 
+											<span name="attr_attacking_weapon_weight_x4"></span> up to <span name="attr_attacking_weapon_weight_x5"></span> lbs. <b class="alert">3</b> in 6 |
+											<span name="attr_attacking_weapon_weight_x5"></span> up to <span name="attr_attacking_weapon_weight_x6"></span> lbs. <b class="alert">4</b> in 6 <br />
+											<span name="attr_attacking_weapon_weight_times_x6"></span> up to <span name="attr_attacking_weapon_weight_x7"></span> lbs. <b class="alert">5</b> in 6 |
+											<span name="attr_attacking_weapon_weight_times_seven"></span> lbs or more. <b class="alert">6</b> in 6<br />
+											Unarmed/1-handed can't parry over  <b class="alert"><span name="attr_attacking_weapon_basic_lift"></span></b> lbs. | 
+											2-handed can't parry over <b class="alert"><span name="attr_attacking_weapon_basic_lift_x2"></span></b> lbs.
+										</div>
+									</div>
+
 									<div class="header">
 										<div class="popup">
 											<span data-i18n="notes-label">Notes</span>
@@ -13571,6 +13616,34 @@ visualize what it will look like in chat.
 										</div>
 										<div class="cell" style="width:89%;">
 											<input type="text" style="text-align: left;" name="attr_ref" value="" title="Macro: @{NAME|repeating_melee_$[row #]_ref}" />
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell label">
+											<div class="popup">
+												<span data-i18n="weapon-weight-label">Weapon Weight</span>:
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-weapon-weight-tooltip">Enter the weight of the weapon. If the parrying weapon's weight is one third of this weapon, then parrying weapon must check for breakage. B376.</span>
+											</span>	
+										</div>
+										<div class="cell">
+											<input type="number" class="inline" name="attr_weapon_weight" value="3" title="Macro: @{NAME|repeating_melee_$[row #]_weapon_weight}" />
+										</div>
+									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell label">
+											<div class="popup">
+												<span data-i18n="parrying-weapon-weight-label">Parrying Weapon Weight</span>:
+											</div>
+											<span class="tooltip">
+												<span data-i18n="parrying-melee-weapon-weight-tooltip">If the parrying weapon's weight is equal to or less than this value, then check for breakage. B376.</span>
+											</span>	
+										</div>
+										<div class="cell">
+											<input type="number" class="inline" name="attr_parrying_weapon_weight" readonly value="1" title="Macro: @{NAME|repeating_melee_$[row #]_parrying_weapon_weight}" />
 										</div>
 									</div> <!-- .row -->
 
@@ -21314,11 +21387,14 @@ Select the indent level of the spell. This is handy to help show the spell belon
 				<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Melee attacks. Added a modifier for attacking through unfriendly hex. B388.</li>
 				<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Active Defenses. Added a modifier for attack from a side hex. B390.</li>
 				<li><b>ENHANCEMENT:</b> Tools > General > Drinking and Intoxication Tool. If drinks consumed is less than ST/4, the die button is replaced by the text "No roll needed." Requested by Demented Avenger.</li>
+				<li><b>ENHANCEMENT:</b> Active Defenses. Added a new field for weight of the parrying weapon and tool to calculate weapon breakage. B376.</li>
+				<li><b>ENHANCEMENT:</b> Melee Attacks. Added a new field for weight of the attacking weapon and tool to show the parrying weapon's breaking point. B376.</li>
 				<li><b>BUGFIX:</b> Skill roll was not setting values for max 9, and summary.</li>
 				<li><b>BUGFIX:</b> Technique skill roll was not setting values for max 9, and summary.</li>
 				<li><b>BUGFIX:</b> Defense roll was not setting values summary.</li>
 				<li><b>BUGFIX:</b> Melee skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
 				<li><b>BUGFIX:</b> Ranged skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
+				<li><b>BUGFIX:</b> Fixed the styling for the <b>Duplicate</b> button for melee and ranged attacks.</li>
 			</ul>
 			
 			<h4>Version: 2.18.0</h4>
@@ -26389,6 +26465,15 @@ B378
 				</tr>
 				{{/popupModifier}}
 
+				<!-- parrying weapon breakage -->
+				{#parryingWeaponWeight}
+				<tr>
+					<td colspan="2">
+						If parrying weapon is {{parryingWeaponWeight}} lbs or less, check for breakage. B376.
+					</td>
+				</tr>
+				{/parryingWeaponWeight}
+
 				<!-- quick modifiers -->
 				{{#rollTotal() quickModShow 1}}
 				<tr>
@@ -26895,7 +26980,7 @@ B378
 	
 	const version = "2.19.0";
 	
-	const latestChangesDate = "6/4/2024";
+	const latestChangesDate = "6/11/2024";
 	
 	let modCascade = true;
 	
@@ -28945,6 +29030,7 @@ B378
 				lift_st_base: base,
 				lift_st: modded,
 				basic_lift: basicLift,
+				basic_lift_x2: basicLift * 2,
 				show_size_modifier_lifting_st_message: showMessage,
 				size_modifier_cp_lifting_st_adjustment: pointsNeededForStrength,
 				lifting_points_per_level: pointsPerLevel,
@@ -31820,6 +31906,19 @@ B378
 		});
 
 	};
+
+	// check to see if the melee weapon weight changed. Update parrying weapon weight
+	on('change:repeating_melee:weapon_weight', event => {
+
+		let weaponWeight = +event.newValue;
+
+		let parryingWeaponWeight = weaponWeight / 3;
+
+		// round parryingWeaponWeight to two decimal places
+		parryingWeaponWeight = Math.round(parryingWeaponWeight * 100) / 100;
+
+		setAttrs({ "repeating_melee_parrying_weapon_weight": parryingWeaponWeight });
+	});
 
 	// set note values for damage types
 	// Update thrust and swing when striking st is updated
@@ -36461,7 +36560,7 @@ B378
 	// check for new repeating defense, if new check to add combat reflexes modifier
 	on("change:repeating_defense:name", event => {
 	
-		getAttrs(["repeating_defense_new", "repeating_defense_skill_mod", "repeating_defense_defense_mod_reason", "combat_reflexes"], values => {
+		getAttrs(["repeating_defense_new", "repeating_defense_skill_mod", "repeating_defense_defense_mod_reason", "combat_reflexes", "basic_lift"], values => {
 	
 			const isNew = values.repeating_defense_new === "1";
 	
@@ -36479,11 +36578,15 @@ B378
 
 					bonus = "1";
 				}
+
+				let basicLift = Number(values.basic_lift) ?? 16;
 				
 				const fields = {
 					repeating_defense_defense_combat_reflexes: checked,
 					repeating_defense_defense_combat_reflexes_bonus: bonus,
-					repeating_defense_new: 0
+					repeating_defense_new: 0,
+					repeating_defense_attacking_weapon_basic_lift: basicLift,
+					repeating_defense_attacking_weapon_basic_lift_x2: basicLift * 2,
 				};
 	
 				setAttrs(fields);
@@ -36493,7 +36596,70 @@ B378
 		});
 	
 	});
+
+	// check if parry weapon weight changed and update values
+	on("change:repeating_defense:weapon_weight",  event => {
+
+		const fields = [
+			"repeating_defense_weapon_weight",
+		];
+
+		getAttrs(fields, values => {
+
+			let weaponWeight = +values.repeating_defense_weapon_weight;
+
+			if (weaponWeight < 0) {
+				weaponWeight = 1;
+			}
+
+			let attackingWeaponWeightTimesThree = weaponWeight * 3;
+			let attackingWeaponWeightTimesFour = weaponWeight * 4;
+			let attackingWeaponWeightTimesFive = weaponWeight * 5;
+			let attackingWeaponWeightTimesSix = weaponWeight * 6;
+			let attackingWeaponWeightTimesSeven = weaponWeight * 7;
+
+			const fields = {
+				repeating_defense_attacking_weapon_weight_x3: attackingWeaponWeightTimesThree,
+				repeating_defense_attacking_weapon_weight_x4: attackingWeaponWeightTimesFour,
+				repeating_defense_attacking_weapon_weight_x5: attackingWeaponWeightTimesFive,
+				repeating_defense_attacking_weapon_weight_x6: attackingWeaponWeightTimesSix,
+				repeating_defense_attacking_weapon_weight_x7: attackingWeaponWeightTimesSeven,
+			};
+
+			setAttrs(fields);
+
+		});
+
+	});
 	
+	// if basic lift changes update the basic lift stats for the active defenses
+	on("change:basic_lift", event => {
+
+		let basicLift = +event.newValue;
+
+		if (basicLift < 0) {
+			basicLift = 16;
+		}
+
+		getSectionIDs("repeating_defense", (ids) => {
+	
+			// loop through the rows
+			for (let i = 0; i < ids.length; i++) {
+	
+				let fields = {
+					[`repeating_defense_${ids[i]}_attacking_weapon_basic_lift`]: basicLift,
+					[`repeating_defense_${ids[i]}_attacking_weapon_basic_lift_x2`]: basicLift * 2,
+				};
+	
+				setAttrs(fields);
+	
+			}
+	
+		});
+		
+
+	});
+
 	// check if an repeating active defense type changed
 	// update raw success/fail notes based on selected defense Type
 	on("change:repeating_defense:type", (event) => {
@@ -49060,6 +49226,7 @@ Characters with Skill: ${knowsSkill}`;
 		"raw_critical_hit_notes",
 		"raw_miss_notes",
 		"raw_critical_miss_notes",
+		"parrying_weapon_weight",
 		"macro_one_checked",
 		"macro_one",
 		"macro_two_checked",
@@ -49123,6 +49290,8 @@ Characters with Skill: ${knowsSkill}`;
 		let rawFailNote = values[`${sectionName}_raw_miss_notes`] ?? "";
 
 		let rawCriticalFailNote = values[`${sectionName}_raw_critical_miss_notes`] ?? "";
+
+		let parryingWeaponWeight = values[`${sectionName}_parrying_weapon_weight`] ?? "0";
 
 		let macroOneChecked = values[`${sectionName}_macro_one_checked`] ?? "0";
 
@@ -49218,6 +49387,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (rawCriticalFailNote) {
 			rollDataArray.push(`{{rawCriticalFailNote=${rawCriticalFailNote}}}`);
+		}
+
+		if (parryingWeaponWeight > 0) {
+			rollDataArray.push(`{{parryingWeaponWeight=${parryingWeaponWeight}}}`);
 		}
 
 		rollDataArray.push(`{{showCustomMacroOne=[[${macroOneChecked}]]}}`);
