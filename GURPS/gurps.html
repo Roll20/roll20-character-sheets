@@ -12835,6 +12835,7 @@ visualize what it will look like in chat.
 											<input type="hidden" name="attr_attacking_weapon_weight_x7" value="7"/>
 											<input type="hidden" name="attr_attacking_weapon_basic_lift" value="39"/>
 											<input type="hidden" name="attr_attacking_weapon_basic_lift_x2" value="78"/>
+											<input type="hidden" name="attr_weapon_weight_system" value="lbs"/>
 										</div>
 									</div>
 
@@ -12848,13 +12849,13 @@ visualize what it will look like in chat.
 											</span> 
 										</div>
 										<div class="cell col-input-wide">
-											<span name="attr_attacking_weapon_weight_x3"></span> up to <span name="attr_attacking_weapon_weight_x4"></span> lbs. <b class="alert">2</b> in 6 | 
-											<span name="attr_attacking_weapon_weight_x4"></span> up to <span name="attr_attacking_weapon_weight_x5"></span> lbs. <b class="alert">3</b> in 6 |
-											<span name="attr_attacking_weapon_weight_x5"></span> up to <span name="attr_attacking_weapon_weight_x6"></span> lbs. <b class="alert">4</b> in 6 <br />
-											<span name="attr_attacking_weapon_weight_times_x6"></span> up to <span name="attr_attacking_weapon_weight_x7"></span> lbs. <b class="alert">5</b> in 6 |
-											<span name="attr_attacking_weapon_weight_times_seven"></span> lbs or more. <b class="alert">6</b> in 6<br />
-											Unarmed/1-handed can't parry over  <b class="alert"><span name="attr_attacking_weapon_basic_lift"></span></b> lbs. | 
-											2-handed can't parry over <b class="alert"><span name="attr_attacking_weapon_basic_lift_x2"></span></b> lbs.
+											<span name="attr_attacking_weapon_weight_x3"></span> up to <span name="attr_attacking_weapon_weight_x4"></span> <span name="attr_weapon_weight_system"></span>: <b class="alert">1-2</b> on d6 | 
+											<span name="attr_attacking_weapon_weight_x4"></span> up to <span name="attr_attacking_weapon_weight_x5"></span> <span name="attr_weapon_weight_system"></span>: <b class="alert">1-3</b> on d6 <br />
+											<span name="attr_attacking_weapon_weight_x5"></span> up to <span name="attr_attacking_weapon_weight_x6"></span> <span name="attr_weapon_weight_system"></span>: <b class="alert">1-4</b> on d6 |
+											<span name="attr_attacking_weapon_weight_x6"></span> up to <span name="attr_attacking_weapon_weight_x7"></span> <span name="attr_weapon_weight_system"></span>: <b class="alert">1-5</b> on d6 <br />
+											<span name="attr_attacking_weapon_weight_x7"></span> <span name="attr_weapon_weight_system"></span> or more: <b class="alert">1-6</b> on d6<br />
+											Unarmed/1-handed can't parry <b class="alert"><span name="attr_attacking_weapon_basic_lift"></span></b>+ <span name="attr_weapon_weight_system"></span>. | 
+											2-handed can't parry <b class="alert"><span name="attr_attacking_weapon_basic_lift_x2"></span></b>+ <span name="attr_weapon_weight_system"></span>.
 										</div>
 									</div>
 
@@ -26469,7 +26470,7 @@ B378
 				{#parryingWeaponWeight}
 				<tr>
 					<td colspan="2">
-						If parrying weapon is {{parryingWeaponWeight}} lbs or less, check for breakage. B376.
+						If parrying weapon is {{parryingWeaponWeight}} <span name="attr_weight_system"></span> or less, check for breakage. B376.
 					</td>
 				</tr>
 				{/parryingWeaponWeight}
@@ -36560,7 +36561,7 @@ B378
 	// check for new repeating defense, if new check to add combat reflexes modifier
 	on("change:repeating_defense:name", event => {
 	
-		getAttrs(["repeating_defense_new", "repeating_defense_skill_mod", "repeating_defense_defense_mod_reason", "combat_reflexes", "basic_lift"], values => {
+		getAttrs(["repeating_defense_new", "repeating_defense_skill_mod", "repeating_defense_defense_mod_reason", "combat_reflexes", "basic_lift", "weight_system"], values => {
 	
 			const isNew = values.repeating_defense_new === "1";
 	
@@ -36580,6 +36581,8 @@ B378
 				}
 
 				let basicLift = Number(values.basic_lift) ?? 16;
+
+				let weightSystem = values.weight_system ?? "lbs";
 				
 				const fields = {
 					repeating_defense_defense_combat_reflexes: checked,
@@ -36587,6 +36590,7 @@ B378
 					repeating_defense_new: 0,
 					repeating_defense_attacking_weapon_basic_lift: basicLift,
 					repeating_defense_attacking_weapon_basic_lift_x2: basicLift * 2,
+					repeating_defense_weight_system: weightSystem,
 				};
 	
 				setAttrs(fields);
@@ -36643,17 +36647,41 @@ B378
 
 		getSectionIDs("repeating_defense", (ids) => {
 	
+			let fields = {};
+
 			// loop through the rows
 			for (let i = 0; i < ids.length; i++) {
 	
-				let fields = {
-					[`repeating_defense_${ids[i]}_attacking_weapon_basic_lift`]: basicLift,
-					[`repeating_defense_${ids[i]}_attacking_weapon_basic_lift_x2`]: basicLift * 2,
-				};
+				fields[`repeating_defense_${ids[i]}_attacking_weapon_basic_lift`] = basicLift;
+
+				fields[`repeating_defense_${ids[i]}_attacking_weapon_basic_lift_x2`] = basicLift * 2;
+
+			}
 	
-				setAttrs(fields);
+			setAttrs(fields, { silent: true });
+
+		});
+		
+
+	});
+
+	// if weight system changes, update the melee weapon's weight system
+	on("change:weight_system", event => {
+
+		let weightSystem = event.newValue ?? "lbs";
+
+		getSectionIDs("repeating_defense", (ids) => {
+	
+			let fields = {};
+
+			// loop through the rows
+			for (let i = 0; i < ids.length; i++) {
+	
+				fields[`repeating_defense_${ids[i]}_weapon_weight_system`] = weightSystem;
 	
 			}
+
+			setAttrs(fields, { silent: true });
 	
 		});
 		
