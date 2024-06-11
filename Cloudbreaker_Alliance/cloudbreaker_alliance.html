@@ -37,13 +37,13 @@
 
 		setAttrs(output, {silent: false});
 
-		getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunement_amount", "added_mp", "added_resolve"], function(v) {
+		getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunements_total", "added_mp", "added_resolve"], function(v) {
 			var output = {};
 
 			const armor_hp = parseInt(v["armor_hp"]);
 			const unarmored_toughness = v["unarmored_toughness"];
 			const added_hp = parseInt(v["added_hp"]);
-			const attunement_amount = parseInt(v["attunement_amount"]);
+			const attunements_total = parseInt(v["attunements_total"]);
 			const added_mp = parseInt(v["added_mp"]);
 			const added_resolve = parseInt(v["added_resolve"]);
 
@@ -51,7 +51,7 @@
 			if (unarmored_toughness == "on")
 				hp_max = 20 + (capped_level - 1) * 3 + added_hp;
 
-			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunement_amount;
+			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunements_total;
 			const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
 
 			output["hp_max"] = hp_max;
@@ -110,16 +110,16 @@
 		});
 	});
 
-	on("change:added_mp change:attunement_amount", function(eventInfo) {
-		getAttrs(["added_mp", "attunement_amount", "character_level"], function(v) {
+	on("change:added_mp change:attunements_total", function(eventInfo) {
+		getAttrs(["added_mp", "attunements_total", "character_level"], function(v) {
 			var output = {};
 
 			const character_level = parseInt(v["character_level"]);
 			const capped_level = character_level > 12 ? 12 : character_level;
 
 			const added_mp = parseInt(v["added_mp"]);
-			const attunement_amount = parseInt(v["attunement_amount"]);
-			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunement_amount;
+			const attunements_total = parseInt(v["attunements_total"]);
+			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunements_total;
 
 			output["mp_max"] = mp_max;
 
@@ -148,21 +148,24 @@
 				quirk_value_pair = quirk_value_pair.trimEnd();
 
 				output["all_quirks"] = quirk_value_pair;
+				if (total_quirk_points == undefined)
+					total_quirk_points = 0;
 				output["quirk_total"] = total_quirk_points;
 				setAttrs(output, {silent: false});
 			});
 		});
 	});
 
-	on("change:quirk_total", function(eventInfo) {
-		getAttrs(["added_quirk", "character_level"], function(v) {
+	on("change:quirk_total change:added_quirk", function(eventInfo) {
+		getAttrs(["added_quirk", "character_level", "quirk_total"], function(v) {
 			var output = {};
 
 			const character_level = parseInt(v["character_level"]);
+			const added_quirk = parseInt(v["added_quirk"]);
+			const quirk_total = parseInt(v["quirk_total"]);
 			const capped_level = character_level > 12 ? 12 : character_level;
 			const grade_ranked = Math.floor((capped_level + 1) / 4);
 
-			const added_quirk = parseInt(v["added_quirk"]);
 			const quirk_max = 2 + grade_ranked + added_quirk;
 
 			output["quirk_points_label"] = `${eventInfo.newValue}/${quirk_max}`;
@@ -1151,7 +1154,11 @@
 					<span class="sheet-sectionTitle" style="flex: 1 0 auto; text-align: end;" name="attr_quirk_points_label"></span>
 				</div>
 				<input type="hidden" name="attr_quirk_fold" class="sheet-folder" />
-				<div style="flex-flow: column wrap;" class="sheet-foldable">
+				<div style="flex-flow: column wrap; gap: 4px;" class="sheet-foldable sheet-sectionContainer">
+					<div>
+						<span>Bonus max quirk:</span>
+						<input type="number" name="attr_added_quirk" value="0" />
+					</div>
 					<!-- Quirks (repeating sections) -->
 					<fieldset class="repeating_quirks" style="flex-flow: row wrap;">
 						<!-- Name + Lvl + foldable section -->
@@ -1859,7 +1866,11 @@
 					<span class="sheet-folder"></span>
 				</div>
 				<input type="hidden" name="attr_equipment_fold" class="sheet-folder" />
-				<div class="sheet-sectionContainer sheet-foldable">
+				<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
+					<div>
+						<span>Additional slots:</span>
+						<input type="number" name="attr_added_slots" value="0" />
+					</div>
 					<fieldset class="repeating_equipment">
 						<div>
 							<div class="sheet-repeatingEquipment">
@@ -3491,13 +3502,6 @@ Fond memories: 0/50" />
 				</div>
 			</div>
 		</div>
-	</div>
-
-	<div class="sheet-options sheet-tab">
-		<h1>Options</h1>
-		<input type="number" name="attr_attunement_amount" value="0" />
-		<input type="number" name="attr_added_quirk" value="0" />
-		<input type="number" name="attr_added_slots" value="0" />
 	</div>
 </div>
 
