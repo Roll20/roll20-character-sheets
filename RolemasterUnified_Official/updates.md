@@ -1,4 +1,36 @@
-2024-05-03
+# 2024-06-10
+
+- Attacks:
+  - Attacks have a proper pop up
+  - Add useful error messages for bad attacks
+  - Hide the error message when we show/hide the attack add box
+  - update data when items are added.
+- Bugs
+  - Hybrid fix 'own realm'
+  - Fix dependancies when building CSS for sheet
+  - Deleted the mysterious 'Skills' race
+  - fix swapepd fumble and ranks on attack listing
+  - Show attack ranks (not rank)
+  - Correctly scale non-medium attacks
+- Inventory
+  - (Internal) Move to own file for html
+  - Delete items
+  - Modify item count (update encumberance)
+  - Can add equipment
+    - Can add Armor - by location
+    - Can add shields - db bonus and # attacks
+  - Handle numeric weights as well as strings (x%)
+  - Handle a few more error states for bad equipment.
+- Expertise skills now show as 0 for 0 ranks (not -25)
+- Spells have * or • afer them (compendium)
+- Tests
+  - Added tests fpr jybrid own realm
+- Add some styling to updates.
+- Internal
+  - Attacks are a little less verbose.
+  - Update documentation on attacks
+
+# 2024-06-03
 
 - Add attacks: Fully(?) customisable:
  - Any pubished attack table
@@ -20,7 +52,7 @@
  - Remove some dead code
 - (Need to do rake)
 
-2024-04-27
+# 2024-05-27
 
 - Charactermancer:
   - Fix material and creature lore specializations
@@ -48,7 +80,7 @@
   - Less logging on feats of strength
   - RMU Async functions a bit more verbose on error
 
-2024-04-20
+# 2024-05-20
 
 - Fatigue rolls
 - Track HP
@@ -66,11 +98,11 @@
   - Fancy navigation buttons
   - Fix most skills (not Material Lore and Languages)
 
-2024-04-13
+# 2024-05-13
 
 - Add support for the targetting button.
 
-2024-05-06
+# 2024-05-06
 
 - Attacks:
    - HP Scaling (based on size - beta rules)
@@ -82,11 +114,11 @@
    - With hacky messages!
    - Update preview image to something a little more relevance.
 
-2024-04-29
+# 2024-04-29
 
  - Attacks!
 
-2024-04-14
+# 2024-04-14
 
  - Fix bug in parseIntDefault to return the default if passed a 0
  - Add test for parseIntDefault
@@ -95,7 +127,7 @@
     - The (skill) number rolls natural.
  - Fix a layout issue on safari (I hope)
 
-2024-04-07
+# 2024-04-07
 
   - Fix grammar when casting spells; "cast from Spells List, not casts Spell List"
   - Weight Allowance calculation now shows
@@ -106,7 +138,7 @@
     - Levelup Talents now persist
   - Fix typo on 'received'
 
-2024-03-31
+# 2024-03-31
 
  - More roll template improvements
     - Generalize
@@ -119,7 +151,7 @@
  - Can edit names of Skill specialisations
  - Levelup stat gain fix
  
-2024-03-26
+# 2024-03-26
 
  - Improvements to the roll template layout
  - Charactermancer fix realm
@@ -127,14 +159,14 @@
  - Handle rmuasync errors by continuing
  - Sort translations.json to reduce deltas
 
-2024-03-24
+# 2024-03-24
 
  - Skill rolls
  - Fix height and weight craziness
  - Lots of creation bug fixes.
  - Fix some update function on derived/frontpage
 
-2024-03-17
+# 2024-03-17
 
  - Add specialisations
  - Edit specialisations
@@ -142,7 +174,7 @@
  - Edit spells
  - Bug: Fix skill ranks purchase for specialized skills
 
-2024-03-10
+# 2024-03-10
 
 - Skill specialisations now work in Favourite skills
     Use Ambush: Shields or Ambush:Shields
