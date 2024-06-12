@@ -5,114 +5,158 @@ const dropWarning = (v) => {
   );
 };
 
+const getRow = (section) => `repeating_${section}_${generateRowID()}`;
+
+const getRepUpdate = (attrs, row, page) => {
+  let update = {};
+
+  attrs.forEach((attr) => {
+    if (page[attr] ?? page.data[attr]) {
+      update[`${row}_${attr}`] = page[attr] ?? page.data[attr];
+    } else {
+      dropWarning(`getRepUpdate: Missing ${attr}`);
+    }
+  });
+
+  update[`${row}_flag`] = false;
+
+  return update;
+};
+
 const handle_npc = (page) => {
   console.log(page);
 };
 
+const handle_armor = (page) => {
+  handle_item(page);
+};
+
 const handle_item = (page) => {
-  console.log(page["Subcategory"]);
-  // const subcategory = page["Subcategory"];
+  const row = getRow("equipment");
+  let update = getRepUpdate(["value", "notes"], row, page);
+  update[`${row}_equipment`] = page.name;
+  update[`${row}_category`] = page.data["Subcategory"];
+  setAttrs(update);
+};
 
-  // console.log(page);
+const handle_service = (page) => {
+  handle_item(page);
+};
 
-  // switch (subcategory) {
-  //   case "Weapon":
-  //     handle_weapon(page);
-  //     break;
-  //   case "Ranged Weapon":
-  //     handle_ranged_weapon(page);
-  //     break;
-  //   case "Animal":
-  //     handle_animal(page);
-  //     break;
-  //   case "Armor":
-  //     handle_armor(page);
-  //     break;
-  //   case "Horse":
-  //     handle_horse(page);
-  //     break;
-  //   case "Horse Armor":
-  //     handle_horse_armor(page);
-  //     break;
-  //   case "Service":
-  //     handle_service(page);
-  //     break;
-  //   case "Shield":
-  //     handle_shield(page);
-  //     break;
-  //   case "Squire":
-  //     handle_squire(page);
-  //     break;
-  //   default:
-  //     dropWarning(`Unknown subcategory: ${subcategory}`);
-  // }
+const handle_squire = (page) => {
+  let update = {};
+  update["squire_name"] = page.name;
+  console.log(page);
+};
+
+const handle_weapon = (page) => {
+  const row = getRow("attacks");
+  const attrs = ["name", "damage", "skill"];
+  const update = getRepUpdate(attrs, row, page);
+  setAttrs(update);
+};
+
+const handle_items = (page) => {
+  const subcategory = page.data["Subcategory"];
+
+  console.table({
+    name: page.name,
+    subcategory,
+  });
+
+  switch (subcategory) {
+    case "Armor":
+      handle_armor(page);
+      break;
+    case "Item":
+      handle_item(page);
+      break;
+    // case "Ranged Weapon":
+    //   handle_ranged_weapon(page);
+    //   break;
+    // case "Animal":
+    //   handle_animal(page);
+    //   break;
+    // case "Horse":
+    //   handle_horse(page);
+    //   break;
+    // case "Horse Armor":
+    //   handle_horse_armor(page);
+    //   break;
+    case "Service":
+      handle_service(page);
+      break;
+    // case "Shield":
+    //   handle_shield(page);
+    //   break;
+    case "Squire":
+      handle_squire(page);
+      break;
+    case "Weapon":
+      handle_weapon(page);
+      break;
+    default:
+      dropWarning(`Unknown subcategory: ${subcategory}`);
+  }
 };
 
 const handle_drop = () => {
-  dropWarning("handle_drop");
-
-  getAttrs(["drop_name", "drop_data", "drop_content", "drop_category"], (v) => {
-    if (!v.drop_name || !v.drop_data || !v.drop_content || !v.drop_category) {
+  getAttrs(["drop_name", "drop_data", "drop_content"], (v) => {
+    if (!v.drop_name || !v.drop_data) {
       return;
     }
 
-    // let pagedata = v.drop_data;
+    let pagedata = v.drop_data;
 
-    // try {
-    //   pagedata = JSON.parse(v.drop_data);
-    // } catch (e) {
-    //   console.log(`Error parsing JSON: ${v.drop_data}`);
-    // }
+    try {
+      pagedata = JSON.parse(v.drop_data);
+    } catch (e) {
+      console.log(`Error parsing JSON: ${v.drop_data}`);
+    }
 
-    // const page = {
-    //   name: v.drop_name,
-    //   data: pagedata,
-    //   content: v.drop_content,
-    //   category: v.drop_category,
-    // };
-
-    console.table({
-      category: v.drop_category,
+    const page = {
       name: v.drop_name,
-    });
+      data: pagedata,
+      content: v.drop_content,
+    };
 
-    // switch (page.data) {
-    //   case "Creature":
-    //     handle_npc(page);
-    //     break;
-    //   case "Items":
-    //     handle_item(page);
-    //     break;
-    //   default:
-    //     dropWarning(`Unknown category: ${category}`);
-    // }
+    const { Category } = page.data;
+    switch (Category) {
+      case "Creature":
+        handle_npc(page);
+        break;
+      case "Items":
+        handle_items(page);
+        break;
+      default:
+        dropWarning(`Unknown category: ${Category}`);
+    }
 
     setAttrs(
       {
         drop_name: "",
         drop_data: "",
         drop_content: "",
-        drop_category: "",
       },
       {
         silent: true,
       }
     );
 
-    // get_repeating_data(function (repeating) {
-    //   var results = processDrop(page, v, repeating);
-    //   setAttrs(
-    //     results.update,
-    //     {
-    //       silent: true,
-    //     },
-    //     function () {
-    //       results.callbacks.forEach(function (callback) {
-    //         callback();
-    //       });
-    //     }
-    //   );
-    // });
+    //   // get_repeating_data(function (repeating) {
+    //   //   var results = processDrop(page, v, repeating);
+    //   //   setAttrs(
+    //   //     results.update,
+    //   //     {
+    //   //       silent: true,
+    //   //     },
+    //   //     function () {
+    //   //       results.callbacks.forEach(function (callback) {
+    //   //         callback();
+    //   //       });
+    //   //     }
+    //   //   );
+    //   // });
   });
 };
 
@@ -124,7 +168,7 @@ const handle_drop = () => {
 //   //handle_drop();
 // });
 
-["category", "name", "data", "content"].forEach((attr) => {
+["data"].forEach((attr) => {
   on(`change:drop_${attr}`, () => {
     handle_drop();
   });
