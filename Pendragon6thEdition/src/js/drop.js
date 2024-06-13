@@ -38,7 +38,43 @@ const getStaticUpdate = (attrs, page) => {
 };
 
 const handle_npc = (page) => {
-  console.log(page);
+  const attrs = [
+    "size",
+    "dexterity",
+    "strength",
+    "constitution",
+    "appearance",
+    "type",
+    "hit_points",
+    "knockdown",
+    "major_wound",
+    "unconscious",
+    "movement",
+    "armor_points",
+    "current_glory",
+    "healing_rate",
+    "glory_award",
+    "description",
+  ];
+
+  //TODO: Need special handling for these skills. They will be formatted like repeating section but are static.
+  const combatSkills = [
+    "battle",
+    "bow",
+    "brawling",
+    "charge",
+    "crossbow",
+    "hafted",
+    "two-handed hafted",
+    "horsemanship",
+    "spear",
+    "sword",
+    "thrown weapon",
+  ];
+  let update = getStaticUpdate(attrs, page);
+  update["character_name"] = page.name;
+
+  //TODO: handle all repeating sections
 };
 
 const handle_armor = (page) => {
@@ -155,10 +191,10 @@ const handle_drop = () => {
 
     const { Category } = page.data;
     switch (Category) {
-      case "Creature":
+      case "Creatures":
         handle_npc(page);
         break;
-      case "Horse":
+      case "Horses":
         handle_horse(page);
         break;
       case "Items":
