@@ -23,6 +23,20 @@ const getRepUpdate = (attrs, row, page) => {
   return update;
 };
 
+const getStaticUpdate = (attrs, page) => {
+  let update = {};
+
+  attrs.forEach((attr) => {
+    if (page.data[attr]) {
+      update[attr] = page.data[attr];
+    } else {
+      dropWarning(`getStaticUpdate: Missing ${attr}`);
+    }
+  });
+
+  return update;
+};
+
 const handle_npc = (page) => {
   console.log(page);
 };
@@ -44,15 +58,40 @@ const handle_service = (page) => {
 };
 
 const handle_squire = (page) => {
-  let update = {};
-  update["squire_name"] = page.name;
-  console.log(page);
+  let update = {
+    squire_name: page.name,
+    squire_age: page.data["squire_age"],
+    squire_skill: page.data["squire_skill"],
+  };
+
+  //TODO: handle repeating skills
+
+  setAttrs(update);
 };
 
 const handle_weapon = (page) => {
   const row = getRow("attacks");
   const attrs = ["name", "damage", "skill"];
   const update = getRepUpdate(attrs, row, page);
+  setAttrs(update);
+};
+
+const handle_horse = (page) => {
+  const attrs = [
+    "armor",
+    "charge_damage",
+    "con",
+    "damage",
+    "dex",
+    "hp",
+    "move",
+    "siz",
+    "str",
+    "type",
+  ];
+  const warHorseAttrs = attrs.map((attr) => `warhorse_${attr}`);
+  let update = getStaticUpdate([...warHorseAttrs, "equestrian_notes"], page);
+  update["flag_equestrian_notes"] = false;
   setAttrs(update);
 };
 
@@ -77,9 +116,6 @@ const handle_items = (page) => {
     // case "Animal":
     //   handle_animal(page);
     //   break;
-    // case "Horse":
-    //   handle_horse(page);
-    //   break;
     // case "Horse Armor":
     //   handle_horse_armor(page);
     //   break;
@@ -89,9 +125,6 @@ const handle_items = (page) => {
     // case "Shield":
     //   handle_shield(page);
     //   break;
-    case "Squire":
-      handle_squire(page);
-      break;
     case "Weapon":
       handle_weapon(page);
       break;
@@ -125,8 +158,14 @@ const handle_drop = () => {
       case "Creature":
         handle_npc(page);
         break;
+      case "Horse":
+        handle_horse(page);
+        break;
       case "Items":
         handle_items(page);
+        break;
+      case "Squires":
+        handle_squire(page);
         break;
       default:
         dropWarning(`Unknown category: ${Category}`);
