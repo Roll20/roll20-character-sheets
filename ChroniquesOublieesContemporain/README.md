@@ -14,6 +14,11 @@ v3.17.0 [Screenshot](coc_v2.png)
 
 # Notes de version
 
+## v3.17.1 (2024-06-03)
+
+- Fix des bugs Roll20 (styles inline, sheet.json)
+- Pas de modification fonctionnel
+
 ## v3.17.0 (2024-05-01)
 
 - Fiche de personnage
