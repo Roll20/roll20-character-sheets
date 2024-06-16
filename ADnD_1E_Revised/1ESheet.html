@@ -53,9 +53,10 @@
             <span class="left">
               <span>v.<span name="attr_sheet_version">
             </span>
-            <span class="right">6/2/24'</span>
+            <span class="right">6/12/24'</span>
           </h5>
           <ul>
+            <li>Fixed Climb Walls calculation.</li>
             <li>Reminder: nearly all the per-sheet options can also be set from the Games Settings page so that all new sheets will start with your default options. These settings will apply only to new characters moving forward. If you would also like to apply these settings to all existing characters in the game follow the wiki instructions:<span class="inline-label"><button type="roll" class="url-roll" title="Post this link to chat." value="[Roll20 Wiki Link](https://wiki.roll20.net/Game_Settings_Page#Applying_Setting_Defaults_to_Existing_Content_In-Game)"><span>Applying Setting Defaults to Existing Content</span></button></span></li>
             <li>Option added to auto-fill the Save Base chance based on class and level selected.</li>
             <li>Option added to auto-fill the Thief Skills Base chance based on thief level selected.</li>
@@ -5530,8 +5531,10 @@
   // text/worker
 
   // GiGs custom handling for number type and logs
-  const int = (score, fallback = 0) => parseInt(score) || fallback;
-  const float = (score, fallback = 0) => parseFloat(score) || fallback;
+  // const int = (score, fallback = 0) => parseInt(score) || fallback;
+  // const float = (score, fallback = 0) => parseFloat(score) || fallback;
+  const int = (score, error = 0) => parseInt(score) || error;
+  const float = (score, error = 0) => parseFloat(score) || error;
   const clog = (text, color = 'green') => {
     const message = `%c ${text}`;
     console.log(message, `color: ${color}; font-weight:bold`);
@@ -10328,12 +10331,13 @@
   climbwallsCalc = (migrate) => {
     getAttrs(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic'], (v) => {
       const output = {};
-      const baseClimbwalls = +v.climbwalls_base || 0;
+      let baseClimbwalls = +v.climbwalls_base || 0;
+      baseClimbwalls = baseClimbwalls >= 99.1 ? baseClimbwalls.toFixed(1) : Math.floor(baseClimbwalls);
       const racialClimbwalls = +v.climbwalls_racial_mod || 0;
       const abilityClimbwalls = +v.climbwalls_ability_mod || 0;
       const magicClimbwalls = +v.climbwalls_magic || 0;
       const oldSkill = +v.climbwalls || 0;
-      const newSkill = Math.max(0, Math.min(100, float(baseClimbwalls).toFixed(1) + int(racialClimbwalls + abilityClimbwalls + magicClimbwalls)));
+      const newSkill = Math.max(0, Math.min(100, baseClimbwalls + int(racialClimbwalls + abilityClimbwalls + magicClimbwalls)));
       const macroNormal =
         '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}';
       const macroExceptional =
@@ -10445,7 +10449,7 @@
     hearnoiseCalc();
   });
   on('change:climbwalls_base change:climbwalls_racial_mod change:climbwalls_ability_mod change:climbwalls_magic', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    clog(`Change Detected:${eventInfo.sourceAttribute}`);
     climbwallsCalc();
   });
   on('change:readlanguages_base change:readlanguages_racial_mod change:readlanguages_ability_mod change:readlanguages_magic', (eventInfo) => {
