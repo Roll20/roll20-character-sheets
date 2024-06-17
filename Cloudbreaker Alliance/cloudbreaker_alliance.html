@@ -31,6 +31,30 @@
 			setAttrs(output, {silent: true});
 		});
 	});
+
+	on("change:repeating_quirks", function(eventInfo) {
+		getSectionIDs("quirks", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_quirks_${id}_quirk_name`).concat(ids.map(id => `repeating_quirks_${id}_quirk_level`));
+
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+				var quirk_value_pair = "";
+
+				ids.forEach(id => {
+					var quirkName = v[`repeating_quirks_${id}_quirk_name`];
+					const quirkLevel = v[`repeating_quirks_${id}_quirk_level`];
+					if (quirkName == undefined || quirkName == "")
+						quirkName = "Unnamed Quirk";
+					quirk_value_pair += `${quirkName}: ${quirkLevel}\n`;
+				});
+
+				quirk_value_pair = quirk_value_pair.trimEnd();
+
+				output["all_quirks"] = quirk_value_pair;
+				setAttrs(output, {silent: true});
+			});
+		});
+	});
 </script>
 
 <html>
@@ -61,7 +85,7 @@
 			<div>
 				<div style="display: flex; flex-grow: 1; flex-shrink: 0;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
 				<div style="flex-shrink: 0; width: 183px;">
-					<span>Level :</span><input type="number" name="attr_character_level" value="1">
+					<span>Level :</span><input type="number" name="attr_character_level" style="text-align: end;" value="1" />
 					<span>(</span><input type="number" name="attr_character_xp" /><span>) exp</span>
 				</div>
 			</div>
@@ -93,12 +117,10 @@
 							<div style="border-bottom: 2px solid #b2b2b2;">
 								<input type="text" name="attr_quirk_name" title="Quirk name" placeholder="Quirk name" />
 								<input type="number" name="attr_quirk_level" title="Quirk level" value="1" />
-								<!-- TODO : Fold arrow -->
 								<input type="checkbox" name="attr_quirk_fold" class="sheet-folder" />
 								<span class="sheet-folder"></span>
 							</div>
 							<!-- Text area for quirk description -->
-							<!-- TODO: Add fold arrow for quirk description -->
 							<input type="hidden" name="attr_quirk_fold" class="sheet-folder" />
 							<div class="sheet-foldable">
 								<textarea name="attr_quirk_description" style="width: 100%;"></textarea>
@@ -106,13 +128,18 @@
 						</div>
 					</fieldset>
 				</div>
+				<div class="sheet-reverseFoldable" style="border: 2px solid var(--light-theme-line-color); border-top: 0; border-radius: 0 0 8px 8px; padding: 4px;">
+					<input type="hidden" name="attr_all_quirks" />
+					<span class="sheet-replicateInput" style="flex-grow: 1; text-transform: capitalize; font-weight: bold; white-space: pre-wrap;" name="attr_all_quirks"></span>
+				</div>
 			</div>
 		</div>
 
 		<!-- Character Stats -->
-		<div>
+		<div style="display: flex; flex-flow: column wrap; gap: 4px;">
 			<div>
 				<!-- HP/MP -->
+				<!--
 				<div>
 					<table style="border-radius: 8px; padding: 4px; border: 2px;">
 						<tr style="background-color: var(--light-theme-header-color);">
@@ -127,31 +154,149 @@
 						</tr>
 					</table>
 				</div>
-				<div style="display: flex; flex-flow: row wrap;">
-					<div style="display: flex; flex-flow: column wrap;">
-						<div class="sheet-section-title" style="flex-grow: 1;">
-							<span class="sheet-section-title">Hit Points</span>
+				-->
+				<div  style="display: flex; flex-flow: row wrap; gap: 8px;">
+					<div class="sheet-guardPoint">
+						<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
+							<span>Spirit</span>
+							<div>
+								<input type="checkbox" name="attr_spirit1" />
+								<input type="checkbox" name="attr_spirit2" />
+								<input type="checkbox" name="attr_spirit3" />
+								<input type="checkbox" name="attr_spirit4" />
+								<input type="checkbox" name="attr_spirit5" />
+							</div>
 						</div>
-						<div style="display: flex; flex-flow: row wrap; border: 2px solid var(--light-theme-line-color); gap: 4px; border-top: 0; border-radius: 0 0 4px 4px; padding: 4px;">
-							<input type="number" style="flex-grow: 1;" name="attr_hp_current" value="0" />
-							<span> / </span>
-							<input type="hidden" name="attr_hp_max" value="10" />
-							<span class="sheet-replicateInput" name="attr_hp_max"></span>
+						<div class="sheet-sectionTitle">
+							<span>Resolve Points</span>
+						</div>
+						<div class="sheet-counterPoint">
+							<div class="sheet-inputPoint">
+								<input type="number" name="attr_resolveCurrent" value="30" />
+							</div>
+							<div>
+								<span>Max Resolve</span>
+								<input type="hidden" name="attr_resolveMax" value="30" />
+								<span class="sheet-replicateInput" name="attr_resolveMax"></span>
+							</div>
+						</div>
+					</div>
+					<div class="sheet-guardPoint">
+						<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
+							<span>Barrier</span>
+							<div>
+								<input type="checkbox" name="attr_barrier1" />
+								<input type="checkbox" name="attr_barrier2" />
+								<input type="checkbox" name="attr_barrier3" />
+							</div>
+						</div>
+						<div class="sheet-sectionTitle">
+							<span>Hit Points</span>
+						</div>
+						<div class="sheet-counterPoint">
+							<div class="sheet-inputPoint">
+								<input type="number" name="attr_hpCurrent" value="15" />
+							</div>
+							<div>
+								<span>Max HP</span>
+								<input type="hidden" name="attr_hpMax" value="15" />
+								<span class="sheet-replicateInput" name="attr_hpMax"></span>
+							</div>
+						</div>
+					</div>
+					<div class="sheet-guardPoint">
+						<div class="sheet-sectionTitle" style="margin-bottom: 2px;">
+							<span>Spellglyphs</span>
+							<div>
+								<input type="checkbox" name="attr_glyph1" />
+								<input type="checkbox" name="attr_glyph2" />
+								<input type="checkbox" name="attr_glyph3" />
+							</div>
+						</div>
+						<div class="sheet-sectionTitle">
+							<span>Mind Points</span>
+						</div>
+						<div class="sheet-counterPoint">
+							<div class="sheet-inputPoint">
+								<input type="number" name="attr_mpCurrent" value="15" />
+							</div>
+							<div>
+								<span>Max MP</span>
+								<input type="hidden" name="attr_mpMax" value="15" />
+								<span class="sheet-replicateInput" name="attr_mpMax"></span>
+							</div>
+						</div>
+					</div>
+					<!-- Destiny End Points -->
+					<div class="sheet-statPill">
+						<div class="sheet-sectionTitle">
+							<span>Destiny's</span>
+							<span style="font-size: small;">End Points</span>
+						</div>
+						<div>
+							<input type="number" name="attr_destinyCurrent" value="0" />
+							<div style="display: flex;
+							flex-flow: column;
+							height: auto;
+							border: 0;
+							border-radius: 0;
+							padding: 0;">
+								<span>Max DEP</span>
+								<span style="text-align: center; font-weight: bold;">12</span>
+							</div>
 						</div>
 					</div>
 				</div>
-				<!-- Destiny End Points -->
-				<div></div>
 			</div>
-			<div>
+			<div style="display: flex; align-items: center; justify-content: center;">
 				<!-- Mastery bonus -->
-				<div></div>
+				<div class="sheet-statPill">
+					<div class="sheet-sectionTitle">
+						<span style="font-size: small;">Mastery</span>
+						<span>Bonus</span>
+					</div>
+					<div>
+						<span style="font-size: x-large; font-weight: bold;">+</span>
+						<input type="number" name="attr_masteryBonus" style="width: 7em; border-radius: 0 8px 8px 0;" value="0" />
+					</div>
+				</div>
 			</div>
 			<div>
 				<!-- Attributes & Skills tableau -->
-				<div></div>
+				<div class="sheet-attributeTable">
+					<!-- Header -->
+					<div class="sheet-sectionTitle">
+						<span class="sheet-sectionTitle">Attributes</span>
+						<span class="sheet-sectionTitle">Skills</span>
+						<span class="sheet-sectionTitle">BNS</span>
+					</div>
+					<div>
+						<!-- Strength -->
+						<div>
+							<div class="sheet-statBlock">
+								<input type="number" name="attr_strength" value="0" />
+								<button type="roll" name="act_rollStrength">
+									<span style="text-transform: uppercase;">Strength</span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<!-- Attributes -->
+					<div></div>
+					<!-- Skills -->
+					<div></div>
+					<!-- BNS -->
+					<div></div>
+				</div>
 				<!-- Toolkits -->
-				<div></div>
+				<div>
+					<!-- Toolkit -->
+					<div></div>
+					<!-- Quality -->
+					<div></div>
+					<!-- BNS -->
+					<div></div>
+				</div>
 			</div>
 		</div>
 
