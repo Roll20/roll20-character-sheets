@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 
 <script type="text/worker">
+	const copper_rank = "copper";
+	const silver_rank = "silver";
+	const gold_rank = "gold";
+	const platinum_rank = "platinum";
+
 	const tabs = [
 		"character",
 		"combat",
@@ -27,7 +32,7 @@
 		const capped_level = new_level > 12 ? 12 : new_level;
 		const grade_ranked = Math.floor((capped_level) / 4);
 
-		const grade = new_level == 89 ? "platinum" : new_level > 8 ? "gold" : new_level > 4 ? "silver" : "copper";
+		const grade = new_level == 89 ? platinum_rank : new_level > 8 ? gold_rank : new_level > 4 ? silver_rank : copper_rank;
 		const total_attributes = 7 + grade_ranked;
 
 		output["character_level"] = new_level;
@@ -68,6 +73,27 @@
 			const quirk_max = 2 + grade_ranked + parseInt(v["added_quirk"]);
 
 			output["quirk_points_label"] = `${quirk_total}/${quirk_max}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:adventuring_grade", function(eventInfo) {
+		const previous_grade = eventInfo.previousValue == undefined ? copper_rank : eventInfo.previousValue;
+		const new_grade = eventInfo.newValue;
+		const previous_grade_value = previous_grade == platinum_rank ? 3 : previous_grade == gold_rank ? 3 : previous_grade == silver_rank ? 2 : 1;
+		const new_grade_value = new_grade == platinum_rank ? 3 : new_grade == gold_rank ? 3 : new_grade == silver_rank ? 2 : 1;
+
+		if (previous_grade_value == new_grade_value)
+			return;
+
+		getAttrs(["minor_action"], function(v) {
+			var output = {};
+
+			const minor_action = parseInt(v["minor_action"]);
+			const new_minor_action = minor_action + new_grade_value - previous_grade_value;
+
+			output["minor_action"] = new_minor_action;
 
 			setAttrs(output, {silent: true});
 		});
@@ -194,9 +220,9 @@
 			const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
 			const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
 
-			output["brute_total"] = brute_total;
-			output["endurance_total"] = endurance_total;
-			output["intimidation_total"] = intimidation_total;
+			output["brute_mastery"] = brute ? mastery_bonus : 0;
+			output["endurance_mastery"] = endurance ? mastery_bonus : 0;
+			output["intimidation_mastery"] = intimidation ? mastery_bonus : 0;
 
 			output["brute_total_label"] = `+${brute_total}`;
 			output["endurance_total_label"] = `+${endurance_total}`;
@@ -219,7 +245,7 @@
 
 			const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
 
-			output["brute_total"] = brute_total;
+			output["brute_mastery"] = brute ? mastery_bonus : 0;
 			output["brute_total_label"] = `+${brute_total}`;
 
 			setAttrs(output, {silent: true});
@@ -239,7 +265,7 @@
 
 			const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
 
-			output["endurance_total"] = endurance_total;
+			output["endurance_mastery"] = endurance ? mastery_bonus : 0;
 			output["endurance_total_label"] = `+${endurance_total}`;
 
 			setAttrs(output, {silent: true});
@@ -259,7 +285,7 @@
 
 			const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
 
-			output["intimidation_total"] = intimidation_total;
+			output["intimidation_mastery"] = intimidation ? mastery_bonus : 0;
 			output["intimidation_total_label"] = `+${intimidation_total}`;
 
 			setAttrs(output, {silent: true});
@@ -286,9 +312,9 @@
 			const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
 			const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
 
-			output["sports_total"] = sports_total;
-			output["thievery_total"] = thievery_total;
-			output["deception_total"] = deception_total;
+			output["sports_mastery"] = sports ? mastery_bonus : 0;
+			output["thievery_mastery"] = thievery ? mastery_bonus : 0;
+			output["deception_mastery"] = deception ? mastery_bonus : 0;
 
 			output["sports_total_label"] = `+${sports_total}`;
 			output["thievery_total_label"] = `+${thievery_total}`;
@@ -311,7 +337,7 @@
 
 			const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
 
-			output["sports_total"] = sports_total;
+			output["sports_mastery"] = sports ? mastery_bonus : 0;
 			output["sports_total_label"] = `+${sports_total}`;
 
 			setAttrs(output, {silent: true});
@@ -331,7 +357,7 @@
 
 			const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
 
-			output["thievery_total"] = thievery_total;
+			output["thievery_mastery"] = thievery ? mastery_bonus : 0;
 			output["thievery_total_label"] = `+${thievery_total}`;
 
 			setAttrs(output, {silent: true});
@@ -351,7 +377,7 @@
 
 			const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
 
-			output["deception_total"] = deception_total;
+			output["deception_mastery"] = deception ? mastery_bonus : 0;
 			output["deception_total_label"] = `+${deception_total}`;
 
 			setAttrs(output, {silent: true});
@@ -378,9 +404,9 @@
 			const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
 			const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
 
-			output["detect_total"] = detect_total;
-			output["information_total"] = information_total;
-			output["reason_total"] = reason_total;
+			output["detect_mastery"] = detect ? mastery_bonus : 0;
+			output["information_mastery"] = information ? mastery_bonus : 0;
+			output["reason_mastery"] = reason ? mastery_bonus : 0;
 
 			output["detect_total_label"] = `+${detect_total}`;
 			output["information_total_label"] = `+${information_total}`;
@@ -403,7 +429,7 @@
 
 			const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
 
-			output["detect_total"] = detect_total;
+			output["detect_mastery"] = detect ? mastery_bonus : 0;
 			output["detect_total_label"] = `+${detect_total}`;
 
 			setAttrs(output, {silent: true});
@@ -423,7 +449,7 @@
 
 			const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
 
-			output["information_total"] = information_total;
+			output["information_mastery"] = information ? mastery_bonus : 0;
 			output["information_total_label"] = `+${information_total}`;
 
 			setAttrs(output, {silent: true});
@@ -443,7 +469,7 @@
 
 			const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
 
-			output["reason_total"] = reason_total;
+			output["reason_mastery"] = reason ? mastery_bonus : 0;
 			output["reason_total_label"] = `+${reason_total}`;
 
 			setAttrs(output, {silent: true});
@@ -470,9 +496,9 @@
 			const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
 			const charm_total = empathy + (charm ? mastery_bonus : 0) + charm_bns;
 
-			output["psychology_total"] = psychology_total;
-			output["artistry_total"] = artistry_total;
-			output["charm_total"] = charm_total;
+			output["psychology_mastery"] = psychology ? mastery_bonus : 0;
+			output["artistry_mastery"] = artistry ? mastery_bonus : 0;
+			output["charm_mastery"] = charm ? mastery_bonus : 0;
 
 			output["psychology_total_label"] = `+${psychology_total}`;
 			output["artistry_total_label"] = `+${artistry_total}`;
@@ -495,7 +521,7 @@
 
 			const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
 
-			output["psychology_total"] = psychology_total;
+			output["psychology_mastery"] = psychology ? mastery_bonus : 0;
 			output["psychology_total_label"] = `+${psychology_total}`;
 
 			setAttrs(output, {silent: true});
@@ -515,7 +541,7 @@
 
 			const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
 
-			output["artistry_total"] = artistry_total;
+			output["artistry_mastery"] = artistry ? mastery_bonus : 0;
 			output["artistry_total_label"] = `+${artistry_total}`;
 
 			setAttrs(output, {silent: true});
@@ -535,7 +561,7 @@
 
 			const charm_total = empathy + (charm ? mastery_bonus : 0) + charm_bns;
 
-			output["charm_total"] = charm_total;
+			output["charm_mastery"] = charm ? mastery_bonus : 0;
 			output["charm_total_label"] = `+${charm_total}`;
 
 			setAttrs(output, {silent: true});
@@ -581,7 +607,7 @@
 
 				const kit_total = kit_quality + (kit_mastered ? mastery_bonus : 0) + kit_bns;
 
-				output[`${kit}_total`] = kit_total;
+				output[`${kit}_mastery`] = kit_mastered ? mastery_bonus : 0;
 				output[`${kit}_total_label`] = `+${kit_total}`;
 			}
 
@@ -600,7 +626,7 @@
 
 			const arcanist_total = arcanist_quality + (arcanist ? mastery_bonus : 0) + arcanist_bns;
 
-			output["arcanist_total"] = arcanist_total;
+			output["arcanist_mastery"] = arcanist ? mastery_bonus : 0;
 			output["arcanist_total_label"] = `+${arcanist_total}`;
 
 			setAttrs(output, {silent: true});
@@ -618,7 +644,7 @@
 
 			const chemist_total = chemist_quality + (chemist ? mastery_bonus : 0) + chemist_bns;
 
-			output["chemist_total"] = chemist_total;
+			output["chemist_mastery"] = chemist ? mastery_bonus : 0;
 			output["chemist_total_label"] = `+${chemist_total}`;
 
 			setAttrs(output, {silent: true});
@@ -636,7 +662,7 @@
 
 			const climbing_total = climbing_quality + (climbing ? mastery_bonus : 0) + climbing_bns;
 
-			output["climbing_total"] = climbing_total;
+			output["climbing_mastery"] = climbing ? mastery_bonus : 0;
 			output["climbing_total_label"] = `+${climbing_total}`;
 
 			setAttrs(output, {silent: true});
@@ -654,7 +680,7 @@
 
 			const impersonation_total = impersonation_quality + (impersonation ? mastery_bonus : 0) + impersonation_bns;
 
-			output["impersonation_total"] = impersonation_total;
+			output["impersonation_mastery"] = impersonation ? mastery_bonus : 0;
 			output["impersonation_total_label"] = `+${impersonation_total}`;
 
 			setAttrs(output, {silent: true});
@@ -672,7 +698,7 @@
 
 			const infiltration_total = infiltration_quality + (infiltration ? mastery_bonus : 0) + infiltration_bns;
 
-			output["infiltration_total"] = infiltration_total;
+			output["infiltration_mastery"] = infiltration ? mastery_bonus : 0;
 			output["infiltration_total_label"] = `+${infiltration_total}`;
 
 			setAttrs(output, {silent: true});
@@ -690,7 +716,7 @@
 
 			const mechanic_total = mechanic_quality + (mechanic ? mastery_bonus : 0) + mechanic_bns;
 
-			output["mechanic_total"] = mechanic_total;
+			output["mechanic_mastery"] = mechanic ? mastery_bonus : 0;
 			output["mechanic_total_label"] = `+${mechanic_total}`;
 
 			setAttrs(output, {silent: true});
@@ -708,7 +734,7 @@
 
 			const navigation_total = navigation_quality + (navigation ? mastery_bonus : 0) + navigation_bns;
 
-			output["navigation_total"] = navigation_total;
+			output["navigation_mastery"] = navigation ? mastery_bonus : 0;
 			output["navigation_total_label"] = `+${navigation_total}`;
 
 			setAttrs(output, {silent: true});
@@ -726,7 +752,7 @@
 
 			const thaumaturgist_total = thaumaturgist_quality + (thaumaturgist ? mastery_bonus : 0) + thaumaturgist_bns;
 
-			output["thaumaturgist_total"] = thaumaturgist_total;
+			output["thaumaturgist_mastery"] = thaumaturgist ? mastery_bonus : 0;
 			output["thaumaturgist_total_label"] = `+${thaumaturgist_total}`;
 
 			setAttrs(output, {silent: true});
@@ -750,7 +776,7 @@
 
 					const toolkit_total = toolkit_quality + (toolkit_mastered ? mastery_bonus : 0) + toolkit_bns;
 
-					output[`repeating_toolkits_${id}_toolkit_total`] = toolkit_total;
+					output[`repeating_toolkits_${id}_toolkit_mastery`] = mastery_bonus;
 					output[`repeating_toolkits_${id}_toolkit_total_label`] = `+${toolkit_total}`;
 				}
 
@@ -771,7 +797,7 @@
 
 			const toolkit_total = toolkit_quality + (toolkit_mastered ? mastery_bonus : 0) + toolkit_bns;
 
-			output["repeating_toolkits_toolkit_total"] = toolkit_total;
+			output["repeating_toolkits_toolkit_mastery"] = mastery_bonus;
 			output["repeating_toolkits_toolkit_total_label"] = `+${toolkit_total}`;
 
 			setAttrs(output, {silent: true});
@@ -1061,9 +1087,36 @@
 			const attack_roll = attack_mastery + attack_bonus;
 			const attack_roll_label = `+${attack_roll}`;
 
+			output["repeating_attacks_attack_mastery_value"] = attack_mastery;
 			output["repeating_attacks_attack_roll"] = attack_roll_label;
 
 			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:mastery_bonus", function(eventInfo) {
+		const mastery_bonus = parseInt(eventInfo.newValue);
+		getSectionIDs("attacks", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_attacks_${id}_attack_mastery`).concat(ids.map(id => `repeating_attacks_${id}_attack_bonus`));
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					const mastery = v[`repeating_attacks_${id}_attack_mastery`];
+					const attack_bonus = parseInt(v[`repeating_attacks_${id}_attack_bonus`]);
+
+					const attack_mastery = mastery == "on" ? mastery_bonus : 0;
+
+					const attack_roll = attack_mastery + attack_bonus;
+					const attack_roll_label = `+${attack_roll}`;
+
+					output[`repeating_attacks_${id}_attack_mastery_value`] = attack_mastery;
+					output[`repeating_attacks_${id}_attack_roll`] = attack_roll_label;
+				}
+
+				setAttrs(output, {silent: true});
+			});
 		});
 	});
 
@@ -1222,6 +1275,138 @@
 			setAttrs(output, {silent: true});
 		});
 	});
+
+	/*
+	on("change:spirit1 change:spirit2 change:spirit3 change:spirit4 change:spirit5", function(eventInfo) {
+		const changed_spirit = eventInfo.sourceAttribute;
+		const spirit_number = parseInt(changed_spirit.slice(-1));
+
+		getAttrs(["spirit1", "spirit2", "spirit3", "spirit4", "spirit5"], function(v) {
+			var output = {};
+
+			for (let i = 1; i <= 5; i++) {
+				const spirit = v[`spirit${i}`];
+				if (spirit == undefined || spirit == "")
+					continue;
+				if (i < spirit_number)
+					output[`spirit${i}_checked`] = "on";
+				else
+					output[`spirit${i}_checked`] = "0";
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:barrier1 change:barrier2 change:barrier3", function(eventInfo) {
+		const changed_barrier = eventInfo.sourceAttribute;
+		const barrier_number = parseInt(changed_barrier.slice(-1));
+
+		getAttrs(["barrier1", "barrier2", "barrier3"], function(v) {
+			var output = {};
+
+			for (let i = 1; i <= 3; i++) {
+				const barrier = v[`barrier${i}`];
+				if (barrier == undefined || barrier == "")
+					continue;
+				if (i < barrier_number)
+					output[`barrier${i}_checked`] = "on";
+				else
+					output[`barrier${i}_checked`] = "0";
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:glyph1 change:glyph2 change:glyph3", function(eventInfo) {
+		const changed_glyph = eventInfo.sourceAttribute;
+		const glyph_number = parseInt(changed_glyph.slice(-1));
+
+		getAttrs(["glyph1", "glyph2", "glyph3"], function(v) {
+			var output = {};
+
+			for (let i = 1; i <= 5; i++) {
+				const glyph = v[`glyph${i}`];
+				if (glyph == undefined || glyph == "")
+					continue;
+				if (i < glyph_number)
+					output[`glyph${i}_checked`] = "on";
+				else
+					output[`glyph${i}_checked`] = "0";
+			}
+
+			setAttrs(output, {silent: true});
+		});
+	});
+	*/
+
+	on("change:movement_distance", function(eventInfo) {
+		getAttrs(["movement_distance"], function(v) {
+			var output = {};
+
+			const movement_distance = parseInt(v["movement_zone"]);
+			const movement_zone = Math.floor(movement_distance / 10);
+
+			output["movement_zone"] = movement_zone;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:movement_zone", function(eventInfo) {
+		getAttrs(["movement_zone"], function(v) {
+			var output = {};
+
+			const movement_zone = parseInt(v["movement_zone"]);
+			const movement_distance = movement_zone * 10;
+
+			output["movement_distance"] = movement_distance;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:max_movement_distance", function(eventInfo) {
+		getAttrs(["max_movement_distance"], function(v) {
+			var output = {};
+
+			const max_movement_distance = parseInt(v["max_movement_distance"]);
+			const max_movement_zone = Math.floor(max_movement_distance / 10);
+
+			output["max_movement_zone"] = max_movement_zone;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:max_movement_zone", function(eventInfo) {
+		getAttrs(["max_movement_zone"], function(v) {
+			var output = {};
+
+			const max_movement_zone = parseInt(v["max_movement_zone"]);
+			const max_movement_distance = max_movement_zone * 10;
+
+			output["max_movement_distance"] = max_movement_distance;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	function extractFirstNumberFromString(str) {
+		const regex = /\d+/;
+		const match = str.match(regex);
+		return match ? parseInt(match[0]) : 0;
+	}
+
+	function cutString(str, num) {
+		if (str.includes(num)) {
+			const index = str.indexOf(num);
+			return str.slice(index + num.toString().length);
+		} else {
+			return str;
+		}
+	}
 </script>
 
 <html>
@@ -1233,7 +1418,7 @@
 			<button type="action" class="sheet-tabButton" name="act_combat">Combat</button>
 			<button type="action" class="sheet-tabButton" name="act_magic">Magic</button>
 			<button type="action" class="sheet-tabButton" name="act_notes">Notes</button>
-			<button type="action" class="sheet-tabButton" name="act_options">Options</button>
+			<!-- <button type="action" class="sheet-tabButton" name="act_options">Options</button> -->
 		</div>
 		<div class="sheet-flexGrow sheet-flexEnd">
 			<select name="attr_roll_whisper_type" title="Select roll visibility">
@@ -1253,7 +1438,7 @@
 			<div>
 				<div style="display: flex; flex: 1 0 auto;"><span>Character Name :</span><input type="text" name="attr_character_name"/></div>
 				<div style="display: flex; flex: 1 0 auto;"><span>Character Alias :</span><input type="text" name="attr_character_alias"/></div>
-				<div style="flex-shrink: 0; width: 183px;">
+				<div style="flex: 0 0 auto; width: 183px;">
 					<span>Level :</span><input type="number" name="attr_character_level" style="text-align: end;" value="1" />
 					<span>(</span><input type="number" name="attr_character_xp" /><span>) exp</span>
 				</div>
@@ -1512,6 +1697,7 @@
 					<span class="sheet-sectionTitle" style="width: 148px; flex: 0 0 auto;">Attributes</span>
 					<span class="sheet-sectionTitle" style="width: 120px; flex: 1 0 auto;">Skills</span>
 					<span class="sheet-sectionTitle" style="width: 45.5px; flex: 1 0 auto;">BNS</span>
+					<span class="sheet-sectionTitle" style="width: 50px; flex: 0 0 auto;">Roll</span>
 				</div>
 				<div>
 					<!--
@@ -1544,33 +1730,33 @@
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_brute" />
+								<input type="hidden" name="attr_brute_mastery" value="0" />
 								<span>Brute</span>
 								<input type="number" name="attr_brute_bns" value="0" />
-								<input type="hidden" name="attr_brute_total" value="0" />
 								<input type="hidden" name="attr_brute_total_label" value="0" />
-								<button type="roll" name="act_rollBrute" value="@{roll_whisper_type}">
+								<button type="roll" name="act_rollBrute" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Brute}} {{total=[[2d6 +@{strength} +@{brute_mastery} +@{brute_bns} +@ +?{Modifier|0}]]}}">
 									<span name="attr_brute_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_endurance" />
+								<input type="hidden" name="attr_endurance_mastery" value="0" />
 								<span>Endurance</span>
 								<input type="number" name="attr_endurance_bns" value="0" />
-								<input type="hidden" name="attr_endurance_total" value="0" />
 								<input type="hidden" name="attr_endurance_total_label" value="0" />
-								<button type="roll" name="act_rollEndurance">
+								<button type="roll" name="act_rollEndurance" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Endurance}} {{total=[[2d6 +@{strength} +@{endurance_mastery} +@{endurance_bns} +?{Modifier|0}]]}}">
 									<span name="attr_endurance_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_intimidation" />
+								<input type="hidden" name="attr_intimidation_mastery" value="0" />
 								<span>Intimidation</span>
 								<input type="number" name="attr_intimidation_bns" value="0" />
-								<input type="hidden" name="attr_intimidation_total" value="0" />
 								<input type="hidden" name="attr_intimidation_total_label" value="0" />
-								<button type="roll" name="act_rollIntimidation">
+								<button type="roll" name="act_rollIntimidation" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Intimidation}} {{total=[[2d6 +@{strength} +@{intimidation_mastery} +@{intimidation_bns} +?{Modifier|0}]]}}">
 									<span name="attr_intimidation_total_label"></span>
 								</button>
 							</div>
@@ -1588,33 +1774,33 @@
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_sports" />
+								<input type="hidden" name="attr_sports_mastery" value="0" />
 								<span>Sports</span>
 								<input type="number" name="attr_sports_bns" value="0" />
-								<input type="hidden" name="attr_sports_total" value="0" />
 								<input type="hidden" name="attr_sports_total_label" value="0" />
-								<button type="roll" name="act_rollSports">
+								<button type="roll" name="act_rollSports" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Sports}} {{total=[[2d6 +@{agility} +@{sports_mastery} +@{sports_bns} +?{Modifier|0}]]}}">
 									<span name="attr_sports_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_thievery" />
+								<input type="hidden" name="attr_thievery_mastery" value="0" />
 								<span>Thievery</span>
 								<input type="number" name="attr_thievery_bns" value="0" />
-								<input type="hidden" name="attr_thievery_total" value="0" />
 								<input type="hidden" name="attr_thievery_total_label" value="0" />
-								<button type="roll" name="act_rollThievery">
+								<button type="roll" name="act_rollThievery" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Thievery}} {{total=[[2d6 +@{agility} +@{thievery_mastery} +@{thievery_bns} +?{Modifier|0}]]}}">
 									<span name="attr_thievery_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_deception" />
+								<input type="hidden" name="attr_deception_mastery" value="0" />
 								<span>Deception</span>
 								<input type="number" name="attr_deception_bns" value="0" />
-								<input type="hidden" name="attr_deception_total" value="0" />
 								<input type="hidden" name="attr_deception_total_label" value="0" />
-								<button type="roll" name="act_rollDeception">
+								<button type="roll" name="act_rollDeception" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Deception}} {{total=[[2d6 +@{agility} +@{deception_mastery} +@{deception_bns} +?{Modifier|0}]]}}">
 									<span name="attr_deception_total_label"></span>
 								</button>
 							</div>
@@ -1632,33 +1818,33 @@
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_detect" />
+								<input type="hidden" name="attr_detect_mastery" value="0" />
 								<span>Detect</span>
 								<input type="number" name="attr_detect_bns" value="0" />
-								<input type="hidden" name="attr_detect_total" value="0" />
 								<input type="hidden" name="attr_detect_total_label" value="0" />
-								<button type="roll" name="act_rollDetect">
+								<button type="roll" name="act_rollDetect" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Detect}} {{total=[[2d6 +@{awareness} +@{detect_mastery} +@{detect_bns} +?{Modifier|0}]]}}">
 									<span name="attr_detect_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_information" />
+								<input type="hidden" name="attr_information_mastery" value="0" />
 								<span>Information</span>
 								<input type="number" name="attr_information_bns" value="0" />
-								<input type="hidden" name="attr_information_total" value="0" />
 								<input type="hidden" name="attr_information_total_label" value="0" />
-								<button type="roll" name="act_rollInformation">
+								<button type="roll" name="act_rollInformation" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Information}} {{total=[[2d6 +@{awareness} +@{information_mastery} +@{information_bns} +?{Modifier|0}]]}}">
 									<span name="attr_information_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_reason" />
+								<input type="hidden" name="attr_reason_mastery" value="0" />
 								<span>Reason</span>
 								<input type="number" name="attr_reason_bns" value="0" />
-								<input type="hidden" name="attr_reason_total" value="0" />
 								<input type="hidden" name="attr_reason_total_label" value="0" />
-								<button type="roll" name="act_rollReason">
+								<button type="roll" name="act_rollReason" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Reason}} {{total=[[2d6 +@{awareness} +@{reason_mastery} +@{reason_bns} +?{Modifier|0}]]}}">
 									<span name="attr_reason_total_label"></span>
 								</button>
 							</div>
@@ -1676,33 +1862,33 @@
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_psychology" />
+								<input type="hidden" name="attr_psychology_mastery" value="0" />
 								<span>Psychology</span>
 								<input type="number" name="attr_psychology_bns" value="0" />
-								<input type="hidden" name="attr_psychology_total" value="0" />
 								<input type="hidden" name="attr_psychology_total_label" value="0" />
-								<button type="roll" name="act_rollPsychology">
+								<button type="roll" name="act_rollPsychology" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Psychology}} {{total=[[2d6 +@{empathy} +@{psychology_mastery} +@{psychology_bns} +?{Modifier|0}]]}}">
 									<span name="attr_psychology_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_artistry" />
+								<input type="hidden" name="attr_artistry_bns" value="0" />
 								<span>Artistry</span>
 								<input type="number" name="attr_artistry_bns" value="0" />
-								<input type="hidden" name="attr_artistry_total" value="0" />
 								<input type="hidden" name="attr_artistry_total_label" value="0" />
-								<button type="roll" name="act_rollArtistry">
+								<button type="roll" name="act_rollArtistry" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Artistry}} {{total=[[2d6 +@{empathy} +@{artistry_mastery} +@{artistry_bns} +?{Modifier|0}]]}}">
 									<span name="attr_artistry_total_label"></span>
 								</button>
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
 								<input type="checkbox" name="attr_charm" />
+								<input type="hidden" name="attr_charm_bns" value="0" />
 								<span>Charm</span>
 								<input type="number" name="attr_charm_bns" value="0" />
-								<input type="hidden" name="attr_charm_total" value="0" />
 								<input type="hidden" name="attr_charm_total_label" value="0" />
-								<button type="roll" name="act_rollCharm">
+								<button type="roll" name="act_rollCharm" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Charm}} {{total=[[2d6 +@{empathy} +@{charm_mastery} +@{charm_bns} +?{Modifier|0}]]}}">
 									<span name="attr_charm_total_label"></span>
 								</button>
 							</div>
@@ -1716,6 +1902,7 @@
 					<span class="sheet-sectionTitle" style="flex: 4 0 auto;">Toolkits</span>
 					<span class="sheet-sectionTitle" style="flex: 2 0 auto;">Quality</span>
 					<span class="sheet-sectionTitle" style="flex: 1 0 auto;">BNS</span>
+					<span class="sheet-sectionTitle" style="flex: 1 0 auto;">Roll</span>
 				</div>
 				<div>
 					<!--
@@ -1737,10 +1924,10 @@
 						<input type="number" name="attr_arcanist_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_arcanist" />
+						<input type="hidden" name="attr_arcanist_mastery" value="0" />
 						<input type="number" name="attr_arcanist_bns" value="0" />
-						<input type="hidden" name="attr_arcanist_total" value="0" />
 						<input type="hidden" name="attr_arcanist_total_label" value="+0" />
-						<button type="roll" name="act_rollArcanist">
+						<button type="roll" name="act_rollArcanist" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Arcanist kit}} {{total=[[2d6 +@{arcanist_quality} +@{arcanist_mastery} +@{arcanist_bns} +?{Modifier|0}]]}}">
 							<span name="attr_arcanist_total_label"></span>
 						</button>
 					</div>
@@ -1750,10 +1937,10 @@
 						<input type="number" name="attr_chemist_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_chemist" />
+						<input type="hidden" name="attr_chemist_mastery" value="0" />
 						<input type="number" name="attr_chemist_bns" value="0" />
-						<input type="hidden" name="attr_chemist_total" value="0" />
 						<input type="hidden" name="attr_chemist_total_label" value="+0" />
-						<button type="roll" name="act_rollChemist">
+						<button type="roll" name="act_rollChemist" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Chemist kit}} {{total=[[2d6 +@{chemist_quality} +@{chemist_mastery} +@{chemist_bns} +?{Modifier|0}]]}}">
 							<span name="attr_chemist_total_label"></span>
 						</button>
 					</div>
@@ -1763,10 +1950,10 @@
 						<input type="number" name="attr_climbing_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_climbing" />
+						<input type="hidden" name="attr_climbing_mastery" value="0" />
 						<input type="number" name="attr_climbing_bns" value="0" />
-						<input type="hidden" name="attr_climbing_total" value="0" />
 						<input type="hidden" name="attr_climbing_total_label" value="+0" />
-						<button type="roll" name="act_rollClimbing">
+						<button type="roll" name="act_rollClimbing" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Climbing kit}} {{total=[[2d6 +@{climbing_quality} +@{climbing_mastery} +@{climbing_bns} +?{Modifier|0}]]}}">
 							<span name="attr_climbing_total_label"></span>
 						</button>
 					</div>
@@ -1776,10 +1963,10 @@
 						<input type="number" name="attr_impersonation_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_impersonation" />
+						<input type="hidden" name="attr_impersonation_mastery" value="0" />
 						<input type="number" name="attr_impersonation_bns" value="0" />
-						<input type="hidden" name="attr_impersonation_total" value="0" />
 						<input type="hidden" name="attr_impersonation_total_label" value="+0" />
-						<button type="roll" name="act_rollImpersonation">
+						<button type="roll" name="act_rollImpersonation" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Impersonation kit}} {{total=[[2d6 +@{impersonation_quality} +@{impersonation_mastery} +@{impersonation_bns} +?{Modifier|0}]]}}">
 							<span name="attr_impersonation_total_label"></span>
 						</button>
 					</div>
@@ -1789,10 +1976,10 @@
 						<input type="number" name="attr_infiltration_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_infiltration" />
+						<input type="hidden" name="attr_infiltration_mastery" value="0" />
 						<input type="number" name="attr_infiltration_bns" value="0" />
-						<input type="hidden" name="attr_infiltration_total" value="0" />
 						<input type="hidden" name="attr_infiltration_total_label" value="+0" />
-						<button type="roll" name="act_rollInfiltration">
+						<button type="roll" name="act_rollInfiltration" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Infiltration kit}} {{total=[[2d6 +@{infiltration_quality} +@{infiltration_mastery} +@{infiltration_bns} +?{Modifier|0}]]}}">
 							<span name="attr_infiltration_total_label"></span>
 						</button>
 					</div>
@@ -1802,10 +1989,10 @@
 						<input type="number" name="attr_mechanic_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_mechanic" />
+						<input type="hidden" name="attr_mechanic_mastery" value="0" />
 						<input type="number" name="attr_mechanic_bns" value="0" />
-						<input type="hidden" name="attr_mechanic_total" value="0" />
 						<input type="hidden" name="attr_mechanic_total_label" value="+0" />
-						<button type="roll" name="act_rollMechanic">
+						<button type="roll" name="act_rollMechanic" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Mechanic kit}} {{total=[[2d6 +@{mechanic_quality} +@{mechanic_mastery} +@{mechanic_bns} +?{Modifier|0}]]}}">
 							<span name="attr_mechanic_total_label"></span>
 						</button>
 					</div>
@@ -1815,10 +2002,10 @@
 						<input type="number" name="attr_navigation_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_navigation" />
+						<input type="hidden" name="attr_navigation_mastery" value="0" />
 						<input type="number" name="attr_navigation_bns" value="0" />
-						<input type="hidden" name="attr_navigation_total" value="0" />
 						<input type="hidden" name="attr_navigation_total_label" value="+0" />
-						<button type="roll" name="act_rollNavigation">
+						<button type="roll" name="act_rollNavigation" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Navigation kit}} {{total=[[2d6 +@{navigation_quality} +@{navigation_mastery} +@{navigation_bns} +?{Modifier|0}]]}}">
 							<span name="attr_navigation_total_label"></span>
 						</button>
 					</div>
@@ -1828,10 +2015,10 @@
 						<input type="number" name="attr_thaumaturgist_quality" value="0" />
 						<span>+</span>
 						<input type="checkbox" name="attr_thaumaturgist" />
+						<input type="hidden" name="attr_thaumaturgist_mastery" value="0" />
 						<input type="number" name="attr_thaumaturgist_bns" value="0" />
-						<input type="hidden" name="attr_thaumaturgist_total" value="0" />
 						<input type="hidden" name="attr_thaumaturgist_total_label" value="+0" />
-						<button type="roll" name="act_rollThaumaturgist">
+						<button type="roll" name="act_rollThaumaturgist" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Thaumaturgist kit}} {{total=[[2d6 +@{thaumaturgist_quality} +@{thaumaturgist_mastery} +@{thaumaturgist_bns} +?{Modifier|0}]]}}">
 							<span name="attr_thaumaturgist_total_label"></span>
 						</button>
 					</div>
@@ -1843,10 +2030,10 @@
 								<input type="number" name="attr_toolkit_quality" value="0" />
 								<span>+</span>
 								<input type="checkbox" name="attr_toolkit" />
+								<input type="hidden" name="attr_toolkit_mastery" value="0" />
 								<input type="number" name="attr_toolkit_bns" value="0" />
-								<input type="hidden" name="attr_toolkit_total" value="0" />
 								<input type="hidden" name="attr_toolkit_total_label" value="+0" />
-								<button type="roll" name="act_rollToolkit">
+								<button type="roll" name="act_rollToolkit" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=@{toolkit_name} kit}} {{total=[[2d6 +@{toolkit_quality} +@{toolkit_mastered} +@{toolkit_bns} +?{Modifier|0}]]}}">
 									<span name="attr_toolkit_total_label"></span>
 								</button>
 							</div>
@@ -2308,7 +2495,7 @@
 				</div>
 			</div>
 
-			<div style="display: flex; flex-flow: row wrap; gap: 8px; align-items: stretch;">
+			<div style="display: flex; flex-flow: row wrap; gap: 8px; align-items: stretch; justify-content: space-evenly;">
 				<div class="sheet-movements">
 					<div class="sheet-sectionTitle">
 						<span class="sheet-sectionTitle">Turn Speed</span>
@@ -2454,24 +2641,22 @@
 				</div>
 			</div>
 			<!-- Attacks & Effects -->
-			<div>
-				<input type="hidden" name="attr_attacks_fold" class="sheet-folder" />
+			<div style="flex: 1 0 auto;">
 				<div class="sheet-sectionTitle" style="border-top-left-radius: 0;">
 					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Attack/Effects</span>
 					<!-- <span class="sheet-sectionTitle">Rng</span>
 					<span class="sheet-sectionTitle">Bns</span>
 					<span class="sheet-sectionTitle">Damage</span> -->
-					<input type="checkbox" name="attr_attacks_fold" class="sheet-folder" />
-					<span class="sheet-folder"></span>
 				</div>
-				<div class="sheet-sectionContainer sheet-foldable">
+				<div class="sheet-sectionContainer">
 					<fieldset class="repeating_attacks">
 						<div class="sheet-repeatingAttack">
 							<div style="gap: 4px;">
 								<div>
 									<input type="hidden" name="attr_attack_roll" value="+0" />
-									<button type="roll" name="act_rollAttack"><span name="attr_attack_roll"></span></button>
+									<button type="roll" name="act_rollAttack" value="@{roll_whisper_type} &{template:attack} {{charName=@{character_name}}} {{rollName=@{attack_name}}} {{total=[[2d6 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{damage=@{attack_damage}}}"><span name="attr_attack_roll"></span></button>
 									<input type="checkbox" name="attr_attack_mastery" title="Attack mastery" checked />
+									<input type="hidden" name="attr_attack_mastery_value" />
 									<input type="text" name="attr_attack_name" title="Attack name" placeholder="Attack name" />
 								</div>
 								<div style="flex: 0 0 auto;">
@@ -2486,12 +2671,14 @@
 							</div>
 							<input type="hidden" name="attr_attack_fold" class="sheet-folder" value="on" />
 							<div class="sheet-foldable">
+								<select name="attr_attack_type" title="Attack type">
+									<option value="0">Attack</option>
+									<option value="1">Effect</option>
+								</select>
 								<textarea name="attr_attack_description" title="Attack description" placeholder="Attack description"></textarea>
 							</div>
 						</div>
 					</fieldset>
-					</div>
-				<div class="sheet-sectionContainer sheet-reverseFoldable">
 				</div>
 			</div>
 		</div>
@@ -2652,11 +2839,11 @@
 								<div class="sheet-arcaneBackground" style="flex-flow: column;">
 									<div class="sheet-arcaneBox">
 										<div class="sheet-arcaneBox">
-											<div class="sheet-arcaneBackground" style="background-color: #e3e3e3;">
+											<div class="sheet-arcaneBackground" style="background-color: var(--spell-sub-background-color);">
 												<div>
 													<!-- Fire -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_FIRE.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_FIRE.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_fire" />
 															<span>Fire</span>
@@ -2664,7 +2851,7 @@
 													</div>
 													<!-- Wood -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WOOD.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WOOD.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_wood" />
 															<span>Wood</span>
@@ -2672,7 +2859,7 @@
 													</div>
 													<!-- Earth -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_EARTH.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_EARTH.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_earth" />
 															<span>Earth</span>
@@ -2682,16 +2869,16 @@
 												<div style="justify-content: end;">
 													<!-- Toxic -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_POISON.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_POISON.png" style="height: 64px; width: 64px;"/>
 														<span>Toxic</span>
 													</div>
 												</div>
 											</div>
-											<div class="sheet-arcaneBackground" style="background-color: #e3e3e3;">
+											<div class="sheet-arcaneBackground" style="background-color: var(--spell-sub-background-color);">
 												<div>
 													<!-- Water -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WATER.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WATER.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_water" />
 															<span>Water</span>
@@ -2699,7 +2886,7 @@
 													</div>
 													<!-- Wind -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WIND.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WIND.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_wind" />
 															<span>Wind</span>
@@ -2707,7 +2894,7 @@
 													</div>
 													<!-- Metal -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_METAL.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_METAL.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_metal" />
 															<span>Metal</span>
@@ -2717,7 +2904,7 @@
 												<div style="justify-content: end;">
 													<!-- Lightning -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_LIGHTNING.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_LIGHTNING.png" style="height: 64px; width: 64px;"/>
 														<span>Lightning</span>
 													</div>
 												</div>
@@ -2729,7 +2916,7 @@
 										<!--
 											<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_ICE.png" style="height: 64px; width: 64px;"/>
 										-->
-										<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ICE.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ICE.png" style="height: 64px; width: 64px;"/>
 										<span style="
 											font-size: x-large;
 											color: white;
@@ -2746,7 +2933,7 @@
 								<div class="sheet-cosmicBackground">
 									<!-- Order -->
 									<div>
-										<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ORDER.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ORDER.png" style="height: 64px; width: 64px;"/>
 										<div>
 											<input type="checkbox" name="attr_order" />
 											<input type="checkbox" name="attr_order" />
@@ -2755,7 +2942,7 @@
 									</div>
 									<!-- Chaos -->
 									<div>
-										<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_CHAOS.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_CHAOS.png" style="height: 64px; width: 64px;"/>
 										<div>
 											<input type="checkbox" name="attr_chaos" />
 											<input type="checkbox" name="attr_chaos" />
@@ -2764,7 +2951,7 @@
 									</div>
 									<!-- Astral -->
 									<div>
-										<img src="https://github.com/Wagii/roll20-character-sheets/blob/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ASTRAL.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Wagii/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ASTRAL.png" style="height: 64px; width: 64px;"/>
 										<div>
 											<input type="checkbox" name="attr_astral" />
 											<input type="checkbox" name="attr_astral" />
@@ -2843,6 +3030,10 @@
 									</div>
 									<input type="hidden" name="attr_attack_fold" class="sheet-folder" value="on" />
 									<div class="sheet-foldable">
+										<select name="attr_attack_type" title="Attack type">
+											<option value="0">Attack</option>
+											<option value="1">Effect</option>
+										</select>
 										<textarea name="attr_attack_description" title="Attack description" placeholder="Attack description"></textarea>
 									</div>
 								</div>
@@ -2922,10 +3113,6 @@
 														<option value="3">Instant</option>
 													</select>
 												</div>
-											</div>
-											<div>
-												<span>Rare casting conditions :</span>
-												<textarea name="attr_spell_condition" placeholder="Rare casting conditions"></textarea>
 											</div>
 											<div>
 												<span>Description :</span>
@@ -3008,7 +3195,7 @@
 												<span class="sheet-folder"></span>
 											</div>
 											<input type="hidden" name="attr_spell_rank_one_fold" class="sheet-folder" />
-											<div class="sheet-foldable">
+											<div class="sheet-foldable sheet-spellRankContent">
 												<div>
 													<div>
 														<span>Range:</span>
@@ -3056,7 +3243,7 @@
 												<span class="sheet-folder"></span>
 											</div>
 											<input type="hidden" name="attr_spell_rank_two_fold" class="sheet-folder" />
-											<div class="sheet-foldable">
+											<div class="sheet-foldable sheet-spellRankContent">
 												<div>
 													<div>
 														<span>Range:</span>
@@ -3104,7 +3291,7 @@
 												<span class="sheet-folder"></span>
 											</div>
 											<input type="hidden" name="attr_spell_rank_three_fold" class="sheet-folder" />
-											<div class="sheet-foldable">
+											<div class="sheet-foldable sheet-spellRankContent">
 												<div>
 													<div>
 														<span>Range:</span>
@@ -3193,10 +3380,6 @@
 												</div>
 											</div>
 											<div>
-												<span>Rare casting conditions :</span>
-												<textarea name="attr_spell_condition" placeholder="Rare casting conditions"></textarea>
-											</div>
-											<div>
 												<span>Description :</span>
 												<textarea name="attr_spell_effect" placeholder="Spell effect"></textarea>
 											</div>
@@ -3277,7 +3460,7 @@
 												<span class="sheet-folder"></span>
 											</div>
 											<input type="hidden" name="attr_spell_rank_one_fold" class="sheet-folder" />
-											<div class="sheet-foldable">
+											<div class="sheet-foldable sheet-spellRankContent">
 												<div>
 													<div>
 														<span>Range:</span>
@@ -3325,7 +3508,7 @@
 												<span class="sheet-folder"></span>
 											</div>
 											<input type="hidden" name="attr_spell_rank_two_fold" class="sheet-folder" />
-											<div class="sheet-foldable">
+											<div class="sheet-foldable sheet-spellRankContent">
 												<div>
 													<div>
 														<span>Range:</span>
@@ -3349,7 +3532,7 @@
 										<div class="sheet-spellRank sheet-rank3">
 											<div class="sheet-spellTitle">
 												<input type="hidden" name="attr_spell_rank_three_fold" class="sheet-folder" />
-												<div class="sheet-foldable">
+												<div class="sheet-foldable sheet-spellRankContent">
 													<div>
 														<span class="sheet-spellTitle">Rank 3</span>
 														<span class="sheet-spellSubTitle">(Level 9+)</span>
@@ -3373,7 +3556,7 @@
 												<span class="sheet-folder"></span>
 											</div>
 											<input type="hidden" name="attr_spell_rank_three_fold" class="sheet-folder" />
-											<div class="sheet-foldable">
+											<div class="sheet-foldable sheet-spellRankContent">
 												<div>
 													<div>
 														<span>Range:</span>
@@ -3466,7 +3649,9 @@
 												<div class="sheet-foldable">
 													<div>
 														<span class="sheet-spellTitle">Rank 4</span>
-														<span class="sheet-spellSubTitle" style="text-transform: uppercase; font-size: small;">(Spirit tokens: 3)</span>
+														<span class="sheet-spellSubTitle" style="text-transform: uppercase; font-size: small;">(Spirit tokens: </span>
+														<input type="number" class="sheet-foldable" name="attr_spell_rank_four_spirit" title="Spell Spirits" value="3" />
+														<span class="sheet-spellSubTitle" style="text-transform: uppercase; font-size: small;">)</span>
 													</div>
 													<div>
 														<span class="sheet-spellTitle">MP:</span>
@@ -3476,7 +3661,7 @@
 												<div class="sheet-reverseFoldable">
 													<div>
 														<span class="sheet-spellTitle">Rank 4</span>
-														<span class="sheet-spellSubTitle" style="text-transform: uppercase; font-size: small;">(Spirit tokens: 3)</span>
+														<span class="sheet-spellSubTitle" style="text-transform: uppercase; font-size: small;">(Spirit tokens: </span><span class="sheet-spellSubTitle" name="attr_spell_rank_four_spirit"></span><span class="sheet-spellSubTitle" style="text-transform: uppercase; font-size: small;">)</span>
 													</div>
 													<div>
 														<span class="sheet-spellTitle">MP:</span>
@@ -3901,9 +4086,19 @@ Fond memories: 0/50" />
 
 <rolltemplate class="sheet-rolltemplate-generic">
 	<div class="sheet-template-container">
+		<div class="sheet-template-header"><h1>{{charName}}<br>{{rollName}}</h1></div>
+		<div class="sheet-template-contents">
+			<div class="sheet-template-row">Total = {{total}}</div>
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-attack">
+	<div class="sheet-template-container">
 		<div class="sheet-template-header"><h1>{{charName}} {{rollName}}</h1></div>
 		<div class="sheet-template-contents">
-			<div class="sheet-template-row">{{rollName}}{{subLabel}} = {{total}}</div>
+			<div class="sheet-template-row">Attack = {{total}}</div>
+			<div class="sheet-template-row">Damage = {{damage}}</div>
 		</div>
 	</div>
 </rolltemplate>
