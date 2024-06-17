@@ -1,3 +1,2 @@
-# Medievo_Oscuro
-Medievo Oscuro roll20-character-sheets.
-Puedes descargar los archivos para jugar a Medievo Oscuro en Roll20
+# EXALTED_FIRST_EDITION
+Exalted First edition Roll20 character sheet.
