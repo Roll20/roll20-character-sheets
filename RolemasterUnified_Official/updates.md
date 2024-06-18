@@ -1,3 +1,17 @@
+# 2024-06-17
+
+- Bugs
+  - Handle 0 running ranks in DB calculations
+  - Fix over zealous const in culture ranks
+  - Fix 4th Crafting skill in Urban Culture
+  - Fix display of running ranks in DB info
+- Charactermancer:
+  - Make the pbonus & knack totals text, not entries.
+  - Save languages from charactermancer for all cultures.
+- Special button to edit spells (reorder and delete)
+- Fix knacks using short name for attributes (without the misc)
+- Set critreduction by default
+
 # 2024-06-10
 
 - Attacks:
@@ -24,7 +38,7 @@
 - Expertise skills now show as 0 for 0 ranks (not -25)
 - Spells have * or • afer them (compendium)
 - Tests
-  - Added tests fpr jybrid own realm
+  - Added tests for hybrid own realm
 - Add some styling to updates.
 - Internal
   - Attacks are a little less verbose.
