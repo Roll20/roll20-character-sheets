@@ -8,6 +8,7 @@
 </div>
 
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="characteristics"/>
+<input type="hidden" class="sheet-tallytoggle" name="attr_sheetTally" value="true"/>
 
 <!--  --------------------------------------------------------------------------------- -->
 <!--  Bio, primary statistics, and combat statistics tab                                -->
@@ -10602,9 +10603,10 @@
 <div class="sheet-options">
 	<div class="grid-container-tab-options">
 		<div class="item-options">
-			<div class="item-options-row">
-				<h1> Options </h1>
+			<div class="item-options-first-row">
+				<h1> Character Options </h1>
 			</div>
+			
 			<div class="item-options-row">
 				<label class="container-checkbox">
 					<input type="checkbox" name="attr_useCharacteristicMaximums">
@@ -10639,26 +10641,10 @@
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
-					<input type="checkbox" checked="checked" name="attr_optionAutoSubtractEND">
-					<span class="checkmark" title="@{optionAutoSubtractEND}"></span>
-				</label>
-				<h1>Attack and Power Buttons apply END Costs</h1>
-			</div>
-			
-			<div class="item-options-row">
-				<label class="container-checkbox">
 					<input type="checkbox" name="attr_optionSuperHeroicEndurance">
 					<span class="checkmark" title="@{optionSuperHeroicEndurance}"></span>
 				</label>
 				<h1>Super-Heroic Campaign Endurance</h1>
-			</div>
-			
-			<div class="item-options-row">
-				<label class="container-checkbox">
-					<input type="checkbox" name="attr_optionHitLocationSystem">
-					<span class="checkmark" title="@{optionHitLocationSystem}"></span>
-				</label>
-				<h1>Use Hit Location System</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -10676,6 +10662,28 @@
 				</label>
 				<h1>Choose d6-1 over d3 when Adjusted Damage is ambiguous</h1>
 			</div>
+		</div>
+		
+		<div class="item-options">
+			<div class="item-options-first-row">
+				<h1> Gameplay and Interface Options </h1>
+			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" checked="checked" name="attr_displayDegreeOfSuccess">
+					<span class="checkmark" title="@{displayDegreeOfSuccess}"></span>
+				</label>
+				<h1>Display Degree of Success</h1>
+			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" name="attr_optionHitLocationSystem">
+					<span class="checkmark" title="@{optionHitLocationSystem}"></span>
+				</label>
+				<h1>Use Hit Location System</h1>
+			</div>
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
@@ -10683,6 +10691,14 @@
 					<span class="checkmark" title="@{optionResetTargeting}"></span>
 				</label>
 				<h1>Health Reset Buttons also reset Combat Choices</h1>
+			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" checked="checked" name="attr_optionAutoSubtractEND">
+					<span class="checkmark" title="@{optionAutoSubtractEND}"></span>
+				</label>
+				<h1>Attack and Power Buttons apply END Costs</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -10695,10 +10711,10 @@
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
-					<input type="checkbox" checked="checked" name="attr_displayDegreeOfSuccess">
-					<span class="checkmark" title="@{displayDegreeOfSuccess}"></span>
+					<input type="checkbox" checked="checked" name="attr_showTallyBar">
+					<span class="checkmark" title="@{showTallyBar}"></span>
 				</label>
-				<h1>Display Degree of Success</h1>
+				<h1>Show Tally Bar</h1>
 			</div>
 			
 			<div class="item-options-row">
@@ -10716,16 +10732,16 @@
 				</div>
 				<h1>Whisper Rolls to GM</h1>
 			</div>
+		</div>
+		
+		<div class="item-version-row">
+			<div class="item-version-label">
+				<h2>Version:</h2>
+			</div>
 			
-			<div class="item-version-row">
-				<div class="item-version-label">
-					<h2>Version:</h2>
-				</div>
-				
-				<div class="item-version-information">
-					<!-- Update version before release. -->
-					<input type="text" value="2.94" name="attr_version" title="@{version}" readonly tabindex="-1"/>
-				</div>
+			<div class="item-version-information">
+				<!-- Update version before release. -->
+				<input type="text" value="2.94" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -11472,12 +11488,23 @@
 	});
 	
 
-	// Tab buttons
+	// Show the selected sheet tab. This operation works via a proxy variable to make the CSS easier.
 	const buttonlist = ["characteristics","skills","powers","complications","gear","options"];
 	buttonlist.forEach(button => {
 		on(`clicked:${button}`, function() {
 			setAttrs({
 				sheetTab: button
+			});
+		});
+	});
+	
+	
+	// Show or hide the Tally Bar. This operation works via a proxy variable to make the CSS easier.
+	on("change:showTallyBar", function () {
+		getAttrs(["showTallyBar"], function(values) {
+			
+			setAttrs({
+				"sheetTally": (values["showTallyBar"] === "on") ? "true" : "false"
 			});
 		});
 	});
@@ -12926,7 +12953,7 @@
 				switch (values["powerDCV"+powerId]) {
 					case 'zero':	netDCV = 0;
 									break;
-				case 'half':	halfDCV = true;
+					case 'half':	halfDCV = true;
 									break;
 					default:		break;
 				}
