@@ -1394,6 +1394,133 @@
 			setAttrs(output, {silent: true});
 		});
 	});
+
+	on("sheet:opened", function(eventInfo) {
+		getSectionIDs("storages", function(ids) {
+			var output = {};
+			if (ids.length == 0) {
+				var newStorageLine = `repeating_storages_${generateRowID()}`;
+				output[`${newStorageLine}_storage_name`] = "Guild Storage";
+				output[`${newStorageLine}_storage_capacity`] = 20;
+				output[`${newStorageLine}_storage_description`] = "The Cloudbreaker Guild allows you to store 20 Item Slots worth of items and equipment. You can request that your stored items be delivered to you between missions. You can also store your items on your rides, allowing you to swap your inventory anytime as long as you can access your ride’s trunk. Different rides can store different amounts of items.";
+
+				setAttrs(output, {silent: false});
+			}
+		});
+	});
+
+	on("change:repeating_storages remove:repeating_storages", function(eventInfo) {
+		getSectionIDs("storages", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_storages_${id}_storage_name`).concat(ids.map(id => `repeating_storages_${id}_storage_capacity`));
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+				var storage_value_pair = "";
+				var total_capacity = 0;
+
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					const storageName = v[`repeating_storages_${id}_storage_name`];
+					const storageCapacity = parseInt(v[`repeating_storages_${id}_storage_capacity`]);
+					if (storageName == undefined || storageName == "")
+						continue;
+					storage_value_pair += `${storageName} (${storageCapacity} slots)\n`;
+					total_capacity += storageCapacity;
+				}
+
+				storage_value_pair = storage_value_pair.trimEnd();
+
+				output["storage_storages"] = storage_value_pair;
+				output["storage_total_capacity"] = total_capacity;
+
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+	on("change:repeating_possessions", function(eventInfo) {
+		getSectionIDs("possessions", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_possessions_${id}_possession_name`).concat(ids.map(id => `repeating_possessions_${id}_possession_weight`)).concat(ids.map(id => `repeating_possessions_${id}_possession_quantity`));
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+				var possession_value_pair = "";
+				var total_weight = 0;
+
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					const possessionName = v[`repeating_possessions_${id}_possession_name`];
+					const possessionWeight = parseFloat(v[`repeating_possessions_${id}_possession_weight`]);
+					const possessionQuantity = parseFloat(v[`repeating_possessions_${id}_possession_quantity`]);
+					if (possessionName == undefined || possessionName == "")
+						continue;
+					possession_value_pair += `${possessionName} (${possessionQuantity})\n`;
+					total_weight += possessionWeight * possessionQuantity;
+				}
+
+				possession_value_pair = possession_value_pair.trimEnd();
+
+				output["possession_items"] = possession_value_pair;
+				output["possessions_total_weight"] = total_weight;
+
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+	on("change:storage_total_capacity change:possessions_total_weight", function(eventInfo) {
+		getAttrs(["storage_total_capacity", "possessions_total_weight"], function(v) {
+			var output = {};
+
+			const storage_capacity = parseInt(v["storage_total_capacity"]);
+			const total_weight = parseInt(v["possessions_total_weight"]);
+
+			output["storage_total_weight_label"] = `${total_weight}/${storage_capacity}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:repeating_storages change:repeating_possessions", function(eventInfo) {
+		getSectionIDs("storages", function(storageIDs) {
+			getSectionIDs("possessions", function(possessionsIDs) {
+				var attrs_to_get = storageIDs.map(id => `repeating_storages_${id}_storage_capacity`).concat(storageIDs.map(id => `repeating_storages_${id}_storage_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_quantity`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_weight`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_storage`));
+				getAttrs(attrs_to_get, function(v) {
+					var output = {};
+					var storage_value_pairs = {};
+
+					for (let i = 0; i < storageIDs.length; i++) {
+						const storageID = storageIDs[i];
+						const storageName = v[`repeating_storages_${storageID}_storage_name`];
+						const storageCapacity = parseInt(v[`repeating_storages_${storageID}_storage_capacity`]);
+						storage_value_pairs[storageName] = {capacity: storageCapacity, weight: 0, items: []};
+					}
+
+					for (let i = 0; i < possessionsIDs.length; i++) {
+						const possessionID = possessionsIDs[i];
+						const possessionName = v[`repeating_possessions_${possessionID}_possession_name`];
+						const possessionQuantity = parseInt(v[`repeating_possessions_${possessionID}_possession_quantity`]);
+						const possessionWeight = parseFloat(v[`repeating_possessions_${possessionID}_possession_weight`]);
+						var possessionStorage = v[`repeating_possessions_${possessionID}_possession_storage`];
+						if (possessionStorage == undefined || possessionStorage == "")
+							possessionStorage = "Guild Storage";
+						storage_value_pairs[possessionStorage].weight += possessionQuantity * possessionWeight;
+						storage_value_pairs[possessionStorage].items.push({name: possessionName, quantity: possessionQuantity});
+					}
+
+					var storage_label = "";
+					for (const [storageName, storageData] of Object.entries(storage_value_pairs)) {
+						storage_label += `${storageName} (${storageData.weight}/${storageData.capacity})\n`;
+						for (let item of storageData.items) {
+							storage_label += `  ${item.name} (${item.quantity})\n`;
+						}
+					}
+
+					output["storage_contents"] = storage_label.trimEnd();
+
+					setAttrs(output, {silent: true});
+				});
+			});
+		});
+	});
 </script>
 
 <html>
@@ -3675,27 +3802,6 @@
 		<h1>Notes</h1>
 
 		<div style="display: flex; flex-flow: row wrap; gap: 4px;">
-			<!-- Details -->
-				<!-- Background -->
-				<!-- Personality -->
-				<!-- Appearance -->
-				<!-- Goals -->
-				<!-- Beliefs -->
-				<!-- Relationships -->
-					<!-- Family -->
-					<!-- Friends -->
-					<!-- Enemies -->
-				<!-- Hobbies -->
-				<!-- Secrets -->
-				<!-- Fears -->
-				<!-- Hometown -->
-				<!-- Current Residence -->
-				<!-- Occupation -->
-
-			<!-- Fond Memories & Bonds -->
-			<!-- Equipement -->
-			<!-- Class Ranks list -->
-
 			<!-- Fond Memories & Bonds -->
 			<div>
 				<input type="hidden" name="attr_bond_amount_label" value="Bonds: 0
@@ -4014,6 +4120,96 @@ Fond memories: 0/50" />
 				<input type="hidden" name="attr_details" />
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
 					<span class="sheet-replicateInput sheet-contentSummary" name="attr_details"></span>
+				</div>
+			</div>
+
+			<!-- Storage -->
+			<div style="flex: 1 1 auto;">
+				<input type="hidden" name="attr_storage_contents" />
+				<input type="hidden" name="attr_storage_total_weight_label"/>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Storage</span>
+					<span class="sheet-sectionTitle" style="flex: 0 0 auto;" name="attr_storage_total_weight_label"></span>
+					<input type="checkbox" name="attr_all_storage_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<input type="hidden" name="attr_all_storage_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable">
+					<div>
+						<div>
+							<div class="sheet-sectionTitle">
+								<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Storage</span>
+								<span class="sheet-sectionTitle">Capacity:</span>
+								<span class="sheet-sectionTitle" name="attr_storage_total_capacity"></span>
+								<input type="checkbox" name="attr_storage_fold" class="sheet-folder" />
+								<span class="sheet-folder"></span>
+							</div>
+						</div>
+						<input type="hidden" name="attr_storage_fold" class="sheet-folder" />
+						<input type="hidden" name="attr_storage_total_capacity" value="0" />
+						<div class="sheet-sectionContainer sheet-foldable">
+							<fieldset class="repeating_storages">
+								<div class="sheet-repeatingStorage">
+									<div>
+										<input type="text" name="attr_storage_name" title="Storage name" placeholder="Storage name" />
+										<input type="number" name="attr_storage_capacity" title="Storage weight" value="20" />
+										<input type="checkbox" name="attr_storage_fold" class="sheet-folder" />
+										<span class="sheet-folder"></span>
+									</div>
+									<!-- Text area for storage description -->
+									<input type="hidden" name="attr_storage_fold" class="sheet-folder" />
+									<div class="sheet-foldable">
+										<textarea name="attr_storage_description" style="width: 100%;" placeholder="Storage description"></textarea>
+									</div>
+								</div>
+							</fieldset>
+						</div>
+						<div class="sheet-reverseFoldable sheet-sectionContainer">
+							<input type="hidden" name="attr_storage_storages" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_storage_storages"></span>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Possessions</span>
+							<span class="sheet-sectionTitle">Total weight:</span>
+							<span class="sheet-sectionTitle" name="attr_possessions_total_weight"></span>
+							<input type="checkbox" name="attr_possessions_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_possessions_fold" class="sheet-folder" />
+						<input type="hidden" name="attr_possessions_total_weight" value="0" />
+						<div class="sheet-foldable sheet-sectionContainer" style="gap: 4px;">
+							<fieldset class="repeating_possessions">
+								<div class="sheet-repeatingPossession">
+									<div>
+										<input type="text" name="attr_possession_name" title="Item name" placeholder="Item name" />
+										<input type="number" name="attr_possession_weight" title="Item weight" value="0" />
+										<input type="number" name="attr_possession_quantity" title="Item quantity" value="1" />
+										<input type="checkbox" name="attr_possession_fold" class="sheet-folder" />
+										<span class="sheet-folder"></span>
+									</div>
+									<!-- Text area for possession description -->
+									<input type="hidden" name="attr_possession_fold" class="sheet-folder" />
+									<div class="sheet-foldable">
+										<div>
+											<span>Storage:</span>
+											<input type="text" name="attr_possession_storage" title="Where is this stored" placeholder="Guild storage" />
+										</div>
+										<textarea name="attr_possession_description" style="width: 100%;" placeholder="Item description"></textarea>
+									</div>
+								</div>
+							</fieldset>
+						</div>
+						<div class="sheet-reverseFoldable sheet-sectionContainer">
+							<input type="hidden" name="attr_possession_items" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_possession_items"></span>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<input type="hidden" name="attr_storage_contents" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_storage_contents"></span>
 				</div>
 			</div>
 
