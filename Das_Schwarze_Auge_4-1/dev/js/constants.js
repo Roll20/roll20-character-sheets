@@ -574,6 +574,7 @@ const talents = [
 	't_sp_lutral',
 	't_sp_myranisch',
 	't_sp_myrmidal',
+	't_sp_nequanerwasserschallcode',
 	't_sp_nequanerzeichensprache',
 	't_sp_norkoshal',
 	't_sp_rhoglossa',
@@ -602,7 +603,8 @@ const talents = [
 	't_sc_nequanischebuchstaben',
 	't_sc_vesayitischesilbenzeichen',
 	't_sc_vesayosilbenzeichen',
-	't_sc_vorimperialepiktogramme'
+	't_sc_vorimperialepiktogramme',
+	't_sc_wasserschallzeichen'
 ];
 
 const talents_ebe = [
@@ -1117,7 +1119,7 @@ const talentsData = {
 	't_w_tierkunde': {'internal': "tierkunde", 'ui': "Tierkunde"},
 	't_sp_garethi': {'internal': "garethi", 'ui': "Garethi"},
 	't_sp_bosparano': {'internal': "bosparano", 'ui': "Bosparano"},
-	't_sp_aureliani': {'internal': "aureliani", 'ui': "Aureliani"},
+	't_sp_aureliani': {'internal': "aureliani", 'ui': "Aureliani/Alt-Imperial/Alt-Güldenländisch"},
 	't_sp_zyklopaeisch': {'internal': "zyklopaisch", 'ui': "Zyklopäisch"},
 	't_sp_tulamidya': {'internal': "tulamidya", 'ui': "Tulamidya"},
 	't_sp_urtulamidya': {'internal': "urtulamidya", 'ui': "Urtulamidya"},
@@ -1129,7 +1131,7 @@ const talentsData = {
 	't_sp_alteskemi': {'internal': "alteskemi", 'ui': "Altes Kemi"},
 	't_sp_rabensprache': {'internal': "rabensprache", 'ui': "Rabensprache"},
 	't_sp_thorwalsch': {'internal': "thorwalsch", 'ui': "Thorwalsch"},
-	't_sp_hjaldingsch': {'internal': "hjaldingsch", 'ui': "Hjaldingsch"},
+	't_sp_hjaldingsch': {'internal': "hjaldingsch", 'ui': "Hjaldingsch/Saga-Thorwalsch"},
 	't_sp_isdira': {'internal': "isdira", 'ui': "Isdira"},
 	't_sp_asdharia': {'internal': "asdharia", 'ui': "Asdharia"},
 	't_sp_rogolan': {'internal': "rogolan", 'ui': "Rogolan"},
@@ -1164,8 +1166,8 @@ const talentsData = {
 	't_sc_geheiligteglyphenvonunau': {'internal': "schrift_glyphenvonunau", 'ui': "Geheiligte Glyphen von Unau"},
 	't_sc_gimaril': {'internal': "schrift_gimaril", 'ui': "Gimaril"},
 	't_sc_gjalskisch': {'internal': "schrift_gjalskisch", 'ui': "Gjalskisch"},
-	't_sc_hjaldingscherunen': {'internal': "schrift_hjaldingscherunen", 'ui': "Hjaldingsche Runen"},
-	't_sc_imperialezeichen': {'internal': "schrift_imperialezeichen", 'ui': "(Alt-)Imperiale Zeichen"},
+	't_sc_hjaldingscherunen': {'internal': "schrift_hjaldingscherunen", 'ui': "Hjaldingsche Runen/Runenzeichen"},
+	't_sc_imperialezeichen': {'internal': "schrift_imperialezeichen", 'ui': "(Alt-)Imperiale Zeichen/Alt-Imperiale Buchstaben"},
 	't_sc_isdiraasdharia': {'internal': "schrift_isdira", 'ui': "Isdira/Asdharia"},
 	't_sc_kuslikerzeichen': {'internal': "schrift_kuslikerzeichen", 'ui': "Kusliker Zeichen"},
 	't_sc_mahrischeglyphen': {'internal': "schrift_mahrischeglyphen", 'ui': "Mahrische Glyphen"},
@@ -1226,7 +1228,7 @@ const talentsData = {
 	't_sp_gemeinimperial': {'internal': "gemeinimperial", 'ui': "Gemein-Imperial"},
 	't_sp_hieroimperial': {'internal': "hieroimperial", 'ui': "Hiero-Imperial"},
 	't_sp_fruehimperial': {'internal': "fruehimperial", 'ui': "Früh-Imperial"},
-	't_sp_dorinthisch': {'internal': "dorinthisch", 'ui': "Dorinthisch"},
+	't_sp_dorinthisch': {'internal': "dorinthisch", 'ui': "Proto-Imperial/Dorinthisch"},
 	't_sp_kentorisch': {'internal': "kentorisch", 'ui': "Kentorisch"},
 	't_sp_draydalanisch': {'internal': "draydalanisch", 'ui': "Draydalanisch"},
 	't_sp_yachyach': {'internal': "yachyach", 'ui': "Yachyach"},
@@ -1239,7 +1241,7 @@ const talentsData = {
 	't_sp_pardiral': {'internal': "pardiral", 'ui': "Pardiral/Bhagrach"},
 	't_sp_tighral': {'internal': "tighral", 'ui': "Tighral/Tharr'Orr"},
 	't_sp_lyncal': {'internal': "lyncal", 'ui': "Lyncal/Fhi'ai"},
-	't_sp_sumurrisch': {'internal': "sumurrisch", 'ui': "Sumurrisch"},
+	't_sp_sumurrisch': {'internal': "sumurrisch", 'ui': "Sumurrisch/Ur-Bansumitisch"},
 	't_sp_altnarkramarisch': {'internal': "altnarkramarisch", 'ui': "Alt-Narkramarisch"},
 	't_sp_alttesumurrisch': {'internal': "alttesumurrisch", 'ui': "Alt-Tesumurrisch"},
 	't_sp_narkramarisch': {'internal': "narkramarisch", 'ui': "Narkramarisch"},
@@ -1260,7 +1262,7 @@ const talentsData = {
 	't_sp_altvesayitisch': {'internal': "altvesayitisch", 'ui': "Alt-Vesayitisch"},
 	't_sp_urvesayitisch': {'internal': "urvesayitisch", 'ui': "Ur-Vesayitisch"},
 	't_sp_abishant': {'internal': "abishant", 'ui': "Abishant"},
-	't_sp_bashurisch': {'internal': "bashurisch", 'ui': "Bashurisch"},
+	't_sp_bashurisch': {'internal': "bashurisch", 'ui': "Archäisch/Bashurisch"},
 	't_sp_bramscho': {'internal': "bramscho", 'ui': "Bramscho/Baramunisch"},
 	't_sp_eupherban': {'internal': "eupherban", 'ui': "Eupherban-Haussprache"},
 	't_sp_grolmurisch': {'internal': "grolmurisch", 'ui': "Grolmurisch"},
@@ -1270,9 +1272,10 @@ const talentsData = {
 	't_sp_lutral': {'internal': "lutral", 'ui': "Lutral"},
 	't_sp_myranisch': {'internal': "myranisch", 'ui': "Myranisch"},
 	't_sp_myrmidal': {'internal': "myrmidal", 'ui': "Myrmidal"},
+	't_sp_nequanerwasserschallcode': {'internal': "nequanerwasserschallcode", 'ui': "Nequaner-Wasserschall-Code"},
 	't_sp_nequanerzeichensprache': {'internal': "nequanerzeichensprache", 'ui': "Nequaner-Zeichensprache"},
 	't_sp_norkoshal': {'internal': "norkoshal", 'ui': "Norkoshal"},
-	't_sp_rhoglossa': {'internal': "rhoglossa", 'ui': "Rhoglossa"},
+	't_sp_rhoglossa': {'internal': "rhoglossa", 'ui': "Alt-Zwergisch/Rhoglossa"},
 	't_sp_ruritin': {'internal': "ruritin", 'ui': "Ruritin"},
 	't_sp_shingwanisch': {'internal': "shingwanisch", 'ui': "Shingwanisch"},
 	't_sp_shinoq': {'internal': "shinoq", 'ui': "Shinoq"},
@@ -1298,7 +1301,8 @@ const talentsData = {
 	't_sc_nequanischebuchstaben': {'internal': "schrift_nequanischebuchstaben", 'ui': "Nequanische Buchstaben"},
 	't_sc_vesayitischesilbenzeichen': {'internal': "schrift_vesayitischesilbenzeichen", 'ui': "Vesayitische Wort- und Silbenzeichen"},
 	't_sc_vesayosilbenzeichen': {'internal': "schrift_vesayosilbenzeichen", 'ui': "Vesayo-Silbenzeichen"},
-	't_sc_vorimperialepiktogramme': {'internal': "schrift_vorimperialepiktogramme", 'ui': "Vor-Imperiale Piktogramme"}
+	't_sc_vorimperialepiktogramme': {'internal': "schrift_vorimperialepiktogramme", 'ui': "Vor-Imperiale Piktogramme"},
+	't_sc_wasserschallzeichen': {'internal': "schrift_wasserschallzeichen", 'ui': "Wasserschallzeichen"}
 };
 const spellsData = {
 	'z_abvenenum': {'internal': "abvenenum", 'ui': "Abvenenum Reine Speise", 'stats': ['KL', 'KL', 'FF']},
