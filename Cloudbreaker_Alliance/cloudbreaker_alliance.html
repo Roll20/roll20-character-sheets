@@ -6,6 +6,17 @@
 	const gold_rank = "gold";
 	const platinum_rank = "platinum";
 
+	var getSectionIDsOrdered = function (sectionName, callback) {
+		'use strict';
+		getAttrs([`_reporder_${sectionName}`], function (v) {
+			getSectionIDs(sectionName, function (idArray) {
+				let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+				ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+				callback(ids);
+			});
+		});
+	};
+
 	const tabs = [
 		"character",
 		"combat",
@@ -153,8 +164,8 @@
 		});
 	});
 
-	on("change:repeating_quirks", function(eventInfo) {
-		getSectionIDs("quirks", function(ids) {
+	on("change:repeating_quirks remove:repeating_quirks change:_reporder:quirks", function(eventInfo) {
+		getSectionIDsOrdered("repeating_quirks", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_quirks_${id}_quirk_name`).concat(ids.map(id => `repeating_quirks_${id}_quirk_level`));
 
 			getAttrs(attrs_to_get, function(v) {
@@ -812,6 +823,7 @@
 
 			const lifeform = v["repeating_traits_trait_lifeform"];
 			const character_lifeform = v["character_lifeform"];
+
 			if (lifeform != "")
 				return;
 
@@ -819,8 +831,10 @@
 
 			setAttrs(output, {silent: true});
 		});
+	});
 
-		getSectionIDs("traits", function(ids) {
+	on("change:repeating_traits remove:repeating_traits change:_reporder:traits", function(eventInfo) {
+		getSectionIDsOrdered("repeating_traits", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_traits_${id}_trait_name`).concat(ids.map(id => `repeating_traits_${id}_trait_type`));
 
 			getAttrs(attrs_to_get, function(v) {
@@ -844,14 +858,14 @@
 		});
 	});
 
-	on("change:repeating_features change:character_primary_class change:character_secondary_class", function(eventInfo) {
+	on("change:repeating_features remove:repeating_features change:_reporder:features change:character_primary_class change:character_secondary_class", function(eventInfo) {
 		getAttrs(["character_primary_class", "character_secondary_class"], function(v) {
 			var output = {};
 
 			const primary_class = v["character_primary_class"].toLowerCase();
 			const secondary_class = v["character_secondary_class"].toLowerCase();
 
-			getSectionIDs("features", function(ids) {
+			getSectionIDsOrdered("repeating_features", function(ids) {
 				var attrs_to_get =
 				ids.map(id => `repeating_features_${id}_feature_name`)
 				.concat(ids.map(id => `repeating_features_${id}_feature_level`))
@@ -942,8 +956,8 @@
 		});
 	});
 
-	on("change:repeating_equipment", function(eventInfo) {
-		getSectionIDs("equipment", function(ids) {
+	on("change:repeating_equipment remove:repeating_equipment change:_reporder:equipment", function(eventInfo) {
+		getSectionIDsOrdered("repeating_equipment", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_equipment_${id}_equipment_name`).concat(ids.map(id => `repeating_equipment_${id}_equipment_quantity`)).concat(ids.map(id => `repeating_equipment_${id}_equipment_weight`)).concat("added_slots");
 
 			getAttrs(attrs_to_get, function(v) {
@@ -994,10 +1008,10 @@
 		});
 	});
 
-	on("change:repeating_bonds change:fond_memories", function(eventInfo) {
+	on("change:repeating_bonds change:fond_memories remove:repeating_bonds change:_reporder:bonds", function(eventInfo) {
 		var output = {};
 
-		getSectionIDs("bonds", function(ids) {
+		getSectionIDsOrdered("repeating_bonds", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_bonds_${id}_bond_name`).concat(ids.map(id => `repeating_bonds_${id}_bond_level`));
 			attrs_to_get.push("fond_memories");
 			getAttrs(attrs_to_get, function(v) {
@@ -1397,7 +1411,7 @@
 	});
 
 	on("sheet:opened", function(eventInfo) {
-		getSectionIDs("storages", function(ids) {
+		getSectionIDsOrdered("repeating_storages", function(ids) {
 			var output = {};
 			if (ids.length == 0) {
 				var newStorageLine = `repeating_storages_${generateRowID()}`;
@@ -1410,8 +1424,8 @@
 		});
 	});
 
-	on("change:repeating_storages remove:repeating_storages", function(eventInfo) {
-		getSectionIDs("storages", function(ids) {
+	on("change:repeating_storages remove:repeating_storages change:_reporder:storages", function(eventInfo) {
+		getSectionIDsOrdered("repeating_storages", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_storages_${id}_storage_name`).concat(ids.map(id => `repeating_storages_${id}_storage_capacity`));
 			getAttrs(attrs_to_get, function(v) {
 				var output = {};
@@ -1438,8 +1452,8 @@
 		});
 	});
 
-	on("change:repeating_possessions", function(eventInfo) {
-		getSectionIDs("possessions", function(ids) {
+	on("change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
+		getSectionIDsOrdered("repeating_possessions", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_possessions_${id}_possession_name`).concat(ids.map(id => `repeating_possessions_${id}_possession_weight`)).concat(ids.map(id => `repeating_possessions_${id}_possession_quantity`));
 			getAttrs(attrs_to_get, function(v) {
 				var output = {};
@@ -1480,9 +1494,9 @@
 		});
 	});
 
-	on("change:repeating_storages change:repeating_possessions", function(eventInfo) {
-		getSectionIDs("storages", function(storageIDs) {
-			getSectionIDs("possessions", function(possessionsIDs) {
+	on("change:repeating_storages change:_reporder:storages remove:repeating_storages change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
+		getSectionIDsOrdered("repeating_storages", function(storageIDs) {
+			getSectionIDsOrdered("repeating_possessions", function(possessionsIDs) {
 				var attrs_to_get = storageIDs.map(id => `repeating_storages_${id}_storage_capacity`).concat(storageIDs.map(id => `repeating_storages_${id}_storage_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_quantity`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_weight`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_storage`));
 				getAttrs(attrs_to_get, function(v) {
 					var output = {};
