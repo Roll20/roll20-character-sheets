@@ -184,7 +184,7 @@
 
 				quirk_value_pair = quirk_value_pair.trimEnd();
 
-				output["all_quirks"] = quirk_value_pair;
+				output["quirk_summary"] = quirk_value_pair;
 				if (total_quirk_points == undefined)
 					total_quirk_points = 0;
 				output["quirk_total"] = total_quirk_points;
@@ -851,7 +851,7 @@
 
 				trait_value_pair = trait_value_pair.trimEnd();
 
-				output["all_traits"] = trait_value_pair;
+				output["trait_summary"] = trait_value_pair;
 
 				setAttrs(output, {silent: false});
 			});
@@ -876,6 +876,7 @@
 					var output = {};
 					var primary_features = [];
 					var secondary_features = [];
+					var uncategorized_features = [];
 
 					for (let i = 0; i < ids.length; i++) {
 						const id = ids[i];
@@ -885,11 +886,60 @@
 						const featureName = v[`repeating_features_${id}_feature_name`];
 						const featureLevel = v[`repeating_features_${id}_feature_level`];
 
-						if ((featureClass == undefined || featureClass == "") && (featureDiscipline == undefined || featureDiscipline == ""))
+						if (primary_class == undefined || primary_class == "" || secondary_class == undefined || secondary_class == "") {
+							primary_features.push({
+								feature_discipline: featureDiscipline,
+								feature_class: featureClass,
+								feature_name: featureName,
+								feature_level: featureLevel
+							});
 							continue;
+						}
 
-						// TODO: Make it so that if there is a class, only use said class and not discipline
-						if ((featureClass != undefined && featureClass != "" && primary_class.includes(featureClass.toLowerCase()))
+						if (featureClass != undefined && featureClass != "") {
+							if (primary_class.includes(featureClass.toLowerCase())) {
+								primary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							} else if (secondary_class.includes(featureClass.toLowerCase())) {
+								secondary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							}
+						}
+						else if (featureDiscipline != undefined && featureDiscipline != "") {
+							if (primary_class.includes(featureDiscipline.toLowerCase())) {
+								primary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							} else if (secondary_class.includes(featureDiscipline.toLowerCase())) {
+								secondary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							}
+						}
+						else {
+							uncategorized_features.push({
+								feature_discipline: featureDiscipline,
+								feature_class: featureClass,
+								feature_name: featureName,
+								feature_level: featureLevel
+							});
+						}
+
+						/* if ((featureClass != undefined && featureClass != "" && primary_class.includes(featureClass.toLowerCase()))
 						|| (featureDiscipline != undefined && featureDiscipline != "" && primary_class.includes(featureDiscipline.toLowerCase()))) {
 							primary_features.push({
 								feature_discipline: featureDiscipline,
@@ -906,11 +956,20 @@
 								feature_name: featureName,
 								feature_level: featureLevel
 							});
-						}
+						} */
 					}
 
 					primary_features.sort((a, b) => a.feature_level - b.feature_level);
 					secondary_features.sort((a, b) => a.feature_level - b.feature_level);
+					if (primary_class == undefined || primary_class == "" || secondary_class == undefined || secondary_class == "") {
+						primary_features.sort((a, b) => {
+							if (a.feature_discipline.toLowerCase() < b.feature_discipline.toLowerCase()) return -1;
+							if (a.feature_discipline.toLowerCase() > b.feature_discipline.toLowerCase()) return 1;
+							if (a.feature_class.toLowerCase() < b.feature_class.toLowerCase()) return -1;
+							if (a.feature_class.toLowerCase() > b.feature_class.toLowerCase()) return 1;
+							return a.feature_level - b.feature_level;
+						});
+					}
 
 					var final_string = "";
 					if (primary_features.length > 0) {
@@ -925,8 +984,14 @@
 							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
 					}
+					if (uncategorized_features.length > 0) {
+						final_string += `Uncategorized features\n`;
+						for (let feature of uncategorized_features) {
+							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
+						}
+					}
 
-					output["all_features"] = final_string.trimEnd();
+					output["feature_summary"] = final_string.trimEnd();
 
 					setAttrs(output, {silent: false});
 				});
@@ -934,23 +999,23 @@
 		});
 	});
 
-	on("change:all_quirks change:all_traits change:all_features", function(eventInfo) {
-		getAttrs(["all_quirks", "all_traits", "all_features"], function(v) {
+	on("change:quirk_summary change:trait_summary change:feature_summary", function(eventInfo) {
+		getAttrs(["quirk_summary", "trait_summary", "feature_summary"], function(v) {
 			var output = {};
 
-			const all_quirks = v["all_quirks"];
-			const all_traits = v["all_traits"];
-			const all_features = v["all_features"];
+			const quirk_summary = v["quirk_summary"];
+			const trait_summary = v["trait_summary"];
+			const feature_summary = v["feature_summary"];
 
 			var all_text = "";
-			if (all_quirks != undefined && all_quirks != "")
-				all_text += "Quirks\n" + all_quirks.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-			if (all_traits != undefined && all_traits != "")
-				all_text += "Traits\n" + all_traits.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-			if (all_features != undefined && all_features != "")
-				all_text += "Features\n" + all_features.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (quirk_summary != undefined && quirk_summary != "")
+				all_text += "Quirks\n" + quirk_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (trait_summary != undefined && trait_summary != "")
+				all_text += "Traits\n" + trait_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (feature_summary != undefined && feature_summary != "")
+				all_text += "Features\n" + feature_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
 
-			output["all_quirks_traits_features"] = all_text.trimEnd();
+			output["quirk_traits_features_summary"] = all_text.trimEnd();
 
 			setAttrs(output, {silent: true});
 		});
@@ -977,7 +1042,7 @@
 
 				equipment_value_pair = equipment_value_pair.trimEnd();
 
-				output["all_equipment"] = equipment_value_pair;
+				output["equipment_summary"] = equipment_value_pair;
 
 				for (const id of ids) {
 					const equipmentWeight = parseFloat(v[`repeating_equipment_${id}_equipment_weight`]);
@@ -1084,7 +1149,7 @@
 
 				ranks_value_pair = ranks_value_pair.trimEnd();
 
-				output["all_ranks"] = ranks_value_pair;
+				output["rank_summary"] = ranks_value_pair;
 
 				setAttrs(output, {silent: true});
 			});
@@ -1620,8 +1685,8 @@
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_quirks" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+					<input type="hidden" name="attr_quirk_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_summary"></span>
 				</div>
 			</div>
 		</div>
@@ -2162,10 +2227,10 @@
 			<div style="flex-flow: column; flex: 1 1 auto;">
 				<div class="sheet-sectionTitle">
 					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Traits & Features</span>
-					<input type="checkbox" name="attr_all_traits_fold" class="sheet-folder" />
+					<input type="checkbox" name="attr_trait_summary_fold" class="sheet-folder" />
 					<span class="sheet-folder"></span>
 				</div>
-				<input type="hidden" name="attr_all_traits_fold" class="sheet-folder" />
+				<input type="hidden" name="attr_trait_summary_fold" class="sheet-folder" />
 				<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
 					<div>
 						<!-- Quirks -->
@@ -2194,8 +2259,8 @@
 							</fieldset>
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
-							<input type="hidden" name="attr_all_quirks" />
-							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+							<input type="hidden" name="attr_quirk_summary" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_summary"></span>
 						</div>
 					</div>
 					<div>
@@ -2232,8 +2297,8 @@
 							</fieldset>
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
-							<input type="hidden" name="attr_all_traits" />
-							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_traits"></span>
+							<input type="hidden" name="attr_trait_summary" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_trait_summary"></span>
 						</div>
 					</div>
 					<!-- Features -->
@@ -2269,14 +2334,14 @@
 							</fieldset>
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
-							<input type="hidden" name="attr_all_features" />
-							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_features"></span>
+							<input type="hidden" name="attr_feature_summary" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_feature_summary"></span>
 						</div>
 					</div>
 				</div>
-				<input type="hidden" name="attr_all_quirks_traits_features" />
+				<input type="hidden" name="attr_quirk_traits_features_summary" />
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks_traits_features"></span>
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_traits_features_summary"></span>
 				</div>
 			</div>
 
@@ -2319,8 +2384,8 @@
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_equipment" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_equipment"></span>
+					<input type="hidden" name="attr_equipment_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_equipment_summary"></span>
 				</div>
 			</div>
 		</div>
@@ -2798,10 +2863,10 @@
 		<div style="flex-flow: column;">
 			<div class="sheet-sectionTitle">
 				<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Traits & Features</span>
-				<input type="checkbox" name="attr_all_traits_fold" class="sheet-folder" />
+				<input type="checkbox" name="attr_trait_summary_fold" class="sheet-folder" />
 				<span class="sheet-folder"></span>
 			</div>
-			<input type="hidden" name="attr_all_traits_fold" class="sheet-folder" />
+			<input type="hidden" name="attr_trait_summary_fold" class="sheet-folder" />
 			<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
 				<div>
 					<!-- Quirks -->
@@ -2830,8 +2895,8 @@
 						</fieldset>
 					</div>
 					<div class="sheet-reverseFoldable sheet-sectionContainer">
-						<input type="hidden" name="attr_all_quirks" />
-						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+						<input type="hidden" name="attr_quirk_summary" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_summary"></span>
 					</div>
 				</div>
 				<div>
@@ -2868,8 +2933,8 @@
 						</fieldset>
 					</div>
 					<div class="sheet-reverseFoldable sheet-sectionContainer">
-						<input type="hidden" name="attr_all_traits" />
-						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_traits"></span>
+						<input type="hidden" name="attr_trait_summary" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_trait_summary"></span>
 					</div>
 				</div>
 				<!-- Features -->
@@ -2905,14 +2970,14 @@
 						</fieldset>
 					</div>
 					<div class="sheet-reverseFoldable sheet-sectionContainer">
-						<input type="hidden" name="attr_all_features" />
-						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_features"></span>
+						<input type="hidden" name="attr_feature_summary" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_feature_summary"></span>
 					</div>
 				</div>
 			</div>
-			<input type="hidden" name="attr_all_quirks_traits_features" />
+			<input type="hidden" name="attr_quirk_traits_features_summary" />
 			<div class="sheet-reverseFoldable sheet-sectionContainer">
-				<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks_traits_features"></span>
+				<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_traits_features_summary"></span>
 			</div>
 		</div>
 	</div>
@@ -3905,8 +3970,8 @@ Fond memories: 0/50" />
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_equipment" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_equipment"></span>
+					<input type="hidden" name="attr_equipment_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_equipment_summary"></span>
 				</div>
 			</div>
 
@@ -3938,8 +4003,8 @@ Fond memories: 0/50" />
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_ranks" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_ranks"></span>
+					<input type="hidden" name="attr_rank_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_rank_summary"></span>
 				</div>
 			</div>
 
