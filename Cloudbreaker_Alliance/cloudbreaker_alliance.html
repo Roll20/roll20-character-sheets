@@ -1076,7 +1076,7 @@
 						const featureLevel = v[`repeating_features_${id}_feature_level`];
 
 						if (primary_class == undefined || primary_class == "" || secondary_class == undefined || secondary_class == "") {
-							primary_features.push({
+							uncategorized_features.push({
 								feature_discipline: featureDiscipline,
 								feature_class: featureClass,
 								feature_name: featureName,
@@ -1129,17 +1129,33 @@
 						}
 					}
 
+					if (primary_features.length == 0 && secondary_features.length == 0 && uncategorized_features.length == 0) {
+						for (let i = 0; i < ids.length; i++) {
+							const id = ids[i];
+							const featureName = v[`repeating_features_${id}_feature_name`];
+							const featureLevel = v[`repeating_features_${id}_feature_level`];
+
+							const featureClass = v[`repeating_features_${id}_feature_class`];
+							const featureDiscipline = v[`repeating_features_${id}_feature_discipline`];
+
+							uncategorized_features.push({
+								feature_discipline: featureDiscipline,
+								feature_class: featureClass,
+								feature_name: featureName,
+								feature_level: featureLevel
+							});
+						}
+					}
+
 					primary_features.sort((a, b) => a.feature_level - b.feature_level);
 					secondary_features.sort((a, b) => a.feature_level - b.feature_level);
-					if (primary_class == undefined || primary_class == "" || secondary_class == undefined || secondary_class == "") {
-						primary_features.sort((a, b) => {
-							if (a.feature_discipline.toLowerCase() < b.feature_discipline.toLowerCase()) return -1;
-							if (a.feature_discipline.toLowerCase() > b.feature_discipline.toLowerCase()) return 1;
-							if (a.feature_class.toLowerCase() < b.feature_class.toLowerCase()) return -1;
-							if (a.feature_class.toLowerCase() > b.feature_class.toLowerCase()) return 1;
-							return a.feature_level - b.feature_level;
-						});
-					}
+					uncategorized_features.sort((a, b) => {
+						if (a.feature_discipline.toLowerCase() < b.feature_discipline.toLowerCase()) return -1;
+						if (a.feature_discipline.toLowerCase() > b.feature_discipline.toLowerCase()) return 1;
+						if (a.feature_class.toLowerCase() < b.feature_class.toLowerCase()) return -1;
+						if (a.feature_class.toLowerCase() > b.feature_class.toLowerCase()) return 1;
+						return a.feature_level - b.feature_level;
+					});
 
 					var final_string = "";
 					if (primary_features.length > 0) {
@@ -1218,7 +1234,7 @@
 					const equipmentWeight = parseFloat(v[`repeating_equipment_${id}_equipment_weight`]);
 					const equipmentQuantity = parseFloat(v[`repeating_equipment_${id}_equipment_quantity`]);
 					if (equipmentQuantity == 0 || equipmentWeight == 0)
-					continue;
+						continue;
 					total_weight += equipmentQuantity * equipmentWeight;
 				}
 
