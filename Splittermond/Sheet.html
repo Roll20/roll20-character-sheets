@@ -7709,23 +7709,69 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
     let nhkAttr = getAttrsAsync(["handgemengepunkte", "handgemengebonus", "hiebwaffenpunkte", "hiebwaffenbonus", "kettenwaffenpunkte", "kettenwaffenbonus", "klingenwaffenpunkte", "klingenwaffenbonus", "stangenwaffenpunkte", "stangenwaffenbonus"]);
     let fnkAttr = getAttrsAsync(["schusswaffenpunkte", "schusswaffenbonus", "wurfwaffenpunkte", "wurfwaffenbonus", "bannmagiepunkte", "bannmagiebonus", "beherrschungsmagiepunkte", "beherrschungsmagiebonus", "bewegungsmagiepunkte", "bewegungsmagiebonus", "erkenntnismagiepunkte", "erkenntnismagiebonus", "felsmagiepunkte", "felsmagiebonus", "feuermagiepunkte", "feuermagiebonus", "heilungsmagiepunkte", "heilungsmagiebonus", "illusionsmagiepunkte", "illusionsmagiebonus", "kampfmagiepunkte", "kampfmagiebonus", "lichtmagiepunkte", "lichtmagiebonus", "naturmagiepunkte", "naturmagiebonus", "schattenmagiepunkte", "schattenmagiebonus", "schicksalsmagiepunkte", "schicksalsmagiebonus", "schutzmagiepunkte", "schutzmagiebonus", "staerkungsmagiepunkte", "staerkungsmagiebonus", "todesmagiepunkte", "todesmagiebonus", "verwandlungsmagiepunkte", "verwandlungsmagiebonus", "wassermagiepunkte", "wassermagiebonus", "windmagiepunkte", "windmagiebonus", "arkanekundepunkte", "arkanekundebonus"]);
 
+
+    let nhkMastery = getSectionIDs("repeating_meisterschaftenkampf", async function(idsArray){
+        // Map Category, name, value
+        var requestArray = [];
+        var resultObj = {};
+        for(id in idsArray) {
+            requestArray.push("repeating_meisterschaftenkampf_" + id + "_meisterschaftsname");
+            requestArray.push("repeating_meisterschaftenkampf_" + id + "_meisterschaftsfertigkeit");
+            requestArray.push("repeating_meisterschaftenkampf_" + id + "_meisterschaftsschwelle");
+        }
+
+        let masteryValues = await getAttrsAsync(requestArray);
+
+        for(id in idsArray) {
+            try {
+                let name = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsname"];
+                let ability = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsfertigkeit"];
+                let value = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsschwelle"];
+
+                resultObj.[ability] = {name: name, value: value};
+            }catch(error) {
+                console.error(error);
+            }
+
+        }
+        resolve(resultObj);
+    });
+
+    console.log(nhkMastery);
+
     // Nahkampfwaffen
     getSectionIDs("repeating_nahkampfwaffen", async function(idarray) {
-        var temp1 = 0;
-        var temp2 = 0;
-        var temp3 = 0; 
+       
+
+
         if (idarray.length > 0)
         {
             _.each(idarray, async function(currentID, i) {
                 let attrmod = 0;
-                getAttrs(["repeating_nahkampfwaffen_" + currentID +"_waffenskill", "repeating_nahkampfwaffen_" + currentID +"_waffenattr1", "repeating_nahkampfwaffen_" + currentID +"_waffenattr2"], async function(v) { 
+                var temp1 = 0;
+                var temp2 = 0;
+                var temp3 = 0; 
+                var temp4 = 0;
 
-                    await Promise.all([baseAttr, nhkAttr]);
+                getAttrs(["repeating_nahkampfwaffen_" + currentID +"_waffenname", "repeating_nahkampfwaffen_" + currentID +"_waffenskill", "repeating_nahkampfwaffen_" + currentID +"_waffenattr1", "repeating_nahkampfwaffen_" + currentID +"_waffenattr2"], async function(v) { 
 
+                    await Promise.all([baseAttr, nhkAttr, nhkMastery]);
+                    console.log(nhkMastery);
+
+                    var name = v["repeating_nahkampfwaffen_" + currentID +"_waffenname"];
                     var skill = v["repeating_nahkampfwaffen_" + currentID +"_waffenskill"];
                     var attr1 = v["repeating_nahkampfwaffen_" + currentID +"_waffenattr1"];
                     var attr2 = v["repeating_nahkampfwaffen_" + currentID +"_waffenattr2"];
                     var update = {};
+
+                    try {
+                        let skillobject = nhkMastery[skill];
+                        
+                    } catch (error) {
+                        console.error(error);
+                    }
+                   
+
                     switch (skill) {
                         case "hiebwaffen":
                             temp1 = +nhkAttr.hiebwaffenpunkte + +nhkAttr.hiebwaffenbonus;
