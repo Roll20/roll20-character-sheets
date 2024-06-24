@@ -10,6 +10,7 @@ const getRow = (section) => `repeating_${section}_${generateRowID()}`;
 const getRepUpdate = (attrs, row, page) => {
   let update = {};
 
+  //TODO: Verify 'name' works as the data may be Uppercase Name
   attrs.forEach((attr) => {
     if (page[attr] ?? page.data[attr]) {
       update[`${row}_${attr}`] = page[attr] ?? page.data[attr];
@@ -18,7 +19,9 @@ const getRepUpdate = (attrs, row, page) => {
     }
   });
 
-  update[`${row}_flag`] = false;
+  if (attrs.includes("notes")) {
+    update[`${row}_flag`] = false;
+  }
 
   return update;
 };
@@ -27,8 +30,8 @@ const getStaticUpdate = (attrs, page) => {
   let update = {};
 
   attrs.forEach((attr) => {
-    if (page.data[attr]) {
-      update[attr] = page.data[attr];
+    if (page[attr] ?? page.data[attr]) {
+      update[attr] = page[attr] ?? page.data[attr];
     } else {
       dropWarning(`getStaticUpdate: Missing ${attr}`);
     }
@@ -83,24 +86,26 @@ const handle_armor = (page) => {
 
 const handle_item = (page) => {
   const row = getRow("equipment");
-  let update = getRepUpdate(["value", "notes"], row, page);
+  let update = getRepUpdate(
+    ["value", "notes", "period_restriction"],
+    row,
+    page
+  );
   update[`${row}_equipment`] = page.name;
   update[`${row}_category`] = page.data["Subcategory"];
+
   setAttrs(update);
 };
 
-const handle_service = (page) => {
-  handle_item(page);
-};
-
 const handle_squire = (page) => {
-  let update = {
-    squire_name: page.name,
-    squire_age: page.data["squire_age"],
-    squire_skill: page.data["squire_skill"],
-  };
+  const attrs = ["age", "skill", "notes"];
+  const update = getStaticUpdate(attrs, page);
+  update["squire_name"] = page.name;
 
-  //TODO: handle repeating skills
+  //Needs special handling for skills
+  // const row = getRow("squire_skills");
+  // const skillsAttr = ["name", "skill"];
+  // const skillsUpdate = getRepUpdate(skillsAttr, row, page);
 
   setAttrs(update);
 };
@@ -143,6 +148,9 @@ const handle_items = (page) => {
     case "Armor":
       handle_armor(page);
       break;
+    case "Animal":
+    case "Service":
+    case "Shield":
     case "Item":
       handle_item(page);
       break;
@@ -154,12 +162,6 @@ const handle_items = (page) => {
     //   break;
     // case "Horse Armor":
     //   handle_horse_armor(page);
-    //   break;
-    case "Service":
-      handle_service(page);
-      break;
-    // case "Shield":
-    //   handle_shield(page);
     //   break;
     case "Weapon":
       handle_weapon(page);
