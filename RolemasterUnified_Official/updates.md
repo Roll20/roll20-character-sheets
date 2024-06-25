@@ -1,3 +1,12 @@
+# 2024-6-24
+
+- Remove HP & PP from side list on main page (tracked in status)
+- Internal
+  - Ignore (generated) inventory files
+- Compendium
+  - Fix issue with Claw Table missing a row causing wierd misses.
+  - Improvements for content for the character creation chapter
+
 # 2024-06-17
 
 - Bugs

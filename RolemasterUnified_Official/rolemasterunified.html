@@ -85,6 +85,17 @@
     <i>{{who}}</i> spends {{ap}}&nbsp;AP on {{computed::action}}
   </div>
 </rolltemplate>
+<rolltemplate class="sheet-rolltemplate-rmuactionload">
+  <div class='sheet-rolltemplate-rmumsg'>
+    <i>{{who}}</i> loads their weapon.
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-rmuactionunload">
+  <div class='sheet-rolltemplate-rmumsg'>
+    <i>{{who}}</i> weapon is no longer loaded.
+  </div>
+</rolltemplate>
 
 <!-- Message for selecting a taget.
   Params we care about are:
@@ -2145,8 +2156,6 @@ Name <input name="attr_character_name">
 <div class='prop_pair'><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manpenalty'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Base Move (BMR)</span><span class='prop_value' name='attr_bmr'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Initiative</span><span class='prop_value'><span name='attr_initiative'></span><button type="roll" class="editbutton rollbutton" value="&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] {{actor=@{character_name} }} {{bonus=@{initiative} }} {{total=$[[1]]}} {{roll=$[[0]]}}"></button></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>hitpoints</span><span class='prop_value' name='attr_hp'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Power</span><span class='prop_value' name='attr_pp'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span></div>
 <div class='prop_pair'><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span></div>
@@ -2179,7 +2188,7 @@ Name <input name="attr_character_name">
 </div>
     <div>Perception</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_perception' value='0'><input class='aptrack' type='radio' name='attr_aptrack_perception' value='1'><input class='aptrack' type='radio' name='attr_aptrack_perception' value='2'></div>
 </div>
-    <div>Missile  (L: <input type='checkbox'>)</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_missile' value='0'><input class='aptrack' type='radio' name='attr_aptrack_missile' value='1'><input class='aptrack' type='radio' name='attr_aptrack_missile' value='2'><input class='aptrack' type='radio' name='attr_aptrack_missile' value='3'></div>
+    <div>Missile  (L: <input name='attr_aptrack_loaded' type='checkbox'>)</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_missile' value='0'><input class='aptrack' type='radio' name='attr_aptrack_missile' value='1'><input class='aptrack' type='radio' name='attr_aptrack_missile' value='2'><input class='aptrack' type='radio' name='attr_aptrack_missile' value='3'></div>
  </div>
     <div>Stand/Drop</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_stand' value='0'><input class='aptrack' type='radio' name='attr_aptrack_stand' value='1'><input class='aptrack' type='radio' name='attr_aptrack_stand' value='2'></div>
 </div>
@@ -2188,7 +2197,7 @@ Name <input name="attr_character_name">
     <div>Eat/Drink</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_eat' value='0'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='1'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='2'></div>
 </div>
     <div class='double'>Concentration</div> <input type='checkbox'>
-    <div>Free Used</div> <input type='checkbox'>
+    <div>Free Action Used</div> <input type='checkbox'>
 
   </div>
 
@@ -4528,7 +4537,7 @@ Bug reports to nashidau on Discord or the #roll20 channel on the
 
 <hr>
 
-Revision 82b76c5317b660cb808bef392a071db9228bd48a
+Revision 7ccbf9bd3ba2fc2fe190ebac50776111b0d89df3
 
 
 <hr>
@@ -10882,6 +10891,20 @@ onCheck(actionevents, (ev) => {
     roll => {
       finishRoll(roll.rollId, { ap: 7, action: select });
   });
+});
+
+
+onCheck("change:aptrack_loaded", (ev) => {
+  console.log(ev);
+  if (ev.newValue == 'on') {
+    startRoll(`&{template:rmuactionload}  {\{who=@{character_name}}} `, roll => {
+	finishRoll(roll.rollId);
+    });
+  } else {
+    startRoll(`&{template:rmuactionunload}  {\{who=@{character_name}}} `, roll => {
+	finishRoll(roll.rollId);
+    });
+  }
 
 });
 
