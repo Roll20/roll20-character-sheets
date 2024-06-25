@@ -7710,11 +7710,14 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
     let fnkAttr = getAttrsAsync(["schusswaffenpunkte", "schusswaffenbonus", "wurfwaffenpunkte", "wurfwaffenbonus", "bannmagiepunkte", "bannmagiebonus", "beherrschungsmagiepunkte", "beherrschungsmagiebonus", "bewegungsmagiepunkte", "bewegungsmagiebonus", "erkenntnismagiepunkte", "erkenntnismagiebonus", "felsmagiepunkte", "felsmagiebonus", "feuermagiepunkte", "feuermagiebonus", "heilungsmagiepunkte", "heilungsmagiebonus", "illusionsmagiepunkte", "illusionsmagiebonus", "kampfmagiepunkte", "kampfmagiebonus", "lichtmagiepunkte", "lichtmagiebonus", "naturmagiepunkte", "naturmagiebonus", "schattenmagiepunkte", "schattenmagiebonus", "schicksalsmagiepunkte", "schicksalsmagiebonus", "schutzmagiepunkte", "schutzmagiebonus", "staerkungsmagiepunkte", "staerkungsmagiebonus", "todesmagiepunkte", "todesmagiebonus", "verwandlungsmagiepunkte", "verwandlungsmagiebonus", "wassermagiepunkte", "wassermagiebonus", "windmagiepunkte", "windmagiebonus", "arkanekundepunkte", "arkanekundebonus"]);
 
 
-    let nhkMastery = getSectionIDs("repeating_meisterschaftenkampf", async function(idsArray){
+    let nhkMastery = new Promise(async function(resolve, reject){
+
+        let idsArray = await getSectionIDsAsync("repeating_meisterschaftenkampf");
+            
         // Map Category, name, value
-        var requestArray = [];
-        var resultObj = {};
-        for(id in idsArray) {
+        let requestArray = [];
+        let resultObj = {};
+        for(id of idsArray) {
             requestArray.push("repeating_meisterschaftenkampf_" + id + "_meisterschaftsname");
             requestArray.push("repeating_meisterschaftenkampf_" + id + "_meisterschaftsfertigkeit");
             requestArray.push("repeating_meisterschaftenkampf_" + id + "_meisterschaftsschwelle");
@@ -7722,21 +7725,44 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
 
         let masteryValues = await getAttrsAsync(requestArray);
 
-        for(id in idsArray) {
+        for(id of idsArray) {
+        
+            let name = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsname"];
+            let ability = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsfertigkeit"];
+            let value = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsschwelle"];
+            console.log("------");
+            console.log(id);
+            console.log(name);
+            console.log(ability);
+            console.log(value);
+            console.log(resultObj);
+            
+            
+            var namesArray = [];
+            var valuesArray = [];
             try {
-                let name = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsname"];
-                let ability = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsfertigkeit"];
-                let value = masteryValues["repeating_meisterschaftenkampf_" + id + "_meisterschaftsschwelle"];
-
-                resultObj.[ability] = {name: name, value: value};
-            }catch(error) {
-                console.error(error);
+                namesArray = resultObj[ability].names.concat([name]);
+            } catch (error) {
+                namesArray = [name];
             }
+            console.log(namesArray);
+
+            try {
+                valuesArray = resultObj[ability].values.concat([+value]);
+            } catch (error) {
+                valuesArray = [+value];
+            }
+            console.log(valuesArray);
+
+            resultObj[ability] = {names: namesArray, values: valuesArray};
+    
 
         }
-        resolve(resultObj);
+        
+        return resolve(resultObj);
     });
 
+    
     console.log(nhkMastery);
 
     // Nahkampfwaffen
@@ -7755,8 +7781,9 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
 
                 getAttrs(["repeating_nahkampfwaffen_" + currentID +"_waffenname", "repeating_nahkampfwaffen_" + currentID +"_waffenskill", "repeating_nahkampfwaffen_" + currentID +"_waffenattr1", "repeating_nahkampfwaffen_" + currentID +"_waffenattr2"], async function(v) { 
 
-                    await Promise.all([baseAttr, nhkAttr, nhkMastery]);
-                    console.log(nhkMastery);
+                    let lol = await Promise.all([baseAttr, nhkAttr, nhkMastery]);
+                    //debugger; Promise.allSettled()
+                    [baseAttr, nhkAttr, nhkMastery] = lol;
 
                     var name = v["repeating_nahkampfwaffen_" + currentID +"_waffenname"];
                     var skill = v["repeating_nahkampfwaffen_" + currentID +"_waffenskill"];
@@ -7764,12 +7791,21 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
                     var attr2 = v["repeating_nahkampfwaffen_" + currentID +"_waffenattr2"];
                     var update = {};
 
-                    try {
-                        let skillobject = nhkMastery[skill];
-                        
-                    } catch (error) {
-                        console.error(error);
-                    }
+                    
+                    console.log("---2---");
+                    console.log(nhkMastery);
+                    console.log(name);
+                    console.log(skill);
+                    console.log(lol);
+         
+                                  
+
+                    let index = nhkMastery[skill].names.findIndex(word => ~name.split(" ").indexOf(word));
+                    console.log(index);
+                    temp4 = (index>=0) ? nhkMastery[skill].values[index] : 0;
+                    console.log(temp4);
+                    
+                
                    
 
                     switch (skill) {
@@ -7857,12 +7893,13 @@ on("change:repeating_nahkampfwaffen:waffenskill change:repeating_nahkampfwaffen:
                             attrmod += baseAttr.hiddenwillenskraftmod;
                             break;
                     }
-                    update["repeating_nahkampfwaffen_" + currentID + "_waffenwert"] = +temp1 + +temp2 + +temp3;
+                    update["repeating_nahkampfwaffen_" + currentID + "_waffenwert"] = +temp1 + +temp2 + +temp3 + +temp4;
                     update["repeating_nahkampfwaffen_" + currentID + "_nahwaffenattrmod"] = +attrmod;
                     setAttrs(update);
                 });
             });
         }
+        return "";
     });
     
     // Fernkampfwaffen
