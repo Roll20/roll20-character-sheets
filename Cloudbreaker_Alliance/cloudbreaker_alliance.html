@@ -6,6 +6,17 @@
 	const gold_rank = "gold";
 	const platinum_rank = "platinum";
 
+	var getSectionIDsOrdered = function (sectionName, callback) {
+		'use strict';
+		getAttrs([`_reporder_${sectionName}`], function (v) {
+			getSectionIDs(sectionName, function (idArray) {
+				let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+				ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+				callback(ids);
+			});
+		});
+	};
+
 	const tabs = [
 		"character",
 		"combat",
@@ -24,7 +35,6 @@
 	});
 
 	on("change:character_level", function(eventInfo) {
-		var output = {};
 		var level = 1;
 		if (eventInfo.newValue != undefined || eventInfo.newValue != "")
 			level = parseInt(eventInfo.newValue);
@@ -35,15 +45,34 @@
 		const grade = new_level == 89 ? platinum_rank : new_level > 8 ? gold_rank : new_level > 4 ? silver_rank : copper_rank;
 		const total_attributes = 7 + grade_ranked;
 
-		output["character_level"] = new_level;
-		output["adventuring_grade"] = grade;
-		output["total_attributes"] = total_attributes;
-		output["mastery_bonus"] = 2 + grade_ranked;
-
-		setAttrs(output, {silent: false});
-
-		getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunements_total", "added_mp", "added_resolve"], function(v) {
+		getAttrs(["downgrade_level"], function(v) {
 			var output = {};
+
+			var downgrade = v["downgrade_level"];
+			var downgraded_rank = grade;
+			var mastery_total = 2 + grade_ranked;
+			if (downgrade == copper_rank) {
+				downgraded_rank = copper_rank;
+				mastery_total = 3;
+			}
+			else if (downgrade == silver_rank && grade != copper_rank) {
+				downgraded_rank = silver_rank;
+				mastery_total = 4;
+			}
+
+			output["character_level"] = new_level;
+			output["adventuring_grade"] = downgraded_rank;
+			output["total_attributes"] = total_attributes;
+			output["mastery_bonus"] = mastery_total;
+
+			setAttrs(output, {silent: false});
+		});
+
+		getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunements_total", "added_mp", "added_resolve", "downgrade_level", "armor_type"], function(v) {
+			var output = {};
+
+			const downgrade = v["downgrade_level"];
+			const armor_type = v["armor_type"];
 
 			const armor_hp = parseInt(v["armor_hp"]);
 			const unarmored_toughness = v["unarmored_toughness"];
@@ -52,15 +81,46 @@
 			const added_mp = parseInt(v["added_mp"]);
 			const added_resolve = parseInt(v["added_resolve"]);
 
-			var hp_max = 15 + (capped_level - 1) * 2 + added_hp + armor_hp;
+			var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
 			if (unarmored_toughness == "on")
-				hp_max = 20 + (capped_level - 1) * 3 + added_hp;
+				hp_max = 20 + (capped_level - 1) * 3;
 
-			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunements_total;
+			if (downgrade == copper_rank) {
+				if (armor_type == "light")
+					hp_max = Math.min(hp_max, 30);
+				else if (armor_type == "medium")
+					hp_max = Math.min(hp_max, 40);
+				else if (armor_type == "heavy")
+					hp_max = Math.min(hp_max, 50);
+				else if (armor_type == "none" && unarmored_toughness == "on")
+					hp_max = Math.min(hp_max, 29);
+				else if (armor_type == "none")
+					hp_max = Math.min(hp_max, 21);
+			}
+			else if (downgrade == silver_rank && grade != copper_rank) {
+				if (armor_type == "light")
+					hp_max = Math.min(hp_max, 45);
+				else if (armor_type == "medium")
+					hp_max = Math.min(hp_max, 55);
+				else if (armor_type == "heavy")
+					hp_max = Math.min(hp_max, 70);
+				else if (armor_type == "none" && unarmored_toughness == "on")
+					hp_max = Math.min(hp_max, 41);
+				else if (armor_type == "none")
+					hp_max = Math.min(hp_max, 29);
+			}
+
+			var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
+
+			if (downgrade == copper_rank)
+				mp_max = Math.min(mp_max, 50);
+			else if (downgrade == silver_rank && grade != copper_rank)
+				mp_max = Math.min(mp_max, 70);
+
 			const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
 
-			output["hp_max"] = hp_max;
-			output["mp_max"] = mp_max;
+			output["hp_max"] = hp_max + added_hp;
+			output["mp_max"] = mp_max + added_mp;
 			output["resolve_max"] = resolve_max;
 
 			setAttrs(output, {silent: true});
@@ -87,15 +147,118 @@
 		if (previous_grade_value == new_grade_value)
 			return;
 
-		getAttrs(["minor_action"], function(v) {
+		getAttrs(["minor_action", "downgrade_level"], function(v) {
 			var output = {};
 
+			const downgrade = v["downgrade_level"];
+
 			const minor_action = parseInt(v["minor_action"]);
-			const new_minor_action = minor_action + new_grade_value - previous_grade_value;
+			var new_minor_action = minor_action + new_grade_value - previous_grade_value;
+
+			if (downgrade == copper_rank)
+				new_minor_action = Math.min(new_minor_action, 1);
+			else if (downgrade == silver_rank && new_grade_value != copper_rank)
+				new_minor_action = Math.min(new_minor_action, 2);
 
 			output["minor_action"] = new_minor_action;
 
 			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:downgrade_level", function(eventInfo) {
+		getAttrs(["character_level"], function(v) {
+			var output = {};
+
+			const downgrade = eventInfo.newValue;
+			const character_level = parseInt(v["character_level"]);
+
+			const capped_level = character_level > 12 ? 12 : character_level;
+
+			const grade = character_level == 89 ? platinum_rank : character_level > 8 ? gold_rank : character_level > 4 ? silver_rank : copper_rank;
+
+			var new_grade = grade;
+			if (downgrade == copper_rank)
+				new_grade = copper_rank;
+			else if (downgrade == silver_rank && grade != copper_rank)
+				new_grade = silver_rank;
+
+			var new_grade_rank = new_grade == platinum_rank ? 3 : new_grade == gold_rank ? 3 : new_grade == silver_rank ? 2 : 1;
+
+			var mastery_bonus = 2 + new_grade_rank;
+			if (downgrade == copper_rank)
+				mastery_bonus = 3;
+			else if (downgrade == silver_rank && grade != copper_rank)
+				mastery_bonus = 4;
+
+			var minor_action = new_grade == copper_rank ? 1 : new_grade == silver_rank ? 2 : 3;
+
+			output["adventuring_grade"] = new_grade;
+			output["mastery_bonus"] = mastery_bonus;
+			output["minor_action"] = minor_action;
+
+			setAttrs(output, {silent: false});
+
+			getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "armor_type"], function(v) {
+				var output = {};
+
+				const armor_type = v["armor_type"];
+
+				const armor_hp = parseInt(v["armor_hp"]);
+				const unarmored_toughness = v["unarmored_toughness"];
+				const added_hp = parseInt(v["added_hp"]);
+
+				var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
+				if (unarmored_toughness == "on")
+					hp_max = 20 + (capped_level - 1) * 3;
+
+				if (downgrade == copper_rank) {
+					if (armor_type == "light")
+						hp_max = Math.min(hp_max, 30);
+					else if (armor_type == "medium")
+						hp_max = Math.min(hp_max, 40);
+					else if (armor_type == "heavy")
+						hp_max = Math.min(hp_max, 50);
+					else if (armor_type == "none" && unarmored_toughness == "on")
+						hp_max = Math.min(hp_max, 29);
+					else if (armor_type == "none")
+						hp_max = Math.min(hp_max, 21);
+				}
+				else if (downgrade == silver_rank && grade != copper_rank) {
+					if (armor_type == "light")
+						hp_max = Math.min(hp_max, 45);
+					else if (armor_type == "medium")
+						hp_max = Math.min(hp_max, 55);
+					else if (armor_type == "heavy")
+						hp_max = Math.min(hp_max, 70);
+					else if (armor_type == "none" && unarmored_toughness == "on")
+						hp_max = Math.min(hp_max, 41);
+					else if (armor_type == "none")
+						hp_max = Math.min(hp_max, 29);
+				}
+
+				output["hp_max"] = hp_max + added_hp;
+
+				setAttrs(output, {silent: true});
+			});
+
+			getAttrs(["attunements_total", "added_mp"], function(v) {
+				var output = {};
+
+				const attunements_total = parseInt(v["attunements_total"]);
+				const added_mp = parseInt(v["added_mp"]);
+
+				var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
+
+				if (downgrade == copper_rank)
+					mp_max = Math.min(mp_max, 50);
+				else if (downgrade == silver_rank && grade != copper_rank)
+					mp_max = Math.min(mp_max, 70);
+
+				output["mp_max"] = mp_max + added_mp;
+
+				setAttrs(output, {silent: true});
+			});
 		});
 	});
 
@@ -115,9 +278,12 @@
 		});
 	});
 
-	on("change:added_hp change:armor_hp change:unarmored_toughness", function(eventInfo) {
-		getAttrs(["added_hp", "armor_hp", "unarmored_toughness", "character_level"], function(v) {
+	on("change:added_hp change:armor_hp change:unarmored_toughness change:armor_type", function(eventInfo) {
+		getAttrs(["added_hp", "armor_hp", "unarmored_toughness", "character_level", "armor_type", "downgrade_level"], function(v) {
 			var output = {};
+
+			const downgrade = v["downgrade_level"];
+			const armor_type = v["armor_type"];
 
 			const character_level = parseInt(v["character_level"]);
 			const capped_level = character_level > 12 ? 12 : character_level;
@@ -126,35 +292,67 @@
 			const armor_hp = parseInt(v["armor_hp"]);
 			const unarmored_toughness = v["unarmored_toughness"];
 
-			var hp_max = 15 + (capped_level - 1) * 2 + added_hp + armor_hp;
+			var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
 			if (unarmored_toughness == "on")
-				hp_max = 20 + (capped_level - 1) * 3 + added_hp;
+				hp_max = 20 + (capped_level - 1) * 3;
 
-			output["hp_max"] = hp_max;
+			if (downgrade == copper_rank) {
+				if (armor_type == "light")
+					hp_max = Math.min(hp_max, 30);
+				else if (armor_type == "medium")
+					hp_max = Math.min(hp_max, 40);
+				else if (armor_type == "heavy")
+					hp_max = Math.min(hp_max, 50);
+				else if (armor_type == "none" && unarmored_toughness == "on")
+					hp_max = Math.min(hp_max, 29);
+				else if (armor_type == "none")
+					hp_max = Math.min(hp_max, 21);
+			}
+			else if (downgrade == silver_rank) {
+				if (armor_type == "light")
+					hp_max = Math.min(hp_max, 45);
+				else if (armor_type == "medium")
+					hp_max = Math.min(hp_max, 55);
+				else if (armor_type == "heavy")
+					hp_max = Math.min(hp_max, 70);
+				else if (armor_type == "none" && unarmored_toughness == "on")
+					hp_max = Math.min(hp_max, 41);
+				else if (armor_type == "none")
+					hp_max = Math.min(hp_max, 29);
+			}
+
+			output["hp_max"] = hp_max + added_hp;
 
 			setAttrs(output, {silent: true});
 		});
 	});
 
 	on("change:added_mp change:attunements_total", function(eventInfo) {
-		getAttrs(["added_mp", "attunements_total", "character_level"], function(v) {
+		getAttrs(["added_mp", "attunements_total", "character_level", "downgrade_level"], function(v) {
 			var output = {};
+
+			const downgrade = v["downgrade_level"];
 
 			const character_level = parseInt(v["character_level"]);
 			const capped_level = character_level > 12 ? 12 : character_level;
 
 			const added_mp = parseInt(v["added_mp"]);
 			const attunements_total = parseInt(v["attunements_total"]);
-			const mp_max = 15 + (capped_level - 1) * 2 + added_mp + 10 * attunements_total;
+			var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
 
-			output["mp_max"] = mp_max;
+			if (downgrade == copper_rank)
+				mp_max = Math.min(mp_max, 50);
+			else if (downgrade == silver_rank)
+				mp_max = Math.min(mp_max, 70);
+
+			output["mp_max"] = mp_max + added_mp;
 
 			setAttrs(output, {silent: true});
 		});
 	});
 
-	on("change:repeating_quirks", function(eventInfo) {
-		getSectionIDs("quirks", function(ids) {
+	on("change:repeating_quirks remove:repeating_quirks change:_reporder:quirks", function(eventInfo) {
+		getSectionIDsOrdered("repeating_quirks", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_quirks_${id}_quirk_name`).concat(ids.map(id => `repeating_quirks_${id}_quirk_level`));
 
 			getAttrs(attrs_to_get, function(v) {
@@ -173,7 +371,7 @@
 
 				quirk_value_pair = quirk_value_pair.trimEnd();
 
-				output["all_quirks"] = quirk_value_pair;
+				output["quirk_summary"] = quirk_value_pair;
 				if (total_quirk_points == undefined)
 					total_quirk_points = 0;
 				output["quirk_total"] = total_quirk_points;
@@ -812,6 +1010,7 @@
 
 			const lifeform = v["repeating_traits_trait_lifeform"];
 			const character_lifeform = v["character_lifeform"];
+
 			if (lifeform != "")
 				return;
 
@@ -819,8 +1018,10 @@
 
 			setAttrs(output, {silent: true});
 		});
+	});
 
-		getSectionIDs("traits", function(ids) {
+	on("change:repeating_traits remove:repeating_traits change:_reporder:traits", function(eventInfo) {
+		getSectionIDsOrdered("repeating_traits", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_traits_${id}_trait_name`).concat(ids.map(id => `repeating_traits_${id}_trait_type`));
 
 			getAttrs(attrs_to_get, function(v) {
@@ -837,21 +1038,23 @@
 
 				trait_value_pair = trait_value_pair.trimEnd();
 
-				output["all_traits"] = trait_value_pair;
+				output["trait_summary"] = trait_value_pair;
 
 				setAttrs(output, {silent: false});
 			});
 		});
 	});
 
-	on("change:repeating_features change:character_primary_class change:character_secondary_class", function(eventInfo) {
-		getAttrs(["character_primary_class", "character_secondary_class"], function(v) {
+	on("change:repeating_features remove:repeating_features change:_reporder:features change:character_primary_class change:character_secondary_class change:adventuring_grade", function(eventInfo) {
+		getAttrs(["character_primary_class", "character_secondary_class", "adventuring_grade"], function(v) {
 			var output = {};
+
+			const adventuring_grade = v["adventuring_grade"];
 
 			const primary_class = v["character_primary_class"].toLowerCase();
 			const secondary_class = v["character_secondary_class"].toLowerCase();
 
-			getSectionIDs("features", function(ids) {
+			getSectionIDsOrdered("repeating_features", function(ids) {
 				var attrs_to_get =
 				ids.map(id => `repeating_features_${id}_feature_name`)
 				.concat(ids.map(id => `repeating_features_${id}_feature_level`))
@@ -862,6 +1065,7 @@
 					var output = {};
 					var primary_features = [];
 					var secondary_features = [];
+					var uncategorized_features = [];
 
 					for (let i = 0; i < ids.length; i++) {
 						const id = ids[i];
@@ -871,21 +1075,52 @@
 						const featureName = v[`repeating_features_${id}_feature_name`];
 						const featureLevel = v[`repeating_features_${id}_feature_level`];
 
-						if ((featureClass == undefined || featureClass == "") && (featureDiscipline == undefined || featureDiscipline == ""))
-							continue;
-
-						if ((featureClass != undefined && featureClass != "" && primary_class.includes(featureClass.toLowerCase()))
-						|| (featureDiscipline != undefined && featureDiscipline != "" && primary_class.includes(featureDiscipline.toLowerCase()))) {
-							primary_features.push({
+						if (primary_class == undefined || primary_class == "" || secondary_class == undefined || secondary_class == "") {
+							uncategorized_features.push({
 								feature_discipline: featureDiscipline,
 								feature_class: featureClass,
 								feature_name: featureName,
 								feature_level: featureLevel
 							});
+							continue;
 						}
-						else if ((featureClass != undefined && featureClass != "" && secondary_class.includes(featureClass.toLowerCase()))
-							|| (featureDiscipline != undefined && featureDiscipline != "" && secondary_class.includes(featureDiscipline.toLowerCase()))) {
-							secondary_features.push({
+
+						if (featureClass != undefined && featureClass != "") {
+							if (primary_class.includes(featureClass.toLowerCase())) {
+								primary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							} else if (secondary_class.includes(featureClass.toLowerCase())) {
+								secondary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							}
+						}
+						else if (featureDiscipline != undefined && featureDiscipline != "") {
+							if (primary_class.includes(featureDiscipline.toLowerCase())) {
+								primary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							} else if (secondary_class.includes(featureDiscipline.toLowerCase())) {
+								secondary_features.push({
+									feature_discipline: featureDiscipline,
+									feature_class: featureClass,
+									feature_name: featureName,
+									feature_level: featureLevel
+								});
+							}
+						}
+						else {
+							uncategorized_features.push({
 								feature_discipline: featureDiscipline,
 								feature_class: featureClass,
 								feature_name: featureName,
@@ -894,8 +1129,33 @@
 						}
 					}
 
-					primary_features.sort((a, b) => b.feature_level - a.feature_level);
-					secondary_features.sort((a, b) => b.feature_level - a.feature_level);
+					if (primary_features.length == 0 && secondary_features.length == 0 && uncategorized_features.length == 0) {
+						for (let i = 0; i < ids.length; i++) {
+							const id = ids[i];
+							const featureName = v[`repeating_features_${id}_feature_name`];
+							const featureLevel = v[`repeating_features_${id}_feature_level`];
+
+							const featureClass = v[`repeating_features_${id}_feature_class`];
+							const featureDiscipline = v[`repeating_features_${id}_feature_discipline`];
+
+							uncategorized_features.push({
+								feature_discipline: featureDiscipline,
+								feature_class: featureClass,
+								feature_name: featureName,
+								feature_level: featureLevel
+							});
+						}
+					}
+
+					primary_features.sort((a, b) => a.feature_level - b.feature_level);
+					secondary_features.sort((a, b) => a.feature_level - b.feature_level);
+					uncategorized_features.sort((a, b) => {
+						if (a.feature_discipline.toLowerCase() < b.feature_discipline.toLowerCase()) return -1;
+						if (a.feature_discipline.toLowerCase() > b.feature_discipline.toLowerCase()) return 1;
+						if (a.feature_class.toLowerCase() < b.feature_class.toLowerCase()) return -1;
+						if (a.feature_class.toLowerCase() > b.feature_class.toLowerCase()) return 1;
+						return a.feature_level - b.feature_level;
+					});
 
 					var final_string = "";
 					if (primary_features.length > 0) {
@@ -904,14 +1164,20 @@
 							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
 					}
-					if (secondary_features.length > 0) {
+					if (secondary_features.length > 0 && adventuring_grade != copper_rank) {
 						final_string += `Secondary Class (${secondary_features[0].feature_discipline} ${secondary_features[0].feature_class}) features\n`;
 						for (let feature of secondary_features) {
 							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
 					}
+					if (uncategorized_features.length > 0) {
+						final_string += `Uncategorized features\n`;
+						for (let feature of uncategorized_features) {
+							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
+						}
+					}
 
-					output["all_features"] = final_string.trimEnd();
+					output["feature_summary"] = final_string.trimEnd();
 
 					setAttrs(output, {silent: false});
 				});
@@ -919,30 +1185,30 @@
 		});
 	});
 
-	on("change:all_quirks change:all_traits change:all_features", function(eventInfo) {
-		getAttrs(["all_quirks", "all_traits", "all_features"], function(v) {
+	on("change:quirk_summary change:trait_summary change:feature_summary", function(eventInfo) {
+		getAttrs(["quirk_summary", "trait_summary", "feature_summary"], function(v) {
 			var output = {};
 
-			const all_quirks = v["all_quirks"];
-			const all_traits = v["all_traits"];
-			const all_features = v["all_features"];
+			const quirk_summary = v["quirk_summary"];
+			const trait_summary = v["trait_summary"];
+			const feature_summary = v["feature_summary"];
 
 			var all_text = "";
-			if (all_quirks != undefined && all_quirks != "")
-				all_text += "Quirks\n" + all_quirks.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-			if (all_traits != undefined && all_traits != "")
-				all_text += "Traits\n" + all_traits.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-			if (all_features != undefined && all_features != "")
-				all_text += "Features\n" + all_features.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (quirk_summary != undefined && quirk_summary != "")
+				all_text += "Quirks\n" + quirk_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (trait_summary != undefined && trait_summary != "")
+				all_text += "Traits\n" + trait_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+			if (feature_summary != undefined && feature_summary != "")
+				all_text += "Features\n" + feature_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
 
-			output["all_quirks_traits_features"] = all_text.trimEnd();
+			output["quirk_traits_features_summary"] = all_text.trimEnd();
 
 			setAttrs(output, {silent: true});
 		});
 	});
 
-	on("change:repeating_equipment", function(eventInfo) {
-		getSectionIDs("equipment", function(ids) {
+	on("change:repeating_equipment remove:repeating_equipment change:_reporder:equipment", function(eventInfo) {
+		getSectionIDsOrdered("repeating_equipment", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_equipment_${id}_equipment_name`).concat(ids.map(id => `repeating_equipment_${id}_equipment_quantity`)).concat(ids.map(id => `repeating_equipment_${id}_equipment_weight`)).concat("added_slots");
 
 			getAttrs(attrs_to_get, function(v) {
@@ -962,7 +1228,7 @@
 
 				equipment_value_pair = equipment_value_pair.trimEnd();
 
-				output["all_equipment"] = equipment_value_pair;
+				output["equipment_summary"] = equipment_value_pair;
 
 				for (const id of ids) {
 					const equipmentWeight = parseFloat(v[`repeating_equipment_${id}_equipment_weight`]);
@@ -972,7 +1238,7 @@
 					total_weight += equipmentQuantity * equipmentWeight;
 				}
 
-				output["equipment_weight_label"] = `${parseInt(total_weight)}/${total_slots}`;
+				output["equipment_weight_label"] = `${total_weight}/${total_slots}`;
 
 				setAttrs(output, {silent: false});
 			});
@@ -993,10 +1259,10 @@
 		});
 	});
 
-	on("change:repeating_bonds change:fond_memories", function(eventInfo) {
+	on("change:repeating_bonds change:fond_memories remove:repeating_bonds change:_reporder:bonds", function(eventInfo) {
 		var output = {};
 
-		getSectionIDs("bonds", function(ids) {
+		getSectionIDsOrdered("repeating_bonds", function(ids) {
 			var attrs_to_get = ids.map(id => `repeating_bonds_${id}_bond_name`).concat(ids.map(id => `repeating_bonds_${id}_bond_level`));
 			attrs_to_get.push("fond_memories");
 			getAttrs(attrs_to_get, function(v) {
@@ -1069,14 +1335,14 @@
 
 				ranks_value_pair = ranks_value_pair.trimEnd();
 
-				output["all_ranks"] = ranks_value_pair;
+				output["rank_summary"] = ranks_value_pair;
 
 				setAttrs(output, {silent: true});
 			});
 		});
 	});
 
-	on("change:repeating_attacks:attack_mastery change:repeating_attacks:attack_bonus", function(eventInfo) {
+	on("change:repeating_attacks change:repeating_attacks:attack_mastery change:repeating_attacks:attack_bonus", function(eventInfo) {
 		getAttrs(["repeating_attacks_attack_mastery", "repeating_attacks_attack_bonus", "mastery_bonus"], function(v) {
 			var output = {};
 
@@ -1347,7 +1613,7 @@
 		getAttrs(["movement_distance"], function(v) {
 			var output = {};
 
-			const movement_distance = parseInt(v["movement_zone"]);
+			const movement_distance = parseInt(v["movement_distance"]);
 			const movement_zone = Math.floor(movement_distance / 10);
 
 			output["movement_zone"] = movement_zone;
@@ -1394,6 +1660,133 @@
 			setAttrs(output, {silent: true});
 		});
 	});
+
+	on("sheet:opened", function(eventInfo) {
+		getSectionIDsOrdered("repeating_storages", function(ids) {
+			var output = {};
+			if (ids.length == 0) {
+				var newStorageLine = `repeating_storages_${generateRowID()}`;
+				output[`${newStorageLine}_storage_name`] = "Guild Storage";
+				output[`${newStorageLine}_storage_capacity`] = 20;
+				output[`${newStorageLine}_storage_description`] = "The Cloudbreaker Guild allows you to store 20 Item Slots worth of items and equipment. You can request that your stored items be delivered to you between missions. You can also store your items on your rides, allowing you to swap your inventory anytime as long as you can access your ride’s trunk. Different rides can store different amounts of items.";
+
+				setAttrs(output, {silent: false});
+			}
+		});
+	});
+
+	on("change:repeating_storages remove:repeating_storages change:_reporder:storages", function(eventInfo) {
+		getSectionIDsOrdered("repeating_storages", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_storages_${id}_storage_name`).concat(ids.map(id => `repeating_storages_${id}_storage_capacity`));
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+				var storage_value_pair = "";
+				var total_capacity = 0;
+
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					const storageName = v[`repeating_storages_${id}_storage_name`];
+					const storageCapacity = parseInt(v[`repeating_storages_${id}_storage_capacity`]);
+					if (storageName == undefined || storageName == "")
+						continue;
+					storage_value_pair += `${storageName} (${storageCapacity} slots)\n`;
+					total_capacity += storageCapacity;
+				}
+
+				storage_value_pair = storage_value_pair.trimEnd();
+
+				output["storage_storages"] = storage_value_pair;
+				output["storage_total_capacity"] = total_capacity;
+
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+	on("change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
+		getSectionIDsOrdered("repeating_possessions", function(ids) {
+			var attrs_to_get = ids.map(id => `repeating_possessions_${id}_possession_name`).concat(ids.map(id => `repeating_possessions_${id}_possession_weight`)).concat(ids.map(id => `repeating_possessions_${id}_possession_quantity`));
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+				var possession_value_pair = "";
+				var total_weight = 0;
+
+				for (let i = 0; i < ids.length; i++) {
+					const id = ids[i];
+					const possessionName = v[`repeating_possessions_${id}_possession_name`];
+					const possessionWeight = parseFloat(v[`repeating_possessions_${id}_possession_weight`]);
+					const possessionQuantity = parseFloat(v[`repeating_possessions_${id}_possession_quantity`]);
+					if (possessionName == undefined || possessionName == "")
+						continue;
+					possession_value_pair += `${possessionName} (${possessionQuantity})\n`;
+					total_weight += possessionWeight * possessionQuantity;
+				}
+
+				possession_value_pair = possession_value_pair.trimEnd();
+
+				output["possession_items"] = possession_value_pair;
+				output["possessions_total_weight"] = total_weight;
+
+				setAttrs(output, {silent: false});
+			});
+		});
+	});
+
+	on("change:storage_total_capacity change:possessions_total_weight", function(eventInfo) {
+		getAttrs(["storage_total_capacity", "possessions_total_weight"], function(v) {
+			var output = {};
+
+			const storage_capacity = parseInt(v["storage_total_capacity"]);
+			const total_weight = parseInt(v["possessions_total_weight"]);
+
+			output["storage_total_weight_label"] = `${total_weight}/${storage_capacity}`;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	on("change:repeating_storages change:_reporder:storages remove:repeating_storages change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
+		getSectionIDsOrdered("repeating_storages", function(storageIDs) {
+			getSectionIDsOrdered("repeating_possessions", function(possessionsIDs) {
+				var attrs_to_get = storageIDs.map(id => `repeating_storages_${id}_storage_capacity`).concat(storageIDs.map(id => `repeating_storages_${id}_storage_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_quantity`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_weight`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_storage`));
+				getAttrs(attrs_to_get, function(v) {
+					var output = {};
+					var storage_value_pairs = {};
+
+					for (let i = 0; i < storageIDs.length; i++) {
+						const storageID = storageIDs[i];
+						const storageName = v[`repeating_storages_${storageID}_storage_name`];
+						const storageCapacity = parseInt(v[`repeating_storages_${storageID}_storage_capacity`]);
+						storage_value_pairs[storageName] = {capacity: storageCapacity, weight: 0, items: []};
+					}
+
+					for (let i = 0; i < possessionsIDs.length; i++) {
+						const possessionID = possessionsIDs[i];
+						const possessionName = v[`repeating_possessions_${possessionID}_possession_name`];
+						const possessionQuantity = parseInt(v[`repeating_possessions_${possessionID}_possession_quantity`]);
+						const possessionWeight = parseFloat(v[`repeating_possessions_${possessionID}_possession_weight`]);
+						var possessionStorage = v[`repeating_possessions_${possessionID}_possession_storage`];
+						if (possessionStorage == undefined || possessionStorage == "")
+							possessionStorage = "Guild Storage";
+						storage_value_pairs[possessionStorage].weight += possessionQuantity * possessionWeight;
+						storage_value_pairs[possessionStorage].items.push({name: possessionName, quantity: possessionQuantity});
+					}
+
+					var storage_label = "";
+					for (const [storageName, storageData] of Object.entries(storage_value_pairs)) {
+						storage_label += `${storageName} (${storageData.weight}/${storageData.capacity})\n`;
+						for (let item of storageData.items) {
+							storage_label += `  ${item.name} (${item.quantity})\n`;
+						}
+					}
+
+					output["storage_contents"] = storage_label.trimEnd();
+
+					setAttrs(output, {silent: true});
+				});
+			});
+		});
+	});
 </script>
 
 <html>
@@ -1405,7 +1798,7 @@
 			<button type="action" class="sheet-tabButton" name="act_combat">Combat</button>
 			<button type="action" class="sheet-tabButton" name="act_magic">Magic</button>
 			<button type="action" class="sheet-tabButton" name="act_notes">Notes</button>
-			<!-- <button type="action" class="sheet-tabButton" name="act_options">Options</button> -->
+			<button type="action" class="sheet-tabButton" name="act_options">Options</button>
 		</div>
 		<div class="sheet-flexGrow sheet-flexEnd">
 			<select name="attr_roll_whisper_type" title="Select roll visibility">
@@ -1478,8 +1871,8 @@
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_quirks" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+					<input type="hidden" name="attr_quirk_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_summary"></span>
 				</div>
 			</div>
 		</div>
@@ -1557,6 +1950,12 @@
 							</div>
 							<div>
 								<span>Armor HP</span>
+								<select name="attr_armor_type">
+									<option value="none" selected>None</option>
+									<option value="light">Light</option>
+									<option value="medium">Medium</option>
+									<option value="heavy">Heavy</option>
+								</select>
 								<input type="number" name="attr_armor_hp" value="0" />
 							</div>
 							<div>
@@ -2020,10 +2419,10 @@
 			<div style="flex-flow: column; flex: 1 1 auto;">
 				<div class="sheet-sectionTitle">
 					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Traits & Features</span>
-					<input type="checkbox" name="attr_all_traits_fold" class="sheet-folder" />
+					<input type="checkbox" name="attr_trait_summary_fold" class="sheet-folder" />
 					<span class="sheet-folder"></span>
 				</div>
-				<input type="hidden" name="attr_all_traits_fold" class="sheet-folder" />
+				<input type="hidden" name="attr_trait_summary_fold" class="sheet-folder" />
 				<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
 					<div>
 						<!-- Quirks -->
@@ -2052,8 +2451,8 @@
 							</fieldset>
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
-							<input type="hidden" name="attr_all_quirks" />
-							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+							<input type="hidden" name="attr_quirk_summary" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_summary"></span>
 						</div>
 					</div>
 					<div>
@@ -2090,8 +2489,8 @@
 							</fieldset>
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
-							<input type="hidden" name="attr_all_traits" />
-							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_traits"></span>
+							<input type="hidden" name="attr_trait_summary" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_trait_summary"></span>
 						</div>
 					</div>
 					<!-- Features -->
@@ -2127,14 +2526,14 @@
 							</fieldset>
 						</div>
 						<div class="sheet-reverseFoldable sheet-sectionContainer">
-							<input type="hidden" name="attr_all_features" />
-							<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_features"></span>
+							<input type="hidden" name="attr_feature_summary" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_feature_summary"></span>
 						</div>
 					</div>
 				</div>
-				<input type="hidden" name="attr_all_quirks_traits_features" />
+				<input type="hidden" name="attr_quirk_traits_features_summary" />
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks_traits_features"></span>
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_traits_features_summary"></span>
 				</div>
 			</div>
 
@@ -2162,8 +2561,8 @@
 							<div class="sheet-repeatingEquipment">
 								<div>
 									<input type="text" name="attr_equipment_name" title="Equipment name" placeholder="Equipment name" />
-									<input type="number" name="attr_equipment_weight" title="Equipment weight" value="0" />
 									<input type="number" name="attr_equipment_quantity" title="Equipment quantity" value="1" />
+									<input type="number" name="attr_equipment_weight" title="Equipment weight" value="0" />
 									<input type="checkbox" name="attr_equipment_fold" class="sheet-folder" />
 									<span class="sheet-folder"></span>
 								</div>
@@ -2177,8 +2576,8 @@
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_equipment" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_equipment"></span>
+					<input type="hidden" name="attr_equipment_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_equipment_summary"></span>
 				</div>
 			</div>
 		</div>
@@ -2626,7 +3025,7 @@
 								<div>
 									<input type="hidden" name="attr_attack_roll" value="+0" />
 									<button type="roll" name="act_rollAttack" value="@{roll_whisper_type} &{template:attack} {{charName=@{character_name}}} {{rollName=@{attack_name}}} {{RollType=[[?{Roll Type|Normal,0|Edge,1|Setback,2}]]}} {{totalN=[[2d6 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{totalE=[[{2d6,2d6}kh1 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{totalSB=[[{2d6,2d6}kl1 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{damage=@{attack_damage}}}"><span name="attr_attack_roll"></span></button>
-									<input type="checkbox" name="attr_attack_mastery" title="Attack mastery" checked />
+									<input type="checkbox" name="attr_attack_mastery" title="Attack mastery" value="on" checked />
 									<input type="hidden" name="attr_attack_mastery_value" />
 									<input type="text" name="attr_attack_name" title="Attack name" placeholder="Attack name" />
 								</div>
@@ -2656,10 +3055,10 @@
 		<div style="flex-flow: column;">
 			<div class="sheet-sectionTitle">
 				<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Traits & Features</span>
-				<input type="checkbox" name="attr_all_traits_fold" class="sheet-folder" />
+				<input type="checkbox" name="attr_trait_summary_fold" class="sheet-folder" />
 				<span class="sheet-folder"></span>
 			</div>
-			<input type="hidden" name="attr_all_traits_fold" class="sheet-folder" />
+			<input type="hidden" name="attr_trait_summary_fold" class="sheet-folder" />
 			<div class="sheet-sectionContainer sheet-foldable" style="gap: 4px;">
 				<div>
 					<!-- Quirks -->
@@ -2688,8 +3087,8 @@
 						</fieldset>
 					</div>
 					<div class="sheet-reverseFoldable sheet-sectionContainer">
-						<input type="hidden" name="attr_all_quirks" />
-						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks"></span>
+						<input type="hidden" name="attr_quirk_summary" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_summary"></span>
 					</div>
 				</div>
 				<div>
@@ -2726,8 +3125,8 @@
 						</fieldset>
 					</div>
 					<div class="sheet-reverseFoldable sheet-sectionContainer">
-						<input type="hidden" name="attr_all_traits" />
-						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_traits"></span>
+						<input type="hidden" name="attr_trait_summary" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_trait_summary"></span>
 					</div>
 				</div>
 				<!-- Features -->
@@ -2763,14 +3162,14 @@
 						</fieldset>
 					</div>
 					<div class="sheet-reverseFoldable sheet-sectionContainer">
-						<input type="hidden" name="attr_all_features" />
-						<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_features"></span>
+						<input type="hidden" name="attr_feature_summary" />
+						<span class="sheet-replicateInput sheet-contentSummary" name="attr_feature_summary"></span>
 					</div>
 				</div>
 			</div>
-			<input type="hidden" name="attr_all_quirks_traits_features" />
+			<input type="hidden" name="attr_quirk_traits_features_summary" />
 			<div class="sheet-reverseFoldable sheet-sectionContainer">
-				<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_quirks_traits_features"></span>
+				<span class="sheet-replicateInput sheet-contentSummary" name="attr_quirk_traits_features_summary"></span>
 			</div>
 		</div>
 	</div>
@@ -2812,7 +3211,7 @@
 												<div>
 													<!-- Fire -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_FIRE.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_FIRE.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_fire" />
 															<span>Fire</span>
@@ -2820,7 +3219,7 @@
 													</div>
 													<!-- Wood -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WOOD.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_WOOD.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_wood" />
 															<span>Wood</span>
@@ -2828,7 +3227,7 @@
 													</div>
 													<!-- Earth -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_EARTH.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_EARTH.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_earth" />
 															<span>Earth</span>
@@ -2838,7 +3237,7 @@
 												<div style="justify-content: end;">
 													<!-- Toxic -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_POISON.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_POISON.png" style="height: 64px; width: 64px;"/>
 														<span>Toxic</span>
 													</div>
 												</div>
@@ -2847,7 +3246,7 @@
 												<div>
 													<!-- Water -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WATER.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_WATER.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_water" />
 															<span>Water</span>
@@ -2855,7 +3254,7 @@
 													</div>
 													<!-- Wind -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_WIND.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_WIND.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_wind" />
 															<span>Wind</span>
@@ -2863,7 +3262,7 @@
 													</div>
 													<!-- Metal -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_METAL.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_METAL.png" style="height: 64px; width: 64px;"/>
 														<div>
 															<input type="checkbox" name="attr_metal" />
 															<span>Metal</span>
@@ -2873,7 +3272,7 @@
 												<div style="justify-content: end;">
 													<!-- Lightning -->
 													<div class="sheet-arcaneAttunement">
-														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_LIGHTNING.png" style="height: 64px; width: 64px;"/>
+														<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_LIGHTNING.png" style="height: 64px; width: 64px;"/>
 														<span>Lightning</span>
 													</div>
 												</div>
@@ -2885,7 +3284,7 @@
 										<!--
 											<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_ICE.png" style="height: 64px; width: 64px;"/>
 										-->
-										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ICE.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_ICE.png" style="height: 64px; width: 64px;"/>
 										<span style="
 											font-size: x-large;
 											color: white;
@@ -2902,7 +3301,7 @@
 								<div class="sheet-cosmicBackground">
 									<!-- Order -->
 									<div>
-										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ORDER.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_ORDER.png" style="height: 64px; width: 64px;"/>
 										<div>
 											<input type="checkbox" name="attr_order" />
 											<input type="checkbox" name="attr_order" />
@@ -2911,7 +3310,7 @@
 									</div>
 									<!-- Chaos -->
 									<div>
-										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_CHAOS.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_CHAOS.png" style="height: 64px; width: 64px;"/>
 										<div>
 											<input type="checkbox" name="attr_chaos" />
 											<input type="checkbox" name="attr_chaos" />
@@ -2920,7 +3319,7 @@
 									</div>
 									<!-- Astral -->
 									<div>
-										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/cloudbreaker_alliance/Cloudbreaker_Alliance/Elements_ASTRAL.png" style="height: 64px; width: 64px;"/>
+										<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Cloudbreaker_Alliance/Elements_ASTRAL.png" style="height: 64px; width: 64px;"/>
 										<div>
 											<input type="checkbox" name="attr_astral" />
 											<input type="checkbox" name="attr_astral" />
@@ -2984,7 +3383,8 @@
 										<div>
 											<input type="hidden" name="attr_attack_roll" value="+0" />
 											<button type="roll" name="act_rollAttack" value="@{roll_whisper_type} &{template:attack} {{charName=@{character_name}}} {{rollName=@{attack_name}}} {{RollType=[[?{Roll Type|Normal,0|Edge,1|Setback,2}]]}} {{totalN=[[2d6 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{totalE=[[{2d6,2d6}kh1 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{totalSB=[[{2d6,2d6}kl1 +@{attack_mastery_value} +@{attack_bonus} +?{Modifier|0}]]}} {{damage=@{attack_damage}}}"><span name="attr_attack_roll"></span></button>
-											<input type="checkbox" name="attr_attack_mastery" title="Attack mastery" checked />
+											<input type="checkbox" name="attr_attack_mastery" title="Attack mastery" value="on" checked />
+											<input type="hidden" name="attr_attack_mastery_value" />
 											<input type="text" name="attr_attack_name" title="Attack name" placeholder="Attack name" />
 										</div>
 										<div style="flex: 0 0 auto;">
@@ -3675,27 +4075,6 @@
 		<h1>Notes</h1>
 
 		<div style="display: flex; flex-flow: row wrap; gap: 4px;">
-			<!-- Details -->
-				<!-- Background -->
-				<!-- Personality -->
-				<!-- Appearance -->
-				<!-- Goals -->
-				<!-- Beliefs -->
-				<!-- Relationships -->
-					<!-- Family -->
-					<!-- Friends -->
-					<!-- Enemies -->
-				<!-- Hobbies -->
-				<!-- Secrets -->
-				<!-- Fears -->
-				<!-- Hometown -->
-				<!-- Current Residence -->
-				<!-- Occupation -->
-
-			<!-- Fond Memories & Bonds -->
-			<!-- Equipement -->
-			<!-- Class Ranks list -->
-
 			<!-- Fond Memories & Bonds -->
 			<div>
 				<input type="hidden" name="attr_bond_amount_label" value="Bonds: 0
@@ -3768,8 +4147,8 @@ Fond memories: 0/50" />
 							<div class="sheet-repeatingEquipment">
 								<div>
 									<input type="text" name="attr_equipment_name" title="Equipment name" placeholder="Equipment name" />
-									<input type="number" name="attr_equipment_weight" title="Equipment weight" value="0" />
 									<input type="number" name="attr_equipment_quantity" title="Equipment quantity" value="1" />
+									<input type="number" name="attr_equipment_weight" title="Equipment weight" value="0" />
 									<input type="checkbox" name="attr_equipment_fold" class="sheet-folder" />
 									<span class="sheet-folder"></span>
 								</div>
@@ -3783,8 +4162,8 @@ Fond memories: 0/50" />
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_equipment" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_equipment"></span>
+					<input type="hidden" name="attr_equipment_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_equipment_summary"></span>
 				</div>
 			</div>
 
@@ -3816,8 +4195,8 @@ Fond memories: 0/50" />
 					</fieldset>
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
-					<input type="hidden" name="attr_all_ranks" />
-					<span class="sheet-replicateInput sheet-contentSummary" name="attr_all_ranks"></span>
+					<input type="hidden" name="attr_rank_summary" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_rank_summary"></span>
 				</div>
 			</div>
 
@@ -4017,6 +4396,96 @@ Fond memories: 0/50" />
 				</div>
 			</div>
 
+			<!-- Storage -->
+			<div style="flex: 1 1 auto;">
+				<input type="hidden" name="attr_storage_contents" />
+				<input type="hidden" name="attr_storage_total_weight_label"/>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Storage</span>
+					<span class="sheet-sectionTitle" style="flex: 0 0 auto;" name="attr_storage_total_weight_label"></span>
+					<input type="checkbox" name="attr_all_storage_fold" class="sheet-folder" />
+					<span class="sheet-folder"></span>
+				</div>
+				<input type="hidden" name="attr_all_storage_fold" class="sheet-folder" />
+				<div class="sheet-sectionContainer sheet-foldable">
+					<div>
+						<div>
+							<div class="sheet-sectionTitle">
+								<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Storage</span>
+								<span class="sheet-sectionTitle">Capacity:</span>
+								<span class="sheet-sectionTitle" name="attr_storage_total_capacity"></span>
+								<input type="checkbox" name="attr_storage_fold" class="sheet-folder" />
+								<span class="sheet-folder"></span>
+							</div>
+						</div>
+						<input type="hidden" name="attr_storage_fold" class="sheet-folder" />
+						<input type="hidden" name="attr_storage_total_capacity" value="0" />
+						<div class="sheet-sectionContainer sheet-foldable">
+							<fieldset class="repeating_storages">
+								<div class="sheet-repeatingStorage">
+									<div>
+										<input type="text" name="attr_storage_name" title="Storage name" placeholder="Storage name" />
+										<input type="number" name="attr_storage_capacity" title="Storage weight" value="20" />
+										<input type="checkbox" name="attr_storage_fold" class="sheet-folder" />
+										<span class="sheet-folder"></span>
+									</div>
+									<!-- Text area for storage description -->
+									<input type="hidden" name="attr_storage_fold" class="sheet-folder" />
+									<div class="sheet-foldable">
+										<textarea name="attr_storage_description" style="width: 100%;" placeholder="Storage description"></textarea>
+									</div>
+								</div>
+							</fieldset>
+						</div>
+						<div class="sheet-reverseFoldable sheet-sectionContainer">
+							<input type="hidden" name="attr_storage_storages" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_storage_storages"></span>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-sectionTitle">
+							<span class="sheet-sectionTitle" style="flex: 1 1 auto;">Possessions</span>
+							<span class="sheet-sectionTitle">Total weight:</span>
+							<span class="sheet-sectionTitle" name="attr_possessions_total_weight"></span>
+							<input type="checkbox" name="attr_possessions_fold" class="sheet-folder" />
+							<span class="sheet-folder"></span>
+						</div>
+						<input type="hidden" name="attr_possessions_fold" class="sheet-folder" />
+						<input type="hidden" name="attr_possessions_total_weight" value="0" />
+						<div class="sheet-foldable sheet-sectionContainer" style="gap: 4px;">
+							<fieldset class="repeating_possessions">
+								<div class="sheet-repeatingPossession">
+									<div>
+										<input type="text" name="attr_possession_name" title="Item name" placeholder="Item name" />
+										<input type="number" name="attr_possession_weight" title="Item weight" value="0" />
+										<input type="number" name="attr_possession_quantity" title="Item quantity" value="1" />
+										<input type="checkbox" name="attr_possession_fold" class="sheet-folder" />
+										<span class="sheet-folder"></span>
+									</div>
+									<!-- Text area for possession description -->
+									<input type="hidden" name="attr_possession_fold" class="sheet-folder" />
+									<div class="sheet-foldable">
+										<div>
+											<span>Storage:</span>
+											<input type="text" name="attr_possession_storage" title="Where is this stored" placeholder="Guild storage" />
+										</div>
+										<textarea name="attr_possession_description" style="width: 100%;" placeholder="Item description"></textarea>
+									</div>
+								</div>
+							</fieldset>
+						</div>
+						<div class="sheet-reverseFoldable sheet-sectionContainer">
+							<input type="hidden" name="attr_possession_items" />
+							<span class="sheet-replicateInput sheet-contentSummary" name="attr_possession_items"></span>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-reverseFoldable sheet-sectionContainer">
+					<input type="hidden" name="attr_storage_contents" />
+					<span class="sheet-replicateInput sheet-contentSummary" name="attr_storage_contents" style="text-transform: none;"></span>
+				</div>
+			</div>
+
 			<!-- Notes -->
 			<div style="flex: 1 1 auto;">
 				<div class="sheet-sectionTitle">
@@ -4043,6 +4512,151 @@ Fond memories: 0/50" />
 				</div>
 				<div class="sheet-reverseFoldable sheet-sectionContainer">
 					<span class="sheet-replicateInput sheet-contentSummary"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Options Tab -->
+	<div class="sheet-options sheet-tab">
+		<h1>Options</h1>
+
+		<div>
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Downgrading</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Downgrade level</span>
+						<select name="attr_downgrade_level">
+							<option value="none" selected>None</option>
+							<option value="copper">Copper</option>
+							<option value="silver">Silver</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Resolve</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Additional max resolve</span>
+						<input type="number" name="attr_added_resolve" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Hit Points</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Unarmored toughness</span>
+						<input type="number" name="attr_unarmored_toughness" value="0" />
+					</div>
+					<div>
+						<span>Armor HP</span>
+						<select name="attr_armor_type">
+							<option value="none">None</option>
+							<option value="light">Light</option>
+							<option value="medium">Medium</option>
+							<option value="heavy">Heavy</option>
+						</select>
+						<input type="number" name="attr_armor_hp" value="0" />
+					</div>
+					<div>
+						<span>Additional max HP</span>
+						<input type="number" name="attr_added_hp" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Mind Points</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Additional max MP</span>
+						<input type="number" name="attr_added_mp" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Defense</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Base defense</span>
+						<input type="number" name="attr_base_defense" value="0" />
+					</div>
+					<div>
+						<span>Bonus defense</span>
+						<input type="number" name="attr_bonus_defense" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">P. Fortitude</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Base fortitude</span>
+						<input type="number" name="attr_base_fortitude" value="0" />
+					</div>
+					<div>
+						<span>Bonus fortitude</span>
+						<input type="number" name="attr_bonus_fortitude" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">M. Fortitude</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Base fortitude</span>
+						<input type="number" name="attr_base_willpower" value="0" />
+					</div>
+					<div>
+						<span>Bonus fortitude</span>
+						<input type="number" name="attr_bonus_willpower" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Equipment</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Additional slots</span>
+						<input type="number" name="attr_added_slots" value="0" />
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div class="sheet-sectionTitle">
+					<span class="sheet-sectionTitle">Attunements</span>
+				</div>
+				<div class="sheet-sectionContainer">
+					<div>
+						<span>Max attunements</span>
+						<input type="number" name="attr_attunements_max" value="0" />
+					</div>
 				</div>
 			</div>
 		</div>
