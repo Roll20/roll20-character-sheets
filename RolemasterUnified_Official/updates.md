@@ -1,3 +1,26 @@
+# 2024-6-24
+
+- Remove HP & PP from side list on main page (tracked in status)
+- Internal
+  - Ignore (generated) inventory files
+- Compendium
+  - Fix issue with Claw Table missing a row causing wierd misses.
+  - Improvements for content for the character creation chapter
+
+# 2024-06-17
+
+- Bugs
+  - Handle 0 running ranks in DB calculations
+  - Fix over zealous const in culture ranks
+  - Fix 4th Crafting skill in Urban Culture
+  - Fix display of running ranks in DB info
+- Charactermancer:
+  - Make the pbonus & knack totals text, not entries.
+  - Save languages from charactermancer for all cultures.
+- Special button to edit spells (reorder and delete)
+- Fix knacks using short name for attributes (without the misc)
+- Set critreduction by default
+
 # 2024-06-10
 
 - Attacks:
@@ -24,7 +47,7 @@
 - Expertise skills now show as 0 for 0 ranks (not -25)
 - Spells have * or • afer them (compendium)
 - Tests
-  - Added tests fpr jybrid own realm
+  - Added tests for hybrid own realm
 - Add some styling to updates.
 - Internal
   - Attacks are a little less verbose.

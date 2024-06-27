@@ -4357,20 +4357,13 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.19.0 -->
+				<!-- current version notes: 2.21.0 -->
 				<ul>
-					<li><b>NEW:</b> Combat > Your Hit Locations Tab. Added a note for <b>Large-Area Injury</b>. If you apply a hit location template, there is now a <b>Large-Area</b> hit location.</li>
-					<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Melee attacks. Added a modifier for attacking through unfriendly hex. B388.</li>
-					<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Active Defenses. Added a modifier for attack from a side hex. B390.</li>
-					<li><b>ENHANCEMENT:</b> Tools > General > Drinking and Intoxication Tool. If drinks consumed is less than ST/4, the die button is replaced by the text "No roll needed." Requested by Demented Avenger.</li>
-					<li><b>ENHANCEMENT:</b> Active Defenses. Added a new field for weight of the parrying weapon and tool to calculate weapon breakage. B376.</li>
-					<li><b>ENHANCEMENT:</b> Melee Attacks. Added a new field for weight of the attacking weapon and tool to show the parrying weapon's breaking point. B376.</li>
-					<li><b>BUGFIX:</b> Skill roll was not setting values for max 9, and summary.</li>
-					<li><b>BUGFIX:</b> Technique skill roll was not setting values for max 9, and summary.</li>
-					<li><b>BUGFIX:</b> Defense roll was not setting values summary.</li>
-					<li><b>BUGFIX:</b> Melee skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
-					<li><b>BUGFIX:</b> Ranged skill roll was not setting values for max 9, summary, hit location, maneuver, and all-out attack.</li>
-					<li><b>BUGFIX:</b> Fixed the styling for the <b>Duplicate</b> button for melee and ranged attacks.</li>
+					<li><b>ENHANCEMENT:</b> Combat > Defense Tab > Active Defense. Updated Parry Heavy Weapon chart to round to decimal places.</li>
+					<li><b>BUGFIX:</b> Fixed bug where the spell roll effective skill was using the ranged modifier tool instead of the spell modifier tool.</li>
+					<li><b>ENHANCEMENT:</b> Updated the Sprint value to be based on the current encumbrance level.</li>
+					<li><b>ENHANCEMENT:</b> Melee skill roll: added the weapon weight.</li>
+					<li><b>ENHANCEMENT:</b> For melee and ranged attacks, added a new tool that auto-calculates damage rolls based on thrust and swing damage.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13479,7 +13472,7 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill" title="Macro: @{NAME|repeating_melee_$[row #]_skill}" />
 									</div>
 									<div class="cell col6">
-										<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{notesTitlePrefix=Weapon}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{quickModShow=[[@{melee_quick_mod_show_in_roll}]]}} {{quickModTotal=[[@{melee_quick_mod_total}]]}} {{quickModSummary=@{melee_quick_mod_summary}}}" />
+										<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Melee Attack}} {{selected=@{selected_token_macro}}} {{target1=@{target_token_macro}}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{popupModifier=@{popup_modifier}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{notesTitlePrefix=Weapon}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{quickModShow=[[@{melee_quick_mod_show_in_roll}]]}} {{quickModTotal=[[@{melee_quick_mod_total}]]}} {{quickModSummary=@{melee_quick_mod_summary}}} {{weightSystem=@{weight_system}}}" />
 									</div>
 								</div> <!-- .row -->
 
@@ -13647,6 +13640,95 @@ visualize what it will look like in chat.
 											<input type="number" class="inline" name="attr_parrying_weapon_weight" readonly value="1" title="Macro: @{NAME|repeating_melee_$[row #]_parrying_weapon_weight}" />
 										</div>
 									</div> <!-- .row -->
+
+									<div class="row">
+										<div class="cell">
+											<h4>Damage Tool</h4>
+
+											<div class="grid-standard grid-5-column-auto-repeat grid__align_center grid__gap_large">
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="method-label">Method</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="damage-tool-method-tooltip">Select a method to help calculate weapon damage. If you select Thrust or Swing, the tool will automatically update your damage with the weapon.</span>
+																</span>
+															</div>
+														</label>
+														<select name="attr_damage_method">
+															<option value="none" data-i18n="option-none">None</option>
+															<option value="thrust" data-i18n="option-thrust">Thrust</option>
+															<option value="swing" data-i18n="option-swing">Swing</option>
+														</select>
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="abbreviation-modifier-label">Mod</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="damage-modifier-tooltip">A flat modifier to the damage roll. Doesn't apply to each die. Typically used for weapons.<br />Examples: <ul><li>Broadsword (Thrust) is Thrust+2.</li></ul></span>
+																</span>
+															</div>
+														</label>
+														<input type="number" name="attr_damage_modifier" class="inline text-left" value="0" step="1" title="Macro: @{NAME|repeating_melee_$[row #]_damage_modifier}" />
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="die-modifier-abbreviated-label">Die Mod</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="die-modifier-tooltip">Select a modifier to apply to each dice.<br />Examples: <ul><li>If you know Brawling at DX+2 or higher, you can add +1 damage per die.</li><li>If Boxing is DX+1, add +1 per die.</li><li>If Boxing is DX+2 or higher, add +2 per die.</li><li>If Karate is DX, add +1 per die.</li><li>If Boxing is DX+1 or higher, add +2 per die.</li><li>If Weapon Master and skill is DX+1, add +1 per die.</li><li>If Weapon Master and skill is DX+2 or higher, add +2 per die.</li><li>Mighty blow or All-Out Attack (Strong). +1 per die.</li><li>Shove is -1 per die.</li></ul></span>
+																</span>
+															</div>
+														</label>
+														<!-- set default value -->
+														<input type="hidden" name="attr_damage_die_modifier" value="0" />
+														<select name="attr_damage_die_modifier" title="Macro: @{NAME|repeating_melee_$[row #]_damage_die_modifier}">
+															<option value="-2" data-i18n="option-negative-two">-2</option>
+															<option value="-1" data-i18n="option-negative-one">-1</option>
+															<option value="0" data-i18n="option-zero" selected>0</option>
+															<option value="1" data-i18n="option-one">+1</option>
+															<option value="2" data-i18n="option-two">+2</option>
+															<option value="3" data-i18n="option-three">+3</option>
+															<option value="4" data-i18n="option-four">+4</option>
+															<option value="5" data-i18n="option-four">+5</option>
+														</select>
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="modify-label">Modify</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="apply-modifier-dice-plus-add-tooltip">Apply the optional rule <b>Modify Dice + Adds</b>. Any +4 becomes +1d6, any +7 becomes +2d6. B269</span>
+																</span>
+															</div>
+														</label>
+														<input type="checkbox" name="attr_apply_dice_adds" value="1" title="Macro: @{NAME|repeating_melee_$[row #]_apply_dice_adds}" />
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<input type="text" name="attr_calculated_damage_roll" readonly="readonly" value="" title="Macro: @{NAME|repeating_melee_$[row #]_apply_dice_adds}" />
+													</div>
+												</div>
+
+											</div>
+
+										</div>
+
+									</div>
 
 									<div class="row">
 										<div class="cell">
@@ -14473,6 +14555,95 @@ visualize what it will look like in chat.
 											<input type="text" style="width: 75px;text-align: left;" name="attr_ref" value="" title="Macro: @{NAME|repeating_ranged_$[row #]_ref}" />
 										</div>
 									</div> <!-- .row -->
+									
+									<div class="row">
+										<div class="cell">
+											<h4>Damage Tool</h4>
+
+											<div class="grid-standard grid-5-column-auto-repeat grid__align_center grid__gap_large">
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="method-label">Method</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="damage-tool-method-tooltip">Select a method to help calculate weapon damage. If you select Thrust or Swing, the tool will automatically update your damage with the weapon.</span>
+																</span>
+															</div>
+														</label>
+														<select name="attr_damage_method">
+															<option value="none" data-i18n="option-none">None</option>
+															<option value="thrust" data-i18n="option-thrust">Thrust</option>
+															<option value="swing" data-i18n="option-swing">Swing</option>
+														</select>
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="abbreviation-modifier-label">Mod</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="damage-modifier-tooltip">A flat modifier to the damage roll. Doesn't apply to each die. Typically used for weapons.<br />Examples: <ul><li>Broadsword (Thrust) is Thrust+2.</li></ul></span>
+																</span>
+															</div>
+														</label>
+														<input type="number" name="attr_damage_modifier" class="inline text-left" value="0" step="1" title="Macro: @{NAME|repeating_melee_$[row #]_damage_modifier}" />
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="die-modifier-abbreviated-label">Die Mod</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="die-modifier-tooltip">Select a modifier to apply to each dice.<br />Examples: <ul><li>If you know Brawling at DX+2 or higher, you can add +1 damage per die.</li><li>If Boxing is DX+1, add +1 per die.</li><li>If Boxing is DX+2 or higher, add +2 per die.</li><li>If Karate is DX, add +1 per die.</li><li>If Boxing is DX+1 or higher, add +2 per die.</li><li>If Weapon Master and skill is DX+1, add +1 per die.</li><li>If Weapon Master and skill is DX+2 or higher, add +2 per die.</li><li>Mighty blow or All-Out Attack (Strong). +1 per die.</li><li>Shove is -1 per die.</li></ul></span>
+																</span>
+															</div>
+														</label>
+														<!-- set default value -->
+														<input type="hidden" name="attr_damage_die_modifier" value="0" />
+														<select name="attr_damage_die_modifier" title="Macro: @{NAME|repeating_melee_$[row #]_damage_die_modifier}">
+															<option value="-2" data-i18n="option-negative-two">-2</option>
+															<option value="-1" data-i18n="option-negative-one">-1</option>
+															<option value="0" data-i18n="option-zero" selected>0</option>
+															<option value="1" data-i18n="option-one">+1</option>
+															<option value="2" data-i18n="option-two">+2</option>
+															<option value="3" data-i18n="option-three">+3</option>
+															<option value="4" data-i18n="option-four">+4</option>
+															<option value="5" data-i18n="option-four">+5</option>
+														</select>
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<label>
+															<div class="standard-tooltip">
+																<span data-i18n="modify-label">Modify</span>:
+																<span class="tooltiptext">
+																	<span data-i18n="apply-modifier-dice-plus-add-tooltip">Apply the optional rule <b>Modify Dice + Adds</b>. Any +4 becomes +1d6, any +7 becomes +2d6. B269</span>
+																</span>
+															</div>
+														</label>
+														<input type="checkbox" name="attr_apply_dice_adds" value="1" title="Macro: @{NAME|repeating_melee_$[row #]_apply_dice_adds}" />
+													</div>
+												</div>
+
+												<div class="grid-item">
+													<div class="container-label-input grid__gap_small grid__align_center">
+														<input type="text" name="attr_calculated_damage_roll" readonly="readonly" value="" title="Macro: @{NAME|repeating_melee_$[row #]_apply_dice_adds}" />
+													</div>
+												</div>
+
+											</div>
+
+										</div>
+
+									</div>
 									
 									<div class="row">
 										<div class="cell">
@@ -16815,7 +16986,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						</div>
 						<div class="cell col1">
 							<input type="hidden" name="attr_rule_of_16_value" value="100" />
-							<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Spell Skill Roll}} {{spellRoll=true}}  {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}}{{useModTool=[[1]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}  {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}}" />
+							<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Spell Skill Roll}} {{spellRoll=true}}  {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}  {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}}" />
 						</div>
 						<div class="cell col2">
 							<input type="text" name="attr_level" title="Macro: @{NAME|repeating_spells_$[row #]_level}" readonly="readonly" value="10"/>
@@ -21382,7 +21553,24 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.19.0 -->
+			<!-- current version notes: 2.21.0 -->
+			<ul>
+				<li><b>ENHANCEMENT:</b> Combat > Defense Tab > Active Defense. Updated Parry Heavy Weapon chart to round to decimal places.</li>
+				<li><b>BUGFIX:</b> Fixed bug where the spell roll effective skill was using the ranged modifier tool instead of the spell modifier tool.</li>
+				<li><b>ENHANCEMENT:</b> Updated the Sprint value to be based on the current encumbrance level.</li>
+				<li><b>ENHANCEMENT:</b> Melee skill roll: added the weapon weight.</li>
+				<li><b>ENHANCEMENT:</b> For melee and ranged attacks, added a new tool that auto-calculates damage rolls based on thrust and swing damage.</li>
+			</ul>
+
+			<h4>Version: 2.20.0</h4>
+			<p>Pull Request: 6/13/2024</p>
+			<ul>
+				<li><b>BUGFIX:</b> Fixed bug where all rolls were showing the note "If parrying weapon is or less, check for breakage. B376." Reported by Niccy_Everson and Cal Godot.</li>
+			</ul>
+
+
+			<h4>Version: 2.19.0</h4>
+			<p>Pull Request: 6/12/2024</p>
 			<ul>
 				<li><b>NEW:</b> Combat > Your Hit Locations Tab. Added a note for <b>Large-Area Injury</b>. If you apply a hit location template, there is now a <b>Large-Area</b> hit location.</li>
 				<li><b>ENHANCEMENT:</b> Roll Modifiers Toolbox for Melee attacks. Added a modifier for attacking through unfriendly hex. B388.</li>
@@ -26467,13 +26655,14 @@ B378
 				{{/popupModifier}}
 
 				<!-- parrying weapon breakage -->
-				{#parryingWeaponWeight}
+				{{#parryingWeaponWeight}}
 				<tr>
 					<td colspan="2">
-						If parrying weapon is {{parryingWeaponWeight}} <span name="attr_weight_system"></span> or less, check for breakage. B376.
+						<span data-i18n="weapon-weight-label">Weapon Weight</span>: {{weaponWeight}}<br />
+						If parrying weapon is {{parryingWeaponWeight}} {{weightSystem}} or less, check for breakage. B376.
 					</td>
 				</tr>
-				{/parryingWeaponWeight}
+				{{/parryingWeaponWeight}}
 
 				<!-- quick modifiers -->
 				{{#rollTotal() quickModShow 1}}
@@ -26979,9 +27168,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.19.0";
+	const version = "2.21.0";
 	
-	const latestChangesDate = "6/11/2024";
+	const latestChangesDate = "6/18/2024";
 	
 	let modCascade = true;
 	
@@ -30396,6 +30585,8 @@ B378
 			let basicMove = +values.basic_move;
 	
 			let enhancedMove = 0;
+
+			let encumberanceLevel = +values.encumbrance_level;
 	
 			// encumbrance levels
 			let enhancedMove0 = "";
@@ -30452,8 +30643,10 @@ B378
 			enhancedMove = getEnhancedValue(basicMove, totalModifier);
 	
 			if (totalModifier == 0) {
+
+				let encumberanceMove = getEncumberedMove(basicMove, encumberanceLevel);
 	
-				let sprint = Math.floor(basicMove * 1.2);
+				let sprint = Math.floor(encumberanceMove * 1.2);
 
 				enhancedMove0 = "";
 	
@@ -36616,11 +36809,12 @@ B378
 				weaponWeight = 1;
 			}
 
-			let attackingWeaponWeightTimesThree = weaponWeight * 3;
-			let attackingWeaponWeightTimesFour = weaponWeight * 4;
-			let attackingWeaponWeightTimesFive = weaponWeight * 5;
-			let attackingWeaponWeightTimesSix = weaponWeight * 6;
-			let attackingWeaponWeightTimesSeven = weaponWeight * 7;
+			// round to 2 decimal places
+			let attackingWeaponWeightTimesThree = parseFloat((weaponWeight * 3).toFixed(2));
+			let attackingWeaponWeightTimesFour = parseFloat((weaponWeight * 4).toFixed(2));
+			let attackingWeaponWeightTimesFive = parseFloat((weaponWeight * 5).toFixed(2));
+			let attackingWeaponWeightTimesSix = parseFloat((weaponWeight * 6).toFixed(2));
+			let attackingWeaponWeightTimesSeven = parseFloat((weaponWeight * 7).toFixed(2));
 
 			const fields = {
 				repeating_defense_attacking_weapon_weight_x3: attackingWeaponWeightTimesThree,
@@ -49254,6 +49448,7 @@ Characters with Skill: ${knowsSkill}`;
 		"raw_critical_hit_notes",
 		"raw_miss_notes",
 		"raw_critical_miss_notes",
+		"weapon_weight",
 		"parrying_weapon_weight",
 		"macro_one_checked",
 		"macro_one",
@@ -49318,6 +49513,8 @@ Characters with Skill: ${knowsSkill}`;
 		let rawFailNote = values[`${sectionName}_raw_miss_notes`] ?? "";
 
 		let rawCriticalFailNote = values[`${sectionName}_raw_critical_miss_notes`] ?? "";
+
+		let weaponWeight = values[`${sectionName}_weapon_weight`] ?? "0";
 
 		let parryingWeaponWeight = values[`${sectionName}_parrying_weapon_weight`] ?? "0";
 
@@ -49415,6 +49612,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (rawCriticalFailNote) {
 			rollDataArray.push(`{{rawCriticalFailNote=${rawCriticalFailNote}}}`);
+		}
+
+		if (weaponWeight > 0) {
+			rollDataArray.push(`{{weaponWeight=${weaponWeight}}}`);
 		}
 
 		if (parryingWeaponWeight > 0) {
@@ -49932,7 +50133,7 @@ Characters with Skill: ${knowsSkill}`;
 			rollDataArray.push(`{{bookReference=${bookReference}}}`);
 		}
 		
-		rollDataArray.push(`{{effectiveSkill=[[{${level} + @{modifier} + @{ranged_roll_modifier}, ${rule16Value} }kl1]]}}`);
+		rollDataArray.push(`{{effectiveSkill=[[{${level} + @{modifier} + @{spell_roll_modifier}, ${rule16Value} }kl1]]}}`);
 
 		rollDataArray.push(`{{{{rule16Value=[[${rule16Value}]]}}} }}`);
 
@@ -52199,7 +52400,7 @@ Characters with Skill: ${knowsSkill}`;
 			}
 
 			if (encumberance != 0) {
-				arrSummary.push(`Encumberance: ${encumberance}`);
+				arrSummary.push(`Encumbrance: ${encumberance}`);
 			}
 
 			if (healthMod != 0) {
@@ -52898,8 +53099,218 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
+	/* damage calculation tool */
+	const damageTypeToolFields = [
+		"damage_method",
+		"damage_modifier",
+		"damage_die_modifier",
+		"apply_dice_adds"
+	];
+
+	const damgeTypeSections = [
+		"repeating_melee",
+		"repeating_ranged"
+	];
+
+	// loop through each damageTypeSections
+	damgeTypeSections.forEach(sectionName => {
+
+		// now log a change event for each field
+		damageTypeToolFields.forEach(fieldName => {
+
+			on(`change:${sectionName}:${fieldName}`, event => {
+
+				updateDamageTypeTool(sectionName, fieldName);
+
+			});
+
+		})
+
+	});
+
+	const updateDamageTypeTool = (sectionName, fieldName) => {
+
+		let fields = damageTypeToolFields.map(field => `${sectionName}_${field}`);
+
+		// add thrust and swing
+		fields.push(`thrust`);
+		fields.push(`swing`);
+
+		getAttrs(fields, values => {
+
+			let method = values[`${sectionName}_damage_method`] ?? "";
+
+			let rollData = "";
+
+			// if method is none or empty, return;
+			if (method == "thrust" || method == "swing") {
+			
+				let thrustDamageRoll = values.thrust ?? "";
+
+				let swingDamageRoll = values.swing ?? "";
+
+				let baseDamageRoll = thrustDamageRoll;
+
+				if (method == "swing") {
+					baseDamageRoll = swingDamageRoll;
+				}
+
+				if (baseDamageRoll != "") {
+					
+					let modifier = Number(values[`${sectionName}_damage_modifier`]) || 0;
+
+					let dieModifier = Number(values[`${sectionName}_damage_die_modifier`]) || 0;
+	
+					let applyDiceAdds = values[`${sectionName}_apply_dice_adds`] == "1";
+	
+					rollData = getCalculatedDamage(baseDamageRoll, modifier, dieModifier, applyDiceAdds);
+
+				}
+				
+			}
+
+			let keyValues = {
+				[`${sectionName}_calculated_damage_roll`]: rollData,
+				[`${sectionName}_damage`]: rollData
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
+	const getCalculatedDamage = (baseRoll, flatModifier, dieModifier, applyDiceAdds) => {
+
+		// Split the baseRoll into its components (number of dice, dice type, and modifier)
+		const rollParts = baseRoll.match(/(\d+)d(\d+)([+-]?\d+)?/);
+		let numberOfDice = parseInt(rollParts[1], 10);
+		const diceType = `d${rollParts[2]}`;
+		let originalModifier = 0; // Default modifier is 0
+	  
+		// Check if there is a modifier in the roll
+		if (rollParts[3]) {
+		  originalModifier = parseInt(rollParts[3], 10);
+		}
+	  
+		// if there's a dieModifier value, we're going to get a modifier = numberOfDice * dieModifier
+		let dieModifierValue = numberOfDice * dieModifier;
+
+		// now we need to get calculate the final modifier. 
+		let finalModifier = originalModifier + flatModifier + dieModifierValue;
+
+		// check for applyDiceAdds
+		if (applyDiceAdds && finalModifier >= 4) {
+
+			// if finalModifier is 4 to 6, finalModifier = finalModifier - 4 but add 1 to numberOfDice
+			// if finalModifier is 7 or higher, finalModifier = finalModifier - 7 but add 1 to numberOfDice
+			if (finalModifier >= 7) {
+				finalModifier -= 7;
+				numberOfDice += 1;
+			} else {
+				finalModifier -= 4;
+				numberOfDice += 1;
+			}
+		}
+
+		// now we need to put it all back together
+		let calculatedDamage = `${numberOfDice}${diceType}${finalModifier !== 0 ? (finalModifier > 0 ? "+" : "") + finalModifier : ""}`;
+
+		return calculatedDamage;
+
+	}
+
+	// if thrust or swing changes, loop through each record in repeating_melee and repeating_ranged
+	// if the record has method = thrust or swing, then update the calculated damage roll
+	on("change:thrust change:swing", event => {
+
+		triggerDamageToolForRepeatingSection();
+
+	});
+
+	const triggerDamageToolForRepeatingSection = () => {
+
+		damgeTypeSections.forEach(sectionName => {
+
+			getSectionIDs(sectionName, ids => {
+
+				ids.forEach(id => {
+
+					let fields = [
+						`${sectionName}_${id}_damage_method`,
+						`${sectionName}_${id}_calculated_damage_roll`
+					];
+
+					getAttrs(fields, values => {
+
+						let method = values[`${sectionName}_${id}_damage_method`] ?? "";
+
+						if (method == "thrust" || method == "swing") {
+
+							updateDamageTypeToolForRowId(sectionName, id);
+
+						}
+
+					});
+
+				});
+
+			});
+
+		});
+
+	}
+
+	const updateDamageTypeToolForRowId = (sectionName, id) => {
+
+		let fields = damageTypeToolFields.map(field => `${sectionName}_${id}_${field}`);
+
+		// add thrust and swing
+		fields.push(`thrust`);
+		fields.push(`swing`);
+
+		getAttrs(fields, values => {
+
+			let method = values[`${sectionName}_${id}_damage_method`] ?? "";
+
+			let rollData = "";
+
+			// if method is none or empty, return;
+			if (method == "thrust" || method == "swing") {
+			
+				let thrustDamageRoll = values.thrust ?? "";
+
+				let swingDamageRoll = values.swing ?? "";
+
+				let baseDamageRoll = thrustDamageRoll;
+
+				if (method == "swing") {
+					baseDamageRoll = swingDamageRoll;
+				}
+
+				if (baseDamageRoll != "") {
+					
+					let modifier = Number(values[`${sectionName}_${id}_damage_modifier`]) || 0;
+
+					let dieModifier = Number(values[`${sectionName}_${id}_damage_die_modifier`]) || 0;
+	
+					let applyDiceAdds = values[`${sectionName}_${id}_apply_dice_adds`] == "1";
+	
+					rollData = getCalculatedDamage(baseDamageRoll, modifier, dieModifier, applyDiceAdds);
+
+				}
+				
+			}
+
+			let keyValues = {
+				[`${sectionName}_${id}_calculated_damage_roll`]: rollData,
+				[`${sectionName}_${id}_damage`]: rollData
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	}
+
 </script>
-
-
-
-

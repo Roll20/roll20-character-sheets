@@ -23,7 +23,7 @@ function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, ebeM
 	if (ebeMacro === "")
 	{
 		ebeRoll = ebeMacro;
-		modRoll = "[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]";
+		modRoll = "{{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}}";
 	} else {
 		ebeRoll = [
 			"{{ebe=",
