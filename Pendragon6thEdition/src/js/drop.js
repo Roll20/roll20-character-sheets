@@ -10,12 +10,9 @@ const getRow = (section) => `repeating_${section}_${generateRowID()}`;
 const getRepUpdate = (attrs, row, page) => {
   let update = {};
 
-  //TODO: Verify 'name' works as the data may be Uppercase Name
   attrs.forEach((attr) => {
     if (page[attr] ?? page.data[attr]) {
-      update[`${row}_${attr}`] = page[attr] ?? page.data[attr];
-    } else {
-      dropWarning(`getRepUpdate: Missing ${attr}`);
+      update[`${row}_${attr}`] = page[attr] ?? cleanAttr(attr, page.data[attr]);
     }
   });
 
@@ -26,14 +23,20 @@ const getRepUpdate = (attrs, row, page) => {
   return update;
 };
 
+const cleanAttr = (attr, value) => {
+  if (attr === "skill") {
+    return `@{${value.toLowerCase()}}`;
+  }
+
+  return value;
+};
+
 const getStaticUpdate = (attrs, page) => {
   let update = {};
 
   attrs.forEach((attr) => {
     if (page[attr] ?? page.data[attr]) {
-      update[attr] = page[attr] ?? page.data[attr];
-    } else {
-      dropWarning(`getStaticUpdate: Missing ${attr}`);
+      update[attr] = page[attr] ?? cleanAttr(attr, page.data[attr]);
     }
   });
 
@@ -84,17 +87,26 @@ const handle_armor = (page) => {
   handle_item(page);
 };
 
-const handle_item = (page) => {
-  const row = getRow("equipment");
+const handle_item = (page, row) => {
   let update = getRepUpdate(
     ["value", "notes", "period_restriction"],
     row,
     page
   );
   update[`${row}_equipment`] = page.name;
-  update[`${row}_category`] = page.data["Subcategory"];
+  update[`${row}_category`] = page.data["subcategory"];
 
   setAttrs(update);
+};
+
+const handle_equipment = (page) => {
+  const row = getRow("equipment");
+  handle_item(page, row);
+};
+
+const handle_arms = (page) => {
+  const row = getRow("arms");
+  handle_item(page, row);
 };
 
 const handle_squire = (page) => {
@@ -132,15 +144,16 @@ const handle_horse = (page) => {
   ];
   const warHorseAttrs = attrs.map((attr) => `warhorse_${attr}`);
   let update = getStaticUpdate([...warHorseAttrs, "equestrian_notes"], page);
+  update["warhorse_type"] = page.name;
   update["flag_equestrian_notes"] = false;
   setAttrs(update);
 };
 
 const handle_items = (page) => {
-  const subcategory = page.data["Subcategory"];
+  const subcategory = page.data["subcategory"];
 
-  console.table({
-    name: page.name,
+  console.log({
+    page: page.name,
     subcategory,
   });
 
@@ -150,29 +163,32 @@ const handle_items = (page) => {
       break;
     case "Animal":
     case "Service":
-    case "Shield":
     case "Item":
-      handle_item(page);
+      handle_equipment(page);
       break;
-    // case "Ranged Weapon":
-    //   handle_ranged_weapon(page);
-    //   break;
+    case "Shield":
+      handle_arms(page);
+      break;
     // case "Animal":
     //   handle_animal(page);
     //   break;
-    // case "Horse Armor":
-    //   handle_horse_armor(page);
-    //   break;
+    case "Horse Armor":
+      handle_equipment(page);
+      break;
+    case "Ranged Weapon":
     case "Weapon":
       handle_weapon(page);
+      handle_arms(page);
       break;
     default:
       dropWarning(`Unknown subcategory: ${subcategory}`);
   }
 };
 
+const dropAttrs = ["drop_name", "drop_data", "drop_content"];
+
 const handle_drop = () => {
-  getAttrs(["drop_name", "drop_data", "drop_content"], (v) => {
+  getAttrs(dropAttrs, (v) => {
     if (!v.drop_name || !v.drop_data) {
       return;
     }
