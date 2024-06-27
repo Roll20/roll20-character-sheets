@@ -58148,7 +58148,7 @@ const processTranslations = (fnames, sheetName) => __awaiter(void 0, void 0, voi
     else {
         // No idea we shouldn't have no translation.json and a translation folder
         // or no translation.json with no translation folder    
-        throw new Error("Missing translation.json file.");
+        console.log("No Translation.json found moving on");
     }
 });
 exports.processTranslations = processTranslations;
