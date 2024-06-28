@@ -110,15 +110,10 @@ const handle_arms = (page) => {
 };
 
 const handle_squire = (page) => {
-  const attrs = ["age", "skill", "notes"];
+  const attrs = ["squire_age", "squire_skill", "squire_notes"];
   const update = getStaticUpdate(attrs, page);
   update["squire_name"] = page.name;
-
-  //Needs special handling for skills
-  // const row = getRow("squire_skills");
-  // const skillsAttr = ["name", "skill"];
-  // const skillsUpdate = getRepUpdate(skillsAttr, row, page);
-
+  update["flag_squire_notes"] = false;
   setAttrs(update);
 };
 
@@ -149,13 +144,26 @@ const handle_horse = (page) => {
   setAttrs(update);
 };
 
+const handle_character = (page) => {
+  const attrs = [
+    "appearance",
+    "dexterity",
+    "size",
+    "strength",
+    "constitution",
+    "healing_rate",
+    "hit_points",
+    "knockdown",
+    "major_wound",
+    "movement",
+    "unconscious",
+  ];
+
+  //TODO: Skills, Passions, Traits, and Equipment are setup wrong. Rake needs to be run again
+};
+
 const handle_items = (page) => {
   const subcategory = page.data["subcategory"];
-
-  console.log({
-    page: page.name,
-    subcategory,
-  });
 
   switch (subcategory) {
     case "Armor":
@@ -169,11 +177,8 @@ const handle_items = (page) => {
     case "Shield":
       handle_arms(page);
       break;
-    // case "Animal":
-    //   handle_animal(page);
-    //   break;
     case "Horse Armor":
-      handle_equipment(page);
+      handle_arms(page);
       break;
     case "Ranged Weapon":
     case "Weapon":
@@ -220,6 +225,9 @@ const handle_drop = () => {
         break;
       case "Squires":
         handle_squire(page);
+        break;
+      case "Pre-generated Characters":
+        handle_character(page);
         break;
       default:
         dropWarning(`Unknown category: ${Category}`);

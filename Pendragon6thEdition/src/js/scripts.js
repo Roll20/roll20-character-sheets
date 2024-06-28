@@ -23,6 +23,7 @@ const updateBrawling = () => {
     //Brawl Damage =  (STR+SIZ)/6
     const damage = round(total(values) / 6);
     return {
+      character_damage: `${damage}d6`,
       brawling_damage: `${damage}`,
       brawling_damage_open: `${round(damage / 2)}`,
     };
