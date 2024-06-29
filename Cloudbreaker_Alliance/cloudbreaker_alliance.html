@@ -1362,6 +1362,49 @@
 		});
 	});
 
+	on("change:repeating_attacks", function(eventInfo) {
+		const id = eventInfo.triggerName;
+		if (eventInfo["sourceAttribute"].includes("attack_rank")) {
+			const new_rank = eventInfo["newValue"];
+			var attrs_to_get = [`${id}_attack_damage_${new_rank}`, `${id}_attack_description_${new_rank}`, `${id}_attack_damage`, `${id}_attack_description`];
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+
+				var new_damage = v[`${id}_attack_damage_${new_rank}`];
+				var new_description = v[`${id}_attack_description_${new_rank}`];
+
+				if (new_damage == undefined || new_damage == "") {
+					new_damage = v[`${id}_attack_damage`];
+					output[`${id}_attack_damage_${new_rank}`] = new_damage;
+				}
+				if (new_description == undefined || new_description == "") {
+					new_description = v[`${id}_attack_description`];
+					output[`${id}_attack_description_${new_rank}`] = new_description;
+				}
+
+				output[`${id}_attack_damage`] = new_damage;
+				output[`${id}_attack_description`] = new_description;
+
+				setAttrs(output, {silent: true});
+			});
+		}
+		else {
+			var attrs_to_get = [`${id}_attack_rank`, `${id}_attack_damage`, `${id}_attack_description`];
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+
+				const rank = v[`${id}_attack_rank`];
+				const damage = v[`${id}_attack_damage`];
+				const description = v[`${id}_attack_description`];
+
+				output[`${id}_attack_damage_${rank}`] = damage;
+				output[`${id}_attack_description_${rank}`] = description;
+
+				setAttrs(output, {silent: true});
+			});
+		}
+	});
+
 	on("change:mastery_bonus", function(eventInfo) {
 		const mastery_bonus = parseInt(eventInfo.newValue);
 		getSectionIDs("attacks", function(ids) {
@@ -3392,13 +3435,19 @@
 											<input type="number" name="attr_attack_bonus" title="Attack bonus" value="0" />
 										</div>
 										<div>
-											<input type="text" name="attr_attack_damage" title="Attack damage" value=" 1 HP Blunt Unarmed Combat" />
+											<input type="text" name="attr_attack_damage" title="Attack damage" value="1 HP Blunt Unarmed Combat" />
 											<input type="checkbox" name="attr_attack_fold" class="sheet-folder" value="on" checked />
 											<span class="sheet-folder"></span>
 										</div>
 									</div>
 									<input type="hidden" name="attr_attack_fold" class="sheet-folder" value="on" />
 									<div class="sheet-foldable">
+										<select name="attr_attack_rank" value="none">
+											<option value="none" selected>None</option>
+											<option value="copper">Rank 1</option>
+											<option value="silver">Rank 2</option>
+											<option value="gold">Rank 3</option>
+										</select>
 										<textarea name="attr_attack_description" title="Attack description" placeholder="Attack description"></textarea>
 									</div>
 								</div>
