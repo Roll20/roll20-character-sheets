@@ -10892,12 +10892,16 @@ visualize what it will look like in chat.
 								</span>
 							</div>
 							<input type="hidden" name="attr_hit_location_layer_use_custom_labels" value="0" />
-							<div class="item grid-header layer layer-1">
+							
+							<div class="item grid-header layer layer-1">								
 								<div class="popup layer-label">
 									<span data-i18n="layer-1-label" class="default">Layer 1</span>
 									<span class="custom" name="attr_hit_location_layer_one_label"></span>
+									<input type="hidden" name="attr_hit_location_layer_one_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_one_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
+									<span data-i18n="armor-on-toggle-tooltip">Turn armor on/off using checkbox.</span>
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
 									<div>
 										<span data-i18n="armor-layor1-tooltip">"Layer 1 <i>(Inner most)</i> is good for natural DR or concealable armor, such as cloth armor under a breastplate.</span>
@@ -10910,10 +10914,13 @@ visualize what it will look like in chat.
 									<span data-i18n="back-label">Back</span>
 								</div>
 							</div>
+
 							<div class="item grid-header layer layer-2">
 								<div class="popup layer-label">
 									<span data-i18n="layer-2-label" class="default">Layer 2</span>
 									<span class="custom" name="attr_hit_location_layer_two_label"></span>
+									<input type="hidden" name="attr_hit_location_layer_two_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_two_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
@@ -10928,10 +10935,13 @@ visualize what it will look like in chat.
 									<span data-i18n="back-label">Back</span>
 								</div>
 							</div>
+
 							<div class="item grid-header layer layer-3">
 								<div class="popup layer-label">
 									<span data-i18n="layer-3-label" class="default">Layer 3</span>
 									<span class="custom" name="attr_hit_location_layer_three_label"></span>
+									<input type="hidden" name="attr_hit_location_layer_three_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_three_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
@@ -10946,10 +10956,13 @@ visualize what it will look like in chat.
 									<span data-i18n="back-label">Back</span>
 								</div>
 							</div>
+
 							<div class="item grid-header layer layer-4">
 								<div class="popup layer-label">
 									<span data-i18n="layer-4-label" class="default">Layer 4</span>
 									<span class="custom" name="attr_hit_location_layer_four_label"></span>
+									<input type="hidden" name="attr_hit_location_layer_four_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_four_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
@@ -40334,11 +40347,23 @@ B378
 			"repeating_hitlocation_layer_3_back",
 			"repeating_hitlocation_layer_4_front",
 			"repeating_hitlocation_layer_4_back",
+			"hit_location_layer_one_on",
+			"hit_location_layer_two_on",
+			"hit_location_layer_three_on",
+			"hit_location_layer_four_on",
 		];
 	
 		getAttrs(fields, values => {
 	
 			let updates = {};
+
+			const layerOneOn = values.hit_location_layer_one_on == "1";
+
+			const layerTwoOn = values.hit_location_layer_two_on == "1";
+
+			const layerThreeOn = values.hit_location_layer_three_on == "1";
+	
+			const layerFourOn = values.hit_location_layer_four_on == "1";
 	
 			// process the front then back locations
 			["front", "back"].forEach(direction => {
@@ -40355,6 +40380,23 @@ B378
 	
 				// sum up the total DR values. Can only do one split DR at this time
 				[1, 2, 3, 4].forEach(layerNo => {
+
+					// check if the layer is on
+					if (layerNo === 1 && !layerOneOn) {
+						return;
+					}
+
+					if (layerNo === 2 && !layerTwoOn) {
+						return;
+					}
+
+					if (layerNo === 3 && !layerThreeOn) {
+						return;
+					}
+
+					if (layerNo === 4 && !layerFourOn) {
+						return;
+					}
 	
 					let propName = `repeating_hitlocation_layer_${layerNo}_${direction}`;
 	
