@@ -10897,8 +10897,8 @@ visualize what it will look like in chat.
 								<div class="popup layer-label">
 									<span data-i18n="layer-1-label" class="default">Layer 1</span>
 									<span class="custom" name="attr_hit_location_layer_one_label"></span>
-									<input type="hidden" name="attr_hit_location_layer_one_on"  value="1" />
-									<input type="checkbox" name="attr_hit_location_layer_one_on" value="1" checked title="Turn DR on/off" />
+									<input type="hidden" name="attr_hit_location_layer_1_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_1_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-on-toggle-tooltip">Turn armor on/off using checkbox.</span>
@@ -10919,8 +10919,8 @@ visualize what it will look like in chat.
 								<div class="popup layer-label">
 									<span data-i18n="layer-2-label" class="default">Layer 2</span>
 									<span class="custom" name="attr_hit_location_layer_two_label"></span>
-									<input type="hidden" name="attr_hit_location_layer_two_on"  value="1" />
-									<input type="checkbox" name="attr_hit_location_layer_two_on" value="1" checked title="Turn DR on/off" />
+									<input type="hidden" name="attr_hit_location_layer_2_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_2_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
@@ -10940,8 +10940,8 @@ visualize what it will look like in chat.
 								<div class="popup layer-label">
 									<span data-i18n="layer-3-label" class="default">Layer 3</span>
 									<span class="custom" name="attr_hit_location_layer_three_label"></span>
-									<input type="hidden" name="attr_hit_location_layer_three_on"  value="1" />
-									<input type="checkbox" name="attr_hit_location_layer_three_on" value="1" checked title="Turn DR on/off" />
+									<input type="hidden" name="attr_hit_location_layer_3_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_3_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
@@ -10961,8 +10961,8 @@ visualize what it will look like in chat.
 								<div class="popup layer-label">
 									<span data-i18n="layer-4-label" class="default">Layer 4</span>
 									<span class="custom" name="attr_hit_location_layer_four_label"></span>
-									<input type="hidden" name="attr_hit_location_layer_four_on"  value="1" />
-									<input type="checkbox" name="attr_hit_location_layer_four_on" value="1" checked title="Turn DR on/off" />
+									<input type="hidden" name="attr_hit_location_layer_4_on"  value="1" />
+									<input type="checkbox" name="attr_hit_location_layer_4_on" value="1" checked title="Turn DR on/off" />
 								</div>
 								<span class="tooltip">
 									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
@@ -40347,30 +40347,28 @@ B378
 			"repeating_hitlocation_layer_3_back",
 			"repeating_hitlocation_layer_4_front",
 			"repeating_hitlocation_layer_4_back",
-			"hit_location_layer_one_on",
-			"hit_location_layer_two_on",
-			"hit_location_layer_three_on",
-			"hit_location_layer_four_on",
+			"hit_location_layer_1_on",
+			"hit_location_layer_2_on",
+			"hit_location_layer_3_on",
+			"hit_location_layer_4_on",
 		];
 	
 		getAttrs(fields, values => {
 	
 			let updates = {};
 
-			const layerOneOn = values.hit_location_layer_one_on == "1";
+			const layerOneOn = values.hit_location_layer_1_on == "1";
 
-			const layerTwoOn = values.hit_location_layer_two_on == "1";
+			const layerTwoOn = values.hit_location_layer_2_on == "1";
 
-			const layerThreeOn = values.hit_location_layer_three_on == "1";
+			const layerThreeOn = values.hit_location_layer_3_on == "1";
 	
-			const layerFourOn = values.hit_location_layer_four_on == "1";
+			const layerFourOn = values.hit_location_layer_4_on == "1";
 	
 			// process the front then back locations
 			["front", "back"].forEach(direction => {
 	
 				let isFlexible = false;
-	
-				let isSplit = false;
 	
 				let arrPrimaryArmor = [];
 	
@@ -40401,88 +40399,12 @@ B378
 					let propName = `repeating_hitlocation_layer_${layerNo}_${direction}`;
 	
 					let armor = String(values[propName]) || "";
-	
-					let firstDR = 0;
-	
-					let secondDR = 0;
-	
-					// remove any hardened notes
-					const hardenedPattern = /\[.*\]/g;
-	
-					armor = armor.replace(hardenedPattern, "");
-	
-					if (armor && armor.indexOf("*") != -1) {
-	
-						isFlexible = true;
-	
-						// be sure to remove *
-						armor = armor.replace("*", "");
-					}
-	
-					// check for split DR
-					if (armor && armor.indexOf("/") != -1) {
-	
-						isSplit = true;
-	
-						let arrArmor = armor.split("/");
-	
-						firstDR = Number(arrArmor[0]);
-	
-						if (isNaN(firstDR)) {
-							firstDR = 0;
-						}
-	
-						arrPrimaryArmor.push(firstDR);
-	
-						let arrSecondDR = arrArmor[1].split(" ");
-	
-						// pull out the first array, which should be DR
-						secondDR = Number(arrSecondDR.splice(0, 1));
-	
-						if (isNaN(secondDR)) {
-							secondDR = 0;
-						}
-	
-						arrSplitArmor.push(secondDR);
-	
-						splitTypes = arrSecondDR.join(" ");
-	
-					} else {
-	
-						firstDR = Number(armor);
-	
-						if (isNaN(firstDR)) {
-							firstDR = 0;
-						}
-	
-						arrPrimaryArmor.push(firstDR);
-	
-						arrSplitArmor.push(firstDR);
-	
-					}
+
+					[isFlexible, splitTypes] = processLayerLocationArmor(armor, arrPrimaryArmor, arrSplitArmor, splitTypes);
 	
 				});
-	
-				// see: https://stackoverflow.com/questions/1230233/how-to-find-the-sum-of-an-array-of-numbers
-				let baseDR = arrPrimaryArmor.reduce((a, b) => a + b, 0);
-	
-				let splitDR = arrSplitArmor.reduce((a, b) => a + b, 0);
-	
-				let layerSummary = baseDR;
-	
-				if (splitDR !== baseDR && isFlexible) {
-	
-					layerSummary += `/${splitDR}* ${splitTypes}`;
-	
-				} else if (splitDR !== baseDR) {
-	
-					layerSummary += `/${splitDR} ${splitTypes}`;
-	
-				} else if (isFlexible) {
-	
-					layerSummary += `*`;
-	
-				}
+
+				let layerSummary = getLayerSummary(arrPrimaryArmor, arrSplitArmor, isFlexible, splitTypes);
 	
 				updates[`repeating_hitlocation_layer_summary_${direction}`] = layerSummary;
 	
@@ -40492,6 +40414,184 @@ B378
 	
 		});
 	
+	}
+
+	// check if an armor layer was turned on/off
+	on("change:hit_location_layer_1_on change:hit_location_layer_2_on change:hit_location_layer_3_on change:hit_location_layer_4_on", async event => {
+
+		await updateHitLocationArmorSummary();
+
+	});
+
+	const updateHitLocationArmorSummary = async () => {
+
+		let layerFields = [
+			"hit_location_layer_1_on",
+			"hit_location_layer_2_on",
+			"hit_location_layer_3_on",
+			"hit_location_layer_4_on",
+		];
+
+		const layerOnOffValues = await getAttrsAsync(layerFields);
+
+		getSectionIDs("repeating_hitlocation", ids => {
+
+			ids.forEach(rowId => {
+
+				let fields = [];
+
+				[1,2,3,4].forEach(layerNo => {
+
+					let layerOn = layerOnOffValues[`hit_location_layer_${layerNo}_on`] === "1";
+
+					if (layerOn) {
+
+						fields.push(`repeating_hitlocation_${rowId}_layer_${layerNo}_front`);
+
+						fields.push(`repeating_hitlocation_${rowId}_layer_${layerNo}_back`);
+
+					}
+
+				});
+
+				getAttrs(fields, values => {
+
+					let updates = {};
+
+					// process the front then back locations
+					["front", "back"].forEach(direction => {
+
+						let isFlexible = false;
+
+						let arrPrimaryArmor = [];
+
+						let arrSplitArmor = [];
+
+						let splitTypes = "";
+
+						// sum up the total DR values. Can only do one split DR at this time
+						[1, 2, 3, 4].forEach(layerNo => {
+
+							let propName = `repeating_hitlocation_${rowId}_layer_${layerNo}_${direction}`;
+
+							// check if values[propName]. 
+							// if it's not there, then it's not on
+							if (!values[propName]) {
+								return;
+							}
+
+							let armor = String(values[propName]) || "";
+
+							[isFlexible, splitTypes] = processLayerLocationArmor(armor, arrPrimaryArmor, arrSplitArmor, splitTypes);
+
+						});
+
+						let layerSummary = getLayerSummary(arrPrimaryArmor, arrSplitArmor, isFlexible, splitTypes);
+
+						updates[`repeating_hitlocation_${rowId}_layer_summary_${direction}`] = layerSummary;
+
+					});
+
+					setAttrs(updates, { silent: true });
+
+				});
+
+			});
+
+		});
+
+	}
+
+	const processLayerLocationArmor = (armorValue, arrPrimaryArmor, arrSplitArmor, splitTypes) => {
+
+		let isFlexible = false;
+
+		let firstDR = 0;
+
+		let secondDR = 0;
+
+		// remove any hardened notes
+		const hardenedPattern = /\[.*\]/g;
+
+		armorValue = armorValue.replace(hardenedPattern, "");
+
+		if (armorValue && armorValue.indexOf("*") != -1) {
+
+			isFlexible = true;
+
+			// be sure to remove *
+			armorValue = armorValue.replace("*", "");
+		}
+
+		// check for split DR
+		if (armorValue && armorValue.indexOf("/") != -1) {
+
+			let arrArmor = armorValue.split("/");
+
+			firstDR = Number(arrArmor[0]);
+
+			if (isNaN(firstDR)) {
+				firstDR = 0;
+			}
+
+			arrPrimaryArmor.push(firstDR);
+
+			let arrSecondDR = arrArmor[1].split(" ");
+
+			// pull out the first array, which should be DR
+			secondDR = Number(arrSecondDR.splice(0, 1));
+
+			if (isNaN(secondDR)) {
+				secondDR = 0;
+			}
+
+			arrSplitArmor.push(secondDR);
+
+			splitTypes = arrSecondDR.join(" ");
+
+		} else {
+
+			firstDR = Number(armorValue);
+
+			if (isNaN(firstDR)) {
+				firstDR = 0;
+			}
+
+			arrPrimaryArmor.push(firstDR);
+
+			arrSplitArmor.push(firstDR);
+
+		}
+
+		return [isFlexible, splitTypes];
+
+	}
+
+	const getLayerSummary = (arrPrimaryArmor, arrSplitArmor, isFlexible, splitTypes) => {
+
+		// see: https://stackoverflow.com/questions/1230233/how-to-find-the-sum-of-an-array-of-numbers
+		let baseDR = arrPrimaryArmor.reduce((a, b) => a + b, 0);
+
+		let splitDR = arrSplitArmor.reduce((a, b) => a + b, 0);
+
+		let layerSummary = baseDR;
+
+		if (splitDR !== baseDR && isFlexible) {
+
+			layerSummary += `/${splitDR}* ${splitTypes}`;
+
+		} else if (splitDR !== baseDR) {
+
+			layerSummary += `/${splitDR} ${splitTypes}`;
+
+		} else if (isFlexible) {
+
+			layerSummary += `*`;
+
+		}
+
+		return layerSummary;
+
 	}
 	
 	// check if a hit locations damage divisor changed
