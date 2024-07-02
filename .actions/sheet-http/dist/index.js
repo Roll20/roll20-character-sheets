@@ -57910,14 +57910,19 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
     // Go ahead and pull translations direc and translation json out of the fnames
     // as they have been uploaded
     fnames = fnames.filter((val) => !["translations", "translation.json"].includes(val));
+    // Lets go ahead and handle the css
+    const cssFilename = sheetJsonObj.css;
+    if (!cssFilename) {
+        console.log("CSS Upload passed no css file in sheet.json");
+    }
+    else {
+        yield processCSSFile(sheetName, cssFilename);
+    }
     // Walk through files and lets get this rolling
     for (const fn of fnames) {
         // We only are looking for specific files.
         // as the root can have a lot of crap
-        if (fn.toLowerCase().includes(".css")) {
-            yield processCSSFile(sheetName, fn);
-        }
-        else if (fn.toLowerCase().includes(".html")) {
+        if (fn.toLowerCase().includes(".html")) {
             if (!sheetJsonObj.html) {
                 yield processHTMLFile(sheetName, fn);
             }
@@ -57929,6 +57934,7 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
             yield processPreviewImageFile(sheetName, fn);
         }
         // Translations already done above
+        // CSS already done above
     }
     const settings = (0, settings_1.getSettings)();
     // Purge cache after we're done
@@ -58277,7 +58283,7 @@ const getSettings = () => {
     let branch = github.context.ref.replace("refs/heads/", "");
     let repoName = github.context.repo.repo;
     let retval = {};
-    if (["staging"].includes(branch)) {
+    if (["staging", "bug/CSC-2712"].includes(branch)) {
         retval = {
             apiKey: process.env["STAGING_API_KEY"],
             sheetHttpUrl: "https://sheet-http.staging.roll20preflight.net",
