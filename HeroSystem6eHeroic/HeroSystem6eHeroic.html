@@ -14992,7 +14992,7 @@
 				weapon04 = "maneuver";
 				weapon05 = "maneuver";
 				weapon06 = "maneuver";
-				display = "contest";
+				display = "weaponContest";
 			} else if (values["martialManeuverType"+maneuverId] === "attack") {		
 				if (isNormal) {
 					maneuverType = "normal";
@@ -15307,9 +15307,10 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX if the maneuver is not a weapon maneuver.
 			
-			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "character_title",  "displayDegreeOfSuccess", "rangeMartial", "currentDCV", "dingbat"], function(values) {
+			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "whisperToGM", "character_title",  "displayDegreeOfSuccess", "rangeMartial", "strengthNet", "currentDCV", "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				let useHitLocations = values.optionHitLocationSystem != 0;
+				let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 				let isNormal = (values["martialManeuverNormal"+maneuverId] === "on") ? true : false;
 				let isAttack = (values["martialManeuverType"+maneuverId] === "attack") ? true : false;
 				let isBlocking = (values["martialManeuverType"+maneuverId] === "block") ? true : false;
@@ -15383,14 +15384,25 @@
 				
 				// Create dice rolling script to send to a roll dialog.
 				if (isAttack || isContest) {
-					// If isNormal is TRUE, use the Normal Damage template. Else use the killing template.
-					theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} ";
-					theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
-					theRoll += "{{subtitle= " + (isRanged ? "Ranged " : "") + (isNormal ? "Normal" : "Killing") + " Attack with @{martialManeuverName"+maneuverId+"}}} ";
-					theRoll += "{{label=DCV}}";
-					theRoll += "{{data="+netDCV+"}}";
+					// Use the attack roll template.
 					
-					if (values.displayDegreeOfSuccess != 0) {
+					// Contest or Attack Heading.
+					if (isContest) {
+						theRoll += "&{template:custom-contest} ";
+						theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}}";
+						theRoll += "{{subtitle=@{martialManeuverName"+maneuverId+"}}}";
+						theRoll += "{{label=DCV}}";
+						theRoll += "{{data="+netDCV+"}}";
+					} else {
+						// If isNormal is TRUE, use the Normal Damage template. Else use the killing template.
+						theRoll += "&{template:custom"+(isNormal ? "-normal" : "") + "-attack} ";
+						theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
+						theRoll += "{{subtitle= " + (isNormal ? "Normal" : "Killing") + " Attack with @{martialManeuverName"+maneuverId+"}}} ";
+						theRoll += "{{label=DCV}}";
+						theRoll += "{{data="+netDCV+"}}";
+					}
+					
+					if (dispDoS) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier]]]}}";
 					} else {
 						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]-@{targetOCVPenalty}[TargetOCV]-@{rangeOCVPenalty}[RangeOCV]+?{Modifiers|0}[Modifier] ]]}}" + "{{Result=[[3d6cf6cs1]]}}";
@@ -15405,7 +15417,7 @@
 					theRoll += "{{label=DCV}}";
 					theRoll += "{{data="+netDCV+"}}";
 					
-					if (values.displayDegreeOfSuccess != 0) {
+					if (dispDoS) {
 						theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
 					} else {
 						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}} ";
@@ -16834,7 +16846,7 @@
 				theRoll += "{{label=DCV}}";
 				theRoll += "{{data="+netDCV+"}}";
 				
-				if (values.displayDegreeOfSuccess != 0) {
+				if (dispDoS) {
 					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}} ";
 				} else {
 					theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManeuverOCV]+?{Modifiers|0}[Modifier]]]}}" + "{{Result=[[3d6cf6cs1]]}} ";
