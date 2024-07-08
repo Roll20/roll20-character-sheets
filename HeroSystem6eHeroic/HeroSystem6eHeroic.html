@@ -10969,9 +10969,9 @@
 <div class="sheet-options">
 	<div class="grid-container-tab-options">
 		<div class="item-options">
-			<div class="item-options-title">
+			<!-- <div class="item-options-title">
 				<h2>Options</h2>
-			</div>	
+			</div>	 -->
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
@@ -11080,6 +11080,15 @@
 				<h1>Show Tally Bar</h1>
 			</div>
 			
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" checked="checked" name="attr_useTallyNet">
+					<span class="checkmark" title="@{useTallyNet}"></span>
+				</label>
+				<h1>Tally Net CP instead of Spent CP</h1>
+			</div>
+			
 			<div class="item-options-row">
 				<input type="text" value="❖" maxlength= 1 name="attr_dingbat" title="@{dingbat}"/>
 				<h1>Name-Title Separator</h1>
@@ -11104,7 +11113,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="3.02" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="3.03" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -11119,20 +11128,29 @@
 
 <div class = "sheet-tallybar">
 	<div class="sheet-flex-tallybar">
-		  <span>Char:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_characteristicsCost title="@{characteristicsCost}" readonly="true" tabindex="-1"/></span>
-		  <span>Skills:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_skillsCost title="@{skillsCost}" readonly="true" tabindex="-1"/></span>
-		  <span>Powers:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_powersPerksTalentsCost title="@{powersPerksTalentsCost}" readonly="true" tabindex="-1"/></span>
-		  <span>Complications:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_complicationsBenefit title="@{complicationsBenefit}" readonly="true" tabindex="-1"/></span>
-		  <span>Bonus:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_bonusBenefit title="@{bonusBenefit}" tabindex="-1"/></span>
-		  <span>EXP:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_experienceBenefit title="@{experienceBenefit}" tabindex="-1"/></span>
-		  <span>Total:</span>
-		  <span><input class="tally" type="number" value="0" min="0" name=attr_totalCharacterCost title="@{totalCharacterCost}" readonly="true" tabindex="-1"/></span>
+		
+		<input class="tally-method" type="hidden" name="attr_tallyMethod" value="net"/>
+		
+		<span>Char:</span>
+		<span><input class="tally" type="number" value="0" min="0" name=attr_characteristicsCost title="@{characteristicsCost}" readonly="true" tabindex="-1"/></span>
+		<span>Skills:</span>
+		<span><input class="tally" type="number" value="0" min="0" name=attr_skillsCost title="@{skillsCost}" readonly="true" tabindex="-1"/></span>
+		<span>Powers:</span>
+		<span><input class="tally" type="number" value="0" min="0" name=attr_powersPerksTalentsCost title="@{powersPerksTalentsCost}" readonly="true" tabindex="-1"/></span>
+		<div class="tally-spent">
+			<span>Spent:</span>
+			<span><input class="tally" type="number" value="0" min="0" name=attr_spentCharacterCost title="@{spentCharacterCost}" readonly="true" tabindex="-1"/></span>
+		</div>
+		<span>Complications:</span>
+		<span><input class="tally" type="number" value="0" min="0" name=attr_complicationsBenefit title="@{complicationsBenefit}" readonly="true" tabindex="-1"/></span>
+		<span>Bonus:</span>
+		<span><input class="tally" type="number" value="0" min="0" name=attr_bonusBenefit title="@{bonusBenefit}" tabindex="-1"/></span>
+		<span>EXP:</span>
+		<span><input class="tally" type="number" value="0" min="0" name=attr_experienceBenefit title="@{experienceBenefit}" tabindex="-1"/></span>
+		<div class="tally-net">
+			<span>Total:</span>
+			<span><input class="tally" type="number" value="0" min="0" name=attr_totalCharacterCost title="@{totalCharacterCost}" readonly="true" tabindex="-1"/></span>
+		</div>
 	</div>
 </div>
 
@@ -11826,12 +11844,11 @@
 			version = 2.90;
 		}
 		
-		if (version < 3.02) {
+		if (version < 3.03) {
 			// Update martial maneuver selections and starting weapon states.
 			values = await _getAttrs(["martialManeuverBlock01", "martialManeuverBlock02", "martialManeuverBlock03", "martialManeuverBlock04", "martialManeuverBlock05", "martialManeuverBlock06", "martialManeuverBlock07", "martialManeuverBlock08", "martialManeuverBlock09", "martialManeuverBlock10", "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"]);
 			
 			let maneuverId;
-			let weaponId;
 			let states = "DDDDDDOOOOOO";
 			
 			for (let i=1; i<=maxManeuverNum; i++) {
@@ -11849,13 +11866,13 @@
 			attributes.weaponType04 = "defense";
 			attributes.weaponType05 = "defense";
 			attributes.weaponType06 = "defense";
-
+			
 			attributes.gearSlideSelection = "gearTreasures";
 			attributes.maneuverSelection = "block";
 			attributes.useManeuvers = "true";
 			attributes.weaponStates = states;
 			
-			version = 3.02;
+			version = 3.03;
 		}
 		
 		if (version != origVersion) {
@@ -11888,6 +11905,18 @@
 			});
 		});
 	});
+	
+	
+	// Display chosen tally value.
+	on("change:useTallyNet", function () {
+		getAttrs(["useTallyNet"], function(values) {
+			
+			setAttrs({
+				"tallyMethod": (values["useTallyNet"] === "on") ? "net" : "spent"
+			});
+		});
+	});
+	
 	
 	/* ------------------------- */
 	/* Functions used sheet-wide */
@@ -13195,17 +13224,19 @@
 			const experienceCP = parseInt(values.experienceBenefit)||0;
 			
 			let totalSkillsCP = set1SkillsCP+set2SkillsCP+set3SkillsCP+combatSkillsCP+languageSkillsCP+enhancerSkillsCP+martialSkillsCP;
-			let totalCP = characteristicsCP+totalSkillsCP+powersPerksTalentsCP-complicationsCP-bonusCP-experienceCP;
+			let netCP = characteristicsCP+totalSkillsCP+powersPerksTalentsCP-complicationsCP-bonusCP-experienceCP;
+			let spentCP = characteristicsCP+totalSkillsCP+powersPerksTalentsCP;
 			
 			setAttrs({
 				"skillsCost":totalSkillsCP,
-				"totalCharacterCost":totalCP
+				"totalCharacterCost":netCP,
+				"spentCharacterCost":spentCP
 			});	
 		});
 	}
 	
 	
-	on("change:characteristicsCost change:hiddenSet1SkillsCost change:hiddenSet2SkillsCost change:hiddenSet3SkillsCost change:hiddenCombatSkillsCost change:hiddenEnhancerSkillsCost change:hiddenLanguageSkillsCost change:hiddenMartialSkillsCost change:powersPerksTalentsCost change:complicationsBenefit change:bonusBenefit change:experienceBenefit", function () {
+	on("change:characteristicsCost change:hiddenSet1SkillsCost change:hiddenSet2SkillsCost change:hiddenSet3SkillsCost change:hiddenCombatSkillsCost change:hiddenEnhancerSkillsCost change:hiddenLanguageSkillsCost change:hiddenMartialSkillsCost change:powersPerksTalentsCost change:complicationsBenefit change:bonusBenefit change:experienceBenefit change:tallyMethod", function () {
 		// Update total character points any of the hidden character point subtotals change.
 		addPoints();	
 	});
