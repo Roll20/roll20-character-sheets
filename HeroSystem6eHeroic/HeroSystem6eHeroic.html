@@ -11828,37 +11828,32 @@
 		
 		if (version < 3.02) {
 			// Update martial maneuver selections and starting weapon states.
-			values = await _getAttrs(["martialManeuverBlock01", "martialManeuverBlock02", "martialManeuverBlock03", "martialManeuverBlock04", "martialManeuverBlock05", "martialManeuverBlock06", "martialManeuverBlock07", "martialManeuverBlock08", "martialManeuverBlock09", "martialManeuverBlock10", "martialManeuverNormal01", "martialManeuverNormal02", "martialManeuverNormal03", "martialManeuverNormal04", "martialManeuverNormal05", "martialManeuverNormal06", "martialManeuverNormal07", "martialManeuverNormal08", "martialManeuverNormal09", "martialManeuverNormal10", "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"]);
+			values = await _getAttrs(["martialManeuverBlock01", "martialManeuverBlock02", "martialManeuverBlock03", "martialManeuverBlock04", "martialManeuverBlock05", "martialManeuverBlock06", "martialManeuverBlock07", "martialManeuverBlock08", "martialManeuverBlock09", "martialManeuverBlock10", "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"]);
 			
 			let maneuverId;
 			let weaponId;
-			let states = "KKKKKNOOOOOO";
+			let states = "DDDDDDOOOOOO";
 			
-			for (let i=1; i<=6; i++) {
-				weaponId = String(i).padStart(2,'0');
-				if (values["weaponNormalDamage"+weaponId] === "on") {
-					states = setCharAt(states, i-1, 'N');
-				} else {
-					states = setCharAt(states, i-1, 'K');
-				}
-			}
-			
-			for (let i=1; i<=10; i++) {
+			for (let i=1; i<=maxManeuverNum; i++) {
 				maneuverId = String(i).padStart(2,'0');
 				if (values["martialManeuverBlock"+maneuverId] === "on") {
-					weaponStateString += 'D';
 					attributes["martialManeuverType"+maneuverId] = "block";
-				} else if (values["martialManeuverNormal"+maneuverId] === "on") {
-					weaponStateString += 'N';
-					attributes["martialManeuverType"+maneuverId] = "attack";
 				} else {
-					weaponStateString += 'K';
 					attributes["martialManeuverType"+maneuverId] = "attack";
 				}
 			}
 			
+			attributes.weaponType01 = "defense";
+			attributes.weaponType02 = "defense";
+			attributes.weaponType03 = "defense";
+			attributes.weaponType04 = "defense";
+			attributes.weaponType05 = "defense";
+			attributes.weaponType06 = "defense";
+
+			attributes.gearSlideSelection = "gearTreasures";
+			attributes.maneuverSelection = "block";
+			attributes.useManeuvers = "true";
 			attributes.weaponStates = states;
-			attributes.gearSlideSelection = "gearManeuvers";
 			
 			version = 3.02;
 		}
@@ -11867,7 +11862,7 @@
 			console.log(`Updated ${name} from ${origVersion} to ${version}`);
 			attributes.version = version;
 		}
-
+		
 		// We are doing this with awaits in order to only do a single setAttrs at the end.
 		setAttrs(attributes);
 	});
@@ -11996,14 +11991,13 @@
 		// Adding weapons to martial maneuvers adds the complexity of needing to recall their standard and martial states.
 		on(`clicked:${button}`, function() {
 			getAttrs(["gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection"], function(values) {
-				const numberOfWeapons = 6;
 				var attributes = new Object();
 				let states = values.weaponStates;
 				var weaponId;
 				
 				// Store weapon states when switching away from standard and martial maneuvers.
 				if (values.gearSlideSelection === "gearManeuvers") {
-					for (let i=1; i <= numberOfWeapons; i++) {
+					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
 						
 						switch (values["weaponType"+weaponId]) {
@@ -12020,19 +12014,19 @@
 						}
 					}			
 				} else if (values.gearSlideSelection === "gearMartialManeuvers") {
-					for (let i=1; i <= numberOfWeapons; i++) {
+					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
 						
 						switch (values["weaponType"+weaponId]) {
-							case "killing": 	states = setCharAt(states, i+numberOfWeapons-1, 'K');
+							case "killing": 	states = setCharAt(states, i+maxWeaponNum-1, 'K');
 												break;
-							case "normal":		states = setCharAt(states, i+numberOfWeapons-1, 'N');
+							case "normal":		states = setCharAt(states, i+maxWeaponNum-1, 'N');
 												break;
-							case "defense": 	states = setCharAt(states, i+numberOfWeapons-1, 'D');
+							case "defense": 	states = setCharAt(states, i+maxWeaponNum-1, 'D');
 												break;
-							case "maneuver": 	states = setCharAt(states, i+numberOfWeapons-1, 'M');
+							case "maneuver": 	states = setCharAt(states, i+maxWeaponNum-1, 'M');
 												break;
-							default:			states = setCharAt(states, i+numberOfWeapons-1, 'O');
+							default:			states = setCharAt(states, i+maxWeaponNum-1, 'O');
 												break;
 						}
 					}
@@ -12040,10 +12034,10 @@
 				
 				// Recall weapon states when switching between standard and martial maneuvers.
 				if (button === "gearMartialManeuvers") {
-					for (let i=1; i <= numberOfWeapons; i++) {
+					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
 						
-						switch (states[i-1+numberOfWeapons]) {
+						switch (states[i-1+maxWeaponNum]) {
 							case "K": 	attributes["weaponType"+weaponId] = "killing";
 										break;
 							case "N":	attributes["weaponType"+weaponId] = "normal";
@@ -12057,7 +12051,7 @@
 						}
 					}
 				} else if (button === "gearManeuvers") {
-					for (let i=1; i <= numberOfWeapons; i++) {
+					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
 						
 						switch (states[i-1]) {
@@ -12207,25 +12201,24 @@
 			
 			const maxEND = parseInt(values.enduranceNet);
 			const maxSTUN = parseInt(values.stunNet);
-			const numberOfWeapons = 6;
 			let states = values.weaponStates;
 			var weaponId;
 			
 			if (values.optionResetTargeting != 0) {
 				if (values.gearSlideSelection === "gearMartialManeuvers") {
-					for (let i=1; i <= numberOfWeapons; i++) {
+					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
 						
 						switch (values["weaponType"+weaponId]) {
-							case "killing": 	states = setCharAt(states, i+numberOfWeapons-1, 'K');
+							case "killing": 	states = setCharAt(states, i+maxWeaponNum-1, 'K');
 												break;
-							case "normal":		states = setCharAt(states, i+numberOfWeapons-1, 'N');
+							case "normal":		states = setCharAt(states, i+maxWeaponNum-1, 'N');
 												break;
-							case "defense": 	states = setCharAt(states, i+numberOfWeapons-1, 'D');
+							case "defense": 	states = setCharAt(states, i+maxWeaponNum-1, 'D');
 												break;
-							case "maneuver": 	states = setCharAt(states, i+numberOfWeapons-1, 'M');
+							case "maneuver": 	states = setCharAt(states, i+maxWeaponNum-1, 'M');
 												break;
-							default:			states = setCharAt(states, i+numberOfWeapons-1, 'O');
+							default:			states = setCharAt(states, i+maxWeaponNum-1, 'O');
 												break;
 						}
 					}
