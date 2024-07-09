@@ -1,3 +1,12 @@
+# 2024-7-9
+
+- First version of individual spell casting
+  - With compendium; click a spell to cast it
+- Spells get own css file now
+- Tests for some spell casting function
+- New misc Flattern for inline summaries
+- Tweaks to edit spell list
+
 # 2024-6-24
 
 - Remove HP & PP from side list on main page (tracked in status)
