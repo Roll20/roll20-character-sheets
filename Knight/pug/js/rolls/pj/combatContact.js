@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable no-plusplus */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
@@ -448,7 +449,12 @@ rollCombatContact.forEach((button) => {
     // GESTION DES BONUS DE BASE
     let dForce = vForce;
 
-    if (hasArmure) { dForce += oForce * 3; }
+    if (hasArmure) {
+      if (oForce > 5) {
+        dForce += 5 * 3;
+        dForce += (oForce - 5);
+      } else dForce += oForce * 3;
+    }
 
     bDegats.push(dForce);
     exec.push(`{{vForce=${dForce}}}`);
