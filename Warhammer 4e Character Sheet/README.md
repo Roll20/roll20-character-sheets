@@ -81,6 +81,13 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+
+June 28th 2024 v1.72b
+
+- Fix issue with Failed Melee test not showing Dual Wield and Furious Assault text and follow up buttons. They now display irrelevant of roll outcome.
+- Recorrected Minor Miscast Rapture, from 1d10 to 1 bleed condition.
+
+
 May 29th 2024 v1.72a
 
 - New Crit tables now work as normal with Strike to Injure (UiA version).

@@ -244,7 +244,12 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
       let dForce = vForce;
 
-      if (hasArmure) { dForce += oForce * 3; }
+      if (hasArmure) {
+        if (oForce > 5) {
+          dForce += 5 * 3;
+          dForce += (oForce - 5);
+        } else dForce += oForce * 3;
+      }
 
       bDegats.push(dForce);
       exec.push(`{{vForce=${dForce}}}`);

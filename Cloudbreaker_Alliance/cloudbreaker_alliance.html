@@ -176,6 +176,7 @@
 			const capped_level = character_level > 12 ? 12 : character_level;
 
 			const grade = character_level == 89 ? platinum_rank : character_level > 8 ? gold_rank : character_level > 4 ? silver_rank : copper_rank;
+			const grade_ranked = Math.floor((capped_level) / 4);
 
 			var new_grade = grade;
 			if (downgrade == copper_rank)
@@ -183,9 +184,7 @@
 			else if (downgrade == silver_rank && grade != copper_rank)
 				new_grade = silver_rank;
 
-			var new_grade_rank = new_grade == platinum_rank ? 3 : new_grade == gold_rank ? 3 : new_grade == silver_rank ? 2 : 1;
-
-			var mastery_bonus = 2 + new_grade_rank;
+			var mastery_bonus = 2 + grade_ranked;
 			if (downgrade == copper_rank)
 				mastery_bonus = 3;
 			else if (downgrade == silver_rank && grade != copper_rank)
@@ -675,32 +674,32 @@
 	});
 
 	on("change:empathy change:mastery_bonus", function(eventInfo) {
-		getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns", "artistry", "artistry_bns", "charm", "charm_bns"], function(v) {
+		getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns", "artistry", "artistry_bns", "appeal", "appeal_bns"], function(v) {
 			var output = {};
 
 			const empathy = parseInt(v["empathy"]);
 
 			const psychology = v["psychology"] == "on";
 			const artistry = v["artistry"] == "on";
-			const charm = v["charm"] == "on";
+			const appeal = v["appeal"] == "on";
 
 			const psychology_bns = parseInt(v["psychology_bns"]);
 			const artistry_bns = parseInt(v["artistry_bns"]);
-			const charm_bns = parseInt(v["charm_bns"]);
+			const appeal_bns = parseInt(v["appeal_bns"]);
 
 			const mastery_bonus = parseInt(v["mastery_bonus"]);
 
 			const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
 			const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
-			const charm_total = empathy + (charm ? mastery_bonus : 0) + charm_bns;
+			const appeal_total = empathy + (appeal ? mastery_bonus : 0) + appeal_bns;
 
 			output["psychology_mastery"] = psychology ? mastery_bonus : 0;
 			output["artistry_mastery"] = artistry ? mastery_bonus : 0;
-			output["charm_mastery"] = charm ? mastery_bonus : 0;
+			output["appeal_mastery"] = appeal ? mastery_bonus : 0;
 
 			output["psychology_total_label"] = `+${psychology_total}`;
 			output["artistry_total_label"] = `+${artistry_total}`;
-			output["charm_total_label"] = `+${charm_total}`;
+			output["appeal_total_label"] = `+${appeal_total}`;
 
 			setAttrs(output, {silent: true});
 		});
@@ -746,21 +745,21 @@
 		});
 	});
 
-	on("change:charm change:charm_bns", function(eventInfo) {
-		getAttrs(["empathy", "mastery_bonus", "charm", "charm_bns"], function(v) {
+	on("change:appeal change:appeal_bns", function(eventInfo) {
+		getAttrs(["empathy", "mastery_bonus", "appeal", "appeal_bns"], function(v) {
 			var output = {};
 
 			const empathy = parseInt(v["empathy"]);
 
-			const charm = v["charm"] == "on";
-			const charm_bns = parseInt(v["charm_bns"]);
+			const appeal = v["appeal"] == "on";
+			const appeal_bns = parseInt(v["appeal_bns"]);
 
 			const mastery_bonus = parseInt(v["mastery_bonus"]);
 
-			const charm_total = empathy + (charm ? mastery_bonus : 0) + charm_bns;
+			const appeal_total = empathy + (appeal ? mastery_bonus : 0) + appeal_bns;
 
-			output["charm_mastery"] = charm ? mastery_bonus : 0;
-			output["charm_total_label"] = `+${charm_total}`;
+			output["appeal_mastery"] = appeal ? mastery_bonus : 0;
+			output["appeal_total_label"] = `+${appeal_total}`;
 
 			setAttrs(output, {silent: true});
 		});
@@ -1075,7 +1074,7 @@
 						const featureName = v[`repeating_features_${id}_feature_name`];
 						const featureLevel = v[`repeating_features_${id}_feature_level`];
 
-						if (primary_class == undefined || primary_class == "" || secondary_class == undefined || secondary_class == "") {
+						if ((primary_class == undefined || primary_class == "") && (secondary_class == undefined || secondary_class == "")) {
 							uncategorized_features.push({
 								feature_discipline: featureDiscipline,
 								feature_class: featureClass,
@@ -1360,6 +1359,49 @@
 
 			setAttrs(output, {silent: true});
 		});
+	});
+
+	on("change:repeating_attacks", function(eventInfo) {
+		const id = eventInfo.triggerName;
+		if (eventInfo["sourceAttribute"].includes("attack_rank")) {
+			const new_rank = eventInfo["newValue"];
+			var attrs_to_get = [`${id}_attack_damage_${new_rank}`, `${id}_attack_description_${new_rank}`, `${id}_attack_damage`, `${id}_attack_description`];
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+
+				var new_damage = v[`${id}_attack_damage_${new_rank}`];
+				var new_description = v[`${id}_attack_description_${new_rank}`];
+
+				if (new_damage == undefined || new_damage == "") {
+					new_damage = v[`${id}_attack_damage`];
+					output[`${id}_attack_damage_${new_rank}`] = new_damage;
+				}
+				if (new_description == undefined || new_description == "") {
+					new_description = v[`${id}_attack_description`];
+					output[`${id}_attack_description_${new_rank}`] = new_description;
+				}
+
+				output[`${id}_attack_damage`] = new_damage;
+				output[`${id}_attack_description`] = new_description;
+
+				setAttrs(output, {silent: true});
+			});
+		}
+		else {
+			var attrs_to_get = [`${id}_attack_rank`, `${id}_attack_damage`, `${id}_attack_description`];
+			getAttrs(attrs_to_get, function(v) {
+				var output = {};
+
+				const rank = v[`${id}_attack_rank`];
+				const damage = v[`${id}_attack_damage`];
+				const description = v[`${id}_attack_description`];
+
+				output[`${id}_attack_damage_${rank}`] = damage;
+				output[`${id}_attack_description_${rank}`] = description;
+
+				setAttrs(output, {silent: true});
+			});
+		}
 	});
 
 	on("change:mastery_bonus", function(eventInfo) {
@@ -1865,7 +1907,7 @@
 							<!-- Text area for quirk description -->
 							<input type="hidden" name="attr_quirk_fold" class="sheet-folder" />
 							<div class="sheet-foldable">
-								<textarea name="attr_quirk_description" style="width: 100%;" title="Quirk deception" placeholder="Quirk deception"></textarea>
+								<textarea name="attr_quirk_description" style="width: 100%;" title="Quirk description" placeholder="Quirk description"></textarea>
 							</div>
 						</div>
 					</fieldset>
@@ -2253,13 +2295,13 @@
 							</div>
 							<div class="sheet-compLine">
 								<span>+</span>
-								<input type="checkbox" name="attr_charm" />
-								<input type="hidden" name="attr_charm_bns" value="0" />
-								<span>Charm</span>
-								<input type="number" name="attr_charm_bns" value="0" />
-								<input type="hidden" name="attr_charm_total_label" value="0" />
-								<button type="roll" name="act_rollCharm" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Charm}} {{RollType=[[?{Roll Type|Normal,0|Edge,1|Setback,2}]]}} {{totalN=[[2d6 +@{empathy} +@{charm_mastery} +@{charm_bns} +?{Modifier|0}]]}} {{totalE=[[{2d6,2d6}kh1 +@{empathy} +@{charm_mastery} +@{charm_bns} +?{Modifier|0}]]}} {{totalSB=[[{2d6,2d6}kl1 +@{empathy} +@{charm_mastery} +@{charm_bns} +?{Modifier|0}]]}}">
-									<span name="attr_charm_total_label"></span>
+								<input type="checkbox" name="attr_appeal" />
+								<input type="hidden" name="attr_appeal_bns" value="0" />
+								<span>Appeal</span>
+								<input type="number" name="attr_appeal_bns" value="0" />
+								<input type="hidden" name="attr_appeal_total_label" value="0" />
+								<button type="roll" name="act_rollAppeal" value="@{roll_whisper_type} &{template:generic} {{charName=@{character_name}}} {{rollName=Appeal}} {{RollType=[[?{Roll Type|Normal,0|Edge,1|Setback,2}]]}} {{totalN=[[2d6 +@{empathy} +@{appeal_mastery} +@{appeal_bns} +?{Modifier|0}]]}} {{totalE=[[{2d6,2d6}kh1 +@{empathy} +@{appeal_mastery} +@{appeal_bns} +?{Modifier|0}]]}} {{totalSB=[[{2d6,2d6}kl1 +@{empathy} +@{appeal_mastery} +@{appeal_bns} +?{Modifier|0}]]}}">
+									<span name="attr_appeal_total_label"></span>
 								</button>
 							</div>
 						</div>
@@ -3392,13 +3434,19 @@
 											<input type="number" name="attr_attack_bonus" title="Attack bonus" value="0" />
 										</div>
 										<div>
-											<input type="text" name="attr_attack_damage" title="Attack damage" value=" 1 HP Blunt Unarmed Combat" />
+											<input type="text" name="attr_attack_damage" title="Attack damage" value="1 HP Blunt Unarmed Combat" />
 											<input type="checkbox" name="attr_attack_fold" class="sheet-folder" value="on" checked />
 											<span class="sheet-folder"></span>
 										</div>
 									</div>
 									<input type="hidden" name="attr_attack_fold" class="sheet-folder" value="on" />
 									<div class="sheet-foldable">
+										<select name="attr_attack_rank" value="none">
+											<option value="none" selected>None</option>
+											<option value="copper">Rank 1</option>
+											<option value="silver">Rank 2</option>
+											<option value="gold">Rank 3</option>
+										</select>
 										<textarea name="attr_attack_description" title="Attack description" placeholder="Attack description"></textarea>
 									</div>
 								</div>
