@@ -5,3 +5,8 @@ Official Character Sheet Template for "Le Cabinet des Murmures" tabletop game, [
 (Evilbram) Dec. 2023
 
 A complet character sheet for the role-playing game "Le Cabinet des Murmures".
+
+## Version 1.1
+(Evilbram) Apr. 2024
+
+Added a new feature in the sheet that allows you to modify the box-shadow color depending on which player has body control.
