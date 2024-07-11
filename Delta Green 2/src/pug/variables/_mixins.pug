@@ -1,5 +1,6 @@
 //- MULTIPLE STYLED CHECKBOXES
-mixin multiCheckbox(attr, num)
+
+//mixin multiCheckbox(attr, num)
 	- let i = 0;
 	while i < num
 		label.styled-checkbox(data-i18n-title=attr + ' ' + ++i title=attr + ' ' + i)
@@ -7,67 +8,22 @@ mixin multiCheckbox(attr, num)
 	input(type='hidden' name='attr_' + attr + '_adapted' value=0)
 
 
+mixin multiCheckbox(attr, num)
+	.radiocontainer 
+		input.radiobox(class='reset' type='radio' name='attr_'+attr value='0')
+		- let i = 0;
+		while i < num
+			input.radiobox(type='radio' name='attr_'+attr value=`${i++}`)
+	input(type='hidden' name='attr_' + attr + '_adapted' value=0)
+	
+	
+
 mixin listskills(val)
 	- let attr = val.replace(' ', '_');
 	- const named_skills = ['art_1', 'craft_1', 'military science_1', 'pilot_1', 'science_1','art_2', 'craft_2', 'military science_2', 'pilot_2', 'science_2'];
 	- let caps = (val === 'humint' || val === 'sigint') ? val.toUpperCase() : val;
 	unless named_skills.includes(val)
 		option(value='@{'+attr+'}' )=caps
-
-//- SKILL ROWS
-//mixin skill(val, key)
-	- const attr = key.replace(' ', '_');
-	- const named_skills = ['art_1', 'craft_1', 'military science_1', 'pilot_1', 'science_1','art_2', 'craft_2', 'military science_2', 'pilot_2', 'science_2'];
-	- var key1=key;
-	if (named_skills.includes(key))
-		- key1 = key.replace('_1','').replace('_2','');
-	
-	- const caps = (key1 === 'humint' || key1 === 'sigint') ? key1.toUpperCase() : key1;
-
-	
-	label.styled-checkbox.center-items(data-i18n-title=caps + ' fail checkbox' title=caps + ' fail checkbox')
-		input(name='attr_' + attr + '_fail' title='@{' + attr + '_fail}' type='checkbox')
-	
-	if (named_skills.includes(key))
-	
-		
-		.form-skill-group 
-			label.skill-button
-				input(type='hidden' class='edit_test' name='attr_'+attr+'_test')
-				span.edit_text
-					div.special_div
-						h3
-							span(data-i18n=caps title=caps)= caps
-							span :
-					
-					input(style='width:100%;'  name='attr_' + attr +'_name' title='@{' + attr + '_name}' type='text' data-i18n-placeholder='choose one' placeholder='choose one' )
-				span.unedit_text
-					//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}} @{${attr}_name}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
-					
-					+editablebetterbutton(attr, caps,'pressable special_div roll',`(${val}%)`,false)
-					//button.pressable(data-i18n-title='skill_roll' type='roll' value=skillRollValue)
-						div.special_div
-							h3
-								span(data-i18n=caps title=caps)= caps
-								span.postspace :
-								span.postspace  
-								span(name='attr_' + attr +'_name' )
-								// span(data-i18n='(' + val + '%)')= '(' + val + '%)'
-			label.switch-edit
-				input(type='checkbox' name='attr_'+attr+'_test' value='editable')
-				span.vslider
-	else 
-		- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{${attr}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`;
-		//+betterbutton(attr, caps,'normal_div roll',`(${val}%)`,false)
-		+betterbutton(attr, caps,'normal_div',`(${val}%)`,false)
-		//button(data-i18n-title=caps + ' roll' name=key title=caps + ' roll' type='roll' value=skillRollValue)					
-			div.normal_div
-				h3(data-i18n=caps title=caps)= caps
-				span(data-i18n='(' + val + '%)')= '(' + val + '%)'
-	.vert-line
-	label.rank(data-i18n-title=caps + ' rank' title=caps + ' rank')
-		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='text' value=val)
-	.horz-line
 
 
 mixin pcskill(val, key)
@@ -154,22 +110,6 @@ mixin npcskill(val, key, hide)
 			input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='text' value=val)
 
 
-// SKILL FOR UNNATURAL
-//mixin skillunnatural(val, key)
-	- const attr = key.replace(' ', '_');
-	- const caps = (key === 'humint' || key === 'sigint') ? key.toUpperCase() : key;
-	//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
-	- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${caps}}}} {{subheader=@{${attr}}}} {{dice=[[1d100]]}}`;
-	label
-	+betterbutton(key, caps,'roll',`(${val}%)`,false)
-	//button(data-i18n-title=caps + ' roll' name=key title=caps + ' roll' type='roll' value=skillRollValue)
-		div.normal_div
-			h3(data-i18n=caps title=caps)= caps
-			span(data-i18n='(' + val + '%)')= '(' + val + '%)'
-	.vert-line
-	label(data-i18n-title=caps + ' rank' title=caps + ' rank')
-		input(data-i18n-placeholder='0' name='attr_' + attr title='@{' + attr + '}' placeholder='0' type='number' value=val min=0 max=99)
-	.horz-line
 //-	DERIVED ATTRIBUTE INPUT OR SPAN
 mixin derived(val, attrName)
 	if val === 'SAN'
@@ -305,7 +245,7 @@ mixin advanced_mod_weapons()
 		input.small-select(data-i18n-placeholder='Holographic sight Standard' type='text' name='attr_accessories_name' title='@{repeating_weapons_${x}_accessories_name}' placeholder='Holographic sight' value='')
 		span(style="display:inline;justify-self:end;")
 			span(data-i18n="modifier") modifier
-			input(type='text' list='common_modifiers' name='attr_accessories_mod' title='@{repeating_weapons_${x}_accessories_mod}' value='0' maxlength='2' size='3'  style="width: 3em;") 
+			input(type='text' list='common_modifiers' name='attr_accessories_mod' title='@{repeating_weapons_${x}_accessories_mod}' value='0' maxlength='2' size='3'  style="width: 3rem;") 
 			span.perc %
 	.item-sel
 		input.fix-check(name='attr_selfire' type='checkbox' value='active')
@@ -341,7 +281,7 @@ mixin advanced_mod_weapons()
 					span )
 		span(style="display:inline;justify-self:end;")
 			span(data-i18n="lethality") lethality
-			input(type='text' name='attr_selfire_lethality' title='@{repeating_weapons_${x}_selfire_lethality}' value='10' maxlength='2' size='3' style="width: 3em;")
+			input(type='text' name='attr_selfire_lethality' title='@{repeating_weapons_${x}_selfire_lethality}' value='10' maxlength='2' size='3' style="width: 3rem;")
 			span %
 			
 
@@ -373,7 +313,8 @@ mixin betterLabel(titleButton,spanButton='',isPersonal=false)
 		h3.aligned-left(data-i18n=key data-i18n-title=titleButton)= titleButton
 		if (spanButton != '')
 			if (isPersonal)
-				span.para(data-i18n=spanButton title=spanButton)= spanButton
+				div
+					span.para(data-i18n=spanButton title=spanButton)= spanButton
 			else
 				span(data-i18n=spanButton title=spanButton)= spanButton
 

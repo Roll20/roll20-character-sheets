@@ -24,7 +24,7 @@ const arrays = {
 		
 };
 
-const _repeating_sections={'skill':'skills','bond':'bonds','special_training':'special','weapons':'weapon'};
+const _repeating_sections={'skill':'skills','bond':'bonds','special':'special','weapons':'weapon'};
 const _rd100 = `[[1d100]]`;
 const _rd4   = `[[1d4]]`;
 const _rd6   = `[[1d6]]`;
@@ -33,7 +33,8 @@ const _rd10  = `[[1d10]]`;
 const _rd12  = `[[1d12]]`;
 const _rd20  = `[[1d20]]`;
 const _queryModifier =`?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}`;
-const prefix_roll = `@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`; 
+const prefix_skill_roll = `@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`; 
+const prefix_bond_roll = `@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[${_rd4}]]}}`; 
 const criticals = [1,11,22,33,44,55,66,77,88,99,100];
 
  // check skill value for weapons and special training
@@ -63,6 +64,10 @@ const isValidSkill=(str)=> {
     console.info('output str:',compar);
     return arrays['_skills'].concat(arrays['_stats']).includes(compar);
 };
+
+on(`remove:repeating_skills`, (eventInfo) => {
+	console.info('repeating remove skills removed',eventInfo);
+});
 
 
 const isEmpty = (obj) => Object.keys(obj).length === 0 && obj.constructor === Object;

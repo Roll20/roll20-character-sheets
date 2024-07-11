@@ -30,7 +30,7 @@ const arrays_drop={
 	skill: ["name","rank"],
 	special_training:["name","skill_or_stat_used"],
 	weapon :["name", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo"],
-	rep: {bond: "repeating_bonds_",special: "repeating_special_",skill:"repeating_skills_",ritual:"repeating_rituals",weapon:"repeating_weapons"},
+	rep: {bond: "repeating_bonds_",special: "repeating_special_",skill:"repeating_skills_",ritual:"repeating_rituals_",weapon:"repeating_weapons_"},
 }
 
 
@@ -163,8 +163,15 @@ const dropWeapon = (data) => {
 	for (const field of weaponfields){
 		if (data[field]){
 			if (field === "skill_percent"){
-				let skillname=data[field].toLowerCase().replace(/ /g, "_");
-				updateAttrs[`${prefix}_${field}`] = `@{${skillname}}`;
+				let skillname=cleanedSkill(data[field]);
+				console.info(skillname);
+				if (isSkillNumber(skillname)){
+					updateAttrs[`${prefix}_skill_percent`] = skillname;
+				}else if (isValidSkill(skillname)){
+					updateAttrs[`${prefix}_skill_percent`] = `@{${skillname}}`;
+				}else{
+					console.error(`skill not found: ${skillname}`);
+				}
 			}else{
 				updateAttrs[`${prefix}_${field}`] = data[field];
 			}
@@ -195,6 +202,7 @@ const handleDragandDrop = () => {
 		const dropDataParsed =JSON.parse(drop_data);
 		const dropType =  getDropType(dropDataParsed);
 		console.info(`drop type:`, dropType);
+		console.info('data:',dropDataParsed);
 		
 		var updateAttrs = false;
 		if (dropType === "Agents"){     
@@ -212,6 +220,7 @@ const handleDragandDrop = () => {
 		}
 		if (dropType === "Weapons"){
 	        console.log("It's a Weapon");
+
 			updateAttrs= dropWeapon(dropDataParsed);
 		}
 		if (updateAttrs === false) {

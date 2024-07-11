@@ -164,6 +164,43 @@ const rollSkillAndStats=(rollValue,rollName,rollFail,_isSkill) => {
 	});
 };
 
+const rollBonds=(rollValue,_value,_names,_parameters) => {
+	
+	startRoll(`${rollValue}`, (results)=> {
+		console.log(results);
+
+		
+		///////////////////////////////////////////////////////////
+		const dice=results.results.dice.result;
+		const local_wp=Math.max(0,parseInt(results.results.local_wp.result)-dice);
+		const score=Math.max(0,parseInt(results.results.score.result)-dice);
+
+		const zerowp=local_wp==0 ? 1 : 0;
+		console.log(`local_wp: ${local_wp}`);
+		console.log(`score: ${score}`);
+		console.log(`dice: ${dice}`);
+		console.log(`zerowp: ${zerowp}`);
+		var update={};
+		console.info('parameters',_parameters);
+		console.info('names',_names);
+		update[_names['local_wp_points']]=local_wp;
+		update[`willpower_points`]=local_wp;
+		update[_names[`score`]]=score;
+		
+		newroll={
+			dice: dice,
+			local_wp: local_wp,
+			score: score,
+			zerowp: zerowp
+		};
+
+		finishRoll(results.rollId,newroll);
+		setAttrs(update,{silent:false}, () => {
+			console.info(`Bonds updated`,update);
+		});
+	});
+};
+
 const rollWeaponsAndRituals = (rollValue,rollName,isLethal,hasAmmo) => {
 
 };
@@ -175,6 +212,20 @@ const clicked_repeating_weapons= (parameters) => {
 	});
 };
 
+const clicked_repeating_actions = (type,parameters,names,queryModifier) => {
+	if (type==='weapons'){
+		clicked_repeating_weapons(parameters,names,queryModifier);
+	}
+	if (type==='bonds'){
+		clicked_repeating_bonds(parameters,names,queryModifier);
+	}
+	if (type==='special'){
+		clicked_repeating_skills(parameters,names,queryModifier);
+	}
+	if (type==='skills'){
+		clicked_repeating_skills(parameters,names,queryModifier);
+	}
+}
 
 const clicked_repeating_skills = (parameters,names,queryModifier) => {
 	getAttrs(parameters, (values) => {
@@ -186,7 +237,7 @@ const clicked_repeating_skills = (parameters,names,queryModifier) => {
 		console.info('values',values);
 
 
-		const rollString=`${prefix_roll} {{header=${skillname}}} {{subheader=${skillrank}}} `;
+		const rollString=`${prefix_skill_roll} {{header=${skillname}}} {{subheader=${skillrank}}} `;
 		///////////////////////////////////////////////////////////
 		const wp_modifiers=check_for_wp_modifiers(values);
 
@@ -208,7 +259,35 @@ const clicked_repeating_skills = (parameters,names,queryModifier) => {
 
 };
 
+
+
 const clicked_repeating_bonds = (parameters,names) => {
+	getAttrs(parameters, (values) => {
+		const bondname=values[names['name']];
+		const bondscore=parseInt(values[names['score']]) || 0;
+        const local_wp_points=parseInt(values[names['local_wp_points']]) || 0;
+		const local_san_points=parseInt(values[names['local_san_points']]) || 0;
+		const charid=values['character_id'];
+		console.log(`bondname: ${bondname} name: ${names['name']}`);
+		console.log(`bondscore: ${bondscore} score: ${names['score']}`);
+		console.log(`local_wp_points: ${local_wp_points} wp_points: ${parameters[`willpower_points`]}`);
+		console.log(`local_san_points: ${local_san_points} san_points: ${parameters[`sanity_points`]}`);
+		console.info('values',values);
+
+
+		const rollString=`${prefix_bond_roll} {{header=${bondname}}} {{subheader=${bondscore}}} `;
+		///////////////////////////////////////////////////////////
+		
+		var rollValue = `${rollString} {{zerowp=[[0]]}} {{score=[[${bondscore}]]}} {{local_wp=[[${local_wp_points}]]}} {{local_sanity=[[${local_san_points}}]]}} {{repress= [^{repress}](~${charid}|sanity_points)}}`;
+		rollValue=`${rollValue} {{projection=1}} {{repression=1}}`;
+		console.info('rollValue',rollValue);
+
+		console.log(rollValue);
+		rollBonds(rollValue,values,names,parameters);
+
+
+	});
+
 };
 // Important functions
 const _allrolls=arrays['_derived_rolls'].concat(arrays[`_stats`],arrays[`_skills`],['unnatural']);
@@ -228,13 +307,13 @@ _allrolls.forEach(roll => {
 					_header = `{{header=^{${prefix_skill.replace('_',' ')}} (${values[`${_roll}_name`]})}}`;
 				
 					console.log(`header: ${_header}`);
-					const rollString=`${prefix_roll} ${_header} {{subheader=@{${roll}}}} `;
+					const rollString=`${prefix_skill_roll} ${_header} {{subheader=@{${roll}}}} `;
 					rollwithmodifiers(rollString,roll,queryModifier);
 				});
 			}else{
 				const caps = (_roll === 'humint' || _roll === 'sigint') ? _roll.toUpperCase() : _roll.replace('_',' ')
 				_header = `{{header=^{${caps.replace('_',' ')}}}}`;
-				const rollString=`${prefix_roll} ${_header} {{subheader=@{${roll}}}} `;
+				const rollString=`${prefix_skill_roll} ${_header} {{subheader=@{${roll}}}} `;
 				rollwithmodifiers(rollString,roll,queryModifier);
 			
 			}

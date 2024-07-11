@@ -42,13 +42,13 @@ $20(selector).on('click', e => {
                 _header = `{{header=^{${prefix_skill.replace('_',' ')}} (${values[`${_roll}_name`]})}}`;
             
                 console.log(`header: ${_header}`);
-                const rollString=`${prefix_roll} ${_header} {{subheader=@{${roll}}}} `;
+                const rollString=`${prefix_skill_roll} ${_header} {{subheader=@{${roll}}}} `;
                 rollwithmodifiers(rollString,roll,queryModifier);
             });
         }else{
             const caps = (_roll === 'humint' || _roll === 'sigint') ? _roll.toUpperCase() : _roll.replace('_',' ')
             _header = `{{header=^{${caps.replace('_',' ')}}}}`;
-            const rollString=`${prefix_roll} ${_header} {{subheader=@{${roll}}}} `;
+            const rollString=`${prefix_skill_roll} ${_header} {{subheader=@{${roll}}}} `;
 
              rollwithmodifiers(rollString,roll,queryModifier);
         
@@ -56,6 +56,7 @@ $20(selector).on('click', e => {
         
 
 });
+
 
 $20('button.repeating_roll').on('click', e => {
 console.log(e);
@@ -71,19 +72,24 @@ var _input_names = {};
 var _parameters =[`repeating_${section}_${id}_name`];
 // Common for all rolls, modifiers
 _parameters.push(`willpower_points`);
+_parameters.push(`sanity_points`);
 _parameters.push(`low_will_power`);
 _parameters.push(`zero_will_power`);
 
 _input_names[`name`]=`repeating_${section}_${id}_name`;
 //skill dependent parameters
+_parameters.push(`character_id`);
+
 if (section==='skills'){
     _input_names[`rank`]=`repeating_${section}_${id}_rank`;	
     _input_names[`fail`]=`repeating_${section}_${id}_fail`;
     _parameters.push(`repeating_${section}_${id}_rank`);
     _parameters.push(`repeating_${section}_${id}_fail`);
-    clicked_repeating_skills(_parameters,_input_names,queryModifier);
 //bond dependent parameters
 }else if (section==='bonds'){
+    _input_names[`local_wp_points`]=`repeating_${section}_${id}_wp_points`;
+    _input_names[`local_san_points`]=`repeating_${section}_${id}_san_points`;
+    _input_names[`score`]=`repeating_${section}_${id}_score`;
     _parameters.push(`repeating_${section}_${id}_score`);
     _parameters.push(`repeating_${section}_${id}_wp_points`);
     _parameters.push(`repeating_${section}_${id}_san_points`);
@@ -96,5 +102,6 @@ if (section==='skills'){
 
 console.log(`parameters: ${_parameters}`);
 
+clicked_repeating_actions(section,_parameters,_input_names,queryModifier);
 });
 
