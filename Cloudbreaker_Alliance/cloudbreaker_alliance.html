@@ -139,28 +139,22 @@
 	});
 
 	on("change:adventuring_grade", function(eventInfo) {
-		const previous_grade = eventInfo.previousValue == undefined ? copper_rank : eventInfo.previousValue;
 		const new_grade = eventInfo.newValue;
-		const previous_grade_value = previous_grade == platinum_rank ? 3 : previous_grade == gold_rank ? 3 : previous_grade == silver_rank ? 2 : 1;
 		const new_grade_value = new_grade == platinum_rank ? 3 : new_grade == gold_rank ? 3 : new_grade == silver_rank ? 2 : 1;
-
-		if (previous_grade_value == new_grade_value)
-			return;
 
 		getAttrs(["minor_action", "downgrade_level"], function(v) {
 			var output = {};
 
 			const downgrade = v["downgrade_level"];
 
-			const minor_action = parseInt(v["minor_action"]);
-			var new_minor_action = minor_action + new_grade_value - previous_grade_value;
+			var minor_action = new_grade_value;
 
 			if (downgrade == copper_rank)
-				new_minor_action = Math.min(new_minor_action, 1);
+				minor_action = Math.min(minor_action, 1);
 			else if (downgrade == silver_rank && new_grade_value != copper_rank)
-				new_minor_action = Math.min(new_minor_action, 2);
+				minor_action = Math.min(minor_action, 2);
 
-			output["minor_action"] = new_minor_action;
+			output["minor_action"] = minor_action;
 
 			setAttrs(output, {silent: true});
 		});
@@ -1158,13 +1152,17 @@
 
 					var final_string = "";
 					if (primary_features.length > 0) {
-						final_string += `Primary Class (${primary_features[0].feature_discipline} ${primary_features[0].feature_class}) features\n`;
+						const primary_discipline = primary_features.find(feature => feature.feature_discipline !== undefined && feature.feature_discipline !== null && feature.feature_discipline !== "")?.feature_discipline || "";
+						const primary_class = primary_features.find(feature => feature.feature_class !== undefined && feature.feature_class !== null && feature.feature_class !== "")?.feature_class || "";
+						final_string += `Primary Class (${primary_discipline} ${primary_class}) features\n`;
 						for (let feature of primary_features) {
 							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
 					}
 					if (secondary_features.length > 0 && adventuring_grade != copper_rank) {
-						final_string += `Secondary Class (${secondary_features[0].feature_discipline} ${secondary_features[0].feature_class}) features\n`;
+						const secondary_discipline = secondary_features.find(feature => feature.feature_discipline !== undefined && feature.feature_discipline !== null && feature.feature_discipline !== "")?.feature_discipline || "";
+						const secondary_class = secondary_features.find(feature => feature.feature_class !== undefined && feature.feature_class !== null && feature.feature_class !== "")?.feature_class || "";
+						final_string += `Secondary Class (${secondary_discipline} ${secondary_class}) features\n`;
 						for (let feature of secondary_features) {
 							final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
 						}
