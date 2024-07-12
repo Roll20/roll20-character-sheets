@@ -104,7 +104,7 @@ on(`change:sheet_select`, ({ newValue }) => {
 });
 
 on(`change:repeating_events:new_glory`, ({ triggerName }) => {
-  const repeatingRow = helpers.getReprowid(triggerName);
+  const repeatingRow = getReprowid(triggerName);
 
   getSectionIDs("events", (idArray) => {
     let characteristics = [];
@@ -113,9 +113,9 @@ on(`change:repeating_events:new_glory`, ({ triggerName }) => {
     );
 
     getAttrs(characteristics, (values) => {
-      const parsedNums = helpers.parseIntegers(values);
+      const parsedNums = parseIntegers(values);
       const gloryValues = Object.values(parsedNums);
-      const sum = helpers.sumIntegers(gloryValues);
+      const sum = sumIntegers(gloryValues);
 
       setAttrs({
         glory_total: sum,

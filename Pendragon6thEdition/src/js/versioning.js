@@ -16,6 +16,21 @@ const versionTwoFour = () => {
   });
 };
 
+const versionTwoFive = () => {
+  getSectionIDs(`repeating_passion`, (ids) => {
+    const map = ids.map((id) => `repeating_passion_${id}_passion`);
+
+    getAttrs(map, (v) => {
+      let update = {};
+      map.forEach((e) => {
+        const rowId = getReprowid(e);
+        update[`${rowId}_target_value`] = v[`${e}`] ? v[`${e}`] : 0;
+      });
+      setAttrs(update);
+    });
+  });
+};
+
 const versioning = async (version) => {
   const updateMessage = (v) =>
     console.log(
@@ -37,6 +52,11 @@ const versioning = async (version) => {
       updateMessage(2.41);
       updateBrawling();
       versioning(2.41);
+      break;
+    case version < 2.5:
+      updateMessage(2.5);
+      versionTwoFive();
+      versioning(2.5);
       break;
     default:
       console.log(

@@ -5,44 +5,6 @@ const dropWarning = (v) => {
   );
 };
 
-const getRow = (section) => `repeating_${section}_${generateRowID()}`;
-
-const getRepUpdate = (attrs, row, page) => {
-  let update = {};
-
-  attrs.forEach((attr) => {
-    if (page[attr] ?? page.data[attr]) {
-      update[`${row}_${attr}`] = page[attr] ?? cleanAttr(attr, page.data[attr]);
-    }
-  });
-
-  if (attrs.includes("notes")) {
-    update[`${row}_flag`] = false;
-  }
-
-  return update;
-};
-
-const cleanAttr = (attr, value) => {
-  if (attr === "skill") {
-    return `@{${value.toLowerCase()}}`;
-  }
-
-  return value;
-};
-
-const getStaticUpdate = (attrs, page) => {
-  let update = {};
-
-  attrs.forEach((attr) => {
-    if (page[attr] ?? page.data[attr]) {
-      update[attr] = page[attr] ?? cleanAttr(attr, page.data[attr]);
-    }
-  });
-
-  return update;
-};
-
 const handle_npc = (page) => {
   const attrs = [
     "size",
@@ -78,25 +40,10 @@ const handle_npc = (page) => {
     "thrown weapon",
   ];
   let update = getStaticUpdate(attrs, page);
+
   update["character_name"] = page.name;
 
   //TODO: handle all repeating sections
-};
-
-const handle_armor = (page) => {
-  handle_item(page);
-};
-
-const handle_item = (page, row) => {
-  let update = getRepUpdate(
-    ["value", "notes", "period_restriction"],
-    row,
-    page
-  );
-  update[`${row}_equipment`] = page.name;
-  update[`${row}_category`] = page.data["subcategory"];
-
-  setAttrs(update);
 };
 
 const handle_equipment = (page) => {
@@ -109,55 +56,68 @@ const handle_arms = (page) => {
   handle_item(page, row);
 };
 
-const handle_squire = (page) => {
-  const attrs = ["squire_age", "squire_skill", "squire_notes"];
-  const update = getStaticUpdate(attrs, page);
-  update["squire_name"] = page.name;
-  update["flag_squire_notes"] = false;
-  setAttrs(update);
+const item_update = (page, row) => {
+  let update = getRepUpdate(
+    ["value", "notes", "period_restriction"],
+    row,
+    page
+  );
+  update[`${row}_equipment`] = page.name;
+  update[`${row}_category`] = page.data["subcategory"];
+  return update;
 };
 
-const handle_weapon = (page) => {
+const attack_update = (page) => {
   const row = getRow("attacks");
   const attrs = ["name", "damage", "skill"];
-  const update = getRepUpdate(attrs, row, page);
-  setAttrs(update);
+  return getRepUpdate(attrs, row, page);
 };
 
-const handle_horse = (page) => {
-  const attrs = [
-    "armor",
-    "charge_damage",
-    "con",
-    "damage",
-    "dex",
-    "hp",
-    "move",
-    "siz",
-    "str",
-    "type",
-  ];
-  const warHorseAttrs = attrs.map((attr) => `warhorse_${attr}`);
-  let update = getStaticUpdate([...warHorseAttrs, "equestrian_notes"], page);
-  update["warhorse_type"] = page.name;
-  update["flag_equestrian_notes"] = false;
-  setAttrs(update);
-};
+// const passion_update = (page) => {
+//   const row = getRow("passions");
+//   const attrs = ["name", "target_value"];
 
 const handle_character = (page) => {
   const attrs = [
     "appearance",
-    "dexterity",
-    "size",
-    "strength",
+    "armor_points",
     "constitution",
+    "dexterity",
     "healing_rate",
     "hit_points",
     "knockdown",
     "major_wound",
     "movement",
+    "size",
+    "strength",
     "unconscious",
   ];
+
+  console.log(page);
+
+  const update = getStaticUpdate(attrs, page);
+  update["character_name"] = page.name;
+
+  const addEntries = (object) => {
+    Object.entries(object).forEach(([key, value]) => {
+      update[key] = value;
+    });
+  };
+
+  //const arms = processDataArrays(page.data.arms, getStaticUpdate);
+
+  const attacks = processDataArrays(page.data.attacks, attack_update);
+  addEntries(attacks);
+
+  // const passions = processDataArrays(page.data.passions, getStaticUpdate);
+
+  //TODO: Handle Arms
+
+  console.log(update);
+
+  setAttrs(update, {
+    silent: true,
+  });
 
   //TODO: Skills, Passions, Traits, and Equipment are setup wrong. Rake needs to be run again
 };
@@ -167,7 +127,7 @@ const handle_items = (page) => {
 
   switch (subcategory) {
     case "Armor":
-      handle_armor(page);
+      handle_arms(page);
       break;
     case "Animal":
     case "Service":
@@ -198,17 +158,9 @@ const handle_drop = () => {
       return;
     }
 
-    let pagedata = v.drop_data;
-
-    try {
-      pagedata = JSON.parse(v.drop_data);
-    } catch (e) {
-      console.log(`Error parsing JSON: ${v.drop_data}`);
-    }
-
     const page = {
       name: v.drop_name,
-      data: pagedata,
+      data: parseJSON(v.drop_data) ?? v.drop_data,
       content: v.drop_content,
     };
 
