@@ -73,9 +73,11 @@ const attack_update = (page) => {
   return getRepUpdate(attrs, row, page);
 };
 
-// const passion_update = (page) => {
-//   const row = getRow("passions");
-//   const attrs = ["name", "target_value"];
+const passion_update = (page) => {
+  const row = getRow("passion");
+  const attrs = ["name", "target_value"];
+  return getRepUpdate(attrs, row, page);
+};
 
 const handle_character = (page) => {
   const attrs = [
@@ -109,11 +111,14 @@ const handle_character = (page) => {
   const attacks = processDataArrays(page.data.attacks, attack_update);
   addEntries(attacks);
 
-  // const passions = processDataArrays(page.data.passions, getStaticUpdate);
+  const passions = processDataArrays(page.data.passions, passion_update);
+  addEntries(passions);
 
   //TODO: Handle Arms
 
   console.log(update);
+
+  //TODO: Keep going down each attribute in the pregen knights and extract the data
 
   setAttrs(update, {
     silent: true,

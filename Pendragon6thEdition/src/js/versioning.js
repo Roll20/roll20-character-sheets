@@ -24,7 +24,7 @@ const versionTwoFive = () => {
       let update = {};
       map.forEach((e) => {
         const rowId = getReprowid(e);
-        update[`${rowId}_target_value`] = v[`${e}`] ? v[`${e}`] : 0;
+        u[`${rowId}_target_value`] = v[`${e}`] ? v[`${e}`] : 0;
       });
       setAttrs(update);
     });
