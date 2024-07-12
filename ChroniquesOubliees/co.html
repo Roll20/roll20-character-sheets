@@ -3350,7 +3350,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
 <!-- FIN TEMPLATES -->
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-  let silent = {
+    let silent = {
     silent: true
   };
 
@@ -4101,7 +4101,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           };
           if (n === 0) fin();
           let armeDroiteTrouvee = values.maindroite == '0' || values.maindroite == 'Autre' || values.maindroite == 'Torche';
-          let armeGaucheTrouvee = values.maingauche == '0' || values.maingauche == '2m' || values.maingauche == 'Autre' || values.maingauche == 'Torche' || values.maingauche.startsWith('b');
+          let armeGaucheTrouvee = !values.maingauche || values.maingauche == '0' || values.maingauche == '2m' || values.maingauche == 'Autre' || values.maingauche == 'Torche' || values.maingauche.startsWith('b');
           arrayArmes.forEach(function(id) {
             if (armeDroiteTrouvee && armeGaucheTrouvee) {
               fin();
@@ -5087,6 +5087,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
   }
 
   function readJSONStats(stats, maxAttack, values) {
+    console.log("Lecture d'un json des stats");
     console.log(stats);
     let se = {};
     for (const f in statsJSON) {
@@ -5517,6 +5518,8 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
           sa[vrt] = capacite;
         } else {
           sa[vrt] = capacite.name;
+          if (capacite.limitedUse) sa[vrt] += ' ' + capacite.limitedUse;
+          if (capacite.spell) sa[vrt] += capacite.spell;
           sa[vn + '-' + (r + 1)] = capacite.description;
         }
       });
@@ -7881,7 +7884,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
   on('change:maingauche', function(eventinfo) {
     getAttrs(['maingauche', 'maingauche_max', 'defbouclieron', 'defbouclier', 'defboucliermalus', 'montrerattaquegauche'], function(values) {
       //Les boucliers sont codés par une valeur commençant par 'b'
-      if (values.maingauche.startsWith('b')) {
+      if (values.maingauche && values.maingauche.startsWith('b')) {
         let set;
         let sa = {};
         if (values.montrerattaquegauche == '1') {
@@ -8008,7 +8011,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
       'maingauche', 'maingauche_max'
     ], function(values) {
       if (values.defbouclieron == '0') {
-        if (values.maingauche.startsWith('b')) {
+        if (values.maingauche && values.maingauche.startsWith('b')) {
           setAttrs({
             maingauche: '0',
             maingauche_max: values.maingauche.substring(1)
@@ -8016,7 +8019,7 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
         }
         return;
       }
-      if (values.maingauche.startsWith('b')) return;
+      if (values.maingauche && values.maingauche.startsWith('b')) return;
       //On met un bouclier
       let nouvelleArmure = '-1';
       if (values.maingauche_max) nouvelleArmure = values.maingauche_max;
@@ -8353,5 +8356,3 @@ Cette feuille de personnage utilise des marques déposées et des droits d’aut
     },
   };*/
 </script>
-
-
