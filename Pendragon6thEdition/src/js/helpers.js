@@ -37,13 +37,6 @@ const parseIntegers = (numbers) => {
   return numbers;
 };
 
-const setcharacteristics = (update, silent) =>
-  silent && typeof update === "object"
-    ? setAttrs(update, { silent: true })
-    : typeof update === "object"
-    ? setAttrs(update)
-    : console.error(`${update} is not an object`);
-
 const sliceAttr = (attribute) => attribute.slice(2, -1);
 
 const sumIntegers = (numbers) => numbers.reduce((a, b) => a + b, 0);

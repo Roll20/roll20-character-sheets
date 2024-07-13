@@ -33,6 +33,11 @@ const personalityTraits = {
   valorous: "cowardly",
 };
 
+const traits = [
+  ...Object.keys(personalityTraits),
+  ...Object.values(personalityTraits),
+];
+
 const skills = [
   "awareness",
   "chirurgery",

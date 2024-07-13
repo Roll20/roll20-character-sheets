@@ -25,20 +25,6 @@ const handle_npc = (page) => {
     "description",
   ];
 
-  //TODO: Need special handling for these skills. They will be formatted like repeating section but are static.
-  const combatSkills = [
-    "battle",
-    "bow",
-    "brawling",
-    "charge",
-    "crossbow",
-    "hafted",
-    "two-handed hafted",
-    "horsemanship",
-    "spear",
-    "sword",
-    "thrown weapon",
-  ];
   let update = getStaticUpdate(attrs, page);
 
   update["character_name"] = page.name;
@@ -64,6 +50,10 @@ const handle_character = (page) => {
     "size",
     "strength",
     "unconscious",
+    "squire_name",
+    "squire_age",
+    "squire_skill",
+    "squire_note",
   ];
 
   const update = getStaticUpdate(attrs, page);
@@ -82,42 +72,48 @@ const handle_character = (page) => {
   );
   addEntries(attacks);
 
-  const passions = processDataArrays(page.data.passions, (data) =>
-    update_section(data, "passions")
+  const updateSection = (section) => {
+    return (data) => update_section(data, section);
+  };
+
+  const passions = processDataArrays(
+    page.data.passions,
+    updateSection("passions")
   );
   addEntries(passions);
 
-  const skillList = parseJSON(page.data.skills);
-  skillList.forEach(({ name, target_value }) => {
-    if ([...skills, ...combatSkills].includes(name.toLowerCase())) {
-      const attr = attrName(name);
-      update[attr] = target_value;
+  const dataSkills = parseJSON(page.data.skills);
+  dataSkills.forEach(({ name, target_value }) => {
+    const isStaticSkill = skills.includes(name.toLowerCase());
+    if (isStaticSkill) {
+      update[attrName(name)] = target_value;
     } else {
-      const row = getRow("skills");
-      update[`${row}_name`] = name;
-      update[`${row}_target_value`] = target_value;
+      const custom = processDataArrays(
+        [{ name, target_value }],
+        updateSection("skills")
+      );
+      addEntries(custom);
     }
   });
 
-  const traits = parseJSON(page.data.traits);
+  const dataTraits = parseJSON(page.data.traits);
   //TODO: Remove the rename when the rake task is updated
-  traits.forEach(({ name, traits: target_value }) => {
-    const staticTraits = [
-      ...Object.keys(personalityTraits),
-      ...Object.values(personalityTraits),
-    ];
-
-    if (staticTraits.includes(name.toLowerCase())) {
-      const attr = attrName(name);
-      update[attr] = target_value;
+  dataTraits.forEach(({ name, traits: target_value }) => {
+    const isStaticTrait = traits.includes(name.toLowerCase());
+    if (isStaticTrait) {
+      update[attrName(name)] = target_value;
     } else {
-      const row = getRow("traits");
-      update[`${row}_name`] = name;
-      update[`${row}_target_value`] = target_value;
+      const custom = processDataArrays(
+        [{ name, target_value }],
+        updateSection("traits")
+      );
+      addEntries(custom);
     }
   });
 
-  console.log(update);
+  if (page.data.squire_notes) {
+    update["flag_squire_notes"] = false;
+  }
 
   setAttrs(update, {
     silent: true,
@@ -199,31 +195,8 @@ const handle_drop = () => {
         silent: true,
       }
     );
-
-    //   // get_repeating_data(function (repeating) {
-    //   //   var results = processDrop(page, v, repeating);
-    //   //   setAttrs(
-    //   //     results.update,
-    //   //     {
-    //   //       silent: true,
-    //   //     },
-    //   //     function () {
-    //   //       results.callbacks.forEach(function (callback) {
-    //   //         callback();
-    //   //       });
-    //   //     }
-    //   //   );
-    //   // });
   });
 };
-
-// on("sheet:compendium-drop", (event) => {
-//   console.log(
-//     `%c Pendragon 6th Edition compendium drop`,
-//     "color: purple; font-weight:bold"
-//   );
-//   //handle_drop();
-// });
 
 ["data"].forEach((attr) => {
   on(`change:drop_${attr}`, () => {
