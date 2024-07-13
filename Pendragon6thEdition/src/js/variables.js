@@ -12,9 +12,9 @@ const repeatingSections = [
   "equipment",
   "arms",
   "attacks",
-  "passion",
+  "passions",
   "skills",
-  "directed-trait",
+  "traits",
 ];
 
 const personalityTraits = {
@@ -32,3 +32,40 @@ const personalityTraits = {
   trusting: "suspicious",
   valorous: "cowardly",
 };
+
+const skills = [
+  "awareness",
+  "chirurgery",
+  "compose",
+  "courtesy",
+  "dancing",
+  "falconry",
+  "fashion",
+  "first aid",
+  "flirting",
+  "folklore",
+  "gaming",
+  "hunting",
+  "intrigue",
+  "literacy",
+  "orate",
+  "play instrument",
+  "recognize",
+  "religion",
+  "singing",
+  "stewardship",
+];
+
+const combatSkills = [
+  "battle",
+  "bow",
+  "brawling",
+  "charge",
+  "crossbow",
+  "hafted",
+  "two-handed hafted",
+  "horsemanship",
+  "spear",
+  "sword",
+  "thrown weapon",
+];

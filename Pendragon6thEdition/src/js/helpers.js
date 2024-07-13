@@ -16,8 +16,8 @@ const getReprowid = (trigger) => {
 };
 
 const getReprowAttribute = (key) => {
-  const getReprowid = getReprowid(key);
-  return key.split(`${getReprowid}_`)[1];
+  const reprowid = getReprowid(key);
+  return key.split(`${reprowid}_`)[1];
 };
 
 const getTranslations = (translationKeys) => {
@@ -47,3 +47,5 @@ const setcharacteristics = (update, silent) =>
 const sliceAttr = (attribute) => attribute.slice(2, -1);
 
 const sumIntegers = (numbers) => numbers.reduce((a, b) => a + b, 0);
+
+const attrName = (name) => name.replace(/ /g, "_").toLowerCase();

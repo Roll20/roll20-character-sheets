@@ -77,39 +77,51 @@ const handle_character = (page) => {
 
   //const arms = processDataArrays(page.data.arms, getStaticUpdate);
 
-  const attacks = processDataArrays(page.data.attacks, update_attack);
+  const attacks = processDataArrays(page.data.attacks, (data) =>
+    update_attack(data)
+  );
   addEntries(attacks);
 
-  const passions = processDataArrays(page.data.passions, update_passion);
+  const passions = processDataArrays(page.data.passions, (data) =>
+    update_section(data, "passions")
+  );
   addEntries(passions);
 
+  const skillList = parseJSON(page.data.skills);
+  skillList.forEach(({ name, target_value }) => {
+    if ([...skills, ...combatSkills].includes(name.toLowerCase())) {
+      const attr = attrName(name);
+      update[attr] = target_value;
+    } else {
+      const row = getRow("skills");
+      update[`${row}_name`] = name;
+      update[`${row}_target_value`] = target_value;
+    }
+  });
+
   const traits = parseJSON(page.data.traits);
-  traits.forEach(({ name, traits }) => {
-    const attr = name.toLowerCase();
+  //TODO: Remove the rename when the rake task is updated
+  traits.forEach(({ name, traits: target_value }) => {
     const staticTraits = [
       ...Object.keys(personalityTraits),
       ...Object.values(personalityTraits),
     ];
 
-    if (staticTraits.includes(attr)) {
-      update[`${attr}`] = traits;
+    if (staticTraits.includes(name.toLowerCase())) {
+      const attr = attrName(name);
+      update[attr] = target_value;
     } else {
-      const row = getRow("directed-trait");
+      const row = getRow("traits");
       update[`${row}_name`] = name;
-      update[`${row}_trait`] = traits;
+      update[`${row}_target_value`] = target_value;
     }
   });
 
-  //TODO: Handle Arms
-
   console.log(update);
 
-  //TODO: Keep going down each attribute in the pregen knights and extract the data
   setAttrs(update, {
     silent: true,
   });
-
-  //TODO: Skills, Passions, Traits, and Equipment are setup wrong. Rake needs to be run again
 };
 
 const handle_items = (page) => {
@@ -170,6 +182,7 @@ const handle_drop = () => {
         break;
       case "Pre-generated Characters":
         resetRepeatingRows(repeatingSections);
+        resetSkillList(page.data.skills);
         handle_character(page);
         break;
       default:
