@@ -1,13 +1,3 @@
-const characteristics = {
-  movement: ["strength", "dexterity"],
-  hp: ["size", "constitution"],
-  unconscious: ["hit_points"],
-  knockdown: ["size"],
-  majorWound: ["constitution"],
-  healingRate: ["constitution"],
-  brawlDamage: ["strength", "size"],
-};
-
 //When performing calculations in King Arthur Pendragon, round
 //0.5 and higher fractions upward and lesser fractions downward.
 //For example, a character with a Damage value of 4.43 would

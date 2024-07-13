@@ -25,6 +25,79 @@
   brawlDamage: ["strength", "size"],
 };
 
+const repeatingSections = [
+  "equipment",
+  "arms",
+  "attacks",
+  "passion",
+  "skills",
+  "directed-trait",
+];
+
+const personalityTraits = {
+  chaste: "lustful",
+  energetic: "lazy",
+  forgiving: "vengeful",
+  generous: "selfish",
+  honest: "deceitful",
+  just: "arbitrary",
+  merciful: "cruel",
+  modest: "proud",
+  prudent: "reckless",
+  spiritual: "worldly",
+  temperate: "indulgent",
+  trusting: "suspicious",
+  valorous: "cowardly",
+};
+const convertIntegerNegative = (number) =>
+  number > 0 ? -Math.abs(number) : number;
+
+const convertIntegersNegatives = (numbers) => {
+  for (let [key, value] of Object.entries(numbers)) {
+    numbers[key] = convertIntegerNegative(value);
+  }
+  return numbers;
+};
+
+const findRepeatingField = (trigger) => trigger.split("_")[1];
+
+const getReprowid = (trigger) => {
+  const split = trigger.split("_");
+  return `${split[0]}_${split[1]}_${split[2]}`;
+};
+
+const getReprowAttribute = (key) => {
+  const getReprowid = getReprowid(key);
+  return key.split(`${getReprowid}_`)[1];
+};
+
+const getTranslations = (translationKeys) => {
+  let translations = {};
+  translationKeys.forEach(
+    (key) => (translations[`${key}`] = getTranslationByKey(key))
+  );
+  return translations;
+};
+
+const parseInteger = (string) => parseFloat(string) || 0;
+
+const parseIntegers = (numbers) => {
+  for (let [key, value] of Object.entries(numbers)) {
+    numbers[key] = parseFloat(value) || 0;
+  }
+  return numbers;
+};
+
+const setcharacteristics = (update, silent) =>
+  silent && typeof update === "object"
+    ? setAttrs(update, { silent: true })
+    : typeof update === "object"
+    ? setAttrs(update)
+    : console.error(`${update} is not an object`);
+
+const sliceAttr = (attribute) => attribute.slice(2, -1);
+
+const sumIntegers = (numbers) => numbers.reduce((a, b) => a + b, 0);
 //When performing calculations in King Arthur Pendragon, round
 //0.5 and higher fractions upward and lesser fractions downward.
 //For example, a character with a Damage value of 4.43 would
@@ -141,55 +214,6 @@ on(`change:repeating_events:new_glory`, ({ triggerName }) => {
     });
   });
 });
-const convertIntegerNegative = (number) =>
-  number > 0 ? -Math.abs(number) : number;
-
-const convertIntegersNegatives = (numbers) => {
-  for (let [key, value] of Object.entries(numbers)) {
-    numbers[key] = convertIntegerNegative(value);
-  }
-  return numbers;
-};
-
-const findRepeatingField = (trigger) => trigger.split("_")[1];
-
-const getReprowid = (trigger) => {
-  const split = trigger.split("_");
-  return `${split[0]}_${split[1]}_${split[2]}`;
-};
-
-const getReprowAttribute = (key) => {
-  const getReprowid = getReprowid(key);
-  return key.split(`${getReprowid}_`)[1];
-};
-
-const getTranslations = (translationKeys) => {
-  let translations = {};
-  translationKeys.forEach(
-    (key) => (translations[`${key}`] = getTranslationByKey(key))
-  );
-  return translations;
-};
-
-const parseInteger = (string) => parseFloat(string) || 0;
-
-const parseIntegers = (numbers) => {
-  for (let [key, value] of Object.entries(numbers)) {
-    numbers[key] = parseFloat(value) || 0;
-  }
-  return numbers;
-};
-
-const setcharacteristics = (update, silent) =>
-  silent && typeof update === "object"
-    ? setAttrs(update, { silent: true })
-    : typeof update === "object"
-    ? setAttrs(update)
-    : console.error(`${update} is not an object`);
-
-const sliceAttr = (attribute) => attribute.slice(2, -1);
-
-const sumIntegers = (numbers) => numbers.reduce((a, b) => a + b, 0);
 const versioningAttr = "latest_versioning_upgrade";
 
 on("sheet:opened", () => {
@@ -306,38 +330,9 @@ const handle_npc = (page) => {
   //TODO: handle all repeating sections
 };
 
-const handle_equipment = (page) => {
-  const row = getRow("equipment");
-  handle_item(page, row);
-};
+const handle_equipment = (page) => handle_item(page, getRow("equipment"));
 
-const handle_arms = (page) => {
-  const row = getRow("arms");
-  handle_item(page, row);
-};
-
-const item_update = (page, row) => {
-  let update = getRepUpdate(
-    ["value", "notes", "period_restriction"],
-    row,
-    page
-  );
-  update[`${row}_equipment`] = page.name;
-  update[`${row}_category`] = page.data["subcategory"];
-  return update;
-};
-
-const attack_update = (page) => {
-  const row = getRow("attacks");
-  const attrs = ["name", "damage", "skill"];
-  return getRepUpdate(attrs, row, page);
-};
-
-const passion_update = (page) => {
-  const row = getRow("passion");
-  const attrs = ["name", "target_value"];
-  return getRepUpdate(attrs, row, page);
-};
+const handle_arms = (page) => handle_item(page, getRow("arms"));
 
 const handle_character = (page) => {
   const attrs = [
@@ -355,8 +350,6 @@ const handle_character = (page) => {
     "unconscious",
   ];
 
-  console.log(page);
-
   const update = getStaticUpdate(attrs, page);
   update["character_name"] = page.name;
 
@@ -368,18 +361,34 @@ const handle_character = (page) => {
 
   //const arms = processDataArrays(page.data.arms, getStaticUpdate);
 
-  const attacks = processDataArrays(page.data.attacks, attack_update);
+  const attacks = processDataArrays(page.data.attacks, update_attack);
   addEntries(attacks);
 
-  const passions = processDataArrays(page.data.passions, passion_update);
+  const passions = processDataArrays(page.data.passions, update_passion);
   addEntries(passions);
+
+  const traits = parseJSON(page.data.traits);
+  traits.forEach(({ name, traits }) => {
+    const attr = name.toLowerCase();
+    const staticTraits = [
+      ...Object.keys(personalityTraits),
+      ...Object.values(personalityTraits),
+    ];
+
+    if (staticTraits.includes(attr)) {
+      update[`${attr}`] = traits;
+    } else {
+      const row = getRow("directed-trait");
+      update[`${row}_name`] = name;
+      update[`${row}_trait`] = traits;
+    }
+  });
 
   //TODO: Handle Arms
 
   console.log(update);
 
   //TODO: Keep going down each attribute in the pregen knights and extract the data
-
   setAttrs(update, {
     silent: true,
   });
@@ -444,6 +453,7 @@ const handle_drop = () => {
         handle_squire(page);
         break;
       case "Pre-generated Characters":
+        resetRepeatingRows(repeatingSections);
         handle_character(page);
         break;
       default:
@@ -543,6 +553,16 @@ const getStaticUpdate = (attrs, page) => {
 
   return update;
 };
+
+const resetRepeatingRows = (sections) => {
+  sections.forEach((section) => {
+    getSectionIDs(`repeating_${section}`, (ids) => {
+      ids.forEach((id) => {
+        removeRepeatingRow(`repeating_${section}_${id}`);
+      });
+    });
+  });
+};
 const handle_horse = (page) => {
   const attrs = [
     "armor",
@@ -563,7 +583,7 @@ const handle_horse = (page) => {
   setAttrs(update);
 };
 const handle_item = (page, row) => {
-  const update = item_update(page, row);
+  const update = update_item(page, row);
   setAttrs(update);
 };
 const handle_squire = (page) => {
@@ -576,5 +596,25 @@ const handle_squire = (page) => {
 const handle_weapon = (page) => {
   const update = attack_update(page);
   setAttrs(update);
+};
+const update_attack = (page) => {
+  const row = getRow("attacks");
+  const attrs = ["name", "damage", "skill"];
+  return getRepUpdate(attrs, row, page);
+};
+const update_item = (page, row) => {
+  let update = getRepUpdate(
+    ["value", "notes", "period_restriction"],
+    row,
+    page
+  );
+  update[`${row}_equipment`] = page.name;
+  update[`${row}_category`] = page.data["subcategory"];
+  return update;
+};
+const update_passion = (page) => {
+  const row = getRow("passion");
+  const attrs = ["name", "target_value"];
+  return getRepUpdate(attrs, row, page);
 };
 </script>

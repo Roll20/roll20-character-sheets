@@ -46,38 +46,9 @@ const handle_npc = (page) => {
   //TODO: handle all repeating sections
 };
 
-const handle_equipment = (page) => {
-  const row = getRow("equipment");
-  handle_item(page, row);
-};
+const handle_equipment = (page) => handle_item(page, getRow("equipment"));
 
-const handle_arms = (page) => {
-  const row = getRow("arms");
-  handle_item(page, row);
-};
-
-const item_update = (page, row) => {
-  let update = getRepUpdate(
-    ["value", "notes", "period_restriction"],
-    row,
-    page
-  );
-  update[`${row}_equipment`] = page.name;
-  update[`${row}_category`] = page.data["subcategory"];
-  return update;
-};
-
-const attack_update = (page) => {
-  const row = getRow("attacks");
-  const attrs = ["name", "damage", "skill"];
-  return getRepUpdate(attrs, row, page);
-};
-
-const passion_update = (page) => {
-  const row = getRow("passion");
-  const attrs = ["name", "target_value"];
-  return getRepUpdate(attrs, row, page);
-};
+const handle_arms = (page) => handle_item(page, getRow("arms"));
 
 const handle_character = (page) => {
   const attrs = [
@@ -95,8 +66,6 @@ const handle_character = (page) => {
     "unconscious",
   ];
 
-  console.log(page);
-
   const update = getStaticUpdate(attrs, page);
   update["character_name"] = page.name;
 
@@ -108,18 +77,34 @@ const handle_character = (page) => {
 
   //const arms = processDataArrays(page.data.arms, getStaticUpdate);
 
-  const attacks = processDataArrays(page.data.attacks, attack_update);
+  const attacks = processDataArrays(page.data.attacks, update_attack);
   addEntries(attacks);
 
-  const passions = processDataArrays(page.data.passions, passion_update);
+  const passions = processDataArrays(page.data.passions, update_passion);
   addEntries(passions);
+
+  const traits = parseJSON(page.data.traits);
+  traits.forEach(({ name, traits }) => {
+    const attr = name.toLowerCase();
+    const staticTraits = [
+      ...Object.keys(personalityTraits),
+      ...Object.values(personalityTraits),
+    ];
+
+    if (staticTraits.includes(attr)) {
+      update[`${attr}`] = traits;
+    } else {
+      const row = getRow("directed-trait");
+      update[`${row}_name`] = name;
+      update[`${row}_trait`] = traits;
+    }
+  });
 
   //TODO: Handle Arms
 
   console.log(update);
 
   //TODO: Keep going down each attribute in the pregen knights and extract the data
-
   setAttrs(update, {
     silent: true,
   });
@@ -184,6 +169,7 @@ const handle_drop = () => {
         handle_squire(page);
         break;
       case "Pre-generated Characters":
+        resetRepeatingRows(repeatingSections);
         handle_character(page);
         break;
       default:
