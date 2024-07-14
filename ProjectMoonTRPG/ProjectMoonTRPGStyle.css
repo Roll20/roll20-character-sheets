@@ -338,6 +338,9 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
 
 /* User for sections displayed in pairs (ex. tools), each taking up half of the column */
 .half {
+    width: 49%;
+}
+.contentContainer.half {
     width: 49% !important;
 }
 
@@ -829,6 +832,9 @@ opacity: 20%;
     width: 23px !important;
     position: absolute; top: 3px; right: 0px;
 }
+.rowContainer.weapon.paletteButton .rowContainer:not(.centerFlex) {
+    margin-left: 1px;
+}
 .skillSelectionElement {
     position: relative;
 }
@@ -1103,7 +1109,7 @@ button[type=roll].NDice, button[type=action].NDice{
 .diceNum {
     text-align: right !important;
 }
-.diceVal {
+.diceVval {
     text-align: left !important;
 }
 
@@ -1200,7 +1206,7 @@ button[type=roll].NDice, button[type=action].NDice{
     height: 35px;
     width: 35px;
 }
-.type-image{ width: 40px; height: auto; text-align: center; }
+.type-image{ text-align: center; }
 .icon .type-image, .resIconRight .type-image, .resIconLeft .type-image {
     opacity: 0;
 }
@@ -1322,6 +1328,7 @@ height: 30px !important;
 width: 30px !important;
 display:inline-block;
 padding: 0 0 0 0px;
+margin: 0px;
 opacity: 30%;
 }
 .tool input[type=checkbox]:checked + label {
@@ -1359,9 +1366,6 @@ margin-bottom: 0px !important;
     margin-top: 7px;
     width: 140px;
 }
-
-.half {
-width: 49%;}
 
 .toolDescriptionInput {
 height: 65px !important;
@@ -1456,27 +1460,26 @@ margin-bottom: 2px !important;}
 }
 .baseDamageInput {
     width: 55px !important;
+    border-top: 2px solid #cc4125 !important;
+    border-left: 2px solid #cc4125 !important;
+    border-right: 2px solid #dbb748 !important;
+    border-bottom: 2px solid #dbb748 !important;
 }
 .flatDamage input {
     width: 45px !important;
 }
-.applyDamageInput {
-    height: 50px; 
-    min-width: 50px;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin-top: 2px; 
-    background-image: url('https://raw.githubusercontent.com/BeautiDemise/roll20-character-sheets/ProjectMoonTRPG-LoR-Rework/ProjectMoonTRPG/imagesResized/icons/damage.png');
-    border-radius: 5px;
-    background-color: #222 !important;
-    border: 1px #111 solid;
+.flatHPInput {
+    border: 2px solid #cc4125 !important;
 }
-.applyDamageInput:hover {
-    background-color: #000 !important;
+.flatSTInput {
+    border: 2px solid #dbb748 !important;
 }
 .damageHelperType input[type=radio] {
     display: none;
+}
+.damageHelperType input[type=radio]:not(:checked) + label:hover {
+    opacity: 60% !important;
+    cursor: pointer;
 }
 .damageHelperType input[type=radio]:checked + label {
     opacity: 100%;
@@ -1490,7 +1493,29 @@ margin-bottom: 2px !important;}
     margin: 0px;
     padding: 0px;
 }
+/* When no damage type is selected, the button is grayed out and unresponsive to input */
+.applyDamageInput {
+    opacity: 60%;
+    cursor: default;
 
+    height: 50px; 
+    min-width: 50px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-top: 2px; 
+    background-image: url('https://raw.githubusercontent.com/BeautiDemise/roll20-character-sheets/ProjectMoonTRPG-LoR-Rework/ProjectMoonTRPG/imagesResized/icons/damage.png');
+    border-radius: 5px;
+    background-color: #222 !important;
+    border: 1px #111 solid;
+}
+.damageHelperType:has(input:checked:not([value="None"])) ~ .applyDamage .applyDamageInput {
+    opacity: 100%;
+}
+.damageHelperType:has(input:checked:not([value="None"])) ~ .applyDamage .applyDamageInput:hover {
+    background-color: #000 !important;
+    cursor: pointer;
+}
 
 
 /* Roll helpers */
@@ -1781,6 +1806,12 @@ background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0)), ur
     overflow: auto;
     padding-left: 18px;
 }
+/* Displays additional options for the WhenHit ailment trigger */
+div.settingStyle:has(select[name="attr_ailTrigger"] > option[value="WhenHit"]:checked)
+~ div .hide-item {
+    display: flex;
+}
+
 
 
 /* Icons! */
@@ -1947,10 +1978,10 @@ background-image: url('https://raw.githubusercontent.com/punibird/roll20-charact
 background-image: url('https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Hostile.png');
 }
 
-.stagger {
+.stagger, .fragilestagger {
 background-image: url('https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/FragileStagger.png');
 }
-.stagger-limbus {
+.stagger-limbus, .fragilestagger-limbus {
 background-image: url('https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/FragileStagger.png');
 }
 
@@ -2201,11 +2232,62 @@ height: 35px;}
 }
 
 
-/* Some day I'll probably figure out what these things do. There's a good dozen of them scattered around the sheet */
+/* Rolltemplate styling */
 .sheet-rolltemplate-message div {
     color: #fff !important;
     background-color: rgba(0,0,0,0.5) !important;
 }
+.sheet-rolltemplate-damagecalculation img {
+    height: 25px;
+    width: 25px;
+}
+.sheet-rolltemplate-damagecalculation .userscript-calculationContainer {
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    position: relative;
+}
+.sheet-rolltemplate-damagecalculation .userscript-calculationContainer div:nth-child(n+2) {
+    border-bottom: 1px solid #555;
+}
+.sheet-rolltemplate-damagecalculation .userscript-calculationContainer div:first-child {
+    height: 30px;
+    border: 2px solid #000;
+}
+.sheet-rolltemplate-damagecalculation .userscript-damageDisplay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    text-align: center;
+    width: 64%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+.sheet-rolltemplate-damagecalculation .userscript-baseDamage .userscript-flatModifier {
+    padding-left: 8px;
+}
+.sheet-rolltemplate-damagecalculation .userscript-updateStatDisplay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 35%;
+    background-color: #000;
+    border: 2px solid #000 !important;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    font-size: 16px;
+}
+.sheet-rolltemplate-damagecalculation .userscript-calculationContainer:has(div[class=userscript-noDamage]) {
+    display: none;
+}
+.sheet-rolltemplate-damagecalculation .userscript-hpCalculationContainer div:first-child { color: #cc4125; background-color: #111; }
+.sheet-rolltemplate-damagecalculation .userscript-stCalculationContainer div:first-child { color: #f1c232; background-color: #111; }
+.sheet-rolltemplate-damagecalculation .userscript-spCalculationContainer div:first-child { color: #6d9eeb; background-color: #111; }
+
 
 
 /* Alright here's the actual sheet tab switching functionality */
