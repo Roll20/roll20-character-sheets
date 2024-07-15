@@ -2359,6 +2359,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
 //Reset Compendium fields to empty
 const getDropInfoCommand = (category, source) => {
   const PHEGCategoryTypes = {
+    Gear: 'gear',
     Edges: 'npc_Edge',
     Hindrances: 'npc_hindrance',
     Weapons: 'weapons', //Needs handling for PA/Vehicle/RA
@@ -2906,11 +2907,18 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       if (/^(pa|ra)/.test(repSection)) {
       }
       fields.forEach(field => {
-        jsonObj[`${field}`] !== undefined
-          ? (targetObj[
-              `repeating_${repSection}_${repSectionID}_${prefix}${field}`
-            ] = jsonObj[`${field}`])
-          : log(`${field}`, 'Not Found', r20color);
+        const ref = jsonObj.hasOwnProperty(field) ?
+          field :
+          jsonObj.hasOwnProperty(`data-cs-${field}`) ?
+            `data-cs-${field}` :
+            null;
+        if(!ref){
+          log(`${field}`, 'Not Found', r20color);
+          return;
+        }
+        targetObj[
+          `repeating_${repSection}_${repSectionID}_${prefix}${field}`
+        ] = jsonObj[ref]
       });
     } else {
       log('Non-Repeating Fields', 'Fields Found', r20color);
@@ -3288,6 +3296,7 @@ const compendiumBestiary = function () {
 };
 
 const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster){
+  debugger;
   const PHEGCategoryExtraSets = {
     Edges: {
       edgeCount: obj => obj['data-Edges'].length,
@@ -3348,6 +3357,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
           dropType,
           monster
         );
+        
       });
     }
   });
@@ -17069,7 +17079,3 @@ on(
 <rolltemplate class="sheet-rolltemplate-debug">
 	{{#rollLess() distracted -1}}<span class="sheet-templateCondition" data-i18n-title="distracted">♦</span>{{/rollLess() distracted -1}}{{#rollTotal() vulnerable -2}}<span class="sheet-templateCondition" data-i18n-title="vulnerable">♠</span>{{/rollTotal() vulnerable -2}}{{#rollTotal() stunned -2}}<span class="sheet-templateCondition" data-i18n-title="stunned">♣</span>{{/rollTotal() stunned -2}}
 </rolltemplate>
-
-
-
-
