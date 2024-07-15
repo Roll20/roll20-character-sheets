@@ -1946,10 +1946,11 @@ wiz3['Explosive Runes'] = {
     'reference': 'p. 191',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 332',
+    'errata': 'Sage Advice #201 p. 45',
     'damage': '[[6d4+6]]',
     'damage-type': 'Fire',
     'healing': '',
-    'effect': 'By tracing these mystic runes upon a book, map, scroll, or similar object bearing written information, the wizard prevents unauthorized persons from reading his material. The explosive runes are difficult to detect: 5% chance per level of magic-user experience of the reader; thieves have only a 5% chance. Trap detection by spell or magical device always finds these runes.\n&emsp;When read, the explosive runes detonate, delivering 6d4+6 points of damage to the reader, who gets no saving throw. A like amount, or half that if saving throws are made, is suffered by each creature within the blast radius. The wizard who cast the spell, as well as any he instructs, can read the protected writing without triggering the runes. Likewise, the wizard can remove the runes whenever desired. Others can remove them only with a successful *dispel magic* or *erase* spell. Explosive runes otherwise last until the spell is triggered. The item upon which the runes are placed is destroyed when the explosion takes place, unless it is not normally subject to destruction by magical fire (see the item saving throws in Chapter 6 of the *DUNGEON MASTER Guide*).'
+    'effect': 'By tracing these mystic runes upon a book, map, scroll, or similar object bearing written information, the wizard prevents unauthorized persons from reading his material. The explosive runes are difficult to detect: 5% chance per level of magic-user experience of the reader; thieves have only a 5% chance. Trap detection by spell or magical device always finds these runes.\n&emsp; To trigger the *explosive runes* the written material must be read. A character who cannt see or read cannot trigger the *runes*. When read, the *explosive runes* detonate, delivering 6d4+6 points of damage to the reader, who gets no saving throw. A like amount, or half that if saving throws are made, is suffered by each creature within the blast radius. The wizard who cast the spell, as well as any he instructs, can read the protected writing without triggering the runes. Likewise, the wizard can remove the runes whenever desired. Others can remove them only with a successful *dispel magic* or *erase* spell. Explosive runes otherwise last until the spell is triggered. The item upon which the runes are placed is destroyed when the explosion takes place, unless it is not normally subject to destruction by magical fire (see the item saving throws in Chapter 6 of the *DUNGEON MASTER Guide*).'
 };
 
 wiz3['Feign Death'] = {
@@ -1986,7 +1987,7 @@ wiz3['Fireball'] = {
     'reference': 'p. 191',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 367',
-    'errata': 'Sage Advice #243 p. 20',
+    'errata': 'Sage Advice #148 p. 12\nSage Advice #155 p. 86\nSage Advice #243 p. 20\nSage Advice #247 p. 20\nSage Advice #252 p. 24\nSage Advice #260 p. 23\nSage Advice #265 p. 24+26',
     'damage': '[[ [[{[[@{level-wizard}]],10}kl1]]d6]]',
     'damage-type': 'Fire',
     'healing': '',
@@ -2007,10 +2008,11 @@ wiz3['Flame Arrow'] = {
     'reference': 'p. 192',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 372',
+    'errata': 'Sage Advice #148 p. 12\nSage Advice #169 p. 99',
     'damage': '*First version:* Normal arrow damage + 1 Fire\n*Second version:* 1d6 piercing + 4d6',
     'damage-type': 'Fire',
     'healing': '',
-    'effect': 'This spell has two effects. First, the wizard can cause normal arrows or crossbow bolts to become magical *flaming missiles* for one round. The missiles must be nocked and drawn (or cocked) at the completion of the spell. If they are not loosed within one round, they are consumed by the magic. For every five levels the caster has achieved, up to 10 arrows or bolts can be affected. Currently up to [[floor([[@{level-wizard}]]/5)*10]] arrows or bolts. The arrows inflict normal damage, plus 1 point of fire damage to any target struck. They may also cause incendiary damage. This version of the spell is used most often in large battles.\n&emsp;The second version of this spell enables the caster to hurl *fiery bolts* at opponents within range. Each bolt inflicts 1d6 points of piercing damage, plus 4d6 points of fire damage. Only half the fire damage is inflicted if the creature struck successfully saves vs. spell. The caster receives one bolt for every five experience levels (two bolts at 10th level, three at 15th level, etc.). Currently [[floor([[@{level-wizard}]]/5)]] bolts. Bolts must be used on creatures within 20 yards of each other and in front of the wizard.'
+    'effect': 'This spell has two effects. First, the wizard can cause normal arrows or crossbow bolts to become magical *flaming missiles* for one round. The missiles must be nocked and drawn (or cocked) at the completion of the spell. If they are not loosed within one round, they are consumed by the magic. For every five levels the caster has achieved, up to 10 arrows or bolts can be affected. Currently up to [[floor([[@{level-wizard}]]/5)*10]] arrows or bolts. The arrows inflict normal damage, plus 1 point of fire damage to any target struck. They may also cause incendiary damage. This version of the spell is used most often in large battles. This version does not break invisibility.\n&emsp;The second version of this spell enables the caster to hurl *fiery bolts* at opponents within range, by making a to-hit roll for each bolt with dexterity adjustments. Each bolt inflicts 1d6 points of piercing damage, plus 4d6 points of fire damage. Only half the fire damage is inflicted if the creature struck successfully saves vs. spell. The caster receives one bolt for every five experience levels (two bolts at 10th level, three at 15th level, etc.). Currently [[floor([[@{level-wizard}]]/5)]] bolts. Bolts must be used on creatures within 20 yards of each other and in front of the wizard.'
 };
 
 wiz3['Fly'] = {
@@ -2026,11 +2028,11 @@ wiz3['Fly'] = {
     'reference': 'p. 192',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 382',
-    'errata': 'Sage Advice #150 p. 10\nSage Advice #154 p. 7\nSage Advice #168 p. 56\nSage Advice #171 p. 90\nDungeon Master Option: High-Level Campaigns p. 71',
+    'errata': 'Sage Advice #150 p. 10\nSage Advice #154 p. 7\nSage Advice #168 p. 56\nSage Advice #171 p. 90\nSage Advice #183 p. 92\nDungeon Master Option: High-Level Campaigns p. 71',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to bestow the power of magical flight. The creature affected is able to move vertically and horizontally at a rate of 18 (half that if ascending, twice that if descending in a dive). A *haste* spell does not double the movement rate of *fly*. The maneuverability class of the creature is B (180 degrees or less of turning in a round). Using the *fly* spell requires as much concentration as walking, so most spells can be cast while hovering or moving slowly (movement of 3). Using *fly* requires only mental concentration and no muscle movement and can therefore be used while paralyzed. Possible combat penalties while flying are known to the DM (found in the “Aerial Combat” section of Chapter 9 of the *DMG*). The exact duration of the spell is always unknown to the spellcaster, as the variable addition is determined secretly by the DM.'
+    'effect': 'This spell enables the wizard to bestow the power of magical flight. The creature affected is able to move vertically and horizontally at a rate of 18 (half that if ascending, twice that if descending in a dive). A *haste* spell does not double the movement rate of *fly*. The maneuverability class of the creature is B (180 degrees or less of turning in a round). Using the *fly* spell requires as much concentration as walking, so most spells can be cast while hovering or moving slowly (movement of 3). Using *fly* requires only mental concentration and no muscle movement and can therefore be used while paralyzed or caught in a *rope of entanglement*. Possible combat penalties while flying are known to the DM (found in the “Aerial Combat” section of Chapter 9 of the *DMG*). The exact duration of the spell is always unknown to the spellcaster, as the variable addition is determined secretly by the DM.'
 };
 
 wiz3['Gust of Wind'] = {
