@@ -1,3 +1,14 @@
+# 2024-7-16
+
+- Display "No Voice" instead of "none" in spells
+- Show all the modifier in the casting log all the time.
+- Can edit spell names
+- Spell results show RR targets for F, Fm and I spells.
+- No PP spells now longer check or require PP
+- Cap passive dodge & passive block at 50
+- Fix calculation of partial dodge when encumbered (Thanks @filroden)
+- No stats is equal to a 50.  Makes NPCs super easy.
+
 # 2024-7-9
 
 - First version of individual spell casting
