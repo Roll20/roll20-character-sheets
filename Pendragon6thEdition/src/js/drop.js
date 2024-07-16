@@ -65,7 +65,10 @@ const handle_character = (page) => {
     });
   };
 
-  //const arms = processDataArrays(page.data.arms, getStaticUpdate);
+  const arms = processDataArrays(page.data.arms, (data) =>
+    update_item(data, getRow("arms"))
+  );
+  addEntries(arms);
 
   const attacks = processDataArrays(page.data.attacks, (data) =>
     update_attack(data)
@@ -84,7 +87,9 @@ const handle_character = (page) => {
 
   const dataSkills = parseJSON(page.data.skills);
   dataSkills.forEach(({ name, target_value }) => {
-    const isStaticSkill = skills.includes(name.toLowerCase());
+    const isStaticSkill = [...skills, ...combatSkills].includes(
+      name.toLowerCase()
+    );
     if (isStaticSkill) {
       update[attrName(name)] = target_value;
     } else {
@@ -97,8 +102,7 @@ const handle_character = (page) => {
   });
 
   const dataTraits = parseJSON(page.data.traits);
-  //TODO: Remove the rename when the rake task is updated
-  dataTraits.forEach(({ name, traits: target_value }) => {
+  dataTraits.forEach(({ name, target_value }) => {
     const isStaticTrait = traits.includes(name.toLowerCase());
     if (isStaticTrait) {
       update[attrName(name)] = target_value;

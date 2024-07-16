@@ -72,6 +72,26 @@ const versionTwoFiveTwo = () => {
   });
 };
 
+const versionTwoFiveThree = () => {
+  const renameSectionAttrTargetValue = (section, attribute) => {
+    getSectionIDs(section, (ids) => {
+      const map = ids.map((id) => `${section}_${id}_${attribute}`);
+
+      getAttrs(map, (v) => {
+        let update = {};
+        map.forEach((e) => {
+          const rowId = getReprowid(e);
+          update[`${rowId}_name`] = v[`${e}`] ? v[`${e}`] : 0;
+        });
+        setAttrs(update);
+      });
+    });
+  };
+
+  renameSectionAttrTargetValue("repeating_equipment", "equipment");
+  renameSectionAttrTargetValue("repeating_arms", "equipment");
+};
+
 const versioning = async (version) => {
   const updateMessage = (v) =>
     console.log(
@@ -108,6 +128,11 @@ const versioning = async (version) => {
       updateMessage(2.52);
       versionTwoFiveTwo();
       versioning(2.52);
+      break;
+    case version < 2.53:
+      updateMessage(2.53);
+      versionTwoFiveThree();
+      versioning(2.53);
       break;
     default:
       console.log(

@@ -19,7 +19,7 @@ const getRepUpdate = (attrs, row, page) => {
   let update = {};
 
   attrs.forEach((attr) => {
-    if (page[attr] ?? page.data[attr]) {
+    if (page?.[attr] ?? page?.data?.[attr]) {
       update[`${row}_${attr}`] = page[attr] ?? cleanAttr(attr, page.data[attr]);
     }
   });
@@ -43,7 +43,7 @@ const getStaticUpdate = (attrs, page) => {
   let update = {};
 
   attrs.forEach((attr) => {
-    if (page[attr] ?? page.data[attr]) {
+    if (page?.[attr] ?? page?.data?.[attr]) {
       update[attr] = page[attr] ?? cleanAttr(attr, page.data[attr]);
     }
   });
