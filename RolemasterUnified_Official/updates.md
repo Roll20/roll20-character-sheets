@@ -1,3 +1,11 @@
+# 2024-7-18
+
+- SCR now includes stat modifier.
+- Improve layout of hits/injuries/endurance etc
+- AP Tracking for spells: So cast a spell with 2AP, -50 mod.  Optional checkbox to enable
+- Handle Spell Trickery
+- Put a gradient on buttons... make them a little more obvious about action.
+
 # 2024-7-16
 
 - Display "No Voice" instead of "none" in spells
