@@ -829,9 +829,6 @@ opacity: 20%;
     width: 23px !important;
     position: absolute; top: 3px; right: 0px;
 }
-.rowContainer.weapon.paletteButton .rowContainer:not(.centerFlex) {
-    margin-left: 1px;
-}
 .skillSelectionElement {
     position: relative;
 }
@@ -1143,8 +1140,10 @@ button[type=roll].NDice, button[type=action].NDice{
 }
 
 
-/* Style the button when the checkbox is checked */
-.expand-toggle:checked ~ .expand-btn, #weapon1-slash:checked ~ .expand-btn, #weapon1-pierce:checked ~ .expand-btn, #weapon1-blunt:checked ~ .expand-btn, #weapon2-slash:checked ~ .expand-btn, #weapon2-pierce:checked ~ .expand-btn, #weapon2-blunt:checked ~ .expand-btn {
+/* Reveal/hide content with checkbox is checked */
+.expand-toggle:checked ~ .expand-btn,
+#weapon1-slash:checked ~ .expand-btn, #weapon1-pierce:checked ~ .expand-btn, #weapon1-blunt:checked ~ .expand-btn,
+#weapon2-slash:checked ~ .expand-btn, #weapon2-pierce:checked ~ .expand-btn, #weapon2-blunt:checked ~ .expand-btn {
     opacity: 100% !important;
 }
 .expand-toggle:checked ~ .type-image {
@@ -1271,6 +1270,10 @@ button[type=roll].NDice, button[type=action].NDice{
     align-items: center;
     justify-content: center;
 }
+/* Removes the spacing between weapons if only two weapons are displayed (aka. the hide-toggle for extra weapons is unchecked) */
+.weaponContainer .contentContainer:has(+ .hide-toggle):has(+ :not(:checked)) {
+    margin-top: 0px !important;
+}
 
 
 /* Outfits */
@@ -1317,31 +1320,30 @@ button[type=roll].NDice, button[type=action].NDice{
 
 
 /* Outfit custom resistance display */
-.outfitContainer .hide-toggle:checked ~ .hide-item,
-.egoContainer .editCover .hide-toggle:checked ~ .hide-item {
+:is(.outfitContainer, .egoContainer, .distortionContainer) .editCover .hide-toggle:checked ~ .hide-item {
     display: flex;
 }
-.outfitContainer .editCover .columnAlign,
-.egoContainer .editCover .columnAlign {
+:is(.outfitContainer, .egoContainer, .distortionContainer) .editCover .columnAlign {
     align-items: normal;
     flex-direction: column;
     justify-content: start;
 }
-.egoContainer .editCover {
+:is(.egoContainer, .distortionContainer) .editCover {
     padding-bottom: 35px;
 }
-.outfitContainer .editCover > .columnAlign > .rowContainer > .rowContainer { width: 82.34px; }
-.egoContainer .editCover > .hide-item > .columnAlign > .rowContainer > .rowContainer { width: 82.34px; }
+.outfitContainer .editCover > .columnAlign > .rowContainer > .rowContainer, 
+.egoContainer .editCover .columnAlign > .rowContainer > .rowContainer,
+.distortionContainer .editCover > .columnAlign > .rowContainer > .rowContainer,
 .outfitCustomResistDisplay .repitem:has(.hide-toggle:checked)  { width: 82.34px; }
 
-.outfitContainer .status_effect_value, .egoContainer .status_effect_value {
+:is(.outfitContainer, .egoContainer) .status_effect_value {
     background-color: rgba(0, 0, 0, 0.2) !important;
-    border-radius: 4px;
+    border-radius: 5px;
 }
-.outfitContainer .ailmentNum, .egoContainer .ailmentNum {
+:is(.outfitContainer, .egoContainer, .distortionContainer) .ailmentNum {
     text-align: center;
 }
-.outfitContainer .status_effect_item, .egoContainer .status_effect_item {
+:is(.outfitContainer, .egoContainer, .distortionContainer) .status_effect_item {
     width: 25px;
     opacity: 100%;
 }
@@ -1502,12 +1504,25 @@ margin-bottom: 2px !important;}
 .flatDamage input {
     width: 45px !important;
 }
+.flatHPInput, .flatSTInput {
+    text-align: left !important;
+    padding-right: 2px;
+    padding-left: 8px;
+}
 .flatHPInput {
     border: 2px solid #cc4125 !important;
 }
 .flatSTInput {
     border: 2px solid #dbb748 !important;
 }
+/* Does not display the input spinner when not in used. If this is not done the spinner hides part of larger numbers behind it */
+.flatHPInput:not(:hover):not(:focus)::-webkit-inner-spin-button,
+.flatHPInput:not(:hover):not(:focus)::-webkit-outer-spin-button,
+.flatSTInput:not(:hover):not(:focus)::-webkit-inner-spin-button,
+.flatSTInput:not(:hover):not(:focus)::-webkit-outer-spin-button {
+    display: none;
+}
+
 .damageHelperType input[type=radio] {
     display: none;
 }
@@ -1731,48 +1746,58 @@ background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0)), ur
     color: #fff;
     font-weight: bold;
     background-color: transparent !important;
-    width: 47.5px !important;
     padding-left: 1px;
     text-align: left;
 }
 .ailmentNumThisTurn {
-    width: 40px !important;
-    padding-left: 3px;
+    width: 30px !important;
+    padding-right: 0px;
     position: absolute;
-    left: 0;
+    left: 3px;
 }
 .ailmentNumNextTurn {
     color: #999;
-    width: 33px !important;
+    width: 28px !important;
     padding-right: 0px;
     position: absolute;
-    left: 20px;
+    left: 25px;
 }
-/* This terrifying block disables interacting with the next turn field while selecting or hovering over the current turn field */
-.ailmentNumThisTurn:hover + .ailmentNumNextTurn,
-.ailmentNumThisTurn:focus + .ailmentNumNextTurn,
-.ailmentNumThisTurn:hover + .ailmentNumNextTurn::-webkit-inner-spin-button, 
-.ailmentNumThisTurn:hover + .ailmentNumNextTurn::-webkit-outer-spin-button,
-.ailmentNumThisTurn:focus + .ailmentNumNextTurn::-webkit-inner-spin-button, 
-.ailmentNumThisTurn:focus + .ailmentNumNextTurn::-webkit-outer-spin-button {
+/* If the next turn field is disabled by a hide toggle (Burn/Bleed/Smoke/Charge individual setting) or by a hide toggle rev (Global setting) the standard field is returned to it's normal styling */
+.status_effect_value .hide-toggle:not(:checked) ~ .ailmentNumThisTurn,
+.status_effect_value .hide-toggle-rev:checked ~ .ailmentNumThisTurn {
+    width: 45.5px !important;
+    padding-right: 4px;
+}
+/* This wide boi disables the spinner (up and down buttons in number inputs) when not hovering over or selecting an ailment field */
+/* The default behavour is to make their opacity 0. This also causes any text beneath the spinner to be hidden with it which looks terrible */
+.ailmentNumNextTurn:not(:hover):not(:focus)::-webkit-inner-spin-button,
+.ailmentNumNextTurn:not(:hover):not(:focus)::-webkit-outer-spin-button,
+.ailmentNumThisTurn:not(:hover):not(:focus)::-webkit-inner-spin-button,
+.ailmentNumThisTurn:not(:hover):not(:focus)::-webkit-outer-spin-button {
     display: none !important;
+}
+/* This lengthy boi disables interacting with the next turn field while selecting or hovering over the current turn field (the fields partially overlap) */
+:is(.ailmentNumThisTurn:hover, .ailmentNumThisTurn:focus) +
+:is(.ailmentNumNextTurn) {
+    pointer-events: none;
+    z-index:-1;
 }
 #ailmentBlock .contentContainer {
     padding-top: 10px;
 	padding-bottom: 10px;
-}	
+}
 .status_effect_item {
 	width: 30px;
 }
 .status_effect_value {
-    width: 52px; height: 26px; text-align: center;
+    width: 52px;
+    height: 26px;
+    text-align: center;
+    border-radius: 5px;
 }
 .ailmentButton {
     background-color: transparent;
     width: 25px;
-}
-.ailmentRow {
-    margin-bottom: 1px;
 }
 
 
@@ -1857,6 +1882,16 @@ background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0)), ur
     border-radius: 5px;
     background-color: #999;
     overflow: hidden;
+}
+.repitemMock .settingStyle select {
+    padding-left: 3px; padding-right: 3px;
+}
+.repitemMock .settingStyle div:has(b) {
+    text-align: right;
+    padding-right: 4px;
+}
+.repIconMock .columnAlign .rowContainer {
+    align-items: flex-end !important;
 }
 .ailmentCustomEditor .itemcontrol {
     position: absolute;
@@ -2348,7 +2383,7 @@ height: 35px;}
     top: 0px;
     font-size: 16px;
 }
-.sheet-rolltemplate-damagecalculation .userscript-calculationContainer:has(div[class=userscript-noDamage]) {
+.sheet-rolltemplate-damagecalculation .userscript-calculationContainer:has(div:only-child) {
     display: none;
 }
 .sheet-rolltemplate-damagecalculation .userscript-hpCalculationContainer div:first-child { color: #cc4125; background-color: #111; }
