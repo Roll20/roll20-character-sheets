@@ -2704,15 +2704,15 @@
 		</div>
 		<div class="columnAlign flatDamage" style="margin-left: 3px;">
 			<b data-i18n="helper-text-flatdamagehp">Flat HP DMG</b>
-	<input type="number" class="whiteInput flatHPInput" name="attr_flatDamageHP" value="0" data-i18n-title="helper-text-flathpdamage" title="Flat Hitpoint Damage">
+	<input type="number" class="whiteInput flatHPInput" name="attr_flatDamageHP" value="0" data-i18n-title="helper-text-flatdamagehp" title="Flat HP DMG">
 		</div>
 		<div class="columnAlign flatDamage">
 			<b data-i18n="helper-text-flatdamagest">Flat ST DMG</b>
-	<input type="number" class="whiteInput flatSTInput" name="attr_flatDamageST" value="0" data-i18n-title="helper-text-flatstdamage" title="Flat Stagger Damage">
+	<input type="number" class="whiteInput flatSTInput" name="attr_flatDamageST" value="0" data-i18n-title="helper-text-flatdamagest" title="Flat ST DMG">
 		</div>
 		<div class="columnAlign applyDamage">
-			<b data-i18n="helper-text-applydamage">Apply Damage</b>
-			<button type="action" class="applyDamageInput" name="act_applyDamage" data-i18n-title="helper-apply-damage" title="Apply Damage"></button>
+			<b data-i18n="helper-text-applydamage">Apply damage</b>
+			<button type="action" class="applyDamageInput" name="act_applyDamage" data-i18n-title="helper-text-applydamage" title="Apply damage"></button>
 		</div>
 	</div>
 </div>
@@ -6793,7 +6793,7 @@
 		</div>
 	</div>
 	
-	<div class="status_effect_value"><input type="number"  class="ailmentNum" name="attr_damageResist" value="0"></div>
+	<div class="status_effect_value"><input type="number" class="ailmentNum" name="attr_damageResist" value="0"></div>
 </div>
 
 </div>
@@ -9410,7 +9410,7 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 
 		<div class="rowContainer">
 			<div class="settingStyle"><div style="width: 66px; margin-left: 5px;">
-				<b data-i18n="message-smoke-damage-calculation">Damage</b>:
+				<b data-i18n="message-damage-calculation">Damage</b>:
 			</div>
 			<select name="attr_smokeCalculationMode" class="darkInput" style="width: 40px;">
 				<option value="/" selected>/</option>
@@ -11740,7 +11740,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	langResistCombined = "<b style='opacity: 50%;'><br>(" + langResist + burnresist + ")</b>";
 	}
 
-	let burnmessage = langBurn + "<b>" + burndamage + "</b>" + langDamage + langResistCombined;
+	let burnmessage = langBurn + "<b>" + burndamage + "</b> " + langDamage + "." + langResistCombined;
 
 	setAttrs({"HP":burnresult, "dummy":burnmessage, "dummyIcon":iconnew});
 
@@ -12006,7 +12006,7 @@ getAttrs(["Bleed", "bleedResist", "bleedResist_ego", "distortState", "egoActiveS
 		}
 
 		if(nomessage != "true" && bleedimmune != "true"){
-		bleedmessage = iconnew + " <b>" + charname + "</b>" + langBleed + "<b>" + bleeddamage + "</b>" + langDamage + langResistCombined;
+		bleedmessage = iconnew + " <b>" + charname + "</b>" + langBleed + "<b>" + bleeddamage + "</b> " + langDamage + "." + langResistCombined;
 
 		setAttrs({"dummy":bleedmessage, "HP":bleedresult, "Bleed":bleednew});
 
@@ -12759,10 +12759,16 @@ on('clicked:applyDamage', (info) => {
 	if (isNaN(hpResistance) || isNaN(stResistance)) {
 		let alertIcon = "<img src='https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Aggro.png' style='width: 25px; height: 25px;' >"
 		let alertMessage = "";
+		let langAlertMessage = "Outfit resistances not set for";
+		let langDamage = "damage";
+
+		langDamage = getTranslationByKey("message-damage")
 		if (outfitType == "ego") {
-			alertMessage = `Ego outfit resistances not set for ${damageType} damage`;
+			langAlertMessage = getTranslationByKey("message-mystery-missing-resistance");
+			alertMessage = `${langAlertMessage} ${damageType} ${langDamage}`;
 		} else {
-			alertMessage = `Outfit resistances not set for ${damageType} damage`;
+			langAlertMessage = getTranslationByKey("message-outfit-missing-resistance");
+			alertMessage = `${langAlertMessage} ${damageType} ${langDamage}`;
 		}
 		setAttrs({"dummy":alertMessage, "dummyIcon":alertIcon});
 		startRoll(("/w " + characterName + "&{template:errorMessage} {{icon=@{dummyIcon}}} {{message=@{dummy} }}"), (results) => {
@@ -12990,6 +12996,32 @@ on('clicked:applyDamage', (info) => {
 	
 	/* Damage calculations block end */
 
+	/* Translation prep */
+	let langBaseDamage = "Base damage";
+	let langFlatDamageHP = "Flat HP DMG";
+	let langFlatDamageST = "Flat ST DMG";
+	let langDamage = "damage";
+	let langDealt = "dealt";
+	let langIncreasedHPDamageBy = "increased HP damage by";
+	let langSmoke = "Smoke";
+	let langFragile = "Fragile";
+	let langProtection = "Protection";
+	let langStProtection = "Stagger Protection";
+	let langDamageResistance = "Damage Resistance"
+
+	if(getTranslationByKey("helper-text-basedamage") != false){
+		langBaseDamage = getTranslationByKey("helper-text-basedamage");
+		langFlatDamageHP= getTranslationByKey("helper-text-flatdamagehp");
+		langFlatDamageST = getTranslationByKey("helper-text-flatdamagest");
+		langDamage = getTranslationByKey("message-damage-calculation");
+		langDealt = getTranslationByKey("message dealt");
+		langIncreasedHPDamageBy = getTranslationByKey("message-increased-HP-damage-by");
+		langSmoke = getTranslationByKey("ailments-smoke");
+		langFragile = getTranslationByKey("ailments-fragile");
+		langProtection = getTranslationByKey("ailments-protection");
+		langStProtection = getTranslationByKey("ailments-stgprotection");
+		langDamageResistance = getTranslationByKey("oufit-damage-resistance");
+	}
 
 	/* Damage calculation chat message block begin */
 	let damageCalculation = "";
@@ -13009,22 +13041,22 @@ on('clicked:applyDamage', (info) => {
 
 	/* Base damage and flat damage/regen */
 	if (baseDamage != 0) { 
-		hpDamageBody += `<div class="baseDamage"><b>Base damage:</b> ${baseDamage} x [${hpResistance}x]` + getIcon("def", resHPIcon) + "</div>";
-		stDamageBody += `<div class="baseDamage"><b>Base damage:</b> ${baseDamage} x [${stResistance}x]` + getIcon("def", resSTIcon) + "</div>";
+		hpDamageBody += `<div class="baseDamage"><b>${langBaseDamage}:</b> ${baseDamage} x [${hpResistance}x]` + getIcon("def", resHPIcon) + "</div>";
+		stDamageBody += `<div class="baseDamage"><b>${langBaseDamage}:</b> ${baseDamage} x [${stResistance}x]` + getIcon("def", resSTIcon) + "</div>";
 	}
-	if (flatDamageHP != 0) { hpDamageBody += `<div class="flatModifier">Flat HP modifier(s): ${flatDamageHP}</div>`; }
-	if (flatDamageST != 0) { stDamageBody += `<div class="flatModifier">Flat ST modifier(s): ${flatDamageST}</div>`; }
+	if (flatDamageHP != 0) { hpDamageBody += `<div class="flatModifier">${langFlatDamageHP}: ${flatDamageHP}</div>`; }
+	if (flatDamageST != 0) { stDamageBody += `<div class="flatModifier">${langFlatDamageST}: ${flatDamageST}</div>`; }
 	
 	/* Fragile*/
-	if (hpFragile != 0) { hpDamageBody += generateDamageHelperBodyEffect("Fragile", hpFragile, "Damage", 0, getIcon("ailments", "Fragile", settingLimbusStyle)); }
+	if (hpFragile != 0) { hpDamageBody += generateDamageHelperBodyEffect(langFragile, hpFragile, "Damage", 0, getIcon("ailments", "Fragile", settingLimbusStyle)); }
 
 	/* Smoke */
 	if (smoke != 0) {
 		hpDamageBody += "<div>" + getIcon("ailments", "Smoke", settingLimbusStyle);
 		switch (smokeCalcMode) {
-			case "/": hpDamageBody += `<b>Smoke</b> dealt ${Math.floor(smoke/parseInt(smokeCalcVal))} damage</div>`; break;
-			case "%": hpDamageBody += `<b>Smoke</b> increased HP damage by ${Math.floor(smoke * parseFloat(smokeCalcVal) * 100)}%</div>`; break;
-			case "=": hpDamageBody += `<b>Smoke</b> dealt ${smokeCalcVal} damage</div>`; break;
+			case "/": hpDamageBody += `<b>${langSmoke}</b> ${langDealt} ${Math.floor(smoke/parseInt(smokeCalcVal))} ${langDamage}</div>`; break;
+			case "%": hpDamageBody += `<b>${langSmoke}</b> ${langIncreasedHPDamageBy} ${Math.floor(smoke * parseFloat(smokeCalcVal) * 100)}%</div>`; break;
+			case "=": hpDamageBody += `<b>${langSmoke}</b> ${langDealt} ${smokeCalcVal} ${langDamage}</div>`; break;
 		}
 	}
 
@@ -13047,11 +13079,11 @@ on('clicked:applyDamage', (info) => {
 	}
 
 	/* Flat damage resistance status ailments and outfit damage resistance effect */
-	if (hpProtection != 0) { hpDamageBody += generateDamageHelperBodyEffect("Protection", hpProtection, "Reduction", 0, getIcon("ailments", "Protection", settingLimbusStyle)); }
-	if (stProtection != 0) { stDamageBody += generateDamageHelperBodyEffect("Stagger Protection", stProtection, "Reduction", 0, getIcon("ailments", "StaggerProtection", settingLimbusStyle)); }
+	if (hpProtection != 0) { hpDamageBody += generateDamageHelperBodyEffect(langProtection, hpProtection, "Reduction", 0, getIcon("ailments", "Protection", settingLimbusStyle)); }
+	if (stProtection != 0) { stDamageBody += generateDamageHelperBodyEffect(langStProtection, stProtection, "Reduction", 0, getIcon("ailments", "StaggerProtection", settingLimbusStyle)); }
 	
-	if ((damageResistance != 0) && (Math.abs(sumBothBefore + sumHpBefore)) > 0) { hpDamageBody += generateDamageHelperBodyEffect("Damage Resistance", damageResistance, "Reduction", 0, getIcon("ailments", "DamageResist", settingLimbusStyle)); }
-	if ((damageResistance != 0) && (Math.abs(sumBothBefore + sumStBefore)) > 0) { stDamageBody += generateDamageHelperBodyEffect("Damage Resistance", damageResistance, "Reduction", 0, getIcon("ailments", "DamageResist", settingLimbusStyle)); }
+	if ((damageResistance != 0) && (Math.abs(sumBothBefore + sumHpBefore)) > 0) { hpDamageBody += generateDamageHelperBodyEffect(langDamageResistance, damageResistance, "Reduction", 0, getIcon("ailments", "DamageResist", settingLimbusStyle)); }
+	if ((damageResistance != 0) && (Math.abs(sumBothBefore + sumStBefore)) > 0) { stDamageBody += generateDamageHelperBodyEffect(langDamageResistance, damageResistance, "Reduction", 0, getIcon("ailments", "DamageResist", settingLimbusStyle)); }
 
 	}
 
@@ -13104,37 +13136,54 @@ function getIcon(iconFolder, iconName, settingLimbusStyle = "false") {
 }
 
 function generateDamageHelperHeader(statName, newStat, oldStat) {
+	let langBar = "HP";
+	let langDamage = "damage";
+	let langSuffered = "Suffered";
+	let langSufferedNo = "Suffered no";
+	let langRegened = "Regened";
+	
 	let updateDisplay = "";
 	let displayContent = "";
 
-	if (oldStat <= 0) {
-		switch (statName) {
-			case "HP": displayContent = "Defeated"; break;
-			case "ST": displayContent = "Staggered"; break;
-			case "SP": displayContent = "Panic"; break;
-		}
+	langDamage = getTranslationByKey("message-damage");
+	switch (statName) {
+		case "HP": langBar= getTranslationByKey("bar-health-shortened"); break;
+		case "ST": langBar = getTranslationByKey("bar-stagres-shortened"); break;
+		case "SP": langBar = getTranslationByKey("bar-sanity-shortened"); break;
 	}
-	else { displayContent = `${oldStat} -> ${newStat}`; }
 
-	updateDisplay = `<div class="updateStatDisplay"><b>${displayContent}</b></div>`;
+	updateDisplay = `<div class="updateStatDisplay"><b>${oldStat} -> ${newStat}</b></div>`;
 
-	if (newStat < oldStat) { return `<div><div class="damageDisplay">Suffered ${oldStat-newStat} ${statName} damage</div>${updateDisplay}</div>`; }
-	else if (newStat > oldStat) { return `<div><div class="damageDisplay">Regened ${newStat-oldStat} ${statName}</div>${updateDisplay}</div>`; }
-	else { return `<div><div class="noDamage damageDisplay">Suffered no ${statName} damage</div>${updateDisplay}</div>` }
+	if (newStat < oldStat) { langSuffered = getTranslationByKey("message-suffered");
+		return `<div><div class="damageDisplay">${langSuffered} ${oldStat-newStat} ${langBar} ${langDamage}</div>${updateDisplay}</div>`; }
+	else if (newStat > oldStat) { langRegened = getTranslationByKey("message-regened-capitalized");
+		return `<div><div class="damageDisplay">${langRegened} ${newStat-oldStat} ${langBar}</div>${updateDisplay}</div>`; }
+	else { langSufferedNo = getTranslationByKey("message-suffered-no");
+		return `<div><div class="noDamage damageDisplay">${langSufferedNo} ${langBar} ${langDamage}</div>${updateDisplay}</div>` }
 }
 
 function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailmentRes, iconString, resMode = "", resVal = "", resIcon = "") {
+	let langDamage = "damage";
+	let langDealt = "dealt";
+	let langRegened = "regened";
+	let langReducedDamageBy = "reduced damage by";
+	let langResist = "Resistance: ";
+	
 	let message = "<div>";
 	switch (effectType) {
-		case "Damage": message += `${iconString}<b>${effectName}</b> dealt ${Math.abs(effectVal)} damage`; break;
-		case "Regen": message += `${iconString}<b>${effectName}</b> regened ${Math.abs(effectVal)} damage`; break;
-		case "Reduction": message += `${iconString}<b>${effectName}</b> reduced damage by ${Math.abs(effectVal)}`; break;
+		case "Damage": langDealt = getTranslationByKey("message-dealt"); langDamage = getTranslationByKey("message-damage");
+			message += `${iconString}<b>${effectName}</b> ${langDealt} ${Math.abs(effectVal)} ${langDamage}`; break;
+		case "Regen": langRegened = getTranslationByKey("message-regened"); langDamage = getTranslationByKey("message-damage");
+			message += `${iconString}<b>${effectName}</b> ${langRegened} ${Math.abs(effectVal)} ${langDamage}`; break;
+		case "Reduction": langReducedDamageBy = getTranslationByKey("message-reduced-damage-by");
+			message += `${iconString}<b>${effectName}</b> ${langReducedDamageBy} ${Math.abs(effectVal)}`; break;
 	}
 	if (resMode == "beforeResistance") {
 		message += ` x [${resVal}x] ` + getIcon("def", resIcon);
 	}
 	if (ailmentRes != 0) {
-		message += `<b style='opacity: 50%;'> (${effectName} resistance: ${ailmentRes})</b>`; 
+		langResist = getTranslationByKey("message-resist");
+		message += `<b style='opacity: 50%;'> (${effectName} ${langResist}${ailmentRes})</b>`; 
 	}
 	return message + "</div>";
 }
