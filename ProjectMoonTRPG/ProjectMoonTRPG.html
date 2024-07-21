@@ -13145,11 +13145,15 @@ function generateDamageHelperHeader(statName, newStat, oldStat) {
 	let updateDisplay = "";
 	let displayContent = "";
 
-	langDamage = getTranslationByKey("message-damage");
-	switch (statName) {
-		case "HP": langBar= getTranslationByKey("bar-health-shortened"); break;
-		case "ST": langBar = getTranslationByKey("bar-stagres-shortened"); break;
-		case "SP": langBar = getTranslationByKey("bar-sanity-shortened"); break;
+	if(getTranslationByKey("message-damage") != false) {
+		langDamage = getTranslationByKey("message-damage");
+		switch (statName) {
+			case "HP": langBar = getTranslationByKey("bar-health-shortened"); break;
+			case "ST": langBar = getTranslationByKey("bar-stagres-shortened"); break;
+			case "SP": langBar = getTranslationByKey("bar-sanity-shortened"); break;
+		}
+	} else {
+		langBar = statName;
 	}
 
 	updateDisplay = `<div class="updateStatDisplay"><b>${oldStat} -> ${newStat}</b></div>`;
@@ -13169,20 +13173,24 @@ function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailme
 	let langReducedDamageBy = "reduced damage by";
 	let langResist = "Resistance: ";
 	
+	if(getTranslationByKey("message-damage") != false) {
+		langDamage = getTranslationByKey("message-damage");
+		langDealt = getTranslationByKey("message-dealt");
+		langRegened = getTranslationByKey("message-regened");
+		langReducedDamageBy = getTranslationByKey("message-reduced-damage-by");
+		langResist = getTranslationByKey("message-resist");
+	}
+
 	let message = "<div>";
 	switch (effectType) {
-		case "Damage": langDealt = getTranslationByKey("message-dealt"); langDamage = getTranslationByKey("message-damage");
-			message += `${iconString}<b>${effectName}</b> ${langDealt} ${Math.abs(effectVal)} ${langDamage}`; break;
-		case "Regen": langRegened = getTranslationByKey("message-regened"); langDamage = getTranslationByKey("message-damage");
-			message += `${iconString}<b>${effectName}</b> ${langRegened} ${Math.abs(effectVal)} ${langDamage}`; break;
-		case "Reduction": langReducedDamageBy = getTranslationByKey("message-reduced-damage-by");
-			message += `${iconString}<b>${effectName}</b> ${langReducedDamageBy} ${Math.abs(effectVal)}`; break;
+		case "Damage": message += `${iconString}<b>${effectName}</b> ${langDealt} ${Math.abs(effectVal)} ${langDamage}`; break;
+		case "Regen": message += `${iconString}<b>${effectName}</b> ${langRegened} ${Math.abs(effectVal)} ${langDamage}`; break;
+		case "Reduction": message += `${iconString}<b>${effectName}</b> ${langReducedDamageBy} ${Math.abs(effectVal)}`; break;
 	}
 	if (resMode == "beforeResistance") {
 		message += ` x [${resVal}x] ` + getIcon("def", resIcon);
 	}
 	if (ailmentRes != 0) {
-		langResist = getTranslationByKey("message-resist");
 		message += `<b style='opacity: 50%;'> (${effectName} ${langResist}${ailmentRes})</b>`; 
 	}
 	return message + "</div>";
