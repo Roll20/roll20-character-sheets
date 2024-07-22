@@ -167,6 +167,7 @@ const handle_drop = () => {
     };
 
     const { Category } = page.data;
+
     switch (Category) {
       case "Creatures":
         handle_npc(page);
