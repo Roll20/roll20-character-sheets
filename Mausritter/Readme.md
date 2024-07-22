@@ -1,6 +1,7 @@
-# Into the Mausritter Character Sheet
+# Mausritter Character Sheet
 
-Fan-made Character Sheet Template for "Mausritter" tabletop game, [Mausritter](https://mausritter.com/).
+Fan-made Character Sheet Template for "Mausritter" tabletop game , [Mausritter](https://mausritter.com/).
+Mausritter ©2024 Isaac Williams & Losing Games
 
 ## Version 1.0
 
