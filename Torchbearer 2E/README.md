@@ -12,5 +12,6 @@ Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E director
 
 ## Known Bugs
 
-- Backpacks have a bug requiring toggling twice to make it work
-- Fresh does not get counted for a new character
+- Spacing on invocations is funky
+- Background isn't responsive
+- New skills start with full BL track
