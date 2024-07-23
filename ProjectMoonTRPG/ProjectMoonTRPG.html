@@ -14486,7 +14486,7 @@ getAttrs(["settingEditMode"], function(values) {
 
 
 on("clicked:autoEffectTest", function() {
-	AutoScriptMain(`(Gain 5 Burn)  /* Test comment */ (Gain 2 Fragile, Next Turn, TestCondition2)`, "Combat start")
+	AutoScriptMain(`(Gain 5 Burn)  /* Test comment */ (Gain 2 Fragile Next Turn, TestCondition2)`, "Combat start")
 
 });
 
@@ -14619,7 +14619,7 @@ function collectAutoScripts(triggerType) {
 	if (triggerType != "None") {
 		switch (triggerType) {
 			case "Permanent": break; /* Triggers with all other triggers. Useful for stuff like Status Quo */
-			case "Combat start": return [["Gain","3","Rupture"],"This turn"];
+			case "Combat start": return [["Gain","3","Rupture","This turn"]];
 			case "Round start": break;
 			case "Round end": break;
 			case "Damaged": break;
@@ -14728,11 +14728,21 @@ function conditionButton(conditional, AutoEffect) {
 
 function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	/* Check format */
-	if (AutoEffect[0].length != 3) { autoEffectErrorMessage(`Expected format: (Gain N #Ailment)`, AutoEffect); return {error: true}; }
+	if (AutoEffect[0].length < 3 || AutoEffect[0].length > 6) { autoEffectErrorMessage(`Expected format: (Gain N #Ailment #Round(optional))`, AutoEffect); return {error: true}; }
 	
 	/* Handle scaling */
 	AutoEffect[0][1] *= scaling;
 	if (scaling == 0) { return null }
+	
+	/* Handle conditionals */
+	if (AutoEffect.length > 1) {
+		let conditionalReturn = false;
+		AutoEffect.slice(1).forEach(conditional => {
+			conditionButton(conditional, AutoEffect.slice(0,2));
+			conditionalReturn = true;
+		});
+		if (conditionalReturn) { return null; }
+	}
 	
 	/* Get ailment name */
 	let effectAilment = AutoEffect[0][2];
@@ -14743,20 +14753,11 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[0][1]}" is not a number`, AutoEffect); return {error: true}; }
 	let count = ailmentList[effectAilment][1];
 
-	/* Get conditionals */
+	/* Handle the optional turn override */
+	/* This is between you and me, but "Next turn" doesn't actually do anything ;) */
 	let forceTarget = "";
-	if (AutoEffect.length > 1) {
-		let conditionalReturn = false;
-		AutoEffect.slice(1).forEach(conditional => {
-			switch (conditional.toLowerCase()) {
-				case "this turn": forceTarget = "This turn"; break;
-				case "next turn": forceTarget = "Next turn"; break;
-				default:
-					conditionButton(conditional, AutoEffect.slice(0,2));
-					conditionalReturn = true; break;
-			}
-		});
-		if (conditionalReturn) { return null; }
+	if (AutoEffect[0][3] != undefined) {
+		if (["this", "thisturn", "this turn"].includes(AutoEffect[0][3].toLowerCase())) { forceTarget = "This turn"; }
 	}
 
 	/* Get target attribute */
@@ -14767,7 +14768,7 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][3]}_ailNum`; } /* If custom ailment */
 	
 	/* Effect changes target to the next turn field if it's enabled */
-	/* Is ignored if "This turn" conditional is included */
+	/* Is ignored if "This turn" override is included */
 	if (effectHasNextTurn == 'true' && forceTarget != "This turn") {
 		effectTarget += "NextTurn";
 		count = ailmentList[effectAilment][2];
