@@ -13074,7 +13074,6 @@ on('clicked:applyDamage', (info) => {
 			if (ailmentArray["effect"] == "StagRes" || ailmentArray["effect"] == "HPStagRes") {
 				stDamageBody += generateDamageHelperBodyEffect(ailmentArray["name"], ailmentArray["effectVal"], ailmentArray["type"], ailmentArray["customRes"], getIcon("ailments", ailmentArray["icon"]), ailmentArray["beforeRes"], stResistance, resSTIcon);
 			}
-			console.log(ailmentArray["effect"])
 			if (ailmentArray["effect"] == "SP") {
 				spDamageBody += generateDamageHelperBodyEffect(ailmentArray["name"], ailmentArray["effectVal"], ailmentArray["type"], ailmentArray["customRes"], getIcon("ailments", ailmentArray["icon"]));
 			}
@@ -14483,143 +14482,12 @@ getAttrs(["settingEditMode"], function(values) {
 
 /*--- AutoScript functions ---*/
 
-
-
-on("clicked:autoEffectTest", function() {
-	AutoScriptMain(`(Gain 5 Burn)  /* Test comment */ (Gain 2 Fragile Next Turn, TestCondition2)`, "Combat start")
-
-});
-
-/* Main function for using AutoScripts. Called by actions through on click events */
-/* inputAutoScript: AutoScript provided by the action. Can be an empty string */
-/* trigger: "Combat start", "Round start", "Round end", "Damaged", "Staggered", "Defeated", "Panic",
-	"Permanent", "Offensive", "Defensive", "Block", "Evade" or "None".
-	Selects which type of AutoEffects to collect and append to an AutoScript.
-	Block and Evade also include Defensive */
-function AutoScriptMain(inputAutoScript, triggerType="None") {
-
-	/* Converts the input AutoScript to to an array if it isn't one already */
-	let AutoScript = [];
-	if (inputAutoScript != "") {
-		try { AutoScript = JSON.parse(inputAutoScript); }
-		catch(e) { AutoScript = AutoScriptToArray(inputAutoScript); }
-	}
-
-	/* Appends one or more AutoScripts based on the trigger type */
-	AutoScript.push(collectAutoScripts(triggerType));
-
-
-	/* Get relevant attributes */
-	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
-		"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max",
-		"StaggerState", "distortState", "egoActiveState", "egoType"], function(values) {
-
-	let settingMuteMessage = values.settingMuteMessage;
-	let settingWhisperRolls = values.settingWhisperRolls;
-	let settingWhisperTarget = values.settingWhisperTarget;
-	let settingLimbusStyle = values.settingLimbusStyle;
-	let settingHideNextTurn = values.settingHideNextTurn;
-	
-	let HP = values.HP;
-	let HPdamage = values.HP_max - HP;
-	let ST = values.StagRes;
-	let STdamage = values.StagRes_max - ST;
-	let SP = values.SP;
-	let SPdamage = values.SP_max - SP;
-
-	let StaggerState = values.StaggerState;
-	let distortState = values.distortState;
-	let egoActiveState = values.egoActiveState;
-	let egoType = values.egoType;
-	
-	let scaling = 2;
-
-	let output = {};
-	let tempOutput = {};
-	let ailmentList = {};
-
-
-	/* Get all ailments */
-	getAttrs(["burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
-		"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
-		"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
-
-	const HasNextTurn = settingHideNextTurn == true ? 'false' : 'true';
-
-	let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"]
-	ailmentNames.forEach(ailment => {
-		if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
-			ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`]];
-		} else {
-			ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`]];
-		}
-	});
-
-	/* Get all custom ailments */
-	getSectionIDs(`repeating_ailments`, idarray => {
-	const fieldnames = idarray.reduce((rows,id) =>
-	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,
-	`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`, ], '');
-	
-	let ailName = "";
-	let ailHasNextTurn = "";
-	let ailNum = 0;
-	let ailNumNextTurn = 0;
-	
-	getAttrs([...fieldnames], v => {
-	idarray.forEach(id => {
-		ailName = v[`repeating_ailments_${id}_ailName`];
-		ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
-		ailNum = v[`repeating_ailments_${id}_ailNum`];
-		ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`]
-		
-		ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id];
-	});
-	
-
-	/* Execute each AutoEffect in the AutoScript */
-	AutoScript.forEach(AutoEffect => {
-		switch (AutoEffect[0][0]) {
-			case "Gain": tempOutput = autoEffectGainAilment(AutoEffect, ailmentList, scaling); break;
-			default: autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
-		}
-		for (const property in tempOutput) {
-			if (output.hasOwnProperty(property)) {
-				output[property] += tempOutput[property];
-			} else {
-				output[property] = tempOutput[property];
-			}
-		}
-	});
-
-	// console.log(output)
-	setAttrs(output);
-
-
-	/* Message handling */
-
-
-
-	});
-	});
-	});
-	});
-}
-
-
-
-
-/* Checks all nested AutoScripts and generated one non-nested AutoScript from all scripts matching a type */
-function AutoScriptCombiner(AutoEffectType) {
-	return;
-}
-
 /* Gathers all AutoScripts that match a certain trigger type */
 function collectAutoScripts(triggerType) {
 	if (triggerType != "None") {
 		switch (triggerType) {
 			case "Permanent": break; /* Triggers with all other triggers. Useful for stuff like Status Quo */
-			case "Combat start": return [["Gain","3","Rupture","This turn"]];
+			case "Combat start": return [["Gain","3","Tremor","This turn"]];
 			case "Round start": break;
 			case "Round end": break;
 			case "Damaged": break;
@@ -14687,29 +14555,182 @@ function AutoScriptToArray(inputAutoScript) {
 	return AutoScriptArray;
 }
 
-/* Checks that an AutoScript in array form is correctly formatted. Returns false upon detecting an error
-	let barValid = [];
-	let barValid = [];
+on("clicked:autoEffectTest", function() {
+	AutoScriptMain(`(Require 1 Rupture Scaling)  /* Test comment */ (Gain 2 Fragile Next Turn, TestCondition2)`, "Combat start")
+
+});
+
+/* Main function for using AutoScripts. Called by actions through on click events */
+/* inputAutoScript: AutoScript provided by the action. Can be an empty string */
+/* trigger: "Combat start", "Round start", "Round end", "Damaged", "Staggered", "Defeated", "Panic",
+	"Permanent", "Offensive", "Defensive", "Block", "Evade" or "None".
+	Selects which type of AutoEffects to collect and append to an AutoScript.
+	Block and Evade also include Defensive */
+function AutoScriptMain(inputAutoScript, triggerType="None") {
+
+	/* Converts the input AutoScript to to an array if it isn't one already */
+	let AutoScript = [];
+	if (inputAutoScript != "") {
+		try { AutoScript = JSON.parse(inputAutoScript); }
+		catch(e) { AutoScript = AutoScriptToArray(inputAutoScript); }
+	}
+
+	/* Appends one or more AutoScripts based on the trigger type */
+	AutoScript.push(collectAutoScripts(triggerType));
+
+
+	/* Get relevant attributes */
+	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
+		"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max",
+		"StaggerState", "distortState", "egoActiveState", "egoType"], function(values) {
+
+	let settingMuteMessage = values.settingMuteMessage;
+	let settingWhisperRolls = values.settingWhisperRolls;
+	let settingWhisperTarget = values.settingWhisperTarget;
+	let settingLimbusStyle = values.settingLimbusStyle;
+	let settingHideNextTurn = values.settingHideNextTurn;
 	
+	let HP = values.HP;
+	let ST = values.StagRes;
+	let SP = values.SP;
+	let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP) };
+
+	let HPdamage = values.HP_max - HP;
+	let STdamage = values.StagRes_max - ST;
+	let SPdamage = values.SP_max - SP;
+	let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage }
+
+	let StaggerState = values.StaggerState;
+	let distortState = values.distortState;
+	let egoActiveState = values.egoActiveState;
+	let egoType = values.egoType;
 	
-	inputAutoScript.forEach(AutoEffect => {
-		if (["Gain", "Require", "Consume", "Action", "Set", "Add", "ChallengeRoll"].includes(AutoEffect[0][0])) {
-			if (["Set", "Add"].includes(AutoEffect[0][0])) {
-				if (AutoEffect.length != 2) {
-					autoEffectErrorMessage(`Expected format: (${AutoEffect[0][0]} #Bar N)`, AutoEffect); return false;
-				}
-			}
-			if (AutoEffect[0][0] == "ChallengeRoll") {
-				if (AutoEffect.length != 2) {
-					autoEffectErrorMessage(`Expected format: (${AutoEffect[0][0]} #Stat N)`, AutoEffect); return false;
-				}
+	let scaling = 1;
+	let checkResult = "success";
+
+	let output = {};
+	let tempOutput = {};
+	let returnValues = { checkResult:"success", error:false, };
+	let ailmentList = {};
+
+
+	/* Get all ailments */
+	getAttrs(["burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
+		"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
+		"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
+
+	const HasNextTurn = settingHideNextTurn == true ? 'false' : 'true';
+
+	let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"]
+	ailmentNames.forEach(ailment => {
+		if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
+			ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`]];
+		} else {
+			ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`]];
+		}
+	});
+
+	/* Get all custom ailments */
+	getSectionIDs(`repeating_ailments`, idarray => {
+	const fieldnames = idarray.reduce((rows,id) =>
+	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,
+	`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`, ], '');
+	
+	let ailName = "";
+	let ailHasNextTurn = "";
+	let ailNum = 0;
+	let ailNumNextTurn = 0;
+	
+	getAttrs([...fieldnames], v => {
+	idarray.forEach(id => {
+		ailName = v[`repeating_ailments_${id}_ailName`];
+		ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
+		ailNum = v[`repeating_ailments_${id}_ailNum`];
+		ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`]
+		
+		ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id];
+	});
+	
+
+	/* Execute each AutoEffect in the AutoScript */
+	AutoScript.forEach(AutoEffect => {
+		/* Checks are always processed. Other AutoEffects are not processed if the last check failed */
+		switch (AutoEffect[0][0]) {
+			case "Require": tempOutput = autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList); break;
+			case "Consume": tempOutput = autoEffectConsume(AutoEffect, ailmentList, barList); break;
+			default: tempOutput = {}; break;
+		}
+		if (checkResult != "failure") {
+			switch (AutoEffect[0][0]) {
+				case "Require": break; /* Already executed above */
+				case "Consume": break; 
+				case "Gain": tempOutput = autoEffectGainAilment(AutoEffect, ailmentList, scaling); break;
+				default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
 			}
 		}
-	});		
-	else if (isNaN(parseInt(autoEffectArray[0][1]))) { autoEffectErrorMessage(`Value "${autoEffectArray[0][1]}" is not a number`, autoEffect); return null; }
-	else if (getAilmentAttribute(autoEffectArray[0][2]) == false) { autoEffectErrorMessage(`"Ailment "${autoEffectArray[0][2]}" does not exist`, autoEffect); return null; }
-	*/
+		console.log(tempOutput)
 
+		/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
+		/*  but does not apply any changes to attributes */
+		if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
+			returnValues.error == true;
+			output = {};
+			return;
+		}
+
+		/* Handle changes to scaling */
+		if (tempOutput.hasOwnProperty("scaling")) {
+			scaling = parseInt(tempOutput.scaling);
+			delete tempOutput.scaling;
+		}
+
+		/* Handle check results from Require and Consume */
+		/* For the returnValues, the worst result is returned */
+		if (tempOutput.checkResult != undefined) {
+			checkResult = tempOutput.checkResult;
+			if (returnValues.checkResult == "success") {
+				returnValues.checkResult = tempOutput.checkResult;
+			}
+			else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
+				returnValues.checkResult = tempOutput.checkResult;
+			}
+			delete tempOutput.checkResult;
+		}
+
+		/* Add attribute changes from AutoEffect to output */
+		/* The first time a attribute is modified, add it's count */
+		/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
+		/* If Consume 4 Burn is used later, this amount will be removed without adding count */
+		for (const property in tempOutput) {
+			if (output.hasOwnProperty(property)) {
+				output[property] += tempOutput[property];
+			} else {
+				output[property] = tempOutput[property] + tempOutput.count;
+			}
+		}
+	});
+
+	// console.log(output)
+	setAttrs(output);
+
+	console.log(returnValues)
+
+
+	/* Message handling */
+
+
+	/* Error handling */
+	if (returnValues.error == true) {
+		/* Run function that clears all condition buttons */
+	}
+
+
+
+	});
+	});
+	});
+	});
+}
 /*--- AutoScript functions end ---*/
 
 
@@ -14720,10 +14741,116 @@ function autoEffectErrorMessage(errorString, autoEffect) {
 	console.log(errorString + autoEffect)
 }
 
+/* Checks if an AutoEffect has conditionals */
+/* If true, creates a condition button for each conditional and returns true */
+/* If the condition button already exists, append the AutoEffect to the existing button */
+/* If false, returns false */
+function processConditionals(AutoEffect) {
+	if (AutoEffect.length > 1) {
+		AutoEffect.slice(1).forEach(conditional => {
+			/* Remember to apply AutoEffect.slice(0,2)) */
+			console.log("Creating conditionButton " + conditional + " with effect " + JSON.stringify(AutoEffect.slice(0,2)));
+		});
+		return true;
+	}
+	return false;
+}
 
-/* Sets up a condition button with an AutoEffect, or appends the AutoEffect to the button if it already exists*/
-function conditionButton(conditional, AutoEffect) {
-	console.log("Creating conditionButton " + conditional + " with effect " + JSON.stringify(AutoEffect));
+
+function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
+	/* Check format */
+	if (AutoEffect[0].length < 3 || AutoEffect[0].length > 4) { autoEffectErrorMessage(`Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional))`, AutoEffect); return {error: true}; }
+
+	/* Handle conditionals */
+	if (processConditionals(AutoEffect) == true) { return {}; }
+
+	/* Get required value */
+	let effectVal = parseInt(Math.abs(AutoEffect[0][1]));
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[0][1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Get target count */
+	let effectName = AutoEffect[0][2];
+
+	/* Handle ailment count */
+	if (ailmentList.hasOwnProperty(effectName)) { count = ailmentList[effectName][1]; }
+	/* Handle bar count */
+	else if (barList.hasOwnProperty(effectName)) { count = barList[effectName]; }
+	/* Handle bar damage count */
+	else if (barDamageList.hasOwnProperty(effectName)) { count = barDamageList[effectName]; }
+	else { autoEffectErrorMessage(`Ailment, Bar or BarDamage "${effectName}" does not exist`, AutoEffect); return {error: true}; }
+	
+	/* Handle the optional scaling property */
+	let scaling = 1;
+	let returnValues = {};
+	if (AutoEffect[0][3] != undefined) {
+		if (AutoEffect[0][3].toLowerCase() == "scaling") {
+			scaling = Math.floor(count/effectVal);
+			returnValues.scaling = scaling;
+		}
+	}
+
+	/* Execute AutoEffect check */
+	if (count >= effectVal) {
+		returnValues.checkResult = "success";
+	} else {
+		returnValues.checkResult = "failure";
+	}
+	return returnValues;
+}
+
+function autoEffectConsume(AutoEffect, ailmentList, barList) {
+	/* Check format */
+	if (AutoEffect[0].length < 3 || AutoEffect[0].length > 4) { autoEffectErrorMessage(`Expected format: (Consume N #Ailment/#Bar #Scaling(optional))`, AutoEffect); return {error: true}; }
+
+	/* Handle conditionals */
+	if (processConditionals(AutoEffect) == true) { return {}; }
+
+	/* Get consumed value */
+	let effectVal = parseInt(Math.abs(AutoEffect[0][1]));
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[0][1]}" is not a number`, AutoEffect); return {error: true}; }
+	let count = 0;
+
+	/* Get target */
+	let effectName = AutoEffect[0][2];
+	let effectTarget = "";
+	let effectRepeatingId = ailmentList[effectName][3];
+
+	/* Handle ailment target */
+	if (ailmentList.hasOwnProperty(effectName)) {
+		if (effectRepeatingId == undefined) { effectTarget = effectName; } /* If standard ailment */
+		else { effectTarget = `repeating_ailments_${ailmentList[effectName][3]}_ailNum`; } /* If custom ailment */
+		count = ailmentList[effectName][1];
+	}
+	/* Handle bar target */
+	else if (barList.hasOwnProperty(effectName)) {
+		effectTarget = effectName;
+		count = barList[effectName];
+	}
+	else { autoEffectErrorMessage(`Ailment or Bar "${effectName}" does not exist`, AutoEffect); return {error: true}; }
+	
+	/* Handle the optional scaling property */
+	let scaling = 1;
+	let returnValues = {};
+	if (AutoEffect[0][3] != undefined) {
+		if (AutoEffect[0][3].toLowerCase() == "scaling") {
+			scaling = Math.floor(count/effectVal);
+			returnValues.scaling = scaling;
+		}
+	}
+
+	/* Execute AutoEffect check */
+	if (count >= effectVal) {
+		returnValues[effectTarget] = -effectVal*scaling;
+		returnValues.count = parseInt(count);
+		if (!(count >= 2*effectVal)) {
+			returnValues.checkResult = "last success";
+		} else {
+			returnValues.checkResult = "success";
+		}
+	} else {
+		returnValues.checkResult = "failure";
+	}
+	return returnValues;
 }
 
 function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
@@ -14732,17 +14859,10 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	
 	/* Handle scaling */
 	AutoEffect[0][1] *= scaling;
-	if (scaling == 0) { return null }
+	if (scaling == 0) { return {}; }
 	
 	/* Handle conditionals */
-	if (AutoEffect.length > 1) {
-		let conditionalReturn = false;
-		AutoEffect.slice(1).forEach(conditional => {
-			conditionButton(conditional, AutoEffect.slice(0,2));
-			conditionalReturn = true;
-		});
-		if (conditionalReturn) { return null; }
-	}
+	if (processConditionals(AutoEffect) == true) { return {}; }
 	
 	/* Get ailment name */
 	let effectAilment = AutoEffect[0][2];
@@ -14775,7 +14895,7 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	}
 	
 	/* Execute AutoEffect */
-	return { [effectTarget]: parseInt(count) + parseInt(effectVal) }
+	return { [effectTarget]: parseInt(effectVal), count:parseInt(count) }
 }
 
 
