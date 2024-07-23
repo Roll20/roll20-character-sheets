@@ -6292,6 +6292,13 @@
 		<div class="item-powers-combat-mods">
 			<!-- Range Maneuvers -->
 			<div class="item-powers-range-mods">
+				<div class="custom-select-alternate">
+					<select name="attr_powerManeuver" title="@oowerManeuver">
+						<option value="haymaker">Haymaker</option>
+						<option value="multipleAttack">Multiple Attack</option>
+						<option value="strike" selected>Strike</option>
+					</select>
+				</div>	
 				<h1>Braced:</h1>
 				<label class="container-checkbox-small-dark">
 					<input type="checkbox" name="attr_checkBrace">
@@ -6302,11 +6309,11 @@
 					<input type="checkbox" name="attr_checkSet">
 					<span class="checkmark-small-dark" title="@{checkSet}"></span>
 				</label>
-				<h1>Multiple Attack:</h1>
+				<!-- <h1>Multiple Attack:</h1>
 				<label class="container-checkbox-small-dark">
 					<input type="checkbox" name="attr_checkMultipleAttack">
 					<span class="checkmark-small-dark" title="@{checkMultipleAttack}"></span>
-				</label>
+				</label> -->
 				<button type="action" class="button buttonRollPowerArmor" tabindex="-1" name="act_armorActivation01" title="%{armorActivation01}">Armor</button>
 			</div>
 			
@@ -13575,7 +13582,7 @@
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "checkMultipleAttack", "dingbat"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat"], function(values) {
 				var attributes = new Object();
 				
 				var theRoll = values.whisperToGM||"";
@@ -13588,6 +13595,11 @@
 				let subtractENDAmt = parseInt(values["powerEND"+powerId])||0;
 				let netDCV = parseInt(values["currentDCV"])||3;
 				let halfDCV = false;
+				let modDCV = 0;
+				let modDC = 0;
+				let theAdvantage = 0;
+				let adjustedDamage = values["hiddenPowerDice" + powerId];
+				// let adjustedDC = values["hiddenPowerDice" + powerId];
 				let needsActivation = (values["powerActivate"+powerId] === "on") ? true : false;
 				let isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
 				let isMental = false;
@@ -13596,7 +13608,7 @@
 				// Modifiers
 				let isSet = (values.checkSet === "on") ? true : false;
 				let isBraced = (values.checkBrace === "on") ? true : false;
-				let isMultipleAttack = (values.checkMultipleAttack === "on") ? true : false;
+				// let isMultipleAttack = (values.checkMultipleAttack === "on") ? true : false;
 				let braceMod = 0;
 				let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 				let hasRangePenalty = (theRangePenalty > 0) ? true : false;
@@ -13621,6 +13633,16 @@
 					default:		break;
 				}
 				
+				// Maneuver
+				switch (values.powerManeuver) {
+					case 'haymaker':		modDCV = -5;
+											modDC = 4;
+											break;
+					case 'multipleAttack':	halfDCV = true;
+											break;
+					default:				break;
+				}
+				
 				// Braced modifiers.
 				if (isBraced) {
 					braceMod = 2;
@@ -13633,15 +13655,21 @@
 				}
 					
 				// Multiple Attack
-				if (isMultipleAttack) {
-					halfDCV = true;
-				}
+				// if (isMultipleAttack) {
+				// 	halfDCV = true;
+				// }
+				// 
+				// if (halfDCV) {
+				// 	netDCV = Math.round(netDCV/2);
+				// }
 				
-				if (halfDCV) {
-					netDCV = Math.round(netDCV/2);
-				}
+				// DCV
+				netDCV = getNetDCV(netDCV, modDCV, halfDCV);
 				
-				attributes.hiddenDamage = values["hiddenPowerDice" + powerId];
+				// Power Dice
+				// adjustedDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, thePip);
+				
+				// attributes.hiddenDamage = values["hiddenPowerDice" + powerId];
 				attributes.hiddenDamageType = values["powerDamageType" + powerId];
 				attributes.hiddenStunMod = parseInt(values["powerStunMod" + powerId])||0;
 				attributes.hiddenMessage = values["powerName"+powerId];
@@ -13675,6 +13703,10 @@
 									attributes.hiddenIsPower = "true";
 									attributes.hiddenIsMental = "false";
 				}
+				
+				
+				let adjustedDC = convertDiceToDC(adjustedDamage, true, theAdvantage);
+				attributes.hiddenDamage = getDamageDice(adjustedDC.DC + modDC, adjustedDC.advantage, adjustedDC.normal, adjustedDC.pip);
 				
 				// Send changes for use with damage roll template functions.
 				setAttrs(attributes);
@@ -16014,6 +16046,151 @@
 	/* --- Weapon Attacks   --- */
 	/* ------------------------ */
 	
+	function convertDiceToDC(theDamage, isNormal, theAdvantage) {
+		// theDamage should be a string of dice.
+		// isNormal is a boolean.
+		// theAdvantage is a float.
+		
+		let theDC = 0;
+		let dice = "0";
+		let mods = "0";
+		let halfDice = "0";
+		let theAdds = "0";
+		let thePip = 0;
+		
+		// First parse damage text for valid Hero damage dice.
+		// Remove extraneous characters.
+		theDamage = theDamage.replace(/[^\ddD\\+\\-]/g,"");
+		
+		// Check for d6 dice.
+		if (theDamage.includes('d6')) {
+			dice = theDamage.split('d6')[0];
+			mods = theDamage.split('d6')[1];
+		} else {
+			dice = "0";
+			mods = theDamage;
+		}
+		
+		// Check for "d6", without a "1"
+		if (dice.length === 0) {
+			dice = "1";
+		}
+		
+		// Check for half d6 dice.
+		if (theDamage.includes('d3')) {
+			halfDice = mods.split('d3')[0];
+			theAdds = mods.split('d3')[1];	
+		} else {
+			halfDice = "0";
+			theAdds = mods;
+		}
+		
+		halfDice = halfDice.replace(/\D/g,'');
+		
+		// Check for "d3" without a "1".
+		if (halfDice.length === 0) {
+			halfDice = "1";
+		}
+		
+		theAdds = theAdds.replace(/\D-/g,'');
+		
+		if (theAdds.length > 0) {
+			if ( ( theAdds === "1" ) || ( theAdds === "+1" )) {
+				thePip = +1;
+			} else if (theAdds === "-1") {
+				thePip = -1;
+			} else {
+				thePip = 0;
+			}
+		} else {
+			thePip = 0;
+		}
+		
+		// Calculate damage class, trying to match HERO DC tables.
+		if (isNormal) {
+			theDC = (1 + theAdvantage) * (Number(dice) + 0.5 * Number(halfDice));	
+			if (theAdvantage === 0.25) {
+				theDC = Math.round(theDC);
+				if (Number(dice) === 1) {
+					theDC = 2;
+				} 
+			} else if (theAdvantage === 0.75) {
+				theDC = Math.floor(theDC + 0.5);
+			} else {
+				theDC = Math.ceil(theDC);
+			}
+		} else {
+			if (theAdvantage === 0) {
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + thePip);
+				theDC = Math.round(theDC);
+			} else if (theAdvantage === 0.25) {
+				// Standard 3:2:1 points ratio doesn't work.
+				theDC = (1 + theAdvantage) * ( 3.25 * Number(dice) + 1.5 * Number(halfDice) + 0.8 * thePip);
+				theDC = Math.round(theDC);
+			} else if (theAdvantage === 0.5) {
+				// Standard 3:2:1 points ratio doesn't work.
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 1.8 * Number(halfDice) + 1 * thePip);
+				theDC = Math.round(theDC);
+			} else if (theAdvantage === 0.75) {
+				// Standard 3:2:1 points ratio doesn't work.
+				theDC = (1 + theAdvantage) * ( 2.96 * Number(dice) + 1.65 * Number(halfDice) + 0.71 * thePip);
+				theDC = Math.ceil(theDC);
+			} else if (theAdvantage === 1) {
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
+				// Need disambiguation.
+				if (thePip === -1) {
+					theDC += 1;
+				}
+				theDC = Math.round(theDC);
+			} else if (theAdvantage === 1.25) {
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
+				// Need disambiguation.
+				if (thePip === -1) {
+					theDC += 1;
+					if (theDC === 19) {
+						theDC += 1;
+					}
+				}
+				theDC = Math.ceil(theDC);
+			} else if (theAdvantage === 1.5) {
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
+				// Need disambiguation.
+				if (thePip === -1) {
+					theDC += 2;
+					if (theDC === 14.5) {
+						theDC -= 1;
+					} else if (theDC === 29) {
+						theDC -= 1;
+					}
+				}
+				theDC = Math.ceil(theDC);
+			} else if (theAdvantage === 1.75) {
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
+				// Need disambiguation.
+				if (thePip === -1) {
+					theDC += 2;
+				}
+				theDC = Math.ceil(theDC);
+			} else {
+				// (theAdvantage === 2)
+				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
+				if (thePip === -1) {
+					theDC += 2;
+				}
+				theDC = Math.ceil(theDC);
+			}
+		}
+		
+		return {
+			advantage: theAdvantage,
+			normal: isNormal,
+			DC: theDC,
+			d6: dice,
+			d3: halfDice,
+			pip: thePip
+		};
+	}
+	
 	
 	function getDamageDice(damageClass, advantage, isNormal, thePip) {
 		// Converts Damage Class into Damage Dice following the tables of 6E2 101 and the Expanded Damage Tables.
@@ -16101,7 +16278,6 @@
 				minusPipLow = 0.85;
 			}
 		}
-		
 		
 		// Construct Hero standard dice string.
 		if (isNormal) {
@@ -16275,14 +16451,17 @@
 				let theDamage = values["weaponDamage"+weaponId]||"";
 				let theAdvantage = parseFloat(values["weaponAdvantage"+weaponId])||0;
 				let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
+				
+				// Parse damage string
+				let damageObject = convertDiceToDC(theDamage, isNormal, theAdvantage);
+				let theDC = damageObject.DC;
+				let dice = damageObject.d6;
+				let halfDice = damageObject.d3;
+				let thePip = damageObject.pip;
+				
+				// Modifiers and options
 				let capDamage = (values.optionWeaponDamageCap === "on") ? true : false;
 				let optionMinusOne = (values.optionD6MinusOne === "on") ? true : false;
-				let theDC = 0;
-				let dice = "0";
-				let mods = "0";
-				let halfDice = "0";
-				let theAdds = "0";
-				let thePip = 0;
 				let damageLevels =  parseInt(values["weaponCSL"+weaponId]/2)||0;
 				let strengthEnhanced = (values["weaponEnhancedByStr"+weaponId] === "on") ? true : false;
 				let strengthApplied = parseInt(values["weaponStrength"+weaponId])||0;
@@ -16291,129 +16470,6 @@
 				let adjustedDC = 0;
 				let adjustedDamage = theDamage;
 				let penaltyOCV = 0;
-				
-				// First parse damage text for valid Hero damage dice.
-				// Remove extraneous characters.
-				theDamage = theDamage.replace(/[^\ddD\\+\\-]/g,"");
-				
-				// Check for d6 dice.
-				if (theDamage.includes('d6')) {
-					dice = theDamage.split('d6')[0];
-					mods = theDamage.split('d6')[1];
-				} else {
-					dice = "0";
-					mods = theDamage;
-				}
-				
-				// Check for "d6", without a "1"
-				if (dice.length === 0) {
-					dice = "1";
-				}
-				
-				// Check for half d6 dice.
-				if (theDamage.includes('d3')) {
-					halfDice = mods.split('d3')[0];
-					theAdds = mods.split('d3')[1];	
-				} else {
-					halfDice = "0";
-					theAdds = mods;
-				}
-				
-				halfDice = halfDice.replace(/\D/g,'');
-				
-				// Check for "d3" without a "1".
-				if (halfDice.length === 0) {
-					halfDice = "1";
-				}
-				
-				theAdds = theAdds.replace(/\D-/g,'');
-				
-				if (theAdds.length > 0) {
-					if ( ( theAdds === "1" ) || ( theAdds === "+1" )) {
-						thePip = +1;
-					} else if (theAdds === "-1") {
-						thePip = -1;
-					} else {
-						thePip = 0;
-					}
-				} else {
-					thePip = 0;
-				}
-				
-				// Calculate damage class, trying to match HERO DC tables.
-				if (isNormal) {
-					theDC = (1 + theAdvantage) * (Number(dice) + 0.5 * Number(halfDice));	
-					if (theAdvantage === 0.25) {
-						theDC = Math.round(theDC);
-						if (Number(dice) === 1) {
-							theDC = 2;
-						} 
-					} else if (theAdvantage === 0.75) {
-						theDC = Math.floor(theDC + 0.5);
-					} else {
-						theDC = Math.ceil(theDC);
-					}
-				} else {
-					if (theAdvantage === 0) {
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + thePip);
-						theDC = Math.round(theDC);
-					} else if (theAdvantage === 0.25) {
-						// Standard 3:2:1 points ratio doesn't work.
-						theDC = (1 + theAdvantage) * ( 3.25 * Number(dice) + 1.5 * Number(halfDice) + 0.8 * thePip);
-						theDC = Math.round(theDC);
-					} else if (theAdvantage === 0.5) {
-						// Standard 3:2:1 points ratio doesn't work.
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 1.8 * Number(halfDice) + 1 * thePip);
-						theDC = Math.round(theDC);
-					} else if (theAdvantage === 0.75) {
-						// Standard 3:2:1 points ratio doesn't work.
-						theDC = (1 + theAdvantage) * ( 2.96 * Number(dice) + 1.65 * Number(halfDice) + 0.71 * thePip);
-						theDC = Math.ceil(theDC);
-					} else if (theAdvantage === 1) {
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
-						// Need disambiguation.
-						if (thePip === -1) {
-							theDC += 1;
-						}
-						theDC = Math.round(theDC);
-					} else if (theAdvantage === 1.25) {
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
-						// Need disambiguation.
-						if (thePip === -1) {
-							theDC += 1;
-							if (theDC === 19) {
-								theDC += 1;
-							}
-						}
-						theDC = Math.ceil(theDC);
-					} else if (theAdvantage === 1.5) {
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
-						// Need disambiguation.
-						if (thePip === -1) {
-							theDC += 2;
-							if (theDC === 14.5) {
-								theDC -= 1;
-							} else if (theDC === 29) {
-								theDC -= 1;
-							}
-						}
-						theDC = Math.ceil(theDC);
-					} else if (theAdvantage === 1.75) {
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
-						// Need disambiguation.
-						if (thePip === -1) {
-							theDC += 2;
-						}
-						theDC = Math.ceil(theDC);
-					} else {
-						// (theAdvantage === 2)
-						theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
-						if (thePip === -1) {
-							theDC += 2;
-						}
-						theDC = Math.ceil(theDC);
-					}
-				}
 				
 				// Prevent out of range strength.
 				if (minStrength < 1) {
@@ -16458,6 +16514,7 @@
 					thePip = -1;
 				}
 				
+				// Calculate final weapon damage
 				adjustedDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, thePip);
 				
 				attributes["hiddenWeaponSign"+weaponId] = thePip;
