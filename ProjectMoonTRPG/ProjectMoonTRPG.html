@@ -14566,7 +14566,7 @@ function AutoScriptToArray(inputAutoScript) {
 }
 
 on("clicked:autoEffectTest", function() {
-	AutoScriptMain(`(Require 20 -HP Scaling)  /* Test comment */ (Gain 2 Fragile Next Turn, TestCondition2)`, "Combat start")
+	AutoScriptMain(`(Require 2 Charge) (Consume 2 Charge)`, "Combat start")
 
 });
 
@@ -14653,13 +14653,15 @@ function AutoScriptMain(inputAutoScript, triggerType="None") {
 	
 	getAttrs([...fieldnames], v => {
 	idarray.forEach(id => {
-		ailName = v[`repeating_ailments_${id}_ailName`];
+		ailName = v[`repeating_ailments_${id}_ailName`].replace(" ","_");
 		ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
 		ailNum = v[`repeating_ailments_${id}_ailNum`];
 		ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`]
 		
 		ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id];
 	});
+
+	console.log(ailmentList)
 	
 
 	/* Execute each AutoEffect in the AutoScript */
@@ -14888,6 +14890,8 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	let forceTarget = "";
 	if (AutoEffect[0][3] != undefined) {
 		if (["this", "thisturn", "this turn"].includes(AutoEffect[0][3].toLowerCase())) { forceTarget = "This turn"; }
+	} else {
+		autoEffectErrorMessage(`"${AutoEffect[0][1]}". Expected "This turn" or "Next turn"`, AutoEffect); return {error: true};
 	}
 
 	/* Get target attribute */
