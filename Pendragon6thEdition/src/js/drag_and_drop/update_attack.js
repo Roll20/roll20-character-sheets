@@ -24,7 +24,3 @@ const update_attack = (page) => {
 
   return update;
 };
-
-// Expectation would be it applies damage_type always, then adds damage on top if applicable
-// In this instance Club would be X+2D6 where X is the character's brawling damage (based on STR + SIZ)
-// Battle Axe would be XD6 (character damage) no + anything as no damage
