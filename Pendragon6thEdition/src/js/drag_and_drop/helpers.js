@@ -15,22 +15,6 @@ const processDataArrays = (array, callback) => {
 
 const getRow = (section) => `repeating_${section}_${generateRowID()}`;
 
-const getRepUpdate = (attrs, row, page) => {
-  let update = {};
-
-  attrs.forEach((attr) => {
-    if (page?.[attr] ?? page?.data?.[attr]) {
-      update[`${row}_${attr}`] = page[attr] ?? cleanAttr(attr, page.data[attr]);
-    }
-  });
-
-  if (attrs.includes("notes")) {
-    update[`${row}_flag`] = false;
-  }
-
-  return update;
-};
-
 const cleanAttr = (attr, value) => {
   if (attr === "skill") {
     return `@{${value.toLowerCase()}}`;
