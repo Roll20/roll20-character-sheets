@@ -5,11 +5,6 @@ const update_attack = (page) => {
   const { damage, damage_type } = page.data;
   const update = getRepUpdate(attrs, row, page);
 
-  console.table({
-    damage,
-    damage_type,
-  });
-
   const type = `${damage_type.toLowerCase()}_damage`;
   getAttrs([type], (values) => {
     console.log("values", values);
