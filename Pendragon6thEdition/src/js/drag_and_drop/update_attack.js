@@ -6,16 +6,21 @@ const update_attack = (page) => {
   const update = getRepUpdate(attrs, row, page);
 
   const type = `${damage_type.toLowerCase()}_damage`;
-  getAttrs([type], (values) => {
-    console.log("values", values);
 
-    if (values) {
-      const modifier = damage ? `+${damage}` : "";
-      setAttrs({ [`${row}_damage`]: `${values[type]}${modifier}` });
-    } else {
-      dropWarning(`Unknown damage type: ${damage_type}`);
-    }
-  });
+  if (["brawling", "character"].includes(damage_type.toLowerCase())) {
+    getAttrs([type], (values) => {
+      console.log("values", values);
+
+      if (values) {
+        const modifier = damage ? `+${damage}` : "";
+        setAttrs({ [`${row}_damage`]: `${values[type]}${modifier}` });
+      } else {
+        dropWarning(`Unknown damage type: ${damage_type}`);
+      }
+    });
+  } else if (damage) {
+    update[`${row}_damage`] = damage;
+  }
 
   return update;
 };
