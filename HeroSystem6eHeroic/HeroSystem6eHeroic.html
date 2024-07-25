@@ -13922,7 +13922,7 @@
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEffect"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "powerCSL", "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat"], function(values) {
 				var attributes = new Object();
 				
 				var theRoll = values.whisperToGM||"";
@@ -13930,6 +13930,7 @@
 				const showDesc = (values.showPowerDescriptions === "on") ? true : false;
 				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 				const lesserDingbat = " ⬩ ";
+				const effect = values["powerEffect" + powerId].toLowerCase();
 				let damageLabel = "Result";
 				let subtractEND = (values.optionAutoSubtractEND === "on") ? true : false;
 				let subtractENDAmt = parseInt(values["powerEND"+powerId])||0;
@@ -13940,6 +13941,7 @@
 				let theAdvantage = 0;
 				let adjustedDamage = values["hiddenPowerDice" + powerId];
 				let adjustedDC = 0;
+				let damageLevels =  parseInt(values.powerCSL/2)||0;
 				let needsActivation = (values["powerActivate"+powerId] === "on") ? true : false;
 				let isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
 				let isMental = false;
@@ -13949,11 +13951,14 @@
 				// Modifiers
 				let isSet = (values.checkSet === "on") ? true : false;
 				let isBraced = (values.checkBrace === "on") ? true : false;
-				// let isMultipleAttack = (values.checkMultipleAttack === "on") ? true : false;
+				let isSpecialDamage = false;
 				let braceMod = 0;
 				let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 				let hasRangePenalty = (theRangePenalty > 0) ? true : false;
 				let isRangedAttack = (values.rangeToTarget > 8) ? true : false;
+				
+				// Unusual haymakers as per 6E2 69.
+				// const haymakerSet = new Set(["drain", "entangle", "flash", "mental blast", "mind control", "telekinesis", "transform"]);
 					
 				// Range Mod
 				switch (values["powerRMod"+powerId]) {
@@ -13974,16 +13979,6 @@
 					default:		break;
 				}
 				
-				// Apply maneuver modifiers.
-				switch (values.powerManeuver) {
-					case 'haymaker':		modDCV = -5;
-											modDC = 4;
-											break;
-					case 'multipleAttack':	halfDCV = true;
-											break;
-					default:				break;
-				}
-				
 				// Braced modifiers.
 				if (isBraced) {
 					braceMod = 2;
@@ -13995,47 +13990,115 @@
 					}
 				}
 				
-				// DCV
-				netDCV = getNetDCV(netDCV, modDCV, halfDCV);
-				
 				// Establish damage and attack types.
 				switch (values["powerDamageType"+powerId]) {
 					case 'killing':	attributes.hiddenIsNormal = "false";
 									attributes.hiddenIsPower = "false";
 									attributes.hiddenIsMental = "false";
 									isNormal = false;
+									modDC += damageLevels;
 									break;
 					case 'HKA':		attributes.hiddenIsNormal = "false";
 									attributes.hiddenIsPower = "false";
 									attributes.hiddenIsMental = "false";
 									isNormal = false;
+									modDC += damageLevels;
 									break;
 					case 'normal':	attributes.hiddenIsNormal = "true";
 									attributes.hiddenIsPower = "false";
 									attributes.hiddenIsMental = "false";
+									modDC += damageLevels;
 									break;
 					case 'HTH':		attributes.hiddenIsNormal = "true";
 									attributes.hiddenIsPower = "false";
 									attributes.hiddenIsMental = "false";
+									modDC += damageLevels;
 									break;
 					case 'mental':	attributes.hiddenIsNormal = "false";
 									attributes.hiddenIsPower = "true";
 									attributes.hiddenIsMental = "true";
+									attributes.powerCSL = 0;
 									isMental = true;
 									break;
 					default:		attributes.hiddenIsNormal = "false";
 									attributes.hiddenIsPower = "true";
 									attributes.hiddenIsMental = "false";
+									attributes.powerCSL = 0;
+				}
+				
+				// Apply maneuver modifiers.
+				adjustedDC = convertDiceToDC(adjustedDamage, isNormal, theAdvantage);
+				
+				if (values.powerManeuver === "haymaker") {
+					modDCV += -5;
+					
+					// Check for unusual haymakers as per 6E2 69.
+					if (effect.includes("drain")) {
+						adjustedDC.d6 += 2;
+						isSpecialDamage = true;
+					} else if (effect.includes("entangle")) {
+						adjustedDC.d6 += 2;
+						isSpecialDamage = true;
+					} else if (effect.includes("flash")) {
+						adjustedDC.d6 += 4;
+						isSpecialDamage = true;
+					} else if (effect.includes("mental blast")) {
+						adjustedDC.d6 += 2;
+						isSpecialDamage = true;
+					} else if (effect.includes("mind control")) {
+						adjustedDC.d6 += 4;
+						isSpecialDamage = true;
+					} else if (effect.includes("telekinesis")) {
+						if (adjustedDC.d6 !== 0) {
+							adjustedDC.d6 += 2;
+							if (adjustedDC.d3 === 1) {
+								adjustedDC.d6 += 1;
+								adjustedDC.d3 = 0;
+							} else {
+								adjustedDC.d3 = 1;
+							}
+						} else {
+							adjustedDC.adds += 13;
+						}
+						isSpecialDamage = true;
+					} else if (effect.includes("transform")) {
+						if (effect.includes("major")) {
+							adjustedDC.d6 += 4;
+						} else if (effect.includes("severe")) {
+							adjustedDC.d6 += 1;
+							adjustedDC.d3 += 1;
+							adjustedDC.pip += 1;
+						} else {
+							adjustedDC.d6 += 6;
+						}
+						isSpecialDamage = true;
+					} else if (values["powerDamageType"+powerId] !== "power") {
+						modDC += 4;
+					} else {
+						// This shouldn't be a haymaker.
+						modDCV += 5;
+						attributes.powerManeuver = "strike";
+					}
+				} else if (values.powerManeuver === "multipleAttack") {
+					halfDCV = true;
+				} else {
+					// Defaults are fine.
 				}
 				
 				// Assign damage dice.
-				if (modDC !== 0) {
-					adjustedDC = convertDiceToDC(adjustedDamage, isNormal, theAdvantage);
+				if (isSpecialDamage) {
+					attributes.hiddenDamage = standardDamageString(adjustedDC.d6, adjustedDC.d3, adjustedDC.pip, adjustedDC.adds);
+				} else if (modDC !== 0) {
+					// adjustedDC = convertDiceToDC(adjustedDamage, isNormal, theAdvantage);
 					attributes.hiddenDamage = getDamageDice(adjustedDC.DC + modDC, adjustedDC.advantage, adjustedDC.normal, adjustedDC.pip);
 				} else {
 					attributes.hiddenDamage = values["hiddenPowerDice" + powerId];
 				}
 				
+				// DCV
+				netDCV = getNetDCV(netDCV, modDCV, halfDCV);
+				
+				// Hidden attribute sendoff
 				attributes.hiddenDamageType = values["powerDamageType" + powerId];
 				attributes.hiddenStunMod = parseInt(values["powerStunMod" + powerId])||0;
 				attributes.hiddenMessage = values["powerName"+powerId];
@@ -16521,9 +16584,10 @@
 			advantage: theAdvantage,
 			normal: isNormal,
 			DC: theDC,
-			d6: dice,
-			d3: halfDice,
-			pip: thePip
+			d6: Number(dice),
+			d3: Number(halfDice),
+			pip: thePip,
+			adds: Number(theAdds)
 		};
 	}
 	
@@ -16768,6 +16832,11 @@
 		}	
 		// Return text string.
 		return dice;
+	}
+	
+	
+	function standardDamageString(d6, d3, pip, adds) {
+		return d6.toString()+"d6+"+d3.toString()+"d3+"+(pip+adds).toString();
 	}
 	
 	
