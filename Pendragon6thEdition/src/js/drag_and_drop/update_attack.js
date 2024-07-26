@@ -5,17 +5,26 @@ const update_attack = (page) => {
   const { damage, damage_type } = page.data;
   const update = getRepUpdate(attrs, row, page);
 
-  const type = `${damage_type.toLowerCase()}_damage`;
+  const type = damage_type.toLowerCase();
 
-  if (["brawling", "character"].includes(damage_type.toLowerCase())) {
-    getAttrs([type], (values) => {
-      console.log("values", values);
-
-      if (values) {
-        const modifier = damage ? `+${damage}` : "";
-        setAttrs({ [`${row}_damage`]: `${values[type]}${modifier}` });
+  const modifier = damage ? `+${damage}` : "";
+  if (["brawling", "character"].includes(type)) {
+    const attr = `${type}_damage`;
+    getAttrs([attr], (v) => {
+      if (v) {
+        setAttrs({ [`${row}_damage`]: `${v[attr]}${modifier}` });
       } else {
         dropWarning(`Unknown damage type: ${damage_type}`);
+      }
+    });
+  } else if (["horse"].includes(type)) {
+    getAttrs(["warhorse_damage"], ({ warhorse_damage }) => {
+      if (warhorse_damage) {
+        setAttrs({
+          [`${row}_damage`]: `${warhorse_damage}${modifier}`,
+        });
+      } else {
+        dropWarning(`Could not get values for warhorse damage`);
       }
     });
   } else if (damage) {

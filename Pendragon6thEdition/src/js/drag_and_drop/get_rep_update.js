@@ -3,7 +3,8 @@ const getRepUpdate = (attrs, row, page) => {
 
   attrs.forEach((attr) => {
     if (page?.[attr] ?? page?.data?.[attr]) {
-      update[`${row}_${attr}`] = page[attr] ?? cleanAttr(attr, page.data[attr]);
+      update[`${row}_${attr}`] =
+        page[attr] ?? roll20Attribute(attr, page.data[attr]);
     }
   });
 
