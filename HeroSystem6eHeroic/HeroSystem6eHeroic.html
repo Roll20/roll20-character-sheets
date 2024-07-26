@@ -13922,7 +13922,7 @@
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEffect"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "powerCSL", "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEffect"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerAttackAdvantage"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "powerCSL", "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat"], function(values) {
 				var attributes = new Object();
 				
 				var theRoll = values.whisperToGM||"";
@@ -13938,9 +13938,8 @@
 				let halfDCV = false;
 				let modDCV = 0;
 				let modDC = 0;
-				let theAdvantage = 0;
-				let adjustedDamage = values["hiddenPowerDice" + powerId];
-				let adjustedDC = 0;
+				let theAdvantage = parseFloat(values["powerAttackAdvantage"+powerId])||0;
+				let damageObject = {};
 				let damageLevels =  parseInt(values.powerCSL/2)||0;
 				let needsActivation = (values["powerActivate"+powerId] === "on") ? true : false;
 				let isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
@@ -13957,9 +13956,6 @@
 				let hasRangePenalty = (theRangePenalty > 0) ? true : false;
 				let isRangedAttack = (values.rangeToTarget > 8) ? true : false;
 				
-				// Unusual haymakers as per 6E2 69.
-				// const haymakerSet = new Set(["drain", "entangle", "flash", "mental blast", "mind control", "telekinesis", "transform"]);
-					
 				// Range Mod
 				switch (values["powerRMod"+powerId]) {
 					case 'zero':	theRangePenalty = 0;
@@ -13969,7 +13965,7 @@
 									break;
 					default:		break;
 				}
-					
+				
 				// Modify DCV if needed.
 				switch (values["powerDCV"+powerId]) {
 					case 'zero':	netDCV = 0;
@@ -14027,49 +14023,51 @@
 				}
 				
 				// Apply maneuver modifiers.
-				adjustedDC = convertDiceToDC(adjustedDamage, isNormal, theAdvantage);
+				damageObject = createDamageObject(values["hiddenPowerDice" + powerId], isNormal, theAdvantage);
+				
+				attributes.treasures = parseFloat(values["powerAttackAdvantage"+powerId]);
 				
 				if (values.powerManeuver === "haymaker") {
 					modDCV += -5;
 					
 					// Check for unusual haymakers as per 6E2 69.
 					if (effect.includes("drain")) {
-						adjustedDC.d6 += 2;
+						damageObject.d6 += 2;
 						isSpecialDamage = true;
 					} else if (effect.includes("entangle")) {
-						adjustedDC.d6 += 2;
+						damageObject.d6 += 2;
 						isSpecialDamage = true;
 					} else if (effect.includes("flash")) {
-						adjustedDC.d6 += 4;
+						damageObject.d6 += 4;
 						isSpecialDamage = true;
 					} else if (effect.includes("mental blast")) {
-						adjustedDC.d6 += 2;
+						damageObject.d6 += 2;
 						isSpecialDamage = true;
 					} else if (effect.includes("mind control")) {
-						adjustedDC.d6 += 4;
+						damageObject.d6 += 4;
 						isSpecialDamage = true;
 					} else if (effect.includes("telekinesis")) {
-						if (adjustedDC.d6 !== 0) {
-							adjustedDC.d6 += 2;
-							if (adjustedDC.d3 === 1) {
-								adjustedDC.d6 += 1;
-								adjustedDC.d3 = 0;
+						if (damageObject.d6 !== 0) {
+							damageObject.d6 += 2;
+							if (damageObject.d3 === 1) {
+								damageObject.d6 += 1;
+								damageObject.d3 = 0;
 							} else {
-								adjustedDC.d3 = 1;
+								damageObject.d3 = 1;
 							}
 						} else {
-							adjustedDC.adds += 13;
+							damageObject.adds += 13;
 						}
 						isSpecialDamage = true;
 					} else if (effect.includes("transform")) {
 						if (effect.includes("major")) {
-							adjustedDC.d6 += 4;
+							damageObject.d6 += 4;
 						} else if (effect.includes("severe")) {
-							adjustedDC.d6 += 1;
-							adjustedDC.d3 += 1;
-							adjustedDC.pip += 1;
+							damageObject.d6 += 1;
+							damageObject.d3 += 1;
+							damageObject.pip += 1;
 						} else {
-							adjustedDC.d6 += 6;
+							damageObject.d6 += 6;
 						}
 						isSpecialDamage = true;
 					} else if (values["powerDamageType"+powerId] !== "power") {
@@ -14087,10 +14085,9 @@
 				
 				// Assign damage dice.
 				if (isSpecialDamage) {
-					attributes.hiddenDamage = standardDamageString(adjustedDC.d6, adjustedDC.d3, adjustedDC.pip, adjustedDC.adds);
+					attributes.hiddenDamage = standardDamageString(damageObject.d6, damageObject.d3, damageObject.pip, damageObject.adds);
 				} else if (modDC !== 0) {
-					// adjustedDC = convertDiceToDC(adjustedDamage, isNormal, theAdvantage);
-					attributes.hiddenDamage = getDamageDice(adjustedDC.DC + modDC, adjustedDC.advantage, adjustedDC.normal, adjustedDC.pip);
+					attributes.hiddenDamage = getDamageDice(damageObject.DC + modDC, damageObject.advantage, damageObject.normal, damageObject.pip);
 				} else {
 					attributes.hiddenDamage = values["hiddenPowerDice" + powerId];
 				}
@@ -16445,7 +16442,7 @@
 	/* --- Weapon Attacks   --- */
 	/* ------------------------ */
 	
-	function convertDiceToDC(theDamage, isNormal, theAdvantage) {
+	function createDamageObject(theDamage, isNormal, theAdvantage) {
 		// theDamage should be a string of dice.
 		// isNormal is a boolean.
 		// theAdvantage is a float.
@@ -16858,7 +16855,7 @@
 				let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
 				
 				// Parse damage string
-				let damageObject = convertDiceToDC(theDamage, isNormal, theAdvantage);
+				let damageObject = createDamageObject(theDamage, isNormal, theAdvantage);
 				let theDC = damageObject.DC;
 				let dice = damageObject.d6;
 				let halfDice = damageObject.d3;
