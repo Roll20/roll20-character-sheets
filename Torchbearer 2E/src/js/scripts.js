@@ -1,9 +1,3 @@
-
-on("sheet:opened", function (eventinfo) {
-  initialize();
-});
-
-
 const tablist = ["anatomy", "kit", "magic", "relationships", "levels", "options"];
 tablist.forEach(button => {
   on(`clicked:${button}`, function () {
@@ -24,6 +18,10 @@ modeList.forEach(button => {
 
 // Old code
 // --------
+
+on("sheet:opened", function (eventinfo) {
+  initialize();
+});
 
 const scrubAdvancement = attribute_base => {
   const update = {};
