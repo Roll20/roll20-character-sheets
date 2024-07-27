@@ -268,6 +268,10 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 [HeroMarkdown](https://github.com/Villain1nGlasses/HeroMarkdown) is a style specification for BaldarSilveraxe's Roll20 markdown script modeled after Slugnet's Alien RPG conversion.
 
+`HERO Roller`
+
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. It is not currently 100% compatible due to case sensitivity (HS6e uses *OCV* and HS6eH uses *ocv*). Adding a fix for this issue is on my list of things to do.
+
 # <a id="tokens">Tokens Settings</a>
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
