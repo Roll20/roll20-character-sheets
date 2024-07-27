@@ -264,7 +264,7 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 `HERO Markdown`
 
-[HeroMarkdown](https://github.com/Villain1nGlasses/HeroMarkdown) is a style specification for BaldarSilveraxe's Roll20 markdown script modeled after Slugnet's Alien RPG conversion.
+[HeroMarkdown](https://github.com/Villain1nGlasses/HeroMarkdown) is a style specification for BaldarSilveraxe's Roll20 markdown script modeled after Slugnet's Alien RPG conversion. Markdown can make creating attractive handouts easier.
 
 `HERO Roller`
 
