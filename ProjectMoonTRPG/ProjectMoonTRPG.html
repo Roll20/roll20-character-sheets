@@ -10690,6 +10690,10 @@ on("change:StagRes", function() {
 
 		setAttrs({"StaggerState":"Staggered"});
 
+		/* AutoScripts */
+		resetConditionals();
+		AutoScriptMain("", "Staggered");
+
  
 		} /* Value check end */
 
@@ -10788,6 +10792,10 @@ on("change:SP", function() {
 
 		if(currentsan <= 0 && panicstate == "0"){
 			setAttrs({"PanicState":"Panic"});
+
+			/* AutoScripts */
+			resetConditionals();
+			AutoScriptMain("", "Panic");
  
 		}
 		else if(currentsan > 0 && panicstate != "0"){
@@ -10798,7 +10806,7 @@ on("change:SP", function() {
 
 	} /* AutoDetect check end */
 
-		});
+	});
 });
 
 /* Auto: HP related updates (Detect Defeat, Detect EGO activation) */
@@ -10823,6 +10831,10 @@ on("change:HP", function() {
 	if(currenthp <= 0 && detect != "0" && defeatstate == "0"){
 
 		setAttrs({"DefeatState":"Defeated"});
+
+		/* AutoScripts */
+		resetConditionals();
+		AutoScriptMain("", "Defeated");
 
 		} /* Defeat check end */
 
@@ -11621,7 +11633,7 @@ on("change:skillSelect", function() {
 
 	/* Get IDs/names */
 	getAttrs(["skillSelect"], function(values){
-        let buttonid = values.skillSelect;
+    let buttonid = values.skillSelect;
 	let skillcat = buttonid.split('S')[0];
 
 	let name = buttonid + "Name";
@@ -11929,6 +11941,9 @@ getSectionIDs(`repeating_global`, idarray => {
         });
     });
 
+	/* AutoScripts */
+	resetConditionals();
+	AutoScriptMain("", "Round start");
 
 });
 
@@ -12109,9 +12124,9 @@ getAttrs(["Bleed", "bleedResist", "bleedResist_ego", "distortState", "egoActiveS
 on('clicked:rollCombat', (info) => {
 	/* Preparing values */
 	/* Get IDs/names */
-        let buttonid = info.htmlAttributes.id.split('_')[1];
-        let rawcheck = info.htmlAttributes.id.split('_')[2];
-        let numcheck = info.htmlAttributes.id.split('_')[3];
+	let buttonid = info.htmlAttributes.id.split('_')[1];
+	let rawcheck = info.htmlAttributes.id.split('_')[2];
+	let numcheck = info.htmlAttributes.id.split('_')[3];
 
 	let name = buttonid + "Name";
 	let type = buttonid + "Type";
@@ -12198,7 +12213,11 @@ on('clicked:rollCombat', (info) => {
 getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
-        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "skillSelect", "baseActNum", "Light", "difficulty", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses", `${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`], function(values) {
+        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "skillSelect", "baseActNum", "Light",
+		"difficulty", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
+		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
+		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
+		`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,], function(values) {
 
 	let currentlight = parseInt(values.Light);
 	let newlight = parseInt(values.Light);
@@ -12353,20 +12372,51 @@ getSectionIDs(`repeating_global`, idarray => {
 			}
 		}
 
+	getAttrs([`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript", `${skillselect}AutoScript`], function(values) {
+
+	/* AutoScripts */
+	let AutoScript = "";
+	let triggerType = "None";
+
+	/* Get AutoScript from taken action */
+	switch (buttonid) {
+		case "def": AutoScript = values.outfitAutoScript; break;
+		case "evd": AutoScript = values.outfitAutoScript; break;
+		case "egoDef": AutoScript = values.egoAutoScript; break;
+		case "egoEvd": AutoScript = values.egoAutoScript; break;
+		default: AutoScript = values[`${buttonid}AutoScript`]; break;
+	}
+
+	/* Get trigger type if any */
+	switch (basetype) {
+		case "Attack": triggerType = "Offensive"; break;
+		case "Defend": triggerType = "Block"; break;
+		case "Evade": triggerType = "Evade"; break;
+	}
+
+	/* Get skill AutoAcript if any */
+	if (skillselect != undefined || skillselect != "0") {
+		AutoScript += values[`${skillselect}AutoScript`];
+	}
+
+	/* Clean AutoScript. Remove nested and undefined */
+	AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
+	AutoScript = AutoScript.replace("undefined", "");
+	
+	resetConditionals();
+	AutoScriptMain(AutoScript, triggerType);
+	
 	/* Power */
 	let activepower = "0";
 	if(basetype == "Attack"){
-	activepower = parseInt(values.attPower) + parseInt(values.Strength) - parseInt(values.Feeble);
-	
-	attackmessage = weapontype + " | " + weaponrange + weaponuse + skillmass + "<br>";
-
+		activepower = parseInt(values.attPower) + parseInt(values.Strength) - parseInt(values.Feeble);
+		attackmessage = weapontype + " | " + weaponrange + weaponuse + skillmass + "<br>";
 	}
 	else if(basetype == "Defend"){
-	activepower = parseInt(values.defPower) + parseInt(values.Endurance) - parseInt(values.Disarm);
-
+		activepower = parseInt(values.defPower) + parseInt(values.Endurance) - parseInt(values.Disarm);
 	}
 	else if(basetype == "Evade"){
-	activepower = parseInt(values.evdPower) + parseInt(values.evdPositive) - parseInt(values.evdNegative);
+		activepower = parseInt(values.evdPower) + parseInt(values.evdPositive) - parseInt(values.evdNegative);
 	}
 
 	/* Distortion modifiers */
@@ -12577,7 +12627,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	setAttrs({"dummy":" ", "skillSelect":"0", [`${uses}`]:newuses});
 
     });
-
+	});
   });
 });
 
@@ -12728,6 +12778,10 @@ on('clicked:rollChallenge', (info) => {
 	}
 	else if(statn == "Speed"){
 	setAttrs({"baseSpeed": total });
+
+	/* AutoScripts */
+	resetConditionals();
+	AutoScriptMain("", "Combat start");
 	}
 
             finishRoll(
@@ -13057,6 +13111,12 @@ on('clicked:applyDamage', (info) => {
 	if (newSP > maxSP) { newSP = maxSP }
 	output["HP"] = newHP; output["StagRes"] = newST; output["SP"] = newSP;
 	setAttrs(output);
+
+	/* AutoScripts */
+	if (newHP < oldHP || newST < oldST) {
+		resetConditionals();
+		AutoScriptMain("", "Damaged");
+	}
 	
 	/* console.log("HP base: " + sumBothBefore + ". HP after resistance: " + Math.ceil(Math.min((hpResistance * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)))
 	console.log("ST base: " + sumBothBefore + ". ST after resistance: " + Math.ceil(Math.min((stResistance * (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)))
@@ -14548,7 +14608,291 @@ getAttrs(["settingEditMode"], function(values) {
     });
 
 
+
+
 /*--- AutoScript functions ---*/
+
+/* AutoScript editor open button */
+on("clicked:autoScriptEdit", function(info) {	
+	let newEditorTarget = info.htmlAttributes.id;
+	getAttrs([`${newEditorTarget}`,"autoScriptEditorTarget", "autoScriptEditorInput"], function(values) {
+		let oldEditorTarget = values.autoScriptEditorTarget;
+		let newEditorInput = values[`${newEditorTarget}`];
+		let oldEditorInput = values.autoScriptEditorInput;
+		setAttrs({
+			[oldEditorTarget]: oldEditorInput,
+			autoScriptEditorInput: newEditorInput,
+			autoScriptEditorTarget: newEditorTarget,
+			autoScriptEditor_display: "true"
+		});
+	});
+});
+/* AutoScript editor close button */
+on("clicked:closeAutoScriptEdit", function(info) {
+	getAttrs(["autoScriptEditorTarget", "autoScriptEditorInput"], function(values) {
+		let editorTarget = values.autoScriptEditorTarget;
+		let editorInput = values.autoScriptEditorInput;
+		setAttrs({
+			[editorTarget]: editorInput,
+			autoScriptEditor_display: "0"
+		});
+	});
+});
+
+/* Temp testing button */
+on("clicked:autoEffectTest", function() {
+	/* All buttons except conditional buttons must have resetConditionals */
+	resetConditionals();
+	AutoScriptMain(`(Gain 3 Burn) (Gain 2 Fragile Next turn, TestConditional) (Gain 4 Fragile, TestConditional)`, "Combat start")
+});
+
+/* Executes a conditional button. Hides the button if at least one check fails */
+/* Also hides the button if a Consume check would fail after using the button again */
+on("clicked:repeating_conditionalButtons:activate", function(info) {
+	let buttonid = info.sourceAttribute.split("_")[2];
+	let buttonAutoScript = "";
+	let returnValues = {};
+	getAttrs([`repeating_conditionalButtons_${buttonid}_buttonAutoScript`], function(values) {
+		buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`]
+		AutoScriptMain(buttonAutoScript, "None", function(returnValues) {
+			if (returnValues.checkResult != "success") {
+				setAttrs({[`repeating_conditionalButtons_${buttonid}_hideButton`]: "true"})
+			}
+		}, "false");
+	});
+});
+
+/* Main function for using AutoScripts. Called by actions through on click events */
+/* inputAutoScript: AutoScript provided by the action. Can be an empty string */
+/* trigger: "Combat start", "Round start", "Damaged", "Staggered", "Defeated", "Panic",
+"Permanent", "Offensive", "Defensive", "Block", "Evade" or "None".
+Selects which type of AutoEffects to collect and append to an AutoScript.
+Block and Evade also include Defensive */
+/* callback: Function to be run on returnValues. Defaults to an empty function */
+/* collect: If the function should collect augment/outfit/etc. AutoEffects or not*/
+function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, collect="true") {
+	
+	/* Adds the input AutoScript */
+	let AutoScript = "";
+	if (inputAutoScript != "") {
+		AutoScript = inputAutoScript;
+	}
+	
+	/* Appends one or more AutoScripts based on the trigger type */
+	let autoScriptTypes = [];
+	if (collect == "true") {
+		autoScriptTypes.push(triggerType)
+		if (triggerType != "None") {
+			if (autoScriptTypes.includes("Block") || autoScriptTypes.includes("Evade")) {
+				autoScriptTypes.push("Defensive");
+			}
+		}
+		if (!autoScriptTypes.includes("Permanent")) {
+			autoScriptTypes.push("Permanent")
+		}
+	}
+	
+	getAttrs(["augmentAutoScript", "outfitAutoScript", "egoAutoScript", "distortState", "egoActiveState"], function(values) {
+		
+		let augmentAutoScript = "";
+		let outfitAutoScript = "";
+		let egoAutoScript = "";
+		let collectedAutoScript = [];
+		
+		/* Finds all substrings that begin with "[#" and end with "#]" */
+		augmentAutoScript = values.augmentAutoScript.match(/\[([#][^]+[#])\]/g);
+		if (augmentAutoScript == null) { augmentAutoScript = ""; }
+		outfitAutoScript = values.outfitAutoScript.match(/\[([#][^]+[#])\]/g);
+		if (outfitAutoScript == null) { outfitAutoScript = ""; }
+		if (values.distortState == "true" || values.egoActiveState == "true") {
+			egoAutoScript = values.egoAutoScript.match(/\[([#][^]+[#])\]/g);
+			if (egoAutoScript == null) { egoAutoScript = ""; }
+		}
+		
+		let TypedAutoScript = AutoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
+
+		TypedAutoScript.forEach((autoScriptType) => {
+			if (autoScriptTypes.includes(autoScriptType[0])) {
+				AutoScript += autoScriptType[1];
+			}
+		});
+
+	/* Convert AutoScript to an array */
+	AutoScript = AutoScriptToArray(AutoScript);
+
+	/* Get relevant attributes */
+	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
+	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max",
+	"StaggerState", "distortState", "egoActiveState", "egoType"], function(values) {
+		
+		let settingMuteMessage = values.settingMuteMessage;
+		let settingWhisperRolls = values.settingWhisperRolls;
+		let settingWhisperTarget = values.settingWhisperTarget;
+		let settingLimbusStyle = values.settingLimbusStyle;
+		let settingHideNextTurn = values.settingHideNextTurn;
+		
+		let HP = values.HP;
+		let ST = values.StagRes;
+		let SP = values.SP;
+		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP) };
+		
+		let HPdamage = values.HP_max - HP;
+		let STdamage = values.StagRes_max - ST;
+		let SPdamage = values.SP_max - SP;
+		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage }
+		
+		let StaggerState = values.StaggerState;
+		let distortState = values.distortState;
+		let egoActiveState = values.egoActiveState;
+		let egoType = values.egoType;
+		
+		let scaling = 1;
+		let checkResult = "success";
+		
+		let output = {};
+		let tempOutput = {};
+		let returnValues = { checkResult:"success", error:false, };
+		let conditionalList = {}
+		
+		let ailmentList = {};
+		
+		
+	/* Get all ailments */
+	getAttrs(["burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
+	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
+	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
+		
+		const HasNextTurn = settingHideNextTurn == true ? 'false' : 'true';
+
+		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"]
+		ailmentNames.forEach(ailment => {
+			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
+				ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`]];
+			} else {
+				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`]];
+			}
+		});
+	
+		/* Get all custom ailments */
+	getSectionIDs(`repeating_ailments`, idarray => {
+	const fieldnames = idarray.reduce((rows,id) =>
+	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,
+	`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`, ], '');
+	
+		let ailName = "";
+		let ailHasNextTurn = "";
+		let ailNum = 0;
+		let ailNumNextTurn = 0;
+		
+		getAttrs([...fieldnames], v => {
+		idarray.forEach(id => {
+			ailName = v[`repeating_ailments_${id}_ailName`].replace(" ","_");
+			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
+			ailNum = v[`repeating_ailments_${id}_ailNum`];
+			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`]
+			
+			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id];
+		});
+	
+
+		/* Execute each AutoEffect in the AutoScript */
+		AutoScript.forEach(AutoEffect => {
+			if (AutoEffect == undefined) {
+			return;
+		}
+		/* If conditional, add AutoEffect to either a new conditional button or a existing one */
+		if (AutoEffect.length > 1) {
+			AutoEffect.slice(1).forEach(conditional => {
+				if (conditionalList.hasOwnProperty(conditional)) {
+					conditionalList[conditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+				} else {
+					conditionalList[conditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+				}
+			});
+		}
+		/* If not conditional, process AutoEffect as normal */
+		else {
+			/* Checks are always processed. Other AutoEffects are not processed if the last check failed */
+			switch (AutoEffect[0][0]) {
+				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+				default: tempOutput = {}; break;
+			}
+			if (checkResult != "failure") {
+				switch (AutoEffect[0][0]) {
+					case "Require": break; /* Already executed above */
+					case "Consume": break; 
+					case "Gain": tempOutput = autoEffectGainAilment(AutoEffect[0], ailmentList, scaling); break;
+					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
+				}
+			}
+			console.log(tempOutput)
+			
+			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
+			/*  but does not apply any changes to attributes */
+			if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
+				returnValues.error == true;
+				output = {};
+				return;
+			}
+	
+			/* Handle changes to scaling */
+			if (tempOutput.hasOwnProperty("scaling")) {
+				scaling = parseInt(tempOutput.scaling);
+				delete tempOutput.scaling;
+			}
+	
+			/* Handle check results from Require and Consume */
+			/* For the returnValues, the worst result is returned */
+			if (tempOutput.checkResult != undefined) {
+				checkResult = tempOutput.checkResult;
+				if (returnValues.checkResult == "success") {
+					returnValues.checkResult = tempOutput.checkResult;
+				}
+				else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
+					returnValues.checkResult = tempOutput.checkResult;
+				}
+				delete tempOutput.checkResult;
+			}
+	
+			/* Add attribute changes from AutoEffect to output */
+			/* The first time a attribute is modified, add its count */
+			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
+			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
+			for (const property in tempOutput) {
+				if (output.hasOwnProperty(property)) {
+					output[property] += tempOutput[property];
+				} else {
+					output[property] = tempOutput[property] + tempOutput.count;
+				}
+			}
+		}
+	});
+
+	// console.log(output)
+	setAttrs(output);
+	
+	/* Create conditional buttons */
+	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalList)) {
+		createConditionalButton(buttonName, buttonAutoScript);
+	}
+	
+	
+	/* Message handling */
+	
+	/* Error handling */
+	if (returnValues.error == true) {
+		/* Run function that clears all condition buttons */
+	}
+	
+	callback(returnValues);
+	});
+	});
+	});
+	});
+	});
+}
+
 /* Removes all newline and tab characters as well as JavaScript comments from an AutoScript */
 function cleanAutoScript(AutoScript) {
 	let cleanAutoScript = AutoScript.replace(/(\r\n|\n|\r|\t)/gm, "");
@@ -14608,299 +14952,9 @@ function AutoScriptToArray(inputAutoScript, mode="normal") {
 	/* Return the converted AutoScript */
 	return AutoScriptArray;
 }
-
-/* AutoScript editor */
-on("clicked:autoScriptEdit", function(info) {	
-	let newEditorTarget = info.htmlAttributes.id;
-	getAttrs([`${newEditorTarget}`,"autoScriptEditorTarget", "autoScriptEditorInput"], function(values) {
-		let oldEditorTarget = values.autoScriptEditorTarget;
-		let newEditorInput = values[`${newEditorTarget}`];
-		let oldEditorInput = values.autoScriptEditorInput;
-		setAttrs({
-			[oldEditorTarget]: oldEditorInput,
-			autoScriptEditorInput: newEditorInput,
-			autoScriptEditorTarget: newEditorTarget,
-			autoScriptEditor_display: "true"
-		});
-	});
-});
-on("clicked:closeAutoScriptEdit", function(info) {
-	getAttrs(["autoScriptEditorTarget", "autoScriptEditorInput"], function(values) {
-		let editorTarget = values.autoScriptEditorTarget;
-		let editorInput = values.autoScriptEditorInput;
-		setAttrs({
-			[editorTarget]: editorInput,
-			autoScriptEditor_display: "0"
-		});
-	});
-});
-
-
-
-
-
-
-
-
-
-on("clicked:autoEffectTest", function() {
-	/* All buttons except conditional buttons must have resetConditionals */
-	resetConditionals();
-	AutoScriptMain(`(Gain 3 Burn) (Gain 2 Fragile Next turn, TestConditional) (Gain 4 Fragile, TestConditional)`, "Combat start")
-});
-
-
-/* Executes a conditional button. Hides the button if at least one check fails */
-/* Also hides the button if a Consume check would fail after using the button again */
-on("clicked:repeating_conditionalButtons:activate", function(info) {
-	let buttonid = info.sourceAttribute.split("_")[2];
-	let buttonAutoScript = "";
-	let returnValues = {};
-	getAttrs([`repeating_conditionalButtons_${buttonid}_buttonAutoScript`], function(values) {
-		buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`]
-		AutoScriptMain(buttonAutoScript, "None", function(returnValues) {
-			if (returnValues.checkResult != "success") {
-				setAttrs({[`repeating_conditionalButtons_${buttonid}_hideButton`]: "true"})
-			}
-		});
-	});
-});
-
-
-/* Main function for using AutoScripts. Called by actions through on click events */
-/* inputAutoScript: AutoScript provided by the action. Can be an empty string */
-/* trigger: "Combat start", "Round start", "Round end", "Damaged", "Staggered", "Defeated", "Panic",
-	"Permanent", "Offensive", "Defensive", "Block", "Evade" or "None".
-	Selects which type of AutoEffects to collect and append to an AutoScript.
-	Block and Evade also include Defensive */
-/* callback: Function to be run on returnValues. Defaults to an empty function */
-function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}) {
-	
-	/* Adds the input AutoScript */
-	let AutoScript = "";
-	if (inputAutoScript != "") {
-		AutoScript = inputAutoScript;
-	}
-	
-	/* Appends one or more AutoScripts based on the trigger type */
-	let autoScriptTypes = [triggerType];
-	if (triggerType != "None") {
-		if (autoScriptTypes.includes("Block") || autoScriptTypes.includes("Evade")) {
-			autoScriptTypes.push("Defensive");
-		}
-	}
-	if (!autoScriptTypes.includes("Permanent")) {
-		autoScriptTypes.push("Permanent")
-	}
-	console.log(autoScriptTypes)
-	
-	getAttrs(["augmentAutoScript", "outfitAutoScript", "egoAutoScript", "distortState", "egoActiveState"], function(values) {
-		
-		let augmentAutoScript = "";
-		let outfitAutoScript = "";
-		let egoAutoScript = "";
-		let collectedAutoScript = [];
-
-		/* Finds all substrings that begin with "[#" and end with "#]" */
-		augmentAutoScript = values.augmentAutoScript.match(/\[([#][^]+[#])\]/g);
-		if (augmentAutoScript == null) { augmentAutoScript = ""; }
-		outfitAutoScript = values.outfitAutoScript.match(/\[([#][^]+[#])\]/g);
-		if (outfitAutoScript == null) { outfitAutoScript = ""; }
-		if (values.distortState == "true" || values.egoActiveState == "true") {
-			egoAutoScript = values.egoAutoScript.match(/\[([#][^]+[#])\]/g);
-			if (egoAutoScript == null) { egoAutoScript = ""; }
-		}
-		
-		let TypedAutoScript = AutoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
-
-		TypedAutoScript.forEach((autoScriptType) => {
-			if (autoScriptTypes.includes(autoScriptType[0])) {
-				AutoScript += autoScriptType[1];
-			}
-		});
-
-	/* Convert AutoScript to an array */
-	AutoScript = AutoScriptToArray(AutoScript);
-
-	/* Get relevant attributes */
-	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
-	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max",
-	"StaggerState", "distortState", "egoActiveState", "egoType"], function(values) {
-		
-		let settingMuteMessage = values.settingMuteMessage;
-		let settingWhisperRolls = values.settingWhisperRolls;
-		let settingWhisperTarget = values.settingWhisperTarget;
-		let settingLimbusStyle = values.settingLimbusStyle;
-		let settingHideNextTurn = values.settingHideNextTurn;
-		
-		let HP = values.HP;
-		let ST = values.StagRes;
-		let SP = values.SP;
-		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP) };
-		
-		let HPdamage = values.HP_max - HP;
-		let STdamage = values.StagRes_max - ST;
-		let SPdamage = values.SP_max - SP;
-		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage }
-		
-		let StaggerState = values.StaggerState;
-		let distortState = values.distortState;
-		let egoActiveState = values.egoActiveState;
-		let egoType = values.egoType;
-		
-		let scaling = 1;
-		let checkResult = "success";
-		
-		let output = {};
-		let tempOutput = {};
-		let returnValues = { checkResult:"success", error:false, };
-		let conditionalList = {}
-		
-		let ailmentList = {};
-
-		
-	/* Get all ailments */
-	getAttrs(["burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
-	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
-	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
-		
-		const HasNextTurn = settingHideNextTurn == true ? 'false' : 'true';
-
-		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"]
-		ailmentNames.forEach(ailment => {
-			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
-				ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`]];
-			} else {
-				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`]];
-			}
-		});
-	
-	/* Get all custom ailments */
-	getSectionIDs(`repeating_ailments`, idarray => {
-	const fieldnames = idarray.reduce((rows,id) =>
-	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,
-	`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`, ], '');
-	
-		let ailName = "";
-		let ailHasNextTurn = "";
-		let ailNum = 0;
-		let ailNumNextTurn = 0;
-		
-		getAttrs([...fieldnames], v => {
-		idarray.forEach(id => {
-			ailName = v[`repeating_ailments_${id}_ailName`].replace(" ","_");
-			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
-			ailNum = v[`repeating_ailments_${id}_ailNum`];
-			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`]
-			
-			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id];
-		});
-	
-
-	/* Execute each AutoEffect in the AutoScript */
-	AutoScript.forEach(AutoEffect => {
-		if (AutoEffect == undefined) {
-			return;
-		}
-		/* If conditional, add AutoEffect to either a new conditional button or a existing one */
-		if (AutoEffect.length > 1) {
-			AutoEffect.slice(1).forEach(conditional => {
-				if (conditionalList.hasOwnProperty(conditional)) {
-					conditionalList[conditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + ")";
-				} else {
-					conditionalList[conditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + ")";
-				}
-			});
-		}
-		/* If not conditional, process AutoEffect as normal */
-		else {
-			/* Checks are always processed. Other AutoEffects are not processed if the last check failed */
-			switch (AutoEffect[0][0]) {
-				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
-				default: tempOutput = {}; break;
-			}
-			if (checkResult != "failure") {
-				switch (AutoEffect[0][0]) {
-					case "Require": break; /* Already executed above */
-					case "Consume": break; 
-					case "Gain": tempOutput = autoEffectGainAilment(AutoEffect[0], ailmentList, scaling); break;
-					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
-				}
-			}
-			console.log(tempOutput)
-	
-			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
-			/*  but does not apply any changes to attributes */
-			if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
-				returnValues.error == true;
-				output = {};
-				return;
-			}
-	
-			/* Handle changes to scaling */
-			if (tempOutput.hasOwnProperty("scaling")) {
-				scaling = parseInt(tempOutput.scaling);
-				delete tempOutput.scaling;
-			}
-	
-			/* Handle check results from Require and Consume */
-			/* For the returnValues, the worst result is returned */
-			if (tempOutput.checkResult != undefined) {
-				checkResult = tempOutput.checkResult;
-				if (returnValues.checkResult == "success") {
-					returnValues.checkResult = tempOutput.checkResult;
-				}
-				else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
-					returnValues.checkResult = tempOutput.checkResult;
-				}
-				delete tempOutput.checkResult;
-			}
-	
-			/* Add attribute changes from AutoEffect to output */
-			/* The first time a attribute is modified, add its count */
-			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
-			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
-			for (const property in tempOutput) {
-				if (output.hasOwnProperty(property)) {
-					output[property] += tempOutput[property];
-				} else {
-					output[property] = tempOutput[property] + tempOutput.count;
-				}
-			}
-		}
-	});
-
-	// console.log(output)
-	setAttrs(output);
-
-	/* Create conditional buttons */
-	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalList)) {
-		createConditionalButton(buttonName, buttonAutoScript);
-	}
-
-
-
-
-
-	
-	
-	/* Message handling */
-	
-	
-	/* Error handling */
-	if (returnValues.error == true) {
-		/* Run function that clears all condition buttons */
-	}
-	
-	callback(returnValues);
-	});
-	});
-	});
-	});
-	});
-}
 /*--- AutoScript functions end ---*/
+
+
 
 
 /*--- AutoEffect functions ---*/
@@ -14927,7 +14981,6 @@ function resetConditionals() {
 		}
 	});
 }
-
 
 function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Check format */
@@ -15061,6 +15114,8 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	return { [effectTarget]: parseInt(effectVal), count:parseInt(count) }
 }
 /*--- AutoEffect functions end ---*/
+
+
 
 
 /*--- Export/Import functions ---*/
