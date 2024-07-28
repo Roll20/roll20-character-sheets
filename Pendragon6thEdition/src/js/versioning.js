@@ -1,26 +1,48 @@
+const versioningAttr = "latest_versioning_upgrade";
+
 on("sheet:opened", () => {
-  getAttrs(["latest_version_upgrade"], (v) => {
-    versioning(parseFloat(v.latest_version_upgrade) || 1);
+  getAttrs([versioningAttr], (v) => {
+    versioning(parseFloat(v[versioningAttr]) || 1);
   });
 });
 
-const versioning = (version) => {
-  const updateMessage = (version) =>
+const versionTwoFour = () => {
+  getAttrs(["halfed"], (values) => {
+    if (values.halfed) {
+      setAttrs({
+        hafted: values.halfed,
+      });
+    }
+  });
+};
+
+const versioning = async (version) => {
+  const updateMessage = (v) =>
     console.log(
-      `%c Pendragon 6th Edition is updating to ${version}`,
+      `%c Pendragon 6th Edition is updating to ${v}`,
       "color: orange; font-weight:bold"
     );
 
   switch (true) {
     case version < 1:
       versioning(1);
-      console.log(updateMessage(version));
+      updateMessage(1);
+      break;
+    case version < 2.4:
+      updateMessage(2.4);
+      versionTwoFour();
+      versioning(2.4);
+      break;
+    case version < 2.41:
+      updateMessage(2.41);
+      updateBrawling();
+      versioning(2.41);
       break;
     default:
       console.log(
         `%c Pendragon 6th Edition is update to date.`,
         "color: green; font-weight:bold"
       );
-      setAttrs({ latest_versioning_upgrade: version });
+      setAttrs({ version, [`${versioningAttr}`]: version });
   }
 };
