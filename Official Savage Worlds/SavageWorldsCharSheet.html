@@ -1,6 +1,7 @@
 
 <script type="text/worker">
-  const sheetVersionPrefix = 'Official Savage Worlds v';
+  //# sourceURL=SWADE.js
+const sheetVersionPrefix = 'Official Savage Worlds v';
 const sheetVersion = '1.00.30';
 
 // Define colors for Logs
@@ -2245,6 +2246,7 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
+        debugger;
         lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
 };
@@ -2341,6 +2343,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
             return false;
         }
     });
+    
     if (!compendiumObj) { //If we didn't find an object matching the expansion pathways and the object name, just find the first item with a matching name
         compendiumObj = dataArr.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
         if (!compendiumObj) { //If there still isn't a matching compendium object, return the original PHEG
@@ -2672,14 +2675,14 @@ const determineWeaponOptions = function (
     ? (targetObj[`${section}_damageatt`] = 'na')
     : log('damageatt', 'Found...will set appropriately', r20color);
   targetObj[`${section}_weaponcarried`] = 'on';
-  if (jsonObj['dmgdietype'] === 'dmgdietype') {
+  if (jsonObj.hasOwnProperty('dmgdietype')) {
     //check if the format is correct
     typeof jsonObj['dmgdietype'] !== 'undefined' &&
     parseInt(jsonObj['dmgdietype'] || 0) > 0
-      ? (jsonObj['dmgdietype'] = 'd' + jsonObj['dmgdietype'] + '!')
+      ? (jsonObj['dmgdietype'] = `d${jsonObj['dmgdietype']}!`)
       : log(
           'dmgdietype',
-          "Either isn't defined or is formatted correctly, hopefully",
+          "Either isn't defined or is not formatted correctly, hopefully",
           r20color
         );
   }
@@ -2765,7 +2768,7 @@ const dropSpecialAbilities = function({repSectionID,repSection,targetObj}){
 };
 
 const dropWeapons = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
-  jsonObj['weaponnotes'] = jsonObj['description'];
+  jsonObj['weaponnotes'] = jsonObj['description'] ?? '';
   targetObj[`repeating_${repSection}_${repSectionID}_showweaponconfig`] = 0;
   determineWeaponOptions(
     jsonObj,
@@ -3287,6 +3290,7 @@ const compendiumBestiary = function () {
               'Write PHEG data and all remaining attributes to character sheet',
               r20color
             );
+            debugger;
             setAttrs(finalCharacterDetails);
           });
         },
