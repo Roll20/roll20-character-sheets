@@ -1,6 +1,7 @@
 
 <script type="text/worker">
-  const sheetVersionPrefix = 'Official Savage Worlds v';
+  //# sourceURL=SWADE.js
+const sheetVersionPrefix = 'Official Savage Worlds v';
 const sheetVersion = '1.00.30';
 
 // Define colors for Logs
@@ -2245,6 +2246,7 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
+        debugger;
         lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
 };
@@ -2341,6 +2343,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
             return false;
         }
     });
+    
     if (!compendiumObj) { //If we didn't find an object matching the expansion pathways and the object name, just find the first item with a matching name
         compendiumObj = dataArr.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
         if (!compendiumObj) { //If there still isn't a matching compendium object, return the original PHEG
@@ -2359,6 +2362,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
 //Reset Compendium fields to empty
 const getDropInfoCommand = (category, source) => {
   const PHEGCategoryTypes = {
+    Gear: 'gear',
     Edges: 'npc_Edge',
     Hindrances: 'npc_hindrance',
     Weapons: 'weapons', //Needs handling for PA/Vehicle/RA
@@ -2671,14 +2675,14 @@ const determineWeaponOptions = function (
     ? (targetObj[`${section}_damageatt`] = 'na')
     : log('damageatt', 'Found...will set appropriately', r20color);
   targetObj[`${section}_weaponcarried`] = 'on';
-  if (jsonObj['dmgdietype'] === 'dmgdietype') {
+  if (jsonObj.hasOwnProperty('dmgdietype')) {
     //check if the format is correct
     typeof jsonObj['dmgdietype'] !== 'undefined' &&
     parseInt(jsonObj['dmgdietype'] || 0) > 0
-      ? (jsonObj['dmgdietype'] = 'd' + jsonObj['dmgdietype'] + '!')
+      ? (jsonObj['dmgdietype'] = `d${jsonObj['dmgdietype']}!`)
       : log(
           'dmgdietype',
-          "Either isn't defined or is formatted correctly, hopefully",
+          "Either isn't defined or is not formatted correctly, hopefully",
           r20color
         );
   }
@@ -2764,7 +2768,7 @@ const dropSpecialAbilities = function({repSectionID,repSection,targetObj}){
 };
 
 const dropWeapons = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
-  jsonObj['weaponnotes'] = jsonObj['description'];
+  jsonObj['weaponnotes'] = jsonObj['description'] ?? '';
   targetObj[`repeating_${repSection}_${repSectionID}_showweaponconfig`] = 0;
   determineWeaponOptions(
     jsonObj,
@@ -2906,11 +2910,18 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       if (/^(pa|ra)/.test(repSection)) {
       }
       fields.forEach(field => {
-        jsonObj[`${field}`] !== undefined
-          ? (targetObj[
-              `repeating_${repSection}_${repSectionID}_${prefix}${field}`
-            ] = jsonObj[`${field}`])
-          : log(`${field}`, 'Not Found', r20color);
+        const ref = jsonObj.hasOwnProperty(field) ?
+          field :
+          jsonObj.hasOwnProperty(`data-cs-${field}`) ?
+            `data-cs-${field}` :
+            null;
+        if(!ref){
+          log(`${field}`, 'Not Found', r20color);
+          return;
+        }
+        targetObj[
+          `repeating_${repSection}_${repSectionID}_${prefix}${field}`
+        ] = jsonObj[ref]
       });
     } else {
       log('Non-Repeating Fields', 'Fields Found', r20color);
@@ -3279,6 +3290,7 @@ const compendiumBestiary = function () {
               'Write PHEG data and all remaining attributes to character sheet',
               r20color
             );
+            debugger;
             setAttrs(finalCharacterDetails);
           });
         },
@@ -3288,6 +3300,7 @@ const compendiumBestiary = function () {
 };
 
 const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster){
+  debugger;
   const PHEGCategoryExtraSets = {
     Edges: {
       edgeCount: obj => obj['data-Edges'].length,
@@ -3348,6 +3361,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
           dropType,
           monster
         );
+        
       });
     }
   });
@@ -17069,7 +17083,3 @@ on(
 <rolltemplate class="sheet-rolltemplate-debug">
 	{{#rollLess() distracted -1}}<span class="sheet-templateCondition" data-i18n-title="distracted">♦</span>{{/rollLess() distracted -1}}{{#rollTotal() vulnerable -2}}<span class="sheet-templateCondition" data-i18n-title="vulnerable">♠</span>{{/rollTotal() vulnerable -2}}{{#rollTotal() stunned -2}}<span class="sheet-templateCondition" data-i18n-title="stunned">♣</span>{{/rollTotal() stunned -2}}
 </rolltemplate>
-
-
-
-

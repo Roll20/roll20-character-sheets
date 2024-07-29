@@ -1,4 +1,4 @@
-# Mythic_Updated
+# 100DOS Mythic
 
 Official character sheet for the 100DOS and mythic system.
 
