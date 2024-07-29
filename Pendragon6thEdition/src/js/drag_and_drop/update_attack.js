@@ -18,18 +18,27 @@ const update_attack = (page) => {
       }
     });
   } else if (["horse"].includes(type)) {
-    getAttrs(["warhorse_damage"], ({ warhorse_damage }) => {
-      if (warhorse_damage) {
-        setAttrs({
-          [`${row}_damage`]: `${warhorse_damage}${modifier}`,
-        });
-      } else {
-        dropWarning(`Could not get values for warhorse damage`);
+    getAttrs(
+      ["warhorse_charge_damage", "warhorse_damage"],
+      ({ warhorse_charge_damage, warhorse_damage }) => {
+        if (warhorse_charge_damage || warhorse_damage) {
+          const damage = warhorse_charge_damage || warhorse_damage;
+
+          setAttrs({
+            [`${row}_damage`]: `${damage}${modifier}`,
+          });
+        } else {
+          dropWarning(`Could not get values for warhorse damage`);
+        }
       }
-    });
+    );
   } else if (damage) {
     update[`${row}_damage`] = damage;
   }
+
+  console.table({
+    type,
+  });
 
   return update;
 };
