@@ -2047,7 +2047,7 @@
 
 <div class='rmusheet compendium-drop-target creature Creature'>
     
-    <input name="attr_drop_name" type="hidden" accept="name">
+    <input name="attr_drop_name" type="hidden" accept="Name">
     <input name="attr_drop_category" type="hidden" accept="Category">
     <input name="attr_drop_data" type="hidden" accept="data">
     <input name='attr_drop_creature' type='hidden' accept='Creature'>
@@ -4971,7 +4971,7 @@ Bug reports to nashidau on Discord or the #roll20 channel on the
 
 <hr>
 
-Revision cc3f628489966030459e95315984c2dad682d062
+Revision 58e41aa1c4bd458fb8d6a614d5c0b34e2644d3d6
 
 
 <hr>
@@ -6551,7 +6551,7 @@ let  RMUSkills = {};
 
     function updateSkill(skill, catbonus, catlog) {
       const aname = skill.aname;
-      getAttrs([aname + "_ranks_misc", aname + "_pbonus", aname + "_misc"], (attrs) => {
+      getAttrs([aname + "_ranks_misc", aname + "_pbonus", aname + "_misc", aname + "_ranks"], (attrs) => {
 	let bonus = 0;
 	let log = skill.display + ":\n";
 	
@@ -6590,6 +6590,8 @@ let  RMUSkills = {};
 
 	  if (ranks != 0) {
 	    setAttrs({[aname + "_ranks"] : ranks});
+	  } else if (attrs[aname + "_ranks"] && attrs[name + "_ranks"] != "")  {
+	    setAttrs({[aname + "_ranks"] : ""});
 	  }
 	  setAttrs({[aname + "_bonus"] : bonus});
 	}
@@ -10246,17 +10248,23 @@ let RMUInventory = {}
 { // Scope the whole file: Use let/const only ;-)
 
    RMUInventory.itemDrop = function (name, datastr) {
+      console.log("Item drop in inventory");
       const data = JSON.parse(datastr);
       // Add slot:
       const rowid = generateRowID();
       const prefix = `repeating_stuff_${rowid}`;
 
-      setAttrs({
-	[`${prefix}_itemname`]: name,
+      const update = {
+ 	[`${prefix}_itemname`]: name,
 	[`${prefix}_itemweight`]: data.Weight,
 	[`${prefix}_itemcount`]: 1,
 	[`${prefix}_itemsystem`]: datastr,
-	[`${prefix}_itemnotes`]: data.Notes})
+      }
+      if (data.Notes) {
+	update[`${prefix}_itemnotes`] = data.Notes;
+      }
+
+      VrmuSetAttrs(update);
    }
 
 
@@ -10612,20 +10620,17 @@ let RMUInventory = {}
 
 let drop = {};
 
-/* this does nothing */
-
 onCheck("change:drop_data", event => drop.handleDrop());
-
 
 drop.handleDrop = function() {
   console.log("Handle drop");
 
-  getAttrs(['drop_name', 'drop_data', 'drop_category'], (drop) => {
-      console.log(drop);
+  getAttrs(['drop_name', 'drop_data', 'drop_category', 'drop_creature'], (drop) => {
+      console.log("Drop data", drop);
       if (drop.drop_category === 'Item') {
 	RMUInventory.itemDrop(drop.drop_name, drop.drop_data);
       } else if (drop.drop_category == 'Creature') {
-	creature.newCreature(drop.drop_data);
+	creature.newCreature(drop.drop_name, drop.drop_data);
       } else {
 	console.log("Don't know how to handle a ", drop.drop_category);
       }
@@ -10633,7 +10638,6 @@ drop.handleDrop = function() {
 }
 
 
-/**/
 
 
 
@@ -11692,9 +11696,9 @@ J E + C + B
 		updates[`${prefix}_attackskill`] = items.attackaddskill;
 		updates[`${prefix}_attackri`] = items.attackaddri;
 
-		updates[`${prefix}_attackmin`] = cdata.data.min.match(/\d+/)[0] || 0;
-		updates[`${prefix}_attackmax`] = cdata.data.max.match(/\d+/)[0] || 0;
-		updates[`${prefix}_attackdata`] = cdata.data['data-attack'] || "";
+		updates[`${prefix}_attackmin`] = cdata?.data?.min?.match(/\d+/)[0] || 0;
+		updates[`${prefix}_attackmax`] = cdata?.data?.max?.match(/\d+/)[0] || 0;
+		updates[`${prefix}_attackdata`] = cdata?.data['data-attack'] || "";
 		// Once we have set it, update them all
 		setAttrs(updates, updateAttackBonuses);
 	    });
@@ -12086,7 +12090,7 @@ weaponcodes = {
 
 
 
-creature.newCreature = function(jdata) {
+creature.newCreature = function(name, jdata) {
   let cdata = JSON.parse(jdata);
   console.log(cdata);
   let updates = {}
