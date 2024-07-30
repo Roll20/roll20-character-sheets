@@ -1544,10 +1544,7 @@
 
 
 	<!-- Roll helper palette -->
-	<div class="rowContainer titleHeader"><button type="action" class="qolButton" name="act_resetHelpers" data-i18n-title="reset-button" title="Reset"> ! </button> <h4 data-i18n="heading-rollhelper">Roll helpers</h4> 
-
-	<button type="action" name="act_autoEffectTest">AutoEffectTest</button>
-	</div>
+	<div class="rowContainer titleHeader"><button type="action" class="qolButton" name="act_resetHelpers" data-i18n-title="reset-button" title="Reset"> ! </button> <h4 data-i18n="heading-rollhelper">Roll helpers</h4></div>
 
 	<input type="checkbox" class="helperText" name="attr_settingHelperText" value="true" hidden="true">
 	<div class="contentContainer darkBG helperTextContainer">
@@ -12213,11 +12210,16 @@ on('clicked:rollCombat', (info) => {
 getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
-        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "skillSelect", "baseActNum", "Light",
+		/* Get skillSelect first as it's used to gather further values */
+		getAttrs(["skillSelect"], function(values) {
+			let skillselect = values.skillSelect;
+
+        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "baseActNum", "Light",
 		"difficulty", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
 		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
-		`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,], function(values) {
+		`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,
+		`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript", `${skillselect}AutoScript`], function(values) {
 
 	let currentlight = parseInt(values.Light);
 	let newlight = parseInt(values.Light);
@@ -12242,7 +12244,6 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	let distortstate = values.distortState;
 
-	let skillselect = values.skillSelect;
 	let advstate = values.advState;
 	let difficulty = parseInt(values.difficulty);
 	let lightmessage = "";
@@ -12372,18 +12373,14 @@ getSectionIDs(`repeating_global`, idarray => {
 			}
 		}
 
-	getAttrs([`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript", `${skillselect}AutoScript`], function(values) {
-
 	/* AutoScripts */
 	let AutoScript = "";
 	let triggerType = "None";
 
 	/* Get AutoScript from taken action */
 	switch (buttonid) {
-		case "def": AutoScript = values.outfitAutoScript; break;
-		case "evd": AutoScript = values.outfitAutoScript; break;
-		case "egoDef": AutoScript = values.egoAutoScript; break;
-		case "egoEvd": AutoScript = values.egoAutoScript; break;
+		case "def": case "evd": AutoScript = values.outfitAutoScript; break;
+		case "egoWeapon": case "egoDef": case "egoEvd": AutoScript = values.egoAutoScript; break;
 		default: AutoScript = values[`${buttonid}AutoScript`]; break;
 	}
 
@@ -13379,8 +13376,12 @@ on('clicked:declareAction', (info) => {
 	headercolor = "#8e7cc3";
 	newicon = "/";
 
+	/* Get toolSelect first as it's used to gather further values */
+	getAttrs(["toolSelect"], function(values) {
+		let toolselect = values.toolSelect;
+
 	/* Get attributes */
-        getAttrs(["actionType", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "toolSelect", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses"], function(values) {
+        getAttrs(["actionType", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`], function(values) {
 
 	let charname = values.character_name;
 	let simpledisplay = values.settingSimpleDisplay;
@@ -13394,8 +13395,6 @@ on('clicked:declareAction', (info) => {
 	let currentlight = values.Light;
 	let newlight = values.Light;
 	let actcounter = parseInt(values.baseActNum) + 1;
-
-	let toolselect = values.toolSelect;
 
 	let output = {};
 
@@ -13537,6 +13536,16 @@ on('clicked:declareAction', (info) => {
 
 	let lightmessage = "";
 
+	/* AutoScripts */
+	let AutoScript = values[`${toolselect}AutoScript`];
+
+	/* Clean AutoScript. Remove nested and undefined */
+	AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
+	AutoScript = AutoScript.replace("undefined", "");
+	
+	resetConditionals();
+	AutoScriptMain(AutoScript, "None");
+
 	/* Translation prep */
 	let langFrom = "From";
 	let langUse = "Use Tool";
@@ -13648,7 +13657,7 @@ on('clicked:declareAction', (info) => {
 	setAttrs(output);
 
 
-
+	});
 	});
 
 });
@@ -14639,13 +14648,6 @@ on("clicked:closeAutoScriptEdit", function(info) {
 	});
 });
 
-/* Temp testing button */
-on("clicked:autoEffectTest", function() {
-	/* All buttons except conditional buttons must have resetConditionals */
-	resetConditionals();
-	AutoScriptMain(`(Gain 3 Burn) (Gain 2 Fragile Next turn, TestConditional) (Gain 4 Fragile, TestConditional)`, "Combat start")
-});
-
 /* Executes a conditional button. Hides the button if at least one check fails */
 /* Also hides the button if a Consume check would fail after using the button again */
 on("clicked:repeating_conditionalButtons:activate", function(info) {
@@ -14685,6 +14687,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		if (triggerType != "None") {
 			if (autoScriptTypes.includes("Block") || autoScriptTypes.includes("Evade")) {
 				autoScriptTypes.push("Defensive");
+			}
+			else if (autoScriptTypes.includes("Combat start")) {
+				autoScriptTypes.push("Round start");
 			}
 		}
 		if (!autoScriptTypes.includes("Permanent")) {
@@ -14808,6 +14813,18 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 				} else {
 					conditionalList[conditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + ")";
 				}
+
+				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
+				if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
+					switch (AutoEffect[0][0]) {
+						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+						default: tempOutput = {}; break;
+					}
+					if (tempOutput.checkResult == "failure") {
+						conditionalList[conditional] = "#Do not display#";
+					}
+				}
 			});
 		}
 		/* If not conditional, process AutoEffect as normal */
@@ -14874,6 +14891,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 	
 	/* Create conditional buttons */
 	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalList)) {
+		/* Checks if any checks failed and the button should not be displayed */
+		if (buttonAutoScript.indexOf("#Do not display#") != -1) { continue; }
 		createConditionalButton(buttonName, buttonAutoScript);
 	}
 	
