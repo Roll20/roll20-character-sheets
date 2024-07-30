@@ -13145,8 +13145,8 @@ on('clicked:applyDamage', (info) => {
 		langBaseDamage = getTranslationByKey("helper-text-basedamage");
 		langFlatDamageHP= getTranslationByKey("helper-text-flatdamagehp");
 		langFlatDamageST = getTranslationByKey("helper-text-flatdamagest");
-		langDamage = getTranslationByKey("message-damage-calculation");
-		langDealt = getTranslationByKey("message dealt");
+		langDamage = getTranslationByKey("message-damage");
+		langDealt = getTranslationByKey("message-dealt");
 		langIncreasedHPDamageBy = getTranslationByKey("message-increased-HP-damage-by");
 		langSmoke = getTranslationByKey("ailments-smoke");
 		langFragile = getTranslationByKey("ailments-fragile");
@@ -15773,7 +15773,7 @@ getSectionIDs(`repeating_global`, idarray => {
 /* Function: Update custom ailment */
 function updateCustomAilment(rowid) {
 
-        getAttrs(["distortState", "egoActiveState", "egoType", `repeating_ailments_${rowid}_ailNum`, `repeating_ailments_${rowid}_ailNumNextTurn`, `repeating_ailments_${rowid}_ailName`, `repeating_ailments_${rowid}_ailIcon`, `repeating_ailments_${rowid}_ailTrigger`, `repeating_ailments_${rowid}_ailEffect`, `repeating_ailments_${rowid}_ailEffectMode`, `repeating_ailments_${rowid}_ailEffectVal`, `repeating_ailments_${rowid}_ailCustomResistanceNum`, `repeating_ailments_${rowid}_ailCustomResistanceNumEgo`, `repeating_ailments_${rowid}_ailDecayMode`, `repeating_ailments_${rowid}_ailDecayVal`, `repeating_ailments_${rowid}_ailDecayMin`, `repeating_ailments_${rowid}_ailMax`, `repeating_ailments_${rowid}_ailMaxBehavior`, `repeating_ailments_${rowid}_ailMessageCheck`, `repeating_ailments_${rowid}_ailMessage`, "HP", "StagRes", "SP", "Light", "distortCounter", "difficulty", "baseSpeed", "baseLuckNum", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "character_name"], function(values) {
+        getAttrs(["distortState", "egoActiveState", "egoType", `repeating_ailments_${rowid}_ailNum`, `repeating_ailments_${rowid}_ailNumNextTurn`, `repeating_ailments_${rowid}_ailName`, `repeating_ailments_${rowid}_ailIcon`, `repeating_ailments_${rowid}_ailTrigger`, `repeating_ailments_${rowid}_ailEffect`, `repeating_ailments_${rowid}_ailEffectMode`, `repeating_ailments_${rowid}_ailEffectVal`, `repeating_ailments_${rowid}_ailDecayWhenHit`, `repeating_ailments_${rowid}_ailCustomResistanceNum`, `repeating_ailments_${rowid}_ailCustomResistanceNumEgo`, `repeating_ailments_${rowid}_ailDecayMode`, `repeating_ailments_${rowid}_ailDecayVal`, `repeating_ailments_${rowid}_ailDecayMin`, `repeating_ailments_${rowid}_ailMax`, `repeating_ailments_${rowid}_ailMaxBehavior`, `repeating_ailments_${rowid}_ailMessageCheck`, `repeating_ailments_${rowid}_ailMessage`, "HP", "StagRes", "SP", "Light", "distortCounter", "difficulty", "baseSpeed", "baseLuckNum", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "character_name"], function(values) {
 
 	let charname = values.character_name;
 	let nomessage = values.settingMuteMessage;
@@ -15783,6 +15783,7 @@ function updateCustomAilment(rowid) {
 	let icon = values[`repeating_ailments_${rowid}_ailIcon`];
 	let count = values[`repeating_ailments_${rowid}_ailNum`];
 	let countnextturn = values[`repeating_ailments_${rowid}_ailNumNextTurn`];
+	let decayWhenhit = values[`repeating_ailments_${rowid}_ailDecayWhenHit`];
 
 	let trigger = values[`repeating_ailments_${rowid}_ailTrigger`];
 
@@ -15925,9 +15926,12 @@ function updateCustomAilment(rowid) {
 		newcount = 0;
 		}
 		
-		output[`repeating_ailments_${rowid}_ailNum`] = parseInt(newcount) + parseInt(countnextturn);
+		output[`repeating_ailments_${rowid}_ailNum`] = parseInt(newcount);
+		if (decayWhenhit != "true") {
+			output[`repeating_ailments_${rowid}_ailNum`] += parseInt(countnextturn);
 		}
-	else if (countnextturn > 0) {
+	}
+	else if (countnextturn > 0 && trigger != "WhenHit") {
 		output[`repeating_ailments_${rowid}_ailNum`] = countnextturn;
 	}
 
