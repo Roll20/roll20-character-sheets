@@ -107,6 +107,7 @@
 <!-- AutoScript edit popup -->
 <input type="checkbox" id="autoScriptEditorToggle" name="attr_autoScriptEditor_display" value="true" hidden="true">
 <div class="contentContainer darkBG autoscriptEditorContainer">
+	<button type="action" class="darkInput saveAutoScriptButton" name="act_saveAutoScriptEdit" data-i18n-title="autoscript-save-changes" title="Save AutoScript changes">Save</button>
 	<button type="action" class="darkInput closeAutoScriptButton" name="act_closeAutoScriptEdit" data-i18n-title="autoscript-close-editor" title="Close AutoScript Editor"></button>
 	<label for="autoScriptInput" style="margin-left: 5px;" data-i18n="autoscript-editor">AutoScript Editor</label>
 	<input type="text" class="autoScriptEditorTarget darkBG" name="attr_autoScriptEditorTarget" readonly>
@@ -12662,6 +12663,10 @@ on('clicked:rollChallenge', (info) => {
 
 	let rollformat = "2d6" + "+" + parseInt(stat) + "+(" + parseInt(difficulty) + ")";
 
+	/* AutoScripts */
+	resetConditionals();
+	AutoScriptMain("", "Challenge");
+
 	/* Type Formatting */
 	if(buttonid == "instinct"){
 	newicon = "https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/stats/Instinct.png";
@@ -13110,10 +13115,9 @@ on('clicked:applyDamage', (info) => {
 	setAttrs(output);
 
 	/* AutoScripts */
-	if (newHP < oldHP || newST < oldST) {
-		resetConditionals();
-		AutoScriptMain("", "Damaged");
-	}
+	if (newHP < oldHP) { resetConditionals(); AutoScriptMain("", "DamagedHP"); }
+	if (newST < oldST) { resetConditionals(); AutoScriptMain("", "DamagedST"); }
+	if (newSP < oldSP) { resetConditionals(); AutoScriptMain("", "DamagedSP"); }
 	
 	/* console.log("HP base: " + sumBothBefore + ". HP after resistance: " + Math.ceil(Math.min((hpResistance * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)))
 	console.log("ST base: " + sumBothBefore + ". ST after resistance: " + Math.ceil(Math.min((stResistance * (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)))
@@ -14636,16 +14640,23 @@ on("clicked:autoScriptEdit", function(info) {
 		});
 	});
 });
-/* AutoScript editor close button */
-on("clicked:closeAutoScriptEdit", function(info) {
+/* AutoScript editor save button */
+function saveAutoScriptEditor() {
 	getAttrs(["autoScriptEditorTarget", "autoScriptEditorInput"], function(values) {
 		let editorTarget = values.autoScriptEditorTarget;
 		let editorInput = values.autoScriptEditorInput;
 		setAttrs({
-			[editorTarget]: editorInput,
-			autoScriptEditor_display: "0"
+			[editorTarget]: editorInput
 		});
 	});
+}
+on("clicked:saveAutoScriptEdit", function(info) {
+	saveAutoScriptEditor();
+});
+/* AutoScript editor close button */
+on("clicked:closeAutoScriptEdit", function(info) {
+	saveAutoScriptEditor();
+	setAttrs({autoScriptEditor_display: "0"});
 });
 
 /* Executes a conditional button. Hides the button if at least one check fails */
@@ -14666,8 +14677,8 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 
 /* Main function for using AutoScripts. Called by actions through on click events */
 /* inputAutoScript: AutoScript provided by the action. Can be an empty string */
-/* trigger: "Combat start", "Round start", "Damaged", "Staggered", "Defeated", "Panic",
-"Permanent", "Offensive", "Defensive", "Block", "Evade" or "None".
+/* trigger: "Combat start", "Round start", "Permanent", "Damaged", "DamagedHP", "DamagedST", "DamagedSP",
+"Staggered", "Defeated", "Panic", "Challenge", "Offensive", "Defensive", "Block", "Evade" or "None".
 Selects which type of AutoEffects to collect and append to an AutoScript.
 Block and Evade also include Defensive */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
@@ -14690,6 +14701,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 			}
 			else if (autoScriptTypes.includes("Combat start")) {
 				autoScriptTypes.push("Round start");
+			}
+			else if (autoScriptTypes.some(item => ["DamagedHP", "DamagedST", "DamagedSP"].includes(item))) {
+				autoScriptTypes.push("Damaged");
 			}
 		}
 		if (!autoScriptTypes.includes("Permanent")) {
@@ -14718,7 +14732,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 
 		TypedAutoScript.forEach((autoScriptType) => {
 			if (autoScriptTypes.includes(autoScriptType[0])) {
-				AutoScript += autoScriptType[1];
+				AutoScript += "(Reset)" + autoScriptType[1];
 			}
 		});
 
@@ -14778,7 +14792,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 			}
 		});
 	
-		/* Get all custom ailments */
+	/* Get all custom ailments */
 	getSectionIDs(`repeating_ailments`, idarray => {
 	const fieldnames = idarray.reduce((rows,id) =>
 	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,
@@ -14829,16 +14843,16 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		}
 		/* If not conditional, process AutoEffect as normal */
 		else {
-			/* Checks are always processed. Other AutoEffects are not processed if the last check failed */
+			/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
 			switch (AutoEffect[0][0]) {
 				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
 				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+				case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
 				default: tempOutput = {}; break;
 			}
 			if (checkResult != "failure") {
 				switch (AutoEffect[0][0]) {
-					case "Require": break; /* Already executed above */
-					case "Consume": break; 
+					case "Require": case "Consume": case "Reset": break; /* Already executed above */
 					case "Gain": tempOutput = autoEffectGainAilment(AutoEffect[0], ailmentList, scaling); break;
 					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
 				}
@@ -15912,7 +15926,7 @@ function updateCustomAilment(rowid) {
 		}
 		
 		output[`repeating_ailments_${rowid}_ailNum`] = parseInt(newcount) + parseInt(countnextturn);
-	}
+		}
 	else if (countnextturn > 0) {
 		output[`repeating_ailments_${rowid}_ailNum`] = countnextturn;
 	}
