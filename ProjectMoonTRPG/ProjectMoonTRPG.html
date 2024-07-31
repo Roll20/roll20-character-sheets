@@ -1561,7 +1561,8 @@
 
 	<input type="text" name="attr_baseSpeed" value="0" hidden="true">
 	<input type="text" name="attr_prevSpeed" value="0" hidden="true">
-	<input type="text" name="attr_dynamicSpeed" value="0" hidden="true">
+	<input type="text" name="attr_thisRoundSpeed" value="0" hidden="true">
+	<input type="text" name="attr_nextRoundSpeed" value="0" hidden="true">
 	<div style="overflow: hidden; position: relative;"><div class="blocker"></div><input type="text" class="speedbox whiteInput" name="attr_calcSpeed" value="0" data-i18n-title="helper-current-speed" title="Current Speed"></div>
 
 </div>
@@ -11240,23 +11241,22 @@ getSectionIDs(`repeating_global`, idarray => {
 });
 
 /* Auto: Update calculated speed | Update Evd power (Haste/Bind) */
-on("change:Haste change:Bind change:dynamicSpeed change:baseSpeed", function() {
-
+on("change:Haste change:Bind change:thisRoundSpeed change:baseSpeed", function() {
 getSectionIDs(`repeating_global`, idarray => {
-        let id = `repeating_global_${idarray[0]}`;
+    let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["settingTurnUpdate", "baseSpeed", "prevSpeed", "Haste", "Bind", "character_name", "settingEvdInfluence", `${id}_evdAilment`, "evdPositive", "evdNegative"], function(values) {
+	getAttrs(["settingTurnUpdate", "baseSpeed", "prevSpeed", "thisRoundSpeed", "Haste", "Bind", "character_name", "settingEvdInfluence", `${id}_evdAilment`, "evdPositive", "evdNegative"], function(values) {
 	let turnupdate = values.settingTurnUpdate;
 	let evdinfluence = values[`${id}_evdAilment`];
 
 	let basespeed = parseInt(values.baseSpeed);
 	let prevspeed = parseInt(values.prevSpeed);
-	let dynamicspeed = parseInt(values.dynamicSpeed);
+	let thisRoundSpeed = parseInt(values.thisRoundSpeed);
 
 	let hastenum = parseInt(values.Haste);
 	let bindnum = parseInt(values.Bind);
 	let name = values.character_name;
-	let newspeed = basespeed + hastenum - bindnum;
+	let newspeed = basespeed + hastenum - bindnum + thisRoundSpeed;
 	let command = "[[" + newspeed + "&{tracker} ]]";
 	let message = "Speed update: ";
 	
@@ -11277,7 +11277,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	}	
 
 
-		});
+	});
 	});
 });
 
@@ -11702,7 +11702,7 @@ on('clicked:updateAilments', function() {
 getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingBurnImmune",
+	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingBurnImmune", "nextRoundSpeed",
 		"StaggerState", "SealState", "ImmobileState", "Burn", "burnResist", "burnResist_ego", "distortState", "egoActiveState", "egoType", "Smoke", "Charge", "HP", "StagRes_max", "settingLimbusStyle",
 		`${id}_staggerRecoverPercent`, `${id}_staggerRecoverBase`, `${id}_burnDecayMode`, `${id}_burnDecayVal`, `${id}_smokeDecayMode`, `${id}_smokeDecayVal`, `${id}_chargeDecayMode`, `${id}_chargeDecayVal`,
 		"Bleed", "BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
@@ -11749,6 +11749,8 @@ getSectionIDs(`repeating_global`, idarray => {
 	style = style + "limbus/";
 	}
 
+	let nextRoundSpeed = parseInt(values.nextRoundSpeed);
+
 	let burnresist = values.burnResist;
 	let distortstate = values.distortState;
 	let egostate = values.egoActiveState;
@@ -11768,6 +11770,10 @@ getSectionIDs(`repeating_global`, idarray => {
 	if(whisperrolls == "true"){
 	whisper = "/w " + whispertarget;
 	}
+
+	/* AutoScripts */
+	resetConditionals();
+	AutoScriptMain("", "Round start");
 
 	/* Burn processing */
 	if (parseInt(values.Burn) > 0){
@@ -11900,10 +11906,9 @@ getSectionIDs(`repeating_global`, idarray => {
 
 
 	setAttrs({  
-    	"Bleed":bleednew, "BleedNextTurn":"0", "Burn": burnnew, "BurnNextTurn":"0", "Paralysis": paralysisnew, "ParalysisNextTurn":"0", "Protection": protectionnew, "ProtectionNextTurn":"0", "StaggerProtection": staggerprotectionnew, "StaggerProtectionNextTurn":"0", "Fragile": fragilenew, "FragileNextTurn":"0", "Strength": strengthnew, "StrengthNextTurn":"0", "Feeble": feeblenew, "FeebleNextTurn":"0", "Endurance": endurancenew, "EnduranceNextTurn":"0", "Disarm": disarmnew, "DisarmNextTurn":"0", "Haste": hastenew, "HasteNextTurn":"0", "Bind": bindnew, "BindNextTurn":"0", "Smoke": smokenew, "SmokeNextTurn":"0", "Charge":chargenew, "ChargeNextTurn":"0", "Fortune":fortunenew, "FortuneNextTurn":"0", "baseActNum":"0"});
+    	"thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "Bleed":bleednew, "BleedNextTurn":"0", "Burn": burnnew, "BurnNextTurn":"0", "Paralysis": paralysisnew, "ParalysisNextTurn":"0", "Protection": protectionnew, "ProtectionNextTurn":"0", "StaggerProtection": staggerprotectionnew, "StaggerProtectionNextTurn":"0", "Fragile": fragilenew, "FragileNextTurn":"0", "Strength": strengthnew, "StrengthNextTurn":"0", "Feeble": feeblenew, "FeebleNextTurn":"0", "Endurance": endurancenew, "EnduranceNextTurn":"0", "Disarm": disarmnew, "DisarmNextTurn":"0", "Haste": hastenew, "HasteNextTurn":"0", "Bind": bindnew, "BindNextTurn":"0", "Smoke": smokenew, "SmokeNextTurn":"0", "Charge":chargenew, "ChargeNextTurn":"0", "Fortune":fortunenew, "FortuneNextTurn":"0", "baseActNum":"0"});
 
 	});
-
 
 	/* Custom Ailments */
         getSectionIDs(`repeating_ailments`, idarray => {
@@ -11935,14 +11940,9 @@ getSectionIDs(`repeating_global`, idarray => {
 
 		setAttrs(output);
 
-            });
-        });
     });
-
-	/* AutoScripts */
-	resetConditionals();
-	AutoScriptMain("", "Round start");
-
+    });
+    });
 });
 
 function updateAdvantages(changeval){
@@ -12402,7 +12402,14 @@ getSectionIDs(`repeating_global`, idarray => {
 	AutoScript = AutoScript.replace("undefined", "");
 	
 	resetConditionals();
-	AutoScriptMain(AutoScript, triggerType);
+	AutoScriptMain(AutoScript, triggerType, function(returnValues) {
+
+	let autoeffectdice1 = 0;
+	let autoeffectdice2 = 0;
+	let autoeffectdice3 = 0;
+	if (returnValues.diceCount != undefined) { autoeffectdice1 = returnValues.diceCount}
+	if (returnValues.dicePower != undefined) { autoeffectdice2 = returnValues.dicePower}
+	if (returnValues.diceMax != undefined) { autoeffectdice3 = returnValues.diceMax}
 	
 	/* Power */
 	let activepower = "0";
@@ -12445,9 +12452,9 @@ getSectionIDs(`repeating_global`, idarray => {
 	}
 
 	/* Dice formatting */
-	combinedice1 = parseInt(basedice1) + parseInt(distortdice1) + parseInt(skilldice1);
-	combinedice2 = parseInt(basedice2) + parseInt(distortdice2) + parseInt(skilldice2);
-	combinedice3 = parseInt(basedice3) + parseInt(distortdice3) + parseInt(skilldice3) + parseInt(activepower);
+	combinedice1 = Math.max(parseInt(basedice1) + parseInt(distortdice1) + parseInt(skilldice1) + parseInt(autoeffectdice1), 0);
+	combinedice2 = Math.max(parseInt(basedice2) + parseInt(distortdice2) + parseInt(skilldice2) + parseInt(autoeffectdice2), 0);
+	combinedice3 = parseInt(basedice3) + parseInt(distortdice3) + parseInt(skilldice3) + parseInt(activepower) + parseInt(autoeffectdice3);
 
 	if(values.settingMultihitUses == "true" && limitbehavior != "Limitless" && limitbehavior != null){
 		if(combinedice1 > currentuses){
@@ -12624,6 +12631,7 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	setAttrs({"dummy":" ", "skillSelect":"0", [`${uses}`]:newuses});
 
+	});
     });
 	});
   });
@@ -12631,10 +12639,13 @@ getSectionIDs(`repeating_global`, idarray => {
 
 /* Action: Challenge Roll */
 on('clicked:rollChallenge', (info) => {
-	/* Preparing values */
 	/* Get IDs/names */
-        let buttonid = info.htmlAttributes.id.split('_')[1];
-
+	let buttonid = info.htmlAttributes.id.split('_')[1];
+	rollChallenge(buttonid);
+});
+function rollChallenge(buttonid, rollDifficulty=0) {
+	
+	/* Preparing values */
 	let headercolor = "#888";
 	let newicon = "/";
 	let headertext = "#fff";
@@ -12656,16 +12667,24 @@ on('clicked:rollChallenge', (info) => {
 	let whispertarget = values.settingWhisperTarget;
 	let tracker = "";
 
-	let difficulty = values.difficulty;
+	let difficulty = parseInt(values.difficulty) + parseInt(rollDifficulty);
 	let spdjustice = values.justice;
 	let newicon = "/";
 	let lucknum = "0";
 
-	let rollformat = "2d6" + "+" + parseInt(stat) + "+(" + parseInt(difficulty) + ")";
-
 	/* AutoScripts */
 	resetConditionals();
-	AutoScriptMain("", "Challenge");
+	AutoScriptMain("", ["Challenge", "Combat start"], function(returnValues) {
+
+	let autoEffectDiceCount = 0;
+	let autoEffectDiceMax = 0;
+	let autoEffectSpeedCombat = 0;
+	if (returnValues.dicePower != undefined) { stat = returnValues.dicePower }
+	if (returnValues.diceCount != undefined) { autoEffectDiceCount = returnValues.diceCount }
+	if (returnValues.diceMax != undefined) { autoEffectDiceMax = returnValues.diceMax }
+	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = returnValues.speedCombat }
+
+	let rollformat = Math.max(autoEffectDiceCount + 2, 0) + "d" + Math.max(autoEffectDiceMax + 6, 0) + "+" + parseInt(stat) + "+(" + parseInt(difficulty) + ")";
 
 	/* Type Formatting */
 	if(buttonid == "instinct"){
@@ -12705,7 +12724,7 @@ on('clicked:rollChallenge', (info) => {
 	statn = "Speed";
 	headercolor = "#cf8c44";
 	tracker = "&{tracker}"
-	rollformat = "1d6+" + parseInt(spdjustice) + "+(" + parseInt(difficulty) + ")";
+	rollformat = "1d6+" + (parseInt(spdjustice) + parseInt(autoEffectSpeedCombat)) + "+(" + parseInt(difficulty) + ")";
 	challenge = " ";
 
 	}
@@ -12780,10 +12799,6 @@ on('clicked:rollChallenge', (info) => {
 	}
 	else if(statn == "Speed"){
 	setAttrs({"baseSpeed": total });
-
-	/* AutoScripts */
-	resetConditionals();
-	AutoScriptMain("", "Combat start");
 	}
 
             finishRoll(
@@ -12802,8 +12817,8 @@ on('clicked:rollChallenge', (info) => {
 
 
 	});
-
-});
+	});
+}
 
 
 /* Action: Damage helper apply damage */
@@ -14694,7 +14709,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 	/* Appends one or more AutoScripts based on the trigger type */
 	let autoScriptTypes = [];
 	if (collect == "true") {
-		autoScriptTypes.push(triggerType)
+		if (typeof triggerType == "string") { autoScriptTypes.push(triggerType) }
+		else {autoScriptTypes.push(...triggerType) }
 		if (triggerType != "None") {
 			if (autoScriptTypes.includes("Block") || autoScriptTypes.includes("Evade")) {
 				autoScriptTypes.push("Defensive");
@@ -14710,6 +14726,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 			autoScriptTypes.push("Permanent")
 		}
 	}
+
+	console.log(autoScriptTypes)
 	
 	getAttrs(["augmentAutoScript", "outfitAutoScript", "egoAutoScript", "distortState", "egoActiveState"], function(values) {
 		
@@ -14732,7 +14750,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 
 		TypedAutoScript.forEach((autoScriptType) => {
 			if (autoScriptTypes.includes(autoScriptType[0])) {
-				AutoScript += "(Reset)" + autoScriptType[1];
+				if (AutoScript != "") { AutoScript += "(Reset)"; }
+				AutoScript += autoScriptType[1];
 			}
 		});
 
@@ -14741,7 +14760,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
-	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max",
+	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "thisRoundSpeed", "nextRoundSpeed", 
 	"StaggerState", "distortState", "egoActiveState", "egoType"], function(values) {
 		
 		let settingMuteMessage = values.settingMuteMessage;
@@ -14759,6 +14778,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		let STdamage = values.StagRes_max - ST;
 		let SPdamage = values.SP_max - SP;
 		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage }
+
+		let thisRoundSpeed = values.thisRoundSpeed;
+		let nextRoundSpeed = values.nextRoundSpeed;
 		
 		let StaggerState = values.StaggerState;
 		let distortState = values.distortState;
@@ -14771,7 +14793,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		let output = {};
 		let tempOutput = {};
 		let returnValues = { checkResult:"success", error:false, };
-		let conditionalList = {}
+		let conditionalList = {};
+		let challengeRollList = {};
 		
 		let ailmentList = {};
 		
@@ -14854,6 +14877,14 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 				switch (AutoEffect[0][0]) {
 					case "Require": case "Consume": case "Reset": break; /* Already executed above */
 					case "Gain": tempOutput = autoEffectGainAilment(AutoEffect[0], ailmentList, scaling); break;
+					case "DicePower": tempOutput = autoEffectDicePower(AutoEffect[0], scaling); break;
+					case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
+					case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
+					case "Multi": tempOutput = autoEffectMultiBar(AutoEffect[0], barList, scaling); break;
+					case "DiceMax": tempOutput = autoEffectDiceMax(AutoEffect[0], scaling); break;
+					case "DiceCount": tempOutput = autoEffectDiceCount(AutoEffect[0], scaling); break;
+					case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
+					case "Speed": tempOutput = autoEffectSpeed(AutoEffect[0], scaling, thisRoundSpeed, nextRoundSpeed); break;
 					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
 				}
 			}
@@ -14885,16 +14916,27 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 				}
 				delete tempOutput.checkResult;
 			}
-	
+
+			/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
+			if (tempOutput.dicePower != undefined) { returnValues.dicePower = tempOutput.dicePower }
+			if (tempOutput.diceMax != undefined) { returnValues.diceMax = tempOutput.diceMax }
+			if (tempOutput.diceCount != undefined) { returnValues.diceCount = tempOutput.diceCount }
+			if (tempOutput.speedCombat != undefined) { returnValues.speedCombat = tempOutput.speedCombat }
+
+			/* Handle challenge rolls */
+			if (tempOutput.challengeRollStat != undefined) {
+				challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
+			}
+			
 			/* Add attribute changes from AutoEffect to output */
 			/* The first time a attribute is modified, add its count */
 			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
 			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
 			for (const property in tempOutput) {
 				if (output.hasOwnProperty(property)) {
-					output[property] += tempOutput[property];
+					output[property] += Math.floor(tempOutput[property]);
 				} else {
-					output[property] = tempOutput[property] + tempOutput.count;
+					output[property] = Math.floor(tempOutput[property] + tempOutput.count);
 				}
 			}
 		}
@@ -14909,15 +14951,22 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		if (buttonAutoScript.indexOf("#Do not display#") != -1) { continue; }
 		createConditionalButton(buttonName, buttonAutoScript);
 	}
-	
+
+	/* Execute challange rolls */
+	for (const [statName, rollDifficulty] of Object.entries(challengeRollList)) {
+		/* Checks if any checks failed and the button should not be displayed */
+		rollChallenge(statName, rollDifficulty);
+	}
 	
 	/* Message handling */
 	
-	/* Error handling */
+	/* Error handling and returnValues callback */
 	if (returnValues.error == true) {
-		/* Run function that clears all condition buttons */
+		resetConditionals();
+		callback({error: true});
 	}
 	
+	console.log(returnValues);
 	callback(returnValues);
 	});
 	});
@@ -15019,10 +15068,6 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional))`, AutoEffect); return {error: true}; }
 
-	/* Get required value */
-	let effectVal = parseInt(Math.abs(AutoEffect[1]));
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
-
 	/* Get target count */
 	let effectName = AutoEffect[2];
 
@@ -15033,6 +15078,25 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Handle bar damage count */
 	else if (barDamageList.hasOwnProperty(effectName)) { count = barDamageList[effectName]; }
 	else { autoEffectErrorMessage(`Ailment, Bar or BarDamage "${effectName}" does not exist`, AutoEffect); return {error: true}; }
+
+	/* Get required value. Recalculate count if percentage */
+	let effectVal = AutoEffect[1];
+	if (isNaN(parseInt(Math.abs(effectVal))) == false) {
+		effectVal = parseInt(Math.abs(effectVal));
+	}
+	else if ((/[0-9]+[%]/g).test(String(effectVal))) {
+		let percentage = parseFloat(effectVal.replace("%","")) / 100;
+		let barVal = parseInt(barList[effectName.replace("-","")]);
+		let barMax = parseInt(barVal) + parseInt(barDamageList[`-${effectName.replace("-","")}`]);
+		if (barList.hasOwnProperty(effectName)) {
+			count = barVal;
+		}
+		else if (barDamageList.hasOwnProperty(effectName)) {
+			count = barMax - barVal;
+		}
+		effectVal = barMax*percentage;
+	}
+	else { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number or percentage`, AutoEffect); return {error: true}; }
 	
 	/* Handle the optional scaling property */
 	let scaling = 1;
@@ -15107,7 +15171,7 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 
 function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 6) { autoEffectErrorMessage(`Expected format: (Gain N #Ailment #Round(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 5) { autoEffectErrorMessage(`Expected format: (Gain N #Ailment #Round(optional))`, AutoEffect); return {error: true}; }
 	
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15126,7 +15190,7 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	/* This is between you and me, but "Next turn" doesn't actually do anything ;) */
 	let forceTarget = "";
 	if (AutoEffect[3] != undefined) {
-		if (["this", "thisturn", "this turn"].includes(AutoEffect[3].toLowerCase())) { forceTarget = "This turn"; }
+		if (["this", "thisround", "this round, thisturn, this turn"].includes(AutoEffect[3].toLowerCase())) { forceTarget = "This turn"; }
 	}
 
 	/* Get target attribute */
@@ -15144,7 +15208,174 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	}
 	
 	/* Execute AutoEffect */
-	return { [effectTarget]: parseInt(effectVal), count:parseInt(count) }
+	return { [effectTarget]: parseInt(effectVal), count: parseInt(count) }
+}
+
+function autoEffectSetBar(AutoEffect, barList, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 3) { autoEffectErrorMessage(`Expected format: (Set N #Bar)`, AutoEffect); return {error: true}; }
+
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+
+	/* Get value */
+	let effectVal = parseInt(Math.abs(AutoEffect[1]));
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Get target */
+	let effectBar = AutoEffect[2];
+	let effectTarget = "";
+	if (barList.hasOwnProperty(effectBar)) { effectTarget = effectBar.replace("ST", "StagRes"); }
+	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return {[effectTarget]: parseInt(effectVal), count: 0};
+}
+function autoEffectAddBar(AutoEffect, barList, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 3) { autoEffectErrorMessage(`Expected format: (Add N #Bar)`, AutoEffect); return {error: true}; }
+
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+
+	/* Get value */
+	let effectVal = parseInt(Math.abs(AutoEffect[1]));
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	let count = 0;
+
+	/* Get target */
+	let effectBar = AutoEffect[2];
+	let effectTarget = "";
+	if (barList.hasOwnProperty(effectBar)) {
+		effectTarget = effectBar.replace("ST", "StagRes");
+		count = barList[effectBar];
+	}
+	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return {[effectTarget]: parseInt(effectVal), count: parseInt(count)};
+}
+function autoEffectMultiBar(AutoEffect, barList, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 3) { autoEffectErrorMessage(`Expected format: (Multi N #Bar)`, AutoEffect); return {error: true}; }
+
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+
+	/* Get value */
+	let effectVal = parseFloat(Math.abs(AutoEffect[1]));
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Get target */
+	let effectBar = AutoEffect[2];
+	let effectTarget = "";
+	if (barList.hasOwnProperty(effectBar)) {
+		effectTarget = effectBar.replace("ST", "StagRes");
+		count = barList[effectBar];
+	}
+	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return {[effectTarget]: parseFloat(effectVal) * parseInt(count), count: 0 };
+}
+
+function autoEffectDicePower(AutoEffect, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 2) { autoEffectErrorMessage(`Expected format: (DicePower N)`, AutoEffect); return {error: true}; }
+	
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+	
+	/* Get values */
+	let effectVal = parseInt(AutoEffect[1]);
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return { dicePower: parseInt(effectVal) }
+}
+function autoEffectDiceMax(AutoEffect, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 2) { autoEffectErrorMessage(`Expected format: (DiceMax N)`, AutoEffect); return {error: true}; }
+	
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+	
+	/* Get values */
+	let effectVal = parseInt(AutoEffect[1]);
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return { diceMax: parseInt(effectVal) }
+}
+function autoEffectDiceCount(AutoEffect, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 2) { autoEffectErrorMessage(`Expected format: (DiceCount N)`, AutoEffect); return {error: true}; }
+	
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+	
+	/* Get values */
+	let effectVal = parseInt(AutoEffect[1]);
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return { diceCount: parseInt(effectVal) }
+}
+
+function autoEffectChallengeRoll(AutoEffect, scaling) {
+	/* Check format */
+	if (AutoEffect.length != 3) { autoEffectErrorMessage(`Expected format: (ChallengeRoll #Stat N)`, AutoEffect); return {error: true}; }
+	
+	/* Handle scaling */
+	AutoEffect[2] *= scaling;
+	if (scaling == 0) { return {}; }
+	
+	/* Get values */
+	let effectVal = parseInt(AutoEffect[2]);
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Get target stat */
+	let statTarget = "";
+	if (["fortitude", "instinct", "prudence", "wisdom", "justice", "charm", "insight", "temperance"].includes(AutoEffect[1].toLowerCase())) {
+		statTarget = AutoEffect[1].toLowerCase().replace("fortitude","instinct").replace("prudence","wisdom");
+	}
+	else { autoEffectErrorMessage(`Stat "${AutoEffect[1]}" does not exist.`, AutoEffect); return {error: true}; }
+	
+	/* Execute AutoEffect */
+	return { challengeRollStat: statTarget, challengeRollDifficulty: effectVal }
+}
+
+function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundSpeed) {
+	/* Check format */
+	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (Speed N #Duration)`, AutoEffect); return {error: true}; }
+	
+	/* Handle scaling */
+	AutoEffect[1] *= scaling;
+	if (scaling == 0) { return {}; }
+	
+	/* Get values */
+	let effectVal = parseInt(AutoEffect[1]);
+	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Get duration */
+	let effectDuration = "";
+	if (AutoEffect[2].toLowerCase() == "combat") { effectDuration = "Combat"; }
+	else if (["this", "thisround", "this round, thisturn, this turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "ThisRound"; }
+	else if (["next", "nextround", "next round, nextturn, next turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "NextRound"; }
+	else { autoEffectErrorMessage(`Duration "${AutoEffect[2]}" does not exist. Expected "Combat", "This round" or "Next round"`, AutoEffect); return {error: true}; }
+
+	/* Execute AutoEffect */
+	switch (effectDuration) {
+		case "Combat": return { speedCombat: parseInt(effectVal) }; break;
+		case "ThisRound": return { thisRoundSpeed: parseInt(effectVal), count: parseInt(prevThisRoundSpeed)}; break;
+		case "NextRound": return { nextRoundSpeed: parseInt(effectVal), count: parseInt(prevNextRoundSpeed)}; break;
+	}
 }
 /*--- AutoEffect functions end ---*/
 
