@@ -12775,7 +12775,7 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
 	let autoEffectSpeedCombat = 0;
-	if (returnValues.dicePower != undefined) { stat = returnValues.dicePower }
+	if (returnValues.dicePower != undefined) { stat += returnValues.dicePower }
 	if (returnValues.diceCount != undefined) { autoEffectDiceCount = returnValues.diceCount }
 	if (returnValues.diceMax != undefined) { autoEffectDiceMax = returnValues.diceMax }
 	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = returnValues.speedCombat }
@@ -15005,12 +15005,12 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 					case "Gain": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
 					case "Inflict": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
 					case "Give": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "DicePower": tempOutput = autoEffectDicePower(AutoEffect[0], scaling); break;
 					case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
 					case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
 					case "Multi": tempOutput = autoEffectMultiBar(AutoEffect[0], barList, scaling); break;
-					case "DiceMax": tempOutput = autoEffectDiceMax(AutoEffect[0], scaling); break;
-					case "DiceCount": tempOutput = autoEffectDiceCount(AutoEffect[0], scaling); break;
+					case "DicePower": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+					case "DiceMax": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+					case "DiceCount": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
 					case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
 					case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
 					case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
@@ -15662,9 +15662,18 @@ function autoEffectMultiBar(AutoEffect, barList, scaling) {
 	return {[effectTarget]: Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count)), count: count, message: message, messageValues: messageValues };
 }
 
-function autoEffectDicePower(AutoEffect, scaling) {
+function autoEffectDice(AutoEffect, scaling) {
+	/* Check if DicePower, DiceMax or DiceCount */
+	let autoEffectVariant = "";
+	switch (AutoEffect[0]) {
+		case "DicePower": autoEffectVariant = "DicePower"; break;
+		case "DiceMax": autoEffectVariant = "DiceMax"; break;
+		case "DiceCount": autoEffectVariant = "DiceCount"; break;
+		default: autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); return {error: true}
+	}
+
 	/* Check format */
-	if (AutoEffect.length < 2 || AutoEffect.length > 3) { autoEffectErrorMessage(`Expected format: (DicePower N #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 2 || AutoEffect.length > 3) { autoEffectErrorMessage(`Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); return {error: true}; }
 	
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15675,31 +15684,6 @@ function autoEffectDicePower(AutoEffect, scaling) {
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
 
 	/* Handle message */
-	let message = "";
-	let messageValues = {};
-	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
-	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
-	
-	if (!AutoEffect.includes("Silent")) {
-		message = autoEffectMessage(messageFormat, "Dice Power", effectVal/scaling, 0, scaling, "success");
-	}
-	messageValues = { effectTarget: "Dice Power", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
-	
-	/* Execute AutoEffect */
-	return { dicePower: parseInt(effectVal), message: message, messageValues: messageValues }
-}
-function autoEffectDiceMax(AutoEffect, scaling) {
-	/* Check format */
-	if (AutoEffect.length < 2 || AutoEffect.length > 3) { autoEffectErrorMessage(`Expected format: (DiceMax N #Silent(optional))`, AutoEffect); return {error: true}; }
-	
-	/* Handle scaling */
-	AutoEffect[1] *= scaling;
-	if (scaling == 0) { return {}; }
-	
-	/* Get values */
-	let effectVal = parseInt(AutoEffect[1]);
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
-
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
@@ -15707,38 +15691,12 @@ function autoEffectDiceMax(AutoEffect, scaling) {
 	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
 	
 	if (!AutoEffect.includes("Silent")) {
-		message = autoEffectMessage(messageFormat, "Dice Max", effectVal/scaling, 0, scaling, "success");
+		message = autoEffectMessage(messageFormat, AutoEffect[0].replace("Dice", "Dice "), effectVal/scaling, 0, scaling, "success");
 	}
-	messageValues = { effectTarget: "Dice Max", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
+	messageValues = { effectTarget: AutoEffect[0].replace("Dice", "Dice "), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { diceMax: parseInt(effectVal), message: message, messageValues: messageValues }
-}
-function autoEffectDiceCount(AutoEffect, scaling) {
-	/* Check format */
-	if (AutoEffect.length < 2 || AutoEffect.length > 3) { autoEffectErrorMessage(`Expected format: (DiceCount N #Silent(optional))`, AutoEffect); return {error: true}; }
-	
-	/* Handle scaling */
-	AutoEffect[1] *= scaling;
-	if (scaling == 0) { return {}; }
-	
-	/* Get values */
-	let effectVal = parseInt(AutoEffect[1]);
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
-
-	/* Handle message */
-	let message = "";
-	let messageValues = {};
-	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
-	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
-	
-	if (!AutoEffect.includes("Silent")) {
-		message = autoEffectMessage(messageFormat, "Dice Count", effectVal/scaling, 0, scaling, "success");
-	}
-	messageValues = { effectTarget: "Dice Count", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
-	
-	/* Execute AutoEffect */
-	return { diceCount: parseInt(effectVal), message: message, messageValues: messageValues }
+	return { [AutoEffect[0].replace("D","d")]: parseInt(effectVal), message: message, messageValues: messageValues }
 }
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
