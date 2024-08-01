@@ -108,7 +108,7 @@
 <input type="checkbox" id="autoScriptEditorToggle" name="attr_autoScriptEditor_display" value="true" hidden="true">
 <div class="contentContainer darkBG autoscriptEditorContainer">
 	<button type="action" class="darkInput saveAutoScriptButton" name="act_saveAutoScriptEdit" data-i18n-title="autoscript-save-changes" title="Save AutoScript changes">Save</button>
-	<button type="action" class="darkInput closeAutoScriptButton" name="act_closeAutoScriptEdit" data-i18n-title="autoscript-close-editor" title="Close AutoScript Editor"></button>
+	<button type="action" class="darkInput closeAutoScriptButton" name="act_closeAutoScriptEdit" data-i18n-title="autoscript-close-editor" title="Save and close AutoScript Editor"></button>
 	<label for="autoScriptInput" style="margin-left: 5px;" data-i18n="autoscript-editor">AutoScript Editor</label>
 	<input type="text" class="autoScriptEditorTarget darkBG" name="attr_autoScriptEditorTarget" readonly>
 	<textarea id="autoScriptInput" name="attr_autoScriptEditorInput"></textarea>
@@ -10238,6 +10238,20 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 </rolltemplate>
 
 
+<rolltemplate class="sheet-rolltemplate-autoeffect">
+    <div class="sheet-template-wrapper" style="background-color: #454545; border-radius: 5px; color: #eee; height: auto; padding: 5px; overflow: hidden;">
+		<div style="background-color: #222; height: 30px; border: 2px #000 solid; color: #fff">
+			<div style="float: left; height: 30px; width: 30px; margin-right: 7px; background-color: #85a874;">
+				{{icon}}
+			</div>
+			<div style="width: 80% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>{{#title}}{{title}}{{/title}}</b></div>
+		</div>
+		<div><b>For: </b>{{#name}}{{name}}{{/name}}</div>
+		<div>{{#message}} {{message}} {{/message}}</div>
+	</div>
+</rolltemplate>
+
+
 <rolltemplate class="sheet-rolltemplate-message">
     <div class="sheet-template-wrapper" style="background-color: #333; border-radius: 5px; color: #fff; padding: 5px;">
 
@@ -10689,11 +10703,6 @@ on("change:StagRes", function() {
 
 		setAttrs({"StaggerState":"Staggered"});
 
-		/* AutoScripts */
-		resetConditionals();
-		AutoScriptMain("", "Staggered");
-
- 
 		} /* Value check end */
 
 	});
@@ -10791,11 +10800,6 @@ on("change:SP", function() {
 
 		if(currentsan <= 0 && panicstate == "0"){
 			setAttrs({"PanicState":"Panic"});
-
-			/* AutoScripts */
-			resetConditionals();
-			AutoScriptMain("", "Panic");
- 
 		}
 		else if(currentsan > 0 && panicstate != "0"){
 		setAttrs({"PanicState":"0"});
@@ -10830,10 +10834,6 @@ on("change:HP", function() {
 	if(currenthp <= 0 && detect != "0" && defeatstate == "0"){
 
 		setAttrs({"DefeatState":"Defeated"});
-
-		/* AutoScripts */
-		resetConditionals();
-		AutoScriptMain("", "Defeated");
 
 		} /* Defeat check end */
 
@@ -10960,6 +10960,14 @@ on("change:PanicState", function() {
 
 	setAttrs({"dummyIcon":iconnew});
 
+	/* AutoScripts */
+	resetConditionals();
+	let autoScriptTrigger = currentstate == "Panic" ? "Panic" : "None";
+	AutoScriptMain("", autoScriptTrigger, "true", function(returnValues) {
+
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+
 	/* Translation prep */
 	let langStateTrue = " went into Panic!";
 	let langStateFalse = " is no longer Panicked";
@@ -10971,18 +10979,19 @@ on("change:PanicState", function() {
 	}
 	
 	if(messagestate != "true" && currentstate != "Panic"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + autoScriptMessage + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 	else if(messagestate != "true" && currentstate == "Panic"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + autoScriptMessage + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 
+	});
 	});
 });
 
@@ -11008,6 +11017,13 @@ on("change:DefeatState", function() {
 
 	setAttrs({"dummyIcon":iconnew});
 
+	/* AutoScripts */
+	resetConditionals();
+	AutoScriptMain("", "Defeated", "true", function(returnValues) {
+
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
 	let whispertarget = values.settingWhisperTarget;
@@ -11026,12 +11042,13 @@ on("change:DefeatState", function() {
 	}
 	
 	if(messagestate != "true" && currentstate == "Defeated"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langDefeat + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langDefeat + autoScriptMessage + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 
+	});
 	});
 });
 
@@ -11071,6 +11088,14 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	setAttrs({"dummyIcon":iconnew});
 
+	/* AutoScripts */
+	resetConditionals();
+	let autoScriptTrigger = currentstate == "Staggered" ? "Staggered" : "None";
+	AutoScriptMain("", autoScriptTrigger, "true", function(returnValues) {
+
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
 	let whispertarget = values.settingWhisperTarget;
@@ -11090,19 +11115,20 @@ getSectionIDs(`repeating_global`, idarray => {
 	}
 	
 	if(messagestate != "true" && currentstate != "Staggered"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + autoScriptMessage + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 	else if(messagestate != "true" && currentstate == "Staggered"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + autoScriptMessage + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 
-		});
+	});
+	});
 	});
 });
 
@@ -12402,14 +12428,17 @@ getSectionIDs(`repeating_global`, idarray => {
 	AutoScript = AutoScript.replace("undefined", "");
 	
 	resetConditionals();
-	AutoScriptMain(AutoScript, triggerType, function(returnValues) {
+	AutoScriptMain(AutoScript, triggerType, "true", function(returnValues) {
 
 	let autoeffectdice1 = 0;
 	let autoeffectdice2 = 0;
 	let autoeffectdice3 = 0;
 	if (returnValues.diceCount != undefined) { autoeffectdice1 = returnValues.diceCount}
-	if (returnValues.dicePower != undefined) { autoeffectdice2 = returnValues.dicePower}
-	if (returnValues.diceMax != undefined) { autoeffectdice3 = returnValues.diceMax}
+	if (returnValues.diceMax != undefined) { autoeffectdice2 = returnValues.diceMax}
+	if (returnValues.dicePower != undefined) { autoeffectdice3 = returnValues.dicePower}
+
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
 	
 	/* Power */
 	let activepower = "0";
@@ -12575,11 +12604,16 @@ getSectionIDs(`repeating_global`, idarray => {
 	distortformat = "<br><div style='width: 100%; background-color: #111; height: 80px; float: left; text-align: center; color:" + headertext + "'><b>" + langDistortEffect + "</b><br><div style='overflow: auto; border-top: 1px #555 solid; height: 70px;'>" + distorteffect + "</div></div>";
 	}
 
+	let baseEffectDescription = "<br><div style='width: 50%; height: auto; float: left;'><b>" + langEffectBase + ":</b><br><div style='overflow: auto; border: 1px #555 solid; max-height: 70px; padding-bottom:1px; '>" + baseeffect + "</div></div>";
+	let skillEffectDescription = "<div style='width: 50%; height: auto; float: left;'><b>" + langEffectSkill + ":</b><br><div style='overflow: auto; border: 1px #555 solid; max-height: 70px; padding-bottom:1px; '>" + skilleffect + "</div></div>"
+	if (baseeffect == "") { baseEffectDescription = ""; skillEffectDescription = "<br>" + skillEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
+	if (skilleffect == "(No Skill)") { skillEffectDescription = ""; baseEffectDescription = baseEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
+
 	let header = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + "'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 55%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + basename + "</b></div></div>";
 
-	let body = "<b>" + langFrom + ": </b>"+ charname + "<br><b>" + langRoll + ": </b>" + rollformatmessage + skillinfo + "<div style='text-align: center'>" + attackmessage + "</div><br><div style='width: 50%; height: 80px; float: left;'><b>" + langEffectBase + ":</b><br><div style='overflow: auto; border: 1px #555 solid; height: 70px;'>" + baseeffect + "</div></div><div style='width: 50%; height: 80px; float: left;'><b>" + langEffectSkill + ":</b><br><div style='overflow: auto; border: 1px #555 solid; height: 70px;'>" + skilleffect + "</div></div>" + distortformat;
+	let body = "<b>" + langFrom + ": </b>"+ charname + "<br><b>" + langRoll + ": </b>" + rollformatmessage + skillinfo + "<div style='text-align: center'>" + attackmessage + "</div>" + baseEffectDescription + skillEffectDescription + distortformat;
 
-	let info = header + body;
+	let info = header + body + autoScriptMessage;
 
 	if(simpledisplay == "true"){
 	info = header;
@@ -12674,7 +12708,7 @@ function rollChallenge(buttonid, rollDifficulty=0) {
 
 	/* AutoScripts */
 	resetConditionals();
-	AutoScriptMain("", ["Challenge", "Combat start"], function(returnValues) {
+	AutoScriptMain("", ["Challenge", "Combat start"], "true", function(returnValues) {
 
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
@@ -12683,7 +12717,10 @@ function rollChallenge(buttonid, rollDifficulty=0) {
 	if (returnValues.diceCount != undefined) { autoEffectDiceCount = returnValues.diceCount }
 	if (returnValues.diceMax != undefined) { autoEffectDiceMax = returnValues.diceMax }
 	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = returnValues.speedCombat }
-
+	
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+	
 	let rollformat = Math.max(autoEffectDiceCount + 2, 0) + "d" + Math.max(autoEffectDiceMax + 6, 0) + "+" + parseInt(stat) + "+(" + parseInt(difficulty) + ")";
 
 	/* Type Formatting */
@@ -12775,7 +12812,7 @@ function rollChallenge(buttonid, rollDifficulty=0) {
 
 	let body = "<b>" + langFrom + ": </b>" + charname + "<br><b>" + langRoll + ": </b>" + rollformatmessage;
 
-	let info = header + body;
+	let info = header + body + autoScriptMessage;
 
 	if(simpledisplay == "true"){
 	info = header;
@@ -13130,9 +13167,17 @@ on('clicked:applyDamage', (info) => {
 	setAttrs(output);
 
 	/* AutoScripts */
-	if (newHP < oldHP) { resetConditionals(); AutoScriptMain("", "DamagedHP"); }
-	if (newST < oldST) { resetConditionals(); AutoScriptMain("", "DamagedST"); }
-	if (newSP < oldSP) { resetConditionals(); AutoScriptMain("", "DamagedSP"); }
+	let autoScriptTriggers = ["None"];
+	if (newHP < oldHP) { autoScriptTriggers.push("DamagedHP"); }
+	if (newST < oldST) { autoScriptTriggers.push("DamagedST"); }
+	if (newSP < oldSP) { autoScriptTriggers.push("DamagedSP"); }
+	
+	resetConditionals();
+	AutoScriptMain("", autoScriptTriggers, "true", function(returnValues) {
+
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+
 	
 	/* console.log("HP base: " + sumBothBefore + ". HP after resistance: " + Math.ceil(Math.min((hpResistance * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)))
 	console.log("ST base: " + sumBothBefore + ". ST after resistance: " + Math.ceil(Math.min((stResistance * (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)))
@@ -13237,6 +13282,7 @@ on('clicked:applyDamage', (info) => {
 	damageCalculation += `<div class="calculationContainer hpCalculationContainer">${hpDamageHead}${hpDamageBody}</div>`;
 	damageCalculation += `<div class="calculationContainer stCalculationContainer">${stDamageHead}${stDamageBody}</div>`;
 	damageCalculation += `<div class="calculationContainer spCalculationContainer">${spDamageHead}${spDamageBody}</div>`;
+	damageCalculation += autoScriptMessage;
 	
 	/* Damage type icon */
 	let damageIcon = "";
@@ -13263,6 +13309,7 @@ on('clicked:applyDamage', (info) => {
 	/* Cleanup */
 	setAttrs({"dummy":" "});
 
+});
 });
 });
 });
@@ -13556,14 +13603,20 @@ on('clicked:declareAction', (info) => {
 	let lightmessage = "";
 
 	/* AutoScripts */
-	let AutoScript = values[`${toolselect}AutoScript`];
+	let AutoScript = "";
+	if (toolselect != "0") {
+		AutoScript = values[`${toolselect}AutoScript`];
 
-	/* Clean AutoScript. Remove nested and undefined */
-	AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
-	AutoScript = AutoScript.replace("undefined", "");
-	
+		/* Clean AutoScript. Remove nested and undefined */
+		AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
+		AutoScript = AutoScript.replace("undefined", "");
+	}
+
 	resetConditionals();
-	AutoScriptMain(AutoScript, "None");
+	AutoScriptMain(AutoScript, "None", "true", function(returnValues) {
+
+	let autoScriptMessage = "";
+	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
 
 	/* Translation prep */
 	let langFrom = "From";
@@ -13606,8 +13659,13 @@ on('clicked:declareAction', (info) => {
 
 	}
 
+	let toolDescription = "<div style='text-align: center; padding-top: 3px; padding-bottom: 3px;'><div style='text-align: left; padding: 5px;'>" + tooldesc + "</div></div>";
+	let toolEffect = "<div class='toolEffect' style='max-height: 60px; width: 98%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
+	if (tooldesc == "") { toolDescription = ""; }
+	if (tooleffect == "") { toolEffect = ""; toolDescription = toolDescription.replaceAll(" padding-bottom: 3px;","").replaceAll(" padding: 5px;"," padding-top: 5px;"); }
+
 	if(toolselect != "" && toolselect != null && toolselect != "0"){
-	toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br><div style='text-align: center; padding-top: 3px; padding-bottom: 3px;'><div style='text-align: left; padding: 5px;'>" + tooldesc + "</div></div><div style='height: 60px; width: 98%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
+	toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br>" + toolDescription + toolEffect;
 	}
 
 	if(currentlight >= skillcost){
@@ -13629,7 +13687,7 @@ on('clicked:declareAction', (info) => {
 
 
 
-	let info = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + ";'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 80%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + actiontext + lightmessage + "</b></div></div><b>" + langFrom + ": </b> " + charname + "<br>" + toolinfo + skillinfo;
+	let info = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + ";'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 80%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + actiontext + lightmessage + "</b></div></div><b>" + langFrom + ": </b> " + charname + "<br>" + toolinfo + skillinfo + autoScriptMessage;
 
 	setAttrs({"dummy":info});
 
@@ -13678,7 +13736,7 @@ on('clicked:declareAction', (info) => {
 
 	});
 	});
-
+	});
 });
 
 /* Share: Outfit */
@@ -14679,14 +14737,17 @@ on("clicked:closeAutoScriptEdit", function(info) {
 on("clicked:repeating_conditionalButtons:activate", function(info) {
 	let buttonid = info.sourceAttribute.split("_")[2];
 	let buttonAutoScript = "";
-	let returnValues = {};
-	getAttrs([`repeating_conditionalButtons_${buttonid}_buttonAutoScript`], function(values) {
-		buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`]
-		AutoScriptMain(buttonAutoScript, "None", function(returnValues) {
-			if (returnValues.checkResult != "success") {
-				setAttrs({[`repeating_conditionalButtons_${buttonid}_hideButton`]: "true"})
-			}
-		}, "false");
+	let buttonName = "";
+
+	getAttrs([`repeating_conditionalButtons_${buttonid}_buttonAutoScript`, `repeating_conditionalButtons_${buttonid}_buttonName`], function(values) {
+	buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`];
+	buttonName = values[`repeating_conditionalButtons_${buttonid}_buttonName`];
+
+	AutoScriptMain(buttonAutoScript, "None", "false", function(returnValues) {
+		if (returnValues.checkResult != "success") {
+			setAttrs({[`repeating_conditionalButtons_${buttonid}_hideButton`]: "true"})
+		}
+	}, "false", buttonName);
 	});
 });
 
@@ -14698,7 +14759,7 @@ Selects which type of AutoEffects to collect and append to an AutoScript.
 Block and Evade also include Defensive */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
 /* collect: If the function should collect augment/outfit/etc. AutoEffects or not*/
-function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, collect="true") {
+function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="false", callback=() => {}, collect="true", messageHeaderTitle="AutoEffects") {
 	
 	/* Adds the input AutoScript */
 	let AutoScript = "";
@@ -14707,27 +14768,27 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 	}
 	
 	/* Appends one or more AutoScripts based on the trigger type */
-	let autoScriptTypes = [];
+	let autoScriptTriggers = [];
 	if (collect == "true") {
-		if (typeof triggerType == "string") { autoScriptTypes.push(triggerType) }
-		else {autoScriptTypes.push(...triggerType) }
+		if (typeof triggerType == "string") { autoScriptTriggers.push(triggerType) }
+		else {autoScriptTriggers.push(...triggerType) }
 		if (triggerType != "None") {
-			if (autoScriptTypes.includes("Block") || autoScriptTypes.includes("Evade")) {
-				autoScriptTypes.push("Defensive");
+			if (autoScriptTriggers.includes("Block") || autoScriptTriggers.includes("Evade")) {
+				autoScriptTriggers.push("Defensive");
 			}
-			else if (autoScriptTypes.includes("Combat start")) {
-				autoScriptTypes.push("Round start");
+			else if (autoScriptTriggers.includes("Combat start")) {
+				autoScriptTriggers.push("Round start");
 			}
-			else if (autoScriptTypes.some(item => ["DamagedHP", "DamagedST", "DamagedSP"].includes(item))) {
-				autoScriptTypes.push("Damaged");
+			else if (autoScriptTriggers.some(item => ["DamagedHP", "DamagedST", "DamagedSP"].includes(item))) {
+				autoScriptTriggers.push("Damaged");
 			}
 		}
-		if (!autoScriptTypes.includes("Permanent")) {
-			autoScriptTypes.push("Permanent")
+		if (!autoScriptTriggers.includes("Permanent")) {
+			autoScriptTriggers.push("Permanent")
 		}
 	}
 
-	console.log(autoScriptTypes)
+	console.log(autoScriptTriggers)
 	
 	getAttrs(["augmentAutoScript", "outfitAutoScript", "egoAutoScript", "distortState", "egoActiveState"], function(values) {
 		
@@ -14746,12 +14807,12 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 			if (egoAutoScript == null) { egoAutoScript = ""; }
 		}
 		
-		let TypedAutoScript = AutoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
+		let collectedAutoScripts = AutoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
 
-		TypedAutoScript.forEach((autoScriptType) => {
-			if (autoScriptTypes.includes(autoScriptType[0])) {
+		collectedAutoScripts.forEach((trigger) => {
+			if (autoScriptTriggers.includes(trigger[0])) {
 				if (AutoScript != "") { AutoScript += "(Reset)"; }
-				AutoScript += autoScriptType[1];
+				AutoScript += trigger[1];
 			}
 		});
 
@@ -14795,6 +14856,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		let returnValues = { checkResult:"success", error:false, };
 		let conditionalList = {};
 		let challengeRollList = {};
+		let message = "";
+		let messageValues = {};
 		
 		let ailmentList = {};
 		
@@ -14809,17 +14872,17 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"]
 		ailmentNames.forEach(ailment => {
 			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
-				ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`]];
+				ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`], 0, ailment];
 			} else {
-				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`]];
+				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], 0, ailment];
 			}
 		});
 	
 	/* Get all custom ailments */
 	getSectionIDs(`repeating_ailments`, idarray => {
 	const fieldnames = idarray.reduce((rows,id) =>
-	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,
-	`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`, ], '');
+	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,`repeating_ailments_${id}_ailNum`,
+	`repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`], '');
 	
 		let ailName = "";
 		let ailHasNextTurn = "";
@@ -14832,8 +14895,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
 			ailNum = v[`repeating_ailments_${id}_ailNum`];
 			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`]
+			ailIcon = v[`repeating_ailments_${id}_ailIcon`]
 			
-			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id];
+			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon];
 		});
 	
 
@@ -14871,12 +14935,13 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
 				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
 				case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
+				case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
 				default: tempOutput = {}; break;
 			}
 			if (checkResult != "failure") {
 				switch (AutoEffect[0][0]) {
-					case "Require": case "Consume": case "Reset": break; /* Already executed above */
-					case "Gain": tempOutput = autoEffectGainAilment(AutoEffect[0], ailmentList, scaling); break;
+					case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
+					case "Gain": tempOutput = autoEffectGainAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
 					case "DicePower": tempOutput = autoEffectDicePower(AutoEffect[0], scaling); break;
 					case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
 					case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
@@ -14917,6 +14982,19 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 				delete tempOutput.checkResult;
 			}
 
+			/* Handle updating ailmentList and barList after a successful Consume AutoEffect */
+			if (tempOutput.consumeList != undefined) {
+				if (tempOutput.consumeList == "barList") {
+					barList[tempOutput.consumeTarget] = parseInt(barList[tempOutput.consumeTarget]) + parseInt(tempOutput.consumeVal);
+				} else {
+					console.log(ailmentList[tempOutput.consumeTarget][1])
+					ailmentList[tempOutput.consumeTarget][1] = parseInt(ailmentList[tempOutput.consumeTarget][1]) + parseInt(tempOutput.consumeVal);
+				}
+				delete tempOutput.consumeList;
+				delete tempOutput.consumeVal;
+				delete tempOutput.consumeVal;
+			}
+
 			/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
 			if (tempOutput.dicePower != undefined) { returnValues.dicePower = tempOutput.dicePower }
 			if (tempOutput.diceMax != undefined) { returnValues.diceMax = tempOutput.diceMax }
@@ -14926,6 +15004,16 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 			/* Handle challenge rolls */
 			if (tempOutput.challengeRollStat != undefined) {
 				challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
+			}
+
+			/* Handle message */
+			if (tempOutput.message != undefined) {
+				message += tempOutput.message;
+			}
+
+			/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
+			if (tempOutput.messageValues != undefined) {
+				messageValues = tempOutput.messageValues;
 			}
 			
 			/* Add attribute changes from AutoEffect to output */
@@ -14959,6 +15047,35 @@ function AutoScriptMain(inputAutoScript, triggerType="None", callback=() => {}, 
 	}
 	
 	/* Message handling */
+	if (settingMuteMessage != "true" && message != "") {
+		let newmessage = "<div class='autoeffectContainer'>"
+		
+		if (returnMessage == "false") {
+			let messageHeaderIcon = getIcon("icons", "gear");
+			newmessage += message + "</div>";
+
+			setAttrs({dummyIcon: messageHeaderIcon, dummy: newmessage});
+
+			let whisper = "";
+			if(settingWhisperRolls == "true"){
+				whisper = "/w " + settingWhisperTarget;
+			}
+			
+			startRoll((whisper + "&{template:autoeffect} {{icon=@{dummyIcon}}} {{title=" + messageHeaderTitle + "}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
+				finishRoll(results.rollId, {} );
+			});
+		}
+		else {
+			newmessage += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
+			newmessage += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: #85a874;">`
+			newmessage += `${getIcon("icons", "gear")}`
+			newmessage += `</div>`
+			newmessage += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>AutoEffects</b></div>`
+			newmessage += `</div>` + message + "</div>";
+
+			returnValues.message = newmessage;
+		}
+	}
 	
 	/* Error handling and returnValues callback */
 	if (returnValues.error == true) {
@@ -15041,6 +15158,69 @@ function AutoScriptToArray(inputAutoScript, mode="normal") {
 
 /*--- AutoEffect functions ---*/
 
+
+function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false") {
+	if(messageFormat != ""){
+		let message = messageFormat;
+
+		let langCheck = "[CHECK]";
+		let langSuccess = "Success";
+		let langFailure = "Failure";
+		let langNum = "[NUM]";
+		let langScaling = "[SCALING]";
+		let langScalingNum = "[SCALING NUM]";
+		let langInitial = "[INITIAL]";
+		let langResult = "[RESULT]";
+		let langTarget = "[TARGET]";
+		let langTargetIcon = "[/TARGET]";
+
+		/*if(getTranslationByKey("message-match-check") != false){
+			langCheck = getTranslationByKey("message-match-check");
+			langSuccess = getTranslationByKey("distortion-result-good");
+			langFailure = getTranslationByKey("distortion-result-bad");
+			langNum = getTranslationByKey("message-match-num");
+			langScaling = getTranslationByKey("message-match-scaling");
+			langScalingNum = getTranslationByKey("message-match-scalingnum");
+			langTarget = getTranslationByKey("message-match-target");
+			langTargetIcon = getTranslationByKey("message-match-targeticon");
+		}*/
+
+		if (checkResult == "failure") { message = message.replaceAll(langCheck, "<b>" + langFailure + "</b>"); }
+		else { message = message.replaceAll(langCheck, "<b>" + langSuccess + "</b>"); }
+		message = message.replaceAll(langNum, "<b>" + effectVal + "</b>");
+		message = message.replaceAll(langScaling,  "<b>" + scaling + "</b>");
+		message = message.replaceAll(langScalingNum, "<b>" + (parseFloat(scaling) * parseFloat(effectVal)) + "</b>");
+		message = message.replaceAll(langInitial, "<b>" + parseFloat(effectCount) + "</b>");
+		message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>");
+		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("limbus/","").replace("community/","") + "</b>");
+		
+		/* Icon handling */
+		/* Get target icon. Is in this format: [/TARGET] */
+		message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget, settingLimbusStyle));
+		
+		/* Question mark icon */
+		message = message.replaceAll("[/Question]", getIcon("icons", "Question"));
+
+		if ((/\[\/([^0-9]+)\]/g).test(message)) {
+			/* Get custom icon. Is in one of these formats: [/iconName], [/limbus/iconName], [/community/iconName]*/
+			message = message.replaceAll("[/community/", "[community, ");
+			message = message.replaceAll("[/limbus/", "[ailments, limbus/");
+			message = message.replaceAll("[/", "[ailments, ");
+			
+			message.match((/\[([^0-9]+)\]/g)).forEach(icon => {
+				let iconSelector = icon.replaceAll("[","").replaceAll("]","");
+				let iconFolder = iconSelector.split(", ")[0];
+				let iconName = iconSelector.split(", ")[1]
+				message = message.replace(icon, getIcon(iconFolder, iconName));
+			});
+		}
+
+		newmessage = "<div class='autoeffectEntry'>" + message + "</div>";
+
+		return newmessage;
+	}
+}
+
 /* Whispers an error message to the user detailing an AutoEffect error */
 function autoEffectErrorMessage(errorString, autoEffect) {
 	console.log(errorString + autoEffect)
@@ -15066,7 +15246,7 @@ function resetConditionals() {
 
 function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 5) { autoEffectErrorMessage(`Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional) #Silent(optional))`, AutoEffect); return {error: true}; }
 
 	/* Get target count */
 	let effectName = AutoEffect[2];
@@ -15114,6 +15294,17 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	} else {
 		returnValues.checkResult = "failure";
 	}
+
+	/* Handle message */
+	let messageFormat = "Require [SCALING NUM] [TARGET]: [CHECK]";
+	if (ailmentList.hasOwnProperty(effectName)) { messageFormat = "[/TARGET] " + messageFormat; }
+
+	if (!AutoEffect.includes("Silent")) {
+		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal/scaling, count, scaling, returnValues.checkResult);
+	}
+	returnValues.messageValues = { effectTarget: effectName, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: returnValues.checkResult }
+
+	/* Return check result */
 	return returnValues;
 }
 
@@ -15129,11 +15320,10 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	/* Get target */
 	let effectName = AutoEffect[2];
 	let effectTarget = "";
-	let effectRepeatingId = ailmentList[effectName][3];
-
+	
 	/* Handle ailment target */
 	if (ailmentList.hasOwnProperty(effectName)) {
-		if (effectRepeatingId == undefined) { effectTarget = effectName; } /* If standard ailment */
+		if (ailmentList[effectName][3] == "0") { effectTarget = effectName; } /* If standard ailment */
 		else { effectTarget = `repeating_ailments_${ailmentList[effectName][3]}_ailNum`; } /* If custom ailment */
 		count = ailmentList[effectName][1];
 	}
@@ -15163,15 +15353,30 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 		} else {
 			returnValues.checkResult = "success";
 		}
+		if (ailmentList.hasOwnProperty(effectName)) { returnValues.consumeList = "ailmentList"; }
+		else { returnValues.consumeList = "barList";  }
+		returnValues.consumeTarget = effectName;
+		returnValues.consumeVal = -effectVal*scaling;
 	} else {
 		returnValues.checkResult = "failure";
 	}
+
+	/* Handle message */
+	let messageFormat = "Consume [SCALING NUM] [TARGET]: [CHECK]";
+	if (ailmentList.hasOwnProperty(effectName)) { messageFormat = "[/TARGET] " + messageFormat; }
+
+	if (!(AutoEffect.includes("Silent"))) {
+		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal/scaling, count, scaling, returnValues.checkResult);
+	}
+	returnValues.messageValues = { effectTarget: effectName, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: returnValues.checkResult }
+
+	/* Return check result */
 	return returnValues;
 }
 
-function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
+function autoEffectGainAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 5) { autoEffectErrorMessage(`Expected format: (Gain N #Ailment #Round(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 6) { autoEffectErrorMessage(`Expected format: (Gain N #Ailment #Round(optional) #Silent(optional))`, AutoEffect); return {error: true}; }
 	
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15197,7 +15402,7 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 	let effectTarget = "";
 	let effectRepeatingId = ailmentList[effectAilment][3];
 	let effectHasNextTurn = ailmentList[effectAilment][0];
-	if (effectRepeatingId == undefined) { effectTarget = effectAilment; } /* If standard ailment */
+	if (effectRepeatingId == 0) { effectTarget = effectAilment; } /* If standard ailment */
 	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][3]}_ailNum`; } /* If custom ailment */
 	
 	/* Effect changes target to the next turn field if it's enabled */
@@ -15206,9 +15411,21 @@ function autoEffectGainAilment(AutoEffect, ailmentList, scaling) {
 		effectTarget += "NextTurn";
 		count = ailmentList[effectAilment][2];
 	}
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "[/TARGET] Gained [SCALING NUM] [TARGET]";
+	let effectIcon = ailmentList[effectAilment][4];
+	if (effectHasNextTurn == 'true' && forceTarget != "This turn") { messageFormat += " next turn"; }
+
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, effectIcon, effectVal/scaling, count, scaling, "success", settingLimbusStyle);
+	}
+	messageValues = { effectTarget: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
 	
 	/* Execute AutoEffect */
-	return { [effectTarget]: parseInt(effectVal), count: parseInt(count) }
+	return { [effectTarget]: parseInt(effectVal), count: parseInt(count), message: message, messageValues: messageValues }
 }
 
 function autoEffectSetBar(AutoEffect, barList, scaling) {
@@ -15222,15 +15439,29 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 	/* Get value */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	let count = 0;
 
 	/* Get target */
 	let effectBar = AutoEffect[2];
 	let effectTarget = "";
-	if (barList.hasOwnProperty(effectBar)) { effectTarget = effectBar.replace("ST", "StagRes"); }
+	if (barList.hasOwnProperty(effectBar)) {
+		effectTarget = effectBar.replace("ST", "StagRes");
+		count = barList[effectBar];
+	}
 	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Set [TARGET] to [RESULT]";
+
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, effectTarget, (parseInt(effectVal) - parseInt(count))/scaling, count, scaling, "success");
+	}
+	messageValues = { effectTarget: effectTarget, effectVal: (parseInt(effectVal) - parseInt(count))/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return {[effectTarget]: parseInt(effectVal), count: 0};
+	return {[effectTarget]: parseInt(effectVal) - parseInt(count), count: count, message: message, messageValues: messageValues};
 }
 function autoEffectAddBar(AutoEffect, barList, scaling) {
 	/* Check format */
@@ -15253,9 +15484,20 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 		count = barList[effectBar];
 	}
 	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Regened [SCALING NUM] [TARGET]";
+	if (effectVal < 0) { messageFormat = "Recieved [SCALING NUM] [TARGET] damage"; }
+
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
+	}
+	messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return {[effectTarget]: parseInt(effectVal), count: parseInt(count)};
+	return {[effectTarget]: parseInt(effectVal), count: parseInt(count), message: message, messageValues: messageValues};
 }
 function autoEffectMultiBar(AutoEffect, barList, scaling) {
 	/* Check format */
@@ -15277,9 +15519,19 @@ function autoEffectMultiBar(AutoEffect, barList, scaling) {
 		count = barList[effectBar];
 	}
 	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = `Multiplied [TARGET] by <b>${effectVal}</b> [[SCALING NUM]]`;
+
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, effectTarget, Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count))/scaling, count, scaling, "success");
+	}
+	messageValues = { effectTarget: effectTarget, effectVal: Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count))/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return {[effectTarget]: parseFloat(effectVal) * parseInt(count), count: 0 };
+	return {[effectTarget]: Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count)), count: count, message: message, messageValues: messageValues };
 }
 
 function autoEffectDicePower(AutoEffect, scaling) {
@@ -15293,9 +15545,20 @@ function autoEffectDicePower(AutoEffect, scaling) {
 	/* Get values */
 	let effectVal = parseInt(AutoEffect[1]);
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
+	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
+	
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, "Dice Power", effectVal/scaling, 0, scaling, "success");
+	}
+	messageValues = { effectTarget: "Dice Power", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { dicePower: parseInt(effectVal) }
+	return { dicePower: parseInt(effectVal), message: message, messageValues: messageValues }
 }
 function autoEffectDiceMax(AutoEffect, scaling) {
 	/* Check format */
@@ -15308,9 +15571,20 @@ function autoEffectDiceMax(AutoEffect, scaling) {
 	/* Get values */
 	let effectVal = parseInt(AutoEffect[1]);
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
+	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
+	
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, "Dice Max", effectVal/scaling, 0, scaling, "success");
+	}
+	messageValues = { effectTarget: "Dice Max", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { diceMax: parseInt(effectVal) }
+	return { diceMax: parseInt(effectVal), message: message, messageValues: messageValues }
 }
 function autoEffectDiceCount(AutoEffect, scaling) {
 	/* Check format */
@@ -15323,9 +15597,20 @@ function autoEffectDiceCount(AutoEffect, scaling) {
 	/* Get values */
 	let effectVal = parseInt(AutoEffect[1]);
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
+	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
+	
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, "Dice Count", effectVal/scaling, 0, scaling, "success");
+	}
+	messageValues = { effectTarget: "Dice Count", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { diceCount: parseInt(effectVal) }
+	return { diceCount: parseInt(effectVal), message: message, messageValues: messageValues }
 }
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
@@ -15348,7 +15633,7 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 	else { autoEffectErrorMessage(`Stat "${AutoEffect[1]}" does not exist.`, AutoEffect); return {error: true}; }
 	
 	/* Execute AutoEffect */
-	return { challengeRollStat: statTarget, challengeRollDifficulty: effectVal }
+	return { challengeRollStat: statTarget, challengeRollDifficulty: effectVal, message: message, messageValues: messageValues }
 }
 
 function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundSpeed) {
@@ -15370,13 +15655,63 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 	else if (["next", "nextround", "next round, nextturn, next turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "NextRound"; }
 	else { autoEffectErrorMessage(`Duration "${AutoEffect[2]}" does not exist. Expected "Combat", "This round" or "Next round"`, AutoEffect); return {error: true}; }
 
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
+	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
+	switch (effectDuration) {
+		case "Combat": messageFormat += " this combat"; break;
+		case "ThisRound": messageFormat += " this round"; break;
+		case "NextRound": messageFormat += " next round"; break;
+	}
+
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, "Speed", effectVal/scaling, 0, scaling, "success");
+	}
+	messageValues = { effectTarget: "Speed", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
+
 	/* Execute AutoEffect */
 	switch (effectDuration) {
-		case "Combat": return { speedCombat: parseInt(effectVal) }; break;
-		case "ThisRound": return { thisRoundSpeed: parseInt(effectVal), count: parseInt(prevThisRoundSpeed)}; break;
-		case "NextRound": return { nextRoundSpeed: parseInt(effectVal), count: parseInt(prevNextRoundSpeed)}; break;
+		case "Combat": return { speedCombat: parseInt(effectVal), message: message, messageValues: messageValues }; break;
+		case "ThisRound": return { thisRoundSpeed: parseInt(effectVal), count: parseInt(prevThisRoundSpeed), message: message, messageValues: messageValues }; break;
+		case "NextRound": return { nextRoundSpeed: parseInt(effectVal), count: parseInt(prevNextRoundSpeed), message: message, messageValues: messageValues }; break;
 	}
 }
+
+function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
+	console.log(messageValues)
+	
+	let messageFormat = "";
+	let checkResultOption = "success";
+	let effectTarget = "No target";
+	let effectVal = 0;
+	let effectCount = 0;
+	let scaling = 1;
+	let checkResult = "success";
+	let settingLimbusStyle = "false";
+
+	if (AutoEffect[1] != undefined) { messageFormat = AutoEffect.slice(1).join(" "); }
+	if ((/\"[ \t]*(checksuccess)/ig).test(messageFormat)) { messageFormat = messageFormat.replaceAll(/\"[ \t]*(checksuccess)/ig, "") }
+	else if ((/\"[ \t]*(checkfailure)/ig).test(messageFormat)) { checkResultOption = "failure"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkfailure)/ig, "") }
+	else if ((/\"[ \t]*(checkignore)/ig).test(messageFormat)) { checkResultOption = "ignore"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkignore)/ig, "")}
+	messageFormat = messageFormat.replaceAll('"','');
+
+	if (messageValues.effectTarget != undefined) { effectTarget = messageValues.effectTarget; }
+	if (messageValues.effectVal != undefined) { effectVal = messageValues.effectVal; }
+	if (messageValues.effectCount != undefined) { effectCount = messageValues.effectCount; }
+	if (messageValues.scaling != undefined) { scaling = messageValues.scaling; }
+	if (messageValues.checkResult != undefined) { checkResult = messageValues.checkResult; }
+	if (messageValues.settingLimbusStyle != undefined) { settingLimbusStyle = messageValues.settingLimbusStyle; }
+
+	if (checkResult == checkResultOption || checkResultOption == "ignore") {
+		return { message: autoEffectMessage(messageFormat, effectTarget, effectVal, effectCount, scaling, checkResult, settingLimbusStyle) }
+	} else {
+		return {}
+	}
+}
+
+
 /*--- AutoEffect functions end ---*/
 
 
