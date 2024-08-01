@@ -12735,7 +12735,7 @@ on('clicked:rollChallenge', (info) => {
 	let buttonid = info.htmlAttributes.id.split('_')[1];
 	rollChallenge(buttonid);
 });
-function rollChallenge(buttonid, rollDifficulty=0) {
+function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals="true") {
 	
 	/* Preparing values */
 	let headercolor = "#888";
@@ -12769,7 +12769,7 @@ function rollChallenge(buttonid, rollDifficulty=0) {
 	if (buttonid == "speed") { autoScriptTriggers.push("Combat start"); }
 	else if (buttonid != "luck") { autoScriptTriggers.push("Challenge"); }
 
-	resetConditionals();
+	if (handleAutoScriptConditionals == true) { resetConditionals(); }
 	AutoScriptMain("", autoScriptTriggers, "true", function(returnValues) {
 
 	let autoEffectDiceCount = 0;
@@ -12915,7 +12915,7 @@ function rollChallenge(buttonid, rollDifficulty=0) {
 	setAttrs({"dummy":" ", "skillSelect":"0"});
 
 
-	});
+	}, handleAutoScriptConditionals);
 	});
 }
 
@@ -14960,6 +14960,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon];
 		});
 	
+		console.log(AutoScript)
 
 		/* Execute each AutoEffect in the AutoScript */
 		AutoScript.forEach(AutoEffect => {
@@ -15067,16 +15068,20 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			/* Handle challenge rolls */
 			if (tempOutput.challengeRollStat != undefined) {
 				challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
+				delete tempOutput.challengeRollStat;
+				delete tempOutput.challengeRollDifficulty;
 			}
 
 			/* Handle message */
 			if (tempOutput.message != undefined) {
 				message += tempOutput.message;
+				delete tempOutput.message;
 			}
 
 			/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
 			if (tempOutput.messageValues != undefined) {
 				messageValues = tempOutput.messageValues;
+				delete tempOutput.messageValues;
 			}
 			
 			/* Add attribute changes from AutoEffect to output */
@@ -15106,7 +15111,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	/* Execute challange rolls */
 	for (const [statName, rollDifficulty] of Object.entries(challengeRollList)) {
 		/* Checks if any checks failed and the button should not be displayed */
-		rollChallenge(statName, rollDifficulty);
+		rollChallenge(statName, rollDifficulty, "false");
 	}
 	
 	/* Message handling */
@@ -15738,7 +15743,7 @@ function autoEffectDiceCount(AutoEffect, scaling) {
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
 	/* Check format */
-	if (AutoEffect.length != 3) { autoEffectErrorMessage(`Expected format: (ChallengeRoll #Stat N)`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 3 ) { autoEffectErrorMessage(`Expected format: (ChallengeRoll #Stat N #Silent(optional))`, AutoEffect); return {error: true}; }
 	
 	/* Handle scaling */
 	AutoEffect[2] *= scaling;
@@ -15754,9 +15759,20 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 		statTarget = AutoEffect[1].toLowerCase().replace("fortitude","instinct").replace("prudence","wisdom");
 	}
 	else { autoEffectErrorMessage(`Stat "${AutoEffect[1]}" does not exist.`, AutoEffect); return {error: true}; }
+
+	/* Handle message */
+	let message = "";
+	let messageValues = {};
+	let messageFormat = "Rolling [TARGET] <b>+</b>[SCALING NUM]";
+	if (effectVal < 0) { messageFormat = "Rolling [TARGET] [SCALING NUM]"; }
+
+	if (!AutoEffect.includes("Silent")) {
+		message = autoEffectMessage(messageFormat, (statTarget.charAt(0).toUpperCase() + statTarget.slice(1)), effectVal/scaling, 0, scaling, "success");
+	}
+	messageValues = { effectTarget: (statTarget.charAt(0).toUpperCase() + statTarget.slice(1)), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { challengeRollStat: statTarget, challengeRollDifficulty: effectVal }
+	return { challengeRollStat: statTarget, challengeRollDifficulty: effectVal, message: message, messageValues: messageValues }
 }
 
 function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundSpeed) {
