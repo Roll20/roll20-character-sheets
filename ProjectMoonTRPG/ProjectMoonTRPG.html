@@ -12236,17 +12236,21 @@ on('clicked:rollCombat', (info) => {
 getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
-		/* Get skillSelect first as it's used to gather further values */
-		getAttrs(["skillSelect"], function(values) {
+		/* Get skillSelect and toolSelect first as they're used to gather further values */
+		getAttrs(["skillSelect", "toolselect"], function(values) {
 			let skillselect = values.skillSelect;
+			let toolselect = values.toolselect;
 
         getAttrs(["egoActiveState", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "baseActNum", "Light",
 		"difficulty", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
 		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
 		`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,
-		`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript", `${skillselect}AutoScript`], function(values) {
+		`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript",
+		`${skillselect}AutoScript`, `${toolselect}Name`, `${toolselect}Description`, `${toolselect}Effect`, `${toolselect}Uses`, `${toolselect}Uses_max`, `${toolselect}Reusable`, `${toolselect}AutoScript`], function(values) {
 
+	let output = {}
+	
 	let currentlight = parseInt(values.Light);
 	let newlight = parseInt(values.Light);
 	let charname = values.character_name;
@@ -12354,6 +12358,42 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	}
 
+	/* Tool */
+	let toolDescription = "";
+	let toolEffect = "";
+	let toolinfo = "";
+	let toolname = "";
+	let tooldesc = "";
+	let tooleffect = "";
+
+	let langUse = "Use Tool";
+	let langEffectTool = "Tool Effects";
+
+	if (toolselect != "" && toolselect != null && toolselect != "0") {
+		toolname = values[`${toolselect}Name`];
+		tooldesc = values[`${toolselect}Description`];
+		tooleffect = values[`${toolselect}Effect`];
+		let tooluses = values[`${toolselect}Uses`];
+		let toolusesmax = values[`${toolselect}Uses_max`];
+		let toolreuse = values[`${toolselect}Reusable`];
+		let toolnewuses = tooluses;
+
+		if (getTranslationByKey("palette-action-tool") != false) {
+			langUse = getTranslationByKey("palette-action-tool");
+			langEffectTool = getTranslationByKey("tool-effect").replace(".","");
+		}
+
+		if(toolreuse == "Reusable"){
+			toolnewuses = parseInt(tooluses) - 1;
+			if(parseInt(newuses) < 0){ 
+				toolnewuses = "0";
+			}
+			output[`${toolselect}Uses`] = toolnewuses;
+		}
+		else {
+			output[`${toolselect}Uses`] = "0";
+		}
+	}
 
 	/* Skill */
 	let skillname = values.selectName;
@@ -12392,7 +12432,7 @@ getSectionIDs(`repeating_global`, idarray => {
 		newlight = currentlight - skillcost;
 
 		lightmessage = " <span style='color: #fee2b0'>(" + langSkill + ")</span>";
-		skillinfo= "<br><b>" + langSkill + ": </b>" + skillname + "<br>";
+		skillinfo= "<br><b>" + langSkill + ": </b>" + skillname;
 
 		skilleffect = values.selectEffect;
 
@@ -12417,9 +12457,14 @@ getSectionIDs(`repeating_global`, idarray => {
 		case "Evade": triggerType = "Evade"; break;
 	}
 
+	/* Get tool AutoAcript if any */
+	if (toolselect != "0") {
+		AutoScript += "(Reset)" + values[`${toolselect}AutoScript`];
+	}
+
 	/* Get skill AutoAcript if any */
-	if (skillselect != undefined || skillselect != "0") {
-		AutoScript += values[`${skillselect}AutoScript`];
+	if ((skillselect != undefined || skillselect != "0") && basetype == skilltype) {
+		AutoScript += "(Reset)" + values[`${skillselect}AutoScript`];
 	}
 
 	/* Clean AutoScript. Remove nested and undefined */
@@ -12608,6 +12653,19 @@ getSectionIDs(`repeating_global`, idarray => {
 	if (baseeffect == "") { baseEffectDescription = ""; skillEffectDescription = "<br>" + skillEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
 	if (skilleffect == "(No Skill)") { skillEffectDescription = ""; baseEffectDescription = baseEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
 
+	if(toolselect != "" && toolselect != null && toolselect != "0"){
+		toolDescription = "<div style='text-align: center; padding-top: 3px; padding-bottom: 3px;'><div style='text-align: left; padding: 5px;'>" + tooldesc + "</div></div>";
+		toolEffect = "<br><b>" + langEffectTool + ":</b><div class='toolEffect' style='max-height: 60px; width: 96.5%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
+		if (tooldesc == "") { toolDescription = ""; }
+		if (tooleffect == "") { toolEffect = ""; toolDescription = toolDescription.replaceAll(" padding-bottom: 3px;","").replaceAll(" padding: 5px;"," padding-top: 5px;"); }
+
+		toolinfo = "<br><b>" + langUse + "</b>: " +  toolname + "<br>";
+		
+		baseEffectDescription += toolDescription;
+		skillEffectDescription += toolEffect;
+		skillinfo += toolinfo;
+	}
+
 	let header = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + "'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 55%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + basename + "</b></div></div>";
 
 	let body = "<b>" + langFrom + ": </b>"+ charname + "<br><b>" + langRoll + ": </b>" + rollformatmessage + skillinfo + "<div style='text-align: center'>" + attackmessage + "</div>" + baseEffectDescription + skillEffectDescription + distortformat;
@@ -12621,6 +12679,7 @@ getSectionIDs(`repeating_global`, idarray => {
 
 
 	setAttrs({"baseActNum":actcounter, "dummy":info, "Light":newlight, "dummy2":rollformat, "advState":advstate});
+	setAttrs(output);
 
 	let whisper = "";
 	if(whisperrolls == "true"){
