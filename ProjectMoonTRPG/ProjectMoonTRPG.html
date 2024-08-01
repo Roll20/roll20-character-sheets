@@ -2733,8 +2733,7 @@
 <!-- AutoEffect Conditional Buttons -->
 <div class="conditionalButtonDisplay" style="margin-top: 10px;">
 	<fieldset class="repeating_conditionalButtons">
-		<input type="checkbox" class="hide-toggle-rev" name="attr_hideButton" hidden="true" value="true">
-		<div class="hide-item-rev conditionalButton">
+		<div class="conditionalButton">
 			<button type="action" class="conditionalButtonAct" name="act_activate"></button> 
 			<input type="text" class="conditionalButtonName" name="attr_buttonName" value="">
 			<input type="text" name="attr_buttonAutoScript" hidden="true">
@@ -14745,7 +14744,7 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 
 	AutoScriptMain(buttonAutoScript, "None", "false", function(returnValues) {
 		if (returnValues.checkResult != "success") {
-			setAttrs({[`repeating_conditionalButtons_${buttonid}_hideButton`]: "true"})
+			removeRepeatingRow("repeating_conditionalButtons_" + buttonid)
 		}
 	}, "false", buttonName);
 	});
@@ -15189,7 +15188,7 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		message = message.replaceAll(langInitial, "<b>" + parseFloat(effectCount) + "</b>");
 		message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>");
 		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("limbus/","").replace("community/","") + "</b>");
-		
+
 		/* Icon handling */
 		/* Get target icon. Is in this format: [/TARGET] */
 		message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget, settingLimbusStyle));
@@ -15293,12 +15292,13 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 
 	/* Handle message */
 	let messageFormat = "Require [SCALING NUM] [TARGET]: [CHECK]";
+	let effectIcon = ailmentList[effectName][4];
 	if (ailmentList.hasOwnProperty(effectName)) { messageFormat = "[/TARGET] " + messageFormat; }
 
 	if (!AutoEffect.includes("Silent")) {
 		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal/scaling, count, scaling, returnValues.checkResult);
 	}
-	returnValues.messageValues = { effectTarget: effectName, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: returnValues.checkResult }
+	returnValues.messageValues = { effectTarget: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
@@ -15359,12 +15359,13 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 
 	/* Handle message */
 	let messageFormat = "Consume [SCALING NUM] [TARGET]: [CHECK]";
+	let effectIcon = ailmentList[effectName][4];
 	if (ailmentList.hasOwnProperty(effectName)) { messageFormat = "[/TARGET] " + messageFormat; }
 
 	if (!(AutoEffect.includes("Silent"))) {
 		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal/scaling, count, scaling, returnValues.checkResult);
 	}
-	returnValues.messageValues = { effectTarget: effectName, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: returnValues.checkResult }
+	returnValues.messageValues = { effectTarget: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
