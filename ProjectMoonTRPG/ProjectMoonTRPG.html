@@ -15164,6 +15164,9 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		let langNum = "[NUM]";
 		let langScaling = "[SCALING]";
 		let langScalingNum = "[SCALING NUM]";
+		let langNegNum = "[-NUM]";
+		let langNegScaling = "[-SCALING]";
+		let langNegScalingNum = "[-SCALING NUM]";
 		let langInitial = "[INITIAL]";
 		let langResult = "[RESULT]";
 		let langTarget = "[TARGET]";
@@ -15185,6 +15188,9 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		message = message.replaceAll(langNum, "<b>" + effectVal + "</b>");
 		message = message.replaceAll(langScaling,  "<b>" + scaling + "</b>");
 		message = message.replaceAll(langScalingNum, "<b>" + (parseFloat(scaling) * parseFloat(effectVal)) + "</b>");
+		message = message.replaceAll(langNegNum, "<b>" + (-effectVal) + "</b>");
+		message = message.replaceAll(langNegScaling,  "<b>" + (-scaling) + "</b>");
+		message = message.replaceAll(langNegScalingNum, "<b>" + (-parseFloat(scaling) * parseFloat(effectVal)) + "</b>");
 		message = message.replaceAll(langInitial, "<b>" + parseFloat(effectCount) + "</b>");
 		message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>");
 		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("limbus/","").replace("community/","") + "</b>");
@@ -15469,7 +15475,7 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 	if (scaling == 0) { return {}; }
 
 	/* Get value */
-	let effectVal = parseInt(Math.abs(AutoEffect[1]));
+	let effectVal = parseInt(AutoEffect[1]);
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
 	let count = 0;
 
@@ -15486,7 +15492,7 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 	let message = "";
 	let messageValues = {};
 	let messageFormat = "Regened [SCALING NUM] [TARGET]";
-	if (effectVal < 0) { messageFormat = "Recieved [SCALING NUM] [TARGET] damage"; }
+	if (effectVal < 0) { messageFormat = "Recieved [-SCALING NUM] [TARGET] damage"; }
 
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
