@@ -14869,7 +14869,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			if (egoAutoScript == null) { egoAutoScript = ""; }
 		}
 		
-		let collectedAutoScripts = AutoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
+		let collectedAutoScripts = autoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
 
 		collectedAutoScripts.forEach((trigger) => {
 			if (autoScriptTriggers.includes(trigger[0])) {
@@ -14879,7 +14879,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		});
 
 	/* Convert AutoScript to an array */
-	AutoScript = AutoScriptToArray(AutoScript);
+	AutoScript = autoScriptToArray(AutoScript);
 
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
@@ -15000,7 +15000,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 					} else {
 						conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
 					}
-					console.log(conditionalButtonList[autoEffectConditional])
 	
 					/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
 					if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
@@ -15105,7 +15104,11 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			/* Handle message */
 			if (tempOutput.message != undefined) {
 				if (autoEffectType == "conditional message" || autoEffectType == "conditional message + button") {
-					conditionalMessageList[autoEffectConditional] += tempOutput.message;
+					if (conditionalMessageList[autoEffectConditional] != undefined) {
+						conditionalMessageList[autoEffectConditional] += tempOutput.message;
+					} else {
+						conditionalMessageList[autoEffectConditional] = tempOutput.message;
+					}
 				} else {
 					message += tempOutput.message;
 				}
@@ -15158,13 +15161,10 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	
 	/* Message handling */
 	if (settingMuteMessage != "true" && message != "") {
-		let newmessage = "<div class='autoeffectContainer'>"
-		
 		if (returnMessage == "false") {
 			let messageHeaderIcon = getIcon("icons", "gear");
-			newmessage += message + "</div>";
 
-			setAttrs({dummyIcon: messageHeaderIcon, dummy: newmessage});
+			setAttrs({dummyIcon: messageHeaderIcon, dummy: "<div class='autoeffectContainer'>" + message + "</div>"});
 
 			let whisper = "";
 			if(settingWhisperRolls == "true"){
@@ -15176,28 +15176,17 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			});
 		}
 		else {
-			newmessage += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
-			newmessage += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: #85a874;">`
-			newmessage += `${getIcon("icons", "gear")}`
-			newmessage += `</div>`
-			newmessage += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>AutoEffects</b></div>`
-			newmessage += `</div>` + message + "</div>";
-
-			returnValues.message = newmessage;
+			returnValues.message = autoEffectEntry("AutoEffects", message, "gear");
 		}
 	}
 
 	/* Conditional message handling */
 	for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
-		let newmessage = "<div class='autoeffectContainer'>";
-		newmessage += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
-		newmessage += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: #85a874;">`
-		newmessage += `${getIcon("icons", "gear")}`
-		newmessage += `</div>`
-		newmessage += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>${conditionName}</b></div>`
-		newmessage += `</div>` + conditionMessage + "</div>";
-		
-		returnValues.message += newmessage;
+		if (returnValues.message == undefined) {
+			returnValues.message = autoEffectEntry(conditionName, conditionMessage, "gear");
+		} else {
+			returnValues.message += autoEffectEntry(conditionName, conditionMessage, "gear");
+		}
 	}
 	
 	/* Error handling and returnValues callback */
@@ -15224,7 +15213,7 @@ function cleanAutoScript(AutoScript) {
 /* Converts an AutoScript from a string to an array */
 /* mode: normal is for strings of type (AutoEffect...) (AutoEffect...) ... */
 /* mode: nested is for strings of type [#Offensive, (AutoEffect...) ... #] [#Round start, (AutoEffect...) ... ]*/
-function AutoScriptToArray(inputAutoScript, mode="normal") {
+function autoScriptToArray(inputAutoScript, mode="normal") {
 	let AutoScript = inputAutoScript;
 	let AutoEffect = "";
 	let AutoEffectArray = [];
@@ -15279,6 +15268,18 @@ function AutoScriptToArray(inputAutoScript, mode="normal") {
 
 
 /*--- AutoEffect functions ---*/
+function autoEffectEntry(header, message, iconName) {
+	let newEntry  = "<div class='autoeffectContainer'>"
+		newEntry += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
+		newEntry += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: #85a874;">`
+		newEntry += `${getIcon("icons", iconName)}`
+		newEntry += `</div>`;
+		newEntry += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>${header}</b></div>`
+		newEntry += `</div>` + message + "</div>";
+
+	return newEntry;
+}
+
 function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false") {
 	if(messageFormat != ""){
 		let message = messageFormat;
