@@ -14912,12 +14912,16 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		
 		let scaling = 1;
 		let checkResult = "success";
-		
+		let autoEffectType = "standard";
+
+		let autoEffectConditional = "";
+		let conditionalMessageList = {};
+		let conditionalButtonList = {};
+		let conditionalButtonSilent = "";
+
 		let output = {};
 		let tempOutput = {};
 		let returnValues = { checkResult:"success", error:false, };
-		let conditionalList = {};
-		let conditionalMessageList = {};
 		let challengeRollList = {};
 		let message = "";
 		let messageValues = {};
@@ -14967,19 +14971,36 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 
 		/* Execute each AutoEffect in the AutoScript */
 		AutoScript.forEach(AutoEffect => {
-			if (AutoEffect == undefined) {
+		if (AutoEffect == undefined) {
 			return;
 		}
 		/* Handle conditional */
 		if (AutoEffect.length > 1) {
 			AutoEffect.slice(1).forEach(conditional => {
+				/* If conditional message, execute the script as normal but do not apply any effects and add the message to a seperate section */
+				if (conditional.includes("#Message") && !conditional.includes("#MessageButton")) {
+					autoEffectConditional = conditional.replace("#Message","").trim();
+					autoEffectType = "conditional message";
+				}
 				/* If conditional button, add AutoEffect to either a new conditional button or a existing one */
-				if (!conditional.includes("#Message")) {
-					if (conditionalList.hasOwnProperty(conditional)) {
-						conditionalList[conditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+				/* If conditional message + button, add Silent to AutoEffect after execution */
+				else {
+					if (conditional.includes("#MessageButton") || conditional.includes("#ButtonMessage")) {
+						autoEffectConditional = conditional.replace("#MessageButton","").replace("#ButtonMessage","").trim();
+						conditionalButtonSilent = AutoEffect[0].includes("Silent") ? "" : " Silent";
+						autoEffectType = "conditional message + button";
 					} else {
-						conditionalList[conditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+						autoEffectConditional = conditional.replace("#Button","").trim();
+						conditionalButtonSilent = "";
+						autoEffectType = "conditional button";
 					}
+
+					if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
+						conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
+					} else {
+						conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
+					}
+					console.log(conditionalButtonList[autoEffectConditional])
 	
 					/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
 					if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
@@ -14989,23 +15010,44 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 							default: tempOutput = {}; break;
 						}
 						if (tempOutput.checkResult == "failure") {
-							conditionalList[conditional] = "#Do not display#";
+							conditionalButtonList[autoEffectConditional] = "#Do not display#";
 						}
 					}
 				}
-				/* If conditional message, add AutoEffect return message to a new section for the current roll */
-				else {
-					conditional = conditional.replace("#Message","").trim();
-					tempOutput = autoEffectExecute(AutoEffect[0], ailmentList, barList, barDamageList, scaling, settingLimbusStyle, checkResult, messageValues, thisRoundSpeed, nextRoundSpeed);
-					conditionalMessageList[conditional] = tempOutput.message;
-					console.log(conditionalMessageList)
-				}
 			});
+		} else {
+			autoEffectType = "standard";
 		}
 		/* If not conditional, process AutoEffect as normal */
-		else {
+		if (autoEffectType != "conditional button") {
 			/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
-			tempOutput = autoEffectExecute(AutoEffect[0], ailmentList, barList, barDamageList, scaling, settingLimbusStyle, checkResult, messageValues, thisRoundSpeed, nextRoundSpeed);
+			/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
+			switch (AutoEffect[0][0]) {
+				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+				case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
+				case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
+				default: tempOutput = {}; break;
+			}
+			if (checkResult != "failure") {
+				switch (AutoEffect[0][0]) {
+					case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
+					case "Gain": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
+					case "Inflict": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
+					case "Give": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
+					case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
+					case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
+					case "Multi": tempOutput = autoEffectMultiBar(AutoEffect[0], barList, scaling); break;
+					case "DicePower": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+					case "DiceMax": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+					case "DiceCount": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+					case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
+					case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
+					case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
+					case "Speed": tempOutput = autoEffectSpeed(AutoEffect[0], scaling, thisRoundSpeed, nextRoundSpeed); break;
+					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect} is not a valid AutoEffect`, AutoEffect); break;
+				}
+			}
 			console.log(tempOutput)
 			
 			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
@@ -15062,7 +15104,11 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 
 			/* Handle message */
 			if (tempOutput.message != undefined) {
-				message += tempOutput.message;
+				if (autoEffectType == "conditional message" || autoEffectType == "conditional message + button") {
+					conditionalMessageList[autoEffectConditional] += tempOutput.message;
+				} else {
+					message += tempOutput.message;
+				}
 				delete tempOutput.message;
 			}
 
@@ -15071,16 +15117,24 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 				messageValues = tempOutput.messageValues;
 				delete tempOutput.messageValues;
 			}
+
+			/* Handle conditional message + button having silent AutoEffects */
+			if (autoEffectType == "conditional message + button") {
+				AutoEffect[0].push("Silent");
+			}
+			console.log(AutoEffect)
 			
 			/* Add attribute changes from AutoEffect to output */
 			/* The first time a attribute is modified, add its count */
 			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
 			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
 			for (const property in tempOutput) {
-				if (output.hasOwnProperty(property)) {
-					output[property] += Math.floor(tempOutput[property]);
-				} else {
-					output[property] = Math.floor(tempOutput[property] + tempOutput.count);
+				if (autoEffectType == "standard") {
+					if (output.hasOwnProperty(property)) {
+						output[property] += Math.floor(tempOutput[property]);
+					} else {
+						output[property] = Math.floor(tempOutput[property] + tempOutput.count);
+					}
 				}
 			}
 		}
@@ -15090,7 +15144,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	setAttrs(output);
 	
 	/* Create conditional buttons */
-	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalList)) {
+	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalButtonList)) {
 		/* Checks if any checks failed and the button should not be displayed */
 		if (buttonAutoScript.indexOf("#Do not display#") != -1) { continue; }
 		createConditionalButton(buttonName, buttonAutoScript);
@@ -15225,41 +15279,6 @@ function AutoScriptToArray(inputAutoScript, mode="normal") {
 
 
 /*--- AutoEffect functions ---*/
-function autoEffectExecute(AutoEffect, ailmentList, barList, barDamageList, scaling=1, settingLimbusStyle="false", checkResult="success", messageValues={}, thisRoundSpeed="0", nextRoundSpeed="0") {
-	
-	let tempOutput = {};
-	
-	/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
-	switch (AutoEffect[0]) {
-		case "Require": tempOutput = autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList); break;
-		case "Consume": tempOutput = autoEffectConsume(AutoEffect, ailmentList, barList); break;
-		case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
-		case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect, messageValues); break;
-		default: tempOutput = {}; break;
-	}
-	if (checkResult != "failure") {
-		switch (AutoEffect[0]) {
-			case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
-			case "Gain": tempOutput = autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle); break;
-			case "Inflict": tempOutput = autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle); break;
-			case "Give": tempOutput = autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle); break;
-			case "Set": tempOutput = autoEffectSetBar(AutoEffect, barList, scaling); break;
-			case "Add": tempOutput = autoEffectAddBar(AutoEffect, barList, scaling); break;
-			case "Multi": tempOutput = autoEffectMultiBar(AutoEffect, barList, scaling); break;
-			case "DicePower": tempOutput = autoEffectDice(AutoEffect, scaling); break;
-			case "DiceMax": tempOutput = autoEffectDice(AutoEffect, scaling); break;
-			case "DiceCount": tempOutput = autoEffectDice(AutoEffect, scaling); break;
-			case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect, barList, scaling); break;
-			case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect, barList, scaling); break;
-			case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect, scaling); break;
-			case "Speed": tempOutput = autoEffectSpeed(AutoEffect, scaling, thisRoundSpeed, nextRoundSpeed); break;
-			default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect} is not a valid AutoEffect`, AutoEffect); break;
-		}
-	}
-
-	return tempOutput;
-}
-
 function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false") {
 	if(messageFormat != ""){
 		let message = messageFormat;
@@ -15364,6 +15383,12 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	let checkResult = "success";
 	let settingLimbusStyle = "false";
 
+	/* Check if CustomMessage is silent. No reason to do any formatting being that the message will not be displayed anyways */
+	let silent = "false";
+	if (AutoEffect.indexOf("Silent") > AutoEffect.lastIndexOf('"')) {
+		silent = "true";
+	}
+
 	if (AutoEffect[1] != undefined) { messageFormat = AutoEffect.slice(1).join(" "); }
 	if ((/\"[ \t]*(checksuccess)/ig).test(messageFormat)) { messageFormat = messageFormat.replaceAll(/\"[ \t]*(checksuccess)/ig, "") }
 	else if ((/\"[ \t]*(checkfailure)/ig).test(messageFormat)) { checkResultOption = "failure"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkfailure)/ig, "") }
@@ -15377,7 +15402,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	if (messageValues.checkResult != undefined) { checkResult = messageValues.checkResult.replace("last ","");}
 	if (messageValues.settingLimbusStyle != undefined) { settingLimbusStyle = messageValues.settingLimbusStyle; }
 
-	if (checkResult == checkResultOption || checkResultOption == "ignore") {
+	if (silent == "false" && (checkResult == checkResultOption || checkResultOption == "ignore")) {
 		return { message: autoEffectMessage(messageFormat, effectTarget, effectVal, effectCount, scaling, checkResult, settingLimbusStyle) }
 	} else {
 		return {}
