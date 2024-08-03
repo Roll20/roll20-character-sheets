@@ -2072,7 +2072,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 
 on('clicked:grenade-miss', async function(eventInfo) {
     let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
-    let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
+    let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Melf’s Minute Meteor|Otiluke’s Freezing Sphere - Globe of cold|Produce Flame|Fire Seed missile|Other}');
     switch (grenade) {
         case 'Acid': {
             rollBuilder.push(
@@ -2114,6 +2114,46 @@ on('clicked:grenade-miss', async function(eventInfo) {
             );
             break;
         }
+        case 'Melf’s Minute Meteor': {
+            rollBuilder.push(
+                'name=Melf’s Minute Meteor',
+                'aoe=[[1]]',
+                'aoesplash=[[6]]',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;1d4&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Direct Hit&#41;)',
+                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;1&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Splash&#41;)'
+            );
+            break;
+        }
+        case 'Otiluke’s Freezing Sphere - Globe of cold': {
+            rollBuilder.push(
+                'name=Otiluke’s Freezing Sphere (Globe of cold)',
+                'aoe=[[20]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break;
+        }
+        case 'Produce Flame': {
+            rollBuilder.push(
+                'name=Produce Flame',
+                'aoe=[[3]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;1d4+1&rbrack;&rbrack; fire damage using their Produce Flame! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break;
+        }
+        case 'Fire Seed missile': {
+            rollBuilder.push(
+                'name=Fire Seed missile',
+                'aoe=[[10]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage using their Fire Seed missile! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break
+        }
         case 'Other': {
             let name = await extractQueryResult('?{Grenade name}');
             let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
@@ -2134,7 +2174,17 @@ on('clicked:grenade-miss', async function(eventInfo) {
             );
         }
     }
-    let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
+
+    let distanceName;
+    switch (grenade) {
+        case 'Melf’s Minute Meteor':
+        case 'Produce Flame':
+        case 'Fire Seed missile':
+            distanceName = 'Short';
+            break;
+        default:
+            distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
+    }
     rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
     switch (distanceName) {
         case 'Short': rollBuilder.push('distance=[[1d6cs1cf6]]'); break;
