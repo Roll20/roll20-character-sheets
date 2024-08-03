@@ -13287,7 +13287,7 @@ on('clicked:applyDamage', (info) => {
 
 	/* Calculation summaries (Message head) */
 	hpDamageHead = generateDamageHelperHeader("HP", newHP, oldHP);
-	stDamageHead = generateDamageHelperHeader("ST", newST, oldST);
+	stDamageHead = generateDamageHelperHeader("ST", newST, oldST, staggerState);
 	spDamageHead = generateDamageHelperHeader("SP", newSP, oldSP);
 
 	/* Simple display settings (Envelops entire body block)*/
@@ -13390,18 +13390,20 @@ function getIcon(iconFolder, iconName, settingLimbusStyle = "false") {
 	}
 }
 
-function generateDamageHelperHeader(statName, newStat, oldStat) {
+function generateDamageHelperHeader(statName, newStat, oldStat, staggerState="0") {
 	let langBar = "HP";
 	let langDamage = "damage";
-	let langSuffered = "Suffered";
-	let langSufferedNo = "Suffered no";
+	let langSuffered = "received";
+	let langSufferedNo = "Received no";
 	let langRegened = "Regened";
+	let langStaggered = "Regened";
 	
 	let updateDisplay = "";
 	let displayContent = "";
 
 	if(getTranslationByKey("message-damage") != false) {
 		langDamage = getTranslationByKey("message-damage");
+		langStaggered = getTranslationByKey("ailments-stagger-text");
 		switch (statName) {
 			case "HP": langBar = getTranslationByKey("bar-health-shortened"); break;
 			case "ST": langBar = getTranslationByKey("bar-stagres-shortened"); break;
@@ -13410,14 +13412,14 @@ function generateDamageHelperHeader(statName, newStat, oldStat) {
 	} else {
 		langBar = statName;
 	}
+	if (staggerState == "Staggered") { updateDisplay = `<div class="updateStatDisplay"><b>${langStaggered}!</b></div>`; }
+	else { updateDisplay = `<div class="updateStatDisplay"><b>${oldStat} -> ${newStat}</b></div>`; }
 
-	updateDisplay = `<div class="updateStatDisplay"><b>${oldStat} -> ${newStat}</b></div>`;
-
-	if (newStat < oldStat) { langSuffered = getTranslationByKey("message-suffered");
-		return `<div><div class="damageDisplay">${langSuffered} ${oldStat-newStat} ${langBar} ${langDamage}</div>${updateDisplay}</div>`; }
+	if (newStat < oldStat) { langSuffered = getTranslationByKey("message-received");
+		return `<div><div class="damageDisplay">${oldStat-newStat} ${langBar} ${langDamage} ${langSuffered}</div>${updateDisplay}</div>`; }
 	else if (newStat > oldStat) { langRegened = getTranslationByKey("message-regened-capitalized");
 		return `<div><div class="damageDisplay">${langRegened} ${newStat-oldStat} ${langBar}</div>${updateDisplay}</div>`; }
-	else { langSufferedNo = getTranslationByKey("message-suffered-no");
+	else { langSufferedNo = getTranslationByKey("message-received-no");
 		return `<div><div class="noDamage damageDisplay">${langSufferedNo} ${langBar} ${langDamage}</div>${updateDisplay}</div>` }
 }
 
@@ -14915,6 +14917,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		let tempOutput = {};
 		let returnValues = { checkResult:"success", error:false, };
 		let conditionalList = {};
+		let conditionalMessageList = {};
 		let challengeRollList = {};
 		let message = "";
 		let messageValues = {};
@@ -14967,57 +14970,42 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			if (AutoEffect == undefined) {
 			return;
 		}
-		/* If conditional, add AutoEffect to either a new conditional button or a existing one */
+		/* Handle conditional */
 		if (AutoEffect.length > 1) {
 			AutoEffect.slice(1).forEach(conditional => {
-				if (conditionalList.hasOwnProperty(conditional)) {
-					conditionalList[conditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + ")";
-				} else {
-					conditionalList[conditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+				/* If conditional button, add AutoEffect to either a new conditional button or a existing one */
+				if (!conditional.includes("#Message")) {
+					if (conditionalList.hasOwnProperty(conditional)) {
+						conditionalList[conditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+					} else {
+						conditionalList[conditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + ")";
+					}
+	
+					/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
+					if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
+						switch (AutoEffect[0][0]) {
+							case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+							case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+							default: tempOutput = {}; break;
+						}
+						if (tempOutput.checkResult == "failure") {
+							conditionalList[conditional] = "#Do not display#";
+						}
+					}
 				}
-
-				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
-				if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
-					switch (AutoEffect[0][0]) {
-						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
-						default: tempOutput = {}; break;
-					}
-					if (tempOutput.checkResult == "failure") {
-						conditionalList[conditional] = "#Do not display#";
-					}
+				/* If conditional message, add AutoEffect return message to a new section for the current roll */
+				else {
+					conditional = conditional.replace("#Message","").trim();
+					tempOutput = autoEffectExecute(AutoEffect[0], ailmentList, barList, barDamageList, scaling, settingLimbusStyle, checkResult, messageValues, thisRoundSpeed, nextRoundSpeed);
+					conditionalMessageList[conditional] = tempOutput.message;
+					console.log(conditionalMessageList)
 				}
 			});
 		}
 		/* If not conditional, process AutoEffect as normal */
 		else {
 			/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
-			switch (AutoEffect[0][0]) {
-				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
-				case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
-				case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
-				default: tempOutput = {}; break;
-			}
-			if (checkResult != "failure") {
-				switch (AutoEffect[0][0]) {
-					case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
-					case "Gain": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "Inflict": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "Give": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
-					case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
-					case "Multi": tempOutput = autoEffectMultiBar(AutoEffect[0], barList, scaling); break;
-					case "DicePower": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
-					case "DiceMax": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
-					case "DiceCount": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
-					case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
-					case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
-					case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
-					case "Speed": tempOutput = autoEffectSpeed(AutoEffect[0], scaling, thisRoundSpeed, nextRoundSpeed); break;
-					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
-				}
-			}
+			tempOutput = autoEffectExecute(AutoEffect[0], ailmentList, barList, barDamageList, scaling, settingLimbusStyle, checkResult, messageValues, thisRoundSpeed, nextRoundSpeed);
 			console.log(tempOutput)
 			
 			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
@@ -15144,6 +15132,19 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			returnValues.message = newmessage;
 		}
 	}
+
+	/* Conditional message handling */
+	for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
+		let newmessage = "<div class='autoeffectContainer'>";
+		newmessage += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
+		newmessage += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: #85a874;">`
+		newmessage += `${getIcon("icons", "gear")}`
+		newmessage += `</div>`
+		newmessage += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>${conditionName}</b></div>`
+		newmessage += `</div>` + conditionMessage + "</div>";
+		
+		returnValues.message += newmessage;
+	}
 	
 	/* Error handling and returnValues callback */
 	if (returnValues.error == true) {
@@ -15224,7 +15225,40 @@ function AutoScriptToArray(inputAutoScript, mode="normal") {
 
 
 /*--- AutoEffect functions ---*/
+function autoEffectExecute(AutoEffect, ailmentList, barList, barDamageList, scaling=1, settingLimbusStyle="false", checkResult="success", messageValues={}, thisRoundSpeed="0", nextRoundSpeed="0") {
+	
+	let tempOutput = {};
+	
+	/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
+	switch (AutoEffect[0]) {
+		case "Require": tempOutput = autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList); break;
+		case "Consume": tempOutput = autoEffectConsume(AutoEffect, ailmentList, barList); break;
+		case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
+		case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect, messageValues); break;
+		default: tempOutput = {}; break;
+	}
+	if (checkResult != "failure") {
+		switch (AutoEffect[0]) {
+			case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
+			case "Gain": tempOutput = autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle); break;
+			case "Inflict": tempOutput = autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle); break;
+			case "Give": tempOutput = autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle); break;
+			case "Set": tempOutput = autoEffectSetBar(AutoEffect, barList, scaling); break;
+			case "Add": tempOutput = autoEffectAddBar(AutoEffect, barList, scaling); break;
+			case "Multi": tempOutput = autoEffectMultiBar(AutoEffect, barList, scaling); break;
+			case "DicePower": tempOutput = autoEffectDice(AutoEffect, scaling); break;
+			case "DiceMax": tempOutput = autoEffectDice(AutoEffect, scaling); break;
+			case "DiceCount": tempOutput = autoEffectDice(AutoEffect, scaling); break;
+			case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect, barList, scaling); break;
+			case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect, barList, scaling); break;
+			case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect, scaling); break;
+			case "Speed": tempOutput = autoEffectSpeed(AutoEffect, scaling, thisRoundSpeed, nextRoundSpeed); break;
+			default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect} is not a valid AutoEffect`, AutoEffect); break;
+		}
+	}
 
+	return tempOutput;
+}
 
 function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false") {
 	if(messageFormat != ""){
