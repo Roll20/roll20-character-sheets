@@ -14872,7 +14872,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		let collectedAutoScripts = autoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
 
 		collectedAutoScripts.forEach((trigger) => {
-			if (autoScriptTriggers.includes(trigger[0])) {
+			if (autoScriptTriggers.includes(getTriggerFromTranslation(trigger[0]))) {
 				if (AutoScript != "") { AutoScript += "(Reset)"; }
 				AutoScript += trigger[1];
 			}
@@ -14880,6 +14880,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 
 	/* Convert AutoScript to an array */
 	AutoScript = autoScriptToArray(AutoScript);
+
+	/* Translates AutoEffect names, bars and ailments to English */
+	AutoScript = translateAutoScriptArrayToEnglish(AutoScript);
 
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
@@ -14967,180 +14970,180 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon];
 		});
 	
-		console.log(AutoScript)
 
-		/* Execute each AutoEffect in the AutoScript */
-		AutoScript.forEach(AutoEffect => {
-		if (AutoEffect == undefined) {
+	/* Execute each AutoEffect in the AutoScript */
+	AutoScript.forEach(AutoEffect => {
+	if (AutoEffect == undefined) {
+		return;
+	}
+	/* Handle conditional */
+	if (AutoEffect.length > 1) {
+		AutoEffect.slice(1).forEach(conditional => {
+			/* If conditional message, execute the script as normal but do not apply any effects and add the message to a seperate section */
+			if (conditional.includes("#Message") && !conditional.includes("#MessageButton")) {
+				autoEffectConditional = conditional.replace("#Message","").trim();
+				autoEffectType = "conditional message";
+			}
+			/* If conditional button, add AutoEffect to either a new conditional button or a existing one */
+			/* If conditional message + button, add Silent to AutoEffect after execution */
+			else {
+				if (conditional.includes("#MessageButton")) {
+					autoEffectConditional = conditional.replace("#MessageButton","").trim();
+					conditionalButtonSilent = AutoEffect[0].includes("Silent") ? "" : " " + "Silent";
+					autoEffectType = "conditional message + button";
+				} else {
+					autoEffectConditional = conditional.replace("Button","").trim();
+					conditionalButtonSilent = "";
+					autoEffectType = "conditional button";
+				}
+
+				if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
+					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
+				} else {
+					conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
+				}
+
+				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
+				if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
+					switch (AutoEffect[0][0]) {
+						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+						default: tempOutput = {}; break;
+					}
+					if (tempOutput.checkResult == "failure") {
+						conditionalButtonList[autoEffectConditional] = "#Do not display#";
+					}
+				}
+			}
+		});
+	} else {
+		autoEffectType = "standard";
+	}
+	/* If not conditional, process AutoEffect as normal */
+	if (autoEffectType != "conditional button") {
+		/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
+		switch (AutoEffect[0][0]) {
+			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+			case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+			case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
+			case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
+			default: tempOutput = {}; break;
+		}
+		if (checkResult != "failure") {
+			switch (AutoEffect[0][0]) {
+				case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
+				case "Gain": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
+				case "Inflict": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
+				case "Give": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
+				case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
+				case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
+				case "Multi": tempOutput = autoEffectMultiBar(AutoEffect[0], barList, scaling); break;
+				case "DicePower": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+				case "DiceMax": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+				case "DiceCount": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
+				case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
+				case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
+				case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
+				case "Speed": tempOutput = autoEffectSpeed(AutoEffect[0], scaling, thisRoundSpeed, nextRoundSpeed); break;
+				default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
+			}
+		}
+		console.log(tempOutput)
+		
+		/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
+		/*  but does not apply any changes to attributes */
+		if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
+			returnValues.error == true;
+			output = {};
 			return;
 		}
-		/* Handle conditional */
-		if (AutoEffect.length > 1) {
-			AutoEffect.slice(1).forEach(conditional => {
-				/* If conditional message, execute the script as normal but do not apply any effects and add the message to a seperate section */
-				if (conditional.includes("#Message") && !conditional.includes("#MessageButton")) {
-					autoEffectConditional = conditional.replace("#Message","").trim();
-					autoEffectType = "conditional message";
-				}
-				/* If conditional button, add AutoEffect to either a new conditional button or a existing one */
-				/* If conditional message + button, add Silent to AutoEffect after execution */
-				else {
-					if (conditional.includes("#MessageButton") || conditional.includes("#ButtonMessage")) {
-						autoEffectConditional = conditional.replace("#MessageButton","").replace("#ButtonMessage","").trim();
-						conditionalButtonSilent = AutoEffect[0].includes("Silent") ? "" : " Silent";
-						autoEffectType = "conditional message + button";
-					} else {
-						autoEffectConditional = conditional.replace("#Button","").trim();
-						conditionalButtonSilent = "";
-						autoEffectType = "conditional button";
-					}
 
-					if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
-						conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
-					} else {
-						conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
-					}
-	
-					/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
-					if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
-						switch (AutoEffect[0][0]) {
-							case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-							case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
-							default: tempOutput = {}; break;
-						}
-						if (tempOutput.checkResult == "failure") {
-							conditionalButtonList[autoEffectConditional] = "#Do not display#";
-						}
-					}
-				}
-			});
-		} else {
-			autoEffectType = "standard";
+		/* Handle changes to scaling */
+		if (tempOutput.hasOwnProperty("scaling")) {
+			scaling = parseInt(tempOutput.scaling);
+			delete tempOutput.scaling;
 		}
-		/* If not conditional, process AutoEffect as normal */
-		if (autoEffectType != "conditional button") {
-			/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
-			/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
-			switch (AutoEffect[0][0]) {
-				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
-				case "Reset": tempOutput = {checkResult: "success", scaling: 1}; break;
-				case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
-				default: tempOutput = {}; break;
+
+		/* Handle check results from Require and Consume */
+		/* For the returnValues, the worst result is returned */
+		if (tempOutput.checkResult != undefined) {
+			checkResult = tempOutput.checkResult;
+			if (returnValues.checkResult == "success") {
+				returnValues.checkResult = tempOutput.checkResult;
 			}
-			if (checkResult != "failure") {
-				switch (AutoEffect[0][0]) {
-					case "Require": case "Consume": case "Reset": case "CustomMessage": break; /* Already executed above */
-					case "Gain": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "Inflict": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "Give": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
-					case "Set": tempOutput = autoEffectSetBar(AutoEffect[0], barList, scaling); break;
-					case "Add": tempOutput = autoEffectAddBar(AutoEffect[0], barList, scaling); break;
-					case "Multi": tempOutput = autoEffectMultiBar(AutoEffect[0], barList, scaling); break;
-					case "DicePower": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
-					case "DiceMax": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
-					case "DiceCount": tempOutput = autoEffectDice(AutoEffect[0], scaling); break;
-					case "BaseDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
-					case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
-					case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
-					case "Speed": tempOutput = autoEffectSpeed(AutoEffect[0], scaling, thisRoundSpeed, nextRoundSpeed); break;
-					default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect} is not a valid AutoEffect`, AutoEffect); break;
-				}
+			else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
+				returnValues.checkResult = tempOutput.checkResult;
 			}
-			console.log(tempOutput)
+			delete tempOutput.checkResult;
+		}
+
+		/* Handle updating ailmentList and barList after a successful Consume AutoEffect */
+		if (tempOutput.consumeList != undefined) {
+			if (tempOutput.consumeList == "barList") {
+				barList[tempOutput.consumeTarget] = parseInt(barList[tempOutput.consumeTarget]) + parseInt(tempOutput.consumeVal);
+			} else {
+				ailmentList[tempOutput.consumeTarget][1] = parseInt(ailmentList[tempOutput.consumeTarget][1]) + parseInt(tempOutput.consumeVal);
+			}
+			delete tempOutput.consumeList;
+			delete tempOutput.consumeVal;
+			delete tempOutput.consumeVal;
+		}
+
+		/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
+		if (tempOutput.dicePower != undefined) { returnValues.dicePower = tempOutput.dicePower }
+		if (tempOutput.diceMax != undefined) { returnValues.diceMax = tempOutput.diceMax }
+		if (tempOutput.diceCount != undefined) { returnValues.diceCount = tempOutput.diceCount }
+		if (tempOutput.speedCombat != undefined) { returnValues.speedCombat = tempOutput.speedCombat }
+
+		/* Handle challenge rolls */
+		if (tempOutput.challengeRollStat != undefined) {
+			challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
+			delete tempOutput.challengeRollStat;
+			delete tempOutput.challengeRollDifficulty;
+		}
+
+		/* Handle message */
+		if (tempOutput.message != undefined) {
+			/* Translate output message. Targets are still written in English */
+			tempOutput.message = autoEffectTranslateMessage(tempOutput.message);
 			
-			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
-			/*  but does not apply any changes to attributes */
-			if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
-				returnValues.error == true;
-				output = {};
-				return;
-			}
-	
-			/* Handle changes to scaling */
-			if (tempOutput.hasOwnProperty("scaling")) {
-				scaling = parseInt(tempOutput.scaling);
-				delete tempOutput.scaling;
-			}
-	
-			/* Handle check results from Require and Consume */
-			/* For the returnValues, the worst result is returned */
-			if (tempOutput.checkResult != undefined) {
-				checkResult = tempOutput.checkResult;
-				if (returnValues.checkResult == "success") {
-					returnValues.checkResult = tempOutput.checkResult;
-				}
-				else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
-					returnValues.checkResult = tempOutput.checkResult;
-				}
-				delete tempOutput.checkResult;
-			}
-
-			/* Handle updating ailmentList and barList after a successful Consume AutoEffect */
-			if (tempOutput.consumeList != undefined) {
-				if (tempOutput.consumeList == "barList") {
-					barList[tempOutput.consumeTarget] = parseInt(barList[tempOutput.consumeTarget]) + parseInt(tempOutput.consumeVal);
+			if (autoEffectType == "conditional message" || autoEffectType == "conditional message + button") {
+				if (conditionalMessageList[autoEffectConditional] != undefined) {
+					conditionalMessageList[autoEffectConditional] += tempOutput.message;
 				} else {
-					ailmentList[tempOutput.consumeTarget][1] = parseInt(ailmentList[tempOutput.consumeTarget][1]) + parseInt(tempOutput.consumeVal);
+					conditionalMessageList[autoEffectConditional] = tempOutput.message;
 				}
-				delete tempOutput.consumeList;
-				delete tempOutput.consumeVal;
-				delete tempOutput.consumeVal;
+			} else {
+				message += tempOutput.message;
 			}
+			delete tempOutput.message;
+		}
 
-			/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
-			if (tempOutput.dicePower != undefined) { returnValues.dicePower = tempOutput.dicePower }
-			if (tempOutput.diceMax != undefined) { returnValues.diceMax = tempOutput.diceMax }
-			if (tempOutput.diceCount != undefined) { returnValues.diceCount = tempOutput.diceCount }
-			if (tempOutput.speedCombat != undefined) { returnValues.speedCombat = tempOutput.speedCombat }
+		/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
+		if (tempOutput.messageValues != undefined) {
+			messageValues = tempOutput.messageValues;
+			delete tempOutput.messageValues;
+		}
 
-			/* Handle challenge rolls */
-			if (tempOutput.challengeRollStat != undefined) {
-				challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
-				delete tempOutput.challengeRollStat;
-				delete tempOutput.challengeRollDifficulty;
-			}
-
-			/* Handle message */
-			if (tempOutput.message != undefined) {
-				if (autoEffectType == "conditional message" || autoEffectType == "conditional message + button") {
-					if (conditionalMessageList[autoEffectConditional] != undefined) {
-						conditionalMessageList[autoEffectConditional] += tempOutput.message;
-					} else {
-						conditionalMessageList[autoEffectConditional] = tempOutput.message;
-					}
+		/* Handle conditional message + button having silent AutoEffects */
+		if (autoEffectType == "conditional message + button") {
+			AutoEffect[0].push("Silent");
+		}
+		
+		/* Add attribute changes from AutoEffect to output */
+		/* The first time a attribute is modified, add its count */
+		/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
+		/* If Consume 4 Burn is used later, this amount will be removed without adding count */
+		for (const property in tempOutput) {
+			if (autoEffectType == "standard") {
+				if (output.hasOwnProperty(property)) {
+					output[property] += Math.floor(tempOutput[property]);
 				} else {
-					message += tempOutput.message;
-				}
-				delete tempOutput.message;
-			}
-
-			/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
-			if (tempOutput.messageValues != undefined) {
-				messageValues = tempOutput.messageValues;
-				delete tempOutput.messageValues;
-			}
-
-			/* Handle conditional message + button having silent AutoEffects */
-			if (autoEffectType == "conditional message + button") {
-				AutoEffect[0].push("Silent");
-			}
-			console.log(AutoEffect)
-			
-			/* Add attribute changes from AutoEffect to output */
-			/* The first time a attribute is modified, add its count */
-			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
-			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
-			for (const property in tempOutput) {
-				if (autoEffectType == "standard") {
-					if (output.hasOwnProperty(property)) {
-						output[property] += Math.floor(tempOutput[property]);
-					} else {
-						output[property] = Math.floor(tempOutput[property] + tempOutput.count);
-					}
+					output[property] = Math.floor(tempOutput[property] + tempOutput.count);
 				}
 			}
 		}
+	}
 	});
 
 	// console.log(output)
@@ -15262,6 +15265,42 @@ function autoScriptToArray(inputAutoScript, mode="normal") {
 	/* Return the converted AutoScript */
 	return AutoScriptArray;
 }
+
+function translateAutoScriptArrayToEnglish(AutoScript) {
+	for (let i = 0; i < AutoScript.length; i++) {
+		/* Translate AutoEffect names */
+		AutoScript[i][0][0] = getAutoEffectFromTranslation(AutoScript[i][0][0]);
+	
+		/* Translate Ailments and Bars */
+		switch (AutoScript[i][0][0]) {
+			case "Reset": case "CustomMessage": case "DicePower": case "DiceMax": case "DiceCount": case "BaseDamage": break;
+			case "Require": case "Consume": AutoScript[i][0][2] = getAilmentOrBarFromTranslation(AutoScript[i][0][2]); break;
+			case "Gain": case "Inflict": case "Give": AutoScript[i][0][2] = getAilmentFromTranslation(AutoScript[i][0][2]); break;
+			case "Set": case "Add": case "Multi": case "FlatDamage": AutoScript[i][0][2] = getBarFromTranslation(AutoScript[i][0][2]); break;
+			case "ChallengeRoll": AutoScript[i][0][1] = getStatFromTranslation(AutoScript[i][0][1]); break;
+			default: console.log("Translation error with AutoEffect name " + AutoScript[i][0][0])
+		}
+
+		/* Translate Options */
+		for (let j = 0; j < AutoScript[i][0].length; j++) {
+			if(getOptionFromTranslation(AutoScript[i][0][j]) != "Unknown Option") {
+				AutoScript[i][0][j] = getOptionFromTranslation(AutoScript[i][0][j]);
+			}
+		}
+
+		/* Translate conditional options */
+		let langButtonOption = getTranslationByKey("autoeffect-option-button");
+		let langMessageOption = getTranslationByKey("autoeffect-option-message");
+		let langMessageButtonOption = getTranslationByKey("autoeffect-option-messagebutton");
+
+		/*for (let k = 0; k < AutoScript[i].length; k++) {
+			AutoScript[i][k] = AutoScript[i][k].replace(langButtonOption,"#Button");
+			AutoScript[i][k] = AutoScript[i][k].replace(langMessageOption,"#Message");
+			AutoScript[i][k] = AutoScript[i][k].replace(langMessageButtonOption,"#MessageButton");
+		}*/
+	}
+	return AutoScript;
+}
 /*--- AutoScript functions end ---*/
 
 
@@ -15284,30 +15323,19 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 	if(messageFormat != ""){
 		let message = messageFormat;
 
-		let langCheck = "[CHECK]";
-		let langSuccess = "Success";
-		let langFailure = "Failure";
-		let langNum = "[NUM]";
-		let langScaling = "[SCALING]";
-		let langScalingNum = "[SCALING NUM]";
-		let langNegNum = "[-NUM]";
-		let langNegScaling = "[-SCALING]";
-		let langNegScalingNum = "[-SCALING NUM]";
-		let langInitial = "[INITIAL]";
-		let langResult = "[RESULT]";
-		let langTarget = "[TARGET]";
-		let langTargetIcon = "[/TARGET]";
-
-		/*if(getTranslationByKey("message-match-check") != false){
-			langCheck = getTranslationByKey("message-match-check");
-			langSuccess = getTranslationByKey("distortion-result-good");
-			langFailure = getTranslationByKey("distortion-result-bad");
-			langNum = getTranslationByKey("message-match-num");
-			langScaling = getTranslationByKey("message-match-scaling");
-			langScalingNum = getTranslationByKey("message-match-scalingnum");
-			langTarget = getTranslationByKey("message-match-target");
-			langTargetIcon = getTranslationByKey("message-match-targeticon");
-		}*/
+		let langCheck = getTranslationByKeyCustom("[CHECK]", "autoeffect-match-check");
+		let langSuccess = getTranslationByKeyCustom("Success", "distort-results-good");
+		let langFailure = getTranslationByKeyCustom("Failure", "distort-results-bad");
+		let langNum = getTranslationByKeyCustom("[NUM]", "autoeffect-match-num");
+		let langScaling = getTranslationByKeyCustom("[SCALING]", "autoeffect-match-scaling");
+		let langScalingNum = getTranslationByKeyCustom("[SCALING NUM]", "autoeffect-match-scalingnum");
+		let langNegNum = getTranslationByKeyCustom("[-NUM]", "autoeffect-match-neg-num");
+		let langNegScaling = getTranslationByKeyCustom("[-SCALING]", "autoeffect-match-neg-scaling");
+		let langNegScalingNum = getTranslationByKeyCustom("[-SCALING NUM]", "autoeffect-match-neg-scalingnum");
+		let langInitial = getTranslationByKeyCustom("[INITIAL]", "autoeffect-match-initial");
+		let langResult = getTranslationByKeyCustom("[RESULT]", "autoeffect-match-result");
+		let langTarget = getTranslationByKeyCustom("[TARGET]", "autoeffect-match-target");
+		let langTargetIcon = getTranslationByKeyCustom("[/TARGET]", "autoeffect-match-targeticon");
 
 		if (checkResult == "failure") { message = message.replaceAll(langCheck, "<b>" + langFailure + "</b>"); }
 		else { message = message.replaceAll(langCheck, "<b>" + langSuccess + "</b>"); }
@@ -15348,6 +15376,32 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 	}
 }
 
+function autoEffectTranslateMessage(message) {
+	let returnMessage = message
+		.replaceAll("Burn", getTranslationByKeyCustom("Burn","ailments-burn"))
+		.replaceAll("Bleed", getTranslationByKeyCustom("Bleed","ailments-bleed"))
+		.replaceAll("Paralysis", getTranslationByKeyCustom("Paralysis","ailments-paralysis"))
+		.replaceAll("Fragile", getTranslationByKeyCustom("Fragile","ailments-fragile"))
+		.replaceAll("Protection", getTranslationByKeyCustom("Protection","ailments-protection"))
+		.replaceAll("Stagger Protection", getTranslationByKeyCustom("Stagger Protection","ailments-stgprotection"))
+		.replaceAll("Strength", getTranslationByKeyCustom("Strength","ailments-strength"))
+		.replaceAll("Endurance", getTranslationByKeyCustom("Endurance","ailments-endurance"))
+		.replaceAll("Haste", getTranslationByKeyCustom("Haste","ailments-haste"))
+		.replaceAll("Feeble", getTranslationByKeyCustom("Feeble","ailments-feeble"))
+		.replaceAll("Disarm", getTranslationByKeyCustom("Disarm","ailments-disarm"))
+		.replaceAll("Bind", getTranslationByKeyCustom("Bind","ailments-bind"))
+		.replaceAll("Smoke", getTranslationByKeyCustom("Smoke","ailments-smoke"))
+		.replaceAll("Charge", getTranslationByKeyCustom("Charge","ailments-charge"))
+		.replaceAll("Fortune", getTranslationByKeyCustom("Fortune","ailments-fortune"))
+		.replaceAll("HP", getTranslationByKeyCustom("HP","bar-health-shortened"))
+		.replaceAll("ST", getTranslationByKeyCustom("ST","bar-stagres-shortened"))
+		.replaceAll("SP", getTranslationByKeyCustom("SP","bar-sanity-shortened"))
+		.replaceAll("THP", getTranslationByKeyCustom("THP","bar-health-temp-shortened"))
+		.replaceAll("TST", getTranslationByKeyCustom("TST","bar-stagres-temp-shortened"));
+	
+	return returnMessage;
+}
+
 /* Whispers an error message to the user detailing an AutoEffect error */
 function autoEffectErrorMessage(errorString, autoEffect) {
 	console.log(errorString + autoEffect)
@@ -15373,8 +15427,6 @@ function resetConditionals() {
 
 function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 
-	console.log(messageValues)
-
 	let messageFormat = "";
 	let checkResultOption = "success";
 	let effectTarget = "No target";
@@ -15386,12 +15438,12 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 
 	/* Check if CustomMessage is silent. No reason to do any formatting being that the message will not be displayed anyways */
 	let silent = "false";
-	if (AutoEffect.indexOf("Silent") > AutoEffect.lastIndexOf('"')) {
+	if (AutoEffect.indexOf("#Silent") > AutoEffect.lastIndexOf('"')) {
 		silent = "true";
 	}
 
 	if (AutoEffect[1] != undefined) { messageFormat = AutoEffect.slice(1).join(" "); }
-	if ((/\"[ \t]*(checksuccess)/ig).test(messageFormat)) { messageFormat = messageFormat.replaceAll(/\"[ \t]*(checksuccess)/ig, "") }
+	if ((/\"[ \t]*(checksuccess)/ig).test(messageFormat)) { messageFormat = messageFormat.replaceAll((/\"[ \t]*(checksuccess)/ig), "") }
 	else if ((/\"[ \t]*(checkfailure)/ig).test(messageFormat)) { checkResultOption = "failure"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkfailure)/ig, "") }
 	else if ((/\"[ \t]*(checkignore)/ig).test(messageFormat)) { checkResultOption = "ignore"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkignore)/ig, "")}
 	messageFormat = messageFormat.replaceAll('"','');
@@ -15422,7 +15474,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Handle bar count */
 	else if (barList.hasOwnProperty(effectName)) { count = barList[effectName]; }
 	/* Handle bar damage count */
-	else if (barDamageList.hasOwnProperty(effectName)) { count = barDamageList[effectName]; }
+	else if (barDamageList.hasOwnProperty("-" + effectName)) { count = barDamageList[effectName]; }
 	else { autoEffectErrorMessage(`Ailment, Bar or BarDamage "${effectName}" does not exist`, AutoEffect); return {error: true}; }
 
 	/* Get required value. Recalculate count if percentage */
@@ -15462,7 +15514,8 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	}
 
 	/* Handle message */
-	let messageFormat = "Require [SCALING NUM] [TARGET]: [CHECK]";
+	let messageFormat = getTranslationByKeyCustom("Require [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-require");
+	
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
 		messageFormat = "[/TARGET] " + messageFormat;
@@ -15532,11 +15585,12 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	}
 
 	/* Handle message */
-	let messageFormat = "Consume [SCALING NUM] [TARGET]: [CHECK]";
+	let messageFormat = getTranslationByKeyCustom("Consume [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-consume");
+
 	let effectIcon = ailmentList[effectName][4];
 	if (ailmentList.hasOwnProperty(effectName)) { messageFormat = "[/TARGET] " + messageFormat; }
 
-	if (!(AutoEffect.includes("Silent"))) {
+	if (!AutoEffect.includes("Silent")) {
 		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult);
 	}
 	returnValues.messageValues = { effectTarget: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
@@ -15597,9 +15651,9 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	let messageValues = {};
 	let messageFormat = "";
 	switch (autoEffectVariant) {
-		case "Gain": messageFormat = "[/TARGET] Gained [SCALING NUM] [TARGET]"; break;
-		case "Inflict": messageFormat = "[/TARGET] Inflict [SCALING NUM] [TARGET] to target"; break;
-		case "Give": messageFormat = "[/TARGET] Give [SCALING NUM] [TARGET] to ally"; break;
+		case "Gain": messageFormat = getTranslationByKeyCustom("[/TARGET] Gain [SCALING NUM] [TARGET]", "autoeffect-format-gain"); break;
+		case "Inflict": messageFormat = getTranslationByKeyCustom("[/TARGET] Inflict [SCALING NUM] [TARGET] to target", "autoeffect-format-inflict"); break;
+		case "Give": messageFormat = getTranslationByKeyCustom("[/TARGET] Give [SCALING NUM] [TARGET] to ally", "autoeffect-format-give"); break;
 	}
 	
 	let effectIcon = ailmentList[effectAilment][4];
@@ -15641,7 +15695,7 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = "Set [TARGET] to [RESULT]";
+	let messageFormat = getTranslationByKeyCustom("Set [TARGET] to [RESULT]", "autoeffect-format-set");
 
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, effectTarget, (parseInt(effectVal) - parseInt(count))/scaling, count, scaling, "success");
@@ -15676,8 +15730,8 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = "Regened [SCALING NUM] [TARGET]";
-	if (effectVal < 0) { messageFormat = "Recieved [-SCALING NUM] [TARGET] damage"; }
+	let messageFormat = getTranslationByKeyCustom("Regen [SCALING NUM] [TARGET]", "autoeffect-format-add")
+	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Receive [-SCALING NUM] [TARGET] damage", "autoeffect-format-add-neg"); }
 
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
@@ -15711,7 +15765,7 @@ function autoEffectMultiBar(AutoEffect, barList, scaling) {
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = `Multiplied [TARGET] by <b>${effectVal}</b> [[SCALING NUM]]`;
+	let messageFormat = getTranslationByKeyCustom("Multiply [TARGET] by <b>", "autoeffect-format-multi1") + effectVal + getTranslationByKeyCustom("</b> [[SCALING NUM]]", "autoeffect-format-multi2");
 
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, effectTarget, Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count))/scaling, count, scaling, "success");
@@ -15744,11 +15798,10 @@ function autoEffectDice(AutoEffect, scaling) {
 	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
 
 	/* Handle message */
-	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
-	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
+	let messageFormat = getTranslationByKeyCustom("Increase [TARGET] by [SCALING NUM]", "autoeffect-format-dice");
+	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Reduce [TARGET] by [SCALING NUM]", "autoeffect-format-dice-neg"); }
 	
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, AutoEffect[0].replace("Dice", "Dice "), effectVal/scaling, 0, scaling, "success");
@@ -15774,15 +15827,15 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 	/* Get target stat */
 	let statTarget = "";
 	if (["fortitude", "instinct", "prudence", "wisdom", "justice", "charm", "insight", "temperance"].includes(AutoEffect[1].toLowerCase())) {
-		statTarget = AutoEffect[1].toLowerCase().replace("fortitude","instinct").replace("prudence","wisdom");
+		statTarget = AutoEffect[1].toLowerCase();
 	}
 	else { autoEffectErrorMessage(`Stat "${AutoEffect[1]}" does not exist.`, AutoEffect); return {error: true}; }
 
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = "Rolling [TARGET] <b>+</b>[SCALING NUM]";
-	if (effectVal < 0) { messageFormat = "Rolling [TARGET] [SCALING NUM]"; }
+	let messageFormat = getTranslationByKeyCustom("Rolling [TARGET] <b>+</b>[SCALING NUM]", "autoeffect-format-challengeroll");
+	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Rolling [TARGET] [SCALING NUM]", "autoeffect-format-challengeroll-neg"); }
 
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, (statTarget.charAt(0).toUpperCase() + statTarget.slice(1)), effectVal/scaling, 0, scaling, "success");
@@ -15790,7 +15843,7 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 	messageValues = { effectTarget: (statTarget.charAt(0).toUpperCase() + statTarget.slice(1)), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { challengeRollStat: statTarget, challengeRollDifficulty: effectVal, message: message, messageValues: messageValues }
+	return { challengeRollStat: statTarget.replace("fortitude","instinct").replace("prudence","wisdom"), challengeRollDifficulty: effectVal, message: message, messageValues: messageValues }
 }
 
 function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundSpeed) {
@@ -15807,7 +15860,7 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 
 	/* Get duration */
 	let effectDuration = "";
-	if (AutoEffect[2].toLowerCase() == "combat") { effectDuration = "Combat"; }
+	if (AutoEffect[2].toLowerCase() == "this combat") { effectDuration = "Combat"; }
 	else if (["this", "thisround", "this round, thisturn, this turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "ThisRound"; }
 	else if (["next", "nextround", "next round, nextturn, next turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "NextRound"; }
 	else { autoEffectErrorMessage(`Duration "${AutoEffect[2]}" does not exist. Expected "Combat", "This round" or "Next round"`, AutoEffect); return {error: true}; }
@@ -15815,12 +15868,12 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = "Increased [TARGET] by [SCALING NUM]";
-	if (effectVal < 0) { messageFormat = "Reduced [TARGET] by [SCALING NUM]"; }
+	getTranslationByKeyCustom("Increase [TARGET] by [SCALING NUM]", "autoeffect-format-speed");
+	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Reduce [TARGET] by [SCALING NUM]", "autoeffect-format-speed-neg"); }
 	switch (effectDuration) {
-		case "Combat": messageFormat += " this combat"; break;
-		case "ThisRound": messageFormat += " this round"; break;
-		case "NextRound": messageFormat += " next round"; break;
+		case "Combat": messageFormat += " " + getTranslationByKeyCustom("this combat", "autoeffect-option-thiscombat"); break;
+		case "ThisRound": messageFormat += " " + getTranslationByKeyCustom("this round", "autoeffect-option-thisround"); break;
+		case "NextRound": messageFormat += " " + getTranslationByKeyCustom("next round", "autoeffect-option-nextround"); break;
 	}
 
 	if (!AutoEffect.includes("Silent")) {
@@ -15871,8 +15924,8 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	let messageValues = {};
 	let messageFormat = "";
 	switch (autoEffectVariant) {
-		case "BaseDamage": messageFormat = "Increased Base Damage by [SCALING NUM]"; break;
-		case "FlatDamage": messageFormat = "Dealt [SCALING NUM] [TARGET] Damage"; break;
+		case "BaseDamage": messageFormat = getTranslationByKeyCustom("Increase Base Damage by [SCALING NUM]", "autoeffect-format-basedamage"); break;
+		case "FlatDamage": messageFormat = getTranslationByKeyCustom("Deal [SCALING NUM] [TARGET] Damage", "autoeffect-format-flatdamage"); break;
 	}
 
 	if (!AutoEffect.includes("Silent")) {
@@ -16991,6 +17044,119 @@ getSectionIDs("repeating_global", function(idarray) {
 	});
 });
 
+
+/* --- Generic helper functions --- */
+
+/* Returns a translation, or a base string if no translation is available */
+function getTranslationByKeyCustom(base, key) {
+	if (getTranslationByKey(key) != false) {
+		return getTranslationByKey(key);
+	} else {
+		return base;
+	}
+}
+
+/* Inputs an AutoEffect name written in the current language and returns it back to English */
+function getAutoEffectFromTranslation(autoEffect) {
+	if (getTranslationByKey("autoeffect-require") == autoEffect) { return "Require"; }
+	if (getTranslationByKey("autoeffect-consume") == autoEffect) { return "Consume"; }
+	if (getTranslationByKey("autoeffect-custommessage") == autoEffect) { return "CustomMessage"; }
+	if (getTranslationByKey("autoeffect-reset") == autoEffect) { return "Reset"; }
+	if (getTranslationByKey("autoeffect-gain") == autoEffect) { return "Gain"; }
+	if (getTranslationByKey("autoeffect-inflict") == autoEffect) { return "Inflict"; }
+	if (getTranslationByKey("autoeffect-give") == autoEffect) { return "Give"; }
+	if (getTranslationByKey("autoeffect-set") == autoEffect) { return "Set"; }
+	if (getTranslationByKey("autoeffect-add") == autoEffect) { return "Add"; }
+	if (getTranslationByKey("autoeffect-multi") == autoEffect) { return "Multi"; }
+	if (getTranslationByKey("autoeffect-basedamage") == autoEffect) { return "BaseDamage"; }
+	if (getTranslationByKey("autoeffect-flatdamage") == autoEffect) { return "FlatDamage"; }
+	if (getTranslationByKey("autoeffect-dicepower") == autoEffect) { return "DicePower"; }
+	if (getTranslationByKey("autoeffect-dicemax") == autoEffect) { return "DiceMax"; }
+	if (getTranslationByKey("autoeffect-dicecount") == autoEffect) { return "DiceCount"; }
+	if (getTranslationByKey("autoeffect-challengeroll") == autoEffect) { return "ChallengeRoll"; }
+	if (getTranslationByKey("autoeffect-speed") == autoEffect) { return "Speed"; }
+	return "Unknown AutoEffect: " + autoEffect;
+}
+
+/* Inputs a trigger written in the current language and returns it back to English */
+function getTriggerFromTranslation(trigger) {
+	if (getTranslationByKey("autoeffect-trigger-combatstart") == trigger) { return "Combat start"; }
+	if (getTranslationByKey("autoeffect-trigger-roundstart") == trigger) { return "Round start"; }
+	if (getTranslationByKey("autoeffect-trigger-permanent") == trigger) { return "Permanent"; }
+	if (getTranslationByKey("autoeffect-trigger-damaged") == trigger) { return "Damaged"; }
+	if (getTranslationByKey("autoeffect-trigger-damagedhp") == trigger) { return "DamagedHP"; }
+	if (getTranslationByKey("autoeffect-trigger-damagedst") == trigger) { return "DamagedST"; }
+	if (getTranslationByKey("autoeffect-trigger-damagedsp") == trigger) { return "DamagedSP"; }
+	if (getTranslationByKey("autoeffect-trigger-staggered") == trigger) { return "Staggered"; }
+	if (getTranslationByKey("autoeffect-trigger-defeated") == trigger) { return "Defeated"; }
+	if (getTranslationByKey("autoeffect-trigger-panic") == trigger) { return "Panic"; }
+	if (getTranslationByKey("autoeffect-trigger-challenge") == trigger) { return "Challenge"; }
+	if (getTranslationByKey("autoeffect-trigger-offensive") == trigger) { return "Offensive"; }
+	if (getTranslationByKey("autoeffect-trigger-defensive") == trigger) { return "Defensive"; }
+	if (getTranslationByKey("autoeffect-trigger-block") == trigger) { return "Block"; }
+	if (getTranslationByKey("autoeffect-trigger-evade") == trigger) { return "Evade"; }
+	return "Unknown Trigger"
+}
+
+/* Inputs an ailment written in the current language and returns it back to English */
+function getAilmentFromTranslation(ailment) {
+	if (getTranslationByKey("ailments-burn") == ailment) { return "Burn"; }
+	if (getTranslationByKey("ailments-bleed") == ailment) { return "Bleed"; }
+	if (getTranslationByKey("ailments-paralysis") == ailment) { return "Paralysis"; }
+	if (getTranslationByKey("ailments-fragile") == ailment) { return "Fragile"; }
+	if (getTranslationByKey("ailments-protection") == ailment) { return "Protection"; }
+	if (getTranslationByKey("ailments-stgprotection") == ailment) { return "Stagger Protection"; }
+	if (getTranslationByKey("ailments-strength") == ailment) { return "Strength"; }
+	if (getTranslationByKey("ailments-endurance") == ailment) { return "Endurance"; }
+	if (getTranslationByKey("ailments-haste") == ailment) { return "Haste"; }
+	if (getTranslationByKey("ailments-feeble") == ailment) { return "Feeble"; }
+	if (getTranslationByKey("ailments-disarm") == ailment) { return "Disarm"; }
+	if (getTranslationByKey("ailments-bind") == ailment) { return "Bind"; }
+	if (getTranslationByKey("ailments-smoke") == ailment) { return "Smoke"; }
+	if (getTranslationByKey("ailments-charge") == ailment) { return "Charge"; }
+	if (getTranslationByKey("ailments-fortune") == ailment) { return "Fortune"; }
+	return ailment; /* Is presumably a custom ailment */
+}
+
+/* Inputs an status bar shorthand written in the current language and returns it back to English */
+function getBarFromTranslation(bar) {
+	if (getTranslationByKey("bar-health-shortened") == bar) { return "HP"; }
+	if (getTranslationByKey("bar-stagres-shortened") == bar) { return "ST"; }
+	if (getTranslationByKey("bar-sanity-shortened") == bar) { return "SP"; }
+	if ("-" + getTranslationByKey("bar-health-shortened") == bar) { return "-HP"; }
+	if ("-" + getTranslationByKey("bar-stagres-shortened") == bar) { return "-ST"; }
+	if ("-" + getTranslationByKey("bar-sanity-shortened") == bar) { return "-SP"; }
+	if (getTranslationByKey("bar-health-temp-shortened") == bar) { return "THP"; }
+	if (getTranslationByKey("bar-stagres-temp-shortened") == bar) { return "TST"; }
+	return "Unknown Bar";
+}
+
+function getAilmentOrBarFromTranslation(input) {
+	if (getBarFromTranslation(input) != "Unknown Bar") { return getBarFromTranslation(input); }
+	return getAilmentFromTranslation(input);
+}
+
+function getStatFromTranslation(stat) {
+	if (getTranslationByKey("stats-instinct") == stat) { return "Fortitude"; }
+	if (getTranslationByKey("stats-wisdom") == stat) { return "Prudence"; }
+	if (getTranslationByKey("stats-justice") == stat) { return "Justice"; }
+	if (getTranslationByKey("stats-charm") == stat) { return "Charm"; }
+	if (getTranslationByKey("stats-insight") == stat) { return "Insight"; }
+	if (getTranslationByKey("stats-temperance") == stat) { return "Temperance"; }
+	return "Unknown Stat";
+}
+
+function getOptionFromTranslation(option) {
+	if (getTranslationByKey("autoeffect-option-scaling") == option) { return "Scaling"; }
+	if (getTranslationByKey("autoeffect-option-silent") == option) { return "Silent"; }
+	if (getTranslationByKey("autoeffect-option-thisround") == option) { return "this round"; }
+	if (getTranslationByKey("autoeffect-option-nextround") == option) { return "next round"; }
+	if (getTranslationByKey("autoeffect-option-thiscombat") == option) { return "this combat"; }
+	if (getTranslationByKey("autoeffect-option-checksuccess") == option) { return "CheckSuccess"; }
+	if (getTranslationByKey("autoeffect-option-checkfailure") == option) { return "CheckFailure"; }
+	if (getTranslationByKey("autoeffect-option-checkignore") == option) { return "CheckIgnore"; }
+	return "Unknown Option";
+}
 
 </script>
 
