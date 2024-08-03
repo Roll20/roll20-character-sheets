@@ -2074,23 +2074,64 @@ on('clicked:grenade-miss', async function(eventInfo) {
     let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
     let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
     switch (grenade) {
-        case 'Acid':       rollBuilder.push('name=Acid','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~@{character_name}|acid-hit)`,`splashdmg=[Damage](~@{character_name}|acid-splash)`); break;
-        case 'Holy water': rollBuilder.push('name=Holy water','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~@{character_name}|holy-water-hit)`,`splashdmg=[Damage](~@{character_name}|holy-water-splash)`); break;
-        case 'Oil (lit)':  rollBuilder.push('name=Oil (lit)','aoe=[[3]]','aoesplash=[[3+6]]',`hitdmg=[Round 1](~@{character_name}|oil-lit-hit1) [Round 2](~@{character_name}|oil-lit-hit2)`,`splashdmg=[Damage](~@{character_name}|oil-lit-splash)`); break;
-        case 'Poison':     rollBuilder.push('name=Poison','aoe=[[1]]','aoesplash=[[1+6]]','hitdmg=Special','splashdmg=Special'); break;
+        case 'Acid': {
+            rollBuilder.push(
+                'name=Acid',
+                'aoe=[[1]]',
+                'aoesplash=[[1+6]]',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;2d4&rbrack;&rbrack; acid damage using their Acid! &#40;Direct Hit&#41;)',
+                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;1&rbrack;&rbrack; acid damage using their Acid! &#40;Splash&#41;)'
+            );
+            break;
+        }
+        case 'Holy water': {
+            rollBuilder.push(
+                'name=Holy water',
+                'aoe=[[1]]',
+                'aoesplash=[[1+6]]',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;1d6+1&rbrack;&rbrack; damage using their Holy water! &#40;Direct Hit&#41;)',
+                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;2&rbrack;&rbrack; damage using their Holy water! &#40;Splash&#41;)'
+            );
+            break;
+        }
+        case 'Oil (lit)': {
+            rollBuilder.push(
+                'name=Oil (lit)',
+                'aoe=[[3]]',
+                'aoesplash=[[3+6]]',
+                'hitdmg=[Round 1](`/em rolls &lbrack;&lbrack;2d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, first round&#41;) [Round 2](`/em rolls &lbrack;&lbrack;1d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, second round&#41;)',
+                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;1d3&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Splash&#41;)'
+            );
+            break;
+        }
+        case 'Poison': {
+            rollBuilder.push(
+                'name=Poison',
+                'aoe=[[1]]',
+                'aoesplash=[[1+6]]',
+                'hitdmg=[Special](`/em affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Direct Hit&#41;)',
+                'splashdmg=[Special](`/em affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Splash&#41;)'
+            );
+            break;
+        }
         case 'Other': {
-            let name   = await extractQueryResult('?{Grenade name}');
-            let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
-            let damage = await extractQueryResult('?{Direct damage|1d6}');
+            let name = await extractQueryResult('?{Grenade name}');
+            let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+            let damage = await extractQueryResult('?{Direct Hit damage|1d6}');
             let splash = await extractQueryResult('?{Splash damage|1d3}');
 
-            let customGrenade = {}
-            customGrenade['custom-grenade-name'] = name;
-            customGrenade['custom-grenade-hit'] = damage;
-            customGrenade['custom-grenade-splash'] = splash;
-            setAttrs(customGrenade);
+            let escapedName = name.replaceAll('(','&#40;')
+                .replaceAll(')','&#41;')
+                .replaceAll('[','&lbrack;')
+                .replaceAll(']','&rbrack;');
 
-            rollBuilder.push(`name=${name}`,`aoe=[[${aoe}]]`,`aoesplash=[[${aoe}+6]]`,`hitdmg=[Damage](~@{character_name}|custom-grenade-hit)`,`splashdmg=[Damage](~@{character_name}|custom-grenade-splash)`);
+            rollBuilder.push(
+                `name=${name}`,
+                `aoe=[[${aoe}]]`,
+                `aoesplash=[[${aoe}+6]]`,
+                `hitdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Direct Hit&#41;)`,
+                `splashdmg=[Damage](\`/em rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`
+            );
         }
     }
     let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
