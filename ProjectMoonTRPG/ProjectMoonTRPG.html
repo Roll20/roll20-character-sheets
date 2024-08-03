@@ -107,11 +107,13 @@
 <!-- AutoScript edit popup -->
 <input type="checkbox" id="autoScriptEditorToggle" name="attr_autoScriptEditor_display" value="true" hidden="true">
 <div class="contentContainer darkBG autoscriptEditorContainer">
-	<button type="action" class="darkInput saveAutoScriptButton" name="act_saveAutoScriptEdit" data-i18n-title="autoscript-save-changes" title="Save AutoScript changes">Save</button>
+	<button type="action" id="autoScriptStyling" class="darkInput styleAutoScriptButton" name="act_autoScriptEdit" data-i18n-title="autoscript-open-style-editor" title="Open Styling Editor" data-i18n="autoscript-open-style-editor">Open AutoScript Styling Editor</button>
+	<button type="action" class="darkInput saveAutoScriptButton" name="act_saveAutoScriptEdit" data-i18n-title="autoscript-save-changes-title" title="Save AutoScript changes" data-i18n="autoscript-save-changes">Save</button>
 	<button type="action" class="darkInput closeAutoScriptButton" name="act_closeAutoScriptEdit" data-i18n-title="autoscript-close-editor" title="Save and close AutoScript Editor"></button>
 	<label for="autoScriptInput" style="margin-left: 5px;" data-i18n="autoscript-editor">AutoScript Editor</label>
 	<input type="text" class="autoScriptEditorTarget darkBG" name="attr_autoScriptEditorTarget" readonly>
 	<textarea id="autoScriptInput" name="attr_autoScriptEditorInput"></textarea>
+	<input type="text" name="attr_autoScriptStyling" hidden="true">
 </div>
 
 
@@ -13384,9 +13386,9 @@ on('clicked:applyDamage', (info) => {
 /* Damage helper functions beginning */
 function getIcon(iconFolder, iconName, settingLimbusStyle = "false") {
 	if (settingLimbusStyle == "true") {
-		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/limbus/${iconName}.png">`;
+		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/AutoEffects-Functionality/ProjectMoonTRPG/imagesResized/ailments/limbus/${iconName}.png">`;
 	} else {
-		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/${iconFolder}/${iconName}.png">`
+		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/AutoEffects-Functionality/ProjectMoonTRPG/imagesResized/${iconFolder}/${iconName}.png">`
 	}
 }
 
@@ -14887,14 +14889,14 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
 	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "thisRoundSpeed", "nextRoundSpeed", 
-	"StaggerState", "distortState", "egoActiveState", "egoType"], function(values) {
+	"StaggerState", "distortState", "egoActiveState", "egoType", "autoScriptStyling"], function(values) {
 		
 		let settingMuteMessage = values.settingMuteMessage;
 		let settingWhisperRolls = values.settingWhisperRolls;
 		let settingWhisperTarget = values.settingWhisperTarget;
 		let settingLimbusStyle = values.settingLimbusStyle;
 		let settingHideNextTurn = values.settingHideNextTurn;
-		
+
 		let HP = values.HP;
 		let ST = values.StagRes;
 		let SP = values.SP;
@@ -14921,10 +14923,15 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		let conditionalMessageList = {};
 		let conditionalButtonList = {};
 		let conditionalButtonSilent = "";
+		let errorMessageList = {};
+
+		let stylingList = parseAutoScriptStyling(values.autoScriptStyling);
+
+		console.log(stylingList)
 
 		let output = {};
 		let tempOutput = {};
-		let returnValues = { checkResult:"success", error:false, };
+		let returnValues = { checkResult:"success", error:false };
 		let challengeRollList = {};
 		let message = "";
 		let messageValues = {};
@@ -15045,7 +15052,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 				case "FlatDamage": tempOutput = autoEffectDamage(AutoEffect[0], barList, scaling); break;
 				case "ChallengeRoll": tempOutput = autoEffectChallengeRoll(AutoEffect[0], scaling); break;
 				case "Speed": tempOutput = autoEffectSpeed(AutoEffect[0], scaling, thisRoundSpeed, nextRoundSpeed); break;
-				default: tempOutput = {error:true}; autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); break;
+				default: tempOutput = autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0][0].replace("Unknown: ","")} is not a valid AutoEffect`, AutoEffect[0]); break;
 			}
 		}
 		console.log(tempOutput)
@@ -15053,7 +15060,17 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
 		/*  but does not apply any changes to attributes */
 		if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
-			returnValues.error == true;
+			if (tempOutput.errorType != undefined) {
+				if (errorMessageList[tempOutput.errorType] != undefined) {
+					errorMessageList[tempOutput.errorType] += tempOutput.errorMessage;
+				} else {
+					errorMessageList[tempOutput.errorType] = tempOutput.errorMessage;
+				}
+			}
+			
+			if (returnValues.error != true) {
+				returnValues.error = tempOutput.error;
+			}
 			output = {};
 			return;
 		}
@@ -15145,9 +15162,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		}
 	}
 	});
-
-	// console.log(output)
-	setAttrs(output);
 	
 	/* Create conditional buttons */
 	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalButtonList)) {
@@ -15163,7 +15177,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	}
 	
 	/* Message handling */
-	if (settingMuteMessage != "true" && message != "") {
+	if (settingMuteMessage != "true" && message != "" && returnValues.error != true) {
 		if (returnMessage == "false") {
 			let messageHeaderIcon = getIcon("icons", "gear");
 
@@ -15184,20 +15198,42 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	}
 
 	/* Conditional message handling */
-	for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
-		if (returnValues.message == undefined) {
-			returnValues.message = autoEffectEntry(conditionName, conditionMessage, "gear");
-		} else {
-			returnValues.message += autoEffectEntry(conditionName, conditionMessage, "gear");
+	if (returnValues.error != true) {
+		for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
+			let iconName = "gear";
+			let iconColor = "#85a874"; 
+			if (stylingList[conditionName] != undefined) {
+				iconName = stylingList[conditionName][0];
+				iconColor = stylingList[conditionName][1];
+			}
+			
+			if (returnValues.message == undefined) {
+				returnValues.message = autoEffectEntry(conditionName, conditionMessage, iconName, iconColor);
+			} else {
+				returnValues.message += autoEffectEntry(conditionName, conditionMessage, iconName, iconColor);
+			}
 		}
 	}
-	
+
 	/* Error handling and returnValues callback */
 	if (returnValues.error == true) {
+		returnValues.message = "";
+		
+		/* Error message */
+		for (const [errorType, errorMessage] of Object.entries(errorMessageList)) {
+			if (errorType)
+			if (returnValues.message == undefined) {
+				returnValues.message = autoEffectEntry(errorType, errorMessage, "exit", "Red");
+			} else {
+				returnValues.message += autoEffectEntry(errorType, errorMessage, "exit", "Red");
+			}
+		}
+
 		resetConditionals();
-		callback({error: true});
 	}
 	
+	// console.log(output)
+	setAttrs(output);
 	callback(returnValues);
 	});
 	});
@@ -15283,7 +15319,7 @@ function translateAutoScriptArrayToEnglish(AutoScript) {
 
 		/* Translate Options */
 		for (let j = 0; j < AutoScript[i][0].length; j++) {
-			if(getOptionFromTranslation(AutoScript[i][0][j]) != "Unknown Option") {
+			if(getOptionFromTranslation(AutoScript[i][0][j]) != "Unknown: " + AutoScript[i][0][j]) {
 				AutoScript[i][0][j] = getOptionFromTranslation(AutoScript[i][0][j]);
 			}
 		}
@@ -15301,16 +15337,56 @@ function translateAutoScriptArrayToEnglish(AutoScript) {
 	}
 	return AutoScript;
 }
+
+function parseAutoScriptStyling(AutoScriptStyling) {
+	let stylingList = {};
+	let stylingRule = "";
+
+	/* Remove all newlines, tab spaces and comments */
+	AutoScriptStyling = cleanAutoScript(AutoScriptStyling);
+
+	do {
+		AutoScriptStyling = AutoScriptStyling.trim();
+
+		/* Checks if an styling rule still remains in the AutoScript */
+		if (AutoScriptStyling.indexOf("(") == 0 && AutoScriptStyling.indexOf(")")) {
+
+			/* Removes the next styling rule from the string. Removes the parentheses */
+			stylingRule = AutoScriptStyling.substring(1, AutoScriptStyling.indexOf(")"));
+			AutoScriptStyling = AutoScriptStyling.substring(AutoScriptStyling.indexOf(")")+1);
+
+			stylingRule = stylingRule.trim().split(",");
+			stylingRule = stylingRule.map(e => e.trim());
+
+			stylingList[stylingRule[0]] = [stylingRule[1], stylingRule[2]];
+		} else {
+			break;
+		}
+	} while (AutoScriptStyling.length > 1)
+
+	/* Return the styling list */
+	return stylingList;
+}
 /*--- AutoScript functions end ---*/
 
 
 
 
 /*--- AutoEffect functions ---*/
-function autoEffectEntry(header, message, iconName) {
+function autoEffectEntry(header, message, iconName="gear", iconColor="#85a874") {
+	if (!(/^#(?:[0-9a-fA-F]{3}){1,2}$/).test(iconColor)) {
+		switch (iconColor.toLowerCase()) {
+			case "red": iconColor = "#c25944"; break;
+			case "blue": iconColor = "#7397d1"; break;
+			case "yellow": iconColor = "#dbb748"; break;
+			case "purple": iconColor = "#8e7cc3"; break;
+			default: iconColor = "#85a874";
+		}
+	}
+	
 	let newEntry  = "<div class='autoeffectContainer'>"
 		newEntry += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
-		newEntry += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: #85a874;">`
+		newEntry += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: ${iconColor};">`
 		newEntry += `${getIcon("icons", iconName)}`
 		newEntry += `</div>`;
 		newEntry += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>${header}</b></div>`
@@ -15403,8 +15479,10 @@ function autoEffectTranslateMessage(message) {
 }
 
 /* Whispers an error message to the user detailing an AutoEffect error */
-function autoEffectErrorMessage(errorString, autoEffect) {
-	console.log(errorString + autoEffect)
+function autoEffectErrorMessage(errorType, errorString, AutoEffect) {
+	AutoEffect = AutoEffect.join(" ").replace("Unknown: ","");
+	errorMessage = `(${AutoEffect}) - ${errorString}`
+	return { errorType: errorType, errorMessage: errorMessage, error: true};
 }
 
 /* Creates a new conditional button*/
@@ -15426,6 +15504,7 @@ function resetConditionals() {
 }
 
 function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
+	if (AutoEffect.length > 2) { AutoEffect.slice(3).forEach(option => { if (!["checksuccess", "checkfailure", "checkignore"].includes(option.toLowerCase())) { return autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 
 	let messageFormat = "";
 	let checkResultOption = "success";
@@ -15463,8 +15542,11 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 }
 
 function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
+	let returnValues = {};
+	
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 5) { autoEffectErrorMessage(`Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional) #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 5) { return autoEffectErrorMessage("Format Error", `Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional) #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["scaling", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 
 	/* Get target count */
 	let effectName = AutoEffect[2];
@@ -15475,7 +15557,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	else if (barList.hasOwnProperty(effectName)) { count = barList[effectName]; }
 	/* Handle bar damage count */
 	else if (barDamageList.hasOwnProperty("-" + effectName)) { count = barDamageList[effectName]; }
-	else { autoEffectErrorMessage(`Ailment, Bar or BarDamage "${effectName}" does not exist`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Target", `Ailment, Bar or BarDamage "${effectName}" does not exist`, AutoEffect); }
 
 	/* Get required value. Recalculate count if percentage */
 	let effectVal = AutoEffect[1];
@@ -15494,11 +15576,10 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 		}
 		effectVal = barMax*percentage;
 	}
-	else { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number or percentage`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number or percentage`, AutoEffect); }
 	
 	/* Handle the optional scaling property */
 	let scaling = 1;
-	let returnValues = {};
 	if (AutoEffect[3] != undefined) {
 		if (AutoEffect[3].toLowerCase() == "scaling") {
 			scaling = Math.floor(count/effectVal);
@@ -15532,12 +15613,15 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 }
 
 function autoEffectConsume(AutoEffect, ailmentList, barList) {
-	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 5) { autoEffectErrorMessage(`Expected format: (Consume N #Ailment/#Bar #Scaling(optional) #Silent(optional))`, AutoEffect); return {error: true}; }
+	let returnValues = {};
 
+	/* Check format */
+	if (AutoEffect.length < 3 || AutoEffect.length > 5) { return autoEffectErrorMessage("Format Error", `Expected format: (Consume N #Ailment/#Bar #Scaling(optional) #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["scaling", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
+	
 	/* Get consumed value */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
 
 	/* Get target */
@@ -15555,11 +15639,10 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 		effectTarget = effectName;
 		count = barList[effectName];
 	}
-	else { autoEffectErrorMessage(`Ailment or Bar "${effectName}" does not exist`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Target", `Ailment or Bar "${effectName}" does not exist`, AutoEffect); }
 	
 	/* Handle the optional scaling property */
 	let scaling = 1;
-	let returnValues = {};
 	if (AutoEffect[3] != undefined) {
 		if (AutoEffect[3].toLowerCase() == "scaling") {
 			scaling = Math.floor(count/effectVal);
@@ -15600,29 +15683,32 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 }
 
 function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
+	let returnValues = {};
+	
 	/* Check if Gain, Inflict or Give */
 	let autoEffectVariant = "";
 	switch (AutoEffect[0]) {
 		case "Gain": autoEffectVariant = "Gain"; break;
 		case "Inflict": autoEffectVariant = "Inflict"; break;
 		case "Give": autoEffectVariant = "Give"; break;
-		default: autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); return {error: true}
+		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 6) { autoEffectErrorMessage(`Expected format: (${autoEffectVariant} N #Ailment #Round(optional) #Silent(optional))`, AutoEffect); return {error: true}; }
-	
+	if (AutoEffect.length < 3 || AutoEffect.length > 6) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Ailment #Round(optional) #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["this", "next", "thisround", "nextround", "thisturn", "nextturn", "turn", "round", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
+
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
 	if (scaling == 0) { return {}; }
 	
 	/* Get ailment name */
 	let effectAilment = AutoEffect[2];
-	if (!ailmentList.hasOwnProperty(effectAilment)) { autoEffectErrorMessage(`Ailment "${effectAilment}" does not exist`, AutoEffect); return {error: true}; }
+	if (!ailmentList.hasOwnProperty(effectAilment)) { return autoEffectErrorMessage("Invalid Target", `Ailment "${effectAilment}" does not exist`, AutoEffect); }
 	
 	/* Get values */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = ailmentList[effectAilment][1];
 
 	/* Handle the optional turn override */
@@ -15665,14 +15751,15 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	messageValues = { effectTarget: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
 	
 	/* Execute AutoEffect */
-	let returnValues = { message: message, messageValues: messageValues };
+	returnValues = {...returnValues, message: message, messageValues: messageValues };
 	if (autoEffectVariant == "Gain") { returnValues = { ...returnValues, [effectTarget]: parseInt(effectVal), count: parseInt(count) } }
 	return returnValues;
 }
 
 function autoEffectSetBar(AutoEffect, barList, scaling) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (Set N #Bar #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (Set N #Bar #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15680,7 +15767,7 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 
 	/* Get value */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
 
 	/* Get target */
@@ -15690,7 +15777,7 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 		effectTarget = effectBar.replace("ST", "StagRes");
 		count = barList[effectBar];
 	}
-	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -15707,7 +15794,8 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 }
 function autoEffectAddBar(AutoEffect, barList, scaling) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (Add N #Bar #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (Add N #Bar #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15715,7 +15803,7 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 
 	/* Get value */
 	let effectVal = parseInt(AutoEffect[1]);
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
 
 	/* Get target */
@@ -15725,7 +15813,7 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 		effectTarget = effectBar.replace("ST", "StagRes");
 		count = barList[effectBar];
 	}
-	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -15743,7 +15831,8 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 }
 function autoEffectMultiBar(AutoEffect, barList, scaling) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (Multi N #Bar #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (Multi N #Bar #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15751,7 +15840,7 @@ function autoEffectMultiBar(AutoEffect, barList, scaling) {
 
 	/* Get value */
 	let effectVal = parseFloat(Math.abs(AutoEffect[1]));
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 
 	/* Get target */
 	let effectBar = AutoEffect[2];
@@ -15760,7 +15849,7 @@ function autoEffectMultiBar(AutoEffect, barList, scaling) {
 		effectTarget = effectBar.replace("ST", "StagRes");
 		count = barList[effectBar];
 	}
-	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -15783,11 +15872,12 @@ function autoEffectDice(AutoEffect, scaling) {
 		case "DicePower": autoEffectVariant = "DicePower"; break;
 		case "DiceMax": autoEffectVariant = "DiceMax"; break;
 		case "DiceCount": autoEffectVariant = "DiceCount"; break;
-		default: autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); return {error: true}
+		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 
 	/* Check format */
-	if (AutoEffect.length < 2 || AutoEffect.length > 3) { autoEffectErrorMessage(`Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 2) { if (AutoEffect[2].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }
 	
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15795,7 +15885,7 @@ function autoEffectDice(AutoEffect, scaling) {
 	
 	/* Get values */
 	let effectVal = parseInt(AutoEffect[1]);
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -15814,7 +15904,8 @@ function autoEffectDice(AutoEffect, scaling) {
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 3 ) { autoEffectErrorMessage(`Expected format: (ChallengeRoll #Stat N #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 3 ) { return autoEffectErrorMessage("Format Error", `Expected format: (ChallengeRoll #Stat N #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 	
 	/* Handle scaling */
 	AutoEffect[2] *= scaling;
@@ -15822,14 +15913,14 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 	
 	/* Get values */
 	let effectVal = parseInt(AutoEffect[2]);
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 
 	/* Get target stat */
 	let statTarget = "";
 	if (["fortitude", "instinct", "prudence", "wisdom", "justice", "charm", "insight", "temperance"].includes(AutoEffect[1].toLowerCase())) {
 		statTarget = AutoEffect[1].toLowerCase();
 	}
-	else { autoEffectErrorMessage(`Stat "${AutoEffect[1]}" does not exist.`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Stat", `Stat "${AutoEffect[1]}" does not exist.`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -15848,7 +15939,7 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 
 function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundSpeed) {
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 5) { autoEffectErrorMessage(`Expected format: (Speed N #Duration #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 5) { return autoEffectErrorMessage("Format Error", `Expected format: (Speed N #Duration #Silent(optional))`, AutoEffect); }
 	
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15856,14 +15947,14 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 	
 	/* Get values */
 	let effectVal = parseInt(AutoEffect[1]);
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 
 	/* Get duration */
 	let effectDuration = "";
-	if (AutoEffect[2].toLowerCase() == "this combat") { effectDuration = "Combat"; }
+	if (["thiscombat"].includes(AutoEffect[2].toLowerCase()) || AutoEffect[3].toLowerCase() == "combat" ) { effectDuration = "Combat"; }
 	else if (["this", "thisround", "this round, thisturn, this turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "ThisRound"; }
 	else if (["next", "nextround", "next round, nextturn, next turn"].includes(AutoEffect[2].toLowerCase())) { effectDuration = "NextRound"; }
-	else { autoEffectErrorMessage(`Duration "${AutoEffect[2]}" does not exist. Expected "Combat", "This round" or "Next round"`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Option", `Duration "${AutoEffect.slice(2).join(" ")}" does not exist. Expected "This Combat", "This round" or "Next round"`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -15895,11 +15986,12 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	switch (AutoEffect[0]) {
 		case "BaseDamage": autoEffectVariant = "BaseDamage"; break;
 		case "FlatDamage": autoEffectVariant = "FlatDamage"; break;
-		default: autoEffectErrorMessage(`${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect); return {error: true}
+		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 	
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { autoEffectErrorMessage(`Expected format: (${autoEffectVariant} N #Bar #Silent(optional))`, AutoEffect); return {error: true}; }
+	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Bar #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -15907,7 +15999,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 
 	/* Get value */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
-	if (isNaN(effectVal) == true) { autoEffectErrorMessage(`Value "${AutoEffect[1]}" is not a number`, AutoEffect); return {error: true}; }
+	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
 
 	/* Get target */
@@ -15917,7 +16009,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 		effectTarget = effectBar.replace("ST", "StagRes");
 		count = barList[effectBar];
 	}
-	else { autoEffectErrorMessage(`Bar "${effectBar}" does not exist`, AutoEffect); return {error: true}; }
+	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -17075,7 +17167,7 @@ function getAutoEffectFromTranslation(autoEffect) {
 	if (getTranslationByKey("autoeffect-dicecount") == autoEffect) { return "DiceCount"; }
 	if (getTranslationByKey("autoeffect-challengeroll") == autoEffect) { return "ChallengeRoll"; }
 	if (getTranslationByKey("autoeffect-speed") == autoEffect) { return "Speed"; }
-	return "Unknown AutoEffect: " + autoEffect;
+	return "Unknown: " + autoEffect;
 }
 
 /* Inputs a trigger written in the current language and returns it back to English */
@@ -17095,7 +17187,7 @@ function getTriggerFromTranslation(trigger) {
 	if (getTranslationByKey("autoeffect-trigger-defensive") == trigger) { return "Defensive"; }
 	if (getTranslationByKey("autoeffect-trigger-block") == trigger) { return "Block"; }
 	if (getTranslationByKey("autoeffect-trigger-evade") == trigger) { return "Evade"; }
-	return "Unknown Trigger"
+	return "Unknown: " + trigger;
 }
 
 /* Inputs an ailment written in the current language and returns it back to English */
@@ -17128,11 +17220,11 @@ function getBarFromTranslation(bar) {
 	if ("-" + getTranslationByKey("bar-sanity-shortened") == bar) { return "-SP"; }
 	if (getTranslationByKey("bar-health-temp-shortened") == bar) { return "THP"; }
 	if (getTranslationByKey("bar-stagres-temp-shortened") == bar) { return "TST"; }
-	return "Unknown Bar";
+	return "Unknown: " + bar;
 }
 
 function getAilmentOrBarFromTranslation(input) {
-	if (getBarFromTranslation(input) != "Unknown Bar") { return getBarFromTranslation(input); }
+	if (getBarFromTranslation(input) != "Unknown: " + input) { return getBarFromTranslation(input); }
 	return getAilmentFromTranslation(input);
 }
 
@@ -17143,7 +17235,7 @@ function getStatFromTranslation(stat) {
 	if (getTranslationByKey("stats-charm") == stat) { return "Charm"; }
 	if (getTranslationByKey("stats-insight") == stat) { return "Insight"; }
 	if (getTranslationByKey("stats-temperance") == stat) { return "Temperance"; }
-	return "Unknown Stat";
+	return "Unknown: " + stat;
 }
 
 function getOptionFromTranslation(option) {
@@ -17155,7 +17247,7 @@ function getOptionFromTranslation(option) {
 	if (getTranslationByKey("autoeffect-option-checksuccess") == option) { return "CheckSuccess"; }
 	if (getTranslationByKey("autoeffect-option-checkfailure") == option) { return "CheckFailure"; }
 	if (getTranslationByKey("autoeffect-option-checkignore") == option) { return "CheckIgnore"; }
-	return "Unknown Option";
+	return "Unknown: " + option;
 }
 
 </script>
