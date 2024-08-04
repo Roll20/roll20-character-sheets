@@ -2072,7 +2072,23 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 
 on('clicked:grenade-miss', async function(eventInfo) {
     let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
-    let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Melf’s Minute Meteor|Otiluke’s Freezing Sphere - Globe of cold|Produce Flame|Fire Seed missile|Other}');
+    const query = '?{What grenade have been thrown?'.concat(
+        '|Acid',
+        '|Holy water',
+        '|Oil (lit)',
+        '|Poison',
+        '|--------',
+        '|Fire Seed missile',
+        '|Ice Knife',
+        '|Melf’s Minute Meteor',
+        '|Otiluke’s Freezing Sphere - Globe of cold',
+        '|Produce Flame',
+        '|Puffball',
+        '|Sol’s Searing Orb',
+        '|Other',
+        '}'
+    );
+    let grenade = await extractQueryResult(query);
     switch (grenade) {
         case 'Acid': {
             rollBuilder.push(
@@ -2114,6 +2130,7 @@ on('clicked:grenade-miss', async function(eventInfo) {
             );
             break;
         }
+        case '--------': return;
         case 'Melf’s Minute Meteor': {
             rollBuilder.push(
                 'name=Melf’s Minute Meteor',
@@ -2144,6 +2161,16 @@ on('clicked:grenade-miss', async function(eventInfo) {
             );
             break;
         }
+        case 'Puffball': {
+            rollBuilder.push(
+                'name=Puffball',
+                'aoe=[[10]]',
+                'aoesplash=',
+                'hitdmg=[Effect](`/em causes creatures failing a save vs. poison to be unable to attack and lose all Dexterity bonuses to Armor Class and saving throws using their Puffball! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break;
+        }
         case 'Fire Seed missile': {
             rollBuilder.push(
                 'name=Fire Seed missile',
@@ -2154,11 +2181,32 @@ on('clicked:grenade-miss', async function(eventInfo) {
             );
             break
         }
+        case 'Ice Knife': {
+            rollBuilder.push(
+                'name=Ice Knife',
+                'aoe=[[10]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break;
+        }
+        case 'Sol’s Searing Orb': {
+            rollBuilder.push(
+                'name=Sol’s Searing Orb',
+                'aoe=[[6]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness to normal creatures. Or &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness to undead using their Sol’s Searing Orb! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break;
+        }
         case 'Other': {
             let name = await extractQueryResult('?{Grenade name}');
             let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
             let damage = await extractQueryResult('?{Direct Hit damage|1d6}');
             let splash = await extractQueryResult('?{Splash damage|1d3}');
+            splash = splash.trim();
 
             let escapedName = name.replaceAll('(','&#40;')
                 .replaceAll(')','&#41;')
@@ -2170,16 +2218,22 @@ on('clicked:grenade-miss', async function(eventInfo) {
                 `aoe=[[${aoe}]]`,
                 `aoesplash=[[${aoe}+6]]`,
                 `hitdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Direct Hit&#41;)`,
-                `splashdmg=[Damage](\`/em rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`
             );
+
+            if (splash === '' || splash === '0') {
+                rollBuilder.push('splashdmg=');
+            } else {
+                rollBuilder.push(`splashdmg=[Damage](\`/em rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`);
+            }
         }
     }
 
     let distanceName;
     switch (grenade) {
+        case 'Fire Seed missile':
         case 'Melf’s Minute Meteor':
         case 'Produce Flame':
-        case 'Fire Seed missile':
+        case 'Sol’s Searing Orb':
             distanceName = 'Short';
             break;
         default:
