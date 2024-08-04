@@ -107,13 +107,16 @@
 <!-- AutoScript edit popup -->
 <input type="checkbox" id="autoScriptEditorToggle" name="attr_autoScriptEditor_display" value="true" hidden="true">
 <div class="contentContainer darkBG autoscriptEditorContainer">
+	<input type="checkbox" class="toggleStylingButton" name="attr_autoScriptEditorTarget" value="autoScriptStyling" hidden="true">
 	<button type="action" id="autoScriptStyling" class="darkInput styleAutoScriptButton" name="act_autoScriptEdit" data-i18n-title="autoscript-open-style-editor" title="Open Styling Editor" data-i18n="autoscript-open-style-editor">Open AutoScript Styling Editor</button>
+	<button type="action" id="autoScriptStylingDefault" class="darkInput styleAutoScriptDefault" name="act_autoScriptStylingDefault">Reset Styling to Default</button>
 	<button type="action" class="darkInput saveAutoScriptButton" name="act_saveAutoScriptEdit" data-i18n-title="autoscript-save-changes-title" title="Save AutoScript changes" data-i18n="autoscript-save-changes">Save</button>
 	<button type="action" class="darkInput closeAutoScriptButton" name="act_closeAutoScriptEdit" data-i18n-title="autoscript-close-editor" title="Save and close AutoScript Editor"></button>
 	<label for="autoScriptInput" style="margin-left: 5px;" data-i18n="autoscript-editor">AutoScript Editor</label>
 	<input type="text" class="autoScriptEditorTarget darkBG" name="attr_autoScriptEditorTarget" readonly>
 	<textarea id="autoScriptInput" name="attr_autoScriptEditorInput"></textarea>
-	<input type="text" name="attr_autoScriptStyling" hidden="true">
+	<textarea type="text" class="autoScriptStylingStorage" name="attr_autoScriptStyling" hidden="true"></textarea>
+	<textarea type="text" class="autoScriptStylingStorage" name="attr_autoScriptStylingDefault" hidden="true"></textarea>
 </div>
 
 
@@ -14764,6 +14767,30 @@ getAttrs(["settingEditMode"], function(values) {
 
 /*--- AutoScript functions ---*/
 
+/* Auto: Set default AutoScript styling */
+/* This is intended as a temporary solution while I figure out a better way to add styling as a setting */
+on("sheet:opened", function() {
+	getAttrs(["autoScriptStylingDefault"], function(values) {
+	let sheetDefaults = values.autoScriptStylingDefault;
+
+	let stylingDefault =
+`/* Clash results */
+(Clash Win, icons, win, red) (CW, icons, win, red)
+(Clash Lose, icons, lose, yellow) (CL, icons, lose, yellow)
+
+/* On Use and On Hit */
+(On Use, icons, Portable, blue)
+(On Hit, icons, Attack, purple)`;
+
+	if(sheetDefaults != stylingDefault){
+
+	setAttrs({"autoScriptStylingDefault":stylingDefault});
+
+	}
+
+	});
+});
+
 /* AutoScript editor open button */
 on("clicked:autoScriptEdit", function(info) {	
 	let newEditorTarget = info.htmlAttributes.id;
@@ -14796,6 +14823,15 @@ on("clicked:saveAutoScriptEdit", function(info) {
 on("clicked:closeAutoScriptEdit", function(info) {
 	saveAutoScriptEditor();
 	setAttrs({autoScriptEditor_display: "0"});
+});
+/* AutoScript editor reset styling to default button */
+on("clicked:autoScriptStylingDefault", function(info) {
+	getAttrs(["autoScriptStylingDefault"], function(values) {
+		setAttrs({
+			autoScriptStyling: values.autoScriptStylingDefault,
+			autoScriptEditorInput: values.autoScriptStylingDefault
+		});
+	});
 });
 
 /* Executes a conditional button. Hides the button if at least one check fails */
@@ -15193,24 +15229,26 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			});
 		}
 		else {
-			returnValues.message = autoEffectEntry("AutoEffects", message, "gear");
+			returnValues.message = autoEffectEntry("AutoEffects", message);
 		}
 	}
 
 	/* Conditional message handling */
 	if (returnValues.error != true) {
 		for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
+			let iconFolder = "icons";
 			let iconName = "gear";
 			let iconColor = "#85a874"; 
 			if (stylingList[conditionName] != undefined) {
-				iconName = stylingList[conditionName][0];
-				iconColor = stylingList[conditionName][1];
+				iconFolder = stylingList[conditionName][0];
+				iconName = stylingList[conditionName][1];
+				iconColor = stylingList[conditionName][2];
 			}
 			
 			if (returnValues.message == undefined) {
-				returnValues.message = autoEffectEntry(conditionName, conditionMessage, iconName, iconColor);
+				returnValues.message = autoEffectEntry(conditionName, conditionMessage, iconFolder, iconName, iconColor);
 			} else {
-				returnValues.message += autoEffectEntry(conditionName, conditionMessage, iconName, iconColor);
+				returnValues.message += autoEffectEntry(conditionName, conditionMessage, iconFolder, iconName, iconColor);
 			}
 		}
 	}
@@ -15223,9 +15261,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		for (const [errorType, errorMessage] of Object.entries(errorMessageList)) {
 			if (errorType)
 			if (returnValues.message == undefined) {
-				returnValues.message = autoEffectEntry(errorType, errorMessage, "exit", "Red");
+				returnValues.message = autoEffectEntry(errorType, errorMessage, "icons", "exit", "Red");
 			} else {
-				returnValues.message += autoEffectEntry(errorType, errorMessage, "exit", "Red");
+				returnValues.message += autoEffectEntry(errorType, errorMessage, "icons", "exit", "Red");
 			}
 		}
 
@@ -15358,7 +15396,7 @@ function parseAutoScriptStyling(AutoScriptStyling) {
 			stylingRule = stylingRule.trim().split(",");
 			stylingRule = stylingRule.map(e => e.trim());
 
-			stylingList[stylingRule[0]] = [stylingRule[1], stylingRule[2]];
+			stylingList[stylingRule[0]] = [stylingRule[1], stylingRule[2], stylingRule[3]];
 		} else {
 			break;
 		}
@@ -15373,7 +15411,7 @@ function parseAutoScriptStyling(AutoScriptStyling) {
 
 
 /*--- AutoEffect functions ---*/
-function autoEffectEntry(header, message, iconName="gear", iconColor="#85a874") {
+function autoEffectEntry(header, message, iconFolder="icons", iconName="gear", iconColor="#85a874") {
 	if (!(/^#(?:[0-9a-fA-F]{3}){1,2}$/).test(iconColor)) {
 		switch (iconColor.toLowerCase()) {
 			case "red": iconColor = "#c25944"; break;
@@ -15387,7 +15425,7 @@ function autoEffectEntry(header, message, iconName="gear", iconColor="#85a874") 
 	let newEntry  = "<div class='autoeffectContainer'>"
 		newEntry += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
 		newEntry += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: ${iconColor};">`
-		newEntry += `${getIcon("icons", iconName)}`
+		newEntry += `${getIcon(iconFolder, iconName)}`
 		newEntry += `</div>`;
 		newEntry += `<div style="width: 55% ; overflow: hidden ; height: 20px ; padding-top: 5px ; float: left"><b>${header}</b></div>`
 		newEntry += `</div>` + message + "</div>";
@@ -16037,7 +16075,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 
 let attrkeyCharacter = ["character_nameBase", "instinct", "wisdom", "justice", "charm", "insight", "temperance", "EXP", "character_job", "age", "height", "character_origin", "character_residence", "character_assets", "character_ahn", "character_url", "character_summary", "character_combatnote", "character_history", "character_relations", "character_notes", "character_desc", "character_personality", "character_background"];
 
-let attrkeySettings = ["settingWhisperRolls", "settingMuteMessage", "settingAutoDetect", "settingTurnUpdate", "settingSimpleDisplay", "settingExtraEquip", "settingHideSpecial", "settingHelperText", "settingHideShare", "settingBurnImmune", "settingBleedImmune", "settingMultihitFull", "settingMultihitUses", "settingHideUses"];
+let attrkeySettings = ["settingWhisperRolls", "settingMuteMessage", "settingAutoDetect", "settingTurnUpdate", "settingSimpleDisplay", "settingExtraEquip", "settingHideSpecial", "settingHelperText", "settingHideShare", "settingBurnImmune", "settingBleedImmune", "settingMultihitFull", "settingMultihitUses", "settingHideUses", "AutoScriptStyling"];
 
 let attrkeyEquip = ["outfitName", "outfitRank", "outfitDescription", "outfitEffect", "defDice1", "defDice2", "defDice3", "evdDice1", "evdDice2", "evdDice3", "outfitImmune1", "outfitImmune2", "outfitImmune3", "outfitImmune4", "outfitImmune5", "outfitImmune6", "bleedResist", "burnResist", "damageResist", "outfitAutoScript",
 
