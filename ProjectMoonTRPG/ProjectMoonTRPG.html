@@ -45,6 +45,8 @@
 
 <label for="HideSpecial"><input type="checkbox" id="HideSpecial" name="attr_settingHideSpecial" value="true"><span data-i18n="settings-hidespecial">Hide: Special items</span></label>
 
+<label for="HideBaseEffect"><input type="checkbox" id="HideBaseEffect" name="attr_settingHideBaseEffect" value="true"><span data-i18n="settings-hidebaseeffect">Hide: Base effects</span></label>
+
 <label for="HideNextTurn"><input type="checkbox" id="HideNextTurn" name="attr_settingHideNextTurn" value="true"><span data-i18n="settings-hidenextturn">Hide: Ailment next turn input </span></label>
 
 <label for="HelperText"><input type="checkbox" id="HelperText" name="attr_settingHelperText" value="true"><span data-i18n="settings-hidehelpertext">Hide:  Helper text</span></label>
@@ -10941,6 +10943,7 @@ on("change:PanicState", function() {
 	let currentstate = values.PanicState;
 	let messagestate = values.settingMuteMessage;
 	let overridecheck = values.messageOverride;
+	let overrideeffect = values.settingHideBaseEffect;
 
 	let style = "https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/";
 	if(values.settingLimbusStyle == "true"){
@@ -12246,7 +12249,7 @@ getSectionIDs(`repeating_global`, idarray => {
 			let skillselect = values.skillSelect;
 			let toolselect = values.toolselect;
 
-        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "baseActNum", "Light",
+        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "baseActNum", "Light",
 		"difficulty", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
 		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
@@ -12260,6 +12263,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let newlight = parseInt(values.Light);
 	let charname = values.character_name;
 	let simpledisplay = values.settingSimpleDisplay;
+	let hidebaseffect = values.settingHideBaseEffect;
 	let whisperrolls = values.settingWhisperRolls;
 	let whispertarget = values.settingWhisperTarget;
 
@@ -12670,6 +12674,8 @@ getSectionIDs(`repeating_global`, idarray => {
 		skillEffectDescription += toolEffect;
 		skillinfo += toolinfo;
 	}
+
+	if (hidebaseffect == "true") { baseEffectDescription = ""; skillEffectDescription = ""; }
 
 	let header = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + "'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 55%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + basename + "</b></div></div>";
 
@@ -13516,10 +13522,11 @@ on('clicked:declareAction', (info) => {
 		let toolselect = values.toolSelect;
 
 	/* Get attributes */
-        getAttrs(["actionType", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`], function(values) {
+        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`], function(values) {
 
 	let charname = values.character_name;
 	let simpledisplay = values.settingSimpleDisplay;
+	let hidebaseffect = values.settingHideBaseEffect;
 	let whisperrolls = values.settingWhisperRolls;
 	let whispertarget = values.settingWhisperTarget;
 	let distortstate = values.distortState;
@@ -13754,7 +13761,7 @@ on('clicked:declareAction', (info) => {
 			}
 	}
 
-
+	if (hidebaseffect == "true") { skillinfo= "<b>" + langSkill + ": </b>" + skillname; toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br>"; }
 
 	let info = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + ";'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 80%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + actiontext + lightmessage + "</b></div></div><b>" + langFrom + ": </b> " + charname + "<br>" + toolinfo + skillinfo + autoScriptMessage;
 
