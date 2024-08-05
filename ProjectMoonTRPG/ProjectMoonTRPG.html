@@ -12787,10 +12787,10 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
 	let autoEffectSpeedCombat = 0;
-	if (returnValues.dicePower != undefined) { stat += returnValues.dicePower; }
-	if (returnValues.diceCount != undefined) { autoEffectDiceCount = returnValues.diceCount; }
-	if (returnValues.diceMax != undefined) { autoEffectDiceMax = returnValues.diceMax; }
-	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = returnValues.speedCombat; }
+	if (returnValues.dicePower != undefined) { stat += returnValues.parseInt(dicePower); }
+	if (returnValues.diceCount != undefined) { autoEffectDiceCount = parseInt(returnValues.diceCount); }
+	if (returnValues.diceMax != undefined) { autoEffectDiceMax = parseInt(returnValues.diceMax); }
+	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = parseInt(returnValues.speedCombat); }
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -14956,8 +14956,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		let SPdamage = values.SP_max - SP;
 		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage }
 
-		let thisRoundSpeed = values.thisRoundSpeed;
-		let nextRoundSpeed = values.nextRoundSpeed;
+		let thisRoundSpeed = parseInt(values.thisRoundSpeed);
+		let nextRoundSpeed = parseInt(values.nextRoundSpeed);
 		
 		let StaggerState = values.StaggerState;
 		let distortState = values.distortState;
@@ -15154,10 +15154,22 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		}
 
 		/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
-		if (tempOutput.DicePower != undefined) { returnValues.dicePower = tempOutput.DicePower }
-		if (tempOutput.DiceMax != undefined) { returnValues.diceMax = tempOutput.DiceMax }
-		if (tempOutput.DiceCount != undefined) { returnValues.diceCount = tempOutput.DiceCount }
-		if (tempOutput.speedCombat != undefined) { returnValues.speedCombat = tempOutput.speedCombat }
+		if (tempOutput.DicePower != undefined) {
+			if (returnValues.dicePower != undefined) { returnValues.dicePower += tempOutput.DicePower }
+			else { returnValues.dicePower = tempOutput.DicePower }
+		}
+		if (tempOutput.DiceMax != undefined) {
+			if (returnValues.DiceMax != undefined) { returnValues.DiceMax += tempOutput.DiceMax }
+			else { returnValues.DiceMax = tempOutput.DiceMax }
+		}
+		if (tempOutput.DiceCount != undefined) {
+			if (returnValues.DiceCount != undefined) { returnValues.DiceCount += tempOutput.DiceCount }
+			else { returnValues.DiceCount = tempOutput.DiceCount }
+		}
+		if (tempOutput.speedCombat != undefined) {
+			if (returnValues.speedCombat != undefined) { returnValues.speedCombat += tempOutput.speedCombat }
+			else { returnValues.speedCombat = tempOutput.speedCombat }
+		}
 
 		/* Handle challenge rolls */
 		if (tempOutput.challengeRollStat != undefined) {
@@ -15941,7 +15953,7 @@ function autoEffectDice(AutoEffect, scaling) {
 	if (scaling == 0) { return {}; }
 	
 	/* Get values */
-	let effectVal = parseInt(AutoEffect[1]);
+	let effectVal = parseFloat(AutoEffect[1]);
 	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 
 	/* Handle message */
@@ -15956,7 +15968,7 @@ function autoEffectDice(AutoEffect, scaling) {
 	messageValues = { effectTarget: AutoEffect[0].replace("Dice", "Dice "), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { [AutoEffect[0]]: parseInt(effectVal), message: message, messageValues: messageValues }
+	return { [AutoEffect[0]]: parseFloat(effectVal), message: message, messageValues: messageValues }
 }
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
@@ -16003,7 +16015,7 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 	if (scaling == 0) { return {}; }
 	
 	/* Get values */
-	let effectVal = parseInt(AutoEffect[1]);
+	let effectVal = parseFloat(AutoEffect[1]);
 	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 
 	/* Get duration */
@@ -16031,9 +16043,9 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 
 	/* Execute AutoEffect */
 	switch (effectDuration) {
-		case "Combat": return { speedCombat: parseInt(effectVal), message: message, messageValues: messageValues }; break;
-		case "ThisRound": return { thisRoundSpeed: parseInt(effectVal), count: parseInt(prevThisRoundSpeed), message: message, messageValues: messageValues }; break;
-		case "NextRound": return { nextRoundSpeed: parseInt(effectVal), count: parseInt(prevNextRoundSpeed), message: message, messageValues: messageValues }; break;
+		case "Combat": return { speedCombat: parseFloat(effectVal), message: message, messageValues: messageValues }; break;
+		case "ThisRound": return { thisRoundSpeed: parseFloat(effectVal), count: parseInt(prevThisRoundSpeed), message: message, messageValues: messageValues }; break;
+		case "NextRound": return { nextRoundSpeed: parseFloat(effectVal), count: parseInt(prevNextRoundSpeed), message: message, messageValues: messageValues }; break;
 	}
 }
 
