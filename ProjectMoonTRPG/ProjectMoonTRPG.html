@@ -34,8 +34,9 @@
 <label for="TurnUpdate"><input type="checkbox" id="TurnUpdate" name="attr_settingTurnUpdate" value="true">
 <span data-i18n="settings-turnupdate">Auto: Update Turn Order</span></label>
 
+<label for="AutoApplyDamage"><input type="checkbox" id="AutoApplyDamage" name="attr_settingAutoApplyDamage" value="true" checked><span data-i18n="settings-disableautoapplydamage">Auto: Apply damage taken</label>
+	
 <label for="DistortSave"><input type="checkbox" id="DistortSave" name="attr_settingDistortSave" value="true"><span data-i18n="settings-distortsave">Auto: Save/Load on Distort</span></label>
-
 
 <label for="SimpleDisplay"><input type="checkbox" id="SimpleDisplay" name="attr_settingSimpleDisplay" value="true"><span data-i18n="settings-simpledisplay">Simple roll display</label>
 
@@ -47,7 +48,9 @@
 
 <label for="HideBaseEffect"><input type="checkbox" id="HideBaseEffect" name="attr_settingHideBaseEffect" value="true"><span data-i18n="settings-hidebaseeffect">Hide: Base effects</span></label>
 
-<label for="HideNextTurn"><input type="checkbox" id="HideNextTurn" name="attr_settingHideNextTurn" value="true"><span data-i18n="settings-hidenextturn">Hide: Ailment next turn input </span></label>
+<label for="HideNextTurn"><input type="checkbox" id="HideNextTurn" name="attr_settingHideNextTurn" value="true"><span data-i18n="settings-hidenextturn">Hide: Next turn input </span></label>
+
+<label for="HideBarUpdate"><input type="checkbox" id="HideBarUpdate" name="attr_settingHideBarUpdate" value="true"><span data-i18n="settings-hidebarupdate">Hide: Status bar update </span></label>
 
 <label for="HelperText"><input type="checkbox" id="HelperText" name="attr_settingHelperText" value="true"><span data-i18n="settings-hidehelpertext">Hide:  Helper text</span></label>
 
@@ -12486,9 +12489,9 @@ getSectionIDs(`repeating_global`, idarray => {
 	let autoeffectdice1 = 0;
 	let autoeffectdice2 = 0;
 	let autoeffectdice3 = 0;
-	if (returnValues.diceCount != undefined) { autoeffectdice1 = returnValues.diceCount}
-	if (returnValues.diceMax != undefined) { autoeffectdice2 = returnValues.diceMax}
-	if (returnValues.dicePower != undefined) { autoeffectdice3 = returnValues.dicePower}
+	if (returnValues.diceCount != undefined) { autoeffectdice1 = returnValues.diceCount; }
+	if (returnValues.diceMax != undefined) { autoeffectdice2 = returnValues.diceMax; }
+	if (returnValues.dicePower != undefined) { autoeffectdice3 = returnValues.dicePower; }
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -12620,8 +12623,6 @@ getSectionIDs(`repeating_global`, idarray => {
 	else if(acounter <= dcounter && advstate != "0"){
 	rollformatmessage += " x" + acounter + ")</span>";
 	}
-
-
 
 	/* Multi-hit formatting */
 	if(combinedice1 > 1){
@@ -12786,11 +12787,11 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
 	let autoEffectSpeedCombat = 0;
-	if (returnValues.dicePower != undefined) { stat += returnValues.dicePower }
-	if (returnValues.diceCount != undefined) { autoEffectDiceCount = returnValues.diceCount }
-	if (returnValues.diceMax != undefined) { autoEffectDiceMax = returnValues.diceMax }
-	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = returnValues.speedCombat }
-	
+	if (returnValues.dicePower != undefined) { stat += returnValues.dicePower; }
+	if (returnValues.diceCount != undefined) { autoEffectDiceCount = returnValues.diceCount; }
+	if (returnValues.diceMax != undefined) { autoEffectDiceMax = returnValues.diceMax; }
+	if (returnValues.speedCombat != undefined) { autoEffectSpeedCombat = returnValues.speedCombat; }
+
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
 	
@@ -12936,7 +12937,7 @@ on('clicked:applyDamage', (info) => {
 
 	/* Get attribute values */
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
-	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay",
+	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
 	"baseDamage", "flatDamageHP", "flatDamageST", "damageHelperType",
 	"distortState", "egoActiveState", "egoType", "StaggerState", "damageResist", "damageResist_ego"], function(values) {
 
@@ -12946,6 +12947,8 @@ on('clicked:applyDamage', (info) => {
 	let whisperrolls = values.settingWhisperRolls;
 	let whispertarget = values.settingWhisperTarget;
 	let simpledisplay = values.settingSimpleDisplay;
+	let autoapplydamage = values.settingAutoApplyDamage;
+	let hidebarupdate = values.settingHideBarUpdate;
 	
 	let characterName = values.character_name;
 
@@ -13237,7 +13240,9 @@ on('clicked:applyDamage', (info) => {
 	if (newST > maxST) { newST = maxST }
 	if (newSP > maxSP) { newSP = maxSP }
 	output["HP"] = newHP; output["StagRes"] = newST; output["SP"] = newSP;
-	setAttrs(output);
+	if (autoapplydamage == "true") {
+		setAttrs(output);
+	}
 
 	/* AutoScripts */
 	let autoScriptTriggers = ["None"];
@@ -13297,9 +13302,9 @@ on('clicked:applyDamage', (info) => {
 	let resSTIcon = "Res" + damageType + "Stg";
 
 	/* Calculation summaries (Message head) */
-	hpDamageHead = generateDamageHelperHeader("HP", newHP, oldHP);
-	stDamageHead = generateDamageHelperHeader("ST", newST, oldST, staggerState);
-	spDamageHead = generateDamageHelperHeader("SP", newSP, oldSP);
+	hpDamageHead = generateDamageHelperHeader("HP", newHP, oldHP, "0", autoapplydamage, hidebarupdate);
+	stDamageHead = generateDamageHelperHeader("ST", newST, oldST, staggerState, autoapplydamage, hidebarupdate);
+	spDamageHead = generateDamageHelperHeader("SP", newSP, oldSP, "0", autoapplydamage, hidebarupdate);
 
 	/* Simple display settings (Envelops entire body block)*/
 	if (simpledisplay == "0") {
@@ -13395,13 +13400,13 @@ on('clicked:applyDamage', (info) => {
 /* Damage helper functions beginning */
 function getIcon(iconFolder, iconName, settingLimbusStyle = "false") {
 	if (settingLimbusStyle == "true") {
-		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/limbus/${iconName}.png">`;
+		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.6/ProjectMoonTRPG/imagesResized/ailments/limbus/${iconName}.png">`;
 	} else {
-		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/${iconFolder}/${iconName}.png">`
+		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.6/ProjectMoonTRPG/imagesResized/${iconFolder}/${iconName}.png">`
 	}
 }
 
-function generateDamageHelperHeader(statName, newStat, oldStat, staggerState="0") {
+function generateDamageHelperHeader(statName, newStat, oldStat, staggerState="0", autoapplydamage="true", hidebarupdate="false") {
 	let langBar = "HP";
 	let langDamage = "damage";
 	let langSuffered = "received";
@@ -13424,6 +13429,7 @@ function generateDamageHelperHeader(statName, newStat, oldStat, staggerState="0"
 		langBar = statName;
 	}
 	if (staggerState == "Staggered") { updateDisplay = `<div class="updateStatDisplay"><b>${langStaggered}!</b></div>`; }
+	else if (autoapplydamage != "true" || hidebarupdate != "false") { updateDisplay = `<div class="updateStatDisplay"><b>---</b></div>`; }
 	else { updateDisplay = `<div class="updateStatDisplay"><b>${oldStat} -> ${newStat}</b></div>`; }
 
 	if (newStat < oldStat) { langSuffered = getTranslationByKey("message-received");
@@ -14970,8 +14976,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 
 		let stylingList = parseAutoScriptStyling(values.autoScriptStyling);
 
-		console.log(stylingList)
-
 		let output = {};
 		let tempOutput = {};
 		let returnValues = { checkResult:"success", error:false };
@@ -15042,7 +15046,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 					conditionalButtonSilent = AutoEffect[0].includes("Silent") ? "" : " " + "Silent";
 					autoEffectType = "conditional message + button";
 				} else {
-					autoEffectConditional = conditional.replace("Button","").trim();
+					autoEffectConditional = conditional.replace("#Button","").trim();
 					conditionalButtonSilent = "";
 					autoEffectType = "conditional button";
 				}
@@ -15150,9 +15154,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		}
 
 		/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
-		if (tempOutput.dicePower != undefined) { returnValues.dicePower = tempOutput.dicePower }
-		if (tempOutput.diceMax != undefined) { returnValues.diceMax = tempOutput.diceMax }
-		if (tempOutput.diceCount != undefined) { returnValues.diceCount = tempOutput.diceCount }
+		if (tempOutput.DicePower != undefined) { returnValues.dicePower = tempOutput.DicePower }
+		if (tempOutput.DiceMax != undefined) { returnValues.diceMax = tempOutput.DiceMax }
+		if (tempOutput.DiceCount != undefined) { returnValues.diceCount = tempOutput.DiceCount }
 		if (tempOutput.speedCombat != undefined) { returnValues.speedCombat = tempOutput.speedCombat }
 
 		/* Handle challenge rolls */
@@ -15601,7 +15605,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Handle bar count */
 	else if (barList.hasOwnProperty(effectName)) { count = barList[effectName]; }
 	/* Handle bar damage count */
-	else if (barDamageList.hasOwnProperty("-" + effectName)) { count = barDamageList[effectName]; }
+	else if (barDamageList.hasOwnProperty(effectName)) { count = barDamageList[effectName]; }
 	else { return autoEffectErrorMessage("Invalid Target", `Ailment, Bar or BarDamage "${effectName}" does not exist`, AutoEffect); }
 
 	/* Get required value. Recalculate count if percentage */
@@ -15640,7 +15644,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	}
 
 	/* Handle message */
-	let messageFormat = getTranslationByKeyCustom("Require [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-require");
+	let messageFormat = getTranslationByKeyCustom("Require [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-require");
 	
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
@@ -15944,7 +15948,7 @@ function autoEffectDice(AutoEffect, scaling) {
 	messageValues = { effectTarget: AutoEffect[0].replace("Dice", "Dice "), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { [AutoEffect[0].replace("D","d")]: parseInt(effectVal), message: message, messageValues: messageValues }
+	return { [AutoEffect[0]]: parseInt(effectVal), message: message, messageValues: messageValues }
 }
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
@@ -16004,7 +16008,7 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	getTranslationByKeyCustom("Increase [TARGET] by [SCALING NUM]", "autoeffect-format-speed");
+	let messageFormat = getTranslationByKeyCustom("Increase [TARGET] by [SCALING NUM]", "autoeffect-format-speed");
 	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Reduce [TARGET] by [SCALING NUM]", "autoeffect-format-speed-neg"); }
 	switch (effectDuration) {
 		case "Combat": messageFormat += " " + getTranslationByKeyCustom("this combat", "autoeffect-option-thiscombat"); break;
