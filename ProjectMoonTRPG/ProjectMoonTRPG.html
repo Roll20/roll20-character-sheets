@@ -15566,7 +15566,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 
 	/* Check if CustomMessage is silent. No reason to do any formatting being that the message will not be displayed anyways */
 	let silent = "false";
-	if (AutoEffect.indexOf("#Silent") > AutoEffect.lastIndexOf('"')) {
+	if (AutoEffect.indexOf("Silent") > AutoEffect.lastIndexOf('"')) {
 		silent = "true";
 	}
 
@@ -15595,7 +15595,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 5) { return autoEffectErrorMessage("Format Error", `Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional) #Silent(optional))`, AutoEffect); }
-	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["scaling", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
+	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!(["scaling", "silent"].includes(option.toLowerCase()) || (/(scaling[0-9]+)/ig).test(option))) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 
 	/* Get target count */
 	let effectName = AutoEffect[2];
@@ -15630,8 +15630,12 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	/* Handle the optional scaling property */
 	let scaling = 1;
 	if (AutoEffect[3] != undefined) {
-		if (AutoEffect[3].toLowerCase() == "scaling") {
-			scaling = Math.floor(count/effectVal);
+		if (AutoEffect[3].toLowerCase().includes("scaling")) {
+			if ((/(scaling[0-9]+)/ig).test(AutoEffect[3])) {
+				scaling = Math.min(Math.floor(count/effectVal), parseInt(AutoEffect[3].toLowerCase().replace("scaling","")));
+			} else {
+				scaling = Math.floor(count/effectVal);
+			}
 			returnValues.scaling = scaling;
 		}
 	}
@@ -15666,7 +15670,7 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 5) { return autoEffectErrorMessage("Format Error", `Expected format: (Consume N #Ailment/#Bar #Scaling(optional) #Silent(optional))`, AutoEffect); }
-	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["scaling", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
+	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!(["scaling", "silent"].includes(option.toLowerCase()) || (/(scaling[0-9]+)/ig).test(option))) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 	
 	/* Get consumed value */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
@@ -15693,8 +15697,12 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	/* Handle the optional scaling property */
 	let scaling = 1;
 	if (AutoEffect[3] != undefined) {
-		if (AutoEffect[3].toLowerCase() == "scaling") {
-			scaling = Math.floor(count/effectVal);
+		if (AutoEffect[3].toLowerCase().includes("scaling")) {
+			if ((/(scaling[0-9]+)/ig).test(AutoEffect[3])) {
+				scaling = Math.min(Math.floor(count/effectVal), parseInt(AutoEffect[3].toLowerCase().replace("scaling","")));
+			} else {
+				scaling = Math.floor(count/effectVal);
+			}
 			returnValues.scaling = scaling;
 		}
 	}
