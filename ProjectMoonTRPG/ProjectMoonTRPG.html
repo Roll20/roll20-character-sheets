@@ -10974,10 +10974,7 @@ on("change:PanicState", function() {
 	/* AutoScripts */
 	resetConditionals();
 	let autoScriptTrigger = currentstate == "Panic" ? "Panic" : "None";
-	AutoScriptMain("", autoScriptTrigger, "true", function(returnValues) {
-
-	let autoScriptMessage = "";
-	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+	AutoScriptMain("", autoScriptTrigger, "false")
 
 	/* Translation prep */
 	let langStateTrue = " went into Panic!";
@@ -10990,19 +10987,18 @@ on("change:PanicState", function() {
 	}
 	
 	if(messagestate != "true" && currentstate != "Panic"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + autoScriptMessage + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 	else if(messagestate != "true" && currentstate == "Panic"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + autoScriptMessage + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue  + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 
-	});
 	});
 });
 
@@ -11030,10 +11026,7 @@ on("change:DefeatState", function() {
 
 	/* AutoScripts */
 	resetConditionals();
-	AutoScriptMain("", "Defeated", "true", function(returnValues) {
-
-	let autoScriptMessage = "";
-	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+	AutoScriptMain("", "Defeated", "false")
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -11053,13 +11046,12 @@ on("change:DefeatState", function() {
 	}
 	
 	if(messagestate != "true" && currentstate == "Defeated"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langDefeat + autoScriptMessage + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langDefeat + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 
-	});
 	});
 });
 
@@ -11102,10 +11094,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	/* AutoScripts */
 	resetConditionals();
 	let autoScriptTrigger = currentstate == "Staggered" ? "Staggered" : "None";
-	AutoScriptMain("", autoScriptTrigger, "true", function(returnValues) {
-
-	let autoScriptMessage = "";
-	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
+	AutoScriptMain("", autoScriptTrigger, "false")
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -11126,19 +11115,18 @@ getSectionIDs(`repeating_global`, idarray => {
 	}
 	
 	if(messagestate != "true" && currentstate != "Staggered"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + autoScriptMessage + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 	else if(messagestate != "true" && currentstate == "Staggered"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + autoScriptMessage + "}}"), (results) => {
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
 	}
 
-	});
 	});
 	});
 });
@@ -15058,9 +15046,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 				}
 
 				if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
-					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
+					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
 				} else {
-					conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].toString().replaceAll(","," ") + conditionalButtonSilent + ")";
+					conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
 				}
 
 				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
@@ -15108,7 +15096,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 				default: tempOutput = autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0][0].replace("Unknown: ","")} is not a valid AutoEffect`, AutoEffect[0]); break;
 			}
 		}
-		console.log(tempOutput)
+		// console.log(tempOutput)
 		
 		/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
 		/*  but does not apply any changes to attributes */
@@ -15201,8 +15189,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			delete tempOutput.message;
 		}
 
-		console.log(conditionalMessageList)
-
 		/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
 		if (tempOutput.messageValues != undefined) {
 			messageValues = tempOutput.messageValues;
@@ -15244,28 +15230,14 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 	}
 	
 	/* Message handling */
-	if (settingMuteMessage != "true" && message != "" && returnValues.error != true) {
-		if (returnMessage == "false") {
-			let messageHeaderIcon = getIcon("icons", "gear");
-
-			setAttrs({dummyIcon: messageHeaderIcon, dummy: "<div class='autoeffectContainer'>" + message + "</div>"});
-
-			let whisper = "";
-			if(settingWhisperRolls == "true"){
-				whisper = "/w " + settingWhisperTarget;
-			}
-			
-			startRoll((whisper + "&{template:autoeffect} {{icon=@{dummyIcon}}} {{title=" + messageHeaderTitle + "}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
-				finishRoll(results.rollId, {} );
-			});
-		}
-		else {
+	if (returnValues.error != true && message != "") {
+		if (returnMessage == "true") {
 			returnValues.message = autoEffectEntry("AutoEffects", message);
 		}
 	}
 
 	/* Conditional message handling */
-	if (returnValues.error != true) {
+	if (returnValues.message != "") {
 		for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
 			let iconFolder = "icons";
 			let iconName = "gear";
@@ -15284,7 +15256,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		}
 	}
 
-	/* Error handling and returnValues callback */
+	/* Error handling  */
 	if (returnValues.error == true) {
 		returnValues.message = "";
 		
@@ -15297,8 +15269,26 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 				returnValues.message += autoEffectEntry(errorType, errorMessage, "icons", "exit", "Red");
 			}
 		}
-
 		resetConditionals();
+	}
+
+	/* If no message is to be returned, print both message and returnValues.message (if it has any contents) to the chat */
+	if (settingMuteMessage != "true" && (message != "" || returnValues.message != undefined)) {
+		if (returnMessage == "false") {
+			let messageHeaderIcon = getIcon("icons", "gear");
+			if (returnValues.message == undefined) { returnValues.message = ""; }
+			let messageContents = "<div class='autoeffectContainer'>" + message + returnValues.message + "</div>";
+			
+			let whisper = "";
+			if(settingWhisperRolls == "true"){
+				whisper = "/w " + settingWhisperTarget;
+			}
+			
+			setAttrs({dummyIcon: messageHeaderIcon, dummy: messageContents});
+			startRoll((whisper + "&{template:autoeffect} {{icon=@{dummyIcon}}} {{title=" + messageHeaderTitle + "}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
+				finishRoll(results.rollId, {} );
+			});
+		}
 	}
 	
 	// console.log(output)
@@ -15313,9 +15303,17 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 
 /* Removes all newline and tab characters as well as JavaScript comments from an AutoScript */
 function cleanAutoScript(AutoScript) {
+	/* Remove all newlines and tab spaces */
 	let cleanAutoScript = AutoScript.replace(/(\r\n|\n|\r|\t)/gm, "");
+
+	/* Remove all comments */
 	cleanAutoScript = cleanAutoScript.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g,'');
-	cleanAutoScript = cleanAutoScript.replaceAll('“','').replaceAll('”','');
+
+	/* Remove all spaces between AutoEffects ex. )    ( -> )( */
+	cleanAutoScript = cleanAutoScript.replace(/\)( +)\(/g,')(')
+
+	/* Replace all “” quotes with "" quotes */
+	cleanAutoScript = cleanAutoScript.replaceAll('“','"').replaceAll('”','"');
 	return cleanAutoScript;
 }
 
@@ -15329,16 +15327,17 @@ function autoScriptToArray(inputAutoScript, mode="normal") {
 	let AutoScriptArray = [];
 
 	let beginChar = "(";
+	let middleChar = ")("
 	let endChar = ")";
 	let charOffset = 1;
 
 	if (mode == "nested") {
 		beginChar = "[#";
+		middleChar = "#][#";
 		endChar = "#]";
 		charOffset = 2;
 	}
 
-	/* Remove all newlines, tab spaces and comments */
 	AutoScript = cleanAutoScript(AutoScript);
 
 	do {
@@ -15348,16 +15347,29 @@ function autoScriptToArray(inputAutoScript, mode="normal") {
 		if (AutoScript.indexOf(beginChar) == 0 && AutoScript.indexOf(endChar)) {
 
 			/* Removes the next AutoEffect from the AutoScript. Removes the parentheses */
-			AutoEffect = AutoScript.substring(charOffset, AutoScript.indexOf(endChar));
-			AutoScript = AutoScript.substring(AutoScript.indexOf(endChar)+charOffset);
-
+			if (AutoScript.indexOf(middleChar) != "-1") {
+				AutoEffect = AutoScript.substring(charOffset, AutoScript.indexOf(middleChar));
+				AutoScript = AutoScript.substring(AutoScript.indexOf(middleChar)+charOffset);
+			} else {
+				AutoEffect = AutoScript.substring(charOffset, AutoScript.length-1);
+				AutoScript = "";
+			}
+			
 			/* Structures the AutoEffect into an array and stores it */
 			if (mode == "nested") {
 				AutoEffect = AutoEffect.trim().replace(",","£");
 				AutoEffectArray = AutoEffect.split("£");
 				AutoEffectArray = AutoEffectArray.map(e => e.trim());
 			} else {
-				AutoEffectArray = AutoEffect.trim().split(",");
+				/* For CustomMessage AutoScripts, preserve commas in the messages format by extracting the format before splitting over "," */
+				if (AutoEffect.includes("CustomMessage")) {
+					let messageFormat = AutoEffect.match(/"(.*?)"/g);
+					AutoEffect = AutoEffect.replace(/"(.*?)"/g,"£").trim().split(",");
+					AutoEffect[0] = AutoEffect[0].replace("£", messageFormat);
+					AutoEffectArray = AutoEffect;
+				} else {
+					AutoEffectArray = AutoEffect.trim().split(",");
+				}
 				AutoEffectArray = AutoEffectArray.map(e => e.trim());
 				AutoEffectArray[0] = AutoEffectArray[0].split(/\s+/);
 			}
@@ -15465,7 +15477,7 @@ function autoEffectEntry(header, message, iconFolder="icons", iconName="gear", i
 	return newEntry;
 }
 
-function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false") {
+function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false", effectIcon="No icon") {
 	if(messageFormat != ""){
 		let message = messageFormat;
 
@@ -15496,8 +15508,12 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("limbus/","").replace("community/","") + "</b>");
 
 		/* Icon handling */
-		/* Get target icon. Is in this format: [/TARGET] */
-		message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget, settingLimbusStyle));
+		/* Get target icon. Is in this format: [/TARGET]. If a effectIcon is procided, use that instead */
+		if (effectIcon != "No icon") {
+			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectIcon, settingLimbusStyle));
+		} else {
+			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget, settingLimbusStyle));
+		}
 		
 		/* Question mark icon */
 		message = message.replaceAll("[/Question]", getIcon("icons", "Question"));
@@ -15579,6 +15595,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	let messageFormat = "";
 	let checkResultOption = "success";
 	let effectTarget = "No target";
+	let effectIcon = "No icon";
 	let effectVal = 0;
 	let effectCount = 0;
 	let scaling = 1;
@@ -15598,6 +15615,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	messageFormat = messageFormat.replaceAll('"','');
 
 	if (messageValues.effectTarget != undefined) { effectTarget = messageValues.effectTarget; }
+	if (messageValues.effectIcon != undefined) { effectTarget = messageValues.effectIcon; }
 	if (messageValues.effectVal != undefined) { effectVal = messageValues.effectVal; }
 	if (messageValues.effectCount != undefined) { effectCount = messageValues.effectCount; }
 	if (messageValues.scaling != undefined) { scaling = messageValues.scaling; }
@@ -15605,7 +15623,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	if (messageValues.settingLimbusStyle != undefined) { settingLimbusStyle = messageValues.settingLimbusStyle; }
 
 	if (silent == "false" && (checkResult == checkResultOption || checkResultOption == "ignore")) {
-		return { message: autoEffectMessage(messageFormat, effectTarget, effectVal, effectCount, scaling, checkResult, settingLimbusStyle) }
+		return { message: autoEffectMessage(messageFormat, effectTarget, effectVal, effectCount, scaling, checkResult, settingLimbusStyle, effectIcon) }
 	} else {
 		return {}
 	}
@@ -15631,8 +15649,8 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 
 	/* Get required value. Recalculate count if percentage */
 	let effectVal = AutoEffect[1];
-	if (isNaN(parseInt(Math.abs(effectVal))) == false) {
-		effectVal = parseInt(Math.abs(effectVal));
+	if (isNaN(parseFloat(Math.abs(effectVal))) == false) {
+		effectVal = parseFloat(Math.abs(effectVal));
 	}
 	else if ((/[0-9]+[%]/g).test(String(effectVal))) {
 		let percentage = parseFloat(effectVal.replace("%","")) / 100;
@@ -15680,7 +15698,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	if (!AutoEffect.includes("Silent")) {
 		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult);
 	}
-	returnValues.messageValues = { effectTarget: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
+	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
@@ -15747,14 +15765,17 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 
 	/* Handle message */
 	let messageFormat = getTranslationByKeyCustom("Consume [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-consume");
-
-	let effectIcon = ailmentList[effectName][4];
-	if (ailmentList.hasOwnProperty(effectName)) { messageFormat = "[/TARGET] " + messageFormat; }
+	
+	let effectIcon = effectName;
+	if (ailmentList.hasOwnProperty(effectName)) {
+		messageFormat = "[/TARGET] " + messageFormat;
+		effectIcon = ailmentList[effectName][4];
+	}
 
 	if (!AutoEffect.includes("Silent")) {
 		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult);
 	}
-	returnValues.messageValues = { effectTarget: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
+	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
@@ -15792,6 +15813,7 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	/* Handle the optional turn override */
 	/* This is between you and me, but "Next turn" doesn't actually do anything ;) */
 	let forceTarget = "";
+
 	if (AutoEffect[3] != undefined) {
 		if (["this", "thisround", "this round, thisturn, this turn"].includes(AutoEffect[3].toLowerCase())) { forceTarget = "This round"; }
 	}
@@ -15824,9 +15846,9 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	if (effectHasNextTurn == 'true' && forceTarget != "This round") { messageFormat += " next round"; }
 
 	if (!AutoEffect.includes("Silent")) {
-		message = autoEffectMessage(messageFormat, effectIcon, effectVal/scaling, count, scaling, "success", settingLimbusStyle);
+		message = autoEffectMessage(messageFormat, effectAilment, effectVal/scaling, count, scaling, "success", settingLimbusStyle, effectIcon);
 	}
-	messageValues = { effectTarget: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
+	messageValues = { effectTarget: effectAilment, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
 	
 	/* Execute AutoEffect */
 	returnValues = {...returnValues, message: message, messageValues: messageValues };
