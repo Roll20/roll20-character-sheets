@@ -13122,7 +13122,17 @@ on('clicked:applyDamage', (info) => {
 					if ((ailDamageTypeTrigger == "Any" || ailDamageTypeTrigger == damageType) && (ailEffect != "None" && ailEffect != null && count != 0)) {
 
 						/* Calculate base attribute change and its polarity */
-						if (ailEffectVal == "n") {
+						
+						/* Ailment is n or -n multiplied by a number */
+						if ((/([0-9]+n)/).test(ailEffectVal)) {
+							ailEffectVal = ailEffectVal.replaceAll("n","");
+							ailEffectVal = parseInt(count) * parseInt(ailEffectVal)
+						}
+						else if ((/(-[0-9]+n)/).test(ailEffectVal)) {
+							ailEffectVal = (0 - parseInt(count)) * parseInt(ailEffectVal)
+						}
+						/* Ailment in n or -n */
+						else if (ailEffectVal == "n") {
 							ailEffectVal = parseInt(count);
 						}
 						else if (ailEffectVal == "-n") {
@@ -13215,14 +13225,14 @@ on('clicked:applyDamage', (info) => {
 
 	/* Final calculation */
 	/*                          \--------------------- Before Resistance ----------------------/  \----------------------- After Resistance ----------------------- / */
-	newHP += Math.ceil(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
-	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
+	newHP += Math.max(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
+	newST += Math.max(Math.min((stResistance *                   (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
 	newSP += sumSanity;
 
 	/* Caps increase by regen amount */
-	newHP = Math.floor(newHP, newHP + hpRegen + hpStRegen);
-	newST = Math.floor(newST, newST + stRegen + hpStRegen);
-	newSP = Math.floor(newSP, newSP + spRegen);
+	newHP = Math.min(newHP, oldHP + hpRegen + hpStRegen);
+	newST = Math.min(newST, oldST + stRegen + hpStRegen);
+	newSP = Math.min(newSP, oldSP + spRegen);
 
 	/* Apply damage */
 	if (newHP > maxHP) { newHP = maxHP }
@@ -16848,11 +16858,20 @@ function updateCustomAilment(rowid) {
 		targetval = values[`${effecttargetinlist}`];
 
 		if(effecttargetinlist != "None" && effecttargetinlist != null && trigger != "WhenHit" && activateEffect == "true" && count != 0) {
-			if(effectval == "n"){
-			effectval = parseInt(count);
+			
+			if ((/([0-9]+n)/).test(effectval)) {
+				effectval = effectval.replaceAll("n","");
+				effectval = parseInt(count) * parseInt(effectval)
 			}
-			else if(effectval == "-n"){
-			effectval = (0 - parseInt(count));
+			else if ((/(-[0-9]+n)/).test(effectval)) {
+				effectval = (0 - parseInt(count)) * parseInt(effectval)
+			}
+			/* Ailment in n or -n */
+			else if (effectval == "n") {
+				effectval = parseInt(count);
+			}
+			else if (effectval == "-n") {
+				effectval = (0 - parseInt(count)) + Math.min(count, ailCustomResistanceNum);
 			}
 
 			if(effectmode == "+"){
