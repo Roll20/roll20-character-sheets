@@ -116,11 +116,13 @@ Each item in the Armor, Weapon, and Equipment sections has an associated check b
 
 # <a id="page-2-maneuvers">Page 2: Maneuvers</a>
 
-HERO combat provides a number of tactical options via maneuvers and is an important aspect of play. The Standard Maneuvers slide is accessible using the (S) button in the lower right pane that also includes targeting, martial maneuvers, and a text field. Click the name of a desired maneuver to show its action "card." Those that work with weapons will a change the color the weapon's "Roll" button (blue for Block, orange for Disarm, red or green for attacks, and gray when unavailable). Each card also provides a button when unarmed combat is an option.
+HERO combat provides a number of tactical options via maneuvers and is an important aspect of play. The Standard Maneuvers slide is accessible using the (S) button in the lower right pane that also includes targeting, martial maneuvers, and a text field. Click the name of a desired maneuver to show its action "card." Those that work with weapons will a change the color the weapon's "Roll" button (blue for Block, orange for Disarm, red or green for attacks, and gray when unavailable). Each card also provides a button when unarmed combat is an option. Each maneuver's OCV and DCV may be increased by the supplied CSL input fields.
 
 ![Standard Maneuvers](/HeroSystem6eHeroic/images/standardManeuvers.png)
 
-The Martial and Custom Maneuvers slide (M) may be used for purchased martial arts or custom maneuvers. The fields CP, OCV, DCV, and Phase have their usual meanings. The "Type" selector is important since it determines whether or not the maneuver is for unarmed or armed combat. The choices are *Attack*, *Block*, *Contest*, *Dodge*, *WP Attack*, *WP Block*, and *WP Contest*. The unarmed Attack type has a direct entry field for damage. The "WP Attack" variant will activate weapon Roll buttons and applies the DC bonus to weapon damage. The *Contest* types invoke the strength contest dialog, with the maneuver's STR Mod value added to the attacking character's strength. END costs for WP maneuvers will include the base weapon endurance cost *plus* the END Mod. Martial arts maneuvers generally do not have END costs, so the unarmed variants assume zero END *plus* the END Mod value.
+The Martial and Custom Maneuvers slide (M) may be used for purchased martial arts or custom maneuvers. The fields CP, OCV, DCV, and Phase have their usual meanings. OCV and DCV have two input fields. The second is intended for . Damage may also be increased by the application of Damage Classes, which cost two CSLs. Roll20 will convert damage dice to DC, add the DC modifier, and then convert the net back into dice.
+
+The "Type" selector is important since it determines whether or not the maneuver is for unarmed or armed combat. The choices are *Attack*, *Block*, *Contest*, *Dodge*, *WP Attack*, *WP Block*, and *WP Contest*. The unarmed Attack type has a direct entry field for damage. The "WP Attack" variant will activate weapon Roll buttons and applies the DC bonus to weapon damage. The *Contest* types invoke the strength contest dialog, with the maneuver's STR Mod value added to the attacking character's strength. END costs for WP maneuvers will include the base weapon endurance cost *plus* the END Mod. Martial arts maneuvers generally do not have END costs, so the unarmed variants assume zero END *plus* the END Mod value.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
 
@@ -228,9 +230,13 @@ By default this is checked, showing the amount a roll succeeded or failed by. In
 
 Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-`Health Reset Buttons also reset Combat Choices` 
+`Health Reset Buttons reset Combat Choices` 
 
-When checked a reset also returns maneuver and targeting selections to their default states.
+When checked a reset returns maneuver and targeting selections to their default states.
+
+`Health Reset Buttons reset applied CSLs` 
+
+Similarly, here a reset also returns applied Combat Skill Levels to zero.
 
 `Attack and Power Buttons Apply END Costs` 
 
@@ -303,4 +309,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
-*Last updated by Villain in Glasses on July 27, 2024 to represent the sheet as of version 3.1.*
+*Last updated by Villain in Glasses on August 2, 2024 to represent the sheet as of version 3.14.*
