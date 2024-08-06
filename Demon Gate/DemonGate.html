@@ -810,22 +810,24 @@
     
     function UpdateStrSkills()
     {
+        updateAllSkills();
+
         UpdateLifting();
-    
-        UpdateAllAdditionalSkills();
     }
     
     function UpdateBdySkills()
     {
+        updateAllSkills();
+
         UpdateDrinking();
         UpdateDrugTolerance();
-        UpdateEndurance();
-    
-        UpdateAllAdditionalSkills();
+        UpdateEndurance();    
     }
     
     function UpdateDexSkills()
     {
+        updateAllSkills();
+
         UpdateAcrobatics();
         UpdateClimbing();
         UpdateDancing();
@@ -840,12 +842,12 @@
         UpdateStealth();
         UpdateSwimming();
         UpdateTeamster();
-    
-        UpdateAllAdditionalSkills();
     }
     
     function UpdatePrcSkills()
     {
+        updateAllSkills();
+
         UpdateArt();
         UpdateAstronomy();
         UpdateConcealment();
@@ -873,12 +875,12 @@
         UpdateTraps();
         UpdateWeatherSense();
         UpdateWeaving();
-    
-        UpdateAllAdditionalSkills();
     }
     
     function UpdateIntSkills()
     {
+        updateAllSkills();
+
         UpdateAlchemy();
         UpdateAppraisal();
         UpdateArmorer();
@@ -919,24 +921,24 @@
         UpdateWeaponsmith();
         UpdateWildSurvival();
         UpdateLangSkills();
-    
-        UpdateAllAdditionalSkills();
     }
     
     function UpdateWilSkills()
     {
+        updateAllSkills();
+
         UpdateBattleChant();
         UpdateBloodMagic();
         UpdateConjuring();
         UpdateExorcism();
         UpdateMeditation();
         UpdateNecromancy();
-    
-        UpdateAllAdditionalSkills();
     }
     
     function UpdateChrSkills()
     {
+        updateAllSkills();
+
         UpdateActing();
         UpdateAnimalKinship();
         UpdateBarter();
@@ -951,8 +953,6 @@
         UpdateSpeech();
         UpdateStoryTelling();
         UpdateStreetwise();
-    
-        UpdateAllAdditionalSkills();
     }
     
     function UpdateLevel()
@@ -2448,8 +2448,14 @@
             setAttrs({WildDice: GetDice(total)});
         });
     }
+
+    // Does not update the "Skills (old) tab"
+    function updateAllSkills() {
+        updateAllFixedNonCombatSkills();
+        updateAllAdditionalSkills();
+    }
     
-    function UpdateAllAdditionalSkills() {
+    function updateAllAdditionalSkills() {
         console.log('Updating all additional skills');
     
         getSectionIDs("skills", function(ids) {
@@ -3459,7 +3465,7 @@
     });
     
     on("change:physmod change:menmod", function() {
-        UpdateAllAdditionalSkills();
+        updateAllAdditionalSkills();
     });
     
     on("change:repeating_skills:skillattribute change:repeating_skills:skillrating change:repeating_skills:skillbonus", function() {
@@ -3661,7 +3667,7 @@
         UpdateFixedNonCombatSkill(20);
     });
     
-    function UpdateAllFixedNonCombatSkills() {
+    function updateAllFixedNonCombatSkills() {
         console.log('Updating fixed non-combat skills');
 
         // Keep this in sync with the number of fixed skill rows on the sheet
@@ -3790,6 +3796,12 @@
 
     on("sheet:opened", function()
     {
+        updateAllSkills();
+        convertOldAttributes();
+    });
+
+    // We can probably get rid of this
+    function convertOldAttributes() {
         const converted = "converted";
         const conversionNotNeeded = "conversion not needed";
 
@@ -3833,7 +3845,7 @@
 
             console.log('Converted HP, mana and chi');
         });
-    });
+    }
 
     function numberOrZero(input) {
         return isNaN(input) ? 0 : Number(input);
@@ -5345,7 +5357,9 @@
                     </div>
 
                     <div class="sheet-column-grow">
-                        <h1>Non-Combat Skills</h1>
+                        <div>
+                            <h1>Non-Combat Skills</h1>
+                        </div>
 
                         <table class="sheet-vertical-margin">
                             <tr>
@@ -5403,7 +5417,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill1Name} Check}} {{text=Roll: [[@{Skill1Dice}@{Skill1Tier}@{Skill1ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill1Name} Check}} {{text=Roll: [[@{Skill1Dice}@{Skill1Tier}@{Skill1ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5451,7 +5465,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill2Name} Check}} {{text=Roll: [[@{Skill2Dice}@{Skill2Tier}@{Skill2ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill2Name} Check}} {{text=Roll: [[@{Skill2Dice}@{Skill2Tier}@{Skill2ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5499,7 +5513,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill3Name} Check}} {{text=Roll: [[@{Skill3Dice}@{Skill3Tier}@{Skill3ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill3Name} Check}} {{text=Roll: [[@{Skill3Dice}@{Skill3Tier}@{Skill3ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5547,7 +5561,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill4Name} Check}} {{text=Roll: [[@{Skill4Dice}@{Skill4Tier}@{Skill4ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill4Name} Check}} {{text=Roll: [[@{Skill4Dice}@{Skill4Tier}@{Skill4ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5595,7 +5609,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill5Name} Check}} {{text=Roll: [[@{Skill5Dice}@{Skill5Tier}@{Skill5ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill5Name} Check}} {{text=Roll: [[@{Skill5Dice}@{Skill5Tier}@{Skill5ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5643,7 +5657,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill6Name} Check}} {{text=Roll: [[@{Skill6Dice}@{Skill6Tier}@{Skill6ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill6Name} Check}} {{text=Roll: [[@{Skill6Dice}@{Skill6Tier}@{Skill6ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5691,7 +5705,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill7Name} Check}} {{text=Roll: [[@{Skill7Dice}@{Skill7Tier}@{Skill7ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill7Name} Check}} {{text=Roll: [[@{Skill7Dice}@{Skill7Tier}@{Skill7ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5739,7 +5753,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill8Name} Check}} {{text=Roll: [[@{Skill8Dice}@{Skill8Tier}@{Skill8ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill8Name} Check}} {{text=Roll: [[@{Skill8Dice}@{Skill8Tier}@{Skill8ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5787,7 +5801,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill9Name} Check}} {{text=Roll: [[@{Skill9Dice}@{Skill9Tier}@{Skill9ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill9Name} Check}} {{text=Roll: [[@{Skill9Dice}@{Skill9Tier}@{Skill9ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5835,7 +5849,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill10Name} Check}} {{text=Roll: [[@{Skill10Dice}@{Skill10Tier}@{Skill10ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill10Name} Check}} {{text=Roll: [[@{Skill10Dice}@{Skill10Tier}@{Skill10ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5884,7 +5898,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill11Name} Check}} {{text=Roll: [[@{Skill11Dice}@{Skill11Tier}@{Skill11ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill11Name} Check}} {{text=Roll: [[@{Skill11Dice}@{Skill11Tier}@{Skill11ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5932,7 +5946,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill12Name} Check}} {{text=Roll: [[@{Skill12Dice}@{Skill12Tier}@{Skill12ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill12Name} Check}} {{text=Roll: [[@{Skill12Dice}@{Skill12Tier}@{Skill12ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -5980,7 +5994,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill13Name} Check}} {{text=Roll: [[@{Skill13Dice}@{Skill13Tier}@{Skill13ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill13Name} Check}} {{text=Roll: [[@{Skill13Dice}@{Skill13Tier}@{Skill13ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6028,7 +6042,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill14Name} Check}} {{text=Roll: [[@{Skill14Dice}@{Skill14Tier}@{Skill14ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill14Name} Check}} {{text=Roll: [[@{Skill14Dice}@{Skill14Tier}@{Skill14ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6076,7 +6090,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill15Name} Check}} {{text=Roll: [[@{Skill15Dice}@{Skill15Tier}@{Skill15ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill15Name} Check}} {{text=Roll: [[@{Skill15Dice}@{Skill15Tier}@{Skill15ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6124,7 +6138,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill16Name} Check}} {{text=Roll: [[@{Skill16Dice}@{Skill16Tier}@{Skill16ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill16Name} Check}} {{text=Roll: [[@{Skill16Dice}@{Skill16Tier}@{Skill16ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6172,7 +6186,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill17Name} Check}} {{text=Roll: [[@{Skill17Dice}@{Skill17Tier}@{Skill17ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill17Name} Check}} {{text=Roll: [[@{Skill17Dice}@{Skill17Tier}@{Skill17ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6220,7 +6234,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill18Name} Check}} {{text=Roll: [[@{Skill18Dice}@{Skill18Tier}@{Skill18ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill18Name} Check}} {{text=Roll: [[@{Skill18Dice}@{Skill18Tier}@{Skill18ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6268,7 +6282,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill19Name} Check}} {{text=Roll: [[@{Skill19Dice}@{Skill19Tier}@{Skill19ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill19Name} Check}} {{text=Roll: [[@{Skill19Dice}@{Skill19Tier}@{Skill19ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6316,7 +6330,7 @@
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button type="roll"
-                                        value="&{template:simple} {{name=@{Skill20Name} Check}} {{text=Roll: [[@{Skill20Dice}@{Skill20Tier}@{Skill20ConditionMod}+?{Modifier|0}]]}}">
+                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{Skill20Name} Check}} {{text=Roll: [[@{Skill20Dice}@{Skill20Tier}@{Skill20ConditionMod}+?{Modifier|0}]]}}">
                                     </button>
                                 </td>
                             </tr>
@@ -6380,7 +6394,7 @@
                                         </td>
                                         <td class="sheet-button-cell">
                                             <button type="roll"
-                                                value="&{template:simple} {{name=@{SkillName} Check}} {{text=Roll: [[@{SkillDice}@{SkillTier}@{SkillConditionMod}+?{Modifier|0}]]}}">
+                                                value="&{template:simple} {{character=@{character_name}}}{{name=@{SkillName} Check}} {{text=Roll: [[@{SkillDice}@{SkillTier}@{SkillConditionMod}+?{Modifier|0}]]}}">
                                             </button>
                                         </td>
                                     </tr>
@@ -9638,7 +9652,7 @@
                                         <input type="text" name="attr_TraitName" value="" class="sheet-tall-control" placeholder="Name of trait" />
                                     </div>
                                     <div class="sheet-flex-form-fixed sheet-tall-control">
-                                        <button type="roll" class="sheet-display-text-button-small" value="&{template:text} {{title=@{TraitName}}} {{text=@{TraitDesc}}}">
+                                        <button type="roll" class="sheet-display-text-button-small" value="&{template:text} {{character=@{character_name}}} {{title=@{TraitName}}} {{text=@{TraitDesc}}}">
                                             Display in Chat
                                         </button>
                                     </div>
@@ -9661,7 +9675,7 @@
                                     <div class="sheet-input-wide sheet-tall-control sheet-input-like">Vision</div>
                                 </div>
                                 <div class="sheet-flex-form-fixed sheet-tall-control">
-                                    <button type="roll" class="sheet-display-text-button-small" value="&{template:text} {{title=Vision}} {{text=@{Vision}}}">
+                                    <button type="roll" class="sheet-display-text-button-small" value="&{template:text} {{character=@{character_name}}} {{title=Vision}} {{text=@{Vision}}}">
                                         Display in Chat
                                     </button>
                                 </div>
@@ -9682,7 +9696,7 @@
                                     </div>
                                     <div class="sheet-flex-form-fixed sheet-tall-control">
                                         <button type="roll" class="sheet-display-text-button-small"
-                                            value="&{template:text} {{title=@{RaceAbilName}}} {{text=@{RaceAbilDesc}}}">
+                                            value="&{template:text} {{character=@{character_name}}} {{title=@{RaceAbilName}}} {{text=@{RaceAbilDesc}}}">
                                             Display in Chat
                                         </button>
                                     </div>
@@ -9707,7 +9721,7 @@
                                     </div>
                                     <div class="sheet-flex-form-fixed sheet-tall-control">
                                         <button type="roll" class="sheet-display-text-button-small"
-                                            value="&{template:text} {{title=@{TalentName}}} {{text=@{TalentDesc}}}">
+                                            value="&{template:text} {{character=@{character_name}}} {{title=@{TalentName}}} {{text=@{TalentDesc}}}">
                                             Display in Chat
                                         </button>
                                     </div>
@@ -9733,7 +9747,7 @@
                                     </div>
                                     <div class="sheet-flex-form-fixed sheet-tall-control">
                                         <button type="roll" class="sheet-display-text-button-small"
-                                            value="&{template:class-ability-text} {{name=@{ClassAbilName}}} {{rating=@{ClassAbilRating}}} {{maxRating=@{ClassAbilMaxRating}}} {{power=@{ClassAbilPower}}} {{description=@{ClassAbilDesc}}}">
+                                            value="&{template:class-ability-text} {{name=@{ClassAbilName}}} {{character=@{character_name}}} {{rating=@{ClassAbilRating}}} {{maxRating=@{ClassAbilMaxRating}}} {{power=@{ClassAbilPower}}} {{description=@{ClassAbilDesc}}}">
                                             Display in Chat
                                         </button>
                                     </div>
@@ -10129,7 +10143,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ActDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Acting Check}} {{text=Roll: [[@{ActDice}@{ActTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Acting Check}} {{text=Roll: [[@{ActDice}@{ActTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10154,7 +10168,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ArtDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Art Check}} {{text=Roll: [[@{ArtDice}@{ArtTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Art Check}} {{text=Roll: [[@{ArtDice}@{ArtTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10179,7 +10193,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_GemDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Gem Cutting Check}} {{text=Roll: [[@{GemDice}@{GemTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Gem Cutting Check}} {{text=Roll: [[@{GemDice}@{GemTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10204,7 +10218,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_GlassDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Glass Blowing Check}} {{text=Roll: [[@{GlassDice}@{GlassTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Glass Blowing Check}} {{text=Roll: [[@{GlassDice}@{GlassTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10229,7 +10243,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ImpersonDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Impersonation Check}} {{text=Roll: [[@{ImpersonDice}@{ImpersonTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Impersonation Check}} {{text=Roll: [[@{ImpersonDice}@{ImpersonTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10254,7 +10268,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_MapDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Mapping Check}} {{text=Roll: [[@{MapDice}@{MapTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Mapping Check}} {{text=Roll: [[@{MapDice}@{MapTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10279,7 +10293,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_MusicDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Music Check}} {{text=Roll: [[@{MusicDice}@{MusicTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Music Check}} {{text=Roll: [[@{MusicDice}@{MusicTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10304,7 +10318,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_PotteryDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Pottery Check}} {{text=Roll: [[@{PotteryDice}@{PotteryTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Pottery Check}} {{text=Roll: [[@{PotteryDice}@{PotteryTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10329,7 +10343,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SewDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Sewing Check}} {{text=Roll: [[@{SewDice}@{SewTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Sewing Check}} {{text=Roll: [[@{SewDice}@{SewTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10354,7 +10368,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SingDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Singing Check}} {{text=Roll: [[@{SingDice}@{SingTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Singing Check}} {{text=Roll: [[@{SingDice}@{SingTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10379,7 +10393,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_StoryDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Story Telling Check}} {{text=Roll: [[@{StoryDice}@{StoryTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Story Telling Check}} {{text=Roll: [[@{StoryDice}@{StoryTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10404,7 +10418,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_WeaveDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Weaving Check}} {{text=Roll: [[@{WeaveDice}@{WeaveTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Weaving Check}} {{text=Roll: [[@{WeaveDice}@{WeaveTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -10453,7 +10467,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_AnimalDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Animal Kinship Check}} {{text=Roll: [[@{AnimalDice}@{AnimalTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Animal Kinship Check}} {{text=Roll: [[@{AnimalDice}@{AnimalTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10478,7 +10492,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_BarterDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Bartering Check}} {{text=Roll: [[@{BarterDice}@{BarterTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Bartering Check}} {{text=Roll: [[@{BarterDice}@{BarterTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10503,7 +10517,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DeceptDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Deception Check}} {{text=Roll: [[@{DeceptDice}@{DeceptTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Deception Check}} {{text=Roll: [[@{DeceptDice}@{DeceptTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10528,7 +10542,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LiesDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Detect Lies Check}} {{text=Roll: [[@{LiesDice}@{LiesTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Detect Lies Check}} {{text=Roll: [[@{LiesDice}@{LiesTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10553,7 +10567,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_IntrgDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Interrogation Check}} {{text=Roll: [[@{IntrgDice}@{IntrgTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Interrogation Check}} {{text=Roll: [[@{IntrgDice}@{IntrgTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10578,7 +10592,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LeadDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Leadership Check}} {{text=Roll: [[@{LeadDice}@{LeadTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Leadership Check}} {{text=Roll: [[@{LeadDice}@{LeadTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10603,7 +10617,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SeducDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Seduction Check}} {{text=Roll: [[@{SeducDice}@{SeducTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Seduction Check}} {{text=Roll: [[@{SeducDice}@{SeducTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10628,7 +10642,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SpeechDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Speech Check}} {{text=Roll: [[@{SpeechDice}@{SpeechTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Speech Check}} {{text=Roll: [[@{SpeechDice}@{SpeechTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10653,7 +10667,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_StreetDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Streetwise Check}} {{text=Roll: [[@{StreetDice}@{StreetTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Streetwise Check}} {{text=Roll: [[@{StreetDice}@{StreetTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -10701,7 +10715,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_AlchDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Alchemy Check}} {{text=Roll: [[@{AlchDice}@{AlchTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Alchemy Check}} {{text=Roll: [[@{AlchDice}@{AlchTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10726,7 +10740,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_AstroDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Astrology Check}} {{text=Roll: [[@{AstroDice}@{AstroTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Astrology Check}} {{text=Roll: [[@{AstroDice}@{AstroTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10751,7 +10765,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ChantDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Battle Chant Check}} {{text=Roll: [[@{ChantDice}@{ChantTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Battle Chant Check}} {{text=Roll: [[@{ChantDice}@{ChantTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10776,7 +10790,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_BloodDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Blood Magic Check}} {{text=Roll: [[@{BloodDice}@{BloodTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Blood Magic Check}} {{text=Roll: [[@{BloodDice}@{BloodTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10801,7 +10815,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_CircleDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Circle Magic Check}} {{text=Roll: [[@{CircleDice}@{CircleTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Circle Magic Check}} {{text=Roll: [[@{CircleDice}@{CircleTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10826,7 +10840,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ConjDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Conjuring Check}} {{text=Roll: [[@{ConjDice}@{ConjTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Conjuring Check}} {{text=Roll: [[@{ConjDice}@{ConjTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10851,7 +10865,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_CrystalDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Crystal Lore Check}} {{text=Roll: [[@{CrystalDice}@{CrystalTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Crystal Lore Check}} {{text=Roll: [[@{CrystalDice}@{CrystalTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10876,7 +10890,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ExorcismDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Exorcism Check}} {{text=Roll: [[@{ExorcismDice}@{ExorcismTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Exorcism Check}} {{text=Roll: [[@{ExorcismDice}@{ExorcismTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10901,7 +10915,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_MeditationDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Meditation Check}} {{text=Roll: [[@{MeditationDice}@{MeditationTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Meditation Check}} {{text=Roll: [[@{MeditationDice}@{MeditationTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10926,7 +10940,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_NecroDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Necromancy Check}} {{text=Roll: [[@{NecroDice}@{NecroTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Necromancy Check}} {{text=Roll: [[@{NecroDice}@{NecroTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10951,7 +10965,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SpCraftDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Spell Craft Check}} {{text=Roll: [[@{SpCraftDice}@{SpCraftTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Spell Craft Check}} {{text=Roll: [[@{SpCraftDice}@{SpCraftTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -10976,7 +10990,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ThaumDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Thaumaturgy Check}} {{text=Roll: [[@{ThaumDice}@{ThaumTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Thaumaturgy Check}} {{text=Roll: [[@{ThaumDice}@{ThaumTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -11024,7 +11038,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_HealDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Healing Check}} {{text=Roll: [[@{HealDice}@{HealTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Healing Check}} {{text=Roll: [[@{HealDice}@{HealTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11049,7 +11063,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_MedicDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Medicine Check}} {{text=Roll: [[@{MedicDice}@{MedicTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Medicine Check}} {{text=Roll: [[@{MedicDice}@{MedicTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11074,7 +11088,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_PlantDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Plant Lore Check}} {{text=Roll: [[@{PlantDice}@{PlantTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Plant Lore Check}} {{text=Roll: [[@{PlantDice}@{PlantTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11099,7 +11113,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_PoisDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Poisons Check}} {{text=Roll: [[@{PoisDice}@{PoisTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Poisons Check}} {{text=Roll: [[@{PoisDice}@{PoisTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -11148,7 +11162,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_AcrobatDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Acrobatics Check}} {{text=Roll: [[@{AcrobatDice}@{AcrobatTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Acrobatics Check}} {{text=Roll: [[@{AcrobatDice}@{AcrobatTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11173,7 +11187,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ClimbDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Climbing Check}} {{text=Roll: [[@{ClimbDice}@{ClimbTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Climbing Check}} {{text=Roll: [[@{ClimbDice}@{ClimbTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11198,7 +11212,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DanceDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Dancing Check}} {{text=Roll: [[@{DanceDice}@{DanceTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Dancing Check}} {{text=Roll: [[@{DanceDice}@{DanceTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11223,7 +11237,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DrinkDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Drinking Check}} {{text=Roll: [[@{DrinkDice}@{DrinkTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Drinking Check}} {{text=Roll: [[@{DrinkDice}@{DrinkTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11248,7 +11262,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DrugDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Drug Tolerance Check}} {{text=Roll: [[@{DrugDice}@{DrugTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Drug Tolerance Check}} {{text=Roll: [[@{DrugDice}@{DrugTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11273,7 +11287,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_EndurDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Endurance Check}} {{text=Roll: [[@{EndurDice}@{EndurTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Endurance Check}} {{text=Roll: [[@{EndurDice}@{EndurTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11298,7 +11312,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_FlyDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Flying Check}} {{text=Roll: [[@{FlyDice}@{FlyTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Flying Check}} {{text=Roll: [[@{FlyDice}@{FlyTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11323,7 +11337,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_JuggleDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Juggling Check}} {{text=Roll: [[@{JuggleDice}@{JuggleTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Juggling Check}} {{text=Roll: [[@{JuggleDice}@{JuggleTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11348,7 +11362,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_JumpDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Jumping Check}} {{text=Roll: [[@{JumpDice}@{JumpTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Jumping Check}} {{text=Roll: [[@{JumpDice}@{JumpTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11373,7 +11387,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LiftDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Lifting Check}} {{text=Roll: [[@{LiftDice}@{LiftTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Lifting Check}} {{text=Roll: [[@{LiftDice}@{LiftTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11398,7 +11412,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LipDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Lip Reading Check}} {{text=Roll: [[@{LipDice}@{LipTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Lip Reading Check}} {{text=Roll: [[@{LipDice}@{LipTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11423,7 +11437,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ListenDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Listening Check}} {{text=Roll: [[@{ListenDice}@{ListenTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Listening Check}} {{text=Roll: [[@{ListenDice}@{ListenTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11448,7 +11462,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ObservDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Observation Check}} {{text=Roll: [[@{ObservDice}@{ObservTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Observation Check}} {{text=Roll: [[@{ObservDice}@{ObservTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11473,7 +11487,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_RunDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Running Check}} {{text=Roll: [[@{RunDice}@{RunTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Running Check}} {{text=Roll: [[@{RunDice}@{RunTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11498,7 +11512,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SwimDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Swimming Check}} {{text=Roll: [[@{SwimDice}@{SwimTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Swimming Check}} {{text=Roll: [[@{SwimDice}@{SwimTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -11550,7 +11564,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_AppraisalDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Appraisal Check}} {{text=Roll: [[@{AppraisalDice}@{AppraisalTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Appraisal Check}} {{text=Roll: [[@{AppraisalDice}@{AppraisalTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11575,7 +11589,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_BegDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Begging Check}} {{text=Roll: [[@{BegDice}@{BegTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Begging Check}} {{text=Roll: [[@{BegDice}@{BegTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11600,7 +11614,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ConcDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Concealment Check}} {{text=Roll: [[@{ConcDice}@{ConcTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Concealment Check}} {{text=Roll: [[@{ConcDice}@{ConcTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11625,7 +11639,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DisgDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Disguise Check}} {{text=Roll: [[@{DisgDice}@{DisgTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Disguise Check}} {{text=Roll: [[@{DisgDice}@{DisgTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11650,7 +11664,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_EscapeDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Escape Artistry Check}} {{text=Roll: [[@{EscapeDice}@{EscapeTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Escape Artistry Check}} {{text=Roll: [[@{EscapeDice}@{EscapeTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11675,7 +11689,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ForgeryDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Forgery Check}} {{text=Roll: [[@{ForgeryDice}@{ForgeryTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Forgery Check}} {{text=Roll: [[@{ForgeryDice}@{ForgeryTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11700,7 +11714,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_GambleDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Gambling Check}} {{text=Roll: [[@{GambleDice}@{GambleTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Gambling Check}} {{text=Roll: [[@{GambleDice}@{GambleTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11725,7 +11739,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LockDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Lock Picking Check}} {{text=Roll: [[@{LockDice}@{LockTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Lock Picking Check}} {{text=Roll: [[@{LockDice}@{LockTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11750,7 +11764,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LootDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Looting Check}} {{text=Roll: [[@{LootDice}@{LootTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Looting Check}} {{text=Roll: [[@{LootDice}@{LootTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11775,7 +11789,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_StealDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Stealing Check}} {{text=Roll: [[@{StealDice}@{StealTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Stealing Check}} {{text=Roll: [[@{StealDice}@{StealTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11800,7 +11814,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_StealthDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Stealth Check}} {{text=Roll: [[@{StealthDice}@{StealthTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Stealth Check}} {{text=Roll: [[@{StealthDice}@{StealthTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11825,7 +11839,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TrailDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Trailing Check}} {{text=Roll: [[@{TrailDice}@{TrailTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Trailing Check}} {{text=Roll: [[@{TrailDice}@{TrailTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -11874,7 +11888,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_AstronomyDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Astronomy Check}} {{text=Roll: [[@{AstronomyDice}@{AstronomyTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Astronomy Check}} {{text=Roll: [[@{AstronomyDice}@{AstronomyTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11899,7 +11913,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_CreatureDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Creature Lore Check}} {{text=Roll: [[@{CreatureDice}@{CreatureTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Creature Lore Check}} {{text=Roll: [[@{CreatureDice}@{CreatureTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11924,7 +11938,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DecipherDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Decipher Check}} {{text=Roll: [[@{DecipherDice}@{DecipherTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Decipher Check}} {{text=Roll: [[@{DecipherDice}@{DecipherTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11949,7 +11963,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_DemonDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Demon Lore Check}} {{text=Roll: [[@{DemonDice}@{DemonTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Demon Lore Check}} {{text=Roll: [[@{DemonDice}@{DemonTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11974,7 +11988,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_HeraldDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Heraldry Check}} {{text=Roll: [[@{HeraldDice}@{HeraldTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Heraldry Check}} {{text=Roll: [[@{HeraldDice}@{HeraldTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -11999,7 +12013,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_HistoryDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=History Check}} {{text=Roll: [[@{HistoryDice}@{HistoryTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=History Check}} {{text=Roll: [[@{HistoryDice}@{HistoryTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12024,7 +12038,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LawDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Law Check}} {{text=Roll: [[@{LawDice}@{LawTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Law Check}} {{text=Roll: [[@{LawDice}@{LawTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12049,7 +12063,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LingDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Linguistics Check}} {{text=Roll: [[@{LingDice}@{LingTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Linguistics Check}} {{text=Roll: [[@{LingDice}@{LingTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12074,7 +12088,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_PhilDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Philosophy Check}} {{text=Roll: [[@{PhilDice}@{PhilTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Philosophy Check}} {{text=Roll: [[@{PhilDice}@{PhilTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12099,7 +12113,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ReadDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Read & Write Check}} {{text=Roll: [[@{ReadDice}@{ReadTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Read & Write Check}} {{text=Roll: [[@{ReadDice}@{ReadTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12124,7 +12138,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ResearchDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Research Check}} {{text=Roll: [[@{ResearchDice}@{ResearchTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Research Check}} {{text=Roll: [[@{ResearchDice}@{ResearchTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12149,7 +12163,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TeachDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Teaching Check}} {{text=Roll: [[@{TeachDice}@{TeachTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Teaching Check}} {{text=Roll: [[@{TeachDice}@{TeachTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12174,7 +12188,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TheoDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Theology Check}} {{text=Roll: [[@{TheoDice}@{TheoTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Theology Check}} {{text=Roll: [[@{TheoDice}@{TheoTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -12223,7 +12237,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_CookDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Cooking Check}} {{text=Roll: [[@{CookDice}@{CookTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Cooking Check}} {{text=Roll: [[@{CookDice}@{CookTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12248,7 +12262,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_FishDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Fishing Check}} {{text=Roll: [[@{FishDice}@{FishTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Fishing Check}} {{text=Roll: [[@{FishDice}@{FishTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12273,7 +12287,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ForageDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Foraging Check}} {{text=Roll: [[@{ForageDice}@{ForageTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Foraging Check}} {{text=Roll: [[@{ForageDice}@{ForageTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12298,7 +12312,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_HuntDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Hunting Check}} {{text=Roll: [[@{HuntDice}@{HuntTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Hunting Check}} {{text=Roll: [[@{HuntDice}@{HuntTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12323,7 +12337,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_StSurvDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Street Survival Check}} {{text=Roll: [[@{StSurvDice}@{StSurvTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Street Survival Check}} {{text=Roll: [[@{StSurvDice}@{StSurvTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12348,7 +12362,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TrackDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Tracking Check}} {{text=Roll: [[@{TrackDice}@{TrackTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Tracking Check}} {{text=Roll: [[@{TrackDice}@{TrackTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12373,7 +12387,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TrapDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Traps Check}} {{text=Roll: [[@{TrapDice}@{TrapTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Traps Check}} {{text=Roll: [[@{TrapDice}@{TrapTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12398,7 +12412,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_WeatherDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Weather Sense Check}} {{text=Roll: [[@{WeatherDice}@{WeatherTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Weather Sense Check}} {{text=Roll: [[@{WeatherDice}@{WeatherTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12423,7 +12437,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_WildDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Wilderness Survival Check}} {{text=Roll: [[@{WildDice}@{WildTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Wilderness Survival Check}} {{text=Roll: [[@{WildDice}@{WildTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -12471,7 +12485,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_ArmorerDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Armorer Check}} {{text=Roll: [[@{ArmorerDice}@{ArmorerTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Armorer Check}} {{text=Roll: [[@{ArmorerDice}@{ArmorerTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12496,7 +12510,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_BlackDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Blacksmith Check}} {{text=Roll: [[@{BlackDice}@{BlackTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Blacksmith Check}} {{text=Roll: [[@{BlackDice}@{BlackTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12521,7 +12535,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_BowyerDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Bowyer & Fletcher Check}} {{text=Roll: [[@{BowyerDice}@{BowyerTier}@{MenMod}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Bowyer & Fletcher Check}} {{text=Roll: [[@{BowyerDice}@{BowyerTier}@{MenMod}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12546,7 +12560,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_BrewDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Brewing Check}} {{text=Roll: [[@{BrewDice}@{BrewTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Brewing Check}} {{text=Roll: [[@{BrewDice}@{BrewTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12571,7 +12585,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_CarpDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Carpentry Check}} {{text=Roll: [[@{CarpDice}@{CarpTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Carpentry Check}} {{text=Roll: [[@{CarpDice}@{CarpTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12596,7 +12610,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_FarmDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Farming Check}} {{text=Roll: [[@{FarmDice}@{FarmTier}@{MenMod}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Farming Check}} {{text=Roll: [[@{FarmDice}@{FarmTier}@{MenMod}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12621,7 +12635,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LWorkDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Leather Working Check}} {{text=Roll: [[@{LWorkDice}@{LWorkTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Leather Working Check}} {{text=Roll: [[@{LWorkDice}@{LWorkTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12646,7 +12660,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_LocksmithDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Locksmith Check}} {{text=Roll: [[@{LocksmithDice}@{LocksmithTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Locksmith Check}} {{text=Roll: [[@{LocksmithDice}@{LocksmithTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12671,7 +12685,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_MasonDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Masonry Check}} {{text=Roll: [[@{MasonDice}@{MasonTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Masonry Check}} {{text=Roll: [[@{MasonDice}@{MasonTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12696,7 +12710,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_MiningDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Mining Check}} {{text=Roll: [[@{MiningDice}@{MiningTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Mining Check}} {{text=Roll: [[@{MiningDice}@{MiningTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12721,7 +12735,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SiegeDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Siege Craft Check}} {{text=Roll: [[@{SiegeDice}@{SiegeTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Siege Craft Check}} {{text=Roll: [[@{SiegeDice}@{SiegeTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12746,7 +12760,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TinkerDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Tinker Check}} {{text=Roll: [[@{TinkerDice}@{TinkerTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Tinker Check}} {{text=Roll: [[@{TinkerDice}@{TinkerTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12771,7 +12785,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_WpnSmDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Weaponsmith Check}} {{text=Roll: [[@{WpnSmDice}@{WpnSmTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Weaponsmith Check}} {{text=Roll: [[@{WpnSmDice}@{WpnSmTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -12819,7 +12833,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_NavDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Navigation Check}} {{text=Roll: [[@{NavDice}@{NavTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Navigation Check}} {{text=Roll: [[@{NavDice}@{NavTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12844,7 +12858,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_RidingDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Riding Check}} {{text=Roll: [[@{RidingDice}@{RidingTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Riding Check}} {{text=Roll: [[@{RidingDice}@{RidingTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12869,7 +12883,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SeaDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Seafaring Check}} {{text=Roll: [[@{SeaDice}@{SeaTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Seafaring Check}} {{text=Roll: [[@{SeaDice}@{SeaTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12894,7 +12908,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_SkyDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Skyfaring Check}} {{text=Roll: [[@{SkyDice}@{SkyTier}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Skyfaring Check}} {{text=Roll: [[@{SkyDice}@{SkyTier}@{MenMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                         <tr>
@@ -12919,7 +12933,7 @@
                                                 <input type="text" class="sheet-dice-field" name="attr_TeamDice" value="" readonly />
                                             </td>
                                             <td class="sheet-button-cell"><button type="roll"
-                                                    value="&{template:simple} {{name=Teamster Check}} {{text=Roll: [[@{TeamDice}@{TeamTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
+                                                    value="&{template:simple} {{character=@{character_name}}}{{name=Teamster Check}} {{text=Roll: [[@{TeamDice}@{TeamTier}@{PhysMod}+?{Modifier|0}]]}}"></button>
                                             </td>
                                         </tr>
                                     </table>
@@ -12987,7 +13001,7 @@
                                                 </td>
                                                 <td class="sheet-button-cell">
                                                     <button type="roll"
-                                                        value="&{template:simple} {{name=@{SkillName} Check}} {{text=Roll: [[@{SkillDice}@{SkillTier}@{SkillConditionMod}+?{Modifier|0}]]}}">
+                                                        value="&{template:simple} {{character=@{character_name}}}{{name=@{SkillName} Check}} {{text=Roll: [[@{SkillDice}@{SkillTier}@{SkillConditionMod}+?{Modifier|0}]]}}">
                                                     </button>
                                                 </td>
                                             </tr>
@@ -13015,6 +13029,7 @@
         <div class="sheet-template-container">
             <div class="sheet-template-box">
                 <div class="sheet-template-title">{{title}}</div>
+                <div class="sheet-template-subtitle">{{character}}</div>
                 
                 <div class="sheet-template-text">{{text}}</div>
             </div>
@@ -13025,6 +13040,7 @@
         <div class="sheet-template-container">
             <div class="sheet-template-box">
                 <div class="sheet-template-title">{{name}}</div>
+                <div class="sheet-template-subtitle">{{character}}</div>
                 
                 <table>
                     <tr>
@@ -13052,6 +13068,7 @@
         <div class="sheet-template-container">
             <div class="sheet-template-box">
                 <div class="sheet-template-title">{{name}}</div>
+                <div class="sheet-template-subtitle">{{character}}</div>
 
                 {{#rollGreater() difference 0}}
                 <div class="sheet-template-failure">Failure</div>
@@ -13163,6 +13180,7 @@
         <div class="sheet-template-container">
             <div class="sheet-template-box">
                 <div class="sheet-template-title">{{name}}</div>
+                <div class="sheet-template-subtitle">{{character}}</div>
                 
                 <table>
                     <tr>
@@ -13256,7 +13274,3 @@
         </div>
     </rolltemplate>
 </div>
-
-
-
-
