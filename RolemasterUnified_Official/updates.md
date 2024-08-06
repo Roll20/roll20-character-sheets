@@ -1,3 +1,20 @@
+# 2024-8-6
+
+- Spells:
+  - Fix bug where OE Low rolls failed with NaN
+  - Show the correct OE Low roll when rolling OE Low
+  - Tweak message for PP on failure
+- Fonts; add some more fallback fonts.  Impact is terrible
+- Create:
+  - Fix a bug where lanages spent in creation were not showing.
+- Add validation that events are registered correctly.
+- Inventory/Attacks
+  - Correctly cleanup old attacks.  No longer thousands of attacks
+  - Refactor code to be cleaner in process
+  - Use pending infrastructure to remove potential race conditions
+  - Automatically update the bonuses for attacks.
+- Remove encoded attack message on attacks.
+
 # 2024-7-30
 
 - Lots more work on Creatures on the backend.
