@@ -1,3 +1,57 @@
+# 2024-7-30
+
+- Lots more work on Creatures on the backend.
+  - Big thanks to Scott C on the roll20 discord for his aid.
+- Override 0 ranks when set.  Thanks to Hurin for this bug
+- Handle not having compendium when adding attacks.  Thanks to Christoffer Holm for the report
+
+# 2024-7-23
+
+- Start of Injury tracking
+  - Hits updates
+  - Fatigue updated
+  - Penalty total updates
+- Shadows and colour for buttons
+- Dynamic columns for skills
+- Handle Grace
+- Basic Creature sheet
+  - Drop from Compendium to VTT (For Creature Law Owners)
+  - Targetable NPC sheet.
+  - Support Roman numeral style creature size
+  - Don't update RRs on creature sheets.
+  - Inititive for creatures
+  - Start of creature attacks
+- Internal:
+  - Add a validating rmuSetAttrs
+
+# 2024-7-18
+
+- SCR now includes stat modifier.
+- Improve layout of hits/injuries/endurance etc
+- AP Tracking for spells: So cast a spell with 2AP, -50 mod.  Optional checkbox to enable
+- Handle Spell Trickery
+- Put a gradient on buttons... make them a little more obvious about action.
+
+# 2024-7-16
+
+- Display "No Voice" instead of "none" in spells
+- Show all the modifier in the casting log all the time.
+- Can edit spell names
+- Spell results show RR targets for F, Fm and I spells.
+- No PP spells now longer check or require PP
+- Cap passive dodge & passive block at 50
+- Fix calculation of partial dodge when encumbered (Thanks @filroden)
+- No stats is equal to a 50.  Makes NPCs super easy.
+
+# 2024-7-9
+
+- First version of individual spell casting
+  - With compendium; click a spell to cast it
+- Spells get own css file now
+- Tests for some spell casting function
+- New misc Flattern for inline summaries
+- Tweaks to edit spell list
+
 # 2024-6-24
 
 - Remove HP & PP from side list on main page (tracked in status)
