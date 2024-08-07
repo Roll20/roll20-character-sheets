@@ -13131,7 +13131,7 @@ on('clicked:applyDamage', (info) => {
 						else if ((/(-[0-9]+n)/).test(ailEffectVal)) {
 							ailEffectVal = (0 - parseInt(count)) * parseInt(ailEffectVal)
 						}
-						/* Ailment in n or -n */
+						/* Ailment is n or -n */
 						else if (ailEffectVal == "n") {
 							ailEffectVal = parseInt(count);
 						}
@@ -15515,14 +15515,20 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		message = message.replaceAll(langNegScalingNum, "<b>" + (-parseFloat(scaling) * parseFloat(effectVal)) + "</b>");
 		message = message.replaceAll(langInitial, "<b>" + parseFloat(effectCount) + "</b>");
 		message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>");
-		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("limbus/","").replace("community/","") + "</b>");
+		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("_"," ") + "</b>");
+
+		console.log(messageFormat)
+		console.log(effectIcon)
+		console.log(effectTarget)
+		console.log(settingLimbusStyle == "true")
 
 		/* Icon handling */
 		/* Get target icon. Is in this format: [/TARGET]. If a effectIcon is procided, use that instead */
 		if (effectIcon != "No icon") {
+			if (settingLimbusStyle == "true") { effectIcon = effectIcon.replace("limbus/",""); }
 			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectIcon, settingLimbusStyle));
 		} else {
-			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget, settingLimbusStyle));
+			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget.replace("_",""), settingLimbusStyle));
 		}
 		
 		/* Question mark icon */
@@ -15625,7 +15631,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	messageFormat = messageFormat.replaceAll('"','');
 
 	if (messageValues.effectTarget != undefined) { effectTarget = messageValues.effectTarget; }
-	if (messageValues.effectIcon != undefined) { effectTarget = messageValues.effectIcon; }
+	if (messageValues.effectIcon != undefined) { effectIcon = messageValues.effectIcon; }
 	if (messageValues.effectVal != undefined) { effectVal = messageValues.effectVal; }
 	if (messageValues.effectCount != undefined) { effectCount = messageValues.effectCount; }
 	if (messageValues.scaling != undefined) { scaling = messageValues.scaling; }
@@ -15803,6 +15809,8 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 
+	console.log(ailmentList)
+
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 6) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Ailment #Round(optional) #Silent(optional))`, AutoEffect); }
 	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["this", "next", "thisround", "nextround", "thisturn", "nextturn", "turn", "round", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
@@ -15858,7 +15866,7 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	if (!AutoEffect.includes("Silent")) {
 		message = autoEffectMessage(messageFormat, effectAilment, effectVal/scaling, count, scaling, "success", settingLimbusStyle, effectIcon);
 	}
-	messageValues = { effectTarget: effectAilment, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
+	messageValues = { effectTarget: effectAilment, effectIcon: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
 	
 	/* Execute AutoEffect */
 	returnValues = {...returnValues, message: message, messageValues: messageValues };
@@ -16859,6 +16867,7 @@ function updateCustomAilment(rowid) {
 
 		if(effecttargetinlist != "None" && effecttargetinlist != null && trigger != "WhenHit" && activateEffect == "true" && count != 0) {
 			
+			/* Ailment is n or -n multiplied by a number */
 			if ((/([0-9]+n)/).test(effectval)) {
 				effectval = effectval.replaceAll("n","");
 				effectval = parseInt(count) * parseInt(effectval)
@@ -16866,7 +16875,7 @@ function updateCustomAilment(rowid) {
 			else if ((/(-[0-9]+n)/).test(effectval)) {
 				effectval = (0 - parseInt(count)) * parseInt(effectval)
 			}
-			/* Ailment in n or -n */
+			/* Ailment is n or -n */
 			else if (effectval == "n") {
 				effectval = parseInt(count);
 			}
