@@ -60,6 +60,9 @@
     Name {{name}} Attack Roll {{attack}} Crit {{critical}} Loc {{computed::location}} 
     {{computed::fluff}} 
     {{result}}
+
+    computed::injurystring is the injury enced string to send accross.
+
 -->
 <rolltemplate class="sheet-rolltemplate-rmuattack">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
@@ -75,7 +78,6 @@
       {{/rollTotal() computed::hascritical 1}}
     {{/rollTotal() computed::ishit 1}}
        
-    {-{##  {{computed::injurystring}} ## }-}
 
     [Apply](~{{target}}|applyattackresult||{{computed::injurystring}})
 
@@ -913,7 +915,7 @@
 </div>
 
 
-	  Language Total: 
+	  <b>Language Total</b>: 
 	  <span class='create_language_spent'></span> 
 	    / 
 	  <span class='create_language_available'></span> 
@@ -4971,7 +4973,7 @@ Bug reports to nashidau on Discord or the #roll20 channel on the
 
 <hr>
 
-Revision 58e41aa1c4bd458fb8d6a614d5c0b34e2644d3d6
+Revision b1e290520d11c557fe80380f39ba12f50017cd8d
 
 
 <hr>
@@ -6216,6 +6218,14 @@ function onCheck(str, func) {
     rmuerror("Calling on with not a functio", str, func);
     return -1;
   }
+  const items = str.split(/\s+/);
+  for (item of items) {
+    // Each should have at least one :
+    if (item != '' && !item.includes(":")) {
+      rmuerror(`${item} doesn't have a colon from ${str}`);
+    }
+  }
+
   on(str, func);
 }
 
@@ -7301,8 +7311,8 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	    //roll.results.roll.dice
 	    if (totalroll < 6) {
 	      // OE: Oops
-	      totalroll -= roll.results.roll.oeroll;
-	      totalrollstr = `${totalrollstr} - (${roll.results.roll.dice.join(' + ')})`;
+	      totalroll -= roll.results.oeroll.result;
+	      totalrollstr = `${totalrollstr} - (${roll.results.oeroll.dice.join(' + ')})`;
 	    }
 	    total = totalroll + mod;
 	    let result = "Unknown";
@@ -7316,13 +7326,12 @@ onCheck(spellcastevents.join(" "), (ev) => {
 		pp -= level;
 	      }
 	      // FIXME: Should check for type to display RR message or directed skill roll
-	      // FIXME: Should check for nopp
 	    } else if (total == 0) {
 	      result = "Spell just fizzles.  Carry on.";
 	      ppmsg = "No PP";
 	    } else {
 	      result = "Spell fails.  Roll spell failure";
-	      ppmsg = "???";
+	      ppmsg = "As per fail roll";
 	      // FIXME: Should roll for spell failure.  Or offer button to do same
 	    }
 
@@ -9512,26 +9521,26 @@ let RMUCultures = {}
 
 // FIXME: This needs to die
 RMUCultures.cultures = {
- reaver : { skills : {
-	survival: '1', regionown: '5', tracking: '1', craftingvocation: '3', lores: '3', perception: '1', rangedweapons: '1', stalking: '1', riding: '1', running: '2', maneuveringinarmor: '2', animalhandling: '1', languages: '11', unarmed: '2', climbing: '1', medicine: '1', regionneighbour: '1', jumping: '1', meleeweapons: '1', bodydevelopment: '2',  } },
- mariner : { skills : {
-	compositionperf: '1', regionown: '5', influence: '1', navigation: '1', craftingvocation: '4', weighttraining: '1', lores: '5', perception: '2', trading: '1', bodydevelopment: '1', running: '1', regionneighbour: '2', jumping: '1', languages: '15', unarmed: '1', swimming: '2', socialawareness: '1', climbing: '1', medicine: '1', acrobatics: '1', survival: '1',  } },
- urban : { skills : {
-	religionphilosophy: '1', compositionperf: '3', regionown: '5', bodydevelopment: '1', trading: '2', regionneighbour: '3', animalhandling: '1', craftingvocation: '7', unarmed: '1', influence: '2', socialawareness: '2', running: '1', languages: '17', lores: '7', perception: '2',  } },
- harsh : { skills : {
-	stalking: '2', survival: '3', regionown: '5', concealment: '1', bodydevelopment: '3', running: '2', tracking: '1', meleeweapons: '1', craftingvocation: '4', unarmed: '1', medicine: '2', maneuveringinarmor: '1', languages: '8', navigation: '1', lores: '2', perception: '2',  } },
- underground : { skills : {
-	stalking: '3', survival: '2', regionown: '5', concealment: '1', bodydevelopment: '2', medicine: '2', running: '1', meleeweapons: '1', craftingvocation: '5', unarmed: '1', climbing: '1', socialawareness: '1', weighttraining: '1', languages: '13', lores: '4', perception: '2',  } },
- sylvan : { skills : {
-	survival: '2', regionown: '5', tracking: '1', craftingvocation: '4', lores: '4', perception: '1', rangedweapons: '1', herbalism: '1', bodydevelopment: '1', animalhandling: '2', languages: '13', unarmed: '1', stalking: '2', socialawareness: '1', concealment: '1', running: '2', climbing: '2', medicine: '1',  } },
- highland : { skills : {
-	compositionperf: '1', regionown: '5', tracking: '1', craftingvocation: '4', lores: '4', perception: '1', stalking: '1', climbing: '1', bodydevelopment: '2', swimming: '1', maneuveringinarmor: '1', animalhandling: '1', languages: '13', unarmed: '1', running: '2', socialawareness: '1', medicine: '1', jumping: '1', survival: '2', meleeweapons: '1',  } },
- cosmopolitan : { skills : {
-	religionphilosophy: '2', compositionperf: '4', regionown: '5', bodydevelopment: '1', regionneighbour: '2', trading: '1', craftingvocation: '6', unarmed: '1', influence: '2', socialawareness: '3', running: '1', languages: '19', lores: '7', perception: '2',  } },
- nomad : { skills : {
-	compositionperf: '1', regionown: '5', tracking: '1', craftingvocation: '4', lores: '4', perception: '1', herbalism: '1', riding: '3', trading: '1', regionneighbour: '2', animalhandling: '4', languages: '14', unarmed: '1', running: '2', socialawareness: '1', medicine: '1', survival: '1', navigation: '1', bodydevelopment: '1',  } },
  rural : { skills : {
-	compositionperf: '1', regionown: '5', influence: '1', craftingvocation: '4', weighttraining: '1', lores: '4', perception: '1', herbalism: '1', riding: '2', trading: '1', regionneighbour: '1', animalhandling: '3', languages: '13', piloting: '1', swimming: '1', socialawareness: '1', running: '1', climbing: '1', medicine: '1', bodydevelopment: '1',  } },
+	trading: '1', bodydevelopment: '1', compositionperf: '1', riding: '2', running: '1', lores: '4', herbalism: '1', animalhandling: '3', socialawareness: '1', swimming: '1', climbing: '1', influence: '1', craftingvocation: '4', weighttraining: '1', perception: '1', piloting: '1', languages: '13', regionown: '5', regionneighbour: '1', medicine: '1',  } },
+ nomad : { skills : {
+	trading: '1', bodydevelopment: '1', compositionperf: '1', unarmed: '1', riding: '3', tracking: '1', running: '2', lores: '4', herbalism: '1', navigation: '1', animalhandling: '4', survival: '1', craftingvocation: '4', perception: '1', regionneighbour: '2', socialawareness: '1', regionown: '5', languages: '14', medicine: '1',  } },
+ mariner : { skills : {
+	trading: '1', bodydevelopment: '1', compositionperf: '1', unarmed: '1', languages: '15', running: '1', lores: '5', navigation: '1', jumping: '1', survival: '1', swimming: '2', socialawareness: '1', influence: '1', craftingvocation: '4', weighttraining: '1', perception: '2', acrobatics: '1', climbing: '1', regionown: '5', regionneighbour: '2', medicine: '1',  } },
+ urban : { skills : {
+	trading: '2', bodydevelopment: '1', animalhandling: '1', socialawareness: '2', compositionperf: '3', unarmed: '1', languages: '17', craftingvocation: '7', influence: '2', perception: '2', regionneighbour: '3', running: '1', regionown: '5', lores: '7', religionphilosophy: '1',  } },
+ highland : { skills : {
+	maneuveringinarmor: '1', compositionperf: '1', unarmed: '1', meleeweapons: '1', tracking: '1', running: '2', lores: '4', animalhandling: '1', jumping: '1', survival: '2', swimming: '1', stalking: '1', craftingvocation: '4', socialawareness: '1', perception: '1', climbing: '1', bodydevelopment: '2', regionown: '5', languages: '13', medicine: '1',  } },
+ reaver : { skills : {
+	maneuveringinarmor: '2', unarmed: '2', riding: '1', tracking: '1', rangedweapons: '1', running: '2', lores: '3', animalhandling: '1', jumping: '1', survival: '1', stalking: '1', climbing: '1', craftingvocation: '3', bodydevelopment: '2', perception: '1', regionneighbour: '1', languages: '11', regionown: '5', meleeweapons: '1', medicine: '1',  } },
+ underground : { skills : {
+	stalking: '3', bodydevelopment: '2', climbing: '1', socialawareness: '1', survival: '2', concealment: '1', unarmed: '1', meleeweapons: '1', craftingvocation: '5', weighttraining: '1', perception: '2', running: '1', languages: '13', regionown: '5', lores: '4', medicine: '2',  } },
+ harsh : { skills : {
+	stalking: '2', maneuveringinarmor: '1', medicine: '2', bodydevelopment: '3', survival: '3', concealment: '1', unarmed: '1', meleeweapons: '1', tracking: '1', lores: '2', perception: '2', running: '2', languages: '8', regionown: '5', craftingvocation: '4', navigation: '1',  } },
+ cosmopolitan : { skills : {
+	trading: '1', bodydevelopment: '1', socialawareness: '3', compositionperf: '4', unarmed: '1', languages: '19', craftingvocation: '6', influence: '2', perception: '2', regionneighbour: '2', running: '1', regionown: '5', lores: '7', religionphilosophy: '2',  } },
+ sylvan : { skills : {
+	bodydevelopment: '1', unarmed: '1', languages: '13', tracking: '1', rangedweapons: '1', running: '2', lores: '4', herbalism: '1', animalhandling: '2', survival: '2', concealment: '1', craftingvocation: '4', perception: '1', stalking: '2', socialawareness: '1', regionown: '5', climbing: '2', medicine: '1',  } },
 
 };
 
@@ -9681,8 +9690,8 @@ RMUCultures.nlangchoices = 4;
 
 RMUCultures.langchoicesnames = Array.from({length: RMUCultures.nlangchoices * 2}, (v, i) =>{
       return (i % 2) ?
-      "create_culture_languages_lang" + (Math.floor(i/2) + 1) + "_s" :
-      "create_culture_languages_lang" + (Math.floor(i/2) + 1) + "_w"});
+      "create_culture_languages_lang" + (Math.floor(i/2) + 1) + "s" :
+      "create_culture_languages_lang" + (Math.floor(i/2) + 1) + "w"});
 
 
 function langranksselected(donefn) {
@@ -9692,20 +9701,27 @@ function langranksselected(donefn) {
 RMUCultures.getLanguageRanksSum = function (values) {
   let total = 0;
   for (const ranks in values) {
-    if (ranks.startsWith('create_culture_languages')) {
+    if (ranks.startsWith('create_culture_languages') && !ranks.endsWith("_spend")) {
       total += parseInt(values[ranks]) || 0;
     }
   }
-  console.log("total is ", total, values);
   return total;
 }
 
 function langranksselectedtotal(donefn) {
-  getAttrs(RMUCultures.langchoicesnames, (result) => {
-      let total = RMUCultures.getLanguageRanksSum(result);
-      donefn(total, result);
-  });
+  const cmdata = getCharmancerData();
+  let total = RMUCultures.getLanguageRanksSum(cmdata.languages.values);
+  donefn(total);
 }
+
+
+const changes = Array.from(RMUCultures.langchoicesnames,
+    (v, i)=>{ return "mancerchange:" + v }).join(" ");
+onCheck(changes, (event) => {
+  langranksselectedtotal((total)=> {
+    setCharmancerText({"create_language_spent": total});
+  });
+});
 
 
 onCheck("mancerchange:create_culture_lores1 mancerchange:create_culture_lores2 " +
@@ -9726,15 +9742,6 @@ onCheck("mancerchange:create_culture_lores1 mancerchange:create_culture_lores2 "
 
 
 
-
-
-const changes = Array.from(RMUCultures.langchoicesnames,
-    (v, i)=>{ return "change:" + v }).join(" ");
-onCheck(changes, (event) => {
-  langranksselectedtotal((total, ranks) => {
-    setAttrs({create_culture_languages_spent: total});
-  });
-});
 
 
 RMUCultures.handleSelect = function(culturename, name, selected, specialisation, ranks) {
@@ -9775,13 +9782,6 @@ onCheck("page:languages", (_) => {
     }
 
     setCharmancerText({"create_language_available": ranks});
-});
-
-onCheck("mancerchange:create_culture_languages_lang1s mancerchange:create_culture_languages_lang1w " +
-    "mancerchange:create_culture_languages_lang2s mancerchange:create_culture_languages_lang2w " +
-    "mancerchange:create_culture_languages_lang3s mancerchange:create_culture_languages_lang3w " +
-    "mancerchange:create_culture_languages_lang4s mancerchange:create_culture_languages_lang4w ", (ev) => {
-    console.log("Mancer change", ev);
 });
 
 
@@ -10328,39 +10328,52 @@ let RMUInventory = {}
       RMUInventory.updateEquipped();
   });
 
-
-  // Someone changed a system relaed thing; or equpped something
-  RMUInventory.updateEquipped = function() {
-      getSectionIDs('repeating_attack', (ids) => {
+  /** Get a list of all the known attacks.
+   * Then get the 'source' field for all of them.
+   * If the source is 'inventory' delete it.
+   *
+   * Pending Safe
+   */
+  RMUInventory.deleteCreatedAttacks = function() {
+    getSectionIDsPending('repeating_attack', (ids) => {
 	let items = []
 	ids.forEach((id) => {
 	    items.push(`repeating_attack_${id}_attacksource`)
 
 	});
-	getAttrs(items, todelete => {
-	    items.forEach(source => {
-	      if (source == 'inventory') {
-		removeRepeatingRow(source.replace("_attacksource"))
+	getAttrsPending(items, todelete => {
+	    for (source in todelete) {
+	      if (todelete[source] == 'inventory') {
+		removeRepeatingRow(source.replace("_attacksource", ""))
 	      }
-	    });
+	    }
 	});
-      });
-      getSectionIDs(`repeating_stuff`, ids => {
+    });
+  }
+
+  /**
+   * Get all the equipped eqipment and if it's Armor or Weapons add it 
+   * to the front page of the character sheet.
+   *
+   * Pending sage
+   */
+  RMUInventory.addSpecialEquipment = function() {
+    getSectionIDsPending(`repeating_stuff`, ids => {
 	let toget = ['base_at_misc']
 	ids.forEach(id => {
 	    toget.push(`repeating_stuff_${id}_itemname`);
 	    toget.push(`repeating_stuff_${id}_itemequipped`);
 	    toget.push(`repeating_stuff_${id}_itemsystem`);
-	})
+	});
 	getAttrsPending(toget, (stuff) => {
 	    let updates = {};
 	    let atinfo = miscBonusHighest(stuff.base_at_misc || "", 1);
 	    // Set default AT to base_at everywhere.
 	    updates.at_head = updates.at_torso = updates.at_legs =
-		  updates.at_arms = atinfo[0];
+	    updates.at_arms = atinfo[0];
 	    updates.at_head_info = updates.at_torso_info = updates.at_legs_info =
 		  updates.at_arms_info = atinfo[1] ? atinfo[1] : "Natural";
-	      
+
 	    updates.shield_type_bonus = 0;
 	    updates.shield_type_nattacks = '-';
 	    ids.forEach(id => {
@@ -10370,7 +10383,7 @@ let RMUInventory = {}
 		  return;
 		}
 		const name = stuff[`repeating_stuff_${id}_itemname`];
-		let json = ""
+		let json = {}
 		try {
 		  const sys = stuff[`repeating_stuff_${id}_itemsystem`];
 		  if (sys && typeof(sys) == 'string') {
@@ -10385,44 +10398,52 @@ let RMUInventory = {}
 		//  - attack table
 		if (json.AT) {
 		  switch (json.Subtype) {
-		  case 'Helmet':
-		    updates.at_head = json.AT;
-		    updates.at_head_info = name;
-		    break;
-		  case 'Torso':
-		    updates.at_torso = json.AT; 
-		    updates.at_torso_info = name;
-		    break;
-		  case 'Vambraces':
-		    updates.at_legs = json.AT;
-		    updates.at_legs_info = name;
-		    break;
-		  case 'Greaves':
-		    updates.at_arms = json.AT;
-		    updates.at_arms_info = name;
-		    break
-		  default:
-		    updates.at_head = json.AT;
-		    updates.at_torso = json.AT;
-		    updates.at_legs = json.AT;
-		    updates.at_arms = json.AT;
-		    updates.at_head_info = updates.at_torso_info = updates.at_legs_info =
-			updates.at_arms_info = name;
-		  }
-		}
-		if (json['DB Bonus']) {
-		  updates.shield_type_bonus = json['DB Bonus'];
-		  updates.shield_type_nattacks = json['Attacks Blocked'];
-		}
-		if (json['Attack Table']) {
-		  RMUInventory.updateWeapon(name, json);
-		}
-		  	
-	    });
-	    setAttrsPending(updates);
+		    case 'Helmet':
+		      updates.at_head = json.AT;
+		      updates.at_head_info = name;
+		      break;
+		    case 'Torso':
+		      updates.at_torso = json.AT; 
+		      updates.at_torso_info = name;
+		      break;
+		    case 'Vambraces':
+		      updates.at_legs = json.AT;
+		      updates.at_legs_info = name;
+		      break;
+		    case 'Greaves':
+		      updates.at_arms = json.AT;
+		      updates.at_arms_info = name;
+		      break
+		    default:
+			updates.at_head = json.AT;
+			updates.at_torso = json.AT;
+				updates.at_legs = json.AT;
+				updates.at_arms = json.AT;
+				updates.at_head_info = updates.at_torso_info = updates.at_legs_info =
+				  updates.at_arms_info = name;
+			  }
+			}
+			if (json['DB Bonus']) {
+			  updates.shield_type_bonus = json['DB Bonus'];
+			  updates.shield_type_nattacks = json['Attacks Blocked'];
+			}
+			if (json['Attack Table']) {
+			  RMUInventory.updateWeapon(name, json);
+			}
 
-	});
-      });
+		    });
+		    setAttrsPending(updates);
+		});
+	    });
+  }
+   
+  // Someone changed a system relaed thing; or equpped something
+  RMUInventory.updateEquipped = function() {
+    console.log("UPdate equipped");
+    addPendingFunction("Delete creatied attacks", RMUInventory.deleteCreatedAttacks);
+    addPendingFunction("Add Special Equipement", RMUInventory.addSpecialEquipment);
+    addPendingFunction("Update bonuses for Attacks", attacks.updateAttackBonuses);
+    checkPending();
   }
 
   onCheck("change:repeating_stuff:itemcount", (ev) => {
@@ -10507,16 +10528,15 @@ let RMUInventory = {}
     // Range is either 'short' or 'RI'
     const range = json['RI'] || json['short'] || '-';
 
-    getCompendiumPage("AttackTable:" + json['Attack Table'],
-	(cdata) => {
+    getCompendiumPagePending("AttackTable:" + json['Attack Table'], (cdata) => {
 	console.log("Attack data for", json['Attack Table'], cdata);
 	if (!cdata.data['data-attack']) {
-	rmuerror("Data attack missing in ", json['Attack Table']);
+	  rmuerror("Data attack missing in ", json['Attack Table']);
 	}
 	let min = cdata.data.min.match(/\d+/)[0] || 0;
 	let max = cdata.data.max.match(/\d+/)[0] || 0;
 	let attack_table = cdata.data['data-attack'] || "";
-	setAttrs({
+	setAttrsPending({
 	    [`${prefix}_attackname`]: name,
 	    [`${prefix}_attacksize`]:  size,
 	    [`${prefix}_attacktable`]: json['Attack Table'],
@@ -11700,7 +11720,7 @@ J E + C + B
 		updates[`${prefix}_attackmax`] = cdata?.data?.max?.match(/\d+/)[0] || 0;
 		updates[`${prefix}_attackdata`] = cdata?.data['data-attack'] || "";
 		// Once we have set it, update them all
-		setAttrs(updates, updateAttackBonuses);
+		setAttrs(updates, attacks.updateAttackBonuses);
 	    });
 	});
 
@@ -11711,7 +11731,7 @@ J E + C + B
     });
     
     /**/
-    function updateAttackBonuses() {
+    attacks.updateAttackBonuses = function () {
       getSectionIDs('repeating_attack', (ids) => {
 	let toget = []
 	ids.forEach((id) => {
@@ -11755,7 +11775,7 @@ J E + C + B
       });
     }
 
-    onCheck("clicked:updateattacks",updateAttackBonuses);
+    onCheck("clicked:updateattacks", attacks.updateAttackBonuses);
 
 
     // FIXME: Should add a are you sure button
