@@ -81,6 +81,35 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+
+July 25th 2024 v1.72c
+
+- Critical Damage Rules Houserule 3#: Changed spells RT crit button, will now Default to Elemental table on the drop down menu.
+
+
+June 28th 2024 v1.72b
+
+- Fix issue with Failed Melee test not showing Dual Wield and Furious Assault text and follow up buttons. They now display irrelevant of roll outcome.
+- Recorrected Minor Miscast Rapture, from 1d10 to 1 bleed condition.
+
+
+May 29th 2024 v1.72a
+
+- New Crit tables now work as normal with Strike to Injure (UiA version).
+
+
+May 25th 2024 v1.72
+
+- Adding new optional Crit tables suitable for Unarmed/undamaging and Elemental/Magic Damage types to compliment the standard Up in arms Crit tables. Adding flavor and a non-leathal option for certian situations. This new option can be activated by select new Crit Rule: Houserule #3 in the setting tab. When enabled clicking crit roll button will have show a new dropdown to choose between Weapon(Default), Unarmed and Elemental crit tables. 
+
+These tables where created by my long time awesome & grumpy WFRP GM, Marve.
+
+
+Mar 29th 2024 v1.71
+
+- Fixed Menacing Talent, it now adds +2SL per lvl if the roll is a success, and +1SL per lvl if the roll fails. It is now a non-situational bonus adding directly to the SL result to reflect RAW rules more closely.
+
+
 February 4th 2024 v1.7
 
 - Added first iteration of Vehicle & Enterprise sheet page modes. These allow you too create sheets to record various values and information associated with these. As per rule additions from various source books UiA,SoC,EiS and Enterprise rules from Achieves of the Empire III. Further rolls (ie traveling etc) info may be added in a later update. Weapons will not be included on Vehicle sheets due to requiring the character statistic and skill to fire etc.

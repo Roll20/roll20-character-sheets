@@ -8703,7 +8703,7 @@ on(`change:repeating_dependency:total remove:repeating_dependency`, function(eve
 });
 /* Weapons */
 /* When a favored weapon is selected it is added to the weapons_buttons attr which is how we add it to combat rolls */
-on("change:repeating_meleeweapon change:repeating_rangedweapon change:_reporder:meleeweapon change:_reporder:rangedweapon remove:repeating_meleeweapon remove:repeating_rangedweapon", function(event) {
+on("change:repeating_meleeweapon:favored change:repeating_rangedweapon:favored change:_reporder:meleeweapon change:_reporder:rangedweapon remove:repeating_meleeweapon remove:repeating_rangedweapon", function(event) {
     if (event.sourceType === "sheetworker") {return;}
     const type = event.sourceAttribute.split('_')[1];
     const id = event.sourceAttribute.split('_')[2];
@@ -8734,14 +8734,25 @@ on("change:repeating_meleeweapon change:repeating_rangedweapon change:_reporder:
                         weaponButtons = weaponButtons + ` [${name}](~${v['character_id']}|repeating_rangedweapon_${id}_roll)`;
                     }
                 });
-                let newAttrs = {weapon_buttons: weaponButtons};
-                if (id.startsWith("-")) {
-                    newAttrs[`repeating_${type}_${id}_id`] = `repeating_${type}_${id}`;
-                    newAttrs[`repeating_${type}_${id}_rollval`] = `%{${v['character_id']}|repeating_${type}_${id}_roll}`;
-                }
-                setAttrs(newAttrs);
+                setAttrs({weapon_buttons: weaponButtons});
             });
         });
+    });
+});
+
+/* Set the id and rollval for weapons anytime they are updated. */
+on("change:repeating_meleeweapon change:repeating_rangedweapon", function(event) {
+    if (event.sourceType === "sheetworker") {return;}
+    const type = event.sourceAttribute.split('_')[1];
+    const id = event.sourceAttribute.split('_')[2];
+
+    getAttrs(['character_id'], function(v) {
+        let newAttrs = {};
+
+        newAttrs[`repeating_${type}_${id}_id`] = `repeating_${type}_${id}`;
+        newAttrs[`repeating_${type}_${id}_rollval`] = `%{${v['character_id']}|repeating_${type}_${id}_roll}`;
+
+        setAttrs(newAttrs);
     });
 });
 

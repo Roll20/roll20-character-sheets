@@ -6,14 +6,13 @@ on("sheet:opened", () => {
   });
 });
 
-const versionTwoThree = () => {
-  getAttrs(characteristics.brawlDamage, (values) => {
-    //Brawl Damage =  (STR+SIZ)/6
-    const damage = round(total(values) / 6);
-    setAttrs({
-      brawling_damage: damage,
-      brawling_damage_open: damage / 2,
-    });
+const versionTwoFour = () => {
+  getAttrs(["halfed"], (values) => {
+    if (values.halfed) {
+      setAttrs({
+        hafted: values.halfed,
+      });
+    }
   });
 };
 
@@ -25,15 +24,19 @@ const versioning = async (version) => {
     );
 
   switch (true) {
-    case version < 2.3:
-      const v = 2.3;
-      console.log(updateMessage(v));
-      versionTwoThree();
-      versioning(v);
-      break;
     case version < 1:
       versioning(1);
-      console.log(updateMessage(version));
+      updateMessage(1);
+      break;
+    case version < 2.4:
+      updateMessage(2.4);
+      versionTwoFour();
+      versioning(2.4);
+      break;
+    case version < 2.41:
+      updateMessage(2.41);
+      updateBrawling();
+      versioning(2.41);
       break;
     default:
       console.log(

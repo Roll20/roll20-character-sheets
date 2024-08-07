@@ -175,7 +175,7 @@ on("sheet:opened change:character_name", function(eventInfo) {
 	{
 		ebeTalents.push(talent + "-ebe");
 	}
-	for(attr of [].concat(talents, ebeTalents, spells, melee))
+	for(attr of [].concat(talents, ebeTalents, spells, melee, reg))
 	{
 		attrsToGet.push(attr + "_action");
 	}
