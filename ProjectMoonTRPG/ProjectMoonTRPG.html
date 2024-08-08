@@ -15263,16 +15263,16 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			delete tempOutput.checkResult;
 		}
 
-		/* Handle updating ailmentList and barList after a successful Consume AutoEffect */
-		if (tempOutput.consumeList != undefined) {
-			if (tempOutput.consumeList == "barList") {
-				barList[tempOutput.consumeTarget] = parseInt(barList[tempOutput.consumeTarget]) + parseInt(tempOutput.consumeVal);
+		/* Handle updating ailmentList and barList after a successful AutoEffect */
+		if (tempOutput.modifyList != undefined) {
+			if (tempOutput.modifyList == "barList") {
+				barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
 			} else {
-				ailmentList[tempOutput.consumeTarget][1] = parseInt(ailmentList[tempOutput.consumeTarget][1]) + parseInt(tempOutput.consumeVal);
+				ailmentList[tempOutput.modifyTarget][1] = parseInt(ailmentList[tempOutput.modifyTarget][1]) + parseInt(tempOutput.modifyVal);
 			}
-			delete tempOutput.consumeList;
-			delete tempOutput.consumeVal;
-			delete tempOutput.consumeVal;
+			delete tempOutput.modifyList;
+			delete tempOutput.modifyTarget;
+			delete tempOutput.modifyVal;
 		}
 
 		/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
@@ -15673,7 +15673,8 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		message = message.replaceAll(langNegScaling,  "<b>" + (-scaling) + "</b>");
 		message = message.replaceAll(langNegScalingNum, "<b>" + (-parseFloat(scaling) * parseFloat(effectVal)) + "</b>");
 		message = message.replaceAll(langInitial, "<b>" + parseFloat(effectCount) + "</b>");
-		message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>");
+		if (checkResult != "failure") { message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>"); }
+		else {message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount)) + "</b>");}
 		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("_"," ") + "</b>");
 
 		/* Icon handling */
@@ -15930,16 +15931,16 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 		} else {
 			returnValues.checkResult = "success";
 		}
-		if (ailmentList.hasOwnProperty(effectName)) { returnValues.consumeList = "ailmentList"; }
-		else { returnValues.consumeList = "barList";  }
-		returnValues.consumeTarget = effectName;
-		returnValues.consumeVal = -effectVal*scaling;
+		if (ailmentList.hasOwnProperty(effectName)) { returnValues.modifyList = "ailmentList"; }
+		else { returnValues.modifyList = "barList";  }
+		returnValues.modifyTarget = effectName;
+		returnValues.modifyVal = -effectVal*scaling;
 	} else {
 		returnValues.checkResult = "failure";
 	}
 
 	/* Handle message */
-	let messageFormat = getTranslationByKeyCustom("Consume [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-consume");
+	let messageFormat = getTranslationByKeyCustom("Consume [-SCALING NUM] [TARGET]: [CHECK] [[INITIAL] -> [RESULT]]", "autoeffect-format-consume");
 	
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
@@ -15948,9 +15949,9 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	}
 
 	if (!AutoEffect.includes("Silent")) {
-		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult);
+		returnValues.message = autoEffectMessage(messageFormat, effectName, -effectVal, count, Math.max(scaling,1), returnValues.checkResult);
 	}
-	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
+	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: -effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
@@ -16007,12 +16008,17 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 		count = ailmentList[effectAilment][2];
 	}
 
+	/* Update target list */
+	returnValues.modifyList = "ailmentList";
+	returnValues.modifyTarget = effectTarget;
+	returnValues.modifyVal = effectVal;
+
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
 	let messageFormat = "";
 	switch (autoEffectVariant) {
-		case "Gain": messageFormat = getTranslationByKeyCustom("[/TARGET] Gain [SCALING NUM] [TARGET]", "autoeffect-format-gain"); break;
+		case "Gain": messageFormat = getTranslationByKeyCustom("[/TARGET] Gain [SCALING NUM] [TARGET] [[INITIAL] -> [RESULT]]", "autoeffect-format-gain"); break;
 		case "Inflict": messageFormat = getTranslationByKeyCustom("[/TARGET] Inflict [SCALING NUM] [TARGET] to target", "autoeffect-format-inflict"); break;
 		case "Give": messageFormat = getTranslationByKeyCustom("[/TARGET] Give [SCALING NUM] [TARGET] to ally", "autoeffect-format-give"); break;
 	}
@@ -16030,6 +16036,7 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	if (autoEffectVariant == "Gain") { returnValues = { ...returnValues, [effectTarget]: parseInt(effectVal), count: parseInt(count) } }
 	if (autoEffectVariant == "Inflict") { returnValues = { ...returnValues, "autoInflict": autoEffectToString(AutoEffect).replace("Inflict","Gain").replace(/silent/ig,"") } }
 	if (autoEffectVariant == "Give") { returnValues = { ...returnValues, "autoGive": autoEffectToString(AutoEffect).replace("Give","Gain").replace(/silent/ig,"") } }
+
 	return returnValues;
 }
 
@@ -16070,6 +16077,8 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 	return {[effectTarget]: parseInt(effectVal) - parseInt(count), count: count, message: message, messageValues: messageValues};
 }
 function autoEffectAddBar(AutoEffect, barList, scaling) {
+	returnValues = {};
+	
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (Add N #Bar #Silent(optional))`, AutoEffect); }
 	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
@@ -16092,19 +16101,24 @@ function autoEffectAddBar(AutoEffect, barList, scaling) {
 	}
 	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 
+	/* Update target list */
+	returnValues.modifyList = "barList";
+	returnValues.modifyTarget = effectTarget;
+	returnValues.modifyVal = effectVal;
+
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = getTranslationByKeyCustom("Regen [SCALING NUM] [TARGET]", "autoeffect-format-add")
-	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Receive [-SCALING NUM] [TARGET] damage", "autoeffect-format-add-neg"); }
+	let messageFormat = getTranslationByKeyCustom("Regen [SCALING NUM] [TARGET] [[INITIAL] -> [RESULT]]", "autoeffect-format-add")
+	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Receive [-SCALING NUM] [TARGET] damage [[INITIAL] -> [RESULT]]", "autoeffect-format-add-neg"); }
 
 	if (!AutoEffect.includes("Silent")) {
-		message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
+		returnValues.message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
 	}
-	messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
+	returnValues.messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return {[effectTarget]: parseInt(effectVal), count: parseInt(count), message: message, messageValues: messageValues};
+	return {... returnValues, [effectTarget]: parseInt(effectVal), count: parseInt(count) };
 }
 function autoEffectMultiBar(AutoEffect, barList, scaling) {
 	/* Check format */
