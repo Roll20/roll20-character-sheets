@@ -10302,7 +10302,7 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 	{{/rollBetween() roll1 7 9}}
 
 	{{#rollGreater() roll1 9}}
-<b data-i18n="message-success">Success!</b> <img src="https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/icons/good.png" style="width: 25px; height: 25px;">
+	<b data-i18n="message-success">Success!</b> <img src="https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/icons/good.png" style="width: 25px; height: 25px;">
 	{{/rollGreater() roll1 9}}
 
 	</div>
@@ -10315,7 +10315,92 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
     </div>
 </rolltemplate>
 
+<!-- Chat message action buttons -->
+<div style="display:none">
+<button type="action" name="act_actionButtonDamage"></button>
+<button type="action" name="act_actionButtonInflict"></button>
+<button type="action" name="act_actionButtonGive"></button>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-actionbuttons">
+    <div class="sheet-actionButtonBlocker"></div>
+	
+	<div class="sheet-actionButtonContainer">{{#buttonlabel0}}<div class="sheet-button {{color0}}">[x]({{icon0}})[{{buttonlabel0}}](~selected|{{buttonlink0}}||{{computed::datapackage0}})</div>{{/buttonlabel0}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel1}}<div class="sheet-button {{color1}}">[x]({{icon1}})[{{buttonlabel1}}](~selected|{{buttonlink1}}||{{computed::datapackage1}})</div>{{/buttonlabel1}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel2}}<div class="sheet-button {{color2}}">[x]({{icon2}})[{{buttonlabel2}}](~selected|{{buttonlink2}}||{{computed::datapackage2}})</div>{{/buttonlabel2}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel3}}<div class="sheet-button {{color3}}">[x]({{icon3}})[{{buttonlabel3}}](~selected|{{buttonlink3}}||{{computed::datapackage3}})</div>{{/buttonlabel3}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel4}}<div class="sheet-button {{color4}}">[x]({{icon4}})[{{buttonlabel4}}](~selected|{{buttonlink4}}||{{computed::datapackage4}})</div>{{/buttonlabel4}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel5}}<div class="sheet-button {{color5}}">[x]({{icon5}})[{{buttonlabel5}}](~selected|{{buttonlink5}}||{{computed::datapackage5}})</div>{{/buttonlabel5}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel6}}<div class="sheet-button {{color6}}">[x]({{icon6}})[{{buttonlabel6}}](~selected|{{buttonlink6}}||{{computed::datapackage6}})</div>{{/buttonlabel6}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel7}}<div class="sheet-button {{color7}}">[x]({{icon7}})[{{buttonlabel7}}](~selected|{{buttonlink7}}||{{computed::datapackage7}})</div>{{/buttonlabel7}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel8}}<div class="sheet-button {{color8}}">[x]({{icon8}})[{{buttonlabel8}}](~selected|{{buttonlink8}}||{{computed::datapackage8}})</div>{{/buttonlabel8}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel9}}<div class="sheet-button {{color9}}">[x]({{icon9}})[{{buttonlabel9}}](~selected|{{buttonlink9}}||{{computed::datapackage9}})</div>{{/buttonlabel9}}</div>
+
+</rolltemplate>
+
+
 <script type="text/worker">
+
+
+
+async function createActionButtons(buttonList) {
+	
+	let rollBase = "&{template:actionbuttons} {{roll1=[[0]]}}";
+	let dataList = {}
+
+	if (buttonList[0] != undefined) {
+		for (let i = 0; i < buttonList.length; i++) {
+			rollBase += ` {{datapackage${i}=[[0]]}} {{buttonlabel${i}=${buttonList[i][0]}}} {{icon${i}=${buttonList[i][1]}}} {{color${i}=${buttonList[i][2]}}} {{buttonlink${i}=${buttonList[i][3]}}}`;
+			dataList[`datapackage${i}`] = Data.package([buttonList[i][4]]);
+		}
+	
+		let buttonRoll = await startRoll(rollBase);
+		finishRoll(buttonRoll.rollId, dataList);
+	}
+}
+
+function generateActionButton(name, icon, color, action, data) {
+	switch (name.toLowerCase()) {
+		case "apply damage": name = getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"); break;
+		case "apply ailments": name = getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"); break;
+		case "give ailments": name = getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"); break;
+	}
+	icon = icon.replaceAll('<img src="',"").replaceAll('" >',"");
+	
+	return [name, icon, color, action, data];
+}	
+
+
+/* Action button functions */
+on('clicked:actionButtonDamage', async (data) => {
+    data = Data.unpackage(data.originalRollId);
+	data = data[0];
+	if (typeof data == "string") {
+		AutoScriptMain(data, "None", "false", () => {}, "false", getTranslationByKeyCustom("Apply ailments", "helper-text-applydamage"));
+	} else {
+		damageHelper(data.damageTypeOverride, data.baseOverride, data.flatHPOverride, data.flatSTOverride, data.flatSPOverride);
+	}
+});
+on('clicked:actionButtonInflict', async (data) => {
+	data = Data.unpackage(data.originalRollId);
+	data = data[0];
+	AutoScriptMain(data, "None", "false", () => {}, "false", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+});
+on('clicked:actionButtonGive', async (data) => {
+	data = Data.unpackage(data.originalRollId);
+	data = data[0];
+	AutoScriptMain(data, "None", "false", () => {}, "false", getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+});
+
+
+
+
+
+
+
+
+
+
 
 /* Auto: Recalculate derived stats */
 on("change:instinct change:wisdom change:justice change:charm change:insight change:temperance change:repeating_global", function() {
@@ -12501,6 +12586,15 @@ getSectionIDs(`repeating_global`, idarray => {
 	if (returnValues.diceMax != undefined) { autoeffectdice2 = returnValues.diceMax; }
 	if (returnValues.dicePower != undefined) { autoeffectdice3 = returnValues.dicePower; }
 
+	let autoeffectBaseDamage = 0;
+	let autoeffectFlatDamageHP = 0;
+	let autoeffectFlatDamageST = 0;
+	let autoeffectFlatDamageSP = 0;
+	if (returnValues.baseDamage != undefined) { autoeffectBaseDamage = returnValues.baseDamage; }
+	if (returnValues.flatDamageHP != undefined) { autoeffectFlatDamageHP = returnValues.flatDamageHP; }
+	if (returnValues.flatDamageST != undefined) { autoeffectFlatDamageST = returnValues.flatDamageST; }
+	if (returnValues.flatDamageSP != undefined) { autoeffectFlatDamageSP = returnValues.flatDamageSP; }
+
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
 	
@@ -12708,14 +12802,27 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	/*--- send roll end --*/
 	startRoll((whisper + "&{template:baseRoll} {{roll1= @{dummy2} }} {{advantage=@{advState}}} {{infodump=@{dummy}}}"), (results) => {
-            //const total = results.results.roll1.result;
+            const total = parseInt(results.results.roll1.result);
 
-            finishRoll(
-                results.rollId,
-                {
-           
-                }
-            );
+            finishRoll(results.rollId, {} );
+
+			/* Action Buttons */
+			
+			
+			let damage_data = {
+				baseOverride: total + autoeffectBaseDamage,
+				flatHPOverride: autoeffectFlatDamageHP,
+				flatSTOverride: autoeffectFlatDamageST,
+				flatSPOverride: autoeffectFlatDamageSP,
+				damageTypeOverride: weapontype
+			}
+
+			let buttonList = [];
+			if (basetype == "Attack") { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", damage_data)); }
+			else if (returnValues.autoDamage != undefined) { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", returnValues.autoDamage)); }
+			if (returnValues.autoInflict != undefined) { buttonList.push(generateActionButton("Apply ailments", getIcon("icons","lose"), "purple", "actionButtonInflict", returnValues.autoInflict)); }
+			if (returnValues.autoGive != undefined) { buttonList.push(generateActionButton("Give ailments", getIcon("icons","win"), "blue", "actionButtonGive", returnValues.autoGain)); }
+			createActionButtons(buttonList);
         });
 	/*--- send roll end ---*/
 
@@ -12901,13 +13008,9 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 	setAttrs({"baseSpeed": total, "isFirstRound": "true"});
 	}
 
-            finishRoll(
-                results.rollId,
-                {
-
-		}
-            );
-        });
+		finishRoll(results.rollId,{});
+		
+	});
 	/*--- send roll end ---*/
 
 	/* Cleanup */
@@ -12923,7 +13026,10 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 
 /* Action: Damage helper apply damage */
 on('clicked:applyDamage', (info) => {
+	damageHelper();
+});
 
+function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flatHPOverride=undefined, flatSTOverride=undefined, flatSPOverride=undefined) {
 	/* Get attribute values */
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
@@ -12954,7 +13060,14 @@ on('clicked:applyDamage', (info) => {
 	let baseDamage = parseInt(values.baseDamage);
 	let flatDamageHP = parseInt(values.flatDamageHP);
 	let flatDamageST = parseInt(values.flatDamageST);
+	let flatDamageSP = 0;
 	let damageType = values.damageHelperType;
+
+	if (baseOverride != undefined) { baseDamage = baseOverride; }
+	if (flatHPOverride != undefined) { flatDamageHP = flatHPOverride; }
+	if (flatSTOverride != undefined) { flatDamageST = flatSTOverride; }
+	if (flatSPOverride != undefined) { flatDamageSP = flatSPOverride; }
+	if (damageTypeOverride != undefined) { damageType = damageTypeOverride; }
 
 	let hpResistance = 1.0;
 	let stResistance = 1.0;
@@ -12996,6 +13109,7 @@ on('clicked:applyDamage', (info) => {
 			case "Slash": hpResistance = parseFloat(values[`${outfitType}Immune1`]); stResistance = parseFloat(values[`${outfitType}Immune2`]); break;
 			case "Pierce": hpResistance = parseFloat(values[`${outfitType}Immune3`]); stResistance = parseFloat(values[`${outfitType}Immune4`]); break;
 			case "Blunt": hpResistance = parseFloat(values[`${outfitType}Immune5`]); stResistance = parseFloat(values[`${outfitType}Immune6`]); break;
+			default: break;
 		}
 	}
 
@@ -13038,7 +13152,7 @@ on('clicked:applyDamage', (info) => {
 	let percentageModHP = 1.0;
 
 	/* Sum of all modifiers that do not take resistance into consideration */
-	let sumSanity = 0;
+	let sumSanity = -flatDamageSP;
 
 	/* Retrieve global settings for Smoke settings */
 	getSectionIDs(`repeating_global`, idarray => {
@@ -13081,7 +13195,7 @@ on('clicked:applyDamage', (info) => {
 		let hpStRegen = 0;
 		let stRegen = -flatDamageST;
 		let hpRegen = -flatDamageHP;
-		let spRegen = 0;
+		let spRegen = -flatDamageSP;
 
 		getAttrs([...fieldnames], v => {
 			idarray.forEach(id => {
@@ -13225,9 +13339,9 @@ on('clicked:applyDamage', (info) => {
 
 	/* Final calculation */
 	/*                          \--------------------- Before Resistance ----------------------/  \----------------------- After Resistance ----------------------- / */
-	newHP += Math.max(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
-	newST += Math.max(Math.min((stResistance *                   (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
-	newSP += sumSanity;
+	newHP += Math.ceil(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
+	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
+	newSP += Math.ceil(sumSanity);
 
 	/* Caps increase by regen amount */
 	newHP = Math.min(newHP, oldHP + hpRegen + hpStRegen);
@@ -13269,6 +13383,7 @@ on('clicked:applyDamage', (info) => {
 	let langBaseDamage = "Base damage";
 	let langFlatDamageHP = "Flat HP DMG";
 	let langFlatDamageST = "Flat ST DMG";
+	let langFlatDamageSP = "Flat SP DMG";
 	let langDamage = "damage";
 	let langDealt = "dealt";
 	let langIncreasedHPDamageBy = "increased HP damage by";
@@ -13282,6 +13397,7 @@ on('clicked:applyDamage', (info) => {
 		langBaseDamage = getTranslationByKey("helper-text-basedamage");
 		langFlatDamageHP= getTranslationByKey("helper-text-flatdamagehp");
 		langFlatDamageST = getTranslationByKey("helper-text-flatdamagest");
+		langFlatDamageSP = getTranslationByKey("helper-text-flatdamagesp");
 		langDamage = getTranslationByKey("message-damage");
 		langDealt = getTranslationByKey("message-dealt");
 		langIncreasedHPDamageBy = getTranslationByKey("message-increased-HP-damage-by");
@@ -13315,6 +13431,7 @@ on('clicked:applyDamage', (info) => {
 	}
 	if (flatDamageHP != 0) { hpDamageBody += `<div class="flatModifier">${langFlatDamageHP}: ${flatDamageHP}</div>`; }
 	if (flatDamageST != 0) { stDamageBody += `<div class="flatModifier">${langFlatDamageST}: ${flatDamageST}</div>`; }
+	if (flatDamageSP != 0) { spDamageBody += `<div class="flatModifier">${langFlatDamageSP}: ${flatDamageSP}</div>`; }
 	
 	/* Fragile*/
 	if (hpFragile != 0) { hpDamageBody += generateDamageHelperBodyEffect(langFragile, hpFragile, "Damage", 0, getIcon("ailments", "Fragile", settingLimbusStyle)); }
@@ -13393,7 +13510,7 @@ on('clicked:applyDamage', (info) => {
 });
 });
 });
-});
+}
 
 
 /* Damage helper functions beginning */
@@ -13789,13 +13906,16 @@ on('clicked:declareAction', (info) => {
 
 	/*--- send roll end --*/
 	startRoll((whisper + "&{template:baseRoll} {{infodump=@{dummy} }}"), (results) => {
-            finishRoll(
-                results.rollId,
-                {
+        finishRoll(results.rollId,{});
 
-		}
-            );
-        });
+		console.log(returnValues)
+
+		let buttonList = [];
+		if (returnValues.autoDamage != undefined) { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", returnValues.autoDamage)); }
+		if (returnValues.autoInflict != undefined) { buttonList.push(generateActionButton("Apply ailments", getIcon("icons","lose"), "purple", "actionButtonInflict", returnValues.autoInflict)); }
+		if (returnValues.autoGive != undefined) { buttonList.push(generateActionButton("Give ailments", getIcon("icons","win"), "blue", "actionButtonGive", returnValues.autoGain)); }
+		createActionButtons(buttonList);
+    });
 	/*--- send roll end ---*/
 
 	output["skillSelect"] = "";
@@ -14783,7 +14903,12 @@ on("sheet:opened", function() {
 
 /* On Use and On Hit */
 (On Use, icons, Portable, blue)
-(On Hit, icons, Attack, purple)`;
+(On Hit, icons, Attack, purple)
+
+/* Action buttons */
+(Apply damage, icons, damage, red)
+(Apply ailments, icons, lose, purple)
+(Give ailments, icons, win, yellow)`;
 
 	if(sheetDefaults != stylingDefault){
 
@@ -14910,7 +15035,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			if (egoAutoScript == null) { egoAutoScript = ""; }
 		}
 		
-		let collectedAutoScripts = autoScriptToArray(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
+		let collectedAutoScripts = parseAutoScript(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
 
 		let firstRound = getTranslationByKeyCustom("#First round", "")
 
@@ -14925,10 +15050,10 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		});
 
 	/* Convert AutoScript to an array */
-	AutoScript = autoScriptToArray(AutoScript);
+	AutoScript = parseAutoScript(AutoScript);
 
 	/* Translates AutoEffect names, bars and ailments to English */
-	AutoScript = translateAutoScriptArrayToEnglish(AutoScript);
+	AutoScript = translateAutoScriptToEnglish(AutoScript);
 
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
@@ -15021,8 +15146,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			
 			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon, ailTrigger];
 		});
-
-		console.log(ailmentList)
 
 	/* Execute each AutoEffect in the AutoScript */
 	AutoScript.forEach(AutoEffect => {
@@ -15170,11 +15293,46 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			else { returnValues.speedCombat = tempOutput.speedCombat }
 		}
 
+		/* Handle BaseDamage, FlatDamageHP, FlatDamageST and FlatDamageSP */
+		if (tempOutput.BaseDamage != undefined) {
+			if (returnValues.baseDamage != undefined) { returnValues.baseDamage += tempOutput.BaseDamage }
+			else { returnValues.baseDamage = tempOutput.BaseDamage }
+		}
+		if (tempOutput.FlatDamageHP != undefined) {
+			if (returnValues.flatDamageHP != undefined) { returnValues.flatDamageHP += tempOutput.FlatDamageHP }
+			else { returnValues.flatDamageHP = tempOutput.FlatDamageHP }
+		}
+		if (tempOutput.FlatDamageST != undefined) {
+			if (returnValues.flatDamageST != undefined) { returnValues.flatDamageST += tempOutput.FlatDamageST }
+			else { returnValues.flatDamageST = tempOutput.FlatDamageST }
+		}
+		if (tempOutput.FlatDamageSP != undefined) {
+			if (returnValues.flatDamageSP != undefined) { returnValues.flatDamageSP += tempOutput.FlatDamageSP }
+			else { returnValues.flatDamageSP = tempOutput.FlatDamageSP }
+		}
+
 		/* Handle challenge rolls */
 		if (tempOutput.challengeRollStat != undefined) {
 			challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
 			delete tempOutput.challengeRollStat;
 			delete tempOutput.challengeRollDifficulty;
+		}
+
+		/* Handle Inflict, Give and FlatDamage on non-attacks */
+		if (tempOutput.autoInflict != undefined) {
+			if (returnValues.autoInflict != undefined) { returnValues.autoInflict += tempOutput.autoInflict; }
+			else { returnValues.autoInflict = tempOutput.autoInflict; }
+			delete tempOutput.autoInflict;
+		}
+		if (tempOutput.autoGive != undefined) {
+			if (returnValues.autoGive != undefined) { returnValues.autoGive += tempOutput.autoGive; }
+			else { returnValues.autoGive = tempOutput.autoGive; }
+			delete tempOutput.autoGive;
+		}
+		if (tempOutput.autoDamage != undefined) {
+			if (returnValues.autoDamage != undefined) { returnValues.autoDamage += tempOutput.autoDamage; }
+			else { returnValues.autoDamage = tempOutput.autoDamage; }
+			delete tempOutput.autoDamage;
 		}
 
 		/* Handle message */
@@ -15254,9 +15412,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			}
 			
 			if (returnValues.message == undefined) {
-				returnValues.message = autoEffectEntry(conditionName, conditionMessage, iconFolder, iconName, iconColor);
+				returnValues.message = autoEffectEntry(conditionName, conditionMessage, iconFolder, iconName, getColor(iconColor));
 			} else {
-				returnValues.message += autoEffectEntry(conditionName, conditionMessage, iconFolder, iconName, iconColor);
+				returnValues.message += autoEffectEntry(conditionName, conditionMessage, iconFolder, iconName, getColor(iconColor));
 			}
 		}
 	}
@@ -15269,18 +15427,28 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 		for (const [errorType, errorMessage] of Object.entries(errorMessageList)) {
 			if (errorType)
 			if (returnValues.message == undefined) {
-				returnValues.message = autoEffectEntry(errorType, errorMessage, "icons", "exit", "Red");
+				returnValues.message = autoEffectEntry(errorType, errorMessage, "icons", "exit", getColor("Red"));
 			} else {
-				returnValues.message += autoEffectEntry(errorType, errorMessage, "icons", "exit", "Red");
+				returnValues.message += autoEffectEntry(errorType, errorMessage, "icons", "exit", getColor("Red"));
 			}
 		}
 		resetConditionals();
 	}
 
-	/* If no message is to be returned, print both message and returnValues.message (if it has any contents) to the chat */
+	/* If no message is to be returned, print both message, returnValues.message (if it has any contents) and actions buttons (if any exist) to the chat */
 	if (settingMuteMessage != "true" && (message != "" || returnValues.message != undefined)) {
 		if (returnMessage == "false") {
-			let messageHeaderIcon = getIcon("icons", "gear");
+			
+			let iconFolder = "icons";
+			let iconName = "gear";
+			let iconColor = "#85a874"; 
+			if (stylingList[messageHeaderTitle] != undefined) {
+				iconFolder = stylingList[messageHeaderTitle][0];
+				iconName = stylingList[messageHeaderTitle][1];
+				iconColor = stylingList[messageHeaderTitle][2];
+			}
+			let messageHeaderIcon = getIcon(iconFolder, iconName, "false", `style="background-color: ${getColor(iconColor)}"`);
+
 			if (returnValues.message == undefined) { returnValues.message = ""; }
 			let messageContents = "<div class='autoeffectContainer'>" + message + returnValues.message + "</div>";
 			
@@ -15293,10 +15461,15 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 			startRoll((whisper + "&{template:autoeffect} {{icon=@{dummyIcon}}} {{title=" + messageHeaderTitle + "}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
 				finishRoll(results.rollId, {} );
 			});
+
+			let buttonList = [];
+			if (returnValues.autoDamage != undefined) { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", returnValues.autoDamage)); }
+			if (returnValues.autoInflict != undefined) { buttonList.push(generateActionButton("Apply ailments", getIcon("icons","lose"), "purple", "actionButtonInflict", returnValues.autoInflict)); }
+			if (returnValues.autoGive != undefined) { buttonList.push(generateActionButton("Give ailments", getIcon("icons","win"), "blue", "actionButtonGive", returnValues.autoGive)); }
+			createActionButtons(buttonList);
 		}
 	}
-	
-	// console.log(output)
+
 	setAttrs(output);
 	callback(returnValues);
 	});
@@ -15308,6 +15481,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="fals
 
 /* Removes all newline and tab characters as well as JavaScript comments from an AutoScript */
 function cleanAutoScript(AutoScript) {
+
 	/* Remove all newlines and tab spaces */
 	let cleanAutoScript = AutoScript.replace(/(\r\n|\n|\r|\t)/gm, "");
 
@@ -15325,7 +15499,7 @@ function cleanAutoScript(AutoScript) {
 /* Converts an AutoScript from a string to an array */
 /* mode: normal is for strings of type (AutoEffect...) (AutoEffect...) ... */
 /* mode: nested is for strings of type [#Offensive, (AutoEffect...) ... #] [#Round start, (AutoEffect...) ... ]*/
-function autoScriptToArray(inputAutoScript, mode="normal") {
+function parseAutoScript(inputAutoScript, mode="normal") {
 	let AutoScript = inputAutoScript;
 	let AutoEffect = "";
 	let AutoEffectArray = [];
@@ -15389,7 +15563,7 @@ function autoScriptToArray(inputAutoScript, mode="normal") {
 	return AutoScriptArray;
 }
 
-function translateAutoScriptArrayToEnglish(AutoScript) {
+function translateAutoScriptToEnglish(AutoScript) {
 	for (let i = 0; i < AutoScript.length; i++) {
 		/* Translate AutoEffect names */
 		AutoScript[i][0][0] = getAutoEffectFromTranslation(AutoScript[i][0][0]);
@@ -15461,16 +15635,6 @@ function parseAutoScriptStyling(AutoScriptStyling) {
 
 /*--- AutoEffect functions ---*/
 function autoEffectEntry(header, message, iconFolder="icons", iconName="gear", iconColor="#85a874") {
-	if (!(/^#(?:[0-9a-fA-F]{3}){1,2}$/).test(iconColor)) {
-		switch (iconColor.toLowerCase()) {
-			case "red": iconColor = "#c25944"; break;
-			case "blue": iconColor = "#7397d1"; break;
-			case "yellow": iconColor = "#dbb748"; break;
-			case "purple": iconColor = "#8e7cc3"; break;
-			default: iconColor = "#85a874";
-		}
-	}
-	
 	let newEntry  = "<div class='autoeffectContainer'>"
 		newEntry += `<div style="background-color: #222; height: 25px; border: 2px #000 solid; color: #fff">`
 		newEntry += `<div style="float: left; height: 25px; width: 25px; margin-right: 7px; background-color: ${iconColor};">`
@@ -15511,11 +15675,6 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		message = message.replaceAll(langInitial, "<b>" + parseFloat(effectCount) + "</b>");
 		message = message.replaceAll(langResult, "<b>" + (parseFloat(effectCount) + parseFloat(effectVal)) + "</b>");
 		message = message.replaceAll(langTarget, "<b>" + effectTarget.replace("_"," ") + "</b>");
-
-		console.log(messageFormat)
-		console.log(effectIcon)
-		console.log(effectTarget)
-		console.log(settingLimbusStyle == "true")
 
 		/* Icon handling */
 		/* Get target icon. Is in this format: [/TARGET]. If a effectIcon is procided, use that instead */
@@ -15573,6 +15732,11 @@ function autoEffectTranslateMessage(message) {
 		.replaceAll("TST", getTranslationByKeyCustom("TST","bar-stagres-temp-shortened"));
 	
 	return returnMessage;
+}
+
+/* Converts an AutoEffect from an array back into its string form */
+function autoEffectToString(AutoEffect) {
+	return "(" + AutoEffect.join(" ") + ")";
 }
 
 /* Whispers an error message to the user detailing an AutoEffect error */
@@ -15804,8 +15968,6 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 
-	console.log(ailmentList)
-
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 6) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Ailment #Round(optional) #Silent(optional))`, AutoEffect); }
 	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!["this", "next", "thisround", "nextround", "thisturn", "nextturn", "turn", "round", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
@@ -15866,6 +16028,8 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 	/* Execute AutoEffect */
 	returnValues = {...returnValues, message: message, messageValues: messageValues };
 	if (autoEffectVariant == "Gain") { returnValues = { ...returnValues, [effectTarget]: parseInt(effectVal), count: parseInt(count) } }
+	if (autoEffectVariant == "Inflict") { returnValues = { ...returnValues, "autoInflict": autoEffectToString(AutoEffect).replace("Inflict","Gain").replace(/silent/ig,"") } }
+	if (autoEffectVariant == "Give") { returnValues = { ...returnValues, "autoGive": autoEffectToString(AutoEffect).replace("Give","Gain").replace(/silent/ig,"") } }
 	return returnValues;
 }
 
@@ -16103,26 +16267,34 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	}
 	
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Bar #Silent(optional))`, AutoEffect); }
-	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
+	if (autoEffectVariant == "BaseDamage") {
+		if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); }
+		if (AutoEffect.length > 2) { if (AutoEffect[2].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }
+	} else {
+		if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Bar #Silent(optional))`, AutoEffect); }
+		if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
+	}
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
 	if (scaling == 0) { return {}; }
 
 	/* Get value */
-	let effectVal = parseInt(Math.abs(AutoEffect[1]));
+	let effectVal = parseInt(AutoEffect[1]); 
+	if (autoEffectVariant == "BaseDamage") { effectVal = Math.abs(effectVal); }
 	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
 
 	/* Get target */
 	let effectBar = AutoEffect[2];
 	let effectTarget = "";
-	if (barList.hasOwnProperty(effectBar)) {
-		effectTarget = effectBar.replace("ST", "StagRes");
-		count = barList[effectBar];
+	if (effectBar != undefined) {
+		if (barList.hasOwnProperty(effectBar)) {
+			effectTarget = effectBar.replace("ST", "StagRes");
+			count = barList[effectBar];
+		}
+		else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 	}
-	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 
 	/* Handle message */
 	let message = "";
@@ -16139,7 +16311,12 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { message: message, messageValues: messageValues };
+	returnValues = { [AutoEffect[0]]: effectVal, message: message, messageValues: messageValues }
+	if (autoEffectVariant != "BaseDamage") {
+		returnValues[`${AutoEffect[0]}${AutoEffect[2]}`] = effectVal;
+		returnValues.autoDamage = `(Add -${effectVal} ${AutoEffect[2]})`;
+	}
+	return returnValues;
 }
 /*--- AutoEffect functions end ---*/
 
@@ -17275,6 +17452,19 @@ function getIcon(iconFolder, iconName, settingLimbusStyle = "false", style="") {
 	}
 }
 
+function getColor(color) {
+	if (!(/^#(?:[0-9a-fA-F]{3}){1,2}$/).test(color)) {
+		switch (color.toLowerCase()) {
+			case "red": color = "#c25944"; break;
+			case "blue": color = "#7397d1"; break;
+			case "yellow": color = "#dbb748"; break;
+			case "purple": color = "#8e7cc3"; break;
+			default: color = "#85a874";
+		}
+	}
+	return color;
+}
+
 /* Returns a translation, or a base string if no translation is available */
 function getTranslationByKeyCustom(base, key) {
 	if (getTranslationByKey(key) != false) {
@@ -17388,6 +17578,26 @@ function getOptionFromTranslation(option) {
 
 function capitalize(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Helper used to package and unpackage data transferred through action buttons
+// Read more about this system at https://app.roll20.net/forum/post/10346883/adventures-with-startroll/?pageforid=10346884#post-10346884
+const Data = {
+    chars: {
+        '"': '%quot;',
+        ',': '%comma;',
+        ':': '%colon;',
+        '}': '%rcub;',
+        '{': '%lcub;'
+    },
+    package(data) {
+		data = (typeof(data) === 'object') ? JSON.stringify(data) : (typeof(data) === 'string') ? data : null;
+        return (data) ? `${data}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+    },
+    unpackage(data) {
+		data = `${data}`.replace(new RegExp(`(${Object.values(this.chars).join('|')})`, 'g'), (r) => Object.entries(this.chars).find(e=>e[1]===r)[0]);
+        return JSON.parse(data);
+    }
 }
 
 </script>
