@@ -2146,7 +2146,7 @@ on('clicked:grenade-miss', async function(eventInfo) {
                 'name=Otiluke’s Freezing Sphere (Globe of cold)',
                 'aoe=[[20]]',
                 'aoesplash=',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)',
+                'hitdmg=[Damage](`/em causes creatures failing a save vs. spell &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)',
                 'splashdmg='
             );
             break;
@@ -2176,7 +2176,7 @@ on('clicked:grenade-miss', async function(eventInfo) {
                 'name=Fire Seed missile',
                 'aoe=[[10]]',
                 'aoesplash=',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage using their Fire Seed missile! &#40;Direct Hit&#41;)',
+                'hitdmg=[Damage](`/em causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)',
                 'splashdmg='
             );
             break
@@ -2196,7 +2196,7 @@ on('clicked:grenade-miss', async function(eventInfo) {
                 'name=Sol’s Searing Orb',
                 'aoe=[[6]]',
                 'aoesplash=',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness to normal creatures. Or &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness to undead using their Sol’s Searing Orb! &#40;Direct Hit&#41;)',
+                'hitdmg=[Damage](`/em causes normal creatures failing a saving throw vs. spell &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness. Or causes undead &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness. All victims are allowed a saving throw vs. spell, with success indicating half damage and no blindness. Using their Sol’s Searing Orb! &#40;Direct Hit&#41;)',
                 'splashdmg='
             );
             break;
