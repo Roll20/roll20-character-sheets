@@ -2131,6 +2131,26 @@ on('clicked:grenade-miss', async function(eventInfo) {
             break;
         }
         case '--------': return;
+        case 'Fire Seed missile': {
+            rollBuilder.push(
+                'name=Fire Seed missile',
+                'aoe=[[10]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break
+        }
+        case 'Ice Knife': {
+            rollBuilder.push(
+                'name=Ice Knife',
+                'aoe=[[10]]',
+                'aoesplash=',
+                'hitdmg=[Damage](`/em causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)',
+                'splashdmg='
+            );
+            break;
+        }
         case 'Melf’s Minute Meteor': {
             rollBuilder.push(
                 'name=Melf’s Minute Meteor',
@@ -2167,26 +2187,6 @@ on('clicked:grenade-miss', async function(eventInfo) {
                 'aoe=[[10]]',
                 'aoesplash=',
                 'hitdmg=[Effect](`/em causes creatures failing a save vs. poison to be unable to attack and lose all Dexterity bonuses to Armor Class and saving throws using their Puffball! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break;
-        }
-        case 'Fire Seed missile': {
-            rollBuilder.push(
-                'name=Fire Seed missile',
-                'aoe=[[10]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break
-        }
-        case 'Ice Knife': {
-            rollBuilder.push(
-                'name=Ice Knife',
-                'aoe=[[10]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)',
                 'splashdmg='
             );
             break;
@@ -2249,7 +2249,6 @@ on('clicked:grenade-miss', async function(eventInfo) {
     let finalRollText = rollBuilder.string();
     console.log(finalRollText);
     startRoll(finalRollText, function (roll) {
-        console.log(roll);
         let computedRolls = {
             hit: 0,
             splash: 0
@@ -2261,7 +2260,6 @@ on('clicked:grenade-miss', async function(eventInfo) {
         } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
             computedRolls.splash = 1;
         }
-        console.log(computedRolls);
         finishRoll(roll.rollId, computedRolls);
     });
 });
