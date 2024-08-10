@@ -10376,7 +10376,7 @@ on('clicked:actionButtonDamage', async (data) => {
     data = Data.unpackage(data.originalRollId);
 	data = data[0];
 	if (typeof data == "string") {
-		AutoScriptMain(data, "None", "false", "false", () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
+		AutoScriptMain(data, "None", "false", "false", {}, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 	} else {
 		damageHelper(data.damageTypeOverride, data.baseOverride, data.flatHPOverride, data.flatSTOverride, data.flatSPOverride);
 	}
@@ -10384,12 +10384,12 @@ on('clicked:actionButtonDamage', async (data) => {
 on('clicked:actionButtonInflict', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", "false", () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	AutoScriptMain(data, "None", "false", "false", {}, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
 });
 on('clicked:actionButtonGive', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", "false", () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+	AutoScriptMain(data, "None", "false", "false", {}, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
 });
 
 
@@ -11872,6 +11872,9 @@ getSectionIDs(`repeating_global`, idarray => {
 	else if(distortstate == "true"){
 	burnresist = parseInt(values.burnResist) + parseInt(values.burnResist_ego);
 	}
+	
+	let output = {};
+	let autoScriptOverrideList = {};
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -11881,12 +11884,8 @@ getSectionIDs(`repeating_global`, idarray => {
 	whisper = "/w " + whispertarget;
 	}
 
-	/* AutoScripts */
-	resetConditionals();
-	AutoScriptMain("", "Round start");
-
 	/* Burn processing */
-	if (parseInt(values.Burn) > 0){
+	if (parseInt(values.Burn) > 0) {
 
 		/* Decay */
 		if(burndecay == "n"){
@@ -11906,48 +11905,73 @@ getSectionIDs(`repeating_global`, idarray => {
 		burnnew += parseInt(burndecay);
 		}
 
-	let burndamage = parseInt(values.Burn - burnresist);
+		/* Damage */
+		let burndamage = parseInt(values.Burn - burnresist);
 
-	if(burndamage <= 0){
-	burndamage = 0;
-	}
+		if(burndamage <= 0){
+		burndamage = 0;
+		}
 
-	let burnresult = parseInt(values.HP - burndamage);
+		let burnresult = parseInt(values.HP - burndamage);
 
-	let iconnew = "<img src='"+ style + "Burn.png' style='width: 25px; height: 25px;' >";
+		let iconnew = "<img src='"+ style + "Burn.png' style='width: 25px; height: 25px;' >";
 
-	if(burnimmune == "true"){
-	burnresult = parseInt(values.HP);
-	}
+		if(burnimmune == "true"){
+		burnresult = parseInt(values.HP);
+		}
 
-	/* Translation prep */
-	let langBurn = " was burned for ";
-	let langDamage = " damage.";
-	let langResist = "Resistance: ";
-	let langResistCombined = "";
+		/* Translation prep */
+		let langBurn = " was burned for ";
+		let langDamage = " damage.";
+		let langResist = "Resistance: ";
+		let langResistCombined = "";
 
-	if(getTranslationByKey("message-burn") != false){
+		if(getTranslationByKey("message-burn") != false){
 
-	langBurn = getTranslationByKey("message-burn");
-	langDamage= getTranslationByKey("message-damage");
-	langResist= getTranslationByKey("message-resist");
-	}
+		langBurn = getTranslationByKey("message-burn");
+		langDamage= getTranslationByKey("message-damage");
+		langResist= getTranslationByKey("message-resist");
+		}
 
-	if(burnresist != "0"){
-	langResistCombined = "<b style='opacity: 50%;'><br>(" + langResist + burnresist + ")</b>";
-	}
+		if(burnresist != "0"){
+		langResistCombined = "<b style='opacity: 50%;'><br>(" + langResist + burnresist + ")</b>";
+		}
 
-	let burnmessage = langBurn + "<b>" + burndamage + "</b> " + langDamage + "." + langResistCombined;
+		let burnmessage = langBurn + "<b>" + burndamage + "</b> " + langDamage + "." + langResistCombined;
 
-	setAttrs({"HP":burnresult, "dummy":burnmessage, "dummyIcon":iconnew});
+		setAttrs({"HP":burnresult, "dummy":burnmessage, "dummyIcon":iconnew});
+		autoScriptOverrideList.Burn = [burnnew, burncurrent];
 
-	if(nomessage != "true" && burnimmune != "true"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
-            finishRoll(results.rollId, {} );
-       			 });
-
+		if(nomessage != "true" && burnimmune != "true"){
+			startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
+            	finishRoll(results.rollId, {} );
+       		});
 		}
 	}
+
+	/* Custom Ailments */
+	getSectionIDs(`repeating_ailments`, idarray => {
+		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailNextTurn`, `repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`], '');
+		
+		getAttrs([...fieldnames], v => {
+
+			idarray.forEach(id => {
+
+				let ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
+				
+				let ailNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
+				let ailNum = v[`repeating_ailments_${id}_ailNum`];
+				let ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
+				
+				if (ailTrigger == "RoundEnd") {
+					updateCustomAilment(id, "standard", "true", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
+				}
+				else {
+					updateCustomAilment(id, "decay", "true", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
+				}
+			});
+		});
+    });
 
 	/* Smoke processing */
 	if (parseInt(values.Smoke) > 0){
@@ -11968,6 +11992,7 @@ getSectionIDs(`repeating_global`, idarray => {
 		else if(values[`${id}_smokeDecayMode`] == "="){
 		smokenew += parseInt(smokedecay);
 		}
+		autoScriptOverrideList.Smoke = [smokenew, smokecurrent];
 	}
 
 	/* Charge processing */
@@ -11989,66 +12014,42 @@ getSectionIDs(`repeating_global`, idarray => {
 		else if(values[`${id}_chargeDecayMode`] == "="){
 		chargenew += parseInt(chargedecay);
 		}
+		autoScriptOverrideList.Charge = [chargenew, chargecurrent];
 	}
 
 
 	/* Stagger processing */
 	if(stagcheck != "0"){
 	stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
-
 	setAttrs({"StaggerState":"0", "StagRes":stagnew});
-
 	}
 
 	/* Seal processing */
 	if(sealcheck != "0"){
-
 	setAttrs({"SealState":"0"});
-
 	}
 
 	/* Immobile processing */
 	if(immobilecheck != "0"){
-
 	setAttrs({"ImmobileState":"0"});
-
 	}
 
+	/* AutoScripts */
+	resetConditionals();
+	AutoScriptMain("", "Round start", "true", "false", autoScriptOverrideList);
 
-	setAttrs({  
-    	"thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "isFirstRound":"false", "Bleed":bleednew, "BleedNextTurn":"0", "Burn": burnnew, "BurnNextTurn":"0", "Paralysis": paralysisnew, "ParalysisNextTurn":"0", "Protection": protectionnew, "ProtectionNextTurn":"0", "StaggerProtection": staggerprotectionnew, "StaggerProtectionNextTurn":"0", "Fragile": fragilenew, "FragileNextTurn":"0", "Strength": strengthnew, "StrengthNextTurn":"0", "Feeble": feeblenew, "FeebleNextTurn":"0", "Endurance": endurancenew, "EnduranceNextTurn":"0", "Disarm": disarmnew, "DisarmNextTurn":"0", "Haste": hastenew, "HasteNextTurn":"0", "Bind": bindnew, "BindNextTurn":"0", "Smoke": smokenew, "SmokeNextTurn":"0", "Charge":chargenew, "ChargeNextTurn":"0", "Fortune":fortunenew, "FortuneNextTurn":"0", "baseActNum":"0"});
+	output = {
+		...output, "thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "isFirstRound":"false", "baseActNum":"0",
+		"Bleed":bleednew, "BleedNextTurn":"0", "Burn": burnnew, "BurnNextTurn":"0", "Paralysis": paralysisnew, "ParalysisNextTurn":"0", "Protection": protectionnew, "ProtectionNextTurn":"0",
+		"StaggerProtection": staggerprotectionnew, "StaggerProtectionNextTurn":"0", "Fragile": fragilenew, "FragileNextTurn":"0", "Strength": strengthnew, "StrengthNextTurn":"0",
+		"Feeble": feeblenew, "FeebleNextTurn":"0", "Endurance": endurancenew, "EnduranceNextTurn":"0", "Disarm": disarmnew, "DisarmNextTurn":"0", "Haste": hastenew, "HasteNextTurn":"0",
+		"Bind": bindnew, "BindNextTurn":"0", "Smoke": smokenew, "SmokeNextTurn":"0", "Charge":chargenew, "ChargeNextTurn":"0", "Fortune":fortunenew, "FortuneNextTurn":"0"
+	}
 
+	setAttrs(output);
+	setAttrs(output);
 	});
-
-	/* Custom Ailments */
-        getSectionIDs(`repeating_ailments`, idarray => {
-            const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailNextTurn`, `repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`], '');
-            
-			const output = {}
-			
-			getAttrs([...fieldnames], v => {
-  
-                idarray.forEach(id => {
-
-			let ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
-			
-			let ailNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
-			let ailNum = v[`repeating_ailments_${id}_ailNum`];
-			let ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
-			
-			if (ailTrigger == "RoundEnd") {
-				updateCustomAilment(id);
-			}
-			else if (ailTrigger == "WhenHit") {
-				updateCustomAilment(id, "decay");
-			}
-		});
-
-		setAttrs(output);
-
-    });
-    });
-    });
+	});
 });
 
 function updateAdvantages(changeval){
@@ -12116,7 +12117,7 @@ getAttrs(["Paralysis", "Fortune", "advState", "advNum", "disadvNum"], function(v
 /* standard - Triggers both decay and damage like normal */
 /* decay - Triggers only decay */
 /* damage - Triggers only damage */
-function updateBleed(mode="standard") {
+function updateBleed(mode="standard", callback=() => {}) {
 getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
@@ -12223,6 +12224,7 @@ getAttrs(["Bleed", "bleedResist", "bleedResist_ego", "distortState", "egoActiveS
 		if (bleedimmune != "true") {
 			setAttrs({"HP":bleedresult, "Bleed":bleednew});
 		}
+		callback({ Bleed: [bleednew, bleedcurrent] });
 	}
 	});
 	});
@@ -12328,7 +12330,7 @@ getSectionIDs(`repeating_global`, idarray => {
 			let toolselect = values.toolselect;
 
         getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull", `${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "baseActNum", "Light",
-		"difficulty", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
+		"difficulty", "Bleed", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
 		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
 		`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,
@@ -12527,20 +12529,21 @@ getSectionIDs(`repeating_global`, idarray => {
 		}
 
 	/* Bleed processing */
-	updateBleed();
+	let autoScriptOverrideList = {};
+	updateBleed("standard", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
 
 	/* Custom Ailments processing */
 	getSectionIDs(`repeating_ailments`, idarray => {
-		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`], '');
+		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNum`], '');
 		getAttrs([...fieldnames], v => {
-			idarray.forEach(id => {
+		idarray.forEach(id => {
 
-		let current = v[`repeating_ailments_${id}_ailTrigger`];
+			let current = v[`repeating_ailments_${id}_ailTrigger`];
 
-		if(current == "OnAction"){
-		updateCustomAilment(id);
-		}
-			});
+			if(current == "OnAction"){
+				updateCustomAilment(id, "standard", "false", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
+			}
+		});
 		});
 	});
 
@@ -12577,7 +12580,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	AutoScript = AutoScript.replace("undefined", "");
 	
 	resetConditionals();
-	AutoScriptMain(AutoScript, triggerType, "true", "true", function(returnValues) {
+	AutoScriptMain(AutoScript, triggerType, "true", "true", autoScriptOverrideList, function(returnValues) {
 
 	let autoeffectdice1 = 0;
 	let autoeffectdice2 = 0;
@@ -12878,7 +12881,7 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="true") {
 	else if (buttonid != "luck") { autoScriptTriggers.push("Challenge"); }
 
 	if (handleAutoScriptConditionals == true) { resetConditionals(); }
-	AutoScriptMain("", autoScriptTriggers, collectAutoScripts, "true", function(returnValues) {
+	AutoScriptMain("", autoScriptTriggers, collectAutoScripts, "true", {}, function(returnValues) {
 
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
@@ -13079,7 +13082,7 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	let staggerState = values.StaggerState;
 	let outfitType = "";
 
-	let ailCalculationArray = {}; 
+	let ailCalculationList = {}; 
 
 
 	/* Cancel operation if no damage type has been selected */
@@ -13214,10 +13217,11 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 				ailIcon = v[`repeating_ailments_${id}_ailIcon`];
 				count = v[`repeating_ailments_${id}_ailNum`];
 
-				if (ailEffectVal == "-n") {
+				if ((/(-[0-9]*n)/).test(ailEffectVal)) {
 					ailType = "Damage";
 				} else {
-					ailType = v[`repeating_ailments_${id}_ailPositiveType`];
+					if (ailBeforeResistance == "beforeResistance") { ailType = "Reduction"; }
+					else { ailType = v[`repeating_ailments_${id}_ailPositiveType`]; }
 				}
 
 				if (egoActiveState == "true" && egoType == "Outfit" && distortState != "true") {
@@ -13316,12 +13320,12 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 						tempSumBoth = 0; tempSumHp = 0; tempSumSt = 0;
 
 						/* Used to generate a damage calculation message later in this function */
-						ailCalculationArray[id] = {name: ailName, icon: ailIcon, effect: ailEffect, count: count, effectVal: ailEffectVal, type: ailType, beforeRes: ailBeforeResistance, customRes: ailCustomResistanceNum}
+						ailCalculationList[id] = {name: ailName, icon: ailIcon, effect: ailEffect, count: count, effectVal: ailEffectVal, type: ailType, beforeRes: ailBeforeResistance, customRes: ailCustomResistanceNum}
 					}
 				
 					// Decay status ailment
 					if (ailDecayWhenHit == "true") {
-						updateCustomAilment(id, "decay", "false");
+						updateCustomAilment(id, "decay", "false", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
 					}
 				}
 				
@@ -13364,7 +13368,7 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	if (newSP < oldSP) { autoScriptTriggers.push("DamagedSP"); }
 	
 	resetConditionals();
-	AutoScriptMain("", autoScriptTriggers, "true", "true", function(returnValues) {
+	AutoScriptMain("", autoScriptTriggers, "true", "true", {}, function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -13447,8 +13451,8 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	}
 
 	/* Custom status ailment damage/regen/resistance */
-	for (var ailment in ailCalculationArray) {
-		let ailmentArray = ailCalculationArray[ailment];
+	for (var ailment in ailCalculationList) {
+		let ailmentArray = ailCalculationList[ailment];
 		
 		if (ailmentArray["count"] != 0) {
 			if (ailmentArray["effect"] == "HP" || ailmentArray["effect"] == "HPStagRes") { 
@@ -13636,7 +13640,7 @@ on('clicked:declareAction', (info) => {
 		let toolselect = values.toolSelect;
 
 	/* Get attributes */
-        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`], function(values) {
+        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, "Bleed"], function(values) {
 
 	let charname = values.character_name;
 	let simpledisplay = values.settingSimpleDisplay;
@@ -13793,18 +13797,19 @@ on('clicked:declareAction', (info) => {
 	let lightmessage = "";
 
 	/* Bleed processing */
-	updateBleed();
+	let autoScriptOverrideList = {};
+	updateBleed("standard", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
 
 	/* Custom Ailments processing */
 	getSectionIDs(`repeating_ailments`, idarray => {
-		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`], '');
+		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNum`], '');
 		getAttrs([...fieldnames], v => {
 		idarray.forEach(id => {
 
 			let current = v[`repeating_ailments_${id}_ailTrigger`];
 
 			if(current == "OnAction"){
-				updateCustomAilment(id);
+				updateCustomAilment(id, "standard", "false", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
 			}
 		});
 		});
@@ -13821,7 +13826,7 @@ on('clicked:declareAction', (info) => {
 	}
 
 	resetConditionals();
-	AutoScriptMain(AutoScript, "None", "true", "true", function(returnValues) {
+	AutoScriptMain(AutoScript, "None", "true", "true", autoScriptOverrideList, function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -14954,13 +14959,16 @@ on("clicked:closeAutoScriptEdit", function(info) {
 });
 /* AutoScript editor reset styling to default button */
 on("clicked:autoScriptStylingDefault", function(info) {
+	loadDefaultAutoScriptStyling();
+});
+function loadDefaultAutoScriptStyling() {
 	getAttrs(["autoScriptStylingDefault"], function(values) {
 		setAttrs({
 			autoScriptStyling: values.autoScriptStylingDefault,
 			autoScriptEditorInput: values.autoScriptStylingDefault
 		});
 	});
-});
+}
 
 /* Executes a conditional button. Hides the button if at least one check fails */
 /* Also hides the button if a Consume check would fail after using the button again */
@@ -14973,7 +14981,7 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 	buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`];
 	buttonName = values[`repeating_conditionalButtons_${buttonid}_buttonName`];
 
-	AutoScriptMain(buttonAutoScript, "None", "false", "false", function(returnValues) {
+	AutoScriptMain(buttonAutoScript, "None", "false", "false", {}, function(returnValues) {
 		if (returnValues.checkResult != "success") {
 			removeRepeatingRow("repeating_conditionalButtons_" + buttonid)
 		}
@@ -14991,7 +14999,7 @@ Block and Evade also include Defensive */
 /* returnMessage: If true, the function returns a returnValues object and does not print its standard chat message */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
-function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", returnMessage="false", callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
+function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", returnMessage="false", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
 	
 	/* Adds the input AutoScript */
 	let AutoScript = "";
@@ -15105,11 +15113,12 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 		let message = "";
 		let messageValues = {};
 		
-		/* Has the following format: nextTurnSetting, ailmentNum, ailmentNextRoundNum, ailmentName (or id if repeating), ailmentTrigger */
 		let ailmentList = {};
 		
-		
 	/* Get all ailments */
+	/* Gives a list with the following format: hasNextTurnField, count, nextTurnCount, countImmutable, repeatingAilmentId, ailmentIconName */
+	/* countImmutable: Matches the count at the beginning of the AutoEffect execution. Should never be modified */
+	/* repeatingAilmentId: Is set to 0 for standard ailments */
 	getAttrs(["burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
 	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
 	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
@@ -15120,9 +15129,13 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 		ailmentNames.forEach(ailment => {
 			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
 				let ailmentNextTurnSetting = settingHideNextTurn == "true" ? "false" : values[ailment.toLowerCase()+"NextTurnSetting"];
-				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], 0, ailment];
+				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
 			} else {
-				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], 0, ailment];
+				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
+			}
+			if (overrideList.hasOwnProperty(ailment)) {
+				ailmentList[ailment][1] = Math.max(overrideList[ailment][0], 0);
+				ailmentList[ailment][3] = Math.max(overrideList[ailment][1], 0);
 			}
 		});
 	
@@ -15139,14 +15152,19 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 		
 		getAttrs([...fieldnames], v => {
 		idarray.forEach(id => {
-			ailName = v[`repeating_ailments_${id}_ailName`].replace(" ","_");
+			ailName = v[`repeating_ailments_${id}_ailName`].replaceAll(" ","_");
 			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
 			ailNum = v[`repeating_ailments_${id}_ailNum`];
 			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
 			ailIcon = v[`repeating_ailments_${id}_ailIcon`];
 			ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
 			
-			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon];
+			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, ailNum, id, ailIcon];
+
+			if (overrideList.hasOwnProperty(ailName)) {
+				ailmentList[ailName][1] = Math.max(overrideList[ailName.replaceAll(" ","_")][0], 0);
+				ailmentList[ailName][3] = Math.max(overrideList[ailName.replaceAll(" ","_")][1], 0);
+			}
 		});
 
 	/* Execute each AutoEffect in the AutoScript */
@@ -15201,8 +15219,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 	if (autoEffectType != "conditional button") {
 		/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
 		switch (AutoEffect[0][0]) {
-			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-			case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, settingLimbusStyle); break;
+			case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, settingLimbusStyle); break;
 			case "Reset": tempOutput = { checkResult: "success", scaling: 1, messageValues: {checkResult:"success"} }; break;
 			case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
 			default: tempOutput = {}; break;
@@ -15685,7 +15703,7 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 			if (settingLimbusStyle == "true") { effectIcon = effectIcon.replace("limbus/",""); }
 			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectIcon, settingLimbusStyle));
 		} else {
-			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget.replace("_",""), settingLimbusStyle));
+			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget.replace("_"," "), settingLimbusStyle));
 		}
 		
 		/* Question mark icon */
@@ -15807,7 +15825,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	}
 }
 
-function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
+function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, settingLimbusStyle) {
 	let returnValues = {};
 	
 	/* Check format */
@@ -15816,9 +15834,11 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 
 	/* Get target count */
 	let effectName = AutoEffect[2];
+	let count = 0;
+	let countImmutable = 0;
 
 	/* Handle ailment count */
-	if (ailmentList.hasOwnProperty(effectName)) { count = ailmentList[effectName][1]; }
+	if (ailmentList.hasOwnProperty(effectName)) { count = ailmentList[effectName][1]; countImmutable = ailmentList[effectName][3]; }
 	/* Handle bar count */
 	else if (barList.hasOwnProperty(effectName)) { count = barList[effectName]; }
 	/* Handle bar damage count */
@@ -15858,7 +15878,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	}
 
 	/* Execute AutoEffect check */
-	if (count >= effectVal) {
+	if (countImmutable >= effectVal) {
 		returnValues.checkResult = "success";
 	} else {
 		returnValues.checkResult = "failure";
@@ -15870,11 +15890,11 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
 		messageFormat = "[/TARGET] " + messageFormat;
-		effectIcon = ailmentList[effectName][4];
+		effectIcon = ailmentList[effectName][5];
 	}
 
 	if (!AutoEffect.includes("Silent")) {
-		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult);
+		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
 	}
 	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
@@ -15882,7 +15902,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList) {
 	return returnValues;
 }
 
-function autoEffectConsume(AutoEffect, ailmentList, barList) {
+function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle) {
 	let returnValues = {};
 
 	/* Check format */
@@ -15893,6 +15913,7 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
 	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
+	let countImmutable = 0;
 
 	/* Get target */
 	let effectName = AutoEffect[2];
@@ -15900,9 +15921,9 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	
 	/* Handle ailment target */
 	if (ailmentList.hasOwnProperty(effectName)) {
-		if (ailmentList[effectName][3] == "0") { effectTarget = effectName; } /* If standard ailment */
-		else { effectTarget = `repeating_ailments_${ailmentList[effectName][3]}_ailNum`; } /* If custom ailment */
-		count = ailmentList[effectName][1];
+		if (ailmentList[effectName][4] == "0") { effectTarget = effectName; } /* If standard ailment */
+		else { effectTarget = `repeating_ailments_${ailmentList[effectName][4]}_ailNum`; } /* If custom ailment */
+		count = ailmentList[effectName][1]; countImmutable = ailmentList[effectName][3];
 	}
 	/* Handle bar target */
 	else if (barList.hasOwnProperty(effectName)) {
@@ -15925,7 +15946,7 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	}
 
 	/* Execute AutoEffect check */
-	if (count >= effectVal) {
+	if (countImmutable >= effectVal && count >= effectVal) {
 		returnValues[effectTarget] = -effectVal*scaling;
 		returnValues.count = parseInt(count);
 		if (!(count >= 2*effectVal)) {
@@ -15942,16 +15963,17 @@ function autoEffectConsume(AutoEffect, ailmentList, barList) {
 	}
 
 	/* Handle message */
-	let messageFormat = getTranslationByKeyCustom("Consume [-SCALING NUM] [TARGET]: [CHECK] [[INITIAL] -> [RESULT]]", "autoeffect-format-consume");
+	let messageFormat = getTranslationByKeyCustom("Consume [-SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-consume");
+	if (returnValues.checkResult != "failure") { messageFormat += " " + getTranslationByKeyCustom("[[INITIAL] -> [RESULT]]", "autoeffect-format-consume-success");}
 	
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
 		messageFormat = "[/TARGET] " + messageFormat;
-		effectIcon = ailmentList[effectName][4];
+		effectIcon = ailmentList[effectName][5];
 	}
 
 	if (!AutoEffect.includes("Silent")) {
-		returnValues.message = autoEffectMessage(messageFormat, effectName, -effectVal, count, Math.max(scaling,1), returnValues.checkResult);
+		returnValues.message = autoEffectMessage(messageFormat, effectName, -effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
 	}
 	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: -effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
@@ -15998,10 +16020,10 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 
 	/* Get target attribute */
 	let effectTarget = "";
-	let effectRepeatingId = ailmentList[effectAilment][3];
+	let effectRepeatingId = ailmentList[effectAilment][4];
 	let effectHasNextTurn = ailmentList[effectAilment][0];
 	if (effectRepeatingId == 0) { effectTarget = effectAilment; } /* If standard ailment */
-	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][3]}_ailNum`; } /* If custom ailment */
+	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][4]}_ailNum`; } /* If custom ailment */
 	
 	/* Effect changes target to the next turn field if it's enabled */
 	/* Is ignored if "This turn" override is included */
@@ -16025,7 +16047,7 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle)
 		case "Give": messageFormat = getTranslationByKeyCustom("[/TARGET] Give [SCALING NUM] [TARGET] to ally", "autoeffect-format-give"); break;
 	}
 	
-	let effectIcon = ailmentList[effectAilment][4];
+	let effectIcon = ailmentList[effectAilment][5];
 	if (effectHasNextTurn == 'true' && forceTarget != "This round") { messageFormat += " next round"; }
 
 	if (!AutoEffect.includes("Silent")) {
@@ -16963,18 +16985,19 @@ getSectionIDs(`repeating_global`, idarray => {
 /* standard - Triggers both decay and effect */
 /* decay - Triggers only decay */
 /* effect - Triggers only effect */
-function updateCustomAilment(rowid, mode="standard", roundEnd="true") {
+function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=() => {}) {
 
     getAttrs(["distortState", "egoActiveState", "egoType", `repeating_ailments_${rowid}_ailNum`, `repeating_ailments_${rowid}_ailNumNextTurn`, `repeating_ailments_${rowid}_ailName`, `repeating_ailments_${rowid}_ailIcon`, `repeating_ailments_${rowid}_ailTrigger`, `repeating_ailments_${rowid}_ailEffect`, `repeating_ailments_${rowid}_ailEffectMode`, `repeating_ailments_${rowid}_ailEffectVal`, `repeating_ailments_${rowid}_ailDecayWhenHit`, `repeating_ailments_${rowid}_ailCustomResistanceNum`, `repeating_ailments_${rowid}_ailCustomResistanceNumEgo`, `repeating_ailments_${rowid}_ailDecayRoundEnd`, `repeating_ailments_${rowid}_ailDecayMode`, `repeating_ailments_${rowid}_ailDecayVal`, `repeating_ailments_${rowid}_ailDecayMin`, `repeating_ailments_${rowid}_ailMax`, `repeating_ailments_${rowid}_ailMaxBehavior`, `repeating_ailments_${rowid}_ailMessageCheck`, `repeating_ailments_${rowid}_ailMessage`, "HP", "StagRes", "SP", "Light", "distortCounter", "difficulty", "baseSpeed", "baseLuckNum", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "character_name"], function(values) {
 
 	let charname = values.character_name;
 	let nomessage = values.settingMuteMessage;
+	let mutemessage = values.settingMuteMessage;
 	let hiddenroll = values.settingWhisperRolls;
 
 	let ailname = values[`repeating_ailments_${rowid}_ailName`];
 	let icon = values[`repeating_ailments_${rowid}_ailIcon`];
-	let count = values[`repeating_ailments_${rowid}_ailNum`];
-	let countnextturn = values[`repeating_ailments_${rowid}_ailNumNextTurn`];
+	let count = parseInt(values[`repeating_ailments_${rowid}_ailNum`]);
+	let countnextturn = parseInt(values[`repeating_ailments_${rowid}_ailNumNextTurn`]);
 
 	let trigger = values[`repeating_ailments_${rowid}_ailTrigger`];
 
@@ -17002,7 +17025,8 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true") {
 
 	//console.log("Name: " + name + " | Icon: " + icon + " | Count: " + count + " | Trigger: " + trigger + " | Effect: " + effecttarget + effectmode + effectval + " | Decay: Count " + decaymode + decayval + " | Message: (" + messagecheck + ")" + message);
 
-	let output = {};
+	let output = { [`repeating_ailments_${rowid}_ailNum`]: count };
+	let returnValues = { [ailname]: [count, count] };
 
 	let newcount = parseInt(count);
 	let newmessage = message;
@@ -17049,7 +17073,7 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true") {
 	/*-- Process Effect --*/
 	let effecttargetlist = [];
 	if (effecttarget == "HPStagRes") {
-		effecttargetlist.push("HP"); effecttargetlist.push("StagRes");
+		effecttargetlist.push("HP", "StagRes");
 	} else {
 		effecttargetlist.push(effecttarget);
 	}
@@ -17097,40 +17121,41 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true") {
 			output[`${effecttargetinlist}`] = result;
 
 			activateMessage = "true";
-
 		}
 	});
 	/*-- Process Effect end --*/
 
 	
 	/*-- Decay --*/
-	if(activateDecay == "true" && count >= decaymin){
-		if(decayval == "n") {
-		decayval = parseInt(count);
+	if(activateDecay == "true" && count >= decaymin) {
+		if ( !(trigger == "OnAction" && roundEnd == "true")) {
+			if(decayval == "n") {
+			decayval = parseInt(count);
+			}
+			else if(decayval == "-n"){
+			decayval = (0 - parseInt(count));
+			}
+	
+			if(decaymode == "+"){
+			newcount = parseInt(count) + parseInt(decayval);	
+			}
+			else if(decaymode == "x"){
+			newcount = parseInt(parseInt(count) * parseFloat(decayval));
+			}
+			else if(decaymode == "="){
+			newcount = parseInt(decayval);
+			}
+	
+			/* Overflow adjustment */
+			if(maxcount != 0 && newcount > maxcount){
+			newcount = maxcount;
+			}
+			if(newcount <= 0){
+			newcount = 0;
+			}
 		}
-		else if(decayval == "-n"){
-		decayval = (0 - parseInt(count));
-		}
-
-		if(decaymode == "+"){
-		newcount = parseInt(count) + parseInt(decayval);	
-		}
-		else if(decaymode == "x"){
-		newcount = parseInt(parseInt(count) * parseFloat(decayval));
-		}
-		else if(decaymode == "="){
-		newcount = parseInt(decayval);
-		}
-
-		/* Overflow adjustment */
-		if(maxcount != 0 && newcount > maxcount){
-		newcount = maxcount;
-		}
-		if(newcount <= 0){
-		newcount = 0;
-		}
-		
 		output[`repeating_ailments_${rowid}_ailNum`] = parseInt(newcount);
+		returnValues[ailname][0] = parseInt(newcount);
 	}
 	if (activateDecay == "true" && roundEnd == "true") {
 		if (trigger == "WhenHit" && decayRoundEnd != "true") {
@@ -17138,85 +17163,80 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true") {
 		}
 		output[`repeating_ailments_${rowid}_ailNum`] += parseInt(countnextturn);
 		output[`repeating_ailments_${rowid}_ailNumNextTurn`] = 0;
+		returnValues[ailname][0] += parseInt(countnextturn);
 	}
 	/*-- Decay end --*/
 
-	setAttrs(output);
-
 	/* Message */
-	let mutemessage = values.settingMuteMessage;
-
 	if(messagecheck != "0" && activateMessage == "true" && mutemessage != "true"){
 
-	let langEffectValue = "[EVAL]";
-	let langDecayValue = "[DVAL]";
-	let langName = "[CHAR]";
-	let langCount = "[COUNT]";
-	let langAilName = "[AIL]";
-	let langResult = "[RESULT]";
-	let langChange = "[DIFF]";
+		let langEffectValue = "[EVAL]";
+		let langDecayValue = "[DVAL]";
+		let langName = "[CHAR]";
+		let langCount = "[COUNT]";
+		let langAilName = "[AIL]";
+		let langResult = "[RESULT]";
+		let langChange = "[DIFF]";
 
-	/*if(getTranslationByKey("message-match-value") != false){
+		/*if(getTranslationByKey("message-match-value") != false){
 
-		langEffectValue = getTranslationByKey("message-match-evalue");
-		langDecayValue = getTranslationByKey("message-match-dvalue");
-		langName = getTranslationByKey("message-match-name");
-		langCount = getTranslationByKey("message-match-count");
-		langAilName = getTranslationByKey("message-match-ailment");
-		langResult = getTranslationByKey("message-match-result");
-		langChange = getTranslationByKey("message-match-change");
-		}*/
-	
-	message = message.replaceAll(langEffectValue, "<b>" + effectval + "</b>");
-	message = message.replaceAll(langDecayValue, "<b>" + decayval + "</b>");
-	message = message.replaceAll(langName,  "<b>" + charname + "</b>");
-	message = message.replaceAll(langCount, "<b>" + count + "</b>");
-	message = message.replaceAll(langAilName, "<b>" + ailname + "</b>");
-	message = message.replaceAll(langResult, "<b>" + result + "</b>");
-	message = message.replaceAll(langChange, "<b>" + change + "</b>");
+			langEffectValue = getTranslationByKey("message-match-evalue");
+			langDecayValue = getTranslationByKey("message-match-dvalue");
+			langName = getTranslationByKey("message-match-name");
+			langCount = getTranslationByKey("message-match-count");
+			langAilName = getTranslationByKey("message-match-ailment");
+			langResult = getTranslationByKey("message-match-result");
+			langChange = getTranslationByKey("message-match-change");
+			}*/
+		
+		message = message.replaceAll(langEffectValue, "<b>" + effectval + "</b>");
+		message = message.replaceAll(langDecayValue, "<b>" + decayval + "</b>");
+		message = message.replaceAll(langName,  "<b>" + charname + "</b>");
+		message = message.replaceAll(langCount, "<b>" + count + "</b>");
+		message = message.replaceAll(langAilName, "<b>" + ailname + "</b>");
+		message = message.replaceAll(langResult, "<b>" + result + "</b>");
+		message = message.replaceAll(langChange, "<b>" + change + "</b>");
 
-	if (customRes != 0) {
-		message += `<b style='opacity: 50%;'><br>(Resistance: ${customRes})</b>`
-	}
-	newmessage = message;
-
-	let iconnew = "";
-
-	if(icon == "Question"){
-	iconnew = "<img src='https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/icons/question.png' style='width: 25px; height: 25px;' >";
-	}
-	if(icon != "Question" && icon != "None"){
-	iconnew = "<img src='https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/"+ icon +".png' style='width: 25px; height: 25px;' >";
-	}
-
-	newmessage = iconnew + newmessage;
-
-
-	/* Whisper roll */
-	let whisperrolls = values.settingWhisperRolls;
-	let whispertarget = values.settingWhisperTarget;
-	let whisper = "";
-	if(whisperrolls == "true"){
-	whisper = "/w " + whispertarget;
+		if (customRes != 0) {
+			message += `<b style='opacity: 50%;'><br>(Resistance: ${customRes})</b>`
 		}
+		newmessage = message;
 
-	setAttrs({"dummy":newmessage});
+		let iconnew = "";
 
+		if(icon == "Question"){
+		iconnew = "<img src='https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/icons/question.png' style='width: 25px; height: 25px;' >";
+		}
+		if(icon != "Question" && icon != "None"){
+		iconnew = "<img src='https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/"+ icon +".png' style='width: 25px; height: 25px;' >";
+		}
+		newmessage = iconnew + newmessage;
 
-	/*--- Send roll --*/
-	startRoll((whisper + "&{template:message} {{icon=@{dummy}}}"), (results) => {
-            finishRoll(results.rollId, { });
-        });
+		/* Whisper roll */
+		let whisperrolls = values.settingWhisperRolls;
+		let whispertarget = values.settingWhisperTarget;
+		let whisper = "";
+		if(whisperrolls == "true"){
+		whisper = "/w " + whispertarget;
+			}
 
+		setAttrs({"dummy":newmessage});
 
-	setAttrs({"dummy":" "});
+		/*--- Send roll --*/
+		startRoll((whisper + "&{template:message} {{icon=@{dummy}}}"), (results) => {
+			finishRoll(results.rollId, { });
+		});
 
+		setAttrs({"dummy":" "});
 	}
 	/*--Message end --*/
 
-
+	/* Apply to target */
+	setAttrs(output);
+	if (count != 0) {
+		callback(returnValues);
+	}
 	});
-
 }
 
 /* Update: Edit Mode state */
@@ -17310,7 +17330,7 @@ getSectionIDs("repeating_global", function(idarray) {
 
 	}
 
-    getAttrs(["syncStateGame", "syncStateAilment", "syncLockGame", "syncLockAilment", "global_access", "global_editMode", "global_editKey", "global_gameSettingSource", "global_ailmentSettingSource", "gameEditor", "ailmentEditor", `repeating_global_${rowid}_editKey`, `repeating_global_${rowid}_gameSettingSource`, `repeating_global_${rowid}_ailmentSettingSource`, "settingEvdInfluence", "settingTestOption"], function(values) {
+    getAttrs(["syncStateGame", "syncStateAilment", "syncLockGame", "syncLockAilment", "global_access", "global_editMode", "global_editKey", "global_gameSettingSource", "global_ailmentSettingSource", "gameEditor", "ailmentEditor", `repeating_global_${rowid}_editKey`, `repeating_global_${rowid}_gameSettingSource`, `repeating_global_${rowid}_ailmentSettingSource`, "settingEvdInfluence", "settingTestOption", "autoScriptStyling"], function(values) {
 
 	/* Translation prep */
 	let langUpdate = "Update";
@@ -17429,6 +17449,12 @@ getSectionIDs("repeating_global", function(idarray) {
 		syncBody += langCustomAilments + ": " + langSyncFail + "\n";
 			}
 		}
+	}
+
+	/* Check missing AutoScript styling */
+	let autoScriptStyling = values.autoScriptStyling;
+	if (autoScriptStyling == "") {
+		loadDefaultAutoScriptStyling();
 	}
 
 	/* Check: Obsolete attributes  */
