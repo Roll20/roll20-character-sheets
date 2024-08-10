@@ -10376,7 +10376,7 @@ on('clicked:actionButtonDamage', async (data) => {
     data = Data.unpackage(data.originalRollId);
 	data = data[0];
 	if (typeof data == "string") {
-		AutoScriptMain(data, "None", "false", () => {}, "false", getTranslationByKeyCustom("Apply ailments", "helper-text-applydamage"));
+		AutoScriptMain(data, "None", "false", "false", () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 	} else {
 		damageHelper(data.damageTypeOverride, data.baseOverride, data.flatHPOverride, data.flatSTOverride, data.flatSPOverride);
 	}
@@ -10384,12 +10384,12 @@ on('clicked:actionButtonDamage', async (data) => {
 on('clicked:actionButtonInflict', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", () => {}, "false", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	AutoScriptMain(data, "None", "false", "false", () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
 });
 on('clicked:actionButtonGive', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", () => {}, "false", getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+	AutoScriptMain(data, "None", "false", "false", () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
 });
 
 
@@ -11059,7 +11059,7 @@ on("change:PanicState", function() {
 	/* AutoScripts */
 	resetConditionals();
 	let autoScriptTrigger = currentstate == "Panic" ? "Panic" : "None";
-	AutoScriptMain("", autoScriptTrigger, "false")
+	AutoScriptMain("", autoScriptTrigger)
 
 	/* Translation prep */
 	let langStateTrue = " went into Panic!";
@@ -11111,7 +11111,7 @@ on("change:DefeatState", function() {
 
 	/* AutoScripts */
 	resetConditionals();
-	AutoScriptMain("", "Defeated", "false")
+	AutoScriptMain("", "Defeated")
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -11179,7 +11179,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	/* AutoScripts */
 	resetConditionals();
 	let autoScriptTrigger = currentstate == "Staggered" ? "Staggered" : "None";
-	AutoScriptMain("", autoScriptTrigger, "false")
+	AutoScriptMain("", autoScriptTrigger)
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -12577,7 +12577,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	AutoScript = AutoScript.replace("undefined", "");
 	
 	resetConditionals();
-	AutoScriptMain(AutoScript, triggerType, "true", function(returnValues) {
+	AutoScriptMain(AutoScript, triggerType, "true", "true", function(returnValues) {
 
 	let autoeffectdice1 = 0;
 	let autoeffectdice2 = 0;
@@ -12843,7 +12843,7 @@ on('clicked:rollChallenge', (info) => {
 	let buttonid = info.htmlAttributes.id.split('_')[1];
 	rollChallenge(buttonid);
 });
-function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals="true") {
+function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="true") {
 	
 	/* Preparing values */
 	let headercolor = "#888";
@@ -12878,7 +12878,7 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 	else if (buttonid != "luck") { autoScriptTriggers.push("Challenge"); }
 
 	if (handleAutoScriptConditionals == true) { resetConditionals(); }
-	AutoScriptMain("", autoScriptTriggers, "true", function(returnValues) {
+	AutoScriptMain("", autoScriptTriggers, collectAutoScripts, "true", function(returnValues) {
 
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
@@ -13019,7 +13019,7 @@ function rollChallenge(buttonid, rollDifficulty=0, handleAutoScriptConditionals=
 	setAttrs({"dummy":" ", "skillSelect":"0"});
 
 
-	}, handleAutoScriptConditionals);
+	});
 	});
 }
 
@@ -13364,7 +13364,7 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	if (newSP < oldSP) { autoScriptTriggers.push("DamagedSP"); }
 	
 	resetConditionals();
-	AutoScriptMain("", autoScriptTriggers, "true", function(returnValues) {
+	AutoScriptMain("", autoScriptTriggers, "true", "true", function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -13821,7 +13821,7 @@ on('clicked:declareAction', (info) => {
 	}
 
 	resetConditionals();
-	AutoScriptMain(AutoScript, "None", "true", function(returnValues) {
+	AutoScriptMain(AutoScript, "None", "true", "true", function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -14973,11 +14973,11 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 	buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`];
 	buttonName = values[`repeating_conditionalButtons_${buttonid}_buttonName`];
 
-	AutoScriptMain(buttonAutoScript, "None", "false", function(returnValues) {
+	AutoScriptMain(buttonAutoScript, "None", "false", "false", function(returnValues) {
 		if (returnValues.checkResult != "success") {
 			removeRepeatingRow("repeating_conditionalButtons_" + buttonid)
 		}
-	}, "false", buttonName);
+	}, buttonName);
 	});
 });
 
@@ -14987,9 +14987,11 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 "Staggered", "Defeated", "Panic", "Challenge", "Offensive", "Defensive", "Block", "Evade" or "None".
 Selects which type of AutoEffects to collect and append to an AutoScript.
 Block and Evade also include Defensive */
+/* collect: If the function should collect augment/outfit/etc. AutoEffects or not */
+/* returnMessage: If true, the function returns a returnValues object and does not print its standard chat message */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
-/* collect: If the function should collect augment/outfit/etc. AutoEffects or not*/
-function AutoScriptMain(inputAutoScript, triggerType="None", returnMessage="false", callback=() => {}, collect="true", messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
+/* messageHeaderTitle: Title of the standard chat message printed by the function */
+function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", returnMessage="false", callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
 	
 	/* Adds the input AutoScript */
 	let AutoScript = "";
