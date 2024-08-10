@@ -15114,15 +15114,15 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
 	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
 		
-		const HasNextTurn = settingHideNextTurn == true ? 'false' : 'true';
+		const HasNextTurn = settingHideNextTurn == "true" ? 'false' : 'true';
 
 		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"]
 		ailmentNames.forEach(ailment => {
 			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
-				ailmentList[ailment] = [values[ailment.toLowerCase()+"NextTurnSetting"], values[ailment], values[`${ailment}NextTurn`], 0, ailment, "UnsetTrigger"];
-				if (ailment == "Bleed") { ailmentList[ailment][5] = "OnAction"; }
+				let ailmentNextTurnSetting = settingHideNextTurn == "true" ? "false" : values[ailment.toLowerCase()+"NextTurnSetting"];
+				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], 0, ailment];
 			} else {
-				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], 0, ailment, "UnsetTrigger"];
+				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], 0, ailment];
 			}
 		});
 	
@@ -15130,7 +15130,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 	getSectionIDs(`repeating_ailments`, idarray => {
 	const fieldnames = idarray.reduce((rows,id) =>
 	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,`repeating_ailments_${id}_ailNum`,
-	`repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`, `repeating_ailments_${id}_ailTrigger`], '');
+	`repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`], '');
 	
 		let ailName = "";
 		let ailHasNextTurn = "";
@@ -15146,7 +15146,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 			ailIcon = v[`repeating_ailments_${id}_ailIcon`];
 			ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
 			
-			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon, ailTrigger];
+			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, id, ailIcon];
 		});
 
 	/* Execute each AutoEffect in the AutoScript */
