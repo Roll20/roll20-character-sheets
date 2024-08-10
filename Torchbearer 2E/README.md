@@ -8,6 +8,5 @@ Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E director
 ## Future Work
 
 - Hidable relics & spells
-- Allow items to have charges
 - Condition reminders
-- Send beliefs to chat button
+- Auto upgrade ratings
