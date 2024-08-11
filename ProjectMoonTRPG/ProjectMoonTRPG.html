@@ -2742,11 +2742,19 @@
 
 
 <!-- AutoEffect Conditional Buttons -->
-<div class="conditionalButtonDisplay" style="margin-top: 10px;">
+<div class="conditionalButtonDisplay" style="margin-top: 10px; width: calc(100% + 5px);">
 	<fieldset class="repeating_conditionalButtons">
-		<div class="conditionalButton">
-			<button type="action" class="conditionalButtonAct" name="act_activate"></button> 
-			<input type="text" class="conditionalButtonName" name="attr_buttonName" value="">
+		<input type="checkbox" name="attr_buttonColor" value="green" class="conditioalButtonColorSelection" hidden checked/>
+		<input type="checkbox" name="attr_buttonColor" value="blue" class="conditioalButtonColorSelection" hidden />
+		<input type="checkbox" name="attr_buttonColor" value="red" class="conditioalButtonColorSelection" hidden />
+		<input type="checkbox" name="attr_buttonColor" value="orange" class="conditioalButtonColorSelection" hidden />
+		<input type="checkbox" name="attr_buttonColor" value="yellow" class="conditioalButtonColorSelection" hidden />
+		<input type="checkbox" name="attr_buttonColor" value="purple" class="conditioalButtonColorSelection" hidden />
+		<input type="checkbox" name="attr_buttonColor" value="black" class="conditioalButtonColorSelection" hidden />
+		<img name="attr_buttonIcon" class="conditionalButtonIcon conditioalButtonColor">
+		<button type="action" class="conditionalButtonAct" name="act_activate"></button> 
+		<div class="conditionalButton conditioalButtonColor">
+			<span type="text" class="conditionalButtonName" name="attr_buttonName"></span>
 			<input type="text" name="attr_buttonAutoScript" hidden="true">
 		</div>
 	</fieldset>
@@ -10335,6 +10343,8 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 	<div class="sheet-actionButtonContainer">{{#buttonlabel7}}<div class="sheet-button {{color7}}">[x]({{icon7}})[{{buttonlabel7}}](~selected|{{buttonlink7}}||{{computed::datapackage7}})</div>{{/buttonlabel7}}</div>
 	<div class="sheet-actionButtonContainer">{{#buttonlabel8}}<div class="sheet-button {{color8}}">[x]({{icon8}})[{{buttonlabel8}}](~selected|{{buttonlink8}}||{{computed::datapackage8}})</div>{{/buttonlabel8}}</div>
 	<div class="sheet-actionButtonContainer">{{#buttonlabel9}}<div class="sheet-button {{color9}}">[x]({{icon9}})[{{buttonlabel9}}](~selected|{{buttonlink9}}||{{computed::datapackage9}})</div>{{/buttonlabel9}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel10}}<div class="sheet-button {{color10}}">[x]({{icon10}})[{{buttonlabel10}}](~selected|{{buttonlink10}}||{{computed::datapackage10}})</div>{{/buttonlabel10}}</div>
+	<div class="sheet-actionButtonContainer">{{#buttonlabel11}}<div class="sheet-button {{color11}}">[x]({{icon11}})[{{buttonlabel11}}](~selected|{{buttonlink11}}||{{computed::datapackage11}})</div>{{/buttonlabel11}}</div>
 
 </rolltemplate>
 
@@ -10360,11 +10370,10 @@ async function createActionButtons(buttonList) {
 }
 
 function generateActionButton(name, icon, color, action, data) {
-	switch (name.toLowerCase()) {
-		case "apply damage": name = getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"); break;
-		case "apply ailments": name = getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"); break;
-		case "give ailments": name = getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"); break;
-	}
+	name = name.replace("autoDamage", getTranslationByKeyCustom("Apply damage", "helper-text-applydamage")) ;
+	name = name.replace("autoInflict", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	name = name.replace("autoGive", getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"), );
+	
 	icon = icon.replaceAll('<img src="',"").replaceAll('" >',"");
 	
 	return [name, icon, color, action, data];
@@ -10376,7 +10385,7 @@ on('clicked:actionButtonDamage', async (data) => {
     data = Data.unpackage(data.originalRollId);
 	data = data[0];
 	if (typeof data == "string") {
-		AutoScriptMain(data, "None", "false", "false", {}, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
+		AutoScriptMain(data, "None", "false", "true", {}, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 	} else {
 		damageHelper(data.damageTypeOverride, data.baseOverride, data.flatHPOverride, data.flatSTOverride, data.flatSPOverride);
 	}
@@ -10384,12 +10393,12 @@ on('clicked:actionButtonDamage', async (data) => {
 on('clicked:actionButtonInflict', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", "false", {}, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	AutoScriptMain(data, "None", "false", "true", {}, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
 });
 on('clicked:actionButtonGive', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", "false", {}, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+	AutoScriptMain(data, "None", "false", "true", {}, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
 });
 
 
@@ -12036,7 +12045,7 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	/* AutoScripts */
 	resetConditionals();
-	AutoScriptMain("", "Round start", "true", "false", autoScriptOverrideList);
+	AutoScriptMain("", "Round start", "true", "true", autoScriptOverrideList);
 
 	output = {
 		...output, "thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "isFirstRound":"false", "baseActNum":"0",
@@ -12580,7 +12589,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	AutoScript = AutoScript.replace("undefined", "");
 	
 	resetConditionals();
-	AutoScriptMain(AutoScript, triggerType, "true", "true", autoScriptOverrideList, function(returnValues) {
+	AutoScriptMain(AutoScript, triggerType, "true", "false", autoScriptOverrideList, function(returnValues) {
 
 	let autoeffectdice1 = 0;
 	let autoeffectdice2 = 0;
@@ -12766,7 +12775,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let baseEffectDescription = "<br><div style='width: 50%; height: auto; float: left;'><b>" + langEffectBase + ":</b><br><div style='overflow: auto; border: 1px #555 solid; max-height: 70px; padding-bottom:1px; '>" + baseeffect + "</div></div>";
 	let skillEffectDescription = "<div style='width: 50%; height: auto; float: left;'><b>" + langEffectSkill + ":</b><br><div style='overflow: auto; border: 1px #555 solid; max-height: 70px; padding-bottom:1px; '>" + skilleffect + "</div></div>"
 	if (baseeffect == "") { baseEffectDescription = ""; skillEffectDescription = "<br>" + skillEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
-	if (skilleffect == "(No Skill)") { skillEffectDescription = ""; baseEffectDescription = baseEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
+	if (skilleffect == "(No Skill)" || skilleffect == "") { skillEffectDescription = ""; baseEffectDescription = baseEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
 
 	if(toolselect != "" && toolselect != null && toolselect != "0"){
 		toolDescription = "<div style='text-align: center; padding-top: 3px; padding-bottom: 3px;'><div style='text-align: left; padding: 5px;'>" + tooldesc + "</div></div>";
@@ -12805,28 +12814,33 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	/*--- send roll end --*/
 	startRoll((whisper + "&{template:baseRoll} {{roll1= @{dummy2} }} {{advantage=@{advState}}} {{infodump=@{dummy}}}"), (results) => {
-            const total = parseInt(results.results.roll1.result);
+		const total = parseInt(results.results.roll1.result);
 
-            finishRoll(results.rollId, {} );
+		finishRoll(results.rollId, {} );
 
-			/* Action Buttons */
-			
-			
-			let damage_data = {
-				baseOverride: total + autoeffectBaseDamage,
-				flatHPOverride: autoeffectFlatDamageHP,
-				flatSTOverride: autoeffectFlatDamageST,
-				flatSPOverride: autoeffectFlatDamageSP,
-				damageTypeOverride: weapontype
+		/* Action Buttons */
+		let damage_data = {
+			baseOverride: total + autoeffectBaseDamage,
+			flatHPOverride: autoeffectFlatDamageHP,
+			flatSTOverride: autoeffectFlatDamageST,
+			flatSPOverride: autoeffectFlatDamageSP,
+			damageTypeOverride: weapontype
+		}
+
+		/* Action Buttons */
+		let buttonList = [];
+		if (basetype == "Attack") { buttonList.push(generateActionButton("autoDamage", getIcon("icons","damage"), "red", "actionButtonDamage", damage_data)); }
+		for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
+			if (buttonKey.startsWith("auto")) {
+				switch (buttonKey.split(" ")[0]) {
+					case "autoDamage": if (basetype != "Attack") { buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)) }; break;
+					case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
+					case "autoGive": buttonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue)); break;
+				}
 			}
-
-			let buttonList = [];
-			if (basetype == "Attack") { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", damage_data)); }
-			else if (returnValues.autoDamage != undefined) { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", returnValues.autoDamage)); }
-			if (returnValues.autoInflict != undefined) { buttonList.push(generateActionButton("Apply ailments", getIcon("icons","lose"), "purple", "actionButtonInflict", returnValues.autoInflict)); }
-			if (returnValues.autoGive != undefined) { buttonList.push(generateActionButton("Give ailments", getIcon("icons","win"), "blue", "actionButtonGive", returnValues.autoGive)); }
-			createActionButtons(buttonList);
-        });
+		}
+		createActionButtons(buttonList);
+    });
 	/*--- send roll end ---*/
 
 	/* Cleanup */
@@ -12881,7 +12895,7 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="true") {
 	else if (buttonid != "luck") { autoScriptTriggers.push("Challenge"); }
 
 	if (handleAutoScriptConditionals == true) { resetConditionals(); }
-	AutoScriptMain("", autoScriptTriggers, collectAutoScripts, "true", {}, function(returnValues) {
+	AutoScriptMain("", autoScriptTriggers, collectAutoScripts, "false", {}, function(returnValues) {
 
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
@@ -13368,7 +13382,7 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	if (newSP < oldSP) { autoScriptTriggers.push("DamagedSP"); }
 	
 	resetConditionals();
-	AutoScriptMain("", autoScriptTriggers, "true", "true", {}, function(returnValues) {
+	AutoScriptMain("", autoScriptTriggers, "true", "false", {}, function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -13826,7 +13840,7 @@ on('clicked:declareAction', (info) => {
 	}
 
 	resetConditionals();
-	AutoScriptMain(AutoScript, "None", "true", "true", autoScriptOverrideList, function(returnValues) {
+	AutoScriptMain(AutoScript, "None", "true", "false", autoScriptOverrideList, function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -13913,12 +13927,17 @@ on('clicked:declareAction', (info) => {
 	startRoll((whisper + "&{template:baseRoll} {{infodump=@{dummy} }}"), (results) => {
         finishRoll(results.rollId,{});
 
-		console.log(returnValues)
-
+		/* Action Buttons */
 		let buttonList = [];
-		if (returnValues.autoDamage != undefined) { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", returnValues.autoDamage)); }
-		if (returnValues.autoInflict != undefined) { buttonList.push(generateActionButton("Apply ailments", getIcon("icons","lose"), "purple", "actionButtonInflict", returnValues.autoInflict)); }
-		if (returnValues.autoGive != undefined) { buttonList.push(generateActionButton("Give ailments", getIcon("icons","win"), "blue", "actionButtonGive", returnValues.autoGive)); }
+		for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
+			if (buttonKey.startsWith("auto")) {
+				switch (buttonKey.startsWith()) {
+					case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)); break;
+					case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
+					case "autoGive": buttonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue)); break;
+				}
+			}
+		}
 		createActionButtons(buttonList);
     });
 	/*--- send roll end ---*/
@@ -14981,7 +15000,7 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 	buttonAutoScript = values[`repeating_conditionalButtons_${buttonid}_buttonAutoScript`];
 	buttonName = values[`repeating_conditionalButtons_${buttonid}_buttonName`];
 
-	AutoScriptMain(buttonAutoScript, "None", "false", "false", {}, function(returnValues) {
+	AutoScriptMain(buttonAutoScript, "None", "false", "true", {}, function(returnValues) {
 		if (returnValues.checkResult != "success") {
 			removeRepeatingRow("repeating_conditionalButtons_" + buttonid)
 		}
@@ -14996,10 +15015,10 @@ on("clicked:repeating_conditionalButtons:activate", function(info) {
 Selects which type of AutoEffects to collect and append to an AutoScript.
 Block and Evade also include Defensive */
 /* collect: If the function should collect augment/outfit/etc. AutoEffects or not */
-/* returnMessage: If true, the function returns a returnValues object and does not print its standard chat message */
+/* sendMessage: If true, the function print a standard chat message */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
-function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", returnMessage="false", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
+function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
 	
 	/* Adds the input AutoScript */
 	let AutoScript = "";
@@ -15172,51 +15191,44 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 	if (AutoEffect == undefined) {
 		return;
 	}
-	/* Handle conditional */
+
+	/* Handle conditionals */
 	if (AutoEffect.length > 1) {
 		AutoEffect.slice(1).forEach(conditional => {
-			/* If conditional message, execute the script as normal but do not apply any effects and add the message to a seperate section */
-			if (conditional.includes("#Message") && !conditional.includes("#MessageButton")) {
-				autoEffectConditional = conditional.replace("#Message","").trim();
-				autoEffectType = "conditional message";
+
+			/* If action buttons are requested, execute the script as normal but do not apply any effects and add the message to a seperate section */
+			if (conditional.includes("#Action")) {
+				autoEffectConditional = conditional.replace("#Action","").trim();
+				autoEffectType = "action buttons";
 			}
-			/* If conditional button, add AutoEffect to either a new conditional button or a existing one */
-			/* If conditional message + button, add Silent to AutoEffect after execution */
+			/* If conditional buttons are requested, do not execute any conditional AutoEffects and store them in conditional buttons to be executed later */
 			else {
-				if (conditional.includes("#MessageButton")) {
-					autoEffectConditional = conditional.replace("#MessageButton","").trim();
-					conditionalButtonSilent = AutoEffect[0].includes("Silent") ? "" : " " + "Silent";
-					autoEffectType = "conditional message + button";
-				} else {
-					autoEffectConditional = conditional.replace("#Button","").trim();
-					conditionalButtonSilent = "";
-					autoEffectType = "conditional button";
-				}
+				autoEffectConditional = conditional;
+				autoEffectType = "conditional buttons";
 
 				if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
 					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
 				} else {
 					conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
 				}
+			}
 
-				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
-				if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
-					switch (AutoEffect[0][0]) {
-						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
-						default: tempOutput = {}; break;
-					}
-					if (tempOutput.checkResult == "failure") {
-						conditionalButtonList[autoEffectConditional] = "#Do not display#";
-					}
+			/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
+			if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
+				switch (AutoEffect[0][0]) {
+					case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
+					case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+					default: tempOutput = {}; break;
+				}
+				if (tempOutput.checkResult == "failure") {
+					conditionalButtonList[autoEffectConditional] = "#Do not display#";
 				}
 			}
 		});
 	} else {
 		autoEffectType = "standard";
 	}
-	/* If not conditional, process AutoEffect as normal */
-	if (autoEffectType != "conditional button") {
+	if (autoEffectType != "conditional buttons") {
 		/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
 		switch (AutoEffect[0][0]) {
 			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, settingLimbusStyle); break;
@@ -15245,150 +15257,117 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 			}
 		}
 		// console.log(tempOutput)
-		
-		/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
-		/*  but does not apply any changes to attributes */
-		if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
-			if (tempOutput.errorType != undefined) {
-				if (errorMessageList[tempOutput.errorType] != undefined) {
-					errorMessageList[tempOutput.errorType] += tempOutput.errorMessage;
-				} else {
-					errorMessageList[tempOutput.errorType] = tempOutput.errorMessage;
+			
+			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
+			/*  but does not apply any changes to attributes */
+			if (tempOutput.hasOwnProperty("error") || returnValues.error == true) {
+				if (tempOutput.errorType != undefined) {
+					if (errorMessageList[tempOutput.errorType] != undefined) {
+						errorMessageList[tempOutput.errorType] += tempOutput.errorMessage;
+					} else {
+						errorMessageList[tempOutput.errorType] = tempOutput.errorMessage;
+					}
 				}
+				
+				if (returnValues.error != true) {
+					returnValues.error = tempOutput.error;
+				}
+				output = {};
+				return;
+			}
+
+			/* Handle changes to scaling */
+			if (tempOutput.hasOwnProperty("scaling")) {
+				scaling = parseInt(tempOutput.scaling);
+				delete tempOutput.scaling;
+			}
+
+			/* Handle check results from Require and Consume */
+			/* For the returnValues, the worst result is returned */
+			if (tempOutput.checkResult != undefined) {
+				checkResult = tempOutput.checkResult;
+				if (returnValues.checkResult == "success") {
+					returnValues.checkResult = tempOutput.checkResult;
+				}
+				else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
+					returnValues.checkResult = tempOutput.checkResult;
+				}
+				delete tempOutput.checkResult;
+			}
+
+			/* Handle updating ailmentList and barList after a successful AutoEffect */
+			if (tempOutput.modifyList != undefined) {
+				if (tempOutput.modifyList == "barList") {
+					barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
+				} else {
+					ailmentList[tempOutput.modifyTarget][1] = parseInt(ailmentList[tempOutput.modifyTarget][1]) + parseInt(tempOutput.modifyVal);
+				}
+				delete tempOutput.modifyList;
+				delete tempOutput.modifyTarget;
+				delete tempOutput.modifyVal;
+			}
+
+			/* Handle DicePower, DiceMax, DiceCount, Speed with Combat duration, */
+			/* BaseDamage, FlatDamageHP, FlatDamageST and FlatDamageSP */
+			let effectList = ["dicePower", "diceMax", "diceCount", "speedCombat", "baseDamage", "flatDamageHP", "flatDamageST", "flatDamageSP"];
+			effectList.forEach(effect => {
+				if (tempOutput[effect] != undefined) {
+					if (returnValues[effect] != undefined) { returnValues[effect] += tempOutput[effect] }
+					else { returnValues[effect] = tempOutput[effect] }
+					delete tempOutput[effect];
+				}
+			});
+
+			/* Handle Inflict, Give and FlatDamage (for non-attacks) */
+			effectList = ["autoInflict", "autoGive", "autoDamage"];
+			effectList.forEach(effect => {
+				if (tempOutput[effect] != undefined) {
+					if (autoEffectConditional == "") {
+						if (returnValues[effect] != undefined) { returnValues[effect] += tempOutput[effect] }
+						else { returnValues[effect] = tempOutput[effect] }
+					} else {
+						if (returnValues[`${effect} (${autoEffectConditional})`] != undefined) { returnValues[`${effect} (${autoEffectConditional})`] += tempOutput[effect] }
+						else { returnValues[`${effect} (${autoEffectConditional})`] = tempOutput[effect] }
+					}
+					delete tempOutput[effect];
+				}
+			});
+
+			/* Handle challenge rolls */
+			if (tempOutput.challengeRollStat != undefined) {
+				challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
+				delete tempOutput.challengeRollStat;
+				delete tempOutput.challengeRollDifficulty;
+			}
+
+			/* Handle message */
+			if (tempOutput.message != undefined) {
+				/* Translate output message. Targets are still written in English */
+				tempOutput.message = autoEffectTranslateMessage(tempOutput.message);
+				
+				if (autoEffectType == "action buttons") {
+					if (conditionalMessageList[autoEffectConditional] != undefined) {
+						conditionalMessageList[autoEffectConditional] += tempOutput.message;
+					} else {
+						conditionalMessageList[autoEffectConditional] = tempOutput.message;
+					}
+				} else {
+					message += tempOutput.message;
+				}
+				delete tempOutput.message;
+			}
+
+			/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
+			if (tempOutput.messageValues != undefined) {
+				messageValues = tempOutput.messageValues;
+				delete tempOutput.messageValues;
 			}
 			
-			if (returnValues.error != true) {
-				returnValues.error = tempOutput.error;
-			}
-			output = {};
-			return;
-		}
-
-		/* Handle changes to scaling */
-		if (tempOutput.hasOwnProperty("scaling")) {
-			scaling = parseInt(tempOutput.scaling);
-			delete tempOutput.scaling;
-		}
-
-		/* Handle check results from Require and Consume */
-		/* For the returnValues, the worst result is returned */
-		if (tempOutput.checkResult != undefined) {
-			checkResult = tempOutput.checkResult;
-			if (returnValues.checkResult == "success") {
-				returnValues.checkResult = tempOutput.checkResult;
-			}
-			else if (returnValues.checkResult == "last success" && tempOutput.checkResult == "failure") {
-				returnValues.checkResult = tempOutput.checkResult;
-			}
-			delete tempOutput.checkResult;
-		}
-
-		/* Handle updating ailmentList and barList after a successful AutoEffect */
-		if (tempOutput.modifyList != undefined) {
-			if (tempOutput.modifyList == "barList") {
-				barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
-			} else {
-				ailmentList[tempOutput.modifyTarget][1] = parseInt(ailmentList[tempOutput.modifyTarget][1]) + parseInt(tempOutput.modifyVal);
-			}
-			delete tempOutput.modifyList;
-			delete tempOutput.modifyTarget;
-			delete tempOutput.modifyVal;
-		}
-
-		/* Handle DicePower, DiceMax, DiceCount and Speed with Combat duration */
-		if (tempOutput.DicePower != undefined) {
-			if (returnValues.dicePower != undefined) { returnValues.dicePower += tempOutput.DicePower }
-			else { returnValues.dicePower = tempOutput.DicePower }
-		}
-		if (tempOutput.DiceMax != undefined) {
-			if (returnValues.diceMax != undefined) { returnValues.diceMax += tempOutput.DiceMax }
-			else { returnValues.diceMax = tempOutput.DiceMax }
-		}
-		if (tempOutput.DiceCount != undefined) {
-			if (returnValues.diceCount != undefined) { returnValues.diceCount += tempOutput.DiceCount }
-			else { returnValues.diceCount = tempOutput.DiceCount }
-		}
-		if (tempOutput.speedCombat != undefined) {
-			if (returnValues.speedCombat != undefined) { returnValues.speedCombat += tempOutput.speedCombat }
-			else { returnValues.speedCombat = tempOutput.speedCombat }
-		}
-
-		/* Handle BaseDamage, FlatDamageHP, FlatDamageST and FlatDamageSP */
-		if (tempOutput.BaseDamage != undefined) {
-			if (returnValues.baseDamage != undefined) { returnValues.baseDamage += tempOutput.BaseDamage }
-			else { returnValues.baseDamage = tempOutput.BaseDamage }
-		}
-		if (tempOutput.FlatDamageHP != undefined) {
-			if (returnValues.flatDamageHP != undefined) { returnValues.flatDamageHP += tempOutput.FlatDamageHP }
-			else { returnValues.flatDamageHP = tempOutput.FlatDamageHP }
-		}
-		if (tempOutput.FlatDamageST != undefined) {
-			if (returnValues.flatDamageST != undefined) { returnValues.flatDamageST += tempOutput.FlatDamageST }
-			else { returnValues.flatDamageST = tempOutput.FlatDamageST }
-		}
-		if (tempOutput.FlatDamageSP != undefined) {
-			if (returnValues.flatDamageSP != undefined) { returnValues.flatDamageSP += tempOutput.FlatDamageSP }
-			else { returnValues.flatDamageSP = tempOutput.FlatDamageSP }
-		}
-
-		/* Handle challenge rolls */
-		if (tempOutput.challengeRollStat != undefined) {
-			challengeRollList[tempOutput.challengeRollStat] = tempOutput.challengeRollDifficulty;
-			delete tempOutput.challengeRollStat;
-			delete tempOutput.challengeRollDifficulty;
-		}
-
-		/* Handle Inflict, Give and FlatDamage on non-attacks */
-		if (tempOutput.autoInflict != undefined) {
-			if (returnValues.autoInflict != undefined) { returnValues.autoInflict += tempOutput.autoInflict; }
-			else { returnValues.autoInflict = tempOutput.autoInflict; }
-			delete tempOutput.autoInflict;
-		}
-		if (tempOutput.autoGive != undefined) {
-			if (returnValues.autoGive != undefined) { returnValues.autoGive += tempOutput.autoGive; }
-			else { returnValues.autoGive = tempOutput.autoGive; }
-			delete tempOutput.autoGive;
-		}
-		if (tempOutput.autoDamage != undefined) {
-			if (returnValues.autoDamage != undefined) { returnValues.autoDamage += tempOutput.autoDamage; }
-			else { returnValues.autoDamage = tempOutput.autoDamage; }
-			delete tempOutput.autoDamage;
-		}
-
-		/* Handle message */
-		if (tempOutput.message != undefined) {
-			/* Translate output message. Targets are still written in English */
-			tempOutput.message = autoEffectTranslateMessage(tempOutput.message);
-			
-			if (autoEffectType == "conditional message" || autoEffectType == "conditional message + button") {
-				if (conditionalMessageList[autoEffectConditional] != undefined) {
-					conditionalMessageList[autoEffectConditional] += tempOutput.message;
-				} else {
-					conditionalMessageList[autoEffectConditional] = tempOutput.message;
-				}
-			} else {
-				message += tempOutput.message;
-			}
-			delete tempOutput.message;
-		}
-
-		/* Handle messageValues. Used by the CustomMessage AutoEffect. Outputted by all AutoEffects that generate messages */
-		if (tempOutput.messageValues != undefined) {
-			messageValues = tempOutput.messageValues;
-			delete tempOutput.messageValues;
-		}
-
-		/* Handle conditional message + button having silent AutoEffects */
-		if (autoEffectType == "conditional message + button") {
-			AutoEffect[0].push("Silent");
-		}
-		
-		/* Add attribute changes from AutoEffect to output */
-		/* The first time a attribute is modified, add its count */
-		/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
-		/* If Consume 4 Burn is used later, this amount will be removed without adding count */
-		for (const property in tempOutput) {
-			if (autoEffectType == "standard") {
+			/* Add attribute changes from AutoEffect to output */
+			/* The first time a attribute is modified, add its count */
+			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
+			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
+			for (const property in tempOutput) {
 				if (output.hasOwnProperty(property)) {
 					output[property] += Math.floor(tempOutput[property]);
 				} else {
@@ -15396,14 +15375,23 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 				}
 			}
 		}
-	}
 	});
 	
 	/* Create conditional buttons */
 	for (const [buttonName, buttonAutoScript] of Object.entries(conditionalButtonList)) {
 		/* Checks if any checks failed and the button should not be displayed */
 		if (buttonAutoScript.indexOf("#Do not display#") != -1) { continue; }
-		createConditionalButton(buttonName, buttonAutoScript);
+		
+		let iconFolder = "icons";
+		let iconName = "gear";
+		let iconColor = "green"; 
+		if (stylingList[buttonName] != undefined) {
+			iconFolder = stylingList[buttonName][0];
+			iconName = stylingList[buttonName][1];
+			iconColor = stylingList[buttonName][2];
+			if (!["green","blue","red","orange","yellow","purple","black"].includes(iconColor)) { iconColor = "green"; }
+		}
+		createConditionalButton(buttonName, buttonAutoScript, iconFolder, iconName, iconColor);
 	}
 
 	/* Execute challange rolls */
@@ -15413,13 +15401,15 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 	}
 	
 	/* Message handling */
+	/* Standard messages print as a generic "AutoEffects" section and include all unconditional effects */
 	if (returnValues.error != true && message != "") {
-		if (returnMessage == "true") {
+		if (sendMessage == "false") {
 			returnValues.message = autoEffectEntry("AutoEffects", message);
 		}
 	}
 
 	/* Conditional message handling */
+	/* One conditional message section is printed for each conditional in the AutoScript */
 	if (returnValues.message != "") {
 		for (const [conditionName, conditionMessage] of Object.entries(conditionalMessageList)) {
 			let iconFolder = "icons";
@@ -15455,39 +15445,48 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", ret
 		resetConditionals();
 	}
 
-	/* If no message is to be returned, print both message, returnValues.message (if it has any contents) and actions buttons (if any exist) to the chat */
-	if (settingMuteMessage != "true" && (message != "" || returnValues.message != undefined)) {
-		if (returnMessage == "false") {
-			
-			let iconFolder = "icons";
-			let iconName = "gear";
-			let iconColor = "#85a874"; 
-			if (stylingList[messageHeaderTitle] != undefined) {
-				iconFolder = stylingList[messageHeaderTitle][0];
-				iconName = stylingList[messageHeaderTitle][1];
-				iconColor = stylingList[messageHeaderTitle][2];
-			}
-			let messageHeaderIcon = getIcon(iconFolder, iconName, "false", `style="background-color: ${getColor(iconColor)}"`);
-
-			if (returnValues.message == undefined) { returnValues.message = ""; }
-			let messageContents = "<div class='autoeffectContainer'>" + message + returnValues.message + "</div>";
-			
-			let whisper = "";
-			if(settingWhisperRolls == "true"){
-				whisper = "/w " + settingWhisperTarget;
-			}
-			
-			setAttrs({dummyIcon: messageHeaderIcon, dummy: messageContents});
-			startRoll((whisper + "&{template:autoeffect} {{icon=@{dummyIcon}}} {{title=" + messageHeaderTitle + "}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
-				finishRoll(results.rollId, {} );
-			});
-
-			let buttonList = [];
-			if (returnValues.autoDamage != undefined) { buttonList.push(generateActionButton("Apply damage", getIcon("icons","damage"), "red", "actionButtonDamage", returnValues.autoDamage)); }
-			if (returnValues.autoInflict != undefined) { buttonList.push(generateActionButton("Apply ailments", getIcon("icons","lose"), "purple", "actionButtonInflict", returnValues.autoInflict)); }
-			if (returnValues.autoGive != undefined) { buttonList.push(generateActionButton("Give ailments", getIcon("icons","win"), "blue", "actionButtonGive", returnValues.autoGive)); }
-			createActionButtons(buttonList);
+	/* If a message is to be sent, print all unconditional and conditional sections in one chat message. Attach any action buttons that exist for the AutoScript */
+	if (settingMuteMessage != "true" && sendMessage == "true" && !((message == undefined || message == "") && (returnValues.message == undefined || returnValues.message == ""))) {
+		
+		/* Get AutoScript styling */
+		let iconFolder = "icons";
+		let iconName = "gear";
+		let iconColor = "#85a874"; 
+		if (stylingList[messageHeaderTitle] != undefined) {
+			iconFolder = stylingList[messageHeaderTitle][0];
+			iconName = stylingList[messageHeaderTitle][1];
+			iconColor = stylingList[messageHeaderTitle][2];
 		}
+		let messageHeaderIcon = getIcon(iconFolder, iconName, "false", `style="background-color: ${getColor(iconColor)}"`);
+
+		/* Prepare unconditional and conditional sections into one message block */
+		if (message == undefined) { message = ""; }
+		if (returnValues.message == undefined) { returnValues.message = ""; }
+		let messageContents = "<div class='autoeffectContainer'>" + message + returnValues.message + "</div>";
+		
+		let whisper = "";
+		if(settingWhisperRolls == "true"){
+			whisper = "/w " + settingWhisperTarget;
+		}
+		
+		/* Post the message to the chat */
+		setAttrs({dummyIcon: messageHeaderIcon, dummy: messageContents});
+		startRoll((whisper + "&{template:autoeffect} {{icon=@{dummyIcon}}} {{title=" + messageHeaderTitle + "}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
+			finishRoll(results.rollId, {} );
+		
+			/* Attach any action buttons that have been created for the AutoScript*/
+			let buttonList = [];
+			for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
+				if (buttonKey.startsWith("auto")) {
+					switch (buttonKey.split(" ")[0]) {
+						case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)); break;
+						case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
+						case "autoGive": buttonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue)); break;
+					}
+				}
+			}
+			createActionButtons(buttonList);
+		});
 	}
 
 	setAttrs(output);
@@ -15513,6 +15512,11 @@ function cleanAutoScript(AutoScript) {
 
 	/* Replace all “” quotes with "" quotes */
 	cleanAutoScript = cleanAutoScript.replaceAll('“','"').replaceAll('”','"');
+
+	/* Remove any of the old v0.6 options that still remain in the AutoScript */
+	conditional = conditional.replaceAll("#Button","").replaceAll("#Message","").replaceAll("#MessageButton","").trim();
+	autoEffectConditional = "";
+
 	return cleanAutoScript;
 }
 
@@ -15606,15 +15610,15 @@ function translateAutoScriptToEnglish(AutoScript) {
 		}
 
 		/* Translate conditional options */
-		let langButtonOption = getTranslationByKey("autoeffect-option-button");
-		let langMessageOption = getTranslationByKey("autoeffect-option-message");
-		let langMessageButtonOption = getTranslationByKey("autoeffect-option-messagebutton");
+		let langButtonOption = getTranslationByKeyCustom("#Button", "autoeffect-option-button");
+		let langMessageOption = getTranslationByKeyCustom("#Message", "autoeffect-option-message");
+		let langMessageButtonOption = getTranslationByKeyCustom("#MessageButton", "autoeffect-option-messagebutton");
 
-		/*for (let k = 0; k < AutoScript[i].length; k++) {
+		for (let k = 1; k < AutoScript[i].length; k++) {
 			AutoScript[i][k] = AutoScript[i][k].replace(langButtonOption,"#Button");
 			AutoScript[i][k] = AutoScript[i][k].replace(langMessageOption,"#Message");
 			AutoScript[i][k] = AutoScript[i][k].replace(langMessageButtonOption,"#MessageButton");
-		}*/
+		}
 	}
 	return AutoScript;
 }
@@ -15666,7 +15670,7 @@ function autoEffectEntry(header, message, iconFolder="icons", iconName="gear", i
 	return newEntry;
 }
 
-function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false", effectIcon="No icon") {
+function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0, effectCount=0, scaling=1, checkResult="success", settingLimbusStyle="false", effectIcon="No icon", iconColor=undefined) {
 	if(messageFormat != ""){
 		let message = messageFormat;
 
@@ -15701,13 +15705,13 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		/* Get target icon. Is in this format: [/TARGET]. If a effectIcon is procided, use that instead */
 		if (effectIcon != "No icon") {
 			if (settingLimbusStyle == "true") { effectIcon = effectIcon.replace("limbus/",""); }
-			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectIcon, settingLimbusStyle));
+			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectIcon, settingLimbusStyle, `class="autoEffectImage" style="background-color: ${iconColor}"`));
 		} else {
-			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget.replace("_"," "), settingLimbusStyle));
+			message = message.replaceAll(langTargetIcon, getIcon("ailments", effectTarget.replace("_"," "), settingLimbusStyle, `class="autoEffectImage" style="background-color: ${iconColor}"`));
 		}
 		
 		/* Question mark icon */
-		message = message.replaceAll("[/Question]", getIcon("icons", "Question"));
+		message = message.replaceAll("[/Question]", getIcon("icons", "Question", "false", `class="autoEffectImage" style="background-color: ${iconColor}"`));
 
 		if ((/\[\/([^0-9]+)\]/g).test(message)) {
 			/* Get custom icon. Is in one of these formats: [/iconName], [/limbus/iconName], [/community/iconName]*/
@@ -15719,7 +15723,7 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 				let iconSelector = icon.replaceAll("[","").replaceAll("]","");
 				let iconFolder = iconSelector.split(", ")[0];
 				let iconName = iconSelector.split(", ")[1]
-				message = message.replace(icon, getIcon(iconFolder, iconName));
+				message = message.replace(icon, getIcon(iconFolder, iconName, "false", `class="autoEffectImage" style="background-color: ${iconColor}"`));
 			});
 		}
 
@@ -15774,11 +15778,15 @@ function autoEffectErrorMessage(errorType, errorString, AutoEffect) {
 }
 
 /* Creates a new conditional button*/
-function createConditionalButton(buttonName, buttonAutoScript) {
+function createConditionalButton(buttonName, buttonAutoScript, iconFolder, iconName, iconColor) {
 	let output = {}
+	let buttonIcon = getIcon(iconFolder, iconName, "false").replace('<img src="','').replace('" >','');
+
 	let newrowid = generateRowID();
 	output[`repeating_conditionalButtons_${newrowid}_buttonName`] = buttonName;
 	output[`repeating_conditionalButtons_${newrowid}_buttonAutoScript`] = buttonAutoScript;
+	output[`repeating_conditionalButtons_${newrowid}_buttonIcon`] = buttonIcon;
+	output[`repeating_conditionalButtons_${newrowid}_buttonColor`] = iconColor;
 	setAttrs(output);
 }
 
@@ -15867,6 +15875,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, sett
 			count = barMax - barVal;
 		}
 		effectVal = barMax*percentage;
+		countImmutable = count;
 	}
 	else { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number or percentage`, AutoEffect); }
 	
@@ -16190,14 +16199,14 @@ function autoEffectDice(AutoEffect, scaling) {
 	/* Check if DicePower, DiceMax or DiceCount */
 	let autoEffectVariant = "";
 	switch (AutoEffect[0]) {
-		case "DicePower": autoEffectVariant = "DicePower"; break;
-		case "DiceMax": autoEffectVariant = "DiceMax"; break;
-		case "DiceCount": autoEffectVariant = "DiceCount"; break;
+		case "DicePower": autoEffectVariant = "dicePower"; break;
+		case "DiceMax": autoEffectVariant = "diceMax"; break;
+		case "DiceCount": autoEffectVariant = "diceCount"; break;
 		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 
 	/* Check format */
-	if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (${capitalize(autoEffectVariant)} N #Silent(optional))`, AutoEffect); }
 	if (AutoEffect.length > 2) { if (AutoEffect[2].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }
 	
 	/* Handle scaling */
@@ -16220,7 +16229,7 @@ function autoEffectDice(AutoEffect, scaling) {
 	messageValues = { effectTarget: AutoEffect[0].replace("Dice", "Dice "), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	return { [AutoEffect[0]]: parseFloat(effectVal), message: message, messageValues: messageValues }
+	return { [autoEffectVariant]: parseFloat(effectVal), message: message, messageValues: messageValues }
 }
 
 function autoEffectChallengeRoll(AutoEffect, scaling) {
@@ -16305,13 +16314,13 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	/* Check if BaseDamage or FlatDamage */
 	let autoEffectVariant = "";
 	switch (AutoEffect[0]) {
-		case "BaseDamage": autoEffectVariant = "BaseDamage"; break;
-		case "FlatDamage": autoEffectVariant = "FlatDamage"; break;
+		case "BaseDamage": autoEffectVariant = "baseDamage"; break;
+		case "FlatDamage": autoEffectVariant = "flatDamage"; break;
 		default: return autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0]} is not a valid AutoEffect`, AutoEffect);
 	}
 	
 	/* Check format */
-	if (autoEffectVariant == "BaseDamage") {
+	if (autoEffectVariant == "baseDamage") {
 		if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); }
 		if (AutoEffect.length > 2) { if (AutoEffect[2].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }
 	} else {
@@ -16325,7 +16334,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 
 	/* Get value */
 	let effectVal = parseInt(AutoEffect[1]); 
-	if (autoEffectVariant == "BaseDamage") { effectVal = Math.abs(effectVal); }
+	if (autoEffectVariant == "baseDamage") { effectVal = Math.abs(effectVal); }
 	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
 	let count = 0;
 
@@ -16345,8 +16354,8 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	let messageValues = {};
 	let messageFormat = "";
 	switch (autoEffectVariant) {
-		case "BaseDamage": messageFormat = getTranslationByKeyCustom("Increase Base Damage by [SCALING NUM]", "autoeffect-format-basedamage"); break;
-		case "FlatDamage": messageFormat = getTranslationByKeyCustom("Deal [SCALING NUM] [TARGET] Damage", "autoeffect-format-flatdamage"); break;
+		case "baseDamage": messageFormat = getTranslationByKeyCustom("Increase Base Damage by [SCALING NUM]", "autoeffect-format-basedamage"); break;
+		case "flatDamage": messageFormat = getTranslationByKeyCustom("Deal [SCALING NUM] [TARGET] Damage", "autoeffect-format-flatdamage"); break;
 	}
 
 	if (!AutoEffect.includes("Silent")) {
@@ -16355,9 +16364,9 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	returnValues = { [AutoEffect[0]]: effectVal, message: message, messageValues: messageValues }
-	if (autoEffectVariant != "BaseDamage") {
-		returnValues[`${AutoEffect[0]}${AutoEffect[2]}`] = effectVal;
+	returnValues = { [autoEffectVariant]: effectVal, message: message, messageValues: messageValues }
+	if (autoEffectVariant != "baseDamage") {
+		returnValues[`${autoEffectVariant}${AutoEffect[2]}`] = effectVal;
 		returnValues.autoDamage = `(Add -${effectVal} ${AutoEffect[2]})`;
 	}
 	return returnValues;
@@ -17501,12 +17510,17 @@ function getIcon(iconFolder, iconName, settingLimbusStyle = "false", style="") {
 }
 
 function getColor(color) {
-	if (!(/^#(?:[0-9a-fA-F]{3}){1,2}$/).test(color)) {
+	if (color == undefined) {
+		return "#85a874";
+	}
+	if (!(/^#(?:[0-9a-fA-F]{6}){1,2}$/).test(color)) {
 		switch (color.toLowerCase()) {
-			case "red": color = "#c25944"; break;
 			case "blue": color = "#7397d1"; break;
+			case "red": color = "#c25944"; break;
+			case "orange": color = "#cf8c44"; break;
 			case "yellow": color = "#dbb748"; break;
 			case "purple": color = "#8e7cc3"; break;
+			case "black": color = "#000000"; break;
 			default: color = "#85a874";
 		}
 	}
