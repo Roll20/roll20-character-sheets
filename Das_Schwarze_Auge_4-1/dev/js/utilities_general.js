@@ -143,6 +143,15 @@ function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
 }
 
 /*
+	Array Comparison (Simple)
+	Compares simple/unnested arrays for non-weird values (no checks for undefined or NaN, so beware!).
+	Adapted from https://www.freecodecamp.org/news/how-to-compare-arrays-in-javascript/
+*/
+function arraysEqual(arrayA, arrayB) {
+	return arrayA.length === arrayB.length && arrayA.every((element, index) => element === arrayB[index]);
+}
+
+/*
 	Property Checker
 	Checks whether properties (given in an array of strings) are available in an object.
 	Does not check whether the array contains strings only.
