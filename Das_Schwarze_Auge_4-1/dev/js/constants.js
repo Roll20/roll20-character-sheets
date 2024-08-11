@@ -1641,6 +1641,63 @@ const spellsData = {
 	'z_zwingtanz': {'internal': "zwingtanz", 'ui': "Zwingtanz", 'stats': ['MU', 'KL', 'CH']}
 };
 /*
+	Myranor-only
+	Map sources to spheres
+ */
+const sourcesSpheresData = {
+	'Abgrund': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggari': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggression': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Avastada': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Begierde': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Carafai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Darcalya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Dya\'Khol': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Eis': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Endgültigkeit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erfolg': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erkenntnis': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erz': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Eskates': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Feenwesen': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Feuer': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Freiheit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Galkuzul': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Ghorgumor': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Harmonie': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Humus': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Iryabaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Khalyanar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Kraft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Kreativität': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Luft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Mishkarya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Naggarach': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Thesephai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Tiergeister': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Totenwesen': { "internal": 'Tod', "ui": 'Sphäre des Todes' },
+	'Tyakaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Wahnsinn': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Wasser': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Xolovar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Zauberei': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Zeit': { "internal": 'Zeit', "ui": 'Sphäre der Zeit' }
+};
+
+/*
+	Myranor-only
+	Map spheres to stats required for checks
+*/
+const spheresStatsData = {
+	'Zeit': [ 'MU', 'KL', 'IN' ],
+	'Elemente': [ 'MU', 'KL', 'CH' ],
+	'Natur': [ 'MU', 'KL', 'IN' ],
+	'Tod': [ 'MU', 'MU', 'CH' ],
+	'Stellare': [ 'KL', 'IN', 'CH' ],
+	'Dämonen': [ 'MU', 'MU', 'CH' ]
+}
+
+/*
 	Constants for effective encumbrance for talent/spell checks
 */
 const effectiveEncumbrance = {
