@@ -13339,7 +13339,7 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 				
 					// Decay status ailment
 					if (ailDecayWhenHit == "true") {
-						updateCustomAilment(id, "decay", "false", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
+						updateCustomAilment(id, "decay", "false");
 					}
 				}
 				
@@ -15195,16 +15195,27 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	/* Handle conditionals */
 	if (AutoEffect.length > 1) {
 		AutoEffect.slice(1).forEach(conditional => {
+			autoEffectType = "";
+
+			console.log(conditional.replaceAll("#Action","").replaceAll("#Conditional","").trim())
+			console.log(autoEffectConditional)
+			
+			/* Reset if new conditional doesn't match previous one */
+			if (conditional.replaceAll("#Action","").replaceAll("#Conditional","").trim() != autoEffectConditional) {
+				scaling = 1; checkResult = "success";
+			}
 
 			/* If action buttons are requested, execute the script as normal but do not apply any effects and add the message to a seperate section */
-			if (conditional.includes("#Action")) {
-				autoEffectConditional = conditional.replace("#Action","").trim();
-				autoEffectType = "action buttons";
+			/* Action buttons are as of yet only supported by a few AutoEffects. Other AutoEffects are granted conditional buttons instead */
+			let actionSupport = ["Inflict", "Give", "BaseDamage", "FlatDamage", "Require", "Consume", "Reset", "CustomMessage"];
+			if (conditional.includes("#Action") && actionSupport.includes(AutoEffect[0][0])) {
+				autoEffectConditional = conditional.replaceAll("#Action","").trim();
+				autoEffectType += "action";
 			}
 			/* If conditional buttons are requested, do not execute any conditional AutoEffects and store them in conditional buttons to be executed later */
-			else {
-				autoEffectConditional = conditional;
-				autoEffectType = "conditional buttons";
+			if (!conditional.includes("#Action") || conditional.includes("#Conditional")) {
+				autoEffectConditional = conditional.replaceAll("#Action","").replaceAll("#Conditional","").trim();
+				autoEffectType += "conditional";
 
 				if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
 					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
@@ -15227,8 +15238,10 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		});
 	} else {
 		autoEffectType = "standard";
+		autoEffectConditional = "";
+		scaling = 1; checkResult = "success";
 	}
-	if (autoEffectType != "conditional buttons") {
+	if (autoEffectType != "conditional") {
 		/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
 		switch (AutoEffect[0][0]) {
 			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, settingLimbusStyle); break;
@@ -15345,7 +15358,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				/* Translate output message. Targets are still written in English */
 				tempOutput.message = autoEffectTranslateMessage(tempOutput.message);
 				
-				if (autoEffectType == "action buttons") {
+				if (!autoEffectType.includes("action")) {
 					if (conditionalMessageList[autoEffectConditional] != undefined) {
 						conditionalMessageList[autoEffectConditional] += tempOutput.message;
 					} else {
@@ -15368,10 +15381,12 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
 			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
 			for (const property in tempOutput) {
-				if (output.hasOwnProperty(property)) {
-					output[property] += Math.floor(tempOutput[property]);
-				} else {
-					output[property] = Math.floor(tempOutput[property] + tempOutput.count);
+				if (autoEffectType == "standard") {
+					if (output.hasOwnProperty(property)) {
+						output[property] += Math.floor(tempOutput[property]);
+					} else {
+						output[property] = Math.floor(tempOutput[property] + tempOutput.count);
+					}
 				}
 			}
 		}
