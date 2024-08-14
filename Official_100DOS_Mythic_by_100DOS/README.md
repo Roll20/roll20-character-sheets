@@ -17,4 +17,3 @@ The Journal section includes: objective tracking and notes.
 The vehicles section includes: A display with vehicle stats and weapons. When the vehicle sheet is opened Any melee or ranged weapons dragged onto the sheet from the compendium will be moved here. The accelerate and brake buttons will increase a token bar is a token was selected, allowing you to track a vehicle's current speed.
 
 The settings section allows you to overwrite the default settings of the sheet.
-
