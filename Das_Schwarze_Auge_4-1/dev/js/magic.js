@@ -27,6 +27,15 @@ function replaceSpellStats(spellData, stats) {
 	const func = "replaceSpellStats";
 	debugLog(func, spellData, stats);
 
+	const replacementUIString = {
+		"AchKL": `Kristallomantische Repräsentation hat KL (${stats['KL']}) einmal durch IN (${stats['IN']}) ersetzt.`,
+		"AchIN": `Kristallomantische Repräsentation hat IN (${stats['IN']}) einmal durch KL (${stats['KL']}) ersetzt.`,
+		"Elf": `Elfische Repräsentation hat KL (${stats['KL']}) einmal durch IN (${stats['IN']}) ersetzt.`,
+		"Kop": `Kophtanische Repräsentation hat KL (${stats['KL']}) einmal durch CH (${stats['CH']}) ersetzt.`,
+		"NerMU": `Neristische Repräsentation hat MU (${stats['MU']}) einmal durch FF (${stats['FF']}) ersetzt.`,
+		"NerCH": `Neristische Repräsentation hat CH (${stats['CH']}) einmal durch FF (${stats['FF']}) ersetzt.`
+	};
+
 	let result = { "modified": false, "replacementInfo": "" };
 	let replacement = { "replaceable": "", "replacer": "" };
 	switch (spellData["representation"]) {
@@ -70,7 +79,7 @@ function replaceSpellStats(spellData, stats) {
 					{
 						spellData["stats"][i] = otherStat;
 						result["modified"] = true;
-						result["replacementInfo"] = spellData["representation"] + multiStat;
+						result["replacementInfo"] = replacementUIString[spellData["representation"] + multiStat];
 						break;
 					}
 				}
@@ -117,7 +126,7 @@ function replaceSpellStats(spellData, stats) {
 				{
 					spellData["stats"][stat] = replacement["replacer"];
 					result["modified"] = true;
-					result["replacementInfo"] = spellData["representation"];
+					result["replacementInfo"] = replacementUIString[spellData["representation"]];
 					break;
 				}
 			}
@@ -164,7 +173,7 @@ function replaceSpellStats(spellData, stats) {
 			let replacedStat = spellData["stats"][lowestStat["index"]];
 			spellData["stats"][lowestStat["index"]] = replacement["replacer"];
 			result["modified"] = true;
-			result["replacementInfo"] = spellData["representation"] + replacedStat;
+			result["replacementInfo"] = replacementUIString[spellData["representation"] + replacedStat];
 			break;
 		}
 		default:
@@ -201,14 +210,6 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 		attrsToGet.push("Eigenschaft_Attributo");
 	}
 	safeGetAttrs(attrsToGet, function (v) {
-		const replacementUIString = {
-			"AchKL": `Kristallomantische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
-			"AchIN": `Kristallomantische Repräsentation hat IN (${v["IN"]}) einmal durch KL (${v["KL"]}) ersetzt.`,
-			"Elf": `Elfische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
-			"Kop": `Kophtanische Repräsentation hat KL (${v["KL"]}) einmal durch CH (${v["CH"]}) ersetzt.`,
-			"NerMU": `Neristische Repräsentation hat MU (${v["MU"]}) einmal durch FF (${v["FF"]}) ersetzt.`,
-			"NerCH": `Neristische Repräsentation hat CH (${v["CH"]}) einmal durch FF (${v["FF"]}) ersetzt.`
-		};
 		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop", "Ner" ]);
 		if (v.hasOwnProperty("Eigenschaft_Attributo"))
 		{
@@ -259,7 +260,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			"{{result=[[0]]}} " +
 			"{{criticality=[[0]]}} " +
 			"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} " + 
-			"{{repmod=" + (replacementResult["modified"] ? replacementUIString[replacementResult["replacementInfo"]] : "") + "}} ";
+			"{{repmod=" + (replacementResult["modified"] ? replacementResult["replacementInfo"] : "") + "}} ";
 		debugLog(func, rollMacro);
 
 		// Execute Roll
