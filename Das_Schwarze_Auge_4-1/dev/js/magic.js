@@ -2,8 +2,8 @@
 
 /*
 	Adapt Spell Stats Based on Spell Representation
-	Three representations offer the special feature of exchanging stats of spell checks.
-	Returns object with boolean property "modified" and exchange info string "replacement".
+	Four representations offer the special feature of exchanging stats of spell checks.
+	Returns object with boolean property "modified" and exchange info string "replacementInfo".
 
 	Elvish Representation (Elf)
 		IN can replace KL
@@ -14,6 +14,14 @@
 	Kophtanic Representation (Kop)
 		CH can replace KL
 		Check must not be CH/CH/CH after exchange
+
+	Myranor
+	Neristic Representation (Ner)
+		FF can replace MU or CH
+
+	Arguments
+		spellData: Object with "representation" (shorthand) and "stats" (array of spell stats)
+		stats: Stats of the caster (object with two-letter stat properties and the corresponding values)
 */
 function replaceSpellStats(spellData, stats) {
 	const func = "replaceSpellStats";
@@ -115,6 +123,50 @@ function replaceSpellStats(spellData, stats) {
 			}
 			break;
 		}
+		case "Ner":
+		// Block required to encapsulate consts
+		{
+			debugLog(func, "Attempting replacement for Neristic representation (Ner)");
+			// Replacement is not improving anything, so break
+			if (
+				(stats['FF'] <= stats['MU']) &&
+				(stats['FF'] <= stats['CH'])
+			) break;
+
+			replacement["replacer"] = "FF";
+			replacement["replaceable"] = [ "MU", "CH" ];
+			const spellStatFreq = countStats(spellData["stats"]);
+			let replaceablesFreq = spellStatFreq[replacement["replaceable"][0]] + spellStatFreq[replacement["replaceable"][1]]
+
+			// Nothing to replace
+			if (replaceablesFreq === 0)
+			{
+				break;
+			}
+
+			// Replacement
+			// Up to three stats might match, but only one can be replaced -> determine index to replace after iterating over all stats
+			let lowestStat = { "value": Infinity, "index": null };
+			for (stat in spellData["stats"])
+			{
+				// Get values of replaceable stats at the index of the replaceable stat
+				if (replacement["replaceable"].includes(spellData["stats"][stat]))
+				{
+					currentStat = spellData["stats"][stat];
+					statValue = stats[currentStat];
+					if (lowestStat["value"] > statValue)
+					{
+						lowestStat["value"] = statValue;
+						lowestStat["index"] = stat;
+					}
+				}
+			}
+			let replacedStat = spellData["stats"][lowestStat["index"]];
+			spellData["stats"][lowestStat["index"]] = replacement["replacer"];
+			result["modified"] = true;
+			result["replacementInfo"] = spellData["representation"] + replacedStat;
+			break;
+		}
 		default:
 			debugLog(func, "No representation suitable for replacements found:", spellData["representation"]);
 			break;
@@ -137,9 +189,11 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 		spellRep,
 		"v_festematrix",
 		"n_spruchhemmung",
+		"MU",
 		"KL",
 		"IN",
-		"CH"
+		"CH",
+		"FF"
 	];
 	// Special treatment for Attributo (user-selectable third stat)
 	if (trigger === "z_attributo")
@@ -151,9 +205,11 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			"AchKL": `Kristallomantische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
 			"AchIN": `Kristallomantische Repräsentation hat IN (${v["IN"]}) einmal durch KL (${v["KL"]}) ersetzt.`,
 			"Elf": `Elfische Repräsentation hat KL (${v["KL"]}) einmal durch IN (${v["IN"]}) ersetzt.`,
-			"Kop": `Kophtanische Repräsentation hat KL (${v["KL"]}) einmal durch CH (${v["CH"]}) ersetzt.`
+			"Kop": `Kophtanische Repräsentation hat KL (${v["KL"]}) einmal durch CH (${v["CH"]}) ersetzt.`,
+			"NerMU": `Neristische Repräsentation hat MU (${v["MU"]}) einmal durch FF (${v["FF"]}) ersetzt.`,
+			"NerCH": `Neristische Repräsentation hat CH (${v["CH"]}) einmal durch FF (${v["FF"]}) ersetzt.`
 		};
-		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop" ]);
+		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop", "Ner" ]);
 		if (v.hasOwnProperty("Eigenschaft_Attributo"))
 		{
 			// Resolve the stat
@@ -161,7 +217,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			stats[stats.indexOf("Eigenschaft_Attributo")] = attributoVariableStat;
 			debugLog(func, "Attributo special case, stats after resolution:", stats);
 		}
-		let characterStats = { "KL": v["KL"], "IN": v["IN"], "CH": v["CH"] };
+		let characterStats = { "MU": v["MU"], "KL": v["KL"], "IN": v["IN"], "CH": v["CH"], "FF": v["FF"] };
 		let spellData = {};
 		spellData["stats"] = stats;
 
