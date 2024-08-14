@@ -3418,6 +3418,8 @@ const FOLDABLE_REPEATING_SECTIONS = [
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'potions',
     'dusts',
+    'magic-items',
+    'wands',
     'scrolls',
 ];
 FOLDABLE_REPEATING_SECTIONS.forEach(section => {
