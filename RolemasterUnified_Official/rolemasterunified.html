@@ -149,6 +149,18 @@
   </div>
 </rolltemplate>
 
+<!-- Simple Roll a critical result:
+<-->
+<rolltemplate class="sheet-rolltemplate-rmucriticallookup">
+  <div class='sheet-rolltemplate-noboxes'>
+    {{who}} looks up a {{computed::degree}} {{computed::type}} critical with value {{roll}}
+    <br>
+    <i>{{computed::result}}</i>
+    <br>
+    {{computed::effect}}
+  </div>
+</rolltemplate>
+
 <!-- Message for resting/sleeping
   {{who}} {{rests}} for {{period}}
   {{result}}
@@ -2109,6 +2121,7 @@
 
 <h1 class='creaturetitle'><span name='attr_character_name'></span></h1>
 
+<div class='creature-multicolumn'>
 <div class='creaturestats'>
   <span class='creatureheading'>Stats</span>
   <span>Ag</span> <span name='attr_ag'>X</span>
@@ -2126,24 +2139,25 @@
 
 <div class='creaturedefenses'>
   <span class='creatureheading'>Defenses</span>
-  <span>AT (DB)</span>
-  <span>Crit Reduction</span>
-  <span>Size</span>
-  <span>Hits (Scaled)</span>
-  <span>PP</span>
-  <span>Initiative</span>
 
+  <span>AT (DB)</span>
   <span>
     <span name='attr_at'></span>
     (<span name='attr_db'></span>)
   </span>
+  <span>Crit Reduction</span>
   <span name='attr_critreduction'></span>
+  <span>Size</span>
   <span name='attr_size'></span>
+  <span>Hits (Scaled)</span>
   <span>
     <span name='attr_hits'></span>
     (<span name='attr_hitsscaled'></span>)
   </span>
+  <span>PP</span>
   <span name='attr_pp'></span>
+  
+  <span>Initiative</span>
   <span>
     <span name='attr_initiative'></span>
     <button type="roll" class="editbutton rollbutton" value="&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] {{actor=@{character_name} }} {{bonus=@{initiative} }} {{total=$[[1]]}} {{roll=$[[0]]}}"><span style="font-family:dicefontd10;">j</span></button>
@@ -2154,17 +2168,11 @@
 
 <div class='creaturerrs'>
   <span class='creatureheading'>RRs</span>
-    <span>Channeling</span>
-    <span>Essence</span>
-    <span>Mentalism</span>
-    <span>Physical</span>
-    <span>Fear</span>
-
-    <span name='attr_rr_channeling_bonus'></span>
-    <span name='attr_rr_essence_bonus'></span>
-    <span name='attr_rr_mentalism_bonus'></span>
-    <span name='attr_rr_physical_bonus'></span>
-    <span name='attr_rr_fear_bonus'></span>
+    <span>Channeling</span> <span name='attr_rr_channeling_bonus'></span>
+    <span>Essence</span> <span name='attr_rr_essence_bonus'></span>
+    <span>Mentalism</span> <span name='attr_rr_mentalism_bonus'></span>
+    <span>Physical</span> <span name='attr_rr_physical_bonus'></span>
+    <span>Fear</span> <span name='attr_rr_fear_bonus'></span>
 </div>
 
 <div class='creatureattacks'>
@@ -2176,14 +2184,149 @@
     <span name='attr_attacksize'></span>
     <span name='attr_type'></span>
     <input type='hidden' name='attr_attackersize'>
-    <button type='action' name='act_creatureattack'>Attack!</button>
+    <button type='action' name='act_creaturemakeattack'>Attack!</button>
 
   </fieldset>
 
 </div>
 
+<div>
+    <div class='foe'>
+
+      <span style='grid-column: span 1'>
+        Target:
+      </span>
+      <span name='attr_target_name' style='grid-column: span 2'></span>
+      <button type='action' name='act_rmuattackgettarget'
+                class='rollbutton fancybutton fancybuttoninline'>Select</button>
+      <span class='foe_target_db'>
+        DB
+      </span>
+      <input type='number' name='attr_target_db'>
+      <span class='foe_target_at'>
+        AT
+      </span>
+      <input type='text' style='width: 100%' name='attr_target_at' 
+  	pattern="\d|10|((\d,|10,){3}(\d|10))"
+        title='Use AT of target (1-10) or 4 ATs separated by commas'>
+      <span>Size</span>
+      <select style='width:100%' name='attr_target_size'>
+        <option value="1">Miniscule</option>
+        <option value="2">Diminutive</option>
+        <option value="3">Tiny</option>
+        <option value="4">Small</option>
+        <option value="5">Medium</option>
+        <option value="6">Big</option>
+        <option value="7">Large</option>
+        <option value="8">Huge</option>
+        <option value="9">Gigantic</option>
+        <option value="10">Enormous</option>
+      </select>
+      <span>Crit. Red.</span>
+      <select style='width:100%' name='attr_target_crit'>
+        <option value="0">None</option>
+        <option value="1">I</option>
+        <option value="2">II</option>
+        <option value="3">III</option>
+      </select>
+    </div>
+
+
+
+
+</div>
+
+<div class='creatureactions'>
+  <h2>Actions</h2>
+
+  
+
+
+
+
+  
+  <div class='actionblock' style='position:relatuve'>
+    <div>Melee</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_melee_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_melee_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_melee_x' value='2'><input class='aptrack' type='radio' name='attr_aptrack_melee_x' value='3'><input class='aptrack' type='radio' name='attr_aptrack_melee_x' value='4'></div>
+</div>
+    <div>Perception</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_perception_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_perception_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_perception_x' value='2'></div>
+</div>
+    <div>Missile  (L: <input name='attr_aptrack_loaded' type='checkbox'>)</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_missile_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_missile_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_missile_x' value='2'><input class='aptrack' type='radio' name='attr_aptrack_missile_x' value='3'></div>
+ </div>
+    <div>Stand/Drop</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_stand_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_stand_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_stand_x' value='2'></div>
+</div>
+    <div>Spell</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_spell_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_spell_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_spell_x' value='2'><input class='aptrack' type='radio' name='attr_aptrack_spell_x' value='3'><input class='aptrack' type='radio' name='attr_aptrack_spell_x' value='4'></div>
+</div>
+    <div>Eat/Drink</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_eat_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_eat_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_eat_x' value='2'></div>
+</div>
+    <div class='double'>Concentration</div> <input type='checkbox'>
+    <div>Free Action Used</div> <input type='checkbox'>
+  </div>
+
+
+
+</div>
+
+<div class='creaturestatus'>
+  <h2>Status</h2>
+
+  
+
+
+
+    <div class='prop_pair'>
+      <span><b>Hits</b></span>
+      <span>
+        <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
+      </span>
+
+      <span>Hits Penalty:</span>
+      <span name='attr_hppenalty'></span>
+    </div>
+
+    <div class='prop_pair'>
+      <span>Injury Penalty:</span>
+      <span>
+        <input type='number' name='attr_injurypenalty'>
+      </span>
+    </div>
+
+    
+    <div class='prop_pair'>
+      <span><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_endurance_info' class='stat_info'></span> 
+        Endurance:
+      </span>
+      <span>
+        <button type='action' class='rollbutton fancybutton fancybuttoninline' name='act_enduranceroll'>
+          <span style='font-family: dicefontd10'>t</span>
+          <span name='attr_endurance'></span>
+          </button>
+      </span>
+      <span>Fatigue:</span>
+      <span> <input type='number' name='attr_fatigue'></span>
+    </div>
+
+    <div class='prop_pair'>
+      <span>Manuever Penalty:</span>
+      <span name='attr_manuever_penalty'></span>
+    </div>
+
+    <hr>
+
+    <div class='prop_pair'>
+      <span><b>PP</b></span>
+      <span>
+        <input type='number' name='attr_pp'> /
+        <span name='attr_pp_max'></span>
+      </span>
+    </div>
+
+
+
+</div>
+
 <hr>
 
+</div> 
 </div> 
 
 
@@ -2256,42 +2399,13 @@ Name <input name="attr_character_name">
 
     <hr>
    
-<div class='prop_pair'><span class='prop_prop_plain'>Profession</span><span class='prop_value' name='attr_profession'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Race</span><span class='prop_value' name='attr_race'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Level</span><span class='prop_value' name='attr_display_level'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Culture</span><span class='prop_value' name='attr_culture'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Realm</span><span class='prop_value' name='attr_realm'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Age</span><span class='prop_value'><input name='attr_age'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Skin</span><span class='prop_value'><input name='attr_skin'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Eyes</span><span class='prop_value'><input name='attr_eyes'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Gender</span><span class='prop_value' name='attr_gender'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Build</span><span class='prop_value' name='attr_build'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Height</span><span class='prop_value' name='attr_height'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Weight</span><span class='prop_value' name='attr_weight'></span></div>
-<div class='prop_pair'><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
-<span class='prop_value' name='attr_weightallowance'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encpenalty'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manpenalty'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Base Move (BMR)</span><span class='prop_value' name='attr_bmr'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Initiative</span><span class='prop_value'><span name='attr_initiative'></span><button type="roll" class="editbutton rollbutton" value="&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] {{actor=@{character_name} }} {{bonus=@{initiative} }} {{total=$[[1]]}} {{roll=$[[0]]}}"><span style="font-family:dicefontd10;">j</span></button></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Easy</span><span class='prop_value' name='attr_strfeat_easy'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Light</span><span class='prop_value' name='attr_strfeat_light'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Medium</span><span class='prop_value' name='attr_strfeat_medium'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Hard</span><span class='prop_value' name='attr_strfeat_hard'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Very Hard</span><span class='prop_value' name='attr_strfeat_veryhard'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Ext. Hard</span><span class='prop_value' name='attr_strfeat_exthard'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Sheer Folly</span><span class='prop_value' name='attr_strfeat_sheerfolly'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Absurd</span><span class='prop_value' name='attr_strfeat_absurd'></span></div>
-<div class='prop_pair'><span class='prop_prop_plain'>Nigh Impossible</span><span class='prop_value' name='attr_strfeat_nighimpossible'></span></div>
+<div class='prop_pair'><span class='prop_prop_plain'>Profession</span><span class='prop_value' name='attr_profession'></span><span class='prop_prop_plain'>Race</span><span class='prop_value' name='attr_race'></span><span class='prop_prop_plain'>Level</span><span class='prop_value' name='attr_display_level'></span><span class='prop_prop_plain'>Culture</span><span class='prop_value' name='attr_culture'></span><span class='prop_prop_plain'>Realm</span><span class='prop_value' name='attr_realm'></span><span class='prop_prop_plain'>Age</span><span class='prop_value'><input type='text' style='width:100%' name='attr_age'></span><span class='prop_prop_plain'>Skin</span><span class='prop_value'><input type='text' style='width:100%' name='attr_skin'></span><span class='prop_prop_plain'>Eyes</span><span class='prop_value'><input type='text' style='width:100%' name='attr_eyes'></span><span class='prop_prop_plain'>Gender</span><span class='prop_value' name='attr_gender'></span><span class='prop_prop_plain'>Build</span><span class='prop_value' name='attr_build'></span><span class='prop_prop_plain'>Height</span><span class='prop_value' name='attr_height'></span><span class='prop_prop_plain'>Weight</span><span class='prop_value' name='attr_weight'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
+<span class='prop_value' name='attr_weightallowance'></span><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encpenalty'></span><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manpenalty'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_bmr_info'></span>Base Move (BMR)</span></span>
+<span class='prop_value' name='attr_bmr'></span><span class='prop_prop_plain'>Initiative</span><span class='prop_value'><span name='attr_initiative'></span><button type="roll" class="editbutton rollbutton" value="&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] {{actor=@{character_name} }} {{bonus=@{initiative} }} {{total=$[[1]]}} {{roll=$[[0]]}}"><span style="font-family:dicefontd10;">j</span></button></span><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span><span class='prop_prop_plain'>Easy</span><span class='prop_value' name='attr_strfeat_easy'></span><span class='prop_prop_plain'>Light</span><span class='prop_value' name='attr_strfeat_light'></span><span class='prop_prop_plain'>Medium</span><span class='prop_value' name='attr_strfeat_medium'></span><span class='prop_prop_plain'>Hard</span><span class='prop_value' name='attr_strfeat_hard'></span><span class='prop_prop_plain'>Very Hard</span><span class='prop_value' name='attr_strfeat_veryhard'></span><span class='prop_prop_plain'>Ext. Hard</span><span class='prop_value' name='attr_strfeat_exthard'></span><span class='prop_prop_plain'>Sheer Folly</span><span class='prop_value' name='attr_strfeat_sheerfolly'></span><span class='prop_prop_plain'>Absurd</span><span class='prop_value' name='attr_strfeat_absurd'></span><span class='prop_prop_plain'>Nigh Impossible</span><span class='prop_value' name='attr_strfeat_nighimpossible'></span>
 
-
-    <span class='prop_prop_plaint'>EP</span>
+    <span class='prop_prop_plain'>EP</span>
     <span class='prop_value'><input class='xp' type="number" name="attr_xp" value="10000"></span>
+    </div>
     
    </div> <!-- sheet-col -->
 
@@ -2300,10 +2414,13 @@ Name <input name="attr_character_name">
 
   <h2>Actions</h2>
 
+ 
+
+
 
 
   
-  <div class='actionblock'>
+  <div class='actionblock' style='position:relatuve'>
     <div>Melee</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_melee' value='0'><input class='aptrack' type='radio' name='attr_aptrack_melee' value='1'><input class='aptrack' type='radio' name='attr_aptrack_melee' value='2'><input class='aptrack' type='radio' name='attr_aptrack_melee' value='3'><input class='aptrack' type='radio' name='attr_aptrack_melee' value='4'></div>
 </div>
     <div>Perception</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_perception' value='0'><input class='aptrack' type='radio' name='attr_aptrack_perception' value='1'><input class='aptrack' type='radio' name='attr_aptrack_perception' value='2'></div>
@@ -2318,11 +2435,16 @@ Name <input name="attr_character_name">
 </div>
     <div class='double'>Concentration</div> <input type='checkbox'>
     <div>Free Action Used</div> <input type='checkbox'>
-
   </div>
 
 
+
+
   <h2>Status</h2>
+
+  
+
+
 
     <div class='prop_pair'>
       <span><b>Hits</b></span>
@@ -2370,6 +2492,9 @@ Name <input name="attr_character_name">
         <span name='attr_pp_max'></span>
       </span>
     </div>
+
+
+
 
     <!-- not hooked up yet -->
     <button type='action' name='act_statusrest'
@@ -2464,7 +2589,7 @@ Name <input name="attr_character_name">
 
     
 
-    <div class='foe'>
+      <div class='foe'>
 
       <span style='grid-column: span 1'>
         Target:
@@ -2504,10 +2629,16 @@ Name <input name="attr_character_name">
       </select>
     </div>
 
+
+
+
+
     <button class='fancybuttoninline fancybutton' type='action' name='act_attackadd'>
           <span style="font-family:Pictos;">&</span></button>
     <button class='fancybuttoninline fancybutton' type='action' name='act_rollcrit'>
           <span style="font-family:dicefontd10;">j</span>Crit</button>
+    <button class='fancybuttoninline fancybutton' type='action' name='act_rollcritselect'>
+          <span style="font-family:Pictos;">s</span>Crit</button>
 
     <input type='hidden' name='attr_attackaddshow' class='attackaddshow'>
     <div class='attackadd overlay'>
@@ -4387,7 +4518,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellownbase'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4443,7 +4574,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellopen'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4499,7 +4630,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellclosed'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4555,7 +4686,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellotherbaseownrealm'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4611,7 +4742,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellopenother'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4667,7 +4798,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellclosedother'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4723,7 +4854,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='spellotherbaseother'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4779,7 +4910,7 @@ Name <input name="attr_character_name">
           <div class='spellname'>
  <button type='action' name='act_editspelllist' class='icon editbutton' style='padding-left: 0.7em'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></button>
 <span class='skill_info' name='attr_info'></span>
-          <span name='attr_name'></span>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
+          <span name='attr_name'></span>          <button type='compendium' name='attr_name' class='inlinecompendium editbutton'></button>          </div>          <div class='spellranks'><span name='attr_ranks'></span></div>          <div class='spellscr'><span name='attr_scr'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{scr} ]] - [[ 1d100!>96]] ]] {{bonus=@{scr} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=casts a spell from }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_scr'></button></div>
           <div class='spellmastery'><span name='attr_spellmastery'></span><button type="roll" class="editbutton rollbutton " name="dicerolls" value="&{template:rmu} [[ [[ [[ 1d100!>96 ]] + @{spellmastery} ]] - [[ 1d100!>96]] ]] {{bonus=@{spellmastery} }} {{um=$[[0]]}} {{rollh=$[[1]]}} {{rollsub=$[[2]]}} {{rolll=$[[3]]}} {{action=@{name}}} {{verb=manipulates the magic of }}{{actor=@{character_name}}} }}"><input type='hidden' name='attr_name'><input type='hidden' name='attr_spellmastery'></button></div>
         </div>
 <input type='hidden' name='attr_group' value='arcane'><input type='hidden' name='attr_grace' value='0'><input type='hidden' name='attr_trickery' value='0'><div class='knownspells'>
@@ -4973,7 +5104,7 @@ Bug reports to nashidau on Discord or the #roll20 channel on the
 
 <hr>
 
-Revision b1e290520d11c557fe80380f39ba12f50017cd8d
+Revision a20cefa1074772856d5538822ccc975ed55cdd94
 
 
 <hr>
@@ -5029,6 +5160,35 @@ function getStatNameFromAbbr(abbr) {
     console.log("Could not find stat "  + abbr);
     return null;
 }
+
+
+
+function parseIntDefault(str, def) {
+  if (typeof(str) == 'number') {
+    if (Number.isInteger(str)) {
+      return str;
+    }
+    return Math.floor(str);
+  }
+  let rv = parseInt(str);
+  if (Number.isNaN(rv)) {
+    return def;
+  }
+  return rv;
+}
+
+function parseNumberDefault(str, def) {
+  if (typeof(str) == 'number') {
+    return str;
+  }
+  let rv = Number.parseFloat(str);
+  if (Number.isNaN(rv)) {
+    return def;
+  }
+  return rv;
+}
+
+
 
 
 
@@ -5937,8 +6097,9 @@ function miscBonusTotal(miscstr, prefix = '') {
 	    log += `${prefix}Set to ${obj.absolute}  ${obj.name}\n`;
 	    total = parseInt(obj.absolute);
 	} else if (obj.hasOwnProperty('value')) {
-	    log += `${prefix}${obj.value}   ${obj.name}\n`;
-	    total += parseInt(obj.value);
+	    let value = parseIntDefault(obj.value, 0);
+	    log += `${prefix}${value}   ${obj.name}\n`;
+	    total += value;
 	} else if (obj.hasOwnProperty('message')) {
 	    log += `${prefix}${obj.message}\n`;
 	} else {
@@ -5961,13 +6122,14 @@ function miscBonusTotalFlat(miscstr) {
 	    log += `Set to ${obj.absolute}  ${obj.name}\n`;
 	    total = parseInt(obj.absolute);
 	} else if (obj.hasOwnProperty('value')) {
-	    if (obj.value < 0) {
+	    let value = parseIntDefault(obj.value, 0);
+	    if (value < 0) {
 		// Negatives print their own sign
-		log += ` ${obj.value} [${obj.name}]`;
+		log += ` ${value} [${obj.name}]`;
 	    } else {
-		log += ` +${obj.value} [${obj.name}]`;
+		log += ` +${value} [${obj.name}]`;
 	    }
-	    total += parseInt(obj.value);
+	    total += value;
 	} else if (obj.hasOwnProperty('message')) {
 	    // Skipped
 	} else {
@@ -6209,6 +6371,11 @@ function pendingInfo() {
   console.log(`Pending level is ${rmuasync} with ${pendingList.length} queued`);
 }
 
+function pendingReset() {
+  let rmuasync = 0;
+  let pendingList = []
+}
+
 function onCheck(str, func) {
   if (typeof(str) != 'string') {
     rmuerror("Calling on with not a string", str);
@@ -6269,7 +6436,7 @@ let RMURaces = {};
 
     {
       const health = racedata['data-health'];
-      miscAttrSet("endurance_misc", rstr, health.Endurance);
+      miscAttrSet("endurance_misc", rstr, health.Endurance || 0);
       miscAttrSet("bodydevelopment_misc", rstr, health["Base Hits"]);
       // FIXME setAttr correct call
       setAttrs({"recovery_multiplier": health["Recovery Mult"]});
@@ -6497,8 +6664,6 @@ let  RMUSkills = {};
       checkPending();
     }
     RMUSkills.updateStatCache = updateStatCache;
-
-    on("sheet:opened", updateStatCache);
 
     RMUSkills.getStat = function(name) {
       return  statCache_[name]
@@ -6796,11 +6961,60 @@ onCheck('change:repeating_favorite:favskill', (ev) => {
     RMUSkills.updateFavoriteSkill(ev.newValue, basename);
 });
 
+RMUSkills.updateFavoriteSKillsDefault = function(attrname) {
+      setAttrs({[`${attrname}_ranks`]: '?', [`${attrname}_bonus`]: '?'});
+      return;
+  
+}
+
+RMUSkills.updateFavoriteSkillSpecialisation = function(skillname, attrname) {
+  const splitindex = skillname.search(/:/);
+  if (splitindex == -1) {
+    return RMUSkills.updateFavoriteSKillsDefault(attrname);
+  }
+  const specskill = skillname.substring(0, splitindex);
+  const specialisation = skillname.substring(splitindex + 1).trim();
+  const skill =  RMUSkills.getSkillByDisplayName(specskill);
+  if (!skill) {
+    console.log("Can;t find skill", specskill)
+    return RMUSkills.updateFavoriteSKillsDefault(attrname);
+  }
+  if (!skill.dynamicspecializations) {
+    console.log("Not a dynamic skill... giveup");
+    return RMUSkills.updateFavoriteSKillsDefault(attrname);
+  }
+  const prefix = `repeating_specialization${specskill}`;
+  getSectionIDs(prefix, (idarray) => {
+      let toget = [];
+      for (const id of idarray) {
+	  toget.push(`${prefix}_${id}_ranks`);
+	  toget.push(`${prefix}_${id}_bonus`);
+	  toget.push(`${prefix}_${id}_name`);
+      }
+      getAttrs(toget, (skills) => {
+	for (const id of idarray) {
+	  const name = skills[`${prefix}_${id}_name`] || "";
+	  const ntrim = name.trim();
+	  if (ntrim === specialisation) {
+	    setAttrs({
+		  [`${attrname}_ranks`]: skills[`${prefix}_${id}_ranks`] || '-',
+		  [`${attrname}_bonus`]: skills[`${prefix}_${id}_bonus`]});
+	    return; // Done
+	  }
+	}
+      });
+  });
+    
+
+  
+
+
+}
+
 RMUSkills.updateFavoriteSkill = function(skillname, basename) {
     const skill = RMUSkills.getSkillByDisplayName(skillname);
     if (!skill) {
-      setAttrs({[`${basename}_ranks`]: '?', [`${basename}_bonus`]: '?'});
-      return;
+      return RMUSkills.updateFavoriteSkillSpecialisation(skillname, basename);
     }
     let toget = [`${skill.aname}_ranks`, `${skill.aname}_bonus`];
     getAttrs(toget, (attrs) => {
@@ -8824,72 +9038,30 @@ function cmPopulateListOptions(target, items, selected) {
   }
 }
 
-/* FIXME: Put this in support.js or similar */
-function parseIntDefault(str, def) {
-  if (typeof(str) == 'number') {
-    if (Number.isInteger(str)) {
-      return str;
-    }
-    return Math.floor(str);
-  }
-  let rv = parseInt(str);
-  if (Number.isNaN(rv)) {
-    return def;
-  }
-  return rv;
-}
-
-/* FIXME: Put this in support.js or similar */
-function parseNumberDefault(str, def) {
-  if (typeof(str) == 'number') {
-    return str;
-  }
-  let rv = Number.parseFloat(str);
-  if (Number.isNaN(rv)) {
-    return def;
-  }
-  return rv;
-}
-
-
-
 const knack_select_all = Array.from({length: 15}).map((_,i) => 'knack_select_' + i);
-
-onCheck("sheet:opened", load => {
-    getAttrs(['charactercreated'], init => {
-	console.log("CC", init, init.charactercreated, init.charactercreated == true);
-	if (init.charactercreated == 'true') {
-	  // Make sure charactermancer button is hiiden
-	  setAttrs({"flag_cmancer_show": "0"})
-
-	  // Do nothing
-	  return;
-	}
-	setAttrs({"flag_cmancer_show": "on"})
-
-	// Get current knack and pbonus values
-	pbonus_total = 0;
-	knack_total = 0;
-	getAttrs(Array.from({length: 15}).map((_,i) => "pbonus_select_" + i), (ev) => {
-	    let pbs = Object.keys(ev);
-	    pbs.forEach(key => {
-		if (ev[key] == 'on') {
-		  pbonus_total += 1;
-		}
-	    });
-	});
-	getAttrs(Array.from({length: 15}).map((_,i) => "knack_select_" + i), (ev) => {
-	    let knacks = Object.keys(ev);
-	    knacks.forEach(key => {
-		knack_total += parseInt(ev[key]) || 0;
-	    });
-	});
-    });
-});
 
 onCheck("clicked:showcharmancer", (ev) => {
   // Launchers sheet-charmancer-race
   startCharactermancer("race");
+
+  // Get current knack and pbonus values
+  pbonus_total = 0;
+  knack_total = 0;
+  getAttrs(Array.from({length: 15}).map((_,i) => "pbonus_select_" + i), (ev) => {
+      let pbs = Object.keys(ev);
+      pbs.forEach(key => {
+	  if (ev[key] == 'on') {
+	  pbonus_total += 1;
+	  }
+	  });
+      });
+  getAttrs(Array.from({length: 15}).map((_,i) => "knack_select_" + i), (ev) => {
+      let knacks = Object.keys(ev);
+      knacks.forEach(key => {
+	  knack_total += parseInt(ev[key]) || 0;
+	  });
+	});
+
 });
 
 onCheck("clicked:showbuyskills", (ev) => {
@@ -9934,12 +10106,13 @@ frontpage.updateMaxPace = function () { console.log("update Max pace Not Impleme
 frontpage.updateBMR = function () {
   console.log("Update BMR");
   getAttrsPending(["bmr_misc", "qu"], (ev) => {
-    // FIXME: Display for bmr_info
-    let lstart = "20  Starting movement";
-    let [total, log] = miscBonusTotal(ev.bmr_misc, lstart);
-    let qb = parseIntDefault(ev.qu, 0);
-    total += Math.floor(qb / 2) + 20;
-    log += `${qb}  Quickness / 2`
+    let log = F(20) + " Starting movement\n";
+    let [total, mlog] = miscBonusTotal(ev.bmr_misc, "");
+    log += mlog;
+    let qb = Math.floor(parseIntDefault(ev.qu, 0) / 2);
+    total += qb + 20;
+    log += `${F(qb)}  Quickness / 2\n`
+    log += `${T(total)} Total Movement`
     setAttrsPending({bmr: total, bmr_info: log});
   });
 }
@@ -10220,7 +10393,6 @@ function generateHeightWeight(race, gender) {
   getAttrsPending(["bmr_misc"], (ev) => {
       let bmr = ev.bmr_misc || [];
       bmr = miscBonusSet(bmr, "Individual Stride", istride);
-      bmr = miscBonusSet(bmr, "Racial Stride", rsize['Stride'])
       setAttrsPending({"bmr_misc": bmr});
   });
 
@@ -10778,15 +10950,10 @@ Edit.saveTab = function(tab) {
   });
 }
 
-onCheck("sheet:opened", (_) => {
-    Edit.hideEdit();
-})
-
 onCheck("clicked:edit_skill_cancel", (ev) => {
     Edit.clearSections();
     Edit.hideEdit();
 });
-
 
 // This only wotk for skill specialisations
 onCheck("clicked:edit_skill_save", (ev) => {
@@ -11064,6 +11231,7 @@ function sizeToNumeric(code) {
 }
 
 function sizeFromNumeric(value) {
+    // FIXME: value, value makes no sense.
     switch (parseIntDefault(value, value)) {
 	case 1: return "Mi";
 	case 2: return "Di";
@@ -11535,6 +11703,37 @@ J E + C + B
 
     }
 
+    attacks.startAttack = function(cdata) {
+	if (cdata.targetsize < cdata.attackersize) {
+	    cdata.sizedbmod = 5 * (cdata.attackersize - cdata.targetsize);
+	    cdata.targetdb += cdata.sizedbmod;
+	}
+	const roll_string = "&{template:rmuattack} " +
+	    `[[ [[ 1d100!>96 ]] + [[${cdata.attackbonus}]] - ([[${cdata.targetdb}]]) ]] ` +
+	    "[[ 1d100 ]] " +
+	    `{\{name=${cdata.character}}} ` +
+	    `{\{target=${cdata.targetname}}} ` +
+	    `{\{weapon=${cdata.attackname}}} ` +
+	    "{\{hitlocation=[[1d7]] }} " +
+	    "{\{attackrollum=$[[0]]}} " +
+	    "{\{attackbonus=$[[1]]}} " +
+	    "{\{targetdb=$[[2]]}} " +
+	    "{\{attackroll=$[[3]]}} " +
+	    "{\{critical=$[[4]]}} " +
+	    "{\{hascritical=[[0]]}} " +
+	    "{\{critdescription=[[0]]}} " +
+	    "{\{criteffect=[[0]]}} " +
+	    "{\{attackresult=[[0]]}} " +
+	    "{\{damage=[[0]]}} " +
+	    "{\{ishit=[[0]]}} " +
+	    "{\{injurystring=[[0]]}} ";
+	    console.log(roll_string);
+	    console.log(cdata);
+	    startRoll(roll_string, roll => {
+		    attacks.resolveAttack(roll.rollId, roll.results, cdata);
+		    });
+    }
+
     onCheck('clicked:repeating_attack:rmuattackroll', (ev) => {
 	const basename = ev.sourceAttribute.replace("_rmuattackroll", "");
 	getAttrs(['character_name', `${basename}_attackstr`, `${basename}_attackmin`,
@@ -11563,34 +11762,7 @@ J E + C + B
 		cdata.targetdb = parseIntDefault(values.target_db, 0);
 		cdata.targetsize = parseIntDefault(values.target_size, 5);
 		cdata.targetcrit = parseIntDefault(values.target_crit, 0);
-		if (cdata.targetsize < cdata.attackersize) {
-		    cdata.sizedbmod = 5 * (cdata.attackersize - cdata.targetsize);
-		    cdata.targetdb += cdata.sizedbmod;
-		}
-		const roll_string = "&{template:rmuattack} " +
-		    `[[ [[ 1d100!>96 ]] + [[${cdata.attackbonus}]] - ([[${cdata.targetdb}]]) ]] ` +
-		    "[[ 1d100 ]] " +
-		    `{\{name=${cdata.character}}} ` +
-		    `{\{target=${cdata.targetname}}} ` +
-		    `{\{weapon=${cdata.attackname}}} ` +
-		    "{\{hitlocation=[[1d7]] }} " +
-		    "{\{attackrollum=$[[0]]}} " +
-		    "{\{attackbonus=$[[1]]}} " +
-		    "{\{targetdb=$[[2]]}} " +
-		    "{\{attackroll=$[[3]]}} " +
-		    "{\{critical=$[[4]]}} " +
-		    "{\{hascritical=[[0]]}} " +
-		    "{\{critdescription=[[0]]}} " +
-		    "{\{criteffect=[[0]]}} " +
-		    "{\{attackresult=[[0]]}} " +
-		    "{\{damage=[[0]]}} " +
-		    "{\{ishit=[[0]]}} " +
-		    "{\{injurystring=[[0]]}} ";
-		console.log(roll_string);
-		console.log(cdata);
-		startRoll(roll_string, roll => {
-			attacks.resolveAttack(roll.rollId, roll.results, cdata);
-		});
+		attacks.startAttack(cdata);
 	});
     });
     attacks.datarollregex = /^0\[(.*)\]\s*$/;
@@ -11654,6 +11826,39 @@ J E + C + B
 	    const type = attacks.getDataFromRoll(roll.results.type.expression);
 	    const degree = parseInt(attacks.getDataFromRoll(roll.results.degree.expression));
 	    const croll = roll.results.roll.result
+	    const index = hitLocation[croll].rollindex;
+	    console.log(degree, type, index);
+	    attacks.getCritical(degree, type, index, (desc, effect) => {
+		    console.log("desc", desc);
+		    console.log("effect", effect);
+		    finishRoll(roll.rollId, {
+			type: type,
+			degree: numericToCritCode(degree),
+			result: desc,
+			effect: effect});
+	    });
+	});
+    });
+
+    onCheck('clicked:rollcritselect', (ev) => {
+	const roll_string = "&{template:rmucriticallookup}" +
+		"{\{who=@{character_name}}}" +
+		"{\{roll=[[?{What crit result?}]]}}" +
+		"{\{type=[[0[?{CriticalType|Acid|Cold|Electricity|Grapple|Heat|Holy" +
+		    "|Impact|Krush|Puncture|Slash|Steam|Strikes|Subdual|Sweeps|Unbalance}]]]}}" +
+		"{\{degree=[[0[?{Degree|A,0|B,1|C,2|D,3|E,4}]]]}}" +
+		"{\{result=[[0]]}}" +
+		"{\{effect=[[0]]}}";
+	console.log(roll_string);
+	startRoll(roll_string, roll => {
+	    const type = attacks.getDataFromRoll(roll.results.type.expression);
+	    const degree = parseInt(attacks.getDataFromRoll(roll.results.degree.expression));
+	    let croll = parseIntDefault(roll.results.roll.result, 100);
+	    if (croll < 1) {
+		croll = 1;
+	    } else if (croll > 100) {
+		croll = 100;
+	    }
 	    const index = hitLocation[croll].rollindex;
 	    console.log(degree, type, index);
 	    attacks.getCritical(degree, type, index, (desc, effect) => {
@@ -11797,7 +12002,8 @@ J E + C + B
 
 
 actions = [
-	"melee", "missile", "spell", "perception", "eat", "stand"
+	"melee", "missile", "spell", "perception", "eat", "stand",
+	"melee_x", "missile_x", "spell_x", "perception_x", "eat_x", "stand_x",
 ];
 
 const actionevents = actions.map(name => `change:aptrack_${name}`).join(" ");
@@ -11811,13 +12017,14 @@ onCheck(actionevents, (ev) => {
     }
     toclear[`aptrack_${action}`] = 0;
   }
-  console.log(toclear);
   setAttrs(toclear, { silent: true });
 
   // Don't update on 0 AP messages
   if (+ev.newValue == 0) {
     return;
   }
+
+  select = select.replace("_x", "")
 
   // Send to chat as a rollmessage
   startRoll(`&{template:rmuactionmsg}  {\{who=@{character_name}}} {\{ap=${ev.newValue}}} ` +
@@ -11882,15 +12089,22 @@ const fatigueResults = {
 
 onCheck("change:hppenalty change:injurypenalty change:fatigue", updatePenalties);
 
-onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus sheet:opened ", (x) => {
-    getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus'], (ev) => {
+onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", (x) => {
+    getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits'], (ev) => {
 	let update = {}
-	update.hp_max = ev.bodydevelopment_bonus;
-	update.pp_max = ev.powerdevelopment_bonus;
+	// Creatures use 'hits'; Use that instead of bodydevelopement
+	let hp = ev.bodydevelopment_bonus;
+	let pp = ev.powerdevelopment_bonus;
+	if (ev.hits) {
+	  hp = ev.hits
+	}
+	update.hp_max = hp;
+	update.pp_max = pp
+	/*
 	update.bar1_max = ev.bodydevelopment_bonus;
 	update.bar1_value = ev.hp;
 	update.bar2_max = ev.powerdevelopment_bonus;
-	update.bar2_value = ev.pp;
+	update.bar2_value = ev.pp;*/
 //	if (!ev.hasOwnProperty(hp)) {
 //	  update.hp = ev.bodydevelopment_bonus; 
 //	}
@@ -12100,11 +12314,94 @@ onCheck("clicked:statusrest", (_) => {
 
 creature = {}
 
+creature.getLongSize = function(shortname) {
+  switch (shortname) {
+  case "Mi": return "Miniscule"
+  case "Di": return "Diminutive"
+  case "T": return "Tiny"
+  case "S": return "Small"
+  case "M": return "Medium"
+  case "B": return "Big"
+  case "L": return "Large"
+  case "H": return "Huge"
+  case "G": return "Gigantic"
+  case "E": return "Enormous"
+  }
+  console.log("Unknown size ", shortname);
+  return ""
+}
+
+// Sorted alphabetically
+//  Weapon (we) and ranged weapon are special (rw)
 weaponcodes = {
+  be: "Beak",
   bi: "Bite",
   cl: "Claw",
+  cr: "Crush",
+  gr: "Grapple",
   ho: "Horn",
   ra: "Ram",
+  sw: "Unarmed Sweeps",
+  un: "Unarmed Strikes",
+  si: "Stinger",
+  tr: "Trample",
+/*
+Dagger		da
+Short Sword		ss
+Rapier		rp
+Arming sword		as
+Longsword		ls
+Broadsword		bs
+Scimitar		sc
+Falchion		fa
+Two-handed Sword		ts
+Mace		ma
+Club		cu
+Two-handed Club		tc
+Shield		sh
+Quarterstaff		qs
+War Hammer		wh
+War Mattock		wm
+Hand Axe		hx
+Battle Axe		bx
+Two-handed Axe		tx
+Flail		fl
+Heavy Flail		hf
+Whip		wi
+Spear		sp
+Halberd		ha
+Pole Axe		px
+Sling		sl
+Short Bow		sb
+Long Bow		lb
+Light Crossbow		lc
+Heavy Crossbow		hc
+Bola		bo
+Javelin		ja
+Dagger (Thrown)		td
+Hand Axe (Thrown)		ta
+Rock, one handed		ro
+Rock, Two handed		rt
+Rock, medium		rm
+Rock, large		rl
+Rock, huge		rh
+Spear (Thrown)		tp
+War Hammer (Thrown)		tw
+Elemental bolt		elb
+Blast bolt		bbo
+Earth bolt		ebo
+Fire Bolt		fbo
+Ice Bolt		ibo
+Water Bolt		wbo
+Lightning Bolt		lbo
+Blast ball		bba
+Cold Ball		cba
+Earth Ball		
+Shard ball		sba
+Fire Ball		fba
+Lightning Ball		lba
+Tongue		wi
+*/
 };
 
 
@@ -12133,14 +12430,24 @@ creature.newCreature = function(name, jdata) {
   
   updates.at_torso = updates.at_head = updates.at_arms = updates.at_legs = updates.at;
   updates.db = cdata.DB;
-  updates.critreduciton = cdata.critreduciton;
+  // FIXME: Kill this after my next upload.
+  updates.critreduction = cdata.critreduction || cdata.critreduciton;
+
   updates.hits = parseInt(cdata.hits);
-  updates.hits_max = updates.hits;
+  updates.hp = updates.hits;
+  updates.hp_max = updates.hp;
   updates.hitsscaled = cdata.hitsscaled;
   updates.pp = parseInt(cdata.PP);
   updates.pp_max = updates.pp;
   updates.size = cdata.size;
   updates.initiative = cdata.initiative;
+
+  // Status stuff
+  updates.hppenalty = 0; // Nothing by default
+  updates.injurypenalty = 0;
+  updates.endurance = 99;
+  updates.fatigue = 0;
+  updates.manuever_penalty = 0;
 
   updates.rr_channeling_bonus = cdata.Ch;
   updates.rr_essence_bonus = cdata.Ess;
@@ -12169,9 +12476,10 @@ creature.newCreature = function(name, jdata) {
       console.log("Look up", weaponcodes[type]);
       getCompendiumPage(`AttackTable:${weaponcodes[type]}`, cdata => {
           let nu = {};
-          nu[`${prefix}_attackname`] = "Size " + weaponcodes[type];
+          // FIXME: Handle errors in size slookup gracefully.
+          nu[`${prefix}_attackname`] = creature.getLongSize(size) + " " + weaponcodes[type];
           nu[`${prefix}_attacksize`] = size;
-          nu[`${prefix}_attackbasefumble`] = 2; // FIXMEitems.attackaddfumble;
+          nu[`${prefix}_attackbasefumble`] = 1; // FIXMEitems.attackaddfumble;
           nu[`${prefix}_attacktable`] = weaponcodes[type];
           nu[`${prefix}_attackstr`] = 100;
           nu[`${prefix}_attacksource`] = 'creature';
@@ -12181,7 +12489,7 @@ creature.newCreature = function(name, jdata) {
           nu[`${prefix}_attackmin`] = cdata.data.min.match(/\d+/)[0] || 0;
           nu[`${prefix}_attackmax`] = cdata.data.max.match(/\d+/)[0] || 0;
           nu[`${prefix}_attackdata`] = cdata.data['data-attack'] || "";
-          VsetAttrs(nu);
+          VrmuSetAttrs(nu);
       });
     }
   
@@ -12200,17 +12508,56 @@ creature.newCreature = function(name, jdata) {
   });*/
 }
 
-onCheck('clicked:repeating_creatureattack:creatureattack', (ev) => {
-    const basename = ev.sourceAttribute.replace("_creatureattack","");
-    console.log(ev);
+/**
+ * So some poor sap is being attacked.  We need to get all the stuff into a object (cdata),
+ * then generate the roll string - and then let attacks resolve it.
+ */
+onCheck('clicked:repeating_creatureattack:creaturemakeattack', (ev) => {
+    console.log("Creature attack", ev);
+    const basename = ev.sourceAttribute.replace("_creaturemakeattack","");
+    console.log("basenae", basename);
     const toget = [
+      'character_name',
+      'size', 
       `${basename}_ob`,
       `${basename}_attack`,
       `${basename}_attacksize`,
       `${basename}_type`,
-    ];
-    getAttrs(toget, (data) => {
+      `${basename}_attackstr`,
+      `${basename}_attackmin`,
+      `${basename}_attackmax`,
+      `${basename}_attackdata`,
+      `${basename}_attackbonus`,
+      `${basename}_attackname`,
+      `${basename}_attackfumble`,
+      `${basename}_attacksize`,
+      'target_name',
+      'target_db',
+      'target_at',
+      'target_size',
+      'target_crit',
 
+    ];
+    getAttrs(toget, (values) => {
+      console.log("Attack data", toget, values);
+      cdata = {};
+      cdata.min = +values[`${basename}_attackmin`];
+      cdata.max = +values[`${basename}_attackmax`];
+      cdata.fumblerange = +values[`${basename}_attackfumble`] || 1;
+      cdata.character = values.character_name;
+      cdata.attackbonus = +values[`${basename}_ob`];
+      cdata.attackdata = values[`${basename}_attackdata`];
+      cdata.attacksize = sizeToNumeric(values[`${basename}_attacksize`] || 'M');
+      cdata.attackersize = sizeToNumeric(values.size || 'M');
+      cdata.attackname = values[`${basename}_attackname`] || "Weapon";
+      cdata.str = +values.str || 0;
+      cdata.targetname = values.target_name || "Foe";
+      cdata.targetat = values.target_at || 1;
+      cdata.targetdb = parseIntDefault(values.target_db, 0);
+      cdata.targetsize = parseIntDefault(values.target_size, 5);
+      cdata.targetcrit = parseIntDefault(values.target_crit, 0);
+      console.log(cdata);
+      attacks.startAttack(cdata);
     });
 
 });
@@ -12291,6 +12638,46 @@ onCheck("clicked:applyattackresult", (ev) => {
 // vim: set sw=4 sts=4 syn=javascript :
 
 
+
+/**
+ * This is called on init.
+ *
+ * All sheet:opened calls should be from here.
+ *
+ * To do: Add handling for versions here.
+ */
+
+onCheck("sheet:opened", (_) => {
+    // First clear pending
+    console.log("Sheet Load");
+    pendingInfo();
+    pendingReset();
+
+    Edit.hideEdit();
+
+    getAttrs(['charactercreated'], init => {
+	if (init.charactercreated == 'true') {
+	  // Make sure charactermancer button is hiiden
+	  setAttrs({"flag_cmancer_show": "0"})
+
+	  // Do nothing
+	  return;
+	}
+	setAttrs({"flag_cmancer_show": "on"})
+    });
+
+    getAttrs(['sheetselect'], (sheet) => {
+	if (!sheet.sheetselect) {
+	  sheet.sheetselect = 'playersheet';
+	  setAttrs(sheet);
+	}
+	if (sheet.sheetselect == 'playersheet') {
+	  RMUSkills.updateStatCache();
+	}
+    });
+});
+
+// vim: set sw=2 sts=2 syn=javascript :
 
 
 function getStatFromAName(aname) {

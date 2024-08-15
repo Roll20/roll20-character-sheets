@@ -1,3 +1,28 @@
+# 2024-8-15
+
+- Show BMR info on front page
+- Make BMR info more legible
+- Don't add racial bonnus to BMR twice.
+- Eyes/Skin/Hair now save
+- Improve layout of the derived properties on the front page.
+- Integrate EP into layout.
+- Updates to way sheets open to make creatures easier to deal with.
+- Force all sheets to be playersheets unless they are creatures
+- Spell Lists -> click on the i to see the list in the compendium
+- Foe box looks a little pretier.
+- Endurance:
+  - Create correctly if zero
+- Misc:
+  - Handle 'Null' data
+- Creatures;
+  - They have critreduction, not critreduciton
+  - Redo layout.
+  - Can now target PCs
+  - Track AP box
+  - Status box (hits etc)
+  - Creatures can attack!
+  - Don't apply DB size mod twice.
+
 # 2024-8-6
 
 - Spells:
