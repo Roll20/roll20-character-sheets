@@ -215,53 +215,94 @@ on("change:repeating_conjuration-spells-myranor", function(info) {
 });
 
 on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
-	const func = "Action Listener for Spell Roll Buttons";
-	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
-	var nameInternal = "Hardcoded Internal Name"; //spellsData[trigger]["internal"];
-	var nameUI = "Hardcoded UI Name"; //spellsData[trigger]["ui"];
-	//Copy array, or we get a reference and modify the database
-	var stats = ["MU", "IN", "KL"]; //[...spellsData[trigger]["stats"]];
-	var spellRep = "z_blitz_representation"; //"z_" + nameInternal + "_representation";
-	debugLog(func, trigger); //, spellsData[trigger]);
+	const func = "Action Listener for Myranor Conjuration Spell Roll Buttons";
+
+	const triggerRow = info["sourceAttribute"].match(/^repeating_conjuration-spells-myranor_(?<rowID>-[^_]+)/).groups["rowID"];
+	const attrPrefix = "repeating_conjuration-spells-myranor";
+	const rowAttrs = [
+		"name", "sphere", "source", "representation_full", "representation_short", "value",
+		"type", "stats", "stat0", "stat1", "stat2",
+	];
+	debugLog(func, triggerRow);
 
 	var attrsToGet = [
+		"sf_representations_myranor",
+		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK",
 		"v_festematrix",
 		"n_spruchhemmung"
 	];
+	for (attr of rowAttrs)
+	{
+		attrsToGet.push(
+			[
+				attrPrefix,
+				triggerRow,
+				attr
+			].join("_")
+		);
+	}
 
 	safeGetAttrs(attrsToGet, function (v) {
+		// Shortening of result properties
+		const repeatingRegex = new RegExp(`${attrPrefix}_${triggerRow}_`);
+		var shortResults = {};
+		for (attr of attrsToGet)
+		{
+			// attrs from outside the repeating section are already short
+			if (!attr.match(repeatingRegex))
+			{
+				shortResults[attr] = v[attr];
+				continue;
+			}
+			shortAttr = attr.replace(repeatingRegex, '');
+			shortResults[shortAttr] = v[attr];
+		}
+
+		// Replacements
+		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop", "Ner" ]);
+		let characterStats = { "MU": v["MU"], "KL": v["KL"], "IN": v["IN"], "CH": v["CH"], "FF": v["FF"] };
+		let spellData = {};
+		spellData["stats"] = [ shortResults["stat0"], shortResults["stat1"], shortResults["stat2"] ];
+
+		// Regex matches everything that is known to not be included in the (German) representations strings
+		// firstRep = first result element
+		let firstRep = v["sf_representations_myranor"].replace(/^\s*(.*?)\s*$/, '$1').split(/[^a-zäöüßA-ZÄÖÜ\/']+/)[0];
+		// Spell representation: use specific value given for each spell, fall back: first representation
+		spellData["representation"] = shortResults["representation_short"];
+		if (
+			( spellData["representation"] === "" ) ||
+			( spellData["representation"] === 0 )
+		)
+		{
+			if ( firstRep !== "" ) {
+				spellData["representation"] = firstRep;
+			}
+		}
+
+		let replacementResult = { "modified": false, "replacementInfo": "", "stats": [ ...spellData["stats"] ] };
+		if ( relevantRepresentations.has(spellData["representation"]) )
+		{
+			replacementResult = replaceSpellStats(spellData, characterStats);
+		}
+
 		// Build Roll Macro
 		var rollMacro = "";
-
-		/*rollMacro +=
-			"@{gm_roll_opt} " +
-			"&{template:default} " +
-			"{{name=" + nameUI + "}} " +
-			"{{wert=[[@{ZfW_" + nameInternal + "}d1cs0cf2]]}} " +
-			"{{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}} " +
-			"{{stats=[[ " +
-				"[Eigenschaft 1:] [[@{" + stats[0] + "}]]d1cs0cf2 + " +
-				"[Eigenschaft 2:] [[@{" + stats[1] + "}]]d1cs0cf2 + " +
-				"[Eigenschaft 3:] [[@{" + stats[2] + "}]]d1cs0cf2" +
-				"]]}} " +
-			"{{roll=[[3d20cs<@{cs_zauber}cf>@{cf_zauber}]]}} " +
-			"{{result=[[0]]}} " +
-			"{{criticality=[[0]]}} " +
-			"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}} " + 
-			"{{repmod=" + (replacementResult["modified"] ? replacementUIString[replacementResult["replacementInfo"]] : "") + "}} ";
-		debugLog(func, rollMacro);*/
 		rollMacro = [
 			"@{gm_roll_opt}",
-			"&{template:default}",
-			"{{name=Test}}",
-			"{{wert=[[10d1]]}}",
-			"{{mod=[[0d1]]}}",
-			"{{stats=[[ [Eigenschaft 1:] 15d1cs0cf2 + [Eigenschaft 2:] 15d1cs0cf2 + [Eigenschaft 3:] 15d1cs0cf2 ]]}}",
+			"&{template:zauber}",
+			`{{name=${shortResults["name"]}}}`,
+			`{{wert=[[${shortResults["value"]}d1]]}}`,
+			"{{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}}",
+			"{{stats=[[",
+				`[Eigenschaft 1:] [[@{${replacementResult["stats"][0]}}]]d1cs0cf2 +`,
+				`[Eigenschaft 2:] [[@{${replacementResult["stats"][1]}}]]d1cs0cf2 +`,
+				`[Eigenschaft 3:] [[@{${replacementResult["stats"][2]}}]]d1cs0cf2`,
+			"]]}}",
 			"{{roll=[[3d20cs<@{cs_zauber}cf>@{cf_zauber}]]}}",
 			"{{result=[[0]]}}",
 			"{{criticality=[[0]]}}",
 			"{{critThresholds=[[[[@{cs_zauber}]]d1cs0cf2 + [[@{cf_zauber}]]d1cs0cf2]]}}",
-			"{{repmod=}}"
+			"{{repmod=" + (replacementResult["modified"] ? replacementResult["replacementInfo"] : "") + "}}"
 		].join(" ");
 		debugLog(func, rollMacro);
 
