@@ -16067,22 +16067,21 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, sett
 	}
 	else { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number or percentage`, AutoEffect); }
 	
-	let scaling = 1;
 	/* Handle the scaling option */
-	if (AutoEffect[3] != undefined) {
-		if (AutoEffect[3].toLowerCase().includes("scaling")) {
-			if ((/(scaling[0-9]+)/ig).test(AutoEffect[3])) {
-				scaling = Math.min(Math.floor(count/effectVal), parseInt(AutoEffect[3].toLowerCase().replace("scaling","")));
+	let scaling = 1;
+	let scalingOption = AutoEffect.find(option => (/(scaling)/ig).test(option));
+	if (scalingOption != undefined) {
+		if ((/(scaling[0-9]+)/ig).test(scalingOption)) {
+			scaling = Math.min(Math.floor(countImmutable/effectVal), parseInt(scalingOption.toLowerCase().replace("scaling","")));
 			} else {
-				scaling = Math.floor(count/effectVal);
+			scaling = Math.floor(countImmutable/effectVal);
 			}
 			returnValues.scaling = scaling;
-		}
 	}
 
 	/* Handle the target option */
-	if (AutoEffect.includes("Target")) {
-		returnValues.autoRequire = autoEffectToString(AutoEffect).replaceAll("Target","");
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		returnValues.autoRequire = autoEffectToString(AutoEffect).replace(/(target)/ig,"");
 		returnValues.scaling = 1;
 	} else {
 	
@@ -16102,7 +16101,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, sett
 			effectIcon = ailmentList[effectName][5];
 		}
 	
-		if (!AutoEffect.includes("Silent")) {
+		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 			returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
 		}
 		returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
@@ -16144,22 +16143,21 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle,
 	}
 	else { return autoEffectErrorMessage("Invalid Target", `Ailment or Bar "${effectName}" does not exist`, AutoEffect); }
 	
-	let scaling = 1;
 	/* Handle the scaling option */
-	if (AutoEffect[3] != undefined) {
-		if (AutoEffect[3].toLowerCase().includes("scaling")) {
-			if ((/(scaling[0-9]+)/ig).test(AutoEffect[3])) {
-				scaling = Math.min(Math.floor(count/effectVal), parseInt(AutoEffect[3].toLowerCase().replace("scaling","")));
+	let scaling = 1;
+	let scalingOption = AutoEffect.find(option => (/(scaling)/ig).test(option));
+	if (scalingOption != undefined) {
+		if ((/(scaling[0-9]+)/ig).test(scalingOption)) {
+			scaling = Math.min(Math.floor(countImmutable/effectVal), parseInt(scalingOption.toLowerCase().replace("scaling","")));
 			} else {
-				scaling = Math.floor(count/effectVal);
+			scaling = Math.floor(countImmutable/effectVal);
 			}
 			returnValues.scaling = scaling;
-		}
 	}
 
 	/* Handle the target option */
-	if (AutoEffect.includes("Target")) {
-		returnValues.autoConsume = autoEffectToString(AutoEffect).replaceAll("Target","");
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		returnValues.autoConsume = autoEffectToString(AutoEffect).replace(/(target)/ig,"");
 		returnValues.scaling = 1;
 	} else {
 
@@ -16192,7 +16190,7 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle,
 			effectIcon = ailmentList[effectName][5];
 		}
 	
-		if (!AutoEffect.includes("Silent")) {
+		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 			returnValues.message = autoEffectMessage(messageFormat, effectName, -effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
 		}
 		returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: -effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
@@ -16273,7 +16271,7 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle,
 	if (effectHasNextTurn == 'true' && forceTarget != "This round") { messageFormat += " next round"; }
 	if (autoEffectType == "standard") { messageFormat += " [[INITIAL] -> [RESULT]]" }
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, effectAilment, effectVal/scaling, count, scaling, "success", settingLimbusStyle, effectIcon);
 	}
 	messageValues = { effectTarget: effectAilment, effectIcon: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
@@ -16315,7 +16313,7 @@ function autoEffectSetBar(AutoEffect, barList, scaling) {
 	let messageValues = {};
 	let messageFormat = getTranslationByKeyCustom("Set [TARGET] to [RESULT]", "autoeffect-format-set");
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, effectTarget, (parseInt(effectVal) - parseInt(count))/scaling, count, scaling, "success");
 	}
 	messageValues = { effectTarget: effectTarget, effectVal: (parseInt(effectVal) - parseInt(count))/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
@@ -16361,7 +16359,7 @@ function autoEffectAddBar(AutoEffect, barList, scaling, autoEffectType) {
 
 	if (autoEffectType == "standard") { messageFormat += " [[INITIAL] -> [RESULT]]" }
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		returnValues.message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
 	}
 	returnValues.messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
@@ -16396,7 +16394,7 @@ function autoEffectMultiBar(AutoEffect, barList, scaling) {
 	let messageValues = {};
 	let messageFormat = getTranslationByKeyCustom("Multiply [TARGET] by <b>", "autoeffect-format-multi1") + effectVal + getTranslationByKeyCustom("</b> [[SCALING NUM]]", "autoeffect-format-multi2");
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, effectTarget, Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count))/scaling, count, scaling, "success");
 	}
 	messageValues = { effectTarget: effectTarget, effectVal: Math.floor(parseFloat(effectVal) * parseInt(count) - parseInt(count))/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
@@ -16433,7 +16431,7 @@ function autoEffectDice(AutoEffect, scaling) {
 	let messageFormat = getTranslationByKeyCustom("Increase [TARGET] by [SCALING NUM]", "autoeffect-format-dice");
 	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Reduce [TARGET] by [SCALING NUM]", "autoeffect-format-dice-neg"); }
 	
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, AutoEffect[0].replace("Dice", "Dice "), effectVal/scaling, 0, scaling, "success");
 	}
 	messageValues = { effectTarget: AutoEffect[0].replace("Dice", "Dice "), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
@@ -16468,7 +16466,7 @@ function autoEffectChallengeRoll(AutoEffect, scaling) {
 	let messageFormat = getTranslationByKeyCustom("Rolling [TARGET] <b>+</b>[SCALING NUM]", "autoeffect-format-challengeroll");
 	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Rolling [TARGET] [SCALING NUM]", "autoeffect-format-challengeroll-neg"); }
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, (statTarget.charAt(0).toUpperCase() + statTarget.slice(1)), effectVal/scaling, 0, scaling, "success");
 	}
 	messageValues = { effectTarget: (statTarget.charAt(0).toUpperCase() + statTarget.slice(1)), effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
@@ -16507,7 +16505,7 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 		case "NextRound": messageFormat += " " + getTranslationByKeyCustom("next round", "autoeffect-option-nextround"); break;
 	}
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, "Speed", effectVal/scaling, 0, scaling, "success");
 	}
 	messageValues = { effectTarget: "Speed", effectVal: effectVal/scaling, effectCount: 0, scaling: scaling, checkResult: "success" }
@@ -16567,7 +16565,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 		case "flatDamage": messageFormat = getTranslationByKeyCustom("Deal [SCALING NUM] [TARGET] Damage", "autoeffect-format-flatdamage"); break;
 	}
 
-	if (!AutoEffect.includes("Silent")) {
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
 	}
 	messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
