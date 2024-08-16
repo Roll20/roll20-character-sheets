@@ -10472,11 +10472,47 @@ function generateActionButton(name, icon, color, action, data, target) {
 	return [name, icon, color, action, data, target];
 }	
 
+/* Takes in arguments of the format: [returnValue, queryText, {label1:value1, label2:value2, ...}] */
+/* Sends one query for each argument included and returns an array of results */
+async function sendQuery(...args) {
+	let queryList = [];
+	args.forEach(arg => { if(arg != [] && arg != "") { queryList.push(arg); } });
+	
+	let rollBase = "! ";
+	queryList.forEach(query => {
+		rollBase += `{{${query[0]}=[[0[?{${query[1]}`;
+		
+		for (const [label, value] of Object.entries(query[2])) {
+			rollBase += `|${label},${value}`;
+		}
+
+		rollBase += "}]]]}}";
+	});
+
+	//?{Name of Query|Label 1, value1|Label 2, value2}
+	
+	let queryRoll = await startRoll(rollBase);
+	
+	let queryResults = {}
+	queryList.forEach(query => {
+		queryResults[query[0]] = queryRoll.results[query[0]].expression.match(/^0\[(.*)\]\s*$/)[1];
+	});
+    finishRoll(queryRoll.rollId);
+	return queryResults;
+}
+
 
 /* Action button functions */
 on('clicked:actionButtonDamage', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
+
+	/* If the damage type is unset (such as for ranged weapon) query the player for a damage type */
+	if (data.damageTypeOverride == "---") {
+		let queryResults = await sendQuery(["damageTypeOverride", "Select damage type of attack: ", {"Slash":"Slash", "Pierce":"Pierce", "Blunt":"Blunt"}]);
+		data.damageTypeOverride = queryResults.damageTypeOverride;
+	}
+
 	if (typeof data == "string") {
 		AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 	} else {
