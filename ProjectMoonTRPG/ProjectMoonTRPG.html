@@ -10341,7 +10341,7 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 </div>
 
 <rolltemplate class="sheet-rolltemplate-actionbuttons">
-    <div class="sheet-actionButtonBlocker"></div>
+    <div class="sheet-actionButtonBlocker{{whisperMode}}"></div>
 	
 	<div class="sheet-actionButtonContainer">{{#buttonlabel0}}<div class="sheet-button {{color0}}">[x]({{icon0}})[{{buttonlabel0}}](~{{computed::targetid0}}|{{buttonlink0}}||{{computed::datapackage0}})</div>{{/buttonlabel0}}</div>
 	<div class="sheet-actionButtonContainer">{{#buttonlabel1}}<div class="sheet-button {{color1}}">[x]({{icon1}})[{{buttonlabel1}}](~{{computed::targetid1}}|{{buttonlink1}}||{{computed::datapackage1}})</div>{{/buttonlabel1}}</div>
@@ -10435,15 +10435,19 @@ async function checkTargetAttrs(returnValues, charname="", charid="selected") {
 
 async function createActionButtons(buttonList, charname="", charid="selected") {
 	
-	//getAttrs(["settingTargetMode"], async function(values) {
+	getAttrs(["settingWhisperRolls", "settingWhisperTarget"], async function(values) {
 
+	/* Whisper roll */
+	let whisperrolls = values.settingWhisperRolls;
+	let whispertarget = values.settingWhisperTarget;
+	let whispermode = ""
 	let whisper = "";
-	/*let targetmode = values.settingTargetMode;
-	if (targetmode == "true" && charname != "") {
-		whisper = `/w ${charname.split(" ")[0]} `;
-	}*/
+	if(whisperrolls == "true"){
+		whisper =  `/w ${whispertarget} `;
+		whispermode = "Whisper";
+	}
 
-	let rollBase = whisper + "&{template:actionbuttons}";
+	let rollBase = whisper + `&{template:actionbuttons} {{whisperMode=${whispermode}}} `;
 	let dataList = {}
 
 	if (buttonList[0] != undefined) {
@@ -10455,7 +10459,7 @@ async function createActionButtons(buttonList, charname="", charid="selected") {
 		let buttonRoll = await startRoll(rollBase); 
 		finishRoll(buttonRoll.rollId, dataList);
 	}
-	//});
+	});
 }
 
 function generateActionButton(name, icon, color, action, data, target) {
