@@ -31,6 +31,30 @@ const THAC0_FORMULAS = {
     'psionicist': l => 21-Math.ceil(l/2),
 }
 
+const SPELL_LEVEL_REQUIREMENT = {
+    'Wizard': {
+        '1': 1,
+        '2': 3,
+        '3': 5,
+        '4': 7,
+        '5': 9,
+        '6': 12,
+        '7': 14,
+        '8': 16,
+        '9': 18,
+    },
+    'Priest': {
+        '1': 1,
+        '2': 3,
+        '3': 5,
+        '4': 7,
+        '5': 9,
+        '6': 11,
+        '7': 14,
+        'q': 10,
+    }
+}
+
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
 
@@ -3043,29 +3067,34 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
 
     let spell;
     let spellClass;
+    let classLevel;
     if (wizardSpell && priestSpell) {
         spellClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
         spell = spellClass === 'Wizard' ? wizardSpell : priestSpell;
     } else if (wizardSpell) {
-        spell = wizardSpell;
         spellClass = 'Wizard';
+        spell = wizardSpell;
+        classLevel = '@{level-class2}';
     } else {
-        spell = priestSpell;
         spellClass = 'Priest';
+        spell = priestSpell;
+        classLevel = '@{level-class3}'
     }
 
-    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS], async function(books) {
-        if (bookInactiveShowToast(books, spell))
+    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS, 'scroll-failure-system'], async function(values) {
+        if (bookInactiveShowToast(values, spell))
             return
+
+        console.log(values);
 
         let parse = parseSourceAttribute(eventInfo);
 
         let rollBuilder = new RollTemplateBuilder('2Espell');
         rollBuilder.push(`title=@{scroll}\n(Casting level @{scroll-level})`);
         rollBuilder.push(`splevel=${displaySpellLevel(spell.level, spellClass)}`);
-        rollBuilder.push(`school=${getSpellSchools(spell, books)}`);
+        rollBuilder.push(`school=${getSpellSchools(spell, values)}`);
         if (spellClass === 'Priest') {
-            let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+            let sphereRules = getActiveSettings(SPHERE_FIELDS, values);
             rollBuilder.push(`sphere=${getSpellSpheres(spell, sphereRules)}`);
         }
         rollBuilder.push(`range=${spell['range']}`);
@@ -3094,23 +3123,56 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
 
         let recommendedMinimumLevel;
-
-        let spellLevel = parseInt(spell.level);
-        if (isNaN(spellLevel)) {
+        let levelRequirement = SPELL_LEVEL_REQUIREMENT[spellClass][spell.level];
+        if (levelRequirement < 6) {
             recommendedMinimumLevel = 6;
-        } else if (spellLevel <= 3) {
-            recommendedMinimumLevel = 6;
-        } else if (spellLevel === 4 || spellLevel === 5) {
-            recommendedMinimumLevel = spellLevel*2;
-        } else if (spellLevel === 6 && spellClass === 'Priest') {
-            recommendedMinimumLevel = spellLevel*2;
-        } else if (spellLevel >= 6) {
-            recommendedMinimumLevel = spellLevel*2+1
+        } else {
+            recommendedMinimumLevel = levelRequirement+1;
         }
 
         let scribeLevel = await extractQueryResult(`?{At what level is ${eventInfo.newValue} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
 
-        let spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}? (If you do not use this rule, set the value to 0)|0}`);
+        let failureSystem = values['scroll-failure-system'];
+
+        let casterFailure = '';
+        if (failureSystem.includes('spell-level')) {
+            casterFailure = `{(${levelRequirement}-(${classLevel}))*5,0}kh1`;
+        } else if (failureSystem.includes('casting-level')) {
+            casterFailure = `{((@{scroll-level})-(${classLevel}))*5,0}kh1`;
+        }
+
+        let rogueClass;
+        let rogueFailure = '';
+        if (failureSystem.includes('thief')) {
+            rogueClass = 'Thief';
+            rogueFailure = `100-({0,@{level-class4}}>10*75)`;
+        } else if (failureSystem.includes('bard')) {
+            rogueClass = 'Bard';
+            rogueFailure = `100-({0,@{level-class4}}>10*85)`;
+        }
+
+        let spellFailure;
+        if (failureSystem === '' || failureSystem === 'disabled') {
+            spellFailure = 0;
+        } else if (failureSystem === 'custom') {
+            spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}?|0}`);
+        } else if (failureSystem.includes('best')) {
+            spellFailure = `{[[${casterFailure}]] [${spellClass}],[[${rogueFailure}]] [${rogueClass}]}kl1`;
+        } else if (failureSystem.includes('select')) {
+            casterFailure = casterFailure
+                .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                .replaceAll(',', '&#44;');
+            rogueFailure = rogueFailure
+                .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                .replaceAll(',','&#44;');
+            spellFailure = `?{Try as a ${spellClass} or a ${rogueClass}?|${spellClass},${casterFailure} [${spellClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+        } else if (rogueClass) {
+            spellFailure = `${rogueFailure} [${rogueClass}]`;
+        } else {
+            spellFailure = `${casterFailure} [${spellClass}]`;
+        }
+
+        console.log(spellFailure);
 
         let scrollInfo = {
             [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
