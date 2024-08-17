@@ -15393,7 +15393,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		switch (AutoEffect[0][0]) {
 			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, settingLimbusStyle); break;
 			case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, settingLimbusStyle, autoEffectType); break;
-			case "Reset": tempOutput = { checkResult: "success", scaling: 1, messageValues: {checkResult:"success"} }; break;
+			case "Reset": tempOutput = autoEffectReset(AutoEffect[0]); break;
 			case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
 			default: tempOutput = {}; break;
 		}
@@ -15416,7 +15416,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				default: tempOutput = autoEffectErrorMessage("Invalid AutoEffect", `${AutoEffect[0][0].replace("Unknown: ","")} is not a valid AutoEffect`, AutoEffect[0]); break;
 			}
 		}
-		console.log(tempOutput)
+		// console.log(tempOutput)
 			
 			/* Handle errors. Continues executing AutoEffects for the sake of finding additional errors, */
 			/*  but does not apply any changes to attributes */
@@ -15490,8 +15490,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				}
 			});
 
-			/* Handle target options for Require, Consume and CustomMessage */
-			effectList = ["autoRequire", "autoConsume", "autoCustomMessage"];
+			/* Handle target options for Require, Consume, Reset and CustomMessage */
+			effectList = ["autoRequire", "autoConsume", "autoReset", "autoCustomMessage"];
 			effectList.forEach(effect => {
 				if (tempOutput[effect] != undefined) {
 					if (autoEffectConditional == "") {
@@ -16217,6 +16217,15 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle,
 
 	/* Return check result */
 	return returnValues;
+}
+
+function autoEffectReset(AutoEffect) {
+	/* Handle the target option */
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		return { autoReset: autoEffectToString(AutoEffect).replace(/(target)/ig,"") };
+	} else {
+		return { checkResult: "success", scaling: 1, messageValues: {checkResult:"success"} };
+	}
 }
 
 function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle, autoEffectType) {
