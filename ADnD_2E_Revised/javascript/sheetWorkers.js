@@ -2279,9 +2279,9 @@ on('clicked:grenade-miss', async function(eventInfo) {
         };
 
         // See if monster is within direct hit
-        if (roll.results.distance.result <= roll.results.aoe.result / 2) {
+        if (roll.results.aoe && roll.results.distance.result <= roll.results.aoe.result / 2) {
             computedRolls.hit = 1;
-        } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+        } else if (roll.results.aoesplash && roll.results.distance.result <= roll.results.aoesplash.result / 2) {
             computedRolls.splash = 1;
         }
         finishRoll(roll.rollId, computedRolls);
