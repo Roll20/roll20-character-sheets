@@ -10509,7 +10509,13 @@ on('clicked:actionButtonDamage', async (data) => {
 
 	/* If the damage type is unset (such as for ranged weapon) query the player for a damage type */
 	if (data.damageTypeOverride == "---") {
-		let queryResults = await sendQuery(["damageTypeOverride", "Select damage type of attack: ", {"Slash":"Slash", "Pierce":"Pierce", "Blunt":"Blunt"}]);
+		let queryResults = await sendQuery(["damageTypeOverride",
+			getTranslationByKeyCustom("Select damage type of attack", "query-damage-type"), {
+				[getTranslationByKeyCustom("Slash","weapon-type-Slash")]:"Slash",
+				[getTranslationByKeyCustom("Pierce","weapon-type-Pierce")]:"Pierce",
+				[getTranslationByKeyCustom("Blunt","weapon-type-Blunt")]:"Blunt"
+			}
+		]);
 		data.damageTypeOverride = queryResults.damageTypeOverride;
 	}
 
@@ -15154,8 +15160,17 @@ on("clicked:closeAutoScriptEdit", function(info) {
 	setAttrs({autoScriptEditor_display: "0"});
 });
 /* AutoScript editor reset styling to default button */
-on("clicked:autoScriptStylingDefault", function(info) {
-	loadDefaultAutoScriptStyling();
+on("clicked:autoScriptStylingDefault", async function(info) {
+	let queryResults = await sendQuery(["userConfirmation",
+		getTranslationByKeyCustom("Are you certain you want to reset back to the default AutoEffect styling settings? This action can not be reversed", "query-reset-styling"), {
+			[getTranslationByKeyCustom("No","query-no")]:"false",
+			[getTranslationByKeyCustom("Yes","query-yes")]:"true"
+		}
+	]);
+
+	if (queryResults.userConfirmation == "true") {
+		loadDefaultAutoScriptStyling();
+	}
 });
 function loadDefaultAutoScriptStyling() {
 	getAttrs(["autoScriptStylingDefault"], function(values) {
