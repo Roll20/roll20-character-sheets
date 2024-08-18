@@ -3082,10 +3082,11 @@ on('change:scroll-failure-system', function (eventInfo) {
 });
 
 on('change:repeating_scrolls:scroll', async function (eventInfo) {
-    if (!eventInfo.newValue)
+    let scrollName = eventInfo.newValue;
+    if (!scrollName)
         return;
 
-    let spellName = eventInfo.newValue.replace(/ scroll$/, '');
+    let spellName = scrollName.replace(/ scroll$/, '');
     let wizardSpell = wizardSpells['wizmonster'][spellName];
     let priestSpell = priestSpells['primonster'][spellName];
     if (!wizardSpell && !priestSpell)
@@ -3095,7 +3096,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
     let casterClass;
     let casterLevel;
     if (wizardSpell && priestSpell) {
-        casterClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
+        casterClass = await extractQueryResult(`?{Is ${scrollName} a Wizard or Priest scroll?|Wizard|Priest}`);
         spell = casterClass === 'Wizard' ? wizardSpell : priestSpell;
     } else if (wizardSpell) {
         casterClass = 'Wizard';
@@ -3154,7 +3155,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             recommendedMinimumLevel = levelRequirement+1;
         }
 
-        let scribeLevel = await extractQueryResult(`?{At what level is ${eventInfo.newValue} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
+        let scribeLevel = await extractQueryResult(`?{At what level is ${scrollName} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
 
         let failureSystem = values['scroll-failure-system'];
 
@@ -3179,9 +3180,9 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         if (failureSystem === '' || failureSystem === 'disabled') {
             spellFailure = 0;
         } else if (failureSystem === 'custom') {
-            spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}?|0}`);
+            spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${scrollName}?|0}`);
         } else if (failureSystem.includes('best')) {
-            spellFailure = `{[[${casterFailure}]] [${casterClass}],[[${rogueFailure}]] [${rogueClass}]}kl1`;
+            spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
         } else if (failureSystem.includes('select')) {
             casterFailure = casterFailure
                 .replaceAll(/(?<!class\d|level)}/g,'&#125;')
@@ -3189,7 +3190,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             rogueFailure = rogueFailure
                 .replaceAll(/(?<!class\d|level)}/g,'&#125;')
                 .replaceAll(',','&#44;');
-            spellFailure = `?{Try as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+            spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
         } else if (rogueClass) {
             spellFailure = `${rogueFailure} [${rogueClass}]`;
         } else {
