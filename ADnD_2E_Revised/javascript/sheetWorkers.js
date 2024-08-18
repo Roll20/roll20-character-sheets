@@ -3053,8 +3053,9 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
             a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
         })
         .execute();
-})
+});
 
+//#region Scroll
 on('change:scroll-failure-system', function (eventInfo) {
     let failureSystem = eventInfo.newValue;
     if (!failureSystem)
@@ -3091,34 +3092,32 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         return
 
     let spell;
-    let spellClass;
-    let classLevel;
+    let casterClass;
+    let casterLevel;
     if (wizardSpell && priestSpell) {
-        spellClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
-        spell = spellClass === 'Wizard' ? wizardSpell : priestSpell;
+        casterClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
+        spell = casterClass === 'Wizard' ? wizardSpell : priestSpell;
     } else if (wizardSpell) {
-        spellClass = 'Wizard';
+        casterClass = 'Wizard';
         spell = wizardSpell;
-        classLevel = '@{level-class2}';
+        casterLevel = '@{level-class2}';
     } else {
-        spellClass = 'Priest';
+        casterClass = 'Priest';
         spell = priestSpell;
-        classLevel = '@{level-class3}'
+        casterLevel = '@{level-class3}'
     }
 
     getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS, 'scroll-failure-system'], async function(values) {
         if (bookInactiveShowToast(values, spell))
             return
 
-        console.log(values);
-
         let parse = parseSourceAttribute(eventInfo);
 
         let rollBuilder = new RollTemplateBuilder('2Espell');
         rollBuilder.push(`title=@{scroll}\n(Casting level @{scroll-level})`);
-        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, spellClass)}`);
+        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, casterClass)}`);
         rollBuilder.push(`school=${getSpellSchools(spell, values)}`);
-        if (spellClass === 'Priest') {
+        if (casterClass === 'Priest') {
             let sphereRules = getActiveSettings(SPHERE_FIELDS, values);
             rollBuilder.push(`sphere=${getSpellSpheres(spell, sphereRules)}`);
         }
@@ -3148,7 +3147,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
 
         let recommendedMinimumLevel;
-        let levelRequirement = SPELL_LEVEL_REQUIREMENT[spellClass][spell.level];
+        let levelRequirement = SPELL_LEVEL_REQUIREMENT[casterClass][spell.level];
         if (levelRequirement < 6) {
             recommendedMinimumLevel = 6;
         } else {
@@ -3161,9 +3160,9 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
 
         let casterFailure = '';
         if (failureSystem.includes('spell-level')) {
-            casterFailure = `{(${levelRequirement}-(${classLevel}))*5,0}kh1`;
+            casterFailure = `{(${levelRequirement}-(${casterLevel}))*5,0}kh1`;
         } else if (failureSystem.includes('casting-level')) {
-            casterFailure = `{((@{scroll-level})-(${classLevel}))*5,0}kh1`;
+            casterFailure = `{((@{scroll-level})-(${casterLevel}))*5,0}kh1`;
         }
 
         let rogueClass;
@@ -3182,7 +3181,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         } else if (failureSystem === 'custom') {
             spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}?|0}`);
         } else if (failureSystem.includes('best')) {
-            spellFailure = `{[[${casterFailure}]] [${spellClass}],[[${rogueFailure}]] [${rogueClass}]}kl1`;
+            spellFailure = `{[[${casterFailure}]] [${casterClass}],[[${rogueFailure}]] [${rogueClass}]}kl1`;
         } else if (failureSystem.includes('select')) {
             casterFailure = casterFailure
                 .replaceAll(/(?<!class\d|level)}/g,'&#125;')
@@ -3190,14 +3189,12 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
             rogueFailure = rogueFailure
                 .replaceAll(/(?<!class\d|level)}/g,'&#125;')
                 .replaceAll(',','&#44;');
-            spellFailure = `?{Try as a ${spellClass} or a ${rogueClass}?|${spellClass},${casterFailure} [${spellClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+            spellFailure = `?{Try as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
         } else if (rogueClass) {
             spellFailure = `${rogueFailure} [${rogueClass}]`;
         } else {
-            spellFailure = `${casterFailure} [${spellClass}]`;
+            spellFailure = `${casterFailure} [${casterClass}]`;
         }
-
-        console.log(spellFailure);
 
         let scrollInfo = {
             [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
@@ -3209,6 +3206,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         setAttrs(scrollInfo);
     });
 });
+//#endregion
 //#endregion
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
