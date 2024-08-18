@@ -3055,6 +3055,31 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         .execute();
 })
 
+on('change:scroll-failure-system', function (eventInfo) {
+    let failureSystem = eventInfo.newValue;
+    if (!failureSystem)
+        return;
+
+    getAttrs(['level-class2','level-class3','level-class4'], function (values) {
+        let wizardLevel = parseInt(values['level-class2']) || 0;
+        let priestLevel = parseInt(values['level-class3']) || 0;
+        let rogueLevel = parseInt(values['level-class4']) || 0;
+
+        if (failureSystem.includes('level') && !wizardLevel && !priestLevel &&
+            (failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+            return showToast(WARNING, 'Missing Class levels', `You have no Wizard, Priest, or Rogue levels in the fields @{level-class2}, @{level-class3}, or @{level-class4}. Either the Wizard or Priest, and Rogue fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+        }
+
+        if (failureSystem.includes('level') && !wizardLevel && !priestLevel) {
+            return showToast(WARNING, 'Missing Wizard/Priest level', `You have no Wizard or Priest levels in the fields @{level-class2} or @{level-class3}. Either of these fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+        }
+
+        if ((failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+            return showToast(WARNING, 'Missing Rogue level', `You have no Rogue level in the field @{level-class4}. This field must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+        }
+    });
+});
+
 on('change:repeating_scrolls:scroll', async function (eventInfo) {
     if (!eventInfo.newValue)
         return;
