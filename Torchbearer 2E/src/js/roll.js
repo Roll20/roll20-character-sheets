@@ -44,6 +44,10 @@ function rollableItemClicked(button) {
     "trait2_name",
     "trait3_name",
     "trait4_name",
+    "wise1_name",
+    "wise2_name",
+    "wise3_name",
+    "wise4_name",
     "rolling_trait"
   ];
 
@@ -51,6 +55,7 @@ function rollableItemClicked(button) {
     const beginnersLuckRoll = calculateBeginnersLuck(button);
 
     populateTraitOptions(values);
+    populateWiseOptions(values);
 
     setAttrs({
       rolling: button,
@@ -88,6 +93,29 @@ function populateTraitOptions(values) {
 
   populateListOptions({
     elemSelector: '.sheet-trait-selector',
+    optionsArray: options
+  });
+}
+
+function populateWiseOptions(values) {
+  const options = [
+    { label: "No wise", value: 0 },
+  ];
+
+  for (let i = 1; i <= 4; i++) {
+    if (values["wise" + i + "_name"]) {
+      const res = { label: values["wise" + i + "_name"], value: i };
+
+      if (values["rolling_du_wise"] == i) {
+        res.selected = true;
+      }
+
+      options.push(res);
+    }
+  }
+
+  populateListOptions({
+    elemSelector: '.sheet-du-wise-selector',
     optionsArray: options
   });
 }
