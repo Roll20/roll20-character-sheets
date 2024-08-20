@@ -204,8 +204,6 @@
 
 
 
-<input type="hidden" class="xsheet-toggle" name="xattr_charactercreated" value='false'>
-
 
 <charmancer class="sheet-charmancer-race">
 <div>
@@ -2114,6 +2112,9 @@
     </div> 
   </div> 
 </div>
+
+
+
 
 <input type='hidden' name='attr_sheetselect' class='sheetselect'>
 <div class='creaturesheet'>
@@ -5096,7 +5097,14 @@ Name <input name="attr_character_name">
 <button type='action' name='act_updateattacks' class='fancybutton'>Attacks</button>
 <button type='action' name='act_editspells' class='fancybutton'>Edit Spells</button>
 
+<hr>
 
+<p>Rerun the initial charactermancer.  Warning this may add all sorts of weird results to your character.
+This is not for usual use.</p>
+
+<button type='action' name='act_showcharmancer' class='toggler fancybutton'>Charactermancer</button>
+
+<p>This is the magic button to apply attack results.  Clicking should do little.</p>
 <button type="action" name="act_applyattackresult"></button>
 
 <hr>
@@ -5106,7 +5114,7 @@ Bug reports to nashidau on Discord or the #roll20 channel on the
 
 <hr>
 
-Revision 7c647d878cc463743cc3ecad22079f37bf249bd6
+Revision 312226f26becda9be73d84535e75bcb5c7156fe7
 
 
 <hr>
@@ -8230,81 +8238,108 @@ function levelUpStart(_) {
  
     });
 
-    // So we need to get the profession & Costs
-    const data = getCharmancerData();
+    let costs = {};
 
-    const costs = getCostsWithWeapons(data.knacks.values);
-    dpspent = 0;
-
-    let catupdates = {}
-    for (const cat in costs) {
-      catupdates['cmcategory-' + cat + '-cost'] = costs[cat];
-    }
-    catupdates['cmcategory-combattraining-cost'] = '-';
-    catupdates['cmcategory-spellcasting-cost'] = '-';
-    setCharmancerText(catupdates);
-
-    // Update each of the cost fields and the selectors.
-    RMUSkills.forEachSkill((skill, cat, pskill) => {
-	if (skill.spellgroup) {
-	  return;
-	}
-	const skillname = pskill ? pskill.aname : skill.aname;
-	const costarray = generateCostArray(costs[cat.aname] ?? costs[skillname]);
-	if (costarray.length == 0) {
-	  rmuerror("Could not generate costs", pskill, pskill.aname, skill.aname);
-	  return;
-	}
-	cmPopulateListOptions('cmskill' + skill.aname + 'ranks', costarray); 
+    addPendingFunction("Level Up fetch costs", () => {
+      const toget = [];
+      categories.forEach(cat => {
+	toget.push(cat.aname + '_cost');
+      });
+      toget.push('magicalritual_cost', 'spellownbase_cost', 'spellopen_cost',
+		'spallclosed_cost', 'spellrestricted_cost', 'spellarcane_cost');
+      toget.push('meleeweapons_cost', 'rangedweapons_cost', 'unarmed_cost',
+	  'shield_cost');
+      console.log("toget for level up", toget);
+      getAttrsPending(toget, (results) => {
+	  // Strip the costs of each key
+	  for (const [key, cost] of Object.entries(results)) {
+	    costs[key.replace(/_cost/, "")] = cost;
+	  }
+      });
     });
 
-    // Global scope; as the other is a pending funtion.
-    let savedspelllists = [];
-    let savedtalents = [];
-    let savedstatgains = [];
-    // On load I should check the list of repeating sections and add
-    // them
-    if (data?.levelup?.repeating) {
-      const profession = data.profession.values.profession;
-      const costs = getCostsFromData(profession);
-      for (const index in data.levelup.repeating) {
-	// Need to extract the skillname so I can call addRepeating again
-	const prefix = data.levelup.repeating[index];
-	// See if it's spell list.
-	if (prefix.includes("spelllist")) {
-	  savedspelllists.push(prefix);
-	  continue;
+	// Global scope; as the other is a pending funtion.
+	let savedspelllists = [];
+	let savedtalents = [];
+	let savedstatgains = [];
+
+    addPendingFunction("Level Up Start body", () => {
+	// So we need to get the profession & Costs
+
+
+	const data = getCharmancerData();
+
+//	const costs = getCostsWithWeapons(data.knacks.values);
+	dpspent = 0;
+
+	let catupdates = {}
+	for (const cat in costs) {
+	  catupdates['cmcategory-' + cat + '-cost'] = costs[cat];
 	}
-	if (prefix.endsWith("_talent")) {
-	  savedtalents.push(prefix);
-	  continue;
-	}
-	if (prefix.endsWith("_statgain")) {
-	  savedstatgains.push(prefix);
-	  continue;
-	}
-	const match = prefix.match(/cmskill_(.*)_specializations/)
-	if (!match || match.length < 2) {
-	  rmuerror("Coulnd't match regex against ", prefix, index);
-	  continue;
-	}
-	const origname = match[0];
-	const skillname = match[1];
-	const skill = RMUSkills.getSkillByName(skillname)
-	const costarray = generateCostArray(costs[skill.category]);
-	addRepeatingSection(`cmskill${skillname}`, 'specialization', origname,
-	    (sectionname) => {
+	catupdates['cmcategory-combattraining-cost'] = '-';
+	catupdates['cmcategory-spellcasting-cost'] = '-';
+	setCharmancerText(catupdates);
+
+	// Update each of the cost fields and the selectors.
+	RMUSkills.forEachSkill((skill, cat, pskill) => {
+	    if (skill.spellgroup) {
+	    return;
+	    }
+	    const skillname = pskill ? pskill.aname : skill.aname;
+	    const costarray = generateCostArray(costs[cat.aname] ?? costs[skillname]);
+	    if (costarray.length == 0) {
+	    rmuerror("Could not generate costs", pskill, pskill.aname, skill.aname);
+	    return;
+	    }
+	    cmPopulateListOptions('cmskill' + skill.aname + 'ranks', costarray); 
+	    });
+
+
+	// On load I should check the list of repeating sections and add
+	// them
+	if (data?.levelup?.repeating) {
+	  const profession = data.profession.values.profession;
+	  const costs = getCostsFromData(profession);
+	  for (const index in data.levelup.repeating) {
+	    // Need to extract the skillname so I can call addRepeating again
+	    const prefix = data.levelup.repeating[index];
+	    // See if it's spell list.
+	    if (prefix.includes("spelllist")) {
+	      savedspelllists.push(prefix);
+	      continue;
+	    }
+	    if (prefix.endsWith("_talent")) {
+	      savedtalents.push(prefix);
+	      continue;
+	    }
+	    if (prefix.endsWith("_statgain")) {
+	      savedstatgains.push(prefix);
+	      continue;
+	    }
+	    const match = prefix.match(/cmskill_(.*)_specializations/)
+	      if (!match || match.length < 2) {
+		rmuerror("Coulnd't match regex against ", prefix, index);
+		continue;
+	      }
+	    const origname = match[0];
+	    const skillname = match[1];
+	    const skill = RMUSkills.getSkillByName(skillname)
+	      const costarray = generateCostArray(costs[skill.category]);
+	    addRepeatingSection(`cmskill${skillname}`, 'specialization', origname,
+		(sectionname) => {
 		console.log("recreate section", sectionname);
 		const sname = `${sectionname}_specname`;
 		const rname = `${sectionname}_cmskillranks`;
 		cmPopulateListOptions(rname, costarray, data.levelup.values[rname])
 		setAttrsPending({[sname]: data.levelup.values[sname]});
-	    }
-	);
-      }
-    }
+		}
+		);
+	  }
+	}
+    });
 
     addPendingFunction('Talents add', () => {
+      const data = getCharmancerData();
       for (obj of savedtalents) {
 	addRepeatingSection('added_talents', 'talent', (id) => {
 	    setCharmancerOptions(`${id}_talent`, "Category:Talent",
@@ -8314,6 +8349,7 @@ function levelUpStart(_) {
     });
 
     addPendingFunction('Spell List add', () => {
+	const data = getCharmancerData();
 	getAttrsPending(["realm"], (realm) => {
 	    initSpellListsCM(
 		savedspelllists,
@@ -8694,7 +8730,7 @@ RMUStats.updateStatOption = function(stats) {
       highestval = statval;
     } else if (highestval == statval) {
       highest.push(st);
-    } else if (statval > secondhighest) {
+    } else if (statval > secondhighestval) {
       secondhighest = [];
       secondhighest.push(st)
 	secondhighestval = statval;
@@ -9551,6 +9587,35 @@ function cleanCompendiumName(str) {
   return str.replace(/[^:]*:/, "").replace(/\?.*/, "");
 }
 
+function saveCostData(pdata, kdata) {
+  const updates = {};
+  console.log("save cost data:", pdata, kdata);
+  {
+    const scosts = pdata['data-skillCost'];
+    for (const [group, cost] of Object.entries(scosts)) {
+      updates[RMUSkills.getCatByDisplayName(group)?.aname + "_cost"] = cost;
+    }
+  }
+  {
+    const mcosts = pdata['data-Spellcasting'];
+    updates.magicalritual_cost = mcosts['Magic Ritual'];
+    updates.spellownbase_cost = mcosts['Base'];
+    updates.spellopen_cost = mcosts['Open'];
+    updates.spellclosed_cost = mcosts['Closed'];
+    updates.spellrestricted_cost = mcosts['Restricted'];
+    updates.spellarcane_cost = mcosts['Arcane'];
+  }
+  {
+    const wcosts = getWeaponCosts(kdata);
+    for (const [group, cost] of Object.entries(wcosts)){
+      updates[`${group}_cost`] = cost;
+    }
+  }
+  updates.costdatasaved = true;
+  console.log(updates);
+  setAttrsPending(updates);
+}
+
 /**/
 onCheck("mancerfinish:newcharacter", (ev) => {
     const data = ev.data;
@@ -9566,6 +9631,7 @@ onCheck("mancerfinish:newcharacter", (ev) => {
       if (realm == 'None') {
 	realm = cleanCompendiumName(data.profession.values.realm);
       }
+      saveCostData(data.profession.data.profession, data.knacks.values);
       setAttrsPending({profession: cleanCompendiumName(data.profession.values.profession),
 		realm: realm,
 		xp: 10000,
@@ -9665,13 +9731,7 @@ onCheck("mancerfinish:newcharacter", (ev) => {
 
 
     addPendingFunction("CMFinish: Save Weapon Costs", () => {
-	console.log("Saving", data.knacks.values)
-	const costs = getWeaponCosts(data.knacks.values);
-	const updates = {}
-	for (const [group, cost] of Object.entries(costs)){
-	  updates[`${group}_cost`] = cost;
-	}
-	setAttrsPending(updates);
+
     });
 
     addPendingFunction("CMFinish: update all skills", RMUSkills.updateAllSkills);
