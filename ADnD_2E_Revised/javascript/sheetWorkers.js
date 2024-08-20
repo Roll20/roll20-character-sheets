@@ -2094,215 +2094,224 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 });
 //#endregion
 
-on('clicked:grenade-miss', async function(eventInfo) {
-    let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
-    const query = '?{What grenade have been thrown?'.concat(
-        '|Acid',
-        '|Holy water',
-        '|Oil (lit)',
-        '|Poison',
-        '|Boulder',
-        '|--------',
-        '|Fire Seed missile',
-        '|Ice Knife',
-        '|Melf’s Minute Meteor',
-        '|Otiluke’s Freezing Sphere - Globe of cold',
-        '|Produce Flame',
-        '|Puffball',
-        '|Sol’s Searing Orb',
-        '|Other',
-        '}'
-    );
-    let grenade = await extractQueryResult(query);
-    switch (grenade) {
-        case 'Acid': {
-            rollBuilder.push(
-                'name=Acid',
-                'aoe=[[1]]',
-                'aoesplash=[[1+6]]',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;2d4&rbrack;&rbrack; acid damage using their Acid! &#40;Direct Hit&#41;)',
-                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;1&rbrack;&rbrack; acid damage using their Acid! &#40;Splash&#41;)'
-            );
-            break;
+on('clicked:grenade-miss', function(eventInfo) {
+    getAttrs(['tab11'], async function(values) {
+        let templateVisibility = '';
+        let rollVisibility = '/em';
+        if (values['tab11'] === '2') {
+            templateVisibility = values['wtype'];
+            rollVisibility = values['wtype'];
         }
-        case 'Holy water': {
-            rollBuilder.push(
-                'name=Holy water',
-                'aoe=[[1]]',
-                'aoesplash=[[1+6]]',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;1d6+1&rbrack;&rbrack; damage using their Holy water! &#40;Direct Hit&#41;)',
-                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;2&rbrack;&rbrack; damage using their Holy water! &#40;Splash&#41;)'
-            );
-            break;
-        }
-        case 'Oil (lit)': {
-            rollBuilder.push(
-                'name=Oil (lit)',
-                'aoe=[[3]]',
-                'aoesplash=[[3+6]]',
-                'hitdmg=[Round 1](`/em rolls &lbrack;&lbrack;2d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, first round&#41;) [Round 2](`/em rolls &lbrack;&lbrack;1d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, second round&#41;)',
-                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;1d3&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Splash&#41;)'
-            );
-            break;
-        }
-        case 'Poison': {
-            rollBuilder.push(
-                'name=Poison',
-                'aoe=[[1]]',
-                'aoesplash=[[1+6]]',
-                'hitdmg=[Special](`/em affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Direct Hit&#41;)',
-                'splashdmg=[Special](`/em affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Splash&#41;)'
-            );
-            break;
-        }
-        case 'Boulder': {
-            let damage = await extractQueryResult('?{Direct Hit damage|3d10}');
-            rollBuilder.push(
-                'name=Boulder',
-                'aoe=[[2]]',
-                'aoesplash=[[2]]',
-                `hitdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their Boulder! &#40;Direct Hit&#41;)`,
-                `splashdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
-                'bounce=[[3d10]]'
-            );
-            break;
-        }
-        case '--------': return;
-        case 'Fire Seed missile': {
-            rollBuilder.push(
-                'name=Fire Seed missile',
-                'aoe=[[10]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break
-        }
-        case 'Ice Knife': {
-            rollBuilder.push(
-                'name=Ice Knife',
-                'aoe=[[10]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break;
-        }
-        case 'Melf’s Minute Meteor': {
-            rollBuilder.push(
-                'name=Melf’s Minute Meteor',
-                'aoe=[[1]]',
-                'aoesplash=[[6]]',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;1d4&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Direct Hit&#41;)',
-                'splashdmg=[Damage](`/em rolls &lbrack;&lbrack;1&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Splash&#41;)'
-            );
-            break;
-        }
-        case 'Otiluke’s Freezing Sphere - Globe of cold': {
-            rollBuilder.push(
-                'name=Otiluke’s Freezing Sphere (Globe of cold)',
-                'aoe=[[20]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em causes creatures failing a save vs. spell &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break;
-        }
-        case 'Produce Flame': {
-            rollBuilder.push(
-                'name=Produce Flame',
-                'aoe=[[3]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em rolls &lbrack;&lbrack;1d4+1&rbrack;&rbrack; fire damage using their Produce Flame! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break;
-        }
-        case 'Puffball': {
-            rollBuilder.push(
-                'name=Puffball',
-                'aoe=[[10]]',
-                'aoesplash=',
-                'hitdmg=[Effect](`/em causes creatures failing a save vs. poison to be unable to attack and lose all Dexterity bonuses to Armor Class and saving throws using their Puffball! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break;
-        }
-        case 'Sol’s Searing Orb': {
-            rollBuilder.push(
-                'name=Sol’s Searing Orb',
-                'aoe=[[6]]',
-                'aoesplash=',
-                'hitdmg=[Damage](`/em causes normal creatures failing a saving throw vs. spell &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness. Or causes undead &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness. All victims are allowed a saving throw vs. spell, with success indicating half damage and no blindness. Using their Sol’s Searing Orb! &#40;Direct Hit&#41;)',
-                'splashdmg='
-            );
-            break;
-        }
-        case 'Other': {
-            let name = await extractQueryResult('?{Grenade name}');
-            let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
-            let damage = await extractQueryResult('?{Direct Hit damage|1d6}');
-            let splash = await extractQueryResult('?{Splash damage|1d3}');
-            splash = splash.trim();
 
-            let escapedName = name.replaceAll('(','&#40;')
-                .replaceAll(')','&#41;')
-                .replaceAll('[','&lbrack;')
-                .replaceAll(']','&rbrack;');
+        let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
+        const query = '?{What grenade have been thrown?'.concat(
+            '|Acid',
+            '|Holy water',
+            '|Oil (lit)',
+            '|Poison',
+            '|Boulder',
+            '|--------',
+            '|Fire Seed missile',
+            '|Ice Knife',
+            '|Melf’s Minute Meteor',
+            '|Otiluke’s Freezing Sphere - Globe of cold',
+            '|Produce Flame',
+            '|Puffball',
+            '|Sol’s Searing Orb',
+            '|Other',
+            '}'
+        );
+        let grenade = await extractQueryResult(query);
+        switch (grenade) {
+            case 'Acid': {
+                rollBuilder.push(
+                    'name=Acid',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;2d4&rbrack;&rbrack; acid damage using their Acid! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1&rbrack;&rbrack; acid damage using their Acid! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Holy water': {
+                rollBuilder.push(
+                    'name=Holy water',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d6+1&rbrack;&rbrack; damage using their Holy water! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;2&rbrack;&rbrack; damage using their Holy water! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Oil (lit)': {
+                rollBuilder.push(
+                    'name=Oil (lit)',
+                    'aoe=[[3]]',
+                    'aoesplash=[[3+6]]',
+                    `hitdmg=[Round 1](\`${rollVisibility} rolls &lbrack;&lbrack;2d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, first round&#41;) [Round 2]({rollVisibility}\`$ rolls &lbrack;&lbrack;1d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, second round&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d3&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Poison': {
+                rollBuilder.push(
+                    'name=Poison',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Special](\`${rollVisibility} affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Special](\`${rollVisibility} affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Boulder': {
+                let damage = await extractQueryResult('?{Direct Hit damage|3d10}');
+                rollBuilder.push(
+                    'name=Boulder',
+                    'aoe=[[2]]',
+                    'aoesplash=[[2]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their Boulder! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
+                    'bounce=[[3d10]]'
+                );
+                break;
+            }
+            case '--------': return;
+            case 'Fire Seed missile': {
+                rollBuilder.push(
+                    'name=Fire Seed missile',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break
+            }
+            case 'Ice Knife': {
+                rollBuilder.push(
+                    'name=Ice Knife',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Melf’s Minute Meteor': {
+                rollBuilder.push(
+                    'name=Melf’s Minute Meteor',
+                    'aoe=[[1]]',
+                    'aoesplash=[[6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d4&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Otiluke’s Freezing Sphere - Globe of cold': {
+                rollBuilder.push(
+                    'name=Otiluke’s Freezing Sphere (Globe of cold)',
+                    'aoe=[[20]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. spell &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Produce Flame': {
+                rollBuilder.push(
+                    'name=Produce Flame',
+                    'aoe=[[3]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d4+1&rbrack;&rbrack; fire damage using their Produce Flame! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Puffball': {
+                rollBuilder.push(
+                    'name=Puffball',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Effect](\`${rollVisibility} causes creatures failing a save vs. poison to be unable to attack and lose all Dexterity bonuses to Armor Class and saving throws using their Puffball! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Sol’s Searing Orb': {
+                rollBuilder.push(
+                    'name=Sol’s Searing Orb',
+                    'aoe=[[6]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes normal creatures failing a saving throw vs. spell &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness. Or causes undead &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness. All victims are allowed a saving throw vs. spell, with success indicating half damage and no blindness. Using their Sol’s Searing Orb! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Other': {
+                let name = await extractQueryResult('?{Grenade name}');
+                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let damage = await extractQueryResult('?{Direct Hit damage|1d6}');
+                let splash = await extractQueryResult('?{Splash damage|1d3}');
+                splash = splash.trim();
 
-            rollBuilder.push(
-                `name=${name}`,
-                `aoe=[[${aoe}]]`,
-                `aoesplash=[[${aoe}+6]]`,
-                `hitdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Direct Hit&#41;)`,
-            );
+                let escapedName = name.replaceAll('(','&#40;')
+                    .replaceAll(')','&#41;')
+                    .replaceAll('[','&lbrack;')
+                    .replaceAll(']','&rbrack;');
 
-            if (splash === '' || splash === '0') {
-                rollBuilder.push('splashdmg=');
-            } else {
-                rollBuilder.push(`splashdmg=[Damage](\`/em rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`);
+                rollBuilder.push(
+                    `name=${name}`,
+                    `aoe=[[${aoe}]]`,
+                    `aoesplash=[[${aoe}+6]]`,
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Direct Hit&#41;)`,
+                );
+
+                if (splash === '' || splash === '0') {
+                    rollBuilder.push('splashdmg=');
+                } else {
+                    rollBuilder.push(`splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`);
+                }
             }
         }
-    }
 
-    let distanceName;
-    switch (grenade) {
-        case 'Fire Seed missile':
-        case 'Melf’s Minute Meteor':
-        case 'Produce Flame':
-        case 'Sol’s Searing Orb':
-            distanceName = 'Short';
-            break;
-        default:
-            distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
-    }
-    rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
-    let distanceRoll;
-    switch (distanceName) {
-        case 'Short':  distanceRoll='1d6cs1cf6'; break;
-        case 'Medium': distanceRoll='1d10cs1cf10'; break;
-        case 'Long':   distanceRoll='2d10cs1cf10'; break;
-    }
-    if (grenade === 'Boulder') {
-        distanceRoll = distanceRoll + '*2';
-    }
-    rollBuilder.push(`distance=[[${distanceRoll}]]`);
-    rollBuilder.push('hit=[[0]]','splash=[[0]]');
-    let finalRollText = rollBuilder.string();
-    console.log(finalRollText);
-    startRoll(finalRollText, function (roll) {
-        let computedRolls = {
-            hit: 0,
-            splash: 0
-        };
-
-        // See if monster is within direct hit
-        if (roll.results.aoe && roll.results.distance.result <= roll.results.aoe.result / 2) {
-            computedRolls.hit = 1;
-        } else if (roll.results.aoesplash && roll.results.distance.result <= roll.results.aoesplash.result / 2) {
-            computedRolls.splash = 1;
+        let distanceName;
+        switch (grenade) {
+            case 'Fire Seed missile':
+            case 'Melf’s Minute Meteor':
+            case 'Produce Flame':
+            case 'Sol’s Searing Orb':
+                distanceName = 'Short';
+                break;
+            default:
+                distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
         }
-        finishRoll(roll.rollId, computedRolls);
+        rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
+        let distanceRoll;
+        switch (distanceName) {
+            case 'Short':  distanceRoll='1d6cs1cf6'; break;
+            case 'Medium': distanceRoll='1d10cs1cf10'; break;
+            case 'Long':   distanceRoll='2d10cs1cf10'; break;
+        }
+        if (grenade === 'Boulder') {
+            distanceRoll = distanceRoll + '*2';
+        }
+        rollBuilder.push(`distance=[[${distanceRoll}]]`);
+        rollBuilder.push('hit=[[0]]','splash=[[0]]');
+        let finalRollText = `${templateVisibility} ${rollBuilder.string()}`;
+        console.log(finalRollText);
+        startRoll(finalRollText, function (roll) {
+            let computedRolls = {
+                hit: 0,
+                splash: 0
+            };
+
+            // See if monster is within direct hit
+            if (roll.results.aoe && roll.results.distance.result <= roll.results.aoe.result / 2) {
+                computedRolls.hit = 1;
+            } else if (roll.results.aoesplash && roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+                computedRolls.splash = 1;
+            }
+            finishRoll(roll.rollId, computedRolls);
+        });
     });
 });
 
