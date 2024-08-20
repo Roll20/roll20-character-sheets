@@ -2101,6 +2101,7 @@ on('clicked:grenade-miss', async function(eventInfo) {
         '|Holy water',
         '|Oil (lit)',
         '|Poison',
+        '|Boulder',
         '|--------',
         '|Fire Seed missile',
         '|Ice Knife',
@@ -2151,6 +2152,18 @@ on('clicked:grenade-miss', async function(eventInfo) {
                 'aoesplash=[[1+6]]',
                 'hitdmg=[Special](`/em affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Direct Hit&#41;)',
                 'splashdmg=[Special](`/em affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Splash&#41;)'
+            );
+            break;
+        }
+        case 'Boulder': {
+            let damage = await extractQueryResult('?{Direct Hit damage|3d10}');
+            rollBuilder.push(
+                'name=Boulder',
+                'aoe=[[2]]',
+                'aoesplash=[[2]]',
+                `hitdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their Boulder! &#40;Direct Hit&#41;)`,
+                `splashdmg=[Damage](\`/em rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
+                'bounce=[[3d10]]'
             );
             break;
         }
@@ -2264,11 +2277,16 @@ on('clicked:grenade-miss', async function(eventInfo) {
             distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
     }
     rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
+    let distanceRoll;
     switch (distanceName) {
-        case 'Short': rollBuilder.push('distance=[[1d6cs1cf6]]'); break;
-        case 'Medium': rollBuilder.push('distance=[[1d10cs1cf10]]'); break;
-        case 'Long': rollBuilder.push('distance=[[2d10cs1cf10]]'); break;
+        case 'Short':  distanceRoll='1d6cs1cf6'; break;
+        case 'Medium': distanceRoll='1d10cs1cf10'; break;
+        case 'Long':   distanceRoll='2d10cs1cf10'; break;
     }
+    if (grenade === 'Boulder') {
+        distanceRoll = distanceRoll + '*2';
+    }
+    rollBuilder.push(`distance=[[${distanceRoll}]]`);
     rollBuilder.push('hit=[[0]]','splash=[[0]]');
     let finalRollText = rollBuilder.string();
     console.log(finalRollText);
