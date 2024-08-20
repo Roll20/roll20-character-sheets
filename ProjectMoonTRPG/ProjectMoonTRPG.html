@@ -15144,9 +15144,12 @@ function saveAutoScriptEditor() {
 	getAttrs(["autoScriptEditorTarget", "autoScriptEditorInput"], function(values) {
 		let editorTarget = values.autoScriptEditorTarget;
 		let editorInput = values.autoScriptEditorInput;
-		setAttrs({
-			[editorTarget]: editorInput
-		});
+
+		if (editorTarget != "") {
+			setAttrs({
+				[editorTarget]: editorInput
+			});
+		}
 	});
 }
 on("clicked:saveAutoScriptEdit", function(info) {
@@ -15155,7 +15158,10 @@ on("clicked:saveAutoScriptEdit", function(info) {
 /* AutoScript editor close button */
 on("clicked:closeAutoScriptEdit", function(info) {
 	saveAutoScriptEditor();
-	setAttrs({autoScriptEditor_display: "0"});
+	setAttrs({
+		autoScriptEditor_display: "0",
+		autoScriptEditorTarget: ""
+	});
 });
 /* AutoScript editor reset styling to default button */
 on("clicked:autoScriptStylingDefault", async function(info) {
@@ -15171,11 +15177,19 @@ on("clicked:autoScriptStylingDefault", async function(info) {
 	}
 });
 function loadDefaultAutoScriptStyling() {
-	getAttrs(["autoScriptStylingDefault"], function(values) {
-		setAttrs({
-			autoScriptStyling: values.autoScriptStylingDefault,
-			autoScriptEditorInput: values.autoScriptStylingDefault
-		});
+	getAttrs(["autoScriptStylingDefault", "autoScriptEditorTarget"], function(values) {
+		let stylingDefault = values.autoScriptStylingDefault;
+		let editorTarget = values.autoScriptEditorTarget;
+		
+		let output = {autoScriptStyling: stylingDefault}
+		
+		// Only modifies the editor input if autoScriptStyling is currently open in the editor
+		// Avoids issues with styling rules being applied to other AutoScripts
+		if (editorTarget == "autoScriptStyling") {
+			output.autoScriptEditorInput = stylingDefault;
+		}
+		
+		setAttrs(output);
 	});
 }
 
@@ -17578,7 +17592,14 @@ getSectionIDs("repeating_global", function(idarray) {
 
 	}
 
-    getAttrs(["syncStateGame", "syncStateAilment", "syncLockGame", "syncLockAilment", "global_access", "global_editMode", "global_editKey", "global_gameSettingSource", "global_ailmentSettingSource", "gameEditor", "ailmentEditor", `repeating_global_${rowid}_editKey`, `repeating_global_${rowid}_gameSettingSource`, `repeating_global_${rowid}_ailmentSettingSource`, "settingEvdInfluence", "settingTestOption", "autoScriptStyling"], function(values) {
+    getAttrs(["syncStateGame", "syncStateAilment", "syncLockGame", "syncLockAilment",
+	"global_access", "global_editMode", "global_editKey", "global_gameSettingSource", "global_ailmentSettingSource", "gameEditor", "ailmentEditor",
+	`repeating_global_${rowid}_editKey`, `repeating_global_${rowid}_gameSettingSource`, `repeating_global_${rowid}_ailmentSettingSource`, "settingEvdInfluence", "settingTestOption",
+	"autoScriptStyling", "autoScriptEditorTarget", "autoScriptEditorInput",
+	"weapon1AutoScript", "weapon2AutoScript", "weapon3AutoScript", "weapon4AutoScript", "augmentAutoScript", "outfitAutoScript",
+	"tool1AutoScript", "tool2AutoScript", "tool3AutoScript", "tool4AutoScript", "special1AutoScript", "special2AutoScript",
+	"skill1AutoScript", "skill2AutoScript", "skill3AutoScript", "skill4AutoScript", "skill5AutoScript", "skill6AutoScript",
+	"egoSkill1AutoScript", "egoSkill2AutoScript", "egoSkill3AutoScript", "egoSkill4AutoScript", "egoSkill5AutoScript", "egoSkill6AutoScript"], function(values) {
 
 	/* Translation prep */
 	let langUpdate = "Update";
@@ -17705,6 +17726,29 @@ getSectionIDs("repeating_global", function(idarray) {
 		loadDefaultAutoScriptStyling();
 	}
 
+	/* Delete any AutoScript styling rules present in normal AutoScripts */
+	/* There used to be a bug that replaced one AutoScript with the default AutoScript styling rules. This cleans up any sheets affected by the bug */
+	/* Should be able to remove this after a few updates have passed and all currently used character sheets have been cleaned (added in update 0.6.3) */
+	let colorList = ["green","blue","red","orange","yellow","purple","black"];
+	let autoScriptList = ["weapon1", "weapon2", "weapon3", "weapon4", "augment", "outfit", "tool1", "tool2", "tool3", "tool4", "special1", "special2",
+	"skill1", "skill2", "skill3", "skill4", "skill5", "skill6", "egoSkill1", "egoSkill2", "egoSkill3", "egoSkill4", "egoSkill5", "egoSkill6",
+	"autoScriptEditorInput"];
+
+	let editorTarget = values.autoScriptEditorTarget;
+	autoScriptList.forEach(autoScriptPrefix => {
+		let target = `${autoScriptPrefix}AutoScript`;
+		if (autoScriptPrefix == "autoScriptEditorInput") { target = "autoScriptEditorInput"; }
+		let autoScript = values[target];
+		
+		colorList.forEach(color => {
+			let stylingRegex = new RegExp(`[(].+?,.+?,.+?,.*?${color}.*?[)]`, "ig");
+			if (stylingRegex.test(autoScript)) {
+				autoScript = autoScript.replaceAll(stylingRegex, "");
+				output[target] = autoScript;
+			}
+		});
+	});
+
 	/* Check: Obsolete attributes  */
 	let evdInfluence = values.settingEvdInfluence;
 	let testRankPower = values.settingTestOption;
@@ -17725,9 +17769,7 @@ getSectionIDs("repeating_global", function(idarray) {
 	output[`popup_display`] = syncToggle;
 
 	setAttrs(output);
-
-
-		});
+	});
 	});
 });
 
