@@ -13774,25 +13774,24 @@ function generateDamageHelperHeader(statName, newStat, oldStat, staggerState="0"
 }
 
 function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailmentRes, iconString, resMode = "", resVal = "", resIcon = "") {
-	let langDamage = "damage";
-	let langDealt = "dealt";
-	let langRegened = "regened";
-	let langReducedDamageBy = "reduced damage by";
-	let langResist = "Resistance: ";
+	let langDamage = getTranslationByKeyCustom("damage", "message-damage");
+	let langDealt = getTranslationByKeyCustom("dealt", "message-dealt");
+	let langRegened = getTranslationByKeyCustom("regened", "message-regened");
+	let langResist = getTranslationByKeyCustom("Resistance: ", "message-resist");
 	
-	if(getTranslationByKey("message-damage") != false) {
-		langDamage = getTranslationByKey("message-damage");
-		langDealt = getTranslationByKey("message-dealt");
-		langRegened = getTranslationByKey("message-regened");
-		langReducedDamageBy = getTranslationByKey("message-reduced-damage-by");
-		langResist = getTranslationByKey("message-resist");
+	let langReduction = "";
+	if (effectVal < 0) {
+		langReduction = getTranslationByKeyCustom("increased damage by", "message-increased-damage-by");
+	} else {
+		langReduction = getTranslationByKeyCustom("reduced damage by", "message-reduced-damage-by");
 	}
+
 
 	let message = "<div>";
 	switch (effectType) {
 		case "Damage": message += `${iconString}<div><b>${effectName}</b> ${langDealt} ${Math.abs(effectVal)} ${langDamage}`; break;
 		case "Regen": message += `${iconString}<div><b>${effectName}</b> ${langRegened} ${Math.abs(effectVal)} ${langDamage}`; break;
-		case "Reduction": message += `${iconString}<div><b>${effectName}</b> ${langReducedDamageBy} ${Math.abs(effectVal)}`; break;
+		case "Reduction": message += `${iconString}<div><b>${effectName}</b> ${langReduction} ${Math.abs(effectVal)}`; break;
 	}
 	if (resMode == "beforeResistance") {
 		message += ` x [${resVal}x] ` + getIcon("def", resIcon);
