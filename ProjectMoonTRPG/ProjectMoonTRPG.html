@@ -15511,12 +15511,22 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				delete tempOutput.checkResult;
 			}
 
+			console.log(tempOutput.modifyList)
+			console.log(tempOutput.modifyTarget)
+			console.log(tempOutput.modifyVal)
+			console.log(ailmentList)
+			
 			/* Handle updating ailmentList and barList after a successful AutoEffect */
 			if (tempOutput.modifyList != undefined) {
 				if (tempOutput.modifyList == "barList") {
 					barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
 				} else {
-					ailmentList[tempOutput.modifyTarget][1] = parseInt(ailmentList[tempOutput.modifyTarget][1]) + parseInt(tempOutput.modifyVal);
+					let targetIndex = 1;
+					if (tempOutput.modifyTarget.includes("NextTurn")) {
+						tempOutput.modifyTarget = tempOutput.modifyTarget.replace("NextTurn","");
+						targetIndex = 2;
+					}
+					ailmentList[tempOutput.modifyTarget][targetIndex] = parseInt(ailmentList[tempOutput.modifyTarget][targetIndex]) + parseInt(tempOutput.modifyVal);
 				}
 				delete tempOutput.modifyList;
 				delete tempOutput.modifyTarget;
@@ -16337,8 +16347,8 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle,
 
 	/* Update target list */
 	returnValues.modifyList = "ailmentList";
-	returnValues.modifyTarget = effectAilment;
-	returnValues.modifyVal = effectVal;
+	returnValues.modifyTarget = effectTarget;
+	returnValues.modifyVal = effectVal*scaling;
 
 	/* Handle message */
 	let message = "";
