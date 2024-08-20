@@ -1739,6 +1739,7 @@
 
 <div class="toggleable">
 <input type="checkbox" name="attr_StaggerState" value="Staggered" id="state_Stagger" class="expand-toggle">
+<input type="number" name="attr_StaggerDuration" hidden="true">
 <label class="status_effect_item expand-btn rowContainer" for="state_Stagger" data-i18n-title="ailments-stagger-title" title="Stagger">
 	<div class="icon">
 	<input type="checkbox" class="hide-toggle-rev" value="true" name="attr_settingLimbusStyle" >
@@ -9367,6 +9368,9 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 <b data-i18n="editor-stg-recovery">STG Recovery</b>:</div> <input type="number" name="attr_staggerRecoverPercent" min="0" value="100" style="width:50px;">% + <input type="number" name="attr_staggerRecoverBase" value="0"></div>
 
 <div class="rowContainer settingStyle"><div style="width: 100px;">
+<b data-i18n="editor-stg-duration">STG Duration</b>:</div> <input type="number" name="attr_staggerDurationMax" value="1"></div>
+
+<div class="rowContainer settingStyle"><div style="width: 100px;">
 <b data-i18n="editor-stg-sanity">SP Damage</b>:</div> <input type="number" name="attr_staggerSanity" value="5"></div>
 
 </div>
@@ -10943,17 +10947,24 @@ on("sheet:opened", function() {
 
 /* Auto: Detect Stagger */
 on("change:StagRes", function() {
+	getSectionIDs(`repeating_global`, idarray => {
+        let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["StagRes", "StaggerState"], function(values) {
+	getAttrs(["StagRes", "StaggerState", `${id}_staggerDurationMax`], function(values) {
 	let currentstag = parseInt(values.StagRes);
 	let currentstate = values.StaggerState;
+	let statedurationmax = parseInt(values[`${id}_staggerDurationMax`]);
 
 		if(currentstag <= 0 && currentstate == "0"){
 
-		setAttrs({"StaggerState":"Staggered"});
+		setAttrs({
+			"StaggerState":"Staggered",
+			"StaggerDuration":statedurationmax
+		});
 
 		} /* Value check end */
 
+	});
 	});
 });
 
@@ -11295,45 +11306,49 @@ on("change:DefeatState", function() {
 });
 
 /* Auto: Stagger State updates */
-on("change:StaggerState", function() {
+on("change:StaggerState change:StaggerDuration", function() {
 
 getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["StagRes", "StaggerState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "SP", "egoCondition", "egoActiveState", "messageOverride", "distortState", `${id}_staggerSanity`, "settingLimbusStyle"], function(values) {
+	getAttrs(["StagRes", "StaggerState", "StaggerDuration", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "SP", "egoCondition", "egoActiveState", "messageOverride", "distortState", `${id}_staggerSanity`, `${id}_staggerDurationMax`, "settingLimbusStyle"], function(values) {
 
 	let style = "https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/";
 	if(values.settingLimbusStyle == "true"){
-	style = style + "limbus/";
+		style = style + "limbus/";
 	}
 
 	let iconnew = "<img src='" + style + "FragileStagger.png' style='width: 25px; height: 25px;' >";
 	let currentstate = values.StaggerState;
+	let stateduration = parseInt(values.StaggerDuration);
+	let statedurationmax = parseInt(values[`${id}_staggerDurationMax`]);
 	let messagestate = values.settingMuteMessage;
 	let egocon = values.egoCondition;
 	let egostate = values.egoActiveState;
 	let sanity = parseInt(values.SP) - parseInt(values[`${id}_staggerSanity`]);
 
 	if(egocon == "OnStagger" && currentstate != "0"){
-	setAttrs({"egoActiveState":"true"});
+		setAttrs({"egoActiveState":"true"});
 	}
 
-	if(currentstate == "Staggered" && values.distortState != "true") {
-	setAttrs({"SP":sanity});
+	if(currentstate == "Staggered" && values.distortState != "true" && stateduration == statedurationmax) {
+		setAttrs({"SP":sanity});
 	}
 
 	let overridecheck = values.messageOverride;
 	if(overridecheck == "true"){
-	messagestate = "true";
-	setAttrs({"messageOverride":"0"});
+		messagestate = "true";
+		setAttrs({"messageOverride":"0"});
 	}
 
 	setAttrs({"dummyIcon":iconnew});
 
-	/* AutoScripts */
-	resetConditionals();
-	let autoScriptTrigger = currentstate == "Staggered" ? "Staggered" : "None";
-	AutoScriptMain("", autoScriptTrigger, "true", "true", { targetmode:"false" })
+	if (stateduration == statedurationmax) {
+		/* AutoScripts */
+		resetConditionals();
+		let autoScriptTrigger = currentstate == "Staggered" ? "Staggered" : "None";
+		AutoScriptMain("", autoScriptTrigger, "true", "true", { targetmode:"false" })
+	}
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -11344,23 +11359,31 @@ getSectionIDs(`repeating_global`, idarray => {
 	}
 
 	/* Translation prep */
-	let langStateTrue = " is Staggered!";
-	let langStateFalse = " is no longer Staggered.";
+	let langStateTrue = getTranslationByKeyCustom(" is Staggered!", "message-stagger1");
+	let langStateFalse = getTranslationByKeyCustom(" is no longer Staggered.", "message-stagger2");
+	let langStateDurationNextRound = getTranslationByKeyCustom(" will stop being Staggered next round.", "message-stagger3");
+	let langStateDurationMultiRound = getTranslationByKeyCustom(" will stop being Staggered in ", "message-stagger4") + parseInt(stateduration + 1) + " " + getTranslationByKeyCustom("rounds", "message-round-plural");
+	let messageDescription = "";
 
-	if(getTranslationByKey("message-stagger1") != false){
+	console.log(stateduration)
+	console.log(statedurationmax)
 
-	langStateTrue = getTranslationByKey("message-stagger1");
-	langStateFalse = getTranslationByKey("message-stagger2");
+	if (currentstate == "Staggered" && stateduration == statedurationmax) {
+		messageDescription = langStateTrue;
+	}
+	else if (currentstate == "Staggered" && stateduration == 0) {
+		messageDescription = langStateDurationNextRound;
+	}
+	else if (currentstate == "Staggered" && stateduration < statedurationmax) {
+		messageDescription = langStateDurationMultiRound;
+	}
+	else if (currentstate != "Staggered" && stateduration == 0) {
+		messageDescription = langStateFalse;
 	}
 	
-	if(messagestate != "true" && currentstate != "Staggered"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateFalse + "}}"), (results) => {
-
-            finishRoll(results.rollId, {} );
-        });
-	}
-	else if(messagestate != "true" && currentstate == "Staggered"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + langStateTrue + "}}"), (results) => {
+	
+	if(messagestate != "true"){
+	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + messageDescription + "}}"), (results) => {
 
             finishRoll(results.rollId, {} );
         });
@@ -11560,8 +11583,12 @@ on(`sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ail
 
 /* Action: Reset Ailments */
    on('clicked:resetAilments', function() {
-	getAttrs(["SP"], function(values) {
+	getSectionIDs(`repeating_global`, idarray => {
+        let id = `repeating_global_${idarray[0]}`;
+
+	getAttrs(["SP", `${id}_staggerDurationMax`], function(values) {
 	let newsan = parseInt(values.SP);
+	let staggerdurationmax = parseInt(values[`${id}_staggerDurationMax`]);
 
 	if(newsan <= "0"){
 	newsan = "1";
@@ -11570,7 +11597,7 @@ on(`sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ail
 	setAttrs({"messageOverride":"true"});
 
 	setAttrs({  
-    	"StaggerState":"0", "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "Burn": "0", "Bleed":"0", "Paralysis":"0", "Protection": "0", "StaggerProtection": "0", "Fragile": "0", "Strength": "0", "Feeble": "0", "Endurance": "0", "Disarm": "0", "Haste": "0", "Bind": "0", "Charge":"0", "Smoke": "0", "Seal":"0", "Fortune":"0", "BurnNextTurn": "0", "BleedNextTurn":"0", "ParalysisNextTurn":"0", "ProtectionNextTurn": "0", "StaggerProtectionNextTurn": "0", "FragileNextTurn": "0", "StrengthNextTurn": "0", "FeebleNextTurn": "0", "EnduranceNextTurn": "0", "DisarmNextTurn": "0", "HasteNextTurn": "0", "BindNextTurn": "0", "ChargeNextTurn":"0", "SmokeNextTurn": "0", "Seal":"0", "FortuneNextTurn":"0", "SP":newsan});	});
+    	"StaggerState":"0", "StaggerDuration":staggerdurationmax, "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "Burn": "0", "Bleed":"0", "Paralysis":"0", "Protection": "0", "StaggerProtection": "0", "Fragile": "0", "Strength": "0", "Feeble": "0", "Endurance": "0", "Disarm": "0", "Haste": "0", "Bind": "0", "Charge":"0", "Smoke": "0", "Seal":"0", "Fortune":"0", "BurnNextTurn": "0", "BleedNextTurn":"0", "ParalysisNextTurn":"0", "ProtectionNextTurn": "0", "StaggerProtectionNextTurn": "0", "FragileNextTurn": "0", "StrengthNextTurn": "0", "FeebleNextTurn": "0", "EnduranceNextTurn": "0", "DisarmNextTurn": "0", "HasteNextTurn": "0", "BindNextTurn": "0", "ChargeNextTurn":"0", "SmokeNextTurn": "0", "Seal":"0", "FortuneNextTurn":"0", "SP":newsan});	});
 
 
 	/* Custom Ailments */
@@ -11585,8 +11612,7 @@ on(`sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ail
                 setAttrs(output);
             });
         });
-
-
+	});
 });
 
 /*Action: Reset uses */
@@ -11634,7 +11660,10 @@ on('clicked:resetUses', function() {
 
 /* Action: Reset health */
    on('clicked:resetHealth', function() {
-	getAttrs(["HP_max", "StagRes_max", "SP_max", "Light_max", "distortCounter_max", "egoCondition"], function(values) {
+	getSectionIDs(`repeating_global`, idarray => {
+        let id = `repeating_global_${idarray[0]}`;
+
+	getAttrs(["HP_max", "StagRes_max", "SP_max", "Light_max", "distortCounter_max", "egoCondition", `${id}_staggerDurationMax`], function(values) {
 	let egocon = values.egoCondition;
 	let egonew = "0";
  	let hpnew = parseInt(values.HP_max);
@@ -11642,6 +11671,7 @@ on('clicked:resetUses', function() {
 	let spnew = parseInt(values.SP_max);
 	let lightnew = parseInt(values.Light_max);
 	let counternew = parseInt(values.distortCounter_max);
+	let staggerdurationmax = parseInt(values[`${id}_staggerDurationMax`])
 
 	if(egocon == "AlwaysActive"){
 	egonew = "true";
@@ -11649,12 +11679,11 @@ on('clicked:resetUses', function() {
 
 	setAttrs({"messageOverride":"true"});
 
-	setAttrs({"HP": hpnew, "StagRes": stagrnew, "SP":spnew, "Light":lightnew, "egoActiveState":egonew, "StaggerState":"0", "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "distortCounter":counternew});
+	setAttrs({"HP": hpnew, "StagRes": stagrnew, "SP":spnew, "Light":lightnew, "egoActiveState":egonew, "StaggerState":"0", "StaggerDuration":staggerdurationmax, "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "distortCounter":counternew});
 
-
- 		});
-
+ 	});
 	});
+});
 
 /* Action: Reset stats */
    on('clicked:resetStats', function() {
@@ -11684,7 +11713,7 @@ on('clicked:resetUses', function() {
 	langRulename = getTranslationByKey("editor-rulename-placeholder");
 	}
 
-	setAttrs({[`${id}_ruleName`]:langRulename, [`${id}_healthBase`]:"30", [`${id}_healthStat`]:"Instinct", [`${id}_healthStatMod`]:"6", [`${id}_healthRankMod`]:"6", [`${id}_staggerBase`]:"20", [`${id}_staggerStat`]:"Charm", [`${id}_staggerStatMod`]:"4", [`${id}_staggerRankMod`]:"4", [`${id}_sanityBase`]:"15", [`${id}_sanityStat`]:"Wisdom", [`${id}_sanityStatMod`]:"3", [`${id}_sanityRankMod`]:"0", [`${id}_lightBase`]:"3", [`${id}_lightRankMod`]:"1", [`${id}_distortLightBase`]:"5", [`${id}_distortLightRankMod`]:"1", [`${id}_expCalc`]:"8", [`${id}_attStat`]:"Instinct", [`${id}_defStat`]:"Temperance", [`${id}_evdStat`]:"Insight", [`${id}_evdAilment`]:"EnduranceDisarm", [`${id}_multiPenalty`]:"-2", [`${id}_multiStyle`]:"n", [`${id}_staggerRecoverPercent`]:"100", [`${id}_staggerRecoverBase`]:"0", [`${id}_staggerSanity`]:"5", [`${id}_burnDecayMode`]:"x", [`${id}_burnDecayVal`]:"0.5", [`${id}_burnNextTurnSetting`]:"false", [`${id}_bleedDecayMode`]:"x", [`${id}_bleedDecayVal`]:"0.5", [`${id}_bleedNextTurnSetting`]:"false", [`${id}_smokeDecayMode`]:"+", [`${id}_smokeDecayVal`]:"-1", [`${id}_smokeNextTurnSetting`]:"false", [`${id}_smokeCalculationMode`]:"/", [`${id}_smokeCalculationVal`]:"2", [`${id}_chargeDecayMode`]:"+", [`${id}_chargeDecayVal`]:"0", [`${id}_chargeNextTurnSetting`]:"false", "settingLimbusStyle":"0"});
+	setAttrs({[`${id}_ruleName`]:langRulename, [`${id}_healthBase`]:"30", [`${id}_healthStat`]:"Instinct", [`${id}_healthStatMod`]:"6", [`${id}_healthRankMod`]:"6", [`${id}_staggerBase`]:"20", [`${id}_staggerStat`]:"Charm", [`${id}_staggerStatMod`]:"4", [`${id}_staggerRankMod`]:"4", [`${id}_sanityBase`]:"15", [`${id}_sanityStat`]:"Wisdom", [`${id}_sanityStatMod`]:"3", [`${id}_sanityRankMod`]:"0", [`${id}_lightBase`]:"3", [`${id}_lightRankMod`]:"1", [`${id}_distortLightBase`]:"5", [`${id}_distortLightRankMod`]:"1", [`${id}_expCalc`]:"8", [`${id}_attStat`]:"Instinct", [`${id}_defStat`]:"Temperance", [`${id}_evdStat`]:"Insight", [`${id}_evdAilment`]:"EnduranceDisarm", [`${id}_multiPenalty`]:"-2", [`${id}_multiStyle`]:"n", [`${id}_staggerRecoverPercent`]:"100", [`${id}_staggerRecoverBase`]:"0", [`${id}_staggerDurationMax`]:"1", [`${id}_staggerSanity`]:"5", [`${id}_burnDecayMode`]:"x", [`${id}_burnDecayVal`]:"0.5", [`${id}_burnNextTurnSetting`]:"false", [`${id}_bleedDecayMode`]:"x", [`${id}_bleedDecayVal`]:"0.5", [`${id}_bleedNextTurnSetting`]:"false", [`${id}_smokeDecayMode`]:"+", [`${id}_smokeDecayVal`]:"-1", [`${id}_smokeNextTurnSetting`]:"false", [`${id}_smokeCalculationMode`]:"/", [`${id}_smokeCalculationVal`]:"2", [`${id}_chargeDecayMode`]:"+", [`${id}_chargeDecayVal`]:"0", [`${id}_chargeNextTurnSetting`]:"false", "settingLimbusStyle":"0"});
 
         	});
 
@@ -11700,7 +11729,7 @@ on('clicked:resetUses', function() {
 function dataExportGlobal() {
      getSectionIDs(`repeating_global`, idarray => {
 	let id = `repeating_global_${idarray[0]}_`;
-	let attrkey = [`${id}ruleName`, `${id}healthBase`, `${id}healthStat`, `${id}healthStatMod`, `${id}healthRankMod`, `${id}staggerBase`, `${id}staggerStat`, `${id}staggerStatMod`, `${id}staggerRankMod`, `${id}sanityBase`, `${id}sanityStat`, `${id}sanityStatMod`, `${id}sanityRankMod`, `${id}lightBase`, `${id}lightRankMod`, `${id}distortLightBase`, `${id}distortLightRankMod`, `${id}attStat`, `${id}defStat`, `${id}evdStat`, `${id}evdAilment`, `${id}multiPenalty`, `${id}multiStyle`, `${id}staggerRecoverPercent`, `${id}staggerRecoverBase`, `${id}staggerSanity`, `${id}burnDecayMode`, `${id}burnDecayVal`, `${id}burnNextTurnSetting`, `${id}bleedDecayMode`, `${id}bleedDecayVal`, `${id}bleedNextTurnSetting`, `${id}smokeDecayMode`, `${id}smokeDecayVal`, `${id}smokeNextTurnSetting`, `${id}smokeCalculationMode`, `${id}smokeCalculationVal`, `${id}chargeDecayMode`, `${id}chargeDecayVal`, `${id}chargeNextTurnSetting`, `settingLimbusStyle`];
+	let attrkey = [`${id}ruleName`, `${id}healthBase`, `${id}healthStat`, `${id}healthStatMod`, `${id}healthRankMod`, `${id}staggerBase`, `${id}staggerStat`, `${id}staggerStatMod`, `${id}staggerRankMod`, `${id}sanityBase`, `${id}sanityStat`, `${id}sanityStatMod`, `${id}sanityRankMod`, `${id}lightBase`, `${id}lightRankMod`, `${id}distortLightBase`, `${id}distortLightRankMod`, `${id}attStat`, `${id}defStat`, `${id}evdStat`, `${id}evdAilment`, `${id}multiPenalty`, `${id}multiStyle`, `${id}staggerRecoverPercent`, `${id}staggerRecoverBase`, `${id}staggerDurationMax`, `${id}staggerSanity`, `${id}burnDecayMode`, `${id}burnDecayVal`, `${id}burnNextTurnSetting`, `${id}bleedDecayMode`, `${id}bleedDecayVal`, `${id}bleedNextTurnSetting`, `${id}smokeDecayMode`, `${id}smokeDecayVal`, `${id}smokeNextTurnSetting`, `${id}smokeCalculationMode`, `${id}smokeCalculationVal`, `${id}chargeDecayMode`, `${id}chargeDecayVal`, `${id}chargeNextTurnSetting`, `settingLimbusStyle`];
 	let exportkey = attrkeyGlobal;
 	let textbase = "";
 
@@ -11979,7 +12008,7 @@ getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingBurnImmune", "nextRoundSpeed",
-		"StaggerState", "SealState", "ImmobileState", "Burn", "burnResist", "burnResist_ego", "distortState", "egoActiveState", "egoType", "Smoke", "Charge", "HP", "StagRes_max", "settingLimbusStyle",
+		"StaggerState", "StaggerDuration", "SealState", "ImmobileState", "Burn", "burnResist", "burnResist_ego", "distortState", "egoActiveState", "egoType", "Smoke", "Charge", "HP", "StagRes_max", "settingLimbusStyle",
 		`${id}_staggerRecoverPercent`, `${id}_staggerRecoverBase`, `${id}_burnDecayMode`, `${id}_burnDecayVal`, `${id}_smokeDecayMode`, `${id}_smokeDecayVal`, `${id}_chargeDecayMode`, `${id}_chargeDecayVal`,
 		"Bleed", "BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
 
@@ -12003,6 +12032,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let burnimmune = values.settingBurnImmune;
 	let iconstyle = values.settingLimbusStyle;
 	let stagcheck = values.StaggerState;
+	let stagduration = parseInt(values.StaggerDuration);
 	let sealcheck = values.SealState;
 	let immobilecheck = values.ImmobileState;
 
@@ -12185,19 +12215,23 @@ getSectionIDs(`repeating_global`, idarray => {
 
 
 	/* Stagger processing */
-	if(stagcheck != "0"){
-	stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
-	setAttrs({"StaggerState":"0", "StagRes":stagnew});
+	if(stagduration == 0) {
+		if(stagcheck != "0"){
+			stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
+			setAttrs({"StaggerState":"0", "StagRes":stagnew});
+		}
+	} else {
+		setAttrs({"StaggerDuration":stagduration-1});
 	}
 
 	/* Seal processing */
 	if(sealcheck != "0"){
-	setAttrs({"SealState":"0"});
+		setAttrs({"SealState":"0"});
 	}
 
 	/* Immobile processing */
 	if(immobilecheck != "0"){
-	setAttrs({"ImmobileState":"0"});
+		setAttrs({"ImmobileState":"0"});
 	}
 
 	/* AutoScripts */
@@ -14014,7 +14048,6 @@ on('clicked:declareAction', (info) => {
 	/* Get skill AutoAcript if any */
 	if ((skillselect != undefined || skillselect != "0") && skilltype == "Action") {
 		AutoScript += "(Reset)" + values[`${skillselect}AutoScript`];
-		console.log(skillselect)
 	}
 
 	/* Clean AutoScript. Remove nested and undefined */
@@ -14022,7 +14055,6 @@ on('clicked:declareAction', (info) => {
 		AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
 		AutoScript = AutoScript.replace("undefined", "");
 	}
-	console.log(AutoScript)
 
 	resetConditionals();
 	AutoScriptMain(AutoScript, "None", "true", "false", autoScriptOverrideList, function(returnValues) {
@@ -15358,7 +15390,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	/* countImmutable: Matches the count at the beginning of the AutoEffect execution. Should never be modified */
 	/* repeatingAilmentId: Is set to 0 for standard ailments */
 	getAilmentList(overrideList, function(ailmentList) { 
-		console.log(ailmentList)
+		// console.log(ailmentList)
 
 
 	/* Execute each AutoEffect in the AutoScript */
@@ -16674,7 +16706,7 @@ let attrkeySkills = ["skill1Name", "skill1Rank", "skill1Type", "skill1Light", "s
 "egoSkill5Name", "egoSkill5Rank", "egoSkill5Type", "egoSkill5Light", "egoSkill5Dice1", "egoSkill5Dice2", "egoSkill5Dice3", "egoSkill5Description", "egoSkill5Effect", "egoSkill5AutoScript",
 "egoSkill6Name", "egoSkill6Rank", "egoSkill6Type", "egoSkill6Light", "egoSkill6Dice1", "egoSkill6Dice2", "egoSkill6Dice3", "egoSkill6Description", "egoSkill6Effect", "egoSkill6AutoScript"];
 
-let attrkeyGlobal = ["global_ruleName", "global_healthBase", "global_healthStat", "global_healthStatMod", "global_healthRankMod", "global_staggerBase", "global_staggerStat", "global_staggerStatMod", "global_staggerRankMod", "global_sanityBase", "global_sanityStat", "global_sanityStatMod", "global_sanityRankMod", "global_lightBase", "global_lightRankMod", "global_distortLightBase", "global_distortLightRankMod", "global_attStat", "global_defStat", "global_evdStat", "global_evdAilment", "global_multiPenalty", "global_multiStyle", "global_staggerRecoverPercent", "global_staggerRecoverBase", "global_staggerSanity", "global_burnDecayMode", "global_burnDecayVal", "global_burnNextTurnSetting", "global_bleedDecayMode", "global_bleedDecayVal", "global_bleedNextTurnSetting", "global_smokeDecayMode", "global_smokeDecayVal", "global_smokeNextTurnSetting", "global_smokeCalculationMode", "global_smokeCalculationVal", "global_chargeDecayMode", "global_chargeDecayVal", "global_chargeNextTurnSetting", "settingLimbusStyle"];
+let attrkeyGlobal = ["global_ruleName", "global_healthBase", "global_healthStat", "global_healthStatMod", "global_healthRankMod", "global_staggerBase", "global_staggerStat", "global_staggerStatMod", "global_staggerRankMod", "global_sanityBase", "global_sanityStat", "global_sanityStatMod", "global_sanityRankMod", "global_lightBase", "global_lightRankMod", "global_distortLightBase", "global_distortLightRankMod", "global_attStat", "global_defStat", "global_evdStat", "global_evdAilment", "global_multiPenalty", "global_multiStyle", "global_staggerRecoverPercent", "global_staggerRecoverBase", `global_staggerDurationMax`, "global_staggerSanity", "global_burnDecayMode", "global_burnDecayVal", "global_burnNextTurnSetting", "global_bleedDecayMode", "global_bleedDecayVal", "global_bleedNextTurnSetting", "global_smokeDecayMode", "global_smokeDecayVal", "global_smokeNextTurnSetting", "global_smokeCalculationMode", "global_smokeCalculationVal", "global_chargeDecayMode", "global_chargeDecayVal", "global_chargeNextTurnSetting", "settingLimbusStyle"];
 
 /* Data Exporter */
 function dataExport(override, target){
