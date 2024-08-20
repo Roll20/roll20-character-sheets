@@ -13824,12 +13824,13 @@ on('clicked:declareAction', (info) => {
 	headercolor = "#8e7cc3";
 	newicon = "/";
 
-	/* Get toolSelect first as it's used to gather further values */
-	getAttrs(["toolSelect"], function(values) {
-		let toolselect = values.toolSelect;
+	/* Get skillSelect and toolSelect first as they're used to gather further values */
+	getAttrs(["skillSelect", "toolselect"], function(values) {
+		let skillselect = values.skillSelect;
+		let toolselect = values.toolselect;
 
 	/* Get attributes */
-        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, "Bleed"], function(values) {
+        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "skillSelect", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, `${skillselect}AutoScript`, "Bleed"], function(values) {
 
 	let charname = values.character_name;
 	let simpledisplay = values.settingSimpleDisplay;
@@ -14006,13 +14007,24 @@ on('clicked:declareAction', (info) => {
 
 	/* AutoScripts */
 	let AutoScript = "";
-	if (toolselect != "0") {
-		AutoScript = values[`${toolselect}AutoScript`];
 
-		/* Clean AutoScript. Remove nested and undefined */
+	/* Get tool AutoAcript if any */
+	if (toolselect != "0") {
+		AutoScript += "(Reset)" + values[`${toolselect}AutoScript`];
+	}
+
+	/* Get skill AutoAcript if any */
+	if ((skillselect != undefined || skillselect != "0") && skilltype == "Action") {
+		AutoScript += "(Reset)" + values[`${skillselect}AutoScript`];
+		console.log(skillselect)
+	}
+
+	/* Clean AutoScript. Remove nested and undefined */
+	if (AutoScript != "") {
 		AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
 		AutoScript = AutoScript.replace("undefined", "");
 	}
+	console.log(AutoScript)
 
 	resetConditionals();
 	AutoScriptMain(AutoScript, "None", "true", "false", autoScriptOverrideList, function(returnValues) {
