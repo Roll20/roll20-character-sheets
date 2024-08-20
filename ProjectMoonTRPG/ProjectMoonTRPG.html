@@ -10957,10 +10957,8 @@ on("change:StagRes", function() {
 
 		if(currentstag <= 0 && currentstate == "0"){
 
-		setAttrs({
-			"StaggerState":"Staggered",
-			"StaggerDuration":statedurationmax
-		});
+		setAttrs({"StaggerState":"Staggered"});
+		setAttrs({"StaggerDuration":statedurationmax});
 
 		} /* Value check end */
 
@@ -11306,8 +11304,8 @@ on("change:DefeatState", function() {
 });
 
 /* Auto: Stagger State updates */
-on("change:StaggerState change:StaggerDuration", function() {
-
+on("change:StaggerState change:StaggerDuration", function(eventInfo) {
+	
 getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
@@ -11326,6 +11324,11 @@ getSectionIDs(`repeating_global`, idarray => {
 	let egocon = values.egoCondition;
 	let egostate = values.egoActiveState;
 	let sanity = parseInt(values.SP) - parseInt(values[`${id}_staggerSanity`]);
+
+	/* Aborts the function if staggerduration is set to its max value. Hinders a double messages when Staggered (StaggerState and StaggerDuration are both changed) */
+	if (eventInfo.sourceAttribute == "staggerduration" && stateduration == statedurationmax) {
+		return;
+	}
 
 	if(egocon == "OnStagger" && currentstate != "0"){
 		setAttrs({"egoActiveState":"true"});
@@ -11364,9 +11367,6 @@ getSectionIDs(`repeating_global`, idarray => {
 	let langStateDurationNextRound = getTranslationByKeyCustom(" will stop being Staggered next round.", "message-stagger3");
 	let langStateDurationMultiRound = getTranslationByKeyCustom(" will stop being Staggered in ", "message-stagger4") + parseInt(stateduration + 1) + " " + getTranslationByKeyCustom("rounds", "message-round-plural");
 	let messageDescription = "";
-
-	console.log(stateduration)
-	console.log(statedurationmax)
 
 	if (currentstate == "Staggered" && stateduration == statedurationmax) {
 		messageDescription = langStateTrue;
