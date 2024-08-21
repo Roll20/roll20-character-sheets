@@ -1,3 +1,21 @@
+import { initRelay } from '@roll20/beacon-sdk';
+
+const dispatch = initRelay({
+    handlers: {
+        onInit: ({ character } ) => { console.log('sheet character', character) },
+        onChange: () => {},
+        onSettingsChange: () => {},
+        onSharedSettingsChange: () => {},
+        onTranslationsRequest: () => {},
+        onDragOver: () => {}
+    },
+    // Refer to our advanced example sheet on how to setup actions and computed properties.
+    actions: {},
+    computed: {}
+})
+
+
+
 const setAttributes = (update, silent) => { 
 	(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
 };

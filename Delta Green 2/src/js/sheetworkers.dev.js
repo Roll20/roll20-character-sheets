@@ -1,5 +1,7 @@
 "use strict";
 
+var _beaconSdk = require("@roll20/beacon-sdk");
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
@@ -9,6 +11,23 @@ function _nonIterableRest() { throw new TypeError("Invalid attempt to destructur
 function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+var dispatch = (0, _beaconSdk.initRelay)({
+  handlers: {
+    onInit: function onInit(_ref) {
+      var character = _ref.character;
+      console.log('sheet character', character);
+    },
+    onChange: function onChange() {},
+    onSettingsChange: function onSettingsChange() {},
+    onSharedSettingsChange: function onSharedSettingsChange() {},
+    onTranslationsRequest: function onTranslationsRequest() {},
+    onDragOver: function onDragOver() {}
+  },
+  // Refer to our advanced example sheet on how to setup actions and computed properties.
+  actions: {},
+  computed: {}
+});
 
 var setAttributes = function setAttributes(update, silent) {
   silent === true ? setAttrs(update, {
@@ -214,10 +233,10 @@ var definesanroll = function definesanroll(san, sold, bnew, bold, sanflags, char
     rollString = "".concat(rollString, " {{flag_temp=1}}");
 
     if (!isEmpty(Temp_disorder)) {
-      Object.entries(Temp_disorder).forEach(function (_ref, index) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            key = _ref2[0],
-            val = _ref2[1];
+      Object.entries(Temp_disorder).forEach(function (_ref2, index) {
+        var _ref3 = _slicedToArray(_ref2, 2),
+            key = _ref3[0],
+            val = _ref3[1];
 
         rollString = "".concat(rollString, " {{tdis_name").concat(index, "=").concat(key, "}} {{tdis_desc").concat(index, "=").concat(val, "}} ");
       });
@@ -228,10 +247,10 @@ var definesanroll = function definesanroll(san, sold, bnew, bold, sanflags, char
     rollString = "".concat(rollString, " {{flag_2san=1}}");
 
     if (!isEmpty(Temp_disorder)) {
-      Object.entries(Temp_disorder).forEach(function (_ref3, index) {
-        var _ref4 = _slicedToArray(_ref3, 2),
-            key = _ref4[0],
-            val = _ref4[1];
+      Object.entries(Temp_disorder).forEach(function (_ref4, index) {
+        var _ref5 = _slicedToArray(_ref4, 2),
+            key = _ref5[0],
+            val = _ref5[1];
 
         rollString = "".concat(rollString, " {{tdis_name").concat(index, "=").concat(key, "}} {{tdis_desc").concat(index, "=").concat(val, "}} ");
       });
@@ -427,10 +446,10 @@ on("change:repeating_skills:rank", function (eventInfo) {
     console.log('Repeating Skills updated on change');
   });
 });
-Object.entries(_repeating_sections).forEach(function (_ref5) {
-  var _ref6 = _slicedToArray(_ref5, 2),
-      element = _ref6[0],
-      section = _ref6[1];
+Object.entries(_repeating_sections).forEach(function (_ref6) {
+  var _ref7 = _slicedToArray(_ref6, 2),
+      element = _ref7[0],
+      section = _ref7[1];
 
   on("change:repeating_".concat(section), function (eventInfo) {
     var id = eventInfo.sourceAttribute.split('_')[2];
