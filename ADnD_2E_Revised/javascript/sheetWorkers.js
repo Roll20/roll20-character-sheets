@@ -2099,8 +2099,8 @@ on('clicked:grenade-miss', function(eventInfo) {
         let templateVisibility = '';
         let rollVisibility = '/em';
         if (values['tab11'] === '2') {
-            templateVisibility = values['wtype'];
-            rollVisibility = values['wtype'];
+            templateVisibility = '@{wtype}';
+            rollVisibility = '@{wtype}';
         }
 
         let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
