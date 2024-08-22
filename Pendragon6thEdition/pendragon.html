@@ -448,13 +448,18 @@ const handle_npc = (page) => {
     "description",
   ];
 
-  let update = getStaticUpdate(attrs, page);
+  const update = getStaticUpdate(attrs, page);
 
   update["character_name"] = page.name;
+  update["sheet_type"] = "npc";
+  update["flag_description"] = false;
 
-  console.log(page);
+  console.log(page.data);
 
   //TODO: handle all repeating sections
+  setAttrs(update, {
+    silent: true,
+  });
 };
 
 const handle_equipment = (page) => handle_item(page, getRow("equipment"));
@@ -628,28 +633,10 @@ const handle_drop = () => {
   });
 };
 
-["data", "name", "content", "uniquename"].forEach((attr) => {
+["data", "name", "content"].forEach((attr) => {
   on(`change:drop_${attr}`, () => {
-    console.log("DROP DATA CHANGED");
-
-    //handle_drop();
+    handle_drop();
   });
-});
-
-on("change:drop_category", function (eventinfo) {
-  console.log(eventinfo.newValue);
-
-  if (eventinfo.newValue === "Creatures") {
-    console.log("NPC");
-  } else {
-    console.log("Not NPC");
-    //handle_drop(eventinfo.newValue);
-  }
-});
-
-on("sheet:compendium-drop", function (eventinfo) {
-  console.log(eventinfo);
-  //handle_drop(eventinfo.newValue);
 });
 const getRepUpdate = (attrs, row, page) => {
   let update = {};
