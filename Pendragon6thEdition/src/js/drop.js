@@ -205,9 +205,11 @@ const handle_drop = () => {
   });
 };
 
-["data"].forEach((attr) => {
+["data", "name", "content", "uniquename"].forEach((attr) => {
   on(`change:drop_${attr}`, () => {
-    handle_drop();
+    console.log("DROP DATA CHANGED");
+
+    //handle_drop();
   });
 });
 
@@ -220,4 +222,9 @@ on("change:drop_category", function (eventinfo) {
     console.log("Not NPC");
     //handle_drop(eventinfo.newValue);
   }
+});
+
+on("sheet:compendium-drop", function (eventinfo) {
+  console.log(eventinfo);
+  //handle_drop(eventinfo.newValue);
 });
