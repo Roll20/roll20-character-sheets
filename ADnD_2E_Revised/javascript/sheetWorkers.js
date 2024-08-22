@@ -2170,7 +2170,7 @@ on('clicked:grenade-miss', function(eventInfo) {
                     'aoe=[[2]]',
                     'aoesplash=[[2]]',
                     `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their Boulder! &#40;Direct Hit&#41;)`,
-                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage, minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
                     'bounce=[[3d10]]'
                 );
                 break;
