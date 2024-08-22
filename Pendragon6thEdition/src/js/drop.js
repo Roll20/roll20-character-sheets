@@ -29,6 +29,8 @@ const handle_npc = (page) => {
 
   update["character_name"] = page.name;
 
+  console.log(page);
+
   //TODO: handle all repeating sections
 };
 
@@ -207,4 +209,15 @@ const handle_drop = () => {
   on(`change:drop_${attr}`, () => {
     handle_drop();
   });
+});
+
+on("change:drop_category", function (eventinfo) {
+  console.log(eventinfo.newValue);
+
+  if (eventinfo.newValue === "Creatures") {
+    console.log("NPC");
+  } else {
+    console.log("Not NPC");
+    //handle_drop(eventinfo.newValue);
+  }
 });

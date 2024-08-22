@@ -40,10 +40,17 @@ const versionTwoFive = () => {
 
 const versionTwoFiveTwo = () => {
   getAttrs(["play", "sing"], (v) => {
-    setAttrs({
-      "play instrument": v.play,
-      singing: v.sing,
-    });
+    const update = {};
+
+    if (v.play) {
+      update["play instrument"] = v.play;
+    }
+
+    if (v.sing) {
+      update.singing = v.sing;
+    }
+
+    setAttrs(update);
   });
 };
 
