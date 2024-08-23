@@ -15510,25 +15510,20 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				delete tempOutput.checkResult;
 			}
 
-			console.log(tempOutput.modifyList)
-			console.log(tempOutput.modifyTarget)
-			console.log(tempOutput.modifyVal)
-			console.log(ailmentList)
-			
 			/* Handle updating ailmentList and barList after a successful AutoEffect */
 			if (tempOutput.modifyList != undefined) {
 				if (tempOutput.modifyList == "barList") {
 					barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
 				} else {
 					let targetIndex = 1;
-					if (tempOutput.modifyTarget.includes("NextTurn")) {
-						tempOutput.modifyTarget = tempOutput.modifyTarget.replace("NextTurn","");
+					if (tempOutput.modifyNextTurn != undefined && tempOutput.modifyNextTurn == "true") {
 						targetIndex = 2;
 					}
 					ailmentList[tempOutput.modifyTarget][targetIndex] = parseInt(ailmentList[tempOutput.modifyTarget][targetIndex]) + parseInt(tempOutput.modifyVal);
 				}
 				delete tempOutput.modifyList;
 				delete tempOutput.modifyTarget;
+				delete tempOutput.modifyNextTurn;
 				delete tempOutput.modifyVal;
 			}
 
@@ -16337,17 +16332,21 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle,
 	if (effectRepeatingId == 0) { effectTarget = effectAilment; } /* If standard ailment */
 	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][4]}_ailNum`; } /* If custom ailment */
 	
+	/* Update target list */
+	if (autoEffectVariant == "Gain") {
+		returnValues.modifyList = "ailmentList";
+		returnValues.modifyTarget = effectAilment;
+		returnValues.modifyNextTurn = "false";
+		returnValues.modifyVal = effectVal*scaling;
+	}
+
 	/* Effect changes target to the next turn field if it's enabled */
 	/* Is ignored if "This turn" override is included */
 	if (effectHasNextTurn == 'true' && forceTarget != "This round") {
 		effectTarget += "NextTurn";
 		count = ailmentList[effectAilment][2];
+		if (returnValues.modifyNextTurn != undefined) { returnValues.modifyNextTurn = "true"; }
 	}
-
-	/* Update target list */
-	returnValues.modifyList = "ailmentList";
-	returnValues.modifyTarget = effectTarget;
-	returnValues.modifyVal = effectVal*scaling;
 
 	/* Handle message */
 	let message = "";
