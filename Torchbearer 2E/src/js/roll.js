@@ -98,7 +98,8 @@ function populateTraitOptions(values) {
 }
 
 function populateWiseOptions(values) {
-  const options = [
+  // Deeper understanding
+  const duOptions = [
     { label: "No wise", value: 0 },
   ];
 
@@ -110,12 +111,34 @@ function populateWiseOptions(values) {
         res.selected = true;
       }
 
-      options.push(res);
+      duOptions.push(res);
     }
   }
 
   populateListOptions({
     elemSelector: '.sheet-du-wise-selector',
-    optionsArray: options
+    optionsArray: duOptions
+  });
+
+  // Of course
+  const ocOptions = [
+    { label: "No wise", value: 0 },
+  ];
+
+  for (let i = 1; i <= 4; i++) {
+    if (values["wise" + i + "_name"]) {
+      const res = { label: values["wise" + i + "_name"], value: i };
+
+      if (values["rolling_du_wise"] == i) {
+        res.selected = true;
+      }
+
+      ocOptions.push(res);
+    }
+  }
+
+  populateListOptions({
+    elemSelector: '.sheet-oc-wise-selector',
+    optionsArray: ocOptions
   });
 }
