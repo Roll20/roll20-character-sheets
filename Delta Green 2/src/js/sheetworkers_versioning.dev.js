@@ -175,7 +175,7 @@ var version_200_201 = function version_200_201() {
     fields: ['name', 'special_training', 'skill_or_stat_used', 'skill_span']
   }, {
     section: 'repeating_weapons',
-    fields: ['name', 'weapons', 'skill_percent', 'skill_span']
+    fields: ['name', 'weapons', 'skill_percent', 'skill_span', 'ammo', 'hasammo', 'ammo_max']
   }];
   getSectionIDs(sectionDetails, function (v) {
     var repspecial = v.filter(function (el) {
@@ -183,11 +183,12 @@ var version_200_201 = function version_200_201() {
     });
     var repweapons = v.filter(function (el) {
       return el.startsWith("repeating_weapons");
-    }); // const fullarray=[].concat(repspecial,repweapons);
+    });
+    console.log('in getSectionIDs section', section); // const fullarray=[].concat(repspecial,repweapons);
     //console.info('fullarray',fullarray);
 
     getAttrs(v, function (values) {
-      //console.info('fullarray',values);
+      console.info('fullarray', values);
       var repweapons_oldname = repweapons.filter(function (el) {
         return el.endsWith('_weapons');
       });
@@ -212,6 +213,37 @@ var version_200_201 = function version_200_201() {
       var repweapons_skill = repspecial.filter(function (el) {
         return el.endsWith('_skill_percent');
       });
+      var repweapons_ammo = repweapons.filter(function (el) {
+        return el.endsWith('_ammo');
+      });
+      var repweapons_hasammo = repweapons.filter(function (el) {
+        return el.endsWith('_hasammo');
+      });
+      var repweapons_ammo_max = repweapons.filter(function (el) {
+        return el.endsWith('_ammo_max');
+      });
+      console.log("%c repweapons_oldname", 'color: green; font-weight:bold');
+      console.info(repweapons_oldname);
+      console.log("%c repspecial_oldname", 'color: green; font-weight:bold');
+      console.info(repspecial_oldname);
+      console.log("%c repweapons_name", 'color: green; font-weight:bold');
+      console.info(repweapons_name);
+      console.log("%c repspecial_name", 'color: green; font-weight:bold');
+      console.info(repspecial_name);
+      console.log("%c repspecial_span", 'color: green; font-weight:bold');
+      console.info(repspecial_span);
+      console.log("%c repspecial_skill", 'color: green; font-weight:bold');
+      console.info(repspecial_skill);
+      console.log("%c repweapons_span", 'color: green; font-weight:bold');
+      console.info(repweapons_span);
+      console.log("%c repweapons_skill", 'color: green; font-weight:bold');
+      console.info(repweapons_skill);
+      console.log("%c repweapons_ammo", 'color: green; font-weight:bold');
+      console.info(repweapons_ammo);
+      console.log("%c repweapons_hasammo", 'color: green; font-weight:bold');
+      console.info(repweapons_hasammo);
+      console.log("%c repweapons_ammo_max", 'color: green; font-weight:bold');
+      console.info(repweapons_ammo_max);
 
       for (i = 0; i < repweapons_name; i++) {
         if (values[repweapons_oldname[i]] != '') {
@@ -226,6 +258,13 @@ var version_200_201 = function version_200_201() {
           update1[repspecial_name[i]] = values[repspecial_oldname[i]];
           update1[repspecial_oldname[i]] = '';
           update1[repspecial_span[i]] = values[repspecial_skill[i]];
+        }
+      }
+
+      for (i = 0; i < repweapons_ammo; i++) {
+        if (values[repweapons_ammo[i]] != '') {
+          update1[repweapons_ammo_max[i]] = values[repweapons_ammo[i]];
+          update1[repweapons_hasammo[i]] = values[repweapons_ammo[i]] > 0 ? '1' : '0';
         }
       }
 

@@ -1,29 +1,7 @@
-const updateRepeatingRollsonOpenJQ = () => {
-
-    Object.entries(_repeating_sections).forEach(([element,section])=> {
-        getSectionIDs(section, function(idarray) {
-            var update={};
-            console.log('section: '+section+' element: '+element+' idarray: '+idarray);
-            idarray.forEach(id => {
-                update[`repeating_${section}_${id}_${element}_r`] = `${id}`;
-            });				
-            console.info('Value of update inside repeating rollUpdate',update);
-            setAttrs(update, {silent:true}, () => {
-                console.log('Repeating Rolls updated');
-                console.info('update',update);
-            });
-            
-        });
-    });
-
-};
-
 
 const selector='button.roll';
     
 $20(selector).on('click', e => {
-        
-        
         var _header = ``;
         console.log(e);
         const roll = e.htmlAttributes.name.match(/^attr_(.*)_r$/)[1];
@@ -59,49 +37,21 @@ $20(selector).on('click', e => {
 
 
 $20('button.repeating_roll').on('click', e => {
-console.log(e);
-const id = e.htmlAttributes.value;
-const section = _repeating_sections[e.htmlAttributes.name.split('_')[1]];
-const hasmodifiers = (e.shiftKey) ? true : false;
-console.info(`hasmodifiers:`, hasmodifiers);
-const queryModifier = (hasmodifiers) ? _queryModifier : '0';
+    console.log(e);
+    const id = e.htmlAttributes.value;
+    const section = _repeating_sections[e.htmlAttributes.name.split('_')[1]];
+    console.log(`in button rep rolls section: ${section})`);
+    const hasmodifiers = (e.shiftKey) ? true : false;
+    console.info(`hasmodifiers:`, hasmodifiers);
+    const queryModifier = (hasmodifiers) ? _queryModifier : '0';
 
-var _header = ``;
-var _rank =``
-var _input_names = {};
-var _parameters =[`repeating_${section}_${id}_name`];
-// Common for all rolls, modifiers
-_parameters.push(`willpower_points`);
-_parameters.push(`sanity_points`);
-_parameters.push(`low_will_power`);
-_parameters.push(`zero_will_power`);
+    var _input_names = {};
+    var _parameters = [];
+    setRepeatingParametersAndInputNames(section, id, _parameters, _input_names)
 
-_input_names[`name`]=`repeating_${section}_${id}_name`;
-//skill dependent parameters
-_parameters.push(`character_id`);
+    console.info(`parameters: ${_parameters}`);
+    console.info(`input names: ${_input_names}`);
 
-if (section==='skills'){
-    _input_names[`rank`]=`repeating_${section}_${id}_rank`;	
-    _input_names[`fail`]=`repeating_${section}_${id}_fail`;
-    _parameters.push(`repeating_${section}_${id}_rank`);
-    _parameters.push(`repeating_${section}_${id}_fail`);
-//bond dependent parameters
-}else if (section==='bonds'){
-    _input_names[`local_wp_points`]=`repeating_${section}_${id}_wp_points`;
-    _input_names[`local_san_points`]=`repeating_${section}_${id}_san_points`;
-    _input_names[`score`]=`repeating_${section}_${id}_score`;
-    _parameters.push(`repeating_${section}_${id}_score`);
-    _parameters.push(`repeating_${section}_${id}_wp_points`);
-    _parameters.push(`repeating_${section}_${id}_san_points`);
-//special training dependent parameters
-}else if (section==='special'){
-    _parameters.push(`repeating_${section}_${id}_skill_or_stat_used`);
-}else{	
-    console.error(`Section ${section} not found`);
-}
-
-console.log(`parameters: ${_parameters}`);
-
-clicked_repeating_actions(section,_parameters,_input_names,queryModifier);
+    clicked_repeating_actions(section, _parameters, _input_names, queryModifier);
 });
 

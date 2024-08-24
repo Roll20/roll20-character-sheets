@@ -1,20 +1,6 @@
-import { initRelay } from '@roll20/beacon-sdk';
-
-const dispatch = initRelay({
-    handlers: {
-        onInit: ({ character } ) => { console.log('sheet character', character) },
-        onChange: () => {},
-        onSettingsChange: () => {},
-        onSharedSettingsChange: () => {},
-        onTranslationsRequest: () => {},
-        onDragOver: () => {}
-    },
-    // Refer to our advanced example sheet on how to setup actions and computed properties.
-    actions: {},
-    computed: {}
-})
 
 
+let isInitialized = false;
 
 const setAttributes = (update, silent) => { 
 	(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
@@ -42,7 +28,23 @@ const arrays = {
 		
 };
 
-const _repeating_sections={'skill':'skills','bond':'bonds','special':'special','weapons':'weapon'};
+const _repeating_sections={
+	'skill':'skills',
+	'bond':'bonds',
+	'special':'special',
+	'weapons':'weapons'};
+
+const _repeating_damages = [
+	'damage',
+	'damageCritical',
+	'lethality',
+	'lethalityCritical',
+	'damage_2',
+	'damage_2Critical',
+	'selective_fire',
+	'selective_fireCritical',
+]
+
 const _rd100 = `[[1d100]]`;
 const _rd4   = `[[1d4]]`;
 const _rd6   = `[[1d6]]`;
@@ -50,10 +52,10 @@ const _rd8   = `[[1d8]]`;
 const _rd10  = `[[1d10]]`;
 const _rd12  = `[[1d12]]`;
 const _rd20  = `[[1d20]]`;
-const _queryModifier =`?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}`;
+const _queryModifier = `?{Modifier|0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}`;
 const prefix_skill_roll = `@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`; 
+const prefix_damage_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}}`;
 const prefix_bond_roll = `@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[${_rd4}]]}}`; 
-const criticals = [1,11,22,33,44,55,66,77,88,99,100];
 
  // check skill value for weapons and special training
  const isSkillNumber = (str) => {
@@ -94,6 +96,7 @@ const getSections = function(sectionDetails,callback){
 	let queueClone = _.clone(sectionDetails);
 	const worker = (queue,repeatAttrs=[],sections={})=>{
 	  let detail = queue.shift();
+	  console.log('in getSections',detail.section);
 	  getSectionIDs(detail.section,(IDs)=>{
 		sections[detail.section] = IDs;
 		IDs.forEach((id)=>{
@@ -257,6 +260,7 @@ const update_additionalskills= ()=>{
       addskills=idarray.map(id =>`repeating_skills_${id}`) ; 
       console.log(addskills);  //log of debugging to be sure
 	  idarray.forEach(id=>{
+		update[`repeating_skills_${id}_${element}_action`] = `%{${character_id}|repeating_skills_${id}_${element}-action}`;			
 		update[`repeating_skills_${id}_skill_r`]=id;
 	  });
 	  setAttrs(update,{silent:true},()=>{
@@ -271,8 +275,10 @@ const setMinMax = (skill, min, max) => {
 	return (Iskill < min) ? min : (Iskill > max) ? max : Iskill;
 };
 
-on(`change:repeating_weapons:shotgun change:repeating_weapons:blastradius`, (eventInfo)=> {
-	const possibilities=['shotgun','blastradius'];
+
+
+on(`change:repeating_weapons:shotgun change:repeating_weapons:blast_radius`, (eventInfo)=> {
+	const possibilities=['shotgun','blast_radius'];
 	const choice = eventInfo.newValue==='active' ? 1 : 0;
 	const whichone= eventInfo.triggerName.split('_')[3];
 	const isMinority=isMinorityReport(eventInfo);
@@ -284,7 +290,7 @@ on(`change:repeating_weapons:shotgun change:repeating_weapons:blastradius`, (eve
 		if (choice==1){update[`repeating_weapongs_${other}`]=0;}
 		
 		setAttrs(update,{silent:true},()=>{
-			console.info(`update shotgun/blastradius`,update);
+			console.info(`update shotgun/blast_radius`,update);
 		});
 
 	}

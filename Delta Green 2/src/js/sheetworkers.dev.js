@@ -1,7 +1,5 @@
 "use strict";
 
-var _beaconSdk = require("@roll20/beacon-sdk");
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
@@ -12,22 +10,7 @@ function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) ||
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-var dispatch = (0, _beaconSdk.initRelay)({
-  handlers: {
-    onInit: function onInit(_ref) {
-      var character = _ref.character;
-      console.log('sheet character', character);
-    },
-    onChange: function onChange() {},
-    onSettingsChange: function onSettingsChange() {},
-    onSharedSettingsChange: function onSharedSettingsChange() {},
-    onTranslationsRequest: function onTranslationsRequest() {},
-    onDragOver: function onDragOver() {}
-  },
-  // Refer to our advanced example sheet on how to setup actions and computed properties.
-  actions: {},
-  computed: {}
-});
+var isInitialized = false;
 
 var setAttributes = function setAttributes(update, silent) {
   silent === true ? setAttrs(update, {
@@ -60,8 +43,9 @@ var _repeating_sections = {
   'skill': 'skills',
   'bond': 'bonds',
   'special': 'special',
-  'weapons': 'weapon'
+  'weapons': 'weapons'
 };
+var _repeating_damages = ['damage', 'damageCritical', 'lethality', 'lethalityCritical', 'damage_2', 'damage_2Critical', 'selective_fire', 'selective_fireCritical'];
 var _rd100 = "[[1d100]]";
 var _rd4 = "[[1d4]]";
 var _rd6 = "[[1d6]]";
@@ -69,10 +53,10 @@ var _rd8 = "[[1d8]]";
 var _rd10 = "[[1d10]]";
 var _rd12 = "[[1d12]]";
 var _rd20 = "[[1d20]]";
-var _queryModifier = "?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}";
+var _queryModifier = "?{Modifier|0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}";
 var prefix_skill_roll = "@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[".concat(_rd100, "]]}}");
-var prefix_bond_roll = "@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[".concat(_rd4, "]]}}");
-var criticals = [1, 11, 22, 33, 44, 55, 66, 77, 88, 99, 100]; // check skill value for weapons and special training
+var prefix_damage_roll = "@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}}";
+var prefix_bond_roll = "@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[".concat(_rd4, "]]}}"); // check skill value for weapons and special training
 
 var isSkillNumber = function isSkillNumber(str) {
   var num = Number(str);
@@ -118,6 +102,7 @@ var getSections = function getSections(sectionDetails, callback) {
     var repeatAttrs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
     var sections = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     var detail = queue.shift();
+    console.log('in getSections', detail.section);
     getSectionIDs(detail.section, function (IDs) {
       sections[detail.section] = IDs;
       IDs.forEach(function (id) {
@@ -233,10 +218,10 @@ var definesanroll = function definesanroll(san, sold, bnew, bold, sanflags, char
     rollString = "".concat(rollString, " {{flag_temp=1}}");
 
     if (!isEmpty(Temp_disorder)) {
-      Object.entries(Temp_disorder).forEach(function (_ref2, index) {
-        var _ref3 = _slicedToArray(_ref2, 2),
-            key = _ref3[0],
-            val = _ref3[1];
+      Object.entries(Temp_disorder).forEach(function (_ref, index) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            key = _ref2[0],
+            val = _ref2[1];
 
         rollString = "".concat(rollString, " {{tdis_name").concat(index, "=").concat(key, "}} {{tdis_desc").concat(index, "=").concat(val, "}} ");
       });
@@ -247,10 +232,10 @@ var definesanroll = function definesanroll(san, sold, bnew, bold, sanflags, char
     rollString = "".concat(rollString, " {{flag_2san=1}}");
 
     if (!isEmpty(Temp_disorder)) {
-      Object.entries(Temp_disorder).forEach(function (_ref4, index) {
-        var _ref5 = _slicedToArray(_ref4, 2),
-            key = _ref5[0],
-            val = _ref5[1];
+      Object.entries(Temp_disorder).forEach(function (_ref3, index) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            key = _ref4[0],
+            val = _ref4[1];
 
         rollString = "".concat(rollString, " {{tdis_name").concat(index, "=").concat(key, "}} {{tdis_desc").concat(index, "=").concat(val, "}} ");
       });
@@ -302,6 +287,7 @@ var update_additionalskills = function update_additionalskills() {
     console.log(addskills); //log of debugging to be sure
 
     idarray.forEach(function (id) {
+      update["repeating_skills_".concat(id, "_").concat(element, "_action")] = "%{".concat(character_id, "|repeating_skills_").concat(id, "_").concat(element, "-action}");
       update["repeating_skills_".concat(id, "_skill_r")] = id;
     });
     setAttrs(update, {
@@ -317,8 +303,8 @@ var setMinMax = function setMinMax(skill, min, max) {
   return Iskill < min ? min : Iskill > max ? max : Iskill;
 };
 
-on("change:repeating_weapons:shotgun change:repeating_weapons:blastradius", function (eventInfo) {
-  var possibilities = ['shotgun', 'blastradius'];
+on("change:repeating_weapons:shotgun change:repeating_weapons:blast_radius", function (eventInfo) {
+  var possibilities = ['shotgun', 'blast_radius'];
   var choice = eventInfo.newValue === 'active' ? 1 : 0;
   var whichone = eventInfo.triggerName.split('_')[3];
   var isMinority = isMinorityReport(eventInfo);
@@ -344,7 +330,7 @@ on("change:repeating_weapons:shotgun change:repeating_weapons:blastradius", func
     setAttrs(update, {
       silent: true
     }, function () {
-      console.info("update shotgun/blastradius", update);
+      console.info("update shotgun/blast_radius", update);
     });
   }
 });
@@ -446,10 +432,10 @@ on("change:repeating_skills:rank", function (eventInfo) {
     console.log('Repeating Skills updated on change');
   });
 });
-Object.entries(_repeating_sections).forEach(function (_ref6) {
-  var _ref7 = _slicedToArray(_ref6, 2),
-      element = _ref7[0],
-      section = _ref7[1];
+Object.entries(_repeating_sections).forEach(function (_ref5) {
+  var _ref6 = _slicedToArray(_ref5, 2),
+      element = _ref6[0],
+      section = _ref6[1];
 
   on("change:repeating_".concat(section), function (eventInfo) {
     var id = eventInfo.sourceAttribute.split('_')[2];

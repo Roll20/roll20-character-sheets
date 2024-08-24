@@ -1,29 +1,3 @@
-/*
-const _disorder_related=arrays[`disorder_related`];
-const _disorder_related_max=arrays[`disorder_related`].map(element=>`${element}_max`);
-const _disorder_related_old=arrays[`disorder_related`].map(element=>`${element}_old`);
-const _disorder_total= _disorder_related.concat(_disorder_related_max,_disorder_related_old,[`power_score`,`trackbp`]);
-
-arrays[`disorder_related`].array.forEach(element => {
-    const element_max = `${element}_max`;
-    
-    on(`change:${element}`, function() {   
-        getAttrs(_disorder_total,function(v){
-                const sold = parseInt(v[`sanity_points_max`],0);
-                const smax = parseInt(v[`sanity_points_old`],0);
-                const bmax = parseInt(v[`breaking_point_max`],0);
-                const bold = parseInt(v[`breaking_point_old`],0);
-                const bnew = parseInt(v[`breaking_point`],0);
-                const trackbp = v[`trackbp`]==='active' ? 1 : 0;
-                const pow = parseInt(v[`power_score`],0);
-                const snew=parseInt(v[element],0);
-                    
-                const sanflags=saneffects(snew,sold,smax,bnew,bmax,bold,pow,trackbp);
-                  
-        });
-    });
-});
-*/
 
 arrays['_colored_derivative'].forEach(vitality => {
     on(`change:${vitality}_points`, (eventInfo) => {

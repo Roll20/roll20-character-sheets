@@ -1,50 +1,106 @@
 // - LETHALITY DAMAGE
+mixin modifierRow()
+  | {{#rollTotal() computed::blast_radius 1}}
+  .sheet-template-row.sheet-template-tworows
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="blast radius") blast radius:
+    span.sheet-template-computed 
+      span +20%
+  | {{/rollTotal() computed::blast_radius 1}}
 
-.rolltemplates
- 
-  // rolltemplate.sheet-rolltemplate-fancy-damage
-    .sheet-template-container
-      //- Display a header on the template -
-      | {{#header}}
-      .sheet-template-header
-        h1 {{header}} 
-        h2 {{#subheader}}({{subheader}}){{/subheader}}
-      | {{/header}}
-      //- Display the dice roll in the template -
-      .sheet-template-body
-        .sheet-template-row.sheet-template-onerow
-          span.inlinerollresult {{damage}}
-        |
-        | {{#^rollTotal() AP 0}}
-        .sheet-template-row.sheet-template-onerow
-          span.inlinerollresult Armor Piercing: {{AP}}
-        | {{/^rollTotal() AP 0}}
+  | {{#rollTotal() computed::isShotgun 1}}
+  .sheet-template-row.sheet-template-tworows
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="shotgun") shotgun
+    span.sheet-template-computed 
+      span +20%
+  | {{/rollTotal() computed::isShotgun 1}}
 
-  // rolltemplate.sheet-rolltemplate-fancy-sanloss
-    .sheet-template-container
-      //- Display a header on the template -
-      .sheet-template-header
-        h1 {{type}} 
-        br
-        h2 ( {{#rollTotal() hasminsan 1}}{{success}}{{/rollTotal() hasminsan 1}} {{#^rollTotal() hasminsan 1}}-{{/^rollTotal() hasminsan 1}} / {{#rollTotal() hasmaxsan 1}}{{failure}}{{/rollTotal() hasmaxsan 1}} {{#^rollTotal() hasmaxsan 1}}-{{/^rollTotal() hasmaxsan 1}}  )
-      //- Display the dice roll in the template -
-      .sheet-template-body
-        .sheet-template-row.sheet-template-onerow 
-          span.inlinerollresult {{#rollTotal() hasminsan 1}}{{roll1}}{{/rollTotal() hasminsan 1}} {{#^rollTotal() hasminsan 1}}-{{/^rollTotal() hasminsan 1}} / {{#rollTotal() hasmaxsan 1}}{{roll2}}{{/rollTotal() hasmaxsan 1}} {{#^rollTotal() hasmaxsan 1}}-{{/^rollTotal() hasmaxsan 1}} 
+  | {{#rollTotal() computed::hasaccessories 1}}
+  .sheet-template-row.sheet-template-tworows
+    span.sheet-rolltitle {{accessoriesName}}:
+    span.sheet-template-computed
+      |{{#rollGreater() computed::accessoriesMod 0}} 
+      span.sheet-template-plus.sheet-template-percent {{accessoriesMod}}
+      | {{/rollGreater() computed::accessoriesMod 0}}
+      | {{#rollLess() computed::accessoriesMod 0}}
+      span.sheet-template-percent {{accessoriesMod}}
+      | {{/rollLess() computed::accessoriesMod 0}}
+  | {{/rollTotal() computed::hasaccessories 1}}
 
+  .sheet-template-row.sheet-template-tworows  
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="modifier") modifier
+    span.sheet-template-computed
+      | {{#rollGreater() computed::modifier 0}}
+      span.sheet-template-plus.sheet-template-percent {{computed::modifier}}
+      | {{/rollGreater() computed::modifier 0}}
+      | {{#rollLess() computed::modifier 0}}
+      span.sheet-template-percent {{computed::modifier}}
+      | {{/rollLess() computed::modifier 0}}
+
+
+mixin rollDamages()
+  | {{#damage}}
+  .sheet-template-row.sheet-template-onerow 
+    .sheet-template-attack-buttons  
+      | {{#rollTotal() computed::isCritical 0}}
+      .sheet-template-button {{damage}}
+      | {{/rollTotal() computed::isCritical 0}}
+      | {{#rollTotal() computed::isCritical 1}}
+      .sheet-template-button {{damageCritical}}
+      | {{/rollTotal() computed::isCritical 1}}
+  | {{#double_damage}}
+  .sheet-template-row.sheet-template-onerow 
+    .sheet-template-attack-buttons 
+      | {{#rollTotal() computed::isCritical 0}}
+      .sheet-template-button {{double_damage}}
+      | {{/rollTotal() computed::isCritical 0}}
+      | {{#rollTotal() computed::isCritical 1}}
+      .sheet-template-button {{double_damageCritical}}
+      | {{/rollTotal() computed::isCritical 1}}
+  | {{/double_damage}}
+  |{{/damage}}
+  |{{#lethality}}
+  .sheet-template-row.sheet-template-onerow
+    .sheet-template-attack-buttons
+      | {{#rollTotal() computed::isCritical 0}}
+      .sheet-template-button {{lethality}}
+      | {{/rollTotal() computed::isCritical 0}}
+      | {{#rollTotal() computed::isCritical 1}}
+      .sheet-template-button {{lethalityCritical}}
+      | {{/rollTotal() computed::isCritical 1}}
+  |{{/lethality}}
+  |{{#selective_fire}}
+  .sheet-template-row.sheet-template-onerow
+    .sheet-template-attack-buttons
+      | {{#rollTotal() computed::isCritical 0}}
+      .sheet-template-button {{selective_fire}}
+      | {{/rollTotal() computed::isCritical 0}}
+      | {{#rollTotal() computed::isCritical 1}}
+      .sheet-template-button {{selective_fireCritical}}
+      | {{/rollTotal() computed::isCritical 1}}
+  |{{/selective_fire}}
+     
+
+mixin rollHeader(isPercent=false)
+  //- Display a header on the template -
+  | {{#name}}
+  .sheet-template-superheader
+    h2 {{name}}
+  | {{/name}}
+  //- Display a header on the template -
+  | {{#header}}
+  .sheet-template-header
+    h1  {{header}} 
+    if isPercent
+      h2 {{#subheader}}({{subheader}}%){{/subheader}}
+    else
+      h2 {{#subheader}}({{subheader}}){{/subheader}}
+  | {{/header}}   
+
+
+.rolltemplates 
   rolltemplate.sheet-rolltemplate-fancy-bonds
     .sheet-template-container
-      //- Display a header on the template -
-      | {{#name}}
-      .sheet-template-superheader
-        h2 {{name}}
-      | {{/name}}
-      //- Display a header on the template -
-      | {{#header}}
-      .sheet-template-header
-        h1  {{header}} 
-        h2 {{#subheader}}({{subheader}}){{/subheader}}
-      | {{/header}}
+      +rollHeader()
       .sheet-template-body
         .sheet-template-row.sheet-template-tworows 
             span.sheet-rolltitle Bond: 
@@ -69,37 +125,67 @@
         | {{#^rollTotal() computed::zerowp 1}}
         | {{#projection}}
         .sheet-template-row.sheet-template-onerow 
-          span.inlinerollresult {{full_loss}} SAN
+          span.inlinerollresult {{dice}} SAN
         | {{/projection}}
         | {{/^rollTotal() computed::zerowp 1}}
-        | {{#^rollTotal() computed::zerowp 1}}
-        | {{#repression}}
-        .sheet-template-row.sheet-template-onerow 
-          span.inlinerollresult(data-i18n="Make a sanity test to repress temporary insanity or an acute episode.") Make a sanity test to repress temporary insanity or an acute episode.
-        | {{/repression}}
-        | {{/^rollTotal() computed::zerowp 1}}
-  
+        
     | {{#^rollTotal() computed::zerowp 1}}
     | {{#repression}}
     .sheet-template-reaction 
-      .sheet-template-body
         .sheet-template-button {{repress}}
     | {{/repression}}
     | {{/^rollTotal() computed::zerowp 1}}
 
-  rolltemplate.sheet-rolltemplate-fancy-rolls
+rolltemplate.sheet-rolltemplate-fancy-rituals
+
+rolltemplate.sheet-rolltemplate-fancy-damages 
+    .sheet-template-container 
+      | {{#damage}}
+      +rollHeader() 
+      | {{/damage}}
+      | {{#lethality}}
+      +rollHeader(true)
+      | {{/lethality}}
+      .sheet-template-body
+        .sheet-template-row.sheet-template-tworows 
+        | {{#damage}}
+        .sheet-template-row.sheet-template-tworows 
+          span.sheet-after-colons.sheet-rolltitle(data-i18n="damage") damage
+          span.sheet-template-computed
+            span {{damage}}
+        | {{/damage}}
+        | {{#lethality}}
+        .sheet-template-row.sheet-template-onerow 
+          span.sheet-template-computed
+            span.sheet-template-percent {{roll}}
+        .sheet-template-row.sheet-template-tworows 
+          span.sheet-after-colons.sheet-rolltitle(data-i18n="lethality") lethality
+          span.sheet-template-computed
+            span {{computed::lethality}}
+        .sheet-template-row.sheet-template-tworows 
+          span.sheet-after-colons.sheet-rolltitle(data-i18n="outcome") outcome
+          |{{#^rollGreater() roll computed::lethality}}
+          span.sheet-template-outcome(data-i18n="kill") kill 
+          | {{/^rollGreater() roll computed::lethality}} 
+          | {{#rollGreater() roll computed::lethality}}
+          span.sheet-template-outcome(data-i18n="failure") failure
+          | {{/rollGreater() roll computed::lethality}}
+        .sheet-template-row.sheet-template-tworows 
+          span.sheet-after-colons.sheet-rolltitle(data-i18n="damage") damage
+          span.sheet-template-computed
+            span {{computed::roll}}
+        | {{/lethality}}
+        | {{#rollTotal() trackbullets 1}}
+        .sheet-template-row.sheet-template-tworows 
+          span
+            span.sheet-rollbefore.aligned-left {{current_ammo}}
+            span.sheet-rolltext.aligned-left → 
+            span.sheet-rollafter.aligned-left {{computed::current_ammo}}
+        | {{/rollTotal() trackbullets 1}}
+        
+rolltemplate.sheet-rolltemplate-fancy-rolls
     .sheet-template-container
-      //- Display a header on the template -
-      | {{#name}}
-      .sheet-template-superheader
-        h2 {{name}}
-      | {{/name}}
-      //- Display a header on the template -
-      | {{#header}}
-      .sheet-template-header
-        h1  {{header}} 
-        h2 {{#subheader}}({{subheader}}%){{/subheader}}
-      | {{/header}}
+      +rollHeader(true)
       //- Display the dice roll in the template -
       | {{#rollTotal() computed::zero_will_power 1}}
       .sheet-template-overlay-zero-wp
@@ -116,14 +202,7 @@
         .sheet-template-overlay-low-wp90
           .sheet-template-body
             | {{#^rollTotal() computed::modifier 0}}
-            .sheet-template-row.sheet-template-tworows
-              span.sheet-rolltitle(data-i18n="low WP:") low WP:
-              span.sheet-template-computed 
-                span -20
-            .sheet-template-row.sheet-template-tworows
-              span.sheet-rolltitle(data-i18n="modifier:") modifier:
-              span.sheet-template-computed 
-                span {{computed::modifier}}
+            +modifierRow()
             | {{/^rollTotal() computed::modifier 0}}
             .sheet-template-row.sheet-template-onerow 
               span.inlinerollresult {{dice}}
@@ -160,6 +239,10 @@
             | {{/rollTotal() computed::isCritical 0}}
             | {{/rollTotal() computed::isSuccess 0}}
 
+            | {{#rollTotal() computed::isSuccess 1}}
+            +rollDamages()
+            | {{/rollTotal() computed::isSuccess 1}}
+
       | {{/rollTotal() computed::low_will_power 1}}
       
       | {{#rollTotal() computed::low_will_power 0}}
@@ -167,10 +250,7 @@
       
       .sheet-template-body
         | {{#^rollTotal() computed::modifier 0}}
-        .sheet-template-row.sheet-template-tworows
-          span.sheet-rolltitle(data-i18n="modifier:") modifier:
-          span.sheet-template-computed 
-            span {{computed::modifier}}
+        +modifierRow()
         | {{/^rollTotal() computed::modifier 0}}
         
         .sheet-template-row.sheet-template-onerow 
@@ -207,18 +287,12 @@
           span.sheet-template-outcome(data-i18n="failure") failure
         | {{/rollTotal() computed::isCritical 0}}
         | {{/rollTotal() computed::isSuccess 0}}
-
-
+        | {{#rollTotal() computed::isSuccess 1}}
+        +rollDamages()
+        | {{/rollTotal() computed::isSuccess 1}}
       | {{/rollTotal() computed::zero_will_power 0}}
       | {{/rollTotal() computed::low_will_power 0}}
 
     | {{#ritual}}
     | {{/ritual}}
-    | {{#attack}}
-    | {{#damage}}
-    | {{/damage}}
-    | {{#lethality}}
-    | {{/lethality}}
-    | {{/attack}}
-    | {{#sanloss}}
-    | {{/sanloss}}
+
