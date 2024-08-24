@@ -1,3 +1,14 @@
+# 2024-8-20
+
+- Characters now save their skill costs on creation
+  - Enables use of custom professions
+  - Helps with Roll20 Characters (create characters outside of game)
+- Support: Add "charactermancer" button to the settings page.
+  - Will break your harcater.  You hae been warned
+  - Allows migration to new skill costs
+- Bugfix: Highest stat gets confused if the first is highest, and the second is not the
+   secondhighest.  Add tests for these cases.
+
 # 2024-8-15
 
 - Show BMR info on front page
