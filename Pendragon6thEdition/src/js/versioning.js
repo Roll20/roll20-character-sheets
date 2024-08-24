@@ -17,22 +17,22 @@ const versionTwoFour = () => {
   });
 };
 
-const versionTwoFive = () => {
-  const renameSectionAttrTargetValue = (section, attribute) => {
-    getSectionIDs(section, (ids) => {
-      const map = ids.map((id) => `${section}_${id}_${attribute}`);
+const renameSectionAttrTargetValue = (section, attribute) => {
+  getSectionIDs(section, (ids) => {
+    const map = ids.map((id) => `${section}_${id}_${attribute}`);
 
-      getAttrs(map, (v) => {
-        let update = {};
-        map.forEach((e) => {
-          const rowId = getReprowid(e);
-          update[`${rowId}_target_value`] = v[`${e}`] ? v[`${e}`] : 0;
-        });
-        setAttrs(update);
+    getAttrs(map, (v) => {
+      let update = {};
+      map.forEach((e) => {
+        const rowId = getReprowid(e);
+        update[`${rowId}_target_value`] = v[`${e}`] ? v[`${e}`] : 0;
       });
+      setAttrs(update);
     });
-  };
+  });
+};
 
+const versionTwoFive = () => {
   renameSectionAttrTargetValue("repeating_passion", "passion");
   renameSectionAttrTargetValue("repeating_directed-trait", "trait");
   renameSectionAttrTargetValue("repeating_skills", "skill");
@@ -55,7 +55,7 @@ const versionTwoFiveTwo = () => {
 };
 
 const versionTwoFiveThree = () => {
-  const renameSectionAttrTargetValue = (section, attribute) => {
+  const renameSectionAttr = (section, attribute) => {
     getSectionIDs(section, (ids) => {
       const map = ids.map((id) => `${section}_${id}_${attribute}`);
       getAttrs(map, (v) => {
@@ -70,8 +70,8 @@ const versionTwoFiveThree = () => {
     });
   };
 
-  renameSectionAttrTargetValue("repeating_equipment", "equipment");
-  renameSectionAttrTargetValue("repeating_arms", "equipment");
+  renameSectionAttr("repeating_equipment", "equipment");
+  renameSectionAttr("repeating_arms", "equipment");
 };
 
 const versionThreeZero = () => {
@@ -118,6 +118,13 @@ const versionThreeZero = () => {
   setNPCAbilityFlagFalse();
 };
 
+const versionThreeTwo = () => {
+  renameSectionAttrTargetValue("repeating_attacks", "other_skill");
+  renameSectionAttrTargetValue("repeating_skills", "skill");
+  renameSectionAttrTargetValue("repeating_traits", "traits");
+  renameSectionAttrTargetValue("repeating_passions", "passion");
+};
+
 const versioning = async (version) => {
   const updateMessage = (v) =>
     console.log(
@@ -159,6 +166,11 @@ const versioning = async (version) => {
       updateMessage(3);
       versionThreeZero();
       versioning(3);
+      break;
+    case version < 3.2:
+      updateMessage(3.2);
+      versionThreeTwo();
+      versioning(3.2);
       break;
     default:
       console.log(
