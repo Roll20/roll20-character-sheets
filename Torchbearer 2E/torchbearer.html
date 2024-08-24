@@ -3177,7 +3177,7 @@
   </div>
   <!-- PAGE 5 - LEVEL REQUIREMENTS & BENEFITS-->
   <div class="sheet-roll-tab">
-    <div class="sheet-section-header"><span name="attr_rolling"></span><span>&nbsp; Roll</span></div>
+    <div class="sheet-section-header"><span name="attr_rolling_title"></span><span>&nbsp; Roll</span></div>
     <div class="sheet-section-body">
       <!-- Left column-->
       <div class="sheet-column-left">
@@ -3398,6 +3398,24 @@
             <option value="outside">Outside</option>
           </select>
         </div>
+        <div class="sheet-roll-header">Help & aid 
+          <div class="sheet-reference-text">(DH pg. 65, 73; SG pg. 37)</div>
+        </div>
+        <div class="sheet-roll-help">
+          <input class="sheet-handwritten" value="0" name="attr_rolling_help" type="number"/>
+          <div class="sheet-roll-help-label">Help</div>
+          <div class="sheet-reference-text">(Ability, skill, or nature; not afraid)</div>
+        </div>
+        <input class="sheet-grind-flag" name="attr_rolling_grind" type="hidden"/>
+        <div class="sheet-instinct-help-warning"> 
+          <div class="sheet-reference-text">Instinct can only be helped by nature, instinct, or wise.</div>
+        </div>
+        <div class="sheet-roll-synergy">
+          <input class="sheet-handwritten" value="0" name="attr_rolling_synergy" type="number"/><span>Synergy</span><span class="sheet-reference-text">(DH pg. 87)</span>
+        </div>
+        <div class="sheet-roll-aid">
+          <input class="sheet-handwritten" value="0" name="attr_rolling_aid" type="number"/><span>Aid</span><span class="sheet-reference-text">(DH pg. 77)</span>
+        </div>
         <div class="sheet-roll-header">Additional dice</div>
         <div class="sheet-gear-or-supplies">
           <input class="sheet-handwritten" value="0" name="attr_rolling_gearetal" type="number"/>
@@ -3410,24 +3428,6 @@
         <div class="sheet-other-successes">
           <input class="sheet-handwritten" value="0" name="attr_rolling_othersuccesses" type="number"/>
           <div class="sheet-other-dice-label">other successes</div>
-        </div>
-        <div class="sheet-roll-header">Help & aid 
-          <div class="sheet-reference-text">(DH pg. 65, 73; SG pg. 37)</div>
-        </div>
-        <div class="sheet-roll-help">
-          <input class="sheet-handwritten" value="0" name="attr_rolling_help" type="number"/>
-          <div class="sheet-roll-help-label">Ability, skill, or nature (help)</div>
-        </div>
-        <div class="sheet-reference-text">Helpers cannot be afraid</div>
-        <input class="sheet-grind-flag" name="attr_rolling_grind" type="hidden"/>
-        <div class="sheet-instinct-help-warning"> 
-          <div class="sheet-reference-text">Instinct can only be helped by nature, instinct, or wise.</div>
-        </div>
-        <div class="sheet-roll-synergy">
-          <input class="sheet-handwritten" value="0" name="attr_rolling_synergy" type="number"/><span>Synergy</span><span class="sheet-reference-text">(DH pg. 87)</span>
-        </div>
-        <div class="sheet-roll-aid">
-          <input class="sheet-handwritten" value="0" name="attr_rolling_aid" type="number"/><span>Aid</span><span class="sheet-reference-text">(DH pg. 77)</span>
         </div>
         <div class="sheet-roll-header">Conditions
           <div class="sheet-reference-text">(SG pg. 46)</div>
@@ -3625,11 +3625,12 @@
           <input class="sheet-aid-flag" name="attr_rolling_aid" type="hidden"/>
           <input class="sheet-gaining-wisdom-flag" name="attr_rolling_gaining_wisdom" type="hidden"/>
           <input class="sheet-sick-flag" name="attr_sick" type="hidden"/>
+          <input class="sheet-grind-flag" name="attr_rolling_grind" type="hidden"/>
           <li class="sheet-advancement-item">Mark pass or fail</li>
           <div class="sheet-reference-text sheet-sick-warning">Sick: do not log tests</div>
           <li class="sheet-advancement-item sheet-tax-nature">Tax Nature (if applicable)</li>
-          <li class="sheet-advancement-item sheet-gaining-wisdom">Gaining Wisdom</li>
-          <li class="sheet-advancement-item">Advance the grind</li>
+          <li class="sheet-advancement-item sheet-gaining-wisdom">Gaining Wisdom<span class="sheet-reference-text">(DH pg. 78)</span></li>
+          <li class="sheet-advancement-item sheet-grind">Advance the grind</li>
           <li class="sheet-advancement-item sheet-synergy">Mark Synergy</li>
           <li class="sheet-advancement-item sheet-aid">Mark Aid</li>
           <li class="sheet-advancement-item">Success or failure</li>
@@ -4010,7 +4011,8 @@ const skills = [
   "survivalist",
   "theologian",
 ];
-const rollableItems = abilities.concat(...skills);
+const customSkills = ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"];
+const rollableItems = abilities.concat(...skills, ...customSkills);
 
 rollableItems.forEach(button => {
   on(`clicked:${button}`, function () {
@@ -4021,25 +4023,25 @@ rollableItems.forEach(button => {
 function rollableItemClicked(button) {
   const attrsToGet = [
     button,
-    "trait1_name",
-    "trait2_name",
-    "trait3_name",
-    "trait4_name",
-    "wise1_name",
-    "wise2_name",
-    "wise3_name",
-    "wise4_name",
     "rolling_trait"
   ];
 
+  for (let i = 1; i <= 4; i++) {
+    attrsToGet.push("trait" + i + "_name");
+    attrsToGet.push("wise" + i + "_name");
+  }
+  attrsToGet.push(button + "_name");
+
   getAttrs(attrsToGet, function (values) {
-    const beginnersLuckRoll = calculateBeginnersLuck(button);
+    const beginnersLuckRoll = calculateBeginnersLuck(values, button);
+    const skillName = getSkillName(values, button);
 
     populateTraitOptions(values);
     populateWiseOptions(values);
 
     setAttrs({
       rolling: button,
+      rolling_title: skillName,
       tab: "roll",
       beginners_luck_roll: beginnersLuckRoll,
       rolling_dice: values[button],
@@ -4047,7 +4049,15 @@ function rollableItemClicked(button) {
   });
 }
 
-function calculateBeginnersLuck(button) {
+function getSkillName(values, button) {
+  if (customSkills.includes(button)) {
+    return values[button + "_name"];
+  }
+
+  return button;
+}
+
+function calculateBeginnersLuck(values, button) {
   let beginnersLuckRoll = false;
   if (skills.includes(button) && !(values[button] > 0)) {
     beginnersLuckRoll = true;

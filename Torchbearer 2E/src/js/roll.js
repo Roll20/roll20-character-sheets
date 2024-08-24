@@ -29,7 +29,8 @@ const skills = [
   "survivalist",
   "theologian",
 ];
-const rollableItems = abilities.concat(...skills);
+const customSkills = ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"];
+const rollableItems = abilities.concat(...skills, ...customSkills);
 
 rollableItems.forEach(button => {
   on(`clicked:${button}`, function () {
@@ -40,25 +41,25 @@ rollableItems.forEach(button => {
 function rollableItemClicked(button) {
   const attrsToGet = [
     button,
-    "trait1_name",
-    "trait2_name",
-    "trait3_name",
-    "trait4_name",
-    "wise1_name",
-    "wise2_name",
-    "wise3_name",
-    "wise4_name",
     "rolling_trait"
   ];
 
+  for (let i = 1; i <= 4; i++) {
+    attrsToGet.push("trait" + i + "_name");
+    attrsToGet.push("wise" + i + "_name");
+  }
+  attrsToGet.push(button + "_name");
+
   getAttrs(attrsToGet, function (values) {
-    const beginnersLuckRoll = calculateBeginnersLuck(button);
+    const beginnersLuckRoll = calculateBeginnersLuck(values, button);
+    const skillName = getSkillName(values, button);
 
     populateTraitOptions(values);
     populateWiseOptions(values);
 
     setAttrs({
       rolling: button,
+      rolling_title: skillName,
       tab: "roll",
       beginners_luck_roll: beginnersLuckRoll,
       rolling_dice: values[button],
@@ -66,7 +67,15 @@ function rollableItemClicked(button) {
   });
 }
 
-function calculateBeginnersLuck(button) {
+function getSkillName(values, button) {
+  if (customSkills.includes(button)) {
+    return values[button + "_name"];
+  }
+
+  return button;
+}
+
+function calculateBeginnersLuck(values, button) {
   let beginnersLuckRoll = false;
   if (skills.includes(button) && !(values[button] > 0)) {
     beginnersLuckRoll = true;
