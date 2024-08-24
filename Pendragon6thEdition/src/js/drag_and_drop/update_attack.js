@@ -1,11 +1,15 @@
-const update_attack = (page) => {
+const update_attack = (attacks) => {
   const row = getRow("attacks");
-  const attrs = ["name", "skill"];
+  const attrs = ["name", "skill", "target_value"];
 
-  const { damage, damage_type } = page.data;
-  const update = getRepUpdate(attrs, row, page);
+  const { damage, damage_type, target_value, skill } = attacks;
+  const update = getRepUpdate(attrs, row, attacks);
 
-  const type = damage_type.toLowerCase();
+  if (!skill && target_value) {
+    update[`${row}_skill`] = "@{target_value}";
+  }
+
+  const type = damage_type?.toLowerCase();
 
   const modifier = damage ? `+${damage}` : "";
   if (["brawling", "character"].includes(type)) {
@@ -35,10 +39,6 @@ const update_attack = (page) => {
   } else if (damage) {
     update[`${row}_damage`] = damage;
   }
-
-  console.table({
-    type,
-  });
 
   return update;
 };

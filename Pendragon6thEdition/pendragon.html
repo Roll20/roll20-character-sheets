@@ -440,6 +440,10 @@ const dropWarning = (v) => {
   );
 };
 
+const handle_equipment = (page) => handle_item(page, getRow("equipment"));
+
+const handle_arms = (page) => handle_item(page, getRow("arms"));
+
 const handle_npc = (page) => {
   const attrs = [
     "size",
@@ -458,6 +462,7 @@ const handle_npc = (page) => {
     "healing_rate",
     "glory_award",
     "description",
+    "movement  ",
   ];
 
   const update = getStaticUpdate(attrs, page);
@@ -466,23 +471,37 @@ const handle_npc = (page) => {
   update["sheet_type"] = "npc";
   update["flag_description"] = false;
 
-  const abilities = processDataArrays(page.data.abilities, (data) =>
-    update_item(data, getRow("abilities"))
-  );
-  Object.assign(update, abilities);
+  ["arms", "abilities"].forEach((section) => {
+    const data = page.data[section];
+    if (data) {
+      const sectionUpdate = processDataArrays(data, (data) =>
+        update_item(data, getRow(section))
+      );
+      Object.assign(update, sectionUpdate);
+    }
+  });
 
+  const attacks = processDataArrays(page.data.attacks, (data) =>
+    update_attack(data)
+  );
+  Object.assign(update, attacks);
+
+  const dataSkills = update_mix_section(
+    page.data.skills,
+    "skills",
+    combatSkills
+  );
+  Object.assign(update, dataSkills);
+
+  const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+  Object.assign(update, dataTraits);
   console.log(page.data);
   console.log(update);
 
-  //TODO: handle all repeating sections
   setAttrs(update, {
     silent: true,
   });
 };
-
-const handle_equipment = (page) => handle_item(page, getRow("equipment"));
-
-const handle_arms = (page) => handle_item(page, getRow("arms"));
 
 const handle_character = (page) => {
   const attrs = [
@@ -517,45 +536,20 @@ const handle_character = (page) => {
   );
   Object.assign(update, attacks);
 
-  const updateSection = (section) => {
-    return (data) => update_section(data, section);
-  };
-
   const passions = processDataArrays(
     page.data.passions,
     updateSection("passions")
   );
   Object.assign(update, passions);
 
-  const dataSkills = parseJSON(page.data.skills);
-  dataSkills.forEach(({ name, target_value }) => {
-    const isStaticSkill = [...skills, ...combatSkills].includes(
-      name.toLowerCase()
-    );
-    if (isStaticSkill) {
-      update[attrName(name)] = target_value;
-    } else {
-      const custom = processDataArrays(
-        [{ name, target_value }],
-        updateSection("skills")
-      );
-      Object.assign(update, custom);
-    }
-  });
+  const dataSkills = update_mix_section(page.data.skills, "skills", [
+    ...skills,
+    ...combatSkills,
+  ]);
+  Object.assign(update, dataSkills);
 
-  const dataTraits = parseJSON(page.data.traits);
-  dataTraits.forEach(({ name, target_value }) => {
-    const isStaticTrait = traits.includes(name.toLowerCase());
-    if (isStaticTrait) {
-      update[attrName(name)] = target_value;
-    } else {
-      const custom = processDataArrays(
-        [{ name, target_value }],
-        updateSection("traits")
-      );
-      Object.assign(update, custom);
-    }
-  });
+  const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+  Object.assign(update, dataTraits);
 
   if (page.data.squire_notes) {
     update["flag_squire_notes"] = false;
@@ -667,30 +661,7 @@ const getRepUpdate = (attrs, row, page) => {
 
   return update;
 };
-const roll20Attribute = (attr, value) => {
-  if (attr === "skill") {
-    return `@{${attrName(value)}}`;
-  }
-
-  return value;
-};
-const parseJSON = (jsonString) => {
-  try {
-    return JSON.parse(jsonString);
-  } catch (e) {
-    console.log(`Error parsing JSON: ${jsonString}`);
-    return undefined;
-  }
-};
-
-const processDataArrays = (array, callback) => {
-  const parsed = typeof array === "string" ? parseJSON(array) : array;
-  const map = parsed.map((e) => callback(e));
-  return map.reduce((acc, val) => ({ ...acc, ...val }));
-};
-
 const getRow = (section) => `repeating_${section}_${generateRowID()}`;
-
 const getStaticUpdate = (attrs, page) => {
   let update = {};
 
@@ -741,14 +712,60 @@ const handle_weapon = (page) => {
   const update = update_attack(page);
   setAttrs(update);
 };
-const update_attack = (page) => {
+const parseJSON = (jsonString) => {
+  try {
+    return JSON.parse(jsonString);
+  } catch (e) {
+    console.log(`Error parsing JSON: ${jsonString}`);
+    return undefined;
+  }
+};
+const processDataArrays = (array, callback) => {
+  const parsed = typeof array === "string" ? parseJSON(array) : array;
+  const map = parsed.map((e) => callback(e));
+  return map.reduce((acc, val) => ({ ...acc, ...val }));
+};
+const resetRepeatingRows = (sections) => {
+  sections.forEach((section) => {
+    getSectionIDs(`repeating_${section}`, (ids) => {
+      ids.forEach((id) => {
+        removeRepeatingRow(`repeating_${section}_${id}`);
+      });
+    });
+  });
+};
+const resetSkillList = (skills) => {
+  const skillList = parseJSON(skills);
+  const names = skillList.map(({ name }) => name.toLowerCase());
+  const update = {};
+
+  [...skills, ...combatSkills].forEach((skill) => {
+    if (!names.includes(skill)) {
+      update[skill] = 0;
+    }
+  });
+
+  setAttrs(update);
+};
+const roll20Attribute = (attr, value) => {
+  if (attr === "skill") {
+    return `@{${attrName(value)}}`;
+  }
+
+  return value;
+};
+const update_attack = (attacks) => {
   const row = getRow("attacks");
-  const attrs = ["name", "skill"];
+  const attrs = ["name", "skill", "target_value"];
 
-  const { damage, damage_type } = page.data;
-  const update = getRepUpdate(attrs, row, page);
+  const { damage, damage_type, target_value, skill } = attacks;
+  const update = getRepUpdate(attrs, row, attacks);
 
-  const type = damage_type.toLowerCase();
+  if (!skill && target_value) {
+    update[`${row}_skill`] = "@{target_value}";
+  }
+
+  const type = damage_type?.toLowerCase();
 
   const modifier = damage ? `+${damage}` : "";
   if (["brawling", "character"].includes(type)) {
@@ -779,10 +796,6 @@ const update_attack = (page) => {
     update[`${row}_damage`] = damage;
   }
 
-  console.table({
-    type,
-  });
-
   return update;
 };
 const update_item = (page, row) => {
@@ -798,31 +811,33 @@ const update_item = (page, row) => {
 
   return update;
 };
+const updateSection = (section) => {
+  return (data) => update_section(data, section);
+};
+
 const update_section = (page, section) => {
   const row = getRow(section);
   const attrs = ["name", "target_value"];
   return getRepUpdate(attrs, row, page);
 };
-const resetSkillList = (skills) => {
-  const skillList = parseJSON(skills);
-  const names = skillList.map(({ name }) => name.toLowerCase());
+const update_mix_section = (data, section, staticArray) => {
+  const parsedData = parseJSON(data);
   const update = {};
 
-  [...skills, ...combatSkills].forEach((skill) => {
-    if (!names.includes(skill)) {
-      update[skill] = 0;
+  parsedData.forEach(({ name, target_value }) => {
+    const isStaticSkill = staticArray.includes(name.toLowerCase());
+
+    if (isStaticSkill) {
+      update[attrName(name)] = target_value;
+    } else {
+      const custom = processDataArrays(
+        [{ name, target_value }],
+        updateSection(section)
+      );
+      Object.assign(update, custom);
     }
   });
 
-  setAttrs(update);
-};
-const resetRepeatingRows = (sections) => {
-  sections.forEach((section) => {
-    getSectionIDs(`repeating_${section}`, (ids) => {
-      ids.forEach((id) => {
-        removeRepeatingRow(`repeating_${section}_${id}`);
-      });
-    });
-  });
+  return update;
 };
 </script>
