@@ -466,7 +466,13 @@ const handle_npc = (page) => {
   update["sheet_type"] = "npc";
   update["flag_description"] = false;
 
+  const abilities = processDataArrays(page.data.abilities, (data) =>
+    update_item(data, getRow("abilities"))
+  );
+  Object.assign(update, abilities);
+
   console.log(page.data);
+  console.log(update);
 
   //TODO: handle all repeating sections
   setAttrs(update, {
@@ -501,21 +507,15 @@ const handle_character = (page) => {
   const update = getStaticUpdate(attrs, page);
   update["character_name"] = page.name;
 
-  const addEntries = (object) => {
-    Object.entries(object).forEach(([key, value]) => {
-      update[key] = value;
-    });
-  };
-
   const arms = processDataArrays(page.data.arms, (data) =>
     update_item(data, getRow("arms"))
   );
-  addEntries(arms);
+  Object.assign(update, arms);
 
   const attacks = processDataArrays(page.data.attacks, (data) =>
     update_attack(data)
   );
-  addEntries(attacks);
+  Object.assign(update, attacks);
 
   const updateSection = (section) => {
     return (data) => update_section(data, section);
@@ -525,7 +525,7 @@ const handle_character = (page) => {
     page.data.passions,
     updateSection("passions")
   );
-  addEntries(passions);
+  Object.assign(update, passions);
 
   const dataSkills = parseJSON(page.data.skills);
   dataSkills.forEach(({ name, target_value }) => {
@@ -539,7 +539,7 @@ const handle_character = (page) => {
         [{ name, target_value }],
         updateSection("skills")
       );
-      addEntries(custom);
+      Object.assign(update, custom);
     }
   });
 
@@ -553,7 +553,7 @@ const handle_character = (page) => {
         [{ name, target_value }],
         updateSection("traits")
       );
-      addEntries(custom);
+      Object.assign(update, custom);
     }
   });
 
@@ -637,6 +637,7 @@ const handle_drop = () => {
         drop_name: "",
         drop_data: "",
         drop_content: "",
+        drop_category: "",
       },
       {
         silent: true,
@@ -645,7 +646,7 @@ const handle_drop = () => {
   });
 };
 
-["data", "name", "content"].forEach((attr) => {
+["data"].forEach((attr) => {
   on(`change:drop_${attr}`, () => {
     handle_drop();
   });
