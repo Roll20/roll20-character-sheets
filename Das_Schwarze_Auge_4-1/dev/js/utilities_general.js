@@ -74,6 +74,67 @@ function unpackObject(cargo) {
 }
 
 /*
+	getDefaultValue()
+
+This function is used as an interface to the defaultValues object. This became necessary when repeating sections had to be handled as well.
+
+'attr' has to be a string. The return value is the default value to use for the requested attribute.
+*/
+function getDefaultValue(attr) {
+	const caller = "getDefaultValue";
+	const repeatingRegex = /^repeating_/;
+	const repeatingPartsRegex = /^repeating_(?<section>[^_]+)_(?<rowID>[^_]+)_(?<attr>.*)$/;
+
+	var defaultValue = 0;
+
+	let attrType = "normal";
+	if (attr.match(repeatingRegex))
+	{
+		attrType = "repeating";
+	}
+
+	switch(attrType)
+	{
+		case "normal":
+			defaultValue = defaultValues[attr] ?? 0;
+			break;
+		case "repeating":
+			// Extract the individual parts of the string
+			const repeatingInfo = attr.match(repeatingPartsRegex).groups;
+
+			// Check for perfect match
+			const matchResults = checkRequiredProperties(["section", "rowID", "attr"], repeatingInfo);
+			if (matchResults["errors"] > 0)
+			{
+				debugLog(caller, "Repeating section attribute gotten, but errors encountered when matching the individual parts of the attribute. Falling back to default value 0. The following parts could not be matched:", matchResults["missing"]);
+				defaultValue = 0;
+				break;
+			}
+
+			// Get the default value
+			const repeatingSection = "repeating_" + repeatingInfo["section"];
+			if (Object.hasOwn(defaultValues, repeatingSection))
+			{
+				if (Object.hasOwn(defaultValues[repeatingSection], repeatingInfo["attr"]))
+				{
+					defaultValue = defaultValues[repeatingSection][repeatingInfo["attr"]];
+				} else {
+					debugLog(caller, `Repeating section found in defaultValues, but not attribute "${repeatingInfo["attr"]}". Falling back to default value 0.`);
+					defaultValue = 0;
+				}
+			} else {
+				debugLog(caller, "Repeating section not found in defaultValues. Falling back to default value 0.");
+				defaultValue = 0;
+				break;
+			}
+			break;
+		default:
+			break;
+	}
+	return defaultValue;
+}
+
+/*
 	Safe getAttrs()
 
 This function calls getAttrs(), but checks whether all attributes returned are actually there and are not NaN or undefined. Non-existing attributes are filled with the stored default value or 0.
