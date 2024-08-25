@@ -36,6 +36,8 @@ const update_attack = (attacks) => {
         }
       }
     );
+  } else if (damage.toLowerCase() === "special") {
+    update[`${row}_damage`] = 0;
   } else if (damage) {
     update[`${row}_damage`] = damage;
   }

@@ -58,10 +58,28 @@ const handle_npc = (page) => {
   );
   Object.assign(update, dataSkills);
 
+  const passions = processDataArrays(
+    page.data.passions,
+    updateSection("passions")
+  );
+  Object.assign(update, passions);
+
   const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+  Object.entries(personalityTraits).forEach(([positive, negative]) => {
+    const keys = Object.keys(dataTraits);
+    if (keys.includes(positive) && !keys.includes(negative)) {
+      const targetValue = dataTraits[positive];
+      dataTraits[negative] = 20 - targetValue;
+    } else if (!keys.includes(positive) && keys.includes(negative)) {
+      const targetValue = dataTraits[negative];
+      dataTraits[positive] = 20 - targetValue;
+    } else if (!keys.includes(positive) && !keys.includes(negative)) {
+      dataTraits[positive] = 10;
+      dataTraits[negative] = 10;
+    }
+  });
+
   Object.assign(update, dataTraits);
-  console.log(page.data);
-  console.log(update);
 
   setAttrs(update, {
     silent: true,
