@@ -88,7 +88,7 @@ function safeGetAttrs( attrsToGet, callback ) {
 
 			for (req of attrsToGet) {
 			// Check for missing attributes and try setting a default value
-				if (!attrs.hasOwnProperty(req)) {
+				if (!Object.hasOwn(attrs, req)) {
 					errors[0] += 1;
 					missing.push(req);
 					attrs[req] = defaultValues[req] || 0;
@@ -162,7 +162,7 @@ function checkRequiredProperties(properties, values) {
 	var missing = [];
 
 	for (req of properties) {
-		if (!values.hasOwnProperty(req)) {
+		if (!Object.hasOwn(values, req)) {
 			errors += 1;
 			missing.push(req);
 		}

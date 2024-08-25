@@ -211,7 +211,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 	}
 	safeGetAttrs(attrsToGet, function (v) {
 		const relevantRepresentations = new Set([ "Ach", "Elf", "Kop", "Ner" ]);
-		if (v.hasOwnProperty("Eigenschaft_Attributo"))
+		if (Object.hasOwn(v, "Eigenschaft_Attributo"))
 		{
 			// Resolve the stat
 			let attributoVariableStat = v["Eigenschaft_Attributo"].replace(/^@\{([a-zA-Z]+)\}$/, "$1");
