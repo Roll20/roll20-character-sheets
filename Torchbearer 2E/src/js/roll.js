@@ -57,6 +57,7 @@ function rollableItemClicked(button) {
     populateTraitOptions(values);
     populateWiseOptions(values);
 
+
     setAttrs({
       rolling: button,
       rolling_title: skillName,
@@ -70,6 +71,10 @@ function rollableItemClicked(button) {
 function getSkillName(values, button) {
   if (customSkills.includes(button)) {
     return values[button + "_name"];
+  }
+
+  if(button =="lore_master") {
+    return "Lore Master";
   }
 
   return button;
