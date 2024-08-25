@@ -13,9 +13,9 @@ const customSkillFails = [];
 const customSkillBl = [];
 
 for (let i = 1; i <= 5; i++) {
-  customSkillPasses.push = "skill" + i + "_pass"
-  customSkillPasses.push = "skill" + i + "_fail"
-  customSkillPasses.push = "skill" + i + "_bl"
+  customSkillPasses.push("skill" + i + "_pass");
+  customSkillFails.push("skill" + i + "_fail");
+  customSkillBl.push("skill" + i + "_bl");
 }
 
 const allListeners = [].concat(...traitUses, ...traitChecks, ...abilityPasses, ...abilityFails, ...skillPasses, ...skillFails, ...skillBl, ...customSkillPasses, ...customSkillFails, ...customSkillBl)

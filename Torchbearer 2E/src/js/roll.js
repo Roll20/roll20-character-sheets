@@ -73,7 +73,7 @@ function getSkillName(values, button) {
     return values[button + "_name"];
   }
 
-  if(button =="lore_master") {
+  if (button == "lore_master") {
     return "Lore Master";
   }
 
@@ -82,9 +82,10 @@ function getSkillName(values, button) {
 
 function calculateBeginnersLuck(values, button) {
   let beginnersLuckRoll = false;
-  if (skills.includes(button) && !(values[button] > 0)) {
+  if ((skills.includes(button) || customSkills.includes(button)) && !(values[button] > 0)) {
     beginnersLuckRoll = true;
   }
+
   return beginnersLuckRoll;
 }
 
