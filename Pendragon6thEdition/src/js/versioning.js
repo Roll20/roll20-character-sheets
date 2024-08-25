@@ -132,6 +132,9 @@ const versionThreeTwo = () => {
     if (v["armor"]) {
       update["armor_points"] = v["armor"];
     }
+
+    console.log(update);
+
     setAttrs(update);
   });
 };
@@ -183,7 +186,7 @@ const versioning = async (version) => {
       versionThreeTwo();
       versioning(3.2);
       break;
-    case version < 3.3:
+    case version < 3.2:
       updateMessage(3.2);
       versionThreeTwo();
       versioning(3.2);
