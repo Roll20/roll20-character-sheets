@@ -477,7 +477,7 @@ function generateAEBaseMasterlyRegenerationRoll (statValue) {
 	if (isNaN(roll))
 	{
 		debugLog(func, "statValue cannot be parsed as integer. Using default value.");
-		roll = defaultValues["reg_sleep_ae_base"];
+		roll = getDefaultValue("reg_sleep_ae_base");
 	} else {
 		roll = DSAround(roll);
 		roll = roll.toString() + "d1cs2cf0";

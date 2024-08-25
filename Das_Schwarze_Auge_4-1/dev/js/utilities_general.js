@@ -152,7 +152,7 @@ function safeGetAttrs( attrsToGet, callback ) {
 				if (!Object.hasOwn(attrs, req)) {
 					errors[0] += 1;
 					missing.push(req);
-					attrs[req] = defaultValues[req] || 0;
+					attrs[req] = getDefaultValue(req) || 0;
 				}
 			// Check existing attributes for undefined or NaN
 				if (
@@ -161,7 +161,7 @@ function safeGetAttrs( attrsToGet, callback ) {
 				) {
 					errors[1] += 1;
 					badDef.push(req);
-					attrs[req] = defaultValues[req] || 0;
+					attrs[req] = getDefaultValue(req) || 0;
 				}
 			}
 			if ( errors[0] > 0 ) {
@@ -193,7 +193,7 @@ function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
 		) {
 			errors += 1;
 			badDef.push(req);
-			attrsToSet[req] = defaultValues[req] || 0;
+			attrsToSet[req] = getDefaultValue(req) || 0;
 		}
 	}
 	if ( errors > 0 ) {
