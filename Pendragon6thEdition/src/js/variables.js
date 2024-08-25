@@ -9,6 +9,7 @@ const characteristics = {
 };
 
 const repeatingSections = [
+  "abilities",
   "equipment",
   "arms",
   "attacks",

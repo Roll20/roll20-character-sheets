@@ -189,6 +189,8 @@ const handle_drop = () => {
 
     switch (Category) {
       case "Creatures":
+        resetRepeatingRows(repeatingSections);
+        resetSkillList(page.data.skills);
         handle_npc(page);
         break;
       case "Horses":
