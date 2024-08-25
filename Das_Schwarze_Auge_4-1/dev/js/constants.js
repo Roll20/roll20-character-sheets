@@ -312,7 +312,23 @@ const defaultValues = {
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
 	"reg_sleep_sleep_disorder_trigger": "1d0",
-	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}",
+
+	// Repeating sections
+	"repeating_conjuration-spells-myranor": {
+		"spell_action": '&{template:default} {{Hinweis=Attribut "spell_action" eines myranischen Beschwörungszaubers noch nicht gesetzt. Versuchen Sie den Charakterbogen zu schließen und wieder zu öffnen. Alternativ sollte eine Änderung an der Quelle, der Kategorie, der Repräsentation oder den Probeneigenschaften dazu führen, dass der Würfelknopf korrekt funktioniert.}}',
+		"sphere": "Sphäre unbekannt",
+		"stats": "MU/KL/CH",
+		"value": 0,
+		"source": "Quelle?",
+		"type": "?",
+		"representation_full": "??????",
+		"representation_short": "???",
+		"stat0": "MU",
+		"stat1": "KL",
+		"stat2": "CH",
+		"name": "Quelle? (?), ???"
+	}
 };
 
 /*
