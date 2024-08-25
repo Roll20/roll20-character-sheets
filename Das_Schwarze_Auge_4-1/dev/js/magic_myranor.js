@@ -98,7 +98,10 @@ on("change:repeating_conjuration-spells-myranor", function(info) {
 		debugLog(func, "info", info, "trigger", trigger);
 
 		// Build list of attributes
-		var attrsToGet = ["character_name"];
+		var attrsToGet = [
+			"character_name",
+			"sf_representations_myranor"
+		];
 
 		var prefix = "repeating_conjuration-spells-myranor_" + trigger["rowID"] + "_";
 		for (attr of repeatingAttrs)
@@ -112,6 +115,28 @@ on("change:repeating_conjuration-spells-myranor", function(info) {
 
 			// Always update spell_action
 			attrsToChange[prefix + "spell_action"] = `%{${v["character_name"]}|${prefix}spell-action}`;
+
+			// Fill representation
+			/// Get first representation from special skills list disregarding leading/trailing whitespace
+			const spellRepSplitRegEx = /[^a-zäöüßA-ZÄÖÜ\/']+/;
+			let firstRepShort = v["sf_representations_myranor"].trim().split(spellRepSplitRegEx)[0];
+			/// Assume that several representations are separated by [.,;]
+			let firstRepFull = v["sf_representations_myranor"].trim().split(/[.,;]/)[0];
+
+			/// Spell representation: use specific value given for each spell, fall back: first representation
+			let spellRep = String(v[prefix + "representation_full"]).trim().split(spellRepSplitRegEx)[0];
+			if (
+				( spellRep === "" ) ||
+				( spellRep === 0 )
+			)
+			{
+				if ( firstRepShort !== "" ) {
+					spellRep = firstRepShort;
+					v[prefix + "representation_short"] = spellRep;
+					attrsToChange[prefix + "representation_short"] = spellRep;
+					attrsToChange[prefix + "representation_full"] = firstRepFull;
+				}
+			}
 
 			switch(trigger["attr"]){
 				case "source":
@@ -199,6 +224,13 @@ on("change:repeating_conjuration-spells-myranor", function(info) {
 				case "stat0":
 				case "stat1":
 				case "stat2":
+					// Adapt name (stat changes can induce using the first representation)
+					/// Act only on empty or supposedly previously automatically edited fields
+					if (isNameAutomatic(v[prefix + "name"], v[prefix + "source"], v[prefix + "type"], v[prefix + "representation_short"]))
+					{
+						let name = generateAutomaticName(v[prefix + "source"], v[prefix + "type"], v[prefix + "representation_short"]);
+						attrsToChange[prefix + "name"] = name;
+					}
 					// Update summarized stats
 					var stats = extractStats(
 						[ v[prefix + "stat0"], v[prefix + "stat1"], v[prefix + "stat2"] ]
@@ -266,7 +298,8 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 
 		// Regex matches everything that is known to not be included in the (German) representations strings
 		// firstRep = first result element
-		let firstRep = v["sf_representations_myranor"].replace(/^\s*(.*?)\s*$/, '$1').split(/[^a-zäöüßA-ZÄÖÜ\/']+/)[0];
+		const spellRepSplitRegEx = /[^a-zäöüßA-ZÄÖÜ\/']+/;
+		let firstRep = v["sf_representations_myranor"].trim().split(spellRepSplitRegEx)[0];
 		// Spell representation: use specific value given for each spell, fall back: first representation
 		spellData["representation"] = shortResults["representation_short"];
 		if (
