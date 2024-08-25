@@ -123,6 +123,17 @@ const versionThreeTwo = () => {
   renameSectionAttrTargetValue("repeating_skills", "skill");
   renameSectionAttrTargetValue("repeating_traits", "traits");
   renameSectionAttrTargetValue("repeating_passions", "passion");
+
+  getAttrs(["glory_won", "armor"], (v) => {
+    const update = {};
+    if (v["glory_won"]) {
+      update["glory_award"] = v["glory_won"];
+    }
+    if (v["armor"]) {
+      update["armor_points"] = v["armor"];
+    }
+    setAttrs(update);
+  });
 };
 
 const versioning = async (version) => {
@@ -168,6 +179,11 @@ const versioning = async (version) => {
       versioning(3);
       break;
     case version < 3.2:
+      updateMessage(3.2);
+      versionThreeTwo();
+      versioning(3.2);
+      break;
+    case version < 3.3:
       updateMessage(3.2);
       versionThreeTwo();
       versioning(3.2);
