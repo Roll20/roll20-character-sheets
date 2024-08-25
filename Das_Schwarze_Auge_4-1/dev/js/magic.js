@@ -224,9 +224,10 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 
 		// Regex matches everything that is known to not be included in the (German) representations strings
 		// firstRep = first result element
-		let firstRep = v["sf_representations"].split(/[^a-zäöüßA-ZÄÖÜ\/]+/)[0];
+		const spellRepSplitRegEx = /[^a-zäöüßA-ZÄÖÜ\/']+/;
+		let firstRep = v["sf_representations"].trim().split(spellRepSplitRegEx)[0];
 		// Spell representation: use specific value given for each spell, fall back: first representation
-		spellData["representation"] = String(v[spellRep]).split(/[^a-zäöüßA-ZÄÖÜ\/]+/)[0];
+		spellData["representation"] = String(v[spellRep]).trim().split(spellRepSplitRegEx)[0];
 		if (
 			( spellData["representation"] === "" ) ||
 			( spellData["representation"] === 0 )
