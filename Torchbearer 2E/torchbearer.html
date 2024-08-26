@@ -5476,7 +5476,7 @@
           <div class="sheet-luck-sixes">
             <input class="sheet-handwritten sheet-luck-dice" value="0" name="attr_rolling_luck_dice" type="number"/>
             <div class="sheet-luck-label">six(es)</div>
-            <button class="sheet-roll-button">Roll Luck</button>
+            <button class="sheet-roll-button" type="roll" value="&amp;{template:luck} {{numDice=@{rolling_luck_dice}}} {{charName=@{character_name}}} {{result=[[@{rolling_luck_dice}d6&gt;4!]]}}">Roll Luck</button>
           </div>
         </div>
         <div class="sheet-roll-header">
@@ -5584,109 +5584,14 @@
   </div>
   <!-- HIDDEN FIELDS-->
 </div>
-<div class="sheet-rolltemplates">
-  <rolltemplate class="sheet-rolltemplate-simple">
-    <div class="sheet-container">
-      <div class="sheet-header"><span class="sheet-name">{{roll_name}} {{number_of_dice}}</span>
-        <div class="sheet-sub-header">{{#character}}<span class="sheet-faint">{{character}}</span>{{#bl}}<span>-</span>{{/bl}}
-            {{/character}}
-            {{#description}}
-          <div class="row"><span class="description">{{description}}</span></div>{{/description}}
-            {{#bl}}<span class="sheet-faint">Beginner's Luck (<span class="sheet-caps">{{bl}}</span>)</span>{{/bl}}
-        </div>
-      </div>
-      <div class="sheet-result">{{#dead}}
-        <div class="sheet-failure sheet-handwritten sheet-dead"><span class="sheet-row">You're dead, seems unlikely</span></div>{{/dead}}
-          {{^dead}}
-          {{#rollGreater() result 1}}
-        <div class="sheet-success sheet-handwritten"><span>{{result}}</span></div>
-        <div class="sheet-success-footer sheet-success sheet-handwritten"><span>Successes</span></div>{{/rollGreater() result 1}}
-          {{#rollTotal() result 1}}
-        <div class="sheet-success sheet-handwritten"><span>{{result}}</span></div>
-        <div class="sheet-success-footer sheet-success sheet-handwritten"><span>Success</span></div>{{/rollTotal() result 1}}
-          {{#rollTotal() result 0}}
-        <div class="sheet-failure sheet-handwritten"><span>{{result}}</span></div>
-        <div class="sheet-success-footer sheet-failure sheet-handwritten"><span>Successes</span></div>{{/rollTotal() result 0}}
-          {{/dead}}
-      </div>
-      <div class="sheet-conditions">{{#conditions}}<span class="sheet-handwritten">{{conditions}}</span>{{/conditions}}</div>
-    </div>
-  </rolltemplate>
-  <rolltemplate class="sheet-rolltemplate-complex">
-    <div class="sheet-container">
-      <div class="sheet-header"><span class="sheet-name">{{roll_name}} {{number_of_dice}}</span>
-        <div class="sheet-sub-header">{{#character}}<span class="sheet-faint">{{character}}</span>{{#bl}}<span>-</span>{{/bl}} {{/character}} {{#bl}}<span class="sheet-faint">Beginner's Luck (<span class="sheet-caps">{{bl}}</span>)</span>{{/bl}}</div>
-      </div>
-      <div class="sheet-result">{{#dead}}
-        <div class="sheet-failure sheet-handwritten sheet-dead"><span class="sheet-row">You're dead, seems unlikely</span></div>{{/dead}}
-          {{^dead}}
-          {{#simple}}
-          {{#rollGreater() result 1}}
-        <div class="sheet-success sheet-handwritten"><span>{{result}}</span></div>
-        <div class="sheet-success-footer sheet-success sheet-handwritten"><span>Successes</span></div>{{/rollGreater() result 1}}
-          {{#rollTotal() result 1}}
-        <div class="sheet-success sheet-handwritten"><span>{{result}}</span></div>
-        <div class="sheet-success-footer sheet-success sheet-handwritten"><span>Success</span></div>{{/rollTotal() result 1}}
-          {{#rollTotal() result 0}}
-        <div class="sheet-failure sheet-handwritten"><span>{{result}}</span></div>
-        <div class="sheet-success-footer sheet-failure sheet-handwritten"><span>Successes</span></div>{{/rollTotal() result 0}}
-          {{/simple}}
-          {{^simple}}
-        <div class="sheet-column-3">{{#rollLess() result ob}}
-          <div class="sheet-failure sheet-handwritten"><span>{{result}}</span></div>
-          <div class="sheet-success-footer sheet-failure sheet-handwritten">{{#rollTotal() result 1}}<span>Success</span>{{/rollTotal() result 1}} {{#^rollTotal() result 1}}<span>Successes</span>{{/^rollTotal() result 1}}</div>{{/rollLess() result ob}}
-            {{#^rollLess() result ob}}
-          <div class="sheet-success sheet-handwritten"><span>{{result}}</span></div>
-          <div class="sheet-success-footer sheet-success sheet-handwritten">{{#rollTotal() result 1}}<span>Success</span>{{/rollTotal() result 1}}
-              {{#^rollTotal() result 1}}<span>Successes</span>{{/^rollTotal() result 1}}
-          </div>
-          <div>
-            {{#success_mod}}
-              {{#^rollTotal() success_mod 0}}
-              {{#^rollLess() success_mod 0}}
-            <div class="sheet-success sheet-handwritten"><span class="sheet-operator">+</span><span>{{success_mod}}</span></div>
-            <div class="sheet-success-footer sheet-success sheet-handwritten">{{#rollTotal() success_mod 1}}<span>Success</span>{{/rollTotal() success_mod 1}}
-                {{#^rollTotal() success_mod 1}}<span>Successes</span>{{/^rollTotal() success_mod 1}}
-            </div>{{/^rollLess() success_mod 0}}
-              {{#rollLess() success_mod 0}}
-            <div class="sheet-failure sheet-handwritten"><span>{{success_mod}}</span></div>
-            <div class="sheet-success-footer sheet-faiure sheet-handwritten">{{#rollTotal() success_mod 1}}<span>Success</span>{{/rollTotal() success_mod 1}}
-                {{#^rollTotal() success_mod 1}}<span>Successes</span>{{/^rollTotal() success_mod 1}}
-            </div>{{/rollLess() success_mod 0}}
-              {{/^rollTotal() success_mod 0}}
-              {{/success_mod}}
-          </div>{{/^rollLess() result ob}}
-        </div>{{#conflict}}
-        <div class="sheet-column-3">
-          <div class="sheet-handwritten"><span>+</span></div>
-        </div>
-        <div class="sheet-column-3">
-          <div class="sheet-success sheet-handwritten"><span>{{disposition}}</span></div>
-          <div class="sheet-success-footer sheet-success sheet-handwritten"><span>Disposition</span></div>
-        </div>{{/conflict}}
-          {{^conflict}}
-        <div class="sheet-column-3">
-          <div class="sheet-vs"><span>VS</span></div>
-        </div>
-        <div class="sheet-column-3">{{#rollLess() ob result}}
-          <div class="sheet-failure sheet-handwritten"><span>{{ob}}</span></div>
-          <div class="sheet-success-footer sheet-failure sheet-handwritten">{{#independent}}<span>Obstacle</span>{{/independent}} {{#versus}}<span>Opponent</span>{{/versus}}</div>{{/rollLess() ob result}} {{#^rollLess() ob result}}
-          <div class="sheet-success sheet-handwritten"><span>{{ob}}</span></div>
-          <div class="sheet-success-footer sheet-success sheet-handwritten">{{#independent}}<span>Obstacle</span>{{/independent}} {{#versus}}<span>Opponent</span>{{/versus}}</div>{{/^rollLess() ob result}}
-        </div>{{/conflict}}
-          {{/simple}}
-          {{/dead}}
-      </div>{{#conflict}}
-      <div class="sheet-conflict-subtype"><span class="sheet-handwritten">
-          {{#might}}Might {{might}}{{/might}} {{#precedence}}Precedence
-            {{precedence}}{{/precedence}}</span></div>{{/conflict}}
-      <div class="sheet-conditions">{{#conditions}}<span class="sheet-handwritten">{{conditions}}</span>{{/conditions}}
-          {{#modifiers}}
-          {{#conditions}}<span class="sheet-handwritten sheet-comma">,</span>{{/conditions}}<span class="sheet-handwritten">{{modifiers}}</span>{{/modifiers}}
-      </div>
-    </div>
-  </rolltemplate>
-</div>
+<rolltemplate class="sheet-rolltemplate-luck">
+  <div class="sheet-roll-header">Luck {{numDice}}</div>
+  <div class="sheet-roll-subheader">{{charName}}</div>
+  <div class="sheet-roll-result">
+    <div class="sheet-roll-result-num">{{result}}</div>
+    <div class="sheet-roll-result-label">successes</div>
+  </div>
+</rolltemplate>
 <script type="text/worker">
   function resetRoll() {
   setAttrs({
