@@ -1748,7 +1748,7 @@
 
 <div class="toggleable">
 <input type="checkbox" name="attr_StaggerState" value="Staggered" id="state_Stagger" class="expand-toggle">
-<input type="number" name="attr_StaggerDuration" hidden="true">
+<input type="number" name="attr_StaggerDuration" value="1" hidden="true">
 <label class="status_effect_item expand-btn rowContainer" for="state_Stagger" data-i18n-title="ailments-stagger-title" title="Stagger">
 	<div class="icon">
 	<input type="checkbox" class="hide-toggle-rev" value="true" name="attr_settingLimbusStyle" >
@@ -10714,6 +10714,20 @@ getSectionIDs(`repeating_global`, idarray => {
 	});
 });
 
+/* Change stagger duration */
+on("change:repeating_global:staggerDurationMax", function() {
+	getSectionIDs(`repeating_global`, idarray => {
+		let id = `repeating_global_${idarray[0]}`;
+	
+	getAttrs(["StaggerDuration", `${id}_staggerDurationMax`], function(values) {
+	
+	if (values.StaggerDuration != values[`${id}_staggerDurationMax`]) {
+		setAttrs({"StaggerDuration":values[`${id}_staggerDurationMax`]});
+	}
+	});
+	});
+});
+
 
 /* Edit toggle */
 on("change:settingHideShare", function() {
@@ -11292,7 +11306,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let egocon = values.egoCondition;
 	let egostate = values.egoActiveState;
 	let sanity = parseInt(values.SP) - parseInt(values[`${id}_staggerSanity`]);
-
+	
 	/* Aborts the function if staggerduration is set to its max value. Hinders a double messages when Staggered (StaggerState and StaggerDuration are both changed) */
 	if (eventInfo.sourceAttribute == "staggerduration" && stateduration == statedurationmax) {
 		return;
@@ -11976,7 +11990,7 @@ getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingBurnImmune", "nextRoundSpeed",
-		"StaggerState", "StaggerDuration", "SealState", "ImmobileState", "Burn", "burnResist", "burnResist_ego", "distortState", "egoActiveState", "egoType", "Smoke", "Charge", "HP", "StagRes_max", "settingLimbusStyle",
+		"StaggerState", "StaggerDuration", `${id}_staggerDurationMax`, "SealState", "ImmobileState", "Burn", "burnResist", "burnResist_ego", "distortState", "egoActiveState", "egoType", "Smoke", "Charge", "HP", "StagRes_max", "settingLimbusStyle",
 		`${id}_staggerRecoverPercent`, `${id}_staggerRecoverBase`, `${id}_burnDecayMode`, `${id}_burnDecayVal`, `${id}_smokeDecayMode`, `${id}_smokeDecayVal`, `${id}_chargeDecayMode`, `${id}_chargeDecayVal`,
 		"Bleed", "BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
 
@@ -12001,6 +12015,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let iconstyle = values.settingLimbusStyle;
 	let stagcheck = values.StaggerState;
 	let stagduration = parseInt(values.StaggerDuration);
+	let stagdurationmax = parseInt(values[`${id}_staggerDurationMax`]);
 	let sealcheck = values.SealState;
 	let immobilecheck = values.ImmobileState;
 
@@ -12186,7 +12201,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	if(stagduration == 0) {
 		if(stagcheck != "0"){
 			stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
-			setAttrs({"StaggerState":"0", "StagRes":stagnew});
+			setAttrs({"StaggerState":"0", "StaggerDuration":stagdurationmax, "StagRes":stagnew});
 		}
 	} else {
 		setAttrs({"StaggerDuration":stagduration-1});
