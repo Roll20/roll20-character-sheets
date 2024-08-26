@@ -1,4 +1,5 @@
 on("sheet:opened", function (eventinfo) {
+  console.log('initialize');
   initialize();
 });
 

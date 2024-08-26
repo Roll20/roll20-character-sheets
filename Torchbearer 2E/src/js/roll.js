@@ -34,6 +34,7 @@ const rollableItems = abilities.concat(...skills, ...customSkills);
 
 rollableItems.forEach(button => {
   on(`clicked:${button}`, function () {
+    console.log(`clicked:${button}`);
     rollableItemClicked(button);
   });
 });
@@ -50,20 +51,25 @@ function rollableItemClicked(button) {
   }
   attrsToGet.push(button + "_name");
 
+  attrsToGet.push(...abilities, ...skills, ...customSkills);
+  attrsToGet.push(...calculateDiceValues);
+
+  resetRoll();
+
   getAttrs(attrsToGet, function (values) {
     const beginnersLuckRoll = calculateBeginnersLuck(values, button);
     const skillName = getSkillName(values, button);
+    const rollingDice = calculateDice(values, button);
 
     populateTraitOptions(values);
     populateWiseOptions(values);
-
 
     setAttrs({
       rolling: button,
       rolling_title: skillName,
       tab: "roll",
       beginners_luck_roll: beginnersLuckRoll,
-      rolling_dice: values[button],
+      rolling_dice: rollingDice,
     });
   });
 }

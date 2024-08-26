@@ -22,6 +22,7 @@ const allListeners = [].concat(...traitUses, ...traitChecks, ...abilityPasses, .
 
 allListeners.forEach(function (value) {
   on(`clicked:${value}`, function (event) {
+    console.log(`clicked:${value}`);
     setAttrs({
       [value]: event.htmlAttributes.value
     });

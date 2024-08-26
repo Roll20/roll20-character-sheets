@@ -5402,7 +5402,6 @@
           <input name="attr_rolling_deeper_understanding" type="checkbox"/><span>Deeper Understanding</span>
         </div>
         <input class="sheet-du-wise-flag" value="0" name="attr_rolling_deeper_understanding" type="hidden"/>
-        <input class="sheet-luck-flag" value="0" name="attr_rolling_luck" type="hidden"/>
         <div class="sheet-deeper-understanding">
           <div class="sheet-fate">
               <div class="sheet-fate-titles">
@@ -5422,32 +5421,41 @@
           <div class="sheet-wise-1">
             <div class="sheet-wise-xp-section">
               <input value="1" name="attr_wise1_fate" type="checkbox"/>
-              <div class="sheet-wise-label">Fate (Advancement)</div>
+              <div class="sheet-wise-label">Fate
+                <div class="sheet-reference-text">Gaining Wisdom</div>
+              </div>
             </div>
             <button class="sheet-roll-button">Roll D.U.</button>
           </div>
           <div class="sheet-wise-2">
             <div class="sheet-wise-xp-section">
               <input value="1" name="attr_wise2_fate" type="checkbox"/>
-              <div class="sheet-wise-label">Fate (Advancement)</div>
+              <div class="sheet-wise-label">Fate
+                <div class="sheet-reference-text">Gaining Wisdom</div>
+              </div>
             </div>
             <button class="sheet-roll-button">Roll D.U.</button>
           </div>
           <div class="sheet-wise-3">
             <div class="sheet-wise-xp-section">
               <input value="1" name="attr_wise3_fate" type="checkbox"/>
-              <div class="sheet-wise-label">Fate (Advancement)</div>
+              <div class="sheet-wise-label">Fate
+                <div class="sheet-reference-text">Gaining Wisdom</div>
+              </div>
             </div>
             <button class="sheet-roll-button">Roll D.U.</button>
           </div>
           <div class="sheet-wise-4">
             <div class="sheet-wise-xp-section">
               <input value="1" name="attr_wise4_fate" type="checkbox"/>
-              <div class="sheet-wise-label">Fate (Advancement)</div>
+              <div class="sheet-wise-label">Fate
+                <div class="sheet-reference-text">Gaining Wisdom</div>
+              </div>
             </div>
             <button class="sheet-roll-button">Roll D.U.</button>
           </div>
         </div>
+        <input class="sheet-luck-flag" value="0" name="attr_rolling_luck" type="hidden"/>
         <div class="sheet-roll-header">
           <input name="attr_rolling_luck" type="checkbox"/><span>Luck</span>
         </div>
@@ -5495,7 +5503,9 @@
             <div class="sheet-section">
               <div class="sheet-wise-xp-section">
                 <input value="1" name="attr_wise1_persona" type="checkbox"/>
-                <div class="sheet-wise-label">Persona (Advancement)</div>
+                <div class="sheet-wise-label">Persona
+                  <div class="sheet-reference-text">Gaining Wisdom</div>
+                </div>
               </div>
               <div class="sheet-failed-dice">
                 <input class="sheet-handwritten" value="0" name="attr_rolling_failed_dice" type="number"/>
@@ -5508,7 +5518,9 @@
             <div class="sheet-section">
               <div class="sheet-wise-xp-section">
                 <input value="1" name="attr_wise2_persona" type="checkbox"/>
-                <div class="sheet-wise-label">Persona (Advancement)</div>
+                <div class="sheet-wise-label">Persona
+                  <div class="sheet-reference-text">Gaining Wisdom</div>
+                </div>
               </div>
               <div class="sheet-failed-dice">
                 <input class="sheet-handwritten" value="0" name="attr_rolling_failed_dice" type="number"/>
@@ -5521,7 +5533,9 @@
             <div class="sheet-section">
               <div class="sheet-wise-xp-section">
                 <input value="1" name="attr_wise3_persona" type="checkbox"/>
-                <div class="sheet-wise-label">Persona (Advancement)</div>
+                <div class="sheet-wise-label">Persona
+                  <div class="sheet-reference-text">Gaining Wisdom</div>
+                </div>
               </div>
               <div class="sheet-failed-dice">
                 <input class="sheet-handwritten" value="0" name="attr_rolling_failed_dice" type="number"/>
@@ -5534,7 +5548,9 @@
             <div class="sheet-section">
               <div class="sheet-wise-xp-section">
                 <input value="1" name="attr_wise4_persona" type="checkbox"/>
-                <div class="sheet-wise-label">Persona (Advancement)</div>
+                <div class="sheet-wise-label">Persona
+                  <div class="sheet-reference-text">Gaining Wisdom</div>
+                </div>
               </div>
               <div class="sheet-failed-dice">
                 <input class="sheet-handwritten" value="0" name="attr_rolling_failed_dice" type="number"/>
@@ -5672,7 +5688,132 @@
   </rolltemplate>
 </div>
 <script type="text/worker">
-  on("sheet:opened", function (eventinfo) {
+  function resetRoll() {
+  setAttrs({
+    rolling_type: "independent",
+    rolling_obstacle: 1,
+    rolling_disposition_ability: "will",
+    rolling_grind: 1,
+    rolling_bl_select: "health",
+    rolling_bl_nature_within: "within",
+    rolling_trait: 0,
+    rolling_trait_option: "forme",
+    rolling_persona: 0,
+    rolling_channel_nature: 0,
+    rolling_nature_within: "within",
+    rolling_help: 0,
+    rolling_synergy: 0,
+    rolling_aid: 0,
+    rolling_gearetal: 0,
+    rolling_otherdice: 0,
+    rolling_othersuccesses: 0,
+    rolling_hnt: 0,
+    rolling_exhausted: 0,
+    rolling_deeper_understanding: 0,
+    rolling_du_wise: 0,
+    rolling_luck: 0,
+    rolling_luck_dice: 0,
+    rolling_of_course: 0,
+    rolling_oc_wise: 0,
+    rolling_failed_dice: 0,
+    rolling_beginners_luck_roll: 0,
+  })
+};const calculateDiceValues = [
+  // Also needs all the skills, abilities, and custom skills
+  "rolling",
+  "rolling_bl_select",
+  "taxed_nature",
+  "rolling_help",
+  "rolling_aid",
+  "rolling_gearetal",
+  "rolling_trait",
+  "rolling_trait_option",
+  "rolling_trait_option",
+  "rolling_persona",
+  "rolling_channel_nature",
+  "taxed_nature",
+  "rolling_otherdice",
+  "injured",
+  "sick",
+  "fresh"
+];
+
+calculateDiceValues.forEach(v => {
+  on("change:" + v, function () {
+    console.log('calculateDiceValues', "change:" + v);
+    let attrsToGet = [...calculateDiceValues, ...abilities, ...skills, ...customSkills];
+
+    getAttrs(attrsToGet, function (values) {
+      setAttrs({
+        rolling_dice: calculateDice(values, values['rolling']),
+      });
+    });
+  });
+});
+
+function calculateDice(values, rolling) {
+  const isBeginnersLuck = calculateBeginnersLuck(values, rolling);
+
+  // Get the skill or ability
+  let rollValue = parseInt(values[rolling]);
+
+  if (rolling == 'nature') {
+    rollValue = parseInt(values['taxed_nature']);
+  }
+
+  // Change it if we're doing beginners luck
+  if (isBeginnersLuck) {
+    let blSelected = values['rolling_bl_select'];
+    rollValue = parseInt(values[blSelected]);
+
+    if (blSelected == "nature") {
+      rollValue = parseInt(values['taxed_nature']);
+    }
+  }
+
+  // Add help, aid, supplies, gear
+  rollValue += parseInt(values['rolling_help']);
+  rollValue += parseInt(values['rolling_aid']);
+  rollValue += parseInt(values['rolling_gearetal']);
+
+  // Check to half for beginners luck
+  if (isBeginnersLuck) {
+    rollValue = Math.floor(rollValue / 2);
+  }
+
+  // Add traits, persona, channelled nature, conditions, etc.
+  if (values['rolling_trait'] > 0) {
+    if (values['rolling_trait_option'] == "forme") {
+      rollValue += 1
+    }
+    if (values['rolling_trait_option'] == "againstme") {
+      rollValue -= 1
+    }
+  }
+
+  rollValue += parseInt(values['rolling_persona']);
+
+  if (values['rolling_channel_nature'] == "on") {
+    rollValue += parseInt(values['taxed_nature']);
+  }
+
+  rollValue += parseInt(values['rolling_otherdice']);
+
+  if (values['injured'] > 0) {
+    rollValue -= 1;
+  }
+
+  if (values['sick'] > 0) {
+    rollValue -= 1;
+  }
+
+  if (values['fresh'] > 0) {
+    rollValue += 1;
+  }
+
+  return rollValue;
+};on("sheet:opened", function (eventinfo) {
+  console.log('initialize');
   initialize();
 });
 
@@ -5698,6 +5839,7 @@ function initialize() {
   const tablist = ["anatomy", "kit", "magic", "relationships", "levels", "roll"];
 tablist.forEach(button => {
   on(`clicked:${button}`, function () {
+    console.log(`clicked:${button}`);
     setAttrs({
       tab: button
     });
@@ -5707,6 +5849,7 @@ tablist.forEach(button => {
 const modeList = ["editing", "playing"];
 modeList.forEach(button => {
   on(`clicked:${button}`, function () {
+    console.log(`clicked:${button}`);
     setAttrs({
       edit: button
     });
@@ -5748,6 +5891,7 @@ const rollableItems = abilities.concat(...skills, ...customSkills);
 
 rollableItems.forEach(button => {
   on(`clicked:${button}`, function () {
+    console.log(`clicked:${button}`);
     rollableItemClicked(button);
   });
 });
@@ -5764,20 +5908,25 @@ function rollableItemClicked(button) {
   }
   attrsToGet.push(button + "_name");
 
+  attrsToGet.push(...abilities, ...skills, ...customSkills);
+  attrsToGet.push(...calculateDiceValues);
+
+  resetRoll();
+
   getAttrs(attrsToGet, function (values) {
     const beginnersLuckRoll = calculateBeginnersLuck(values, button);
     const skillName = getSkillName(values, button);
+    const rollingDice = calculateDice(values, button);
 
     populateTraitOptions(values);
     populateWiseOptions(values);
-
 
     setAttrs({
       rolling: button,
       rolling_title: skillName,
       tab: "roll",
       beginners_luck_roll: beginnersLuckRoll,
-      rolling_dice: values[button],
+      rolling_dice: rollingDice,
     });
   });
 }
@@ -5921,6 +6070,7 @@ const allListeners = [].concat(...traitUses, ...traitChecks, ...abilityPasses, .
 
 allListeners.forEach(function (value) {
   on(`clicked:${value}`, function (event) {
+    console.log(`clicked:${value}`);
     setAttrs({
       [value]: event.htmlAttributes.value
     });
