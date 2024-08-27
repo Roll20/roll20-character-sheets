@@ -12634,7 +12634,7 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	/* Tool */
 	let toolDescription = "";
-	let toolEffect = "";
+	let toolEffectDescription = "";
 	let toolinfo = "";
 	let toolname = "";
 	let tooldesc = "";
@@ -12680,8 +12680,6 @@ getSectionIDs(`repeating_global`, idarray => {
 	let skillinfo = "";
 
 	if(currentlight >= skillcost && rawcheck != "raw"){
-
-	
 
 		if(skilltype == "Mass" && basetype == "Attack"){
 		skilltype = "Attack";
@@ -12963,19 +12961,19 @@ getSectionIDs(`repeating_global`, idarray => {
 	distortformat = "<br><div style='width: 100%; background-color: #111; height: 80px; float: left; text-align: center; color:" + headertext + "'><b>" + langDistortEffect + "</b><br><div style='overflow: auto; border-top: 1px #555 solid; height: 70px;'>" + distorteffect + "</div></div>";
 	}
 
-	let baseEffectDescription = "<br><div style='width: 50%; height: auto; float: left;'><b>" + langEffectBase + ":</b><br><div style='overflow: auto; border: 1px #555 solid; max-height: 70px; padding-bottom:1px; '>" + baseeffect + "</div></div>";
-	let skillEffectDescription = "<div style='width: 50%; height: auto; float: left;'><b>" + langEffectSkill + ":</b><br><div style='overflow: auto; border: 1px #555 solid; max-height: 70px; padding-bottom:1px; '>" + skilleffect + "</div></div>"
-	if (baseeffect == "") { baseEffectDescription = ""; skillEffectDescription = "<br>" + skillEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
-	if (skilleffect == "(No Skill)" || skilleffect == "") { skillEffectDescription = ""; baseEffectDescription = baseEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
+	let baseEffectDescription = "<br><div class='descriptionContainer'><b>" + langEffectBase + ":</b><br><div class='effectDescription'>" + baseeffect + "</div></div>";
+	let skillEffectDescription = "<div class='descriptionContainer'><b>" + langEffectSkill + ":</b><br><div class='effectDescription'>" + skilleffect + "</div></div>"
+	if (baseeffect == "") { baseEffectDescription = ""; }
+	if (skilleffect == "(No Skill)" || skilleffect == "") { skillEffectDescription = ""; }
 
-	if(toolselect != "" && toolselect != null && toolselect != "0"){
+	if(toolselect != "" && toolselect != null && toolselect != "0") {
 		toolDescription = "<div style='text-align: center; padding-top: 3px; padding-bottom: 3px;'><div style='text-align: left; padding: 5px;'>" + tooldesc + "</div></div>";
-		toolEffect = "<br><b>" + langEffectTool + ":</b><div class='toolEffect' style='max-height: 60px; width: 96.5%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
-		if (tooleffect == "") { toolEffect = ""; toolDescription = toolDescription.replaceAll(" padding-bottom: 3px;","").replaceAll(" padding: 5px;"," padding-top: 5px;"); }
+		toolEffectDescription = "<br><b>" + langEffectTool + ":</b><div class='toolEffect' style='max-height: 60px; width: 96.5%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
+		if (tooleffect == "") { toolEffectDescription = ""; toolDescription = toolDescription.replaceAll(" padding-bottom: 3px;","").replaceAll(" padding: 5px;"," padding-top: 5px;"); }
 
 		toolinfo = "<br><b>" + langUse + "</b>: " +  toolname + "<br>";
 		
-		skillEffectDescription += toolEffect;
+		skillEffectDescription += toolEffectDescription;
 		skillinfo += toolinfo;
 	}
 
@@ -13995,12 +13993,7 @@ on('clicked:declareAction', (info) => {
 	let skillcost = values.selectLight;
 	let skilldesc = values.selectDescription;
 	let skilleffect = values.selectEffect;
-
-	let skilldice1 = "0";
-	let skilldice2 = "0";
-	let skilldice3 = "0";
 	let skillinfo = "";
-
 	let lightmessage = "";
 
 	/* Bleed processing */
@@ -14104,33 +14097,25 @@ on('clicked:declareAction', (info) => {
 	}
 
 	let toolDescription = "<div style='text-align: center; padding-top: 3px; padding-bottom: 3px;'><div style='text-align: left; padding: 5px;'>" + tooldesc + "</div></div>";
-	let toolEffect = "<div class='toolEffect' style='max-height: 60px; width: 96.5%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
+	let toolEffectDescription = "<div class='toolEffect' style='max-height: 60px; width: 96.5%; border: 1px #555 solid; overflow: auto; float: left; padding: 3px;'>" + tooleffect + "</div>";
 	if (tooldesc == "") { toolDescription = ""; }
-	if (tooleffect == "") { toolEffect = ""; toolDescription = toolDescription.replaceAll(" padding-bottom: 3px;","").replaceAll(" padding: 5px;"," padding-top: 5px;"); }
+	if (tooleffect == "") { toolEffectDescription = ""; toolDescription = toolDescription.replaceAll(" padding-bottom: 3px;","").replaceAll(" padding: 5px;"," padding-top: 5px;"); }
 
-	if(toolselect != "" && toolselect != null && toolselect != "0"){
-	toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br>" + toolDescription + toolEffect;
+	if(toolselect != "" && toolselect != null && toolselect != "0") {
+		toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br>" + toolDescription + toolEffectDescription;
 	}
 
-	if(currentlight >= skillcost){
+	if(currentlight >= skillcost && skilltype == "Action") {
+		newlight = currentlight - skillcost;
+		lightmessage = " <span style='color: #fee2b0'>(" + langSkill + ")</span>";
 
-		if(skilltype == "Action"){
+		skillinfo= "<b>" + langSkill + ": </b>" + skillname;
+		let skillDescription = "<br><div class='descriptionContainer'><b>" + langDesc + ":</b><br><div class='effectDescription'>" + skilldesc + "</div></div>";
+		let skillEffectDescription = "<div class='descriptionContainer'><b>" + langEffect + ":</b><br><div class='effectDescription''>" + skilleffect + "</div></div>";
 
-			skilldice1 = values.selectDice1;
-			skilldice2 = values.selectDice2;
-			skilldice3 = values.selectDice3;
-
-			newlight = currentlight - skillcost;
-
-			lightmessage = " <span style='color: #fee2b0'>(" + langSkill + ")</span>";
-			skillinfo= "<b>" + langSkill + ": </b>" + skillname;
-			let skillDescription = "<br><div style='width: 50%; height: 80px; float: left;'><b>" + langDesc + ":</b><br><div style='overflow: auto; border: 1px #555 solid; height: 70px;'>" + skilldesc + "</div></div>";
-			let skillEffectDescription = "<div style='width: 50%; height: 80px; float: left;'><b>" + langEffect + ":</b><br><div style='overflow: auto; border: 1px #555 solid; height: 70px;'>" + skilleffect + "</div></div>";
-
-			if (skilldesc == "") { skillDescription = ""; skillEffectDescription = skillEffectDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
-			if (skilleffect == "") { skillEffectDescription = ""; skillDescription = skillDescription.replaceAll("style='width: 50%;", "style='width: 100%;") }
-			skillinfo = skillinfo + skillDescription + skillEffectDescription;
-		}
+		if (skilldesc == "") { skillDescription = ""; }
+		if (skilleffect == "") { skillEffectDescription = ""; }
+		skillinfo = skillinfo + skillDescription + skillEffectDescription;
 	}
 
 	if (hidebaseffect == "true") { skillinfo= "<b>" + langSkill + ": </b>" + skillname; toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br>"; }
