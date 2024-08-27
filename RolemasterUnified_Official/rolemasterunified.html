@@ -63,23 +63,33 @@
 
     computed::injurystring is the injury enced string to send accross.
 
+
+
+      {{#^rollTotal() manueverpenalty 0}}
+	{{manueverpenalty}} [Manuever&nbsp;Penalty]
+      {{/^rollTotal() manueverpenalty 0}}
+
 -->
 <rolltemplate class="sheet-rolltemplate-rmuattack">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
     <i>{{name}}</i> attacks <i>{{target}}</i> with a <i>{{weapon}}</i><br>
-    <i>Rolls</i> {{attackrollum}} + OB{{attackbonus}} - DB {{targetdb}} ⇒ {{computed::attackroll}}
-      <b>{{computed::attackresult}}!</b><br>
+
+    <b>{{computed::attackresult}}!</b>
+    <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
+      <b>{{computed::attackroll}}</b> =
+      {{attackrollum}} [Roll] {{computed::attackmoddescription}}<br>
+    </p>
     {{#rollTotal() computed::ishit 1}}
-    Hits {{computed::hitlocation}} for {{computed::damage}}
+      Hits {{computed::hitlocation}} for {{computed::damage}}
       {{#rollTotal() computed::hascritical 1}}
         <br>Critical Roll {{computed::critical}}
 	<br><i>{{computed::critdescription}}</i>
 	<br>{{computed::criteffect}}
       {{/rollTotal() computed::hascritical 1}}
     {{/rollTotal() computed::ishit 1}}
-       
+    <br>
 
-    [Apply](~{{target}}|applyattackresult||{{computed::injurystring}})
+    [Apply](~{{computed::targetname}}|applyattackresult||{{computed::injurystring}})
 
 
   </div>
@@ -191,7 +201,8 @@
 <rolltemplate class="sheet-rolltemplate-rmuspell">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
     {{who}} casts {{computed::spell}}<br>
-    Modifiers: {{mod}} = {{computed::modlog}}<br>
+    <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
+    Modifiers: {{mod}} = {{computed::modlog}}</p>
     Result: {{computed::total}} = {{computed::roll}} + {{mod}}<br>
     {{computed::result}}<br>
     {{who}} now has {{computed::pp}} PP ({{computed::ppmsg}})
@@ -2120,7 +2131,7 @@
 <div class='creaturesheet'>
 
 
-<h1 class='creaturetitle'><span name='attr_character_name'></span></h1>
+<h1 class='creaturetitle'><span name='attr_character_name'>Creature</span></h1>
 
 <div class='creature-multicolumn'>
 <div class='creaturestats'>
@@ -2140,6 +2151,9 @@
 
 <div class='creaturedefenses'>
   <span class='creatureheading'>Defenses</span>
+
+  <span>Level</span> 
+  <span name='attr_level'></span>
 
   <span>AT (DB)</span>
   <span>
@@ -2161,7 +2175,7 @@
   <span>Initiative</span>
   <span>
     <span name='attr_initiative'></span>
-    <button type="roll" class="editbutton rollbutton" value="&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] {{actor=@{character_name} }} {{bonus=@{initiative} }} {{total=$[[1]]}} {{roll=$[[0]]}}"><span style="font-family:dicefontd10;">j</span></button>
+    <button type="action" value="act_rollinitiative" class="editbutton rollbutton"><span style="font-family:dicefontd10;">j</span></button>
   </span>
 
 
@@ -2238,6 +2252,16 @@
 
 </div>
 
+<div class='creaturemove'>
+  <span class='creatureheading'>Movement</span>
+
+  <fieldset class='repeating_creaturemove'>
+    <span name='attr_type'></span>
+    (Max <span name='attr_pace'></span>)
+    <span><span name='attr_bmr'></span>'/rnd</span>
+ </fieldset>
+
+</div>
 
 <div class='creatureactions'>
   <h2>Actions</h2>
@@ -2404,7 +2428,7 @@ Name <input name="attr_character_name">
    
 <div class='prop_pair'><span class='prop_prop_plain'>Profession</span><span class='prop_value' name='attr_profession'></span><span class='prop_prop_plain'>Race</span><span class='prop_value' name='attr_race'></span><span class='prop_prop_plain'>Level</span><span class='prop_value' name='attr_display_level'></span><span class='prop_prop_plain'>Culture</span><span class='prop_value' name='attr_culture'></span><span class='prop_prop_plain'>Realm</span><span class='prop_value' name='attr_realm'></span><span class='prop_prop_plain'>Age</span><span class='prop_value'><input type='text' style='width:100%' name='attr_age'></span><span class='prop_prop_plain'>Skin</span><span class='prop_value'><input type='text' style='width:100%' name='attr_skin'></span><span class='prop_prop_plain'>Eyes</span><span class='prop_value'><input type='text' style='width:100%' name='attr_eyes'></span><span class='prop_prop_plain'>Gender</span><span class='prop_value' name='attr_gender'></span><span class='prop_prop_plain'>Build</span><span class='prop_value' name='attr_build'></span><span class='prop_prop_plain'>Height</span><span class='prop_value' name='attr_height'></span><span class='prop_prop_plain'>Weight</span><span class='prop_value' name='attr_weight'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
 <span class='prop_value' name='attr_weightallowance'></span><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encpenalty'></span><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manpenalty'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_bmr_info'></span>Base Move (BMR)</span></span>
-<span class='prop_value' name='attr_bmr'></span><span class='prop_prop_plain'>Initiative</span><span class='prop_value'><span name='attr_initiative'></span><button type="roll" class="editbutton rollbutton" value="&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] {{actor=@{character_name} }} {{bonus=@{initiative} }} {{total=$[[1]]}} {{roll=$[[0]]}}"><span style="font-family:dicefontd10;">j</span></button></span><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span><span class='prop_prop_plain'>Easy</span><span class='prop_value' name='attr_strfeat_easy'></span><span class='prop_prop_plain'>Light</span><span class='prop_value' name='attr_strfeat_light'></span><span class='prop_prop_plain'>Medium</span><span class='prop_value' name='attr_strfeat_medium'></span><span class='prop_prop_plain'>Hard</span><span class='prop_value' name='attr_strfeat_hard'></span><span class='prop_prop_plain'>Very Hard</span><span class='prop_value' name='attr_strfeat_veryhard'></span><span class='prop_prop_plain'>Ext. Hard</span><span class='prop_value' name='attr_strfeat_exthard'></span><span class='prop_prop_plain'>Sheer Folly</span><span class='prop_value' name='attr_strfeat_sheerfolly'></span><span class='prop_prop_plain'>Absurd</span><span class='prop_value' name='attr_strfeat_absurd'></span><span class='prop_prop_plain'>Nigh Impossible</span><span class='prop_value' name='attr_strfeat_nighimpossible'></span>
+<span class='prop_value' name='attr_bmr'></span><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span><span class='prop_prop_plain'>Easy</span><span class='prop_value' name='attr_strfeat_easy'></span><span class='prop_prop_plain'>Light</span><span class='prop_value' name='attr_strfeat_light'></span><span class='prop_prop_plain'>Medium</span><span class='prop_value' name='attr_strfeat_medium'></span><span class='prop_prop_plain'>Hard</span><span class='prop_value' name='attr_strfeat_hard'></span><span class='prop_prop_plain'>Very Hard</span><span class='prop_value' name='attr_strfeat_veryhard'></span><span class='prop_prop_plain'>Ext. Hard</span><span class='prop_value' name='attr_strfeat_exthard'></span><span class='prop_prop_plain'>Sheer Folly</span><span class='prop_value' name='attr_strfeat_sheerfolly'></span><span class='prop_prop_plain'>Absurd</span><span class='prop_value' name='attr_strfeat_absurd'></span><span class='prop_prop_plain'>Nigh Impossible</span><span class='prop_value' name='attr_strfeat_nighimpossible'></span>
 
     <span class='prop_prop_plain'>EP</span>
     <span class='prop_value'><input class='xp' type="number" name="attr_xp" value="10000"></span>
@@ -2591,6 +2615,10 @@ Name <input name="attr_character_name">
     <h2>Attacks</h2>
 
     
+    <div class='prop_pair'>
+      <span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span> Initiative</span>
+      <span class='prop_value'><span name='attr_initiative'></span><button type="action" value="act_rollinitiative" class="editbutton rollbutton"><span style="font-family:dicefontd10;">j</span></button></span>
+    </div>
 
       <div class='foe'>
 
@@ -2643,6 +2671,11 @@ Name <input name="attr_character_name">
     <button class='fancybuttoninline fancybutton' type='action' name='act_rollcritselect'>
           <span style="font-family:Pictos;">s</span>Crit</button>
 
+        <br>
+    <input type='checkbox' name='attr_attackuseap' id='attackuseap'>
+      <label style='display:inline' for='attackuseap'>Use AP?</label>
+    <!-- other mods go here -->
+
     <input type='hidden' name='attr_attackaddshow' class='attackaddshow'>
     <div class='attackadd overlay'>
       <div class="attackaddcontent skillchange">
@@ -2651,68 +2684,69 @@ Name <input name="attr_character_name">
       <div>Attack Skill</div> 
         <select name='attr_attackaddskill'>
           
+          <option value="beak">Beak</option>
+          <option value="bite">Bite</option>
           <option value="blade">Blade</option>
+          <option value="bow">Bow</option>
           <option value="chain">Chain</option>
-          <option value="hafted">Hafted</option>
+          <option value="claw">Claw</option>
+          <option value="crossbow">Crossbow</option>
+          <option value="elementalbolts">Elemental Bolts</option>
+          <option value="meleeexotic">Exotic (Melee)</option>
+          <option value="rangedexotic">Exotic (Ranged)</option>
           <option value="greaterblade">Greater Blade</option>
           <option value="greaterchain">Greater Chain</option>
           <option value="greaterhafter">Greater Hafted</option>
+          <option value="hafted">Hafted</option>
+          <option value="horn">Horn</option>
+          <option value="illusionaryattacks">Illusionary Attacks</option>
+          <option value="none">None</option>
           <option value="polearm">Pole Arm</option>
-          <option value="meleeexotic">Exotic</option>
-          <option value="bow">Bow</option>
-          <option value="crossbow">Crossbow</option>
-          <option value="sling">Sling</option>
-          <option value="thrown">Thrown</option>
-          <option value="rangedexotic">Exotic</option>
+          <option value="ram">Ram</option>
           <option value="shield">Shield</option>
+          <option value="sling">Sling</option>
+          <option value="stinger">Stinger</option>
           <option value="strikes">Strikes</option>
           <option value="sweepsthrows">Sweeps &amp; Throws</option>
-          <option value="wrestling">Wrestling</option>
-          <option value="beak">Beak</option>
-          <option value="bite">Bite</option>
-          <option value="claw">Claw</option>
-          <option value="horn">Horn</option>
-          <option value="ram">Ram</option>
-          <option value="stinger">Stinger</option>
           <option value="trample">Trample</option>
-          <option value="elementalbolts">Elemental Bolts</option>
-          <option value="illusionaryattacks">Illusionary Attacks</option>
+          <option value="thrown">Thrown</option>
+          <option value="wrestling">Wrestling</option>
           <option value="hurling">Hurling</option>
         </select>
       <div>Table</div>
         <select name="attr_attackaddtable">
           <option value="Arming Sword">Arming Sword</option>
           <option value="Ball, Cold">Ball, Cold</option>
+          <option value="Ball, Fire">Ball, Fire</option>
+          <option value="Ball, Lightning">Ball, Lightning</option>
           <option value="Battle Axe">Battle Axe</option>
           <option value="Beak">Beak</option>
           <option value="Bite">Bite</option>
           <option value="Bola">Bola</option>
+          <option value="Bolt, Fire">Bolt, Fire</option>
+          <option value="Bolt, Ice">Bolt, Ice</option>
+          <option value="Bolt, Lightning">Bolt, Lightning</option>
+          <option value="Bolt, Shock">Bolt, Shock</option>
+          <option value="Bolt, Water">Bolt, Water</option>
+          <option value="Bow, Long">Bow, Long</option>
+          <option value="Bow, Short">Bow, Short</option>
           <option value="Broadsword">Broadsword</option>
           <option value="Claw">Claw</option>
           <option value="Club">Club</option>
-          <option value="Ball, Cold">Ball, Cold</option>
           <option value="Crossbow">Crossbow</option>
           <option value="Crush">Crush</option>
           <option value="Dagger">Dagger</option>
           <option value="Falchion">Falchion</option>
           <option value="Fighting Stick">Fighting Stick</option>
-          <option value="Ball, Fire">Ball, Fire</option>
-          <option value="Bolt, Fire">Bolt, Fire</option>
           <option value="Flail">Flail</option>
           <option value="Grapple">Grapple</option>
           <option value="Horn">Horn</option>
-          <option value="Bolt, Ice">Bolt, Ice</option>
-          <option value="Ball, Lightning">Ball, Lightning</option>
-          <option value="Bolt, Lightning">Bolt, Lightning</option>
-          <option value="Bow, Long">Bow, Long</option>
           <option value="Mace">Mace</option>
           <option value="Ram">Ram</option>
           <option value="Rapier">Rapier</option>
           <option value="Rock">Rock</option>
           <option value="Scimitar">Scimitar</option>
           <option value="Shield">Shield</option>
-          <option value="Bolt, Shock">Bolt, Shock</option>
-          <option value="Bow, Short">Bow, Short</option>
           <option value="Sling">Sling</option>
           <option value="Spear">Spear</option>
           <option value="Stinger">Stinger</option>
@@ -2720,7 +2754,6 @@ Name <input name="attr_character_name">
           <option value="Unarmed Strike">Unarmed Strike</option>
           <option value="Unarmed Sweeps">Unarmed Sweeps</option>
           <option value="War Hammer">War Hammer</option>
-          <option value="Bolt, Water">Bolt, Water</option>
           <option value="Whip">Whip</option>
         </select>
       <div>Size</div>
@@ -5114,7 +5147,11 @@ Bug reports to nashidau on Discord or the #roll20 channel on the
 
 <hr>
 
-Revision 312226f26becda9be73d84535e75bcb5c7156fe7
+Sheet Version: <span name='attr_version'></span>
+
+<br>
+
+Revision 3d329790ea74dce78d71c9d4b89143b32e0ce159
 
 
 <hr>
@@ -6135,9 +6172,9 @@ function miscBonusTotalFlat(miscstr) {
 	    let value = parseIntDefault(obj.value, 0);
 	    if (value < 0) {
 		// Negatives print their own sign
-		log += ` ${value} [${obj.name}]`;
+		log += ` ${value}&nbsp;[${obj.name}]`;
 	    } else {
-		log += ` +${value} [${obj.name}]`;
+		log += ` +${value}&nbsp;[${obj.name}]`;
 	    }
 	    total += value;
 	} else if (obj.hasOwnProperty('message')) {
@@ -7408,6 +7445,8 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	'castingvoice', 'castingpreprounds', 'castingsubtle', 'castinghands',
 	// AP
 	'castinguseap', 'aptrack_spell',
+	// Manuever Penalty
+	'manuever_penalty',
 	],
       (spelldata) => {
 	console.log(spelldata);
@@ -7450,10 +7489,10 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	    return;
 	  }
 	  if (ap == 2) {
-	    mlog += '-50 [Fast Cast 2AP]';
+	    mlog += '-50&nbsp;[Fast&nbsp;Cast&nbsp;2AP]';
 	    mod += -50;
 	  } else if (ap == 3) {
-	    mlog += '-25 [Fast Cast 3AP]';
+	    mlog += '-25&nbsp;[Fast&nbsp;Cast&nbsp;3AP]';
 	    mod += -25;
 	  }
 	}
@@ -7469,16 +7508,28 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	}
 
 	{
+	  const manp = parseIntDefault(spelldata.manuever_penalty, 0);
+	  if (manp < 0) {
+	    mlog += ` ${manp}&nbsp;[Manuever&nbsp;Penalty]`;
+	    mod += manp;
+	  }
+	}
+
+	{
 	  const miscmod = parseIntDefault(spelldata.castingmiscmod, 0);
 	  if (miscmod) {
 	    mod += miscmod;
-	    mlog += ` ${miscmod} [Other modifier]`;
+	    if (miscmod > 0) {
+	      mlog += ` +${miscmod}&nbsp;[Other&nbsp;modifier]`;
+	    } else {
+	      mlog += ` ${miscmod}&nbsp;[Other&nbsp;modifier]`;
+	    }
 	  }
 	}
 
 	if (preprounds > 0) {
 	  mod += preprounds * 10;
-	  mlog += ` +(${preprounds} * 10) [Prep]`;
+	  mlog += ` +(${preprounds}&nbsp;*&nbsp;10)&nbsp;[Prep]`;
 	}
 
 	if (casterlevel < level) {
@@ -7486,29 +7537,29 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	  const overpenalty = overcast * 20;
 
 	  if (grace > overpenalty) {
-	    mlog += ` -0 [Overcast ${overcast} levels (${overpenalty} + ${grace} Grace (0 capped))]`;
+	    mlog += ` -0&nbsp;[Overcast ${overcast} levels (${overpenalty} + ${grace} Grace (0 capped))]`;
 	  } else if (grace > 0) {
 	    const modified = overpenalty - grace;
-	    mlog += ` -${modified} [Overcast ${overcast} levels ({${overpenalty} + ${grace} Grace)]`
+	    mlog += ` -${modified}&nbsp;[Overcast ${overcast} levels ({${overpenalty} + ${grace} Grace)]`
 	    mod -= modified;
 	  } else {
 	    // FIXME: add grace here
-	    mlog += ` -${overpenalty} (Overcast ${overcast} levels * 20)`
+	    mlog += ` -${overpenalty}&nbsp;(Overcast ${overcast} levels * 20)`
 	    mod -= overpenalty;
 	  }
 	}
 
 	if (group == 'spellownbase') {
 	  mod += 5;
-	  mlog += ' +5 [Base List]';
+	  mlog += ' +5&nbsp;[Base&nbsp;List]';
 	} else if (group == 'spellopen') {
-	  mlog += ' +0 [Open List]';
+	  mlog += ' +0&nbsp;[Open&nbsp;List]';
 	} else if (group == 'spellclosed') {
 	  mod += -5;
-	  mlog += ' -5 [Closed List]';
+	  mlog += ' -5&nbsp;[Closed&nbsp;List]';
 	} else {
 	  mod += -10;
-	  mlog += ' -10 [Other List]';
+	  mlog += ' -10&nbsp;[Other&nbsp;List]';
 	}
 
 	const scrbonus = miscBonusTotalFlat(spelldata.scr_misc);
@@ -9736,6 +9787,17 @@ onCheck("mancerfinish:newcharacter", (ev) => {
 
     addPendingFunction("CMFinish: update all skills", RMUSkills.updateAllSkills);
     addPendingFunction("CMFinish: Front page", updateFrontPage);
+
+    addPendingFunction("CMFinish: Set PP and HP to some initial values", () => {
+	getAttrsPending(['pp', 'hp_max', 'pp_max'], (v) => {
+	    const update = {}
+	    update.pp = v.pp_max || 0;
+	    update.hp = v.hp_max || 0;
+	    update.injury_penalty = 0;
+	    update.fatigue = 0;
+	    VrmuSetAttrs(update);
+	});
+    });
     addPendingFunction("CMFinish: Set character created flag", () => {
 	setAttrsPending({charactercreated: 'true', flag_cmancer_show: '0'});
     });
@@ -11589,6 +11651,10 @@ J E + C + B
     //	    - cdata.attackersize - Size of the attacker
     //	    - cdata.targetsize = values.target_size || 0;
     //	    - cdata.targetcrit = values.target_crit || '';
+    //      - cdata.attackmod = The numeric attack modifer - all mods
+    //	    - cdata.attackmoddescription = Description of the above
+    //      - cdata.manuever_penalty = values.manuever_penalty || 0;
+
     //		
     // Results are:
     //	    - attackresult -> "Hit/Miss/Fumble"
@@ -11602,9 +11668,14 @@ J E + C + B
     attacks.resolveAttack = function(rollId, rolls, cdata) {
 	let result = {};
 	let injuryhits = 0;
+	let moddescription = '';
 	// Nil out the defined fields
 	result.attackresult = "??";
 	result.finalroll = "??";
+
+	result.attackmoddescription = cdata.attackmoddescription;
+	result.attackmod = cdata.attackmod;
+
 	// First check for a fumble
 	if (rolls.attackrollum.result <= cdata.fumblerange) {
 	    result.attackresult = "Fumble";
@@ -11612,8 +11683,10 @@ J E + C + B
 	    finishRoll(rollId, result);
 	    return;
 	}
+
 	    
 	result.finalroll = rolls.attackroll.result;
+	// FIXME: Expand this roll into the log
 
 	// Now did we hit or miss?
 	if (result.finalroll < cdata.min) {
@@ -11713,6 +11786,10 @@ J E + C + B
 	result.hitside = hit.side
 	result.critical = critroll;
 
+	// The 'computed' version of the target is html entity encoded
+	// FIXME: Entity should be all; not just )
+	result.targetname = cdata.targetname.replace(")", '&#41;');	
+	console.log("rep", cdata.targetname, result.targetescaped);
 
 	// Get critical
 	if (critinfo.critical) {
@@ -11729,6 +11806,7 @@ J E + C + B
 		});
 	    return;
 	}
+
 	result.injurystring = injury.updateInjuryString(injuryhits, {});
 	finishRoll(rollId, result);
     }
@@ -11766,22 +11844,66 @@ J E + C + B
     }
 
     attacks.startAttack = function(cdata) {
-	if (cdata.targetsize < cdata.attackersize) {
-	    cdata.sizedbmod = 5 * (cdata.attackersize - cdata.targetsize);
-	    cdata.targetdb += cdata.sizedbmod;
+	let attackmoddescription = '';
+	let attackmod = 0;
+	
+	attackmod += cdata.attackbonus;
+	attackmoddescription = ` +${cdata.attackbonus}&nbsp;[Attack&nbsp;Bonus]`; 
+
+	if (cdata.manuever_penalty < 0) {
+	    attackmod += cdata.manuever_penalty;
+	    attackmoddescription += ` ${cdata.manuever_penalty}&nbsp;[Manuever&nbsp;Penalty]`; 
 	}
+
+	if (cdata.targetsize < cdata.attackersize) {
+	    const dbdiff = (5 * (cdata.attackersize - cdata.targetsize));
+	    attackmod -= dbdiff;
+	    attackmoddescription +=
+		` -${dbdiff}&nbsp;[Size Difference (${cdata.attackersize} vs ${cdataltargetsize})]`;
+	}
+
+	attackmod -= cdata.targetdb;
+	if (cdata.targetdb < 0) {
+	    attackmoddescription += ` -(${cdata.targetdb})&nbsp;[Target&nbsp;DB]`;
+	} else {
+	    attackmoddescription += ` -${cdata.targetdb}&nbsp;[Target&nbsp;DB]`;
+	}
+
+	if (cdata.useap) {
+	    if (cdata.apused < 2) {
+		sendMessage("Must use at least 2 AP to attack");
+		return;
+	    }
+
+	    // FIXME: Missile.
+	    let appenalty = 0;
+	    if (cdata.apused == 2) {
+		appenalty = 50;
+	    } else if (cdata.apused == 3) {
+		appenalty = 25;
+	    }
+	    if (appenalty != 0) {
+		attackmoddescription += ` -${appenalty}&nbsp;[Fast&nbsp;Attack (${cdata.apused}&nbsp;AP)]`;
+		attackmod -= appenalty;
+	    }
+	}
+
+	cdata.attackmod = attackmod;
+	cdata.attackmoddescription = attackmoddescription;
+
 	const roll_string = "&{template:rmuattack} " +
-	    `[[ [[ 1d100!>96 ]] + [[${cdata.attackbonus}]] - ([[${cdata.targetdb}]]) ]] ` +
-	    "[[ 1d100 ]] " +
+	    `[[ [[ 1d100!>96 ]] + ${attackmod} ]] ` +
+	    "[[ 1d100 ]] " + // crit roll
 	    `{\{name=${cdata.character}}} ` +
 	    `{\{target=${cdata.targetname}}} ` +
 	    `{\{weapon=${cdata.attackname}}} ` +
+	    `{\{manueverpenalty=${cdata.manuever_penalty}}} ` +
+	    `{\{attackmoddescription=[[0]]}} ` +
+	    `{\{targetname=[[0]]}} ` +
 	    "{\{hitlocation=[[1d7]] }} " +
 	    "{\{attackrollum=$[[0]]}} " +
-	    "{\{attackbonus=$[[1]]}} " +
-	    "{\{targetdb=$[[2]]}} " +
-	    "{\{attackroll=$[[3]]}} " +
-	    "{\{critical=$[[4]]}} " +
+	    "{\{attackroll=$[[1]]}} " +
+	    "{\{critical=$[[2]]}} " +
 	    "{\{hascritical=[[0]]}} " +
 	    "{\{critdescription=[[0]]}} " +
 	    "{\{criteffect=[[0]]}} " +
@@ -11793,7 +11915,7 @@ J E + C + B
 	    console.log(cdata);
 	    startRoll(roll_string, roll => {
 		    attacks.resolveAttack(roll.rollId, roll.results, cdata);
-		    });
+	    });
     }
 
     onCheck('clicked:repeating_attack:rmuattackroll', (ev) => {
@@ -11804,8 +11926,10 @@ J E + C + B
 			`${basename}_attackname`,
 			`${basename}_attackfumble`,
 			'size', `${basename}_attacksize`,
+			'manuever_penalty',
 			'target_name', 'target_db', 'target_at',
 			'target_size', 'target_crit',
+			'attackuseap', 'aptrack_melee', 'aptrack_missile',
 			], values => {
 		console.log('New attack: get attrs', values, ev);
 		cdata = {}
@@ -11824,6 +11948,10 @@ J E + C + B
 		cdata.targetdb = parseIntDefault(values.target_db, 0);
 		cdata.targetsize = parseIntDefault(values.target_size, 5);
 		cdata.targetcrit = parseIntDefault(values.target_crit, 0);
+		cdata.manuever_penalty = parseIntDefault(values.manuever_penalty, 0);
+		cdata.useap = (values.attackuseap == 'on') ? true : false;
+		// FIXME: Missile is wrong
+		cdata.apused = parseIntDefault(values.aptrack_melee, 0);
 		attacks.startAttack(cdata);
 	});
     });
@@ -11982,6 +12110,7 @@ J E + C + B
 		updates[`${prefix}_attacksource`] = 'user';
 		updates[`${prefix}_attackskill`] = items.attackaddskill;
 		updates[`${prefix}_attackri`] = items.attackaddri;
+		updates[`${prefix}_attackmodifier`] = parseIntDefault(items.attackaddmodifier, 0);
 
 		updates[`${prefix}_attackmin`] = cdata?.data?.min?.match(/\d+/)[0] || 0;
 		updates[`${prefix}_attackmax`] = cdata?.data?.max?.match(/\d+/)[0] || 0;
@@ -12010,19 +12139,26 @@ J E + C + B
 	    // Now I need to get the skill bonuses
 	    const skillSet = new Set();
 	    ids.forEach((id) => {
-		skillSet.add(attackinfo[`repeating_attack_${id}_attackskill`] + '_bonus');
-		skillSet.add(attackinfo[`repeating_attack_${id}_attackskill`] + '_ranks');
+		const name = attackinfo[`repeating_attack_${id}_attackskill`];
+		if (name != 'none') {
+		    skillSet.add(attackinfo[`repeating_attack_${id}_attackskill`] + '_bonus');
+		    skillSet.add(attackinfo[`repeating_attack_${id}_attackskill`] + '_ranks');
+		}
 	    });
 	    getAttrs(Array.from(skillSet), (skills) => {
 		console.log(skills);
 		ids.forEach((id) => {
 		    let prefix = `repeating_attack_${id}_`;
-		    let skill = attackinfo[`repeating_attack_${id}_attackskill`];
 
 		    let modifier =
 			parseIntDefault(attackinfo[`repeating_attack_${id}_attackmodifier`], 0);
-		    let skillbonus = parseIntDefault(skills[skill + '_bonus'], 0);
-		    let skillranks = parseIntDefault(skills[skill + '_ranks'], 0);
+		    let skill = attackinfo[`repeating_attack_${id}_attackskill`];
+		    let skillbonus = 0;
+		    let skillranks = 0;
+		    if (skill != 'none') {
+			skillbonus = parseIntDefault(skills[skill + '_bonus'], 0);
+			skillranks = parseIntDefault(skills[skill + '_ranks'], 0);
+		    }
 		    let fumble =
 			parseIntDefault(attackinfo[`repeating_attack_${id}_attackbasefumble`], 0);
 
@@ -12371,6 +12507,15 @@ onCheck("clicked:statusrest", (_) => {
     });
 });
 
+onCheck("clicked:rollinitative", () => {
+  startRoll('&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] ' +
+      '{\{actor=@{character_name} }} ' +
+      '{]{bonus=@{initiative} }} {\{total=$[[1]]}} {\{roll=$[[0]]}}',
+      (roll) => {
+	finishRoll(roll.rollId, {});
+  });
+});
+
 
 
 
@@ -12496,6 +12641,7 @@ creature.newCreature = function(name, jdata) {
   // FIXME: Kill this after my next upload.
   updates.critreduction = cdata.critreduction || cdata.critreduciton;
 
+  updates.level = parseInt(cdata.level);
   updates.hits = parseInt(cdata.hits);
   updates.hp = updates.hits;
   updates.hp_max = updates.hp;
@@ -12508,7 +12654,7 @@ creature.newCreature = function(name, jdata) {
   // Status stuff
   updates.hppenalty = 0; // Nothing by default
   updates.injurypenalty = 0;
-  updates.endurance = 99;
+  updates.endurance = cdata.Fatigue;
   updates.fatigue = 0;
   updates.manuever_penalty = 0;
 
@@ -12558,6 +12704,18 @@ creature.newCreature = function(name, jdata) {
   
     updates[`${prefix}_type`] = type;
   }
+
+  let moves = JSON.parse(cdata['data-move'])
+  for (const { type, pace, bmr } of moves) {
+  //for (const move of moves) {
+    console.log("mocve", type, pace, bmr);
+    const rowid = generateRowID();
+    const prefix = `repeating_creaturemove_${rowid}`;
+    updates[`${prefix}_type`] = type;
+    updates[`${prefix}_pace`] = pace;
+    updates[`${prefix}_bmr`] = bmr;
+  }
+    // type, pace, bmr
 
   VrmuSetAttrs(updates);
   /*
@@ -12631,10 +12789,25 @@ onCheck('clicked:repeating_creatureattack:creaturemakeattack', (ev) => {
 
 const injury = {}
 
-// Grabs all the known fields and crreate an injury string.
+// Maps the critical table to the critical encoding.
+// Hits are not covered, nor is the description field
+injury.criticalmaps = {
+    P : 'P' /* Ijury penalty */,
+    F: 'F' /* Fatigue */,
+    B: 'B' /* Bleed */,
+    St: 'S' /* staggered */,
+    Prn: 'P' /* Prone */,
+    K: 'K' /* Knock back */,
+    G: 'G' /* Grapple % */,
+    "S-25" : 'Q', "S-50" : 'W', "S-75" : 'E', /* Stuns */
+    Br: 'X' /* Breakage roll */,
+    D: 'D' /* Death/defeat */,
+};
+
+// Grabs all the known fields and create an injury string.
 // returns it as a string.
 // FIXME: Should take location and side
-injury.updateInjuryString = function(hits, critical) {
+injury.updateInjuryString = function(hits, critical, attacker) {
     let istr = "";
     console.log("Update Injury string", hits, critical);
     // First get base hits + critical hits
@@ -12650,15 +12823,25 @@ injury.updateInjuryString = function(hits, critical) {
 	return istr;
     }
 
-    if (critical.P) {
-	istr += `P${Math.abs(critical.P)}`;
-    }
-    if (critical.F) {
-	istr += `F${Math.abs(critical.F)}`;
+    for (const [critfield, value] of Object.entries(critical)) {
+	const istrfield = injury.criticalmaps[critfield];
+	if (typeof(istrfield) !== 'string') {
+	    rmuerror("Unknown critical type", critfield, value, critical);
+	} else {
+	    istr += `${istrfield}${Math.abs(value)}`;
+	}
     }
 
+    if (attacker && typeof(attacker) === 'string') {
+	const asan = attacker.replaceAll('@', '').replaceAll(")", '&#41');
+	istr += `@${asan}@`;
+    }
 
-   // istr += '"AttackResult"';
+    if (critical.description) {
+	// kill double quotes
+	const desc = critical.description.replaceAll('"', '').replaceAll(")", '&#41;');
+	istr += `"${desc}"`;
+    }
 
     console.log(istr);
     return istr;
@@ -12729,7 +12912,7 @@ onCheck("sheet:opened", (_) => {
 	setAttrs({"flag_cmancer_show": "on"})
     });
 
-    getAttrs(['sheetselect'], (sheet) => {
+    getAttrs(['sheetselect', 'version'], (sheet) => {
 	if (!sheet.sheetselect) {
 	  sheet.sheetselect = 'playersheet';
 	  setAttrs(sheet);
@@ -12737,8 +12920,56 @@ onCheck("sheet:opened", (_) => {
 	if (sheet.sheetselect == 'playersheet') {
 	  RMUSkills.updateStatCache();
 	}
+
+	doVersionCheck(sheet.version || 1);
     });
+
 });
+
+function doVersionCheck(version) {
+  const oldversion = version;
+  if (version == 1) {
+    addPendingFunction("Upgrade from 1 to 2", upgradeV1to2);
+    version = 2;
+  }
+
+  if (oldversion != version) {
+    addPendingFunction(`Version update to ${version}`, () => {
+	setAttrsPending({version: version});
+    });
+  }
+}
+
+/**
+ * Version 1 has costs in charactermancer.  Version 2 moves to each field.
+ */
+function upgradeV1to2() {
+  // get profeession.
+  getAttrsPending(['profession'], ({profession}) => {
+      console.log('profession', profession); 
+      getCompendiumPage(`Profession:${profession}`, (pdata) => {
+	  const skills = JSON.parse(pdata.data['data-skillCost']);
+	  const updates = {};
+	  for (const [group, cost] of Object.entries(skills)) {
+	    updates[RMUSkills.getCatByDisplayName(group)?.aname + "_cost"] = cost;
+	  }
+	  {
+	    const mcosts = JSON.parse(pdata.data['data-Spellcasting']);
+	    updates.magicalritual_cost = mcosts['Magic Ritual'];
+	    updates.spellownbase_cost = mcosts['Base'];
+	    updates.spellopen_cost = mcosts['Open'];
+	    updates.spellclosed_cost = mcosts['Closed'];
+	    updates.spellrestricted_cost = mcosts['Restricted'];
+	    updates.spellarcane_cost = mcosts['Arcane'];
+	  }
+	  updates.costdatasaved = true;
+	  console.log(updates);
+	  setAttrsPending(updates);
+      });
+
+  });
+}
+
 
 // vim: set sw=2 sts=2 syn=javascript :
 
