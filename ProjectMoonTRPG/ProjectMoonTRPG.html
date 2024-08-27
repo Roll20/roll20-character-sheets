@@ -10495,7 +10495,7 @@ async function sendQuery(...args) {
 /* Action button functions */
 on('clicked:actionButtonDamage', async (data) => {
 	getAttrs(["lastDefenceRoll"], async function(values) {
-		let defenceRoll = values.lastDefenceRoll;
+		let defenceRoll = parseInt(values.lastDefenceRoll);
 		data = Data.unpackage(data.originalRollId);
 		data = data[0];
 
@@ -10515,7 +10515,6 @@ on('clicked:actionButtonDamage', async (data) => {
 		if (typeof data == "string") {
 			AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 		} else {
-			console.log(data)
 			damageHelper(data, defenceRoll);
 		}
 
@@ -13272,7 +13271,12 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="false") {
 
 /* Action: Damage helper apply damage */
 on('clicked:applyDamage', (info) => {
-	damageHelper();
+	getAttrs(["lastDefenceRoll"], function(values) {
+		let defenceRoll = parseInt(values.lastDefenceRoll);
+		damageHelper({}, defenceRoll);
+
+		setAttrs({lastDefenceRoll: 0});
+	});
 });
 
 function damageHelper(overrideList = {}, defenceRoll=0) {
@@ -16667,7 +16671,6 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 		if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Bar #Silent(optional))`, AutoEffect); }
 		if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 	}
-	console.log(returnValues)
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
