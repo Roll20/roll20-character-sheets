@@ -2768,9 +2768,19 @@
 
 
 <!-- Combat palette -->
-              <div class="status_effect" style="margin-top: 10px;">
-
+<div class="status_effect" style="margin-top: 5px;">
 	<div class="contentContainer darkBG">
+
+	<!-- Combat options -->
+	<input type="checkbox" class="hide-toggle-rev" name="attr_lastDefenceRoll" value="0"> <!-- Combat options setting in v0.7 -->
+	<div class="rowContainer combatOptionsContainer hide-item-rev">
+		<div class="rowContainer" style="margin-left: 3px;"> <!-- columnAlign in v0.7 -->
+			<div class="columnAlign helpers"> <!-- delete this later -->
+				<b data-i18n="helper-text-lastdefenceroll">Last Defence roll</b>  <!-- delete this later. Remember to also delete the translation -->
+			</div>
+			<input type="number" class="darkInput defenceDice" name="attr_lastDefenceRoll" min="0"> <!-- delete this later -->
+		</div>
+	</div>
                      
 	<!-- Weapon 1 Palette -->
 	<div class="weaponSlot">
@@ -10478,28 +10488,33 @@ async function sendQuery(...args) {
 
 /* Action button functions */
 on('clicked:actionButtonDamage', async (data) => {
-	data = Data.unpackage(data.originalRollId);
-	data = data[0];
+	getAttrs(["lastDefenceRoll"], async function(values) {
+		let defenceRoll = values.lastDefenceRoll;
+		data = Data.unpackage(data.originalRollId);
+		data = data[0];
 
-	/* If the damage type is unset (such as for ranged weapon) query the player for a damage type */
-	if (data.damageTypeOverride == "---") {
-		let queryResults = await sendQuery(["damageTypeOverride",
-			getTranslationByKeyCustom("Select damage type of attack", "query-damage-type"), {
-				[getTranslationByKeyCustom("---", "weapon-type-None")]:"None",
-				[getTranslationByKeyCustom("Slash","weapon-type-Slash")]:"Slash",
-				[getTranslationByKeyCustom("Pierce","weapon-type-Pierce")]:"Pierce",
-				[getTranslationByKeyCustom("Blunt","weapon-type-Blunt")]:"Blunt"
-			}
-		]);
-		data.damageTypeOverride = queryResults.damageTypeOverride;
-	}
+		/* If the damage type is unset (such as for ranged weapon) query the player for a damage type */
+		if (data.damageTypeOverride == "---") {
+			let queryResults = await sendQuery(["damageTypeOverride",
+				getTranslationByKeyCustom("Select damage type of attack", "query-damage-type"), {
+					[getTranslationByKeyCustom("---", "weapon-type-None")]:"None",
+					[getTranslationByKeyCustom("Slash","weapon-type-Slash")]:"Slash",
+					[getTranslationByKeyCustom("Pierce","weapon-type-Pierce")]:"Pierce",
+					[getTranslationByKeyCustom("Blunt","weapon-type-Blunt")]:"Blunt"
+				}
+			]);
+			data.damageTypeOverride = queryResults.damageTypeOverride;
+		}
 
-	if (typeof data == "string") {
-		AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
-	} else {
-		console.log(data)
-		damageHelper(data);
-	}
+		if (typeof data == "string") {
+			AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
+		} else {
+			console.log(data)
+			damageHelper(data, defenceRoll);
+		}
+
+		setAttrs({lastDefenceRoll: 0});
+	});
 });
 on('clicked:actionButtonInflict', async (data) => {
 	data = Data.unpackage(data.originalRollId);
@@ -13019,6 +13034,13 @@ getSectionIDs(`repeating_global`, idarray => {
 
 		finishRoll(results.rollId, {} );
 
+		/* Store defensive reaction rolls */
+		if (basetype == "Defend" || basetype == "Evade") {
+			setAttrs({lastDefenceRoll: Math.max(parseInt(rollList["roll1"]),0)})
+		} else {
+			setAttrs({lastDefenceRoll: 0})
+		}
+
 		/* Action Buttons */
 		let damage_data = {
 			baseHPOverride: autoeffectBaseDamageHP,
@@ -13247,7 +13269,7 @@ on('clicked:applyDamage', (info) => {
 	damageHelper();
 });
 
-function damageHelper(overrideList = {}) {
+function damageHelper(overrideList = {}, defenceRoll=0) {
 	/* Get attribute values */
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
@@ -13557,9 +13579,9 @@ function damageHelper(overrideList = {}) {
 	}
 
 	/* Final calculation */
-	/*                          \--------------------- Before Resistance ----------------------/  \----------------------- After Resistance ----------------------- / */
-	newHP += Math.ceil(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
-	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
+	/*                          \---------------------------- Before Resistance -----------------------------/  \----------------------- After Resistance ----------------------- / */
+	newHP += Math.ceil(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore + defenceRoll)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
+	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore + defenceRoll)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
 	newSP += Math.ceil(sumSanity);
 
 	/* Caps increase by regen amount */
@@ -13610,7 +13632,8 @@ function damageHelper(overrideList = {}) {
 	let langFragile = "Fragile";
 	let langProtection = "Protection";
 	let langStProtection = "Stagger Protection";
-	let langDamageResistance = "Damage Resistance"
+	let langDamageResistance = "Damage Resistance";
+	let langDefence = "Block";
 
 	if(getTranslationByKey("helper-text-basedamage") != false){
 		langBaseDamage = getTranslationByKey("helper-text-basedamage");
@@ -13625,6 +13648,7 @@ function damageHelper(overrideList = {}) {
 		langProtection = getTranslationByKey("ailments-protection");
 		langStProtection = getTranslationByKey("ailments-stgprotection");
 		langDamageResistance = getTranslationByKey("oufit-damage-resistance");
+		langDefence = getTranslationByKey("autoeffect-trigger-block");
 	}
 
 	/* Damage calculation chat message block begin */
@@ -13653,6 +13677,12 @@ function damageHelper(overrideList = {}) {
 	if (flatDamageHP != 0) { hpDamageBody += `<div class="flatModifier">${langFlatDamageHP}: ${flatDamageHP}</div>`; }
 	if (flatDamageST != 0) { stDamageBody += `<div class="flatModifier">${langFlatDamageST}: ${flatDamageST}</div>`; }
 	if (flatDamageSP != 0) { spDamageBody += `<div class="flatModifier">${langFlatDamageSP}: ${flatDamageSP}</div>`; }
+
+	/* Defence roll */
+	if (defenceRoll != 0) {
+		hpDamageBody += generateDamageHelperBodyEffect(langDefence, defenceRoll, "Defence", 0, getIcon("icons", "egoDef", "false"));
+		stDamageBody += generateDamageHelperBodyEffect(langDefence, defenceRoll, "Defence", 0, getIcon("icons", "egoDef", "false"));
+	}
 	
 	/* Fragile*/
 	if (hpFragile != 0) { hpDamageBody += generateDamageHelperBodyEffect(langFragile, hpFragile, "Damage", 0, getIcon("ailments", "Fragile", settingLimbusStyle)); }
@@ -13775,6 +13805,7 @@ function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailme
 	let langDealt = getTranslationByKeyCustom("dealt", "message-dealt");
 	let langRegened = getTranslationByKeyCustom("regened", "message-regened");
 	let langResist = getTranslationByKeyCustom("Resistance: ", "message-resist");
+	let langReducedBaseDamageBy = getTranslationByKeyCustom("reduced base damage by", "message-reduced-basedamage-by");
 	
 	let langReduction = "";
 	if (effectVal < 0) {
@@ -13789,6 +13820,7 @@ function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailme
 		case "Damage": message += `${iconString}<div><b>${effectName}</b> ${langDealt} ${Math.abs(effectVal)} ${langDamage}`; break;
 		case "Regen": message += `${iconString}<div><b>${effectName}</b> ${langRegened} ${Math.abs(effectVal)} ${langDamage}`; break;
 		case "Reduction": message += `${iconString}<div><b>${effectName}</b> ${langReduction} ${Math.abs(effectVal)}`; break;
+		case "Defence": message += `${iconString}<div><b>${effectName}</b> ${langReducedBaseDamageBy} ${Math.abs(effectVal)}`; break;
 	}
 	if (resMode == "beforeResistance") {
 		message += ` x [${resVal}x] ` + getIcon("def", resIcon);
