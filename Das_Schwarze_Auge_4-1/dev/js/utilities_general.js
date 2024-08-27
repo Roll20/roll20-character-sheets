@@ -222,7 +222,7 @@ function checkRequiredProperties(properties, values) {
 	var errors = 0;
 	var missing = [];
 
-	for (req of properties) {
+	for (let req of properties) {
 		if (!Object.hasOwn(values, req)) {
 			errors += 1;
 			missing.push(req);
