@@ -15801,7 +15801,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			}
 		}
 	}
-
 	
 	/* Message handling */
 	/* Standard messages print as a generic "AutoEffects" section and include all unconditional effects */
@@ -16846,8 +16845,8 @@ function autoEffectProc(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 	let returnValues = {};
 
 	/* Check format */
-	if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (Proc #Ailment #Silent(optional))`, AutoEffect); }
-	if (AutoEffect.length > 2) { if (AutoEffect[2].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }
+	if (AutoEffect.length < 2 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (Proc #Ailment #Target(optional) #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 2) { AutoEffect.slice(2).forEach(option => { if (!(["silent", "target"].includes(option.toLowerCase()))) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 
 	/* Handle scaling */
 	if (scaling == 0) { return {}; }
@@ -16857,32 +16856,39 @@ function autoEffectProc(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 	let effectRepeatingId = ailmentList[effectAilment][4];
 	if (!ailmentList.hasOwnProperty(effectAilment)) { return autoEffectErrorMessage("Invalid Target", `Ailment "${effectAilment}" does not exist`, AutoEffect); }
 	
-	/* Get target and proc ailment */
+	/* Get target */
 	let effectTarget = "";
 	if (effectRepeatingId == 0) { effectTarget = effectAilment; } /* If standard ailment */
 	else { effectTarget = effectRepeatingId; } /* If custom ailment */ 
-	returnValues.procAilment = effectTarget;
-
-	/* Handle message */
-	let message = "";
-	let messageValues = {};
-	let messageFormat = getTranslationByKeyCustom("[/TARGET] Proc [TARGET]", "autoeffect-format-proc");
-	let effectIcon = ailmentList[effectAilment][5];
 	
-	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
-		message = autoEffectMessage(messageFormat, effectAilment, 0, 0, 1, "success", settingLimbusStyle, effectIcon);
-	}
-	messageValues = { effectTarget: effectAilment, effectIcon: effectIcon, effectVal: 0, effectCount: 0, scaling: 1, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
+	/* Handle the target option */
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		returnValues = {...returnValues, "autoInflict": autoEffectToString(AutoEffect.slice(0, 2)) }
+	} else {
+		returnValues.procAilment = effectTarget;
 
-	return {...returnValues, message: message, messageValues: messageValues };
+		/* Handle message */
+		let message = "";
+		let messageValues = {};
+		let messageFormat = getTranslationByKeyCustom("[/TARGET] Proc [TARGET]", "autoeffect-format-proc");
+		let effectIcon = ailmentList[effectAilment][5];
+		
+		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
+			message = autoEffectMessage(messageFormat, effectAilment, 0, 0, 1, "success", settingLimbusStyle, effectIcon);
+		}
+		messageValues = { effectTarget: effectAilment, effectIcon: effectIcon, effectVal: 0, effectCount: 0, scaling: 1, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
+		returnValues = {...returnValues, message: message, messageValues: messageValues }
+	}
+
+	return returnValues;
 }
 
 function autoEffectPause(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 	let returnValues = {};
 
 	/* Check format */
-	if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (Pause N #Ailment #Silent(optional))`, AutoEffect); }
-	if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
+	if (AutoEffect.length < 3 || AutoEffect.length > 5) { return autoEffectErrorMessage("Format Error", `Expected format: (Pause N #Ailment #Target(optional) #Silent(optional))`, AutoEffect); }
+	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!(["silent", "target"].includes(option.toLowerCase()))) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -16904,19 +16910,25 @@ function autoEffectPause(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 	if (effectRepeatingId == 0) { effectTarget = `${effectAilment}DecayPause`; } /* If standard ailment */
 	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][4]}_ailDecayPause`; } /* If custom ailment */
 
-	/* Handle message */
-	let message = "";
-	let messageValues = {};
-	let messageFormat = getTranslationByKeyCustom("[/TARGET] Paused [TARGET] for [SCALING NUM] activations", "autoeffect-format-pause");
-	let effectIcon = ailmentList[effectAilment][5];
+	/* Handle the target option */
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		returnValues = {...returnValues, "autoInflict": autoEffectToString(AutoEffect.slice(0, 3)) }
+	} else {
 
-	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
-		message = autoEffectMessage(messageFormat, effectAilment, effectVal/scaling, count, scaling, "success", settingLimbusStyle, effectIcon);
+		/* Handle message */
+		let message = "";
+		let messageValues = {};
+		let messageFormat = getTranslationByKeyCustom("[/TARGET] Paused [TARGET] for [SCALING NUM] activations", "autoeffect-format-pause");
+		let effectIcon = ailmentList[effectAilment][5];
+
+		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
+			message = autoEffectMessage(messageFormat, effectAilment, effectVal/scaling, count, scaling, "success", settingLimbusStyle, effectIcon);
+		}
+		messageValues = { effectTarget: effectAilment, effectIcon: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
+		
+		/* Execute AutoEffect */
+		returnValues = { [effectTarget]: parseInt(effectVal), count: parseInt(count), message: message, messageValues: messageValues }
 	}
-	messageValues = { effectTarget: effectAilment, effectIcon: effectIcon, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success", settingLimbusStyle: settingLimbusStyle }
-	
-	/* Execute AutoEffect */
-	returnValues = { [effectTarget]: parseInt(effectVal), count: parseInt(count), message: message, messageValues: messageValues }
 
 	return returnValues;
 }
@@ -18057,7 +18069,7 @@ getSectionIDs("repeating_global", function(idarray) {
 	/* There used to be a bug that replaced one AutoScript with the default AutoScript styling rules. This cleans up any sheets affected by the bug */
 	/* Should be able to remove this after a few updates have passed and all currently used character sheets have been cleaned (added in update 0.6.3) */
 	let colorList = ["green","blue","red","orange","yellow","purple","black"];
-	let autoScriptList = ["weapon1", "weapon2", "weapon3", "weapon4", "augment", "outfit", "tool1", "tool2", "tool3", "tool4", "special1", "special2",
+	let autoScriptList = ["weapon1", "weapon2", "weapon3", "weapon4", "augment", "outfit", "ego", "tool1", "tool2", "tool3", "tool4", "special1", "special2",
 	"skill1", "skill2", "skill3", "skill4", "skill5", "skill6", "egoSkill1", "egoSkill2", "egoSkill3", "egoSkill4", "egoSkill5", "egoSkill6",
 	"autoScriptEditorInput"];
 
