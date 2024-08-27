@@ -15324,29 +15324,29 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			autoScriptTriggers.push("Permanent")
 		}
 	}
+
+	let autoScriptList = ["weapon1", "weapon2", "weapon3", "weapon4", "augment", "outfit", "tool1", "tool2", "tool3", "tool4", "special1", "special2",
+	"skill1", "skill2", "skill3", "skill4", "skill5", "skill6", "egoSkill1", "egoSkill2", "egoSkill3", "egoSkill4", "egoSkill5", "egoSkill6"];
+	autoScriptList = autoScriptList.map(prefix => prefix + "AutoScript");
 	
-	getAttrs(["augmentAutoScript", "outfitAutoScript", "egoAutoScript", "distortState", "egoActiveState", "isFirstRound"], function(values) {
+	getAttrs([...autoScriptList, "distortState", "egoActiveState", "isFirstRound"], function(values) {
 		
-		let augmentAutoScript = "";
-		let outfitAutoScript = "";
-		let egoAutoScript = "";
-		let collectedAutoScript = [];
-		
-		/* Finds all substrings that begin with "[#" and end with "#]" */
-		augmentAutoScript = values.augmentAutoScript.match(/\[([#][^]+[#])\]/g);
-		if (augmentAutoScript == null) { augmentAutoScript = ""; }
-		outfitAutoScript = values.outfitAutoScript.match(/\[([#][^]+[#])\]/g);
-		if (outfitAutoScript == null) { outfitAutoScript = ""; }
-		if (values.distortState == "true" || values.egoActiveState == "true") {
-			egoAutoScript = values.egoAutoScript.match(/\[([#][^]+[#])\]/g);
-			if (egoAutoScript == null) { egoAutoScript = ""; }
-		}
-		
-		let collectedAutoScripts = parseAutoScript(augmentAutoScript + outfitAutoScript + egoAutoScript, "nested");
+		let collectedAutoScripts = "";
+		autoScriptList.forEach(autoScript => {
+			/* Finds all substrings that begin with "[#" and end with "#]" */
+			if (autoScript == "egoAutoScript" && !(values.distortState == "true" || values.egoActiveState == "true")) {
+				return;
+			}
+			if ((/\[([#][^]+[#])\]/g).test(values[`${autoScript}`])) {
+				collectedAutoScripts += values[`${autoScript}`].match(/\[([#][^]+[#])\]/g);
+			}
+		});
+		collectedAutoScripts = parseAutoScript(collectedAutoScripts, "nested");
 
 		let firstRound = getTranslationByKeyCustom("#First round", "autoeffect-option-firstround")
 
 		collectedAutoScripts.forEach((trigger) => {
+			
 			/* Accept #First round triggers if it is currently the first round. Otherwise discard them */
 			if (trigger[0].includes(firstRound) && values.isFirstRound == "true") { trigger[0] = trigger[0].replace(firstRound,"").trim(); }
 
