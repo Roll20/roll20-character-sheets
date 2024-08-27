@@ -10512,6 +10512,13 @@ on('clicked:actionButtonDamage', async (data) => {
 			data.damageTypeOverride = queryResults.damageTypeOverride;
 		}
 
+		/* If taking Light damage, process it as an Add AutoEffect */
+		if (data.flatLightOverride != 0) {
+			data.autoScriptOverride = `(Add -${data.flatLightOverride} Light)`;
+		}
+
+		console.log(data)
+
 		if (typeof data == "string") {
 			AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 		} else {
@@ -12812,12 +12819,17 @@ getSectionIDs(`repeating_global`, idarray => {
 	let autoeffectFlatDamageHP = 0;
 	let autoeffectFlatDamageST = 0;
 	let autoeffectFlatDamageSP = 0;
+	let autoeffectFlatDamageLight = 0;
 	if (returnValues.baseDamage != undefined) { autoeffectBaseDamage = returnValues.baseDamage; }
 	if (returnValues.baseDamageHP != undefined) { autoeffectBaseDamageHP = returnValues.baseDamageHP; }
 	if (returnValues.baseDamageST != undefined) { autoeffectBaseDamageST = returnValues.baseDamageST; }
 	if (returnValues.flatDamageHP != undefined) { autoeffectFlatDamageHP = returnValues.flatDamageHP; }
 	if (returnValues.flatDamageST != undefined) { autoeffectFlatDamageST = returnValues.flatDamageST; }
 	if (returnValues.flatDamageSP != undefined) { autoeffectFlatDamageSP = returnValues.flatDamageSP; }
+	if (returnValues.flatDamageLight != undefined) { autoeffectFlatDamageLight = returnValues.flatDamageLight; }
+
+	let autoEffectLight = 0;
+	if (returnValues.Light != undefined) {autoEffectLight = parseInt(returnValues.Light); }
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -13017,7 +13029,7 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	}
 
-	setAttrs({"baseActNum":actcounter, "dummy":info, "Light":newlight, "advState":advstate});
+	setAttrs({"baseActNum":actcounter, "dummy":info, "Light":newlight + autoEffectLight, "advState":advstate});
 	setAttrs(output);
 
 	let whisper = "";
@@ -13053,6 +13065,7 @@ getSectionIDs(`repeating_global`, idarray => {
 			flatHPOverride: autoeffectFlatDamageHP,
 			flatSTOverride: autoeffectFlatDamageST,
 			flatSPOverride: autoeffectFlatDamageSP,
+			flatLightOverride: autoeffectFlatDamageLight,
 			damageTypeOverride: weapontype
 		}
 		if (basetype == "Attack") {
@@ -13332,6 +13345,9 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	let egoActiveState = values.egoActiveState;
 	let staggerState = values.StaggerState;
 	let outfitType = "";
+
+	let autoScript = "";
+	if (overrideList.autoScriptOverride != undefined) { autoScript = overrideList.autoScriptOverride; }
 
 	let ailCalculationList = {}; 
 
@@ -13615,7 +13631,7 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	if (newSP < oldSP) { autoScriptTriggers.push("DamagedSP"); }
 	
 	resetConditionals();
-	AutoScriptMain("", autoScriptTriggers, "true", "false", { targetmode: "false" }, function(returnValues) {
+	AutoScriptMain(autoScript, autoScriptTriggers, "true", "false", { targetmode: "false" }, function(returnValues) {
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
@@ -13912,8 +13928,8 @@ on('clicked:declareAction', (info) => {
 
 	let actiontype = values.actionType;
 	let actiontext = "";
-	let currentlight = values.Light;
-	let newlight = values.Light;
+	let currentlight = parseInt(values.Light);
+	let newlight = parseInt(values.Light);
 	let actcounter = parseInt(values.baseActNum) + 1;
 
 	let output = {};
@@ -14092,6 +14108,9 @@ on('clicked:declareAction', (info) => {
 	resetConditionals();
 	AutoScriptMain(AutoScript, "None", "true", "false", autoScriptOverrideList, function(returnValues) {
 
+	let autoEffectLight = 0;
+	if (returnValues.Light != undefined) {autoEffectLight = parseInt(returnValues.Light); }
+
 	/* Action buttons */
 	let buttonList = [];
 	//let giveButtonList = [];
@@ -14198,7 +14217,7 @@ on('clicked:declareAction', (info) => {
 
 	output["skillSelect"] = "";
 	output["toolSelect"] = "";
-	output["Light"] = newlight;
+	output["Light"] = newlight + autoEffectLight;
 	output["baseActNum"] = actcounter;
 	output["lastDefenceRoll"] = 0;
 
@@ -15365,7 +15384,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
 	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", //"settingTargetMode",
-	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "thisRoundSpeed", "nextRoundSpeed", 
+	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "thisRoundSpeed", "nextRoundSpeed", 
 	"StaggerState", "distortState", "egoActiveState", "egoType", "autoScriptStyling"], function(values) {
 		
 		let settingMuteMessage = values.settingMuteMessage;
@@ -15381,12 +15400,14 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let HP = values.HP;
 		let ST = values.StagRes;
 		let SP = values.SP;
-		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP) };
+		let Light = values.Light;
+		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP), Light:parseInt(Light) };
 		
 		let HPdamage = values.HP_max - HP;
 		let STdamage = values.StagRes_max - ST;
 		let SPdamage = values.SP_max - SP;
-		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage }
+		let LightExpended = values.Light_max - Light;
+		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
 
 		let thisRoundSpeed = parseInt(values.thisRoundSpeed);
 		let nextRoundSpeed = parseInt(values.nextRoundSpeed);
@@ -15572,15 +15593,18 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			returnValues.targetCheck = [exampleTargetCheck1, exampleTargetCheck2];
 			*/
 
-
 			/* Handle DicePower, DiceMax, DiceCount, Speed with Combat duration, */
 			/* BaseDamage, FlatDamageHP, FlatDamageST and FlatDamageSP */
-			let effectList = ["dicePower", "diceMax", "diceCount", "speedCombat", "baseDamage", "baseDamageHP", "baseDamageST" , "flatDamageHP", "flatDamageST", "flatDamageSP"];
+			/* FlatDamageLight and Light (combatRoll, declareAction and action buttons need Light added/consumed by AutoEffects to update the Light count properly) */
+			let effectList = ["dicePower", "diceMax", "diceCount", "speedCombat", "baseDamage", "baseDamageHP",
+			"baseDamageST" , "flatDamageHP", "flatDamageST", "flatDamageSP", "flatDamageLight", "Light"];
 			effectList.forEach(effect => {
 				if (tempOutput[effect] != undefined) {
 					if (returnValues[effect] != undefined) { returnValues[effect] += tempOutput[effect] }
 					else { returnValues[effect] = tempOutput[effect] }
-					delete tempOutput[effect];
+					if (effect != "Light") {
+						delete tempOutput[effect];
+					}
 				}
 			});
 
@@ -15646,10 +15670,12 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			/* For example, if Gain 3 Burn is used and current Burn is 2, output Burn is set to 5 */
 			/* If Consume 4 Burn is used later, this amount will be removed without adding count */
 			for (const property in tempOutput) {
-				if (output.hasOwnProperty(property)) {
-					output[property] += Math.floor(tempOutput[property]);
-				} else {
-					output[property] = Math.floor(tempOutput[property] + tempOutput.count);
+				if (property != "count") {
+					if (output.hasOwnProperty(property)) {
+						output[property] += Math.floor(tempOutput[property]);
+					} else {
+						output[property] = Math.floor(tempOutput[property] + tempOutput.count);
+					}
 				}
 			}
 		}
@@ -16489,8 +16515,22 @@ function autoEffectAddBar(AutoEffect, barList, scaling, autoEffectType) {
 	/* Handle message */
 	let message = "";
 	let messageValues = {};
-	let messageFormat = getTranslationByKeyCustom("Regen [SCALING NUM] [TARGET]", "autoeffect-format-add")
-	if (effectVal < 0) { messageFormat = getTranslationByKeyCustom("Receive [-SCALING NUM] [TARGET] damage", "autoeffect-format-add-neg"); }
+	let messageFormat = ""
+	if (effectBar != "Light") {
+		if (effectVal < 0) {
+			messageFormat = getTranslationByKeyCustom("Receive [-SCALING NUM] [TARGET] damage", "autoeffect-format-add-neg");
+		} else {
+			messageFormat = getTranslationByKeyCustom("Regen [SCALING NUM] [TARGET]", "autoeffect-format-add");
+		}
+	} else {
+		if (effectVal < 0) {
+			messageFormat = getTranslationByKeyCustom("Lose [-SCALING NUM] [TARGET]", "autoeffect-format-add-light-neg");
+		} else {
+			messageFormat = getTranslationByKeyCustom("Gain [-SCALING NUM] [TARGET]", "autoeffect-format-add-light");
+		}
+	}
+	
+
 
 	if (autoEffectType == "standard" || autoEffectType == "section") { messageFormat += " [[INITIAL] -> [RESULT]]" }
 
@@ -18048,6 +18088,7 @@ function getBarFromTranslation(bar) {
 	if ("-" + getTranslationByKey("bar-sanity-shortened") == bar) { return "-SP"; }
 	if (getTranslationByKey("bar-health-temp-shortened") == bar) { return "THP"; }
 	if (getTranslationByKey("bar-stagres-temp-shortened") == bar) { return "TST"; }
+	if (getTranslationByKey("bar-light") == bar) { return "Light"; }
 	return "Unknown: " + bar;
 }
 
