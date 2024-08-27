@@ -10497,7 +10497,8 @@ on('clicked:actionButtonDamage', async (data) => {
 	if (typeof data == "string") {
 		AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 	} else {
-		damageHelper(data.damageTypeOverride, data.baseOverride, data.flatHPOverride, data.flatSTOverride, data.flatSPOverride);
+		console.log(data)
+		damageHelper(data);
 	}
 });
 on('clicked:actionButtonInflict', async (data) => {
@@ -12786,10 +12787,14 @@ getSectionIDs(`repeating_global`, idarray => {
 	if (returnValues.dicePower != undefined) { autoeffectdice3 = returnValues.dicePower; }
 
 	let autoeffectBaseDamage = 0;
+	let autoeffectBaseDamageHP = 0;
+	let autoeffectBaseDamageST = 0;
 	let autoeffectFlatDamageHP = 0;
 	let autoeffectFlatDamageST = 0;
 	let autoeffectFlatDamageSP = 0;
 	if (returnValues.baseDamage != undefined) { autoeffectBaseDamage = returnValues.baseDamage; }
+	if (returnValues.baseDamageHP != undefined) { autoeffectBaseDamageHP = returnValues.baseDamageHP; }
+	if (returnValues.baseDamageST != undefined) { autoeffectBaseDamageST = returnValues.baseDamageST; }
 	if (returnValues.flatDamageHP != undefined) { autoeffectFlatDamageHP = returnValues.flatDamageHP; }
 	if (returnValues.flatDamageST != undefined) { autoeffectFlatDamageST = returnValues.flatDamageST; }
 	if (returnValues.flatDamageSP != undefined) { autoeffectFlatDamageSP = returnValues.flatDamageSP; }
@@ -13016,6 +13021,8 @@ getSectionIDs(`repeating_global`, idarray => {
 
 		/* Action Buttons */
 		let damage_data = {
+			baseHPOverride: autoeffectBaseDamageHP,
+			baseSTOverride: autoeffectBaseDamageST,
 			flatHPOverride: autoeffectFlatDamageHP,
 			flatSTOverride: autoeffectFlatDamageST,
 			flatSPOverride: autoeffectFlatDamageSP,
@@ -13240,7 +13247,7 @@ on('clicked:applyDamage', (info) => {
 	damageHelper();
 });
 
-function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flatHPOverride=undefined, flatSTOverride=undefined, flatSPOverride=undefined) {
+function damageHelper(overrideList = {}) {
 	/* Get attribute values */
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
@@ -13269,16 +13276,20 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	let newSP = parseInt(oldSP);
 
 	let baseDamage = parseInt(values.baseDamage);
+	let baseDamageHP = 0;
+	let baseDamageST = 0;
 	let flatDamageHP = parseInt(values.flatDamageHP);
 	let flatDamageST = parseInt(values.flatDamageST);
 	let flatDamageSP = 0;
 	let damageType = values.damageHelperType;
 
-	if (baseOverride != undefined) { baseDamage = baseOverride; }
-	if (flatHPOverride != undefined) { flatDamageHP = flatHPOverride; }
-	if (flatSTOverride != undefined) { flatDamageST = flatSTOverride; }
-	if (flatSPOverride != undefined) { flatDamageSP = flatSPOverride; }
-	if (damageTypeOverride != undefined) { damageType = damageTypeOverride; }
+	if (overrideList.baseOverride != undefined) { baseDamage = overrideList.baseOverride; }
+	if (overrideList.baseHPOverride != undefined) { baseDamageHP = overrideList.baseHPOverride; }
+	if (overrideList.baseSTOverride != undefined) { baseDamageST = overrideList.baseSTOverride; }
+	if (overrideList.flatHPOverride != undefined) { flatDamageHP = overrideList.flatHPOverride; }
+	if (overrideList.flatSTOverride != undefined) { flatDamageST = overrideList.flatSTOverride; }
+	if (overrideList.flatSPOverride != undefined) { flatDamageSP = overrideList.flatSPOverride; }
+	if (overrideList.damageTypeOverride != undefined) { damageType = overrideList.damageTypeOverride; }
 
 	let hpResistance = 1.0;
 	let stResistance = 1.0;
@@ -13347,8 +13358,8 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 
 	/* Sum of all modifiers that apply before resistances */
 	let sumBothBefore = -baseDamage;
-	let sumHpBefore = 0;
-	let sumStBefore = 0;
+	let sumHpBefore = -baseDamageHP;
+	let sumStBefore = -baseDamageST;
 
 	/* Sum of all modifiers that apply after resistances*/
 	let sumBothAfter = 0;
@@ -13633,9 +13644,11 @@ function damageHelper(damageTypeOverride=undefined, baseOverride=undefined, flat
 	if (simpledisplay == "0") {
 
 	/* Base damage and flat damage/regen */
+	let sumBaseDamageHP = -(sumBothBefore + sumHpBefore);
+	let sumBaseDamageST = -(sumBothBefore + sumStBefore);
 	if (baseDamage != 0) { 
-		hpDamageBody += `<div class="baseDamage"><b>${langBaseDamage}:</b> ${baseDamage} x [${hpResistance}x]` + getIcon("def", resHPIcon) + "</div>";
-		stDamageBody += `<div class="baseDamage"><b>${langBaseDamage}:</b> ${baseDamage} x [${stResistance}x]` + getIcon("def", resSTIcon) + "</div>";
+		hpDamageBody += `<div class="baseDamage"><b>${langBaseDamage}:</b> ${sumBaseDamageHP} x [${hpResistance}x]` + getIcon("def", resHPIcon) + "</div>";
+		stDamageBody += `<div class="baseDamage"><b>${langBaseDamage}:</b> ${sumBaseDamageST} x [${stResistance}x]` + getIcon("def", resSTIcon) + "</div>";
 	}
 	if (flatDamageHP != 0) { hpDamageBody += `<div class="flatModifier">${langFlatDamageHP}: ${flatDamageHP}</div>`; }
 	if (flatDamageST != 0) { stDamageBody += `<div class="flatModifier">${langFlatDamageST}: ${flatDamageST}</div>`; }
@@ -15519,7 +15532,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 
 			/* Handle DicePower, DiceMax, DiceCount, Speed with Combat duration, */
 			/* BaseDamage, FlatDamageHP, FlatDamageST and FlatDamageSP */
-			let effectList = ["dicePower", "diceMax", "diceCount", "speedCombat", "baseDamage", "flatDamageHP", "flatDamageST", "flatDamageSP"];
+			let effectList = ["dicePower", "diceMax", "diceCount", "speedCombat", "baseDamage", "baseDamageHP", "baseDamageST" , "flatDamageHP", "flatDamageST", "flatDamageSP"];
 			effectList.forEach(effect => {
 				if (tempOutput[effect] != undefined) {
 					if (returnValues[effect] != undefined) { returnValues[effect] += tempOutput[effect] }
@@ -16598,6 +16611,8 @@ function autoEffectSpeed(AutoEffect, scaling, prevThisRoundSpeed, prevNextRoundS
 }
 
 function autoEffectDamage(AutoEffect, barList, scaling) {
+	let returnValues = {};
+
 	/* Check if BaseDamage or FlatDamage */
 	let autoEffectVariant = "";
 	switch (AutoEffect[0]) {
@@ -16608,12 +16623,13 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	
 	/* Check format */
 	if (autoEffectVariant == "baseDamage") {
-		if (AutoEffect.length < 2 || AutoEffect.length > 3) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Silent(optional))`, AutoEffect); }
-		if (AutoEffect.length > 2) { if (AutoEffect[2].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }
+		if (AutoEffect.length < 2 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Bar(optional) #Silent(optional))`, AutoEffect); }
+		if (AutoEffect.length > 2) { AutoEffect.slice(2).forEach(option => { if (!["hp", "st", "silent"].includes(option.toLowerCase())) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[2]}" is not a valid option`, AutoEffect); } }); }
 	} else {
 		if (AutoEffect.length < 3 || AutoEffect.length > 4) { return autoEffectErrorMessage("Format Error", `Expected format: (${autoEffectVariant} N #Bar #Silent(optional))`, AutoEffect); }
 		if (AutoEffect.length > 3) { if (AutoEffect[3].toLowerCase() != "silent") { return autoEffectErrorMessage("Invalid Option", `Option "${AutoEffect[3]}" is not a valid option`, AutoEffect); } }
 	}
+	console.log(returnValues)
 
 	/* Handle scaling */
 	AutoEffect[1] *= scaling;
@@ -16627,10 +16643,9 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	/* Get target */
 	let effectBar = AutoEffect[2];
 	let effectTarget = "";
-	if (effectBar != undefined) {
+	if (effectBar != undefined && effectBar.toLowerCase() != "silent") {
 		if (barList.hasOwnProperty(effectBar)) {
-			effectTarget = effectBar.replace("ST", "StagRes");
-			count = barList[effectBar];
+			effectTarget = effectBar;
 		}
 		else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
 	}
@@ -16640,7 +16655,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	let messageValues = {};
 	let messageFormat = "";
 	switch (autoEffectVariant) {
-		case "baseDamage": messageFormat = getTranslationByKeyCustom("Increase Base Damage by [SCALING NUM]", "autoeffect-format-basedamage"); break;
+		case "baseDamage": messageFormat = getTranslationByKeyCustom("Increase [TARGET] Base Damage by [SCALING NUM]", "autoeffect-format-basedamage"); break;
 		case "flatDamage": messageFormat = getTranslationByKeyCustom("Deal [SCALING NUM] [TARGET] Damage", "autoeffect-format-flatdamage"); break;
 	}
 
@@ -16650,9 +16665,8 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	messageValues = { effectTarget: effectTarget, effectVal: effectVal/scaling, effectCount: count, scaling: scaling, checkResult: "success" }
 	
 	/* Execute AutoEffect */
-	returnValues = { [autoEffectVariant]: effectVal, message: message, messageValues: messageValues }
+	returnValues = { ...returnValues, [`${autoEffectVariant}${effectTarget}`]: effectVal, message: message, messageValues: messageValues }
 	if (autoEffectVariant != "baseDamage") {
-		returnValues[`${autoEffectVariant}${AutoEffect[2]}`] = effectVal;
 		returnValues.autoDamage = `(Add -${effectVal} ${AutoEffect[2]})`;
 	}
 	return returnValues;
