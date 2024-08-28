@@ -12155,14 +12155,15 @@ function updateAilments(ailmentOverride=[]) {
 			/* Temporary HP */
 			let THPUsed = {}
 			let THPmessage = "";
-			if (burndamage > 0) {
+			if (burndamage > 0 && Object.keys(THP_Sources).length > 0) {
 				let returnTHP = applyTempBarDamageAilment(THP_Sources, "THP", burndamage, burnresult);
 				burnresult = returnTHP.newBar;
 				burndamage = returnTHP.damage;
 				THPUsed = returnTHP.THPUsed;
 			}
 			for (const sourceName in THPUsed) {
-				THPmessage = "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][0] + ")</b>";
+				let countUpdate = ` [${parseInt(THPUsed[sourceName][0] + THPUsed[sourceName][1])} -> ${THPUsed[sourceName][0]}]`;
+				THPmessage = "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][1] + countUpdate + ")</b>";
 			}
 	
 			/* Translation prep */
@@ -12496,14 +12497,15 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 		/* Temporary HP */
 		let THPUsed = {}
 		let THPmessage = "";
-		if (bleeddamage > 0) {
+		if (bleeddamage > 0 && Object.keys(THP_Sources).length > 0) {
 			let returnTHP = applyTempBarDamageAilment(THP_Sources, "THP", bleeddamage, bleedresult);
 			bleedresult = returnTHP.newBar;
 			bleeddamage = returnTHP.damage;
 			THPUsed = returnTHP.THPUsed;
 		}
 		for (const sourceName in THPUsed) {
-			THPmessage = "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][0] + ")</b>";
+			let countUpdate = ` [${parseInt(THPUsed[sourceName][0] + THPUsed[sourceName][1])} -> ${THPUsed[sourceName][0]}]`;
+			THPmessage = "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][1] + countUpdate + ")</b>";
 		}
 
 		/* Chat message */
@@ -13739,7 +13741,7 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 					}
 					newHP = returnTHP.newBar;
 					HPDamage = returnTHP.damage;
-					tempHPUsed[returnTHP.messageName] = [returnTHP.messageVal, returnTHP.messageIcon]
+					tempHPUsed[returnTHP.messageName] = [returnTHP.tempBarVal, returnTHP.messageVal, returnTHP.messageIcon]
 				}
 			}
 			setAttrs({"THP_Sources":JSON.stringify(THP_Sources)});
@@ -13757,7 +13759,7 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 					}
 					newST = returnTST.newBar;
 					STDamage = returnTST.damage;
-					tempSTUsed[returnTST.messageName] = [returnTST.messageVal, returnTST.messageIcon]
+					tempSTUsed[returnTST.messageName] = [returnTST.tempBarVal, returnTST.messageVal, returnTST.messageIcon]
 				}
 			}
 			setAttrs({"TST_Sources":JSON.stringify(TST_Sources)});
@@ -13908,7 +13910,8 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 			if (sourceName == "AutoEffects THP") {
 				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("Temp HP", "bar-health-temp-shorter");
 			}
-			hpDamageBody += generateDamageHelperBodyEffect(effectName, sourceVals[0], "Reduction", 0, sourceVals[1]);
+			let countUpdate = `[${parseInt(sourceVals[0] + sourceVals[1])} -> ${sourceVals[0]}]`;
+			hpDamageBody += generateDamageHelperBodyEffect(effectName, `${sourceVals[1]} ${countUpdate}`, "TempReduction", 0, sourceVals[2]);
 		}
 	}
 	if (Object.keys(tempSTUsed).length > 0) {
@@ -13917,7 +13920,8 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 			if (sourceName == "AutoEffects TST") {
 				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("Temp ST", "bar-stagres-temp-shorter");
 			}
-			stDamageBody += generateDamageHelperBodyEffect(effectName, sourceVals[0], "Reduction", 0, sourceVals[1]);
+			let countUpdate = `[${parseInt(sourceVals[0] + sourceVals[1])} -> ${sourceVals[0]}]`;
+			stDamageBody += generateDamageHelperBodyEffect(effectName, `${sourceVals[1]} ${countUpdate}`, "TempReduction", 0, sourceVals[2]);
 		}
 	}
 
@@ -14020,6 +14024,7 @@ function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailme
 		case "Damage": message += `${iconString}<div><b>${effectName}</b> ${langDealt} ${Math.abs(effectVal)} ${langDamage}`; break;
 		case "Regen": message += `${iconString}<div><b>${effectName}</b> ${langRegened} ${Math.abs(effectVal)} ${langDamage}`; break;
 		case "Reduction": message += `${iconString}<div><b>${effectName}</b> ${langReduction} ${Math.abs(effectVal)}`; break;
+		case "TempReduction": message += `${iconString}<div><b>${effectName}</b> ${langReduction} ${effectVal}`; break;
 		case "Defence": message += `${iconString}<div><b>${effectName}</b> ${langReducedBaseDamageBy} ${Math.abs(effectVal)}`; break;
 	}
 	if (resMode == "beforeResistance") {
@@ -14054,7 +14059,7 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 			let suppressEvent = (newCount == 0) ? "false" : "true";
 			setAttrs({[sourceName]:newCount, tempBar_suppress_event:suppressEvent});
 		}
-		return {tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
+		return { tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
 	}
 }
 /* Damage helper functions end */
@@ -14065,64 +14070,66 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 function applyTempBarDamageAilment(tempBar_Sources, target, damage, newBar) {
 
 	let tempBarUsed = {};
+	let returnTempBar = {};
 	if (Object.keys(tempBar_Sources).length > 0) {
 		for (const sourceName in tempBar_Sources) {
-			let returnTempBar = applyTempBarDamage(sourceName, tempBar_Sources[sourceName], target, damage, newBar);
-			if (returnTempBar != undefined) {
-				if (returnTempBar.tempBarVal == 0) {
-					delete tempBar_Sources[sourceName];
-				} else {
-					tempBar_Sources[sourceName][0] = returnTempBar.tempBarVal;
+			if (damage > 0) {
+				returnTempBar = applyTempBarDamage(sourceName, tempBar_Sources[sourceName], target, damage, newBar);
+				if (returnTempBar != undefined) {
+					if (returnTempBar.tempBarVal == 0) {
+						delete tempBar_Sources[sourceName];
+					} else {
+						tempBar_Sources[sourceName][0] = returnTempBar.tempBarVal;
+					}
+					newBar = returnTempBar.newBar;
+					damage = returnTempBar.damage;
+					tempBarUsed[returnTempBar.messageName] = [returnTempBar.tempBarVal, returnTempBar.messageVal, returnTempBar.messageIcon]
 				}
-				newBar = returnTempBar.newBar;
-				damage = returnTempBar.damage;
-				tempBarUsed[returnTempBar.messageName] = [returnTempBar.messageVal, returnTempBar.messageIcon]
 			}
 		}
 		setAttrs({[`${target}_Sources`]:JSON.stringify(tempBar_Sources)});
 	}
-	return {newBar:newBar, damage:damage, [`${target}Used`]:tempBarUsed}
+	if (returnTempBar.tempBarVal != undefined) {
+		return { tempBarVal:returnTempBar.tempBarVal, newBar:newBar, damage:damage, [`${target}Used`]:tempBarUsed }
+	}
 }
 
 on('change:repeating_ailments:ailNum', (info) => {
-	
-	if (info.newValue != undefined) {
-		let ailPrefix = info.sourceAttribute.replace("ailnum","");
-	
-		getAttrs([`${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`, `${ailPrefix}ailIcon`,
-			"tempBar_suppress_event"], function(values) {
-	
-			let ailNum = parseInt(info.newValue);
-			let ailTarget = values[`${ailPrefix}ailEffect`];
-			let ailName = values[`${ailPrefix}ailName`];
-			let ailEffectVal = Math.abs(parseFloat(values[`${ailPrefix}ailEffectVal`].replaceAll("n", "")));
-			let ailEffectMode = values[`${ailPrefix}ailEffectMode`];
-			let ailIcon = values[`${ailPrefix}ailIcon`];
-			let tempBarVal = 0;
-	
-			if (ailTarget == "THP" || ailTarget == "TST") {
-				if (values.tempBar_suppress_event != "true") {
-					/* Calculate temp bar value */
-					if(ailEffectMode == "+") {
-						tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
-					}
-					else if(ailEffectMode == "=" && ailNum != 0) {
-						tempBarVal = parseFloat(ailEffectVal);
-						ailNum = "None";
-					} else {
-						ailNum = 0;
-					}
-					
-					/* Update the temp source for the correct bar */
-					updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
-				} else {
-					setAttrs({"tempBar_suppress_event":"false"});
+
+	let ailPrefix = info.sourceAttribute.replace("ailnum","");
+
+	getAttrs([`${ailPrefix}ailNum`, `${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`,
+		`${ailPrefix}ailIcon`, "tempBar_suppress_event"], function(values) {
+
+		let ailNum = values[`${ailPrefix}ailNum`];
+		let ailTarget = values[`${ailPrefix}ailEffect`];
+		let ailName = values[`${ailPrefix}ailName`];
+		let ailEffectVal = Math.abs(parseFloat(values[`${ailPrefix}ailEffectVal`].replaceAll("n", "")));
+		let ailEffectMode = values[`${ailPrefix}ailEffectMode`];
+		let ailIcon = values[`${ailPrefix}ailIcon`];
+		let tempBarVal = 0;
+
+		if (ailTarget == "THP" || ailTarget == "TST") {
+			if (values.tempBar_suppress_event != "true") {
+				/* Calculate temp bar value */
+				if(ailEffectMode == "+") {
+					tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
 				}
+				else if(ailEffectMode == "=" && ailNum != 0) {
+					tempBarVal = parseFloat(ailEffectVal);
+					ailEffectVal = "None";
+				} else {
+					ailEffectVal = 0;
+				}
+				
+				/* Update the temp source for the correct bar */
+				updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
+			} else {
+				setAttrs({"tempBar_suppress_event":"false"});
 			}
-		});
-	} else {
-		updateTempBarStyling(info)
-	}
+		}
+	});
+	updateTempBarStyling(info)
 })
 
 on('change:THP_Sources change:TST_Sources', (info) => {
@@ -18003,7 +18010,8 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 				tempBarUsed = returnTempBar[`${tempBarTarget}Used`];
 			}
 			for (const sourceName in tempBarUsed) {
-				tempBarMessage += "<b style='opacity: 50%;'><br>(" + sourceName + ": " + tempBarUsed[sourceName][0] + ")</b>";
+				let countUpdate = ` [${parseInt(THPUsed[sourceName][0] + THPUsed[sourceName][1])} -> ${THPUsed[sourceName][0]}]`;
+				tempBarMessage += "<b style='opacity: 50%;'><br>(" + sourceName + ": " + tempBarUsed[sourceName][1] + countUpdate + ")</b>";
 			}
 
 			output[`${effecttargetinlist}`] = result;
