@@ -11713,7 +11713,7 @@ on('clicked:resetUses', function() {
 
 	setAttrs({"messageOverride":"true"});
 
-	setAttrs({"HP": hpnew, "StagRes": stagrnew, "SP":spnew, "Light":lightnew, "egoActiveState":egonew, "StaggerState":"0", "StaggerDuration":staggerdurationmax, "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "distortCounter":counternew});
+	setAttrs({"HP": hpnew, "StagRes": stagrnew, "SP":spnew, "Light":lightnew, "egoActiveState":egonew, "StaggerState":"0", "StaggerDuration":staggerdurationmax, "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "distortCounter":counternew, "THP_Sources":"", "TST_Sources":""});
 
  	});
 	});
@@ -13868,8 +13868,8 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	if (Object.keys(tempHPUsed).length > 0) {
 		for (const [sourceName, sourceVals] of Object.entries(tempHPUsed)) {
 			let effectName = sourceName;
-			if (sourceName == "AutoEffect THP") {
-				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("THP", "bar-health-temp-shortened");
+			if (sourceName == "AutoEffects THP") {
+				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("Temp HP", "bar-health-temp-shorter");
 			}
 			hpDamageBody += generateDamageHelperBodyEffect(effectName, sourceVals[0], "Reduction", 0, sourceVals[1]);
 		}
@@ -13877,8 +13877,8 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	if (Object.keys(tempSTUsed).length > 0) {
 		for (const [sourceName, sourceVals] of Object.entries(tempSTUsed)) {
 			let effectName = sourceName;
-			if (sourceName == "AutoEffect TST") {
-				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("TST", "bar-stagres-temp-shortened");
+			if (sourceName == "AutoEffects TST") {
+				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("Temp ST", "bar-stagres-temp-shorter");
 			}
 			stDamageBody += generateDamageHelperBodyEffect(effectName, sourceVals[0], "Reduction", 0, sourceVals[1]);
 		}
@@ -14013,7 +14013,9 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 		}
 
 		if (sourceVals[1] != "None") {
-			setAttrs({[sourceName]: Math.ceil(tempBarVal/sourceVals[1]), tempBar_suppress_event:"true"});
+			let newCount = Math.ceil(tempBarVal/sourceVals[1]);
+			let suppressEvent = (newCount == 0) ? "false" : "true";
+			setAttrs({[sourceName]:newCount, tempBar_suppress_event:suppressEvent});
 		}
 		return {tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
 	}
@@ -14024,40 +14026,59 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 
 /* Temporary HP and ST */
 on('change:repeating_ailments:ailNum', (info) => {
-	let ailPrefix = info.sourceAttribute.replace("ailnum","");
-
-	getAttrs([`${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`, `${ailPrefix}ailIcon`,
-		"tempBar_suppress_event"], function(values) {
-
-		let ailNum = parseInt(info.newValue);
-		let ailTarget = values[`${ailPrefix}ailEffect`];
-		let ailName = values[`${ailPrefix}ailName`];
-		let ailEffectVal = Math.abs(parseFloat(values[`${ailPrefix}ailEffectVal`].replaceAll("n", "")));
-		let ailEffectMode = values[`${ailPrefix}ailEffectMode`];
-		let ailIcon = values[`${ailPrefix}ailIcon`];
-		let tempBarVal = 0;
-
-		if (ailTarget == "THP" || ailTarget == "TST") {
-			if (values.tempBar_suppress_event != "true") {
-				/* Calculate temp bar value */
-				if(ailEffectMode == "+") {
-					tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
-				}
-				else if(ailEffectMode == "=" && ailNum != 0) {
-					tempBarVal = parseFloat(ailEffectVal);
-					ailNum = "None";
+	
+	if (info.newValue != undefined) {
+		let ailPrefix = info.sourceAttribute.replace("ailnum","");
+	
+		getAttrs([`${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`, `${ailPrefix}ailIcon`,
+			"tempBar_suppress_event"], function(values) {
+	
+			let ailNum = parseInt(info.newValue);
+			let ailTarget = values[`${ailPrefix}ailEffect`];
+			let ailName = values[`${ailPrefix}ailName`];
+			let ailEffectVal = Math.abs(parseFloat(values[`${ailPrefix}ailEffectVal`].replaceAll("n", "")));
+			let ailEffectMode = values[`${ailPrefix}ailEffectMode`];
+			let ailIcon = values[`${ailPrefix}ailIcon`];
+			let tempBarVal = 0;
+	
+			if (ailTarget == "THP" || ailTarget == "TST") {
+				if (values.tempBar_suppress_event != "true") {
+					/* Calculate temp bar value */
+					if(ailEffectMode == "+") {
+						tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
+					}
+					else if(ailEffectMode == "=" && ailNum != 0) {
+						tempBarVal = parseFloat(ailEffectVal);
+						ailNum = "None";
+					} else {
+						ailNum = 0;
+					}
+					
+					/* Update the temp source for the correct bar */
+					updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
 				} else {
-					ailNum = 0;
+					setAttrs({"tempBar_suppress_event":"false"});
 				}
-				
-				/* Update the temp source for the correct bar */
-				updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
-			} else {
-				setAttrs({"tempBar_suppress_event":"false"});
 			}
-		}
-	});
+		});
+	}
 })
+
+on('change:THP_Sources change:TST_Sources', (info) => {
+	let bar = (info.sourceAttribute == "thp_sources") ? "HP" : "STGR";
+	let val = info.newValue;
+	
+	if (val == undefined) {
+		$20(`#HPbar`).removeClass('tempBar');
+		$20(`#STGRbar`).removeClass('tempBar');
+	} else {
+		if (val == "" || val == "{}") {
+			$20(`#${bar}bar`).removeClass('tempBar');
+		} else {
+			$20(`#${bar}bar`).addClass('tempBar');
+		}
+	}
+});
 
 function updateTempBar(target, name, tempBarVal, tempNum, effectName, iconFolder, iconName, stack="false") {
 	getAttrs(["THP_Sources", "TST_Sources"], function(values) {
@@ -16347,8 +16368,8 @@ function autoEffectTranslateMessage(message) {
 		.replaceAll("HP", getTranslationByKeyCustom("HP","bar-health-shortened"))
 		.replaceAll("ST", getTranslationByKeyCustom("ST","bar-stagres-shortened"))
 		.replaceAll("SP", getTranslationByKeyCustom("SP","bar-sanity-shortened"))
-		.replaceAll("THP", getTranslationByKeyCustom("THP","bar-health-temp-shortened"))
-		.replaceAll("TST", getTranslationByKeyCustom("TST","bar-stagres-temp-shortened"));
+		.replaceAll("THP", getTranslationByKeyCustom("THP","bar-health-temp-shortest"))
+		.replaceAll("TST", getTranslationByKeyCustom("TST","bar-stagres-temp-shortest"));
 	
 	return returnMessage;
 }
@@ -16760,7 +16781,8 @@ function autoEffectAddBar(AutoEffect, barList, scaling, autoEffectType) {
 	let effectBar = AutoEffect[2];
 	let effectTarget = "";
 	if (barList.hasOwnProperty(effectBar)) {
-		effectTarget = effectBar.replace("ST", "StagRes");
+		effectTarget = effectBar;
+		if (effectTarget == "ST") { effectTarget = "StagRes"}
 		count = barList[effectBar];
 	}
 	else { return autoEffectErrorMessage("Invalid Target", `Bar "${effectBar}" does not exist`, AutoEffect); }
@@ -18458,8 +18480,8 @@ function getBarFromTranslation(bar) {
 	if ("-" + getTranslationByKey("bar-health-shortened") == bar) { return "-HP"; }
 	if ("-" + getTranslationByKey("bar-stagres-shortened") == bar) { return "-ST"; }
 	if ("-" + getTranslationByKey("bar-sanity-shortened") == bar) { return "-SP"; }
-	if (getTranslationByKey("bar-health-temp-shortened") == bar) { return "THP"; }
-	if (getTranslationByKey("bar-stagres-temp-shortened") == bar) { return "TST"; }
+	if (getTranslationByKey("bar-health-temp-shortest") == bar) { return "THP"; }
+	if (getTranslationByKey("bar-stagres-temp-shortest") == bar) { return "TST"; }
 	if (getTranslationByKey("bar-light") == bar) { return "Light"; }
 	return "Unknown: " + bar;
 }
