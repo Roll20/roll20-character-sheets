@@ -36,7 +36,7 @@ function replaceSpellStats(spellData, stats) {
 		"NerCH": `Neristische Repräsentation hat CH (${stats['CH']}) einmal durch FF (${stats['FF']}) ersetzt.`
 	};
 
-	let result = { "modified": false, "replacementInfo": "" };
+	let result = { "modified": false, "replacementInfo": "", "stats": [ ...spellData["stats"] ] };
 	let replacement = { "replaceable": "", "replacer": "" };
 	switch (spellData["representation"]) {
 		case "Ach":
@@ -77,7 +77,7 @@ function replaceSpellStats(spellData, stats) {
 				{
 					if (spellData["stats"][i] === multiStat)
 					{
-						spellData["stats"][i] = otherStat;
+						result["stats"][i] = otherStat;
 						result["modified"] = true;
 						result["replacementInfo"] = replacementUIString[spellData["representation"] + multiStat];
 						break;
@@ -124,7 +124,7 @@ function replaceSpellStats(spellData, stats) {
 			{
 				if (spellData["stats"][stat] === replacement["replaceable"])
 				{
-					spellData["stats"][stat] = replacement["replacer"];
+					result["stats"][stat] = replacement["replacer"];
 					result["modified"] = true;
 					result["replacementInfo"] = replacementUIString[spellData["representation"]];
 					break;
@@ -171,7 +171,7 @@ function replaceSpellStats(spellData, stats) {
 				}
 			}
 			let replacedStat = spellData["stats"][lowestStat["index"]];
-			spellData["stats"][lowestStat["index"]] = replacement["replacer"];
+			result["stats"][lowestStat["index"]] = replacement["replacer"];
 			result["modified"] = true;
 			result["replacementInfo"] = replacementUIString[spellData["representation"] + replacedStat];
 			break;
@@ -238,7 +238,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			}
 		}
 
-		let replacementResult = { "modified": false, "replacementInfo": "" };
+		let replacementResult = { "modified": false, "replacementInfo": "", "stats": [ ...stats ] };
 		if ( relevantRepresentations.has(spellData["representation"]) )
 		{
 			replacementResult = replaceSpellStats(spellData, characterStats);
@@ -253,9 +253,9 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			"{{wert=[[@{ZfW_" + nameInternal + "}d1cs0cf2]]}} " +
 			"{{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}} " +
 			"{{stats=[[ " +
-				"[Eigenschaft 1:] [[@{" + stats[0] + "}]]d1cs0cf2 + " +
-				"[Eigenschaft 2:] [[@{" + stats[1] + "}]]d1cs0cf2 + " +
-				"[Eigenschaft 3:] [[@{" + stats[2] + "}]]d1cs0cf2" +
+				"[Eigenschaft 1:] [[@{" + replacementResult["stats"][0] + "}]]d1cs0cf2 + " +
+				"[Eigenschaft 2:] [[@{" + replacementResult["stats"][1] + "}]]d1cs0cf2 + " +
+				"[Eigenschaft 3:] [[@{" + replacementResult["stats"][2] + "}]]d1cs0cf2" +
 				"]]}} " +
 			"{{roll=[[3d20cs<@{cs_zauber}cf>@{cf_zauber}]]}} " +
 			"{{result=[[0]]}} " +
