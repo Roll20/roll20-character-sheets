@@ -2762,9 +2762,9 @@
 			<button type="action" class="applyDamageInput" name="act_applyDamage" data-i18n-title="helper-text-applydamage" title="Apply damage"></button>
 		</div>
 	</div>
-	<input type="text" name="attr_THP_Sources" value="" hidden="true">
-	<input type="text" name="attr_TST_Sources" value="" hidden="true">
-	<input type="text" name="attr_tempBar_suppress_event" value="false" hidden="true">
+	<input type="text" name="attr_THP_Sources" value="">
+	<input type="text" name="attr_TST_Sources" value="">
+	<input type="text" name="attr_tempBar_suppress_event" value="false">
 </div>
 
 
@@ -12055,7 +12055,7 @@ function updateAilments(ailmentOverride=[]) {
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingBurnImmune", "nextRoundSpeed",
 		"StaggerState", "StaggerDuration", `${id}_staggerDurationMax`, "SealState", "ImmobileState", "burnResist", "burnResist_ego", "distortState", "egoActiveState", "egoType", "HP", "StagRes_max", "settingLimbusStyle",
 		`${id}_staggerRecoverPercent`, `${id}_staggerRecoverBase`, `${id}_burnDecayMode`, `${id}_burnDecayVal`, `${id}_smokeDecayMode`, `${id}_smokeDecayVal`, `${id}_chargeDecayMode`, `${id}_chargeDecayVal`,
-		...attributeList], function(values) {
+		...attributeList, "THP_Sources"], function(values) {
 
  	let burnnew = 0;
 	let bleednew = parseInt(values.Bleed);
@@ -12091,6 +12091,11 @@ function updateAilments(ailmentOverride=[]) {
 	}
 	else if(distortstate == "true"){
 	burnresist = parseInt(values.burnResist) + parseInt(values.burnResist_ego);
+	}
+
+	let THP_Sources = {};
+	if (values.THP_Sources != "" && values.THP_Sources != "{}") {
+		THP_Sources = JSON.parse(values.THP_Sources);
 	}
 	
 	let output = {};
@@ -12143,7 +12148,21 @@ function updateAilments(ailmentOverride=[]) {
 			let iconnew = "<img src='"+ style + "Burn.png' style='width: 25px; height: 25px;' >";
 	
 			if(burnimmune == "true"){
-			burnresult = parseInt(values.HP);
+				burnresult = parseInt(values.HP);
+				burndamage = 0;
+			}
+
+			/* Temporary HP */
+			let THPUsed = {}
+			let THPmessage = "";
+			if (burndamage > 0) {
+				let returnTHP = applyTempBarDamageAilment(THP_Sources, "THP", burndamage, burnresult);
+				burnresult = returnTHP.newBar;
+				burndamage = returnTHP.damage;
+				THPUsed = returnTHP.THPUsed;
+			}
+			for (const sourceName in THPUsed) {
+				THPmessage = "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][0] + ")</b>";
 			}
 	
 			/* Translation prep */
@@ -12160,10 +12179,10 @@ function updateAilments(ailmentOverride=[]) {
 			}
 	
 			if(burnresist != "0"){
-			langResistCombined = "<b style='opacity: 50%;'><br>(" + langResist + burnresist + ")</b>";
+				langResistCombined = "<b style='opacity: 50%;'><br>(" + langResist + burnresist + ")</b>";
 			}
 	
-			let burnmessage = langBurn + "<b>" + burndamage + "</b> " + langDamage + "." + langResistCombined;
+			let burnmessage = langBurn + "<b>" + burndamage + "</b> " + langDamage + "." + langResistCombined + THPmessage;
 	
 			setAttrs({"HP":burnresult, "dummy":burnmessage, "dummyIcon":iconnew});
 			autoScriptOverrideList.Burn = [burnnew, burncurrent];
@@ -12387,7 +12406,8 @@ getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
 getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distortState", "egoActiveState", "egoType", "HP",
-	"settingBleedImmune", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "settingLimbusStyle", "character_name", `${id}_bleedDecayMode`, `${id}_bleedDecayVal`], function(values) {
+	"settingBleedImmune", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "settingLimbusStyle", "character_name", `${id}_bleedDecayMode`, `${id}_bleedDecayVal`,
+	"THP_Sources"], function(values) {
 
 	let bleednew = "0";
 	let bleedcurrent = values.Bleed;
@@ -12408,15 +12428,20 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 	let egotype = values.egoType;
 
 	if(egostate == "true" && egotype == "Outfit" && distortstate != "true"){
-	bleedresist = values.bleedResist_ego;
+		bleedresist = values.bleedResist_ego;
 	}
 	else if(distortstate == "true"){
-	bleedresist = parseInt(values.bleedResist) + parseInt(values.bleedResist_ego);
+		bleedresist = parseInt(values.bleedResist) + parseInt(values.bleedResist_ego);
 	}
 
 	if (bleeddecaypause > 0) {
 		mode = "damage";
 		setAttrs({"BleedDecayPause":bleeddecaypause - 1});
+	}
+
+	let THP_Sources = {};
+	if (values.THP_Sources != "" && values.THP_Sources != "{}") {
+		THP_Sources = JSON.parse(values.THP_Sources);
 	}
 
 	/* Translation prep */
@@ -12465,15 +12490,27 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 		/* Damage */
 		if (mode == "standard" || mode == "damage" || bleedimmune != "true") {
 			bleeddamage = Math.max(parseInt(values.Bleed - bleedresist), 0);
-
 			bleedresult -= bleeddamage;
+		}
+
+		/* Temporary HP */
+		let THPUsed = {}
+		let THPmessage = "";
+		if (bleeddamage > 0) {
+			let returnTHP = applyTempBarDamageAilment(THP_Sources, "THP", bleeddamage, bleedresult);
+			bleedresult = returnTHP.newBar;
+			bleeddamage = returnTHP.damage;
+			THPUsed = returnTHP.THPUsed;
+		}
+		for (const sourceName in THPUsed) {
+			THPmessage = "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][0] + ")</b>";
 		}
 
 		/* Chat message */
 		if(nomessage != "true" && bleedimmune != "true"){
 			let iconnew = getIcon("ailments", "Bleed", values.settingLimbusStyle, 'style="width: 25px; height: 25px;"');
 			
-			bleedmessage = iconnew + " <b>" + charname + "</b>" + langBleed + "<b>" + bleeddamage + "</b> " + langDamage + "." + langResistCombined;
+			bleedmessage = iconnew + " <b>" + charname + "</b>" + langBleed + "<b>" + bleeddamage + "</b> " + langDamage + "." + langResistCombined + THPmessage;
 
 			/* Whisper roll */
 			let whisperrolls = values.settingWhisperRolls;
@@ -14025,6 +14062,28 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 
 
 /* Temporary HP and ST */
+function applyTempBarDamageAilment(tempBar_Sources, target, damage, newBar) {
+
+	let tempBarUsed = {};
+	if (Object.keys(tempBar_Sources).length > 0) {
+		for (const sourceName in tempBar_Sources) {
+			let returnTempBar = applyTempBarDamage(sourceName, tempBar_Sources[sourceName], target, damage, newBar);
+			if (returnTempBar != undefined) {
+				if (returnTempBar.tempBarVal == 0) {
+					delete tempBar_Sources[sourceName];
+				} else {
+					tempBar_Sources[sourceName][0] = returnTempBar.tempBarVal;
+				}
+				newBar = returnTempBar.newBar;
+				damage = returnTempBar.damage;
+				tempBarUsed[returnTempBar.messageName] = [returnTempBar.messageVal, returnTempBar.messageIcon]
+			}
+		}
+		setAttrs({[`${target}_Sources`]:JSON.stringify(tempBar_Sources)});
+	}
+	return {newBar:newBar, damage:damage, [`${target}Used`]:tempBarUsed}
+}
+
 on('change:repeating_ailments:ailNum', (info) => {
 	
 	if (info.newValue != undefined) {
@@ -14062,12 +14121,15 @@ on('change:repeating_ailments:ailNum', (info) => {
 			}
 		});
 	} else {
-		$20(`#HPbar`).removeClass('tempBar');
-		$20(`#STGRbar`).removeClass('tempBar');
+		updateTempBarStyling(info)
 	}
 })
 
 on('change:THP_Sources change:TST_Sources', (info) => {
+	updateTempBarStyling(info);
+});
+
+function updateTempBarStyling(info) {
 	let bar = (info.sourceAttribute == "thp_sources") ? "HP" : "STGR";
 	let val = info.newValue;
 	
@@ -14081,7 +14143,7 @@ on('change:THP_Sources change:TST_Sources', (info) => {
 			$20(`#${bar}bar`).addClass('tempBar');
 		}
 	}
-});
+}
 
 function updateTempBar(target, name, tempBarVal, tempNum, effectName, iconFolder, iconName, stack="false") {
 	getAttrs(["THP_Sources", "TST_Sources"], function(values) {
@@ -16813,8 +16875,6 @@ function autoEffectAddBar(AutoEffect, barList, scaling, autoEffectType) {
 		}
 	}
 	
-
-
 	if (autoEffectType == "standard" || autoEffectType == "section") {
 		messageFormat += " [[INITIAL] -> [RESULT]]"
 	}
@@ -17778,7 +17838,8 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 		`repeating_ailments_${rowid}_ailCustomResistanceNumEgo`, `repeating_ailments_${rowid}_ailDecayRoundEnd`, `repeating_ailments_${rowid}_ailDecayMode`,
 		`repeating_ailments_${rowid}_ailDecayVal`, `repeating_ailments_${rowid}_ailDecayMin`, `repeating_ailments_${rowid}_ailMax`, `repeating_ailments_${rowid}_ailMaxBehavior`,
 		`repeating_ailments_${rowid}_ailMessageCheck`, `repeating_ailments_${rowid}_ailMessage`,
-		"HP", "StagRes", "SP", "Light", "distortCounter", "difficulty", "baseSpeed", "baseLuckNum", "character_name"], function(values) {
+		"HP", "StagRes", "SP", "Light", "distortCounter", "difficulty", "baseSpeed", "baseLuckNum", "character_name",
+		"THP_Sources", "TST_Sources"], function(values) {
 
 	let charname = values.character_name;
 	let nomessage = values.settingMuteMessage;
@@ -17816,6 +17877,15 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 		}
 	}
 
+	let THP_Sources = {};
+	if (values.THP_Sources != "" && values.THP_Sources != "{}") {
+		THP_Sources = JSON.parse(values.THP_Sources);
+	}
+	let TST_Sources = {};
+	if (values.TST_Sources != "" && values.TST_Sources != "{}") {
+		TST_Sources = JSON.parse(values.TST_Sources);
+	}
+
 	let maxcount = parseInt(values[`repeating_ailments_${rowid}_ailMax`]);
 	let maxtype = values[`repeating_ailments_${rowid}_ailMaxBehavior`];
 
@@ -17829,6 +17899,7 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 
 	let newcount = parseInt(count);
 	let newmessage = message;
+	let tempBarMessage = "";
 
 	let targetval = "";
 	let result = "";
@@ -17917,6 +17988,24 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 				result += Math.min(change, customRes);
 				change -= Math.min(change, customRes);
 			}
+
+			/* Temporary bar values */
+			let tempBarTarget = "";
+			let tempBar_Sources = {};
+			if (effecttargetinlist == "HP") { tempBarTarget = "THP"; tempBar_Sources = THP_Sources }
+			if (effecttargetinlist == "StagRes") { tempBarTarget = "TST"; tempBar_Sources = TST_Sources }
+			
+			let tempBarUsed = {}
+			if (change > 0 && Object.keys(tempBar_Sources).length > 0) {
+				let returnTempBar = applyTempBarDamageAilment(tempBar_Sources, tempBarTarget, change, result);
+				result = returnTempBar.newBar;
+				change = returnTempBar.damage;
+				tempBarUsed = returnTempBar[`${tempBarTarget}Used`];
+			}
+			for (const sourceName in tempBarUsed) {
+				tempBarMessage += "<b style='opacity: 50%;'><br>(" + sourceName + ": " + tempBarUsed[sourceName][0] + ")</b>";
+			}
+
 			output[`${effecttargetinlist}`] = result;
 
 			activateMessage = "true";
@@ -18009,7 +18098,7 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 		if(icon != "Question" && icon != "None"){
 		iconnew = "<img src='https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/"+ icon +".png' style='width: 25px; height: 25px;' >";
 		}
-		newmessage = iconnew + newmessage;
+		newmessage = iconnew + newmessage + tempBarMessage;
 
 		/* Whisper roll */
 		let whisperrolls = values.settingWhisperRolls;
