@@ -150,17 +150,18 @@ const version_170_200 = () => {
 const version_200_201 = () => {
     let codeversion=2.01;
     let update1={};
+    console.log('verion:',codeversion);
     update1['version']=codeversion;
     
         // UPDATE NAMES FOR SPECIAL TRAINING AND WEAPONS AND TRIGGER TEST
     const sectionDetails = [
         {section:'repeating_special', fields: ['name','special_training','skill_or_stat_used','skill_span']},
-        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_max']}];
+        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_total']}];
     
     getSectionIDs(sectionDetails, (v)=>{
             const repspecial= v.filter(el => el.startsWith(`repeating_special`));
             const repweapons= v.filter(el => el.startsWith(`repeating_weapons`));
-            console.log('in getSectionIDs section',section);
+            console.log('in getSectionIDs section',sectionDetails.section);
            // const fullarray=[].concat(repspecial,repweapons);
             //console.info('fullarray',fullarray);
             getAttrs(v,(values) => {
@@ -176,7 +177,7 @@ const version_200_201 = () => {
                 const repweapons_skill=repspecial.filter(el => el.endsWith('_skill_percent'));
                 const repweapons_ammo=repweapons.filter(el => el.endsWith('_ammo'));
                 const repweapons_hasammo=repweapons.filter(el => el.endsWith('_hasammo'));
-                const repweapons_ammo_max=repweapons.filter(el => el.endsWith('_ammo_max'));
+                const repweapons_ammo_total=repweapons.filter(el => el.endsWith('_ammo_total'));
 
                 console.log(`%c repweapons_oldname`, 'color: green; font-weight:bold');
                 console.info(repweapons_oldname);
@@ -198,8 +199,8 @@ const version_200_201 = () => {
                 console.info(repweapons_ammo);
                 console.log(`%c repweapons_hasammo`, 'color: green; font-weight:bold');
                 console.info(repweapons_hasammo);
-                console.log(`%c repweapons_ammo_max`, 'color: green; font-weight:bold');
-                console.info(repweapons_ammo_max);
+                console.log(`%c repweapons_ammo_total`, 'color: green; font-weight:bold');
+                console.info(repweapons_ammo_total);
 
 
                 for (i=0; i<repweapons_name ;i++){
@@ -221,7 +222,7 @@ const version_200_201 = () => {
 
                 for (i=0; i<repweapons_ammo ;i++){
                     if (values[repweapons_ammo[i]]!='') {
-                        update1[repweapons_ammo_max[i]]=values[repweapons_ammo[i]];
+                        update1[repweapons_ammo_total[i]]=values[repweapons_ammo[i]];
                         update1[repweapons_hasammo[i]]=values[repweapons_ammo[i]]>0 ? '1' : '0';
                     }
                 }

@@ -4,6 +4,7 @@ input(name='attr_version' type='hidden' value='1.99')
 
 //- MIXINS
 include src/pug/variables/_mixins.pug
+include src/pug/sections/_ritual_activation.pug
 
 //- OBJECTS
 //- ============================={{/damage}}
@@ -16,6 +17,10 @@ input(name='attr_initial_str' type='hidden' value=1)
 input(name='attr_initial_hp' type='hidden'  value=1)
 input(name='attr_sanity_points_old' type='hidden'  value=0)
 input(name='attr_breaking_point_old' type='hidden' value=0)
+input(name='attr_ritual_skill' type='number' value=0)
+
+//- Use for the buttons lead to nothing
+button.none(type='action' name='act_nothing') 
 
 //TABS & LOGO
 // =============================
@@ -65,10 +70,17 @@ input(name='attr_breaking_point_old' type='hidden' value=0)
 
 //- SKILL ROWS
 
+//datalist(id="")
+	each (skill,_) in skills1
+		+listskills(skill)
 
 
 datalist(id="weaponskills")
 	each skill in weaponskills
+		+listskills(skill)
+
+datalist(id="ritualskills")
+	each skill in ritualskills
 		+listskills(skill)
 
 
@@ -87,42 +99,14 @@ datalist(id="allskills")
 datalist(id="defensive-qualities")
 	each val,key in defensiveQualities
 		+listskills(key)
-
 div.compendium-drop-target
+	include src/pug/compendium/_compendium.pug
 	// TABS
 	// =============================
-	.tabs.grid
-		// Buttons to toggle on GM whisper
-		div.first
-			span(data-i18n-title='GM Whisper') GM Whisper
-			label.switch(data-i18-titlen='whisper rolls to gm' title='whisper rolls to gm')
-				input.whisper-toggle(name='attr_gm_toggle' type='checkbox' value='/w gm')
-				span.slider
-		// LOGO
-		img(alt='Delta Green' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Delta%20Green%202/img/deltagreenlogo.jpg')
-		div.last
-			input.settinggear(name='attr_mysettings' type='checkbox' value='settings')
-			span
-		input.setting_gear(type='hidden' name='attr_mysettings')
-		.grid.navmenu 
-			input.type(name='attr_sheet_type' type='hidden' )
-			a.pc(href='#personal-data-pc' data-i18n='personal data') Personal Data 
-			a.pc(href='#statistical-data-pc' data-i18n='statistical data') Statistical Data
-			a.pc(href='#psychological-data-pc' data-i18n='psychological data') Psychological Data
-			a.pc(href='#applicable-skills-pc' data-i18n='applicable skill sets') Applicable Skill sets
-			a.pc(href='#injuries-pc' data-i18n='injuries') Injuries
-			a.pc(href='#equipment-pc' data-i18n='equipment') Equipment
-			a.pc(href='#remarks-pc' data-i18n='remarks') Remarks
-			
-			a.npc(href='#personal-data-npc' data-i18n='personal data') Personal Data 
-			a.npc(href='#statistical-data-npc' data-i18n='statistical data') Statistical Data
-			a.npc(href='#applicable-skills-npc' data-i18n='applicable skill sets') Applicable Skill sets
-			a.npc(href='#equipment-npc' data-i18n='equipment') Equipment
-			a.npc(href='#remarks-npc' data-i18n='remarks') Remarks
-		.grid.empty
+	include src/pug/_navigation.pug
+	
 		
 	// COMPENDIUM DATA
-	include src/pug/compendium/_compendium.pug
 	// SETTINGS
 
 	input.setting_gear(type='hidden' name='attr_mysettings')
@@ -131,16 +115,12 @@ div.compendium-drop-target
 		// =============================
 		include src/pug/_settings.pug
 	
-	
-
-
 	.mainsheet
 	
-
-
 		input.type(name='attr_sheet_type' type='hidden' value='pc')
 		input.display_string(name='attr_toggles' type='hidden' value='')
 		// CHARACTER SHEETS
+		include src/pug/sections/equipment.pug
 		// NPC SHEET
 		// =============================
 		include src/pug/_npc.pug
@@ -158,10 +138,4 @@ div.compendium-drop-target
 //SHEETWORKERS
 // =============================
 script(type='text/worker')
-		include src/js/sheetworkers.js
-		include src/js/sheetworkers_versioning.js
-		include src/js/sheetworkers_parseinput.js 
-		include src/js/sheetworkers_rolls.js
-		include src/js/sheetworkers_jquery.js
-		include src/js/sheetworkers_onopen.js
-		include src/js/sheetworkers_compendium.js 
+		include deltagreen_scripts.pug

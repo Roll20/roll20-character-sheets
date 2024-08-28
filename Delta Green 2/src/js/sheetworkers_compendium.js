@@ -37,7 +37,13 @@ const arrays_drop={
 const dropAgent = (data) => {
 	const updateAttrs = {};
 	updateAttrs[`sheet_type`] = "pc";
-	
+	// First of all reset skills and repeating sections for skills and abilities
+    resetBonds(updateAttrs);
+	resetSkills(updateAttrs);
+    resetAllRepeatingSkills(updateAttrs);
+    resetAllSpecialAbilities(updateAttrs);
+	console.log(`Agent Reset:`,updateAttrs);
+
 	// bonds
 	const special_trainings = isJSONString(data.repeated_special_trainings);
 	const rituals= isJSONString(data.repeating_rituals);
@@ -90,6 +96,8 @@ const dropAgent = (data) => {
 					updateAttrs[`${prefix}_name`] = `bond_${i}`;
 					updateAttrs[`${prefix}_test`] = `editable`;
 				}
+			}else if (data[field]==="name"){
+				updateAttrs[`profession`] = data[field];
 			}else{
 			updateAttrs[field] = data[field];
 			}
@@ -159,7 +167,15 @@ const dropWeapon = (data) => {
 	const updateAttrs = {};
 	let UIDD = generateRowID();
 	var prefix=`${arrays_drop[`rep`][`weapon`]}${UIDD}`;
+	
 	const weaponfields=arrays_drop[`weapon`];
+	if (data.hasOwnProperty(weaponfields[2])==false){
+		console.warn(`weapon uses the repeating field format`);
+		data=isJSONString(data.repeating_weapons);
+		console.log(data);
+	}
+
+	updateAttrs[`${prefix}_test`] = 'editable';
 	for (const field of weaponfields){
 		if (data[field]){
 			if (field === "skill_percent"){
@@ -181,18 +197,8 @@ const dropWeapon = (data) => {
 	return updateAttrs;
 }
 
-/*
-const dropWeaponWrapper = (data) => {
-	const updateAttrs = {};
-	const weapon = isJSONString(data.repeating_weapons);
-	let dWeapons=dropWeapon(weapon);
-	Object.keys(dWeapons).forEach(key => updateAttrs[key] = dWeapons[key]);
-	console.log("here the new weapon");
-	console.log(updateAttrs);
-	return updateAttrs;
 
-}
-*/
+
 const getDropType = data => data.Category || false;
 
 const handleDragandDrop = () => {

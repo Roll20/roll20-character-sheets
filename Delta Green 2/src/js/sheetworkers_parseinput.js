@@ -31,16 +31,57 @@ arrays['_colored_derivative'].forEach(vitality => {
             }
             update[`${vitality}_points`]=value;
             console.log('maxval:'+v[maxval]+' value:'+value+' low_val:'+low_val);
-            console.info(update);
+            
             setAttrs(update, {silent:false}, ()=>{
                 console.log('Vitality color updated');	
             });
         });
     });
  });
+
  
 
-on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_stat_used`,(eventInfo)=>{
+const BondButtonColor= (bondvalue) => {
+    const score = parseInt(bondvalue)||0;
+    const color = (score > 0) ? 'on' : 'off';
+    return color;
+};
+
+const changeBondButtonColorOnOpen = () => {
+    getSectionIDs(`repeating_bonds`, (idarray) => {
+		const allbonds=idarray.map(id =>`repeating_bonds_${id}_score`);
+        getAttrs(allbonds, (value) => {
+            const update={};
+            Object.entries(value).forEach(([key, value]) => {
+                const id = key.split('_')[2];
+                const score = parseInt(value)||0;
+                update['repeating_bonds_'+id+'_color'] = BondButtonColor(score);
+            });
+            setAttrs(update, {silent:true}, () => {
+                console.log('Bond color updated');
+                
+            });
+        });
+    });
+};
+
+on('change:repeating_bonds:score', (eventInfo) => {
+    const update={};
+    const value = parseInt(eventInfo.newValue)||0;
+    update['repeating_bonds_color'] = BondButtonColor(value);
+    setAttrs(update, {silent:true}, () => {
+        console.log('Bond color updated');
+        
+    });
+});
+
+
+
+
+
+
+
+on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_stat_used change:repeating_rituals:skill_percent`,(eventInfo)=>{
     console.log(eventInfo);
     
     const newValue=eventInfo.newValue;
@@ -50,13 +91,13 @@ on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_sta
     const isMinority=isMinorityReport(eventInfo);
     const isValid=(isStringInForm(newValue) && isValidSkill(newValue)) && !isMinority;
     const isNumber=isSkillNumber(newValue);
-    console.info('field:',field);
-    console.info('newValue:',newValue);
-    console.info('id:',id);
-    console.info('isMinorityReport?',isMinority);
-    console.info('isNumber?',isNumber);
-    console.info('isStringForm?',isStringInForm(newValue));
-    console.info('isValidSkill?', isValidSkill(newValue));
+    
+    
+    
+    
+    
+    
+    
     
     var update={};
     if (isNumber){
@@ -64,15 +105,15 @@ on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_sta
         update[field]=number;
         update[skillspan]=number;
         setAttrs(update,{silent:true},()=>{
-            console.info('update number:', number);
+            
         });
     } else if (isValid) {
         const skill=cleanedSkill(newValue);
-        console.info('skill:',skill);
+        
         getAttrs([`${skill}`], (v) =>{
             update[skillspan]=v[`${skill}`];
             setAttrs(update,{silent:true},()=>{
-                console.info('updated skill:',skill);
+                
             });
         })
     } else if (isMinority) {
@@ -81,7 +122,7 @@ on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_sta
         update[field]=0;
         update[skillspan]=0;
         setAttrs(update,{silent:true},()=>{
-            console.info('unrecognized value:', newValue);
+            
         })
     }
 });

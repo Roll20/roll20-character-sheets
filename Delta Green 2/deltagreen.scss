@@ -14,6 +14,7 @@
 //=============================
     @import 'src/scss/variables/_globals';
 
+    @import 'src/scss/_ritual_activation';
 
 
 // REPEATING SECTIONS
@@ -49,7 +50,9 @@
 
 /* HIDE DIFFERENT SHEET TYPES BY DEFAULT
 ============================= */
-
+    .capitalize{
+        text-transform: capitalize;
+    }
     div.npc {
         display: none;
     }
@@ -63,10 +66,117 @@
       //  }
     }
 
-    #personal-data-pc,#statistical-data-pc,#applicable-skills-pc,#injuries-pc,
-    #equipment-pc,#remarks-pc,#psychological-data-pc {
-        scroll-margin-top: 9.2rem;
+    .slashpart{
+        display:grid;
+        width:100%;
+        align-items: center;
+        justify-content: center;
+        grid-template-columns: 1fr 1em 1fr;
+        padding: 0;
+        margin: 0;
+        column-gap: 0.4rem;
+    }
+
+    $ids: (
+    'personal-data-pc',
+    'statistical-data-pc',
+    'applicable-skills-pc',
+    'injuries-pc',
+    'equipment-pc',
+    'remarks-pc',
+    'psychological-data-pc',
+    'personal-data-npc',
+    'source-information-npc',
+    'statistical-data-npc',
+    'applicable-skills-npc',
+    'equipment-npc',
+    'abilities-npc',
+    'remarks-npc',
+    'general-settings', 'modifier-settings', 'automations-settings', 'experimental-settings'
+    );
+
+    @mixin generate-scroll-margin($margin) {
+        @each $id in $ids {
+          ##{$id} {
+            scroll-margin-top: $margin;
+          }
+        }
       }
+
+    // Apply the mixin for default scroll margin
+    @include generate-scroll-margin(9.3rem);
+
+    // Apply the mixin for checked checkboxes
+    input[value='active'].use_global_modifier ~ * {
+        @include generate-scroll-margin(14.3rem);
+    }
+
+    input[value='active'].use_global_modifier + .tabs {
+        height: 14rem !important;
+    }
+    .grid.global-modifier{
+        display: none;
+    }
+    .breakingpoints-reset{
+        display: inline-block !important;
+        padding: 0 !important;
+        input{
+            width: 3em;
+        }
+
+    }
+    input[value='active'].use_global_modifier + .global-modifier{
+        display: grid;
+        gap:0;
+        margin:0;
+        height: 5rem !important;
+        line-height: 5rem;
+        column-gap: 0.5rem;
+        justify-items: auto;
+        grid-template-columns: 13rem 3rem 3rem 1fr;
+        grid-column: 1/4;
+        width: 100%;
+        // I want to allign all elements of the grid (input,span,button) to the middle of the row
+        align-items: center;
+        justify-content: center;
+        background-color: $maincolor;   
+
+        
+        input{
+            width:5rem;
+            color: $accent1;
+        }
+        button{
+            background: linear-gradient(to bottom right, $palecolor, $accent1);
+            width: 8rem;   
+            height: 2rem;     
+            &:focus, &:hover, &:active {
+                //background-color: $accent3;
+                background: linear-gradient(to bottom right, $accent3, $maincolor);
+                color: $accent1;
+                h3{
+                    color: $accent1 !important;
+                }
+            }
+        
+        }
+    }
+    
+
+
+
+     .buttonwrapper{
+         button{
+            display: grid;
+            height: calc(100% - 0.5rem); /* Adjust the value as needed */
+        }
+    }
+    .section-bond-col{
+        .box{
+            height: 100%;
+        }
+    } 
+    
     div.tabs{
         position: sticky;
         top: 0;
@@ -85,7 +195,9 @@
             justify-self: end;
         }
 
-        .navmenu{
+        .navmenu,.navmenu1{
+            gap:0;
+            margin:0;
             grid-auto-flow: column;
             align-items: center;
             justify-content: space-evenly;
@@ -105,8 +217,22 @@
             input.type[value='npc'] ~  a.npc, a.pc {
                 display: block;
             }
+
             
+            input.onsettings[value='settings'] ~ a.nosettings, a.navsettings {
+                display: none !important;
+            }
+
+            input.onsettings[value='settings'] ~ a.navsettings {
+                display: block !important;
+            }
+
+
+
         }
+
+
+
 
         input.setting_gear[value='settings'] ~ .empty,.navmenu{
             display: grid;
@@ -115,9 +241,10 @@
             height: 3rem;
         }
 
-        input.setting_gear[value='settings'] + .navmenu,.empty{
+        input.setting_gear[value='settings'] + .navmenu,.empty,.global-modifiers{
             display: none;
         }
+
 
 
     }
@@ -233,6 +360,10 @@
         text-align: left;
     }
 
+    h2.aligned-center,
+    h3.aligned-center { 
+        justify-self: center !important;
+    }
 /* STYLED CHECKBOXES
 ============================= */
     label.styled-checkbox {
