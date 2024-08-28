@@ -13413,8 +13413,15 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	let autoScript = "";
 	if (overrideList.autoScriptOverride != undefined) { autoScript = overrideList.autoScriptOverride; }
 
-	let THP_Sources = values.THP_Sources;
-	let TST_Sources = values.TST_Sources;
+	
+	let THP_Sources = {};
+	if (values.THP_Sources != "" && values.THP_Sources != "{}") {
+		THP_Sources = JSON.parse(values.THP_Sources);
+	}
+	let TST_Sources = {};
+	if (values.TST_Sources != "" && values.TST_Sources != "{}") {
+		TST_Sources = JSON.parse(values.TST_Sources);
+	}
 
 	let ailCalculationList = {}; 
 
@@ -13682,39 +13689,41 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	let STDamage = oldST - newST;
 	let tempHPUsed = {}
 	let tempSTUsed = {}
-	let firstTempHP = "true";
-	let firstTempST = "true";
 	
 	if (newHP < oldHP) {
-		if (THP_Sources != "" && THP_Sources != "{}") {
-			for (const [sourceName, sourceVals] of Object.entries(JSON.parse(THP_Sources))) {
-				if (firstTempHP != "true") { continue; }
-				else { firstTempHP = "false"}
-				
-				let returnTHP = applyTempBarDamage(sourceName, sourceVals, "THP", HPDamage, newHP);
-				console.log(returnTHP)
+		if (Object.keys(THP_Sources).length > 0) {
+			for (const sourceName in THP_Sources) {
+				let returnTHP = applyTempBarDamage(sourceName, THP_Sources[sourceName], "THP", HPDamage, newHP);
 				if (returnTHP != undefined) {
+					if (returnTHP.tempBarVal == 0) {
+						delete THP_Sources[sourceName];
+					} else {
+						THP_Sources[sourceName][0] = returnTHP.tempBarVal;
+					}
 					newHP = returnTHP.newBar;
 					HPDamage = returnTHP.damage;
 					tempHPUsed[returnTHP.messageName] = [returnTHP.messageVal, returnTHP.messageIcon]
 				}
-				
 			}
+			setAttrs({"THP_Sources":JSON.stringify(THP_Sources)});
 		}
 	}
 	if (newST < oldST) {
-		if (TST_Sources != "" && TST_Sources != "{}") {
-			for (const [sourceName, sourceVals] of Object.entries(JSON.parse(TST_Sources))) {
-				if (firstTempST != "true") { continue; }
-				else { firstTempST = "false"}
-				
-				let returnTST = applyTempBarDamage(sourceName, sourceVals, "TST", STDamage, newST);
+		if (Object.keys(TST_Sources).length > 0) {
+			for (const sourceName in TST_Sources) {
+				let returnTST = applyTempBarDamage(sourceName, TST_Sources[sourceName], "THP", HPDamage, newHP);
 				if (returnTST != undefined) {
+					if (returnTST.tempBarVal == 0) {
+						delete TST_Sources[sourceName];
+					} else {
+						TST_Sources[sourceName][0] = returnTST.tempBarVal;
+					}
 					newST = returnTST.newBar;
 					STDamage = returnTST.damage;
 					tempSTUsed[returnTST.messageName] = [returnTST.messageVal, returnTST.messageIcon]
 				}
 			}
+			setAttrs({"TST_Sources":JSON.stringify(TST_Sources)});
 		}
 	}
 
@@ -13989,7 +13998,6 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 
 	if (damage > 0) {
 		let tempBarVal = parseInt(sourceVals[0]);
-		let ailNum = sourceVals[1];
 		let messageVal = Math.min(tempBarVal, damage);
 		let messageName = sourceVals[2];
 		let messageIcon = getIcon(sourceVals[3], sourceVals[4]);
@@ -14002,14 +14010,12 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 			damage -= tempBarVal;
 			newBar += tempBarVal;
 			tempBarVal = 0;
-			ailNum = 0;
 		}
 
-		updateTempBar(targetBar, sourceName, tempBarVal, ailNum, sourceVals[2], sourceVals[3], sourceVals[4]);
 		if (sourceVals[1] != "None") {
 			setAttrs({[sourceName]: Math.ceil(tempBarVal/sourceVals[1]), tempBar_suppress_event:"true"});
 		}
-		return {newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
+		return {tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
 	}
 }
 /* Damage helper functions end */
