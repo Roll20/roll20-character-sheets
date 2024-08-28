@@ -2762,6 +2762,9 @@
 			<button type="action" class="applyDamageInput" name="act_applyDamage" data-i18n-title="helper-text-applydamage" title="Apply damage"></button>
 		</div>
 	</div>
+	<input type="text" name="attr_THP_Sources" value="" hidden="true">
+	<input type="text" name="attr_TST_Sources" value="" hidden="true">
+	<input type="text" name="attr_tempBar_suppress_event" value="false" hidden="true">
 </div>
 
 
@@ -10044,8 +10047,8 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 			<option data-i18n="bar-health-and-stagres" value="HPStagRes">Health and Stagger</option>
 			<option data-i18n="bar-health" value="HP">Health</option>
 			<option data-i18n="bar-stagres" value="StagRes">Stagger</option>
-			<option data-i18n="bar-health-temp" value="Temp HP">Temp HP</option>
-			<option data-i18n="bar-stagres-temp" value="Temp ST">Temp ST</option>
+			<option data-i18n="bar-health-temp" value="THP">Temp HP</option>
+			<option data-i18n="bar-stagres-temp" value="TST">Temp ST</option>
 			<option data-i18n="bar-sanity" value="SP">Sanity</option>
 			<option data-i18n="bar-light" value="Light">Light</option>
 			<option data-i18n="distort-counter-full" value="distortCounter">Distortion Counter</option>
@@ -10533,8 +10536,6 @@ on('clicked:actionButtonDamage', async (data) => {
 		if (data.flatLightOverride != 0) {
 			data.autoScriptOverride = `(Add -${data.flatLightOverride} Light)`;
 		}
-
-		console.log(data)
 
 		if (typeof data == "string") {
 			AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
@@ -11630,7 +11631,7 @@ on(`sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ail
 		attributeObject[`${ailment}NextTurn`] = 0;
 		attributeObject[`${ailment}DecayPause`] = 0;
 	});
-	setAttrs({...attributeObject, "StaggerState":"0", "StaggerDuration":staggerdurationmax, "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "Seal":"0", "SP":newsan});	});
+	setAttrs({...attributeObject, "StaggerState":"0", "StaggerDuration":staggerdurationmax, "PanicState":"0", "SealState":"0", "ImmobileState":"0", "DefeatState":"0", "Seal":"0", "SP":newsan, "THP_Sources":"", "TST_Sources":""});	});
 
 	/* Custom Ailments */
         getSectionIDs(`repeating_ailments`, idarray => {
@@ -12128,8 +12129,6 @@ function updateAilments(ailmentOverride=[]) {
 				else if(values[`${id}_burnDecayMode`] == "="){
 				burnnew += parseInt(burndecay);
 				}
-
-				console.log(values)
 			}
 
 			/* Damage */
@@ -13361,7 +13360,8 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
 	"baseDamage", "flatDamageHP", "flatDamageST", "damageHelperType",
-	"distortState", "egoActiveState", "egoType", "StaggerState", "damageResist", "damageResist_ego"], function(values) {
+	"distortState", "egoActiveState", "egoType", "StaggerState", "damageResist", "damageResist_ego",
+	"THP_Sources", "TST_Sources"], function(values) {
 
 	const output = {};
 
@@ -13412,6 +13412,9 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 
 	let autoScript = "";
 	if (overrideList.autoScriptOverride != undefined) { autoScript = overrideList.autoScriptOverride; }
+
+	let THP_Sources = values.THP_Sources;
+	let TST_Sources = values.TST_Sources;
 
 	let ailCalculationList = {}; 
 
@@ -13674,6 +13677,47 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore + defenceRoll)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
 	newSP += Math.ceil(sumSanity);
 
+	/* Use temporary HP and ST */
+	let HPDamage = oldHP - newHP;
+	let STDamage = oldST - newST;
+	let tempHPUsed = {}
+	let tempSTUsed = {}
+	let firstTempHP = "true";
+	let firstTempST = "true";
+	
+	if (newHP < oldHP) {
+		if (THP_Sources != "" && THP_Sources != "{}") {
+			for (const [sourceName, sourceVals] of Object.entries(JSON.parse(THP_Sources))) {
+				if (firstTempHP != "true") { continue; }
+				else { firstTempHP = "false"}
+				
+				let returnTHP = applyTempBarDamage(sourceName, sourceVals, "THP", HPDamage, newHP);
+				console.log(returnTHP)
+				if (returnTHP != undefined) {
+					newHP = returnTHP.newBar;
+					HPDamage = returnTHP.damage;
+					tempHPUsed[returnTHP.messageName] = [returnTHP.messageVal, returnTHP.messageIcon]
+				}
+				
+			}
+		}
+	}
+	if (newST < oldST) {
+		if (TST_Sources != "" && TST_Sources != "{}") {
+			for (const [sourceName, sourceVals] of Object.entries(JSON.parse(TST_Sources))) {
+				if (firstTempST != "true") { continue; }
+				else { firstTempST = "false"}
+				
+				let returnTST = applyTempBarDamage(sourceName, sourceVals, "TST", STDamage, newST);
+				if (returnTST != undefined) {
+					newST = returnTST.newBar;
+					STDamage = returnTST.damage;
+					tempSTUsed[returnTST.messageName] = [returnTST.messageVal, returnTST.messageIcon]
+				}
+			}
+		}
+	}
+
 	/* Caps increase by regen amount */
 	newHP = Math.min(newHP, oldHP + hpRegen + hpStRegen);
 	newST = Math.min(newST, oldST + stRegen + hpStRegen);
@@ -13811,6 +13855,26 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	if ((damageResistance != 0) && (Math.abs(sumBothBefore + sumHpBefore)) > 0) { hpDamageBody += generateDamageHelperBodyEffect(langDamageResistance, damageResistance, "Reduction", 0, getIcon("ailments", "DamageResist", settingLimbusStyle)); }
 	if ((damageResistance != 0) && (Math.abs(sumBothBefore + sumStBefore)) > 0) { stDamageBody += generateDamageHelperBodyEffect(langDamageResistance, damageResistance, "Reduction", 0, getIcon("ailments", "DamageResist", settingLimbusStyle)); }
 
+	/* Temporary HP and ST */
+	if (Object.keys(tempHPUsed).length > 0) {
+		for (const [sourceName, sourceVals] of Object.entries(tempHPUsed)) {
+			let effectName = sourceName;
+			if (sourceName == "AutoEffect THP") {
+				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("THP", "bar-health-temp-shortened");
+			}
+			hpDamageBody += generateDamageHelperBodyEffect(effectName, sourceVals[0], "Reduction", 0, sourceVals[1]);
+		}
+	}
+	if (Object.keys(tempSTUsed).length > 0) {
+		for (const [sourceName, sourceVals] of Object.entries(tempSTUsed)) {
+			let effectName = sourceName;
+			if (sourceName == "AutoEffect TST") {
+				effectName = getTranslationByKeyCustom(`AutoEffects`, "autoeffect-title") + " " + getTranslationByKeyCustom("TST", "bar-stagres-temp-shortened");
+			}
+			stDamageBody += generateDamageHelperBodyEffect(effectName, sourceVals[0], "Reduction", 0, sourceVals[1]);
+		}
+	}
+
 	}
 
 	/* Combine damage calculations into one message*/
@@ -13845,13 +13909,13 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	/* Cleanup */
 	setAttrs({"dummy":" "});
 
-});
-});
-});
-});
-});
-});
-});
+	});
+	});
+	});
+	});
+	});
+	});
+	});
 }
 
 
@@ -13920,8 +13984,94 @@ function generateDamageHelperBodyEffect(effectName, effectVal, effectType, ailme
 	}
 	return message + "</div></div>";
 }
+
+function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
+
+	if (damage > 0) {
+		let tempBarVal = parseInt(sourceVals[0]);
+		let ailNum = sourceVals[1];
+		let messageVal = Math.min(tempBarVal, damage);
+		let messageName = sourceVals[2];
+		let messageIcon = getIcon(sourceVals[3], sourceVals[4]);
+
+		if (tempBarVal > damage) {
+			tempBarVal -= damage;
+			newBar += damage;
+			damage = 0;
+		} else {
+			damage -= tempBarVal;
+			newBar += tempBarVal;
+			tempBarVal = 0;
+			ailNum = 0;
+		}
+
+		updateTempBar(targetBar, sourceName, tempBarVal, ailNum, sourceVals[2], sourceVals[3], sourceVals[4]);
+		if (sourceVals[1] != "None") {
+			setAttrs({[sourceName]: Math.ceil(tempBarVal/sourceVals[1]), tempBar_suppress_event:"true"});
+		}
+		return {newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
+	}
+}
 /* Damage helper functions end */
 
+
+
+/* Temporary HP and ST */
+on('change:repeating_ailments:ailNum', (info) => {
+	let ailPrefix = info.sourceAttribute.replace("ailnum","");
+
+	getAttrs([`${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`, `${ailPrefix}ailIcon`,
+		"tempBar_suppress_event"], function(values) {
+
+		let ailNum = parseInt(info.newValue);
+		let ailTarget = values[`${ailPrefix}ailEffect`];
+		let ailName = values[`${ailPrefix}ailName`];
+		let ailEffectVal = Math.abs(parseFloat(values[`${ailPrefix}ailEffectVal`].replaceAll("n", "")));
+		let ailEffectMode = values[`${ailPrefix}ailEffectMode`];
+		let ailIcon = values[`${ailPrefix}ailIcon`];
+		let tempBarVal = 0;
+
+		if (ailTarget == "THP" || ailTarget == "TST") {
+			if (values.tempBar_suppress_event != "true") {
+				/* Calculate temp bar value */
+				if(ailEffectMode == "+") {
+					tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
+				}
+				else if(ailEffectMode == "=" && ailNum != 0) {
+					tempBarVal = parseFloat(ailEffectVal);
+					ailNum = "None";
+				} else {
+					ailNum = 0;
+				}
+				
+				/* Update the temp source for the correct bar */
+				updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
+			} else {
+				setAttrs({"tempBar_suppress_event":"false"});
+			}
+		}
+	});
+})
+
+function updateTempBar(target, name, tempBarVal, tempNum, effectName, iconFolder, iconName, stack="false") {
+	getAttrs(["THP_Sources", "TST_Sources"], function(values) {
+
+		let tempSource = {};
+		if (values[`${target}_Sources`] != "") { tempSource = JSON.parse(values[`${target}_Sources`]); }
+
+		if (!(tempNum == 0 || tempBarVal == 0 || (isNaN(tempNum) && tempNum != "None"))) {
+			if (tempSource[`${name}`] != undefined && stack == "true") {
+				tempSource[`${name}`] = [tempSource[`${name}`][0] + tempBarVal, tempNum, effectName, iconFolder, iconName];
+			} else {
+				tempSource[`${name}`] = [tempBarVal, tempNum, effectName, iconFolder, iconName];
+			}
+		} else {
+			delete tempSource[`${name}`];
+		}
+	
+		setAttrs({[`${target}_Sources`]: JSON.stringify(tempSource)});
+	});
+}
 
 
 /* Update: Tool uses */
@@ -15450,7 +15600,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
 	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", //"settingTargetMode",
 	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "thisRoundSpeed", "nextRoundSpeed", 
-	"StaggerState", "distortState", "egoActiveState", "egoType", "autoScriptStyling"], function(values) {
+	"StaggerState", "distortState", "egoActiveState", "egoType", "autoScriptStyling",
+	"THP_Sources", "TST_Sources"], function(values) {
 		
 		let settingMuteMessage = values.settingMuteMessage;
 		let settingWhisperRolls = values.settingWhisperRolls;
@@ -15466,13 +15617,17 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let ST = values.StagRes;
 		let SP = values.SP;
 		let Light = values.Light;
-		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP), Light:parseInt(Light) };
-		
+		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP), Light:parseInt(Light), THP:0, TST:0 };
 		let HPdamage = values.HP_max - HP;
 		let STdamage = values.StagRes_max - ST;
 		let SPdamage = values.SP_max - SP;
 		let LightExpended = values.Light_max - Light;
 		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
+
+		let THP_Sources = (values.THP_Sources != "" && values.THP_Sources != "{}") ? JSON.parse(values.THP_Sources) : "";
+		if (THP_Sources.AutoEffects != undefined) { barList.THP = THP_Sources.AutoEffects[0]; }
+		let TST_Sources = (values.TST_Sources != "" && values.TST_Sources != "{}") ? JSON.parse(values.TST_Sources) : "";
+		if (TST_Sources.AutoEffects != undefined) { barList.TST = TST_Sources.AutoEffects[0]; }
 
 		let thisRoundSpeed = parseInt(values.thisRoundSpeed);
 		let nextRoundSpeed = parseInt(values.nextRoundSpeed);
@@ -15740,6 +15895,15 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				messageValues = tempOutput.messageValues;
 				delete tempOutput.messageValues;
 			}
+
+			/* Handle temporary HP and ST */
+			effectList = ["THP", "TST"];
+			effectList.forEach(effect => {
+				if (tempOutput[effect] != undefined) {
+					updateTempBar(effect, "AutoEffects", tempOutput[effect], "None", `AutoEffects ${effect}`, "icons", "gear", "true");
+					delete tempOutput[effect];
+				}
+			});
 			
 			/* Add attribute changes from AutoEffect to output */
 			/* The first time a attribute is modified, add its count */
@@ -16604,7 +16768,7 @@ function autoEffectAddBar(AutoEffect, barList, scaling, autoEffectType) {
 	let message = "";
 	let messageValues = {};
 	let messageFormat = ""
-	if (effectBar != "Light") {
+	if (effectBar != "Light" && effectBar != "THP" && effectBar != "TST") {
 		if (effectVal < 0) {
 			messageFormat = getTranslationByKeyCustom("Receive [-SCALING NUM] [TARGET] damage", "autoeffect-format-add-neg");
 		} else {
@@ -16620,7 +16784,9 @@ function autoEffectAddBar(AutoEffect, barList, scaling, autoEffectType) {
 	
 
 
-	if (autoEffectType == "standard" || autoEffectType == "section") { messageFormat += " [[INITIAL] -> [RESULT]]" }
+	if (autoEffectType == "standard" || autoEffectType == "section") {
+		messageFormat += " [[INITIAL] -> [RESULT]]"
+	}
 
 	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 		returnValues.message = autoEffectMessage(messageFormat, effectTarget, effectVal/scaling, count, scaling, "success");
