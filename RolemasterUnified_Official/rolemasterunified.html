@@ -77,7 +77,7 @@
     <b>{{computed::attackresult}}!</b>
     <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
       <b>{{computed::attackroll}}</b> =
-      {{attackrollum}} [Roll] {{computed::attackmoddescription}}<br>
+      {{attackrollum}} [Roll] {{computed::attackmoddescription}}
     </p>
     {{#rollTotal() computed::ishit 1}}
       Hits {{computed::hitlocation}} for {{computed::damage}}
@@ -86,12 +86,9 @@
 	<br><i>{{computed::critdescription}}</i>
 	<br>{{computed::criteffect}}
       {{/rollTotal() computed::hascritical 1}}
+      <br>
+      [Apply](~{{target}}|applyattackresult||{{computed::injurystring}})
     {{/rollTotal() computed::ishit 1}}
-    <br>
-
-    [Apply](~{{computed::targetname}}|applyattackresult||{{computed::injurystring}})
-
-
   </div>
 
 </rolltemplate>
@@ -2308,6 +2305,14 @@
 
       <span>Hits Penalty:</span>
       <span name='attr_hppenalty'></span>
+
+      <span>Bleed</span>
+      <span>
+        <span name='attr_bleeding'></span> / round
+        <button type='action' class='fancybuttoninline fancybutton' name='act_deletebleed'>
+          <span style="font-family:Pictos;">#</span></button>
+      </span>
+
     </div>
 
     <div class='prop_pair'>
@@ -2336,6 +2341,7 @@
       <span>Manuever Penalty:</span>
       <span name='attr_manuever_penalty'></span>
     </div>
+
 
     <hr>
 
@@ -2461,7 +2467,17 @@ Name <input name="attr_character_name">
     <div>Eat/Drink</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_eat' value='0'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='1'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='2'></div>
 </div>
     <div class='double'>Concentration</div> <input type='checkbox'>
-    <div>Free Action Used</div> <input type='checkbox'>
+    <div>Free Used</div> <input type='checkbox'>
+    <div>AP/Phase</div>
+    <div>
+      <select name='attr_actionapperphase' style='width:100%' class='fancyselect'>
+        <option value='1'>1AP</option>
+        <option value='2'>2AP</option>
+        <option value='4'>4AP</option>
+      </select>
+    </div>
+    <div></div>
+    <div><button type='action' name='act_endphase' class='fancybutton fancybuttoninline'>End</button></div>
   </div>
 
 
@@ -2481,6 +2497,14 @@ Name <input name="attr_character_name">
 
       <span>Hits Penalty:</span>
       <span name='attr_hppenalty'></span>
+
+      <span>Bleed</span>
+      <span>
+        <span name='attr_bleeding'></span> / round
+        <button type='action' class='fancybuttoninline fancybutton' name='act_deletebleed'>
+          <span style="font-family:Pictos;">#</span></button>
+      </span>
+
     </div>
 
     <div class='prop_pair'>
@@ -2509,6 +2533,7 @@ Name <input name="attr_character_name">
       <span>Manuever Penalty:</span>
       <span name='attr_manuever_penalty'></span>
     </div>
+
 
     <hr>
 
@@ -2683,7 +2708,6 @@ Name <input name="attr_character_name">
       <div>Attack Name:</div> <input type='text' name='attr_attackaddname'>
       <div>Attack Skill</div> 
         <select name='attr_attackaddskill'>
-          
           <option value="beak">Beak</option>
           <option value="bite">Bite</option>
           <option value="blade">Blade</option>
@@ -2768,6 +2792,13 @@ Name <input name="attr_character_name">
           <option value="8">Huge</option>
           <option value="9">Gigantic</option>
           <option value="10">Enormous</option>
+        </select>
+      <div>Type</div>
+        <select name='attr_attackaddtype'>
+          <option value='melee'>Melee</option>
+          <option value='ranged'>Ranged</option>
+          <option value='directed'>Directed Spell</option>
+          <option value='other'>Other (No AP tracking)</option>
         </select>
       <div>Fumble</div><input type='number' name='attr_attackaddfumble'>
       <div>Modifier</div>
@@ -5132,6 +5163,15 @@ Name <input name="attr_character_name">
 
 <hr>
 
+<h3>Injuries</h3>
+
+<p>Apply an injury.  Format is Uppercase letter, followed by a number.  Letter sare H hits, P penalty, F fatigue, B blleed, S staggered P pRone, K kniocked back, G grapped %, Q/W/E Stun 25/50/77 X breakage roll<p>
+
+<input type='text' name='attr_hackinjury'>  
+<button type='action' name='act_applyinjuryhack' class='fancybutton'>Apply Injury</button>
+
+<hr>
+
 <p>Rerun the initial charactermancer.  Warning this may add all sorts of weird results to your character.
 This is not for usual use.</p>
 
@@ -5151,7 +5191,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 3d329790ea74dce78d71c9d4b89143b32e0ce159
+Revision b7b02f705213ce2c662f03d45719c222fc6debe4
 
 
 <hr>
@@ -11870,17 +11910,28 @@ J E + C + B
 	}
 
 	if (cdata.useap) {
-	    if (cdata.apused < 2) {
-		sendMessage("Must use at least 2 AP to attack");
-		return;
-	    }
-
-	    // FIXME: Missile.
 	    let appenalty = 0;
-	    if (cdata.apused == 2) {
-		appenalty = 50;
-	    } else if (cdata.apused == 3) {
-		appenalty = 25;
+	    if (cdata.attacktype == 'ranged') {
+		if (cdata.apused < 1) {
+		    sendMessage("Must use at least 1 AP to missile");
+		    return;
+		}
+		if (cdata.apused == 1) {
+		    appenalty = 50;
+		} else if (cdata.apused == 2) {
+		    appenalty = 25;
+		}
+	    } else {
+		if (cdata.apused < 2) {
+		    sendMessage(`Must use at least 2 AP to attack (Have ${cdata.apused}`);
+		    return;
+		}
+
+		if (cdata.apused == 2) {
+		    appenalty = 50;
+		} else if (cdata.apused == 3) {
+		    appenalty = 25;
+		}
 	    }
 	    if (appenalty != 0) {
 		attackmoddescription += ` -${appenalty}&nbsp;[Fast&nbsp;Attack (${cdata.apused}&nbsp;AP)]`;
@@ -11925,11 +11976,13 @@ J E + C + B
 			`${basename}_attackbonus`,
 			`${basename}_attackname`,
 			`${basename}_attackfumble`,
+			`${basename}_attacktype`,
 			'size', `${basename}_attacksize`,
 			'manuever_penalty',
 			'target_name', 'target_db', 'target_at',
 			'target_size', 'target_crit',
-			'attackuseap', 'aptrack_melee', 'aptrack_missile',
+			// Used depending on type: So get melee, missile and spell
+			'attackuseap', 'aptrack_melee', 'aptrack_missile', 'aptrack_spell',
 			], values => {
 		console.log('New attack: get attrs', values, ev);
 		cdata = {}
@@ -11950,8 +12003,17 @@ J E + C + B
 		cdata.targetcrit = parseIntDefault(values.target_crit, 0);
 		cdata.manuever_penalty = parseIntDefault(values.manuever_penalty, 0);
 		cdata.useap = (values.attackuseap == 'on') ? true : false;
-		// FIXME: Missile is wrong
-		cdata.apused = parseIntDefault(values.aptrack_melee, 0);
+		// Use the attack type to get the right AP
+		cdata.attacktype = values[`${basename}_attacktype`];
+		if (cdata.attacktype == 'melee') {
+		    cdata.apused = parseIntDefault(values.aptrack_melee, 0);
+		} else if (cdata.attacktype == 'ranged') {
+		    cdata.apused = parseIntDefault(values.aptrack_missile, 0);
+		} else if (cdata.attacktype == 'directed') {
+		    cdata.apused = parseIntDefault(values.aptrack_spell, 0);
+		} else {
+		    cdata.apused = 0;
+		}
 		attacks.startAttack(cdata);
 	});
     });
@@ -11961,7 +12023,6 @@ J E + C + B
     }
 
     onCheck('clicked:rmuattackgettarget', (ev) => {
-
 	const roll_string = "&{template:rmuattacktarget} [[3d8]]  " +
 		"{\{who=@{character_name}}} " +
 		"{\{targetname=[[0[@{target|character_name}] ]]}} " +
@@ -12070,7 +12131,8 @@ J E + C + B
 
     let attackadditems = [
 	"attackaddname", "attackaddskill", "attackaddtable", "attackaddsize",
-	"attackaddfumble", "attackaddmodifier", "attackaddri", "attackaddstrength"
+	"attackaddfumble", "attackaddmodifier", "attackaddri", "attackaddstrength",
+	"attackaddtype",
     ];
 
     // Returns 'true' if it validate, else an error mesasge (string)
@@ -12085,6 +12147,9 @@ J E + C + B
 
     }
 
+    /**
+     * Save the data from adding an attack on the sheet.
+     */
     onCheck("clicked:attackaddsave", () =>  {
 	// So we need to get the things; if there is an error we set the error mesage
 	getAttrs(attackadditems, (items) => {
@@ -12110,6 +12175,7 @@ J E + C + B
 		updates[`${prefix}_attacksource`] = 'user';
 		updates[`${prefix}_attackskill`] = items.attackaddskill;
 		updates[`${prefix}_attackri`] = items.attackaddri;
+		updates[`${prefix}_attacktype`] = items.attackaddtype;
 		updates[`${prefix}_attackmodifier`] = parseIntDefault(items.attackaddmodifier, 0);
 
 		updates[`${prefix}_attackmin`] = cdata?.data?.min?.match(/\d+/)[0] || 0;
@@ -12244,8 +12310,75 @@ onCheck("change:aptrack_loaded", (ev) => {
 	finishRoll(roll.rollId);
     });
   }
-
 });
+
+
+// So this is our per AP stuff
+onCheck("clicked:endphase", () => {
+    console.log("end phase");
+  // FIXME: Should reset when initiative is rolled
+  doTurn();
+});
+
+onCheck("clicked:deletebleed", () => {
+    getAttrs(["character_name"], (x) => {
+	sendMessage(`${x.character_name} is no longer bleeding`);
+	setAttrs({ bleeding: 0, bleedlist: []});
+    });
+});
+
+function handleBleed(currentphase, phasedelta, bleedlist) {
+  // Blledlist is probably a string.
+  if (!bleedlist || typeof(bleedlist) != 'string') {
+    return;
+  }
+
+  // Shift current phase to 1..4
+  currentphase = (currentphase - 1) % 4 + 1;
+
+  const bleeds = JSON.parse(bleedlist);
+  let total = 0;
+
+  // So you bleed if the phase matches or phase + delta is in range
+  for (bleed of bleeds) {
+    if (bleed.phase >= currentphase && bleed.phase < (currentphase + phasedelta)) {
+      console.log(`Bleed: ${bleed.phase}  ${bleed.amount}`);
+      total += bleed.amount;
+    }
+  }
+
+  return total;
+}
+
+
+// FIXME: for now just assuming 1AP per click
+function doTurn() {
+  getAttrs(["character_name", "currentphase",  "actionapperphase",
+      "bleedlist", "hp", ],
+    (turn) => {
+      console.log("End of turn updates", turn);
+      const apperphase = parseIntDefault(turn.actionapperphase, 1);
+      const currentphase = parseIntDefault(turn.currentphase, 1);
+      const relativephase = (currentphase - 1) % 4 + 1;
+      const round = Math.floor((currentphase + 3) / 4);
+      const name = turn.character_name;
+      const updates = {};
+
+      {
+	const n = handleBleed(currentphase, apperphase, turn.bleedlist); 
+	if (n > 0) {
+	  let hp = parseIntDefault(turn.hp, 0) - n
+	  sendMessage(`${name} bleeds ${n} hits.  Now has ${hp} hits`);
+	  updates.hp = hp;
+	}
+      }
+
+      updates.currentphase = currentphase + 1;
+      rmuSetAttrs(updates, ()=> { sendMessage(`${name} completes their turn (Round ${round} / Phase ${currentphase})`)});
+
+  });
+}
+
 
 
 
@@ -12823,14 +12956,20 @@ injury.updateInjuryString = function(hits, critical, attacker) {
 	return istr;
     }
 
-    for (const [critfield, value] of Object.entries(critical)) {
+    for (let [critfield, value] of Object.entries(critical)) {
 	const istrfield = injury.criticalmaps[critfield];
 	if (typeof(istrfield) !== 'string') {
 	    rmuerror("Unknown critical type", critfield, value, critical);
 	} else {
+	    // Sometimes negatives has '( )' around them
+	    value = value.replace(/[)(]/g, "");
 	    istr += `${istrfield}${Math.abs(value)}`;
 	}
     }
+
+    // Indicate the end of the numeric items
+    istr += 'Z';
+    /*
 
     if (attacker && typeof(attacker) === 'string') {
 	const asan = attacker.replaceAll('@', '').replaceAll(")", '&#41');
@@ -12840,46 +12979,99 @@ injury.updateInjuryString = function(hits, critical, attacker) {
     if (critical.description) {
 	// kill double quotes
 	const desc = critical.description.replaceAll('"', '').replaceAll(")", '&#41;');
-	istr += `"${desc}"`;
+	istr += `#${desc}#`;
     }
-
-    console.log(istr);
+*/
+    console.log("Injury string", istr);
     return istr;
 }
 
-injury.unsafeSubstract = function(prop, delta) {
-    getAttrs([prop], (x) => {
-	    let newval = parseIntDefault(x[prop], 0) - parseIntDefault(delta, 0);
-	    setAttrs({[prop]: newval});
-    });
-}
-
-
 /** The result is in "ev.originalRollId".  I wish I was joking */
 onCheck("clicked:applyattackresult", (ev) => {
+    console.log("Apply Attack result triggered", ev);
 	let str = ev.originalRollId;
-	console.log("Got an apply result", ev);
-	console.log(str);
-	const found = str.match(/[A-Z]\d+/g);
-	console.log(found);
+	injury.parseInjuryString(str);
+});
+
+onCheck("clicked:applyinjuryhack", () => {
+    getAttrs(["hackinjury"], ev => {
+	injury.parseInjuryString(ev.hackinjury);
+    });
+});
+
+/* So injury strings have two parts seperated by ;.
+   The first is the numeric fields,
+   The second is the descrtive parts.
+*/
+injury.parseInjuryString = function (str) {
+    // Split it stupid.  It splits then throws away excess fields with limited.
+    let ind = str.indexOf("Z");
+    ind = (ind == -1) ? str.length : ind; 
+    const numerics = str.slice(0, ind);
+    const desc = str.slice(ind + 1, str.length)
+
+    const injurydata = {};
+    const updates = {};
+    let reported = false;
+
+    getAttrs(["hp", "injurypenalty", "fatigue", "bleedlist", "currentphase"], (cdata) => {
+	const found = numerics.match(/[A-Z]\d+/g);
+	const currentphase = parseIntDefault(cdata.currentphase, 1);
+	// Phase in the round - 1-4
+	const relphase = (currentphase - 1) % 4 + 1;
+
 	for (res of found) {
 	    var value = parseInt(res.substring(1));
-	    console.log(res, value);
+	    injurydata[res[0]] = value; // Save it
 	    switch (res[0]) {
 		case 'H':
-		    injury.unsafeSubstract("hp", value);
+		    let hp = parseIntDefault(cdata.hp, 0);
+		    updates.hp = hp - value;
 		    break;
 		case 'P':
-		    injury.unsafeSubstract("injurypenalty", value);
+		    let ip = parseIntDefault(cdata.injurypenalty, 0);
+		    updates.ip = ip - value;
+		    reported = true; // Needs healing time
 		    break;
 		case 'F':
-		    injury.unsafeSubstract("fatigue", value);
+		    updates.fatigue = parseIntDefault(cdata.fatigue, 0) - value;
+		    break;
+		case 'B':
+		    console.log("Handle bleed");
+		    reported = true;
+		    let bl;
+		    if (cdata.bleedlist) {
+			bl = JSON.parse(cdata.bleedlist);
+		    } else {
+			bl = [];
+		    }
+		    bl.push({phase: relphase, amount: value});
+		    // Get the total bleed
+		    let bleed = 0;
+		    for (const b of bl){
+			console.log(bl, b);
+			bleed += b.amount;
+		    }
+		    console.log(bl, cdata, bleed);
+		    updates.bleedlist = JSON.stringify(bl);
+		    updates.bleeding = bleed;
+		    break;
+		case 'S': case 'R': case 'G': case 'Q': case 'W': case 'E':
+		case 'K': case 'X':
+		    injurydata[res[0]] = value;
+		    // just save and handle after
 		    break;
 		default:
-		    console.log("Can;t hanlde ", res);
+		    rmuerror("Can't handle ${res[0]} in injury ${str}");
+		    break;
 	    }
 	}
-});
+
+	VrmuSetAttrs(updates);
+    });
+
+}
+
 
 // vim: set sw=4 sts=4 syn=javascript :
 

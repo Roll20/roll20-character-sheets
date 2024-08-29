@@ -1,3 +1,15 @@
+# 2024-8-29
+
+Bonus midweek update
+- Split injury handling out
+- Handle breakage penalties in criticals correctly
+- Improve layout of rolltemplates; only show Apply when it's useful
+- Condition tracking:
+  - Track current phase
+  - Handle bleeds
+- AP Tracking for attacks: Melee & Spells
+- Add special page to apply injuries
+
 # 2024-8-27
 
 - Add movement for creatures
