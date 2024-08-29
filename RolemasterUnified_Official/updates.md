@@ -1,10 +1,31 @@
+# 2024-8-27
+
+- Add movement for creatures
+- Set default values for hp, pp and injuries and the like.
+- Sort skill and table names in attack add
+- Add option for no attack skill
+- Spells show +/-
+- Initiative is an action; not a roll.  No d20 logo.
+- Attacks
+  - include manuever penalty
+  - add AP tracking (melee only)
+  - Expand modifiers clearly
+- Spells now include manuever penalty
+- Bugs
+  - Fix missing attack modifiers
+  - Handle applying damage to creatures with ')' in their name 
+- Add internal sheet versions.  Unfortuantely
+- Display sheet version on last page
+- Automatically upgrade sheet 1 -> 2
+  - Sheet 2 is skill costs on sheet (Character support)
+
 # 2024-8-20
 
 - Characters now save their skill costs on creation
   - Enables use of custom professions
   - Helps with Roll20 Characters (create characters outside of game)
 - Support: Add "charactermancer" button to the settings page.
-  - Will break your harcater.  You hae been warned
+  - Will break your character.  You hae been warned
   - Allows migration to new skill costs
 - Bugfix: Highest stat gets confused if the first is highest, and the second is not the
    secondhighest.  Add tests for these cases.
