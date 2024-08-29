@@ -17,4 +17,8 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Updated trademark text
 - Set image urls to point to github content
 
-![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
+### Version 1.0.02
+
+- Renamed files to: Mongoose Traveller 2e Official
+
+![Image](Mongoose%20Traveller%202e%20Official.png)
