@@ -25,6 +25,32 @@
   </section>
 </div>
 
+<rolltemplate class="sheet-rolltemplate-action">
+  <div class="sheet-template-container">
+    <div class="sheet-template-header">{{name}}</div>
+    <div class="sheet-template-results">
+      <span class="sheet-template-rolls">
+        {{#rollGreater() roll1 0}}
+          {{roll1}}
+        {{/rollGreater() roll1 0}}
+        {{#rollGreater() roll2 0}}
+          {{roll2}}
+        {{/rollGreater() roll2 0}}
+        {{#rollGreater() roll3 0}}
+          {{roll3}}
+        {{/rollGreater() roll3 0}}
+        {{#rollGreater() roll4 0}}
+          {{roll4}}
+        {{/rollGreater() roll4 0}}
+        {{#rollGreater() roll5 0}}
+          {{roll5}}
+        {{/rollGreater() roll5 0}}
+      </span>
+      <span class="sheet-template-result">{{computed::result}}</span>
+    </div>
+  </div>
+</rolltemplate>
+
 <script type="text/worker">
   function useAttr(key, cb) {
     useAttrs([key], (attrs) => {
@@ -43,12 +69,23 @@
       const rating = parseInt(ratingString)
       if (rating === 0) return
 
-      const rollQuery = rating > 0
-        ? `${rating}d6`
-        : `${Math.abs(rating)}d6kl1`
+      let rollQuery = `&{template:action} {{name=${skillName} ${rating}}} {{result=[[0+(?{Modifier|0})]]}}`
+      const numDice = Math.abs(rating)
+      for (let i = 1; i <= numDice; i++) {
+        rollQuery += ` {{roll${i}=[[1d6]]}}`
+      }
 
-      startRoll(`&{template:default} {{name=${skillName} ${rating}}} {{result=[[${rollQuery}+?{Modifier}]]}}`, ({ rollId }) => {
-        finishRoll(rollId)
+      startRoll(rollQuery, ({ results, rollId }) => {
+        const rollResults = Object.entries(results)
+          .filter(([key]) => key.startsWith('roll'))
+          .map(([, { result }]) => result)
+
+        const result = rating > 0
+          ? rollResults.reduce((total, x) => total + x, 0) + results.result.result
+          : rollResults.reduce((low, x) => low === null || x < low ? x : low, null) + results.result.result
+
+        const computedValues = { result }
+        finishRoll(rollId, computedValues)
       })
     })
   })
