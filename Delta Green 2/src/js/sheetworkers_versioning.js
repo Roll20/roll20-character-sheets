@@ -51,23 +51,23 @@ const version_105_150 = () => {
            console.log(`%c v`, 'color: green; font-weight:bold');
            console.info(v);
            update['version']=codeversion;
-           console.info(update);
+           
             idarray.forEach(id=>{
                 console.log(`%c ${id}`, 'color: green; font-weight:bold');
                 if (v[`repeating_weapons_${id}_damage`]===""){
-                    update["repeating_weapons_"+id+"_hasdamage"]="0";
-           console.info(update);
+                    update["repeating_weapons_"+id+"_hasDamage"]="0";
+           
                 } else{
-                    update["repeating_weapons_"+id+"_hasdamage"]="1";
-           console.info(update);
+                    update["repeating_weapons_"+id+"_hasDamage"]="1";
+           
                 }
                     
                 if (v[`repeating_weapons_${id}_lethality_percent`]>0){
-                    update["repeating_weapons_"+id+"_haslethality"]="1";
-           console.info(update);
+                    update["repeating_weapons_"+id+"_hasLethality"]="1";
+           
                 } else {
-                    update["repeating_weapons_"+id+"_haslethality"]="0";
-           console.info(update);
+                    update["repeating_weapons_"+id+"_hasLethality"]="0";
+           
                 }
                 if (v['sheet_type']==='npc'){
                     update["repeating_weapons_"+id+"_weapons"]=v[`repeating_weapons_${id}_attack`];
@@ -75,7 +75,7 @@ const version_105_150 = () => {
             });
             
            console.log(`%c update`, 'color: green; font-weight:bold');
-           console.info(update);
+           
             setAttrs(update, //Update attributes
                     {silent:true},  // will not trigger sheet workers
                     versioning(codeversion)); // call versioning again
@@ -92,7 +92,7 @@ const version_150_170 = () => {
     update['luck']=50;
     update['luck_max']=50;
     console.log(`%c update`, 'color: green; font-weight:bold');
-    console.info(update);
+    
     setAttrs(update, //Update attributes
             {silent:true},  // will not trigger sheet workers
             versioning(codeversion)); // call versioning again
@@ -139,7 +139,7 @@ const version_170_200 = () => {
         update['breaking_point_old']=v['breaking_point'];
 
         console.log(`%c update`, 'color: green; font-weight:bold');
-        console.info('versioning',update);
+        
         setAttrs(update, //Update attributes
                 {silent:true},  // will not trigger sheet workers
                 versioning(codeversion)); // call versioning again
@@ -154,87 +154,92 @@ const version_200_201 = () => {
     update1['version']=codeversion;
     
         // UPDATE NAMES FOR SPECIAL TRAINING AND WEAPONS AND TRIGGER TEST
-    const sectionDetails = [
-        {section:'repeating_special', fields: ['name','special_training','skill_or_stat_used','skill_span']},
-        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_total']}];
-    
-    getSectionIDs(sectionDetails, (v)=>{
-            const repspecial= v.filter(el => el.startsWith(`repeating_special`));
-            const repweapons= v.filter(el => el.startsWith(`repeating_weapons`));
-            console.log('in getSectionIDs section',sectionDetails.section);
-           // const fullarray=[].concat(repspecial,repweapons);
-            //console.info('fullarray',fullarray);
-            getAttrs(v,(values) => {
-                console.info('fullarray',values);
-                            
-                const repweapons_oldname=repweapons.filter(el => el.endsWith('_weapons'));
-                const repspecial_oldname=repspecial.filter(el => el.endsWith('_special_training'));
-                const repweapons_name=repweapons.filter(el => el.endsWith('_name'));
-                const repspecial_name=repspecial.filter(el => el.endsWith('_name'));
-                const repspecial_span=repweapons.filter(el => el.endsWith('_skill_span'));
-                const repspecial_skill=repspecial.filter(el => el.endsWith('_skill_or_stat_used'));
-                const repweapons_span=repweapons.filter(el => el.endsWith('_skill_span'));
-                const repweapons_skill=repspecial.filter(el => el.endsWith('_skill_percent'));
-                const repweapons_ammo=repweapons.filter(el => el.endsWith('_ammo'));
-                const repweapons_hasammo=repweapons.filter(el => el.endsWith('_hasammo'));
-                const repweapons_ammo_total=repweapons.filter(el => el.endsWith('_ammo_total'));
+    const _sectionDetails = [
+        {section:'repeating_special', fields: ['name','special_training','skill_or_stat_used','skill_span',]},
+        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_total','lethality_percent']}];
 
-                console.log(`%c repweapons_oldname`, 'color: green; font-weight:bold');
-                console.info(repweapons_oldname);
-                console.log(`%c repspecial_oldname`, 'color: green; font-weight:bold');
-                console.info(repspecial_oldname);
-                console.log(`%c repweapons_name`, 'color: green; font-weight:bold');
-                console.info(repweapons_name);
-                console.log(`%c repspecial_name`, 'color: green; font-weight:bold');
-                console.info(repspecial_name);
-                console.log(`%c repspecial_span`, 'color: green; font-weight:bold');
-                console.info(repspecial_span);
-                console.log(`%c repspecial_skill`, 'color: green; font-weight:bold');
-                console.info(repspecial_skill);
-                console.log(`%c repweapons_span`, 'color: green; font-weight:bold');
-                console.info(repweapons_span);
-                console.log(`%c repweapons_skill`, 'color: green; font-weight:bold');
-                console.info(repweapons_skill);
-                console.log(`%c repweapons_ammo`, 'color: green; font-weight:bold');
-                console.info(repweapons_ammo);
-                console.log(`%c repweapons_hasammo`, 'color: green; font-weight:bold');
-                console.info(repweapons_hasammo);
-                console.log(`%c repweapons_ammo_total`, 'color: green; font-weight:bold');
-                console.info(repweapons_ammo_total);
-
-
-                for (i=0; i<repweapons_name ;i++){
-                    if (values[repweapons_oldname[i]]!='') {
-                        update1[repweapons_name[i]]=values[repweapons_oldname[i]];
-                        values[repweapons_oldname[i]]='';
-                        update1[repweapons_span[i]]=values[repweapons_skill[i]];
-                    }
-                    
-                }
-                
-                for (i=0; i<repspecial_name ;i++){
-                    if (values[repspecial_oldname[i]]!='') {
-                        update1[repspecial_name[i]]=values[repspecial_oldname[i]];
-                        update1[repspecial_oldname[i]]='';
-                        update1[repspecial_span[i]]=values[repspecial_skill[i]];
-                    }
-                }
-
-                for (i=0; i<repweapons_ammo ;i++){
-                    if (values[repweapons_ammo[i]]!='') {
-                        update1[repweapons_ammo_total[i]]=values[repweapons_ammo[i]];
-                        update1[repweapons_hasammo[i]]=values[repweapons_ammo[i]]>0 ? '1' : '0';
-                    }
-                }
-
-                console.log(`%c update`, 'color: green; font-weight:bold');
-                console.info('versioning',update1);
-                setAttrs(update1, //Update attributes
-                        {silent:true},  // will not trigger sheet workers
-                        versioning(codeversion)); // call versioning again
+    _sectionDetails.forEach(_group => {
+        const section = _group.section;
+        const fields = _group.fields;
+        getSectionIDs(section, (ids)=>{
+            console.log('in getSectionIDs section',section);
+            console.log('in getSectionIDs ids',ids);
+            const repfields=[];    
+            ids.forEach(id => {
+                fields.forEach(field => {
+                    repfields.push(`repeating_special_${id}_${field}`);
+                });
             });
+            getAttrs(repfields,(values) => {
+                    console.info('fullarray',values);
+                    var update = {};
 
-    
+                    ids.forEach(id => {
+                        const repsecid= `repeating_${section}_${id}_`;
 
+                        if (values.hasOwnProperty(`${repsecid}lethality_percent`)){
+                            if (values[`${repsecid}lethality_percent`]===''){
+                                const number=setMinMax(values[`${repsecid}lethality_percent`]);
+                                update[`${repsecid}lethality_percent`]=number;
+                                update[`${repsecid}lethality_percent`]='';
+                                console.log(`%c update name ${repsecid}lethality_percent to empty`, 'color: green; font-weight:bold');
+                            }
+                        }
+
+                        if (values.hasOwnProperty(`${repsecid}special_training`)){
+                            if (values[`${repsecid}special_training`]!==''){
+                                update[`${repsecid}name`]=values[`${repsecid}special_training`];
+                                update[`${repsecid}special_training`]='';
+                                console.log(`%c update name ${repsecid}special_training to ${repsecid}name`, 'color: green; font-weight:bold');
+                    
+                            }
+                        };
+                        if (values.hasOwnProperty(`${repsecid}weapons`)){
+                            if (values[`${repsecid}weapons`]!==''){
+                                update[`${repsecid}name`]=values[`${repsecid}weapons`];
+                                update[`${repsecid}weapons`]='';
+                                console.log(`%c update name ${repsecid}weapons to ${repsecid}name`, 'color: green; font-weight:bold');
+                            }
+                        };
+                        if (values.hasOwnProperty(`${repsecid}skill_or_stat_used`)){
+                            const value_stat=setMinMax(values[`${repsecid}skill_or_stat_used`]) ;
+                            update[`${repsecid}skill_span`]=value_stat;
+                            update[`${repsecid}skill_or_stat_used`]=value_stat;
+                            console.log(`%c update skill_span for ${repsecid}`, 'color: green; font-weight:bold');
+                        };
+
+                        if (values.hasOwnProperty(`${repsecid}skill_percent`)){
+                            const value_skill = setMinMax(values[`${repsecid}skill_percent`]);
+                            update[`${repsecid}skill_span`]=value_skill;
+                            update[`${repsecid}skill_percent`]=value_skill;
+                            console.log(`%c update skill_span for ${repsecid}`, 'color: green; font-weight:bold');
+                        };
+
+                        if (values.hasOwnProperty(`${repsecid}ammo`)){
+                            const value_ammo = Math.max(parseInt(values[`${repsecid}ammo`],10) || 0,0)  ;
+                            if (value_ammo>0){
+                                update[`${repsecid}ammo_total`]=value_ammo;
+                                update[`${repsecid}hasammo`]=1;
+                                update[`${repsecid}ammo`]=value_ammo;
+                            } else {
+                                update[`${repsecid}hasammo`]=0;
+                                update[`${repsecid}ammo_total`]='';
+                                update[`${repsecid}ammo`]='';
+                            }
+                            console.log(`%c update ammo for ${repsecid}: ammo_total=${update[`${repsecid}ammo_total`]} hasammo=${update[`${repsecid}hasammo`]}`, 'color: green; font-weight:bold');
+                        }
+
+                    }); 
+                    
+
+                    console.log(`%c update`, 'color: green; font-weight:bold');
+                    console.info('versioning',update1);
+                    setAttrs(update1, //Update attributes
+                            {silent:true},  // will not trigger sheet workers
+                            versioning(codeversion)); // call versioning again
+            
+                        });
+
+        });
     });
 };

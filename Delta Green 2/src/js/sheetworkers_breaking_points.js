@@ -60,7 +60,7 @@ on('change:breaking_point', () => {
         update['breaking_point_reset'] = breaking_point;
         update['breaking_point']=breaking_point;
         setAttrs(update, {silent:true}, () => {
-            console.log('reset breaking points on change');
+            
             
         });
     });
@@ -69,11 +69,11 @@ on('change:breaking_point_reset',(eventInfo)=>{
     const breaking_point_reset = parseInt(eventInfo.newValue, 10) || 0;
     getAttrs(['breaking_point_reset'], (values)=> {
         const breaking_point_reset = parseInt(values.breaking_point_reset, 10) || 0;
-        console.log(breaking_point_reset);
+        
         const update = {};
         update['breaking_point_reset'] = Math.min(Math.max(0,breaking_point_reset),99);
         setAttrs(update, {silent:true}, () => {
-            console.log('reset breaking points on change');
+            
             
         });
     });

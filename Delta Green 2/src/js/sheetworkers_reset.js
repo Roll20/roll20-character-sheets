@@ -13,7 +13,7 @@ on('clicked:reset_all', () =>{
 
     setAttrs(update, {silent: true}, () => {
         console.log('reset all');
-        console.info(update);
+        
     });
 });
 on('clicked:reset_stats', () =>{
@@ -22,7 +22,7 @@ on('clicked:reset_stats', () =>{
 
     setAttrs(update, {silent: true}, () => {
         console.log('reset stats');
-        console.info(update);
+        
     });
 });
 on('clicked:reset_skills', () =>{
@@ -31,7 +31,7 @@ on('clicked:reset_skills', () =>{
 
     setAttrs(update, {silent: true}, () => {
         console.log('reset skills');
-        console.info(update);
+        
     });
 });
 on('clicked:reset_equipment', () =>{
@@ -40,7 +40,7 @@ on('clicked:reset_equipment', () =>{
 
     setAttrs(update, {silent: true}, () => {
         console.log('reset equipment');
-        console.info(update);
+        
     });
 });
 on('clicked:reset_breaking_point', () =>{
@@ -62,7 +62,7 @@ const resetBreakingPoints = (update) => {
     
     setAttrs(update, {silent: true}, () => {
         console.log('reset breaking points');
-        console.info(update);
+        
     });
   });
 };
@@ -106,7 +106,7 @@ const resetStats = (update,reset_bonds=true) => {
     });
     if (reset_bonds){
         getSectionIDs('repeating_bonds',(ids) => {
-            console.log(ids);
+            
             ids.forEach(id => {
                 update[`repeating_bonds_${id}_test`] = 'editable';
                 update[`repeating_bonds_${id}_rank`] = '';
@@ -149,7 +149,7 @@ const resetAdaptations= (update) => {
 
 const resetAllWeapons= (update) => {
     getSectionIDs('repeating_weapons',(ids) => {
-        console.log(ids);
+        
         ids.forEach(id => {
             removeRepeatingRow('repeating_weapons_'+id);
         });
@@ -158,7 +158,7 @@ const resetAllWeapons= (update) => {
 
 const resetAllRituals= (update) => {
     getSectionIDs('repeating_rituals',(ids) => {
-        console.log(ids);
+        
         ids.forEach(id => {
             removeRepeatingRow('repeating_rituals_'+id);
         });
@@ -175,7 +175,7 @@ const resetEquipment= (update) => {
 
 const resetAllRepeatingSkills= (update) => {
     getSectionIDs('repeating_skills',(ids) => {
-        console.log(ids);
+        
         ids.forEach(id => {
             removeRepeatingRow('repeating_skills_'+id);
         });

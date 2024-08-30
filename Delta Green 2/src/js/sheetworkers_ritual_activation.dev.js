@@ -8,18 +8,9 @@ function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) ||
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-var RitualCosts = ['sanity_loss_low', 'sanity_loss_high', 'willpower_points_cost', 'power_score_cost', 'hit_points_cost', 'strength_score_cost', 'constitution_score_cost', 'dexterity_score_cost', 'intelligence_score_cost', 'charisma_score_cost'];
-var CurrentValues = ['sanity_points', 'willpower_points', 'power_score', 'hit_points', 'strength_score', 'constitution_score', 'dexterity_score', 'intelligence_score', 'charisma_score'];
-var RitualRolls = ['name', 'skill_span', 'unnatural_gain', 'study_time', 'sanity_loss_for_learning', 'activation_time', 'description', 'complexity', 'flawed_ritual'];
-var RitualDamages = ['damage_target_stat', 'damage_amount', 'damage_isLethal'];
-var RitualHeals = ['health_target_stat', 'health_amount', 'health_isLethal'];
-
 var paythecost = function paythecost(sanity_loss, other_costs) {
   var fraction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
   // lower sanity loss (not half)
-  console.info('pay the cost', other_costs);
   rollSan = "".concat(prefix_ritualloss_roll); //used for before the roll
 
   var hasCosts = {};
@@ -28,19 +19,13 @@ var paythecost = function paythecost(sanity_loss, other_costs) {
     var price = other_costs[attrName + '_cost'];
 
     if (attrName !== 'sanity_points') {
-      if (price === '1' && fraction === 2) {
-        price = 0;
-      }
-
-      rollSan += " {{".concat(attrName, "_cost=[[").concat(price, "/").concat(fraction, "]]}}");
+      rollSan += " {{".concat(attrName, "_cost=[[floor(").concat(price, "/").concat(fraction, ")]]}}");
       rollSan += " {{".concat(attrName, "=").concat(current, "}}");
 
       if (price !== 0 && price !== '0') {
         rollSan += " {{has_".concat(attrName, "=1}}");
         hasCosts[attrName] = 1;
-      } else {
-        console.log('no cost for', attrName);
-      }
+      } else {}
 
       ;
     }
@@ -49,7 +34,6 @@ var paythecost = function paythecost(sanity_loss, other_costs) {
   rollSan += " {{sanity_points=".concat(other_costs.sanity_points, "}}");
   rollSan += " {{has_sanity_points=1}}";
   hasCosts['sanity_points'] = 1;
-  console.info('roll for san cost:', rollSan);
   startRoll(rollSan, function (results) {
     var newroll = {};
     var update = {};
@@ -57,7 +41,6 @@ var paythecost = function paythecost(sanity_loss, other_costs) {
       var attrCost = attrName + '_cost';
       var old_value = parseInt(other_costs[attrName]) || 0;
       var cost = parseInt(results.results[attrCost].result) || 0;
-      console.log("".concat(attrCost, ": ").concat(cost));
       var new_value = Math.max(0, old_value - cost);
       newroll[attrCost] = new_value;
 
@@ -66,57 +49,32 @@ var paythecost = function paythecost(sanity_loss, other_costs) {
       }
     });
     finishRoll(results.rollId, newroll);
-    console.info('update', update);
-    console.info('newroll', update);
     setAttrs(update, {
       silent: true
     }, function () {
       updatebreakingpoints(); // I need to update the breaking points in the callback
-
-      console.log('sanity points updated');
-      console.info(update);
     });
   });
 };
 
-var acceptfailure = function acceptfailure(sanity_loss_low, other_costs) {
-  paythecost(sanity_loss_low, other_costs, 2);
+var acceptfailure = function acceptfailure(sanity_loss_success, other_costs) {
+  paythecost(sanity_loss_success, other_costs, 2);
 };
 
-var forceconnection = function forceconnection(sanity_loss_high, other_costs) {
+var forceconnection = function forceconnection(sanity_loss_failure, other_costs) {
   other_costs['power_score'] = other_costs['power_score'] + 1;
-  paythecost(sanity_loss_high, other_costs, 1);
+  paythecost(sanity_loss_failure, other_costs, 1);
 };
 
 var name_and_param = function name_and_param(repsecid, attrName, _parameters, _input_names) {
   _input_names[attrName] = "".concat(repsecid, "_").concat(attrName);
-  console.log(_input_names[attrName]);
 
   _parameters.push(_input_names[attrName]);
-
-  console.log(_parameters);
-};
-
-var general_manipulation = function general_manipulation(repsecid, _parameters, _input_names) {
-  // general informations to manupulate results
-  _input_names['charname'] = 'character_name';
-
-  _parameters.push(_input_names['charname']);
-
-  _input_names['charid'] = 'character_id';
-
-  _parameters.push(_input_names['charid']);
-
-  _input_names['ritualid'] = repsecid;
 };
 
 var setRitualCostParametersAndInputNames = function setRitualCostParametersAndInputNames(repsecid, _parameters, _input_names) {
-  console.info('RitualCosts', RitualCosts);
-  console.info('type of _parameters', _typeof(_parameters));
-  console.info('parameters', _parameters);
   RitualCosts.forEach(function (attrName) {
     name_and_param(repsecid, attrName, _parameters, _input_names);
-    console.log(attrName + ': ' + _parameters[_input_names[attrName]]);
   });
 };
 
@@ -130,26 +88,17 @@ var setRitualDamageParametersAndInputNames = function setRitualDamageParametersA
 };
 
 var setRitualParametersAndInputNames = function setRitualParametersAndInputNames(repsecid, _parameters, _input_names) {
-  console.info('Get general informations');
-  general_manipulation(repsecid, _parameters, _input_names);
-  console.info(_parameters); // general informations
-
-  console.info('Get RitualRolls');
+  // general informations
   RitualRolls.forEach(function (attrName) {
     name_and_param(repsecid, attrName, _parameters, _input_names);
   });
-  console.info(_parameters);
-  console.info('Get RitualCosts');
   setRitualCostParametersAndInputNames(repsecid, _parameters, _input_names);
-  console.info(_parameters);
-  console.info('Get RitualDamages');
   setRitualDamageParametersAndInputNames(repsecid, _parameters, _input_names);
-  console.log(_parameters);
 };
 
 var getOtherCosts = function getOtherCosts(other_costs, values, names, array) {
-  array.forEach(function (element) {
-    other_costs[element] = values[names[element]] != '' ? values[names[element]] : 0;
+  array.forEach(function (attrName) {
+    other_costs[attrName] = values[names[attrName]] != '' ? values[names[attrName]] : 0;
     ;
   });
 };
@@ -188,60 +137,64 @@ var name_to_shorthand = function name_to_shorthand(name) {
   }
 };
 
+var real_damage = function real_damage(other_costs) {
+  var heal_or_damage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'damage';
+
+  var _normal_value = parseRoll(other_costs["".concat(heal_or_damage, "_amount")]);
+
+  var _lethality_percent = setMinMax(other_costs["".concat(heal_or_damage, "_lethality_percent_amount")]);
+
+  var isLethal = other_costs["".concat(heal_or_damage, "_isLethal")] === 'lethal';
+  _noDamage = !isLethal && _normal_value === 0; // if it is not lethal and the normal value is zero, then it is no damage
+
+  _noLethal = isLethal && _lethality_percent === 0; // if it is lethal and the lethality percent is zero, then it is no damage
+
+  if (_noDamage && _noLethal == 0) {
+    return '';
+  }
+
+  return isLethal ? "".concat(_lethality_percent, "% ") : "".concat(_normal_value, " ");
+};
+
+var ritual_attack_or_heal_action = function ritual_attack_or_heal_action(character_id, repsecid, other_costs) {
+  var heal_or_attack = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'attack';
+  var value = real_damage(other_costs, heal_or_attack);
+
+  if (value === '') {
+    return '';
+  }
+
+  var const_button_part = '](~' + character_id + '|' + repsecid + '_';
+  var target_stat = name_to_shorthand(other_costs["".concat(heal_or_attack, "_target_stat")]);
+  var prefix_button = "{{".concat(heal_or_attack, "_button=[");
+  var suffix_button = target_stat + const_button_part + heal_or_attack + '_action)}}';
+  return prefix_button + value + suffix_button;
+};
+
+var ritual_power_action = function ritual_power_action(character_id, repsecid, other_costs) {
+  var const_button_part = '](~' + character_id + '|';
+  var prefix_power_reaction = '{{power_button=[';
+  var suffix_power_reaction = const_button_part + 'power)}}';
+  return prefix_power_reaction + '^{power}' + suffix_power_reaction;
+};
+
+var ritual_attack_action = function ritual_attack_action(character_id, repsecid, other_costs) {
+  return ritual_attack_or_heal_action(character_id, repsecid, other_costs, 'attack');
+};
+
+var ritual_heal_action = function ritual_heal_action(character_id, repsecid, other_costs) {
+  return ritual_attack_or_heal_action(character_id, repsecid, other_costs, 'heal');
+};
+
 var prepare_ritual_rolls = function prepare_ritual_rolls(other_costs, values, names) {
   var localString = '';
-  var damage_target_stat = name_to_shorthand(other_costs.damage_target_stat);
-  var health_target_stat = name_to_shorthand(other_costs.health_target_stat);
-  var damage_amount = other_costs.damage_amount;
-  var health_amount = other_costs.health_amount;
-  var isLethalAttack = (parseInt(damage_amount, 10) || 0 !== 0) && other_costs.damage_isLethal == 'lethal';
-  var isNormalAttack = damage_amount !== '' && other_costs.damage_isLethal == 'normal';
-  var isLethalHeal = (parseInt(health_amount, 10) || 0 !== 0) && other_costs.health_isLethal == 'lethal';
-  var isNormalHeal = health_amount !== '' && other_costs.health_isLethal == 'normal;';
-  var damage_button = '';
-  var heal_button = '';
-  var const_button_part = '](~' + values[names['charid']] + '|' + names['repsecid'] + '_';
-  var prefix_damage_button = '{{damage_button=[';
-  var prefix_heal_button = '{{heal_button=[';
-  var prefix_power_reaction = '{{power_reaction=[';
-  var suffix_damage_button = damage_target_stat + const_button_part + 'damage_button)}}';
-  var suffix_heal_button = health_target_stat + const_button_part + 'heal_button)}}';
-  var suffix_power_reaction = const_button_part + 'power_reaction)}}';
-  var power_reaction_button = prefix_power_reaction + '^{POWER}' + suffix_power_reaction;
+  localString += ritual_attack_action(values[names['character_id']], names['repsecid'], other_costs);
+  localString += ritual_heal_action(values[names['character_id']], names['repsecid'], other_costs);
 
-  if (isLethalAttack) {
-    damage_button += prefix_damage_button;
-    damage_button += parseInt(damage_amount, 10) + '% ';
-    damage_button += suffix_damage_button;
+  if (values[names['power_reaction']] === 'active') {
+    localString += ritual_power_action(values[names['character_id']], names['repsecid']);
   }
 
-  if (isNormalAttack) {
-    damage_button += prefix_damage_button;
-    damage_button += damage_amount.toUpperCase() + ' ';
-    damage_button += suffix_damage_button;
-  }
-
-  if (isLethalHeal) {
-    heal_button += prefix_heal_button;
-    heal_button += parseInt(health_amount, 10) + '% ';
-    heal_button += suffix_heal_button;
-  }
-
-  if (isNormalHeal) {
-    heal_button += prefix_heal_button;
-    heal_button += health_amount.toUpperCase() + ' ';
-    heal_button += suffix_heal_button;
-  }
-
-  localString += damage_button;
-  localString += heal_button;
-  var power_reaction = values[names['power_reaction']] === 'active' ? 1 : 0;
-
-  if (power_reaction === 1) {
-    localString += power_reaction_button;
-  }
-
-  console.log('localString', localString);
   return localString;
 };
 
@@ -251,12 +204,20 @@ var clicked_repeating_rituals = function clicked_repeating_rituals(parameters, n
     var other_costs = {};
     getOtherCosts(other_costs, values, names, RitualCosts);
     getOtherCosts(other_costs, values, names, RitualDamages);
-    getOtherCosts(other_costs, values, names, RitualHeals); // what is needed to roll
+    getOtherCosts(other_costs, values, names, RitualHeals); //----------------------------------------------------------------------------------------------
+    //---------Not used for the roll, they are always zero. Ask Shane if he wants it----------------
+    //const wp_mod=check_for_wp_modifiers(values,rollName);
+
+    var low_willpower = 0; //wp_mod.low_willpower;
+
+    var zero_willpower = 0; //wp_mod.zero_willpower;
+    //----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
+    // what is needed to roll
 
     var rating = values[names['skill_span']];
-    var sanity_loss_low = other_costs['sanity_loss_low'];
-    var sanity_loss_high = other_costs['sanity_loss_high'];
-    console.info('other_costs', other_costs); // info ritual
+    var sanity_loss_success = other_costs['sanity_loss_success'];
+    var sanity_loss_failure = other_costs['sanity_loss_failure']; // info ritual
 
     var ritual_name = values[names['name']];
     var description = values[names['description']];
@@ -269,8 +230,10 @@ var clicked_repeating_rituals = function clicked_repeating_rituals(parameters, n
       rollString += "{{description=".concat(description, "}}");
     }
 
-    rollString += "{{sanity_loss_low=".concat(sanity_loss_low, "}}");
-    rollString += "{{sanity_loss_high=".concat(sanity_loss_high, "}}");
+    rollString += "{{sanity_loss_success=".concat(sanity_loss_success, "}}");
+    rollString += "{{sanity_loss_failure=".concat(sanity_loss_failure, "}}");
+    rollString += "{{zero_willpower=[[".concat(zero_willpower, "]]}}");
+    rollString += "{{low_willpower=[[".concat(low_willpower, "]]}}");
     var hasOtherCosts = false;
     var costString = '';
     Object.entries(other_costs).forEach(function (_ref) {
@@ -283,53 +246,56 @@ var clicked_repeating_rituals = function clicked_repeating_rituals(parameters, n
         hasOtherCosts = true;
       }
     });
-    console.info('costString', costString);
     rollString += costString;
     rollString += "{{hasCost=[[0]]}}";
     rollString += prepare_ritual_rolls(other_costs, values, names);
     var flawed_ritual = values[names['flawed_ritual']] === 'active' ? 1 : 0;
-    rollString += "{{flawed_ritual=[[".concat(flawed_ritual, "]]}}");
-    rollString += "{{modifier=[[".concat(queryModifier, "]]}}");
-    var charid = values[names['charid']];
-    var ritualid = names['ritualid']; // ritualid is the repeating section id, not a parameter
 
-    rollString += "{{pay_cost=[^{pay the cost}](~".concat(charid, "|").concat(ritualid, "_pay_cost)}}");
-    rollString += "{{accept_failure=[^{accept}](~".concat(charid, "|").concat(ritualid, "_accept_failure)}}");
-    rollString += "{{reject_failure=[^{reject}](~".concat(charid, "|").concat(ritualid, "_force_connection)}}"); /// This are the only quantities than I need to manupulate
+    if (flawed_ritual === 1) {
+      rollString += "{{flawed_ritual=".concat(flawed_ritual, "}}");
+    }
+
+    rollString += "{{modifier=[[".concat(queryModifier, "]]}}");
+    var character_id = values['character_id'];
+    var repsecid = names['repsecid']; // ritualid is the repeating section id, not a parameter
+
+    rollString += "{{pay_cost=[^{pay the cost}](~".concat(character_id, "|").concat(repsecid, "_pay_cost)}}");
+    rollString += "{{accept_failure=[^{accept}](~".concat(character_id, "|").concat(repsecid, "_accept_failure)}}");
+    rollString += "{{reject_failure=[^{reject}](~".concat(character_id, "|").concat(repsecid, "_force_connection)}}"); /// This are the only quantities than I need to manupulate
 
     rollString += "{{isSuccess=[[0]]}}";
-    console.info(rollString);
-    console.info('parameters', parameters);
-    console.info('names', names);
     startRoll(rollString, function (results) {
       var activation_rating = parseInt(results.results.rating.result) || 0;
       var dice = parseInt(results.results.dice.result) || 0;
-      var flawed_ritual = results.results.flawed_ritual.result === 1 ? -20 : 0;
-      var modifier = (parseInt(results.results.modifier.result) || 0) + flawed_ritual;
+
+      var _flawed_ritual = flawed_ritual === 1 ? -20 : 0;
+
+      var _modifier = correct_modifier((parseInt(results.results.modifier.result) || 0) + flawed_ritual, low_willpower);
+
+      var _rating = correct_rating(activation_rating, _modifier);
+
       var hasCost = hasOtherCosts ? 1 : 0;
-      var isSuccess = dice <= activation_rating + modifier ? 1 : 0;
+      var outcome = check_success(dice, _rating);
       newroll = {
-        isSuccess: isSuccess,
+        isSuccess: outcome.isSuccess,
+        IsCritical: outcome.IsCritical,
         dice: dice,
-        modifier: modifier,
-        hasCost: hasCost
+        modifier: _modifier,
+        hasCost: hasCost,
+        flawed_ritual: _flawed_ritual,
+        low_willpower: low_willpower,
+        zero_willpower: zero_willpower
       };
-      console.info('newroll', newroll);
-      console.info('results', results);
       finishRoll(results.rollId, newroll);
     });
   });
 };
-
-var _ritualInfo = ['complexity', 'activation_time', 'activation_time_unit', 'study_time', 'study_time_unit', 'unnatural_gain', 'sanity_loss_for_learning', 'willpower_points_cost', 'power_score_cost', 'hit_points_cost', 'strength_score_cost', 'constitution_score_cost', 'dexterity_score_cost', 'intelligence_score_cost', 'charisma_score_cost', 'sanity_loss_low', 'sanity_loss_high'];
 
 var empty_to_zero = function empty_to_zero(value) {
   return value !== '' || value !== '0' ? value : 0;
 };
 
 on('change:repeating_rituals', function (eventinfo) {
-  console.info(eventinfo);
-  console.log('ritual info to update');
   var id = eventinfo.sourceAttribute.split('_')[2];
   ritual_rolls_info("repeating_rituals_".concat(id));
 });
@@ -354,12 +320,9 @@ var ritual_rolls_info = function ritual_rolls_info(repsecid) {
   });
 
   getAttrs(_parameters, function (values) {
-    console.info(_parameters);
-    console.info(_names);
-    console.info(values);
     var complexity = values[_names['complexity']];
-    var sanity_loss_low = empty_to_zero(values[_names['sanity_loss_low']]);
-    var sanity_loss_high = empty_to_zero(values[_names['sanity_loss_high']]);
+    var sanity_loss_success = empty_to_zero(values[_names['sanity_loss_success']]);
+    var sanity_loss_failure = empty_to_zero(values[_names['sanity_loss_failure']]);
     var activation_time = empty_to_zero(values[_names['activation_time']]) == 0 ? '' : empty_to_zero(values[_names['activation_time']]);
     var activation_time_unit = values[_names['activation_time_unit']];
     var study_time = empty_to_zero(values[_names['study_time']]) == 0 ? '' : empty_to_zero(values[_names['study_time']]);
@@ -373,10 +336,7 @@ var ritual_rolls_info = function ritual_rolls_info(repsecid) {
     var constitution_score_cost = empty_to_zero(values[_names['constitution_score_cost']]);
     var dexterity_score_cost = empty_to_zero(values[_names['dexterity_score_cost']]);
     var intelligence_score_cost = empty_to_zero(values[_names['intelligence_score_cost']]);
-    var charisma_score_cost = empty_to_zero(values[_names['charisma_score_cost']]);
-    console.log('ritual info to update');
-    console.info(repsecid);
-    console.info(values); // complexity text
+    var charisma_score_cost = empty_to_zero(values[_names['charisma_score_cost']]); // complexity text
 
     update["".concat(repsecid, "_complexity_text")] = "".concat(complexity, " ritual"); // study time text
 
@@ -442,18 +402,14 @@ var ritual_rolls_info = function ritual_rolls_info(repsecid) {
       costs_text += "".concat(charisma_score_cost, "CHA, ");
     }
 
-    if (sanity_loss_low != 0) {
-      costs_text += "".concat(sanity_loss_low, "SAN/");
+    if (sanity_loss_success != 0) {
+      costs_text += "".concat(sanity_loss_success, "SAN/");
     }
 
-    costs_text += "".concat(sanity_loss_high, "SAN");
+    costs_text += "".concat(sanity_loss_failure, "SAN");
     update["".concat(repsecid, "_cost_text")] = "".concat(String(costs_text).toUpperCase());
-    console.log('ritual info updated');
     setAttrs(update, {
       silent: true
-    }, function () {
-      console.log('ritual info updated');
-      console.info(update);
-    });
+    }, function () {});
   });
 };

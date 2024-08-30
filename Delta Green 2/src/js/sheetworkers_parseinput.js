@@ -1,20 +1,20 @@
 
 arrays['_colored_derivative'].forEach(vitality => {
     on(`change:${vitality}_points`, (eventInfo) => {
-        console.log('changed '+vitality+'_points');
-        console.log(eventInfo);
-        console.log(eventInfo.newValue);
+        
+        
+        
  
         var value = parseInt(eventInfo.newValue) || 0;
         value = (value < 0) ? 0 : value;
         const maxval=`${vitality}_points_max`;
         getAttrs([maxval], function(v) {
-            console.log('maxval:'+v[maxval]);
+            
             const max_val = parseInt(v[maxval]) || 0;	
             const low_val=2;
             var update={};
  
-            console.log('maxval:'+v[maxval]+' value:'+value+' low_val:'+low_val);
+            
             update[`color_${vitality}`]='normal';
             update[`${vitality}_modifier`]=0;
  
@@ -30,10 +30,10 @@ arrays['_colored_derivative'].forEach(vitality => {
                 update[`${vitality}_modifier`]=2;
             }
             update[`${vitality}_points`]=value;
-            console.log('maxval:'+v[maxval]+' value:'+value+' low_val:'+low_val);
+            
             
             setAttrs(update, {silent:false}, ()=>{
-                console.log('Vitality color updated');	
+                
             });
         });
     });
@@ -49,6 +49,7 @@ const BondButtonColor= (bondvalue) => {
 
 const changeBondButtonColorOnOpen = () => {
     getSectionIDs(`repeating_bonds`, (idarray) => {
+        
 		const allbonds=idarray.map(id =>`repeating_bonds_${id}_score`);
         getAttrs(allbonds, (value) => {
             const update={};
@@ -76,54 +77,103 @@ on('change:repeating_bonds:score', (eventInfo) => {
 });
 
 
+_skill_percent.forEach(_skill_sec_percent => {
+    const section=_skill_sec_percent.section;
+    const field=_skill_sec_percent.field;
+    const input=`repeating_${section}_${field}`;
+    const skillspan=`repeating_${section}_skill_span`;
+    on(`change:repeating_${section}:${field}`, () => {
+        getAttrs([input], (value) => {
+            const SkillPercent = value[`repeating_${section}_${field}`];
+            const isInLinkingForm=isValidLinkInput(SkillPercent);
+            const isInNumericalForm=isSkillNumber(SkillPercent);
+            const update={};
+            var   skillname='';
 
+            if (isInLinkingForm===false && isInNumericalForm===false) {
+                update[input]=0;
+                if (section !=='skills') {update[skillspan]=update[input];}
+                setAttrs(update,{silent:true},()=>{
+                    
+                });
+            }
 
+            if (isInNumericalForm){
+                const number= setMinMax(SkillPercent);
+                update[input]=number;
+                if (section !=='skills') {update[skillspan]=update[input];}
+                setAttrs(update,{silent:true},()=>{
+                    
+                });
+            }
 
-
-
-on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_stat_used change:repeating_rituals:skill_percent`,(eventInfo)=>{
-    console.log(eventInfo);
-    
-    const newValue=eventInfo.newValue;
-    const field=eventInfo.triggerName;
-    const id= field.split('_')[2];
-    const skillspan=`repeating_${field.split('_')[1]}_${id}_skill_span`;
-    const isMinority=isMinorityReport(eventInfo);
-    const isValid=(isStringInForm(newValue) && isValidSkill(newValue)) && !isMinority;
-    const isNumber=isSkillNumber(newValue);
-    
-    
-    
-    
-    
-    
-    
-    
-    var update={};
-    if (isNumber){
-        const number=parseInt(newValue) || 0;
-        update[field]=number;
-        update[skillspan]=number;
-        setAttrs(update,{silent:true},()=>{
-            
+            if (isInLinkingForm) {
+                const skill=cleanedSkill(SkillPercent);
+                skillname=skill;
+                getAttrs([`${skillname}`], (values) => {
+                    const number= setMinMax(values[skillname]);
+                    if (section !=='skills') {update[skillspan]=number;}
+                    setAttrs(update,{silent:true},()=>{
+                        
+                    });
+                });
+            };
         });
-    } else if (isValid) {
-        const skill=cleanedSkill(newValue);
-        
-        getAttrs([`${skill}`], (v) =>{
-            update[skillspan]=v[`${skill}`];
-            setAttrs(update,{silent:true},()=>{
-                
+    });
+});     
+
+
+
+
+_only_number.forEach(_sect_object => {
+    const section=_sect_object.section;
+    const fields=_sect_object.fields;
+    if (Array.isArray(fields)) {
+        fields.forEach(field => {
+            const input=`repeating_${section}_${field}`;
+            on(`change:repeating_${section}:${field}`, () => {
+                getAttrs([input], (value) => {
+                    const update={};
+                    const number=setMinMax(value[input]);
+                    update[input]=number;
+                    setAttrs(update,{silent:true},()=>{
+                    });
+                });
             });
-        })
-    } else if (isMinority) {
-        console.log("Right now the Precogs can't see a thing." );
-    } else {
-        update[field]=0;
-        update[skillspan]=0;
-        setAttrs(update,{silent:true},()=>{
-            
-        })
-    }
+        });
+    };
 });
 
+
+_number_or_roll.forEach(_sect_object => {
+    const section=_sect_object.section;
+    const fields=_sect_object.fields;
+   
+    if (Array.isArray(fields)) {
+        fields.forEach(field => {
+            const input=`repeating_${section}_${field}`;
+            on(`change:repeating_${section}:${field}`, () => {
+                getAttrs([input], (value) => {
+                    const update={};
+                    const number=parseRoll(value[input]);
+                    update[input]=number;
+                    setAttrs(update,{silent:true},()=>{
+                    });
+                });
+            });
+        });
+    };
+});
+
+arrays['_sanity_loss'].forEach(sanity => {
+    on(`change:${sanity}`, () => {
+        getAttrs([`${sanity}`], (v) => {
+            const value= parseRoll(v[sanity]);
+            const update={};
+            update[sanity]=value;
+            setAttrs(update, {silent:true}, () => {
+               console.info(`Sanity points updated`); 
+            });
+        });    
+    });
+});

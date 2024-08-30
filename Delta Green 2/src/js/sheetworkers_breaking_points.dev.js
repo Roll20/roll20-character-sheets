@@ -60,23 +60,18 @@ on('change:breaking_point', function () {
     update['breaking_point'] = breaking_point;
     setAttrs(update, {
       silent: true
-    }, function () {
-      console.log('reset breaking points on change');
-    });
+    }, function () {});
   });
 });
 on('change:breaking_point_reset', function (eventInfo) {
   var breaking_point_reset = parseInt(eventInfo.newValue, 10) || 0;
   getAttrs(['breaking_point_reset'], function (values) {
     var breaking_point_reset = parseInt(values.breaking_point_reset, 10) || 0;
-    console.log(breaking_point_reset);
     var update = {};
     update['breaking_point_reset'] = Math.min(Math.max(0, breaking_point_reset), 99);
     setAttrs(update, {
       silent: true
-    }, function () {
-      console.log('reset breaking points on change');
-    });
+    }, function () {});
   });
 });
 on('clicked:breaking_point_resets', function () {

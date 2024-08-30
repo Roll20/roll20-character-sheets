@@ -1,175 +1,16 @@
 
 
-let _isInitialized = false;
 
-const setAttributes = (update, silent) => { 
-	(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
-};
-
-// === ATTRIBUTE ARRAYS
-	// note: I had the underscore in front of the arrays key to distinguish it from the name of the attribute
-const arrays = {
-		_stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
-		_derived_stats: ['hit_points', 'sanity_points', 'willpower_points', 'breaking_point'],
-		_derived_stats_max: ['hit_points_max', 'willpower_points_max', 'breaking_point_max'],
-		_hit_points: ['strength_score', 'constitution_score'],
-		_sanity_points: ['power_score'], //ALSO USED FOR BREAKING POINTS
-		_willpower_points: ['power_score'],
-		_toggles: ['settings'],
-		_sanity_loss: ['sanity_success', 'sanity_failure'],
-		_skills:['accounting', 'alertness', 'anthropology', 'archeology', 'art_1', 'art_2', 'artillery', 'athletics', 'bureaucracy', 'computer_science', 'craft_1', 'craft_2', 'criminology', 'demolitions', 'disguise', 'dodge', 'drive', 'firearms','first_aid', 'forensics', 'heavy_machinery', 'heavy_weapons', 'history', 'humint', 'law', 'medicine', 'melee_weapons', 'military_science_1', 'military_science_2', 'navigate', 'occult', 'persuade', 'pharmacy', 'pilot_1','pilot_2', 'psychotherapy','ride', 'science_1','science_2', 'search' , 'sigint' , 'stealth' , 'surgery' , 'survival', 'swim', 'unarmed_combat'],
-		_colored_derivative:['willpower','hit'],
-		_derived_rolls:['sanity_points','luck'],
-		_disorder_related:['sanity_points','breaking_point'],
-		_derived_modifiers:['willpower_points','low_willpower','zero_willpower'],
-		_settings_wp:[`mod_willpower_check`],	
-		_adaptation:['violence','helplessness'],
-		_editable_skills:['art_1','art_2','craft_1','craft_2','military_science_1','military_science_2','pilot_1','pilot_2','science_1','science_2'],
-		_weapon :["name", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo"],
-		_rituals : ['name','skill_span','unnatural_gain','study_time','sanity_loss_for_learning','activation_time','description','complexity'],
-		_personal_data : [
-			'profession',
-			'employer',
-			'occupation',
-			'nationality_and_residence',
-			'sex',
-			'age',
-			'education',
-			'personal_details_and_notes',
-			'developments_which_affect_home_and_family',
-			'description',
-			'physical_description',
-			'npc_sources',
-			'npc_remarks'],
-};
-
-const _initial_skills={'accounting': 10, 'alertness': 20, 'anthropology': 0, 'archeology': 0, 'art_1': 0, 
-	'art_2': '0', 'artillery': 0, 'athletics': 30, 'bureaucracy': 10, 'computer_science': 0,
-	 'craft_1': 0, 'craft_2': 0, 'criminology': 10, 'demolitions': 0, 'disguise': 10, 'dodge': 30, 
-	 'drive': 20, 'firearms': 20, 'first_aid': 10, 'forensics': 0, 'heavy_machinery': 10, 'heavy_weapons': 0,
-	 'history': 10, 'humint': 10, 'law': 0, 'medicine': 0, 'melee_weapons': 30, 'military_science_1': 0,
-	 'military_science_2': 0, 'navigate': 10, 'occult': 10, 'persuade': 20, 'pharmacy': 0, 'pilot_1': 0, 
-	 'pilot_2': 0, 'psychotherapy': 10, 'ride': 10, 'science_1': 0, 'science_2': 0, 'search': 20, 'sigint': 0,
-	  'stealth': '10', 'surgery': 0, 'survival': 10, 'swim': 20, 'unarmed_combat': 40,'unnatural': 0};
-
-
-const _repeating_sections={
-	'skill':'skills',
-	'bond':'bonds',
-	'special':'special',
-	'weapons':'weapons',
-	'ritual':'rituals'
-	};
-const _additional_repeating_sections={
-	
-	'pay_cost':'rituals',
-	'force_connection':'rituals',
-	'accept_failure':'rituals'};
-
-const _repeating_damages = [
-	'damage',
-	'damage_critical',
-	'lethality',
-	'lethality_critical',
-	'second_damage',
-	'second_damage_critical',
-	'selective_fire',
-	'selective_fire_critical',
-]
-
-const _repeating_ammo = [
-	'hasammo',
-	'ammo',
-	'ammo_total'
-]
-
-const _rd100 = `[[1d100]]`;
-const _rd4   = `[[1d4]]`;
-const _rd6   = `[[1d6]]`;
-const _rd8   = `[[1d8]]`;
-const _rd10  = `[[1d10]]`;
-const _rd12  = `[[1d12]]`;
-const _rd20  = `[[1d20]]`;
-const _queryModifier = `?{Modifier|0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}`;
-const prefix_skill_roll = `@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`; 
-const prefix_sanity_roll = `@{gm_toggle} &{template:fancy-sanloss} `;
-const prefix_damage_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}}`;
-const prefix_bond_roll = `@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[${_rd4}]]}}`; 
-const prefix_ritual_roll = `@{gm_toggle} &{template:fancy-rituals} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`;
-const prefix_ritualloss_roll = `@{gm_toggle} &{template:fancy-ritualloss} {{name=@{character_name}}} {{header=^{ritual cost}}}`;
- // check skill value for weapons and special training
- const isSkillNumber = (str) => {
-    let num=Number(str);
-    return !isNaN(num) && num>=0 && num<=99
-};
-
-
-// check if linking skill in in linking form
-const isStringInForm=(str)=> {
-    var regex = /^@\{[\w\s]+\}$/;
-    return regex.test(str);
-};
-
-// used for linking skills
-const cleanedSkill= (str) =>{return String(str).toLowerCase().replace(' ','_').replace('@{','').replace('}','')};
-
-// When the trigger comes from another call
-const isMinorityReport = (eventInfo) => !(eventInfo.hasOwnProperty('newValue'));
-
-
-// check if the format is the one of a linking skill
-const isValidSkill=(str)=> {
-    
-    const compar=cleanedSkill(String(str));
-    
-    return arrays['_skills'].concat(arrays['_stats']).concat(['unnatural','ritual_skill']).includes(compar);
-};
-
-on(`remove:repeating_skills`, (eventInfo) => {
-	
-});
-
-
-const isEmpty = (obj) => Object.keys(obj).length === 0 && obj.constructor === Object;
-
-const getSections = function(sectionDetails,callback){
-	let queueClone = _.clone(sectionDetails);
-	const worker = (queue,repeatAttrs=[],sections={})=>{
-	  let detail = queue.shift();
-	  console.log('in getSections',detail.section);
-	  getSectionIDs(detail.section,(IDs)=>{
-		sections[detail.section] = IDs;
-		IDs.forEach((id)=>{
-		  detail.fields.forEach((f)=>{
-			repeatAttrs.push(`${detail.section}_${id}_${f}`);
-		  });
-		});
-		repeatAttrs.push(`_reporder_${detail.section}`);
-		if(queue.length){
-		  worker(queue,repeatAttrs,sections);
-		}else{
-		  callback(repeatAttrs,sections);
-		}
-	  });
-	};
-	if(!queueClone[0]){
-	  callback([],{});
-	}else{
-	  worker(queueClone);
-	}
-  };
 
 // Update span on change
 const updateSkillSpanOnChange=(skill,value,update,isWhat) =>{
-    
-    
-	
+
 	const sectionDetails = [{section:'repeating_special', fields:['skill_or_stat_used']},
 		{section:'repeating_weapons',fields:['skill_percent']},
 		{section:'repeating_rituals',fields:['skill_percent']}];
 
 	getSections(sectionDetails,(attr)=>{
-		console.log(attr);
+		
 		const allskills1=attr.filter(el => el.startsWith(sectionDetails[0][`section`]) && el.endsWith(sectionDetails[0][`fields`][0]));
 		const allskills2=attr.filter(el => el.startsWith(sectionDetails[1][`section`]) && el.endsWith(sectionDetails[1][`fields`][0]));
 		const allskills3=attr.filter(el => el.startsWith(sectionDetails[2][`section`]) && el.endsWith(sectionDetails[2][`fields`][0]));
@@ -207,8 +48,8 @@ const updateSkillSpanOnChange=(skill,value,update,isWhat) =>{
 					}
 				}
 			setAttrs(update,{silent:true},()=>{
-				console.log(`update ${isWhat} on change`);
-				console.log(`update ${skill}  on change`);
+				
+				
 				
 			});
 		});
@@ -217,8 +58,6 @@ const updateSkillSpanOnChange=(skill,value,update,isWhat) =>{
 
     
 }
-
-
 const saneffects=(snew,sold,smax,bnew,bmax,bold,pow,trackbp) => {
     const san = value_current(snew,sold,smax);            
     const diffsan=san-sold;
@@ -228,9 +67,6 @@ const saneffects=(snew,sold,smax,bnew,bmax,bold,pow,trackbp) => {
     const flag_bp   = (san<=bnew && trackbp==1)  ? 1 : 0;    
     return {san2:flag_2san,temp:flag_temp,bp:flag_bp};
 };
-
-
-
 
 const definesanroll=(san,sold,bnew,bold,sanflags,character_name,San2_disorder={},Temp_disorder={}) => {
     const diffsan=san-sold;
@@ -301,50 +137,42 @@ const value_current = (current,old,max) => {
     }
     return Math.max(current,0);
 }
-   
-var addskills=[];	//name of the array
-const update_additionalskills= ()=>{
-    addskills=[];
-	var update={};
-    getSectionIDs('skills', (idarray) => {
-      addskills=idarray.map(id =>`repeating_skills_${id}`) ; 
-      console.log(addskills);  //log of debugging to be sure
-	  idarray.forEach(id=>{
-		update[`repeating_skills_${id}_${element}_action`] = `%{${character_id}|repeating_skills_${id}_${element}-action}`;			
-		update[`repeating_skills_${id}_skill_r`]=id;
-	  });
-	  setAttrs(update,{silent:true},()=>{
+
+
+_shotgun_or_blast_radius.forEach(main => {
+	other= _shotgun_or_blast_radius.filter(el => el == main);
+	
+	
+	on(`change:repeating_weapons:${main}`, (eventInfo) => {
+		id = eventInfo.sourceAttribute.split('_')[2];
+		const main_name=`repeating_weapons_${id}_${main}`;
+		const other_name=`repeating_weapons_${id}_${other}`;
+		const double_barrel_name=`repeating_weapons_${id}_hasDoubleBarrel`;
 		
-	  });
-    });
-};	
-
-
-const setMinMax = (skill, min, max) => {
-	const Iskill=parseInt(skill)||0;
-	return (Iskill < min) ? min : (Iskill > max) ? max : Iskill;
-};	
-
-const _shotgun_or_blast_radius =[`shotgun`,`blast_radius`];
-_shotgun_or_blast_radius.forEach(whichone => {
-	other= _shotgun_or_blast_radius.filter(el => el != whichone);
-	on(`change:repeating_weapons_${whichone}`, (eventInfo) => {
-		getAttrs([`repeating_weapons_${whichone}`,`repeating_weapons_${other}`], (values) => {
-			const whichone_value=values[`repeating_weapons_${whichone}`]==='active' ? 1 : 0;
-			const other_value=values[`repeating_weapons_${other}`]==='active' ? 1 : 0;
+		getAttrs([main_name,other_name], (values) => {
+			
+			console.info(values);
+			const main_value=values[main_name]==='active' ? 1 : 0;
 			const update={};
-			update[`repeating_weapons_${whichone}`]=whichone_value;
-			update[`repeating_weapons_${other}`]=other_value;
-			if (whichone===1 && other===1){
-				 update[`repeating_weapons_${other}`]=0;
+			
+			
+			
+			if (main_value===1 ){
+				if  (main==='shotgun'){
+					update[`repeating_weapons_${id}_blast_radius`]=0;
+					update[double_barrel_name]='active';
+				}else{
+					update[double_barrel_name]=0;
+					update[`repeating_weapons_${id}_shotgun`]=0;
+				}
 			}
-			if (whichone==='shotgun' && whichone_value===1){
-				update[`repeating_weapons_second_damage`]=1;
+			if (main_value===0){
+				update[double_barrel_name]=0;
 			}
 			
 			setAttrs(update,{silent:true},()=>{
 				console.log('Shotgun or Blast Radius updated');
-				console.info(update);	
+				
 			});
 		});
 	});
@@ -366,8 +194,6 @@ const setBondsLocalVariables = () => {
 		});
 	});
 };
-
-
 
 
 arrays['_adaptation'].forEach(adaptation => {
@@ -422,19 +248,27 @@ on(`change:repeating_skills:rank`, (eventInfo) => {
 });
 
 
-Object.entries(_repeating_sections).forEach(([element,section]) => {
+
+Object.entries(_repeating_sections).forEach(([attrName,section]) => {
 	on(`change:repeating_${section}`, (eventInfo) => {
 		const id = eventInfo.sourceAttribute.split('_')[2];
-		changeRepeatingRolls(section,element,id);
+		/*if (_repeating_exceptions.hasOwnProperty(section)){
+			const _array_to_check = _repeating_exceptions[section];
+			const _event_target = eventInfo.sourceAttribute;
+			const flag= _array_to_check.some(v=> _event_target.includes(v));
+			if (flag){
+				attrName= _repeating_exceptions[`weapons`].filter( v=>  eventInfo.sourceAttribute.includes(v))[0];
+				changeRepeatingExceptions(section,attrName);
+			} else {
+				console.log('no exceptions');
+				changeRepeatingRolls(section,attrName,id);
+			}
+		} else {
+			changeRepeatingRolls(section,attrName,id);
+		}*/
+		changeRepeatingRolls(section,attrName,id);
 	});
 });
-Object.entries(_additional_repeating_sections).forEach(([element,section]) => {
-	on(`change:repeating_${section}`, (eventInfo) => {
-		const id = eventInfo.sourceAttribute.split('_')[2];
-		changeRepeatingRolls(section,element,id);
-	});
-});	
-
 
 
 // new function to compute san point max
@@ -456,10 +290,9 @@ arrays['_stats'].forEach(stat => {
 		const _sanity_array=['sanity_points', 'breaking_point','initial_san'];
 		const _initial_hp=['initial_str','initial_con','initial_hp'];
 		on(`change:${stat_score}`, (eventInfo) => {
-			const value = parseInt(eventInfo.newValue) || 0;
 			var update = {};
 			getAttrs(arrays['_stats'].concat(_sanity_array,_initial_hp,['unnatural'],arrays['_stats'].map(el=> `${el}_score`)), function(v) {
-				
+				const value=parseInt(stat[stat_score],10) || 0;
 				update[stat]=value*5;
 				update[stat_score]=value;
 				if (stat==='power'){
@@ -550,74 +383,29 @@ on("change:repeating_skills:rank", function(eventInfo) {
 		}
 });
 
-// UPDATE THE VALUE OF THE BOND IN THE REPEATING SECTION WHEN CREATED
-on("change:repeating_bonds",function(){
-		getAttrs(["repeating_bonds_flag","charisma_score"],function(value){
-			if (value["repeating_bonds_flag"]==0){
-				let update={
-							repeating_bond_score:value["charisma_score"],
-							repeating_bond_flag:1
-							};
-				setAttributes(update,true);
-			}
-		});
+on('change:advanced_weapons',()=>{
+    updateadvancedweapons()
 });
 
 
 
-// CHECK IF DAMAGE OR LETHALITY EXISTS
-on("change:repeating_weapons",function(){
-		getAttrs(['repeating_weapons_damage','repeating_weapons_lethality_percent'],function(value){
-			let update={};
-			if (value['repeating_weapons_damage']===""){
-				update['repeating_weapons_hasdamage']=0;
-			}else{
-				update['repeating_weapons_hasdamage']=1;
-			}
+const updateadvancedweapons = () => {
+	getAttrs(['advanced_weapons'],(v)=>{
+		const advanced_weapons=v['advanced_weapons'];
+		getSectionIDs('repeating_weapons',(ids)=>{
+		
+			const update={};
+		
+			const prefix='repeating_weapons_';
+		
 			
-			if (value['repeating_weapons_lethality_percent']>0){
-				update['repeating_weapons_haslethality']=1;
-			}else{
-				update['repeating_weapons_haslethality']=0;
-			}
-			setAttributes(update,true);
+			ids.forEach((id)=>{
+				update[prefix+id+'_hasAdvancedWeapons']=advanced_weapons;
+				arrays['_advanced_weapons_featurs'].forEach((feat)=>{
+					update[prefix+id+'_'+feat]=0;
+				});
+			});
+			setAttrs(update,{silent:true});
 		});
-});
-	
-
-
-on("change:sanity_success change:sanity_failure",function(){
-	   getAttrs(['sanity_success', 'sanity_failure'], function(v) {
-			let maxsan=v.sanity_failure;
-			let minsan=v.sanity_success;
-			let update={};
-			maxsan="("+maxsan+")";
-			minsan="("+minsan+")";
-			var m1 = minsan.toLowerCase().replace(/[\\+\\-\\*\\/]/gi,"$&").replace(/[dD](\s?\d+[.,]?\d*)/gi,'').replace(/[\\+\\-\\*\\/]/gi,")$&(");
-			var m2 = maxsan.toLowerCase().replace(/[\\+\\-\\*\\/]/gi,")$&(").replace(/[dD]/gi,'*');
-			update['maxsanloss']=Function('"use strict";return (' + m2 + ')')();
-			update['minsanloss']=Function('"use strict";return (' + m1 + ')')();
-			console.log(m1);
-			console.log(m2);
-			setAttributes(update,true);
-		});
-});
-// Create array with list of repeating skills
-const elementid_off= (element) =>{
-	var element=document.getElementById(element);
-	element.style.display="none";
+	});
 };
-// Create array with list of repeating skills
-const elementid_on= (element) =>{
-	var element=document.getElementById(element);
-	element.style.display="block";
-};
-
-on(`change:testjsid`,(eventInfo)=>{
-	const value=eventInfo.newValue;
-	if (value == 'on') {
-		elementid_off("personal_data");
-	}else{
-		elementid_on("personal_data");
-	}
-});

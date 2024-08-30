@@ -1,0 +1,3672 @@
+
+// === ATTRIBUTE ARRAYS
+	// note: I had the underscore in front of the arrays key to distinguish it from the name of the attribute
+    const arrays = {
+		_stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
+		_derived_stats: ['hit_points', 'sanity_points', 'willpower_points', 'breaking_point'],
+		_derived_stats_max: ['hit_points_max', 'willpower_points_max', 'breaking_point_max'],
+		_hit_points: ['strength_score', 'constitution_score'],
+		_sanity_points: ['power_score'], //ALSO USED FOR BREAKING POINTS
+		_willpower_points: ['power_score'],
+		_toggles: ['settings'],
+		_sanity_loss: ['sanity_success', 'sanity_failure'],
+		_skills:['accounting', 'alertness', 'anthropology', 'archeology', 'art_1', 'art_2', 'artillery', 'athletics', 'bureaucracy', 'computer_science', 'craft_1', 'craft_2', 'criminology', 'demolitions', 'disguise', 'dodge', 'drive', 'firearms','first_aid', 'forensics', 'heavy_machinery', 'heavy_weapons', 'history', 'humint', 'law', 'medicine', 'melee_weapons', 'military_science_1', 'military_science_2', 'navigate', 'occult', 'persuade', 'pharmacy', 'pilot_1','pilot_2', 'psychotherapy','ride', 'science_1','science_2', 'search' , 'sigint' , 'stealth' , 'surgery' , 'survival', 'swim', 'unarmed_combat'],
+		_colored_derivative:['willpower','hit'],
+		_derived_rolls:['sanity_points','luck'],
+		_disorder_related:['sanity_points','breaking_point'],
+		_derived_modifiers:['willpower_points','low_willpower','zero_willpower'],
+		_settings_wp:[`mod_willpower_check`],	
+		_adaptation:['violence','helplessness'],
+		_editable_skills:['art_1','art_2','craft_1','craft_2','military_science_1','military_science_2','pilot_1','pilot_2','science_1','science_2'],
+		_weapon :["name", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo"],
+		_rituals : ['name','skill_span','unnatural_gain','study_time','sanity_loss_for_learning','activation_time','description','complexity'],
+		_personal_data : [
+			'profession',
+			'employer',
+			'occupation',
+			'nationality_and_residence',
+			'sex',
+			'age',
+			'education',
+			'personal_details_and_notes',
+			'developments_which_affect_home_and_family',
+			'description',
+			'physical_description',
+			'npc_sources',
+			'npc_remarks'],
+};
+
+const _initial_skills={'accounting': 10, 'alertness': 20, 'anthropology': 0, 'archeology': 0, 'art_1': 0, 
+	'art_2': '0', 'artillery': 0, 'athletics': 30, 'bureaucracy': 10, 'computer_science': 0,
+	 'craft_1': 0, 'craft_2': 0, 'criminology': 10, 'demolitions': 0, 'disguise': 10, 'dodge': 30, 
+	 'drive': 20, 'firearms': 20, 'first_aid': 10, 'forensics': 0, 'heavy_machinery': 10, 'heavy_weapons': 0,
+	 'history': 10, 'humint': 10, 'law': 0, 'medicine': 0, 'melee_weapons': 30, 'military_science_1': 0,
+	 'military_science_2': 0, 'navigate': 10, 'occult': 10, 'persuade': 20, 'pharmacy': 0, 'pilot_1': 0, 
+	 'pilot_2': 0, 'psychotherapy': 10, 'ride': 10, 'science_1': 0, 'science_2': 0, 'search': 20, 'sigint': 0,
+	  'stealth': '10', 'surgery': 0, 'survival': 10, 'swim': 20, 'unarmed_combat': 40,'unnatural': 0};
+
+
+const _repeating_sections={
+	'skill':'skills',
+	'bond':'bonds',
+	'special':'special',
+	'weapons':'weapons',
+	'ritual':'rituals'
+	};
+const _additional_repeating_sections={
+	
+	'pay_cost':'rituals',
+	'force_connection':'rituals',
+	'accept_failure':'rituals'};
+
+const _repeating_damages = [
+	'damage',
+	'damage_critical',
+	'lethality',
+	'lethality_critical',
+	'double_barrel',
+	'double_barrel_critical',
+	'selective_fire',
+	'selective_fire_critical',
+]
+
+const _repeating_ammo = [
+	'hasammo',
+	'ammo',
+	'ammo_total'
+]
+
+const _rd100 = `[[1d100]]`;
+const _rd4   = `[[1d4]]`;
+const _rd6   = `[[1d6]]`;
+const _rd8   = `[[1d8]]`;
+const _rd10  = `[[1d10]]`;
+const _rd12  = `[[1d12]]`;
+const _rd20  = `[[1d20]]`;
+const _INHUMAN_STAT_ = 100;
+const _criticals=[1,11,22,33,44,55,66,77,88,99,100];
+const _queryModifier = `?{Modifier|0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}`;
+const prefix_skill_roll = `@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`; 
+const prefix_sanity_roll = `@{gm_toggle} &{template:fancy-sanloss} `;
+const prefix_damage_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}}`;
+const prefix_bond_roll = `@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[${_rd4}]]}}`; 
+const prefix_ritual_roll = `@{gm_toggle} &{template:fancy-rituals} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`;
+const prefix_ritualloss_roll = `@{gm_toggle} &{template:fancy-ritualloss} {{name=@{character_name}}} {{header=^{ritual cost}}}`;
+ 
+
+const _shotgun_or_blast_radius =[`shotgun`,`blast_radius`];
+const _alldamages=['damage','damage_critical','double_barrel','double_barrel_critical',
+	'lethality','lethality_critical','selective_fire','selective_fire_critical'
+];
+const _npc_san_losses=['sanity_success','sanity_failure'];
+const _ritual_losses=['pay_cost','force_connection','accept_failure'];
+const _allrolls=arrays['_derived_rolls'].concat(arrays[`_stats`],arrays[`_skills`],['unnatural','sanity_loss']);
+
+const RitualCosts   = ['sanity_loss_low','sanity_loss_high',
+    'willpower_points_cost','power_score_cost','hit_points_cost',
+    'strength_score_cost','constitution_score_cost',
+    'dexterity_score_cost','intelligence_score_cost',
+    'charisma_score_cost'];
+
+const CurrentValues = ['sanity_points',
+    'willpower_points','power_score','hit_points',
+    'strength_score','constitution_score',
+    'dexterity_score','intelligence_score',
+    'charisma_score'];
+
+const RitualRolls   = ['name','skill_span','unnatural_gain',
+    'study_time','sanity_loss_for_learning','activation_time',
+    'description','complexity','flawed_ritual'];
+
+const RitualDamages = ['damage_target_stat','attack_amount','damage_isLethal'];
+const RitualHeals   = ['health_target_stat','health_amount','health_isLethal'];
+
+const _ritualInfo=[
+    'complexity',
+    'activation_time',
+    'activation_time_unit',
+    'study_time',
+    'study_time_unit',
+    'unnatural_gain',
+    'sanity_loss_for_learning',
+    'willpower_points_cost',
+    'power_score_cost',
+    'hit_points_cost',
+    'strength_score_cost',
+    'constitution_score_cost',
+    'dexterity_score_cost',
+    'intelligence_score_cost',
+    'charisma_score_cost',
+    'sanity_loss_low',
+    'sanity_loss_high'
+]
+
+const selector='button.roll';
+const sanity_selector='button.sanroll';
+
+let _globalModifier = 0;
+const setWeaponOptions = ({modifier=0,wp_mod={low_willpower:0,zero_willpower:0},hasLethality=0,hasDamage=0,damage='',rating=0,lethality=0,hasAdvancedWeapons=0,isShotgun=0,	hasDoubleBarrel=0,hasSelectiveFire=0,hasAccessories=0,hasBlastRadius=0,	trackAmmo=0,current_ammo=0,double_barrel='',selfire_lethality=0,selfire_type='',accessory_modifier=0,accessory_name='',isSkill=1}) => {
+	const _hasAdvancedWeapons=hasAdvancedWeapons;
+	const _hasLethality= hasLethality;
+	const _hasDamage=hasDamage;
+	const _trackAmmo=trackAmmo;
+	const _rating=rating;
+	const _isSkill=isSkill;
+	const _modifier=modifier;
+	const _wp_mod=wp_mod;
+	var _isShotgun=0;
+	var _hasDoubleBarrel=0;
+	var _hasSelectiveFire=0;
+	var _hasAccessories=0;
+	var _hasBlastRadius=0;
+	var _double_barrel=double_barrel;
+	var _selfire_lethality=selfire_lethality;
+	var _selfire_type=selfire_type;
+	var _selfire_ammo=0;
+	var _current_ammo=0;
+	var _accessory_modifier=accessory_modifier;
+	var _accessory_name=(accessory_name==='') ? '^{accessory}' : accessory_name;
+	
+	var _damage='';
+	var _lethality=0;
+	var _low_willpower=0;
+	var _zero_willpower=0;
+	if (_wp_mod.hasOwnProperty('low_willpower')) { _low_willpower=_wp_mod.low_willpower; }
+	if (_wp_mod.hasOwnProperty('zero_willpower')) { _zero_willpower=_wp_mod.zero_willpower; }
+
+
+	if (_hasDamage==1) { _damage=damage; }
+	if (_hasLethality==1) { _lethality=lethality; }
+
+	if (_hasAdvancedWeapons==1) {
+	_isShotgun=isShotgun;
+	_hasDoubleBarrel=hasDoubleBarrel;
+	_hasSelectiveFire=hasSelectiveFire;
+	_hasAccessories=hasAccessories;
+	_hasBlastRadius=hasBlastRadius;
+	}
+	if (track_bullets==1) { _has_ammo=has_ammo; }
+	if (hasDoubleBarrel==1) { _double_barrel=double_barrel; }
+	if (hasSelectiveFire==1) { 
+		_selfire_lethality=selfire_lethality;
+		_selfire_type=selfire_type;
+		_selfire_ammo=getRollDamage(selfire_type);
+	 }
+	if (hasAccessories==1) { _accessory_modifier=accessory_modifier; _accessory_name=accessory_name; }
+	return { hasLethality: _hasLethality,lethality: _lethality, isSkill: _isSkill, rating: _rating,
+		hasDamage: _hasDamage,damage: _damage,
+		isShotgun: _isShotgun,hasDoubleBarrel: _hasDoubleBarrel,
+		hasSelectiveFire: _hasSelectiveFire,hasAccessories: _hasAccessories,hasBlastRadius: _hasBlastRadius,
+	trackAmmo: _trackAmmo,current_ammo: _current_ammo, double_barrel: _double_barrel,
+	selfire_lethality: _selfire_lethality, selfire_tyle: _selfire_type, selfire_ammo: _selfire_ammo,
+	accessory_modifier: _accessory_modifier,
+	accessory_name: _accessory_name,hasAdvancedWeapons: _hasAdvancedWeapons,
+	zero_willpower: _zero_willpower, low_willpower: _low_willpower, modifier: _modifier
+};
+};
+
+const setDiceSection = (charid,repsecid,use_=true) => {
+	// Input:
+	// charid is the character id
+	// repsecid is the repeating section id
+	// Output:
+	// ](~<charid>|<repsecid>_
+	return '](~'+ character_id +'|'+repsecid+ (use_) ? '_' : '';
+}
+
+const setAdvancedWeaponsString = (options,character_id,repsecid) => {
+	var advancedWeaponsString='';
+	const dice_section = setDiceSection(character_id,repsecid);
+	const nothing_section = setDiceSection(character_id,'nothing)}}',false);
+
+	if (options.hasAdvancedWeapons===1) {
+		if (options.isShotgun===1) {advancedWeaponsString +=  '{{shotgun=[[1]]}}';}
+		if (options.hasDoubleBarrel===1) {
+			if (options.double_barrel != '') {
+				advancedWeaponsString +=  '{{double_barrel=['+options.double_barrel+dice_section+'double_barrel)}}';
+				advancedWeaponsString +=  '{{voiddouble_barrel=['+options.double_barrel+nothing_section;
+				advancedWeaponsString +=  '{{double_barrel_critical=[('+options.double_barrel+')×2'+dice_section+'double_barrel_critical)}}';
+				advancedWeaponsString +=  '{{voiddouble_barrel_critical=[('+full_options.double_barrel+')×2'+nothing_section;
+			}
+		}
+		if (options.hasSelectiveFire===1) {
+			if (options.selfire_lethality>0) {
+				const critical_selfire_lethality=options.selfire_lethality*2;
+				
+				advancedWeaponsString +=  '{{selective_fire=[' + options.selfire_type;
+				advancedWeaponsString +=  '('+options.selfire_lethality + '%)'+dice_section+'selective_fire)}}';
+
+				advancedWeaponsString +=  '{{voidselective_fire=[' + options.selfire_type;
+				advancedWeaponsString +=  '(' + options.selfire_lethality + '%)'+nothing_section;
+
+				advancedWeaponsString +=  '{{selective_fire_critical=[' + options.selfire_type;
+				advancedWeaponsString +=  '(' + critical_selfire_lethality + '%)'+dice_section+'selective_fire_critical)}}';
+				advancedWeaponsString +=  '{{voidselective_fire_critical=[' + options.selfire_type;
+				advancedWeaponsString +=  '(' + critical_selfire_lethality + '%)'+nothing_section;
+			}
+			
+			if (options.selfire_ammo>=options.current_ammo && options.trackAmmo==1) {
+				advancedWeaponsString +=  '{{selfire_noammo=1}}';
+			}else{
+				advancedWeaponsString +=  '{{selfire_wammo=0}}';
+			}
+		}
+		if (options.hasAccessories===1) {
+			advancedWeaponsString +=  '{{accessories=[[1]]}}';
+	
+			advancedWeaponsString +=  '{{accessory_name=' + options.accessory_name + '}}';
+			advancedWeaponsString +=  '{{accessory_modifier=[[' + options.accessory_modifier + ']]}}';
+		}
+		if (options.hasBlastRadius===1) {
+			advancedWeaponsString +=  '{{blast_radius=[[1]]}}';
+		}
+	}	
+
+	
+	if (options.trackAmmo) {
+		advancedWeaponsString += '{{trackbullets=1}}';
+		advancedWeaponsString += '{{current_ammo=' + values['ammo'] + '}}';
+		if (current_ammo>0) {
+			advancedWeaponsString += '{{noammo=1}}';
+		}else{
+			advancedWeaponsString += '{{wammo=0}}';
+		}
+	} else {
+		advancedWeaponsString +- '{{wammo=0}}';
+	}
+
+
+	if (options.hasDamage==1) {
+		
+		advancedWeaponsString += '{{damage= ['+options.damage+dice_section+'damage)}}';
+		advancedWeaponsString += '{{voiddamage= ['+options.damage+nothing_section;
+		
+		advancedWeaponsString += '{{damage_critical= [('+options.damage+')×2'+options.damage+'damage_critical)}}';
+		advancedWeaponsString += '{{voiddamage_critical= [('+options.damage+')×2'+nothing_section;
+	}
+	if (options.hasLethality==1) {
+		const critical_lethality=full_lethality*2;
+		advancedWeaponsString += '{{lethality= ['+options.lethality+'%'+dice_section+'lethality)}}';
+		advancedWeaponsString += '{{voidlethality= ['+full_lethality+'%'+nothing_section;
+
+		advancedWeaponsString += '{{lethality_critical= ['+critical_lethality+'%'+dice_section+'lethality_critical)}}';
+		advancedWeaponsString += '{{voidlethality_critical= ['+critical_lethality+'%' + nothing_section;
+	}
+
+
+	return advancedWeaponsString;
+}
+
+
+const check_for_wp_modifiers = (values,roll) => {
+	console.log('wp: '+values['willpower_points']);
+	console.log('low wp: '+values['low_willpower']);
+	console.log('zero wp: '+values['zero_willpower']);
+	
+	const _willpower_points = parseInt(values[`willpower_points`]) || 0;
+	const _zero_willpower = (values[`zero_willpower`]== 1 && _willpower_points== 0 && roll !== 'luck') ? '[[1]]' : '[[0]]';
+	const _low_willpower  = (values[`low_willpower`] == 1 && _willpower_points <= 2 && _willpower_points>0 && roll !== 'luck' && roll !== 'sanity_points') ? '[[1]]' : '[[0]]';
+	
+	console.log(`zero willpower: ${_zero_willpower}`);
+	console.log(`low willpower: ${_low_willpower}`);
+	return {zero_willpower: _zero_willpower, low_willpower: _low_willpower};
+};
+
+
+const check_success= (dice,rating,isSkill=1) => {
+	// Input:
+	// dice is the result of the roll
+	// rollName is the name of the skill or stat
+	// rollFail used only for stats to check for failure
+	// rating is the rating of the skill or stat
+	// isSkill is the flag to check if it's a skill or a stat [0,1]
+
+	var isSuccess=0;
+	var isCritical=0;
+
+	if (dice==100){ // 100 is always a fumble
+		isCritical=1;
+		isSuccess=0;
+	} else { // check for criticals normally
+		isSuccess = dice<=rating ? 1 : 0;
+		isCritical = _critical.includes(dice) ? 1 : 0;			
+	}
+
+	const isInhuman=(isSkill==0 && rating>=_INHUMAN_STAT_);
+	const isNormalSuccess=(isSuccess==1 && isCritical==0);
+
+	if (isInhuman && isNormalSuccess){ // special case for stats to evaluate criticals
+		const score=Math.round(rating/5);
+		isCritical = (dice<=score) ? 1 : 0;
+	}
+
+	return {isSuccess:isSuccess,isCritical:isCritical};
+
+};
+
+const check_weapon_modifiers = (options) => { 
+	const advanced_weapons = options.hasAdvancedWeapons;
+	var modifier = options.modifier;
+	const low_willpower = options.low_willpower;
+	if (advanced_weapons==0) { return correct_modifier(modifier,low_willpower) ;}
+	
+	if (options.isShotgun==1 || options.hasBlastRadius==1){ modifier+=20;}
+	if (options.hasAccessories==1){modifier+=options.accessory_modifier;}
+	return correct_modifier(modifier,low_willpower);	
+}
+
+const correct_modifier = (modifier,low_willpower,limit_to_40=1) => {
+	// Input:
+	// modifier is the base modifier provided by the used
+	// low_willpowe is the  low willpower flag [0,1]
+	// limit_to_40 is the flag to limit the upper bound modifier to 40% (not used but for future and debugging) [0,1]
+	// Output:
+	// the corrected modifier
+	var corrected_modifier=modifier - (20*low_willpower);
+	return limit_to_40==1 ? Math.min(40,corrected_modifier) : corrected_modifier;
+}
+const correct_rating = (rating,modifier,limit_to_99=1) => {
+	// Input:
+	// rating is the base rating of the skill
+	// modifier is the corrected modifier
+	// limit_to_99 is the flag to limit the upper bound rating to 99% (0 for inhuman stats) [0,1]
+	// Output:
+	// the corrected rating
+	var corrected_rating=rating+modifier;
+	return limit_to_99==1 ? Math.min(99,corrected_rating) : corrected_rating;
+}
+
+const check_sanloss = (sanloss,element) => {
+	console.log('element: '+element);
+	console.log('sanloss: '+sanloss);
+	if (element==='sanity_success'){
+		console.log('sanity_success');
+		return sanloss=='' ? 0 : sanloss;
+	} else if(element==='sanity_failure'){ 
+		console.log('sanity_failure');
+		return sanloss=='' ? 1 : sanloss;
+	}
+};
+
+const check_track_ammo=(rollString,trackAmmo,currentAmmo,used_ammo=1) => {
+	if (trackAmmo==1) {
+		rollString = `${rollString} {{trackbullets=[[1]]}} {{used_ammo=[[${used_ammo}]]}}`;
+		rollString = `${rollString} {{current_ammo=[[${currentAmmo}]]}}`;
+	} else {
+		rollString = `${rollString} {{trackbullets=[[0]]}}`;
+	}
+	return rollString;
+};
+
+const getUsedAmmo=(selfire_type='') => {
+	if (selfire_type==='short burst'){return 3} ;
+	if (selfire_type==='long burst'){return 5} ;
+	if (selfire_type==='short spray'){return 10} ;
+	if (selfire_type==='long spray'){return 20} ;
+	return 1;
+}
+
+const need_to_track_ammo = (_values,_names)=>{
+	const track_bullets=_values[_names['track_bullets']]==='active' ? 1 : 0;
+	const hasammo=_values[_names['hasammo']]==='active' ? 1 : 0;
+	return (track_bullets==1 && hasammo==1) ? 1 : 0;
+}
+
+const get_effective_damage = (value) => {
+	var effective_damage='';
+	if (value==='' || parseInt(value)===0){ return effective_damage};
+	return effective_damage= value;
+}
+
+
+let _isInitialized = false;
+
+const setAttributes = (update, silent) => { 
+	(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
+};
+
+// check skill value for weapons and special training
+ const isSkillNumber = (str) => {
+    let num=Number(str);
+    return !isNaN(num) && num>=0 && num<=99
+};
+
+
+// check if linking skill in in linking form
+const isStringInForm=(str)=> {
+    var regex = /^@\{[\w\s]+\}$/;
+    return regex.test(str);
+};
+
+// used for linking skills
+const cleanedSkill= (str) =>{return String(str).toLowerCase().replace(' ','_').replace('@{','').replace('}','')};
+
+// When the trigger comes from another call
+const isMinorityReport = (eventInfo) => !(eventInfo.hasOwnProperty('newValue'));
+
+
+// check if the format is the one of a linking skill
+const isValidSkill=(str)=> {
+    
+    const compar=cleanedSkill(String(str));
+    
+    return arrays['_skills'].concat(arrays['_stats']).concat(['unnatural','ritual_skill']).includes(compar);
+};
+
+const isEmpty = (obj) => Object.keys(obj).length === 0 && obj.constructor === Object;
+
+const getSections = function(sectionDetails,callback){
+	let queueClone = _.clone(sectionDetails);
+	const worker = (queue,repeatAttrs=[],sections={})=>{
+	  let detail = queue.shift();
+	  console.log('in getSections',detail.section);
+	  getSectionIDs(detail.section,(IDs)=>{
+		sections[detail.section] = IDs;
+		IDs.forEach((id)=>{
+		  detail.fields.forEach((f)=>{
+			repeatAttrs.push(`${detail.section}_${id}_${f}`);
+		  });
+		});
+		repeatAttrs.push(`_reporder_${detail.section}`);
+		if(queue.length){
+		  worker(queue,repeatAttrs,sections);
+		}else{
+		  callback(repeatAttrs,sections);
+		}
+	  });
+	};
+	if(!queueClone[0]){
+	  callback([],{});
+	}else{
+	  worker(queueClone);
+	}
+  };
+
+// Update span on change
+const updateSkillSpanOnChange=(skill,value,update,isWhat) =>{
+
+	const sectionDetails = [{section:'repeating_special', fields:['skill_or_stat_used']},
+		{section:'repeating_weapons',fields:['skill_percent']},
+		{section:'repeating_rituals',fields:['skill_percent']}];
+
+	getSections(sectionDetails,(attr)=>{
+		console.log(attr);
+		const allskills1=attr.filter(el => el.startsWith(sectionDetails[0][`section`]) && el.endsWith(sectionDetails[0][`fields`][0]));
+		const allskills2=attr.filter(el => el.startsWith(sectionDetails[1][`section`]) && el.endsWith(sectionDetails[1][`fields`][0]));
+		const allskills3=attr.filter(el => el.startsWith(sectionDetails[2][`section`]) && el.endsWith(sectionDetails[2][`fields`][0]));
+		
+		const allids1= allskills1.map(el => el.replace(`_${sectionDetails[0][`fields`][0]}`,''));
+		const allids2= allskills2.map(el => el.replace(`_${sectionDetails[1][`fields`][0]}`,''));
+		const allids3= allskills3.map(el => el.replace(`_${sectionDetails[2][`fields`][0]}`,''));
+		const len1=allids1.length;
+		const len2=allids2.length;
+		const len3=allids3.length;
+		
+		
+		
+		
+		
+		
+		getAttrs(allskills1.concat(allskills2).concat(allskills3),(v)=>{
+				
+			for (i=0;i<len1; i++){
+				if (cleanedSkill(v[allskills1[i]])===skill){
+					update[`${allids1[i]}_skill_span`]=value;
+				}
+				
+			}
+
+			for (i=0;i<len2; i++){
+			if (cleanedSkill(v[allskills2[i]])===skill){
+					update[`${allids2[i]}_skill_span`]=value;
+				}
+			}
+
+			for (i=0;i<len3; i++){
+				if (cleanedSkill(v[allskills3[i]])===skill){
+						update[`${allids3[i]}_skill_span`]=value;
+					}
+				}
+			setAttrs(update,{silent:true},()=>{
+				console.log(`update ${isWhat} on change`);
+				console.log(`update ${skill}  on change`);
+				
+			});
+		});
+
+	});
+
+    
+}
+const saneffects=(snew,sold,smax,bnew,bmax,bold,pow,trackbp) => {
+    const san = value_current(snew,sold,smax);            
+    const diffsan=san-sold;
+
+    const flag_2san = (diffsan>=2) ? 1 : 0;
+    const flag_temp = (diffsan>=5) ? 1 : 0;
+    const flag_bp   = (san<=bnew && trackbp==1)  ? 1 : 0;    
+    return {san2:flag_2san,temp:flag_temp,bp:flag_bp};
+};
+
+const definesanroll=(san,sold,bnew,bold,sanflags,character_name,San2_disorder={},Temp_disorder={}) => {
+    const diffsan=san-sold;
+    const flag_2san=(sanflags.san2 && !(isEmpty(San2_disorder)));
+    const flag_temp=sanflags.temp;
+    const flag_bp=sanflags.bp;
+
+    var rollString=`&{template:fancy-rolls} {{name=${character_name}}} {{header=^{sanity_loss}}} `;
+    rollString= `${rollString} {{sanity_loss=[[${diffsan}]]}} {{sanity_new=[[${san}]]}}`;
+    rollString= `${rollString} {{sanity_old=[[${sold}]]}} {{bp_old=[[${bold}]]}} {{bp_new=[[${bnew}]]}}`;
+    
+    if (flag_bp == 1){
+        rollString= `${rollString} {{flag_bp=1}} `;
+    }
+    if (flag_temp==1){
+        rollString=`${rollString} {{flag_temp=1}}`;
+        if (!(isEmpty(Temp_disorder))){
+            Object.entries(Temp_disorder).forEach(([key,val],index)=>{
+                rollString= `${rollString} {{tdis_name${index}=${key}}} {{tdis_desc${index}=${val}}} `;
+            });
+        }
+    }    
+
+    if (flag_2san==1){
+        rollString=`${rollString} {{flag_2san=1}}`;
+        if (!(isEmpty(Temp_disorder))){
+            Object.entries(Temp_disorder).forEach(([key,val],index)=>{
+                rollString= `${rollString} {{tdis_name${index}=${key}}} {{tdis_desc${index}=${val}}} `;
+            });
+        }
+    }   
+    
+
+    var update={};    
+    update['sanity_points']=san;
+    update['sanity_points_old']=sold;
+    if (flag_bp==='on'){
+        update['breaking_point']=Math.max(0,san-pow);
+        update['breaking_point_max']=bold;
+        update['breaking_point_old']==Math.max(0,san-pow);
+    }
+
+    
+    setAttrs(update, {silent:true},()=>{
+        
+    });
+
+    startRoll(`${rollValue} {{isSkill=[[${_isSkill}]]}}`, (results)=> {
+        const sanity_old=results.results.sanity_old.result;
+        const sanity_new=results.results.sanity_new.result;
+        const sanity_loss=results.results.sanity_loss.result;
+        const bp_old=results.results.bp_old.result;
+        const bp_new=results.results.bp_new.result;
+
+        
+        
+		finishRoll(results.rollId,{});
+
+    });
+ 
+}
+
+
+const value_current = (current,old,max) => {
+	
+    if (current>=max) {
+        return (current<=old) ? current : old;
+    }
+    return Math.max(current,0);
+}
+   
+const update_additionalskills= ()=>{
+    addskills=[];
+	var update={};
+    getSectionIDs('skills', (idarray) => {
+      addskills=idarray.map(id =>`repeating_skills_${id}`) ; 
+      console.log(addskills);  //log of debugging to be sure
+	  idarray.forEach(id=>{
+		update[`repeating_skills_${id}_${element}_action`] = `%{${character_id}|repeating_skills_${id}_${element}-action}`;			
+		update[`repeating_skills_${id}_skill_r`]=id;
+	  });
+	  setAttrs(update,{silent:true},()=>{
+		
+	  });
+    });
+};	
+
+
+const setMinMax = (skill, min=0, max=99) => {
+	const IntegerSkill=parseInt(skill)||0;
+	if (min>max) {return IntegerSkill}
+	return Math.min(Math.max(IntegerSkill,min),max);
+};	
+
+_shotgun_or_blast_radius.forEach(main => {
+	other= _shotgun_or_blast_radius.filter(el => el == main);
+	console.log('main:',main);	
+	console.log('other:',other);
+	on(`change:repeating_weapons:${main}`, (eventInfo) => {
+		id = eventInfo.sourceAttribute.split('_')[2];
+		const main_name=`repeating_weapons_${id}_${main}`;
+		const other_name=`repeating_weapons_${id}_${other}`;
+		const double_barrel_name=`repeating_weapons_${id}_hasDoubleBarrel`;
+		
+		getAttrs([main_name,other_name], (values) => {
+			console.log('Shotgun or Blast Radius changed');
+			console.info(values);
+			const main_value=values[main_name]==='active' ? 1 : 0;
+			const update={};
+			console.log(`${main_name} value:`,main_value);
+			console.log(`${other_name} value:`,values[other_name]);
+			console.log(`${double_barrel_name} value:`,values[double_barrel_name]);
+
+			console.info('Shotgun or Blast Radius updated',update);
+			
+			if (main_value===1 ){
+				if  (main_name==='shotgun'){
+					update[`repeating_weapons_${id}_blast_radius`]=0;
+					update[double_barrel_name]='active';
+				}else{
+					update[double_barrel_name]=0;
+					update[`repeating_weapons_${id}_shotgun`]=0;
+				}
+			}
+			
+			setAttrs(update,{silent:true},()=>{
+				console.log('Shotgun or Blast Radius updated');
+				console.info(update);	
+			});
+		});
+	});
+});
+
+const setBondsLocalVariables = () => {
+	getAttrs(["willpower_points","sanity_points"],function(value){
+		let update={};
+		getSectionIDs("bonds",function(idarray){
+			idarray.forEach(id=>{
+				update["repeating_bonds_"+id+"_wp_points"]=value["willpower_points"];
+				update["repeating_bonds_"+id+"_sanity_points"]=value["sanity_points"];
+			});
+			console.log('inside repeating section');
+			
+			setAttrs(update,{silent:true},()=>{
+				console.log('Bonds updated on open');
+			});	
+		});
+	});
+};
+
+
+arrays['_adaptation'].forEach(adaptation => {
+	console.log('adaptation:',adaptation);
+	on('change:'+adaptation, () => {
+		getAttrs([adaptation], (values) => {
+			console.log('values:',values);
+			const value=parseInt(values[adaptation]) || 0;
+			console.log('adaptation changed:'+value);
+			const update={};
+			update[`${adaptation}_adapted`]= value===2 ? 1 : 0;
+			setAttrs(update, {silent:true}, () => {
+				update[`${adaptation}_adapted`] == 1 ? console.log(`${adaptation} adapted`) : console.log(`${adaptation} not adapted`);
+			});
+		});
+	});
+});	
+
+arrays['_settings_wp'].forEach(wp_setting => {
+	on(`change:${wp_setting}`, (eventInfo) => {
+		console.log('wp_setting changed:'+eventInfo.triggerName);
+		getAttrs(arrays['_settings_wp'].concat(arrays['_derived_modifiers']), (values) => {
+			var update = {};
+			if (values['mod_willpower_check'] === 'none'){
+				update[`low_willpower`] = 0;
+				update[`zero_willpower`] = 0;
+			}
+			if (values['mod_willpower_check'] === 'lowonly'){
+				update[`zero_willpower`] = 0;
+				update[`low_willpower`] = 1;
+			}
+			if (values['mod_willpower_check'] === 'all'){
+				update[`low_willpower`] = 1;
+				update[`zero_willpower`] = 1;
+			}
+			
+			setAttrs(update, {silent:true}, () => {
+				console.log('Willpower Settings updated');
+			});
+		});
+	});
+});
+
+on(`change:repeating_skills:rank`, (eventInfo) => {
+	const newValue = setMinMax(parseInt(eventInfo.newValue) || 0, 0, 99);
+	update={};
+	update[eventInfo.sourceAttribute]=newValue;
+	
+	setAttrs(update,{silent:true},()=>{
+		console.log('Repeating Skills updated on change');
+	});
+});
+
+
+Object.entries(_repeating_sections).forEach(([element,section]) => {
+	on(`change:repeating_${section}`, (eventInfo) => {
+		const id = eventInfo.sourceAttribute.split('_')[2];
+		changeRepeatingRolls(section,element,id);
+	});
+});
+Object.entries(_additional_repeating_sections).forEach(([element,section]) => {
+	on(`change:repeating_${section}`, (eventInfo) => {
+		const id = eventInfo.sourceAttribute.split('_')[2];
+		changeRepeatingRolls(section,element,id);
+	});
+});	
+
+
+
+// new function to compute san point max
+on("change:unnatural", function(eventInfo) {
+		const newvalue = setMinMax(parseInt(eventInfo.newValue) || 0,0,99);
+		update={sanity_points_max: 99-newvalue, unnatural: newvalue};
+		
+		setAttrs(update,{silent:true},()=>{
+			console.log('Sanity points updated');
+		});
+});
+
+
+// === debug note: need to change repeating_special_training and repeating_weapons for visulization purposes
+// === Update stats on change
+arrays['_stats'].forEach(stat => {
+		const stat_score = `${stat}_score`;
+		
+		const _sanity_array=['sanity_points', 'breaking_point','initial_san'];
+		const _initial_hp=['initial_str','initial_con','initial_hp'];
+		on(`change:${stat_score}`, (eventInfo) => {
+			const value = parseInt(eventInfo.newValue) || 0;
+			var update = {};
+			getAttrs(arrays['_stats'].concat(_sanity_array,_initial_hp,['unnatural'],arrays['_stats'].map(el=> `${el}_score`)), function(v) {
+				
+				update[stat]=value*5;
+				update[stat_score]=value;
+				if (stat==='power'){
+					const sanmax=99-parseInt(v['unnatural']||0);
+					update[`willpower_points_max`]=value;
+					update['sanity_point_max']=sanmax;
+					const flag_initial_san=v.initial_san;
+					if (flag_initial_san==1){
+						const InitialSanity = value*5;
+						const InitialBreakingPoint = value*4;
+						const InitialWillPower = value; 
+						
+						update['sanity_points']= InitialSanity;
+						update['sanity_points_old']= InitialSanity;
+						update['breaking_point']= InitialBreakingPoint;
+						update['breaking_point_max']= InitialBreakingPoint;
+						update['willpower_points']=InitialWillPower;
+						update['initial_san']=0;
+					}
+
+				}
+
+				if (stat==='strength' || stat==='constitution'){
+					// no matter what the flag will be trigger, I save the check for the initial hp
+					
+					const flag_initial_str=v.initial_str;
+					const flag_initial_con=v.initial_con;
+					const flag_initial_hp=v.initial_hp;
+					const con=parseInt(v[`constitution_score`] ||0);
+					const str=parseInt(v[`strength_score`] ||0);
+					var new_flag_initial_hp=1;
+					if (stat==='strength') {
+						update[`initial_str`]=0;
+						if (flag_initial_con ===0) {
+							new_flag_initial_hp=0;
+						}
+					}else{
+						update[`initial_con`]=0;
+						if (flag_initial_str ===0) {
+							new_flag_initial_hp=0;
+						}
+					}
+					if (flag_initial_hp === 0 || new_flag_initial_hp === 0){
+						update[`hit_points_max`]=Math.ceil((con+str)/2);	
+					}
+					if (new_flag_initial_hp === 0){
+						update[`hit_points`]=update[`hit_points_max`];
+						update[`initial_hp`]=0;
+					}
+				}
+				updateSkillSpanOnChange(stat,value*5,update,'Stats')
+			});
+		});
+});
+
+const skill_in_bounds = (skill) => {
+	const skill_value = parseInt(skill) || 0;
+	return Math.min(99, Math.max(0, skill_value));
+};
+on(`change:ritual_skill`, (eventInfo) => {
+	const value = skill_in_bounds(eventInfo.newValue);
+	var update = {};
+	console.log('ritual_skill:',value);
+	update['ritual_skill'] = value;
+	updateSkillSpanOnChange('ritual_skill',value,update,'Rituals');
+});
+// === Update skills on change
+arrays['_skills'].forEach(skill => {
+		on(`change:${skill}`, (eventInfo) => {
+			const value= skill_in_bounds(eventInfo.newValue);
+			var update={};
+			update[skill]=value;
+			updateSkillSpanOnChange(skill,value,update,'Skills')				
+		});
+});
+
+
+
+
+	// === Update repeating skills on change
+on("change:repeating_skills:rank", function(eventInfo) {
+		const value = parseInt(eventInfo.newValue) || 0;
+		if (value < 0) {
+			setAttributes({[eventInfo.sourceAttribute]: 0}, false);
+		}
+		if (value > 99) {
+			setAttributes({[eventInfo.sourceAttribute]: 99}, false);
+		}
+});
+
+/* visuar option: removes the "advanced weapons" button from the weapons section
+on('change:advanced_weapons',()=>{
+    getAttrs(['advanced_weapons'],(v)=>{
+        const advanced_weapons=v['advanced_weapons'];
+        getSectionIDs('repeating_weapons',(ids)=>{
+        
+            const update={};
+        
+            const prefix='repeating_weapons_';
+        
+            ids.forEach((id)=>{
+                update[prefix+id+'_hasAdvancedWeapons']=advanced_weapons;
+            });
+            setAttrs(update,{silent:true});
+        });
+    });
+});
+
+*/"use strict";
+
+on('clicked:reset_all', () =>{
+    const update = {};
+    resetStats(update,false);
+    resetBonds(update);
+    resetAdaptations(update);
+    resetEquipment(update);
+    resetSkills(update);
+    resetHistory(update);
+    // write all the reset functions here
+
+
+    setAttrs(update, {silent: true}, () => {
+        console.log('reset all');
+        console.info(update);
+    });
+});
+on('clicked:reset_stats', () =>{
+    const update = {};
+    resetStats(update);
+
+    setAttrs(update, {silent: true}, () => {
+        console.log('reset stats');
+        console.info(update);
+    });
+});
+on('clicked:reset_skills', () =>{
+    const update = {};
+    resetSkills(update);
+
+    setAttrs(update, {silent: true}, () => {
+        console.log('reset skills');
+        console.info(update);
+    });
+});
+on('clicked:reset_equipment', () =>{
+    const update = {};
+    resetEquipment(update);
+
+    setAttrs(update, {silent: true}, () => {
+        console.log('reset equipment');
+        console.info(update);
+    });
+});
+on('clicked:reset_breaking_point', () =>{
+    const update = {};
+    resetBreakingPoints(update);
+
+});
+
+
+
+const resetBreakingPoints = (update) => {
+  getAttrs(['breaking_point_max', 'breaking_point', 'breaking_point_reset'], function (values) {
+    console.log('breaking_point_reset:',values);
+    var breaking_point_reset = parseInt(values.breaking_point_reset,10) || 0;
+
+    update['breaking_point_max']= breaking_point_reset;
+    update['breaking_point']= breaking_point_reset;
+    update['breaking_point_reset']= breaking_point_reset;
+    
+    setAttrs(update, {silent: true}, () => {
+        console.log('reset breaking points');
+        console.info(update);
+    });
+  });
+};
+
+
+const resetStats = (update,reset_bonds=true) => {
+    var array_to_reset = arrays['_stats'];
+    const stat_score=arrays['_stats'].map(stat => stat+'_score');
+    array_to_reset=array_to_reset.concat(stat_score);
+    array_to_reset=array_to_reset.concat(arrays['_derived_stats'])
+    array_to_reset=array_to_reset.concat(arrays['_derived_stats_max'])
+
+    
+    array_to_reset = array_to_reset;
+    console.log(array_to_reset);
+    array_to_reset.forEach(stat => {
+        update[stat] = '';
+    });
+
+    const max_values = ['hit_points_max',
+        'willpower_points_max',
+        'breaking_point_max',
+        'sanity_points_old',
+        'breaking_point_old',
+    ];
+
+    max_values.forEach(stat => {
+        update[stat] = '';
+    });
+
+
+    const initial_flags=[
+        'initial_san',
+        'initial_con',
+        'initial_str',
+        'initial_hp',
+    ];
+    console.log(initial_flags);
+    initial_flags.forEach(flag => {
+        update[flag] = '1';
+    });
+    if (reset_bonds){
+        getSectionIDs('repeating_bonds',(ids) => {
+            console.log(ids);
+            ids.forEach(id => {
+                update[`repeating_bonds_${id}_test`] = 'editable';
+                update[`repeating_bonds_${id}_rank`] = '';
+            });
+        });
+    }
+};
+
+const resetSkills = (update) => {
+    Object.entries(_initial_skills).forEach(([skill, value]) => {
+        update[skill] = value;
+        update[`${skill}_fail`] = value;
+    });
+    arrays['_editable_skills'].forEach(skill => {
+        update[`${skill}_name`] = '';
+        update[`${skill}_test`] = 0;
+    });
+    resetAllRepeatingSkills(update);
+    resetAllSpecialAbilities(update);
+
+};
+
+
+const resetBonds= (update) => {
+    getSectionIDs('repeating_bonds',(ids) => {
+        ids.forEach(id => {
+            removeRepeatingRow('repeating_bonds_'+id);
+        });
+    });
+};
+
+const resetAdaptations= (update) => {
+    update['motivations'] = '';
+    console.log(arrays['_adaptation']);
+    arrays['_adaptation'].forEach(adaptation => {
+        update[adaptation] = -1;
+        update[`${adaptation}_adapted`] = 0;
+    });
+};
+
+const resetAllWeapons= (update) => {
+    getSectionIDs('repeating_weapons',(ids) => {
+        console.log(ids);
+        ids.forEach(id => {
+            removeRepeatingRow('repeating_weapons_'+id);
+        });
+    });
+}
+
+const resetAllRituals= (update) => {
+    getSectionIDs('repeating_rituals',(ids) => {
+        console.log(ids);
+        ids.forEach(id => {
+            removeRepeatingRow('repeating_rituals_'+id);
+        });
+    });
+}
+
+
+const resetEquipment= (update) => {
+    resetAllWeapons(update);
+    resetAllRituals(update);
+    update['armor_and_gear'] = '';
+};
+
+
+const resetAllRepeatingSkills= (update) => {
+    getSectionIDs('repeating_skills',(ids) => {
+        console.log(ids);
+        ids.forEach(id => {
+            removeRepeatingRow('repeating_skills_'+id);
+        });
+    });
+}
+
+const resetAllSpecialAbilities= (update) => {  
+    getSectionIDs('repeating_special',(ids) => {
+        console.log('special:'+ids);
+        ids.forEach(id => {
+            removeRepeatingRow('repeating_special_'+id);
+        });
+    });
+}
+const resetHistory = (update) => {
+    console.log(arrays['_personal_data']);
+    arrays['_personal_data'].forEach(data => {
+        update[data] = '';
+    });
+    resetInjuries(update);
+}
+
+const resetInjuries = (update) => {
+    update['injuries'] = '';
+    update['injuries_first_aid'] = 0;
+}
+
+const updatesanitypoints = (tmp_sanity_points,sanity_points_old,sanity_points_max,update) => {
+    const sanity_points = value_current(tmp_sanity_points, sanity_points_old, sanity_points_max);
+    update['sanity_points_old'] = sanity_points;
+    update['sanity_points'] = sanity_points;
+    update['ritual_skill'] = Math.max(99-sanity_points);
+    return {sanity_points:sanity_points,ritual_skill:Math.max(99-sanity_points)};
+};
+
+
+const updatebreakingpoints = () => {
+    getAttrs(['power_score','breaking_point','sanity_points','breaking_point_reset','sanity_points_max','sanity_points_old','track_breaking_points'], (values)=> {
+        const update = {};
+        const flag=values.track_breaking_points==='active' ? true : false;
+        const power_score = parseInt(values.power_score, 10) || 0;
+        const breaking_point = parseInt(values.breaking_point, 10) || 0;
+        const sanity_points_old = parseInt(values.sanity_points_old, 10) || 0;
+        const sanity_points_max = parseInt(values.sanity_points_max, 10) || 0;
+        const tmp_sanity_points = parseInt(values.sanity_points, 10) || 0;
+        update_bp_san_ritual(tmp_sanity_points,sanity_points_old,sanity_points_max,power_score,breaking_point,update,flag);
+
+    });
+}
+
+const update_bp_san_ritual = (tmp_sanity_points,sanity_points_old,sanity_points_max,power_score, breaking_point,update,flag) => {   
+    const updated_values=updatesanitypoints(tmp_sanity_points,sanity_points_old,sanity_points_max,update);
+    var update_breaking_point = breaking_point;
+    if(flag && (updated_values.sanity_points<breaking_point)){
+        update_breaking_point = Math.max(0,updated_values.sanity_points-power_score);
+    }
+    update['breaking_point_reset'] = update_breaking_point;
+    update['breaking_point']=update_breaking_point;
+    updateSkillSpanOnChange('ritual_skill',updated_values.ritual_skill,update,'Rituals');
+}
+
+const setResetBreakingPointsOnOpen = () => {
+    getAttrs(['breaking_point','sanity_points','sanity_points_max','power_score','track_breaking_points'], (values)=> {
+        const breaking_point = Math.max(0,parseInt(values.breaking_point, 10) || 0);
+        const flag=values.track_breaking_points==='active' ? true : false;
+        const power_score = parseInt(values.power_score, 10) || 0;
+
+        const update = {};
+        const open_sanity_points = parseInt(values.sanity_points, 10) || 0; 
+        const sanity_points_max = parseInt(values.sanity_points_max, 10) || 0;
+        update_bp_san_ritual(open_sanity_points,open_sanity_points,sanity_points_max,power_score,breaking_point,update,flag);
+    });
+};
+
+on('change:sanity_points', () => {
+    updatebreakingpoints();
+});
+
+
+
+on('change:breaking_point', () => { 
+    getAttrs(['breaking_point'], (values)=> {
+        const breaking_point = Math.max(0,parseInt(values.breaking_point, 10) || 0);
+        const update = {};
+        
+        update['breaking_point_reset'] = breaking_point;
+        update['breaking_point']=breaking_point;
+        setAttrs(update, {silent:true}, () => {
+            console.log('reset breaking points on change');
+            
+        });
+    });
+});
+on('change:breaking_point_reset',(eventInfo)=>{
+    const breaking_point_reset = parseInt(eventInfo.newValue, 10) || 0;
+    getAttrs(['breaking_point_reset'], (values)=> {
+        const breaking_point_reset = parseInt(values.breaking_point_reset, 10) || 0;
+        console.log(breaking_point_reset);
+        const update = {};
+        update['breaking_point_reset'] = Math.min(Math.max(0,breaking_point_reset),99);
+        setAttrs(update, {silent:true}, () => {
+            console.log('reset breaking points on change');
+            
+        });
+    });
+});
+
+on('clicked:breaking_point_resets', () => {
+    resetBreakingPoints();
+});const versioning = (version) => {
+    console.log(`%c Versioning, ${version}`, 'color: green; font-weight:bold');
+    if (version < 1.05) {
+       version_0_105();
+    } 
+    if (version <1.5) {
+        version_105_150();
+    }
+    if (version<1.7) {
+        version_150_170();
+    }
+    if (version<2.0) {
+        version_170_200();
+    }
+    if (version<2.01) {
+        version_200_201();
+    }
+};
+
+// UPDATE TO VERSION 1.05
+const version_0_105= () => {
+    getAttrs(['version'], function(v) {
+        let codeversion=1.05;
+        let update={version: codeversion,
+                     initial_san: 0,
+                     initial_hp:  0,
+                     initial_str: 0,
+                     initial_con: 0
+        };
+        setAttrs(update, //Update attributes
+            {silent:true},  // will not trigger sheet workers
+            versioning(codeversion)); // call versioning again
+    });
+};
+// UPDATE TO VERSION 1.5
+const version_105_150 = () => {
+    
+    let codeversion=1.5;
+    let update={};
+    
+    getSectionIDs("weapons",function(idarray){
+   console.log(`%c idarray`, 'color: green; font-weight:bold');
+   console.info(idarray);
+        let fieldnames=['sheet_type','version'];
+        console.log(`%c did I found weapons?`, 'color: green; font-weight:bold');
+        idarray.forEach(id => {
+                console.log(`%c ${id}`, 'color: green; font-weight:bold');
+                fieldnames.push(`repeating_weapons_${id}_damage`,`repeating_weapons_${id}_lethality_percent`,`repeating_weapons_${id}_attack`);
+        });
+           getAttrs(fieldnames,function(v) {
+           console.log(`%c v`, 'color: green; font-weight:bold');
+           console.info(v);
+           update['version']=codeversion;
+           console.info(update);
+            idarray.forEach(id=>{
+                console.log(`%c ${id}`, 'color: green; font-weight:bold');
+                if (v[`repeating_weapons_${id}_damage`]===""){
+                    update["repeating_weapons_"+id+"_hasdamage"]="0";
+           console.info(update);
+                } else{
+                    update["repeating_weapons_"+id+"_hasdamage"]="1";
+           console.info(update);
+                }
+                    
+                if (v[`repeating_weapons_${id}_lethality_percent`]>0){
+                    update["repeating_weapons_"+id+"_haslethality"]="1";
+           console.info(update);
+                } else {
+                    update["repeating_weapons_"+id+"_haslethality"]="0";
+           console.info(update);
+                }
+                if (v['sheet_type']==='npc'){
+                    update["repeating_weapons_"+id+"_weapons"]=v[`repeating_weapons_${id}_attack`];
+                }
+            });
+            
+           console.log(`%c update`, 'color: green; font-weight:bold');
+           console.info(update);
+            setAttrs(update, //Update attributes
+                    {silent:true},  // will not trigger sheet workers
+                    versioning(codeversion)); // call versioning again
+            
+        });
+    });
+};
+
+// UPDATE TO VERSION 1.7
+const version_150_170 = () => {
+    let codeversion=1.7;
+    let update={};
+    update['version']=codeversion;
+    update['luck']=50;
+    update['luck_max']=50;
+    console.log(`%c update`, 'color: green; font-weight:bold');
+    console.info(update);
+    setAttrs(update, //Update attributes
+            {silent:true},  // will not trigger sheet workers
+            versioning(codeversion)); // call versioning again
+};
+
+// UPDATE TO VERSION 2.0
+const version_170_200 = () => {
+    let codeversion=2.0;
+    let update={};
+    update['version']=codeversion;
+    getAttrs(["motivations","character_name","name","sanity_points","violence_3","helplessness_3","violence_2","helplessness_2",
+    "sanity_points_old","sanity_points","breaking_point_old","breaking_point_old"],function(v){
+        let motivations=v["motivations"];
+        if (v["name"]!==""){
+            _name=v["name"];
+        }else{
+            _name=v["character_name"];
+        }	
+        update["character_name"]=_name;
+        update["old_motivations"]=motivations.replace(/<br>/g,"\n");
+        const _violence_adapted     = v["violence_2"]==='on';
+        const _helplessness_adapted = v["helplessness_2"]==='on';
+        if (v["violence_2"]==='on'){
+            update["violence_1"]='on';
+        }
+        if (v["helplessness_2"]==='on'){
+            update["helplessness_1"]='on';
+        }
+
+        if (_violence_adapted){
+            update["violence_adapted"]=1;
+            update["violence_2"]='on';
+            update["violence_1"]='on';
+        }
+        if (_helplessness_adapted){
+            update["helplessness_adapted"]=1;
+            update["helplessness_2"]='on';
+            update["helplessness_1"]='on';
+        }
+
+
+        
+        update['sanity_points_old']=v['sanity_points'];
+        update['breaking_point_old']=v['breaking_point'];
+
+        console.log(`%c update`, 'color: green; font-weight:bold');
+        console.info('versioning',update);
+        setAttrs(update, //Update attributes
+                {silent:true},  // will not trigger sheet workers
+                versioning(codeversion)); // call versioning again
+    });
+
+};
+// UPDATE TO VERSION 2.0
+const version_200_201 = () => {
+    let codeversion=2.01;
+    let update1={};
+    console.log('verion:',codeversion);
+    update1['version']=codeversion;
+    
+        // UPDATE NAMES FOR SPECIAL TRAINING AND WEAPONS AND TRIGGER TEST
+    const sectionDetails = [
+        {section:'repeating_special', fields: ['name','special_training','skill_or_stat_used','skill_span']},
+        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_total']}];
+    
+    getSectionIDs(sectionDetails, (v)=>{
+            const repspecial= v.filter(el => el.startsWith(`repeating_special`));
+            const repweapons= v.filter(el => el.startsWith(`repeating_weapons`));
+            console.log('in getSectionIDs section',sectionDetails.section);
+           // const fullarray=[].concat(repspecial,repweapons);
+            //console.info('fullarray',fullarray);
+            getAttrs(v,(values) => {
+                console.info('fullarray',values);
+                            
+                const repweapons_oldname=repweapons.filter(el => el.endsWith('_weapons'));
+                const repspecial_oldname=repspecial.filter(el => el.endsWith('_special_training'));
+                const repweapons_name=repweapons.filter(el => el.endsWith('_name'));
+                const repspecial_name=repspecial.filter(el => el.endsWith('_name'));
+                const repspecial_span=repweapons.filter(el => el.endsWith('_skill_span'));
+                const repspecial_skill=repspecial.filter(el => el.endsWith('_skill_or_stat_used'));
+                const repweapons_span=repweapons.filter(el => el.endsWith('_skill_span'));
+                const repweapons_skill=repspecial.filter(el => el.endsWith('_skill_percent'));
+                const repweapons_ammo=repweapons.filter(el => el.endsWith('_ammo'));
+                const repweapons_hasammo=repweapons.filter(el => el.endsWith('_hasammo'));
+                const repweapons_ammo_total=repweapons.filter(el => el.endsWith('_ammo_total'));
+
+                console.log(`%c repweapons_oldname`, 'color: green; font-weight:bold');
+                console.info(repweapons_oldname);
+                console.log(`%c repspecial_oldname`, 'color: green; font-weight:bold');
+                console.info(repspecial_oldname);
+                console.log(`%c repweapons_name`, 'color: green; font-weight:bold');
+                console.info(repweapons_name);
+                console.log(`%c repspecial_name`, 'color: green; font-weight:bold');
+                console.info(repspecial_name);
+                console.log(`%c repspecial_span`, 'color: green; font-weight:bold');
+                console.info(repspecial_span);
+                console.log(`%c repspecial_skill`, 'color: green; font-weight:bold');
+                console.info(repspecial_skill);
+                console.log(`%c repweapons_span`, 'color: green; font-weight:bold');
+                console.info(repweapons_span);
+                console.log(`%c repweapons_skill`, 'color: green; font-weight:bold');
+                console.info(repweapons_skill);
+                console.log(`%c repweapons_ammo`, 'color: green; font-weight:bold');
+                console.info(repweapons_ammo);
+                console.log(`%c repweapons_hasammo`, 'color: green; font-weight:bold');
+                console.info(repweapons_hasammo);
+                console.log(`%c repweapons_ammo_total`, 'color: green; font-weight:bold');
+                console.info(repweapons_ammo_total);
+
+
+                for (i=0; i<repweapons_name ;i++){
+                    if (values[repweapons_oldname[i]]!='') {
+                        update1[repweapons_name[i]]=values[repweapons_oldname[i]];
+                        values[repweapons_oldname[i]]='';
+                        update1[repweapons_span[i]]=values[repweapons_skill[i]];
+                    }
+                    
+                }
+                
+                for (i=0; i<repspecial_name ;i++){
+                    if (values[repspecial_oldname[i]]!='') {
+                        update1[repspecial_name[i]]=values[repspecial_oldname[i]];
+                        update1[repspecial_oldname[i]]='';
+                        update1[repspecial_span[i]]=values[repspecial_skill[i]];
+                    }
+                }
+
+                for (i=0; i<repweapons_ammo ;i++){
+                    if (values[repweapons_ammo[i]]!='') {
+                        update1[repweapons_ammo_total[i]]=values[repweapons_ammo[i]];
+                        update1[repweapons_hasammo[i]]=values[repweapons_ammo[i]]>0 ? '1' : '0';
+                    }
+                }
+
+                console.log(`%c update`, 'color: green; font-weight:bold');
+                console.info('versioning',update1);
+                setAttrs(update1, //Update attributes
+                        {silent:true},  // will not trigger sheet workers
+                        versioning(codeversion)); // call versioning again
+            });
+
+    
+
+    });
+};
+
+arrays['_colored_derivative'].forEach(vitality => {
+    on(`change:${vitality}_points`, (eventInfo) => {
+        console.log('changed '+vitality+'_points');
+        console.log(eventInfo);
+        console.log(eventInfo.newValue);
+ 
+        var value = parseInt(eventInfo.newValue) || 0;
+        value = (value < 0) ? 0 : value;
+        const maxval=`${vitality}_points_max`;
+        getAttrs([maxval], function(v) {
+            console.log('maxval:'+v[maxval]);
+            const max_val = parseInt(v[maxval]) || 0;	
+            const low_val=2;
+            var update={};
+ 
+            console.log('maxval:'+v[maxval]+' value:'+value+' low_val:'+low_val);
+            update[`color_${vitality}`]='normal';
+            update[`${vitality}_modifier`]=0;
+ 
+            if (value > max_val) {
+                update[`color_${vitality}`]='extra';
+            }
+            if (value <= low_val) {
+                update[`color_${vitality}`]='low';
+                update[`${vitality}_modifier`]=1;
+             }
+            if (value == 0) {
+                update[`color_${vitality}`]='zero';
+                update[`${vitality}_modifier`]=2;
+            }
+            update[`${vitality}_points`]=value;
+            console.log('maxval:'+v[maxval]+' value:'+value+' low_val:'+low_val);
+            
+            setAttrs(update, {silent:false}, ()=>{
+                console.log('Vitality color updated');	
+            });
+        });
+    });
+ });
+
+ 
+
+const BondButtonColor= (bondvalue) => {
+    const score = parseInt(bondvalue)||0;
+    const color = (score > 0) ? 'on' : 'off';
+    return color;
+};
+
+const changeBondButtonColorOnOpen = () => {
+    getSectionIDs(`repeating_bonds`, (idarray) => {
+		const allbonds=idarray.map(id =>`repeating_bonds_${id}_score`);
+        getAttrs(allbonds, (value) => {
+            const update={};
+            Object.entries(value).forEach(([key, value]) => {
+                const id = key.split('_')[2];
+                const score = parseInt(value)||0;
+                update['repeating_bonds_'+id+'_color'] = BondButtonColor(score);
+            });
+            setAttrs(update, {silent:true}, () => {
+                console.log('Bond color updated');
+                
+            });
+        });
+    });
+};
+
+on('change:repeating_bonds:score', (eventInfo) => {
+    const update={};
+    const value = parseInt(eventInfo.newValue)||0;
+    update['repeating_bonds_color'] = BondButtonColor(value);
+    setAttrs(update, {silent:true}, () => {
+        console.log('Bond color updated');
+        
+    });
+});
+
+
+
+
+
+
+
+on(`change:repeating_weapons:skill_percent change:repeating_special:skill_or_stat_used change:repeating_rituals:skill_percent`,(eventInfo)=>{
+    console.log(eventInfo);
+    
+    const newValue=eventInfo.newValue;
+    const field=eventInfo.triggerName;
+    const id= field.split('_')[2];
+    const skillspan=`repeating_${field.split('_')[1]}_${id}_skill_span`;
+    const isMinority=isMinorityReport(eventInfo);
+    const isValid=(isStringInForm(newValue) && isValidSkill(newValue)) && !isMinority;
+    const isNumber=isSkillNumber(newValue);
+    
+    
+    
+    
+    
+    
+    
+    
+    var update={};
+    if (isNumber){
+        const number=parseInt(newValue) || 0;
+        update[field]=number;
+        update[skillspan]=number;
+        setAttrs(update,{silent:true},()=>{
+            
+        });
+    } else if (isValid) {
+        const skill=cleanedSkill(newValue);
+        
+        getAttrs([`${skill}`], (v) =>{
+            update[skillspan]=v[`${skill}`];
+            setAttrs(update,{silent:true},()=>{
+                
+            });
+        })
+    } else if (isMinority) {
+        console.log("Right now the Precogs can't see a thing." );
+    } else {
+        update[field]=0;
+        update[skillspan]=0;
+        setAttrs(update,{silent:true},()=>{
+            
+        })
+    }
+});
+
+const setWeaponOptions = ({modifier=0,wp_mod={low_willpower:0,zero_willpower:0},hasLethality=0,hasDamage=0,damage='',rating=0,lethality=0,hasAdvancedWeapons=0,isShotgun=0,	hasDoubleBarrel=0,hasSelectiveFire=0,hasAccessories=0,hasBlastRadius=0,	trackAmmo=0,current_ammo=0,double_barrel='',selfire_lethality=0,selfire_type='',accessory_modifier=0,accessory_name='',isSkill=1}) => {
+	const _hasAdvancedWeapons=hasAdvancedWeapons;
+	const _hasLethality= hasLethality;
+	const _hasDamage=hasDamage;
+	const _trackAmmo=trackAmmo;
+	const _rating=rating;
+	const _isSkill=isSkill;
+	const _modifier=modifier;
+	const _wp_mod=wp_mod;
+	var _isShotgun=0;
+	var _hasDoubleBarrel=0;
+	var _hasSelectiveFire=0;
+	var _hasAccessories=0;
+	var _hasBlastRadius=0;
+	var _double_barrel=double_barrel;
+	var _selfire_lethality=selfire_lethality;
+	var _selfire_type=selfire_type;
+	var _selfire_ammo=0;
+	var _current_ammo=0;
+	var _accessory_modifier=accessory_modifier;
+	var _accessory_name=(accessory_name==='') ? '^{accessory}' : accessory_name;
+	
+	var _damage='';
+	var _lethality=0;
+	var _low_willpower=0;
+	var _zero_willpower=0;
+	if (_wp_mod.hasOwnProperty('low_willpower')) { _low_willpower=_wp_mod.low_willpower; }
+	if (_wp_mod.hasOwnProperty('zero_willpower')) { _zero_willpower=_wp_mod.zero_willpower; }
+
+
+	if (_hasDamage==1) { _damage=damage; }
+	if (_hasLethality==1) { _lethality=lethality; }
+
+	if (_hasAdvancedWeapons==1) {
+	_isShotgun=isShotgun;
+	_hasDoubleBarrel=hasDoubleBarrel;
+	_hasSelectiveFire=hasSelectiveFire;
+	_hasAccessories=hasAccessories;
+	_hasBlastRadius=hasBlastRadius;
+	}
+	if (track_bullets==1) { _has_ammo=has_ammo; }
+	if (hasDoubleBarrel==1) { _double_barrel=double_barrel; }
+	if (hasSelectiveFire==1) { 
+		_selfire_lethality=selfire_lethality;
+		_selfire_type=selfire_type;
+		_selfire_ammo=getRollDamage(selfire_type);
+	 }
+	if (hasAccessories==1) { _accessory_modifier=accessory_modifier; _accessory_name=accessory_name; }
+	return { hasLethality: _hasLethality,lethality: _lethality, isSkill: _isSkill, rating: _rating,
+		hasDamage: _hasDamage,damage: _damage,
+		isShotgun: _isShotgun,hasDoubleBarrel: _hasDoubleBarrel,
+		hasSelectiveFire: _hasSelectiveFire,hasAccessories: _hasAccessories,hasBlastRadius: _hasBlastRadius,
+	trackAmmo: _trackAmmo,current_ammo: _current_ammo, double_barrel: _double_barrel,
+	selfire_lethality: _selfire_lethality, selfire_tyle: _selfire_type, selfire_ammo: _selfire_ammo,
+	accessory_modifier: _accessory_modifier,
+	accessory_name: _accessory_name,hasAdvancedWeapons: _hasAdvancedWeapons,
+	zero_willpower: _zero_willpower, low_willpower: _low_willpower, modifier: _modifier
+};
+};
+
+const setDiceSection = (charid,repsecid,use_=true) => {
+	// Input:
+	// charid is the character id
+	// repsecid is the repeating section id
+	// Output:
+	// ](~<charid>|<repsecid>_
+	return '](~'+ character_id +'|'+repsecid+ (use_) ? '_' : '';
+}
+
+const setAdvancedWeaponsString = (options,character_id,repsecid) => {
+	var advancedWeaponsString='';
+	const dice_section = setDiceSection(character_id,repsecid);
+	const nothing_section = setDiceSection(character_id,'nothing)}}',false);
+
+	if (options.hasAdvancedWeapons===1) {
+		if (options.isShotgun===1) {advancedWeaponsString +=  '{{shotgun=[[1]]}}';}
+		if (options.hasDoubleBarrel===1) {
+			if (options.double_barrel != '') {
+				advancedWeaponsString +=  '{{double_barrel=['+options.double_barrel+dice_section+'double_barrel)}}';
+				advancedWeaponsString +=  '{{voiddouble_barrel=['+options.double_barrel+nothing_section;
+				advancedWeaponsString +=  '{{double_barrel_critical=[('+options.double_barrel+')×2'+dice_section+'double_barrel_critical)}}';
+				advancedWeaponsString +=  '{{voiddouble_barrel_critical=[('+full_options.double_barrel+')×2'+nothing_section;
+			}
+		}
+		if (options.hasSelectiveFire===1) {
+			if (options.selfire_lethality>0) {
+				const critical_selfire_lethality=options.selfire_lethality*2;
+				
+				advancedWeaponsString +=  '{{selective_fire=[' + options.selfire_type;
+				advancedWeaponsString +=  '('+options.selfire_lethality + '%)'+dice_section+'selective_fire)}}';
+
+				advancedWeaponsString +=  '{{voidselective_fire=[' + options.selfire_type;
+				advancedWeaponsString +=  '(' + options.selfire_lethality + '%)'+nothing_section;
+
+				advancedWeaponsString +=  '{{selective_fire_critical=[' + options.selfire_type;
+				advancedWeaponsString +=  '(' + critical_selfire_lethality + '%)'+dice_section+'selective_fire_critical)}}';
+				advancedWeaponsString +=  '{{voidselective_fire_critical=[' + options.selfire_type;
+				advancedWeaponsString +=  '(' + critical_selfire_lethality + '%)'+nothing_section;
+			}
+			
+			if (options.selfire_ammo>=options.current_ammo && options.trackAmmo==1) {
+				advancedWeaponsString +=  '{{selfire_noammo=1}}';
+			}else{
+				advancedWeaponsString +=  '{{selfire_wammo=0}}';
+			}
+		}
+		if (options.hasAccessories===1) {
+			advancedWeaponsString +=  '{{accessories=[[1]]}}';
+	
+			advancedWeaponsString +=  '{{accessory_name=' + options.accessory_name + '}}';
+			advancedWeaponsString +=  '{{accessory_modifier=[[' + options.accessory_modifier + ']]}}';
+		}
+		if (options.hasBlastRadius===1) {
+			advancedWeaponsString +=  '{{blast_radius=[[1]]}}';
+		}
+	}	
+
+	
+	if (options.trackAmmo) {
+		advancedWeaponsString += '{{trackbullets=1}}';
+		advancedWeaponsString += '{{current_ammo=' + values['ammo'] + '}}';
+		if (current_ammo>0) {
+			advancedWeaponsString += '{{noammo=1}}';
+		}else{
+			advancedWeaponsString += '{{wammo=0}}';
+		}
+	} else {
+		advancedWeaponsString +- '{{wammo=0}}';
+	}
+
+
+	if (options.hasDamage==1) {
+		
+		advancedWeaponsString += '{{damage= ['+options.damage+dice_section+'damage)}}';
+		advancedWeaponsString += '{{voiddamage= ['+options.damage+nothing_section;
+		
+		advancedWeaponsString += '{{damage_critical= [('+options.damage+')×2'+options.damage+'damage_critical)}}';
+		advancedWeaponsString += '{{voiddamage_critical= [('+options.damage+')×2'+nothing_section;
+	}
+	if (options.hasLethality==1) {
+		const critical_lethality=full_lethality*2;
+		advancedWeaponsString += '{{lethality= ['+options.lethality+'%'+dice_section+'lethality)}}';
+		advancedWeaponsString += '{{voidlethality= ['+full_lethality+'%'+nothing_section;
+
+		advancedWeaponsString += '{{lethality_critical= ['+critical_lethality+'%'+dice_section+'lethality_critical)}}';
+		advancedWeaponsString += '{{voidlethality_critical= ['+critical_lethality+'%' + nothing_section;
+	}
+
+
+	return advancedWeaponsString;
+}
+
+
+const updateRepeatingSection = (section, element, id, character_id) => {
+    const update = {};
+    const attrPrefix = `repeating_${section}_${id}`;
+	const attrName = `${attrPrefix}_${element}`;
+    update[`${attrName}_action`] = `%{${character_id}|${attrName}-action}`;
+    update[`${attrName}_r`] = id;
+
+	console.log(' in update repeating section',section);
+	if (section === 'weapons') {
+		update[`${attrPrefix}_damage_action`] = `%{${character_id}|${attrPrefix}_damage-action}`;
+		update[`${attrPrefix}_damage_critical_action`] = `%{${character_id}|${attrPrefix}_damage_critical-action}`;
+		update[`${attrPrefix}_lethality_action`] = `%{${character_id}|${attrPrefix}_lethality-action}`;
+		update[`${attrPrefix}_lethality_critical_action`] = `%{${character_id}|${attrPrefix}_lethality_critical-action}`;
+		update[`${attrPrefix}_selective_fire_action`] = `%{${character_id}|${attrPrefix}_selective_fire-action}`;
+		update[`${attrPrefix}_selective_fire_critical_action`] = `%{${character_id}|${attrPrefix}_selective_fire_critical-action}`;
+		update[`${attrPrefix}_double_barrel_action`] = `%{${character_id}|${attrPrefix}_double_barrel-action}`;
+		update[`${attrPrefix}_double_barrel_critical_action`] = `%{${character_id}|${attrPrefix}_double_barrel_critical-action}`;
+	}
+    return update;
+};
+const updateRepeatingRollsonOpen = () => {
+	i
+	console.log('get chanracter id');
+	getAttrs(['character_id'], (values) => {
+		
+		const character_id=values.character_id;
+		console.info('Repeating Sections',_repeating_sections);
+		Object.entries(_repeating_sections).forEach(([element,section])=> {
+			console.log(' in update repeating rolls on open',section);
+			getSectionIDs(section, function(idarray) {
+				var update={};
+				console.log('section: '+section+' element: '+element+' idarray: '+idarray);
+				idarray.forEach(id => {
+					Object.assign(update, updateRepeatingSection(section, element, id, character_id));
+				});				
+				console.info('Value of update inside repeating rollUpdate',update);
+				setAttrs(update, {silent:true}, () => {
+					console.log('Repeating Rolls updated');
+					console.info('update',update);
+				});
+				
+			});
+		});
+		Object.entries(_additional_repeating_sections).forEach(([element,section])=> {
+			console.log(' in update repeating rolls on open',section);
+			getSectionIDs(section, function(idarray) {
+				var update={};
+				console.log('section: '+section+' element: '+element+' idarray: '+idarray);
+				idarray.forEach(id => {
+					Object.assign(update, updateRepeatingSection(section, element, id, character_id));
+				});				
+				console.info('Value of update inside repeating rollUpdate',update);
+				setAttrs(update, {silent:true}, () => {
+					console.log('Repeating Rolls updated');
+					console.info('update',update);
+				});
+				
+			});
+		});
+		Object.entries(_repeating_damages).forEach((element)=> {
+			getSectionIDs('weapons', function(idarray) {
+				var update={};
+				console.log('section: weapons element: '+element+' idarray: '+idarray);
+				idarray.forEach(id => {
+					update[`repeating_weapons_${id}_${element}`] = `%{${character_id}|repeating_weapons_${id}_${element}`;
+				});				
+				console.info('Value for weapons damage',update);
+				getAttrs(_repeating_ammo.map((element) => `repeating_weapons_${id}_${element}`), (values) => {
+					const currentAmmo=Math.max(0,parseInt(values['ammo']) || 0);
+					const hasammo=values['hasammo']==='active' ? 1 : 0;
+					const ammo_total=Math.max(0,parseInt(values['ammo_total']) || 0);
+					if (ammo_total>=0) {
+						update['hasammo']='inactive';
+					}else{
+						update['hasammo']='active';
+					}
+
+					setAttrs(update, {silent:true}, () => {
+						console.log('Repeating weapon damage updated');
+						console.info('update',update);
+					});
+				});
+			});
+		})
+	});
+};
+
+
+const updateRollsOnOpen= () => {
+	console.log('===update rolls===');
+	const fullrolls = _allrolls;
+	console.info(`all rolls`,_allrolls);
+	getAttrs(['character_id'], (values) => {
+		var update={};
+		const character_id=values.character_id;
+		console.log('character id: '+character_id);
+		fullrolls.forEach(roll => {
+			update[`${roll}_action`] = `%{${character_id}|${roll}-action}`;
+		});
+		console.info('Value of update inside rollUpdate',update);
+		setAttrs(update, {silent:false}, () => {
+			console.log('Rolls updated');
+			console.log('update:',update);
+		});
+	});
+};
+
+const changeRepeatingRolls = (section,element,id) => {
+	console.log(' in change repeating rolls',section);
+	const attrName = `repeating_${section}_${id}_${element}`;
+	getAttrs(['character_id'], (values) => {
+		const character_id = values.character_id;
+		const update = updateRepeatingSection(section, element, id, character_id);
+		console.info(update);
+		setAttrs(update, {silent:true}, () => {
+			console.log(`Update repeating ${element} rolls`);
+		});
+	});
+	
+};
+
+const rollwithmodifiers = (rollString,rollName,queryModifier,additionalParameters) => {
+	initializeRolls();		// Initialize the rolls if flag is not set
+
+	
+	const attr_to_get=arrays['_derived_modifiers']
+	if (additionalParameters.hasOwnProperty('editable_name')) {
+		attr_to_get.push(additionalParameters['editable_name']);
+	}
+
+	getAttrs(attr_to_get, (values) => {
+		console.log('wp: '+values['willpower_points']);
+		console.log('low wp: '+values['low_willpower']);
+		console.log('zero wp: '+values['zero_willpower']);
+
+		///////////////////////////////////////////////////////////
+		const wp_modifiers=check_for_wp_modifiers(values,rollName);
+
+		const _zero_willpower = wp_modifiers.zero_willpower;
+		const _low_willpower = wp_modifiers.low_willpower;
+
+		var rollValue = `${rollString} {{rating=[[@{${rollName}}]]}}`;
+		rollValue= `${rollValue} {{zero_willpower=${_zero_willpower}}}`;
+		rollValue= `${rollValue} {{low_willpower=${_low_willpower}}}} `;
+		rollValue= `${rollValue} {{modifier=[[${queryModifier}]]}}`;
+		rollValue= `${rollValue} {{isCritical=[[0]]}} {{isSuccess=[[0]]}}`;		
+		var _header = ``;
+		if (values.hasOwnProperty(additionalParameters['editable_name'])) {
+			_header = '{{header=^{'+additionalParameters['editable_type']+'}';
+			_header = _header +' ('+values[additionalParameters['editable_name']]+')}}';
+		}else {
+			_header = '{{header=^{'+additionalParameters['name']+'} }}';
+		}
+		rollValue = `${rollValue} ${_header}`;
+                
+
+		if(_zero_willpower!='[[1]]') {
+			rollValue = `${rollValue}`; 			
+		}
+
+		const isSkill=arrays[`_skills`].includes(rollName) ? 1 : 0;
+
+		rollFail=`${rollName}_fail`;
+		rollSkillAndStats(rollValue,rollName,rollFail,isSkill);
+
+	});
+
+};
+
+
+const check_for_wp_modifiers = (values,roll) => {
+	console.log('wp: '+values['willpower_points']);
+	console.log('low wp: '+values['low_willpower']);
+	console.log('zero wp: '+values['zero_willpower']);
+	
+	const _willpower_points = parseInt(values[`willpower_points`]) || 0;
+	const _zero_willpower = (values[`zero_willpower`]== 1 && _willpower_points== 0 && roll !== 'luck') ? '[[1]]' : '[[0]]';
+	const _low_willpower  = (values[`low_willpower`] == 1 && _willpower_points <= 2 && _willpower_points>0 && roll !== 'luck' && roll !== 'sanity_points') ? '[[1]]' : '[[0]]';
+	
+	console.log(`zero willpower: ${_zero_willpower}`);
+	console.log(`low willpower: ${_low_willpower}`);
+	return {zero_willpower: _zero_willpower, low_willpower: _low_willpower};
+};
+
+
+const check_success= (dice,rollName,rollFail,rating,isSkill=1) => {
+	// Input:
+	// dice is the result of the roll
+	// rollName is the name of the skill or stat
+	// rollFail used only for stats to check for failure
+	// rating is the rating of the skill or stat
+	// isSkill is the flag to check if it's a skill or a stat [0,1]
+
+	var isSuccess=0;
+	var isCritical=0;
+
+	if (dice==100){ // 100 is always a fumble
+		isCritical=1;
+		isSuccess=0;
+	} else { // check for criticals normally
+		isSuccess = dice<=rating ? 1 : 0;
+		isCritical = _critical.includes(dice) ? 1 : 0;			
+	}
+
+	const isInhuman=(isSkill==0 && rating>=_INHUMAN_STAT_);
+	const isNormalSuccess=(isSuccess==1 && isCritical==0);
+
+	if (isInhuman && isNormalSuccess){ // special case for stats to evaluate criticals
+		const score=Math.round(rating/5);
+		isCritical = (dice<=score) ? 1 : 0;
+	}
+
+	return {isSuccess:isSuccess,isCritical:isCritical};
+
+};
+
+const check_advanced_weapon_options = (options) => { 
+	const advanced
+}
+const rollAttacks = (rollValue,rollName,options) => {
+	startRoll(`${rollValue}`, (results) => {
+		const dice=results.results.dice.result;
+		const rating=options.rating;
+		const modifier=results.results.modifier.result;
+		const zero_willpower=results.results.zero_willpower.result;
+		const low_willpower=results.results.low_willpower.result;
+		const basemodifier= (modifier - (20*low_willpower));
+
+		const base_modifier= results.results.modifier.result;
+		
+		const advanced_weapons=results.results.advanced_weapons.result;
+
+		if (options.hasBlastRadius==1){
+			const blast_radius=results.results.blast_radius.result;
+		}
+		
+		var full_modifier=basemodifier;
+		if (options.advanced_weapons==1){
+			if (options.isShotgun==1){
+				full_modifier+=20;
+			}
+			
+			else if (options.hasBlastRadius==1){
+				full_modifier+=20;
+			}
+			
+			if (options.hasAccessories==1){
+				const accessory_modifier=parseInt(results.results.accessory_modifier.result)||0;
+				console.log('accessory_modifier: ',accessory_modifier);
+				full_modifier+=accessory_modifier;
+			}
+			
+
+		}
+
+		full_modifier= full_modifier>40 ? 40 : full_modifier;
+		const rating_check=(rating+full_modifier)<0 ? 0 : (rating+full_modifier)>99 ? 99 : (rating+full_modifier);	
+		console.log('rating: ',rating);
+		console.log('rating_check: ',rating_check);
+		console.log('dice: ',dice);
+		console.log('dice<rating:',dice<rating_check);
+		console.log('dice<rating_check:',dice<rating_check);
+		// TO DEBUG
+		const [isSuccess,isCritical]=check_success(dice,rollName,'',rating_check,0)	
+		
+		console.log('isSuccess:',isSuccess);
+		console.log('isCritical:',isCritical);
+
+		newroll={
+			rating: rating_check,
+			dice: dice,
+			modifier: full_modifier,
+			isSuccess: isSuccess,
+			isCritical: isCritical,
+			zero_willpower: zero_willpower,
+			low_willpower: low_willpower,
+			advanced_weapons: advanced_weapons
+		};
+
+
+		console.log(newroll);
+		finishRoll(results.rollId,newroll);
+	});
+};	
+
+const correct_modifier = (modifier,low_willpower,limit_to_40=1) => {
+	// Input:
+	// modifier is the base modifier provided by the used
+	// low_willpowe is the  low willpower flag [0,1]
+	// limit_to_40 is the flag to limit the upper bound modifier to 40% (not used but for future and debugging) [0,1]
+	// Output:
+	// the corrected modifier
+	var corrected_modifier=modifier - (20*low_willpower);
+	return limit_to_40==1 ? Math.min(40,corrected_modifier) : corrected_modifier;
+}
+const correct_rating = (rating,modifier,limit_to_99=1) => {
+	// Input:
+	// rating is the base rating of the skill
+	// modifier is the corrected modifier
+	// limit_to_99 is the flag to limit the upper bound rating to 99% (0 for inhuman stats) [0,1]
+	// Output:
+	// the corrected rating
+	var corrected_rating=rating+modifier;
+	return limit_to_99==1 ? Math.min(99,corrected_rating) : corrected_rating;
+}
+
+
+const rollSkillAndStats=(rollValue,rollName,rollFail,isSkill) => {
+	// Input:
+	// rollValue is the string to roll the dice
+	// rollName is the name of the skill or stat
+	// rollFail used only for stats to check for failure
+	// limit_to_99 is the flag to limit the upper bound rating to 99% (0 for inhuman stats) [0,1]
+	startRoll(rollValue, (results)=> {
+		// low and zero willpower flags only used if the setting is on
+		const zero_willpower=results.results.zero_willpower.result;
+		const low_willpower=results.results.low_willpower.result;
+		//
+		const modifier= correct_modifier(results.results.modifier.result,low_willpower);
+		const rating  = correct_rating(results.results.rating.result,modifier,isSkill);
+		const dice=results.results.dice.result;
+
+		var newroll={};
+		const outcome=check_success(dice,rollName,rollFail,rating,isSkill);
+		newroll={
+			rating: rating_check,
+			dice: dice,
+			modifier: modifier,
+			isSuccess: outcome.isSuccess,
+			isCritical: outcome.isCritical,
+			zero_willpower: zero_willpower,
+			low_willpower: low_willpower
+		};
+
+		console.log(newroll);
+
+		finishRoll(results.rollId,newroll);
+	});
+};
+
+const rollBonds=(rollValue,_value,_names,_parameters) => {
+	
+	startRoll(`${rollValue}`, (results)=> {
+		console.log(results);
+
+		
+		///////////////////////////////////////////////////////////
+		const dice=results.results.dice.result;
+		const local_wp=Math.max(0,parseInt(results.results.local_wp.result)-dice);
+		var score=Math.max(0,parseInt(results.results.score.result)-dice);
+		const original_wp=parseInt(results.results.local_wp.result) || 0;
+
+		const zerowp=local_wp==0 ? 1 : 0;
+		console.log(`local_wp: ${local_wp}`);
+		console.log(`score: ${score}`);
+		console.log(`dice: ${dice}`);
+		console.log(`zerowp: ${zerowp}`);
+		var update={};
+		console.info('parameters',_parameters);
+		console.info('names',_names);
+		update[_names['local_wp_points']]=local_wp;
+		update[`willpower_points`]=local_wp;
+		if (parseInt(results.results.local_wp.result)||0 !=0){
+			update[_names[`score`]]=score;
+		}else{
+			score=parseInt(results.results.score.result) || 0;
+		}
+		update[_names[`color`]]=BondButtonColor(score);
+
+		newroll={
+			dice: Math.min(dice,original_wp),
+			local_wp: local_wp,
+			score: score,
+			zerowp: zerowp
+		};
+
+		finishRoll(results.rollId,newroll);
+		setAttrs(update,{silent:false}, () => {
+			console.info(`Bonds updated`,update);
+		});
+	});
+};
+
+
+
+_alldamages.forEach((element) => {
+	console.log('element: '+element);
+	console.log(`clicked:repeating_weapons:${element}-action`);
+	on(`clicked:repeating_weapons:${element}-action`, (eventInfo) => {
+		console.log(eventInfo);
+		const id = eventInfo.sourceAttribute.split('_')[2];
+		var _input_names = {};
+		var _parameters =[];
+		setDamageParametersAndInputNames(id,element, _parameters, _input_names)
+		clicked_repeating_damages(_parameters,_input_names);
+	});
+});
+
+const check_sanloss = (sanloss,element) => {
+	console.log('element: '+element);
+	console.log('sanloss: '+sanloss);
+	if (element==='sanity_success'){
+		console.log('sanity_success');
+		return sanloss=='' ? 0 : sanloss;
+	} else if(element==='sanity_failure'){ 
+		console.log('sanity_failure');
+		return sanloss=='' ? 1 : sanloss;
+	}
+};
+
+
+_npc_san_losses.forEach((element) => {
+	console.log('element: '+element);
+	on(`clicked:${element}-action`, (eventInfo) => {
+		console.log(eventInfo);
+		getAttrs([element],(values) => {
+			const sanloss=check_sanloss(values[element],element);
+			console.log(sanloss);
+			rollSanityDamages(sanloss,element);
+		});
+	});
+});
+
+
+_ritual_losses.forEach((element) => {
+	console.log('element: '+element);
+	on(`clicked:repeating_rituals:${element}-action`, (eventInfo) => {
+		console.log(eventInfo);
+		const id = eventInfo.sourceAttribute.split('_')[2];
+		const input_names = {};
+		var parameters =[];
+		input_names[`ritual_type`]=element;
+		parameters.push(`repeating_rituals_${id}_ritual_type`);
+		console.log('ritual_type: '+element);
+		console.log('id: '+id);
+		const repsecid = `repeating_rituals_${id}`;
+		input_names[`repsecid`]=repsecid;
+		input_names[`name`]=`${repsecid}_name`;
+		parameters.push(input_names[`name`]);
+		console.log('repsecid: '+repsecid);
+		console.info('parameters',parameters);
+		setRitualCostParametersAndInputNames(repsecid, parameters, input_names);
+		CurrentValues.forEach((element) => {
+			input_names[element]=`${element}`;
+			parameters.push(element);
+		});
+		console.log('log all parameters: ',parameters);
+		clicked_repeating_rituals_cost(parameters,input_names);
+	});
+});
+
+const clicked_repeating_rituals_cost = (parameters,names) => {
+	getAttrs(parameters, (values) => {
+		const ritual_type = names['ritual_type'];
+		// cost of the ritual
+		const other_costs={};
+		getOtherCosts(other_costs,values,names,RitualCosts);
+		getOtherCosts(other_costs,values,names,CurrentValues);
+		console.info('other costs: ',other_costs);
+
+		if(ritual_type==='pay_cost'){
+			paythecost(other_costs['sanity_loss_high'],other_costs);
+		}
+
+		if(ritual_type==='force_connection'){
+			forceconnection(other_costs['sanity_loss_high'],other_costs);
+		}	
+		
+		if(ritual_type==='accept_failure'){
+			acceptfailure(other_costs['sanity_loss_low'],other_costs);
+		}
+
+	});
+};
+
+
+const setDamageParametersAndInputNames=(id,element, _parameters, _input_names) => {
+	_input_names[`name`] = `repeating_weapons_${id}_name`;
+	_input_names[`repsecid`] = `repeating_weapons_${id}`;
+	_parameters.push(_input_names[`name`]);
+	
+	
+	_input_names[`hasammo`] = `repeating_weapons_${id}_hasammo`;
+	_parameters.push(_input_names[`hasammo`]);
+	var flagCritical=false;	
+	flagCritical= flagCritical || (element==='damage_critical');
+	flagCritical= flagCritical || (element==='double_barrel_critical');
+	flagCritical= flagCritical || (element==='lethality_critical');
+	flagCritical= flagCritical || (element==='selective_fire_critical');
+	
+	_input_names[`isCritical`] = (flagCritical==true) ? 1 :  0;
+	const isCritical=_input_names[`isCritical`];	
+
+	console.log('isCritical: '+isCritical);
+	
+	
+	if (element==='damage' || element==='damage_critical') {
+		console.log('damage');
+		if (isCritical==1){
+			_input_names[`header`] = `damage (×2)`;
+		}else{
+			_input_names[`header`] = `damage`;
+		}
+		_input_names[`damage`] = `repeating_weapons_${id}_damage`;
+		_parameters.push(_input_names[`damage`]);
+		_input_names[`damage_type`]='damage';
+	}else if (element==='double_barrel' || element==='double_barrel_critical') {
+		console.log('double damage');
+		_input_names[`damage_type`]='damage';
+		
+		if (isCritical==1){
+			_input_names[`header`] = `damage (×2)`;	
+		}else{
+			_input_names[`header`] = `damage`;
+		}
+
+		_input_names[`damage`] = `repeating_weapons_${id}_double_barrel`;
+		_parameters.push(_input_names[`damage`]);
+	}else if (element==='lethality' || element==='lethality_critical') {
+		console.log('lethality');
+		_input_names[`damage_type`]='lethality';
+		if (isCritical==1){
+			_input_names[`header`] = `lethality (×2)`;
+		}else{
+			_input_names[`header`] = `lethality`;
+		}
+		_input_names[`damage`] = `repeating_weapons_${id}_lethality_percent`;
+		_parameters.push(_input_names[`damage`]);
+	}else if (element==='selective_fire' || element==='selective_fire_critical') {
+
+		if (isCritical==1){
+			_input_names[`header`] = `selective fire (×2)`;
+		}else{
+			_input_names[`header`] = `selective fire`;
+		}
+		
+		_input_names[`damage_type`]='lethality';
+		_input_names[`header`] = `selective fire`;
+		_input_names[`damage`] = `repeating_weapons_${id}_selfire_lethality`;
+		_parameters.push(_input_names[`damage`]);
+		_input_names[`selfire_type`] = `repeating_weapons_${id}_selfire_type`;
+		_parameters.push(_input_names[`selfire_type`]);
+	}
+
+
+	_input_names[`ammo`] = `repeating_weapons_${id}_ammo`;
+	_parameters.push(_input_names[`ammo`]);
+	_input_names[`track_bullets`] = `track_bullets`;
+	_parameters.push(_input_names[`track_bullets`]);
+};
+
+const check_track_ammo=(rollString,trackAmmo,currentAmmo,used_ammo=1) => {
+	if (trackAmmo==1) {
+		rollString = `${rollString} {{trackbullets=[[1]]}} {{used_ammo=[[${used_ammo}]]}}`;
+		rollString = `${rollString} {{current_ammo=[[${currentAmmo}]]}}`;
+	} else {
+		rollString = `${rollString} {{trackbullets=[[0]]}}`;
+	}
+	return rollString;
+};
+
+const getUsedAmmo=(selfire_type='') => {
+	if (selfire_type==='short burst'){return 3} ;
+	if (selfire_type==='long burst'){return 5} ;
+	if (selfire_type==='short spray'){return 10} ;
+	if (selfire_type==='long spray'){return 20} ;
+	return 1;
+}
+
+const clicked_repeating_damages = (parameters,names) => {
+	getAttrs(parameters, (values) => {
+		const isCritical=names['isCritical'];
+		const track_bullets=values[names['track_bullets']]==='active' ? 1 : 0;
+		const hasammo=values[names['hasammo']]==='active' ? 1 : 0;
+		const trackAmmo=track_bullets==1 && hasammo==1 ? 1 : 0;
+		const currentAmmo=Math.max(0,parseInt(values[names['ammo']]) || 0);
+		const selfire_type=(values[names['selfire_type']]) || '';
+		const used_ammo=getUsedAmmo(selfire_type);
+		console.log('trackAmmo: '+trackAmmo);
+		console.log('hasammo: '+hasammo);
+		console.log('currentAmmo: '+currentAmmo);
+		console.log('selfire_type: '+selfire_type);
+		console.log('used_ammo: '+used_ammo);
+		const damage_type=names['damage_type'];
+		var damage=values[names['damage']];
+
+		const header=names['header'];
+		
+		var rollString=`${prefix_damage_roll} {{header=^{${header}}}}`;
+
+		
+		var damageString='';
+
+		if (damage_type === 'damage') {
+			if (isCritical==1){
+				damageString=`{{damage=[[2*${damage}]]}}`;
+			}else{
+				damageString=`{{damage=[[${damage}]]}}`;
+			}
+			
+			rollString = `${rollString}  ${damageString}`;
+			
+			rollString = check_track_ammo(rollString,trackAmmo,currentAmmo,used_ammo)
+		}else if (damage_type === 'lethality') {
+			if (isCritical==1){
+				damage=2*damage;
+			}
+			damageString=`{{lethality=[[${damage}]]}}`;
+			
+			rollString = `${rollString} ${damageString}`;
+			rollString = `${rollString} {{roll=[[1d100]]}}`;
+			
+			rollString = check_track_ammo(rollString,trackAmmo,currentAmmo,used_ammo)
+		}
+		rollString = `${rollString} {{isCritical=[[${isCritical}]]}}`;
+		
+		console.info(rollString);
+		
+		startRoll(rollString, (results) => {
+			
+			const newroll = getRollDamage(results,trackAmmo,damage_type,isCritical);
+			
+			newroll['isCritical']=isCritical;
+			newroll['trackbullets']=trackAmmo;
+			finishRoll(results.rollId,newroll);
+			if (trackAmmo==1){
+				const update={};
+				update[names['ammo']]=newroll['current_ammo'];
+				setAttrs(update, () => {
+					console.log('Ammo updated',update);
+				});
+			}
+		});
+	});
+};
+
+
+const getRollDamage= (results,trackammo,damage_type,critical) =>{
+	const newroll={};
+	if (trackammo==1){
+		const trackbullets=[[1]];
+		newroll['trackbullets']=trackbullets;
+		const used_ammo=results.results.used_ammo.result;
+		const current_ammo=results.results.current_ammo.result;
+		const expended_ammo= current_ammo - used_ammo;
+
+		newroll['current_ammo']= expended_ammo;
+	}
+	if (damage_type==='damage'){
+		const damage=results.results.damage.result;
+		newroll['damage']=damage;
+	}
+	if (damage_type==='lethality'){
+		const lethality=results.results.lethality.result;
+		const roll=results.results.roll.result;
+		const quotient=Math.round(roll/10);
+		const remainder=Math.round(roll%10);
+		var computed_lethality=lethality;
+		var computed_roll= quotient+ (remainder>0 ? remainder : 10);
+
+		if (critical==1) {
+			computed_lethality=lethality*2;
+			computed_roll= computed_roll*2;
+		}
+		
+		newroll['roll']=computed_roll;
+		newroll['lethality']=computed_lethality;
+	}
+	return newroll;
+};
+
+const need_to_track_ammo = (_values,_names)=>{
+	const track_bullets=_values[_names['track_bullets']]==='active' ? 1 : 0;
+	const hasammo=_values[_names['hasammo']]==='active' ? 1 : 0;
+	return (track_bullets==1 && hasammo==1) ? 1 : 0;
+}
+
+const get_effective_damage = (value) => {
+	var effective_damage='';
+	if (value==='' || parseInt(value)===0){ return effective_damage};
+	return effective_damage= value;
+}
+
+const clicked_repeating_weapons= (parameters,names,queryModifier) => {
+	getAttrs(parameters, (values) => {
+		// used to set the roll string
+		const character_id=values['character_id'];
+		const repsecid= names['repsecid'];
+		//
+		const skillrank=setMinMax(values[names['rank']]);
+		const trackAmmo= need_to_track_ammo(values,names);
+		const current_ammo=Math.max(0,parseInt(values[names['ammo']]) || 0);
+		//
+		const hasAdvancedWeapons=values[names['advanced_weapons']] === 'active' ? 1 : 0;
+		const isShotgun = values[names['shotgun']] === 'active' ? 1 : 0;
+		const hasDoubleBarrel = values[names['hasDoubleBarrel']] === 'active' ? 1 : 0;
+		const hasSelectiveFire = values[names['selfire']] === 'active' ? 1 : 0;
+		const hasAccessories = values[names['accessories']] === 'active' ? 1 : 0;
+		const hasBlastRadius = values[names['blast_radius']] === 'active' ? 1 : 0;
+		//
+		const lethality=setMinMax(values[names['lethality']],0,100);
+		const damage= get_effective_damage(values[names['damage']]);
+		const armor_piercing=Math.min(parseInt(values[names['armor_piercing']],10)||0,0);
+		const base_range=values[names['range']];
+		const kill_radius=values[names['kill_radius']];
+		//
+		var _options={};
+		_options['rating']=skillrank;
+		_options['hasLethality']= lethality>0 ? 1 : 0;
+		_options['hasDamage']= damage !='' ? 1 : 0;
+		if (_options['hasDamage']===1) {_options['damage']=damage;}
+		if (_options['hasLethality']===1) {_options['lethality']=lethality;}
+		if (trackAmmo==1) {_options['trackAmmo']=1;_options['current_ammo']=current_ammo;}
+		if (hasAdvancedWeapons===1) {_options['hasAdvancedWeapons']=1;}
+		if (isShotgun===1) {_options['isShotgun']=1;}
+		if (hasDoubleBarrel===1) {_options['hasDoubleBarrel']=1;_options['double_barrel']=values[names['double_barrel']];}
+		if (hasSelectiveFire===1) {	_options['hasSelectiveFire']=1;	_options['selfire_lethality']=values[names['selfire_lethality']];_options['selfire_type']=values[names['selfire_type']];}
+		if (hasAccessories===1) {_options['hasAccessories']=1;_options['accessory_modifier']=values[names['accessory_modifier']];}
+		if (hasBlastRadius===1) {_options['hasBlastRadius']=1;}
+
+		const wp_mod=check_for_wp_modifiers(values);
+
+		
+		const rollString=`${prefix_skill_roll} {{header=${skillname}}} {{subheader=${skillrank}}}`;
+
+		var rollValue = `${rollString} {{rating=[[${skillrank}]]}} {{modifier=[[${queryModifier}]]}} `;
+		rollValue += ` {{low_willpower=${wp_mod.low_willpower}}}  {{zero_willpower=${wp_mod.zero_willpower}}}`;
+		rollValue += ` {{isCritical=[[0]]}} {{isSuccess=[[0]]}}`;		
+		rollValue += ` {{advanced_weapons=[[${hasAdvancedWeapons}]]}}`;		
+
+		if (base_range != "")   {rollValue += '{{base_range=' + base_range + '}}';}
+		if (armor_piercing !=0) {rollValue += '{{armor_piercing=' + armor_piercing + '}}';}
+		if (kill_radius != "")  {rollValue += '{{kill_radius=' + kill_radius + '}}';}
+
+	
+		const options = setWeaponOptions(_options)
+		rollValue += setAdvancedWeaponsString(options,character_id,repsecid);
+		
+
+		console.log(rollValue);
+		rollAttacks(rollValue,skillname,options);
+
+
+	});
+};
+
+const clicked_repeating_actions = (type,parameters,names,queryModifier) => {
+	
+	initializeRolls();		// Initialize the rolls if flag is not set
+	if (type==='weapons'){
+		clicked_repeating_weapons(parameters,names,queryModifier);
+	}
+	if (type==='bonds'){
+		clicked_repeating_bonds(parameters,names,queryModifier);
+	}
+	if (type==='special'){
+		clicked_repeating_skills(parameters,names,queryModifier,0);
+	}
+	if (type==='skills'){
+		clicked_repeating_skills(parameters,names,queryModifier,1);
+	}
+	if (type==='rituals'){
+		clicked_repeating_rituals(parameters,names,queryModifier);
+	}
+}
+
+const clicked_repeating_skills = (parameters,names,queryModifier,rollType) => {
+	getAttrs(parameters, (values) => {
+		const skillname=values[names['name']];
+		const skillfail=names['fail'];
+		const skillrank=parseInt(values[names['rank']]) || 0;
+		console.log(`skillname: ${skillname} name: ${names['name']}`);
+		console.log(`skillrank: ${skillrank} rank: ${names['rank']}`);
+		console.info('values',values);
+
+
+		const rollString=`${prefix_skill_roll} {{header=${skillname}}} {{subheader=${skillrank}}} `;
+		///////////////////////////////////////////////////////////
+		const wp_modifiers=check_for_wp_modifiers(values);
+
+		const _zero_willpower = wp_modifiers.zero_willpower;
+		const _low_willpower = wp_modifiers.low_willpower;
+		const rating=parseInt(values[parameters[names['rank']]]) || 0;
+		var rollValue = `${rollString} {{rating=[[${skillrank}]]}}  {{zero_willpower=${_zero_willpower}}} {{low_willpower=${_low_willpower}}}}  {{modifier=[[${queryModifier}]]}} {{isCritical=[[0]]}} {{isSuccess=[[0]]}}`;		
+
+
+		if(_zero_willpower!='[[1]]') {
+			rollValue = `${rollValue}`; 			
+		}
+
+		console.log(rollValue);
+		rollSkillAndStats(rollValue,skillname,skillfail,rollType);
+
+
+	});
+
+};
+
+
+
+const clicked_repeating_bonds = (parameters,names) => {
+	getAttrs(parameters, (values) => {
+		const bondname=values[names['name']];
+		const bondscore=parseInt(values[names['score']]) || 0;
+        const local_wp_points=parseInt(values[names['local_wp_points']]) || 0;
+		const local_sanity_points=parseInt(values[names['local_sanity_points']]) || 0;
+		const character_id=values['character_id'];
+		console.log(`bondname: ${bondname} name: ${names['name']}`);
+		console.log(`bondscore: ${bondscore} score: ${names['score']}`);
+		console.log(`local_wp_points: ${local_wp_points} wp_points: ${parameters[`willpower_points`]}`);
+		console.log(`local_sanity_points: ${local_sanity_points} sanity_points: ${parameters[`sanity_points`]}`);
+		console.info('values',values);
+		/////////////////////////////////////
+		if (bondscore<=0) {return;}  // No need to roll if the bond is already broken
+		////////////////////////////////////
+
+		const rollString=`${prefix_bond_roll} {{header=${bondname}}} {{subheader=${bondscore}}} `;
+		///////////////////////////////////////////////////////////
+		
+		var rollValue = `${rollString} {{zerowp=[[0]]}} {{score=[[${bondscore}]]}} {{local_wp=[[${local_wp_points}]]}} {{local_sanity=[[${local_sanity_points}}]]}} {{repress= [^{repress}](~${character_id}|sanity_points)}}`;
+		rollValue=`${rollValue} {{projection=1}} {{repression=1}}`;
+		
+		console.info('rollValue',rollValue);
+
+		console.log(rollValue);
+		rollBonds(rollValue,values,names,parameters);
+
+
+	});
+
+};
+
+
+
+// Important functions
+
+
+_allrolls.forEach(roll => {
+	const _roll = (roll === 'sanity_points') ? 'sanity' : roll;		
+	on(`clicked:${roll}-action`, (eventInfo) => {
+		const additionalParameters={}
+		if (arrays[`_editable_skills`].includes(_roll)){
+			const prefix_skill=_roll.slice(0,-2);
+			additionalParameters['editable_name']=`${_roll}_name`;
+			additionalParameters['editable_type']=prefix_skill.replace('_',' ');
+		}else{
+			const caps = (_roll === 'humint' || _roll === 'sigint') ? _roll.toUpperCase() : _roll.replace('_',' ')
+			additionalParameters['name']=caps.replace('_',' ');
+		}
+		
+		const rollString=`${prefix_skill_roll} {{subheader=@{${roll}}}} `;
+
+		rollwithmodifiers(rollString,roll,_queryModifier,additionalParameters);		
+	});
+});
+
+const setCommonParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`name`] = `${repsecid}_name`;
+	_input_names[`repsecid`] = `${repsecid}`;
+	_parameters.push(_input_names[`name`]);
+    _parameters.push(`willpower_points`);
+    _parameters.push(`sanity_points`);
+    _parameters.push(`low_willpower`);
+    _parameters.push(`zero_willpower`);
+    _parameters.push(`character_id`);
+	
+}
+
+const setSkillsParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`rank`] = `${repsecid}_rank`;    
+	_input_names[`fail`] = `${repsecid}_fail`;
+	_parameters.push(_input_names[`rank`]);
+	_parameters.push(_input_names[`fail`]);
+}
+
+const setBondsParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`local_wp_points`] = `willpower_points`;
+	_input_names[`local_sanity_points`] = `sanity_points`;
+	
+	
+	_input_names[`score`] = `${repsecid}_score`;
+	_input_names[`color`] = `${repsecid}_color`;
+	_parameters.push(_input_names[`local_wp_points`]);
+	_parameters.push(_input_names[`local_sanity_points`]);
+	_parameters.push(_input_names[`score`]);
+	_parameters.push(_input_names[`color`]);
+};
+
+const setSpecialParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`rank`] = `${repsecid}_skill_span`;   
+	_parameters.push(_input_names[`rank`]);
+};
+
+const setGeneralWeaponParametersAndInputNames=(repsecid, _parameters, _input_names)=>{
+	_input_names[`rank`] = `${repsecid}_skill_span`;
+	_parameters.push(_input_names[`rank`]);
+	_input_names[`range`] = `${repsecid}_base_range`;
+	_parameters.push(_input_names[`range`]);
+	_input_names[`damage`] = `${repsecid}_damage`;
+	// write the push in function of the input name
+	_parameters.push(_input_names[`damage`]);
+	_input_names[`armor_piercing`] = `${repsecid}_armor_piercing`;
+	_parameters.push(_input_names[`armor_piercing`]);
+	_input_names[`ammo`] = `${repsecid}_ammo`;
+	_parameters.push(_input_names[`ammo`]);
+	_input_names[`hasammo`] = `${repsecid}_hasammo`;
+	_parameters.push(_input_names[`hasammo`]);
+		
+	_input_names[`lethality`]=`${repsecid}_lethality_percent`;
+	_parameters.push(_input_names[`lethality`]);
+	_input_names[`kill_radius`]=`${repsecid}_kill_radius`;
+	_parameters.push(_input_names[`kill_radius`]);
+};
+
+const setShotgunParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`shotgun`] = `${repsecid}_shotgun`;
+	_parameters.push(_input_names[`shotgun`]);
+	_input_names[`hasDoubleBarrel`] = `${repsecid}_hasDoubleBarrel`;	
+	_parameters.push(_input_names[`hasDoubleBarrel`]);
+	_input_names[`double_barrel`] = `${repsecid}_double_barrel`;
+	_parameters.push(_input_names[`double_barrel`]);
+};
+
+const setAccessoriesParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`accessories`]=`${repsecid}_hasAccessories`;	
+	_parameters.push(_input_names[`accessories`]);
+	_input_names[`accessory_name`]=`${repsecid}_accessory_name`;
+	_parameters.push(_input_names[`accessory_name`]);
+	_input_names[`accessory_modifier`]=`${repsecid}_accessory_modifier`;
+	_parameters.push(_input_names[`accessory_modifier`]);
+};
+
+const setBlastRadiusParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`blast_radius`]=`${repsecid}_blast_radius`;
+	_parameters.push(_input_names[`blast_radius`]);
+};
+
+const setSelectiveFireParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+	_input_names[`selfire`]=`${repsecid}_selfire`;
+	_parameters.push(_input_names[`selfire`]);	
+	_input_names[`selfire_lethality`]=`${repsecid}_selfire_lethality`;
+	_parameters.push(_input_names[`selfire_lethality`]);
+	_input_names[`selfire_type`]=`${repsecid}_selfire_type`;
+	_parameters.push(_input_names[`selfire_type`]);
+};
+
+const setAdvancedWeaponParametersAndInputNames=(repsecid, _parameters, _input_names) => {
+
+	_input_names[`advanced_weapons`]=`advanced_weapons`;
+	_parameters.push(_input_names[`advanced_weapons`]);
+
+	setShotgunParametersAndInputNames(repsecid, _parameters, _input_names);
+	setAccessoriesParametersAndInputNames(repsecid, _parameters, _input_names);
+	setBlastRadiusParametersAndInputNames(repsecid, _parameters, _input_names);
+	setSelectiveFireParametersAndInputNames(repsecid, _parameters, _input_names);	
+
+}
+
+const setRepeatingParametersAndInputNames=(section, id, _parameters, _input_names) => {
+	const repsecid = `repeating_${section}_${id}`;
+	_input_names[`section`] = section;
+	_input_names[`id`] = id;
+	setCommonParametersAndInputNames(repsecid, _parameters, _input_names);
+    if (section === 'skills') {
+        setSkillsParametersAndInputNames(repsecid, _parameters, _input_names);
+    } else if (section === 'bonds') {
+		setBondsParametersAndInputNames(repsecid, _parameters, _input_names);
+    } else if (section === 'special') {
+		setSpecialParametersAndInputNames(repsecid, _parameters, _input_names);
+	} else if (section==='rituals') {
+		setRitualParametersAndInputNames(repsecid, _parameters, _input_names);
+    } else if (section==='weapons') {
+
+		setGeneralWeaponParametersAndInputNames(repsecid, _parameters, _input_names);
+
+		setAdvancedWeaponParametersAndInputNames(repsecid, _parameters, _input_names);
+
+		_input_names[`track_bullets`]=`track_bullets`;	
+		_parameters.push(_input_names[`track_bullets`]);
+
+	} else {
+        console.error(`Section ${section} not found`);
+    }
+}
+
+Object.entries(_repeating_sections).forEach(([element,section]) => {
+	on(`clicked:repeating_${section}:${element}-action`, (eventInfo) => {
+		
+		console.log(eventInfo);
+		const id = eventInfo.sourceAttribute.split('_')[2];
+		const queryModifier=_queryModifier;
+		var _input_names = {};
+		var _parameters =[];
+		setRepeatingParametersAndInputNames(section, id, _parameters, _input_names)
+
+		console.info(`parameters: ${_parameters}`);
+		console.info(`input names: ${_input_names}`);
+
+		
+		clicked_repeating_actions(section, _parameters, _input_names, queryModifier);
+
+	});
+});
+
+
+
+//levelup character
+on("clicked:levelup", () =>{
+    let update={};
+    let copyarray=arrays['_skills'];  // copy of the array containing all skills ranks
+    let len=copyarray.length;         // length of the original copyarray
+    let getarray=[];                  // used only to update the values
+    let summary={};                   // information in the log for the users
+    let var_rnd=0;                    // random variable of 1d4
+    let block_to_insert ;
+    let container_block ;
+    let newrowid;
+    let newrowattrs = {};
+    let oldval=0;
+    let newval=0;
+    let name;  
+
+	var addskill=[];
+	
+	getSectionIDs('skills', (idarray) => {
+		addskills=idarray.map(id =>`repeating_skills_${id}`) ; 
+		console.log(addskills);  //log of debugging to be sure
+	
+		copyarray=copyarray.concat(addskills);           // concatenate skill array with repeating skill array
+		console.dir(copyarray);              
+		getSectionIDs("summary", function(idarray) {
+		for(var i=0; i < idarray.length; i++) {
+			removeRepeatingRow("repeating_summary_" + idarray[i]);
+		}
+		});
+		
+		
+		copyarray.forEach((sk,idx)=>{
+			//console.log(idx);
+			if (idx<len){                                // if the idx<len it means I an in the skill array part
+				getAttrs([`${sk}`,`${sk}_name`,`${sk}_fail`],(val)=>{
+					getarray.push(`${sk}`);
+					//console.log(val[`${sk}_fail`]);
+					//    console.log(`${sk}`);
+					if (val[`${sk}_fail`]=='on'){                    //if the checkbox is checked
+						var_rnd=Math.ceil(Math.random() * 4);     // generate a random number for each checked value (less number generated)
+						//console.log(`${idx}`);
+						oldval=(parseInt(val[`${sk}`])||0);
+						newval=oldval+var_rnd;
+						name=val[`${sk}_name`];
+						summary[`${sk}`]=var_rnd;                    // how much the skill has changed 0-3
+						update[`${sk}`]=newval;  // new value of the skill
+						update[`${sk}_fail`]='off';                           // uncheck checkbox
+						
+						//block_to_insert = document.createElement( 'div' );
+						//block_to_insert.innerHTML = 'This demo DIV block was inserted into the page using JavaScript.' ;
+						
+						//container_block = document.getElementById( 'summary' );
+						//container_block.appendChild( block_to_insert );
+						newrowid = generateRowID();
+						newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
+						newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
+						newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
+						
+					}
+				});
+			} else { // if the idx>=len it means I an in the  repeating skill array part
+				getAttrs([`${sk}_name`,`${sk}_rank`,`${sk}_fail`],(val)=>{
+					getarray.push(`${sk}_rank`);
+					//console.log(val[`${sk}_fail`]);
+					//    console.log(`${sk}`);
+					if (val[`${sk}_fail`]=='on'){
+						var_rnd=Math.ceil(Math.random() * 4);       // generate a random number for each checked value (less number generated)
+						//console.log(`${idx}`);
+						summary[`${idx-len}_rank`]=var_rnd;           // since the repeating skill don't have a name, they are identified by number 0-N
+						//
+						oldval=(parseInt(val[`${sk}_rank`])||0);
+						newval=oldval+var_rnd;
+						name=val[`${sk}_name`];
+						//
+						update[`${sk}_rank`]=(parseInt(val[`${sk}_rank`])||0)+var_rnd;
+						update[`${sk}_fail`]='off';
+						newrowid = generateRowID();
+						newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
+						newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
+						newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
+					}
+				});
+			}
+		});
+		//console.log(getarray);
+		console.log(newrowattrs);             // summary in console for the user
+		//setAttrs(newrowattrs);
+		console.log(summary);             // summary in console for the user
+		getAttrs(getarray,()=>{             // update fields
+			setAttributes(update,false);
+			setAttributes(newrowattrs,false);
+		});
+		//console.dir(update);
+	});
+});
+
+const initializeRolls = () => {
+    if (!_isInitialized) {
+        // Perform the necessary setup for rolls
+        console.info('Initializing rolls...');
+        
+        // Example setup code
+        updateRollsOnOpen();
+        updateRepeatingRollsonOpen();
+		setResetBreakingPointsOnOpen();
+		updateRitualInfoOnOpen();
+        console.log('Rolls initialized');
+        // Set the flag to true after initialization
+        _isInitialized = true;
+		updateritualskill();	
+    }
+};
+
+
+const rollSanityDamages = (sanloss) => {
+	const standard =`{{trackbullets=[[0]]}} {{isCritical=[[0]]}}`;
+	console.log('Sanity loss: '+sanloss);
+	var rollString= `${prefix_damage_roll} {{header=^{sanity loss}}}`
+	rollString+=`{{subheader=${sanloss}}}  {{damage=[[${sanloss}]]}} ${standard}`;
+	console.log(rollString);
+	startRoll(rollString, (results) => {
+		const newroll = getRollDamage(results,0,'damage',0);
+		newroll['isCritical']=0;
+		newroll['trackbullets']=0;
+		
+		finishRoll(results.rollId,newroll);
+
+		console.log('Sanity loss updated',newroll);
+		console.log(results);
+	});	 
+};
+
+
+const paythecost=(sanity_loss,other_costs,fraction=1) => {
+        // lower sanity loss (not half)
+        console.info('pay the cost',other_costs);   
+        rollSan=  `${prefix_ritualloss_roll}`;
+        //used for before the roll
+        var hasCosts = {};
+        CurrentValues.forEach((attrName) => {
+            const current=parseInt(other_costs[attrName]) || 0;
+            var price= other_costs[attrName+'_cost'];
+            if (attrName !== 'sanity_points') {
+                if (price === '1' && fraction === 2) {price=0;}                
+                rollSan += ` {{${attrName}_cost=[[${price}/${fraction}]]}}`
+                rollSan += ` {{${attrName}=${current}}}`
+                if (price !== 0 && price !== '0') {
+                    rollSan += ` {{has_${attrName}=1}}`
+                    hasCosts[attrName] = 1;
+                } else {
+                    console.log('no cost for',attrName);
+                };
+            }
+        });
+
+        rollSan += ` {{sanity_points_cost=[[${sanity_loss}]]}}`;
+        rollSan += ` {{sanity_points=${other_costs.sanity_points}}}`;
+        rollSan += ` {{has_sanity_points=1}}`;
+
+        hasCosts['sanity_points'] = 1;
+
+
+        console.info('roll for san cost:',rollSan);
+        startRoll(rollSan, (results) => {
+            const newroll = {};
+            const update = {};
+
+            CurrentValues.forEach((attrName) => {
+                const attrCost=attrName+'_cost';
+                const old_value=parseInt(other_costs[attrName]) || 0;
+                const cost = parseInt(results.results[attrCost].result) || 0;
+                console.log(`${attrCost}: ${cost}`);
+                const new_value = Math.max(0,old_value - cost);
+                newroll[attrCost] = new_value;
+                if (hasCosts.hasOwnProperty(attrName)) {
+                    update[attrName] = new_value;
+                }
+            });
+            
+            finishRoll(results.rollId,newroll);
+
+            console.info('update',update);
+            console.info('newroll',update);
+
+            setAttrs(update, {silent:true}, () => {
+                updatebreakingpoints() // I need to update the breaking points in the callback
+                console.log('sanity points updated');
+                console.info(update);
+            });
+        });
+
+};
+
+const acceptfailure=(sanity_loss_low,other_costs) => {
+    paythecost(sanity_loss_low,other_costs,2);
+};
+
+const forceconnection=(sanity_loss_high,other_costs) => {
+    other_costs['power_score'] = other_costs['power_score']+1 ;
+    paythecost(sanity_loss_high,other_costs,1);
+};
+
+const name_and_param=(repsecid,attrName, _parameters, _input_names) => {
+    _input_names[attrName] = `${repsecid}_${attrName}`;
+    console.log(_input_names[attrName]);
+    _parameters.push(_input_names[attrName]);
+    console.log(_parameters);
+};
+
+const general_manipulation=(repsecid, _parameters, _input_names) => {
+    // general informations to manupulate results
+    _input_names['charname'] = 'character_name';
+    _parameters.push(_input_names['charname']);
+    _input_names['charid'] = 'character_id';
+    _parameters.push(_input_names['charid']);
+    _input_names['ritualid'] = repsecid;
+};
+
+const setRitualCostParametersAndInputNames = (repsecid, _parameters, _input_names) => {
+    console.info('RitualCosts',RitualCosts);
+    console.info('type of _parameters',typeof(_parameters));
+    console.info('parameters',_parameters);
+    RitualCosts.forEach((attrName) => {
+        name_and_param(repsecid,attrName, _parameters, _input_names);
+        console.log(attrName+': '+_parameters[_input_names[attrName]]);
+    });
+};
+
+const setRitualDamageParametersAndInputNames = (repsecid, _parameters, _input_names) => {
+    
+    RitualDamages.forEach((attrName) => {
+        name_and_param(repsecid,attrName, _parameters, _input_names);
+    });
+        
+    RitualHeals.forEach((attrName) => {
+        name_and_param(repsecid,attrName, _parameters, _input_names);
+    });
+};
+
+
+
+const setRitualParametersAndInputNames = (repsecid, _parameters, _input_names) => {
+    
+    console.info('Get general informations');
+    general_manipulation(repsecid, _parameters, _input_names);
+    console.info(_parameters);
+    
+    // general informations
+    console.info('Get RitualRolls');
+    RitualRolls.forEach((attrName) => {
+        name_and_param(repsecid,attrName, _parameters, _input_names);
+    });    
+    console.info(_parameters);
+
+    console.info('Get RitualCosts');
+    setRitualCostParametersAndInputNames(repsecid, _parameters, _input_names);
+    console.info(_parameters);
+    console.info('Get RitualDamages');
+    setRitualDamageParametersAndInputNames(repsecid, _parameters, _input_names);
+    console.log(_parameters);
+};
+
+const getOtherCosts = (other_costs,values,names,array) => {   
+    array.forEach((element) => {
+			other_costs[element]=(values[names[element]]    != '') ? values[names[element]] : 0;;
+    });
+};
+
+const name_to_shorthand = (name) => {
+    if (name === 'willpower_points') {return 'WP';}
+    if (name === 'hit_points') {return 'HP';}
+    if (name === 'strength_score') {return 'STR';}
+    if (name === 'constitution_score') {return 'CON';}
+    if (name === 'dexterity_score') {return 'DEX';}
+    if (name === 'intelligence_score') {return 'INT';}
+    if (name === 'charisma_score') {return 'CHA';}
+    if (name === 'power_score') {return 'POW';}
+};
+const prepare_ritual_rolls = (other_costs,values,names) => {
+    var localString='';  
+    const damage_target_stat=name_to_shorthand(other_costs.damage_target_stat);
+    const health_target_stat=name_to_shorthand(other_costs.health_target_stat);
+    const attack_amount = other_costs.attack_amount;
+    const health_amount = other_costs.health_amount;
+    const isLethalAttack=((parseInt(attack_amount,10) || 0 !==0) && other_costs.damage_isLethal=='lethal');
+    const isNormalAttack=(attack_amount !=='' && other_costs.damage_isLethal=='normal');
+    const isLethalHeal=((parseInt(health_amount,10) || 0 !==0) && other_costs.health_isLethal=='lethal');
+    const isNormalHeal=(health_amount !=='' && other_costs.health_isLethal=='normal;');
+    var damage_button = '';
+    var heal_button = '';
+    const const_button_part = '](~'+values[names['charid']]+'|'+names['repsecid']+'_';
+    const prefix_damage_button = '{{damage_button=[';
+    const prefix_heal_button = '{{heal_button=[';
+    const prefix_power_reaction='{{power_reaction=[';
+    const suffix_damage_button = damage_target_stat+const_button_part+'damage_button)}}';
+    const suffix_heal_button = health_target_stat+const_button_part+'heal_button)}}';
+    const suffix_power_reaction = const_button_part+'power_reaction)}}';
+    const power_reaction_button = prefix_power_reaction+'^{POWER}'+suffix_power_reaction;
+    if(isLethalAttack){
+        damage_button += prefix_damage_button
+        damage_button += parseInt(attack_amount,10)+'% '
+        damage_button += suffix_damage_button
+    }
+    if(isNormalAttack){
+        damage_button += prefix_damage_button
+        damage_button += attack_amount.toUpperCase()+ ' ';
+        damage_button += suffix_damage_button
+    }
+
+    if(isLethalHeal){
+        heal_button += prefix_heal_button
+        heal_button += parseInt(health_amount,10)+'% ';
+        heal_button += suffix_heal_button
+    }
+    if(isNormalHeal){
+        heal_button += prefix_heal_button
+        heal_button += health_amount.toUpperCase()+ ' ';
+        heal_button += suffix_heal_button
+    }
+    
+    localString += damage_button;
+    localString += heal_button;
+    
+    
+    const power_reaction=values[names['power_reaction']] === 'active' ? 1 : 0;
+    if (power_reaction === 1) {
+        localString += power_reaction_button;
+    }
+    
+    console.log('localString',localString);
+
+
+    return localString;
+};
+
+const clicked_repeating_rituals = (parameters,names,queryModifier) => {
+    getAttrs(parameters, (values) => {
+        // cost of the ritual
+        const other_costs={};
+        getOtherCosts(other_costs,values,names,RitualCosts);
+        getOtherCosts(other_costs,values,names,RitualDamages);
+        getOtherCosts(other_costs,values,names,RitualHeals);
+
+        // what is needed to roll
+        const rating = values[names['skill_span']];
+        const sanity_loss_low = other_costs['sanity_loss_low'];
+        const sanity_loss_high = other_costs['sanity_loss_high'];
+        console.info('other_costs',other_costs);
+        // info ritual
+        const ritual_name = values[names['name']];
+        const description = values[names['description']];
+
+        var rollString=`${prefix_ritual_roll} {{header=${ritual_name}}}`;
+        rollString +=` {{subheader=${rating}}}`;
+        rollString +=` {{rating=[[${rating}]]}}`;
+        rollString +=` {{queryModifier=${queryModifier}}}`;
+        
+        if (description !=='') {rollString += `{{description=${description}}}`;}
+        
+        rollString += `{{sanity_loss_low=${sanity_loss_low}}}`;
+        rollString += `{{sanity_loss_high=${sanity_loss_high}}}`;
+        
+        var hasOtherCosts = false;
+        var costString = '';    
+        Object.entries(other_costs).forEach(([key, value]) => {
+            if (value != '' && value!= '0') {costString += `{{${key}=${value}}}`; hasOtherCosts = true;}
+        });
+        
+        console.info('costString',costString);
+        rollString += costString;
+
+
+        rollString += `{{hasCost=[[0]]}}`;
+        rollString += prepare_ritual_rolls(other_costs,values,names);
+
+        const flawed_ritual = values[names['flawed_ritual']] === 'active' ? 1 : 0; 
+        rollString += `{{flawed_ritual=[[${flawed_ritual}]]}}`;
+        rollString += `{{modifier=[[${queryModifier}]]}}`;
+
+        const charid=values[names['charid']];
+        const ritualid=names['ritualid']; // ritualid is the repeating section id, not a parameter
+
+        rollString += `{{pay_cost=[^{pay the cost}](~${charid}|${ritualid}_pay_cost)}}`;
+        rollString += `{{accept_failure=[^{accept}](~${charid}|${ritualid}_accept_failure)}}`;
+        rollString += `{{reject_failure=[^{reject}](~${charid}|${ritualid}_force_connection)}}`;
+        /// This are the only quantities than I need to manupulate
+        rollString += `{{isSuccess=[[0]]}}`;
+
+        console.info(rollString);
+        console.info('parameters',parameters);
+        console.info('names',names);
+        
+
+        startRoll(rollString, (results) => {
+            const activation_rating = parseInt(results.results.rating.result) || 0;
+            const dice = parseInt(results.results.dice.result) || 0;    
+            const flawed_ritual = (results.results.flawed_ritual.result ===1) ? -20 : 0;
+            const modifier = (parseInt(results.results.modifier.result) || 0)+flawed_ritual;
+            const hasCost = hasOtherCosts ? 1 : 0;
+            const isSuccess = (dice <= activation_rating+modifier) ? 1 : 0;
+
+            newroll = {
+                isSuccess: isSuccess,
+                dice: dice,
+                modifier: modifier,
+                hasCost: hasCost,
+            };
+            console.info('newroll',newroll);    
+            console.info('results',results);
+
+            finishRoll(results.rollId,newroll);
+        });
+    });
+};
+
+
+
+const empty_to_zero=(value) => {
+    return (value !== '' || value !=='0') ? value : 0;
+}
+
+on('change:repeating_rituals', (eventinfo) => {
+    console.info(eventinfo)
+    console.log('ritual info to update');
+    const id = eventinfo.sourceAttribute.split('_')[2];
+    ritual_rolls_info(`repeating_rituals_${id}`);
+});
+
+const updateRitualInfoOnOpen = () => {
+    getSectionIDs('repeating_rituals', (ids) => {
+        ids.forEach((id) => {
+            ritual_rolls_info(`repeating_rituals_${id}`);
+        });
+    });
+};
+
+
+const ritual_rolls_info = (repsecid) => {
+    const update = {};
+    const _names={};
+    const _parameters=[];
+
+    _ritualInfo.forEach((ritual_name) => {
+        _names[ritual_name] = `${repsecid}_${ritual_name}`;
+        _parameters.push(_names[ritual_name]);
+    });
+
+    
+    getAttrs(_parameters, (values) => {
+        console.info(_parameters);
+        console.info(_names);
+        console.info(values);
+        const complexity = values[_names['complexity']];
+        const sanity_loss_low = empty_to_zero(values[_names['sanity_loss_low']]);
+        const sanity_loss_high = empty_to_zero(values[_names['sanity_loss_high']]);
+        const activation_time = empty_to_zero(values[_names['activation_time']])==0 ? '' : empty_to_zero(values[_names['activation_time']]); 
+        const activation_time_unit = values[_names['activation_time_unit']];
+        const study_time = empty_to_zero(values[_names['study_time']])==0 ? '' : empty_to_zero(values[_names['study_time']]);
+        const study_time_unit = values[_names['study_time_unit']];
+        const unnatural_gain = empty_to_zero(values[_names['unnatural_gain']]);
+        const sanity_loss_for_learning = empty_to_zero(values[_names['sanity_loss_for_learning']]);
+        const willpower_points_cost = empty_to_zero(values[_names['willpower_points_cost']]);
+        const power_score_cost = empty_to_zero(values[_names['power_score_cost']]);
+        const hit_points_cost = empty_to_zero(values[_names['hit_points_cost']]);
+        const strength_score_cost = empty_to_zero(values[_names['strength_score_cost']]);
+        const constitution_score_cost = empty_to_zero(values[_names['constitution_score_cost']]);
+        const dexterity_score_cost = empty_to_zero(values[_names['dexterity_score_cost']]);
+        const intelligence_score_cost = empty_to_zero(values[_names['intelligence_score_cost']]);
+        const charisma_score_cost = empty_to_zero(values[_names['charisma_score_cost']]);
+        console.log('ritual info to update');
+        console.info(repsecid);
+        console.info(values);
+        // complexity text
+        update[`${repsecid}_complexity_text`] = `${complexity} ritual`;
+        
+        // study time text
+        var study_time_text = '';
+        if (study_time != '') {
+            study_time_text = `${study_time} ${study_time_unit}`;
+        } else {
+            study_time_text = study_time_unit;
+        }
+        update[`${repsecid}_study_time_text`] = `${study_time_text}`;
+        // learning text
+        var learning_cost_text = `${String(sanity_loss_for_learning).toUpperCase()}SAN`;
+        if (unnatural_gain != 0) {learning_cost_text += `; ${unnatural_gain} Unnatural`;}
+
+        
+        update[`${repsecid}_study_cost_text`] = `${learning_cost_text}`;
+        // activation time text
+        var activation_time_text = '';
+        if (activation_time != '') {
+            activation_time_text = `${activation_time} ${activation_time_unit}`;
+        } else {
+            activation_time_text = activation_time_unit;
+        }
+        update[`${repsecid}_activation_time_text`] = `${String(activation_time_text).toUpperCase()}`;
+        // costs text
+        var costs_text = '';
+        if (willpower_points_cost != 0) {costs_text += `${willpower_points_cost}WP, `;}
+        if (hit_points_cost != 0) {costs_text += `${hit_points_cost}HP, `;}
+        if (power_score_cost != 0) {costs_text += `${power_score_cost}POW, `;}
+        if (strength_score_cost != 0) {costs_text += `${strength_score_cost}STR, `;}
+        if (constitution_score_cost != 0) {costs_text += `${constitution_score_cost}CON, `;}
+        if (dexterity_score_cost != 0) {costs_text += `${dexterity_score_cost}DEX, `;}
+        if (intelligence_score_cost != 0) {costs_text += `${intelligence_score_cost}INT, `;}
+        if (charisma_score_cost != 0) {costs_text += `${charisma_score_cost}CHA, `;}
+        if (sanity_loss_low != 0) {costs_text += `${sanity_loss_low}SAN/`;}
+        costs_text += `${sanity_loss_high}SAN`;
+
+        update[`${repsecid}_cost_text`] = `${String(costs_text).toUpperCase()}`;
+        
+        console.log('ritual info updated');
+        setAttrs(update, {silent:true}, () => {
+            console.log('ritual info updated');
+            console.info(update);
+        });
+    });
+};
+
+        
+on('change:useKey', () => {
+    getAttrs(['useKey'], (values) => {
+        const val = values['useKey'];
+        const update = {use_global_modifier:'inactive'};
+        if (val === 'global') {update['use_global_modifier']='active'};
+        console.log(`useKey: ${val}`);
+        console.log(`use_global_modifier: ${update['use_global_modifier']}`);
+
+        setAttrs(update, {silent:true}, () => {
+                console.log(`Set global modifier ${update.use_global_modifier}`);
+        });
+    });
+}); 
+
+on('change:global_modifier_number', (eventInfo) => {
+    getAttrs(['global_modifier_number'], (values) => {
+        const modifier = parseInt(values['global_modifier_number']) || '';
+        console.log(`Global modifier: ${modifier}`);
+    });
+});
+
+on('clicked:reset_global_modifier', () => {
+    const update={'global_modifier_number':''};
+    setAttrs(update, {silent:true}, () => {
+        console.log('Global modifier reset');
+    });
+});
+
+usedModifier = (e,callback) => {
+    var queryModifier = 0;
+    getAttrs(['useKey','global_modifier_number'], (values) => {
+        const useKey = values['useKey'];
+        console.log(`useKey: ${useKey}`);
+        console.log(`global_modifier_number: ${values['global_modifier_number']}`);
+        const globalModifier = parseInt(values['global_modifier_number']) || 0;
+        if (useKey === 'global') {
+            queryModifier = globalModifier;
+        }
+        if (e.altKey && useKey === 'alt') {queryModifier=_queryModifier;}
+        if (e.ctrlKey && useKey === 'ctrl') {queryModifier=_queryModifier;}
+        if (e.metaKey && useKey === 'meta') {queryModifier=_queryModifier;}
+        if (e.shiftKey && useKey === 'shift') {queryModifier=_queryModifier;}
+        if (useKey === 'none') {queryModifier=_queryModifier;}
+        console.log(`queryModifier: ${queryModifier}`);
+        callback(queryModifier);
+    });
+}
+
+$20(selector).on('click', e => {
+        console.log(e);
+        const roll = e.htmlAttributes.name.match(/^attr_(.*)_r$/)[1];
+        const _roll = (roll === 'sanity_points') ? 'sanity' : roll;
+        usedModifier(e,(queryModifier) =>{  
+            console.log(`queryModifier: ${queryModifier}`);
+            console.info(`roll: ${roll} _roll: ${_roll}`);
+
+            const additionalParameters={}
+            if (arrays[`_editable_skills`].includes(_roll)){
+                const prefix_skill=_roll.slice(0,-2);
+                additionalParameters['editable_name']=`${_roll}_name`;
+                additionalParameters['editable_type']=prefix_skill.replace('_',' ');
+            }else{
+                const caps = (_roll === 'humint' || _roll === 'sigint') ? _roll.toUpperCase() : _roll.replace('_',' ')
+                additionalParameters['name']=caps.replace('_',' ');
+            }
+            
+            const rollString=`${prefix_skill_roll} {{subheader=@{${roll}}}} `;
+
+            rollwithmodifiers(rollString,roll,queryModifier,additionalParameters);
+        });
+
+});
+
+$20(sanity_selector).on('click', e => {
+    console.log(e);
+    const _input_name={};
+    var _parameters = [];
+
+    _input_name['success'] = 'sanity_success';
+    _parameters.push(_input_name['success']);
+    _input_name['failure'] = 'sanity_failure';
+    _parameters.push(_input_name['failure']);
+
+    getAttrs(['character_id','sanity_success','sanity_failure'], (values) => {
+        const charid=values['character_id'];
+        const sanity_success=values['sanity_success'] !== '' ? values['sanity_success'] : 0;
+        const sanity_failure=values['sanity_failure'] !== '' ? values['sanity_failure'] : 1;
+        var rollString = `${prefix_sanity_roll} {{header=@{character_name}}}`;
+        rollString += ` {{sanity_type=@{sanity_type}}}`;
+        rollString += ` {{description=@{npc_description}}}`;
+        rollString += ` {{success_roll=[${sanity_success}](~${charid}|sanity_success)}}`;
+        rollString += ` {{failure_roll=[${sanity_failure}](~${charid}|sanity_failure)}}`;
+
+        console.log(`rollString: ${rollString}`);
+        console.info(sanity_success);
+        console.info(sanity_failure);
+        startRoll(rollString,results =>{
+            finishRoll(results.rollId)
+        });
+    });
+});
+
+$20('button.repeating_roll').on('click', e => {
+    console.log(e);
+    const id = e.htmlAttributes.value;
+    const section = _repeating_sections[e.htmlAttributes.name.split('_')[1]];
+    console.log(`in button rep rolls section: ${section})`);
+    
+    usedModifier(e,(queryModifier) => {
+        var _input_names = {};
+        var _parameters = [];
+        setRepeatingParametersAndInputNames(section, id, _parameters, _input_names)
+
+        console.info(`parameters: ${_parameters}`);
+        console.info(`input names: ${_input_names}`);
+
+        clicked_repeating_actions(section, _parameters, _input_names, queryModifier);
+    });
+});
+
+
+
+on('change:repeating_skills remove:repeating_skills', () => {
+  update_additionalskills();
+});
+
+const update_armor_piercing = (value,update) => {
+	const armor_piercing_text = value;
+	const armor_piercing_number = parseInt(armor_piercing_text) || 0;
+	
+	if (armor_piercing_text !== '') { update[`repeating_weapons_armor_piercing`] = armor_piercing_number; }
+	console.log('Armor piercing updated',update);
+};
+
+on('change:repeating_weapons:armor_piercing', () => {
+	getAttrs(['repeating_weapons_armor_piercing'], (values) => {
+		const update = {};
+		update_armor_piercing(values.repeating_weapons_armor_piercing,update);
+		setAttrs(update, {silent:true}, () => {
+			console.log('Base range updated',update);
+		});
+	});
+});
+
+
+
+
+
+on('change:repeating_weapons:ammo_total remove:repeating_weapons', (values) => {
+	
+	const ammo_total = Math.max(0,parseInt(values.newValue)||0);
+	const update = {};
+	update[`repeating_weapons_ammo_total`] = ammo_total;
+	update[`repeating_weapons_ammo`] = ammo_total;
+	update[`repeating_weapons_hasammo`] = ammo_total > 0 ? 'active' : '0';
+	console.log('Ammo updated',update);
+	setAttrs(update, {silent:true}, () => {
+		console.log('Ammo updated',update);
+	});
+});
+
+on('change:repeating_weapons:ammo', (values) => {
+	const ammo = Math.max(0,parseInt(values.newValue)||0);
+	const update = {};
+	update[`repeating_weapons_ammo`] = ammo;
+	setAttrs(update, {silent:true}, () => {
+		console.log('Ammo updated',update);
+	});
+});
+
+
+    //= force the stats to be positive and the skills to be between 0 and 99
+on(`sheet:opened`, () => {
+		
+		// === Versioning
+	getAttrs(['version'], values => { versioning(parseFloat(values.version) || 1); });
+	changeBondButtonColorOnOpen();
+	//initializeRolls();		
+		
+});
+
+
+const isJSONString = (string) => {
+	let json= {};
+	try {
+		json = JSON.parse(string);
+	} catch (e) {
+		console.info('it is not a JSON');
+		return false;
+	}
+	console.info(`string`,json)
+	return json;
+}
+const arrays_drop={
+	fields : [
+		"employer","profession",
+		"accounting","alertness","anthropology","archeology","art_1","art_1_name","art_2","art_2_name","artillery","athletics","bureaucracy",
+		"computer_science","craft_1","craft_1_name","craft_2","craft_2_name","criminology","demolitions","disguise","dodge","drive","firearms",
+		"first_aid","forensics","heavy_machinery","heavy_weapons","history","humint","law","medicine","melee_weapons","military_science_1",
+		"military_science_1_name","military_science_2","military_science_2_name","navigate","occult","persuade","pharmacy","pilot_1","pilot_1_name",
+		"pilot_2","pilot_","psychotherapy","ride","science_1","science_1_name","science_1","science_2_name","search","sigint",	"stealth","surgery",
+		"survival",	"swim","unarmed_combat","unnatural",
+		"armor_and_gear","personal_details_and_notes","motivations","bond_number"],
+	visible: ["accounting","alertness","anthropology","archeology","art_1","art_1_name","art_2","art_2_name","artillery","athletics","bureaucracy",
+		"computer_science","craft_1","craft_1_name","craft_2","craft_2_name","criminology","demolitions","disguise","dodge","drive","firearms",
+		"first_aid","forensics","heavy_machinery","heavy_weapons","history","humint","law","medicine","melee_weapons","military_science_1",
+		"military_science_1_name","military_science_2","military_science_2_name","navigate","occult","persuade","pharmacy","pilot_1","pilot_1_name",
+		"pilot_2","pilot_","psychotherapy","ride","science_1","science_1_name","science_1","science_2_name","search","sigint",	"stealth","surgery",
+		"survival",	"swim","unarmed_combat","unnatural"],
+	bond: ["name","bond_score"],
+	skill: ["name","rank"],
+	special_training:["name","skill_or_stat_used"],
+	weapon :["name", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo"],
+	rep: {bond: "repeating_bonds_",special: "repeating_special_",skill:"repeating_skills_",ritual:"repeating_rituals_",weapon:"repeating_weapons_"},
+}
+
+
+const dropAgent = (data) => {
+	const updateAttrs = {};
+	updateAttrs[`sheet_type`] = "pc";
+	// First of all reset skills and repeating sections for skills and abilities
+    resetBonds(updateAttrs);
+	resetSkills(updateAttrs);
+    resetAllRepeatingSkills(updateAttrs);
+    resetAllSpecialAbilities(updateAttrs);
+	console.log(`Agent Reset:`,updateAttrs);
+
+	// bonds
+	const special_trainings = isJSONString(data.repeated_special_trainings);
+	const rituals= isJSONString(data.repeating_rituals);
+	const weapons= isJSONString(data.repeating_weapons);
+	const repSkills= isJSONString(data.repeating_skills);
+	const dropfields= arrays_drop[`fields`];
+	const visible=arrays_drop['visible'];
+	console.log(`special_trainings: ${special_trainings}`);
+	console.log(`rituals: ${rituals}`);
+	console.log(`weapons: ${weapons}`);
+	console.log(`repSkills: ${repSkills}`);
+
+	if (repSkills){
+		for (const skill of repSkills){
+			let dRepSkills=dropRepSkills(skill);
+			Object.keys(dRepSkills).forEach(key => updateAttrs[key] = dRepSkills[key]);
+		}
+	}
+
+	if (special_trainings){
+		for (const special_training of special_trainings){
+			let dSpecialTraining=dropSpecialTraining(special_training);
+			Object.keys(dSpecialTraining).forEach(key => updateAttrs[key] = dSpecialTraining[key]);
+		}
+	}
+/*	
+	if (rituals){
+		for (const ritual of rituals){
+			let dRitual=dropRitual(ritual);
+			Object.keys(dRitual).forEach(key => updateAttrs[key] = dRitual[key]);
+		}
+	}
+*/
+	if (weapons){
+		for (const weapon of weapons){
+			let dWeapons=dropWeapon(weapon);
+			Object.keys(dWeapons).forEach(key => updateAttrs[key] = dWeapons[key]);
+		}
+	}
+
+	console.info('drop fields:',dropfields);
+	for (const field of dropfields){
+		console.log(field);
+		console.log(data[field]);
+		if (data[field]){
+			if (field === "bond_number") {	
+				for (i=0; i<data[field]; i++){	
+					let UIDD = generateRowID();
+					let prefix=`${arrays_drop[`rep`][`bond`]}${UIDD}`;
+					updateAttrs[`${prefix}_name`] = `bond_${i}`;
+					updateAttrs[`${prefix}_test`] = `editable`;
+				}
+			}else if (data[field]==="name"){
+				updateAttrs[`profession`] = data[field];
+			}else{
+			updateAttrs[field] = data[field];
+			}
+			if (visible.includes(field)){
+				updateAttrs[`${field}_visible`]=`visible`;
+			}
+		}
+	}
+
+	console.info(`Agent:`,updateAttrs);
+	return updateAttrs;
+}
+
+const dropRepSkills = (data) => {
+	const updateAttrs = {};
+	let UIDD = generateRowID();
+	let prefix=`${arrays_drop[`rep`][`skill`]}${UIDD}`;
+	const dropskillfields=arrays_drop[`skill`];
+	dropskillfields.forEach(field =>{
+		updateAttrs[`${prefix}_${field}`] = data[field];
+	});
+	updateAttrs[`${prefix}_test`] = `editable`;
+	console.info(`repeating skills:`,updateAttrs);
+	return updateAttrs;
+}
+
+const dropSpecialTraining = (data) => {
+	const updateAttrs = {};
+	let UIDD = generateRowID();
+	var prefix=`${arrays_drop[`rep`][`special`]}${UIDD}`;
+	const dropspecialtrainingfields=arrays_drop[`special_training`];
+	dropspecialtrainingfields.forEach(field =>{
+		if (data[field]){ 
+			if (field === "skill_or_stat_used"){		
+				let skillname=data[`skill_or_stat_used`].toLowerCase().replace(/ /g, "_");
+				updateAttrs[`${prefix}_skill_or_stat_used`] = `@{${skillname}}`;
+			}else{
+				updateAttrs[`${prefix}_${field}`] = data[field];
+			}
+		}
+	});
+	updateAttrs[`${prefix}_test`] = `editable`;
+	console.info(`special training:`, updateAttrs);
+	return updateAttrs;
+}
+
+/*
+const dropRitual = (data) => {
+	const updateAttrs = {};
+	const UIDD = generateRowID();
+	const prefix=`repeating_rituals_${UIDD}`;
+	// to be updated when the format is decided
+
+	console.log(updateAttrs);
+	return updateAttrs;
+}
+
+const dropMonster = (data) => {
+	const updateAttrs = {};
+	updateAttrs[`sheet_type`] = "npc";
+	// to be updated when the format is decided
+	console.log(updateAttrs);
+	return updateAttrs;
+}
+*/
+const dropWeapon = (data) => {
+	const updateAttrs = {};
+	let UIDD = generateRowID();
+	var prefix=`${arrays_drop[`rep`][`weapon`]}${UIDD}`;
+	
+	const weaponfields=arrays_drop[`weapon`];
+	if (data.hasOwnProperty(weaponfields[2])==false){
+		console.warn(`weapon uses the repeating field format`);
+		data=isJSONString(data.repeating_weapons);
+		console.log(data);
+	}
+
+	updateAttrs[`${prefix}_test`] = 'editable';
+	for (const field of weaponfields){
+		if (data[field]){
+			if (field === "skill_percent"){
+				let skillname=cleanedSkill(data[field]);
+				console.info(skillname);
+				if (isSkillNumber(skillname)){
+					updateAttrs[`${prefix}_skill_percent`] = skillname;
+				}else if (isValidSkill(skillname)){
+					updateAttrs[`${prefix}_skill_percent`] = `@{${skillname}}`;
+				}else{
+					console.error(`skill not found: ${skillname}`);
+				}
+			}else{
+				updateAttrs[`${prefix}_${field}`] = data[field];
+			}
+		}
+	}
+	console.log(`weapon:`, updateAttrs);
+	return updateAttrs;
+}
+
+
+
+const getDropType = data => data.Category || false;
+
+const handleDragandDrop = () => {
+	getAttrs(["drop_name","drop_data"], (v) => {
+		const {drop_name, drop_data} = v;
+		if (drop_name==="" || drop_data===""){return;}
+		const dropDataParsed =JSON.parse(drop_data);
+		const dropType =  getDropType(dropDataParsed);
+		console.info(`drop type:`, dropType);
+		console.info('data:',dropDataParsed);
+		
+		var updateAttrs = false;
+		if (dropType === "Agents"){     
+			console.log("It's an Agent");
+		   updateAttrs=  dropAgent(dropDataParsed);
+		}
+		
+		if (dropType === "Bonds"){     
+			console.log("It's a Bond");
+            updateAttrs= dropBond(dropDataParsed);
+		}
+		if (dropType === "SpecialTrainings"){     
+			console.log("It's an Special Training");
+			updateAttrs= dropSpecialTraining(dropDataParsed);
+		}
+		if (dropType === "Weapons"){
+	        console.log("It's a Weapon");
+
+			updateAttrs= dropWeapon(dropDataParsed);
+		}
+		if (updateAttrs === false) {
+			updateAttrs = {...{drop_name:"", drop_data:"",drop_category:""}};
+			setAttrs(updateAttrs);
+			return	console.warn("Drag and drop could not identify the type of drop");
+		}
+		if (typeof updateAttrs !== "object") {
+			updateAttrs = {...{drop_name:"", drop_data:"",drop_category:""}};
+			setAttrs(updateAttrs);
+			return console.warn("Drag and drop returned  broken value");
+		}
+		const updateAttrsTot = {...updateAttrs, ...{drop_name:"", drop_data:"",drop_category:""}};
+		console.log(updateAttrsTot);
+		setAttrs(updateAttrsTot);
+
+	});
+}
+
+on("change:drop_data", (eventInfo) => {
+	const jsonData = JSON.parse(eventInfo.newValue);
+	console.log(jsonData);
+	handleDragandDrop();
+	// do something with data
+});
+
+
+   // handle WP

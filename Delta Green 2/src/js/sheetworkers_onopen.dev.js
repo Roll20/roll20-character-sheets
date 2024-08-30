@@ -11,8 +11,6 @@ var update_armor_piercing = function update_armor_piercing(value, update) {
   if (armor_piercing_text !== '') {
     update["repeating_weapons_armor_piercing"] = armor_piercing_number;
   }
-
-  console.log('Armor piercing updated', update);
 };
 
 on('change:repeating_weapons:armor_piercing', function () {
@@ -21,9 +19,7 @@ on('change:repeating_weapons:armor_piercing', function () {
     update_armor_piercing(values.repeating_weapons_armor_piercing, update);
     setAttrs(update, {
       silent: true
-    }, function () {
-      console.log('Base range updated', update);
-    });
+    }, function () {});
   });
 });
 on('change:repeating_weapons:ammo_total remove:repeating_weapons', function (values) {
@@ -32,12 +28,9 @@ on('change:repeating_weapons:ammo_total remove:repeating_weapons', function (val
   update["repeating_weapons_ammo_total"] = ammo_total;
   update["repeating_weapons_ammo"] = ammo_total;
   update["repeating_weapons_hasammo"] = ammo_total > 0 ? 'active' : '0';
-  console.log('Ammo updated', update);
   setAttrs(update, {
     silent: true
-  }, function () {
-    console.log('Ammo updated', update);
-  });
+  }, function () {});
 });
 on('change:repeating_weapons:ammo', function (values) {
   var ammo = Math.max(0, parseInt(values.newValue) || 0);
@@ -45,9 +38,7 @@ on('change:repeating_weapons:ammo', function (values) {
   update["repeating_weapons_ammo"] = ammo;
   setAttrs(update, {
     silent: true
-  }, function () {
-    console.log('Ammo updated', update);
-  });
+  }, function () {});
 }); //= force the stats to be positive and the skills to be between 0 and 99
 
 on("sheet:opened", function () {
@@ -55,5 +46,6 @@ on("sheet:opened", function () {
   getAttrs(['version'], function (values) {
     versioning(parseFloat(values.version) || 1);
   });
-  changeBondButtonColorOnOpen(); //initializeRolls();		
+  changeBondButtonColorOnOpen();
+  initializeRolls();
 });

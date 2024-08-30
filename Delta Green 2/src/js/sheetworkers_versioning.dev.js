@@ -60,24 +60,19 @@ var version_105_150 = function version_105_150() {
       console.log("%c v", 'color: green; font-weight:bold');
       console.info(v);
       update['version'] = codeversion;
-      console.info(update);
       idarray.forEach(function (id) {
         console.log("%c ".concat(id), 'color: green; font-weight:bold');
 
         if (v["repeating_weapons_".concat(id, "_damage")] === "") {
-          update["repeating_weapons_" + id + "_hasdamage"] = "0";
-          console.info(update);
+          update["repeating_weapons_" + id + "_hasDamage"] = "0";
         } else {
-          update["repeating_weapons_" + id + "_hasdamage"] = "1";
-          console.info(update);
+          update["repeating_weapons_" + id + "_hasDamage"] = "1";
         }
 
         if (v["repeating_weapons_".concat(id, "_lethality_percent")] > 0) {
-          update["repeating_weapons_" + id + "_haslethality"] = "1";
-          console.info(update);
+          update["repeating_weapons_" + id + "_hasLethality"] = "1";
         } else {
-          update["repeating_weapons_" + id + "_haslethality"] = "0";
-          console.info(update);
+          update["repeating_weapons_" + id + "_hasLethality"] = "0";
         }
 
         if (v['sheet_type'] === 'npc') {
@@ -85,7 +80,6 @@ var version_105_150 = function version_105_150() {
         }
       });
       console.log("%c update", 'color: green; font-weight:bold');
-      console.info(update);
       setAttrs(update, //Update attributes
       {
         silent: true
@@ -103,7 +97,6 @@ var version_150_170 = function version_150_170() {
   update['luck'] = 50;
   update['luck_max'] = 50;
   console.log("%c update", 'color: green; font-weight:bold');
-  console.info(update);
   setAttrs(update, //Update attributes
   {
     silent: true
@@ -155,7 +148,6 @@ var version_170_200 = function version_170_200() {
     update['sanity_points_old'] = v['sanity_points'];
     update['breaking_point_old'] = v['breaking_point'];
     console.log("%c update", 'color: green; font-weight:bold');
-    console.info('versioning', update);
     setAttrs(update, //Update attributes
     {
       silent: true
@@ -171,111 +163,103 @@ var version_200_201 = function version_200_201() {
   console.log('verion:', codeversion);
   update1['version'] = codeversion; // UPDATE NAMES FOR SPECIAL TRAINING AND WEAPONS AND TRIGGER TEST
 
-  var sectionDetails = [{
+  var _sectionDetails = [{
     section: 'repeating_special',
     fields: ['name', 'special_training', 'skill_or_stat_used', 'skill_span']
   }, {
     section: 'repeating_weapons',
-    fields: ['name', 'weapons', 'skill_percent', 'skill_span', 'ammo', 'hasammo', 'ammo_total']
+    fields: ['name', 'weapons', 'skill_percent', 'skill_span', 'ammo', 'hasammo', 'ammo_total', 'lethality_percent']
   }];
-  getSectionIDs(sectionDetails, function (v) {
-    var repspecial = v.filter(function (el) {
-      return el.startsWith("repeating_special");
-    });
-    var repweapons = v.filter(function (el) {
-      return el.startsWith("repeating_weapons");
-    });
-    console.log('in getSectionIDs section', sectionDetails.section); // const fullarray=[].concat(repspecial,repweapons);
-    //console.info('fullarray',fullarray);
 
-    getAttrs(v, function (values) {
-      console.info('fullarray', values);
-      var repweapons_oldname = repweapons.filter(function (el) {
-        return el.endsWith('_weapons');
+  _sectionDetails.forEach(function (_group) {
+    var section = _group.section;
+    var fields = _group.fields;
+    getSectionIDs(section, function (ids) {
+      console.log('in getSectionIDs section', section);
+      console.log('in getSectionIDs ids', ids);
+      var repfields = [];
+      ids.forEach(function (id) {
+        fields.forEach(function (field) {
+          repfields.push("repeating_special_".concat(id, "_").concat(field));
+        });
       });
-      var repspecial_oldname = repspecial.filter(function (el) {
-        return el.endsWith('_special_training');
-      });
-      var repweapons_name = repweapons.filter(function (el) {
-        return el.endsWith('_name');
-      });
-      var repspecial_name = repspecial.filter(function (el) {
-        return el.endsWith('_name');
-      });
-      var repspecial_span = repweapons.filter(function (el) {
-        return el.endsWith('_skill_span');
-      });
-      var repspecial_skill = repspecial.filter(function (el) {
-        return el.endsWith('_skill_or_stat_used');
-      });
-      var repweapons_span = repweapons.filter(function (el) {
-        return el.endsWith('_skill_span');
-      });
-      var repweapons_skill = repspecial.filter(function (el) {
-        return el.endsWith('_skill_percent');
-      });
-      var repweapons_ammo = repweapons.filter(function (el) {
-        return el.endsWith('_ammo');
-      });
-      var repweapons_hasammo = repweapons.filter(function (el) {
-        return el.endsWith('_hasammo');
-      });
-      var repweapons_ammo_total = repweapons.filter(function (el) {
-        return el.endsWith('_ammo_total');
-      });
-      console.log("%c repweapons_oldname", 'color: green; font-weight:bold');
-      console.info(repweapons_oldname);
-      console.log("%c repspecial_oldname", 'color: green; font-weight:bold');
-      console.info(repspecial_oldname);
-      console.log("%c repweapons_name", 'color: green; font-weight:bold');
-      console.info(repweapons_name);
-      console.log("%c repspecial_name", 'color: green; font-weight:bold');
-      console.info(repspecial_name);
-      console.log("%c repspecial_span", 'color: green; font-weight:bold');
-      console.info(repspecial_span);
-      console.log("%c repspecial_skill", 'color: green; font-weight:bold');
-      console.info(repspecial_skill);
-      console.log("%c repweapons_span", 'color: green; font-weight:bold');
-      console.info(repweapons_span);
-      console.log("%c repweapons_skill", 'color: green; font-weight:bold');
-      console.info(repweapons_skill);
-      console.log("%c repweapons_ammo", 'color: green; font-weight:bold');
-      console.info(repweapons_ammo);
-      console.log("%c repweapons_hasammo", 'color: green; font-weight:bold');
-      console.info(repweapons_hasammo);
-      console.log("%c repweapons_ammo_total", 'color: green; font-weight:bold');
-      console.info(repweapons_ammo_total);
+      getAttrs(repfields, function (values) {
+        console.info('fullarray', values);
+        var update = {};
+        ids.forEach(function (id) {
+          var repsecid = "repeating_".concat(section, "_").concat(id, "_");
 
-      for (i = 0; i < repweapons_name; i++) {
-        if (values[repweapons_oldname[i]] != '') {
-          update1[repweapons_name[i]] = values[repweapons_oldname[i]];
-          values[repweapons_oldname[i]] = '';
-          update1[repweapons_span[i]] = values[repweapons_skill[i]];
-        }
-      }
+          if (values.hasOwnProperty("".concat(repsecid, "lethality_percent"))) {
+            if (values["".concat(repsecid, "lethality_percent")] === '') {
+              var number = setMinMax(values["".concat(repsecid, "lethality_percent")]);
+              update["".concat(repsecid, "lethality_percent")] = number;
+              update["".concat(repsecid, "lethality_percent")] = '';
+              console.log("%c update name ".concat(repsecid, "lethality_percent to empty"), 'color: green; font-weight:bold');
+            }
+          }
 
-      for (i = 0; i < repspecial_name; i++) {
-        if (values[repspecial_oldname[i]] != '') {
-          update1[repspecial_name[i]] = values[repspecial_oldname[i]];
-          update1[repspecial_oldname[i]] = '';
-          update1[repspecial_span[i]] = values[repspecial_skill[i]];
-        }
-      }
+          if (values.hasOwnProperty("".concat(repsecid, "special_training"))) {
+            if (values["".concat(repsecid, "special_training")] !== '') {
+              update["".concat(repsecid, "name")] = values["".concat(repsecid, "special_training")];
+              update["".concat(repsecid, "special_training")] = '';
+              console.log("%c update name ".concat(repsecid, "special_training to ").concat(repsecid, "name"), 'color: green; font-weight:bold');
+            }
+          }
 
-      for (i = 0; i < repweapons_ammo; i++) {
-        if (values[repweapons_ammo[i]] != '') {
-          update1[repweapons_ammo_total[i]] = values[repweapons_ammo[i]];
-          update1[repweapons_hasammo[i]] = values[repweapons_ammo[i]] > 0 ? '1' : '0';
-        }
-      }
+          ;
 
-      console.log("%c update", 'color: green; font-weight:bold');
-      console.info('versioning', update1);
-      setAttrs(update1, //Update attributes
-      {
-        silent: true
-      }, // will not trigger sheet workers
-      versioning(codeversion)); // call versioning again
+          if (values.hasOwnProperty("".concat(repsecid, "weapons"))) {
+            if (values["".concat(repsecid, "weapons")] !== '') {
+              update["".concat(repsecid, "name")] = values["".concat(repsecid, "weapons")];
+              update["".concat(repsecid, "weapons")] = '';
+              console.log("%c update name ".concat(repsecid, "weapons to ").concat(repsecid, "name"), 'color: green; font-weight:bold');
+            }
+          }
+
+          ;
+
+          if (values.hasOwnProperty("".concat(repsecid, "skill_or_stat_used"))) {
+            var value_stat = setMinMax(values["".concat(repsecid, "skill_or_stat_used")]);
+            update["".concat(repsecid, "skill_span")] = value_stat;
+            update["".concat(repsecid, "skill_or_stat_used")] = value_stat;
+            console.log("%c update skill_span for ".concat(repsecid), 'color: green; font-weight:bold');
+          }
+
+          ;
+
+          if (values.hasOwnProperty("".concat(repsecid, "skill_percent"))) {
+            var value_skill = setMinMax(values["".concat(repsecid, "skill_percent")]);
+            update["".concat(repsecid, "skill_span")] = value_skill;
+            update["".concat(repsecid, "skill_percent")] = value_skill;
+            console.log("%c update skill_span for ".concat(repsecid), 'color: green; font-weight:bold');
+          }
+
+          ;
+
+          if (values.hasOwnProperty("".concat(repsecid, "ammo"))) {
+            var value_ammo = Math.max(parseInt(values["".concat(repsecid, "ammo")], 10) || 0, 0);
+
+            if (value_ammo > 0) {
+              update["".concat(repsecid, "ammo_total")] = value_ammo;
+              update["".concat(repsecid, "hasammo")] = 1;
+              update["".concat(repsecid, "ammo")] = value_ammo;
+            } else {
+              update["".concat(repsecid, "hasammo")] = 0;
+              update["".concat(repsecid, "ammo_total")] = '';
+              update["".concat(repsecid, "ammo")] = '';
+            }
+
+            console.log("%c update ammo for ".concat(repsecid, ": ammo_total=").concat(update["".concat(repsecid, "ammo_total")], " hasammo=").concat(update["".concat(repsecid, "hasammo")]), 'color: green; font-weight:bold');
+          }
+        });
+        console.log("%c update", 'color: green; font-weight:bold');
+        console.info('versioning', update1);
+        setAttrs(update1, //Update attributes
+        {
+          silent: true
+        }, // will not trigger sheet workers
+        versioning(codeversion)); // call versioning again
+      });
     });
   });
 };

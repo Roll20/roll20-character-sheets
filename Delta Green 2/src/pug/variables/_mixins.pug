@@ -124,15 +124,15 @@ mixin personal(val, key)
 		
 mixin weapons(weaponsAttrs) 
 			input(type='hidden' name='attr_weapons')
-			input(name='attr_haslethality' type='hidden' value='0')
-			input(name='attr_hasdamage'  type='hidden' value='0')
+			input(name='attr_hasLethality' type='hidden' value='0')
+			input(name='attr_hasDamage'  type='hidden' value='0')
 			input(name='attr_hasammo'  type='hidden' value='0')
 			+damagehiddenbuttons('damage')
 			+damagehiddenbuttons('damage_critical')
-			+damagehiddenbuttons('lethality')
-			+damagehiddenbuttons('lethality_critical')
-			+damagehiddenbuttons('double_damage')
-			+damagehiddenbuttons('double_damage_critical')
+			+damagehiddenbuttons('lethality_percent')
+			+damagehiddenbuttons('lethality_percent_critical')
+			+damagehiddenbuttons('double_barrel')
+			+damagehiddenbuttons('double_barrel_critical')
 			+damagehiddenbuttons('selective_fire')
 			+damagehiddenbuttons('selective_fire_critical')
 			each weapon in weaponsAttrs
@@ -143,6 +143,7 @@ mixin weapons(weaponsAttrs)
 						label.weapon_button
 							input(type='hidden' class='edit_test' name='attr_test')
 							span.edit_text
+								input(type='checkbox' name='attr_hasAdvancedWeapons' value='active')
 								input(style='width:100%; padding: 0px 0px; margin: 0px 0;box-sizing: border-box;'  type='text' name='attr_name' value='weapon' title='@{repeating_weapons_${x}_' + attrName + '}')
 							span.unedit_text
 								-const weaponrollName='weapons';			
@@ -169,33 +170,34 @@ mixin weapons(weaponsAttrs)
 							span.wblast
 								span - 
 							span.noblast
-								input.shotgun(name=`attr_second_damage` type='hidden')
+								input.shotgun(name=`attr_hasDoubleBarrel` type='hidden')
 								span.noshotgun
 									input(data-i18n-placeholder=weapon name='attr_damage' placeholder=weapon title='@{repeating_weapons_${x}_damage}' type=atype value='')
 								span.wshotgun
 									.slashpart
 											input(data-i18n-placeholder=weapon name='attr_damage' placeholder=weapon title='@{repeating_weapons_${x}_damage}' type=atype value='')
 											span /
-											input(data-i18n-placeholder=weapon name='attr_second_damage_value' placeholder=weapon title='@{repeating_weapons_${x}_second_damage_value}' type=atype value='')
+											input(data-i18n-placeholder=weapon name='attr_double_barrel' placeholder=weapon title='@{repeating_weapons_${x}_double_barrel}' type=atype value='')
 						span.unedit_text
 							input.blast(name=`attr_blast_radius` type='hidden')
 							span.wblast
 								span - 
 							span.noblast
-								input.shotgun(name=`attr_second_damage` type='hidden')
+								input.shotgun(name=`attr_hasDoubleBarrel` type='hidden')
 								span.noshotgun
 									span(data-i18n-placeholder=weapon name='attr_damage' )
 								span.wshotgun
 									.slashpart
 										span(data-i18n-placeholder=weapon name='attr_damage' )
 										span /
-										span(data-i18n-placeholder=weapon name='attr_second_damage_value')
+										span(data-i18n-placeholder=weapon name='attr_double_barrel')
 				else if (attrName==='ammo')
 					label.weapon_label(data-i18n-title=weapon + ' input' title=weapon + ' input' style='display: grid; position:relative;')
 						input(type='hidden' class='edit_test' name='attr_test')
 						span.edit_text.allowpopup
 								input(data-i18n-placeholder=weapon name='attr_ammo_total' placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '_max}' type=`text` value=0)
-								.othergrid.advancedinfo
+								input(type='hidden' name='attr_hasAdvancedWeapons' value='')
+								.othergrid.advancedinfo.hasAdvancedWeapons
 									input.advanced(type='checkbox')
 									span
 									.modifiers 
@@ -236,7 +238,7 @@ mixin advanced_mod_weapons()
 			|  
 			span.para +20%
 		span.double_damage
-			input.fix-check(name=`attr_second_damage` type='checkbox' value='active')
+			input.fix-check(name=`attr_hasDoubleBarrel` type='checkbox' value='active')
 			span(data-i18n="double damage") double damage
 	.item-check
 		input.fix-check(name='attr_blast_radius' type='checkbox' value='active')
@@ -247,15 +249,15 @@ mixin advanced_mod_weapons()
 	.item-acc 
 		input.fix-check(name='attr_accessories' type='checkbox' value='active')
 		span(data-i18n='accessories') accessories
-		input.small-select(data-i18n-placeholder='Holographic sight Standard' type='text' name='attr_accessoriesName' title='@{repeating_weapons_${x}_accessoriesName}' placeholder='Holographic sight' value='')
+		input.small-select(data-i18n-placeholder='Holographic sight Standard' type='text' name='attr_accessory_name' title='@{repeating_weapons_${x}_accessory_name}' placeholder='Holographic sight' value='')
 		span(style="display:inline;justify-self:end;")
 			span(data-i18n="modifier") modifier
-			input.number(type='text' list='common_modifiers' name='attr_accessoriesMod' title='@{repeating_weapons_${x}_accessoriesMod}' value='0' maxlength='2' size='3'  style="width: 3rem;") 
+			input.number(type='text' list='common_modifiers' name='attr_accessory_modifier' title='@{repeating_weapons_${x}_accessory_modifier}' value='0' maxlength='2' size='3'  style="width: 3rem;") 
 			span.perc %
 	.item-sel
 		input.fix-check(name='attr_selfire' type='checkbox' value='active')
 		span(data-i18n-value='selective fire') selective fire
-		input(type='hidden' name='attr_selfireType' value='short burst')
+		input(type='hidden' name='attr_selfire_type' value='short burst')
 		select.small-select(name_='attr_selfireType')
 			option(value='short burst')
 				span.selfire 
@@ -287,7 +289,7 @@ mixin advanced_mod_weapons()
 					span )
 		span(style="display:inline;justify-self:end;")
 			span(data-i18n="lethality") lethality
-			input.number(type='text' name='attr_selfireLethality' title='@{repeating_weapons_${x}_selfireLethality}' value='10' maxlength='2' size='3' style="width: 3rem;")
+			input.number(type='text' name='attr_selfire_lethality_percent' title='@{repeating_weapons_${x}_selfire_lethality_percent}' value='10' maxlength='2' size='3' style="width: 3rem;")
 			span %
 			
 mixin editablebetterLabel(rollName,titleButton,spanButton='',isPersonal=false)
@@ -419,14 +421,14 @@ mixin editablebetterbutton_npc_rep(rollName,classButton='pressable')
 
 
 mixin sanlossbutton()
-	+damagehiddenbuttons('sanity_success')
-	+damagehiddenbuttons('sanity_failure')
+	+damagehiddenbuttons('sanity_loss_success')
+	+damagehiddenbuttons('sanity_loss_failure')
 	span.sanityLine
 		+betterbutton_npc('sanity_loss','sanity loss','normal_div','',false,true)
 		span.slashpart
-			input(data-i18n-placeholder='0' name='attr_sanity_success' placeholder='0' title='@{sanity_success}' type='text' value='0') 
+			input(data-i18n-placeholder='0' name='attr_sanity_loss_success' placeholder='0' title='@{sanity_loss_success}' type='text' value='0') 
 			span /
-			input(data-i18n-placeholder='0' name='attr_sanity_failure' placeholder='0' title='@{sanity_success}' type='text' value='1') 
+			input(data-i18n-placeholder='0' name='attr_sanity_loss_failure' placeholder='0' title='@{sanity_loss_success}' type='text' value='1') 
 		select.small-select(name='attr_sanity_type')
 			optgroup(label='Sanity Type')
 				option(data-i18n='unnatural' value='unnatural') unnatural

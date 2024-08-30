@@ -1,41 +1,21 @@
 
-const RitualCosts   = ['sanity_loss_low','sanity_loss_high',
-    'willpower_points_cost','power_score_cost','hit_points_cost',
-    'strength_score_cost','constitution_score_cost',
-    'dexterity_score_cost','intelligence_score_cost',
-    'charisma_score_cost'];
-
-const CurrentValues = ['sanity_points',
-    'willpower_points','power_score','hit_points',
-    'strength_score','constitution_score',
-    'dexterity_score','intelligence_score',
-    'charisma_score'];
-
-const RitualRolls   = ['name','skill_span','unnatural_gain',
-    'study_time','sanity_loss_for_learning','activation_time',
-    'description','complexity','flawed_ritual'];
-
-const RitualDamages = ['damage_target_stat','damage_amount','damage_isLethal'];
-const RitualHeals   = ['health_target_stat','health_amount','health_isLethal'];
-
 const paythecost=(sanity_loss,other_costs,fraction=1) => {
         // lower sanity loss (not half)
-        console.info('pay the cost',other_costs);   
+        
         rollSan=  `${prefix_ritualloss_roll}`;
         //used for before the roll
         var hasCosts = {};
         CurrentValues.forEach((attrName) => {
             const current=parseInt(other_costs[attrName]) || 0;
             var price= other_costs[attrName+'_cost'];
-            if (attrName !== 'sanity_points') {
-                if (price === '1' && fraction === 2) {price=0;}                
-                rollSan += ` {{${attrName}_cost=[[${price}/${fraction}]]}}`
+            if (attrName !== 'sanity_points') {               
+                rollSan += ` {{${attrName}_cost=[[floor(${price}/${fraction})]]}}`
                 rollSan += ` {{${attrName}=${current}}}`
                 if (price !== 0 && price !== '0') {
                     rollSan += ` {{has_${attrName}=1}}`
                     hasCosts[attrName] = 1;
                 } else {
-                    console.log('no cost for',attrName);
+                    
                 };
             }
         });
@@ -47,7 +27,7 @@ const paythecost=(sanity_loss,other_costs,fraction=1) => {
         hasCosts['sanity_points'] = 1;
 
 
-        console.info('roll for san cost:',rollSan);
+        
         startRoll(rollSan, (results) => {
             const newroll = {};
             const update = {};
@@ -56,7 +36,7 @@ const paythecost=(sanity_loss,other_costs,fraction=1) => {
                 const attrCost=attrName+'_cost';
                 const old_value=parseInt(other_costs[attrName]) || 0;
                 const cost = parseInt(results.results[attrCost].result) || 0;
-                console.log(`${attrCost}: ${cost}`);
+                
                 const new_value = Math.max(0,old_value - cost);
                 newroll[attrCost] = new_value;
                 if (hasCosts.hasOwnProperty(attrName)) {
@@ -66,50 +46,42 @@ const paythecost=(sanity_loss,other_costs,fraction=1) => {
             
             finishRoll(results.rollId,newroll);
 
-            console.info('update',update);
-            console.info('newroll',update);
+            
+            
 
             setAttrs(update, {silent:true}, () => {
                 updatebreakingpoints() // I need to update the breaking points in the callback
-                console.log('sanity points updated');
-                console.info(update);
+                
+                
             });
         });
 
 };
 
-const acceptfailure=(sanity_loss_low,other_costs) => {
-    paythecost(sanity_loss_low,other_costs,2);
+const acceptfailure=(sanity_loss_success,other_costs) => {
+    paythecost(sanity_loss_success,other_costs,2);
 };
 
-const forceconnection=(sanity_loss_high,other_costs) => {
+const forceconnection=(sanity_loss_failure,other_costs) => {
     other_costs['power_score'] = other_costs['power_score']+1 ;
-    paythecost(sanity_loss_high,other_costs,1);
+    paythecost(sanity_loss_failure,other_costs,1);
 };
 
 const name_and_param=(repsecid,attrName, _parameters, _input_names) => {
     _input_names[attrName] = `${repsecid}_${attrName}`;
-    console.log(_input_names[attrName]);
+    
     _parameters.push(_input_names[attrName]);
-    console.log(_parameters);
+    
 };
 
-const general_manipulation=(repsecid, _parameters, _input_names) => {
-    // general informations to manupulate results
-    _input_names['charname'] = 'character_name';
-    _parameters.push(_input_names['charname']);
-    _input_names['charid'] = 'character_id';
-    _parameters.push(_input_names['charid']);
-    _input_names['ritualid'] = repsecid;
-};
 
 const setRitualCostParametersAndInputNames = (repsecid, _parameters, _input_names) => {
-    console.info('RitualCosts',RitualCosts);
-    console.info('type of _parameters',typeof(_parameters));
-    console.info('parameters',_parameters);
+    
+    
+    
     RitualCosts.forEach((attrName) => {
         name_and_param(repsecid,attrName, _parameters, _input_names);
-        console.log(attrName+': '+_parameters[_input_names[attrName]]);
+        
     });
 };
 
@@ -127,29 +99,27 @@ const setRitualDamageParametersAndInputNames = (repsecid, _parameters, _input_na
 
 
 const setRitualParametersAndInputNames = (repsecid, _parameters, _input_names) => {
+
     
-    console.info('Get general informations');
-    general_manipulation(repsecid, _parameters, _input_names);
-    console.info(_parameters);
     
     // general informations
-    console.info('Get RitualRolls');
+    
     RitualRolls.forEach((attrName) => {
         name_and_param(repsecid,attrName, _parameters, _input_names);
     });    
-    console.info(_parameters);
+    
 
-    console.info('Get RitualCosts');
+    
     setRitualCostParametersAndInputNames(repsecid, _parameters, _input_names);
-    console.info(_parameters);
-    console.info('Get RitualDamages');
+    
+    
     setRitualDamageParametersAndInputNames(repsecid, _parameters, _input_names);
-    console.log(_parameters);
+    
 };
 
 const getOtherCosts = (other_costs,values,names,array) => {   
-    array.forEach((element) => {
-			other_costs[element]=(values[names[element]]    != '') ? values[names[element]] : 0;;
+    array.forEach((attrName) => {
+			other_costs[attrName]=(values[names[attrName]]    != '') ? values[names[attrName]] : 0;;
     });
 };
 
@@ -163,62 +133,58 @@ const name_to_shorthand = (name) => {
     if (name === 'charisma_score') {return 'CHA';}
     if (name === 'power_score') {return 'POW';}
 };
+
+
+const real_damage = (other_costs,heal_or_damage='damage') => {
+    const _normal_value=parseRoll(other_costs[`${heal_or_damage}_amount`]);
+    const _lethality_percent = setMinMax(other_costs[`${heal_or_damage}_lethality_percent_amount`]);
+    const isLethal=other_costs[`${heal_or_damage}_isLethal`]==='lethal';
+    _noDamage = !isLethal && _normal_value === 0; // if it is not lethal and the normal value is zero, then it is no damage
+    _noLethal = isLethal && _lethality_percent === 0; // if it is lethal and the lethality percent is zero, then it is no damage
+    if (_noDamage && _noLethal==0) {return '';}
+    return isLethal ? `${_lethality_percent}% ` : `${_normal_value} `;
+};
+
+const ritual_attack_or_heal_action = (character_id,repsecid,other_costs,heal_or_attack='attack') => {
+    const value = real_damage(other_costs,heal_or_attack);
+    if (value === '') {return '';}
+    const const_button_part = '](~'+character_id+'|'+repsecid+'_';
+    const target_stat=name_to_shorthand(other_costs[`${heal_or_attack}_target_stat`]);
+    
+    const prefix_button = `{{${heal_or_attack}_button=[`;
+    const suffix_button = target_stat+const_button_part+heal_or_attack+'_action)}}';
+    return prefix_button+value+suffix_button;
+};
+
+const ritual_power_action = (character_id,repsecid,other_costs) => {
+    const const_button_part = '](~'+character_id+'|';
+    const prefix_power_reaction='{{power_button=[';
+    const suffix_power_reaction = const_button_part+'power)}}';
+    return prefix_power_reaction+'^{power}'+suffix_power_reaction;
+}
+
+const ritual_attack_action = (character_id,repsecid,other_costs) => {
+    return ritual_attack_or_heal_action(character_id,repsecid,other_costs,'attack');
+};
+const ritual_heal_action = (character_id,repsecid,other_costs) => {
+    return ritual_attack_or_heal_action(character_id,repsecid,other_costs,'heal');
+};
+    
+
 const prepare_ritual_rolls = (other_costs,values,names) => {
     var localString='';  
-    const damage_target_stat=name_to_shorthand(other_costs.damage_target_stat);
-    const health_target_stat=name_to_shorthand(other_costs.health_target_stat);
-    const damage_amount = other_costs.damage_amount;
-    const health_amount = other_costs.health_amount;
-    const isLethalAttack=((parseInt(damage_amount,10) || 0 !==0) && other_costs.damage_isLethal=='lethal');
-    const isNormalAttack=(damage_amount !=='' && other_costs.damage_isLethal=='normal');
-    const isLethalHeal=((parseInt(health_amount,10) || 0 !==0) && other_costs.health_isLethal=='lethal');
-    const isNormalHeal=(health_amount !=='' && other_costs.health_isLethal=='normal;');
-    var damage_button = '';
-    var heal_button = '';
-    const const_button_part = '](~'+values[names['charid']]+'|'+names['repsecid']+'_';
-    const prefix_damage_button = '{{damage_button=[';
-    const prefix_heal_button = '{{heal_button=[';
-    const prefix_power_reaction='{{power_reaction=[';
-    const suffix_damage_button = damage_target_stat+const_button_part+'damage_button)}}';
-    const suffix_heal_button = health_target_stat+const_button_part+'heal_button)}}';
-    const suffix_power_reaction = const_button_part+'power_reaction)}}';
-    const power_reaction_button = prefix_power_reaction+'^{POWER}'+suffix_power_reaction;
-    if(isLethalAttack){
-        damage_button += prefix_damage_button
-        damage_button += parseInt(damage_amount,10)+'% '
-        damage_button += suffix_damage_button
-    }
-    if(isNormalAttack){
-        damage_button += prefix_damage_button
-        damage_button += damage_amount.toUpperCase()+ ' ';
-        damage_button += suffix_damage_button
-    }
+    
+    localString += ritual_attack_action(values[names['character_id']],names['repsecid'],other_costs);
+    localString += ritual_heal_action(values[names['character_id']],names['repsecid'],other_costs);
 
-    if(isLethalHeal){
-        heal_button += prefix_heal_button
-        heal_button += parseInt(health_amount,10)+'% ';
-        heal_button += suffix_heal_button
-    }
-    if(isNormalHeal){
-        heal_button += prefix_heal_button
-        heal_button += health_amount.toUpperCase()+ ' ';
-        heal_button += suffix_heal_button
+    if (values[names['power_reaction']] === 'active') {
+        localString += ritual_power_action(values[names['character_id']],names['repsecid']);
     }
     
-    localString += damage_button;
-    localString += heal_button;
-    
-    
-    const power_reaction=values[names['power_reaction']] === 'active' ? 1 : 0;
-    if (power_reaction === 1) {
-        localString += power_reaction_button;
-    }
-    
-    console.log('localString',localString);
-
 
     return localString;
 };
+
 
 const clicked_repeating_rituals = (parameters,names,queryModifier) => {
     getAttrs(parameters, (values) => {
@@ -228,11 +194,18 @@ const clicked_repeating_rituals = (parameters,names,queryModifier) => {
         getOtherCosts(other_costs,values,names,RitualDamages);
         getOtherCosts(other_costs,values,names,RitualHeals);
 
+        //----------------------------------------------------------------------------------------------
+        //---------Not used for the roll, they are always zero. Ask Shane if he wants it----------------
+        //const wp_mod=check_for_wp_modifiers(values,rollName);
+        const low_willpower  = 0 //wp_mod.low_willpower;
+        const zero_willpower = 0 //wp_mod.zero_willpower;
+        //----------------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------------------
         // what is needed to roll
         const rating = values[names['skill_span']];
-        const sanity_loss_low = other_costs['sanity_loss_low'];
-        const sanity_loss_high = other_costs['sanity_loss_high'];
-        console.info('other_costs',other_costs);
+        const sanity_loss_success = other_costs['sanity_loss_success'];
+        const sanity_loss_failure = other_costs['sanity_loss_failure'];
+        
         // info ritual
         const ritual_name = values[names['name']];
         const description = values[names['description']];
@@ -244,16 +217,19 @@ const clicked_repeating_rituals = (parameters,names,queryModifier) => {
         
         if (description !=='') {rollString += `{{description=${description}}}`;}
         
-        rollString += `{{sanity_loss_low=${sanity_loss_low}}}`;
-        rollString += `{{sanity_loss_high=${sanity_loss_high}}}`;
+        rollString += `{{sanity_loss_success=${sanity_loss_success}}}`;
+        rollString += `{{sanity_loss_failure=${sanity_loss_failure}}}`;
         
+        rollString += `{{zero_willpower=[[${zero_willpower}]]}}`;
+        rollString += `{{low_willpower=[[${low_willpower}]]}}`;
+
         var hasOtherCosts = false;
         var costString = '';    
         Object.entries(other_costs).forEach(([key, value]) => {
             if (value != '' && value!= '0') {costString += `{{${key}=${value}}}`; hasOtherCosts = true;}
         });
         
-        console.info('costString',costString);
+        
         rollString += costString;
 
 
@@ -261,72 +237,60 @@ const clicked_repeating_rituals = (parameters,names,queryModifier) => {
         rollString += prepare_ritual_rolls(other_costs,values,names);
 
         const flawed_ritual = values[names['flawed_ritual']] === 'active' ? 1 : 0; 
-        rollString += `{{flawed_ritual=[[${flawed_ritual}]]}}`;
+        if (flawed_ritual === 1) {rollString += `{{flawed_ritual=${flawed_ritual}}}`;}  
+        
         rollString += `{{modifier=[[${queryModifier}]]}}`;
 
-        const charid=values[names['charid']];
-        const ritualid=names['ritualid']; // ritualid is the repeating section id, not a parameter
+        const character_id=values['character_id'];
+        const repsecid=names['repsecid']; // ritualid is the repeating section id, not a parameter
 
-        rollString += `{{pay_cost=[^{pay the cost}](~${charid}|${ritualid}_pay_cost)}}`;
-        rollString += `{{accept_failure=[^{accept}](~${charid}|${ritualid}_accept_failure)}}`;
-        rollString += `{{reject_failure=[^{reject}](~${charid}|${ritualid}_force_connection)}}`;
+        rollString += `{{pay_cost=[^{pay the cost}](~${character_id}|${repsecid}_pay_cost)}}`;
+        rollString += `{{accept_failure=[^{accept}](~${character_id}|${repsecid}_accept_failure)}}`;
+        rollString += `{{reject_failure=[^{reject}](~${character_id}|${repsecid}_force_connection)}}`;
         /// This are the only quantities than I need to manupulate
         rollString += `{{isSuccess=[[0]]}}`;
 
-        console.info(rollString);
-        console.info('parameters',parameters);
-        console.info('names',names);
+        
+        
+        
         
 
         startRoll(rollString, (results) => {
             const activation_rating = parseInt(results.results.rating.result) || 0;
             const dice = parseInt(results.results.dice.result) || 0;    
-            const flawed_ritual = (results.results.flawed_ritual.result ===1) ? -20 : 0;
-            const modifier = (parseInt(results.results.modifier.result) || 0)+flawed_ritual;
+            const _flawed_ritual = (flawed_ritual ===1) ? -20 : 0;
+            const _modifier = correct_modifier((parseInt(results.results.modifier.result) || 0)+flawed_ritual,low_willpower);
+            const _rating = correct_rating(activation_rating,_modifier);
             const hasCost = hasOtherCosts ? 1 : 0;
-            const isSuccess = (dice <= activation_rating+modifier) ? 1 : 0;
+            const outcome=check_success(dice,_rating);
 
             newroll = {
-                isSuccess: isSuccess,
+                isSuccess: outcome.isSuccess,
+                IsCritical: outcome.IsCritical,
                 dice: dice,
-                modifier: modifier,
+                modifier: _modifier,
                 hasCost: hasCost,
+                flawed_ritual: _flawed_ritual,
+                low_willpower: low_willpower,
+                zero_willpower: zero_willpower,
             };
-            console.info('newroll',newroll);    
-            console.info('results',results);
+            
+            
 
             finishRoll(results.rollId,newroll);
         });
     });
 };
 
-const _ritualInfo=[
-    'complexity',
-    'activation_time',
-    'activation_time_unit',
-    'study_time',
-    'study_time_unit',
-    'unnatural_gain',
-    'sanity_loss_for_learning',
-    'willpower_points_cost',
-    'power_score_cost',
-    'hit_points_cost',
-    'strength_score_cost',
-    'constitution_score_cost',
-    'dexterity_score_cost',
-    'intelligence_score_cost',
-    'charisma_score_cost',
-    'sanity_loss_low',
-    'sanity_loss_high'
-]
+
 
 const empty_to_zero=(value) => {
     return (value !== '' || value !=='0') ? value : 0;
 }
 
 on('change:repeating_rituals', (eventinfo) => {
-    console.info(eventinfo)
-    console.log('ritual info to update');
+    
+    
     const id = eventinfo.sourceAttribute.split('_')[2];
     ritual_rolls_info(`repeating_rituals_${id}`);
 });
@@ -352,12 +316,12 @@ const ritual_rolls_info = (repsecid) => {
 
     
     getAttrs(_parameters, (values) => {
-        console.info(_parameters);
-        console.info(_names);
-        console.info(values);
+        
+        
+        
         const complexity = values[_names['complexity']];
-        const sanity_loss_low = empty_to_zero(values[_names['sanity_loss_low']]);
-        const sanity_loss_high = empty_to_zero(values[_names['sanity_loss_high']]);
+        const sanity_loss_success = empty_to_zero(values[_names['sanity_loss_success']]);
+        const sanity_loss_failure = empty_to_zero(values[_names['sanity_loss_failure']]);
         const activation_time = empty_to_zero(values[_names['activation_time']])==0 ? '' : empty_to_zero(values[_names['activation_time']]); 
         const activation_time_unit = values[_names['activation_time_unit']];
         const study_time = empty_to_zero(values[_names['study_time']])==0 ? '' : empty_to_zero(values[_names['study_time']]);
@@ -372,9 +336,9 @@ const ritual_rolls_info = (repsecid) => {
         const dexterity_score_cost = empty_to_zero(values[_names['dexterity_score_cost']]);
         const intelligence_score_cost = empty_to_zero(values[_names['intelligence_score_cost']]);
         const charisma_score_cost = empty_to_zero(values[_names['charisma_score_cost']]);
-        console.log('ritual info to update');
-        console.info(repsecid);
-        console.info(values);
+        
+        
+        
         // complexity text
         update[`${repsecid}_complexity_text`] = `${complexity} ritual`;
         
@@ -410,15 +374,15 @@ const ritual_rolls_info = (repsecid) => {
         if (dexterity_score_cost != 0) {costs_text += `${dexterity_score_cost}DEX, `;}
         if (intelligence_score_cost != 0) {costs_text += `${intelligence_score_cost}INT, `;}
         if (charisma_score_cost != 0) {costs_text += `${charisma_score_cost}CHA, `;}
-        if (sanity_loss_low != 0) {costs_text += `${sanity_loss_low}SAN/`;}
-        costs_text += `${sanity_loss_high}SAN`;
+        if (sanity_loss_success != 0) {costs_text += `${sanity_loss_success}SAN/`;}
+        costs_text += `${sanity_loss_failure}SAN`;
 
         update[`${repsecid}_cost_text`] = `${String(costs_text).toUpperCase()}`;
         
-        console.log('ritual info updated');
+        
         setAttrs(update, {silent:true}, () => {
-            console.log('ritual info updated');
-            console.info(update);
+            
+            
         });
     });
 };

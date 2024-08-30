@@ -21,7 +21,6 @@ on('clicked:reset_all', function () {
     silent: true
   }, function () {
     console.log('reset all');
-    console.info(update);
   });
 });
 on('clicked:reset_stats', function () {
@@ -31,7 +30,6 @@ on('clicked:reset_stats', function () {
     silent: true
   }, function () {
     console.log('reset stats');
-    console.info(update);
   });
 });
 on('clicked:reset_skills', function () {
@@ -41,7 +39,6 @@ on('clicked:reset_skills', function () {
     silent: true
   }, function () {
     console.log('reset skills');
-    console.info(update);
   });
 });
 on('clicked:reset_equipment', function () {
@@ -51,7 +48,6 @@ on('clicked:reset_equipment', function () {
     silent: true
   }, function () {
     console.log('reset equipment');
-    console.info(update);
   });
 });
 on('clicked:reset_breaking_point', function () {
@@ -70,7 +66,6 @@ var resetBreakingPoints = function resetBreakingPoints(update) {
       silent: true
     }, function () {
       console.log('reset breaking points');
-      console.info(update);
     });
   });
 };
@@ -101,7 +96,6 @@ var resetStats = function resetStats(update) {
 
   if (reset_bonds) {
     getSectionIDs('repeating_bonds', function (ids) {
-      console.log(ids);
       ids.forEach(function (id) {
         update["repeating_bonds_".concat(id, "_test")] = 'editable';
         update["repeating_bonds_".concat(id, "_rank")] = '';
@@ -146,7 +140,6 @@ var resetAdaptations = function resetAdaptations(update) {
 
 var resetAllWeapons = function resetAllWeapons(update) {
   getSectionIDs('repeating_weapons', function (ids) {
-    console.log(ids);
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_weapons_' + id);
     });
@@ -155,7 +148,6 @@ var resetAllWeapons = function resetAllWeapons(update) {
 
 var resetAllRituals = function resetAllRituals(update) {
   getSectionIDs('repeating_rituals', function (ids) {
-    console.log(ids);
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_rituals_' + id);
     });
@@ -170,7 +162,6 @@ var resetEquipment = function resetEquipment(update) {
 
 var resetAllRepeatingSkills = function resetAllRepeatingSkills(update) {
   getSectionIDs('repeating_skills', function (ids) {
-    console.log(ids);
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_skills_' + id);
     });
