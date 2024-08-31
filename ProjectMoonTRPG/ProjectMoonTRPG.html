@@ -1775,11 +1775,11 @@
 	<!-- Helper END -->
 
 
-               <div id="ailmentBlock">
+<div id="ailmentBlock">
 	<input type="text" name="attr_ailmentList" hidden>
 
- <div class="rowContainer titleHeader"><button type="action" class="qolButton" name="act_resetAilments" data-i18n-title="reset-button" title="Reset"> ! </button> <h4 data-i18n="heading-ailments">Status ailments</h4> </div>
-                    <div class="contentContainer darkBG">
+<div class="rowContainer titleHeader"><button type="action" class="qolButton" name="act_resetAilments" data-i18n-title="reset-button" title="Reset"> ! </button> <h4 data-i18n="heading-ailments">Status ailments</h4> </div>
+<div class="contentContainer darkBG">
 <div class="rowContainer centerFlex topRow ailmentStates">
 
 <!-- Hostile -->
@@ -2865,16 +2865,27 @@
 
 <!-- Combat palette -->
 <div class="status_effect" style="margin-top: 5px;">
+<div class="status_effect" style="margin-top: 5px;">
 	<div class="contentContainer darkBG">
 
 	<!-- Combat options -->
-	<input type="checkbox" class="hide-toggle-rev" name="attr_lastDefenceRoll" value="0"> <!-- Combat options setting in v0.7 -->
+	<input type="checkbox" class="hide-toggle-rev" name="attr_settingHideCombatOptions" value="true">
 	<div class="rowContainer combatOptionsContainer hide-item-rev">
-		<div class="rowContainer" style="margin-left: 3px;"> <!-- columnAlign in v0.7 -->
-			<div class="columnAlign helpers"> <!-- delete this later -->
-				<b data-i18n="helper-text-lastdefenceroll">Last Defence roll</b>  <!-- delete this later. Remember to also delete the translation -->
-			</div>
+		<div class="columnAlign">
+			<b>Target</b> <!-- data-i18n="helper-text-selecttarget" -->
+			<button type="action" class="selectTargetButton" name="act_selectTarget" title="Select target">
+				<img name="attr_targetToken" class="targetToken">
+				<div class="selectTargetIcon"></div>
+			</button> <!-- data-i18n-title="helper-text-selecttarget" -->
+		</div>
+		<div class="columnAlign" style="margin-left: 3px;">
+			<input type="text" class="darkInput" name="attr_targetName" style="width: 149px;" placeholder="Target name"> <!-- data-i18n-placeholder="helper-text-targetName" -->
 			<input type="number" class="darkInput defenceDice" name="attr_lastDefenceRoll" min="0"> <!-- delete this later -->
+			<input type="text" name="attr_selfToken" hidden>
+		</div>
+		<div class="columnAlign">
+			<b>Test</b> <!-- data-i18n="helper-text-selecttarget" -->
+			<button type="action" class="selectTargetButton" name="act_testTarget" title="Test"></button>
 		</div>
 	</div>
                      
@@ -10443,13 +10454,142 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 <script type="text/worker">
 
 
+/* Creates one or more action buttons and post them to the chat */
+/* Taken in a buttonList of the format: label, icon, color, transferFunction, transferData, targetOverride */
+async function createActionButtons(buttonList, override="") {
+	
+	getAttrs(["targetName"], async function(values) {
+
+	/* Configure whisper */
+	/* If no target exists or the "selected" override is included for the function, reveal the button to all character */
+	let whisper = "";
+	let targetName = values.targetName;
+	if (targetName != "" && override != "selected") {
+		whisper = `/w ${targetName.split(" ")[0]} `;
+	}
+	else {
+		whisper = "";
+	}
+
+	let rollBase = whisper + "&{template:actionbuttons}";
+	let dataList = {}
+
+	/* Convert buttonList to action buttons */
+	if (buttonList[0] != undefined) {
+		for (let i = 0; i < buttonList.length; i++) {
+			rollBase += ` {{targetid${i}=[[0]]}} {{datapackage${i}=[[0]]}} {{buttonlabel${i}=${buttonList[i][0]}}} {{icon${i}=${buttonList[i][1]}}} {{color${i}=${buttonList[i][2]}}} {{buttonlink${i}=${buttonList[i][3]}}}`;
+			dataList[`datapackage${i}`] = Data.package([buttonList[i][4]]);
+			
+			/* If no target exists or the "selected" targetOverride is included for the button, use selected for targetting */
+			dataList[`targetid${i}`] = (buttonList[i][5] == "selected" || targetName == "") ? "selected" : targetName;
+		}
+		let buttonRoll = await startRoll(rollBase); 
+		finishRoll(buttonRoll.rollId, dataList);
+	}
+	});
+}
+
+function generateActionButton(name, icon, color, action, data, target) {
+	name = name.replace("autoDamage", getTranslationByKeyCustom("Apply damage", "helper-text-applydamage")) ;
+	name = name.replace("autoInflict", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	name = name.replace("autoGive", getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"), );
+	
+	icon = icon.replaceAll('<img src="',"").replaceAll('" >',"");
+	
+	return [name, icon, color, action, data, target];
+}	
+
+
+/* Action button functions */
+on('clicked:actionButtonDamage', async (data) => {
+	getAttrs(["lastDefenceRoll"], function(values) {
+		let defenceRoll = values.lastDefenceRoll;
+		data = Data.unpackage(data.originalRollId);
+		data = data[0];
+
+		if (typeof data == "string") {
+			AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
+		} else {
+			damageHelper(data, defenceRoll);
+		}
+	
+		setAttrs({lastDefenceRoll: 0});
+	});
+});
+on('clicked:actionButtonInflict', async (data) => {
+	data = Data.unpackage(data.originalRollId);
+	data = data[0];
+	AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+});
+on('clicked:actionButtonGive', async (data) => {
+	data = Data.unpackage(data.originalRollId);
+	data = data[0];
+	AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+});
+
+
+
+
+
+
+
+
+
+
+/* Select target functionality */
+on('clicked:selectTarget', async (data) => {
+	let rollBase = `! {{character_name=[[0[@{target|Character|character_name}]]]}} {{selfToken=[[0[@{target|Character|selfToken}]]]}}`;
+	
+	let targetRoll = await startRoll(rollBase);
+	let target = {
+		targetName: targetRoll.results.character_name.expression.match(/^0\[(.*)\]\s*$/)[1],
+		targetToken: targetRoll.results.selfToken.expression.match(/^0\[(.*)\]\s*$/)[1]
+	}
+    finishRoll(targetRoll.rollId);
+	setAttrs(target);
+});
+
+
+
+on('clicked:testTarget', async (data) => {
+	getAttrs(["targetName"], async function(values) {
+		let ailmentList = await getTargetTest(values.targetName, "ailmentList")
+		ailmentList = Data.unpackage(ailmentList.ailmentList);
+		console.log(ailmentList)
+	});
+});
+
+async function getTargetTest(charname, ...args) {
+
+	let attrList = [];
+	args.forEach(arg => { if(arg != [] && arg != "") { attrList.push(arg); } });
+	
+	let rollBase = "! ";
+	attrList.forEach(attribute => {
+		rollBase += `{{${attribute}=[[0[@{${charname}|${attribute}}]]]}}`;
+	});
+	
+	let targetRoll = await startRoll(rollBase);
+	
+	console.log(targetRoll);
+	let target = {}
+	attrList.forEach(attribute => {
+		target[attribute] = targetRoll.results[attribute].expression.match(/^0\[(.*)\]\s*$/)[1];
+	});
+	finishRoll(targetRoll.rollId);
+
+	return target;
+	
+}
+
+
 async function getTargetAttrs(...args) {
 	let attrList = [];
 	args.forEach(arg => { if(arg != [] && arg != "") { attrList.push(arg); } });
 	
 	let rollBase = "! ";
 	attrList.forEach(attribute => {
-		rollBase += `{{${attribute}=[[0[@{target|Character|${attribute}}]]]}}`
+		rollBase += `{{${attribute}=[[0[@{target|Character|${attribute}}]]]}}`;
 	});
 	
 	let targetRoll = await startRoll(rollBase);
@@ -11043,6 +11183,19 @@ on("sheet:opened", function() {
 		setAttrs({"character_nameBase":name});
 		setAttrs({"distortState":"0"});
 	}
+	});
+});
+
+/* Auto: Initialize token image link */
+/* character_token and character_avatar cannot be retrieved from outside the charactersheet. As such a copy is made which can be retrieved */
+on("sheet:opened", function() {
+	getAttrs(["character_token", "selfToken"], function(values) {
+		let token = values.character_token;
+		let selfToken = values.selfToken;
+
+		if(token != selfToken){
+			setAttrs({"selfToken": token});
+		}
 	});
 });
 
@@ -12717,7 +12870,7 @@ getSectionIDs(`repeating_global`, idarray => {
 			let toolselect = values.toolselect;
 
         getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull",
-		`${id}_multiPenalty`, `${id}_multiStyle`, "character_name", "advState", "difficulty", "baseActNum", "Light",
+		`${id}_multiPenalty`, `${id}_multiStyle`, "targetName", "character_name", "advState", "difficulty", "baseActNum", "Light",
 		"difficulty", "Bleed", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
 		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
@@ -12730,6 +12883,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let currentlight = parseInt(values.Light);
 	let newlight = parseInt(values.Light);
 	let charname = values.character_name;
+	let targetname = values.targetName;
 	let simpledisplay = values.settingSimpleDisplay;
 	let hidebaseffect = values.settingHideBaseEffect;
 	let whisperrolls = values.settingWhisperRolls;
@@ -12971,13 +13125,13 @@ getSectionIDs(`repeating_global`, idarray => {
 	
 	/* Action buttons */
 	let buttonList = [];
-	//let giveButtonList = [];
+	let giveButtonList = [];
 	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 		if (buttonKey.startsWith("auto")) {
 			switch (buttonKey.split(" ")[0]) {
 				case "autoDamage": if (basetype != "Attack") { buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)) }; break;
 				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
-				case "autoGive": buttonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
 			}
 		}
 	}
@@ -13195,7 +13349,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let header = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + "'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 55%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + basename + "</b></div></div>";
 
 	let body = "<b>" + langFrom + ": </b>"+ charname + "<br>"
-	if (returnValues.target.character_name != "") { body += "<b>" + langTarget + ": </b>"+ returnValues.target.character_name + "<br>"; }
+	if (basetype == "Attack" && targetname != "") { body += "<b>" + langTarget + ": </b>"+ targetname + "<br>"; }
 	body += "<b>" + langRoll + ": </b>" + rollformatmessage + skillinfo + "<div style='text-align: center'>" + attackmessage + "</div>" + baseEffectDescription + skillEffectDescription + distortformat;
 
 	let info = header + body + autoScriptMessage;
@@ -13247,6 +13401,8 @@ getSectionIDs(`repeating_global`, idarray => {
 		if (basetype == "Attack") {
 			for (const rollKey in rollList) {
 				damage_data.baseOverride = Math.max(parseInt(rollList[rollKey]) + parseInt(autoeffectBaseDamage),0);
+				console.log(rollList[rollKey])
+				console.log(autoeffectBaseDamage)
 
 				let rollNumber = ` (#${rollKey.replace("roll","")})`;
 				if (Object.keys(rollList).length == 1) {
@@ -13255,8 +13411,8 @@ getSectionIDs(`repeating_global`, idarray => {
 				buttonList.push(generateActionButton("autoDamage"+rollNumber, getIcon("icons","damage"), "red", "actionButtonDamage", {...damage_data}));
 			}
 		}
-		createActionButtons(buttonList, returnValues.target.character_name, returnValues.target.character_id);
-		//createActionButtons(giveButtonList);
+		createActionButtons(buttonList);
+		createActionButtons(giveButtonList, "selected");
     });
 	/*--- send roll end ---*/
 
@@ -13469,7 +13625,7 @@ on('clicked:applyDamage', (info) => {
 	});
 });
 
-function damageHelper(overrideList = {}, defenceRoll=0) {
+function damageHelper(overrideList={}, defenceRoll=0) {
 	/* Get attribute values */
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
@@ -13796,6 +13952,9 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	/*                          \---------------------------- Before Resistance -----------------------------/  \----------------------- After Resistance ----------------------- / */
 	newHP += Math.ceil(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore + defenceRoll)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
 	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore + defenceRoll)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
+	/*                          \---------------------------- Before Resistance -----------------------------/  \----------------------- After Resistance ----------------------- / */
+	newHP += Math.ceil(Math.min((hpResistance * percentageModHP * (sumBothBefore + sumHpBefore + defenceRoll)) + hpProtection + damageResistance, 0)) + (sumBothAfter + sumHpAfter);
+	newST += Math.ceil(Math.min((stResistance *                   (sumBothBefore + sumStBefore + defenceRoll)) + stProtection + damageResistance, 0)) + (sumBothAfter + sumStAfter);
 	newSP += Math.ceil(sumSanity);
 
 	/* Use temporary HP and ST */
@@ -13934,6 +14093,12 @@ function damageHelper(overrideList = {}, defenceRoll=0) {
 	if (flatDamageHP != 0) { hpDamageBody += `<div class="flatModifier">${langFlatDamageHP}: ${flatDamageHP}</div>`; }
 	if (flatDamageST != 0) { stDamageBody += `<div class="flatModifier">${langFlatDamageST}: ${flatDamageST}</div>`; }
 	if (flatDamageSP != 0) { spDamageBody += `<div class="flatModifier">${langFlatDamageSP}: ${flatDamageSP}</div>`; }
+
+	/* Defence roll */
+	if (defenceRoll != 0) {
+		hpDamageBody += generateDamageHelperBodyEffect(langDefence, defenceRoll, "Defence", 0, getIcon("icons", "egoDef", "false"));
+		stDamageBody += generateDamageHelperBodyEffect(langDefence, defenceRoll, "Defence", 0, getIcon("icons", "egoDef", "false"));
+	}
 
 	/* Defence roll */
 	if (defenceRoll != 0) {
@@ -14286,9 +14451,10 @@ on('clicked:declareAction', (info) => {
 		let toolselect = values.toolselect;
 
 	/* Get attributes */
-        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "character_name", "Light", "skillSelect", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, `${skillselect}AutoScript`, "Bleed"], function(values) {
+        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "targetName", "character_name", "Light", "skillSelect", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, `${skillselect}AutoScript`, "Bleed"], function(values) {
 
 	let charname = values.character_name;
+	let targetname = values.targetName;
 	let simpledisplay = values.settingSimpleDisplay;
 	let hidebaseffect = values.settingHideBaseEffect;
 	let whisperrolls = values.settingWhisperRolls;
@@ -14483,13 +14649,13 @@ on('clicked:declareAction', (info) => {
 
 	/* Action buttons */
 	let buttonList = [];
-	//let giveButtonList = [];
+	let giveButtonList = [];
 	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 		if (buttonKey.startsWith("auto")) {
 			switch (buttonKey.split(" ")[0]) {
 				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)); break;
 				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
-				case "autoGive": buttonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
 			}
 		}
 	}
@@ -14565,7 +14731,7 @@ on('clicked:declareAction', (info) => {
 	if (hidebaseffect == "true") { skillinfo= "<b>" + langSkill + ": </b>" + skillname; toolinfo = "<b>" + langUse + "</b>: " +  toolname + toolusestext + "<br>"; }
 
 	let info = "<div style='background-color: #222; overflow: hidden; height: 30px; border: 2px #000 solid; color: " + headertext + ";'><div style='float: left'><img src='" + newicon + "' style='width: 30px; height: 30px; border-right: 2px #000 solid; margin-right: 5px; background-color:" + headercolor + "'></div><div style='width: 80%; overflow: hidden; height: 20px; padding-top: 5px; float: left;'><b>" + actiontext + lightmessage + "</b></div></div><b>" + langFrom + ": </b> " + charname + "<br>";
-	if (returnValues.target.character_name != "") { info += "<b>" + langTarget + ": </b>"+ returnValues.target.character_name + "<br>"; }
+	if (targetname != "") { info += "<b>" + langTarget + ": </b>"+ targetname + "<br>"; }
 	info += toolinfo + skillinfo + autoScriptMessage;
 
 	setAttrs({"dummy":info});
@@ -14580,8 +14746,8 @@ on('clicked:declareAction', (info) => {
         finishRoll(results.rollId,{});
 
 		/* Action Buttons */
-		createActionButtons(buttonList, returnValues.target.character_name, returnValues.target.character_id);
-		//createActionButtons(giveButtonList);
+		createActionButtons(buttonList);
+		createActionButtons(giveButtonList, "selected");
     });
 	/*--- send roll end ---*/
 
@@ -15814,14 +15980,12 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let message = "";
 		let messageValues = {};
 		
-		let ailmentList = {};
-		
 	/* Get all ailments */
 	/* Gives a list with the following format: hasNextTurnField, count, nextTurnCount, countImmutable, repeatingAilmentId, ailmentIconName */
 	/* countImmutable: Matches the count at the beginning of the AutoEffect execution. Should never be modified */
 	/* repeatingAilmentId: Is set to 0 for standard ailments */
 	getAilmentList(overrideList, function(ailmentList) { 
-		// console.log(ailmentList)
+	// console.log(ailmentList)
 
 
 	/* Execute each AutoEffect in the AutoScript */
@@ -16076,12 +16240,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			}
 		}
 	});
-
-	/* Get target attributes and execute checkTarget effects */
-	returnValues.target = {character_name: "", character_id: "selected"};
-	/*if (targetmode == "true") {
-		returnValues = await checkTargetAttrs(returnValues);
-	}*/
 	
 	/* Create conditional buttons */
 	let conditionalAlert = "";
@@ -16202,18 +16360,18 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		
 			/* Attach any action buttons that have been created for the AutoScript*/
 			let buttonList = [];
-			//let giveButtonList = [];
+			let giveButtonList = [];
 			for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 				if (buttonKey.startsWith("auto")) {
 					switch (buttonKey.split(" ")[0]) {
 						case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)); break;
 						case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
-						case "autoGive": buttonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+						case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
 					}
 				}
 			}
-			createActionButtons(buttonList, returnValues.target.character_name, returnValues.target.character_id);
-			//createActionButtons(giveButtonList);
+			createActionButtons(buttonList);
+			createActionButtons(giveButtonList, "selected");
 		});
 	}
 
@@ -16628,10 +16786,10 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, sett
 	if (scalingOption != undefined) {
 		if ((/(scaling[0-9]+)/ig).test(scalingOption)) {
 			scaling = Math.min(Math.floor(countImmutable/effectVal), parseInt(scalingOption.toLowerCase().replace("scaling","")));
-			} else {
+		} else {
 			scaling = Math.floor(countImmutable/effectVal);
-			}
-			returnValues.scaling = scaling;
+		}
+		returnValues.scaling = scaling;
 	}
 
 	/* Handle the target option */
@@ -16705,10 +16863,10 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle,
 	if (scalingOption != undefined) {
 		if ((/(scaling[0-9]+)/ig).test(scalingOption)) {
 			scaling = Math.min(Math.floor(countImmutable/effectVal), parseInt(scalingOption.toLowerCase().replace("scaling","")));
-			} else {
+		} else {
 			scaling = Math.floor(countImmutable/effectVal);
-			}
-			returnValues.scaling = scaling;
+		}
+		returnValues.scaling = scaling;
 	}
 
 	/* Handle the target option */
@@ -18682,13 +18840,15 @@ const Data = {
         ',': '%comma;',
         ':': '%colon;',
         '}': '%rcub;',
-        '{': '%lcub;'
+        '{': '%lcub;',
     },
     package(data) {
 		data = (typeof(data) === 'object') ? JSON.stringify(data) : (typeof(data) === 'string') ? data : null;
-        return (data) ? `${data}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+        data = (data) ? `${data}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+		return data.replaceAll(']','%rbrack;').replaceAll('[','%lbrack;');
     },
     unpackage(data) {
+		data = data.replaceAll('%rbrack;',']').replaceAll('%lbrack;','[');
 		data = `${data}`.replace(new RegExp(`(${Object.values(this.chars).join('|')})`, 'g'), (r) => Object.entries(this.chars).find(e=>e[1]===r)[0]);
         return JSON.parse(data);
     }
