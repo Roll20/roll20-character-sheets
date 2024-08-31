@@ -2,11 +2,11 @@
 // check initialization so it updates only once per game at most
 var _isInitialized = false;
 // === ATTRIBUTE ARRAYS
-	
+
 const arrays = {
 		_stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
 		_derived_stats: ['hit_points', 'sanity_points', 'willpower_points', 'breaking_point'],
-		_derived_stats_max: ['hit_points_max', 'willpower_points_max', 'breaking_point_max'],
+		_derived_stats_max: ['sanity_points_max','hit_points_max', 'willpower_points_max', 'breaking_point_max'],
 		_hit_points: ['strength_score', 'constitution_score'],
 		_willpower_points: ['power_score'],
 		_toggles: ['settings'],
@@ -38,11 +38,11 @@ const arrays = {
 		_advanced_weapons_featurs : [`shotgun`,`blast_radius`,`hasDoubleBarrel`,`selfire`,'accessories'],	
         _weapon_hidden_buttons : ['damage','lethality_percent','double_barrel','selective_fire'],
         _ritual_hidden_buttons : ['pay_cost','force_connection','accept_failure','attack','heal','power'],    
-		
+
 };
-///////////// ADD EXCEPTIONS HERE IMPORTANT
-//const _repeating_exceptions = {'weapons': ['hasadvancedinfo']}
-///////////////////////////////////
+
+
+
 const _skill_percent = [
 	{section:'skills', field:'rank'},
     {section:'special', field:'skill_or_stat_used'},
@@ -66,7 +66,23 @@ const _repeating_sections={
 	'special':'special',
 	'weapons':'weapons',
 	'ritual':'rituals'
-	};
+};
+
+const _score_info =  [
+	`willpower_points_max`,
+	`character_creation_bonds`,
+	`repeating_bonds_setScore`,
+	`repeating_bonds_score`,
+	`repeating_bonds_score_old`,
+	`repeating_bonds_color`
+];
+
+const _bond_attributes = [
+	`name`,
+	`test`,
+	`score`,
+	`hurt`,
+];
 
 const _repeating_damages = [
 	'damage',
@@ -97,17 +113,24 @@ const _criticals=[1,11,22,33,44,55,66,77,88,99,100];
 const _queryModifier = `?{Modifier|0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}`;
 const prefix_skill_roll = `@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`; 
 const prefix_sanity_roll = `@{gm_toggle} &{template:fancy-sanloss} `;
-const prefix_damage_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}}`;
+// roll to use in rituals
+// isHealing -> -1 for attack, 1 for heal, 0 for normal damages
+const prefix_attack_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}} {{isHealing=[[-1]]}} {{trackbullets=[[0]]}} {{header=^{attack}}}`;
+const prefix_health_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}} {{isHealing=[[1]]}} {{trackbullets=[[0]]}} {{header=^{heal} }}`;
+// roll to use in weapons
+const prefix_damage_roll = `@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}} {{isHealing=[[0]]}} {{usAiming=[[0]]}}`;
 const prefix_bond_roll = `@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[${_rd4}]]}}`; 
 const prefix_ritual_roll = `@{gm_toggle} &{template:fancy-rituals} {{name=@{character_name}}} {{dice=[[${_rd100}]]}}`;
 const prefix_ritualloss_roll = `@{gm_toggle} &{template:fancy-ritualloss} {{name=@{character_name}}} {{header=^{ritual cost}}}`;
- 
+
 
 const _shotgun_or_blast_radius =[`shotgun`,`blast_radius`];
 const _alldamages=['damage','damage_critical','double_barrel','double_barrel_critical',
 	'lethality_percent','lethality_percent_critical','selective_fire','selective_fire_critical'
 ];
 
+const _ritual_damages=['attack','heal','power'];
+const _type_damages=['damage','lethality_percent'];
 const _ritual_losses=['pay_cost','force_connection','accept_failure'];
 const _allrolls=arrays['_derived_rolls'].concat(arrays[`_stats`],arrays[`_skills`],['unnatural','sanity_loss']);
 
@@ -127,8 +150,8 @@ const RitualRolls   = ['name','skill_span','unnatural_gain',
     'study_time','sanity_loss_for_learning','activation_time',
     'description','complexity','flawed_ritual','power_reaction'];
 
-const RitualDamages = ['attack_target_stat','attack_amount','attack_lethality_percent_amount','attack_isLethal'];
-const RitualHeals   = ['heal_target_stat','heal_amount','heal_lethality_percent_amount','heal_isLethal'];
+const RitualDamages = ['attack_target_stat','attack_damage_amount','attack_lethality_percent_amount','attack_isLethal'];
+const RitualHeals   = ['heal_target_stat','heal_damage_amount','heal_lethality_percent_amount','heal_isLethal'];
 
 const _ritualInfo=[
     'complexity',
@@ -156,10 +179,9 @@ const sanity_selector='button.sanroll';
 let _globalModifier = 0;
 
 
-
 const _number_or_roll= [
     {section:'weapons', fields:['damage','double_barrel']},
-    {section:'rituals',fields:['sanity_loss_low','sanity_loss_high','attr_sanity_loss_for_learning','attr_unnatural_gain','healamount','attack_amount','willpower_points_cost','healpoints_cost','strength_score_cost','constitution_score_cost','dexterity_score_cost','intelligence_score_cost','charisma_score_cost','power_score_cost']}
+    {section:'rituals',fields:['sanity_loss_low','sanity_loss_high','attr_sanity_loss_for_learning','attr_unnatural_gain','heal_damage_amount','attack_damage_amount','willpower_points_cost','healpoints_cost','strength_score_cost','constitution_score_cost','dexterity_score_cost','intelligence_score_cost','charisma_score_cost','power_score_cost']}
 ];
 const _only_number=[
     {section:'weapons', fields:['lethality_percent','selfire_lethality_percent','accessory_modifier']},

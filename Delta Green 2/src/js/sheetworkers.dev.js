@@ -1,7 +1,5 @@
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -65,7 +63,10 @@ var updateSkillSpanOnChange = function updateSkillSpanOnChange(skill, value, upd
 
       setAttrs(update, {
         silent: true
-      }, function () {});
+      }, function () {
+        console.log("Skill span updated for ".concat(skill));
+        console.info(update);
+      });
     });
   });
 };
@@ -157,43 +158,6 @@ var value_current = function value_current(current, old, max) {
   return Math.max(current, 0);
 };
 
-_shotgun_or_blast_radius.forEach(function (main) {
-  other = _shotgun_or_blast_radius.filter(function (el) {
-    return el == main;
-  });
-  on("change:repeating_weapons:".concat(main), function (eventInfo) {
-    id = eventInfo.sourceAttribute.split('_')[2];
-    var main_name = "repeating_weapons_".concat(id, "_").concat(main);
-    var other_name = "repeating_weapons_".concat(id, "_").concat(other);
-    var double_barrel_name = "repeating_weapons_".concat(id, "_hasDoubleBarrel");
-    getAttrs([main_name, other_name], function (values) {
-      console.info(values);
-      var main_value = values[main_name] === 'active' ? 1 : 0;
-      var update = {};
-
-      if (main_value === 1) {
-        if (main === 'shotgun') {
-          update["repeating_weapons_".concat(id, "_blast_radius")] = 0;
-          update[double_barrel_name] = 'active';
-        } else {
-          update[double_barrel_name] = 0;
-          update["repeating_weapons_".concat(id, "_shotgun")] = 0;
-        }
-      }
-
-      if (main_value === 0) {
-        update[double_barrel_name] = 0;
-      }
-
-      setAttrs(update, {
-        silent: true
-      }, function () {
-        console.log('Shotgun or Blast Radius updated');
-      });
-    });
-  });
-});
-
 var setBondsLocalVariables = function setBondsLocalVariables() {
   getAttrs(["willpower_points", "sanity_points"], function (value) {
     var update = {};
@@ -210,210 +174,14 @@ var setBondsLocalVariables = function setBondsLocalVariables() {
       });
     });
   });
-};
-
-arrays['_adaptation'].forEach(function (adaptation) {
-  console.log('adaptation:', adaptation);
-  on('change:' + adaptation, function () {
-    getAttrs([adaptation], function (values) {
-      console.log('values:', values);
-      var value = parseInt(values[adaptation]) || 0;
-      console.log('adaptation changed:' + value);
-      var update = {};
-      update["".concat(adaptation, "_adapted")] = value === 2 ? 1 : 0;
-      setAttrs(update, {
-        silent: true
-      }, function () {
-        update["".concat(adaptation, "_adapted")] == 1 ? console.log("".concat(adaptation, " adapted")) : console.log("".concat(adaptation, " not adapted"));
-      });
-    });
-  });
-});
-arrays['_settings_wp'].forEach(function (wp_setting) {
-  on("change:".concat(wp_setting), function (eventInfo) {
-    console.log('wp_setting changed:' + eventInfo.triggerName);
-    getAttrs(arrays['_settings_wp'].concat(arrays['_derived_modifiers']), function (values) {
-      var update = {};
-
-      if (values['mod_willpower_check'] === 'none') {
-        update["low_willpower"] = 0;
-        update["zero_willpower"] = 0;
-      }
-
-      if (values['mod_willpower_check'] === 'lowonly') {
-        update["zero_willpower"] = 0;
-        update["low_willpower"] = 1;
-      }
-
-      if (values['mod_willpower_check'] === 'all') {
-        update["low_willpower"] = 1;
-        update["zero_willpower"] = 1;
-      }
-
-      setAttrs(update, {
-        silent: true
-      }, function () {
-        console.log('Willpower Settings updated');
-      });
-    });
-  });
-});
-on("change:repeating_skills:rank", function (eventInfo) {
-  var newValue = setMinMax(parseInt(eventInfo.newValue) || 0, 0, 99);
-  update = {};
-  update[eventInfo.sourceAttribute] = newValue;
-  setAttrs(update, {
-    silent: true
-  }, function () {
-    console.log('Repeating Skills updated on change');
-  });
-});
-Object.entries(_repeating_sections).forEach(function (_ref5) {
-  var _ref6 = _slicedToArray(_ref5, 2),
-      attrName = _ref6[0],
-      section = _ref6[1];
-
-  on("change:repeating_".concat(section), function (eventInfo) {
-    var id = eventInfo.sourceAttribute.split('_')[2];
-    /*if (_repeating_exceptions.hasOwnProperty(section)){
-    	const _array_to_check = _repeating_exceptions[section];
-    	const _event_target = eventInfo.sourceAttribute;
-    	const flag= _array_to_check.some(v=> _event_target.includes(v));
-    	if (flag){
-    		attrName= _repeating_exceptions[`weapons`].filter( v=>  eventInfo.sourceAttribute.includes(v))[0];
-    		changeRepeatingExceptions(section,attrName);
-    	} else {
-    		console.log('no exceptions');
-    		changeRepeatingRolls(section,attrName,id);
-    	}
-    } else {
-    	changeRepeatingRolls(section,attrName,id);
-    }*/
-
-    changeRepeatingRolls(section, attrName, id);
-  });
-}); // new function to compute san point max
-
-on("change:unnatural", function (eventInfo) {
-  var newvalue = setMinMax(parseInt(eventInfo.newValue) || 0, 0, 99);
-  update = {
-    sanity_points_max: 99 - newvalue,
-    unnatural: newvalue
-  };
-  setAttrs(update, {
-    silent: true
-  }, function () {
-    console.log('Sanity points updated');
-  });
-}); // === debug note: need to change repeating_special_training and repeating_weapons for visulization purposes
+}; // === debug note: need to change repeating_special_training and repeating_weapons for visulization purposes
 // === Update stats on change
 
-arrays['_stats'].forEach(function (stat) {
-  var stat_score = "".concat(stat, "_score");
-  var _sanity_array = ['sanity_points', 'breaking_point', 'initial_san'];
-  var _initial_hp = ['initial_str', 'initial_con', 'initial_hp'];
-  on("change:".concat(stat_score), function (eventInfo) {
-    var update = {};
-    getAttrs(arrays['_stats'].concat(_sanity_array, _initial_hp, ['unnatural'], arrays['_stats'].map(function (el) {
-      return "".concat(el, "_score");
-    })), function (v) {
-      var value = parseInt(stat[stat_score], 10) || 0;
-      update[stat] = value * 5;
-      update[stat_score] = value;
-
-      if (stat === 'power') {
-        var sanmax = 99 - parseInt(v['unnatural'] || 0);
-        update["willpower_points_max"] = value;
-        update['sanity_point_max'] = sanmax;
-        var flag_initial_san = v.initial_san;
-
-        if (flag_initial_san == 1) {
-          var InitialSanity = value * 5;
-          var InitialBreakingPoint = value * 4;
-          var InitialWillPower = value;
-          update['sanity_points'] = InitialSanity;
-          update['sanity_points_old'] = InitialSanity;
-          update['breaking_point'] = InitialBreakingPoint;
-          update['breaking_point_max'] = InitialBreakingPoint;
-          update['willpower_points'] = InitialWillPower;
-          update['initial_san'] = 0;
-        }
-      }
-
-      if (stat === 'strength' || stat === 'constitution') {
-        // no matter what the flag will be trigger, I save the check for the initial hp
-        var flag_initial_str = v.initial_str;
-        var flag_initial_con = v.initial_con;
-        var flag_initial_hp = v.initial_hp;
-        var con = parseInt(v["constitution_score"] || 0);
-        var str = parseInt(v["strength_score"] || 0);
-        var new_flag_initial_hp = 1;
-
-        if (stat === 'strength') {
-          update["initial_str"] = 0;
-
-          if (flag_initial_con === 0) {
-            new_flag_initial_hp = 0;
-          }
-        } else {
-          update["initial_con"] = 0;
-
-          if (flag_initial_str === 0) {
-            new_flag_initial_hp = 0;
-          }
-        }
-
-        if (flag_initial_hp === 0 || new_flag_initial_hp === 0) {
-          update["hit_points_max"] = Math.ceil((con + str) / 2);
-        }
-
-        if (new_flag_initial_hp === 0) {
-          update["hit_points"] = update["hit_points_max"];
-          update["initial_hp"] = 0;
-        }
-      }
-
-      updateSkillSpanOnChange(stat, value * 5, update, 'Stats');
-    });
-  });
-});
 
 var skill_in_bounds = function skill_in_bounds(skill) {
   var skill_value = parseInt(skill) || 0;
   return Math.min(99, Math.max(0, skill_value));
 };
-
-on("change:ritual_skill", function (eventInfo) {
-  var value = skill_in_bounds(eventInfo.newValue);
-  var update = {};
-  console.log('ritual_skill:', value);
-  update['ritual_skill'] = value;
-  updateSkillSpanOnChange('ritual_skill', value, update, 'Rituals');
-}); // === Update skills on change
-
-arrays['_skills'].forEach(function (skill) {
-  on("change:".concat(skill), function (eventInfo) {
-    var value = skill_in_bounds(eventInfo.newValue);
-    var update = {};
-    update[skill] = value;
-    updateSkillSpanOnChange(skill, value, update, 'Skills');
-  });
-}); // === Update repeating skills on change
-
-on("change:repeating_skills:rank", function (eventInfo) {
-  var value = parseInt(eventInfo.newValue) || 0;
-
-  if (value < 0) {
-    setAttributes(_defineProperty({}, eventInfo.sourceAttribute, 0), false);
-  }
-
-  if (value > 99) {
-    setAttributes(_defineProperty({}, eventInfo.sourceAttribute, 99), false);
-  }
-});
-on('change:advanced_weapons', function () {
-  updateadvancedweapons();
-});
 
 var updateadvancedweapons = function updateadvancedweapons() {
   getAttrs(['advanced_weapons'], function (v) {

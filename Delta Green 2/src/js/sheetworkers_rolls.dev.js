@@ -29,8 +29,7 @@ var updateRepeatingRolls = function updateRepeatingRolls(section, attrName, id, 
   var rep_attrName = "".concat(attrPrefix, "_").concat(attrName);
   var dicePrefix = "%{".concat(character_id, "|").concat(rep_attrName);
   update["".concat(rep_attrName, "_action")] = "".concat(dicePrefix, "-action}");
-  update["".concat(rep_attrName, "_r")] = id; ////////////////// TO BE TESTED SO I UPDATE ONLY THE ROLLS THAT NEEDS IT ///////////////////
-
+  update["".concat(rep_attrName, "_r")] = id;
   update["".concat(rep_attrName, "_initialized")] = "1";
 
   if (section === 'weapons') {
@@ -88,10 +87,7 @@ var updateRepeatingRollsonOpen = function updateRepeatingRollsonOpen(update, cha
       });
     });
   });
-}; ////////////////////////////////////////////////////////////////////////////////////////////
-//const changeRepeatingExceptions = (section,attrName) => {console.log(`Exception: ${section} ${attrName}`)}; // TO BE IMPLEMENTED
-////////////////////////////////////////////////////////////////////////////////////////////
-
+};
 
 var changeRepeatingRolls = function changeRepeatingRolls(section, attrName, id) {
   getAttrs(['character_id', "repeating_".concat(section, "_").concat(id, "_initialized")], function (values) {
@@ -120,11 +116,10 @@ var rollwithmodifiers = function rollwithmodifiers(rollString, rollName, queryMo
   }
 
   getAttrs(attr_to_get, function (values) {
-    ///////////////////////////////////////////////////////////
     var wp_mod = check_for_wp_modifiers(values, rollName);
     rollString += "{{rating=[[@{".concat(rollName, "}]]}}");
-    rollString += "{{zero_willpower=".concat(wp_mod.zero_willpower, "}}");
-    rollString += "{{low_willpower=".concat(wp_mod.low_willpower, "}}} ");
+    rollString += "{{zero_willpower=[[".concat(wp_mod.zero_willpower, "]]}}");
+    rollString += "{{low_willpower=[[".concat(wp_mod.low_willpower, "]]}}} ");
     rollString += "{{modifier=[[".concat(queryModifier, "]]}}");
     rollString += "{{isCritical=[[0]]}} {{isSuccess=[[0]]}}";
     rollString += get_header_skills(values, additionalParameters);
@@ -162,7 +157,7 @@ var rollSkillAndStats = function rollSkillAndStats(rollValue, rollName, isSkill)
   startRoll(rollValue, function (results) {
     // low and zero willpower flags only used if the setting is on
     var zero_willpower = results.results.zero_willpower.result;
-    var low_willpower = results.results.low_willpower.result; //
+    var low_willpower = results.results.low_willpower.result;
 
     var _modifier = correct_modifier(results.results.modifier.result, low_willpower);
 
@@ -189,7 +184,6 @@ var rollSkillAndStats = function rollSkillAndStats(rollValue, rollName, isSkill)
 
 var rollBonds = function rollBonds(rollValue, _value, _names, _parameters) {
   startRoll("".concat(rollValue), function (results) {
-    ///////////////////////////////////////////////////////////
     var dice = results.results.dice.result;
     var local_wp = Math.max(0, parseInt(results.results.local_wp.result) - dice);
     var score = Math.max(0, parseInt(results.results.score.result) - dice);
@@ -218,46 +212,6 @@ var rollBonds = function rollBonds(rollValue, _value, _names, _parameters) {
     }, function () {});
   });
 };
-
-_alldamages.forEach(function (attrName) {
-  on("clicked:repeating_weapons:".concat(attrName, "-action"), function (eventInfo) {
-    var id = eventInfo.sourceAttribute.split('_')[2];
-    var _input_names = {};
-    var _parameters = [];
-    setDamageParametersAndInputNames(id, attrName, _parameters, _input_names);
-    _input_names['rollName'] = attrName;
-    clicked_repeating_damages(_parameters, _input_names);
-  });
-});
-
-arrays['_sanity_loss'].forEach(function (attrName) {
-  on("clicked:".concat(attrName, "-action"), function (eventInfo) {
-    getAttrs([attrName], function (values) {
-      var sanloss = check_sanloss(values[attrName], attrName);
-      rollSanityDamages(sanloss, attrName);
-    });
-  });
-});
-
-_ritual_losses.forEach(function (attrName) {
-  on("clicked:repeating_rituals:".concat(attrName, "-action"), function (eventInfo) {
-    var id = eventInfo.sourceAttribute.split('_')[2];
-    var input_names = {};
-    var parameters = [];
-    input_names["ritual_type"] = attrName;
-    parameters.push("repeating_rituals_".concat(id, "_ritual_type"));
-    var repsecid = "repeating_rituals_".concat(id);
-    input_names["repsecid"] = repsecid;
-    input_names["name"] = "".concat(repsecid, "_name");
-    parameters.push(input_names["name"]);
-    setRitualCostParametersAndInputNames(repsecid, parameters, input_names);
-    CurrentValues.forEach(function (attrName) {
-      input_names[attrName] = "".concat(attrName);
-      parameters.push(attrName);
-    });
-    clicked_repeating_rituals_cost(parameters, input_names);
-  });
-});
 
 var clicked_repeating_rituals_cost = function clicked_repeating_rituals_cost(parameters, names) {
   getAttrs(parameters, function (values) {
@@ -361,8 +315,16 @@ var setDamageParametersAndInputNames = function setDamageParametersAndInputNames
   _parameters.push(_input_names["track_bullets"]);
 };
 
+var addAttackHeader = function addAttackHeader(values, names) {
+  if (names.hasOwnProperty('header')) {
+    return "{{header=^{".concat(realDmgHeader(values, names), "}}}");
+  }
+
+  return '';
+};
+
 var realDmgHeader = function realDmgHeader(values, names) {
-  var header = names['header'];
+  if (names.hasOwnProperty) var header = names['header'];
 
   if (header.includes('_tmp_header_')) {
     // I can use it for other things
@@ -374,7 +336,22 @@ var realDmgHeader = function realDmgHeader(values, names) {
   return header;
 };
 
+var prefixDamageRoll = function prefixDamageRoll(type_prefix) {
+  if (type_prefix === 'damage') {
+    return prefix_damage_roll;
+  }
+
+  if (type_prefix === 'heal') {
+    return prefix_health_roll;
+  }
+
+  if (type_prefix === 'attack') {
+    return prefix_attack_roll;
+  }
+};
+
 var clicked_repeating_damages = function clicked_repeating_damages(parameters, names) {
+  var type_prefix = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'damage';
   getAttrs(parameters, function (values) {
     var isCritical = names['isCritical'];
     var track_bullets = values[names['track_bullets']] === 'active' ? 1 : 0;
@@ -385,8 +362,10 @@ var clicked_repeating_damages = function clicked_repeating_damages(parameters, n
     var used_ammo = getUsedAmmo(selfire_type);
     var damage_type = names['damage_type'];
     var damage = values[names['damage']];
-    var header = realDmgHeader(values, names);
-    var rollString = "".concat(prefix_damage_roll, " {{header=^{").concat(header, "}}}");
+    var rollString = "";
+    rollString += prefixDamageRoll(type_prefix);
+    rollString += addAttackHeader(values, names);
+    rollString += addTargetStat(values, names, type_prefix);
     var damageString = '';
 
     if (damage_type === 'damage') {
@@ -425,6 +404,26 @@ var clicked_repeating_damages = function clicked_repeating_damages(parameters, n
   });
 };
 
+var setDamageRitualParametersAndInputNames = function setDamageRitualParametersAndInputNames(id, _parameters, _input_names) {
+  _input_names["name"] = "repeating_rituals_".concat(id, "_name");
+  _input_names["isCritical"] = 0;
+  var damage_type = _input_names["damage_type"];
+  var attack_or_heal = _input_names["attack_or_heal"];
+  var repsecid = _input_names["repsecid"]; //
+
+  _parameters.push(_input_names["name"]);
+
+  var prefix_names = "".concat(repsecid, "_").concat(attack_or_heal);
+  _input_names["repsecid"] = prefix_names;
+  _input_names["damage"] = "".concat(prefix_names, "_").concat(damage_type, "_amount");
+
+  _parameters.push(_input_names["damage"]);
+
+  _input_names["target_stat"] = "".concat(prefix_names, "_target_stat");
+
+  _parameters.push(_input_names["target_stat"]);
+};
+
 var getRollDamage = function getRollDamage(results, trackammo, damage_type, critical) {
   var newroll = {};
 
@@ -445,10 +444,8 @@ var getRollDamage = function getRollDamage(results, trackammo, damage_type, crit
   if (damage_type === 'lethality_percent') {
     var lethality_percent = results.results.lethality_percent.result;
     var roll = results.results.roll.result;
-    var quotient = Math.round(roll / 10);
-    var remainder = Math.round(roll % 10);
     var computed_lethality_percent = lethality_percent;
-    var computed_roll = quotient + (remainder > 0 ? remainder : 10);
+    var computed_roll = DeltaGreenLethalityFail(roll);
 
     if (critical == 1) {
       computed_lethality_percent = lethality_percent * 2;
@@ -466,27 +463,23 @@ var clicked_repeating_weapons = function clicked_repeating_weapons(parameters, n
   getAttrs(parameters, function (values) {
     // used to set the roll string
     var character_id = values['character_id'];
-    var repsecid = names['repsecid']; //
-
+    var repsecid = names['repsecid'];
     var skillname = values[names['name']];
     var skillrank = setMinMax(values[names['rank']]);
     var trackAmmo = need_to_track_ammo(values, names);
-    var current_ammo = Math.max(0, parseInt(values[names['ammo']]) || 0); //
-
+    var current_ammo = Math.max(0, parseInt(values[names['ammo']]) || 0);
     var hasAdvancedWeapons = values[names['advanced_weapons']] === 'active' ? 1 : 0;
     var isShotgun = values[names['shotgun']] === 'active' ? 1 : 0;
     var hasDoubleBarrel = values[names['hasDoubleBarrel']] === 'active' ? 1 : 0;
     var hasSelectiveFire = values[names['selfire']] === 'active' ? 1 : 0;
     var hasAccessories = values[names['accessories']] === 'active' ? 1 : 0;
     var hasBlastRadius = values[names['blast_radius']] === 'active' ? 1 : 0;
-    var isAiming = values[names['aiming']] === 'active' ? 1 : 0; //
-
+    var isAiming = values[names['aiming']] === 'active' ? 1 : 0;
     var lethality_percent = setMinMax(values[names['lethality_percent']]);
     var damage = parseRoll(values[names['damage']]);
     var armor_piercing = Math.min(parseInt(values[names['armor_piercing']], 10) || 0, 0);
     var base_range = values[names['range']];
-    var kill_radius = values[names['kill_radius']]; //
-
+    var kill_radius = values[names['kill_radius']];
     var _options = {};
     _options['rating'] = skillrank;
     _options['hasLethality'] = lethality_percent > 0 ? 1 : 0;
@@ -528,6 +521,7 @@ var clicked_repeating_weapons = function clicked_repeating_weapons(parameters, n
     if (hasAccessories === 1) {
       _options['hasAccessories'] = 1;
       _options['accessory_modifier'] = values[names['accessory_modifier']];
+      _options['accessory_name'] = values[names['accessory_name']];
     }
 
     if (hasBlastRadius === 1) {
@@ -535,9 +529,10 @@ var clicked_repeating_weapons = function clicked_repeating_weapons(parameters, n
     }
 
     var wp_mod = check_for_wp_modifiers(values);
+    _options['wp_mod'] = wp_mod;
     var rollString = "".concat(prefix_skill_roll, " {{header=").concat(skillname, "}} {{subheader=").concat(skillrank, "}}");
     var rollValue = "".concat(rollString, " {{rating=[[").concat(skillrank, "]]}} {{modifier=[[").concat(queryModifier, "]]}} ");
-    rollValue += " {{low_willpower=".concat(wp_mod.low_willpower, "}}  {{zero_willpower=").concat(wp_mod.zero_willpower, "}}");
+    rollValue += " {{low_willpower=[[".concat(wp_mod.low_willpower, "]]}}  {{zero_willpower=[[").concat(wp_mod.zero_willpower, "]]}}");
     rollValue += " {{isCritical=[[0]]}} {{isSuccess=[[0]]}}";
     rollValue += " {{advanced_weapons=[[".concat(hasAdvancedWeapons, "]]}}");
 
@@ -554,7 +549,8 @@ var clicked_repeating_weapons = function clicked_repeating_weapons(parameters, n
     }
 
     var options = setWeaponOptions(_options);
-    rollValue += setAdvancedWeaponsString(options, character_id, repsecid);
+    rollValue += setAdvancedWeaponsString(options, character_id, repsecid); //********************************************
+
     rollAttacks(rollValue, options);
   });
 };
@@ -587,13 +583,12 @@ var clicked_repeating_skills = function clicked_repeating_skills(parameters, nam
   getAttrs(parameters, function (values) {
     var skillname = values[names['name']];
     var skillrank = parseInt(values[names['rank']]) || 0;
-    var rollString = "".concat(prefix_skill_roll, " {{header=").concat(skillname, "}} {{subheader=").concat(skillrank, "}} "); ///////////////////////////////////////////////////////////
-
+    var rollString = "".concat(prefix_skill_roll, " {{header=").concat(skillname, "}} {{subheader=").concat(skillrank, "}} ");
     var wp_modifiers = check_for_wp_modifiers(values);
     var _zero_willpower = wp_modifiers.zero_willpower;
     var _low_willpower = wp_modifiers.low_willpower;
     var rating = parseInt(values[parameters[names['rank']]]) || 0;
-    var rollValue = "".concat(rollString, " {{rating=[[").concat(skillrank, "]]}}  {{zero_willpower=").concat(_zero_willpower, "}} {{low_willpower=").concat(_low_willpower, "}}}  {{modifier=[[").concat(queryModifier, "]]}} {{isCritical=[[0]]}} {{isSuccess=[[0]]}}");
+    var rollValue = "".concat(rollString, " {{rating=[[").concat(skillrank, "]]}}  {{zero_willpower=[[").concat(_zero_willpower, "]]}} {{low_willpower=[[").concat(_low_willpower, "]]}}}  {{modifier=[[").concat(queryModifier, "]]}} {{isCritical=[[0]]}} {{isSuccess=[[0]]}}");
 
     if (_zero_willpower != '[[1]]') {
       rollValue = "".concat(rollValue);
@@ -610,43 +605,20 @@ var clicked_repeating_bonds = function clicked_repeating_bonds(parameters, names
     var bondscore = parseInt(values[names['score']]) || 0;
     var local_wp_points = parseInt(values[names['local_wp_points']]) || 0;
     var local_sanity_points = parseInt(values[names['local_sanity_points']]) || 0;
-    var character_id = values['character_id']; /////////////////////////////////////
+    var character_id = values['character_id'];
 
     if (bondscore <= 0) {
       return;
     } // No need to roll if the bond is already broken
-    ////////////////////////////////////
 
 
-    var rollString = "".concat(prefix_bond_roll, " {{header=").concat(bondname, "}} {{subheader=").concat(bondscore, "}} "); ///////////////////////////////////////////////////////////
-
+    var rollString = "".concat(prefix_bond_roll, " {{header=").concat(bondname, "}} {{subheader=").concat(bondscore, "}} ");
     var rollValue = "".concat(rollString, " {{zerowp=[[0]]}} {{score=[[").concat(bondscore, "]]}} {{local_wp=[[").concat(local_wp_points, "]]}} {{local_sanity=[[").concat(local_sanity_points, "}]]}} {{repress= [^{repress}](~").concat(character_id, "|sanity_points)}}");
     rollValue = "".concat(rollValue, " {{projection=1}} {{repression=1}}");
     rollBonds(rollValue, values, names, parameters);
   });
 }; // Important functions
 
-
-_allrolls.forEach(function (roll) {
-  var _roll = roll === 'sanity_points' ? 'sanity' : roll;
-
-  on("clicked:".concat(roll, "-action"), function (eventInfo) {
-    var additionalParameters = {};
-
-    if (arrays["_editable_skills"].includes(_roll)) {
-      var prefix_skill = _roll.slice(0, -2);
-
-      additionalParameters['editable_name'] = "".concat(_roll, "_name");
-      additionalParameters['editable_type'] = prefix_skill.replace('_', ' ');
-    } else {
-      var caps = _roll === 'humint' || _roll === 'sigint' ? _roll.toUpperCase() : _roll.replace('_', ' ');
-      additionalParameters['name'] = caps.replace('_', ' ');
-    }
-
-    var rollString = "".concat(prefix_skill_roll, " {{subheader=@{").concat(roll, "}}} ");
-    rollwithmodifiers(rollString, roll, _queryModifier, additionalParameters);
-  });
-});
 
 var setCommonParametersAndInputNames = function setCommonParametersAndInputNames(repsecid, _parameters, _input_names) {
   _input_names["name"] = "".concat(repsecid, "_name");
@@ -821,116 +793,8 @@ var setRepeatingParametersAndInputNames = function setRepeatingParametersAndInpu
   } else {
     console.error("Section ".concat(section, " not found"));
   }
-};
+}; //levelup character
 
-Object.entries(_repeating_sections).forEach(function (_ref3) {
-  var _ref4 = _slicedToArray(_ref3, 2),
-      attrName = _ref4[0],
-      section = _ref4[1];
-
-  on("clicked:repeating_".concat(section, ":").concat(attrName, "-action"), function (eventInfo) {
-    var id = eventInfo.sourceAttribute.split('_')[2];
-    var queryModifier = _queryModifier;
-    var _input_names = {};
-    var _parameters = [];
-    setRepeatingParametersAndInputNames(section, id, _parameters, _input_names);
-    clicked_repeating_actions(section, _parameters, _input_names, queryModifier);
-  });
-}); //levelup character
-
-on("clicked:levelup", function () {
-  var update = {};
-  var copyarray = arrays['_skills']; // copy of the array containing all skills ranks
-
-  var len = copyarray.length; // length of the original copyarray
-
-  var getarray = []; // used only to update the values
-
-  var summary = {}; // information in the log for the users
-
-  var var_rnd = 0; // random variable of 1d4
-
-  var newrowid;
-  var newrowattrs = {};
-  var oldval = 0;
-  var newval = 0;
-  var name;
-  getSectionIDs('skills', function (idarray) {
-    var addskills = idarray.map(function (id) {
-      return "repeating_skills_".concat(id);
-    });
-    copyarray = copyarray.concat(addskills); // concatenate skill array with repeating skill array
-
-    console.dir(copyarray);
-    getSectionIDs("summary", function (idarray) {
-      for (var i = 0; i < idarray.length; i++) {
-        removeRepeatingRow("repeating_summary_" + idarray[i]);
-      }
-    });
-    copyarray.forEach(function (sk, idx) {
-      //
-      if (idx < len) {
-        // if the idx<len it means I an in the skill array part
-        getAttrs(["".concat(sk), "".concat(sk, "_name"), "".concat(sk, "_fail")], function (val) {
-          getarray.push("".concat(sk)); //
-          //    
-
-          if (val["".concat(sk, "_fail")] == 'on') {
-            //if the checkbox is checked
-            var_rnd = Math.ceil(Math.random() * 4); // generate a random number for each checked value (less number generated)
-            //
-
-            oldval = parseInt(val["".concat(sk)]) || 0;
-            newval = oldval + var_rnd;
-            name = val["".concat(sk, "_name")];
-            summary["".concat(sk)] = var_rnd; // how much the skill has changed 0-3
-
-            update["".concat(sk)] = newval; // new value of the skill
-
-            update["".concat(sk, "_fail")] = 'off'; // uncheck checkbox
-
-            newrowid = generateRowID();
-            newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
-            newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
-            newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
-          }
-        });
-      } else {
-        // if the idx>=len it means I an in the  repeating skill array part
-        getAttrs(["".concat(sk, "_name"), "".concat(sk, "_rank"), "".concat(sk, "_fail")], function (val) {
-          getarray.push("".concat(sk, "_rank")); //
-          //    
-
-          if (val["".concat(sk, "_fail")] == 'on') {
-            var_rnd = Math.ceil(Math.random() * 4); // generate a random number for each checked value (less number generated)
-            //
-
-            summary["".concat(idx - len, "_rank")] = var_rnd; // since the repeating skill don't have a name, they are identified by number 0-N
-            //
-
-            oldval = parseInt(val["".concat(sk, "_rank")]) || 0;
-            newval = oldval + var_rnd;
-            name = val["".concat(sk, "_name")]; //
-
-            update["".concat(sk, "_rank")] = (parseInt(val["".concat(sk, "_rank")]) || 0) + var_rnd;
-            update["".concat(sk, "_fail")] = 'off';
-            newrowid = generateRowID();
-            newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
-            newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
-            newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
-          }
-        });
-      }
-    }); //
-    //setAttrs(newrowattrs);
-
-    getAttrs(getarray, function () {
-      // update fields
-      setAttributes(update, false);
-      setAttributes(newrowattrs, false);
-    }); //console.dir(update);
-  });
-});
 
 var initializeRolls = function initializeRolls() {
   if (!_isInitialized) {

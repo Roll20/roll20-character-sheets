@@ -6,7 +6,7 @@ var _isInitialized = false; // === ATTRIBUTE ARRAYS
 var arrays = {
   _stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
   _derived_stats: ['hit_points', 'sanity_points', 'willpower_points', 'breaking_point'],
-  _derived_stats_max: ['hit_points_max', 'willpower_points_max', 'breaking_point_max'],
+  _derived_stats_max: ['sanity_points_max', 'hit_points_max', 'willpower_points_max', 'breaking_point_max'],
   _hit_points: ['strength_score', 'constitution_score'],
   _willpower_points: ['power_score'],
   _toggles: ['settings'],
@@ -25,10 +25,7 @@ var arrays = {
   _advanced_weapons_featurs: ["shotgun", "blast_radius", "hasDoubleBarrel", "selfire", 'accessories'],
   _weapon_hidden_buttons: ['damage', 'lethality_percent', 'double_barrel', 'selective_fire'],
   _ritual_hidden_buttons: ['pay_cost', 'force_connection', 'accept_failure', 'attack', 'heal', 'power']
-}; ///////////// ADD EXCEPTIONS HERE IMPORTANT
-//const _repeating_exceptions = {'weapons': ['hasadvancedinfo']}
-///////////////////////////////////
-
+};
 var _skill_percent = [{
   section: 'skills',
   field: 'rank'
@@ -98,6 +95,8 @@ var _repeating_sections = {
   'weapons': 'weapons',
   'ritual': 'rituals'
 };
+var _score_info = ["willpower_points_max", "character_creation_bonds", "repeating_bonds_setScore", "repeating_bonds_score", "repeating_bonds_score_old", "repeating_bonds_color"];
+var _bond_attributes = ["name", "test", "score", "hurt"];
 var _repeating_damages = ['damage', 'damage_critical', 'lethality_percent', 'lethality_percent_critical', 'double_barrel', 'double_barrel_critical', 'selective_fire', 'selective_fire_critical'];
 var _repeating_ammo = ['hasammo', 'ammo', 'ammo_total'];
 var _rd100 = "[[1d100]]";
@@ -111,13 +110,20 @@ var _INHUMAN_STAT_ = 100;
 var _criticals = [1, 11, 22, 33, 44, 55, 66, 77, 88, 99, 100];
 var _queryModifier = "?{Modifier|0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}";
 var prefix_skill_roll = "@{gm_toggle} &{template:fancy-rolls} {{name=@{character_name}}} {{dice=[[".concat(_rd100, "]]}}");
-var prefix_sanity_roll = "@{gm_toggle} &{template:fancy-sanloss} ";
-var prefix_damage_roll = "@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}}";
+var prefix_sanity_roll = "@{gm_toggle} &{template:fancy-sanloss} "; // roll to use in rituals
+// isHealing -> -1 for attack, 1 for heal, 0 for normal damages
+
+var prefix_attack_roll = "@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}} {{isHealing=[[-1]]}} {{trackbullets=[[0]]}} {{header=^{attack}}}";
+var prefix_health_roll = "@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}} {{isHealing=[[1]]}} {{trackbullets=[[0]]}} {{header=^{heal} }}"; // roll to use in weapons
+
+var prefix_damage_roll = "@{gm_toggle} &{template:fancy-damages} {{name=@{character_name}}} {{isHealing=[[0]]}} {{usAiming=[[0]]}}";
 var prefix_bond_roll = "@{gm_toggle} &{template:fancy-bonds} {{character_id=@{character_id}}}{{name=@{character_name}}} {{dice=[[".concat(_rd4, "]]}}");
 var prefix_ritual_roll = "@{gm_toggle} &{template:fancy-rituals} {{name=@{character_name}}} {{dice=[[".concat(_rd100, "]]}}");
 var prefix_ritualloss_roll = "@{gm_toggle} &{template:fancy-ritualloss} {{name=@{character_name}}} {{header=^{ritual cost}}}";
 var _shotgun_or_blast_radius = ["shotgun", "blast_radius"];
 var _alldamages = ['damage', 'damage_critical', 'double_barrel', 'double_barrel_critical', 'lethality_percent', 'lethality_percent_critical', 'selective_fire', 'selective_fire_critical'];
+var _ritual_damages = ['attack', 'heal', 'power'];
+var _type_damages = ['damage', 'lethality_percent'];
 var _ritual_losses = ['pay_cost', 'force_connection', 'accept_failure'];
 
 var _allrolls = arrays['_derived_rolls'].concat(arrays["_stats"], arrays["_skills"], ['unnatural', 'sanity_loss']);
@@ -125,8 +131,8 @@ var _allrolls = arrays['_derived_rolls'].concat(arrays["_stats"], arrays["_skill
 var RitualCosts = ['sanity_loss_success', 'sanity_loss_failure', 'willpower_points_cost', 'power_score_cost', 'hit_points_cost', 'strength_score_cost', 'constitution_score_cost', 'dexterity_score_cost', 'intelligence_score_cost', 'charisma_score_cost'];
 var CurrentValues = ['sanity_points', 'willpower_points', 'power_score', 'hit_points', 'strength_score', 'constitution_score', 'dexterity_score', 'intelligence_score', 'charisma_score'];
 var RitualRolls = ['name', 'skill_span', 'unnatural_gain', 'study_time', 'sanity_loss_for_learning', 'activation_time', 'description', 'complexity', 'flawed_ritual', 'power_reaction'];
-var RitualDamages = ['attack_target_stat', 'attack_amount', 'attack_lethality_percent_amount', 'attack_isLethal'];
-var RitualHeals = ['heal_target_stat', 'heal_amount', 'heal_lethality_percent_amount', 'heal_isLethal'];
+var RitualDamages = ['attack_target_stat', 'attack_damage_amount', 'attack_lethality_percent_amount', 'attack_isLethal'];
+var RitualHeals = ['heal_target_stat', 'heal_damage_amount', 'heal_lethality_percent_amount', 'heal_isLethal'];
 var _ritualInfo = ['complexity', 'activation_time', 'activation_time_unit', 'study_time', 'study_time_unit', 'unnatural_gain', 'sanity_loss_for_learning', 'willpower_points_cost', 'power_score_cost', 'hit_points_cost', 'strength_score_cost', 'constitution_score_cost', 'dexterity_score_cost', 'intelligence_score_cost', 'charisma_score_cost', 'sanity_loss_success', 'sanity_loss_failure'];
 var selector = 'button.roll';
 var sanity_selector = 'button.sanroll';
@@ -136,7 +142,7 @@ var _number_or_roll = [{
   fields: ['damage', 'double_barrel']
 }, {
   section: 'rituals',
-  fields: ['sanity_loss_low', 'sanity_loss_high', 'attr_sanity_loss_for_learning', 'attr_unnatural_gain', 'healamount', 'attack_amount', 'willpower_points_cost', 'healpoints_cost', 'strength_score_cost', 'constitution_score_cost', 'dexterity_score_cost', 'intelligence_score_cost', 'charisma_score_cost', 'power_score_cost']
+  fields: ['sanity_loss_low', 'sanity_loss_high', 'attr_sanity_loss_for_learning', 'attr_unnatural_gain', 'heal_damage_amount', 'attack_damage_amount', 'willpower_points_cost', 'healpoints_cost', 'strength_score_cost', 'constitution_score_cost', 'dexterity_score_cost', 'intelligence_score_cost', 'charisma_score_cost', 'power_score_cost']
 }];
 var _only_number = [{
   section: 'weapons',

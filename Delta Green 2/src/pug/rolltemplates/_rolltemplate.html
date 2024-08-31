@@ -8,8 +8,10 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
-        <h2>{{#subheader}}({{subheader}}%){{/subheader}}</h2>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
+        <h2>{{#subheader}}({{subheader}}){{/subheader}}</h2>
       </div>{{/header}}   {{/^rollTotal() local_wp 0}}
       {{#rollTotal() local_wp 0}}{{#name}}
       <div class="sheet-template-superheader">
@@ -46,7 +48,9 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
         <h2>{{#subheader}}({{subheader}}){{/subheader}}</h2>
       </div>{{/header}}   
       <div class="sheet-template-body">{{#has_strength_score}}
@@ -122,7 +126,9 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
         <h2>{{#subheader}}({{subheader}}%){{/subheader}}</h2>
       </div>{{/header}}   {{#description}}
       <div class="sheet-template-body"> 
@@ -183,7 +189,7 @@
         <div class="grid sheet-template-subheader">
           <h2 data-i18n="heal"> </h2>
         </div>
-        <div class="sheet-template-row sheet-template-onerow"> <span class="sheet-template-attack-buttons"> 
+        <div class="sheet-template-row sheet-template-onerow"> <span class="sheet-template-heal-buttons"> 
             <div class="sheet-template-button">{{heal_button}}</div></span></div>{{/heal_button}}
       </div>
     </div>{{#power_button}}
@@ -199,7 +205,9 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
         <h2>{{#subheader}}({{subheader}}){{/subheader}}</h2>
       </div>{{/header}}   {{/damage}}
       {{#lethality_percent}}{{#name}}
@@ -208,19 +216,31 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
         <h2>{{#subheader}}({{subheader}}%){{/subheader}}</h2>
       </div>{{/header}}   {{/lethality_percent}}
       <div class="sheet-template-body">{{#damage}}
-        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="damage:">damage:</span><span class="inlinerollresult">{{damage}}</span></div>{{/damage}}
-        {{#lethality_percent}}
-        <div class="sheet-template-row sheet-template-onerow"> <span class="inlinerollresult">{{roll}}</span></div>
-        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="lethality:">lethality:</span><span class="sheet-template-computed"><span>{{computed::lethality_percent}}</span></span></div>
-        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="outcome:">outcome:</span>{{#^rollGreater() roll computed::lethality_percent}}<span class="sheet-template-outcome" data-i18n="kill">kill </span>{{/^rollGreater() roll computed::lethality_percent}} 
-          {{#rollGreater() roll computed::lethality_percent}}<span class="sheet-template-outcome" data-i18n="failure">failure</span>{{/rollGreater() roll computed::lethality_percent}}
-        </div>
-        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="damage:">damage:</span><span class="sheet-template-computed"><span>{{computed::roll}}</span></span></div>{{/lethality_percent}}
-        {{#rollTotal() trackbullets 1}}
+        <div class="sheet-template-row sheet-template-tworows"> 
+          <!-- For rituals-->{{#^rollTotal() isHealing 0}}<span class="sheet-after-colons sheet-rolltitle"> <span>{{target_stat}}:</span></span>{{/^rollTotal() isHealing 0}}
+          <!-- for normal damages-->{{#rollTotal() isHealing 0}}<span class="sheet-after-colons sheet-rolltitle" data-i18n="damage:">damage:</span>{{/rollTotal() isHealing 0}}<span class="inlinerollresult">{{damage}}  </span>
+        </div>{{/damage}} {{#lethality_percent}}
+        <div class="sheet-template-row sheet-template-onerow"><span class="span inlinerollresult">{{roll}}%</span></div>{{#^rollTotal() isHealing 1}}
+        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="outcome:"> </span>{{#^rollGreater() roll lethality_percent}}<span class="sheet-template-computed" data-i18n="kill">kill</span>{{/^rollGreater() roll lethality_percent}}
+          {{#rollGreater() roll lethality_percent}}<span class="sheet-template-computed" data-i18n="failure">failure|  </span>{{/rollGreater() roll lethality_percent}}
+        </div>{{/^rollTotal() isHealing 1}}
+        {{#rollTotal() isHealing 1}}
+        {{#^rollGreater() roll lethality_percent}}
+        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle"><span>{{target_stat}}:</span></span><span class="sheet-template-computed">{{lethality_percent}}</span>
+        </div>{{/^rollGreater() roll lethality_percent}}
+        {{/rollTotal() isHealing 1}}
+        {{#rollGreater() roll lethality_percent}}
+        <div class="sheet-template-row sheet-template-tworows"> {{#^rollTotal() isHealing 0}}<span class="sheet-after-colons sheet-rolltitle"> <span>{{target_stat}}:</span></span>{{/^rollTotal() isHealing 0}}
+          <!-- for normal damages-->{{#rollTotal() isHealing 0}}<span class="sheet-after-colons sheet-rolltitle" data-i18n="damage:">damage:</span>{{/rollTotal() isHealing 0}}<span class="sheet-template-computed">{{computed::roll}}</span>
+        </div>{{/rollGreater() roll lethality_percent}}{{#rollTotal() isHealing 0}}
+        <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="huge target:">huge target:</span><span class="sheet-template-computed">{{lethality_percent}}</span>
+        </div>{{/rollTotal() isHealing 0}}{{/lethality_percent}}{{#rollTotal() trackbullets 1}}
         <div class="sheet-template-row sheet-template-onerow"> <span><span class="sheet-rollbefore aligned-left sheet-template-computed">{{current_ammo}}</span><span class="sheet-rolltext aligned-left">→ </span><span class="sheet-rollafter aligned-left sheet-template-computed">{{computed::current_ammo}}</span></span></div>{{/rollTotal() trackbullets 1}}
       </div>
     </div>
@@ -232,7 +252,9 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
         <h2>{{#subheader}}({{subheader}}){{/subheader}}</h2>
       </div>{{/header}}   
       <div class="sheet-template-body">
@@ -258,7 +280,9 @@
       </div>{{/name}}
       {{#header}}
       <div class="sheet-template-header">
-        <h1> {{header}} </h1>
+        <h1> {{header}} </h1>{{#target_unit}}
+         
+        <h1>{{target_unit}}</h1>{{/target_unit}}
         <h2>{{#subheader}}({{subheader}}%){{/subheader}}</h2>
       </div>{{/header}}   {{#rollTotal() computed::zero_willpower 1}}
       <div class="sheet-template-overlay-zero-wp">
@@ -277,7 +301,7 @@
             {{#rollTotal() computed::isShotgun 1}}
             <div class="sheet-template-row sheet-template-tworows"><span class="sheet-after-colons sheet-rolltitle" data-i18n="shotgun:">shotgun:</span><span class="sheet-template-computed"> <span>+20%</span></span></div>{{/rollTotal() computed::isShotgun 1}}
             {{#rollTotal() computed::accessories 1}}
-            <div class="sheet-template-row sheet-template-tworows"><span class="sheet-after-colons sheet-rolltitle">{{accessory_name}}:</span><span class="sheet-template-computed">{{#rollGreater() computed::accessory_modifier 0}} <span class="sheet-template-plus sheet-template-percent">{{accessory_modifier}}</span>{{/rollGreater() computed::accessory_modifier 0}}
+            <div class="sheet-template-row sheet-template-tworows"><span class="sheet-after-colons sheet-rolltitle"><span>{{accessory_name}}:</span></span><span class="sheet-template-computed">{{#rollGreater() computed::accessory_modifier 0}} <span class="sheet-template-plus sheet-template-percent">{{accessory_modifier}}</span>{{/rollGreater() computed::accessory_modifier 0}}
                 {{#rollLess() computed::accessory_modifier 0}}<span class="sheet-template-percent">{{accessory_modifier}}</span>{{/rollLess() computed::accessory_modifier 0}}</span></div>{{/rollTotal() computed::accessories 1}}
             <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="modifier:">modifier:</span><span class="sheet-template-computed">{{#rollGreater() computed::modifier 0}}<span class="sheet-template-plus sheet-template-percent">{{computed::modifier}}</span>{{/rollGreater() computed::modifier 0}}
                 {{#rollLess() computed::modifier 0}}<span class="sheet-template-percent">{{computed::modifier}}</span>{{/rollLess() computed::modifier 0}}</span></div>{{/^rollTotal() computed::modifier 0}}{{#base_range}}
@@ -398,7 +422,7 @@
         {{#rollTotal() computed::isShotgun 1}}
         <div class="sheet-template-row sheet-template-tworows"><span class="sheet-after-colons sheet-rolltitle" data-i18n="shotgun:">shotgun:</span><span class="sheet-template-computed"> <span>+20%</span></span></div>{{/rollTotal() computed::isShotgun 1}}
         {{#rollTotal() computed::accessories 1}}
-        <div class="sheet-template-row sheet-template-tworows"><span class="sheet-after-colons sheet-rolltitle">{{accessory_name}}:</span><span class="sheet-template-computed">{{#rollGreater() computed::accessory_modifier 0}} <span class="sheet-template-plus sheet-template-percent">{{accessory_modifier}}</span>{{/rollGreater() computed::accessory_modifier 0}}
+        <div class="sheet-template-row sheet-template-tworows"><span class="sheet-after-colons sheet-rolltitle"><span>{{accessory_name}}:</span></span><span class="sheet-template-computed">{{#rollGreater() computed::accessory_modifier 0}} <span class="sheet-template-plus sheet-template-percent">{{accessory_modifier}}</span>{{/rollGreater() computed::accessory_modifier 0}}
             {{#rollLess() computed::accessory_modifier 0}}<span class="sheet-template-percent">{{accessory_modifier}}</span>{{/rollLess() computed::accessory_modifier 0}}</span></div>{{/rollTotal() computed::accessories 1}}
         <div class="sheet-template-row sheet-template-tworows"> <span class="sheet-after-colons sheet-rolltitle" data-i18n="modifier:">modifier:</span><span class="sheet-template-computed">{{#rollGreater() computed::modifier 0}}<span class="sheet-template-plus sheet-template-percent">{{computed::modifier}}</span>{{/rollGreater() computed::modifier 0}}
             {{#rollLess() computed::modifier 0}}<span class="sheet-template-percent">{{computed::modifier}}</span>{{/rollLess() computed::modifier 0}}</span></div>{{/^rollTotal() computed::modifier 0}}

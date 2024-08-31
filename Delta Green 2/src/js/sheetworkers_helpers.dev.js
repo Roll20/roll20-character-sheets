@@ -104,8 +104,7 @@ var setWeaponOptions = function setWeaponOptions(_ref) {
     _hasSelectiveFire = hasSelectiveFire;
     _hasAccessories = hasAccessories;
     _hasBlastRadius = hasBlastRadius;
-  } //if (_trackAmmo==1) { _has_ammo=1; }
-
+  }
 
   if (hasDoubleBarrel == 1) {
     _double_barrel = double_barrel;
@@ -115,11 +114,6 @@ var setWeaponOptions = function setWeaponOptions(_ref) {
     _selfire_lethality_percent = selfire_lethality_percent;
     _selfire_type = selfire_type;
     _selfire_ammo = getRollDamage(selfire_type);
-  }
-
-  if (hasAccessories == 1) {
-    _accessory_modifier = accessory_modifier;
-    _accessory_name = accessory_name;
   }
 
   return {
@@ -149,6 +143,124 @@ var setWeaponOptions = function setWeaponOptions(_ref) {
     isFlawed: _isFlawed,
     isAiming: _isAiming
   };
+};
+
+var getInitializationFlags = function getInitializationFlags(statInfo, values) {
+  // note: flags are INITIALLY set to 1, it was a mistake but now it's better to keep it that way
+  var statName = statInfo['name'];
+  var _stat_used = {
+    strength: 'initial_str',
+    constitution: 'initial_con'
+  };
+  var InitializationFlags = {
+    'initial_hp': 1,
+    'initial_str': 1,
+    'initial_con': 1,
+    'initial_san': 1
+  };
+  Object.keys(InitializationFlags).forEach(function (key) {
+    if (values.hasOwnProperty(key) && values[key] == 0) {
+      InitializationFlags[key] = 0;
+    }
+  });
+
+  if (_stat_used.hasOwnProperty(statName)) {
+    InitializationFlags[_stat_used[statName]] = 0;
+  }
+
+  console.info('InitializationFlags:', InitializationFlags);
+  return InitializationFlags;
+};
+
+var setInitialHp = function setInitialHp(update, values, statInfo, InitializationFlags) {
+  if (statInfo['name'] !== 'strength' && statInfo['name'] !== 'constitution') {
+    return;
+  } // check if the stat is strength or constitution
+
+
+  if (statInfo['name'] == 'strength') {
+    InitializationFlags["initial_str"] = 0;
+  } // set the initial strength to 0
+
+
+  if (statInfo['name'] == 'constitution') {
+    InitializationFlags["initial_con"] = 0;
+  } // set the initial constitution to 0	
+
+
+  if (InitializationFlags['initial_str'] == 1 || InitializationFlags['initial_con'] == 1) {
+    return;
+  } // if either flag is set, I cannot set the initial hp
+  ///////// Set Hp regardless of the initial hp
+
+
+  var _strength_score = Math.max(0, parseInt(values['strength_score'], 10) || 0);
+
+  var _constitution_score = Math.max(0, parseInt(values['constitution_score'], 10) || 0);
+
+  var initial_hit_points = Math.ceil((_strength_score + _constitution_score) / 2); // update max hp regardless of the initial hp
+
+  update['hit_points_max'] = initial_hit_points; //////// If the initial hp is not set yet, set it
+
+  if (InitializationFlags['initial_hp'] == 0) {
+    return;
+  } // check if initial hp is already set
+
+
+  update['hit_points'] = initial_hit_points;
+  update['hit_points_old'] = initial_hit_points;
+  InitializationFlags['initial_hp'] = 0;
+};
+
+var setInitialPower = function setInitialPower(update, values, statInfo, InitializationFlags) {
+  if (statInfo['name'] !== 'power') {
+    return;
+  } // only power can change the sanity points
+
+
+  var sanmax = setSanMax(values["unnatural"]);
+  var InitialWillPower = statInfo.score;
+  update["willpower_points_max"] = InitialWillPower; // only updates if the flag is set
+
+  update['sanity_points_max'] = sanmax;
+
+  if (InitializationFlags['initial_san'] == 0) {
+    return;
+  }
+
+  var InitialSanity = statInfo.stat;
+  var InitialBreakingPoint = statInfo.score * 4; //update['initial_san']=0;
+
+  update['sanity_points'] = InitialSanity;
+  update['sanity_points_old'] = InitialSanity;
+  update['breaking_point'] = InitialBreakingPoint;
+  update['breaking_point_max'] = InitialBreakingPoint;
+  update['willpower_points'] = InitialWillPower;
+  InitializationFlags['initial_san'] = 0;
+};
+
+var setStatScore = function setStatScore(score, statName) {
+  var validNames = ['strength', 'constitution', 'dexterity', 'power', 'intelligence', 'charisma'];
+
+  if (!validNames.includes(statName)) {
+    return false;
+  }
+
+  var _score = Math.max(0, parseInt(score));
+
+  return {
+    name: statName,
+    stat: _score * 5,
+    score: _score
+  };
+};
+
+var setSanMax = function setSanMax(unnatural) {
+  // Input:
+  // unnatural is the unnatural value
+  // Output:
+  // the maximum value for sanity points
+  return 99 - setMinMax(unnatural, 0, 99);
 };
 
 var setDiceSection = function setDiceSection(character_id, repsecid) {
@@ -214,9 +326,9 @@ var setAdvancedWeaponsString = function setAdvancedWeaponsString(options, charac
 
   if (options.trackAmmo) {
     advancedWeaponsString += '{{trackbullets=1}}';
-    advancedWeaponsString += '{{current_ammo=' + values['ammo'] + '}}';
+    advancedWeaponsString += '{{current_ammo=[[' + options.current_ammo + ']]}}';
 
-    if (current_ammo > 0) {
+    if (options.current_ammo > 0) {
       advancedWeaponsString += '{{noammo=1}}';
     } else {
       advancedWeaponsString += '{{wammo=0}}';
@@ -233,11 +345,10 @@ var setAdvancedWeaponsString = function setAdvancedWeaponsString(options, charac
   }
 
   if (options.hasLethality == 1) {
-    var critical_lethality_percent = options.hasLethality * 2;
     advancedWeaponsString += '{{lethality_percent= [' + options.lethality_percent + '%' + dice_section + 'lethality_percent' + rollEnding;
     advancedWeaponsString += '{{voidlethality_percent= [' + options.lethality_percent + '%' + nothing_section;
-    advancedWeaponsString += '{{lethality_percent_critical= [' + critical_lethality_percent + '%' + dice_section + 'lethality_percent_critical' + rollEnding;
-    advancedWeaponsString += '{{voidlethality_percent_critical= [' + critical_lethality_percent + '%' + nothing_section;
+    advancedWeaponsString += '{{lethality_percent_critical= [2×' + options.lethality_percent + '%' + dice_section + 'lethality_percent_critical' + rollEnding;
+    advancedWeaponsString += '{{voidlethality_percent_critical= [2×' + options.lethality_percent + '%' + nothing_section;
   }
 
   return advancedWeaponsString;
@@ -246,9 +357,18 @@ var setAdvancedWeaponsString = function setAdvancedWeaponsString(options, charac
 var check_for_wp_modifiers = function check_for_wp_modifiers(values, roll) {
   var _willpower_points = parseInt(values["willpower_points"]) || 0;
 
-  var _zero_willpower = values["zero_willpower"] == 1 && _willpower_points == 0 && roll !== 'luck' ? '[[1]]' : '[[0]]';
+  var flag_for_zero_willpower = values["zero_willpower"] == 1;
+  flag_for_zero_willpower = flag_for_zero_willpower && _willpower_points == 0 && roll !== 'luck';
 
-  var _low_willpower = values["low_willpower"] == 1 && _willpower_points <= 2 && _willpower_points > 0 && roll !== 'luck' && roll !== 'sanity_points' ? '[[1]]' : '[[0]]';
+  var _zero_willpower = flag_for_zero_willpower ? 1 : 0;
+
+  var flag_for_low_willpower = values["low_willpower"] == 1;
+  flag_for_low_willpower = flag_for_low_willpower && _willpower_points <= 2;
+  flag_for_low_willpower = flag_for_low_willpower && roll !== 'luck' && roll !== 'sanity_points'; /// important it is either one or the other
+
+  flag_for_low_willpower = flag_for_low_willpower && flag_for_zero_willpower == false;
+
+  var _low_willpower = flag_for_low_willpower ? 1 : 0;
 
   return {
     zero_willpower: _zero_willpower,
@@ -536,7 +656,7 @@ var parseRoll = function parseRoll(roll) {
   }
 
   if (regex_roll.test(roll)) {
-    return roll.replace(/\s/g, '');
+    return roll.replace(/\s/g, '').toUpperCase();
   }
 
   return 0;
@@ -556,4 +676,48 @@ var minRoll = function minRoll(roll) {
   }
 
   return parseRoll(roll).replace(/[dD]\d{1,100}/g, '');
+};
+
+var addTargetStat = function addTargetStat(values, names, attrName) {
+  var target_stat = '';
+
+  if (attrName === 'attack' || attrName === 'heal') {
+    target_stat += "{{target_unit=".concat(name_to_shorthand(values[names['target_stat']]), "}}");
+    target_stat += "{{target_stat=".concat(values[names['target_stat']].replace(/_/g, ' '), "}}");
+  }
+
+  return target_stat;
+};
+
+var updatebondscore = function updatebondscore(values, update) {
+  var manualscore = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var character_creation_bonds = parseInt(values["character_creation_bonds"]) || 0 === 1 ? true : false;
+  var willpower_points_max = parseInt(values.willpower_points_max) || 0;
+  var initial_willpower = character_creation_bonds ? willpower_points_max : Math.floor(willpower_points_max / 2);
+  var flag = manualscore ? 1 : parseInt(values["repeating_bonds_setScore"]) || 0;
+  var bond_score_old = parseInt(values["repeating_bonds_score_old"]) || 0;
+  var bond_score = 0;
+
+  if (flag === 0) {
+    bond_score = initial_willpower;
+  } else {
+    bond_score = parseInt(values["repeating_bonds_score"]) || 0;
+
+    if (bond_score > willpower_points_max) {
+      if (willpower_points_max > bond_score_old) {
+        bond_score = willpower_points_max;
+      }
+    }
+  }
+
+  update["repeating_bonds_score"] = bond_score;
+  update["repeating_bonds_score_old"] = bond_score_old;
+  update["repeating_bonds_setScore"] = 1;
+  update["repeating_bonds_color"] = BondButtonColor(bond_score);
+};
+
+var DeltaGreenLethalityFail = function DeltaGreenLethalityFail(roll) {
+  var quotient = Math.floor(roll / 10) == 0 ? 10 : Math.round(roll / 10);
+  var remainder = roll % 10 == 0 ? 10 : Math.round(roll % 10);
+  return quotient + remainder;
 };

@@ -34,10 +34,10 @@ const version_0_105= () => {
 };
 // UPDATE TO VERSION 1.5
 const version_105_150 = () => {
-    
+
     let codeversion=1.5;
     let update={};
-    
+
     getSectionIDs("weapons",function(idarray){
    console.log(`%c idarray`, 'color: green; font-weight:bold');
    console.info(idarray);
@@ -51,35 +51,35 @@ const version_105_150 = () => {
            console.log(`%c v`, 'color: green; font-weight:bold');
            console.info(v);
            update['version']=codeversion;
-           
+
             idarray.forEach(id=>{
                 console.log(`%c ${id}`, 'color: green; font-weight:bold');
                 if (v[`repeating_weapons_${id}_damage`]===""){
                     update["repeating_weapons_"+id+"_hasDamage"]="0";
-           
+
                 } else{
                     update["repeating_weapons_"+id+"_hasDamage"]="1";
-           
+
                 }
-                    
+
                 if (v[`repeating_weapons_${id}_lethality_percent`]>0){
                     update["repeating_weapons_"+id+"_hasLethality"]="1";
-           
+
                 } else {
                     update["repeating_weapons_"+id+"_hasLethality"]="0";
-           
+
                 }
                 if (v['sheet_type']==='npc'){
                     update["repeating_weapons_"+id+"_weapons"]=v[`repeating_weapons_${id}_attack`];
                 }
             });
-            
+
            console.log(`%c update`, 'color: green; font-weight:bold');
-           
+
             setAttrs(update, //Update attributes
                     {silent:true},  // will not trigger sheet workers
                     versioning(codeversion)); // call versioning again
-            
+
         });
     });
 };
@@ -92,7 +92,7 @@ const version_150_170 = () => {
     update['luck']=50;
     update['luck_max']=50;
     console.log(`%c update`, 'color: green; font-weight:bold');
-    
+
     setAttrs(update, //Update attributes
             {silent:true},  // will not trigger sheet workers
             versioning(codeversion)); // call versioning again
@@ -133,13 +133,11 @@ const version_170_200 = () => {
             update["helplessness_1"]='on';
         }
 
-
-        
         update['sanity_points_old']=v['sanity_points'];
         update['breaking_point_old']=v['breaking_point'];
 
         console.log(`%c update`, 'color: green; font-weight:bold');
-        
+
         setAttrs(update, //Update attributes
                 {silent:true},  // will not trigger sheet workers
                 versioning(codeversion)); // call versioning again
@@ -152,12 +150,12 @@ const version_200_201 = () => {
     let update1={};
     console.log('verion:',codeversion);
     update1['version']=codeversion;
-    
+
         // UPDATE NAMES FOR SPECIAL TRAINING AND WEAPONS AND TRIGGER TEST
     const _sectionDetails = [
         {section:'repeating_special', fields: ['name','special_training','skill_or_stat_used','skill_span',]},
-        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_total','lethality_percent']}];
-
+        {section:'repeating_weapons', fields: ['name','weapons','skill_percent','skill_span','ammo','hasammo','ammo_total','lethality_percent']},
+        {section:'repeating_bonds', fields: ['flag','setScore','score','score_old']}];
     _sectionDetails.forEach(_group => {
         const section = _group.section;
         const fields = _group.fields;
@@ -177,6 +175,14 @@ const version_200_201 = () => {
                     ids.forEach(id => {
                         const repsecid= `repeating_${section}_${id}_`;
 
+                        /// bond update
+                        if (values.hasOwnProperty(`${repsecid}flag`)){
+                            update[`${repsecid}setScore`]=1;
+                        }
+                        if (values[`${repsecid}score`]!==''){
+                            update[`${repsecid}score_old`]=values[`${repsecid}score`];
+                        }
+
                         if (values.hasOwnProperty(`${repsecid}lethality_percent`)){
                             if (values[`${repsecid}lethality_percent`]===''){
                                 const number=setMinMax(values[`${repsecid}lethality_percent`]);
@@ -191,7 +197,7 @@ const version_200_201 = () => {
                                 update[`${repsecid}name`]=values[`${repsecid}special_training`];
                                 update[`${repsecid}special_training`]='';
                                 console.log(`%c update name ${repsecid}special_training to ${repsecid}name`, 'color: green; font-weight:bold');
-                    
+
                             }
                         };
                         if (values.hasOwnProperty(`${repsecid}weapons`)){
@@ -230,14 +236,14 @@ const version_200_201 = () => {
                         }
 
                     }); 
-                    
+
 
                     console.log(`%c update`, 'color: green; font-weight:bold');
                     console.info('versioning',update1);
                     setAttrs(update1, //Update attributes
                             {silent:true},  // will not trigger sheet workers
                             versioning(codeversion)); // call versioning again
-            
+
                         });
 
         });

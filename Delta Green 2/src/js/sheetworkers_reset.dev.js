@@ -21,6 +21,7 @@ on('clicked:reset_all', function () {
     silent: true
   }, function () {
     console.log('reset all');
+    console.info(update);
   });
 });
 on('clicked:reset_stats', function () {
@@ -30,6 +31,7 @@ on('clicked:reset_stats', function () {
     silent: true
   }, function () {
     console.log('reset stats');
+    console.info(update);
   });
 });
 on('clicked:reset_skills', function () {
@@ -39,6 +41,7 @@ on('clicked:reset_skills', function () {
     silent: true
   }, function () {
     console.log('reset skills');
+    console.info(update);
   });
 });
 on('clicked:reset_equipment', function () {
@@ -48,11 +51,13 @@ on('clicked:reset_equipment', function () {
     silent: true
   }, function () {
     console.log('reset equipment');
+    console.info(update);
   });
 });
 on('clicked:reset_breaking_point', function () {
   var update = {};
   resetBreakingPoints(update);
+  console.info(update);
 });
 
 var resetBreakingPoints = function resetBreakingPoints(update) {
@@ -66,6 +71,7 @@ var resetBreakingPoints = function resetBreakingPoints(update) {
       silent: true
     }, function () {
       console.log('reset breaking points');
+      console.info(update);
     });
   });
 };
@@ -80,16 +86,14 @@ var resetStats = function resetStats(update) {
   array_to_reset = array_to_reset.concat(arrays['_derived_stats']);
   array_to_reset = array_to_reset.concat(arrays['_derived_stats_max']);
   array_to_reset = array_to_reset;
-  console.log(array_to_reset);
   array_to_reset.forEach(function (stat) {
     update[stat] = '';
   });
-  var max_values = ['hit_points_max', 'willpower_points_max', 'breaking_point_max', 'sanity_points_old', 'breaking_point_old'];
-  max_values.forEach(function (stat) {
+  var old_values = ['sanity_points_old', 'breaking_point_old'];
+  old_values.forEach(function (stat) {
     update[stat] = '';
   });
   var initial_flags = ['initial_san', 'initial_con', 'initial_str', 'initial_hp'];
-  console.log(initial_flags);
   initial_flags.forEach(function (flag) {
     update[flag] = '1';
   });
@@ -98,7 +102,7 @@ var resetStats = function resetStats(update) {
     getSectionIDs('repeating_bonds', function (ids) {
       ids.forEach(function (id) {
         update["repeating_bonds_".concat(id, "_test")] = 'editable';
-        update["repeating_bonds_".concat(id, "_rank")] = '';
+        update["repeating_bonds_".concat(id, "_score")] = '';
       });
     });
   }
@@ -125,6 +129,7 @@ var resetBonds = function resetBonds(update) {
   getSectionIDs('repeating_bonds', function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_bonds_' + id);
+      console.log('removing repeating_bonds_' + id);
     });
   });
 };
@@ -142,6 +147,7 @@ var resetAllWeapons = function resetAllWeapons(update) {
   getSectionIDs('repeating_weapons', function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_weapons_' + id);
+      console.log('removing repeating_weapons_' + id);
     });
   });
 };
@@ -150,6 +156,7 @@ var resetAllRituals = function resetAllRituals(update) {
   getSectionIDs('repeating_rituals', function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_rituals_' + id);
+      console.log('removing repeating_rituals_' + id);
     });
   });
 };
@@ -164,6 +171,7 @@ var resetAllRepeatingSkills = function resetAllRepeatingSkills(update) {
   getSectionIDs('repeating_skills', function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_skills_' + id);
+      console.log('removing repeating_skills_' + id);
     });
   });
 };
@@ -173,6 +181,7 @@ var resetAllSpecialAbilities = function resetAllSpecialAbilities(update) {
     console.log('special:' + ids);
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_special_' + id);
+      console.log('removing repeating_special_' + id);
     });
   });
 };

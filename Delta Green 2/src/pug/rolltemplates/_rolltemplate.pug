@@ -16,7 +16,8 @@ mixin modifierRow()
 
   | {{#rollTotal() computed::accessories 1}}
   .sheet-template-row.sheet-template-tworows
-    span.sheet-after-colons.sheet-rolltitle {{accessory_name}}:
+    span.sheet-after-colons.sheet-rolltitle
+      span {{accessory_name}}:
     span.sheet-template-computed
       |{{#rollGreater() computed::accessory_modifier 0}} 
       span.sheet-template-plus.sheet-template-percent {{accessory_modifier}}
@@ -109,7 +110,6 @@ mixin doDoubleDamageVoid()
     | {{/rollTotal() computed::isCritical 1}}
   |{{/double_barrel}}
 
-
 mixin doLethalityPercent()
   |{{#lethality_percent}}
   .sheet-template-row.sheet-template-onerow 
@@ -181,6 +181,9 @@ mixin rollDamages()
   +doSelectiveFireVoid()
   |{{/selfire_noammo}}
 
+mixin rollHeaderPercent()
+  +rollHeader(true)
+
 mixin rollHeader(isPercent=false)
   | {{#name}}
   .sheet-template-superheader
@@ -189,6 +192,10 @@ mixin rollHeader(isPercent=false)
   | {{#header}}
   .sheet-template-header
     h1  {{header}} 
+    |{{#target_unit}}
+    | 
+    h1 {{target_unit}}
+    |{{/target_unit}}
     if isPercent
       h2 {{#subheader}}({{subheader}}%){{/subheader}}
     else
@@ -293,6 +300,7 @@ mixin costritual()
     .grid.sheet-template-subheader
       h2(style=`color:${maincolor}` data-i18n="outcome") outcome
 
+
 mixin dmgritual()
   |{{#attack_button}}
   .grid.sheet-template-subheader
@@ -302,15 +310,95 @@ mixin dmgritual()
       .sheet-template-button {{attack_button}}
   |{{/attack_button}}
 
-
 mixin healritual()
   |{{#heal_button}}
   .grid.sheet-template-subheader
     h2(data-i18n="heal") 
   .sheet-template-row.sheet-template-onerow 
-    span.sheet-template-attack-buttons  
+    span.sheet-template-heal-buttons  
       .sheet-template-button {{heal_button}}
   |{{/heal_button}}
+
+
+mixin multidamage()
+  |{{#damage}}
+  .sheet-template-row.sheet-template-tworows 
+    // For rituals
+    |{{#^rollTotal() isHealing 0}}
+    span.sheet-after-colons.sheet-rolltitle 
+      span {{target_stat}}:
+    |{{/^rollTotal() isHealing 0}}
+    // for normal damages
+    |{{#rollTotal() isHealing 0}}
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="damage:") damage:
+    |{{/rollTotal() isHealing 0}}
+    span.inlinerollresult {{damage}}  
+  |{{/damage}} 
+
+mixin damage_lethality_sum()
+    span.sheet-template-computed {{computed::roll}}
+
+mixin damage_lethality_itself()
+    span.sheet-template-computed {{lethality_percent}}
+
+
+      
+mixin title_line_attack_damage()
+    |{{#^rollTotal() isHealing 0}}
+    span.sheet-after-colons.sheet-rolltitle 
+      span {{target_stat}}:
+    |{{/^rollTotal() isHealing 0}}
+    // for normal damages
+    |{{#rollTotal() isHealing 0}}
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="damage:") damage:
+    |{{/rollTotal() isHealing 0}}
+
+mixin lethality_outcome()
+  |{{#^rollTotal() isHealing 1}}
+  .sheet-template-row.sheet-template-tworows 
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="outcome:") 
+    |{{#^rollGreater() roll lethality_percent}}
+    span.sheet-template-computed(data-i18n="kill") kill
+    |{{/^rollGreater() roll lethality_percent}}
+    |{{#rollGreater() roll lethality_percent}}
+    span.sheet-template-computed(data-i18n="failure") failure|  
+    |{{/rollGreater() roll lethality_percent}}
+  |{{/^rollTotal() isHealing 1}}
+  
+  |{{#rollTotal() isHealing 1}}
+  |{{#^rollGreater() roll lethality_percent}}
+  .sheet-template-row.sheet-template-tworows 
+    span.sheet-after-colons.sheet-rolltitle
+      span {{target_stat}}:
+    +damage_lethality_itself()
+  |{{/^rollGreater() roll lethality_percent}}
+  |{{/rollTotal() isHealing 1}}
+
+  |{{#rollGreater() roll lethality_percent}}
+  .sheet-template-row.sheet-template-tworows 
+    +title_line_attack_damage()
+    +damage_lethality_sum()
+  |{{/rollGreater() roll lethality_percent}}
+  
+  
+mixin attack_lethality()
+  |{{#rollTotal() isHealing 0}}
+  .sheet-template-row.sheet-template-tworows 
+    span.sheet-after-colons.sheet-rolltitle(data-i18n="huge target:") huge target:
+    +damage_lethality_itself()
+  |{{/rollTotal() isHealing 0}}
+  
+
+
+mixin multilethality()          
+  |{{#lethality_percent}}
+  .sheet-template-row.sheet-template-onerow
+    span.span.inlinerollresult {{roll}}%
+  +lethality_outcome()
+  +attack_lethality()
+  |{{/lethality_percent}}
+
+
 
 
   
@@ -318,7 +406,7 @@ mixin healritual()
   rolltemplate.sheet-rolltemplate-fancy-bonds
     .sheet-template-container
       |{{#^rollTotal() local_wp 0}}
-      +rollHeader(true)
+      +rollHeader()
       |{{/^rollTotal() local_wp 0}}
       |{{#rollTotal() local_wp 0}}
       +rollNoSubHeader()
@@ -364,8 +452,6 @@ mixin healritual()
     |{{/repression}}
     |{{/^rollTotal() computed::zerowp 1}}
 
-
-
   rolltemplate.sheet-rolltemplate-fancy-ritualloss
     .sheet-template-container
       +rollHeader()
@@ -399,11 +485,9 @@ mixin healritual()
         +lossAttribute('sanity_points', 'SAN')
         |{{/has_sanity_points}}
           
-
-
   rolltemplate.sheet-rolltemplate-fancy-rituals
     .sheet-template-container
-      +rollHeader(true)
+      +rollHeaderPercent()
       |{{#description}}
       .sheet-template-body 
         .sheet-template-row.sheet-template-description
@@ -465,47 +549,25 @@ mixin healritual()
     |{{/power_button}}
 
 
+
   rolltemplate.sheet-rolltemplate-fancy-damages 
       .sheet-template-container 
         | {{#damage}}
         +rollHeader() 
         | {{/damage}}
         | {{#lethality_percent}}
-        +rollHeader(true)
+        +rollHeaderPercent()
         | {{/lethality_percent}}
         .sheet-template-body
-          | {{#damage}}
-          .sheet-template-row.sheet-template-tworows 
-            span.sheet-after-colons.sheet-rolltitle(data-i18n="damage:") damage:
-            span.inlinerollresult {{damage}}
-          | {{/damage}}
-          | {{#lethality_percent}}
-          .sheet-template-row.sheet-template-onerow 
-            span.inlinerollresult {{roll}}
-          .sheet-template-row.sheet-template-tworows 
-            span.sheet-after-colons.sheet-rolltitle(data-i18n="lethality:") lethality:
-            span.sheet-template-computed
-              span {{computed::lethality_percent}}
-          .sheet-template-row.sheet-template-tworows 
-            span.sheet-after-colons.sheet-rolltitle(data-i18n="outcome:") outcome:
-            |{{#^rollGreater() roll computed::lethality_percent}}
-            span.sheet-template-outcome(data-i18n="kill") kill 
-            | {{/^rollGreater() roll computed::lethality_percent}} 
-            | {{#rollGreater() roll computed::lethality_percent}}
-            span.sheet-template-outcome(data-i18n="failure") failure
-            | {{/rollGreater() roll computed::lethality_percent}}
-          .sheet-template-row.sheet-template-tworows 
-            span.sheet-after-colons.sheet-rolltitle(data-i18n="damage:") damage:
-            span.sheet-template-computed
-              span {{computed::roll}}
-          | {{/lethality_percent}}
-          | {{#rollTotal() trackbullets 1}}
+          +multidamage()
+          +multilethality()
+          |{{#rollTotal() trackbullets 1}}
           .sheet-template-row.sheet-template-onerow 
             span
               span.sheet-rollbefore.aligned-left.sheet-template-computed {{current_ammo}}
               span.sheet-rolltext.aligned-left → 
               span.sheet-rollafter.aligned-left.sheet-template-computed {{computed::current_ammo}}
-          | {{/rollTotal() trackbullets 1}}
+          |{{/rollTotal() trackbullets 1}}
 
   rolltemplate.sheet-rolltemplate-fancy-sanloss
     .sheet-template-container
@@ -531,7 +593,7 @@ mixin healritual()
 
   rolltemplate.sheet-rolltemplate-fancy-rolls
       .sheet-template-container
-        +rollHeader(true)
+        +rollHeaderPercent()
         //- Display the dice roll in the template -
         | {{#rollTotal() computed::zero_willpower 1}}
         .sheet-template-overlay-zero-wp

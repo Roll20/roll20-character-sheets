@@ -7,7 +7,6 @@ const updatesanitypoints = (tmp_sanity_points,sanity_points_old,sanity_points_ma
     return {sanity_points:sanity_points,ritual_skill:Math.max(99-sanity_points)};
 };
 
-
 const updatebreakingpoints = () => {
     getAttrs(['power_score','breaking_point','sanity_points','breaking_point_reset','sanity_points_max','sanity_points_old','track_breaking_points'], (values)=> {
         const update = {};
@@ -45,40 +44,3 @@ const setResetBreakingPointsOnOpen = () => {
         update_bp_san_ritual(open_sanity_points,open_sanity_points,sanity_points_max,power_score,breaking_point,update,flag);
     });
 };
-
-on('change:sanity_points', () => {
-    updatebreakingpoints();
-});
-
-
-
-on('change:breaking_point', () => { 
-    getAttrs(['breaking_point'], (values)=> {
-        const breaking_point = Math.max(0,parseInt(values.breaking_point, 10) || 0);
-        const update = {};
-        
-        update['breaking_point_reset'] = breaking_point;
-        update['breaking_point']=breaking_point;
-        setAttrs(update, {silent:true}, () => {
-            
-            
-        });
-    });
-});
-on('change:breaking_point_reset',(eventInfo)=>{
-    const breaking_point_reset = parseInt(eventInfo.newValue, 10) || 0;
-    getAttrs(['breaking_point_reset'], (values)=> {
-        const breaking_point_reset = parseInt(values.breaking_point_reset, 10) || 0;
-        
-        const update = {};
-        update['breaking_point_reset'] = Math.min(Math.max(0,breaking_point_reset),99);
-        setAttrs(update, {silent:true}, () => {
-            
-            
-        });
-    });
-});
-
-on('clicked:breaking_point_resets', () => {
-    resetBreakingPoints();
-});

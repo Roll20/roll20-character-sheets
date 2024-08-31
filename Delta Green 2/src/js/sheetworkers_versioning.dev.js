@@ -169,6 +169,9 @@ var version_200_201 = function version_200_201() {
   }, {
     section: 'repeating_weapons',
     fields: ['name', 'weapons', 'skill_percent', 'skill_span', 'ammo', 'hasammo', 'ammo_total', 'lethality_percent']
+  }, {
+    section: 'repeating_bonds',
+    fields: ['flag', 'setScore', 'score', 'score_old']
   }];
 
   _sectionDetails.forEach(function (_group) {
@@ -187,7 +190,15 @@ var version_200_201 = function version_200_201() {
         console.info('fullarray', values);
         var update = {};
         ids.forEach(function (id) {
-          var repsecid = "repeating_".concat(section, "_").concat(id, "_");
+          var repsecid = "repeating_".concat(section, "_").concat(id, "_"); /// bond update
+
+          if (values.hasOwnProperty("".concat(repsecid, "flag"))) {
+            update["".concat(repsecid, "setScore")] = 1;
+          }
+
+          if (values["".concat(repsecid, "score")] !== '') {
+            update["".concat(repsecid, "score_old")] = values["".concat(repsecid, "score")];
+          }
 
           if (values.hasOwnProperty("".concat(repsecid, "lethality_percent"))) {
             if (values["".concat(repsecid, "lethality_percent")] === '') {

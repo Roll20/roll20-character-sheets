@@ -137,28 +137,54 @@ var name_to_shorthand = function name_to_shorthand(name) {
   }
 };
 
-var real_damage = function real_damage(other_costs) {
-  var heal_or_damage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'damage';
+var ritual_power_action = function ritual_power_action(character_id, repsecid, other_costs) {
+  var const_button_part = '](~' + character_id + '|';
+  var prefix_power_reaction = '{{power_button=[';
+  var suffix_power_reaction = const_button_part + 'power)}}';
+  return prefix_power_reaction + '^{power}' + suffix_power_reaction;
+};
+/*
 
-  var _normal_value = parseRoll(other_costs["".concat(heal_or_damage, "_amount")]);
-
-  var _lethality_percent = setMinMax(other_costs["".concat(heal_or_damage, "_lethality_percent_amount")]);
-
-  var isLethal = other_costs["".concat(heal_or_damage, "_isLethal")] === 'lethal';
-  _noDamage = !isLethal && _normal_value === 0; // if it is not lethal and the normal value is zero, then it is no damage
-
-  _noLethal = isLethal && _lethality_percent === 0; // if it is lethal and the lethality percent is zero, then it is no damage
-
-  if (_noDamage && _noLethal == 0) {
-    return '';
-  }
-
-  return isLethal ? "".concat(_lethality_percent, "% ") : "".concat(_normal_value, " ");
+const ritual_attack_or_heal_action = (character_id,repsecid,other_costs,heal_or_attack='attack') => {
+    const value_target=heal_or_attack.replace('_damage','').replace('_lethality_percent','');
+    const value = real_damage(other_costs,value_target);
+    if (value === '') {return '';}
+    const const_button_part = '](~'+character_id+'|'+repsecid+'_';
+    const target_stat=name_to_shorthand(other_costs[`${value_target}_target_stat`]);
+    
+    const prefix_button = `{{${heal_or_attack}_button=[`;
+    const suffix_button = target_stat+const_button_part+heal_or_attack+'-action)}}';
+    return prefix_button+value+suffix_button;
 };
 
-var ritual_attack_or_heal_action = function ritual_attack_or_heal_action(character_id, repsecid, other_costs) {
-  var heal_or_attack = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'attack';
-  var value = real_damage(other_costs, heal_or_attack);
+
+const ritual_attack_action = (character_id,repsecid,other_costs) => {
+    var ritual_rolls='';
+    ritual_rolls+= ritual_attack_or_heal_action(character_id,repsecid,other_costs,'attack_damage');
+    ritual_rolls+= ritual_attack_or_heal_action(character_id,repsecid,other_costs,'attack_lethality_percent');
+    return ritual_rolls;
+};
+const ritual_heal_action = (character_id,repsecid,other_costs) => {
+    var ritual_rolls='';
+    ritual_rolls+= ritual_attack_or_heal_action(character_id,repsecid,other_costs,'heal_damage');
+    ritual_rolls+= ritual_attack_or_heal_action(character_id,repsecid,other_costs,'heal_lethality_percent');
+    return ritual_rolls;
+};
+*/
+
+
+var real_damage = function real_damage(other_costs, heal_or_damage, damage_type) {
+  if (damage_type === 'lethality_percent') {
+    return "".concat(setMinMax(other_costs["".concat(heal_or_damage, "_").concat(damage_type, "_amount")]), "% ");
+  } else if (damage_type === 'damage') {
+    return parseRoll(other_costs["".concat(heal_or_damage, "_").concat(damage_type, "_amount")]);
+  }
+
+  return '';
+};
+
+var ritual_attack_or_heal_action = function ritual_attack_or_heal_action(character_id, repsecid, other_costs, heal_or_attack, damage_type) {
+  var value = real_damage(other_costs, heal_or_attack, damage_type);
 
   if (value === '') {
     return '';
@@ -167,29 +193,24 @@ var ritual_attack_or_heal_action = function ritual_attack_or_heal_action(charact
   var const_button_part = '](~' + character_id + '|' + repsecid + '_';
   var target_stat = name_to_shorthand(other_costs["".concat(heal_or_attack, "_target_stat")]);
   var prefix_button = "{{".concat(heal_or_attack, "_button=[");
-  var suffix_button = target_stat + const_button_part + heal_or_attack + '_action)}}';
+  var suffix_button = " ".concat(target_stat).concat(const_button_part).concat(heal_or_attack, "_").concat(damage_type, "-action)}}");
   return prefix_button + value + suffix_button;
 };
 
-var ritual_power_action = function ritual_power_action(character_id, repsecid, other_costs) {
-  var const_button_part = '](~' + character_id + '|';
-  var prefix_power_reaction = '{{power_button=[';
-  var suffix_power_reaction = const_button_part + 'power)}}';
-  return prefix_power_reaction + '^{power}' + suffix_power_reaction;
+var ritual_attack_action = function ritual_attack_action(character_id, repsecid, other_costs, damage_type) {
+  return ritual_attack_or_heal_action(character_id, repsecid, other_costs, 'attack', damage_type);
 };
 
-var ritual_attack_action = function ritual_attack_action(character_id, repsecid, other_costs) {
-  return ritual_attack_or_heal_action(character_id, repsecid, other_costs, 'attack');
-};
-
-var ritual_heal_action = function ritual_heal_action(character_id, repsecid, other_costs) {
-  return ritual_attack_or_heal_action(character_id, repsecid, other_costs, 'heal');
+var ritual_heal_action = function ritual_heal_action(character_id, repsecid, other_costs, damage_type) {
+  return ritual_attack_or_heal_action(character_id, repsecid, other_costs, 'heal', damage_type);
 };
 
 var prepare_ritual_rolls = function prepare_ritual_rolls(other_costs, values, names) {
   var localString = '';
-  localString += ritual_attack_action(values[names['character_id']], names['repsecid'], other_costs);
-  localString += ritual_heal_action(values[names['character_id']], names['repsecid'], other_costs);
+  var attack_type = other_costs['attack_isLethal'];
+  var heal_type = other_costs['heal_isLethal'];
+  localString += ritual_attack_action(values[names['character_id']], names['repsecid'], other_costs, attack_type);
+  localString += ritual_heal_action(values[names['character_id']], names['repsecid'], other_costs, heal_type);
 
   if (values[names['power_reaction']] === 'active') {
     localString += ritual_power_action(values[names['character_id']], names['repsecid']);
@@ -294,11 +315,6 @@ var clicked_repeating_rituals = function clicked_repeating_rituals(parameters, n
 var empty_to_zero = function empty_to_zero(value) {
   return value !== '' || value !== '0' ? value : 0;
 };
-
-on('change:repeating_rituals', function (eventinfo) {
-  var id = eventinfo.sourceAttribute.split('_')[2];
-  ritual_rolls_info("repeating_rituals_".concat(id));
-});
 
 var updateRitualInfoOnOpen = function updateRitualInfoOnOpen() {
   getSectionIDs('repeating_rituals', function (ids) {
