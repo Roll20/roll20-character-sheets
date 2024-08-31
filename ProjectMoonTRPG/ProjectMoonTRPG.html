@@ -10427,6 +10427,7 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 
 <!-- Chat message action buttons -->
 <div style="display:none">
+<button type="action" name="act_selectToken"></button>
 <button type="action" name="act_actionButtonDamage"></button>
 <button type="action" name="act_actionButtonInflict"></button>
 <button type="action" name="act_actionButtonGive"></button>
@@ -10531,7 +10532,44 @@ on('clicked:actionButtonGive', async (data) => {
 
 
 
+/* Select generic token functionality */
+on('clicked:selectToken', (data) => {
+	getSelectedTokenId();
+});
+async function getSelectedTokenId() {
+	/* If setting is disabled, ask if it should be enabled. Continue if yes */
+	let genericModeCheck = await checkGenericMode();
+	if (genericModeCheck == "false") { return; }
 
+	/* Set selected token */
+	let selectTokenId = "";
+	let rollBase = `! {{token_id=[[0[@{selected|token_id}]]]}}`;
+	let selectRoll = await startRoll(rollBase);
+		selectTokenId = selectRoll.results.token_id.expression.match(/^0\[(.*)\]\s*$/)[1];
+	finishRoll(selectRoll.rollId);
+
+	setAttrs({"tokenId_selected":selectTokenId});
+}
+
+async function checkGenericMode() {
+	getAttrs(["settingGenericTokenMode"], async function(values) {
+		let genericMode = values.settingGenericTokenMode;
+		
+		if (genericMode != "true") {
+			let queryResults = await sendQuery(["enableGenericMode",
+				getTranslationByKeyCustom("Generic token mode not enabled for sheet. Enable setting?", "query-enable-generic-mode"), {
+					[getTranslationByKeyCustom("No","query-no")]:"false",
+					[getTranslationByKeyCustom("Yes","query-yes")]:"true"
+				}
+			]);
+			if (queryResults.enableGenericMode == "true") {
+				setAttrs({"settingGenericTokenMode":"true"});
+			} else {
+				return;
+			}
+		}
+	});
+}
 
 
 
