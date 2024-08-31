@@ -11,6 +11,49 @@
 <button class="none" type="action" name="act_nothing"> </button>
 <!--TABS & LOGO-->
 <!-- =============================-->
+<div class="datahide">
+  <input data-i18n-value="accounting" name="attr_accounting_name" value="accounting"/>
+  <input data-i18n-value="alertness" name="attr_alertness_name" value="alertness"/>
+  <input data-i18n-value="anthropology" name="attr_anthropology_name" value="anthropology"/>
+  <input data-i18n-value="archeology" name="attr_archeology_name" value="archeology"/>
+  <input data-i18n-value="art" name="attr_art_name" value="art"/>
+  <input data-i18n-value="artillery" name="attr_artillery_name" value="artillery"/>
+  <input data-i18n-value="athletics" name="attr_athletics_name" value="athletics"/>
+  <input data-i18n-value="bureaucracy" name="attr_bureaucracy_name" value="bureaucracy"/>
+  <input data-i18n-value="computer science" name="attr_computer_science_name" value="computer science"/>
+  <input data-i18n-value="craft" name="attr_craft_name" value="craft"/>
+  <input data-i18n-value="criminology" name="attr_criminology_name" value="criminology"/>
+  <input data-i18n-value="demolitions" name="attr_demolitions_name" value="demolitions"/>
+  <input data-i18n-value="disguise" name="attr_disguise_name" value="disguise"/>
+  <input data-i18n-value="dodge" name="attr_dodge_name" value="dodge"/>
+  <input data-i18n-value="drive" name="attr_drive_name" value="drive"/>
+  <input data-i18n-value="firearms" name="attr_firearms_name" value="firearms"/>
+  <input data-i18n-value="first aid" name="attr_first_aid_name" value="first aid"/>
+  <input data-i18n-value="forensics" name="attr_forensics_name" value="forensics"/>
+  <input data-i18n-value="heavy machinery" name="attr_heavy_machinery_name" value="heavy machinery"/>
+  <input data-i18n-value="heavy weapons" name="attr_heavy_weapons_name" value="heavy weapons"/>
+  <input data-i18n-value="history" name="attr_history_name" value="history"/>
+  <input data-i18n-value="humint" name="attr_humint_name" value="humint"/>
+  <input data-i18n-value="law" name="attr_law_name" value="law"/>
+  <input data-i18n-value="medicine" name="attr_medicine_name" value="medicine"/>
+  <input data-i18n-value="melee weapons" name="attr_melee_weapons_name" value="melee weapons"/>
+  <input data-i18n-value="military science" name="attr_military_science_name" value="military science"/>
+  <input data-i18n-value="navigate" name="attr_navigate_name" value="navigate"/>
+  <input data-i18n-value="occult" name="attr_occult_name" value="occult"/>
+  <input data-i18n-value="persuade" name="attr_persuade_name" value="persuade"/>
+  <input data-i18n-value="pharmacy" name="attr_pharmacy_name" value="pharmacy"/>
+  <input data-i18n-value="pilot" name="attr_pilot_name" value="pilot"/>
+  <input data-i18n-value="psychotherapy" name="attr_psychotherapy_name" value="psychotherapy"/>
+  <input data-i18n-value="ride" name="attr_ride_name" value="ride"/>
+  <input data-i18n-value="science" name="attr_science_name" value="science"/>
+  <input data-i18n-value="search" name="attr_search_name" value="search"/>
+  <input data-i18n-value="sigint" name="attr_sigint_name" value="sigint"/>
+  <input data-i18n-value="stealth" name="attr_stealth_name" value="stealth"/>
+  <input data-i18n-value="surgery" name="attr_surgery_name" value="surgery"/>
+  <input data-i18n-value="survival" name="attr_survival_name" value="survival"/>
+  <input data-i18n-value="swim" name="attr_swim_name" value="swim"/>
+  <input data-i18n-value="unarmed combat" name="attr_unarmed_combat_name" value="unarmed combat"/>
+</div>
 <!--datalist(id="")
 each (skill,_) in skills1
 	+listskills(skill)
@@ -7284,91 +7327,94 @@ _alldamages.forEach((attrName) => {
 
 
 
-
-on(`clicked:levelup`, () =>{
-    let update={};
-    let copyarray=arrays['_skills'];  // copy of the array containing all skills ranks
-    let len=copyarray.length;         // length of the original copyarray
-    let getarray=[];                  // used only to update the values
-    let summary={};                   // information in the log for the users
-    let var_rnd=0;                    // random variable of 1d4
-    let newrowid;
-    let newrowattrs = {};
-    let oldval=0;
-    let newval=0;
-    let name;  
-
-	getSectionIDs('skills', (idarray) => {
-		const addskills=idarray.map(id =>`repeating_skills_${id}`) ; 
-		copyarray=copyarray.concat(addskills);           // concatenate skill array with repeating skill array
-		console.dir(copyarray);              
-		getSectionIDs("summary", function(idarray) {
-		for(var i=0; i < idarray.length; i++) {
-			removeRepeatingRow("repeating_summary_" + idarray[i]);
-		}
+// levelup character
+on("clicked:levelup", () =>{
+    const copyarray=arrays['_skills'];  // copy of the array containing all skills ranks
+    
+	console.dir(copyarray);              
+    getSectionIDs("repeating_summary", function(idarray) {
+      for(var i=0; i < idarray.length; i++) {
+        removeRepeatingRow("repeating_summary_" + idarray[i]);
+      }
+    });
+	
+	
+	const summary={};                   // object to store the summary of the changes
+    const update={};                    // object to update the attributes
+	const newrowattrs={};               // object to create a new row in the repeating_summary section   
+	const named_skills = copyarray.map((sk) => `${sk}_name`);
+	const failed_skills = copyarray.map((sk) => `${sk}_fail`);
+	getAttrs(copyarray.concat(named_skills,failed_skills),(val)=>{
+		var newrowid;
+		var oldval=0;
+		var newval=0;
+		var name;  
+		var var_rnd=0;                    // random variable of 1d4
+	
+		copyarray.forEach( (sk) => {
+        	if (val[`${sk}_fail`]=='on'){                    //if the checkbox is checked
+        		var_rnd=Math.ceil(Math.random() * 4);     // generate a random number for each checked value (less number generated)
+    
+				oldval=(parseInt(val[`${sk}`])||0);
+				newval=oldval+var_rnd;
+				name=val[`${sk}_name`];
+				summary[`${sk}`]=var_rnd;        // how much the skill has changed 0-3
+				update[`${sk}`]=newval;  // new value of the skill
+				update[`${sk}_fail`]='off';   // uncheck checkbox
+				
+				newrowid = generateRowID();
+				newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
+				newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
+				newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
+			}
 		});
 		
-		
-		copyarray.forEach((sk,idx)=>{
+	});	
+	getSectionIDs("repeating_skills", function(idarray) {
+			var rep_array=[];
+			var rep_rank=[];
+			var rep_name=[];
+			var rep_fail=[];
 
-			if (idx<len){                                // if the idx<len it means I an in the skill array part
-				getAttrs([`${sk}`,`${sk}_name`,`${sk}_fail`],(val)=>{
-					getarray.push(`${sk}`);
-
-
+			idarray.forEach((id) => {
+				rep_array.push(`repeating_skills_${id}`);		
+			});
+			rep_rank=rep_array.map((sk) => `${sk}_rank`);
+			rep_name=rep_array.map((sk) => `${sk}_name`);
+			rep_fail=rep_array.map((sk) => `${sk}_fail`);
+			getAttrs(rep_rank.concat(rep_name,rep_fail),(val)=>{
+				var newrowid;
+				var oldval=0;
+				var newval=0;
+				var name;  
+				var var_rnd=0;                    // random variable of 1d4
+			
+				rep_array.forEach( (sk) => {
 					if (val[`${sk}_fail`]=='on'){                    //if the checkbox is checked
 						var_rnd=Math.ceil(Math.random() * 4);     // generate a random number for each checked value (less number generated)
-
-						oldval=(parseInt(val[`${sk}`])||0);
-						newval=oldval+var_rnd;
-						name=val[`${sk}_name`];
-						summary[`${sk}`]=var_rnd;                    // how much the skill has changed 0-3
-						update[`${sk}`]=newval;  // new value of the skill
-						update[`${sk}_fail`]='off';                           // uncheck checkbox
 						
-						
-						newrowid = generateRowID();
-						newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
-						newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
-						newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
-						
-					}
-				});
-			} else { // if the idx>=len it means I an in the  repeating skill array part
-				getAttrs([`${sk}_name`,`${sk}_rank`,`${sk}_fail`],(val)=>{
-					getarray.push(`${sk}_rank`);
-
-
-					if (val[`${sk}_fail`]=='on'){
-						var_rnd=Math.ceil(Math.random() * 4);       // generate a random number for each checked value (less number generated)
-
-						summary[`${idx-len}_rank`]=var_rnd;           // since the repeating skill don't have a name, they are identified by number 0-N
-
 						oldval=(parseInt(val[`${sk}_rank`])||0);
 						newval=oldval+var_rnd;
 						name=val[`${sk}_name`];
-
-						update[`${sk}_rank`]=(parseInt(val[`${sk}_rank`])||0)+var_rnd;
-						update[`${sk}_fail`]='off';
+						summary[`${sk}`]=var_rnd;                    // how much the skill has changed 0-3
+						update[`${sk}_rank`]=newval;  // new value of the skill
+						update[`${sk}_fail`]='off';                           // uncheck checkbox
+							
 						newrowid = generateRowID();
 						newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
 						newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
-						newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
-					}
+						newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;	
+                	}
 				});
-			}
+				setAttrs(Object.assign(update,newrowattrs),{silent:true},()=>{
+					console.log('inside repeating section');
+					console.info(newrowattrs);
+					console.info(update);
+				});
+			});
 		});
-
-		
-
-		
-		getAttrs(getarray,()=>{             // update fields
-			setAttributes(update,false);
-			setAttributes(newrowattrs,false);
-		});
-
-	});
 });
+  
 arrays['_colored_derivative'].forEach(vitality => {
     on(`change:${vitality}_points`, (eventInfo) => {
 

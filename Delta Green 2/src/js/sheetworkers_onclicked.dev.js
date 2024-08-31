@@ -176,89 +176,109 @@ _alldamages.forEach(function (attrName) {
     _input_names['rollName'] = attrName;
     clicked_repeating_damages(_parameters, _input_names);
   });
-});
+}); // levelup character
+
 
 on("clicked:levelup", function () {
-  var update = {};
   var copyarray = arrays['_skills']; // copy of the array containing all skills ranks
 
-  var len = copyarray.length; // length of the original copyarray
+  console.dir(copyarray);
+  getSectionIDs("repeating_summary", function (idarray) {
+    for (var i = 0; i < idarray.length; i++) {
+      removeRepeatingRow("repeating_summary_" + idarray[i]);
+    }
+  });
+  var summary = {}; // object to store the summary of the changes
 
-  var getarray = []; // used only to update the values
+  var update = {}; // object to update the attributes
 
-  var summary = {}; // information in the log for the users
+  var newrowattrs = {}; // object to create a new row in the repeating_summary section   
 
-  var var_rnd = 0; // random variable of 1d4
+  var named_skills = copyarray.map(function (sk) {
+    return "".concat(sk, "_name");
+  });
+  var failed_skills = copyarray.map(function (sk) {
+    return "".concat(sk, "_fail");
+  });
+  getAttrs(copyarray.concat(named_skills, failed_skills), function (val) {
+    var newrowid;
+    var oldval = 0;
+    var newval = 0;
+    var name;
+    var var_rnd = 0; // random variable of 1d4
 
-  var newrowid;
-  var newrowattrs = {};
-  var oldval = 0;
-  var newval = 0;
-  var name;
-  getSectionIDs('skills', function (idarray) {
-    var addskills = idarray.map(function (id) {
-      return "repeating_skills_".concat(id);
-    });
-    copyarray = copyarray.concat(addskills); // concatenate skill array with repeating skill array
+    copyarray.forEach(function (sk) {
+      if (val["".concat(sk, "_fail")] == 'on') {
+        //if the checkbox is checked
+        var_rnd = Math.ceil(Math.random() * 4); // generate a random number for each checked value (less number generated)
 
-    console.dir(copyarray);
-    getSectionIDs("summary", function (idarray) {
-      for (var i = 0; i < idarray.length; i++) {
-        removeRepeatingRow("repeating_summary_" + idarray[i]);
+        oldval = parseInt(val["".concat(sk)]) || 0;
+        newval = oldval + var_rnd;
+        name = val["".concat(sk, "_name")];
+        summary["".concat(sk)] = var_rnd; // how much the skill has changed 0-3
+
+        update["".concat(sk)] = newval; // new value of the skill
+
+        update["".concat(sk, "_fail")] = 'off'; // uncheck checkbox
+
+        newrowid = generateRowID();
+        newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
+        newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
+        newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
       }
     });
-    copyarray.forEach(function (sk, idx) {
-      if (idx < len) {
-        // if the idx<len it means I an in the skill array part
-        getAttrs(["".concat(sk), "".concat(sk, "_name"), "".concat(sk, "_fail")], function (val) {
-          getarray.push("".concat(sk));
-
-          if (val["".concat(sk, "_fail")] == 'on') {
-            //if the checkbox is checked
-            var_rnd = Math.ceil(Math.random() * 4); // generate a random number for each checked value (less number generated)
-
-            oldval = parseInt(val["".concat(sk)]) || 0;
-            newval = oldval + var_rnd;
-            name = val["".concat(sk, "_name")];
-            summary["".concat(sk)] = var_rnd; // how much the skill has changed 0-3
-
-            update["".concat(sk)] = newval; // new value of the skill
-
-            update["".concat(sk, "_fail")] = 'off'; // uncheck checkbox
-
-            newrowid = generateRowID();
-            newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
-            newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
-            newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
-          }
-        });
-      } else {
-        // if the idx>=len it means I an in the  repeating skill array part
-        getAttrs(["".concat(sk, "_name"), "".concat(sk, "_rank"), "".concat(sk, "_fail")], function (val) {
-          getarray.push("".concat(sk, "_rank"));
-
-          if (val["".concat(sk, "_fail")] == 'on') {
-            var_rnd = Math.ceil(Math.random() * 4); // generate a random number for each checked value (less number generated)
-
-            summary["".concat(idx - len, "_rank")] = var_rnd; // since the repeating skill don't have a name, they are identified by number 0-N
-
-            oldval = parseInt(val["".concat(sk, "_rank")]) || 0;
-            newval = oldval + var_rnd;
-            name = val["".concat(sk, "_name")];
-            update["".concat(sk, "_rank")] = (parseInt(val["".concat(sk, "_rank")]) || 0) + var_rnd;
-            update["".concat(sk, "_fail")] = 'off';
-            newrowid = generateRowID();
-            newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
-            newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
-            newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
-          }
-        });
-      }
+  });
+  getSectionIDs("repeating_skills", function (idarray) {
+    var rep_array = [];
+    var rep_rank = [];
+    var rep_name = [];
+    var rep_fail = [];
+    idarray.forEach(function (id) {
+      rep_array.push("repeating_skills_".concat(id));
     });
-    getAttrs(getarray, function () {
-      // update fields
-      setAttributes(update, false);
-      setAttributes(newrowattrs, false);
+    rep_rank = rep_array.map(function (sk) {
+      return "".concat(sk, "_rank");
+    });
+    rep_name = rep_array.map(function (sk) {
+      return "".concat(sk, "_name");
+    });
+    rep_fail = rep_array.map(function (sk) {
+      return "".concat(sk, "_fail");
+    });
+    getAttrs(rep_rank.concat(rep_name, rep_fail), function (val) {
+      var newrowid;
+      var oldval = 0;
+      var newval = 0;
+      var name;
+      var var_rnd = 0; // random variable of 1d4
+
+      rep_array.forEach(function (sk) {
+        if (val["".concat(sk, "_fail")] == 'on') {
+          //if the checkbox is checked
+          var_rnd = Math.ceil(Math.random() * 4); // generate a random number for each checked value (less number generated)
+
+          oldval = parseInt(val["".concat(sk, "_rank")]) || 0;
+          newval = oldval + var_rnd;
+          name = val["".concat(sk, "_name")];
+          summary["".concat(sk)] = var_rnd; // how much the skill has changed 0-3
+
+          update["".concat(sk, "_rank")] = newval; // new value of the skill
+
+          update["".concat(sk, "_fail")] = 'off'; // uncheck checkbox
+
+          newrowid = generateRowID();
+          newrowattrs['repeating_summary_' + newrowid + '_skillname'] = name;
+          newrowattrs['repeating_summary_' + newrowid + '_oldval'] = oldval;
+          newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;
+        }
+      });
+      setAttrs(Object.assign(update, newrowattrs), {
+        silent: true
+      }, function () {
+        console.log('inside repeating section');
+        console.info(newrowattrs);
+        console.info(update);
+      });
     });
   });
 });
