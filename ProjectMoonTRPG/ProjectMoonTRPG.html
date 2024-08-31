@@ -1520,6 +1520,7 @@
 
 <div class="banner HPtext"><span data-i18n="bar-health">Health</span>
 	<div class="rowContainer centerFlex bars">
+	<input type="checkbox" class="style-toggle-rev" name="attr_THP_Sources" value="{}" hidden="true">
 	<input id="HPbar" class="Cstat HPtext" type="number" name="attr_HP" value="30">
 	<input class="Mstat HP" type="text" name="attr_HP_max" value="30">
 	</div>
@@ -1527,6 +1528,7 @@
 
 	<div class="banner egoSTGRtext"><span data-i18n="bar-stagres">Stagger Res</span>
 	<div class="rowContainer centerFlex bars">
+	<input type="checkbox" class="style-toggle-rev" name="attr_TST_Sources" value="{}" hidden="true">
 	<input id="STGRbar" class="Cstat egoSTGRtext" type="number" name="attr_StagRes" value="20">
 	<input class="Mstat egoSTGR" type="text" name="attr_StagRes_max" value="20">
 
@@ -2762,9 +2764,9 @@
 			<button type="action" class="applyDamageInput" name="act_applyDamage" data-i18n-title="helper-text-applydamage" title="Apply damage"></button>
 		</div>
 	</div>
-	<input type="text" name="attr_THP_Sources" value="">
-	<input type="text" name="attr_TST_Sources" value="">
-	<input type="text" name="attr_tempBar_suppress_event" value="false">
+	<input type="text" name="attr_THP_Sources" value="{}">
+	<input type="text" name="attr_TST_Sources" value="{}">
+	<input type="text" name="attr_tempBar_value_override" value="0">
 </div>
 
 
@@ -12161,7 +12163,6 @@ function updateAilments(ailmentOverride=[]) {
 				burndamage = returnTHP.damage;
 				THPUsed = returnTHP.THPUsed;
 			}
-			console.log(THPUsed)
 			for (const sourceName in THPUsed) {
 				let countUpdate = ` [${parseInt(THPUsed[sourceName][0] + THPUsed[sourceName][1])} -> ${THPUsed[sourceName][0]}]`;
 				THPmessage += "<b style='opacity: 50%;'><br>(" + sourceName + ": " + THPUsed[sourceName][1] + countUpdate + ")</b>";
@@ -14057,8 +14058,9 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 
 		if (sourceVals[1] != "None") {
 			let newCount = Math.ceil(tempBarVal/sourceVals[1]);
-			let suppressEvent = (newCount == 0) ? "false" : "true";
-			setAttrs({[sourceName]:newCount, tempBar_suppress_event:suppressEvent});
+			console.log(newCount)
+			console.log(tempBarVal)
+			setAttrs({[sourceName]:newCount, tempBar_value_override:tempBarVal});
 		}
 		return { tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
 	}
@@ -14100,7 +14102,7 @@ on('change:repeating_ailments:ailNum', (info) => {
 	let ailPrefix = info.sourceAttribute.replace("ailnum","");
 
 	getAttrs([`${ailPrefix}ailNum`, `${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`,
-		`${ailPrefix}ailIcon`, "tempBar_suppress_event"], function(values) {
+		`${ailPrefix}ailIcon`, "tempBar_value_override"], function(values) {
 
 		let ailNum = values[`${ailPrefix}ailNum`];
 		let ailTarget = values[`${ailPrefix}ailEffect`];
@@ -14111,47 +14113,28 @@ on('change:repeating_ailments:ailNum', (info) => {
 		let tempBarVal = 0;
 
 		if (ailTarget == "THP" || ailTarget == "TST") {
-			if (values.tempBar_suppress_event != "true") {
-				/* Calculate temp bar value */
-				if(ailEffectMode == "+") {
-					tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
-				}
-				else if(ailEffectMode == "=" && ailNum != 0) {
-					tempBarVal = parseFloat(ailEffectVal);
-					ailEffectVal = "None";
-				} else {
-					ailEffectVal = 0;
-				}
-
-				/* Update the temp source for the correct bar */
-				updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
-			} else {
-				setAttrs({"tempBar_suppress_event":"false"});
+			/* Calculate temp bar value */
+			if(ailEffectMode == "+") {
+				tempBarVal = parseInt(ailNum) * parseFloat(ailEffectVal);
 			}
+			else if(ailEffectMode == "=" && ailNum != 0) {
+				tempBarVal = parseFloat(ailEffectVal);
+				ailEffectVal = "None";
+			} else {
+				ailEffectVal = 0;
+			}
+			if (parseInt(values.tempBar_value_override) > 0 && (info.newValue != undefined || (info.newValue == undefined && info.previousValue == undefined))) {
+				tempBarVal = parseInt(values.tempBar_value_override)
+			}
+
+			console.log(tempBarVal)
+
+			/* Update the temp source for the correct bar */
+			updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
+			setAttrs({"tempBar_value_override":"0"});
 		}
 	});
-	updateTempBarStyling(info)
 })
-
-on('change:THP_Sources change:TST_Sources', (info) => {
-	updateTempBarStyling(info);
-});
-
-function updateTempBarStyling(info) {
-	let bar = (info.sourceAttribute == "thp_sources") ? "HP" : "STGR";
-	let val = info.newValue;
-	
-	if (val == undefined) {
-		$20(`#HPbar`).removeClass('tempBar');
-		$20(`#STGRbar`).removeClass('tempBar');
-	} else {
-		if (val == "" || val == "{}") {
-			$20(`#${bar}bar`).removeClass('tempBar');
-		} else {
-			$20(`#${bar}bar`).addClass('tempBar');
-		}
-	}
-}
 
 function updateTempBar(target, name, tempBarVal, tempNum, effectName, iconFolder, iconName, stack="false") {
 	getAttrs(["THP_Sources", "TST_Sources"], function(values) {
@@ -14168,7 +14151,7 @@ function updateTempBar(target, name, tempBarVal, tempNum, effectName, iconFolder
 		} else {
 			delete tempSource[`${name}`];
 		}
-	
+
 		setAttrs({[`${target}_Sources`]: JSON.stringify(tempSource)});
 	});
 }
@@ -17975,7 +17958,7 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 				effectval = parseInt(count);
 			}
 			else if (effectval == "-n") {
-				effectval = (0 - parseInt(count)) + Math.min(count, customRes);
+				effectval = (0 - parseInt(count));
 			}
 
 			if(effectmode == "+"){
@@ -18005,13 +17988,13 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 			
 			let tempBarUsed = {}
 			if (change > 0 && Object.keys(tempBar_Sources).length > 0) {
-				let returnTempBar = applyTempBarDamageAilment(tempBar_Sources, tempBarTarget, change, result);
+				let returnTempBar = applyTempBarDamageAilment(tempBar_Sources, tempBarTarget, change, result, roundEnd);
 				result = returnTempBar.newBar;
 				change = returnTempBar.damage;
 				tempBarUsed = returnTempBar[`${tempBarTarget}Used`];
 			}
 			for (const sourceName in tempBarUsed) {
-				let countUpdate = ` [${parseInt(THPUsed[sourceName][0] + THPUsed[sourceName][1])} -> ${THPUsed[sourceName][0]}]`;
+				let countUpdate = ` [${parseInt(tempBarUsed[sourceName][0] + tempBarUsed[sourceName][1])} -> ${tempBarUsed[sourceName][0]}]`;
 				tempBarMessage += "<b style='opacity: 50%;'><br>(" + sourceName + ": " + tempBarUsed[sourceName][1] + countUpdate + ")</b>";
 			}
 
