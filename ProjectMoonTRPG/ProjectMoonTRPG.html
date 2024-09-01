@@ -10543,7 +10543,7 @@ on('clicked:selectToken clicked:repeating_tokens:selectinstance', async function
 		getTokenId("selected", "true");
 	}
 });
-/* setSelectModes: true (always set selection), false (do not set selection), unset (set if unset)*/
+/* setSelectModes: true (always set selection or bars), false (do not set selection or bars), unset (set if unset)*/
 function getTokenId(target="selected", setSelectMode="false", callback=()=>{}) {
 	getAttrs(["tokenId_selected"], function(values) {
 		let tokenId_selected = values.tokenId_selected;
@@ -10585,7 +10585,9 @@ function getTokenId(target="selected", setSelectMode="false", callback=()=>{}) {
 
 		/* If the token already exists, update its token bar values */
 		getSectionIDs(`repeating_tokens`, async function(idarray) {
+			if (idarray.includes(selectAttrs.tokenId.toLowerCase()) && setSelectMode != "false") {
 			updateToken(selectAttrs, "tokenbars");
+			}
 		});
 
 		callback(selectAttrs);
@@ -10874,17 +10876,14 @@ async function updateToken(selectAttrs, mode="full") {
 			[`${tokenPrefix}_StagRes`]:selectAttrs.StagRes, [`${tokenPrefix}_StagRes_max`]:selectAttrs.StagRes_max,
 			[`${tokenPrefix}_SP`]:selectAttrs.SP, [`${tokenPrefix}_SP_max`]:selectAttrs.SP_max,
 		}
-		console.log(tokenValues)
-		if (mode="tokenbars") {
+		if (mode == "tokenbars") {
 			tokenValues = {}
 		}
-		console.log(tokenValues)
 		tokenValues = {...tokenValues,
 			[`${tokenPrefix}_HP_token`]:selectAttrs.barHP,
 			[`${tokenPrefix}_StagRes_token`]:selectAttrs.barStagRes,
 			[`${tokenPrefix}_SP_token`]:selectAttrs.barSP
 		}
-		console.log(tokenValues)
 		setAttrs(tokenValues);
 	});
 	});
