@@ -345,10 +345,17 @@ var setAdvancedWeaponsString = function setAdvancedWeaponsString(options, charac
   }
 
   if (options.hasLethality == 1) {
-    advancedWeaponsString += '{{lethality_percent= [' + options.lethality_percent + '%' + dice_section + 'lethality_percent' + rollEnding;
-    advancedWeaponsString += '{{voidlethality_percent= [' + options.lethality_percent + '%' + nothing_section;
-    advancedWeaponsString += '{{lethality_percent_critical= [2×' + options.lethality_percent + '%' + dice_section + 'lethality_percent_critical' + rollEnding;
-    advancedWeaponsString += '{{voidlethality_percent_critical= [2×' + options.lethality_percent + '%' + nothing_section;
+    var label_lethality = "^{lethality}";
+    advancedWeaponsString += '{{lethality_percent= [';
+    advancedWeaponsString += label_lethality + ' (' + options.lethality_percent + '%)';
+    advancedWeaponsString += dice_section + 'lethality_percent' + rollEnding;
+    advancedWeaponsString += '{{voidlethality_percent= [';
+    advancedWeaponsString += label_lethality + ' (' + options.lethality_percent + '%)' + nothing_section;
+    advancedWeaponsString += '{{lethality_percent_critical= [';
+    advancedWeaponsString += label_lethality + ' (2×' + options.lethality_percent + '%)';
+    advancedWeaponsString += dice_section + 'lethality_percent_critical' + rollEnding;
+    advancedWeaponsString += '{{voidlethality_percent_critical= [';
+    advancedWeaponsString += label_lethality + ' (2×' + options.lethality_percent + '%)' + nothing_section;
   }
 
   return advancedWeaponsString;
