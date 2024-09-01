@@ -322,9 +322,9 @@ const realDmgHeader=(values,names) => {
 	if (names.hasOwnProperty)
 	var header=names['header'];
 	if (header.includes('_tmp_header_')){  // I can use it for other things
-		if (names['rollName']==='selective_fire'){
+		//if (names['rollName']==='selective_fire'){
 			return header.replace('_tmp_header_',values[names[`selfire_type`]]);
-		}
+		//}
 	}
 	return header;
 };

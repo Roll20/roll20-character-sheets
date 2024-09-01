@@ -198,7 +198,7 @@ const setAdvancedWeaponsString = (options,character_id,repsecid) => {
 	if (options.trackAmmo) {
 		advancedWeaponsString += '{{trackbullets=1}}';
 		advancedWeaponsString += '{{current_ammo=[[' + options.current_ammo + ']]}}';
-		if (options.current_ammo>0) {
+		if (options.current_ammo==0) {
 			advancedWeaponsString += '{{noammo=1}}';
 		}else{
 			advancedWeaponsString += '{{wammo=0}}';

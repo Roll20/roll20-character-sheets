@@ -328,9 +328,8 @@ var realDmgHeader = function realDmgHeader(values, names) {
 
   if (header.includes('_tmp_header_')) {
     // I can use it for other things
-    if (names['rollName'] === 'selective_fire') {
-      return header.replace('_tmp_header_', values[names["selfire_type"]]);
-    }
+    //if (names['rollName']==='selective_fire'){
+    return header.replace('_tmp_header_', values[names["selfire_type"]]); //}
   }
 
   return header;
