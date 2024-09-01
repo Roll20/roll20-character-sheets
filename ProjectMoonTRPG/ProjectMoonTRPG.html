@@ -10582,6 +10582,12 @@ function getTokenId(target="selected", setSelectMode="false", callback=()=>{}) {
 		if (setSelectMode == "true" || (setSelectMode == "unset" && tokenId_selected == "")) {
 			setAttrs({"tokenId_selected":selectAttrs.tokenId});
 		}
+
+		/* If the token already exists, update its token bar values */
+		getSectionIDs(`repeating_tokens`, async function(idarray) {
+			updateToken(selectAttrs, "tokenbars");
+		});
+
 		callback(selectAttrs);
 	});
 	});
@@ -10849,7 +10855,7 @@ async function checkTokenInstance(selectAttrs, setSelectMode, callback=()=>{}) {
 		}
 	});
 }
-async function updateToken(selectAttrs) {
+async function updateToken(selectAttrs, mode="full") {
 	getSectionIDs(`repeating_global`, idarray => {
 		let id = `repeating_global_${idarray[0]}`;
 	
@@ -10867,10 +10873,18 @@ async function updateToken(selectAttrs) {
 			[`${tokenPrefix}_HP`]:selectAttrs.HP, [`${tokenPrefix}_HP_max`]:selectAttrs.HP_max,
 			[`${tokenPrefix}_StagRes`]:selectAttrs.StagRes, [`${tokenPrefix}_StagRes_max`]:selectAttrs.StagRes_max,
 			[`${tokenPrefix}_SP`]:selectAttrs.SP, [`${tokenPrefix}_SP_max`]:selectAttrs.SP_max,
+		}
+		console.log(tokenValues)
+		if (mode="tokenbars") {
+			tokenValues = {}
+		}
+		console.log(tokenValues)
+		tokenValues = {...tokenValues,
 			[`${tokenPrefix}_HP_token`]:selectAttrs.barHP,
 			[`${tokenPrefix}_StagRes_token`]:selectAttrs.barStagRes,
 			[`${tokenPrefix}_SP_token`]:selectAttrs.barSP
 		}
+		console.log(tokenValues)
 		setAttrs(tokenValues);
 	});
 	});
