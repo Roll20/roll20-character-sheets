@@ -216,7 +216,7 @@ const setAdvancedWeaponsString = (options,character_id,repsecid) => {
 		advancedWeaponsString += '{{voiddamage_critical= [('+options.damage+')×2'+nothing_section;
 	}
 	if (options.hasLethality==1) {
-		const label_lethality = `^{lethality}`;
+		const label_lethality = `^{Lethality}`;
 		advancedWeaponsString += '{{lethality_percent= [';
 		advancedWeaponsString += label_lethality+' ('+options.lethality_percent+'%)';
 		advancedWeaponsString += dice_section+'lethality_percent'+rollEnding;
@@ -473,7 +473,7 @@ const addTargetStat=(values,names,attrName) => {
 };
 const updatebondscore = (values,update,manualscore=true) => {
 
-	const character_creation_bonds = parseInt(values[`character_creation_bonds`])||0 === 1 ? true : false;
+	const character_creation_bonds = values[`character_creation_bonds`] === 'active' ? true : false;
 	const willpower_points_max = parseInt(values.willpower_points_max) || 0;
 	const initial_willpower =  (character_creation_bonds) ? willpower_points_max : Math.floor(willpower_points_max/2);
 	const flag = (manualscore) ? 1 : parseInt(values[`repeating_bonds_setScore`]) || 0;

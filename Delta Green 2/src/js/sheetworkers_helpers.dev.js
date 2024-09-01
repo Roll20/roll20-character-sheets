@@ -345,7 +345,7 @@ var setAdvancedWeaponsString = function setAdvancedWeaponsString(options, charac
   }
 
   if (options.hasLethality == 1) {
-    var label_lethality = "^{lethality}";
+    var label_lethality = "^{Lethality}";
     advancedWeaponsString += '{{lethality_percent= [';
     advancedWeaponsString += label_lethality + ' (' + options.lethality_percent + '%)';
     advancedWeaponsString += dice_section + 'lethality_percent' + rollEnding;
@@ -698,7 +698,7 @@ var addTargetStat = function addTargetStat(values, names, attrName) {
 
 var updatebondscore = function updatebondscore(values, update) {
   var manualscore = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-  var character_creation_bonds = parseInt(values["character_creation_bonds"]) || 0 === 1 ? true : false;
+  var character_creation_bonds = values["character_creation_bonds"] === 'active' ? true : false;
   var willpower_points_max = parseInt(values.willpower_points_max) || 0;
   var initial_willpower = character_creation_bonds ? willpower_points_max : Math.floor(willpower_points_max / 2);
   var flag = manualscore ? 1 : parseInt(values["repeating_bonds_setScore"]) || 0;
