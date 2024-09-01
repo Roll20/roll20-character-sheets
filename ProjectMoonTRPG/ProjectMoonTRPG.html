@@ -150,11 +150,17 @@
 	<!-- Generic token instances -->
 	<div class="rowContainer genericTokenInstanceContainer">
 		<fieldset class="repeating_tokens">
+			<input type="checkbox" class="style-toggle" name="attr_token_selected" value="true" hidden="true">
 			<div class="contentContainer darkBG genericToken">
-				<!-- Token name -->
+				<!-- Selection button -->
+				<input type="checkbox" class="hide-toggle-rev" name="attr_token_selected" value="true" hidden="true">
+				<button type="action" class="hide-item-rev genericTokenSelectButton" name="act_selectinstance"></button>
+
+				<!-- Token attributes -->
 				<input type="text" class="tokenName" name="attr_tokenName" placeholder="Token Name" data-i18n-placeholder="token-name" readonly>
 				<input type="text" name="attr_tokenId" hidden="true">
-				
+				<input type="text" name="attr_tokenAilmentList" hidden="true">
+
 				<!-- Status bars -->
 				<div class="bars">
 					<input id="HPbar" class="Cstat HPtext" type="number" name="attr_HP" value="30">
@@ -194,21 +200,25 @@
 					<input type="checkbox" class="hide-toggle-rev" name="attr_tokenAilment1Num" value="0" hidden="true">
 					<div class="tokenAilment hide-item-rev">
 						<img name="attr_tokenAilment1Icon">
+						<input type="text" name="attr_tokenAilment1Name" hidden="true">
 						<input type="number" name="attr_tokenAilment1Num" min="0" value="0">
 					</div>
 					<input type="checkbox" class="hide-toggle-rev" name="attr_tokenAilment2Num" value="0" hidden="true">
 					<div class="tokenAilment hide-item-rev">
 						<img name="attr_tokenAilment2Icon">
+						<input type="text" name="attr_tokenAilment2Name" hidden="true">
 						<input type="number" name="attr_tokenAilment2Num" min="0" value="0">
 					</div>
 					<input type="checkbox" class="hide-toggle-rev" name="attr_tokenAilment3Num" value="0" hidden="true">
 					<div class="tokenAilment hide-item-rev">
 						<img name="attr_tokenAilment3Icon">
+						<input type="text" name="attr_tokenAilment3Name" hidden="true">
 						<input type="number" name="attr_tokenAilment3Num" min="0" value="0">
 					</div>
 					<input type="checkbox" class="hide-toggle-rev" name="attr_tokenAilment4Num" value="0" hidden="true">
 					<div class="tokenAilment hide-item-rev">
 						<img name="attr_tokenAilment4Icon">
+						<input type="text" name="attr_tokenAilment4Name" hidden="true">
 						<input type="number" name="attr_tokenAilment4Num" min="0" value="0">
 					</div>
 				</div>
@@ -227,13 +237,11 @@
 		-->
 
 		<div class="columnAlign genericToken_controls">
-			<button type="action" name="act_addGenericToken" placeholder="Add token" data-i18n-placeholder="token-add">Add token</button>
-			<button type="action" name="act_addGenericTokenMultiple" placeholder="Add multiple" data-i18n-placeholder="token-add-multiple">Add multiple</button>
-			<button type="action" name="act_deleteGenericToken" placeholder="Delete token" data-i18n-placeholder="token-delete">Delete token</button>
+			<button type="action" name="act_addToken" placeholder="Add token" data-i18n-placeholder="token-add">Add token</button>
+			<button type="action" name="act_addTokenMultiple" placeholder="Add multiple" data-i18n-placeholder="token-add-multiple">Add multiple</button>
+			<button type="action" name="act_deleteToken" placeholder="Delete token" data-i18n-placeholder="token-delete">Delete token</button>
 		</div>
 	</div>
-</div>
-
 </div>
 
 
@@ -6315,6 +6323,7 @@
 
 </div>
 </div>
+</div>
 
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab"  value="equipment">
 <div class="toggleButtons">
@@ -10483,8 +10492,7 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 <!-- Chat message action buttons -->
 <div style="display:none">
 <button type="action" name="act_selectToken"></button>
-<button type="action" name="act_addToken"></button>
-<button type="action" name="act_deleteToken"></button>
+<button type="action" name="act_deleteTokenMultiple"></button>
 <button type="action" name="act_actionButtonDamage"></button>
 <button type="action" name="act_actionButtonInflict"></button>
 <button type="action" name="act_actionButtonGive"></button>
@@ -10528,21 +10536,29 @@ function generateActionButton(name, icon, color, action, data, target) {
 /* --- Token interaction functions  --- */
 
 /* Select token instance functionality */
-on('clicked:selectToken', async function(data) {
-	getSelectedTokenId("true");
+on('clicked:selectToken clicked:repeating_tokens:selectinstance', async function(info) {
+	if (info.sourceAttribute != undefined) {
+		setAttrs({"tokenId_selected":info.sourceAttribute.replace("repeating_tokens_","").replace("_selectinstance","")});
+	} else {
+		getTokenId("selected", "true");
+	}
 });
-function getSelectedTokenId(setSelected="false", callback=()=>{}) {
+/* setSelectModes: true (always set selection), false (do not set selection), unset (set if unset)*/
+function getTokenId(target="selected", setSelectMode="false", callback=()=>{}) {
+	getAttrs(["tokenId_selected"], function(values) {
+		let tokenId_selected = values.tokenId_selected;
+	
 	/* If setting is disabled, ask if it should be enabled. Continue if yes */
 	checkGenericMode(async function(genericModeCheck) {
 		if (genericModeCheck == "false") { return; }
 
 		/* Get selected token attributes */
 		let selectAttrs = {}
-		let rollBase = `! {{token_id=[[0[@{selected|token_id}]]]}} {{token_name=[[0[@{selected|token_name}]]]}}
-			{{HP=[[0[@{selected|HP}]]]}} {{StagRes=[[0[@{selected|StagRes}]]]}} {{SP=[[0[@{selected|SP}]]]}}
-			{{HP_max=[[0[@{selected|HP_max}]]]}} {{StagRes_max=[[0[@{selected|StagRes_max}]]]}} {{SP_max=[[0[@{selected|SP_max}]]]}}
-			{{bar1=[[0[@{selected|bar1}]]]}} {{bar2=[[0[@{selected|bar2}]]]}} {{bar3=[[0[@{selected|bar3}]]]}}`.replaceAll("\n","").replaceAll("\t","");
-
+		let rollBase = `! {{token_id=[[0[@{${target}|token_id}]]]}} {{token_name=[[0[@{${target}|token_name}]]]}}
+			{{HP=[[0[@{${target}|HP}]]]}} {{StagRes=[[0[@{${target}|StagRes}]]]}} {{SP=[[0[@{${target}|SP}]]]}}
+			{{HP_max=[[0[@{${target}|HP_max}]]]}} {{StagRes_max=[[0[@{${target}|StagRes_max}]]]}} {{SP_max=[[0[@{${target}|SP_max}]]]}}
+			{{bar1=[[0[@{${target}|bar1}]]]}} {{bar2=[[0[@{${target}|bar2}]]]}} {{bar3=[[0[@{${target}|bar3}]]]}}`.replaceAll("\n","").replaceAll("\t","");
+		
 		let selectRoll = await startRoll(rollBase);
 		selectAttrs = {
 			tokenName: selectRoll.results.token_name.expression.match(/^0\[(.*)\]\s*$/)[1],
@@ -10559,65 +10575,236 @@ function getSelectedTokenId(setSelected="false", callback=()=>{}) {
 		}
 		finishRoll(selectRoll.rollId);
 
-		if (setSelected == "true") {
+		/* If token instance does not exist, ask if it should be added. Continue if yes */
+		checkTokenInstance(selectAttrs, setSelectMode, async function(addTokenInstance) {
+			if (addTokenInstance == "false") { return; };
+
+		if (setSelectMode == "true" || (setSelectMode == "unset" && tokenId_selected == "")) {
 			setAttrs({"tokenId_selected":selectAttrs.tokenId});
 		}
 		callback(selectAttrs);
 	});
+	});
+	});
 }
 /* Manipulate token instances functionality */
-on('clicked:addToken', async function(data) {
-	getSelectedTokenId("false", (selectAttrs) => {
+on('clicked:addToken', async function(info) {
+	getTokenId("selected", "unset", (selectAttrs) => {
 		updateToken(selectAttrs);
 	});
 });
-on('clicked:deleteToken', async function(data) {
-	getSelectedTokenId("false", (selectAttrs) => {
-		deleteToken(selectAttrs.tokenId);
+on('clicked:addTokenMultiple', async function(info) {
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	});});});});});});});});});});
+});
+on('clicked:deleteToken', async function(info) {
+	getAttrs(["tokenId_selected"], function(values) {
+		let selectedId = values.tokenId_selected;
+		if (info.htmlAttributes != {}) {
+			if (selectedId != "") {
+				deleteToken(selectedId);
+				setAttrs({"tokenId_selected":""});
+			}
+		} else {
+			getTokenId("selected", "false", (selectAttrs) => {
+				deleteToken(selectAttrs.tokenId);
+				if (selectAttrs.tokenId == selectedId) {
+					setAttrs({"tokenId_selected":""});
+				}
+			});
+		}
+	});
+});
+on('clicked:deleteTokenMultiple', async function(info) {
+	getAttrs(["tokenId_selected"], async function(values) {
+		let selectedId = values.tokenId_selected;
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		getTokenId("target|Target", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
+		});});});});});});});});});});
 	});
 });
 function deleteToken(tokenId) {
 	removeRepeatingRow("repeating_tokens_" + tokenId);
 }
 
+/* On changing the selected token, imports the status bars and ailments of that token */
+on('change:tokenId_selected', (info) => {
+	/* Clear the old selection if there was one */
+	if (info.previousValue != undefined && info.newValue != undefined) {
+		setAttrs({[`repeating_tokens_${info.previousValue}_token_selected`]:"false"});
+	}
 
+	/* Import values from new selection */
+	if (info.newValue != undefined) {
+		let tokenPrefix = `repeating_tokens_${info.newValue}`;
+		let tokenValues = [`${tokenPrefix}_tokenAilmentList`];
 
+		let barlist = ["HP", "StagRes", "SP", "Light"];
+		barlist.forEach(bar => {
+			tokenValues.push(`${tokenPrefix}_${bar}`, `${tokenPrefix}_${bar}_max`,);
+		});
 
+		getAttrs([...tokenValues], async function(values) {
+			let output = {}
 
+			/* Set bars to that of the token instance */
+			barlist.forEach(bar => {
+				output[`${bar}`] = values[`${tokenPrefix}_${bar}`];
+				output[`${bar}_max`] = values[`${tokenPrefix}_${bar}_max`];
+			});
 
+			/* Sets ailments to those of the token instance. If ailmentList is unset, initialize a new empty ailmentList */
+			let ailmentList = values[`${tokenPrefix}_tokenAilmentList`];
+			if (ailmentList != "") {
+				importAilmentList(Data.unpackage(ailmentList));
+			} else {
+				resetAilments(() => {
+					exportAilmentList({}, function(newAilmentList) {
+						setAttrs({[`${tokenPrefix}_tokenAilmentList`]: Data.package(newAilmentList)});
+					});
+				});
+			}
 
-on('remove:repeating_tokens', (info) => {
-	console.log("Delete instance")
-	console.log(info)
+			/* Set new selection */
+			output[`${tokenPrefix}_token_selected`] = "true";
+			setAttrs(output);
+		});
+	}
 });
 
 /* Hides token bar value in display if it matches that of the character sheet */
-let barList = ["HP", "StagRes", "SP"];
+let barList = ["hp", "stagres", "sp"];
 barList.forEach(bar => {
 	on(`change:repeating_tokens:${bar} change:repeating_tokens:${bar}_token`, (info) => {
-	let attr_sheet = `${info.sourceAttribute}`;;
-	let attr_token = `${info.sourceAttribute}`;;
-	if (info.sourceAttribute.match(/_token/g).length == 2) {
-		attr_sheet = `${info.sourceAttribute.replace(/_token([^_]*)$/, '$1')}`;
-	} else {
-		attr_token = `${info.sourceAttribute}` + "_token";
-	}
-	getAttrs([`${attr_sheet}`, `${attr_token}`], function(values) {
-		let bar_sheet = values[`${attr_sheet}`];
-		let bar_token = values[`${attr_token}`];
-		setAttrs({[`${attr_token + "_display"}`]:"" + (bar_sheet != bar_token)});
+		let attr_sheet = `${info.sourceAttribute}`;
+		let attr_token = `${info.sourceAttribute}`;
+		if (info.sourceAttribute.match(/_token/g).length == 2) {
+			attr_sheet = `${info.sourceAttribute.replace(/_token([^_]*)$/, '$1')}`;
+		} else {
+			attr_token = `${info.sourceAttribute}` + "_token";
+		}
+		getAttrs([`${attr_sheet}`, `${attr_token}`], function(values) {
+			let bar_sheet = values[`${attr_sheet}`];
+			let bar_token = values[`${attr_token}`];
+			setAttrs({[`${attr_token + "_display"}`]:"" + (bar_sheet != bar_token)});
+		});
 	});
 });
-}) 
+/* Sync: Status bars */
+[...barList, "light"].forEach(bar => {
+	on(`change:${bar} change:repeating_tokens:${bar}`, (info) => {
+		if (info.newValue != undefined) {
+			getAttrs(["tokenId_selected"], function(values) {
+				let selectedId = values.tokenId_selected;
+				if (selectedId != "") {
+					if (barList.includes(info.sourceAttribute)) {
+						setAttrs({[`repeating_tokens_${selectedId}_${info.sourceAttribute}`]:info.newValue})
+					}
+					else if (info.sourceAttribute.includes(selectedId.toLowerCase())) {
+						setAttrs({[`${bar}`]:info.newValue})
+					}
+				}
+			});
+		}
+	});
+});
+/* Sync: Ailments */
+on(`change:ailmentList`, (info) => {
+	if (info.newValue != undefined) {
+		getAttrs(["tokenId_selected"], function(values) {
+			let ailmentList = Data.unpackage(info.newValue);
+			let selectedId = values.tokenId_selected;
+			if (selectedId != "") {
+				setAttrs({[`repeating_tokens_${selectedId}_tokenAilmentList`]:info.newValue});
+				updateTokenAilmentDisplay(selectedId, ailmentList)
+			}
+		});
+	}
+});
+for (let i = 0; i <= 4; i++) {
+	on(`change:repeating_tokens:tokenAilment${i}Num`, (info) => {
+		if (info.newValue != undefined) {
+			let tokenPrefix = info.sourceAttribute.match((/(repeating_tokens_[^_]+)/g))[0];
+			let tokenIndex = info.sourceAttribute.match((/([\d])num/g))[0].replace("num","");
+			getAttrs(["tokenId_selected", `${tokenPrefix}_tokenAilmentList`,
+				`${tokenPrefix}_tokenAilment${tokenIndex}Name`, `${tokenPrefix}_tokenAilment${tokenIndex}Num`], function(values) {
+				let selectedId = values.tokenId_selected;
+				let ailmentList = Data.unpackage(values[`${tokenPrefix}_tokenAilmentList`]);
+				let ailmentName = values[`${tokenPrefix}_tokenAilment${tokenIndex}Name`];
+				let ailmentNum = values[`${tokenPrefix}_tokenAilment${tokenIndex}Num`];
+				let output = {}
+
+				ailmentList[ailmentName][1] = ailmentNum;
+				output[`${tokenPrefix}_tokenAilmentList`] = Data.package(ailmentList);
+
+				if (tokenPrefix.includes(selectedId.toLowerCase())) {
+					output["ailmentList"] = Data.package(ailmentList);
+					if (ailmentName.includes("repeating_tokens_")) {
+						output[`${ailmentName}_ailNum`] = ailmentNum;
+					} else {
+						output[`${ailmentName}`] = ailmentNum;
+					}
+				}
+				setAttrs(output);
+			});
+		}
+	});
+}
+function updateTokenAilmentDisplay(selectedId, ailmentList) {
+	getAttrs(["settingLimbusStyle"], function(values) {
+		let ailmentDisplayList = [];
+		for (var ailmentName in ailmentList) {
+			ailmentDisplayList.push([ailmentName, ailmentList[ailmentName]]);
+		}
+		ailmentDisplayList.sort(function(ail1, ail2) {
+			return ail1[1][1] - ail2[1][1];
+		});
+		ailmentDisplayList = ailmentDisplayList.slice(ailmentDisplayList.length - 4).reverse();
+		
+		let output = {}
+		for (i = 0; i <= 3; i++) {
+			output[`repeating_tokens_${selectedId}_tokenAilment${i+1}Icon`] = getIcon("ailments", ailmentDisplayList[i][1][5], values.settingLimbusStyle).replace('<img src="','').replace('" >','');
+			output[`repeating_tokens_${selectedId}_tokenAilment${i+1}Num`] = ailmentDisplayList[i][1][1];
+			if (ailmentDisplayList[i][1][4] != 0) {
+				output[`repeating_tokens_${selectedId}_tokenAilment${i+1}Name`] = `repeating_tokens_${ailmentDisplayList[i][1][4]}`;
+			} else {
+				output[`repeating_tokens_${selectedId}_tokenAilment${i+1}Name`] = ailmentDisplayList[i][0];
+			}
+		}
+		setAttrs(output);
+	});
+}
+
+
+
+/* Syncs the ailments of the sheet and selected token */
+/* Whenever a display ailment is incremented or the ailment list updates */
 
 
 
 
-
-
-// getSectionIDs(`repeating_tokens`, idarray => {
-
-
+/* Sync: Action number */
+on(`change:actNum change:repeating_tokens:actNum`, (info) => {
+	
+});
+/* Sync: Combat states */
 
 
 
@@ -10644,8 +10831,23 @@ async function checkGenericMode(callback=()=>{}) {
 		}
 	});
 }
-async function checkTokenInstance() {
-	
+async function checkTokenInstance(selectAttrs, setSelectMode, callback=()=>{}) {
+	getSectionIDs(`repeating_tokens`, async function(idarray) {
+		if (!idarray.includes(selectAttrs.tokenId.toLowerCase()) && setSelectMode == "true") {
+			let queryResults = await sendQuery(["addTokenInstance",
+				getTranslationByKeyCustom("Token does not have a token instance. Add instance?", "query-add-token-instance"), {
+					[getTranslationByKeyCustom("No","query-no")]:"false",
+					[getTranslationByKeyCustom("Yes","query-yes")]:"true"
+				}
+			]);
+			if (queryResults.addTokenInstance == "true") {
+				updateToken(selectAttrs);
+			}
+			callback(queryResults.addTokenInstance)
+		} else {
+			callback("true")
+		}
+	});
 }
 async function updateToken(selectAttrs) {
 	getSectionIDs(`repeating_global`, idarray => {
@@ -10679,6 +10881,9 @@ async function updateToken(selectAttrs) {
 
 /* Select target functionality */
 on('clicked:selectTarget', async (data) => {
+	getTarget("true");
+});
+async function getTarget(setTarget="false", callback=()=>{}) {
 	let rollBase = `! {{character_name=[[0[@{target|Character|character_name}]]]}} {{selfToken=[[0[@{target|Character|selfToken}]]]}}`;
 	
 	let targetRoll = await startRoll(rollBase);
@@ -10687,8 +10892,11 @@ on('clicked:selectTarget', async (data) => {
 		targetToken: targetRoll.results.selfToken.expression.match(/^0\[(.*)\]\s*$/)[1]
 	}
     finishRoll(targetRoll.rollId);
-	setAttrs(target);
-});
+	if (setTarget == "true") {
+		setAttrs(target);
+	}
+	callback(target)
+}
 
 
 
@@ -12002,19 +12210,24 @@ getSectionIDs(`repeating_global`, idarray => {
 
 
 /* Auto: Update ailment list */
-on(`sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ailNum change:repeating_ailments:ailNumNextTurn change:repeating_ailments:ailName clicked:importRepeating clicked:importGlobal
-	change:settingHideNextTurn change:repeating_global:burnNestTurnSetting change:repeating_global:bleedNestTurnSetting change:repeating_global:smokeNestTurnSetting change:repeating_global:chargeNestTurnSetting
-	change:Burn change:Bleed change:Paralysis change:Protection change:StaggerProtection change:Fragile change:Strength change:Feeble change:Endurance change:Disarm change:Haste change:Bind change:Smoke change:Charge change:Fortune
-	change:BurnNextTurn change:BleedNextTurn change:ParalysisNextTurn change:ProtectionNextTurn change:StaggerProtectionNextTurn change:FragileNextTurn change: change:StrengthNextTurn change:FeebleNextTurn change:EnduranceNextTurn
-	change:DisarmNextTurn change:HasteNextTurn change:BindNextTurn change:SmokeNextTurn change:ChargeNextTurn change:FortuneNextTurn`, function() {
-	getAilmentList({}, function(ailmentList) {
+let ailments = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"];
+let ailmentAttributes = `sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ailNum change:repeating_ailments:ailNumNextTurn change:repeating_ailments:ailName clicked:importRepeating clicked:importGlobal
+	change:settingHideNextTurn change:repeating_global:burnNextTurnSetting change:repeating_global:bleedNextTurnSetting change:repeating_global:smokeNextTurnSetting change:repeating_global:chargeNextTurnSetting`;
+ailments.forEach(ailment => {
+	ailmentAttributes += ` change:${ailment} change:${ailment}NextTurn`;
+});
+on(ailmentAttributes, function() {
+	exportAilmentList({}, function(ailmentList) {
 		setAttrs({ailmentList: Data.package(ailmentList)});
 	});
 });
 
 
 /* Action: Reset Ailments */
-   on('clicked:resetAilments', function() {
+on('clicked:resetAilments', function() {
+	resetAilments();
+});
+function resetAilments(callback=()=>{}) {
 	getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
@@ -12048,10 +12261,11 @@ on(`sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ail
 					output[`repeating_ailments_${id}_ailDecayPause`] = 0;
                 });
                 setAttrs(output);
+				callback();
             });
         });
 	});
-});
+}
 
 /*Action: Reset uses */
 on('clicked:resetUses', function() {
@@ -12441,7 +12655,13 @@ else {
 
 /* Action: Update ailments */
 on('clicked:updateAilments', function() {
-	updateAilments();
+	getAttrs(['settingGenericTokenMode'], async function(values) {
+		if (values.settingGenericTokenMode == "true") {
+			updateAilments();
+		} else {
+			updateAilments();
+		}
+	});
 });
 
 function updateAilments(ailmentOverride=[]) {
@@ -13577,8 +13797,6 @@ getSectionIDs(`repeating_global`, idarray => {
 		if (basetype == "Attack") {
 			for (const rollKey in rollList) {
 				damage_data.baseOverride = Math.max(parseInt(rollList[rollKey]) + parseInt(autoeffectBaseDamage),0);
-				console.log(rollList[rollKey])
-				console.log(autoeffectBaseDamage)
 
 				let rollNumber = ` (#${rollKey.replace("roll","")})`;
 				if (Object.keys(rollList).length == 1) {
@@ -14466,8 +14684,6 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 
 		if (sourceVals[1] != "None") {
 			let newCount = Math.ceil(tempBarVal/sourceVals[1]);
-			console.log(newCount)
-			console.log(tempBarVal)
 			setAttrs({[sourceName]:newCount, tempBar_value_override:tempBarVal});
 		}
 		return { tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
@@ -14534,8 +14750,6 @@ on('change:repeating_ailments:ailNum', (info) => {
 			if (parseInt(values.tempBar_value_override) > 0 && (info.newValue != undefined || (info.newValue == undefined && info.previousValue == undefined))) {
 				tempBarVal = parseInt(values.tempBar_value_override)
 			}
-
-			console.log(tempBarVal)
 
 			/* Update the temp source for the correct bar */
 			updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
@@ -16154,7 +16368,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	/* Gives a list with the following format: hasNextTurnField, count, nextTurnCount, countImmutable, repeatingAilmentId, ailmentIconName */
 	/* countImmutable: Matches the count at the beginning of the AutoEffect execution. Should never be modified */
 	/* repeatingAilmentId: Is set to 0 for standard ailments */
-	getAilmentList(overrideList, function(ailmentList) { 
+	exportAilmentList(overrideList, function(ailmentList) { 
 	// console.log(ailmentList)
 
 
@@ -18214,6 +18428,80 @@ getSectionIDs(`repeating_global`, idarray => {
 	});
 });
 
+async function exportAilmentList(overrideList={}, callback=() => {}) {
+	let ailmentList = {}
+	
+	getAttrs(["settingHideNextTurn", "burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
+	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
+	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
+		
+		let settingHideNextTurn = values.settingHideNextTurn;
+		const HasNextTurn = settingHideNextTurn == "true" ? 'false' : 'true';
+
+		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"];
+		ailmentNames.forEach(ailment => {
+			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
+				let ailmentNextTurnSetting = settingHideNextTurn == "true" ? "false" : values[ailment.toLowerCase()+"NextTurnSetting"];
+				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
+			} else {
+				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
+			}
+			if (overrideList.hasOwnProperty(ailment)) {
+				ailmentList[ailment][1] = Math.max(overrideList[ailment][0], 0);
+				ailmentList[ailment][3] = Math.max(overrideList[ailment][1], 0);
+			}
+		});
+
+	/* Get all custom ailments */
+	getSectionIDs(`repeating_ailments`, idarray => {
+	const fieldnames = idarray.reduce((rows,id) =>
+	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,`repeating_ailments_${id}_ailNum`,
+	`repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`], '');
+	
+		let ailName = "";
+		let ailHasNextTurn = "";
+		let ailNum = 0;
+		let ailNumNextTurn = 0;
+		
+		getAttrs([...fieldnames], async function(v) {
+		idarray.forEach(id => {
+			ailName = v[`repeating_ailments_${id}_ailName`].replaceAll(" ","_");
+			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
+			ailNum = v[`repeating_ailments_${id}_ailNum`];
+			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
+			ailIcon = v[`repeating_ailments_${id}_ailIcon`];
+			ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
+			
+			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, ailNum, id, ailIcon];
+
+			if (overrideList.hasOwnProperty(ailName)) {
+				ailmentList[ailName][1] = Math.max(overrideList[ailName.replaceAll(" ","_")][0], 0);
+				ailmentList[ailName][3] = Math.max(overrideList[ailName.replaceAll(" ","_")][1], 0);
+			}
+		});
+		callback(ailmentList);
+	});
+	});
+	});
+}
+
+function importAilmentList(ailmentList) {
+	let output = {}
+	for (const [ailmentName, ailmentValues] of Object.entries(ailmentList)) {
+		/* Default ailments */
+		if (ailmentValues[4] != 0) {
+			output[`repeating_ailments_${ailmentValues[4]}_ailNum`] = ailmentValues[1];
+			output[`repeating_ailments_${ailmentValues[4]}_ailNumNextTurn`]  = ailmentValues[2];
+		}
+		/* Custom ailments */
+		else {
+			output[`${ailmentName}`] = ailmentValues[1];
+			output[`${ailmentName}NextTurn`] = ailmentValues[2];
+		}
+	}
+	setAttrs(output);
+}
+
 
 
 /* Function: Update custom ailment */
@@ -18803,7 +19091,7 @@ getSectionIDs("repeating_global", function(idarray) {
 
 function getIcon(iconFolder, iconName, settingLimbusStyle = "false", style="") {
 	if (settingLimbusStyle == "true") {
-		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/limbus/${iconName}.png" ${style}>`;
+		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/limbus/${iconName.replace("limbus/","")}.png" ${style}>`;
 	} else {
 		return `<img src="https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/${iconFolder}/${iconName}.png" ${style}>`
 	}
@@ -18825,63 +19113,6 @@ function getColor(color) {
 		}
 	}
 	return color;
-}
-
-async function getAilmentList(overrideList={}, callback=() => {}) {
-	let ailmentList = {}
-	
-	getAttrs(["settingHideNextTurn", "burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
-	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
-	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
-		
-		let settingHideNextTurn = values.settingHideNextTurn;
-		const HasNextTurn = settingHideNextTurn == "true" ? 'false' : 'true';
-
-		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"];
-		ailmentNames.forEach(ailment => {
-			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
-				let ailmentNextTurnSetting = settingHideNextTurn == "true" ? "false" : values[ailment.toLowerCase()+"NextTurnSetting"];
-				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
-			} else {
-				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
-			}
-			if (overrideList.hasOwnProperty(ailment)) {
-				ailmentList[ailment][1] = Math.max(overrideList[ailment][0], 0);
-				ailmentList[ailment][3] = Math.max(overrideList[ailment][1], 0);
-			}
-		});
-
-	/* Get all custom ailments */
-	getSectionIDs(`repeating_ailments`, idarray => {
-	const fieldnames = idarray.reduce((rows,id) =>
-	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,`repeating_ailments_${id}_ailNum`,
-	`repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`], '');
-	
-		let ailName = "";
-		let ailHasNextTurn = "";
-		let ailNum = 0;
-		let ailNumNextTurn = 0;
-		
-		getAttrs([...fieldnames], async function(v) {
-		idarray.forEach(id => {
-			ailName = v[`repeating_ailments_${id}_ailName`].replaceAll(" ","_");
-			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
-			ailNum = v[`repeating_ailments_${id}_ailNum`];
-			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
-			ailIcon = v[`repeating_ailments_${id}_ailIcon`];
-			ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
-			
-			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, ailNum, id, ailIcon];
-
-			if (overrideList.hasOwnProperty(ailName)) {
-				ailmentList[ailName][1] = Math.max(overrideList[ailName.replaceAll(" ","_")][0], 0);
-				ailmentList[ailName][3] = Math.max(overrideList[ailName.replaceAll(" ","_")][1], 0);
-			}
-		});
-		callback(ailmentList);
-	});
-	});
-	});
 }
 
 /* Returns a translation, or a base string if no translation is available */
