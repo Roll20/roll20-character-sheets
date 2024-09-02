@@ -1704,7 +1704,7 @@ on('clicked:repeating_customrogue:cr-dm', function (eventInfo) {
         let rollBuilder = new RollTemplateBuilder('2Edefault');
         rollBuilder.push('subtitle=for @{character_name}', 'color=dark-purple');
         rollBuilder.push(`name=@{${values.character_name}|${row}_customskill}\n(in @{armorname})`);
-        rollBuilder.push(`[Secret by DM](~${values.character_name}|${row}_cr)=`);
+        rollBuilder.push(`[Secret by DM](~@{character_name}|${row}_cr)=`);
         rollBuilder.push(`desc=You try to use @{${values.character_name}|${row}_customskill}...`);
         console.log(rollBuilder.string());
 
@@ -2070,57 +2070,54 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 });
 //#endregion
 
-on('clicked:grenade-miss', async function (eventInfo) {
-    getAttrs(['character_name'], async function(values) {
-        let characterName = values['character_name'];
-        let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
-        let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
-        switch (grenade) {
-            case 'Acid':       rollBuilder.push('name=Acid','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~${characterName}|acid-hit)`,`splashdmg=[Damage](~${characterName}|acid-splash)`); break;
-            case 'Holy water': rollBuilder.push('name=Holy water','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~${characterName}|holy-water-hit)`,`splashdmg=[Damage](~${characterName}|holy-water-splash)`); break;
-            case 'Oil (lit)':  rollBuilder.push('name=Oil (lit)','aoe=[[3]]','aoesplash=[[3+6]]',`hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)`,`splashdmg=[Damage](~${characterName}|oil-lit-splash)`); break;
-            case 'Poison':     rollBuilder.push('name=Poison','aoe=[[1]]','aoesplash=[[1+6]]','hitdmg=Special','splashdmg=Special'); break;
-            case 'Other': {
-                let name   = await extractQueryResult('?{Grenade name}');
-                let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
-                let damage = await extractQueryResult('?{Direct damage|1d6}');
-                let splash = await extractQueryResult('?{Splash damage|1d3}');
+on('clicked:grenade-miss', async function(eventInfo) {
+    let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
+    let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
+    switch (grenade) {
+        case 'Acid':       rollBuilder.push('name=Acid','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~@{character_name}|acid-hit)`,`splashdmg=[Damage](~@{character_name}|acid-splash)`); break;
+        case 'Holy water': rollBuilder.push('name=Holy water','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~@{character_name}|holy-water-hit)`,`splashdmg=[Damage](~@{character_name}|holy-water-splash)`); break;
+        case 'Oil (lit)':  rollBuilder.push('name=Oil (lit)','aoe=[[3]]','aoesplash=[[3+6]]',`hitdmg=[Round 1](~@{character_name}|oil-lit-hit1) [Round 2](~@{character_name}|oil-lit-hit2)`,`splashdmg=[Damage](~@{character_name}|oil-lit-splash)`); break;
+        case 'Poison':     rollBuilder.push('name=Poison','aoe=[[1]]','aoesplash=[[1+6]]','hitdmg=Special','splashdmg=Special'); break;
+        case 'Other': {
+            let name   = await extractQueryResult('?{Grenade name}');
+            let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+            let damage = await extractQueryResult('?{Direct damage|1d6}');
+            let splash = await extractQueryResult('?{Splash damage|1d3}');
 
-                let customGrenade = {}
-                customGrenade['custom-grenade-name'] = name;
-                customGrenade['custom-grenade-hit'] = damage;
-                customGrenade['custom-grenade-splash'] = splash;
-                setAttrs(customGrenade);
+            let customGrenade = {}
+            customGrenade['custom-grenade-name'] = name;
+            customGrenade['custom-grenade-hit'] = damage;
+            customGrenade['custom-grenade-splash'] = splash;
+            setAttrs(customGrenade);
 
-                rollBuilder.push(`name=${name}`,`aoe=[[${aoe}]]`,`aoesplash=[[${aoe}+6]]`,`hitdmg=[Damage](~${characterName}|custom-grenade-hit)`,`splashdmg=[Damage](~${characterName}|custom-grenade-splash)`);
-            }
+            rollBuilder.push(`name=${name}`,`aoe=[[${aoe}]]`,`aoesplash=[[${aoe}+6]]`,`hitdmg=[Damage](~@{character_name}|custom-grenade-hit)`,`splashdmg=[Damage](~@{character_name}|custom-grenade-splash)`);
         }
-        let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
-        rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
-        switch (distanceName) {
-            case 'Short': rollBuilder.push('distance=[[1d6cs1cf6]]'); break;
-            case 'Medium': rollBuilder.push('distance=[[1d10cs1cf10]]'); break;
-            case 'Long': rollBuilder.push('distance=[[2d10cs1cf10]]'); break;
-        }
-        rollBuilder.push('hit=[[0]]','splash=[[0]]');
-        let finalRollText = rollBuilder.string();
-        console.log(finalRollText);
-        startRoll(finalRollText, function (roll) {
-            console.log(roll);
-            let computedRolls = {
-                hit: 0,
-                splash: 0
-            };
+    }
+    let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
+    rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
+    switch (distanceName) {
+        case 'Short': rollBuilder.push('distance=[[1d6cs1cf6]]'); break;
+        case 'Medium': rollBuilder.push('distance=[[1d10cs1cf10]]'); break;
+        case 'Long': rollBuilder.push('distance=[[2d10cs1cf10]]'); break;
+    }
+    rollBuilder.push('hit=[[0]]','splash=[[0]]');
+    let finalRollText = rollBuilder.string();
+    console.log(finalRollText);
+    startRoll(finalRollText, function (roll) {
+        console.log(roll);
+        let computedRolls = {
+            hit: 0,
+            splash: 0
+        };
 
-            // See if monster is within direct hit
-            if (roll.results.distance.result <= roll.results.aoe.result / 2) {
-                computedRolls.hit = 1;
-            } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
-                computedRolls.splash = 1;
-            }
-            console.log(computedRolls);
-            finishRoll(roll.rollId, computedRolls);
-        });
+        // See if monster is within direct hit
+        if (roll.results.distance.result <= roll.results.aoe.result / 2) {
+            computedRolls.hit = 1;
+        } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+            computedRolls.splash = 1;
+        }
+        console.log(computedRolls);
+        finishRoll(roll.rollId, computedRolls);
     });
 });
 
@@ -3219,13 +3216,13 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
     on(`clicked:repeating_${section}:action-macro`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty', 'character_name'], function (values) {
+        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
             let macroValue = values[`repeating_${section}_${macro}`];
 
             let isSecret = macroValue.match(/\{\{(secret=true)}}/);
             let powerRollMatch = macroValue.match(/\{\{(powerroll=.*?)}} *\{\{/);
             if (isSecret && powerRollMatch) {
-                macroValue = macroValue.replace(powerRollMatch[1], `powerroll=[Secret by DM](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`)
+                macroValue = macroValue.replace(powerRollMatch[1], `powerroll=[Secret by DM](~@{character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`)
             }
 
             rollPsionicTemplate(macroValue, parse.rowId, values);

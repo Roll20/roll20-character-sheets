@@ -4,7 +4,10 @@
 <div class=main>
 	<!-- Logo -->
 	<div class="logo">
-		<img class="img" src="https://raw.githubusercontent.com/ctotone/JdR/main/Ten%20candles/img/logo_official_dark.png"/><button type="roll" name="roll_Conflict" data-i18n-title="conflict_dice" title="Conflict Dice" value="&{template:tencandles} {{title=^{roll_d6_title}}}{{^{roll_success}=[[?{How many dice?|1}d6s=6]]}}" class="d6"></button>
+		<img class="img" src="https://raw.githubusercontent.com/ctotone/JdR/main/Ten%20candles/img/logo_official_dark.png"/>
+        <button type="action" name="act_conflict" data-i18n-title="conflict_dice" title="Conflict Dice" class="d6"></button>
+        <!-- Old roll
+        <button type="roll" name="roll_Conflict" data-i18n-title="conflict_dice" title="Conflict Dice" value="&{template:tencandles} {{title=^{roll_d6_title}}}{{conflict=[[?{How many dice?|1}d6s=6]]}}" class="d6"></button> -->
 	</div>
 	<br>
 
@@ -26,7 +29,7 @@
 				<p><input type="checkbox" name="attr_vice_check" data-i18n-title="burn" title="Check when the card is burned"><span class="receiver-vice_check" data-i18n="vice">Vice : </span><input class="vice" type="text" name="attr_vice"><input class="vice_rank" type="text" name="attr_vice_rank"></p>
 				<input type="hidden" class="moment_check" name="attr_moment_check" value='0'>
 				<p><input type="checkbox" name="attr_moment_check" data-i18n-title="burn" title="Check when the card is burned"><span class="receiver-moment_check" data-i18n="moment">Moment : "I will find hope..."</p>
-				<p><button type="roll" name="roll_Hope" data-i18n-title="hope_dice" title="Hope Dice" value="&{template:tencandles-hope} {{title=^{roll_hope_dice_title}}}{{^{roll_success}=[[1d6>5]]}}" class="dicehope"></button><input class="card1" type="text" name="attr_moment"></textarea></span><input class="moment_rank" type="text" name="attr_moment_rank"></p>
+				<p><button type="roll" name="roll_Hope" data-i18n-title="hope_dice" title="Hope Dice" value="&{template:tencandles-hope} {{title=^{roll_hope_dice_title}}}{{hope=[[1d6>5]]}}" class="dicehope"></button><input class="card1" type="text" name="attr_moment"></textarea></span><input class="moment_rank" type="text" name="attr_moment_rank"></p>
 				<input type="hidden" class="extremite_check" name="attr_extremite_check" value='0'>
 				<p><input type="checkbox" name="attr_extremite_check" data-i18n-title="burn" title="Check when the card is burned"><span class="receiver-extremite_check" data-i18n="brink">Brink : "Someone seen you..."</span></p>
 				<p><input class="card2" type="text" name="attr_extremite"></p>
@@ -110,13 +113,43 @@
       {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
     </div>
     <div class="sheet-content">
-      {{#allprops() title subtitle desc}}
-      <div class="sheet-key">{{key}}</div>
-      <div class="sheet-value">{{value}}</div>
-      {{/allprops() title subtitle desc}}
-      {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+      
+        {{#rollWasCrit() roll}}
+        <div class="reussite" data-i18n="success">Success</div>
+        <div class="reussite-result">{{roll}}</div>
+            {{#^rollTotal() computed::low 0}}
+            {{#rollTotal() computed::low 1}}
+            <div class="echec" data-i18n="lost_dice">Lost Dice</div>
+            <div class="echec-result-lost">{{computed::low}}</div>
+            {{/rollTotal() computed::low 1}}
+            {{#^rollTotal() computed::low 1}}
+            <div class="echec" data-i18n="lost_dices">Lost Dices</div>
+            <div class="echec-result-lost">{{computed::low}}</div>
+            {{/^rollTotal() computed::low 1}}
+            {{/^rollTotal() computed::low 0}}
+        {{/rollWasCrit() roll}}
+        {{#^rollWasCrit() roll}}
+        <div class="echec" data-i18n="failure">Failure</div>
+        <div class="echec-result">{{roll}}</div>
+            {{#^rollTotal() computed::low 0}}
+                {{#rollTotal() computed::low 1}}
+                <div class="echec" data-i18n="lost_dice">Lost Dice</div>
+                <div class="echec-result-lost">{{computed::low}}</div>
+                {{/rollTotal() computed::low 1}}
+                {{#^rollTotal() computed::low 1}}
+                <div class="echec" data-i18n="lost_dices">Lost Dices</div>
+                <div class="echec-result-lost">{{computed::low}}</div>
+                {{/^rollTotal() computed::low 1}}
+            {{/^rollTotal() computed::low 0}}
+        {{/^rollWasCrit() roll}}
+        {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}  
     </div>
   </div>
+   <!--  <div class="sheet-results">
+        <h4>Result = {{roll}}</h4>
+        <h4>Number 6s = {{computed::high}}</h4>
+        <h4>Number 1s = {{computed::low}}</h4>
+    </div> -->
 </rolltemplate>
 
 <!-- Hope Dice -->
@@ -128,14 +161,41 @@
     </div>
     <div class="sheet-content">
       {{#allprops() title subtitle desc}}
-      <div class="sheet-key">{{key}}</div>
+      {{#rollGreater() hope 0}}
+	  <div class="sheet-key" data-i18n="success">Success</div>
       <div class="sheet-value">{{value}}</div>
-      {{/allprops() title subtitle desc}}
-      {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+	  {{/rollGreater() hope 0}}
+	  {{/allprops() title subtitle desc}}
+	  {{#allprops() title subtitle desc}}
+	  {{#^rollGreater() hope 0}}
+	  <div class="sheet-key-failure" data-i18n="failure">Failure</div>
+      <div class="sheet-value">{{value}}</div>
+	  {{/^rollGreater() hope 0}}
+	  {{/allprops() title subtitle desc}}
+	  {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
     </div>
   </div>
 </rolltemplate>
 
-
-
-
+<script type="text/worker">
+    on('clicked:conflict', (info) => {
+        startRoll("&{template:tencandles} {{title=^{roll_d6_title}}} {{roll=[[?{How many dice?|1}d6s=6]]}} {{high=[[0]]}} {{low=[[0]]}}", (diceroll) => {
+            const total = diceroll.results.roll.result
+            const dice = diceroll.results.roll.dice; //This will be an array of the values rolled on all the dice
+            let total6s = 0;
+            let total1s = 0;
+            for(let i = 0; i < dice.length; i++) {
+                total6s += dice[i] > 5 ? 1 : 0;
+                total1s += dice[i] < 2 ? 1 : 0;
+            }
+            finishRoll(
+                diceroll.rollId, // this is where you save the computed values into something that can be passed to rolltemplates.
+                {
+                    roll: total,
+                    high: total6s,
+                    low: total1s
+                }
+            );
+        });
+    });
+</script>

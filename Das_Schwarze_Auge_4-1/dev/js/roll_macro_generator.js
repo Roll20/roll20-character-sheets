@@ -678,4 +678,4 @@ function buildMacros(macros, reuse, resultType) {
 		return structuredResult;
 	}
 }
-/* roll macro generator begin */
+/* roll macro generator end */

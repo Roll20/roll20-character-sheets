@@ -1004,6 +1004,8 @@
 				<input class="hidden" type="textarea" name="attr_RT-trapblade" value="[r](~@{character_name}|strengthroll)" />
 				<input class="hidden" type="textarea" name="attr_RT-crit" value="[l](~@{character_name}|CriticalTest)" />
 				<input class="hidden" type="textarea" name="attr_RT-critical" value="[l](~@{character_name}|CriticalRoll)" />
+				<input class="hidden" type="textarea" name="attr_RT-critcast" value="[l](~@{character_name}|CriticalRollcast)" />
+				<button type="action" class="hidden" name="act_CriticalRollcast" />
 				<input class="hidden" type="textarea" name="attr_RT-fumble" value="[l](~@{character_name}|FumbleTest)" />
 				<input class="hidden" type="textarea" name="attr_RT-minor" value="[J](~@{character_name}|Minor)" />
 				<input class="hidden" type="textarea" name="attr_RT-major" value="[`](~@{character_name}|Major)" />
@@ -31418,7 +31420,7 @@
 		<div class="spacer-xl"></div>
 		<!-- FOOTER -->
 		<div class="row footer">
-			<div class="col-1 small-label center">Sheet version 1.72 : May 25th 2024 | by Djjus & Pote</div>
+			<div class="col-1 small-label center">Sheet version 1.72b : June 28th 2024 | by Djjus & Pote</div>
 		</div>
 			</div>
 		</div>
@@ -33453,6 +33455,19 @@
 								</div>
 							</div>
 						{{/^rollGreater() test target}}
+						{{#rollGreater() test target}}
+							{{#RTdualwield}}{{#rollGreater() dualwield 0}}						
+							<div class="row">
+								<div class="no-yellow-bg">
+									<div class="col-100-100" style="color: black; font-size: 9px; padding-left: 3px; line-height: 10px" data-i18n="CUSTOM-MODIFIERS">Custom & Situational Bonus:</div>						
+
+								<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #858585">+{{dualwield}}SL <span  data-i18n="DUAL-WIELDER"></span> <span class="chat-button-ripostedmg" style="height: 10px" data-i18n-title="USE-DW" >{{RTdualwield}}</span></div>
+								</div>
+							</div>
+							{{/rollGreater() dualwield 0}}{{/RTdualwield}}
+						{{/rollGreater() test target}}
+						
+						
 					{{/rollGreater() sitmod 0}}
 
 					{{#rollGreater() sitfail 0}}
@@ -35340,9 +35355,9 @@
 											<div class="col-100-100" style="color: black; font-size: 9px; padding-left: 3px; line-height: 10px" data-i18n="EFFECTS">Effects</div>
 										{{/RTfuriousassault}} {{/^rollGreater() test target}} {{/rollGreater() furiousassault 0}}{{/rollTotal() tiring 0}} {{/rollTotal() trip 0}} {{/rollTotal() distract 0}}{{/rollTotal() usedmagic 0}}{{/rollTotal() wrap 0}} {{/rollTotal() fast 0}} {{/rollTotal() hack 0}} {{/rollTotal() slow 0}} {{/rollTotal() penetrating 0}}
 
-										{{#rollGreater() furiousassault 0}} {{#^rollGreater() test target}} {{#RTfuriousassault}}
+										{{#rollGreater() furiousassault 0}} {{#RTfuriousassault}}
 											<div class="col-1 pad-l-md pad-r-md rt-effects" style="color: #858585"><span data-i18n="FURIOUS-ASSAULT-EFFECT"></span> <span class="chat-button-ripostedmg center" style="height: 10px" data-i18n-title="USE-FURIOUS-ASSAULT" >{{RTfuriousassault}}</span></div>
-										{{/RTfuriousassault}} {{/^rollGreater() test target}} {{/rollGreater() furiousassault 0}}
+										{{/RTfuriousassault}} {{/rollGreater() furiousassault 0}}
 										{{#^rollTotal() tiring 0}}
 											<div class="col-100-100 pad-l-md pad-r-md rt-effects" style="margin-right: 3px;color: #858585"><span data-i18n="TIRING">Tiring</span></div>
 										{{/^rollTotal() tiring 0}}
@@ -48025,7 +48040,7 @@ on('clicked:repeating_spellbookpetty:spellcast clicked:repeating_spellbookpetty:
 
 	if (skill === "spellcast") {rollDmgPart = '';
 	if (qspell > 0)  {prefix = eventInfo.triggerName.slice(8, -11);} else {prefix = eventInfo.triggerName.slice(8, -10);}}
-	if (skill === "spellcastdmg") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critical}}}';
+	if (skill === "spellcastdmg") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critcast}}}';
 	if (qspell > 0)  {prefix = eventInfo.triggerName.slice(8, -14);} else {prefix = eventInfo.triggerName.slice(8, -13);}}
 		
 	prermod = parseInt(v.Quick_Spell_Mod) - (parseInt(v.Quick_Spell_LoreMod)*10);
@@ -48109,10 +48124,10 @@ on('clicked:repeating_spellbookarcane:spellcast clicked:repeating_spellbookarcan
 	if (skill === "spellcastreroll") {rollDmgPart = ' {{reroll=[1](~@{character_name}|prefix2-_spellcastreroll)}}';
 	var accumod = '@{LastRollAccuExtSL}';
 	var prefix = eventInfo.triggerName.slice(8, -16);}
-	if (skill === "spellcastdmg") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critical}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
+	if (skill === "spellcastdmg") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critcast}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
 	var accumod = '@{prefix2-_spellchannelsl}';
 	var prefix = eventInfo.triggerName.slice(8, -13);}
-	if (skill === "spellcastdmgreroll") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critical}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
+	if (skill === "spellcastdmgreroll") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critcast}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
 	var accumod = '@{LastRollAccuExtSL}';
 	var prefix = eventInfo.triggerName.slice(8, -19);}
 	
@@ -48432,10 +48447,10 @@ on('clicked:repeating_spellbookrituals:spellcast  clicked:repeating_spellbookrit
    if (skill === "spellcastreroll") {rollDmgPart = ' {{reroll=[1](~@{character_name}|prefix2-_spellcastreroll)}}';
    var accumod = '@{LastRollAccuExtSL}';
    var prefix = eventInfo.triggerName.slice(8, -16);}
-   if (skill === "spellcastdmg") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critical}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
+   if (skill === "spellcastdmg") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critcast}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
    var accumod = '@{prefix2-_spellchannelsl}';
    var prefix = eventInfo.triggerName.slice(8, -13);}
-   if (skill === "spellcastdmgreroll") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critical}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
+   if (skill === "spellcastdmgreroll") {rollDmgPart = ' {{hitlocation=true}} {{spelldamage=[[@{prefix2-_spelldamage}+@{prefix2-_spelldamagewb}]]}} {{RTcrit=@{RT-critcast}}} {{reroll=[1](~@{character_name}|prefix2-_spellcastdmgreroll)}}';
    var accumod = '@{LastRollAccuExtSL}';
    var prefix = eventInfo.triggerName.slice(8, -19);}
 
@@ -49788,16 +49803,19 @@ on('clicked:hypnotismroll', (eventInfo) => {
     });		
     });				
 
-on('clicked:criticalroll', (eventInfo) => {
+on('clicked:criticalroll clicked:criticalrollcast', (eventInfo) => {
 	getAttrs(["initiative_houserule", "CritTable"], function(v) {	
 	
-   if (v.CritTable == 2) {roll = '{{table=[[?{Crit Type|Weapon,0|Unarmed,1|Elemental/Magic,2}]]}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}' ;} else {roll = ' {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}';}
+   if (v.CritTable == 2) {roll = '{{table=[[>table<]]}} {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}' ;} else {roll = ' {{critlocation=[[?{Choose a Hit Location|Random (1d100),[[1d100]]|Head,1|Right Arm,10|Left Arm,30|Body,46|Right Leg,85|Left Leg,96}]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}';}
 	
    roll += ' {{unconscious=[[@{UnconsciousMod}]]}} {{title=Critical Roll}} {{character_name=@{character_name}}} {{attacktype=[[0]]}} {{critroll=[[(1d100)+?{Crit Roll Modifier|0}]]}} {{modvalue=[[?{Crit Roll Modifier|0}]]}} {{critdmgbonus=[[@{Talent_StrikeToInjureLvl} [STRIKE TO INJURE]]]}} {{critname=[[0]]}} {{critdisc=[[0]]}} {{critdmg=[[0]]}} {{critname2=[[0]]}} {{critdisc2=[[0]]}} {{critdmg2=[[0]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
    let rollPart = roll;
+ 
+	if (trigger === "criticalroll") {rollPart = roll.replaceAll('>table<', `(?{Crit Type|Weapon,0|Unarmed,1|Elemental/Magic,2})`);  console.log("Roll");} else if
+	(trigger === "criticalrollcast") {rollPart = roll.replaceAll('>table<', `(?{Crit Type|Elemental/Magic,2|Weapon,0|Unarmed,1})`);  console.log("RollCast");}	
   
    if (v.CritTable == 1) {rollPart += ' {{table=[[0]]}} {{critv2=[[(1d100)+?{Crit Roll Modifier|0}]]}}';}
    if (v.CritTable == 0) {rollPart += ' {{table=[[0]]}}';}
@@ -51824,5 +51842,3 @@ on('clicked:resetQuickPray', function(event){
 });
 		
 </script>
-
-
