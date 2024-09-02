@@ -3097,7 +3097,6 @@ const getScrollSpells = function (scrollName) {
 }
 
 const getScrollCasterClassAndLevel = async function (spLevelMatch, scrollName, scrollSpells) {
-    await keepContextRoll();
     if (spLevelMatch) {
         if (spLevelMatch[1].match(/wizard/i)) {
             return {
@@ -3232,84 +3231,87 @@ on('change:scroll-failure-system', function (eventInfo) {
         return;
     }
 
-    // Validate that the correct fields are filled out before proceeding
-    getAttrs(['level-class2','level-class3','level-class4'], function (values) {
-        let wizardLevel = parseInt(values['level-class2']) || 0;
-        let priestLevel = parseInt(values['level-class3']) || 0;
-        let rogueLevel = parseInt(values['level-class4']) || 0;
+    getSectionIDs('scrolls', function (ids) {
+        let fullFieldNames = ['level-class2','level-class3','level-class4']
+        ids.forEach(id => fullFieldNames.push(`repeating_scrolls_${id}_scroll`,`repeating_scrolls_${id}_scroll-macro`));
+        getAttrs(fullFieldNames, async function (values) {
+            await keepContextRoll();
 
-        if (failureSystem.includes('level') && !wizardLevel && !priestLevel &&
-            (failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
-            return showToast(WARNING, 'Missing Class levels', `You have no Wizard, Priest, or Rogue levels in the fields @{level-class2}, @{level-class3}, or @{level-class4}. Either the Wizard or Priest, and Rogue fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
-        }
+            // Validate that the correct fields are filled out before proceeding
+            let wizardLevel = parseInt(values['level-class2']) || 0;
+            let priestLevel = parseInt(values['level-class3']) || 0;
+            let rogueLevel = parseInt(values['level-class4']) || 0;
 
-        if (failureSystem.includes('level') && !wizardLevel && !priestLevel) {
-            return showToast(WARNING, 'Missing Wizard/Priest level', `You have no Wizard or Priest levels in the fields @{level-class2} or @{level-class3}. Either of these fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
-        }
+            if (failureSystem.includes('level') && !wizardLevel && !priestLevel &&
+                (failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+                return showToast(WARNING, 'Missing Class levels', `You have no Wizard, Priest, or Rogue levels in the fields @{level-class2}, @{level-class3}, or @{level-class4}. Either the Wizard or Priest, and Rogue fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
 
-        if ((failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
-            return showToast(WARNING, 'Missing Rogue level', `You have no Rogue level in the field @{level-class4}. This field must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
-        }
+            if (failureSystem.includes('level') && !wizardLevel && !priestLevel) {
+                return showToast(WARNING, 'Missing Wizard/Priest level', `You have no Wizard or Priest levels in the fields @{level-class2} or @{level-class3}. Either of these fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
 
-        let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
+            if ((failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+                return showToast(WARNING, 'Missing Rogue level', `You have no Rogue level in the field @{level-class4}. This field must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
 
-        // Set new failure chance for each scroll
-        getSectionIDs('scrolls', function (ids) {
-            let fullFieldNames = ids.flatMap(id => [`repeating_scrolls_${id}_scroll`,`repeating_scrolls_${id}_scroll-macro`]);
-            getAttrs(fullFieldNames, async function (values) {
-                let newValues = {};
-                let unhandledScrolls = [];
+            let newValues = {};
+            let unhandledScrolls = [];
+            let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
 
-                for (let id of ids) {
-                    let scrollName = values[`repeating_scrolls_${id}_scroll`];
-                    let scrollMacro = values[`repeating_scrolls_${id}_scroll-macro`];
-
-                    let scrollSpells = getScrollSpells(scrollName);
-                    let spLevelMatch = scrollMacro.match(/\{\{splevel=(.*?)}} *\{\{/);
-
-                    let casterClassAndLevel = await getScrollCasterClassAndLevel(spLevelMatch, scrollName, scrollSpells);
-                    if (!casterClassAndLevel) {
-                        unhandledScrolls.push(scrollName);
-                        continue;
-                    }
-
-                    let {casterClass, casterLevel} = casterClassAndLevel;
-                    let levelRequirement = getScrollSpellLevelRequirement(spLevelMatch, scrollSpells, casterClass);
-                    if (!levelRequirement && failureSystem.includes('spell-level')) {
-                        unhandledScrolls.push(scrollName);
-                        continue;
-                    }
-
-                    let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
-
-                    let spellFailure;
-                    if (rogueSingleClass) {
-                        spellFailure = `${rogueFailure} [${rogueClass}]`;
-                    } else if (casterSingleClass) {
-                        spellFailure = `${casterFailure} [${casterClass}]`;
-                    } else if (failureSystem.includes('best')) {
-                        spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
-                    } else if (failureSystem.includes('select')) {
-                        casterFailure = casterFailure
-                            .replaceAll(/(?<!class\d|level)}/g,'&#125;')
-                            .replaceAll(',', '&#44;');
-                        rogueFailure = rogueFailure
-                            .replaceAll(/(?<!class\d|level)}/g,'&#125;')
-                            .replaceAll(',','&#44;');
-                        spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
-                    }
-
-                    newValues[`repeating_scrolls_${id}_scroll-failure`] = spellFailure;
+            // Set new failure chance for each scroll
+            for (let id of ids) {
+                if (rogueSingleClass) {
+                    newValues[`repeating_scrolls_${id}_scroll-failure`] = `${rogueFailure} [${rogueClass}]`;
+                    continue;
                 }
 
-                if (unhandledScrolls.length > 0) {
-                    let toastObject = getToastObject(WARNING, 'Unhandled Scrolls', `Could not determine spell failure chance for the following scrolls:\n* ${unhandledScrolls.join('\n* ')}`);
-                    Object.assign(newValues, toastObject);
+                let scrollName = values[`repeating_scrolls_${id}_scroll`];
+                let scrollMacro = values[`repeating_scrolls_${id}_scroll-macro`];
+
+                let scrollSpells = getScrollSpells(scrollName);
+                let spLevelMatch = scrollMacro.match(/\{\{splevel=(.*?)}} *\{\{/);
+
+                let casterClassAndLevel = await getScrollCasterClassAndLevel(spLevelMatch, scrollName, scrollSpells);
+                if (!casterClassAndLevel) {
+                    unhandledScrolls.push(scrollName);
+                    continue;
                 }
 
-                setAttrs(newValues);
-            })
-        });
+                let {casterClass, casterLevel} = casterClassAndLevel;
+                let levelRequirement = getScrollSpellLevelRequirement(spLevelMatch, scrollSpells, casterClass);
+                if (!levelRequirement && failureSystem.includes('spell-level')) {
+                    unhandledScrolls.push(scrollName);
+                    continue;
+                }
+
+                let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+
+                let spellFailure;
+                if (casterSingleClass) {
+                    spellFailure = `${casterFailure} [${casterClass}]`;
+                } else if (failureSystem.includes('best')) {
+                    spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
+                } else if (failureSystem.includes('select')) {
+                    casterFailure = casterFailure
+                        .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                        .replaceAll(',', '&#44;');
+                    rogueFailure = rogueFailure
+                        .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                        .replaceAll(',','&#44;');
+                    spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+                }
+
+                newValues[`repeating_scrolls_${id}_scroll-failure`] = spellFailure;
+            }
+
+            if (unhandledScrolls.length > 0) {
+                let toastObject = getToastObject(WARNING, 'Unhandled Scrolls', `Could not determine spell failure chance for the following scrolls. Please update them manually:\n* ${unhandledScrolls.join('\n* ')}`);
+                Object.assign(newValues, toastObject);
+            }
+
+            setAttrs(newValues);
+        })
     });
 });
 
