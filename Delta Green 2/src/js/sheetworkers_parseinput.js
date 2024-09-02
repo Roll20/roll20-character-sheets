@@ -8,7 +8,7 @@ const BondButtonColor= (bondvalue) => {
 };
 
 const changeBondButtonColorOnOpen = () => {
-    getSectionIDs(`repeating_bonds`, (idarray) => {
+    getSectionIDs(`bonds`, (idarray) => {
 		const allbonds=idarray.map(id =>`repeating_bonds_${id}_score`);
         getAttrs(allbonds, (value) => {
             const update={};

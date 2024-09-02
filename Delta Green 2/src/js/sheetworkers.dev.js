@@ -186,7 +186,7 @@ var skill_in_bounds = function skill_in_bounds(skill) {
 var updateadvancedweapons = function updateadvancedweapons() {
   getAttrs(['advanced_weapons'], function (v) {
     var advanced_weapons = v['advanced_weapons'];
-    getSectionIDs('repeating_weapons', function (ids) {
+    getSectionIDs("weapons", function (ids) {
       var update = {};
       var prefix = 'repeating_weapons_';
       ids.forEach(function (id) {

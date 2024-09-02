@@ -126,7 +126,7 @@ const value_current = (current,old,max) => {
 const setBondsLocalVariables = () => {
 	getAttrs(["willpower_points","sanity_points"],function(value){
 		let update={};
-		getSectionIDs("bonds",function(idarray){
+		getSectionIDs(`bonds`,function(idarray){
 			idarray.forEach(id=>{
 				update["repeating_bonds_"+id+"_wp_points"]=value["willpower_points"];
 				update["repeating_bonds_"+id+"_sanity_points"]=value["sanity_points"];
@@ -150,7 +150,7 @@ const skill_in_bounds = (skill) => {
 const updateadvancedweapons = () => {
 	getAttrs(['advanced_weapons'],(v)=>{
 		const advanced_weapons=v['advanced_weapons'];
-		getSectionIDs('repeating_weapons',(ids)=>{
+		getSectionIDs(`weapons`,(ids)=>{
 
 			const update={};
 

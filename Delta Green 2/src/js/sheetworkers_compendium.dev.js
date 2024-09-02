@@ -400,4 +400,4 @@ on("change:drop_data", function (eventInfo) {
   var jsonData = JSON.parse(eventInfo.newValue);
   console.log(jsonData);
   handleDragandDrop(); // do something with data
-}); // handle WP
+});

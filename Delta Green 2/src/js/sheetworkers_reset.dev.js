@@ -99,7 +99,7 @@ var resetStats = function resetStats(update) {
   });
 
   if (reset_bonds) {
-    getSectionIDs('repeating_bonds', function (ids) {
+    getSectionIDs("bonds", function (ids) {
       ids.forEach(function (id) {
         update["repeating_bonds_".concat(id, "_test")] = 'editable';
         update["repeating_bonds_".concat(id, "_score")] = '';
@@ -126,7 +126,7 @@ var resetSkills = function resetSkills(update) {
 };
 
 var resetBonds = function resetBonds(update) {
-  getSectionIDs('repeating_bonds', function (ids) {
+  getSectionIDs("bonds", function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_bonds_' + id);
       console.log('removing repeating_bonds_' + id);
@@ -144,7 +144,7 @@ var resetAdaptations = function resetAdaptations(update) {
 };
 
 var resetAllWeapons = function resetAllWeapons(update) {
-  getSectionIDs('repeating_weapons', function (ids) {
+  getSectionIDs("weapons", function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_weapons_' + id);
       console.log('removing repeating_weapons_' + id);
@@ -153,7 +153,7 @@ var resetAllWeapons = function resetAllWeapons(update) {
 };
 
 var resetAllRituals = function resetAllRituals(update) {
-  getSectionIDs('repeating_rituals', function (ids) {
+  getSectionIDs("rituals", function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_rituals_' + id);
       console.log('removing repeating_rituals_' + id);
@@ -168,7 +168,7 @@ var resetEquipment = function resetEquipment(update) {
 };
 
 var resetAllRepeatingSkills = function resetAllRepeatingSkills(update) {
-  getSectionIDs('repeating_skills', function (ids) {
+  getSectionIDs("skills", function (ids) {
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_skills_' + id);
       console.log('removing repeating_skills_' + id);
@@ -177,7 +177,7 @@ var resetAllRepeatingSkills = function resetAllRepeatingSkills(update) {
 };
 
 var resetAllSpecialAbilities = function resetAllSpecialAbilities(update) {
-  getSectionIDs('repeating_special', function (ids) {
+  getSectionIDs("special", function (ids) {
     console.log('special:' + ids);
     ids.forEach(function (id) {
       removeRepeatingRow('repeating_special_' + id);

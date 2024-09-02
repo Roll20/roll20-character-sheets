@@ -293,7 +293,7 @@ const empty_to_zero=(value) => {
 }
 
 const updateRitualInfoOnOpen = () => {
-    getSectionIDs('repeating_rituals', (ids) => {
+    getSectionIDs(`rituals`, (ids) => {
         ids.forEach((id) => {
             ritual_rolls_info(`repeating_rituals_${id}`);
         });

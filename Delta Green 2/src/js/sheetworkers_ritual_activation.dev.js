@@ -317,7 +317,7 @@ var empty_to_zero = function empty_to_zero(value) {
 };
 
 var updateRitualInfoOnOpen = function updateRitualInfoOnOpen() {
-  getSectionIDs('repeating_rituals', function (ids) {
+  getSectionIDs("rituals", function (ids) {
     ids.forEach(function (id) {
       ritual_rolls_info("repeating_rituals_".concat(id));
     });

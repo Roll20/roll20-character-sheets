@@ -15,7 +15,7 @@ var BondButtonColor = function BondButtonColor(bondvalue) {
 };
 
 var changeBondButtonColorOnOpen = function changeBondButtonColorOnOpen() {
-  getSectionIDs("repeating_bonds", function (idarray) {
+  getSectionIDs("bonds", function (idarray) {
     var allbonds = idarray.map(function (id) {
       return "repeating_bonds_".concat(id, "_score");
     });

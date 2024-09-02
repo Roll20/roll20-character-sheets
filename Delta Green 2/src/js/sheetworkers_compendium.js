@@ -252,6 +252,3 @@ on("change:drop_data", (eventInfo) => {
 	handleDragandDrop();
 	// do something with data
 });
-
-
-   // handle WP

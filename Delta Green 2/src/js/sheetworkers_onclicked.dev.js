@@ -183,7 +183,7 @@ on("clicked:levelup", function () {
   var copyarray = arrays['_skills']; // copy of the array containing all skills ranks
 
   console.dir(copyarray);
-  getSectionIDs("repeating_summary", function (idarray) {
+  getSectionIDs("summary", function (idarray) {
     for (var i = 0; i < idarray.length; i++) {
       removeRepeatingRow("repeating_summary_" + idarray[i]);
     }
@@ -228,7 +228,7 @@ on("clicked:levelup", function () {
       }
     });
   });
-  getSectionIDs("repeating_skills", function (idarray) {
+  getSectionIDs("skills", function (idarray) {
     var rep_array = [];
     var rep_rank = [];
     var rep_name = [];
