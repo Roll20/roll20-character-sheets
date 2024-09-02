@@ -3083,11 +3083,156 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
 });
 
 //#region Scroll
+const getScrollSpells = function (scrollName) {
+    if (!scrollName)
+        return null;
+
+    let spellName = scrollName.replace(/ scroll$/, '');
+    let wizardSpell = wizardSpells['wizmonster'][spellName];
+    let priestSpell = priestSpells['primonster'][spellName];
+    if (!wizardSpell && !priestSpell)
+        return null;
+
+    return {wizardSpell, priestSpell}
+}
+
+const getScrollCasterClassAndLevel = async function (spLevelMatch, scrollName, scrollSpells) {
+    await keepContextRoll();
+    if (spLevelMatch) {
+        if (spLevelMatch[1].match(/wizard/i)) {
+            return {
+                casterClass: 'Wizard',
+                casterLevel: '@{level-class2}',
+            }
+        }
+        if (spLevelMatch[1].match(/priest/i)) {
+            return {
+                casterClass: 'Priest',
+                casterLevel: '@{level-class3}',
+            }
+        }
+    }
+
+    if (!scrollSpells) {
+        return null
+    }
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        let casterClass = await extractQueryResult(`?{Is '${scrollName}' a Wizard or Priest scroll?|Wizard|Priest}`);
+        return {
+            casterClass: casterClass,
+            casterLevel: casterClass === 'Wizard' ? '@{level-class2}' : '@{level-class3}',
+        }
+    }
+    if (wizardSpell) {
+        return {
+            casterClass: 'Wizard',
+            casterLevel: '@{level-class2}',
+        }
+    }
+    if (priestSpell) {
+        return {
+            casterClass: 'Priest',
+            casterLevel: '@{level-class3}',
+        }
+    }
+
+    return null
+}
+
+const getScrollSpellLevelRequirement = function (spLevelMatch, scrollSpells, casterClass) {
+    if (spLevelMatch) {
+        let spellLevelMatch = spLevelMatch[1].match(/\d+/);
+        if (spellLevelMatch) {
+            let spellLevel = spellLevelMatch[0];
+            if (spellLevel.match(/^[1-7]$/)) { // Handle spells in the normal range for both classes
+                return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+            }
+            if (spellLevel.match(/^[8-9]$/) && casterClass === 'Wizard') { // Handle high level wizard spells
+                return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+            }
+        }
+
+        if (spLevelMatch[1].match(/quest/i) && casterClass === 'Priest') { // Handle quest spells
+            return SPELL_LEVEL_REQUIREMENT[casterClass]['q'];
+        }
+    }
+
+    if (!scrollSpells) {
+        return null
+    }
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        let spellLevel = casterClass === 'Wizard' ? wizardSpell.level : priestSpell.level;
+        return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+    }
+    if (wizardSpell) {
+        return SPELL_LEVEL_REQUIREMENT[casterClass][wizardSpell.level];
+    }
+    if (priestSpell) {
+        return SPELL_LEVEL_REQUIREMENT[casterClass][priestSpell.level]
+    }
+
+    return null
+}
+
+const getCasterFailureInfo = function (failureSystem, levelRequirement, casterLevel) {
+    let casterFailure = '';
+    let casterSingleClass = false;
+    if (failureSystem.includes('spell-level')) {
+        casterFailure = `{(${levelRequirement}-(${casterLevel}))*5,0}kh1`;
+        casterSingleClass = failureSystem === 'spell-level';
+    } else if (failureSystem.includes('casting-level')) {
+        casterFailure = `{((@{scroll-level})-(${casterLevel}))*5,0}kh1`;
+        casterSingleClass = failureSystem === 'casting-level';
+    }
+    return {casterFailure, casterSingleClass};
+}
+
+
+const getScrollRogueFailureInfo = function (failureSystem) {
+    let rogueClass;
+    let rogueFailure = '';
+    let rogueSingleClass = false;
+
+    if (failureSystem.includes('thief')) {
+        rogueClass = 'Thief';
+        rogueFailure = `100-({0,@{level-class4}}>10*75)`;
+        rogueSingleClass = failureSystem === 'thief';
+    } else if (failureSystem.includes('bard')) {
+        rogueClass = 'Bard';
+        rogueFailure = `100-({0,@{level-class4}}>10*85)`;
+        rogueSingleClass = failureSystem === 'bard';
+    }
+    return {
+        rogueClass: rogueClass,
+        rogueFailure: rogueFailure,
+        rogueSingleClass: rogueSingleClass,
+    };
+}
+
+
 on('change:scroll-failure-system', function (eventInfo) {
     let failureSystem = eventInfo.newValue;
     if (!failureSystem)
         return;
 
+    // Handle the static values without any validation
+    if (failureSystem === 'custom') {
+        return;
+    } else if (failureSystem === 'disabled') {
+        TAS.repeating('scrolls')
+            .field('scroll-failure')
+            .each(function (row) {
+                row['scroll-failure'] =  '0';
+            })
+            .execute();
+        return;
+    }
+
+    // Validate that the correct fields are filled out before proceeding
     getAttrs(['level-class2','level-class3','level-class4'], function (values) {
         let wizardLevel = parseInt(values['level-class2']) || 0;
         let priestLevel = parseInt(values['level-class3']) || 0;
@@ -3105,26 +3250,84 @@ on('change:scroll-failure-system', function (eventInfo) {
         if ((failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
             return showToast(WARNING, 'Missing Rogue level', `You have no Rogue level in the field @{level-class4}. This field must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
         }
+
+        let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
+
+        // Set new failure chance for each scroll
+        getSectionIDs('scrolls', function (ids) {
+            let fullFieldNames = ids.flatMap(id => [`repeating_scrolls_${id}_scroll`,`repeating_scrolls_${id}_scroll-macro`]);
+            getAttrs(fullFieldNames, async function (values) {
+                let newValues = {};
+                let unhandledScrolls = [];
+
+                for (let id of ids) {
+                    let scrollName = values[`repeating_scrolls_${id}_scroll`];
+                    let scrollMacro = values[`repeating_scrolls_${id}_scroll-macro`];
+
+                    let scrollSpells = getScrollSpells(scrollName);
+                    let spLevelMatch = scrollMacro.match(/\{\{splevel=(.*?)}} *\{\{/);
+
+                    let casterClassAndLevel = await getScrollCasterClassAndLevel(spLevelMatch, scrollName, scrollSpells);
+                    if (!casterClassAndLevel) {
+                        unhandledScrolls.push(scrollName);
+                        continue;
+                    }
+
+                    let {casterClass, casterLevel} = casterClassAndLevel;
+                    let levelRequirement = getScrollSpellLevelRequirement(spLevelMatch, scrollSpells, casterClass);
+                    if (!levelRequirement && failureSystem.includes('spell-level')) {
+                        unhandledScrolls.push(scrollName);
+                        continue;
+                    }
+
+                    let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+
+                    let spellFailure;
+                    if (rogueSingleClass) {
+                        spellFailure = `${rogueFailure} [${rogueClass}]`;
+                    } else if (casterSingleClass) {
+                        spellFailure = `${casterFailure} [${casterClass}]`;
+                    } else if (failureSystem.includes('best')) {
+                        spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
+                    } else if (failureSystem.includes('select')) {
+                        casterFailure = casterFailure
+                            .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                            .replaceAll(',', '&#44;');
+                        rogueFailure = rogueFailure
+                            .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                            .replaceAll(',','&#44;');
+                        spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+                    }
+
+                    newValues[`repeating_scrolls_${id}_scroll-failure`] = spellFailure;
+                }
+
+                if (unhandledScrolls.length > 0) {
+                    let toastObject = getToastObject(WARNING, 'Unhandled Scrolls', `Could not determine spell failure chance for the following scrolls:\n* ${unhandledScrolls.join('\n* ')}`);
+                    Object.assign(newValues, toastObject);
+                }
+
+                setAttrs(newValues);
+            })
+        });
     });
 });
 
 on('change:repeating_scrolls:scroll', async function (eventInfo) {
     let scrollName = eventInfo.newValue;
-    if (!scrollName)
+    let scrollSpells = getScrollSpells(scrollName);
+    if (!scrollSpells)
         return;
-
-    let spellName = scrollName.replace(/ scroll$/, '');
-    let wizardSpell = wizardSpells['wizmonster'][spellName];
-    let priestSpell = priestSpells['primonster'][spellName];
-    if (!wizardSpell && !priestSpell)
-        return
 
     let spell;
     let casterClass;
     let casterLevel;
+
+    let {wizardSpell, priestSpell} = scrollSpells;
     if (wizardSpell && priestSpell) {
-        casterClass = await extractQueryResult(`?{Is ${scrollName} a Wizard or Priest scroll?|Wizard|Priest}`);
+        casterClass = await extractQueryResult(`?{Is '${scrollName}' a Wizard or Priest scroll?|Wizard|Priest}`);
         spell = casterClass === 'Wizard' ? wizardSpell : priestSpell;
+        casterLevel = casterClass === 'Wizard' ? '@{level-class2}' : '@{level-class3}';
     } else if (wizardSpell) {
         casterClass = 'Wizard';
         spell = wizardSpell;
@@ -3186,28 +3389,18 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
 
         let failureSystem = values['scroll-failure-system'];
 
-        let casterFailure = '';
-        if (failureSystem.includes('spell-level')) {
-            casterFailure = `{(${levelRequirement}-(${casterLevel}))*5,0}kh1`;
-        } else if (failureSystem.includes('casting-level')) {
-            casterFailure = `{((@{scroll-level})-(${casterLevel}))*5,0}kh1`;
-        }
-
-        let rogueClass;
-        let rogueFailure = '';
-        if (failureSystem.includes('thief')) {
-            rogueClass = 'Thief';
-            rogueFailure = `100-({0,@{level-class4}}>10*75)`;
-        } else if (failureSystem.includes('bard')) {
-            rogueClass = 'Bard';
-            rogueFailure = `100-({0,@{level-class4}}>10*85)`;
-        }
+        let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+        let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
 
         let spellFailure;
         if (failureSystem === '' || failureSystem === 'disabled') {
-            spellFailure = 0;
+            spellFailure = '0';
         } else if (failureSystem === 'custom') {
             spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${scrollName}?|0}`);
+        } else if (rogueSingleClass) {
+            spellFailure = `${rogueFailure} [${rogueClass}]`;
+        } else if (casterSingleClass) {
+            spellFailure = `${casterFailure} [${casterClass}]`;
         } else if (failureSystem.includes('best')) {
             spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
         } else if (failureSystem.includes('select')) {
@@ -3218,10 +3411,6 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
                 .replaceAll(/(?<!class\d|level)}/g,'&#125;')
                 .replaceAll(',','&#44;');
             spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
-        } else if (rogueClass) {
-            spellFailure = `${rogueFailure} [${rogueClass}]`;
-        } else {
-            spellFailure = `${casterFailure} [${casterClass}]`;
         }
 
         let scrollInfo = {
