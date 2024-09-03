@@ -38,6 +38,12 @@
         {{roll6}}
         {{roll7}}
         {{roll8}}
+        {{#rollLess() modifier 0}}
+          <span class="sheet-template-action-modifier-bad">{{modifier}}</span>
+        {{/rollLess() modifier 0}}
+        {{#rollGreater() modifier 0}}
+          <span class="sheet-template-action-modifier-good">{{modifier}}</span>
+        {{/rollGreater() modifier 0}}
       </span>
       <span class="sheet-template-result">{{computed::result}}</span>
     </div>
@@ -62,7 +68,7 @@
       const rating = parseInt(ratingString)
       if (rating === 0) return
 
-      let rollQuery = `&{template:action} {{name=${skillName} ${rating}}} {{result=[[0+(?{Modifier|0})]]}}`
+      let rollQuery = `&{template:action} {{name=${skillName} ${rating}}} {{modifier=[[0+(?{Modifier|0})]]}} {{result=[[0]]}}`
       const numDice = Math.abs(rating)
       for (let i = 1; i <= numDice; i++) {
         rollQuery += ` {{roll${i}=[[1d6]]}}`
@@ -74,8 +80,8 @@
           .map(([, { result }]) => result)
 
         const result = rating > 0
-          ? rollResults.reduce((total, x) => total + x, 0) + results.result.result
-          : rollResults.reduce((low, x) => low === null || x < low ? x : low, null) + results.result.result
+          ? rollResults.reduce((total, x) => total + x, 0) + results.modifier.result
+          : rollResults.reduce((low, x) => low === null || x < low ? x : low, null) + results.modifier.result
 
         finishRoll(rollId, { result })
       })
