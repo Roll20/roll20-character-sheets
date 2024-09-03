@@ -57902,7 +57902,7 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
     yield processMetaData(sheetName, sheetJsonObj);
     // Lets go ahead and hand the user options as we have that data already
     const jsonObj = !sheetJsonObj.useroptions ? {} : sheetJsonObj.useroptions;
-    //  await processUserOptions(sheetName, jsonObj);
+    yield processUserOptions(sheetName, jsonObj);
     let fnames = yield getFileNamesObj(sheetName);
     // So translations are fun. We have some situations.
     // Rather than cram it in the loop below here we'll just run processTranslatins

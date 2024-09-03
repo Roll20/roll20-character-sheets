@@ -4,6 +4,10 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.7
+### Fixed
+- Deleting a weapon will now actually remove the row instead of just clearing the data
+
 ## 3.6
 ### Fixed
 - Combat Styles did not default to applying Encumbrance penalties

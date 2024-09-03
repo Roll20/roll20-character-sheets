@@ -1,3 +1,23 @@
+const tablist = ["anatomy", "kit", "magic", "relationships", "levels", "options"];
+tablist.forEach(button => {
+  on(`clicked:${button}`, function () {
+    setAttrs({
+      tab: button
+    });
+  });
+});
+
+const modeList = ["editing", "playing"];
+modeList.forEach(button => {
+  on(`clicked:${button}`, function () {
+    setAttrs({
+      edit: button
+    });
+  });
+});
+
+// Old code
+// --------
 
 on("sheet:opened", function (eventinfo) {
   initialize();
