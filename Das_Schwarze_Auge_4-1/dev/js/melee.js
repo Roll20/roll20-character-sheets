@@ -1142,9 +1142,9 @@ on(
 
 		// Add contents to the results data structure
 		for (macro of elements) {
-			if (macro.hasOwnProperty("prefix")) {
+			if (Object.hasOwn(macro, "prefix")) {
 				transformed["common"]["prefix"] += macro["prefix"] + " ";
-			} else if (macro.hasOwnProperty("suffix")) {
+			} else if (Object.hasOwn(macro, "suffix")) {
 				transformed["common"]["suffix"] += macro["suffix"] + " ";
 			} else {
 				transformed["string"]["main"] += '{{' + macro["name"] + '=' + macro["value"] + '}} ';
@@ -1155,9 +1155,9 @@ on(
 
 		// "prefix" and "suffix" are reserved for this internal use case, so check against accidentally using them
 		if (
-			transformed["object"]["main"].hasOwnProperty("prefix") === true
+			Object.hasOwn(transformed["object"]["main"], "prefix") === true
 			||
-			transformed["object"]["main"].hasOwnProperty("suffix") === true
+			Object.hasOwn(transformed["object"]["main"], "suffix") === true
 		) {
 			debugLog(func, "Warning: 'prefix' and/or 'suffix' are used as actual roll variables and will be overwritten.");
 		}
@@ -1187,7 +1187,7 @@ on(
 			// Build String
 			// Prefixes
 			{
-			var template = data.hasOwnProperty('template') ? data["template"] : 'test';
+			var template = Object.hasOwn(data, 'template') ? data["template"] : 'test';
 			defaultElements.push(
 				{ 'prefix':
 					'@{gm_roll_opt} ' +
