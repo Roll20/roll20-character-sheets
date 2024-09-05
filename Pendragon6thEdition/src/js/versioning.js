@@ -133,8 +133,6 @@ const versionThreeTwo = () => {
       update["armor_points"] = v["armor"];
     }
 
-    console.log(update);
-
     setAttrs(update);
   });
 };
