@@ -4360,6 +4360,7 @@
 				<!-- current version notes: 2.24.0 -->
 				<ul>
 					<li><b>BUGFIX:</b> A couple of translation updates and fixing a page reference for Aim. Suggested by Spriteanon and Uncle Mojo.</li>
+					<li><b>BUGFIX:</b> When adding a brand new spell, not all of the modifiers were correctly added. This has now been fixed.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -17010,7 +17011,7 @@ Select the indent level of the inventory item. This is handy to help show the it
 						<div class="cell col4">
 							<!-- TODO: its possible that a character could have different types, maybe add drop-down for spell bonus -->
 							<input type="hidden" name="attr_bonus" value="0" title="Synced with attr_spell_bonus, reduces code" />
-							<input type="hidden" name="attr_custom_modifier" value="0" title="Synced with attr_custom_modifier, reduces code" />
+							<input type="hidden" name="attr_custom_modifier" value="0" title="Synced with attr_spell_custom_modifier, reduces code" />
 							<input type="hidden" name="attr_on_penalty" value="0" title="Synced with attr_on_penalty, reduces code" />
 							<input type="hidden" name="attr_maintained_penalty" value="0" title="Synced with attr_maintained_penalty, reduces code" />
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro: @{NAME|repeating_spells_$[row #]_spell_modifier}" />
@@ -23428,6 +23429,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 			<!-- current version notes: 2.24.0 -->
 			<ul>
 				<li><b>BUGFIX:</b> A couple of translation updates and fixing a page reference for Aim. Suggested by Spriteanon and Uncle Mojo.</li>
+				<li><b>BUGFIX:</b> When adding a brand new spell, not all of the modifiers were correctly added. This has now been fixed.</li>
 			</ul>
 
 			<h4>Version: 2.23.0</h4>
@@ -29074,7 +29076,7 @@ B378
 	
 	const version = "2.24.0";
 	
-	const latestChangesDate = "9/1/2024";
+	const latestChangesDate = "9/10/2024";
 	
 	let modCascade = true;
 	
@@ -31404,14 +31406,19 @@ B378
 	// using "name" to check for a new row and the base="new"
 	on("change:repeating_spells:name", event => {
 	
-		getAttrs(["repeating_spells_name", "repeating_spells_base", "spell_base", "spell_bonus"], values => {
+		getAttrs(["repeating_spells_name", "repeating_spells_base", "spell_base", "spell_bonus", "spell_on_penalty_total", "spell_maintained_penalty_total", "spell_custom_modifier"], values => {
 	
 			if (values.repeating_spells_base === "new") {
+
+				console.log("values", values);
 	
 				// if new, set the repeating base and bonus to the global spell_base drop-down and bonus
 				setAttrs({
 					repeating_spells_base: values.spell_base,
-					repeating_spells_bonus: values.spell_bonus
+					repeating_spells_bonus: values.spell_bonus,
+					repeating_spells_custom_modifier: values.spell_custom_modifier,
+					repeating_spells_on_penalty: values.spell_on_penalty_total,
+					repeating_spells_maintained_penalty: values.spell_maintained_penalty_total
 				});
 	
 			}
