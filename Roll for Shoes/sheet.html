@@ -25,6 +25,31 @@
   </section>
 </div>
 
+<rolltemplate class="sheet-rolltemplate-action">
+  <div class="sheet-template-container">
+    <div class="sheet-template-header">{{name}}</div>
+    <div class="sheet-template-results">
+      <span class="sheet-template-rolls">
+        {{roll1}}
+        {{roll2}}
+        {{roll3}}
+        {{roll4}}
+        {{roll5}}
+        {{roll6}}
+        {{roll7}}
+        {{roll8}}
+        {{#rollLess() modifier 0}}
+          <span class="sheet-template-action-modifier-bad">{{modifier}}</span>
+        {{/rollLess() modifier 0}}
+        {{#rollGreater() modifier 0}}
+          <span class="sheet-template-action-modifier-good">{{modifier}}</span>
+        {{/rollGreater() modifier 0}}
+      </span>
+      <span class="sheet-template-result">{{computed::result}}</span>
+    </div>
+  </div>
+</rolltemplate>
+
 <script type="text/worker">
   function useAttr(key, cb) {
     useAttrs([key], (attrs) => {
@@ -43,12 +68,22 @@
       const rating = parseInt(ratingString)
       if (rating === 0) return
 
-      const rollQuery = rating > 0
-        ? `${rating}d6`
-        : `${Math.abs(rating)}d6kl1`
+      let rollQuery = `&{template:action} {{name=${skillName} ${rating}}} {{modifier=[[0+(?{Modifier|0})]]}} {{result=[[0]]}}`
+      const numDice = Math.abs(rating)
+      for (let i = 1; i <= numDice; i++) {
+        rollQuery += ` {{roll${i}=[[1d6]]}}`
+      }
 
-      startRoll(`&{template:default} {{name=${skillName} ${rating}}} {{result=[[${rollQuery}+?{Modifier}]]}}`, ({ rollId }) => {
-        finishRoll(rollId)
+      startRoll(rollQuery, ({ results, rollId }) => {
+        const rollResults = Object.entries(results)
+          .filter(([key]) => key.startsWith('roll'))
+          .map(([, { result }]) => result)
+
+        const result = rating > 0
+          ? rollResults.reduce((total, x) => total + x, 0) + results.modifier.result
+          : rollResults.reduce((low, x) => low === null || x < low ? x : low, null) + results.modifier.result
+
+        finishRoll(rollId, { result })
       })
     })
   })
@@ -65,7 +100,3 @@
     })
   })
 </script>
-
-
-
-

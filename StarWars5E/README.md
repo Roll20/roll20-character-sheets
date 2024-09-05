@@ -8,9 +8,6 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
-## 2024-07-06
-* Changed the npc Layout
-* Added the possibility to switch "edit/view" of npc traits
 ## 2022-03-19
 * Bug Fix - It was identified that because the default to-hit modifier had been changed from DEX to WIS on the Ship Sheet, sheets upgrading from 2.4 were over-riding any PC weapons to WIS that had not been EXPLICITLY set to DEX, because the weapon attacks on PC and Ship share the same repeating fieldset.  This is a documented Roll20 *feature*.  We have set the default back to DEX on the Ship Weapons for now as a fix for anyone else that still needs to upgrade.  In addition, the defaults between the SHIP and PC defaults have been aligned.  In version 2.4 the PC sheet set the defaults to STR, the SHIP to DEX and we have confirmed that once a name was placed in the 2.4 attack section the defaults would change to DEX.  This should now keep both attack sections in line and avoid a potential future upgrade where one set of defaults writes back over the other. *Ideally in the future the ship weapons will be separated into their own repeating fieldset.*
 * Copied the Save modifiers from the PC sheet to the Ship sheet 

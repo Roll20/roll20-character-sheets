@@ -216,7 +216,7 @@ function calculateWeaponBEModifiers(combatTechnique, BE) {
 	combatTechnique = String(combatTechnique);
 
 	// This should never happen, but in case the code gets edited in the wrong place ...
-	if ( !combatTechniques.hasOwnProperty(combatTechnique) ) {
+	if ( !Object.hasOwn(combatTechniques, combatTechnique) ) {
 		debugLog(caller, "Warnung: Kampftechnik \"" + combatTechnique + "\" unbekannt. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
 		return BEModifiers;
 	}

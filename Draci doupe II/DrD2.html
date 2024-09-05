@@ -128,7 +128,7 @@
             <div class="drd-pc-stats">
                 <div class="drd-stat-numbers">
                     <span class="drd-label">Tělo:</span>
-                    <input type="number" name="attr_body_current" min="0" value="5" title="@{body_current}"/>
+                    <input type="number" name="attr_body_current" value="5" title="@{body_current}"/>
                     <input type="hidden" tabindex="-1" name="attr_body_current_max" value="5" readonly/>
                     <span class="drd-label">Jizev:</span>
                     <input type="number" name="attr_body_scarred" min="0" value="0" title="@{body_scarred}"/>
@@ -157,7 +157,7 @@
                 </div>
                 <div class="drd-stat-numbers">
                     <span class="drd-label">Duše:</span>
-                    <input type="number" name="attr_spirit_current" min="0" value="5" title="@{spirit_current}"/>
+                    <input type="number" name="attr_spirit_current" value="5" title="@{spirit_current}"/>
                     <input type="hidden" tabindex="-1" name="attr_spirit_current_max" value="5" readonly/>
                     <span class="drd-label">Jizev:</span>
                     <input type="number" name="attr_spirit_scarred" min="0" value="0" title="@{spirit_scarred}"/>
@@ -186,7 +186,7 @@
                 </div>
                 <div class="drd-stat-numbers">
                     <span class="drd-label">Vliv:</span>
-                    <input type="number" name="attr_influence_current" min="0" value="5" title="@{influence_current}"/>
+                    <input type="number" name="attr_influence_current" value="5" title="@{influence_current}"/>
                     <input type="hidden" tabindex="-1" name="attr_influence_current_max" value="5" readonly>
                     <span class="drd-label">Jizev:</span>
                     <input type="number" name="attr_influence_scarred" min="0" value="0" title="@{influence_scarred}"/>
@@ -2475,7 +2475,7 @@
             <div class="drd-npc-stats">
                 <div class="drd-stat-numbers">
                     <span class="drd-label">Tělo:</span>
-                    <input type="number" name="attr_body_current" min="0" value="5" title="@{body_current}" readonly tabindex="-1"/>
+                    <input type="number" name="attr_body_current" value="5" title="@{body_current}" readonly tabindex="-1"/>
                     <input type="hidden" tabindex="-1" name="attr_body_current_max" value="5" readonly/>
                     <span class="drd-label">Jizev:</span>
                     <input type="number" name="attr_body_scarred" min="0" value="0" title="@{body_scarred}"/>
@@ -2504,7 +2504,7 @@
                 </div>
                 <div class="drd-stat-numbers">
                     <span class="drd-label">Duše:</span>
-                    <input type="number" name="attr_spirit_current" min="0" value="5" title="@{spirit_current}" readonly tabindex="-1"/>
+                    <input type="number" name="attr_spirit_current" value="5" title="@{spirit_current}" readonly tabindex="-1"/>
                     <input type="hidden" tabindex="-1" name="attr_spirit_current_max" value="5" readonly/>
                     <span class="drd-label">Jizev:</span>
                     <input type="number" name="attr_spirit_scarred" min="0" value="0" title="@{spirit_scarred}"/>
@@ -2533,7 +2533,7 @@
                 </div>
                 <div class="drd-stat-numbers">
                     <span class="drd-label">Vliv:</span>
-                    <input type="number" name="attr_influence_current" min="0" value="5" title="@{influence_current}" readonly tabindex="-1"/>
+                    <input type="number" name="attr_influence_current" value="5" title="@{influence_current}" readonly tabindex="-1"/>
                     <input type="hidden" tabindex="-1" name="attr_influence_current_max" value="5" readonly/>
                     <span class="drd-label">Jizev:</span>
                     <input type="number" name="attr_influence_scarred" min="0" value="0" title="@{influence_scarred}"/>
@@ -2908,9 +2908,8 @@
         }, {silent: true});
     });
 
-    on('change:amulets_option', function(eventInfo){
-        let newVal = eventInfo.newValue;
-        switch(newVal) {
+    function displayAmulets (option) {
+        switch(option) {
             case 'single':
                 $20('.drd-inv-amulets').addClass('drd-hidden');
                 $20('.drd-inv-amulet').removeClass('drd-hidden');
@@ -2926,6 +2925,10 @@
             default:
                 break;
         }
+    }
+    on('change:amulets_option', function(eventInfo){
+        let newVal = eventInfo.newValue;
+        displayAmulets(newVal)
     });
 
     /*
@@ -2947,7 +2950,7 @@
             initializeAttrs(Object.getOwnPropertyNames(v), Object.values(v));
         });
         
-        getAttrs(['professions_total', 'character_level', 'tenacity_current', 'tenacity_current_max', 'amulets_total', 'npc_owner', 'group_size', 'npc_characteristic'], function(v) {
+        getAttrs(['professions_total', 'character_level', 'tenacity_current', 'tenacity_current_max', 'amulets_total', 'npc_owner', 'group_size', 'npc_characteristic', 'body_scarred', 'spirit_scarred', 'influence_scarred', 'danger', 'advantages'], function(v) {
             //workerLog(`Initializing\n[${Object.getOwnPropertyNames(v)}] = [${Object.values(v)}]`);
             setAttrs({
                 professions_total: parseInt(v.professions_total)||0,
@@ -2957,7 +2960,12 @@
                 amulets_total: parseInt(v.amulets_total)||0,
                 npc_owner: String(v.npc_owner),
                 group_size: String(v.group_size),
-                npc_characteristic: parseInt(v.npc_characteristic)||0
+                npc_characteristic: parseInt(v.npc_characteristic)||0,
+                body_scarred: parseInt(v.body_scarred)||0,
+                spirit_scarred: parseInt(v.spirit_scarred)||0,
+                influence_scarred: parseInt(v.influence_scarred)||0,
+                danger: parseInt(v.danger)||0,
+                advantages: parseInt(v.advantages)||0
             }, {silent: true});
         });
 
@@ -2984,17 +2992,7 @@
             if(v.categories_sorted === '1') {$20(`button[name="act_azSort"]`).addClass('drd-toggled'); sortCategories();}
         });
         getAttrs(['amulets_option'], function(v) {
-            if(v.amulets_option == 'single') {
-                $20('.drd-inv-amulets').addClass('drd-hidden');
-                $20('.drd-inv-amulet').removeClass('drd-hidden');
-                $20('input[name="attr_amulets_total"]').addClass('drd-hidden');
-                $20('input[name="attr_amulet_charge"]').removeClass('drd-hidden');
-            } else if (v.amulets_option == 'multiple') {
-                $20('.drd-inv-amulets').removeClass('drd-hidden');
-                $20('.drd-inv-amulet').addClass('drd-hidden');
-                $20('input[name="attr_amulets_total"]').removeClass('drd-hidden');
-                $20('.drd-pc-danger-amulet-adv input[name="attr_amulet_charge"]').addClass('drd-hidden');
-            }
+            displayAmulets(v.amulets_option);
         });
     });
 

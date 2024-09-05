@@ -266,6 +266,36 @@ function countStats (statsArray) {
 }
 
 /*
+	Extracts two-letter stats from an array of strings returning an array with the two-letter stats only
+	Beware: input.length is not necessarily output.length!
+*/
+function extractStats (statsArray) {
+	var caller = "extractStats";
+	const statPattern = /(?:MU|IN|KL|CH|GE|FF|KO|KK)/;
+
+	var results = [];
+
+	if (Array.isArray(statsArray) === false)
+	{
+		debugLog(caller, "statsArray not an array.");
+	}
+	if (statsArray.length === 0)
+	{
+		debugLog(caller, "Array is empty.");
+	}
+
+	for (entry of statsArray)
+	{
+		let result = entry.match(statPattern);
+		if (result)
+		{
+			results.push(result[0]);
+		}
+	}
+	return results;
+}
+
+/*
 	x.5 values are always rounded up in this system, so let's have a function for this.
 */
 function DSAround (num) {

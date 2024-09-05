@@ -1,5 +1,5 @@
 - const templateHeader = name => `&{template:rolls} {{header=^{${name}}}}`
-- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Roll Modifier|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Threshold Modifier|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Roll Modifier|0}),0}kl1)]]}}`
+- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Modifier|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Modifier|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Modifier|0}),0}kl1)]]}}`
 - const damageFormula = attrName => `{{damage=[[(@{${attrName}}+(?{Damage Modifier|0}))]]}}`;
 - const buttonName = name => name.replace(/ /g, '-');
 - const attrName = name => name.replace(/ /g, '_');
@@ -50,16 +50,13 @@ mixin rollButton(name)
 mixin squireButton(name)
   button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader("squire")}  ^{skill}}} ${rollFormula(attrName(`${name}`))}`) t
 
-mixin damageButton(name, i18n)
-  - i18n = i18n ? i18n : name
-  button.capitalize(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${damageFormula(attrName(name))}`)
-
 mixin brawlDamageRollButton(name, i18n)
   - i18n = i18n ? i18n : name
   button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(i18n)} ${rollFormula("brawling")} {{damage=[[(@{${attrName(name)}}+(?{Modifier|0}))]]}}`) t
 
-mixin criticalDamageButton
-  button.d20.capitalize(name=`roll_critical_damage` type='roll' value!=`${templateHeader('critical damage')} {{damage=[[(@{critical_damage})]]}}`) t
+mixin damageButtonD20(name, i18n)
+ - i18n = i18n ? i18n : name
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(i18n)} ${damageFormula(attrName(name))}`) t
 
 mixin repeatingRollButton(name)
   button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula(attrName(name))}`) t
@@ -111,11 +108,12 @@ mixin repeatingFlags(name)
 
 mixin notesTextarea(name)
   -const attr = attrName(name)
-    +repeatingFlags(name)
-    span.display(name=`attr_${attr}`)
-    +textArea(name)
+  +repeatingFlags(name)
+  span.display(name=`attr_${attr}`)
+  +textArea(name)
 
 mixin hoverSpan(name)
   -const attr = attrName(name)
   span.display(name=`attr_${attr}`)
   +numberInput(attr)
+

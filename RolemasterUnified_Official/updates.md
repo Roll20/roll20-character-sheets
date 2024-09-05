@@ -1,3 +1,175 @@
+# 2024-9-3
+
+- Bump sheet to version 3
+  - Version 3 has only 'Realm Stat' for SCRs, removes 'Realm Stat Bonus'
+- Clear high level spell names on updates.
+- Move defenses near RRs on the main page.
+- Spell display:
+  - Don't add Realm Stat to casting bonuses twice.
+  - Always put things [ ] (even hand bonusues) in description
+  - Display 'no voice' corrently (not undefined)
+- Attacks:
+  - Fix escaping for ')' on targets
+  - Fix for target size bug (typo I guess)
+  - Encode location in the damage string.
+- Actions
+  - Persist free action, and clear after 4 phases.
+  - Show the correct phase (relative, not the total)
+  - Add 'new combat' button
+- Status
+  - Display staggered/stun status
+  - Apply stun penalties to spells & attacks
+- Injuries
+  - Display knockback, grapple and other injury types
+  - Keep record of penalty based injuries
+  - Display injuries on Scratch page
+  - Add basic recovery rolls
+  - Set the location in the injury
+  - Can delete injuries
+- Bug fixes:
+  - Misc Remove Attr function now actually does something
+  - Fix minor (but amazinlgy irritating) bug in the AP description
+
+# 2024-8-29
+
+Bonus midweek update
+- Split injury handling out
+- Handle breakage penalties in criticals correctly
+- Improve layout of rolltemplates; only show Apply when it's useful
+- Condition tracking:
+  - Track current phase
+  - Handle bleeds
+- AP Tracking for attacks: Melee & Spells
+- Add special page to apply injuries
+
+# 2024-8-27
+
+- Add movement for creatures
+- Set default values for hp, pp and injuries and the like.
+- Sort skill and table names in attack add
+- Add option for no attack skill
+- Spells show +/-
+- Initiative is an action; not a roll.  No d20 logo.
+- Attacks
+  - include manuever penalty
+  - add AP tracking (melee only)
+  - Expand modifiers clearly
+- Spells now include manuever penalty
+- Bugs
+  - Fix missing attack modifiers
+  - Handle applying damage to creatures with ')' in their name 
+- Add internal sheet versions.  Unfortuantely
+- Display sheet version on last page
+- Automatically upgrade sheet 1 -> 2
+  - Sheet 2 is skill costs on sheet (Character support)
+
+# 2024-8-20
+
+- Characters now save their skill costs on creation
+  - Enables use of custom professions
+  - Helps with Roll20 Characters (create characters outside of game)
+- Support: Add "charactermancer" button to the settings page.
+  - Will break your character.  You hae been warned
+  - Allows migration to new skill costs
+- Bugfix: Highest stat gets confused if the first is highest, and the second is not the
+   secondhighest.  Add tests for these cases.
+
+# 2024-8-15
+
+- Show BMR info on front page
+- Make BMR info more legible
+- Don't add racial bonnus to BMR twice.
+- Eyes/Skin/Hair now save
+- Improve layout of the derived properties on the front page.
+- Integrate EP into layout.
+- Updates to way sheets open to make creatures easier to deal with.
+- Force all sheets to be playersheets unless they are creatures
+- Spell Lists -> click on the i to see the list in the compendium
+- Foe box looks a little pretier.
+- Endurance:
+  - Create correctly if zero
+- Misc:
+  - Handle 'Null' data
+- Creatures;
+  - They have critreduction, not critreduciton
+  - Redo layout.
+  - Can now target PCs
+  - Track AP box
+  - Status box (hits etc)
+  - Creatures can attack!
+  - Don't apply DB size mod twice.
+
+# 2024-8-6
+
+- Spells:
+  - Fix bug where OE Low rolls failed with NaN
+  - Show the correct OE Low roll when rolling OE Low
+  - Tweak message for PP on failure
+- Fonts; add some more fallback fonts.  Impact is terrible
+- Create:
+  - Fix a bug where lanages spent in creation were not showing.
+- Add validation that events are registered correctly.
+- Inventory/Attacks
+  - Correctly cleanup old attacks.  No longer thousands of attacks
+  - Refactor code to be cleaner in process
+  - Use pending infrastructure to remove potential race conditions
+  - Automatically update the bonuses for attacks.
+- Remove encoded attack message on attacks.
+
+# 2024-7-30
+
+- Lots more work on Creatures on the backend.
+  - Big thanks to Scott C on the roll20 discord for his aid.
+- Override 0 ranks when set.  Thanks to Hurin for this bug
+- Handle not having compendium when adding attacks.  Thanks to Christoffer Holm for the report
+
+# 2024-7-23
+
+- Start of Injury tracking
+  - Hits updates
+  - Fatigue updated
+  - Penalty total updates
+- Shadows and colour for buttons
+- Dynamic columns for skills
+- Handle Grace
+- Basic Creature sheet
+  - Drop from Compendium to VTT (For Creature Law Owners)
+  - Targetable NPC sheet.
+  - Support Roman numeral style creature size
+  - Don't update RRs on creature sheets.
+  - Inititive for creatures
+  - Start of creature attacks
+- Internal:
+  - Add a validating rmuSetAttrs
+
+# 2024-7-18
+
+- SCR now includes stat modifier.
+- Improve layout of hits/injuries/endurance etc
+- AP Tracking for spells: So cast a spell with 2AP, -50 mod.  Optional checkbox to enable
+- Handle Spell Trickery
+- Put a gradient on buttons... make them a little more obvious about action.
+
+# 2024-7-16
+
+- Display "No Voice" instead of "none" in spells
+- Show all the modifier in the casting log all the time.
+- Can edit spell names
+- Spell results show RR targets for F, Fm and I spells.
+- No PP spells now longer check or require PP
+- Cap passive dodge & passive block at 50
+- Fix calculation of partial dodge when encumbered (Thanks @filroden)
+- No stats is equal to a 50.  Makes NPCs super easy.
+
+# 2024-7-9
+
+- First version of individual spell casting
+  - With compendium; click a spell to cast it
+- Spells get own css file now
+- Tests for some spell casting function
+- New misc Flattern for inline summaries
+- Tweaks to edit spell list
+
 # 2024-6-24
 
 - Remove HP & PP from side list on main page (tracked in status)
