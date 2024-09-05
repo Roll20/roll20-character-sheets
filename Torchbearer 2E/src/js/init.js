@@ -4,11 +4,11 @@ on("sheet:opened", function (eventinfo) {
 });
 
 function initializeTabs(values) {
-  if (!(values['tab'] in ["anatomy", "kit", "magic", "relationships", "levels", "roll"])) {
-    setAttrs({tab: "anatomy"});
+  if (!(["anatomy", "kit", "magic", "relationships", "levels", "roll"].includes(values['tab']))) {
+    setAttrs({ tab: "anatomy" });
   }
-  if (!(values['edit'] in ["playing", "editing"])) {
-    setAttrs({edit: "playing"});
+  if (!(["playing", "editing"].includes(values['edit']))) {
+    setAttrs({ edit: "playing" });
   }
 }
 
