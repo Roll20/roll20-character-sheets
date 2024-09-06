@@ -77,7 +77,7 @@
     <b>{{computed::attackresult}}!</b>
     <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
       <b>{{computed::attackroll}}</b> =
-      {{attackrollum}} [Roll] {{computed::attackmoddescription}}<br>
+      {{attackrollum}} [Roll] {{computed::attackmoddescription}}
     </p>
     {{#rollTotal() computed::ishit 1}}
       Hits {{computed::hitlocation}} for {{computed::damage}}
@@ -86,12 +86,9 @@
 	<br><i>{{computed::critdescription}}</i>
 	<br>{{computed::criteffect}}
       {{/rollTotal() computed::hascritical 1}}
+      <br>
+      [Apply](~{{targetescaped}}|applyattackresult||{{computed::injurystring}})
     {{/rollTotal() computed::ishit 1}}
-    <br>
-
-    [Apply](~{{computed::targetname}}|applyattackresult||{{computed::injurystring}})
-
-
   </div>
 
 </rolltemplate>
@@ -190,6 +187,15 @@
   </div>
 </rolltemplate>
 
+<!-- end of turn message -->
+<rolltemplate class="sheet-rolltemplate-rmueotmessage">
+  <div class='sheet-rolltemplate-noboxes'
+       style=" box-shadow: 0px 5px 3px 0px rgba(0,0,0,0.45);">
+
+    {{computed::message}}
+  </div>
+</rolltemplate>
+
 
 <!-- Casting a spell
       <who> casts <Spell>
@@ -208,6 +214,19 @@
     {{who}} now has {{computed::pp}} PP ({{computed::ppmsg}})
   </div>
 </rolltemplate>
+
+<!-- Recovery roll -->
+<rolltemplate class="sheet-rolltemplate-rmurecovery">
+  <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
+    {{who}} recovers from injury {{computed::description}}<br>
+    <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
+    Modifiers: {{mod}} = {{computed::modlog}}</p>
+    Result: {{computed::total}} = {{computed::roll}} + {{mod}}<br>
+    {{computed::result}}<br>
+  </div>
+</rolltemplate>
+
+
 
 
 <!-- vim: set sw=2 sts=2 :-->
@@ -2298,9 +2317,28 @@
 
   
 
-
+    
+    <div class='prop_pair'>
+      <span>Staggered</span>
+      <span>
+        <span name='attr_statusstagger'>0</span> AP
+      </span>
+    </div>
+    <div class='prop_pair'>
+      <span>Stun -75</span>
+      <span name='attr_statusstun75info'>0</span>
+    </div>
+    <div class='prop_pair'>
+      <span>Stun -50</span>
+      <span name='attr_statusstun50info'>0</span>
+    </div>
+    <div class='prop_pair'>
+      <span>Stun -25</span>
+      <span name='attr_statusstun25info'>0</span>
+    </div>
 
     <div class='prop_pair'>
+
       <span><b>Hits</b></span>
       <span>
         <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
@@ -2308,6 +2346,14 @@
 
       <span>Hits Penalty:</span>
       <span name='attr_hppenalty'></span>
+
+      <span>Bleed</span>
+      <span>
+        <span name='attr_bleeding'></span> / round
+        <button type='action' class='fancybuttoninline fancybutton' name='act_deletebleed'>
+          <span style="font-family:Pictos;">#</span></button>
+      </span>
+
     </div>
 
     <div class='prop_pair'>
@@ -2336,6 +2382,7 @@
       <span>Manuever Penalty:</span>
       <span name='attr_manuever_penalty'></span>
     </div>
+
 
     <hr>
 
@@ -2460,8 +2507,18 @@ Name <input name="attr_character_name">
 </div>
     <div>Eat/Drink</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_eat' value='0'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='1'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='2'></div>
 </div>
-    <div class='double'>Concentration</div> <input type='checkbox'>
-    <div>Free Action Used</div> <input type='checkbox'>
+    <div class='double'>Concentration</div> <input name='attr_aptrack_concentration' type='checkbox'>
+    <div>Free Used</div> <input name='attr_aptrack_freeused' type='checkbox'>
+    <div>AP/Phase</div>
+    <div>
+      <select name='attr_actionapperphase' style='width:100%' class='fancyselect'>
+        <option value='1'>1AP</option>
+        <option value='2'>2AP</option>
+        <option value='4'>4AP</option>
+      </select>
+    </div>
+    <div></div>
+    <div><button type='action' name='act_endphase' class='fancybutton fancybuttoninline'>End</button></div>
   </div>
 
 
@@ -2471,9 +2528,28 @@ Name <input name="attr_character_name">
 
   
 
-
+    
+    <div class='prop_pair'>
+      <span>Staggered</span>
+      <span>
+        <span name='attr_statusstagger'>0</span> AP
+      </span>
+    </div>
+    <div class='prop_pair'>
+      <span>Stun -75</span>
+      <span name='attr_statusstun75info'>0</span>
+    </div>
+    <div class='prop_pair'>
+      <span>Stun -50</span>
+      <span name='attr_statusstun50info'>0</span>
+    </div>
+    <div class='prop_pair'>
+      <span>Stun -25</span>
+      <span name='attr_statusstun25info'>0</span>
+    </div>
 
     <div class='prop_pair'>
+
       <span><b>Hits</b></span>
       <span>
         <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
@@ -2481,6 +2557,14 @@ Name <input name="attr_character_name">
 
       <span>Hits Penalty:</span>
       <span name='attr_hppenalty'></span>
+
+      <span>Bleed</span>
+      <span>
+        <span name='attr_bleeding'></span> / round
+        <button type='action' class='fancybuttoninline fancybutton' name='act_deletebleed'>
+          <span style="font-family:Pictos;">#</span></button>
+      </span>
+
     </div>
 
     <div class='prop_pair'>
@@ -2510,6 +2594,7 @@ Name <input name="attr_character_name">
       <span name='attr_manuever_penalty'></span>
     </div>
 
+
     <hr>
 
     <div class='prop_pair'>
@@ -2530,94 +2615,19 @@ Name <input name="attr_character_name">
     <button type='action' name='act_statussleep'
         class='rollbutton fancybutton fancybuttoninline'>Sleep</button>
 
-     <h2>Defense</h2>
-
-     <b>AT</b><br>
-     <div class='prop_pair'>
-	<span class='prop_prop_plain'>
-	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_at_head_info' class='stat_info'></span>
-	    Head</span>
-	    <span class='prop_value' name='attr_at_head'></span>
-	<span class='prop_prop_plain'>
-	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_at_torso_info' class='stat_info'></span>
-	    Torso</span>
-	    <span class='prop_value' name='attr_at_torso'></span>
-	<span class='prop_prop_plain'>
-	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_at_arms_info' class='stat_info'></span>
-	    Arms</span>
-	    <span class='prop_value' name='attr_at_arms'></span> 
-	<span class='prop_prop_plain'>
-	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_at_legs_info' class='stat_info'></span>
-	    Legs</span>
-	    <span class='prop_value' name='attr_at_legs'></span> 
-    </div>
-
-    <b>Defensive Bonus</b>
-
-    <div class='prop_pair'>
-	<span class='prop_prop_plan'>Base (qu)</span>
-	    <span class='prop_value' name='attr_db_qu'></span>
-	<span class='prop_prop_plain'>Shield</span>
-	    <span class='prop_value'>
-		<span name='attr_db_shield'></span>
-		(<span  name='attr_db_shield_attacks'></span> attacks)</span>
-	<span class='prop_prop_plain'><b>Dodge</b></span>
-	    <span class='prop_value'>Melee / Missile</span>
-	<span class='prop_prop_plain'>
-	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_db_passivedodge_info' class='stat_info'></span>
-	    Passive Dodge</span>
-	    <span class='prop_value'>
-		<span name='attr_db_passivedodge'></span> / 
-		<span name='attr_db_passivedodgemissile'></span>
-	    </span>
-	<span class='prop_prop_plain'>
-	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_db_partialdodge_info' class='stat_info'></span>
-	    Partial Dodge (C)</span>
-	    <span class='prop_value'>
-		<span name='attr_db_partialdodge'></span> /
-		<span name='attr_db_partialdodgemissile'></span>
-	    </span>
-	<span class='prop_prop_plain'>
-            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_db_fulldodge_info' class='stat_info'></span>
-	    Full Dodge (4 AP)</span>
-	    <span class='prop_value'>
-		<span name='attr_db_fulldodge'></span> /
-		<span name='attr_db_fulldodgemissile'></span>
-	    </span>
-	<span class='prop_prop_plain'>
-	    <b>Block</b></span>
-	    <span class='prop_value'></span>
-	<span class='prop_prop_plain'>
-            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_db_passiveblock_info' class='stat_info'></span>
-	    Passive Block</span>
-	    <span class='prop_value' name='attr_db_passiveblock'></span>
-	<span class='prop_prop_plain'>
-            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_db_partialblock_info' class='stat_info'></span>
-	    Partial Block (C)</span>
-	    <span class='prop_value' name='attr_db_partialblock'></span>
-	<span class='prop_prop_plain'>
-            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
-	    <span name='attr_db_fullblock_info' class='stat_info'></span>
-	    Full Block (4 AP)</span>
-	    <span class='prop_value' name='attr_db_fullblock'></span>
-    </div>
-    <hr>
+  
+   <hr>
 
     <h2>Attacks</h2>
 
     
     <div class='prop_pair'>
       <span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span> Initiative</span>
-      <span class='prop_value'><span name='attr_initiative'></span><button type="action" value="act_rollinitiative" class="editbutton rollbutton"><span style="font-family:dicefontd10;">j</span></button></span>
+      <span class='prop_value'>
+        <span name='attr_initiative'></span><button type="action" value="act_rollinitiative" class="editbutton rollbutton"><span style="font-family:dicefontd10;">j</span></button>
+        <button name='act_newcombat' type='action' class='fancybuttoninline fancybutton'>
+            New Combat</button>
+      </span>
     </div>
 
       <div class='foe'>
@@ -2683,7 +2693,6 @@ Name <input name="attr_character_name">
       <div>Attack Name:</div> <input type='text' name='attr_attackaddname'>
       <div>Attack Skill</div> 
         <select name='attr_attackaddskill'>
-          
           <option value="beak">Beak</option>
           <option value="bite">Bite</option>
           <option value="blade">Blade</option>
@@ -2769,6 +2778,13 @@ Name <input name="attr_character_name">
           <option value="9">Gigantic</option>
           <option value="10">Enormous</option>
         </select>
+      <div>Type</div>
+        <select name='attr_attackaddtype'>
+          <option value='melee'>Melee</option>
+          <option value='ranged'>Ranged</option>
+          <option value='directed'>Directed Spell</option>
+          <option value='other'>Other (No AP tracking)</option>
+        </select>
       <div>Fumble</div><input type='number' name='attr_attackaddfumble'>
       <div>Modifier</div>
       <input type='number' name='attr_attackaddmodifier'>
@@ -2830,6 +2846,89 @@ Name <input name="attr_character_name">
 
 <div class='sheet-col'>
 
+   <h2>Defense</h2>
+
+     <b>AT</b><br>
+     <div class='prop_pair'>
+	<span class='prop_prop_plain'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_at_head_info' class='stat_info'></span>
+	    Head</span>
+	    <span class='prop_value' name='attr_at_head'></span>
+	<span class='prop_prop_plain'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_at_torso_info' class='stat_info'></span>
+	    Torso</span>
+	    <span class='prop_value' name='attr_at_torso'></span>
+	<span class='prop_prop_plain'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_at_arms_info' class='stat_info'></span>
+	    Arms</span>
+	    <span class='prop_value' name='attr_at_arms'></span> 
+	<span class='prop_prop_plain'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_at_legs_info' class='stat_info'></span>
+	    Legs</span>
+	    <span class='prop_value' name='attr_at_legs'></span> 
+    </div>
+
+    <b>Defensive Bonus</b>
+
+    <div class='prop_pair'>
+	<span class='prop_prop_plan'>Base (qu)</span>
+	    <span class='prop_value' name='attr_db_qu'></span>
+	<span class='prop_prop_plain'>Shield</span>
+	    <span class='prop_value'>
+		<span name='attr_db_shield'></span>
+		(<span  name='attr_db_shield_attacks'></span> attacks)</span>
+	<span class='prop_prop_plain'><b>Dodge</b></span>
+	    <span class='prop_value'>Melee / Missile</span>
+	<span class='prop_prop_plain'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_passivedodge_info' class='stat_info'></span>
+	    Passive Dodge</span>
+	    <span class='prop_value'>
+		<span name='attr_db_passivedodge'></span> / 
+		<span name='attr_db_passivedodgemissile'></span>
+	    </span>
+	<span class='prop_prop_plain'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_partialdodge_info' class='stat_info'></span>
+	    Partial Dodge (C)</span>
+	    <span class='prop_value'>
+		<span name='attr_db_partialdodge'></span> /
+		<span name='attr_db_partialdodgemissile'></span>
+	    </span>
+	<span class='prop_prop_plain'>
+            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_fulldodge_info' class='stat_info'></span>
+	    Full Dodge (4 AP)</span>
+	    <span class='prop_value'>
+		<span name='attr_db_fulldodge'></span> /
+		<span name='attr_db_fulldodgemissile'></span>
+	    </span>
+	<span class='prop_prop_plain'>
+	    <b>Block</b></span>
+	    <span class='prop_value'></span>
+	<span class='prop_prop_plain'>
+            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_passiveblock_info' class='stat_info'></span>
+	    Passive Block</span>
+	    <span class='prop_value' name='attr_db_passiveblock'></span>
+	<span class='prop_prop_plain'>
+            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_partialblock_info' class='stat_info'></span>
+	    Partial Block (C)</span>
+	    <span class='prop_value' name='attr_db_partialblock'></span>
+	<span class='prop_prop_plain'>
+            <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_fullblock_info' class='stat_info'></span>
+	    Full Block (4 AP)</span>
+	    <span class='prop_value' name='attr_db_fullblock'></span>
+    </div>
+
+    <hr>
+
      <h2>RRs</h2>
 
      
@@ -2866,6 +2965,8 @@ Name <input name="attr_character_name">
 
 
      <hr>
+
+
 
     <h2>Favorite Skills</h2>
 
@@ -5112,7 +5213,35 @@ Name <input name="attr_character_name">
 
     <h2>Injuries</h2>
 
-     
+    <fieldset class='repeating_specificinjury'>
+      <div class='specificinjury'>
+      Summary: <span name='attr_summary'></span> <br>
+      Bleed: <span name='attr_bleed'></span>
+        | Penalty: <span name='attr_penalty'></span>
+        | Severity <span name='attr_severity'></span>
+        | Location: <span name='attr_location'></span> <br>
+      Type: <select name='attr_type' class='fancyselect'>
+          <option value='unknown'>Unknown</option>
+          <option value='bone'>Bone</option>
+          <option value='cutsburn'>Cuts &amp; Burns</option>
+          <option value='muscle'>Muscle/Tendon</option>
+          <option value='organ'>Organ</option>
+          <option value='poison'>Poison/Disease</option>
+          <option value='tissue'>Skin/Tissue</option>
+        </select>
+      Treatment: <select name='attr_treatment' class='fancyselect'>
+          <option value='new'>New</option>
+          <option value='untreated'>Untreated</option>
+          <option value='medicine'>Medicine</option>
+          <option value='medicineabsolute'>Medicine (Absolute Success)</option>
+          <option value='magic'>Magic or Medicine + Herbalism</option>
+          <option value='magicherbalism'>Magic and Herbalism</option>
+        </select>
+      <button type='action' class='fancybutton fancybuttoninline' name='act_recoveryroll'>Recovery Roll</button>
+      <button type='action' class='fancybuttoninline fancybutton' name='act_deleteitem'
+               ><span style="font-family:Pictos;">#</span></button>
+      </div>
+    </fieldset>
 
 
 </section>
@@ -5129,6 +5258,15 @@ Name <input name="attr_character_name">
 <button type='action' name='act_updatederived' class='fancybutton'>Front Page</button>
 <button type='action' name='act_updateattacks' class='fancybutton'>Attacks</button>
 <button type='action' name='act_editspells' class='fancybutton'>Edit Spells</button>
+
+<hr>
+
+<h3>Injuries</h3>
+
+<p>Apply an injury.  Format is Uppercase letter, followed by a number.  Letter sare H hits, P penalty, F fatigue, B blleed, S staggered P pRone, K kniocked back, G grapped %, Q/W/E Stun 25/50/77 X breakage roll<p>
+
+<input type='text' name='attr_hackinjury'>  
+<button type='action' name='act_applyinjuryhack' class='fancybutton'>Apply Injury</button>
 
 <hr>
 
@@ -5151,7 +5289,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 3d329790ea74dce78d71c9d4b89143b32e0ce159
+Revision 62c14c1bee614a8cf75108d1daca615b453fa787
 
 
 <hr>
@@ -6123,13 +6261,10 @@ function miscBonusRemove(miscstr, name) {
 	return '';
     }
     let misc = JSON.parse(miscstr);
-    for (const obj of misc) {
-	if (obj.name == name) {
-	    //misc[obj]
-	    return JSON.stringify(misc);
-	}
-    }
-    return miscstr;
+    misc = misc.filter(function(item) {
+	    return item.name !== name
+    });
+    return JSON.stringify(misc);
 }
 
 function miscBonusTotal(miscstr, prefix = '') {
@@ -6701,7 +6836,7 @@ let  RMUSkills = {};
 	  }
 	  console.log(statCache_);
 	  // FIXME: Should make this prettier
-	  miscAttrSet("scr_misc", "Realm Stat Bonus", statCache_.rs);
+	  miscAttrSet("scr_misc", "Realm Stat", statCache_.rs);
 	  if (donefn && typeof donefn === 'function') {
 	    donefn();
 	  }
@@ -7279,7 +7414,8 @@ function updateSpellCategory(spellgroup, bonus, gracebonus, trickerybonus) {
 		      buttons[`${basename}_nopp${spell.level}`] = spell.nopp ? 'true' : 'false';
 		      buttons[`${basename}_instant${spell.level}`] = spell.instant ? 'true' : 'false';
 		    } else {
-		      break; // Should be ordered
+		      // Force empty names for higher items.
+		      buttons[`${basename}_spell${spell.level}`] = "";
 		    }
 		  }
 		  
@@ -7308,7 +7444,7 @@ const subtlepenalties = {
 };
 
 const handNames = { "nohand": "No Hands", onehand: "One Hand", twohands: "Two Hands" };
-const voiceNames = { none : "Silent", whisper: "Whisper", normal: "Normal Voice", shout: "Shouting" };
+const voiceNames = { novoice : "Silent", whisper: "Whisper", normal: "Normal Voice", shout: "Shouting" };
 
 /*
  * Returns an object containing string and penalty/bonus.
@@ -7370,11 +7506,11 @@ function getSubtlePenalty(realm, type, trickery, subtle, voice, hands) {
   // Now add hands & voice if a bonus
   if (pentable[hands] > 0) {
     penalty += pentable[hands];
-    log += ` +${pentable[hands]} ${handNames[hands]}`;
+    log += ` +${pentable[hands]} [${handNames[hands]}]`;
   }
   if (pentable[voice] > 0) {
     penalty += pentable[voice];
-    log += ` +${pentable[voice]} ${voiceNames[voice]}`;
+    log += ` +${pentable[voice]} [${voiceNames[voice]}]`;
   }
   
   return { msg: log, modifier: penalty };
@@ -7387,6 +7523,13 @@ function getSubtlePenalty(realm, type, trickery, subtle, voice, hands) {
 function sendMessage(msg) {
   // FIXME: CHeck for braces
   startRoll('&{template:rmumessage}{\{message=[[1d1]]}}', roll => {
+    finishRoll(roll.rollId, { message: msg });
+  });
+}
+
+function sendEOTMessage(msg) {
+  // FIXME: CHeck for braces
+  startRoll('&{template:rmueotmessage}{\{message=[[1d1]]}}', roll => {
     finishRoll(roll.rollId, { message: msg });
   });
 }
@@ -7431,10 +7574,8 @@ onCheck(spellcastevents.join(" "), (ev) => {
     console.log("Cast soemthing", ev);
     // get the numbe from the end
     const level = parseInt(ev.sourceAttribute.match(/\d+$/)[0]);
-    console.log(level);
 
     const basename = ev.sourceAttribute.replace(/_castspell\d*$/, "");
-    console.log(basename);
     getAttrs([`${basename}_type${level}`, `${basename}_name${level}`, `${basename}_spell${level}`,
 	`${basename}_nopp${level}`, `${basename}_instant${level}`,
 	'pp', 'realm', 'character_name', 'scr_misc',
@@ -7446,7 +7587,7 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	// AP
 	'castinguseap', 'aptrack_spell',
 	// Manuever Penalty
-	'manuever_penalty',
+	'manuever_penalty', 'statuseffect',
 	],
       (spelldata) => {
 	console.log(spelldata);
@@ -7462,12 +7603,17 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	const group = spelldata[`${basename}_group`];
 	const trickery = spelldata[`${basename}_trickery`];
 	const grace = Math.max(parseIntDefault(spelldata[`${basename}_grace`], 0), 0);
+	const statuseffect = spelldata.statuseffect || 0;
 
 	let mod = 0; // Total spell mod;
 	let mlog = ''
 
 	let pp = parseIntDefault(spelldata['pp'], 0);
-	console.log(pp, typeof(pp), level, typeof(level));
+
+	if (statuseffect == 'staggered') {
+	  sendMessage(`${caster} is staggered; Unable to cast spells`);
+	  return;
+	}
 
 	// First; check for PP
 	if (!nopp && level > pp) {
@@ -7512,6 +7658,14 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	  if (manp < 0) {
 	    mlog += ` ${manp}&nbsp;[Manuever&nbsp;Penalty]`;
 	    mod += manp;
+	  }
+	}
+
+	{
+	  const spen = parseIntDefault(statuseffect, 0);
+	  if (spen < 0) {
+	    mlog += ` ${spen}&nbsp;[Stun]`;
+	    mod += spen;
 	  }
 	}
 
@@ -11394,55 +11548,55 @@ J E + C + B
 		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
 		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
 		    { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
-		
+
 	/* 10-14 */ { location: "Leg", armorlocation: 4, rollindex: 3, down: 1 },
 		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
 		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
 		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
 		    { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
-		
+
 	/* 15-19 */ { location: "Arm", armorlocation: 3, rollindex: 4, down: 1 },
 		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
 		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
 		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
 		 { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
-		
+
 	/* 20-24 */ { location: "Head", armorlocation: 2, rollindex: 5, down: 1 },
 		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
 		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
 		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
 		 { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
-		
+
 	/* 25-29 */ { location: "Chest", armorlocation: 1, rollindex: 6, down: 2 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
-		
+
 	/* 30-34 */ { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
-		
+
 	/* 35-39 */ { location: "Abdomen", armorlocation: 1, rollindex: 7, down: 4 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
-		
+
 	/* 40-44 */ { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
-		
+
 	/* 45-49 */ { location: "Leg", armorlocation: 4, rollindex: 8, down: 6 },
 		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
 		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
 		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
 		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
-		
+
 	/* 50-54 */ { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
 		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
 		 { location: "Arm", armorlocation: 3, rollindex: 9, down: 11 },
@@ -11454,56 +11608,55 @@ J E + C + B
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
-		
+
 	/* 60-64 */ { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
-		
+
 	/* 65-69 */ { location: "Arm", armorlocation: 3, rollindex: 10, down: 46 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 11, down: 35 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
-		
+
 	/* 70-74 */ { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
-		
+
 	/* 75-79 */ { location: "Leg", armorlocation: 4, rollindex: 12, down: 36 },
 		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
 		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
 		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
 		 { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
-		
+
 	/* 80-84 */ { location: "Chest", armorlocation: 1, rollindex: 13, down: 21 },
 		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
 		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
 		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
 		 { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
-		
+
 	/* 85-89 */ { location: "Head", armorlocation: 2, rollindex: 14, down: 16 },
 		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
 		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
 		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
 		 { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
-		
+
 	/* 90-94 */ { location: "Arm", armorlocation: 3, rollindex: 15, down: 56 },
 		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
 		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
 		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
 		 { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
-		
+
 	/* 95-99 */ { location: "Leg", armorlocation: 4, rollindex: 16, down: 67 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 17, down: 66 },
 		 { location: "Abdomen", armorlocation: 1, rollindex: 17, down: 66 },
 		 { location: "Chest", armorlocation: 1, rollindex: 18, down: 76 },
 		 { location: "Chest", armorlocation: 1, rollindex: 18, down: 76 },
 	/* 100 */ { location: "Head", armorlocation: 2, rollindex: 19, down: 81 },
-		
     ];
 
     /* Returns an obj of location, side, at  */
@@ -11786,11 +11939,6 @@ J E + C + B
 	result.hitside = hit.side
 	result.critical = critroll;
 
-	// The 'computed' version of the target is html entity encoded
-	// FIXME: Entity should be all; not just )
-	result.targetname = cdata.targetname.replace(")", '&#41;');	
-	console.log("rep", cdata.targetname, result.targetescaped);
-
 	// Get critical
 	if (critinfo.critical) {
 	    console.log(critinfo);
@@ -11800,14 +11948,14 @@ J E + C + B
 		    result.criteffect = effect;
 		    result.critdescription = desc;
 		    result.hascritical = 1;
-		    result.injurystring = injury.updateInjuryString(injuryhits, critinfo);
+		    result.injurystring = injury.updateInjuryString(injuryhits, critinfo, 'attacker', result);
 		    console.log(result);
 		    finishRoll(rollId, result);
 		});
 	    return;
 	}
 
-	result.injurystring = injury.updateInjuryString(injuryhits, {});
+	result.injurystring = injury.updateInjuryString(injuryhits, {}, 'attacker', result);
 	finishRoll(rollId, result);
     }
 
@@ -11846,7 +11994,7 @@ J E + C + B
     attacks.startAttack = function(cdata) {
 	let attackmoddescription = '';
 	let attackmod = 0;
-	
+
 	attackmod += cdata.attackbonus;
 	attackmoddescription = ` +${cdata.attackbonus}&nbsp;[Attack&nbsp;Bonus]`; 
 
@@ -11859,7 +12007,7 @@ J E + C + B
 	    const dbdiff = (5 * (cdata.attackersize - cdata.targetsize));
 	    attackmod -= dbdiff;
 	    attackmoddescription +=
-		` -${dbdiff}&nbsp;[Size Difference (${cdata.attackersize} vs ${cdataltargetsize})]`;
+		` -${dbdiff}&nbsp;[Size Difference (${cdata.attackersize} vs ${cdata.targetsize})]`;
 	}
 
 	attackmod -= cdata.targetdb;
@@ -11870,17 +12018,28 @@ J E + C + B
 	}
 
 	if (cdata.useap) {
-	    if (cdata.apused < 2) {
-		sendMessage("Must use at least 2 AP to attack");
-		return;
-	    }
-
-	    // FIXME: Missile.
 	    let appenalty = 0;
-	    if (cdata.apused == 2) {
-		appenalty = 50;
-	    } else if (cdata.apused == 3) {
-		appenalty = 25;
+	    if (cdata.attacktype == 'ranged') {
+		if (cdata.apused < 1) {
+		    sendMessage("Must use at least 1 AP to missile");
+		    return;
+		}
+		if (cdata.apused == 1) {
+		    appenalty = 50;
+		} else if (cdata.apused == 2) {
+		    appenalty = 25;
+		}
+	    } else {
+		if (cdata.apused < 2) {
+		    sendMessage(`Must use at least 2 AP to attack (Used ${cdata.apused})`);
+		    return;
+		}
+
+		if (cdata.apused == 2) {
+		    appenalty = 50;
+		} else if (cdata.apused == 3) {
+		    appenalty = 25;
+		}
 	    }
 	    if (appenalty != 0) {
 		attackmoddescription += ` -${appenalty}&nbsp;[Fast&nbsp;Attack (${cdata.apused}&nbsp;AP)]`;
@@ -11888,14 +12047,24 @@ J E + C + B
 	    }
 	}
 
+	if (cdata.statuseffect) {
+	    attackmoddescription += ` ${cdata.statuseffect}&nbsp;[Stun]`
+	    attackmod += cdata.statuseffect;
+	}
+
 	cdata.attackmod = attackmod;
 	cdata.attackmoddescription = attackmoddescription;
+
+	// The 'computed' version of the target is html entity encoded
+	// FIXME: Entity should be all; not just )
+	cdata.targetescaped = cdata.targetname.replaceAll(")", '&#41;');
 
 	const roll_string = "&{template:rmuattack} " +
 	    `[[ [[ 1d100!>96 ]] + ${attackmod} ]] ` +
 	    "[[ 1d100 ]] " + // crit roll
 	    `{\{name=${cdata.character}}} ` +
 	    `{\{target=${cdata.targetname}}} ` +
+	    `{\{targetescaped=${cdata.targetescaped}}} ` +
 	    `{\{weapon=${cdata.attackname}}} ` +
 	    `{\{manueverpenalty=${cdata.manuever_penalty}}} ` +
 	    `{\{attackmoddescription=[[0]]}} ` +
@@ -11925,13 +12094,20 @@ J E + C + B
 			`${basename}_attackbonus`,
 			`${basename}_attackname`,
 			`${basename}_attackfumble`,
+			`${basename}_attacktype`,
 			'size', `${basename}_attacksize`,
-			'manuever_penalty',
+			'manuever_penalty', 'statuseffect',
 			'target_name', 'target_db', 'target_at',
 			'target_size', 'target_crit',
-			'attackuseap', 'aptrack_melee', 'aptrack_missile',
+			// Used depending on type: So get melee, missile and spell
+			'attackuseap', 'aptrack_melee', 'aptrack_missile', 'aptrack_spell',
+			'token_id'
 			], values => {
-		console.log('New attack: get attrs', values, ev);
+		console.log('New attack: get attrs (with token)', values, ev);
+		if (values.statuseffect && values.statuseffect == 'staggered') {
+		    sendMessage(`${values.character_name} is staggered, cannot attack`);
+		    return;
+		}
 		cdata = {}
 		cdata.min = +values[`${basename}_attackmin`];
 		cdata.max = +values[`${basename}_attackmax`];
@@ -11948,10 +12124,20 @@ J E + C + B
 		cdata.targetdb = parseIntDefault(values.target_db, 0);
 		cdata.targetsize = parseIntDefault(values.target_size, 5);
 		cdata.targetcrit = parseIntDefault(values.target_crit, 0);
+		cdata.statuseffect = parseIntDefault(values.statuseffect, 0);
 		cdata.manuever_penalty = parseIntDefault(values.manuever_penalty, 0);
 		cdata.useap = (values.attackuseap == 'on') ? true : false;
-		// FIXME: Missile is wrong
-		cdata.apused = parseIntDefault(values.aptrack_melee, 0);
+		// Use the attack type to get the right AP
+		cdata.attacktype = values[`${basename}_attacktype`];
+		if (cdata.attacktype == 'melee') {
+		    cdata.apused = parseIntDefault(values.aptrack_melee, 0);
+		} else if (cdata.attacktype == 'ranged') {
+		    cdata.apused = parseIntDefault(values.aptrack_missile, 0);
+		} else if (cdata.attacktype == 'directed') {
+		    cdata.apused = parseIntDefault(values.aptrack_spell, 0);
+		} else {
+		    cdata.apused = 0;
+		}
 		attacks.startAttack(cdata);
 	});
     });
@@ -11961,7 +12147,6 @@ J E + C + B
     }
 
     onCheck('clicked:rmuattackgettarget', (ev) => {
-
 	const roll_string = "&{template:rmuattacktarget} [[3d8]]  " +
 		"{\{who=@{character_name}}} " +
 		"{\{targetname=[[0[@{target|character_name}] ]]}} " +
@@ -11974,6 +12159,7 @@ J E + C + B
 		"{\{targetdodgemissile=[[0[@{target|db_passivedodgemissile}] ]]}} " +
 		"{\{targetblock=[[0[@{target|db_passiveblock}] ]]}} " +
 		"{\{targetcritred=[[0[@{target|critreduction}] ]]}} " +
+		"{\{targettokenid=[[0[@{target|token_id}] ]]}} " +
 		"";
 	    startRoll(roll_string, roll => {
 		const tsize = attacks.getDataFromRoll(roll.results.targetsize.expression);
@@ -11986,19 +12172,23 @@ J E + C + B
 		const dodgem = attacks.getDataFromRoll(roll.results.targetdodgemissile.expression);
 		const block = attacks.getDataFromRoll(roll.results.targetblock.expression);
 		const critred = attacks.getDataFromRoll(roll.results.targetcritred.expression);
+		const tokenid = attacks.getDataFromRoll(roll.results.targettokenid.expression);
 		let atstr = athead
 		if (athead != attorso || athead != atarms || athead != atlegs) {
 		    atstr = `${attorso},${athead},${atarms},${atlegs}`
 		}
 		console.log(attorso, athead, atarms, atlegs);
 		console.log(dodge, block);
+		console.log(tokenid);
 		const db = Math.max(dodge, block);
 		VsetAttrs({target_at: atstr,
 			target_name: tname,
 			target_db: db,
 			target_size: sizeToNumeric(tsize),
-			target_crit: critred});
+			target_crit: critred,
+			target_tokenid: tokenid});
 		finishRoll(roll.rollId, { targetname: tname })
+		//startRoll("/fx acid-burst ${tokenid}", (r) => {finishRoll(r.rollId)});
 	    });
     });
 
@@ -12070,7 +12260,8 @@ J E + C + B
 
     let attackadditems = [
 	"attackaddname", "attackaddskill", "attackaddtable", "attackaddsize",
-	"attackaddfumble", "attackaddmodifier", "attackaddri", "attackaddstrength"
+	"attackaddfumble", "attackaddmodifier", "attackaddri", "attackaddstrength",
+	"attackaddtype",
     ];
 
     // Returns 'true' if it validate, else an error mesasge (string)
@@ -12085,6 +12276,9 @@ J E + C + B
 
     }
 
+    /**
+     * Save the data from adding an attack on the sheet.
+     */
     onCheck("clicked:attackaddsave", () =>  {
 	// So we need to get the things; if there is an error we set the error mesage
 	getAttrs(attackadditems, (items) => {
@@ -12110,6 +12304,7 @@ J E + C + B
 		updates[`${prefix}_attacksource`] = 'user';
 		updates[`${prefix}_attackskill`] = items.attackaddskill;
 		updates[`${prefix}_attackri`] = items.attackaddri;
+		updates[`${prefix}_attacktype`] = items.attackaddtype;
 		updates[`${prefix}_attackmodifier`] = parseIntDefault(items.attackaddmodifier, 0);
 
 		updates[`${prefix}_attackmin`] = cdata?.data?.min?.match(/\d+/)[0] || 0;
@@ -12232,6 +12427,8 @@ onCheck(actionevents, (ev) => {
   });
 });
 
+// Free checked; record current phase.  In 4 phases we clear it
+onCheck("change:aptrack_freeused", (_) => { handleFreeClicked(); });
 
 onCheck("change:aptrack_loaded", (ev) => {
   console.log(ev);
@@ -12244,8 +12441,190 @@ onCheck("change:aptrack_loaded", (ev) => {
 	finishRoll(roll.rollId);
     });
   }
-
 });
+
+
+// This is on the attack panel, but it makes sense here
+// So new combat:
+//   - Reset phase
+//   - Reset AP
+//   - Reset freeaction
+onCheck("clicked:newcombat", () => {
+    setAttrs({
+      aptrack_melee: 0,
+      aptrack_missile: 0,
+      aptrack_spell: 0,
+      aptrack_perception: 0,
+      aptrack_eat: 0,
+      aptrack_stand: 0,
+      aptrack_freeused: 0,
+      aptrack_concentraction: 0,
+      freeactionphase: -1 });
+    getAttrs(["character_name"], (ev) => {
+	sendMessage(`${ev.character_name} prepares for battle`);
+    });
+});
+
+// So this is our per AP stuff
+onCheck("clicked:endphase", () => {
+    console.log("end phase");
+  // FIXME: Should reset when initiative is rolled
+  doTurn();
+});
+
+onCheck("clicked:deletebleed", () => {
+    getAttrs(["character_name"], (x) => {
+	sendMessage(`${x.character_name} is no longer bleeding`);
+	setAttrs({ bleeding: 0, bleedlist: []});
+    });
+});
+
+function handleFreeClicked() {
+  getAttrs(["currentphase", "aptrack_freeused", "character_name"], (data) => {
+      if (data.aptrack_freeused == 'on') {
+	const currentphase = parseIntDefault(data.currentphase, 0);
+	// Turn it off at the _end_ of which phase.
+	setAttrs({freeactionphase: currentphase + 3});
+	sendMessage(`${data.character_name} uses their free action`);
+      }
+  });
+}
+
+function handleBleed(currentphase, bleedlist) {
+  // Blledlist is probably a string.
+  if (!bleedlist || typeof(bleedlist) != 'string') {
+    return;
+  }
+
+  // Shift current phase to 1..4
+  currentphase = (currentphase - 1) % 4 + 1;
+
+  const bleeds = JSON.parse(bleedlist);
+  let total = 0;
+
+  for (bleed of bleeds) {
+    if (bleed.phase == currentphase) {
+      console.log(`Bleed: ${bleed.phase}  ${bleed.amount}`);
+      total += bleed.amount;
+    }
+  }
+
+  return total;
+}
+
+function roundString(phases) {
+  let roundstr = '';
+  if (phases == 0) {
+    return '-';
+  }
+  const rounds = Math.floor(phases / 4);
+  if (rounds > 0) {
+    roundstr = `${rounds}`
+  }
+  const pphases = phases % 4;
+  if (pphases == 1) {
+    roundstr += '\xBC'
+  } else if (pphases == 2) {
+    roundstr += '\xBD'
+  } else if (pphases == 3) {
+    roundstr += '\xBE'
+  }
+  return roundstr;
+}
+
+// FIXME: for now just assuming 1AP per click
+function doTurn() {
+  getAttrs(["character_name", "currentphase",  "actionapperphase",
+      "bleedlist", "hp", "freeactionphase",
+      "statusstagger", "statusstun75", "statusstun50", "statusstun25"],
+    (turn) => {
+      console.log("End of turn updates", turn);
+      const apperphase = parseIntDefault(turn.actionapperphase, 1);
+      let currentphase = parseIntDefault(turn.currentphase, 1);
+      const relativephase = (currentphase - 1) % 4 + 1;
+      const freeactionphase = parseIntDefault(turn.freeactionphase, -1); // Default is never
+      const round = Math.floor((currentphase + 3) / 4);
+      const name = turn.character_name;
+      const updates = {};
+      let statusstagger = parseIntDefault(turn.statusstagger, 0);
+      let statusstun75 = parseIntDefault(turn.statusstun75, 0);
+      let statusstun50 = parseIntDefault(turn.statusstun50, 0);
+      let statusstun25 = parseIntDefault(turn.statusstun25, 0);
+
+      // For each phase we are advancing, apply each effect
+      for (let i = 0 ; i < apperphase ; i ++) {
+	{
+	  const n = handleBleed(currentphase, turn.bleedlist); 
+	  if (n > 0) {
+	    let hp = parseIntDefault(turn.hp, 0) - n
+	    sendMessage(`${name} bleeds ${n} hits.  Now has ${hp} hits`);
+	    updates.hp = hp;
+	  }
+	}
+
+	if (freeactionphase == currentphase) {
+	  sendMessage(`${name} has a free action available`);
+	  updates.aptrack_freeused = 0;
+	  updates.freeactionphase = -1;
+	}
+
+	/* If Else chain as stagger beats stuns, and stuns in order */
+	if (statusstagger > 0) {
+	  statusstagger --;
+	  if (statusstagger == 0) {
+	    sendMessage(`${name} is no longer staggered`);
+	  }
+	} else if (statusstun75 > 0) {
+	  statusstun75 --;
+	  if (statusstun75 == 0) {
+	    sendMessage(`${name} is no longer stunned at -75`);
+	  }
+	} else if (statusstun50 > 0) {
+	  statusstun50 --;
+	  if (statusstun50 == 0) {
+	    sendMessage(`${name} is no longer stunned at -50`);
+	  }
+	} else if (statusstun25 > 0) {
+	  statusstun25 --;
+	  if (statusstun25 == 0) {
+	    sendMessage(`${name} is no longer stunned at -25`);
+	  }
+	}
+
+	currentphase = currentphase + 1;
+      }
+
+      updates.statuseffect = 0;  // Default
+      if (statusstagger) {
+	sendMessage(`${name} is staggered for ${roundString(statusstagger)} rounds`);
+	updates.statuseffect = 'staggered'
+      } else if (statusstun75) {
+	sendMessage(`${name} is stunned at -75 for ${roundString(statusstun75)} rounds`);
+	updates.statuseffect = -75;
+      } else if (statusstun50) {
+	sendMessage(`${name} is stunned at -50 for ${roundString(statusstun50)} rounds`);
+	updates.statuseffect = -50;
+      } else if (statusstun25) {
+	sendMessage(`${name} is stunned at -25 for ${roundString(statusstun25)} rounds`);
+	updates.statuseffect = -25;
+      }
+
+      updates.currentphase = currentphase;
+      updates.statusstagger = statusstagger;
+      updates.statusstun75 = statusstun75;
+      updates.statusstun50 = statusstun50;
+      updates.statusstun25 = statusstun25;
+
+      updates.statusstun75info = roundString(statusstun75);
+      updates.statusstun50info = roundString(statusstun50);
+      updates.statusstun25info = roundString(statusstun25);
+
+      VrmuSetAttrs(updates, ()=> {
+	  sendEOTMessage(`${name} completes their turn (Round ${round} / Phase ${relativephase})`);
+      });
+  });
+}
+
 
 
 
@@ -12799,7 +13178,7 @@ injury.criticalmaps = {
     Prn: 'P' /* Prone */,
     K: 'K' /* Knock back */,
     G: 'G' /* Grapple % */,
-    "S-25" : 'Q', "S-50" : 'W', "S-75" : 'E', /* Stuns */
+    "S25" : 'Q', "S50" : 'W', "S75" : 'E', /* Stuns */
     Br: 'X' /* Breakage roll */,
     D: 'D' /* Death/defeat */,
 };
@@ -12807,7 +13186,7 @@ injury.criticalmaps = {
 // Grabs all the known fields and create an injury string.
 // returns it as a string.
 // FIXME: Should take location and side
-injury.updateInjuryString = function(hits, critical, attacker) {
+injury.updateInjuryString = function(hits, critical, attacker, result) {
     let istr = "";
     console.log("Update Injury string", hits, critical);
     // First get base hits + critical hits
@@ -12823,14 +13202,33 @@ injury.updateInjuryString = function(hits, critical, attacker) {
 	return istr;
     }
 
-    for (const [critfield, value] of Object.entries(critical)) {
+    for (let [critfield, value] of Object.entries(critical)) {
 	const istrfield = injury.criticalmaps[critfield];
 	if (typeof(istrfield) !== 'string') {
 	    rmuerror("Unknown critical type", critfield, value, critical);
 	} else {
+	    // Sometimes negatives has '( )' around them
+	    value = value.replace(/[)(]/g, "");
 	    istr += `${istrfield}${Math.abs(value)}`;
 	}
     }
+
+    if (result.hitlocation) {
+	if (result.hitlocation == 'Head') istr += 'L2';
+	else if (result.hitlocation == 'Chest') istr += 'L1';
+	else if (result.hitlocation == 'Abdomen') istr += 'L1';
+	else if (result.hitlocation == 'Arm') istr += 'L3';
+	else if (result.hitlocation == 'Leg') istr += 'L4';
+    }
+
+    if (result.side) {
+	if (result.side == 'Left') istr += 'D1';
+	else istr += 'D2';
+    }
+
+    // Indicate the end of the numeric items
+    istr += 'Z';
+    /*
 
     if (attacker && typeof(attacker) === 'string') {
 	const asan = attacker.replaceAll('@', '').replaceAll(")", '&#41');
@@ -12840,46 +13238,322 @@ injury.updateInjuryString = function(hits, critical, attacker) {
     if (critical.description) {
 	// kill double quotes
 	const desc = critical.description.replaceAll('"', '').replaceAll(")", '&#41;');
-	istr += `"${desc}"`;
+	istr += `#${desc}#`;
     }
-
-    console.log(istr);
+*/
+    console.log("Injury string", istr);
     return istr;
 }
 
-injury.unsafeSubstract = function(prop, delta) {
-    getAttrs([prop], (x) => {
-	    let newval = parseIntDefault(x[prop], 0) - parseIntDefault(delta, 0);
-	    setAttrs({[prop]: newval});
+/** The result is in "ev.originalRollId".  I wish I was joking */
+onCheck("clicked:applyattackresult", (ev) => {
+    console.log("Apply Attack result triggered", ev);
+	let str = ev.originalRollId;
+	injury.parseInjuryString(str);
+});
+
+onCheck("clicked:applyinjuryhack", () => {
+    getAttrs(["hackinjury"], ev => {
+	injury.parseInjuryString(ev.hackinjury);
     });
+});
+
+/* So injury strings have two parts seperated by ;.
+   The first is the numeric fields,
+   The second is the descrtive parts.
+*/
+injury.parseInjuryString = function (str) {
+    // Split it stupid.  It splits then throws away excess fields with limited.
+    let ind = str.indexOf("Z");
+    ind = (ind == -1) ? str.length : ind;
+    const numerics = str.slice(0, ind);
+    const desc = str.slice(ind + 1, str.length)
+
+    const injurydata = {};
+    const updates = {};
+    let reported = false;
+
+    getAttrs(["character_name", "hp", "injurypenalty", "fatigue", "bleedlist", "currentphase",
+		"statusstagger", "statusstun75", "statusstun50", "statusstun25",
+		"grapplestatus"], (cdata) => {
+	const found = numerics.match(/[A-Z]\d+/g);
+	const currentphase = parseIntDefault(cdata.currentphase, 1);
+	// Phase in the round - 1-4
+	const relphase = (currentphase - 1) % 4 + 1;
+
+	for (res of found) {
+	    var value = parseInt(res.substring(1));
+	    injurydata[res[0]] = value; // Save it
+	    switch (res[0]) {
+		case 'H':
+		    let hp = parseIntDefault(cdata.hp, 0);
+		    updates.hp = hp - value;
+		    break;
+		case 'P':
+		    updates.injurypenalty = parseIntDefault(cdata.injurypenalty, 0) - value;
+		    reported = true; // Needs healing time
+		    break;
+		case 'F':
+		    updates.fatigue = parseIntDefault(cdata.fatigue, 0) - value;
+		    break;
+		case 'B':
+		    reported = true;
+		    let bl;
+		    if (cdata.bleedlist) {
+			bl = JSON.parse(cdata.bleedlist);
+		    } else {
+			bl = [];
+		    }
+		    bl.push({phase: relphase, amount: value});
+		    // Get the total bleed
+		    let bleed = 0;
+		    for (const b of bl){
+			console.log(bl, b);
+			bleed += b.amount;
+		    }
+		    updates.bleedlist = JSON.stringify(bl);
+		    updates.bleeding = bleed;
+		    break;
+		case 'S':
+		    updates.statusstagger = parseIntDefault(cdata.statusstagger, 0) + value;
+		    updates.statuseffect = 'staggered';  // This trumps everything else - apply immediately
+		    break;
+		case 'Q': // stun25
+		    updates.statusstun25 = parseIntDefault(cdata.statusstun25, 0) + 4 * value;
+		    updates.statusstun25info = roundString(updates.statusstun25);
+		    break;
+		case 'W':
+		    updates.statusstun50 = parseIntDefault(cdata.statusstun50, 0) + 4 * value;
+		    updates.statusstun50info = roundString(updates.statusstun50);
+		    break;
+		case 'E':
+		    updates.statusstun75 = parseIntDefault(cdata.statusstun75, 0) + 4 * value;
+		    updates.statusstun75info = roundString(updates.statusstun75);
+		    break;
+		case 'K':
+		    sendMessage(`${cdata.character_name} is knocked back ${value} feet`);
+		    break;
+		case 'R':
+		    sendMessage(`${cdata.character_name} is knocked prone`);
+		    break;
+		case 'X':
+		    sendMessage(`${cdata.character_name} must make a breakage check at ${value}`);
+		    break;
+		case 'G':
+		    updates.grapplestatus = parseIntDefault(cdata.grapplestatus, 0) + value;
+		    sendMessage(`${cdata.character_name} is grappled at ${value}`);
+		    break;
+		case 'L': case 'D': // Already saved... do notihing
+		    break;
+		default:
+		    rmuerror("Can't handle ${res[0]} in injury ${str}");
+		    break;
+	    }
+	}
+
+	if (reported) {
+	    addSpecificInjury(injurydata);
+	}
+
+	VrmuSetAttrs(updates);
+    });
+
+}
+
+function addSpecificInjury(injury) {
+    const rowid = generateRowID();
+    const prefix = `repeating_specificinjury_${rowid}`;
+
+    updates = {}
+    updates[`${prefix}_summary`] = "Some Injury";
+    updates[`${prefix}_bleed`] = injury.B || 0;
+    updates[`${prefix}_penalty`] = injury.P || 0;
+    if (injury.B > 6 || injury.P > 40) {
+	updates[`${prefix}_severity`] = 'Severe';
+    } else if (injury.B > 4 || injury.P > 20) {
+	updates[`${prefix}_severity`] = 'Medium';
+    } else {
+	updates[`${prefix}_severity`] = 'Mild';
+    }
+    let ilocation = 'Right ';
+    if (injury.D == 1) {
+	ilocation = 'Left ';
+    } 
+    if (injury.L) {
+	if (injury.L == 1) ilocation += 'side of Chest/Abdoment';
+	else if (injury.L == 2) ilocation += 'side of Head';
+	else if (injury.L == 3) ilocation += 'Arm';
+	else if (injury.L == 4) ilocation += 'Leg';
+	else rmuerror("Unknown location ", injury.L);
+    }
+    updates[`${prefix}_location`] = ilocation;
+    updates[`${prefix}_type`] = 'unknown';
+    updates[`${prefix}_treatment`] = 'new';
+
+    VrmuSetAttrs(updates);
+}
+
+function startRecoveryRoll(prefix) {
+    getAttrs([`${prefix}_severity`, `${prefix}_type`,
+	    `${prefix}_bleed`, `${prefix}_penalty`,
+	    `${prefix}_location`, `${prefix}_treatment`,
+	    'bodydevelopment_ranks', 'co', 'character_name'],
+	(ev) => {
+	    const simple = {};
+	    for (let key of Object.keys(ev)) {
+		const nk = key.replace(prefix + '_', '')
+		simple[nk] = ev[key];
+	    }
+	    handleRecoveryRoll(simple);
+    	}
+    );
 }
 
 
-/** The result is in "ev.originalRollId".  I wish I was joking */
-onCheck("clicked:applyattackresult", (ev) => {
-	let str = ev.originalRollId;
-	console.log("Got an apply result", ev);
-	console.log(str);
-	const found = str.match(/[A-Z]\d+/g);
-	console.log(found);
-	for (res of found) {
-	    var value = parseInt(res.substring(1));
-	    console.log(res, value);
-	    switch (res[0]) {
-		case 'H':
-		    injury.unsafeSubstract("hp", value);
-		    break;
-		case 'P':
-		    injury.unsafeSubstract("injurypenalty", value);
-		    break;
-		case 'F':
-		    injury.unsafeSubstract("fatigue", value);
-		    break;
-		default:
-		    console.log("Can;t hanlde ", res);
-	    }
+
+const recoveryRollData = {
+    bone: [ 10, 8, 6, 4, 3 ,2, 1],
+    cutsburn: [ 12, 10, 8, 6, 4 ,2, 1],
+    muscle: [ 15, 12, 9, 7, 5 ,3, 1],
+    organ: [ 20, 16, 12, 8, 6 ,4, 2],
+    poison: [ 25, 20, 15, 10, 8 ,5, 3],
+    tissue: [ 5, 4, 3, 2, 2 ,1, 1],
+}
+
+
+function handleRecoveryRoll(injury) {
+console.log(injury);
+    let mul = 1;
+
+    if (injury.treatment === 'new') {
+	sendMessage("Injury needs to be treated; or set to Untreated");
+	return;
+    }
+    if (injury.type === 'unknown') {
+	sendMessage("Please set the injury type before rolling (Bone, Organ etc)");
+	return;
+    }
+    let column = recoveryRollData[injury.type];
+    if (!column) {
+	sendMessage(`Unable to find recovery column for ${injury.type}`);
+	return;
+    }
+
+    // d100OE + BD ranks + Co + Type - Injury Penalty
+    let mod = parseIntDefault(injury.bodydevelopment_ranks);
+    let log = `${mod} [BodyDev Ranks] `;
+
+    {
+	const co = parseIntDefault(injury.co, 0);
+	mod += co;
+	if (co > 0) {
+	    log += `+${co}&nbsp;[Co bonus] `;
+	} else {
+	    log += `${co}&nbsp;[Co bonus] `;
 	}
+    }
+
+    {
+	const pen = parseIntDefault(injury.penalty);
+	mod -= pen;
+	log += `-${pen}&nbsp[Injury Penalty] `;
+    }
+
+    if (injury.treatment == 'untreated') {
+	mod -= 100;
+	log += '-100&nbsp;[Untreated] ';
+    } else if (injury.treatment == 'medicine') {
+	log += '+0&nbsp;[Medicine] ';
+    } else if (injury.treatment == 'medicineabsolute') {
+	mod += 25;
+	log += '+25&nbsp;[Medicine Absolute Success] ';
+    } else if (injury.treatment == 'magic') {
+	mod += 50;
+	log += '+50&nbsp;[Magic or Herbalism] ';
+    } else if (injury.treatment == 'magicherbalism') {
+	mod += 75;
+	log += '+75&nbsp;[Magic and Herbalism] ';
+    }
+
+    startRoll("&{template:rmurecovery} " +
+	"[[ 1d100!>96 ]] [[ 1d100!>96 ]] " +
+	     "{\{roll=$[[0]]}} " +
+	     "{\{oeroll=$[[1]]}} " +
+	     `{\{who=${injury.character_name}}} ` +
+	     `{\{mod=${mod}}} ` +
+	     `{\{modlog=[[0]]}} ` +
+	     `{\{total=[[0]]}} ` +
+	     `{\{result=[[0]]}} `, (roll) => {
+	let mainroll = roll.results.roll.result;
+	let mainrollstr = roll.results.roll.dice.join(' + ');
+	if (mainroll < 6) {
+	    mainroll -= roll.results.oeroll.result
+	    mainrollstr = mainrollstr + ' - (' + roll.results.oeroll.dice.join(' + ') + ')';
+	}
+	let total = mainroll + mod;
+
+	// So lets work out hte index;
+	let ind = 6;
+	if (total < 1) ind = 0;
+	else if (total < 51) ind = 1;
+	else if (total < 76) ind = 2;
+	else if (total < 101) ind = 3;
+	else if (total < 126) ind = 4;
+	else if (total < 176) ind = 5;
+	else ind = 6;
+
+	let basedays = column[ind];
+	if (typeof(basedays) != 'number') {
+		console.log("Got invalid result", basedays, column, ind);
+		sendMessage("Error occured looking up base days");
+		return;
+	}
+
+	// So mutiplier time
+	let adjustdays = basedays;
+	let adjustlog = `${basedays} days`;
+	if (injury.location.toLowerCase().includes('head')) {
+	    adjustdays *= 2;
+	    adjustlog += ' x2&nbsp;[Head Injury] ';
+	}
+
+	if (injury.severity == 'Medium') {
+	    adjustdays *= 5;
+	    adjustlog += ' x5&nbsp;[Medium Severity] ';
+	} else if (injury.severity == 'Severe') {
+	    adjustdays *= 10;
+	    adjustlog += ' x10&nbsp;[Severe Severity] ';
+	}
+
+	let finallog = adjustlog;
+	if (adjustdays != basedays) {
+	    finallog = `${adjustdays} Days = ` + adjustlog;
+	}
+
+	// FIXME: Calculate recovery schedule and save it.
+
+	finishRoll(roll.rollId, {
+		total: total,
+		roll: mainrollstr,
+		modlog: log,
+		result: finallog
+	    });
+     });
+}
+
+onCheck("clicked:repeating_specificinjury:recoveryroll", (ev) => {
+    const basename = ev.sourceAttribute.replace(/_recoveryroll\d*$/, "");
+    console.log(basename, ev);
+    startRecoveryRoll(basename);
 });
+
+// FIXME: Should add a are you sure button
+onCheck('clicked:repeating_specificinjury:deleteitem', (ev) => {
+	const basename = ev.sourceAttribute.replace("_deleteitem", "");
+	removeRepeatingRow(basename);
+});
+
+
 
 // vim: set sw=4 sts=4 syn=javascript :
 
@@ -12933,6 +13607,11 @@ function doVersionCheck(version) {
     version = 2;
   }
 
+  if (version == 2) {
+    addPendingFunction("Upgrade from 2 to 3", upgradeV2to3);
+    version = 3;
+  }
+
   if (oldversion != version) {
     addPendingFunction(`Version update to ${version}`, () => {
 	setAttrsPending({version: version});
@@ -12968,6 +13647,14 @@ function upgradeV1to2() {
       });
 
   });
+}
+
+/**
+ * Version 2 may have two realm stats listed in scr misc.
+ * delete the 'Realm Stat Bonus' field.
+ */
+function upgradeV2to3() {
+  miscAttrRemove("scr_misc", "Realm Stat Bonus");
 }
 
 

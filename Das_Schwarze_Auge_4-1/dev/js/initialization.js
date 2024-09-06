@@ -144,7 +144,7 @@ function initializeSheet(migrationChain) {
 				{
 					for ( attr of attrsToInit )
 					{
-						attrs[attr] = defaultValues[attr];
+						attrs[attr] = getDefaultValue(attr);
 					}
 					debugLog(caller, "Attributes after initialization: ", attrs);
 				}

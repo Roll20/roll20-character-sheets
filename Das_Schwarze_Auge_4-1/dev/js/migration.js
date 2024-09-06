@@ -470,7 +470,7 @@ function migrateTo20210718 (migrationChain) {
 		if (results["errors"] >= 1) {
 			debugLog(caller, "Missing properties: '" + results["missing"].toString() + "'. Using default values. 0 for 'Ges_BE', 'BE_Last', 'BE_TaW' and 'sf_rustungsgewohnungIII'.");
 			for (req of requirements) {
-				if (!values.hasOwnProperty(req)) {
+				if (!Object.hasOwn(values, req)) {
 					values[req] = defaultValue;
 				}
 			}
@@ -928,7 +928,7 @@ function migrateTo20240510(migrationChain) {
 	safeGetAttrs(["subtag1"], function (v) {
 		var attrsToChange = {};
 
-		if (valueMap.hasOwnProperty(v["subtag1"]))
+		if (Object.hasOwn(valueMap, v["subtag1"]))
 		{
 			attrsToChange["sf_representations"] = valueMap[v["subtag1"]];
 		}

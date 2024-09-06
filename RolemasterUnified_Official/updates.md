@@ -1,3 +1,47 @@
+# 2024-9-3
+
+- Bump sheet to version 3
+  - Version 3 has only 'Realm Stat' for SCRs, removes 'Realm Stat Bonus'
+- Clear high level spell names on updates.
+- Move defenses near RRs on the main page.
+- Spell display:
+  - Don't add Realm Stat to casting bonuses twice.
+  - Always put things [ ] (even hand bonusues) in description
+  - Display 'no voice' corrently (not undefined)
+- Attacks:
+  - Fix escaping for ')' on targets
+  - Fix for target size bug (typo I guess)
+  - Encode location in the damage string.
+- Actions
+  - Persist free action, and clear after 4 phases.
+  - Show the correct phase (relative, not the total)
+  - Add 'new combat' button
+- Status
+  - Display staggered/stun status
+  - Apply stun penalties to spells & attacks
+- Injuries
+  - Display knockback, grapple and other injury types
+  - Keep record of penalty based injuries
+  - Display injuries on Scratch page
+  - Add basic recovery rolls
+  - Set the location in the injury
+  - Can delete injuries
+- Bug fixes:
+  - Misc Remove Attr function now actually does something
+  - Fix minor (but amazinlgy irritating) bug in the AP description
+
+# 2024-8-29
+
+Bonus midweek update
+- Split injury handling out
+- Handle breakage penalties in criticals correctly
+- Improve layout of rolltemplates; only show Apply when it's useful
+- Condition tracking:
+  - Track current phase
+  - Handle bleeds
+- AP Tracking for attacks: Melee & Spells
+- Add special page to apply injuries
+
 # 2024-8-27
 
 - Add movement for creatures

@@ -14,7 +14,7 @@
                     </button>
                     -->
                     <button name="act_static_screen_rolls_button" class="styling-section-button wide-button button-click-animation theme-button" type="action">
-                        <span class="d6font">C&nbspD</span>
+                        <span class="d6font">C D</span>
                     </button>
                 </div>
                 <div class="grid-minor-section-title theme-title">
@@ -124,7 +124,7 @@
                         <div class="grid-minor-screen-version styling-pill theme-minor">
                             <span data-i18n="sheet-version">Sheet Version</span>
                         </div>
-                        <input name="attr_static_sheet_settings_version" class="grid-minor-input-version styling-pill-input theme-input" type="text" value="0.0" readonly />
+                        <input name="attr_static_sheet_settings_version" class="grid-minor-input-version styling-pill-input theme-input" type="text" value="0.1" readonly />
                         <div class="grid-minor-screen-size styling-pill theme-minor">
                             <span data-i18n="size">Size</span>
                         </div>
@@ -560,8 +560,10 @@
                             <input name="attr_static_group_type_points" class="grid-minor-input-grouptypepoints styling-pill-input theme-input" type="text" value="" readonly />
 
                             <div class="grid-minor-groupdescription styling-big-pill theme-minor">
-                                <span data-i18n="description">Description</span>
-                                <textarea name="attr_static_group_type_description" class="grid-minor-input-groupdescription styling-big-pill-textarea-attribute theme-input" wrap="soft"></textarea>
+                                <span data-i18n="configuration">Configuration</span>
+                                <textarea name="attr_static_group_type_description" class="grid-minor-input-groupdescription styling-big-pill-textarea-attribute theme-input" wrap="soft" placeholder="No special configuration" readonly></textarea>
+                                <!--<span data-i18n="description">Description</span>
+                                <textarea name="attr_static_group_type_description" class="grid-minor-input-groupdescription styling-big-pill-textarea-attribute theme-input" wrap="soft"></textarea>-->
                             </div>
 
                             <div class="grid-minor-groupenhancements styling-big-pill theme-minor">
@@ -1020,16 +1022,6 @@
                         <div class="grid-minor-combat-header styling-pill-title theme-major">
                             <span data-i18n="combat">Combat</span>
                         </div>
-                        <div class="grid-minor-rules-extradamage styling-pill theme-minor">
-                            <span data-i18n="additional-ranged-damage">Additional Ranged Damage</span>
-                        </div>
-                        <div class="grid-minor-extradamage-state grid-minor-justify-end">
-                            <input name="attr_rules_optional_extradamage_status" class="styling-rule-checkbox" type="checkbox" value="1" />
-                            <button name="act_rules_optional_extradamage_button" class="styling-rule-button" type="action">
-                                <span name="attr_rules_optional_extradamage_icon" class="styling-rule-icon font-pictos"></span>
-                                <input name="attr_rules_optional_extradamage_icon" type="hidden" value="_" />
-                            </button>
-                        </div>
                         <div class="grid-minor-rules-maneuvers styling-pill theme-minor">
                             <span data-i18n="combat-maneuvers">Combat Maneuvers</span>
                         </div>
@@ -1038,6 +1030,16 @@
                             <button name="act_rules_optional_maneuvers_button" class="styling-rule-button" type="action">
                                 <span name="attr_rules_optional_maneuvers_icon" class="styling-rule-icon font-pictos"></span>
                                 <input name="attr_rules_optional_maneuvers_icon" type="hidden" value="_" />
+                            </button>
+                        </div>
+                        <div class="grid-minor-rules-extradamage styling-pill theme-minor">
+                            <span data-i18n="extra-ranged-damage">Extra Ranged Damage</span>
+                        </div>
+                        <div class="grid-minor-extradamage-state grid-minor-justify-end">
+                            <input name="attr_rules_optional_extradamage_status" class="styling-rule-checkbox" type="checkbox" value="1" />
+                            <button name="act_rules_optional_extradamage_button" class="styling-rule-button" type="action">
+                                <span name="attr_rules_optional_extradamage_icon" class="styling-rule-icon font-pictos"></span>
+                                <input name="attr_rules_optional_extradamage_icon" type="hidden" value="_" />
                             </button>
                         </div>
                         <div class="grid-minor-rules-knockback styling-pill theme-minor">
@@ -4782,9 +4784,15 @@
                 defect[j].points : 0;
             }
         }
-        cache.groupdb[temp.group_id].group_points = temp.spent;
+        temp.group_points = 
+            cache.groupdb[temp.group_id].origin === 'item' ||
+            cache.groupdb[temp.group_id].origin === 'shield' ? 
+                Math.max(Math.floor(temp.spent/2), 0) :
+            cache.groupdb[temp.group_id].origin === 'gear' ? 
+                cache.groupdb[temp.group_id].level : temp.spent;
+        cache.groupdb[temp.group_id].group_points = temp.group_points;
         if (cache.static_group_visible_id === temp.group_id) {
-            set_values.static_attributes_group_points = temp.spent;
+            set_values.static_attributes_group_points = temp.group_points;
         }
     }
 
@@ -7937,6 +7945,14 @@
 
     async function attributesMenu(cache, set_values) {
         const query = {} ;
+        const gear_amount = {
+            1:'1-2',
+            2:'3-5',
+            3:'6-10',
+            4:'11-25',
+            5:'26-50',
+            6:'51-100'
+        };
         clog(cache, query, 'attributesMenu()');
         query.next = 'select_type';
         cache.attribute_ids = await getSectionIDsAsync('attributes');
@@ -8043,6 +8059,7 @@
                     query.options = 
                         `|${getTranslationByKey("standard")},standard` +
                         `|${getTranslationByKey("dynamic-powers")},dynamic powers` +
+                        `|${getTranslationByKey("gear")},gear` +
                         `|${getTranslationByKey("power-flux")},power flux` +
                         `|${getTranslationByKey("power-variation")},power variation` + 
                         `|${getTranslationByKey("go-back")},select_type`;
@@ -8280,8 +8297,9 @@
                     query.title = `${getTranslationByKey(query.attribute_translation)}`;
                     query.options = 
                     `|${getTranslationByKey("name")}: ${query.name},set_name` +
-                    `|${getTranslationByKey("source")}: ${getTranslationByKey(query.source)},set_group_source` +
-                    `|${getTranslationByKey("origin")}: ${getTranslationByKey(query.origin.toKebobCase())},set_group_origin`;
+                    `|${getTranslationByKey("source")}: ${getTranslationByKey(query.source)},set_group_source`;
+                    query.options += query.attribute !== 'gear' ?
+                    `|${getTranslationByKey("origin")}: ${getTranslationByKey(query.origin.toKebobCase())},set_group_origin` : '';
                     if (query.group_type !== 'standard') {
                         query.enhancements_ranks = query.enhancements.map(e => e.rank || 0)
                             .reduce((m, n) => m + n, 0);
@@ -8411,9 +8429,9 @@
                     query.title = 'Origin Type';
                     query.options = 
                         `|${getTranslationByKey("innate")},innate` +
-                        `|${getTranslationByKey("gear")},gear` +
+                        //`|${getTranslationByKey("gear")},gear` +
                         `|${getTranslationByKey("item")},item` +
-                        `|${getTranslationByKey("mini-object")},mini object` +
+                        //`|${getTranslationByKey("mini-object")},mini object` +
                         `|${getTranslationByKey("shield")},shield` +
                         `|${getTranslationByKey("go-back")},group_menu`;
                     query.last = query.next;
@@ -8869,7 +8887,7 @@
                         query.group_type = query.selection;
                         query.attribute = query.selection;
                         query.attribute_translation = query.attribute.toKebobCase();
-                        query.origin = 'innate';
+                        query.origin = query.attribute === 'gear' ? 'gear' : 'innate';
                         query.name = `Group ${query.group_id}`;
                         query.source = 'high-technology';
                         if (query.selection !== 'standard') {
@@ -8881,9 +8899,10 @@
                             query.pointpool = getTranslationByKey(`${
                                 query.selection === 'power flux' ? "flux-points" : 
                                 query.selection === 'power variation' ? "variable-points" : 
+                                query.selection === 'gear' ? "amount-of-gear" : 
                                 "dynamic-powers-levels"
                             }`);
-                            query.stat = 'variable';
+                            query.stat = query.attribute === 'gear' ? 'none' : 'variable';
                             query.elevel = 0;
                             if (query.selection === 'power variation') {
                                 query.locked = 'no';
@@ -8998,7 +9017,7 @@
                             query.next = query.selection;
                         } else {
                             query.rank = 
-                                limiter_ranks[`${query.attribute}`][`${query.selection}`] === undefined ? 0 :
+                                limiter_ranks[`${query.attribute}`] === undefined ? 0 ://[`${query.selection}`] === undefined ? 0 :
                                 limiter_ranks[`${query.attribute}`][`${query.selection}`].rank;
                             query.limiters.push({
                                 name:query.selection,
@@ -9924,11 +9943,14 @@
                         groupdb_entry.points = attribute_costs[query.attribute] * query.level;
                         groupdb_entry.pool_points = query.elevel * int(`${
                             query.attribute === 'power flux' ? 5 : 
-                            query.attribute === 'dynamic powers' ? 2 : 0
+                            query.attribute === 'dynamic powers' ? 2 :
+                            query.attribute === 'gear' ? 1 : 0
                         }`);
+                        if (query.attribute === 'gear') {
+                            set_values.static_group_pointpool_points = 
+                                gear_amount[query.elevel] || 'unsupported';
+                        }
                         groupdb_entry.pool_name = query.pointpool;
-                            //query.attribute === 'power flux' ? 
-                            //'Flux Points' : 'Variable Points';
                         if (query.attribute === 'power variation') {
                             groupdb_entry.locked = false;
                         }
@@ -9960,6 +9982,9 @@
                             cache.groupdb[query.load[1]].pool_points = query.elevel * 5;
                         } else if (query.attribute === 'dynamic powers') {
                             cache.groupdb[query.load[1]].pool_points = query.elevel * 2;
+                        } else if (query.attribute === 'gear') {
+                            set_values.static_group_pointpool_points = 
+                                gear_amount[query.elevel] || 'unsupported';
                         }
                     }
                     setAttributeGroupVisibility(cache, set_values);
