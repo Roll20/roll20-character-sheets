@@ -16808,7 +16808,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	for (const [ailmentName, procCount] of Object.entries(procAilmentList)) {
 		for (let i = 0; i < procCount; i++) {
 			if (ailmentName[0] == "-") { /* If custom ailment */
-				updateCustomAilment(ailmentName);
+				updateCustomAilment(ailmentName, "standard", "false");
 			} else { /* If standard ailment */
 				updateAilments([ailmentName]);
 			}
@@ -18749,6 +18749,14 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 	/* Mode behaviour */
 	if (mode == "decay") { activateEffect = "false"; }
 	if (mode == "effect") { activateDecay = "false"; }
+	if (trigger == "None" && mode != "standard") {
+		activateEffect = "false";
+		activateDecay = "false";
+	}
+
+	console.log(ailname)
+	console.log(trigger)
+	console.log(mode)
 
 	/* Max Behavior Check */
 	if(maxcount > 0 && count < maxcount){
@@ -18876,7 +18884,7 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 		output[`repeating_ailments_${rowid}_ailNum`] = parseInt(newcount);
 		returnValues[ailname][0] = parseInt(newcount);
 	}
-	if (activateDecay == "true" && roundEnd == "true") {
+	if (roundEnd == "true") {
 		if (trigger == "WhenHit" && decayRoundEnd != "true") {
 			output[`repeating_ailments_${rowid}_ailNum`] = parseInt(count);
 		}
