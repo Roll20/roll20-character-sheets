@@ -226,7 +226,8 @@
 		</fieldset>
 
 		<!-- Generic token controls -->
-		<input type="text" name="attr_tokenId_selected" hidden="true">
+		<input type="text" name="attr_tokenId_selected" value="" hidden="true">
+		<input type="text" name="attr_tokenId_suppressUpdate" value="false" hidden="true">
 
 
 		<!-- Theorical way to handle multiple multiple token bars at once
@@ -2911,6 +2912,8 @@
 		</div>
 		<div class="columnAlign" style="margin-left: 3px;">
 			<input type="text" class="darkInput" name="attr_targetName" style="width: 149px;" placeholder="Target name"> <!-- data-i18n-placeholder="helper-text-targetName" -->
+			<input type="text" name="attr_targetId" hidden="true">
+			<input type="text" name="attr_targetTokenId" hidden="true">
 			<input type="number" class="darkInput defenceDice" name="attr_lastDefenceRoll" min="0"> <!-- delete this later -->
 			<input type="text" name="attr_selfToken" hidden>
 		</div>
@@ -10785,6 +10788,15 @@ function deleteToken(tokenId) {
 
 /* On changing the selected token, imports the status bars and ailments of that token */
 on('change:tokenId_selected', (info) => {
+	getAttrs(["tokenId_suppressUpdate"], function(values) {
+		if (values.tokenId_suppressUpdate == "true") {
+			setAttrs({"tokenId_suppressUpdate": "false"});
+		} else {
+			updateSelectedToken(info);
+		}
+	});
+});
+function updateSelectedToken(info, callback=()=>{}) {
 	/* Clear the old selection if there was one */
 	if (info.previousValue != undefined && info.newValue != undefined) {
 		setAttrs({[`repeating_tokens_${info.previousValue}_token_selected`]:"false"});
@@ -10823,16 +10835,17 @@ on('change:tokenId_selected', (info) => {
 
 			/* Set new selection */
 			output[`${tokenPrefix}_token_selected`] = "true";
-			setAttrs(output);
+			setAttrs(output, {}, () => {
+				callback();
+			});
 		});
 	}
-});
+}
 
 /* Hides token bar value in display if it matches that of the character sheet */
 let barList = ["hp", "stagres", "sp", "light"];
 barList.forEach(bar => {
 	on(`change:repeating_tokens:${bar} change:repeating_tokens:${bar}_token`, (info) => {
-		console.log(info)
 		let attr_sheet = `${info.sourceAttribute}`;
 		let attr_token = `${info.sourceAttribute}`;
 		if (info.sourceAttribute.match(/_token/g).length == 2) {
@@ -10848,7 +10861,7 @@ barList.forEach(bar => {
 	});
 });
 /* Sync: Status bars */
-[...barList, "light"].forEach(bar => {
+barList.forEach(bar => {
 	on(`change:${bar} change:repeating_tokens:${bar}`, (info) => {
 		if (info.newValue != undefined) {
 			getAttrs(["tokenId_selected"], function(values) {
@@ -10873,7 +10886,7 @@ on(`change:ailmentList`, (info) => {
 			let selectedId = values.tokenId_selected;
 			if (selectedId != "") {
 				setAttrs({[`repeating_tokens_${selectedId}_tokenAilmentList`]:info.newValue});
-				updateTokenAilmentDisplay(selectedId, ailmentList)
+				updateTokenAilmentDisplay(selectedId, ailmentList);
 			}
 		});
 	}
@@ -11026,7 +11039,24 @@ async function updateToken(selectAttrs, mode="full") {
 	});
 	});
 }
-
+async function changeActiveToken(tokenId, callback=()=>{}) {
+	getAttrs(["settingGenericTokenMode", "tokenId_selected"], function(values) {
+		if (values.settingGenericTokenMode != "true" || tokenId == "" || tokenId == values.tokenId_selected) {
+			callback();
+		} else {
+			/* Makes certain the tokenId update is being suppressed before setting the attribute */
+			setAttrs({"tokenId_suppressUpdate": "true"}, {}, () => {
+				setAttrs({"tokenId_selected": tokenId}, {}, () => {
+					let info = {newValue: tokenId}
+					if (values.tokenId_selected != "") { info.previousValue = values.tokenId_selected; }
+					updateSelectedToken(info, ()=>{
+						callback();
+					});
+				});
+			})
+		}
+	});
+}
 
 
 
@@ -11035,12 +11065,14 @@ on('clicked:selectTarget', async (data) => {
 	getTarget("true");
 });
 async function getTarget(setTarget="false", callback=()=>{}) {
-	let rollBase = `! {{character_name=[[0[@{target|Character|character_name}]]]}} {{selfToken=[[0[@{target|Character|selfToken}]]]}}`;
+	let rollBase = `! {{character_name=[[0[@{target|Character|character_name}]]]}} {{character_id=[[0[@{target|Character|character_id}]]]}} {{selfToken=[[0[@{target|Character|selfToken}]]]}} {{tokenId=[[0[@{target|Character|token_id}]]]}}`;
 	
 	let targetRoll = await startRoll(rollBase);
 	let target = {
 		targetName: targetRoll.results.character_name.expression.match(/^0\[(.*)\]\s*$/)[1],
-		targetToken: targetRoll.results.selfToken.expression.match(/^0\[(.*)\]\s*$/)[1]
+		targetId: targetRoll.results.character_id.expression.match(/^0\[(.*)\]\s*$/)[1],
+		targetToken: targetRoll.results.selfToken.expression.match(/^0\[(.*)\]\s*$/)[1],
+		targetTokenId: targetRoll.results.tokenId.expression.match(/^0\[(.*)\]\s*$/)[1]
 	}
     finishRoll(targetRoll.rollId);
 	if (setTarget == "true") {
@@ -11189,13 +11221,17 @@ async function createActionButtons(buttonList, override="") {
 	});
 }*/
 
-async function createActionButtons(buttonList, charname="", charid="selected") {
-	
-	getAttrs(["settingHideActionButtons", "settingWhisperRolls", "settingWhisperTarget"], async function(values) {
+async function createActionButtons(buttonList, targetOverride="") {
+
+	getAttrs(["settingHideActionButtons", "settingWhisperRolls", "settingWhisperTarget", "targetName", "targetId", "targetTokenId"], async function(values) {
 
 	if (values.settingHideActionButtons == "true") {
 		return;
 	}
+
+	let targetName = values.targetName;
+	let targetId = values.targetId;
+	let targetTokenId = values.targetTokenId;
 
 	/* Whisper roll */
 	let whisperrolls = values.settingWhisperRolls;
@@ -11206,6 +11242,10 @@ async function createActionButtons(buttonList, charname="", charid="selected") {
 		whisper =  `/w ${whispertarget} `;
 		whispermode = "Whisper";
 	}
+	else if (targetName != "" && targetOverride == "") {
+		whisper =  `/w ${targetName} `
+		whispermode = "Whisper";
+	}
 
 	let rollBase = whisper + `&{template:actionbuttons} {{whisperMode=${whispermode}}} `;
 	let dataList = {}
@@ -11214,7 +11254,17 @@ async function createActionButtons(buttonList, charname="", charid="selected") {
 		for (let i = 0; i < buttonList.length; i++) {
 			rollBase += ` {{targetid${i}=[[0]]}} {{datapackage${i}=[[0]]}} {{buttonlabel${i}=${buttonList[i][0]}}} {{icon${i}=${buttonList[i][1]}}} {{color${i}=${buttonList[i][2]}}} {{buttonlink${i}=${buttonList[i][3]}}}`;
 			dataList[`datapackage${i}`] = Data.package([buttonList[i][4]]);
-			dataList[`targetid${i}`] = (buttonList[i][5] == "selected") ? "selected" : charid;
+
+			// For the target, use this function's override if set, otherwise use the generateActionButton target if set, otherwise use the sheet's targetId if it's set. If all else fails use "selected"
+			if (targetOverride != "") {
+				dataList[`targetid${i}`] = targetOverride;
+			} else if (buttonList[i][5] != undefined) {
+				dataList[`targetid${i}`] = buttonList[i][5];
+			} else if (targetId != "") {
+				dataList[`targetid${i}`] = targetId;
+			} else {
+				dataList[`targetid${i}`] = "selected";
+			}
 		}
 		let buttonRoll = await startRoll(rollBase); 
 		finishRoll(buttonRoll.rollId, dataList);
@@ -11283,12 +11333,14 @@ on('clicked:actionButtonDamage', async (data) => {
 		}
 
 		/* If taking Light damage, process it as an Add AutoEffect */
-		if (data.flatLightOverride != 0) {
+		if (data.flatLightOverride != undefined && data.flatLightOverride != 0) {
 			data.autoScriptOverride = `(Add -${data.flatLightOverride} Light)`;
 		}
 
-		if (typeof data == "string") {
-			AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
+		if (data.AutoScript != undefined) {
+			let overrideList = {}
+			if (data.targetTokenId != undefined) { overrideList.targetTokenId = data.targetTokenId; }
+			AutoScriptMain(data.AutoScript, "None", "false", "true", overrideList, () => {}, getTranslationByKeyCustom("Apply damage", "helper-text-applydamage"));
 		} else {
 			damageHelper(data, defenceRoll);
 		}
@@ -11299,12 +11351,12 @@ on('clicked:actionButtonDamage', async (data) => {
 on('clicked:actionButtonInflict', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	AutoScriptMain(data.AutoScript, "None", "false", "true", { targetTokenId: data.targetTokenId }, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
 });
 on('clicked:actionButtonGive', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	data = data[0];
-	AutoScriptMain(data, "None", "false", "true", { targetmode:"false" }, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+	AutoScriptMain(data.AutoScript, "None", "false", "true", { targetTokenId: data.targetTokenId }, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
 });
 
 
@@ -12814,14 +12866,35 @@ else {
 on('clicked:updateAilments', function() {
 	getAttrs(['settingGenericTokenMode'], async function(values) {
 		if (values.settingGenericTokenMode == "true") {
-			updateAilments();
+			getSectionIDs(`repeating_tokens`, tokenidarray => {
+				delayUpdate(tokenidarray);
+			});
 		} else {
 			updateAilments();
 		}
 	});
 });
+/* When using multiple tokens, due to all the on:change functions used by the sheet, a delay is 
+    needed to ensure all fields have been properly updated before proceeding to the next token */
+function delayUpdate(tokenidarray) {
+	setTimeout(function() {
+		let tokenId = tokenidarray[0];
+		changeActiveToken(tokenId, () => {
+			updateAilments([], () => {
+				/* Repeat loop while unupdated tokenIds remain */
+				if (tokenidarray.length > 1) {
+					delayUpdate(tokenidarray.slice(1));
+				}
+			});
+		});
+	}, 1000); // For my PC 500ms seems fine, but leaving it at 1000ms to hopefully make it run properly for lower spec PCs
+}
 
-function updateAilments(ailmentOverride=[]) {
+/* Has the following modes: */
+/* single: updates main sheet */
+/* multiple: updates all token's sheets */
+function updateAilments(ailmentOverride=[], callback=()=>{}) {
+	
 	getSectionIDs(`repeating_global`, idarray => {
 		let id = `repeating_global_${idarray[0]}`;
 
@@ -13112,8 +13185,9 @@ function updateAilments(ailmentOverride=[]) {
 		else { output[`${ailment}`] = parseInt(values[`${ailment}NextTurn`]); }
 		output[`${ailment}NextTurn`] = 0;
 	});
-
-	setAttrs(output);
+	setAttrs(output, {}, () => {
+		callback();
+	});
 	});
 	});
 }
@@ -13321,7 +13395,6 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 	}
 	});
 	});
-
 }
 
 /* Action: Combat Roll */
@@ -13423,7 +13496,7 @@ getSectionIDs(`repeating_global`, idarray => {
 			let toolselect = values.toolselect;
 
         getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull",
-		`${id}_multiPenalty`, `${id}_multiStyle`, "targetName", "character_name", "advState", "difficulty", "baseActNum", "Light",
+		`${id}_multiPenalty`, `${id}_multiStyle`, "targetName", "targetTokenId", "character_name", "advState", "difficulty", "baseActNum", "Light",
 		"difficulty", "Bleed", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
 		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
@@ -13437,6 +13510,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let newlight = parseInt(values.Light);
 	let charname = values.character_name;
 	let targetname = values.targetName;
+	let targettokenid = values.targetTokenId;
 	let simpledisplay = values.settingSimpleDisplay;
 	let hidebaseffect = values.settingHideBaseEffect;
 	let whisperrolls = values.settingWhisperRolls;
@@ -13682,8 +13756,8 @@ getSectionIDs(`repeating_global`, idarray => {
 	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 		if (buttonKey.startsWith("auto")) {
 			switch (buttonKey.split(" ")[0]) {
-				case "autoDamage": if (basetype != "Attack") { buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)) }; break;
-				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
+				case "autoDamage": if (basetype != "Attack") { buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})) }; break;
+				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
 				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
 			}
 		}
@@ -13959,7 +14033,7 @@ getSectionIDs(`repeating_global`, idarray => {
 				if (Object.keys(rollList).length == 1) {
 					rollNumber = "";
 				}
-				buttonList.push(generateActionButton("autoDamage"+rollNumber, getIcon("icons","damage"), "red", "actionButtonDamage", {...damage_data}));
+				buttonList.push(generateActionButton("autoDamage"+rollNumber, getIcon("icons","damage"), "red", "actionButtonDamage", {...damage_data, targetTokenId: targettokenid}));
 			}
 		}
 		createActionButtons(buttonList);
@@ -14177,6 +14251,11 @@ on('clicked:applyDamage', (info) => {
 });
 
 function damageHelper(overrideList={}, defenceRoll=0) {
+
+	let tokenId = "";
+	if (overrideList.targetTokenId != undefined) {tokenId = overrideList.targetTokenId; }
+	changeActiveToken(tokenId, () => {
+
 	/* Get attribute values */
 	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
@@ -14748,6 +14827,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	});
 	});
 	});
+	});
 }
 
 
@@ -14989,10 +15069,11 @@ on('clicked:declareAction', (info) => {
 		let toolselect = values.toolselect;
 
 	/* Get attributes */
-        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "targetName", "character_name", "Light", "skillSelect", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, `${skillselect}AutoScript`, "Bleed"], function(values) {
+        getAttrs(["actionType", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "targetName", "targetTokenId", "character_name", "Light", "skillSelect", "selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect", "selectDescription", "baseActNum", "distortState", "tool1Name", "tool1Reusable", "tool1Uses", "tool1Uses_max", "tool1Effect", "tool1Description", "tool2Name", "tool2Reusable", "tool2Uses", "tool2Uses_max", "tool2Effect", "tool2Description", "tool3Name", "tool3Reusable", "tool3Uses", "tool3Uses_max", "tool3Effect", "tool3Description", "tool4Name", "tool4Reusable", "tool4Uses", "tool4Uses_max", "tool4Effect", "tool4Description", "special1Name","special1Description",  "special1Range", "special1Duration", "special1Risk", "special2Name", "special2Description", "special2Range", "special2Duration", "special2Risk", "egoName", "egoType", "egoDescription", "egoUses", "egoUses_max", "egoUseType", "egoEffect", "egoRisk", "egoRange", "egoDuration", "settingHideUses", `${toolselect}AutoScript`, `${skillselect}AutoScript`, "Bleed"], function(values) {
 
 	let charname = values.character_name;
 	let targetname = values.targetName;
+	let targettokenid = values.targetTokenId;
 	let simpledisplay = values.settingSimpleDisplay;
 	let hidebaseffect = values.settingHideBaseEffect;
 	let whisperrolls = values.settingWhisperRolls;
@@ -15191,8 +15272,8 @@ on('clicked:declareAction', (info) => {
 	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 		if (buttonKey.startsWith("auto")) {
 			switch (buttonKey.split(" ")[0]) {
-				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)); break;
-				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
+				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
+				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
 				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
 			}
 		}
@@ -16391,6 +16472,10 @@ Block and Evade also include Defensive */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
 function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
 	
+	/* If using generic token mode, switches to the correct token */
+	let tokenId = (overrideList.targetTokenId != undefined) ? overrideList.targetTokenId : "";
+	changeActiveToken(tokenId, () => {
+
 	/* Adds the input AutoScript */
 	let AutoScript = "";
 	if (inputAutoScript != "") {
@@ -16458,7 +16543,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 
 	/* Get relevant attributes */
 	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
-	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", //"settingTargetMode",
+	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", "targetTokenId", //"settingTargetMode",
 	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "thisRoundSpeed", "nextRoundSpeed", 
 	"StaggerState", "distortState", "egoActiveState", "egoType", "autoScriptStyling",
 	"THP_Sources", "TST_Sources"], function(values) {
@@ -16470,6 +16555,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let settingHideNextTurn = values.settingHideNextTurn;
 		let settingCollapseSections = values.settingCollapseAutoEffectSections;
 		let settingConditionalButtonReminder = values.settingHideConditionalButtonReminder;
+
+		let targetTokenId = values.targetTokenId;
 		//let targetmode = values.settingTargetMode;
 		//if (overrideList.targetmode != undefined) { targetmode = overrideList.targetmode; }
 
@@ -16902,8 +16989,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 				if (buttonKey.startsWith("auto")) {
 					switch (buttonKey.split(" ")[0]) {
-						case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", buttonValue)); break;
-						case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", buttonValue)); break;
+						case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targetTokenId})); break;
+						case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targetTokenId})); break;
 						case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
 					}
 				}
@@ -16915,6 +17002,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 
 	setAttrs(output);
 	callback(returnValues);
+	});
 	});
 	});
 	});
