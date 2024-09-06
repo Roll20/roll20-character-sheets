@@ -12100,6 +12100,12 @@ getSectionIDs(`repeating_global`, idarray => {
 		style = style + "limbus/";
 	}
 
+	/* Get the trigger type */
+	let type = "state";
+	if (eventInfo.sourceAttribute == "staggerduration") {
+		type = "duration";
+	}
+
 	let iconnew = "<img src='" + style + "FragileStagger.png' style='width: 25px; height: 25px;' >";
 	let currentstate = values.StaggerState;
 	let stateduration = parseInt(values.StaggerDuration);
@@ -12109,16 +12115,16 @@ getSectionIDs(`repeating_global`, idarray => {
 	let egostate = values.egoActiveState;
 	let sanity = parseInt(values.SP) - parseInt(values[`${id}_staggerSanity`]);
 	
-	/* Aborts the function if staggerduration is set to its max value. Hinders a double messages when Staggered (StaggerState and StaggerDuration are both changed) */
-	if (eventInfo.sourceAttribute == "staggerduration" && stateduration == statedurationmax) {
+	/* Aborts the function if staggerduration is set to its max value. Hinders a double messages when Staggered or Unstaggered (StaggerState and StaggerDuration are both changed) */
+	if (type == "duration" && stateduration == statedurationmax) {
 		return;
 	}
 
-	if(egocon == "OnStagger" && currentstate != "0"){
+	if(type == "state" && egocon == "OnStagger" && currentstate != "0"){
 		setAttrs({"egoActiveState":"true"});
 	}
 
-	if(currentstate == "Staggered" && values.distortState != "true" && stateduration == statedurationmax) {
+	if(type == "state" && currentstate == "Staggered" && values.distortState != "true") {
 		setAttrs({"SP":sanity});
 	}
 
@@ -12130,7 +12136,7 @@ getSectionIDs(`repeating_global`, idarray => {
 
 	setAttrs({"dummyIcon":iconnew});
 
-	if (stateduration == statedurationmax) {
+	if (type == "state" && currentstate == "Staggered") {
 		/* AutoScripts */
 		resetConditionals();
 		let autoScriptTrigger = currentstate == "Staggered" ? "Staggered" : "None";
@@ -12152,16 +12158,16 @@ getSectionIDs(`repeating_global`, idarray => {
 	let langStateDurationMultiRound = getTranslationByKeyCustom(" will stop being Staggered in ", "message-stagger4") + parseInt(stateduration + 1) + " " + getTranslationByKeyCustom("rounds", "message-round-plural");
 	let messageDescription = "";
 
-	if (currentstate == "Staggered" && stateduration == statedurationmax) {
+	if (type == "state" && currentstate == "Staggered") {
 		messageDescription = langStateTrue;
 	}
-	else if (currentstate == "Staggered" && stateduration == 0) {
+	else if (type == "duration" && stateduration == 0) {
 		messageDescription = langStateDurationNextRound;
 	}
-	else if (currentstate == "Staggered" && stateduration < statedurationmax) {
+	else if (type == "duration" && stateduration < statedurationmax) {
 		messageDescription = langStateDurationMultiRound;
 	}
-	else if (currentstate != "Staggered") {
+	else if (type == "state" && currentstate != "Staggered") {
 		messageDescription = langStateFalse;
 	}
 	
@@ -13051,13 +13057,13 @@ function updateAilments(ailmentOverride=[]) {
 
 
 	/* Stagger processing */
-	if(stagduration == 0) {
-		if(stagcheck != "0"){
+	if(stagcheck == "Staggered"){
+		if(stagduration == 0) {
 			stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
 			setAttrs({"StaggerState":"0", "StaggerDuration":stagdurationmax, "StagRes":stagnew});
+		} else {
+			setAttrs({"StaggerDuration":stagduration-1});
 		}
-	} else {
-		setAttrs({"StaggerDuration":stagduration-1});
 	}
 
 	/* Seal processing */
