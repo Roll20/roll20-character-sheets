@@ -21,4 +21,8 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 
 - Renamed files to: Mongoose Traveller 2e Official
 
+### Version 1.0.03
+
+- Removed all table elements
+
 ![Image](Mongoose%20Traveller%202e%20Official.png)
