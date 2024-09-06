@@ -1700,7 +1700,8 @@
 	<input type="text" name="attr_thisRoundSpeed" value="0" hidden="true">
 	<input type="text" name="attr_nextRoundSpeed" value="0" hidden="true">
 	<input type="text" name="attr_isFirstRound" value="false" hidden="true">
-	<input type="text" name="attr_prevRoundInit" value="false" hidden="true">
+	<input type="number" name="attr_prevRoundInit" value="0" hidden="true">
+	<input type="number" name="attr_prevRoundInitAttempts" value="0" hidden="true">
 	<div style="overflow: hidden; position: relative;"><div class="blocker"></div><input type="text" class="speedbox whiteInput" name="attr_calcSpeed" value="0" data-i18n-title="helper-current-speed" title="Current Speed"></div>
 
 </div>
@@ -10629,13 +10630,15 @@ function getSectionIDsAsync(sectionName){
 /* Update Loop begins */
 let loopDelay = 10000;
 let trackerItemName = "New round";
-on('sheet:opened change:settingLoopEnabled change:configLoopDelay change:configTrackerItemName', (info) => {
+on('sheet:opened change:settingLoopEnabled change:configLoopDelay change:configTrackerItemName change:prevRoundInitAttempts', (info) => {
 	getAttrs(["settingLoopEnabled", "configLoopDelay", "configTrackerItemName"], function(values) {
 		setAttrs({"loopEnabled":"false"});
 		if (values.settingLoopEnabled == "true") {
 			loopDelay = parseInt(values.configLoopDelay);
 			trackerItemName = values.configTrackerItemName;
 			restartLoop();
+		} else {
+			setAttrs({prevRoundInit: 0});
 		}
 	});
 });
@@ -10654,10 +10657,15 @@ on('change:loopEnabled', (info) => {
 });
 function stepLoop() {
 	setTimeout(function() {
-		getAttrs(["loopEnabled"], async function(values) {
-			if (values.loopEnabled == "true") {
+		getAttrs(["loopEnabled", "prevRoundInitAttempts"], async function(values) {
+			console.log(values.prevRoundInitAttempts)
+			if (values.loopEnabled == "true" && parseInt(values.prevRoundInitAttempts) < 5) {
 				let newRoundInit = await getInitiative("New round");
-				setAttrs({prevRoundInit: newRoundInit});
+				if (newRoundInit == "") {
+					setAttrs({prevRoundInitAttempts: parseInt(values.prevRoundInitAttempts) + 1});
+				} else {
+					setAttrs({prevRoundInit: newRoundInit});
+				}
 				//console.log(newRoundInit)
 				setTimeout(stepLoop, loopDelay);
 			} else {
@@ -10765,7 +10773,7 @@ function getTokenId(target="selected", setSelectMode="false", callback=()=>{}) {
 		checkTokenInstance(selectAttrs, setSelectMode, async function(addTokenInstance) {
 			if (addTokenInstance == "false") { return; };
 
-		if (setSelectMode == "true" || (setSelectMode == "unset" && tokenId_selected == "")) {
+		if (setSelectMode == "select" || setSelectMode == "add" || (setSelectMode == "unset" && tokenId_selected == "")) {
 			setAttrs({"tokenId_selected":selectAttrs.tokenId});
 		}
 
@@ -10783,21 +10791,21 @@ function getTokenId(target="selected", setSelectMode="false", callback=()=>{}) {
 }
 /* Manipulate token instances functionality */
 on('clicked:addToken', async function(info) {
-	getTokenId("selected", "unset", (selectAttrs) => {
+	getTokenId("selected", "add", (selectAttrs) => {
 		updateToken(selectAttrs);
 	});
 });
 on('clicked:addTokenMultiple', async function(info) {
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenId(`target|Target`, "unset", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
+	getTokenId(`target|Target`, "add", (selectAttrs) => { updateToken(selectAttrs);
 	});});});});});});});});});});
 });
 on('clicked:deleteToken', async function(info) {
@@ -11044,7 +11052,7 @@ async function checkGenericMode(callback=()=>{}) {
 }
 async function checkTokenInstance(selectAttrs, setSelectMode, callback=()=>{}) {
 	getSectionIDs(`repeating_tokens`, async function(idarray) {
-		if (!idarray.includes(selectAttrs.tokenId.toLowerCase()) && setSelectMode == "true") {
+		if (!idarray.includes(selectAttrs.tokenId.toLowerCase()) && setSelectMode == "select") {
 			let queryResults = await sendQuery(["addTokenInstance",
 				getTranslationByKeyCustom("Token does not have a token instance. Add instance?", "query-add-token-instance"), {
 					[getTranslationByKeyCustom("No","query-no")]:"false",
@@ -14286,7 +14294,7 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="false") {
 	setAttrs({"baseLuckNum": total });
 	}
 	else if(statn == "Speed"){
-	setAttrs({"baseSpeed": total, "isFirstRound": "true"});
+	setAttrs({"baseSpeed": total, "isFirstRound": "true", "prevRoundInitAttempts": 0});
 	}
 
 		finishRoll(results.rollId,{});
