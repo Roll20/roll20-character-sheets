@@ -25,4 +25,4 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 
 - Removed all table elements
 
-![Image](Mongoose%20Traveller%202e%20Official.png)
+![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
