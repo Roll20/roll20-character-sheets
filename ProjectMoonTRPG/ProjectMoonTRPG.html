@@ -47,6 +47,12 @@
 
 			<!-- <label for="TargetMode"><input type="checkbox" id="TargetMode" name="attr_settingTargetMode" value="true"><span data-i18n="settings-targetmode-experimental">Experimental: Target Mode</span></label> -->
 		
+			<label for="LoopEnabled"><input type="checkbox" id="LoopEnabled" name="attr_settingLoopEnabled" value="true"><span data-i18n="settings-autoupdate">Auto: Update on New round</span></label>
+			<input type="checkbox" name="attr_loopEnabled" value="true" hidden="true">
+			<input type="number" name="attr_configLoopDelay" value="10000" hidden="true">
+			<input type="number" name="attr_configUpdateDelay" value="1000" hidden="true">
+			<input type="text" name="attr_configTrackerItemName" value="New round" hidden="true">
+
 			<label for="AutoDetect"><input type="checkbox" id="AutoDetect" name="attr_settingAutoDetect" value="true" checked><span data-i18n="settings-detect">Auto: Detect combat states</span></label>
 		
 			<label for="TurnUpdate"><input type="checkbox" id="TurnUpdate" name="attr_settingTurnUpdate" value="true"><span data-i18n="settings-turnupdate">Auto: Update Turn Order</span></label>
@@ -1694,6 +1700,7 @@
 	<input type="text" name="attr_thisRoundSpeed" value="0" hidden="true">
 	<input type="text" name="attr_nextRoundSpeed" value="0" hidden="true">
 	<input type="text" name="attr_isFirstRound" value="false" hidden="true">
+	<input type="text" name="attr_prevRoundInit" value="false" hidden="true">
 	<div style="overflow: hidden; position: relative;"><div class="blocker"></div><input type="text" class="speedbox whiteInput" name="attr_calcSpeed" value="0" data-i18n-title="helper-current-speed" title="Current Speed"></div>
 
 </div>
@@ -10617,18 +10624,63 @@ function getSectionIDsAsync(sectionName){
     });
 }
 
-on("sheet:opened", ()=>{
-	//const intervalID = setInterval(testLoop, 10000);
+
+
+/* Update Loop begins */
+let loopDelay = 10000;
+let trackerItemName = "New round";
+on('sheet:opened change:settingLoopEnabled change:configLoopDelay change:configTrackerItemName', (info) => {
+	getAttrs(["settingLoopEnabled", "configLoopDelay", "configTrackerItemName"], function(values) {
+		setAttrs({"loopEnabled":"false"});
+		if (values.settingLoopEnabled == "true") {
+			loopDelay = parseInt(values.configLoopDelay);
+			trackerItemName = values.configTrackerItemName;
+			restartLoop();
+		}
+	});
 });
-async function testLoop() {
-	console.log("heya")
+function restartLoop() {
+	setTimeout(function() {
+		//console.log("reset complete")
+		setAttrs({"loopEnabled":"true"});
+	}, loopDelay + 1000);
 }
 
-on("sheet:opened", ()=>{
-	clearInterval()
+on('change:loopEnabled', (info) => {
+	if (info.newValue == "true") {
+		//console.log("beginning loop")
+		stepLoop();
+	}
 });
+function stepLoop() {
+	setTimeout(function() {
+		getAttrs(["loopEnabled"], async function(values) {
+			if (values.loopEnabled == "true") {
+				let newRoundInit = await getInitiative("New round");
+				setAttrs({prevRoundInit: newRoundInit});
+				//console.log(newRoundInit)
+				setTimeout(stepLoop, loopDelay);
+			} else {
+				//console.log("ending loop");
+			}
+		});
+	});
+}
 
-
+async function getInitiative(trackerName="") {
+	let selectAttrs = {}
+	let rollBase = `! {{trackerInitiative=[[0[@{tracker|${trackerName}}]]]}}`;
+	let selectRoll = await startRoll(rollBase);
+	let trackerInitiative =  selectRoll.results.trackerInitiative.expression.match(/^0\[(.*)\]\s*$/)[1]
+	finishRoll(selectRoll.rollId);
+	return trackerInitiative;
+}
+on('change:prevRoundInit', (info) => {
+	if (parseInt(info.newValue) < parseInt(info.previousValue)) {
+		Update();
+	}
+})
+/* Update Loop ends */
 
 
 
@@ -12864,30 +12916,43 @@ else {
 
 /* Action: Update ailments */
 on('clicked:updateAilments', function() {
-	getAttrs(['settingGenericTokenMode'], async function(values) {
+	Update();
+});
+/* Executed either a standard update or a generic token update if the setting is enabled */
+let updateDelay = 1000;
+let initialTokenId_selected = "";
+function Update() {
+	getAttrs(['settingGenericTokenMode', 'tokenId_selected', 'configUpdateDelay'], async function(values) {
 		if (values.settingGenericTokenMode == "true") {
 			getSectionIDs(`repeating_tokens`, tokenidarray => {
-				delayUpdate(tokenidarray);
+				initialTokenId_selected = values.tokenId_selected;
+				updateDelay = parseInt(values.configUpdateDelay);
+				delayUpdateAilments(tokenidarray);
 			});
 		} else {
 			updateAilments();
 		}
 	});
-});
+}
 /* When using multiple tokens, due to all the on:change functions used by the sheet, a delay is 
     needed to ensure all fields have been properly updated before proceeding to the next token */
-function delayUpdate(tokenidarray) {
+function delayUpdateAilments(tokenidarray) {
 	setTimeout(function() {
 		let tokenId = tokenidarray[0];
 		changeActiveToken(tokenId, () => {
 			updateAilments([], () => {
 				/* Repeat loop while unupdated tokenIds remain */
 				if (tokenidarray.length > 1) {
-					delayUpdate(tokenidarray.slice(1));
+					delayUpdateAilments(tokenidarray.slice(1));
+				} else {
+					setTimeout(function() {
+						setAttrs({"tokenId_selected": initialTokenId_selected});
+						initialTokenId_selected = "";
+					}, updateDelay);
 				}
 			});
 		});
-	}, 1000); // For my PC 500ms seems fine, but leaving it at 1000ms to hopefully make it run properly for lower spec PCs
+	}, updateDelay); // For my PC 500ms seems fine, but leaving it at 1000ms to hopefully make it run properly for lower spec PCs
 }
 
 /* Has the following modes: */
@@ -18053,7 +18118,7 @@ let attrkeyCharacter = ["character_nameBase", "instinct", "wisdom", "justice", "
 let attrkeySettings = ["settingWhisperRolls",
 
 "settingSimpleDisplay", "settingExtraEquip", "settingHideSpecial", "settingHelperText", "settingHideShare", "settingHideUses",
-"settingAutoDetect", "settingTurnUpdate", "settingMultihitFull", "settingMultihitUses",
+"settingLoopEnabled", "configLoopDelay", "configUpdateDelay", "configTrackerItemName", "settingAutoDetect", "settingTurnUpdate", "settingMultihitFull", "settingMultihitUses",
 "settingMuteMessage", "settingHideNextTurn", "settingBurnImmune", "settingBleedImmune",
 "settingAutoApplyDamage", "settingHideBarUpdate",
 "settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", "settingHideActionButtons", "settingHideBaseEffect", "AutoScriptStyling"];
