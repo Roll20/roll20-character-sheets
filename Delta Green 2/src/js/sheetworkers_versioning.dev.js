@@ -203,6 +203,7 @@ var version_200_201 = function version_200_201() {
             }
 
             update["".concat(repsecid, "score_old")] = values["".concat(repsecid, "score")];
+            update["".concat(repsecid, "test")] = 'editable';
           }
 
           if (section === 'weapons') {

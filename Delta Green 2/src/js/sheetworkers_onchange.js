@@ -257,6 +257,7 @@ arrays['_skills'].forEach(skill => {
         const value= skill_in_bounds(eventInfo.newValue);
         var update={};
         update[skill]=value;
+        if (value !== _initial_skills[skill]) { update[`${skill}_visible`]=`visible`; }
         updateSkillSpanOnChange(skill,value,update,'Skills')				
     });
 });

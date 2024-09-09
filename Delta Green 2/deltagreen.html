@@ -2433,7 +2433,7 @@ each val,key in defensiveQualities
                     <input name="attr_setScore" title="@{repeating_bonds_${x}_setScore}" type="hidden" value="0"/>
                     <label class="bond_button"> 
                       <input class="edit_test" type="hidden" name="attr_test"/><span class="edit_text">
-                        <input style="width:100%; padding: 0px 0px; margin: 0px 0;box-sizing: border-box;" type="text" name="attr_name" value="bond"/></span><span class="unedit_text">
+                        <input class="text-align-left" type="text" name="attr_name" value="bond"/></span><span class="unedit_text">
                         <input class="usable-color" name="attr_color" type="radio" value="on" checked="checked"/>
                         <div class="usable-element">
                           <div class="buttonwrapper">
@@ -2489,7 +2489,7 @@ each val,key in defensiveQualities
             <div class="grid section incidents-body">
               <h3 class="center" data-i18n="violence" data-i18n-title="violence">violence</h3>
               <div class="radiocontainer"> 
-                <input class="radiobox reset" type="radio" name="attr_violence" value="0"/>
+                <input class="radiobox reset" type="radio" name="attr_violence" value="-1" checked="checked"/>
                 <input class="radiobox" type="radio" name="attr_violence" value="0"/>
                 <input class="radiobox" type="radio" name="attr_violence" value="1"/>
                 <input class="radiobox" type="radio" name="attr_violence" value="2"/>
@@ -2497,7 +2497,7 @@ each val,key in defensiveQualities
               <input type="hidden" name="attr_violence_adapted" value="0"/><span class="italic" data-i18n="adapted">adapted</span>
               <h3 class="center" data-i18n="helplessness" data-i18n-title="helplessness">helplessness</h3>
               <div class="radiocontainer"> 
-                <input class="radiobox reset" type="radio" name="attr_helplessness" value="0"/>
+                <input class="radiobox reset" type="radio" name="attr_helplessness" value="-1" checked="checked"/>
                 <input class="radiobox" type="radio" name="attr_helplessness" value="0"/>
                 <input class="radiobox" type="radio" name="attr_helplessness" value="1"/>
                 <input class="radiobox" type="radio" name="attr_helplessness" value="2"/>
@@ -4061,7 +4061,7 @@ each val,key in defensiveQualities
         </div>
         <div class="inner-main agent-grid border-bottom">
           <div class="grid__item">
-            <button class="update" type="action" name="act_update_agents">1</button>
+            <!--button.update(type='action' name='act_update_agents') 1-->
             <h2>Agent</h2>
           </div>
           <div class="grid__item">
@@ -5991,6 +5991,7 @@ const version_200_201 = () => {
                                 update[`${repsecid}flag`]='';
                             }
                             update[`${repsecid}score_old`]=values[`${repsecid}score`];
+                            update[`${repsecid}test`]='editable';
                         }
 
                         if (section === 'weapons'){
@@ -7077,7 +7078,7 @@ const real_damage = (other_costs,heal_or_damage,damage_type) => {
 
 const ritual_attack_or_heal_action = (character_id,repsecid,other_costs,heal_or_attack,damage_type) => {
     const value = real_damage(other_costs,heal_or_attack,damage_type);
-    if (value === '') {return '';}
+    if (value === 0) {return '';}
     const const_button_part = '](~'+character_id+'|'+repsecid+'_';
     const target_stat=name_to_shorthand(other_costs[`${heal_or_attack}_target_stat`]);
     
@@ -7844,6 +7845,7 @@ arrays['_skills'].forEach(skill => {
         const value= skill_in_bounds(eventInfo.newValue);
         var update={};
         update[skill]=value;
+        if (value !== _initial_skills[skill]) { update[`${skill}_visible`]=`visible`; }
         updateSkillSpanOnChange(skill,value,update,'Skills')				
     });
 });

@@ -185,6 +185,7 @@ const version_200_201 = () => {
                                 update[`${repsecid}flag`]='';
                             }
                             update[`${repsecid}score_old`]=values[`${repsecid}score`];
+                            update[`${repsecid}test`]='editable';
                         }
 
                         if (section === 'weapons'){

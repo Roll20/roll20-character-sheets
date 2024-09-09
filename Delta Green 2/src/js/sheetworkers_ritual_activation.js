@@ -165,7 +165,7 @@ const real_damage = (other_costs,heal_or_damage,damage_type) => {
 
 const ritual_attack_or_heal_action = (character_id,repsecid,other_costs,heal_or_attack,damage_type) => {
     const value = real_damage(other_costs,heal_or_attack,damage_type);
-    if (value === '') {return '';}
+    if (value === 0) {return '';}
     const const_button_part = '](~'+character_id+'|'+repsecid+'_';
     const target_stat=name_to_shorthand(other_costs[`${heal_or_attack}_target_stat`]);
     

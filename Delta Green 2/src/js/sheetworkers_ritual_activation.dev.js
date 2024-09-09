@@ -186,7 +186,7 @@ var real_damage = function real_damage(other_costs, heal_or_damage, damage_type)
 var ritual_attack_or_heal_action = function ritual_attack_or_heal_action(character_id, repsecid, other_costs, heal_or_attack, damage_type) {
   var value = real_damage(other_costs, heal_or_attack, damage_type);
 
-  if (value === '') {
+  if (value === 0) {
     return '';
   }
 
