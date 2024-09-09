@@ -496,7 +496,7 @@ const updatebondscore = (values,update,manualscore=true) => {
 	update[`repeating_bonds_color`] = BondButtonColor(bond_score);
 }
 const DeltaGreenLethalityFail=(roll) => {
-	const quotient=Math.floor(roll/10)== 0 ? 10 : Math.round(roll/10);
-	const remainder= (roll%10 ==0) ? 10 : Math.round(roll%10);
+	const quotient=Math.floor(roll/10)== 0 ? 10 : Math.floor(roll/10);
+	const remainder= (roll%10 ==0) ? 10 : Math.floor(roll%10);
 	return quotient+ remainder;
 };

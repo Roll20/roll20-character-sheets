@@ -198,6 +198,7 @@ const rollBonds=(rollValue,_value,_names,_parameters) => {
 
 		update[_names['local_wp_points']]=local_wp;
 		update[`willpower_points`]=local_wp;
+		update[_names[`hurt`]]='hurt';
 		if (parseInt(results.results.local_wp.result)||0 !=0){
 			update[_names[`score`]]=score;
 		}else{
@@ -635,6 +636,7 @@ const setBondsParametersAndInputNames=(repsecid, _parameters, _input_names) => {
 	_input_names[`local_sanity_points`] = `sanity_points`;
 
 	_input_names[`score`] = `${repsecid}_score`;
+	_input_names[`hurt`] = `${repsecid}_hurt`;
 	_input_names[`color`] = `${repsecid}_color`;
 	_parameters.push(_input_names[`local_wp_points`]);
 	_parameters.push(_input_names[`local_sanity_points`]);

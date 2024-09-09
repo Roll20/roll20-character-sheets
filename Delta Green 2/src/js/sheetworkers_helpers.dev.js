@@ -724,7 +724,7 @@ var updatebondscore = function updatebondscore(values, update) {
 };
 
 var DeltaGreenLethalityFail = function DeltaGreenLethalityFail(roll) {
-  var quotient = Math.floor(roll / 10) == 0 ? 10 : Math.round(roll / 10);
-  var remainder = roll % 10 == 0 ? 10 : Math.round(roll % 10);
+  var quotient = Math.floor(roll / 10) == 0 ? 10 : Math.floor(roll / 10);
+  var remainder = roll % 10 == 0 ? 10 : Math.floor(roll % 10);
   return quotient + remainder;
 };
