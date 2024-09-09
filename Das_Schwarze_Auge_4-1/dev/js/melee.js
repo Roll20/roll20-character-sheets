@@ -1142,9 +1142,9 @@ on(
 
 		// Add contents to the results data structure
 		for (macro of elements) {
-			if (macro.hasOwnProperty("prefix")) {
+			if (Object.hasOwn(macro, "prefix")) {
 				transformed["common"]["prefix"] += macro["prefix"] + " ";
-			} else if (macro.hasOwnProperty("suffix")) {
+			} else if (Object.hasOwn(macro, "suffix")) {
 				transformed["common"]["suffix"] += macro["suffix"] + " ";
 			} else {
 				transformed["string"]["main"] += '{{' + macro["name"] + '=' + macro["value"] + '}} ';
@@ -1155,9 +1155,9 @@ on(
 
 		// "prefix" and "suffix" are reserved for this internal use case, so check against accidentally using them
 		if (
-			transformed["object"]["main"].hasOwnProperty("prefix") === true
+			Object.hasOwn(transformed["object"]["main"], "prefix") === true
 			||
-			transformed["object"]["main"].hasOwnProperty("suffix") === true
+			Object.hasOwn(transformed["object"]["main"], "suffix") === true
 		) {
 			debugLog(func, "Warning: 'prefix' and/or 'suffix' are used as actual roll variables and will be overwritten.");
 		}
@@ -1187,7 +1187,7 @@ on(
 			// Build String
 			// Prefixes
 			{
-			var template = data.hasOwnProperty('template') ? data["template"] : 'test';
+			var template = Object.hasOwn(data, 'template') ? data["template"] : 'test';
 			defaultElements.push(
 				{ 'prefix':
 					'@{gm_roll_opt} ' +
@@ -1208,6 +1208,10 @@ on(
 				defaultElements.push( { 'name': 'confirmationRoll0', 'value': `[[${data["rolls"][0]}]]` } );
 				defaultElements.push( { 'name': 'confirmationRoll1', 'value': `[[${data["rolls"][1]}]]` } );
 				defaultElements.push( { 'name': 'confirmationRoll2', 'value': `[[${data["rolls"][2]}]]` } );
+			} else {
+				defaultElements.push( { 'name': 'confirmationRoll0', 'value': "[[1d0]]" } );
+				defaultElements.push( { 'name': 'confirmationRoll1', 'value': "[[1d0]]" } );
+				defaultElements.push( { 'name': 'confirmationRoll2', 'value': "[[1d0]]" } );
 			}
 
 			// Roll Modifiers
@@ -1372,31 +1376,32 @@ on(
 					passthrough["isConfirmationRoll"] = 1;
 					passthrough["confirmationRollRequired"] = 1;
 					passthrough["showRollTag"] = allElementsObject["showRollTag"];
-					passthrough["rollMacro"] =
-						allElements[0]["prefix"] + " " +
-						"{{name=" + data["ui"] + "}} " +
-						"{{mod=[[" + mod + "]]}} " +
-						"{{ansage=[[" + ansage + "]]}} " +
-						"{{wert=[[" + wert + "]]}} " +
-						"{{taw=[[" + taw + "]]}} " +
-						allElementsObject["roll0"] +
-						allElementsObject["roll1"] +
-						allElementsObject["roll2"] +
-						allElementsObject["confirmationRoll0"] +
-						allElementsObject["confirmationRoll1"] +
-						allElementsObject["confirmationRoll2"] +
-						"{{msg=[[0]]}} " +
-						"{{characterid=" + v["character_id"] + "}} " +
-						"{{charactername=" + v["character_name"] + "}} " +
-						"{{result=[[0]]}} " +
-						"{{isConfirmationRoll=[[1]]}} " +
-						"{{confirmationRollRequired=[[1]]}} " +
-						"{{showRollTag=[[@{show_roll_tags}]]}} " +
-						"{{rollTag=[[0]]}} " +
-						"{{rollTime=[[0]]}} " +
-						"{{rollExpired=[[0]]}} " +
-						"{{rollTimeHuman=[[0]]}} " +
-						"{{passthrough=[[0]]}}";
+					passthrough["rollMacro"] = [
+						allElements[0]["prefix"],
+						"{{name=" + data["ui"] + "}}",
+						"{{mod=[[" + mod + "]]}}",
+						"{{ansage=[[" + ansage + "]]}}",
+						"{{wert=[[" + wert + "]]}}",
+						"{{taw=[[" + taw + "]]}}",
+						allElementsObject["roll0"],
+						allElementsObject["roll1"],
+						allElementsObject["roll2"],
+						allElementsObject["confirmationRoll0"],
+						allElementsObject["confirmationRoll1"],
+						allElementsObject["confirmationRoll2"],
+						"{{msg=[[0]]}}",
+						"{{characterid=" + v["character_id"] + "}}",
+						"{{charactername=" + v["character_name"] + "}}",
+						"{{result=[[0]]}}",
+						"{{isConfirmationRoll=[[1]]}}",
+						"{{confirmationRollRequired=[[1]]}}",
+						"{{showRollTag=[[@{show_roll_tags}]]}}",
+						"{{rollTag=[[0]]}}",
+						"{{rollTime=[[0]]}}",
+						"{{rollExpired=[[0]]}}",
+						"{{rollTimeHuman=[[0]]}}",
+						"{{passthrough=[[0]]}}"
+					].join(" ");
 					console.log("passthrough:", passthrough);
 				}
 			}

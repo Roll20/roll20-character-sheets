@@ -4,6 +4,14 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.10.01 (Build 32)
+
+- fixed minor CSS layout bug 
+
+## 03.10.00 (Build 31)
+
+- fixed minor CSS layout bug 
+
 ## 03.09.00 (Build 30)
 
 - added dark theme configurable for pc + adv sheets

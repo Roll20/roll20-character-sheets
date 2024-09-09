@@ -5,13 +5,13 @@ function initializeSheet(migrationChain) {
 	var attrsToInit = [
 		// Stats and derived values
 		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK", "GS",
-		"legrundw", "LE_max",
-		"AU_max", "ausgrundw", "aus_max",
+		"LE", "legrundw", "LE_max",
+		"AU", "AU_max", "ausgrundw", "aus_max",
 		"erschoepfung_basis", "erschoepfung_max",
 		"ueberanstrengung_max",
 		"mrgrundw", "MR", "wundschwelle",
-		"AE_max", "aspgrundw", "asp_max",
-		"KE_max",
+		"AE", "AE_max", "aspgrundw", "asp_max", "sf_meisterliche_regeneration_leiteigenschaft",
+		"KE", "KE_max",
 		"ap_verfuegbar",
 
 		// Rolls
@@ -59,7 +59,18 @@ function initializeSheet(migrationChain) {
 		"AT_mod_wounds", "PA_mod_wounds", "FK_mod_wounds",
 		"MU_mod_wounds", "IN_mod_wounds", "KL_mod_wounds", "FF_mod_wounds", "GE_mod_wounds", "KO_mod_wounds", "KK_mod_wounds",
 		"GS_mod_wounds", "IB_mod_wounds",
-		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb"
+		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb",
+
+		// Regeneration
+		"reg_sleep_le_ko", "reg_sleep_le_fixed",
+		"reg_sleep_le_mod_advantages_disadvantages", "reg_sleep_le_mod_food_restriction",
+		"reg_sleep_ae_base", "reg_sleep_ae_in", "reg_sleep_ae_fixed",
+		"reg_sleep_ae_mod_advantages_disadvantages", "reg_sleep_ae_mod_special_skills", "reg_sleep_ae_mod_food_restriction", "reg_sleep_ae_mod_homesickness",
+		"reg_sleep_addiction_withdrawal_effect",
+		"reg_sleep_food_restriction_effect",
+		"reg_sleep_mod_somnambulism",
+		"reg_sleep_sleep_disorder_effect", "reg_sleep_sleep_disorder_trigger",
+		"reg_sleep_roll"
 	];
 	// Initialization Second Safeguard Check (function not called based on sixteen attributes and data_version)
 	// These attributes have been picked, because no character generated according to the official rules will have all their attributes at 8, so comparing these attributes will almost guarantee that old sheets are correctly detected and no initialization will take place.
@@ -133,7 +144,7 @@ function initializeSheet(migrationChain) {
 				{
 					for ( attr of attrsToInit )
 					{
-						attrs[attr] = defaultValues[attr];
+						attrs[attr] = getDefaultValue(attr);
 					}
 					debugLog(caller, "Attributes after initialization: ", attrs);
 				}

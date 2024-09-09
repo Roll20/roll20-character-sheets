@@ -11,7 +11,10 @@ var versionsWithMigrations = [
 		20220116,
 		20220604,
 		20220821,
-		20230618
+		20230618,
+		20240414,
+		20240510,
+		20240519
 ];
 
 /*
@@ -467,7 +470,7 @@ function migrateTo20210718 (migrationChain) {
 		if (results["errors"] >= 1) {
 			debugLog(caller, "Missing properties: '" + results["missing"].toString() + "'. Using default values. 0 for 'Ges_BE', 'BE_Last', 'BE_TaW' and 'sf_rustungsgewohnungIII'.");
 			for (req of requirements) {
-				if (!values.hasOwnProperty(req)) {
+				if (!Object.hasOwn(values, req)) {
 					values[req] = defaultValue;
 				}
 			}
@@ -825,6 +828,308 @@ function migrateTo20230618(migrationChain) {
 			safeSetAttrs(attrsToChange, {}, function(){
 				callNextMigration(migrationChain);
 			});
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize sleep regeneration attributes
+*/
+function migrateTo20240414(migrationChain) {
+	var caller = "migrateTo20240414";
+	debugLog(caller, "Invoked.");
+
+	const attrsToGet = [
+		'MagieTab',
+		'LiturgienTab',
+		'verstecke_erschoepfung',
+		'verstecke_ueberanstrengung',
+		'KE'
+	];
+	var attrsToChange =	{
+		"reg_sleep_le_ko": "@{KO} - 1d20",
+		"reg_sleep_le_fixed": "off",
+		"reg_sleep_le_mod_advantages_disadvantages": 0,
+		"reg_sleep_le_mod_food_restriction": 0,
+		"reg_sleep_ae_base": "1d6",
+		"reg_sleep_ae_in": "@{IN} - 1d20",
+		"reg_sleep_ae_fixed": "off",
+		"reg_sleep_ae_mod_advantages_disadvantages": 0,
+		"reg_sleep_ae_mod_special_skills": 0,
+		"reg_sleep_ae_mod_food_restriction": 0,
+		"reg_sleep_ae_mod_homesickness": 0,
+		"reg_sleep_addiction_withdrawal_effect": 0,
+		"reg_sleep_food_restriction_effect": 0,
+		"reg_sleep_mod_somnambulism": 0,
+		"reg_sleep_sleep_disorder_effect": 0,
+		"reg_sleep_sleep_disorder_trigger": 0,
+		"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
+	};
+	safeGetAttrs(attrsToGet, function(values) {
+		// Migrate checkbox inputs which received a value="1" attribute
+		if (values["MagieTab"] === "on")
+		{
+			attrsToChange["MagieTab"] = "1";
+		} else if (values["MagieTab"] === "off") {
+			attrsToChange["MagieTab"] = "0";
+		}
+		if (values["LiturgienTab"] === "on")
+		{
+			attrsToChange["LiturgienTab"] = "1";
+		} else if (values["LiturgienTab"] === "off") {
+			attrsToChange["LiturgienTab"] = "0";
+		}
+		if (values["verstecke_erschoepfung"] === "on")
+		{
+			attrsToChange["verstecke_erschoepfung"] = "1";
+		} else if (values["verstecke_erschoepfung"] === "off") {
+			attrsToChange["verstecke_erschoepfung"] = "0";
+		}
+		if (values["verstecke_ueberanstrengung"] === "on")
+		{
+			attrsToChange["verstecke_ueberanstrengung"] = "1";
+		} else if (values["verstecke_ueberanstrengung"] === "off") {
+			attrsToChange["verstecke_ueberanstrengung"] = "0";
+		}
+
+		// KE gets used for the first time and needs to be usable
+		if (isNaN(parseInt(values["KE"])))
+		{
+			attrsToChange["KE"] = 0;
+		}
+		debugLog(caller, attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function(){
+			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Migrate "subtag1" to sf_representations
+*/
+function migrateTo20240510(migrationChain) {
+	var caller = "migrateTo20240510";
+	debugLog(caller, "Invoked.");
+	let valueMap = {
+		"---": "",
+		"gildenmagisch": "Mag",
+		"elfisch": "Elf",
+		"druidisch": "Dru",
+		"satuarisch": "Hex",
+		"geodisch": "Geo",
+		"schelmisch": "Sch",
+		"scharlatanisch": "Srl",
+		"borbaradianisch": "Bor",
+		"kristallomantisch": "Ach"
+	};
+
+	safeGetAttrs(["subtag1"], function (v) {
+		var attrsToChange = {};
+
+		if (Object.hasOwn(valueMap, v["subtag1"]))
+		{
+			attrsToChange["sf_representations"] = valueMap[v["subtag1"]];
+		}
+		debugLog(caller, attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function () {
+			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Migrate attributes to old names (full clean-up of spell name attributes will follow in the future, if that should still be necessary)
+*/
+function migrateTo20240519(migrationChain) {
+	const caller = "migrateTo20240519";
+	debugLog(caller, "Invoked.");
+	const attrMap = {
+		"z_angste_representation": "z_aengstelindern_representation",
+		"z_animato_representation": "z_animatio_representation",
+		"z_Auge_representation": "z_augedeslimbus_representation",
+		"z_Auris_representation": "z_aurisnasusoculus_representation",
+		"z_band_representation": "z_bandundfessel_representation",
+		"z_Barenruhe_representation": "z_baerenruhe_representation",
+		"z_Beherrschung_representation": "z_beherrschungbrechen_representation",
+		"z_Beschworung_representation": "z_beschwoerungvereiteln_representation",
+		"z_Bewegung_representation": "z_bewegungstoeren_representation",
+		"z_boser_representation": "z_boeserblick_representation",
+		"z_damonenbann_representation": "z_daemonenbann_representation",
+		"z_dichter_representation": "z_dichterunddenker_representation",
+		"z_eigenschaft_representation": "z_eigenschaftwiederherstellen_representation",
+		"z_eigne_representation": "z_eigneaengste_representation",
+		"z_einfluss_representation": "z_einflussbannen_representation",
+		"z_eins_representation": "z_einsmitdernatur_representation",
+		"z_elementarer_representation": "z_elementarerdiener_representation",
+		"z_erinnerung_representation": "z_erinnerungverlassedich_representation",
+		"z_flim_representation": "z_flimflam_representation",
+		"z_fluch_representation": "z_fluchderpestilenz_representation",
+		"z_gefass_representation": "z_gefaessderjahre_representation",
+		"z_granit_representation": "z_granitundmarmor_representation",
+		"z_Harmlose_representation": "z_harmlosegestalt_representation",
+		"z_hartes_representation": "z_hartesschmelze_representation",
+		"z_heilkraft_representation": "z_heilkraftbannen_representation",
+		"z_hellsicht_representation": "z_hellsichttrueben_representation",
+		"z_herbeirufung_representation": "z_herbeirufungvereiteln_representation",
+		"z_herr_representation": "z_herrueberdastierreich_representation",
+		"z_herzschlag_representation": "z_herzschlagruhe_representation",
+		"z_hilfreiche_representation": "z_hilfreichetatze_representation",
+		"z_hollenpein_representation": "z_hoellenpein_representation",
+		"z_illusion_representation": "z_illusionaufloesen_representation",
+		"z_iribaars_representation": "z_iribaarshand_representation",
+		"z_klarum_representation": "z_klarumpurum_representation",
+		"z_komm_representation": "z_kommkoboldkomm_representation",
+		"z_koerperlose_representation": "z_koerperlosereise_representation",
+		"z_krabbelnder_representation": "z_krabbelnderschrecken_representation",
+		"z_kraft_representation": "z_kraftdeserzes_representation",
+		"z_kraft_humus_representation": "z_kraftdeshumus_representation",
+		"z_krahenruf_representation": "z_kraehenruf_representation",
+		"z_krotensprung_representation": "z_kroetensprung_representation",
+		"z_lach_representation": "z_lachdichgesund_representation",
+		"z_langer_representation": "z_langerlulatsch_representation",
+		"z_last_representation": "z_lastdesalters_representation",
+		"z_levthans_representation": "z_levthansfeuer_representation",
+		"z_limbus_representation": "z_limbusversiegeln_representation",
+		"z_lunge_representation": "z_lungedesleviatan_representation",
+		"z_madas_representation": "z_madasspiegel_representation",
+		"z_magischer_representation": "z_magischerraub_representation",
+		"z_metamagie_representation": "z_metamagieneutralisieren_representation",
+		"z_metamorpho_felsenform_representation": "z_metamorphofelsenform_representation",
+		"z_metamorpho_representation": "z_metamorphogletscherform_representation",
+		"z_murks_representation": "z_murksundpatz_representation",
+		"z_objecto_representation": "z_objectoobscuro_representation",
+		"z_objekt_representation": "z_objektentzaubern_representation",
+		"z_paralys_representation": "z_paralysis_representation",
+		"z_pestilenz_representation": "z_pestilenzerspueren_representation",
+		"z_ruhe_representation": "z_ruhekoerper_representation",
+		"z_satuarias_representation": "z_satuariasherrlichkeit_representation",
+		"z_schadenszauber_representation": "z_schadenszauberbannen_representation",
+		"z_schleier_representation": "z_schleierderunwissenheit_representation",
+		"z_seelentier_representation": "z_seelentiererkennen_representation",
+		"z_staub_representation": "z_staubwandle_representation",
+		"z_stein_representation": "z_steinwandle_representation",
+		"z_Stimmen_des_Windes_representation": "z_stimmendeswindes_representation",
+		"z_sumus_representation": "z_sumuselixiere_representation",
+		"z_tempus_representation": "z_tempusstasis_representation",
+		"z_tiere_representation": "z_tierebesprechen_representation",
+		"z_tlalucs_representation": "z_tlalucsodem_representation",
+		"z_totes_representation": "z_toteshandle_representation",
+		"z_unberuhrt_representation": "z_unberuehrt_representation",
+		"z_unsichtbarer_representation": "z_unsichtbarerjaeger_representation",
+		"z_veranderung_representation": "z_veraenderungaufheben_representation",
+		"z_verstandigung_representation": "z_verstaendigungstoeren_representation",
+		"z_verwandlung_representation": "z_verwandlungbeenden_representation",
+		"z_Wand_aus_Flammen_representation": "z_wandausflammen_representation",
+		"z_warmes_representation": "z_warmesblut_representation",
+		"z_Warmes_gefriere_representation": "z_warmesgefriere_representation",
+		"z_weiches_representation": "z_weicheserstarre_representation",
+		"z_weisheit_representation": "z_weisheitderbaeume_representation",
+		"z_zorn_representation": "z_zornderelemente_representation",
+		"z_zunge_representation": "z_zungelaehmen_representation"
+	}
+	const attrsToGet = [
+		"z_aengstelindern_representation",
+		"z_animatio_representation",
+		"z_augedeslimbus_representation",
+		"z_aurisnasusoculus_representation",
+		"z_bandundfessel_representation",
+		"z_baerenruhe_representation",
+		"z_beherrschungbrechen_representation",
+		"z_beschwoerungvereiteln_representation",
+		"z_bewegungstoeren_representation",
+		"z_boeserblick_representation",
+		"z_daemonenbann_representation",
+		"z_dichterunddenker_representation",
+		"z_eigenschaftwiederherstellen_representation",
+		"z_eigneaengste_representation",
+		"z_einflussbannen_representation",
+		"z_einsmitdernatur_representation",
+		"z_elementarerdiener_representation",
+		"z_erinnerungverlassedich_representation",
+		"z_flimflam_representation",
+		"z_fluchderpestilenz_representation",
+		"z_gefaessderjahre_representation",
+		"z_granitundmarmor_representation",
+		"z_harmlosegestalt_representation",
+		"z_hartesschmelze_representation",
+		"z_heilkraftbannen_representation",
+		"z_hellsichttrueben_representation",
+		"z_herbeirufungvereiteln_representation",
+		"z_herrueberdastierreich_representation",
+		"z_herzschlagruhe_representation",
+		"z_hilfreichetatze_representation",
+		"z_hoellenpein_representation",
+		"z_illusionaufloesen_representation",
+		"z_iribaarshand_representation",
+		"z_klarumpurum_representation",
+		"z_kommkoboldkomm_representation",
+		"z_koerperlosereise_representation",
+		"z_krabbelnderschrecken_representation",
+		"z_kraftdeserzes_representation",
+		"z_kraftdeshumus_representation",
+		"z_kraehenruf_representation",
+		"z_kroetensprung_representation",
+		"z_lachdichgesund_representation",
+		"z_langerlulatsch_representation",
+		"z_lastdesalters_representation",
+		"z_levthansfeuer_representation",
+		"z_limbusversiegeln_representation",
+		"z_lungedesleviatan_representation",
+		"z_madasspiegel_representation",
+		"z_magischerraub_representation",
+		"z_metamagieneutralisieren_representation",
+		"z_metamorphofelsenform_representation",
+		"z_metamorphogletscherform_representation",
+		"z_murksundpatz_representation",
+		"z_objectoobscuro_representation",
+		"z_objektentzaubern_representation",
+		"z_paralysis_representation",
+		"z_pestilenzerspueren_representation",
+		"z_ruhekoerper_representation",
+		"z_satuariasherrlichkeit_representation",
+		"z_schadenszauberbannen_representation",
+		"z_schleierderunwissenheit_representation",
+		"z_seelentiererkennen_representation",
+		"z_staubwandle_representation",
+		"z_steinwandle_representation",
+		"z_stimmendeswindes_representation",
+		"z_sumuselixiere_representation",
+		"z_tempusstasis_representation",
+		"z_tierebesprechen_representation",
+		"z_tlalucsodem_representation",
+		"z_toteshandle_representation",
+		"z_unberuehrt_representation",
+		"z_unsichtbarerjaeger_representation",
+		"z_veraenderungaufheben_representation",
+		"z_verstaendigungstoeren_representation",
+		"z_verwandlungbeenden_representation",
+		"z_wandausflammen_representation",
+		"z_warmesblut_representation",
+		"z_warmesgefriere_representation",
+		"z_weicheserstarre_representation",
+		"z_weisheitderbaeume_representation",
+		"z_zornderelemente_representation",
+		"z_zungelaehmen_representation"
+	];
+
+	safeGetAttrs(attrsToGet, function (v) {
+		var attrsToChange = {};
+
+		for (property in attrMap)
+		{
+			let oldAttr = attrMap[property];
+			if (v[oldAttr] === 0)
+			{
+				v[oldAttr] = "";
+			}
+			attrsToChange[property] = v[oldAttr];
+		}
+		debugLog(caller, attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function () {
+			callNextMigration(migrationChain);
 		});
 	});
 }
