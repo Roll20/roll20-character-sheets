@@ -232,6 +232,14 @@
 						<input type="number" name="attr_tokenAilment4Num" min="0" value="0">
 					</div>
 				</div>
+
+				<!-- States -->
+				<input type="text" name="attr_tokenPanicState" value="0" hidden="true">
+				<input type="text" name="attr_tokenStaggerState" value="0" hidden="true">
+				<input type="text" name="attr_tokenStaggerDuration" value="0" hidden="true">
+				<input type="text" name="attr_tokenSealState" value="0" hidden="true">
+				<input type="text" name="attr_tokenImmobileState" value="0" hidden="true">
+				<input type="text" name="attr_tokenDefeatState" value="0" hidden="true">
 			</div>
 		</fieldset>
 
@@ -1824,7 +1832,15 @@
 
 <div class="rowContainer titleHeader"><button type="action" class="qolButton" name="act_resetAilments" data-i18n-title="reset-button" title="Reset"> ! </button> <h4 data-i18n="heading-ailments">Status ailments</h4> </div>
 <div class="contentContainer darkBG">
+
+<!-- States -->
 <div class="rowContainer centerFlex topRow ailmentStates">
+<input type="text" name="attr_PanicStateSuppressUpdate" value="false" hidden="true">
+<input type="text" name="attr_StaggerStateSuppressUpdate" value="false" hidden="true">
+<input type="text" name="attr_StaggerDurationSuppressUpdate" value="false" hidden="true">
+<input type="text" name="attr_SealStateSuppressUpdate" value="false" hidden="true">
+<input type="text" name="attr_ImmobileStateSuppressUpdate" value="false" hidden="true">
+<input type="text" name="attr_DefeatStateSuppressUpdate" value="false" hidden="true">
 
 <!-- Hostile -->
 <div>
@@ -1932,6 +1948,7 @@
 </div>
 
 </div>
+<!-- States END -->
 
 
 <div class="rowContainer ailmentRow">
@@ -10873,6 +10890,11 @@ function updateSelectedToken(info, callback=()=>{}) {
 			tokenValues.push(`${tokenPrefix}_token${tempbar}_Sources`);
 		});
 
+		let statelist = ["PanicState", "StaggerState", "StaggerDuration", "SealState", "ImmobileState", "DefeatState"];
+		statelist.forEach(state => {
+			tokenValues.push(`${tokenPrefix}_token${state}`, state);
+		});
+
 		getAttrs([...tokenValues], async function(values) {
 			let output = {}
 
@@ -10881,6 +10903,7 @@ function updateSelectedToken(info, callback=()=>{}) {
 				output[`${bar}`] = values[`${tokenPrefix}_${bar}`];
 				output[`${bar}_max`] = values[`${tokenPrefix}_${bar}_max`];
 			});
+
 			tempbarlist.forEach(tempbar => {
 				/* For temp bar values from ailments, add an override to make sure any ailment list updates do not change the temp bar value */
 				let tempBarSourceRaw = values[`${tokenPrefix}_token${tempbar}_Sources`];
@@ -10891,6 +10914,14 @@ function updateSelectedToken(info, callback=()=>{}) {
 					}
 				}
 				output[`${tempbar}_Sources`] = tempBarSourceRaw;
+			});
+
+			/* If a state changes between token, suppress the change event listener for the state */
+			statelist.forEach(state => {
+				output[`${state}`] = values[`${tokenPrefix}_token${state}`];
+				if (output[`${state}`] != values[`${state}`]) {
+					output[`${state}SuppressUpdate`] = "true";
+				}
 			});
 
 			/* Sets ailments to those of the token instance. If ailmentList is unset, initialize a new empty ailmentList */
@@ -10908,10 +10939,16 @@ function updateSelectedToken(info, callback=()=>{}) {
 			/* Set new selection */
 			output[`${tokenPrefix}_token_selected`] = "true";
 			setAttrs(output, {}, () => {
+				console.log("Suppressing " + "something!");
 				callback();
 			});
 		});
 	}
+}
+function getSelectedToken(callback=()=>{}) {
+	getAttrs(["tokenId_selected"], function(values) {
+		callback(values.tokenId_selected);
+	});
 }
 
 /* Hides token bar value in display if it matches that of the character sheet */
@@ -10932,6 +10969,7 @@ barList.forEach(bar => {
 		});
 	});
 });
+
 /* Sync: Status bars */
 barList.forEach(bar => {
 	on(`change:${bar} change:repeating_tokens:${bar}`, (info) => {
@@ -10950,6 +10988,7 @@ barList.forEach(bar => {
 		}
 	});
 });
+
 /* Sync: Temporary status bars */
 let tempBarList = ["thp", "tst"];
 tempBarList.forEach(tempBar => {
@@ -10966,6 +11005,27 @@ tempBarList.forEach(tempBar => {
 		}
 	});
 });
+
+/* Sync: States */
+let stateList = ["panicstate", "staggerstate", "staggerduration", "sealstate", "immobilestate", "defeatstate"];
+stateList.forEach(state => {
+	on(`change:${state}`, (info) => {
+		getAttrs(["tokenId_selected"], function(values) {
+			let selectedId = values.tokenId_selected;
+			if (selectedId != "") {
+				console.log(info)
+				if (stateList.includes(info.sourceAttribute)) {
+					/* newValue will in some cases not be set when decreasing staggerduration. This ensures the value is properly decreased */
+					if (info.newValue == undefined && info.sourceAttribute == "staggerduration") {
+						info.newValue = parseInt(info.previousValue) - 1;
+					}
+					setAttrs({[`repeating_tokens_${selectedId}_token${state}`]:info.newValue});
+				}
+			}
+		});
+	});
+});
+
 /* Sync: Ailments */
 on(`change:ailmentList`, (info) => {
 	if (info.newValue != undefined) {
@@ -12138,8 +12198,9 @@ on("change:HostileState", function() {
 });
 
 /* Auto: Panic State updates */
-on("change:PanicState", function() {
-	getAttrs(["SP", "PanicState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+on("change:PanicState", function(info) {
+	getAttrs(["PanicStateSuppressUpdate", "SP", "PanicState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	if (values.PanicStateSuppressUpdate == "true") { setAttrs({"PanicStateSuppressUpdate":"false"}); return; }
 
 	let currentstate = values.PanicState;
 	let messagestate = values.settingMuteMessage;
@@ -12201,7 +12262,8 @@ on("change:PanicState", function() {
 
 /* Auto: Defeat State updates */
 on("change:DefeatState", function() {
-	getAttrs(["DefeatState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	getAttrs(["DefeatStateSuppressUpdate", "DefeatState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	if (values.DefeatStateSuppressUpdate == "true") { setAttrs({"DefeatStateSuppressUpdate":"false"}); return; }
 
 	let currentstate = values.DefeatState;
 	let messagestate = values.settingMuteMessage;
@@ -12253,22 +12315,25 @@ on("change:DefeatState", function() {
 });
 
 /* Auto: Stagger State updates */
-on("change:StaggerState change:StaggerDuration", function(eventInfo) {
+on("change:StaggerState change:StaggerDuration", function(info) {
+	console.log(`${info.sourceAttribute}:`)
+	console.log(info)
 	
 getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["StagRes", "StaggerState", "StaggerDuration", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "SP", "egoCondition", "egoActiveState", "messageOverride", "distortState", `${id}_staggerSanity`, `${id}_staggerDurationMax`, "settingLimbusStyle"], function(values) {
-
-	let style = "https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/";
-	if(values.settingLimbusStyle == "true"){
-		style = style + "limbus/";
-	}
+	getAttrs([`${info.sourceAttribute}SuppressUpdate`, "StagRes", "StaggerState", "StaggerDuration", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "SP", "egoCondition", "egoActiveState", "messageOverride", "distortState", `${id}_staggerSanity`, `${id}_staggerDurationMax`, "settingLimbusStyle"], function(values) {
+	if (values[`${info.sourceAttribute}SuppressUpdate`] == "true") { console.log(info.sourceAttribute + " was suppressed"); setAttrs({[`${info.sourceAttribute}SuppressUpdate`]:"false"}); return; }
 
 	/* Get the trigger type */
 	let type = "state";
-	if (eventInfo.sourceAttribute == "staggerduration") {
+	if (info.sourceAttribute == "staggerduration") {
 		type = "duration";
+	}
+	
+	let style = "https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/";
+	if(values.settingLimbusStyle == "true"){
+		style = style + "limbus/";
 	}
 
 	let iconnew = "<img src='" + style + "FragileStagger.png' style='width: 25px; height: 25px;' >";
@@ -12336,10 +12401,9 @@ getSectionIDs(`repeating_global`, idarray => {
 		messageDescription = langStateFalse;
 	}
 	
-	
-	if(messagestate != "true"){
-	startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + messageDescription + "}}"), (results) => {
 
+	if(messagestate != "true"){
+		startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=" + messageDescription + "}}"), (results) => {
             finishRoll(results.rollId, {} );
         });
 	}
@@ -12350,7 +12414,8 @@ getSectionIDs(`repeating_global`, idarray => {
 
 /* Auto: Immobile State updates */
 on("change:ImmobileState", function() {
-	getAttrs(["ImmobileState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	getAttrs(["ImmobileStateSuppressUpdate", "ImmobileState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	if (values.ImmobileStateSuppressUpdate == "true") { setAttrs({"ImmobileStateSuppressUpdate":"false"}); return; }
 
 
 	let currentstate = values.ImmobileState;
@@ -12406,7 +12471,8 @@ on("change:ImmobileState", function() {
 
 /* Auto: Seal State updates */
 on("change:SealState", function() {
-	getAttrs(["SealState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	getAttrs(["SealStateSuppressUpdate", "SealState", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "messageOverride", "settingLimbusStyle"], function(values) {
+	if (values.SealStateSuppressUpdate == "true") { setAttrs({"SealStateSuppressUpdate":"false"}); return; }
 
 	let currentstate = values.SealState;
 	let messagestate = values.settingMuteMessage;
@@ -13256,6 +13322,8 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 
 
 	/* Stagger processing */
+	console.log(stagcheck)
+	console.log(stagduration)
 	if(stagcheck == "Staggered"){
 		if(stagduration == 0) {
 			stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
