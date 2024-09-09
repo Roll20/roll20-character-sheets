@@ -10716,16 +10716,6 @@ on('change:prevRoundInit', (info) => {
 
 
 
-function generateActionButton(name, icon, color, action, data, target) {
-	name = name.replace("autoDamage", getTranslationByKeyCustom("Apply damage", "helper-text-applydamage")) ;
-	name = name.replace("autoInflict", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
-	name = name.replace("autoGive", getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"), );
-	
-	icon = icon.replaceAll('<img src="',"").replaceAll('" >',"");
-	
-	return [name, icon, color, action, data, target];
-}	
-
 
 /* --- Token interaction functions  --- */
 
@@ -11280,6 +11270,16 @@ async function createActionButtons(buttonList, override="") {
 	}
 	});
 }*/
+
+function generateActionButton(name, icon, color, action, data, target) {
+	name = name.replace("autoDamage", getTranslationByKeyCustom("Apply damage", "helper-text-applydamage")) ;
+	name = name.replace("autoInflict", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+	name = name.replace("autoGive", getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"), );
+	
+	icon = icon.replaceAll('<img src="',"").replaceAll('" >',"");
+	
+	return [name, icon, color, action, data, target];
+}	
 
 async function createActionButtons(buttonList, targetOverride="") {
 
@@ -11843,6 +11843,14 @@ on("sheet:opened", function() {
 		if(token != selfToken){
 			setAttrs({"selfToken": token});
 		}
+	});
+});
+
+/* Auto: Detect empty Temp Bar source */
+/* The sheet doesn't properly detect these fields for some reason.  */
+on("sheet:opened", function() {
+	getAttrs(["THP_Sources", "TST_Sources"], function(values) {
+		setAttrs({"THP_Sources": values.THP_Sources, "TST_Sources": values.TST_Sources});
 	});
 });
 
