@@ -7,7 +7,7 @@ const update_mix_section = (data, section, staticArray) => {
   const update = {};
 
   parsedData?.forEach(({ name, target_value }) => {
-    const isStaticSkill = staticArray.includes(name.toLowerCase());
+    const isStaticSkill = staticArray.includes(name?.toLowerCase());
 
     if (isStaticSkill) {
       update[attrName(name)] = target_value;

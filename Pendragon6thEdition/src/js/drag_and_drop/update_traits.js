@@ -3,7 +3,7 @@ const update_traits = (data) => {
   const update = {};
 
   parsedData.forEach(({ name, target_value }) => {
-    const isStaticTrait = traits.includes(name.toLowerCase());
+    const isStaticTrait = traits.includes(name?.toLowerCase());
 
     if (isStaticTrait) {
       update[attrName(name)] = target_value;

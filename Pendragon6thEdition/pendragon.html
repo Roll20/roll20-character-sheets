@@ -135,7 +135,7 @@ const sliceAttr = (attribute) => attribute.slice(2, -1);
 
 const sumIntegers = (numbers) => numbers.reduce((a, b) => a + b, 0);
 
-const attrName = (name) => name.replace(/ /g, "_").toLowerCase();
+const attrName = (name) => name?.replace(/ /g, "_").toLowerCase();
 //When performing calculations in King Arthur Pendragon, round
 //0.5 and higher fractions upward and lesser fractions downward.
 //For example, a character with a Damage value of 4.43 would
@@ -506,10 +506,12 @@ const handle_npc = (page) => {
     Object.assign(update, attacks);
 
     const parsed = parseJSON(page.data.attacks);
-    const attackSkills = parsed.map(({ skill, target_value }) => ({
-      name: skill.toLowerCase(),
-      target_value,
-    }));
+    const attackSkills = parsed
+      .filter(({ skill, target_value }) => skill && target_value)
+      .map(({ skill, target_value }) => ({
+        name: skill.toLowerCase(),
+        target_value,
+      }));
 
     if (attackSkills.length > 0) {
       const askills = update_mix_section(attackSkills, "skills", combatSkills);
@@ -551,6 +553,10 @@ const handle_npc = (page) => {
     });
 
     Object.assign(update, dataTraits);
+  }
+
+  if (page.data.valorous || page.data.valorous_modifier) {
+    update["valorous"] = page.data.valorous ?? page.data.valorous_modifier;
   }
 
   setAttrs(update, {
@@ -617,10 +623,6 @@ const handle_character = (page) => {
     }
     if (page.data.squire_notes) {
       update["flag_squire_notes"] = false;
-    }
-
-    if (page.data.valorous || page.data.valorous_modifier) {
-      update["valorous"] = page.data.valorous ?? page.data.valorous_modifier;
     }
 
     setAttrs(update, {
@@ -820,7 +822,7 @@ const resetSkillList = (npcSkills) => {
 
   if (npcSkills) {
     const skillList = parseJSON(npcSkills);
-    const names = skillList.map(({ name }) => name.toLowerCase());
+    const names = skillList.map(({ name }) => name?.toLowerCase());
     [...skills, ...combatSkills].forEach((skill) => {
       if (!names.includes(skill)) {
         addSkill(skill);
@@ -891,9 +893,6 @@ const update_attack = (attack) => {
     console.warn(error);
   }
 
-  console.log("update_attack");
-  console.log(update);
-
   return update;
 };
 const update_item = (page, row) => {
@@ -927,7 +926,7 @@ const update_mix_section = (data, section, staticArray) => {
   const update = {};
 
   parsedData?.forEach(({ name, target_value }) => {
-    const isStaticSkill = staticArray.includes(name.toLowerCase());
+    const isStaticSkill = staticArray.includes(name?.toLowerCase());
 
     if (isStaticSkill) {
       update[attrName(name)] = target_value;

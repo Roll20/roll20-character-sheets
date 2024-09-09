@@ -50,8 +50,5 @@ const update_attack = (attack) => {
     console.warn(error);
   }
 
-  console.log("update_attack");
-  console.log(update);
-
   return update;
 };

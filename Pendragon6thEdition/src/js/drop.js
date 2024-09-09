@@ -53,10 +53,12 @@ const handle_npc = (page) => {
     Object.assign(update, attacks);
 
     const parsed = parseJSON(page.data.attacks);
-    const attackSkills = parsed.map(({ skill, target_value }) => ({
-      name: skill.toLowerCase(),
-      target_value,
-    }));
+    const attackSkills = parsed
+      .filter(({ skill, target_value }) => skill && target_value)
+      .map(({ skill, target_value }) => ({
+        name: skill.toLowerCase(),
+        target_value,
+      }));
 
     if (attackSkills.length > 0) {
       const askills = update_mix_section(attackSkills, "skills", combatSkills);
@@ -98,6 +100,10 @@ const handle_npc = (page) => {
     });
 
     Object.assign(update, dataTraits);
+  }
+
+  if (page.data.valorous || page.data.valorous_modifier) {
+    update["valorous"] = page.data.valorous ?? page.data.valorous_modifier;
   }
 
   setAttrs(update, {
@@ -164,10 +170,6 @@ const handle_character = (page) => {
     }
     if (page.data.squire_notes) {
       update["flag_squire_notes"] = false;
-    }
-
-    if (page.data.valorous || page.data.valorous_modifier) {
-      update["valorous"] = page.data.valorous ?? page.data.valorous_modifier;
     }
 
     setAttrs(update, {

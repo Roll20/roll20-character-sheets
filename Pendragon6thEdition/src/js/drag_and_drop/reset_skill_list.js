@@ -4,7 +4,7 @@ const resetSkillList = (npcSkills) => {
 
   if (npcSkills) {
     const skillList = parseJSON(npcSkills);
-    const names = skillList.map(({ name }) => name.toLowerCase());
+    const names = skillList.map(({ name }) => name?.toLowerCase());
     [...skills, ...combatSkills].forEach((skill) => {
       if (!names.includes(skill)) {
         addSkill(skill);
