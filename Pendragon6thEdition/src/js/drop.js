@@ -46,40 +46,59 @@ const handle_npc = (page) => {
     }
   });
 
-  const attacks = processDataArrays(page.data.attacks, (data) =>
-    update_attack(data)
-  );
-  Object.assign(update, attacks);
+  if (page.data.attacks) {
+    const attacks = processDataArrays(page.data.attacks, (data) =>
+      update_attack(data)
+    );
+    Object.assign(update, attacks);
 
-  const dataSkills = update_mix_section(
-    page.data.skills,
-    "skills",
-    combatSkills
-  );
-  Object.assign(update, dataSkills);
+    const parsed = parseJSON(page.data.attacks);
+    const attackSkills = parsed.map(({ skill, target_value }) => ({
+      name: skill.toLowerCase(),
+      target_value,
+    }));
 
-  const passions = processDataArrays(
-    page.data.passions,
-    updateSection("passions")
-  );
-  Object.assign(update, passions);
-
-  const dataTraits = update_mix_section(page.data.traits, "traits", traits);
-  Object.entries(personalityTraits).forEach(([positive, negative]) => {
-    const keys = Object.keys(dataTraits);
-    if (keys.includes(positive) && !keys.includes(negative)) {
-      const targetValue = dataTraits[positive];
-      dataTraits[negative] = 20 - targetValue;
-    } else if (!keys.includes(positive) && keys.includes(negative)) {
-      const targetValue = dataTraits[negative];
-      dataTraits[positive] = 20 - targetValue;
-    } else if (!keys.includes(positive) && !keys.includes(negative)) {
-      dataTraits[positive] = 10;
-      dataTraits[negative] = 10;
+    if (attackSkills.length > 0) {
+      const askills = update_mix_section(attackSkills, "skills", combatSkills);
+      Object.assign(update, askills);
     }
-  });
+  }
 
-  Object.assign(update, dataTraits);
+  if (page.data.skills) {
+    const dataSkills = update_mix_section(
+      page.data.skills,
+      "skills",
+      combatSkills
+    );
+    Object.assign(update, dataSkills);
+  }
+
+  if (page.data.passions) {
+    const passions = processDataArrays(
+      page.data.passions,
+      updateSection("passions")
+    );
+    Object.assign(update, passions);
+  }
+
+  if (page.data.traits) {
+    const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+    Object.entries(personalityTraits).forEach(([positive, negative]) => {
+      const keys = Object.keys(dataTraits);
+      if (keys.includes(positive) && !keys.includes(negative)) {
+        const targetValue = dataTraits[positive];
+        dataTraits[negative] = 20 - targetValue;
+      } else if (!keys.includes(positive) && keys.includes(negative)) {
+        const targetValue = dataTraits[negative];
+        dataTraits[positive] = 20 - targetValue;
+      } else if (!keys.includes(positive) && !keys.includes(negative)) {
+        dataTraits[positive] = 10;
+        dataTraits[negative] = 10;
+      }
+    });
+
+    Object.assign(update, dataTraits);
+  }
 
   setAttrs(update, {
     silent: true,
@@ -109,38 +128,54 @@ const handle_character = (page) => {
   const update = getStaticUpdate(attrs, page);
   update["character_name"] = page.name;
 
-  const arms = processDataArrays(page.data.arms, (data) =>
-    update_item(data, getRow("arms"))
-  );
-  Object.assign(update, arms);
+  try {
+    if (page.data.arms) {
+      const arms = processDataArrays(page.data.arms, (data) =>
+        update_item(data, getRow("arms"))
+      );
+      Object.assign(update, arms);
+    }
+    if (page.data.attacks) {
+      const attacks = processDataArrays(page.data.attacks, (data) =>
+        update_attack(data)
+      );
+      Object.assign(update, attacks);
+    }
 
-  const attacks = processDataArrays(page.data.attacks, (data) =>
-    update_attack(data)
-  );
-  Object.assign(update, attacks);
+    if (page.data.passions) {
+      const passions = processDataArrays(
+        page.data.passions,
+        updateSection("passions")
+      );
+      Object.assign(update, passions);
+    }
 
-  const passions = processDataArrays(
-    page.data.passions,
-    updateSection("passions")
-  );
-  Object.assign(update, passions);
+    if (page.data.skills) {
+      const dataSkills = update_mix_section(page.data.skills, "skills", [
+        ...skills,
+        ...combatSkills,
+      ]);
+      Object.assign(update, dataSkills);
+    }
 
-  const dataSkills = update_mix_section(page.data.skills, "skills", [
-    ...skills,
-    ...combatSkills,
-  ]);
-  Object.assign(update, dataSkills);
+    if (page.data.traits) {
+      const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+      Object.assign(update, dataTraits);
+    }
+    if (page.data.squire_notes) {
+      update["flag_squire_notes"] = false;
+    }
 
-  const dataTraits = update_mix_section(page.data.traits, "traits", traits);
-  Object.assign(update, dataTraits);
+    if (page.data.valorous || page.data.valorous_modifier) {
+      update["valorous"] = page.data.valorous ?? page.data.valorous_modifier;
+    }
 
-  if (page.data.squire_notes) {
-    update["flag_squire_notes"] = false;
+    setAttrs(update, {
+      silent: true,
+    });
+  } catch (error) {
+    console.warn(error);
   }
-
-  setAttrs(update, {
-    silent: true,
-  });
 };
 
 const handle_items = (page) => {

@@ -387,8 +387,6 @@ const versionThreeTwo = () => {
       update["armor_points"] = v["armor"];
     }
 
-    console.log(update);
-
     setAttrs(update);
   });
 };
@@ -501,40 +499,59 @@ const handle_npc = (page) => {
     }
   });
 
-  const attacks = processDataArrays(page.data.attacks, (data) =>
-    update_attack(data)
-  );
-  Object.assign(update, attacks);
+  if (page.data.attacks) {
+    const attacks = processDataArrays(page.data.attacks, (data) =>
+      update_attack(data)
+    );
+    Object.assign(update, attacks);
 
-  const dataSkills = update_mix_section(
-    page.data.skills,
-    "skills",
-    combatSkills
-  );
-  Object.assign(update, dataSkills);
+    const parsed = parseJSON(page.data.attacks);
+    const attackSkills = parsed.map(({ skill, target_value }) => ({
+      name: skill.toLowerCase(),
+      target_value,
+    }));
 
-  const passions = processDataArrays(
-    page.data.passions,
-    updateSection("passions")
-  );
-  Object.assign(update, passions);
-
-  const dataTraits = update_mix_section(page.data.traits, "traits", traits);
-  Object.entries(personalityTraits).forEach(([positive, negative]) => {
-    const keys = Object.keys(dataTraits);
-    if (keys.includes(positive) && !keys.includes(negative)) {
-      const targetValue = dataTraits[positive];
-      dataTraits[negative] = 20 - targetValue;
-    } else if (!keys.includes(positive) && keys.includes(negative)) {
-      const targetValue = dataTraits[negative];
-      dataTraits[positive] = 20 - targetValue;
-    } else if (!keys.includes(positive) && !keys.includes(negative)) {
-      dataTraits[positive] = 10;
-      dataTraits[negative] = 10;
+    if (attackSkills.length > 0) {
+      const askills = update_mix_section(attackSkills, "skills", combatSkills);
+      Object.assign(update, askills);
     }
-  });
+  }
 
-  Object.assign(update, dataTraits);
+  if (page.data.skills) {
+    const dataSkills = update_mix_section(
+      page.data.skills,
+      "skills",
+      combatSkills
+    );
+    Object.assign(update, dataSkills);
+  }
+
+  if (page.data.passions) {
+    const passions = processDataArrays(
+      page.data.passions,
+      updateSection("passions")
+    );
+    Object.assign(update, passions);
+  }
+
+  if (page.data.traits) {
+    const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+    Object.entries(personalityTraits).forEach(([positive, negative]) => {
+      const keys = Object.keys(dataTraits);
+      if (keys.includes(positive) && !keys.includes(negative)) {
+        const targetValue = dataTraits[positive];
+        dataTraits[negative] = 20 - targetValue;
+      } else if (!keys.includes(positive) && keys.includes(negative)) {
+        const targetValue = dataTraits[negative];
+        dataTraits[positive] = 20 - targetValue;
+      } else if (!keys.includes(positive) && !keys.includes(negative)) {
+        dataTraits[positive] = 10;
+        dataTraits[negative] = 10;
+      }
+    });
+
+    Object.assign(update, dataTraits);
+  }
 
   setAttrs(update, {
     silent: true,
@@ -564,38 +581,54 @@ const handle_character = (page) => {
   const update = getStaticUpdate(attrs, page);
   update["character_name"] = page.name;
 
-  const arms = processDataArrays(page.data.arms, (data) =>
-    update_item(data, getRow("arms"))
-  );
-  Object.assign(update, arms);
+  try {
+    if (page.data.arms) {
+      const arms = processDataArrays(page.data.arms, (data) =>
+        update_item(data, getRow("arms"))
+      );
+      Object.assign(update, arms);
+    }
+    if (page.data.attacks) {
+      const attacks = processDataArrays(page.data.attacks, (data) =>
+        update_attack(data)
+      );
+      Object.assign(update, attacks);
+    }
 
-  const attacks = processDataArrays(page.data.attacks, (data) =>
-    update_attack(data)
-  );
-  Object.assign(update, attacks);
+    if (page.data.passions) {
+      const passions = processDataArrays(
+        page.data.passions,
+        updateSection("passions")
+      );
+      Object.assign(update, passions);
+    }
 
-  const passions = processDataArrays(
-    page.data.passions,
-    updateSection("passions")
-  );
-  Object.assign(update, passions);
+    if (page.data.skills) {
+      const dataSkills = update_mix_section(page.data.skills, "skills", [
+        ...skills,
+        ...combatSkills,
+      ]);
+      Object.assign(update, dataSkills);
+    }
 
-  const dataSkills = update_mix_section(page.data.skills, "skills", [
-    ...skills,
-    ...combatSkills,
-  ]);
-  Object.assign(update, dataSkills);
+    if (page.data.traits) {
+      const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+      Object.assign(update, dataTraits);
+    }
+    if (page.data.squire_notes) {
+      update["flag_squire_notes"] = false;
+    }
 
-  const dataTraits = update_mix_section(page.data.traits, "traits", traits);
-  Object.assign(update, dataTraits);
+    if (page.data.valorous || page.data.valorous_modifier) {
+      update["valorous"] = page.data.valorous ?? page.data.valorous_modifier;
+    }
 
-  if (page.data.squire_notes) {
-    update["flag_squire_notes"] = false;
+    setAttrs(update, {
+      silent: true,
+    });
+  } catch (error) {
+    console.warn(error);
   }
-
-  setAttrs(update, {
-    silent: true,
-  });
 };
 
 const handle_items = (page) => {
@@ -754,6 +787,10 @@ const handle_weapon = (page) => {
 };
 const parseJSON = (jsonString) => {
   try {
+    if (typeof jsonString === "object") {
+      return jsonString;
+    }
+
     return JSON.parse(jsonString);
   } catch (e) {
     console.log(`Error parsing JSON: ${jsonString}`);
@@ -761,9 +798,12 @@ const parseJSON = (jsonString) => {
   }
 };
 const processDataArrays = (array, callback) => {
+  if (array === undefined) {
+    return;
+  }
   const parsed = typeof array === "string" ? parseJSON(array) : array;
   const map = parsed.map((e) => callback(e));
-  return map.reduce((acc, val) => ({ ...acc, ...val }));
+  return map?.reduce((acc, val) => ({ ...acc, ...val }));
 };
 const resetRepeatingRows = (sections) => {
   sections.forEach((section) => {
@@ -774,16 +814,21 @@ const resetRepeatingRows = (sections) => {
     });
   });
 };
-const resetSkillList = (skills) => {
-  const skillList = parseJSON(skills);
-  const names = skillList.map(({ name }) => name.toLowerCase());
+const resetSkillList = (npcSkills) => {
   const update = {};
+  const addSkill = (skill) => (update[skill] = 0);
 
-  [...skills, ...combatSkills].forEach((skill) => {
-    if (!names.includes(skill)) {
-      update[skill] = 0;
-    }
-  });
+  if (npcSkills) {
+    const skillList = parseJSON(npcSkills);
+    const names = skillList.map(({ name }) => name.toLowerCase());
+    [...skills, ...combatSkills].forEach((skill) => {
+      if (!names.includes(skill)) {
+        addSkill(skill);
+      }
+    });
+  } else {
+    [...skills, ...combatSkills].forEach((skill) => addSkill(skill));
+  }
 
   setAttrs(update);
 };
@@ -794,49 +839,69 @@ const roll20Attribute = (attr, value) => {
 
   return value;
 };
-const update_attack = (attacks) => {
+const update_attack = (attack) => {
   const row = getRow("attacks");
-  const attrs = ["name", "skill", "target_value"];
+  const attrs = ["name", "target_value"];
 
-  const { damage, damage_type, target_value, skill } = attacks;
-  const update = getRepUpdate(attrs, row, attacks);
+  const { damage, damage_type, target_value, skill } = attack.data;
+  const update = getRepUpdate(attrs, row, attack);
+
+  console.log(attack);
+
+  console.table({
+    damage,
+    damage_type,
+    target_value,
+    skill,
+  });
 
   if (!skill && target_value) {
     update[`${row}_skill`] = "@{target_value}";
   }
 
+  if (skill) {
+    update[`${row}_skill`] = `@{${skill?.toLowerCase()}}`;
+  }
+
   const type = damage_type?.toLowerCase();
 
   const modifier = damage ? `+${damage}` : "";
-  if (["brawling", "character"].includes(type)) {
-    const attr = `${type}_damage`;
-    getAttrs([attr], (v) => {
-      if (v) {
-        setAttrs({ [`${row}_damage`]: `${v[attr]}${modifier}` });
-      } else {
-        dropWarning(`Unknown damage type: ${damage_type}`);
-      }
-    });
-  } else if (["horse"].includes(type)) {
-    getAttrs(
-      ["warhorse_charge_damage", "warhorse_damage"],
-      ({ warhorse_charge_damage, warhorse_damage }) => {
-        if (warhorse_charge_damage || warhorse_damage) {
-          const damage = warhorse_charge_damage || warhorse_damage;
-
-          setAttrs({
-            [`${row}_damage`]: `${damage}${modifier}`,
-          });
+  try {
+    if (["brawling", "character"].includes(type)) {
+      const attr = `${type}_damage`;
+      getAttrs([attr], (v) => {
+        if (v) {
+          setAttrs({ [`${row}_damage`]: `${v[attr]}${modifier}` });
         } else {
-          dropWarning(`Could not get values for warhorse damage`);
+          dropWarning(`Unknown damage type: ${damage_type}`);
         }
-      }
-    );
-  } else if (damage.toLowerCase() === "special") {
-    update[`${row}_damage`] = 0;
-  } else if (damage) {
-    update[`${row}_damage`] = damage;
+      });
+    } else if (["horse"].includes(type)) {
+      getAttrs(
+        ["warhorse_charge_damage", "warhorse_damage"],
+        ({ warhorse_charge_damage, warhorse_damage }) => {
+          if (warhorse_charge_damage || warhorse_damage) {
+            const damage = warhorse_charge_damage || warhorse_damage;
+
+            setAttrs({
+              [`${row}_damage`]: `${damage}${modifier}`,
+            });
+          } else {
+            dropWarning(`Could not get values for warhorse damage`);
+          }
+        }
+      );
+    } else if (damage?.toLowerCase() === "special") {
+      update[`${row}_damage`] = 0;
+    } else if (damage) {
+      update[`${row}_damage`] = damage;
+    }
+  } catch (error) {
+    console.warn(error);
   }
+
+  console.log("update_attack");
+  console.log(update);
 
   return update;
 };
