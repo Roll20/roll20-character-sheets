@@ -201,6 +201,10 @@
 					<input class="Mstat LIGHT" type="text" name="attr_Light_max" value="3">
 				</div>
 
+				<!-- Temporary status bars -->
+				<input type="text" name="attr_tokenTHP_Sources" value="{}" hidden="true">
+				<input type="text" name="attr_tokenTST_Sources" value="{}" hidden="true">
+
 				<!-- Ailment previews -->
 				<div class="rowContainer">
 					<input type="checkbox" class="hide-toggle-rev" name="attr_tokenAilment1Num" value="0" hidden="true">
@@ -2877,9 +2881,8 @@
 			<button type="action" class="applyDamageInput" name="act_applyDamage" data-i18n-title="helper-text-applydamage" title="Apply damage"></button>
 		</div>
 	</div>
-	<input type="text" name="attr_THP_Sources" value="{}">
-	<input type="text" name="attr_TST_Sources" value="{}">
-	<input type="text" name="attr_tempBar_value_override" value="0">
+	<input type="text" name="attr_THP_Sources" value="{}" hidden="true">
+	<input type="text" name="attr_TST_Sources" value="{}" hidden="true">
 </div>
 
 
@@ -10215,12 +10218,15 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 			<option data-i18n="distort-counter-full" value="distortCounter">Distortion Counter</option>
 			<option data-i18n="helper-text-difficulty" value="difficulty">Difficulty</option>
 		</select>
+
+		<!-- Used by Temp HP and Temp ST -->
+		<input type="number" name="attr_ailTempBarOverride" value="0" hidden="true">
 		
-		 <select name="attr_ailEffectMode" class="darkInput" style="width: 40px;">
+		<select name="attr_ailEffectMode" class="darkInput" style="width: 40px;">
 			<option value="+" selected>+</option>
 			<option value="x">x</option>
-		  <option value="=">=</option>
-		  </select>
+			<option value="=">=</option>
+		</select>
 		
 		<input type="text" name="attr_ailEffectVal" style="width: 40px;" value="-n">
 		</div>
@@ -10658,7 +10664,7 @@ on('change:loopEnabled', (info) => {
 function stepLoop() {
 	setTimeout(function() {
 		getAttrs(["loopEnabled", "prevRoundInitAttempts"], async function(values) {
-			console.log(values.prevRoundInitAttempts)
+			//console.log(values.prevRoundInitAttempts)
 			if (values.loopEnabled == "true" && parseInt(values.prevRoundInitAttempts) < 5) {
 				let newRoundInit = await getInitiative("New round");
 				if (newRoundInit == "") {
@@ -10862,6 +10868,11 @@ function updateSelectedToken(info, callback=()=>{}) {
 			tokenValues.push(`${tokenPrefix}_${bar}`, `${tokenPrefix}_${bar}_max`,);
 		});
 
+		let tempbarlist = ["THP", "TST"];
+		tempbarlist.forEach(tempbar => {
+			tokenValues.push(`${tokenPrefix}_token${tempbar}_Sources`);
+		});
+
 		getAttrs([...tokenValues], async function(values) {
 			let output = {}
 
@@ -10869,6 +10880,17 @@ function updateSelectedToken(info, callback=()=>{}) {
 			barlist.forEach(bar => {
 				output[`${bar}`] = values[`${tokenPrefix}_${bar}`];
 				output[`${bar}_max`] = values[`${tokenPrefix}_${bar}_max`];
+			});
+			tempbarlist.forEach(tempbar => {
+				/* For temp bar values from ailments, add an override to make sure any ailment list updates do not change the temp bar value */
+				let tempBarSourceRaw = values[`${tokenPrefix}_token${tempbar}_Sources`];
+				let tempBarSource = Data.unpackage(tempBarSourceRaw);
+				for (const [sourceName, sourceVals] of Object.entries(tempBarSource)) {
+					if (sourceName != "AutoEffects") {
+						output[`${sourceName.replace("ailnum","ailTempBarOverride")}`] = sourceVals[0];
+					}
+				}
+				output[`${tempbar}_Sources`] = tempBarSourceRaw;
 			});
 
 			/* Sets ailments to those of the token instance. If ailmentList is unset, initialize a new empty ailmentList */
@@ -10918,10 +10940,26 @@ barList.forEach(bar => {
 				let selectedId = values.tokenId_selected;
 				if (selectedId != "") {
 					if (barList.includes(info.sourceAttribute)) {
-						setAttrs({[`repeating_tokens_${selectedId}_${info.sourceAttribute}`]:info.newValue})
+						setAttrs({[`repeating_tokens_${selectedId}_${bar}`]:info.newValue})
 					}
 					else if (info.sourceAttribute.includes(selectedId.toLowerCase())) {
 						setAttrs({[`${bar}`]:info.newValue})
+					}
+				}
+			});
+		}
+	});
+});
+/* Sync: Temporary status bars */
+let tempBarList = ["thp", "tst"];
+tempBarList.forEach(tempBar => {
+	on(`change:${tempBar}_sources`, (info) => {
+		if (info.newValue != undefined) {
+			getAttrs(["tokenId_selected"], function(values) {
+				let selectedId = values.tokenId_selected;
+				if (selectedId != "") {
+					if (tempBarList.includes(info.sourceAttribute.replace("_sources", ""))) {
+						setAttrs({[`repeating_tokens_${selectedId}_token${tempBar}_sources`]:info.newValue});
 					}
 				}
 			});
@@ -14999,7 +15037,7 @@ function applyTempBarDamage(sourceName, sourceVals, targetBar, damage, newBar) {
 
 		if (sourceVals[1] != "None") {
 			let newCount = Math.ceil(tempBarVal/sourceVals[1]);
-			setAttrs({[sourceName]:newCount, tempBar_value_override:tempBarVal});
+			setAttrs({[sourceName]:newCount, [`${sourceName.replace("ailnum","ailTempBarOverride")}`]:tempBarVal});
 		}
 		return { tempBarVal:tempBarVal, newBar:newBar, damage:damage, messageName:messageName, messageVal:messageVal, messageIcon:messageIcon};
 	}
@@ -15041,7 +15079,7 @@ on('change:repeating_ailments:ailNum', (info) => {
 	let ailPrefix = info.sourceAttribute.replace("ailnum","");
 
 	getAttrs([`${ailPrefix}ailNum`, `${ailPrefix}ailEffect`, `${ailPrefix}ailName`, `${ailPrefix}ailEffectVal`, `${ailPrefix}ailEffectMode`,
-		`${ailPrefix}ailIcon`, "tempBar_value_override"], function(values) {
+		`${ailPrefix}ailIcon`, `${ailPrefix}ailTempBarOverride`], function(values) {
 
 		let ailNum = values[`${ailPrefix}ailNum`];
 		let ailTarget = values[`${ailPrefix}ailEffect`];
@@ -15049,6 +15087,7 @@ on('change:repeating_ailments:ailNum', (info) => {
 		let ailEffectVal = Math.abs(parseFloat(values[`${ailPrefix}ailEffectVal`].replaceAll("n", "")));
 		let ailEffectMode = values[`${ailPrefix}ailEffectMode`];
 		let ailIcon = values[`${ailPrefix}ailIcon`];
+		let ailTempBarOverride = values[`${ailPrefix}ailTempBarOverride`];
 		let tempBarVal = 0;
 
 		if (ailTarget == "THP" || ailTarget == "TST") {
@@ -15062,13 +15101,15 @@ on('change:repeating_ailments:ailNum', (info) => {
 			} else {
 				ailEffectVal = 0;
 			}
-			if (parseInt(values.tempBar_value_override) > 0 && (info.newValue != undefined || (info.newValue == undefined && info.previousValue == undefined))) {
-				tempBarVal = parseInt(values.tempBar_value_override)
+
+			/* If a temp bar override value exists for the ailment, use that value instead */
+			if (parseInt(ailTempBarOverride) > 0 && (info.newValue != undefined || (info.newValue == undefined && info.previousValue == undefined))) {
+				tempBarVal = parseInt(ailTempBarOverride);
 			}
 
 			/* Update the temp source for the correct bar */
 			updateTempBar(ailTarget, info.sourceAttribute, tempBarVal, ailEffectVal, ailName, "ailments", ailIcon);
-			setAttrs({"tempBar_value_override":"0"});
+			setAttrs({[`${ailPrefix}ailTempBarOverride`]:"0"});
 		}
 	});
 })
