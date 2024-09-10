@@ -10747,13 +10747,14 @@ function stepLoop() {
 
 				/* Sync: Target Ailment/Bar lists */
 				getAttrs(["targetName", "targetSettings"], async function(values) {
+					if (values.targetName != "" && !values.targetName.includes("@{target|")) {
+						updateTargetAilmentList();
+						updateTargetBarLists();
+					}
+
 					let targetSettings = Data.unpackage(values.targetSettings);
 					if (targetSettings.hideDetailsFromTargeting == "true") {
 						unknownTarget();
-					}
-					else if (values.targetName != "" && !values.targetName.includes("@{target|")) {
-						updateTargetAilmentList();
-						updateTargetBarLists();
 					}
 				});
 
@@ -11006,7 +11007,6 @@ function updateSelectedToken(info, callback=()=>{}) {
 			/* Set new selection */
 			output[`${tokenPrefix}_token_selected`] = "true";
 			setAttrs(output, {}, () => {
-				console.log("Suppressing " + "something!");
 				callback();
 			});
 		});
@@ -11080,7 +11080,6 @@ stateList.forEach(state => {
 		getAttrs(["tokenId_selected"], function(values) {
 			let selectedId = values.tokenId_selected;
 			if (selectedId != "") {
-				console.log(info)
 				if (stateList.includes(info.sourceAttribute)) {
 					/* newValue will in some cases not be set when decreasing staggerduration. This ensures the value is properly decreased */
 					if (info.newValue == undefined && info.sourceAttribute == "staggerduration") {
@@ -11302,11 +11301,11 @@ on('clicked:selectTarget', (info) => {
 					"hideDetailsFromTargeting": values.settingHideDetailsFromTargeting
 				})
 			},{},() => {
+				updateTargetAilmentList();
+				updateTargetBarLists();
+
 				if (values.settingHideDetailsFromTargeting == "true") {
 					unknownTarget();
-				} else {
-					updateTargetAilmentList();
-					updateTargetBarLists();
 				}
 			});
 		}
@@ -11341,7 +11340,7 @@ function unknownTarget() {
 
 function updateTargetAilmentList(callback=()=>{}) {
 	getAttrs(["settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings"], function(values) {
-		if (values.settingHideCombatOptions == "0") {
+		if (values.settingHideCombatOptions == "0" && values.targetName != "") {
 
 			let targetSettings = Data.unpackage(values.targetSettings);
 			let targetAilmentListName = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${values.targetTokenId}_tokenAilmentList` : "ailmentList";
@@ -11356,12 +11355,14 @@ function updateTargetAilmentList(callback=()=>{}) {
 					setAttrs({"targetAilmentList": targetAilmentList});
 				}
 			});
+		} else {
+			callback();
 		}
 	});
 }
 function updateTargetBarLists(callback=()=>{}) {
 	getAttrs(["settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings"], function(values) {
-		if (values.settingHideCombatOptions == "0") {
+		if (values.settingHideCombatOptions == "0" && values.targetName != "") {
 
 			let targetBarAttrs = [];
 			let targetSettings = Data.unpackage(values.targetSettings);
@@ -11374,16 +11375,21 @@ function updateTargetBarLists(callback=()=>{}) {
 				let targetBarList = {}
 				let targetBarDamageList = {}
 				barList.forEach(bar => {
-					targetBarList[`${(bar == "stagres") ? "st" : bar}`] = parseInt(values[`${targetPrefix}${bar}`]); 
-					targetBarDamageList[`-${(bar == "stagres") ? "st" : bar}`] = parseInt(values[`${targetPrefix}${bar}_max`]) - targetBarList[`${(bar == "stagres") ? "st" : bar}`];
+					let barName = "";
+					switch (bar) {
+						case "hp": barName = "HP"; break;
+						case "stagres": barName = "ST"; break;
+						case "sp": barName = "SP"; break;
+						case "light": barName = "Light"; break;
+					}
+					targetBarList[`${barName}`] = parseInt(values[`${targetPrefix}${bar}`]); 
+					targetBarDamageList[`-${barName}`] = parseInt(values[`${targetPrefix}${bar}_max`]) - targetBarList[`${barName}`];
 				});
-
-				console.log(targetSettings)
 
 				if (targetSettings.hideBarUpdate == "true") {
 					setAttrs({"HP_target":"???", "StagRes_target":"???", "SP_target":"???"});
 				} else {
-					setAttrs({"HP_target":targetBarList.hp, "StagRes_target":targetBarList.st, "SP_target":targetBarList.sp});
+					setAttrs({"HP_target":targetBarList.HP, "StagRes_target":targetBarList.ST, "SP_target":targetBarList.SP});
 				}
 
 				if (callback != "()=>{}") {
@@ -11392,6 +11398,9 @@ function updateTargetBarLists(callback=()=>{}) {
 					setAttrs({"targetBarList": Data.package(targetBarList), "targetBarDamageList": Data.package(targetBarDamageList)});
 				}
 			});
+		}
+		else {
+			callback();
 		}
 	});
 }
@@ -12397,14 +12406,13 @@ on("change:DefeatState", function() {
 
 /* Auto: Stagger State updates */
 on("change:StaggerState change:StaggerDuration", function(info) {
-	console.log(`${info.sourceAttribute}:`)
-	console.log(info)
+	//console.log(info)
 	
 getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
 	getAttrs([`${info.sourceAttribute}SuppressUpdate`, "StagRes", "StaggerState", "StaggerDuration", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage", "SP", "egoCondition", "egoActiveState", "messageOverride", "distortState", `${id}_staggerSanity`, `${id}_staggerDurationMax`, "settingLimbusStyle"], function(values) {
-	if (values[`${info.sourceAttribute}SuppressUpdate`] == "true") { console.log(info.sourceAttribute + " was suppressed"); setAttrs({[`${info.sourceAttribute}SuppressUpdate`]:"false"}); return; }
+	if (values[`${info.sourceAttribute}SuppressUpdate`] == "true") { setAttrs({[`${info.sourceAttribute}SuppressUpdate`]:"false"}); return; }
 
 	/* Get the trigger type */
 	let type = "state";
@@ -13403,8 +13411,6 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 
 
 	/* Stagger processing */
-	console.log(stagcheck)
-	console.log(stagduration)
 	if(stagcheck == "Staggered"){
 		if(stagduration == 0) {
 			stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
@@ -16743,10 +16749,10 @@ Block and Evade also include Defensive */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
 function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
 	
-	/* If using generic token mode, switches to the correct token */
+	/* If using generic token mode, switches to the correct token before applying incoming AutoEffects */
 	let tokenId = (overrideList.targetTokenId != undefined) ? overrideList.targetTokenId : "";
 	changeActiveToken(tokenId, () => {
-
+	
 	/* Adds the input AutoScript */
 	let AutoScript = "";
 	if (inputAutoScript != "") {
@@ -16842,9 +16848,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let LightExpended = values.Light_max - Light;
 		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
 
-		let targetAilmentList = (values.targetAilmentList != undefined) ? values.targetAilmentList : {};
-		let targetBarList = (values.targetBarList != undefined) ? values.targetBarList : {};
-		let targetBarDamageList = (values.targetBarDamageList != undefined) ? values.targetBarDamageList : {};
+		let targetAilmentList = (values.targetAilmentList != undefined) ? Data.unpackage(values.targetAilmentList) : {};
+		let targetBarList = (values.targetBarList != undefined) ? Data.unpackage(values.targetBarList) : {};
+		let targetBarDamageList = (values.targetBarDamageList != undefined) ? Data.unpackage(values.targetBarDamageList) : {};
 
 		let THP_Sources = (values.THP_Sources != "" && values.THP_Sources != "{}") ? JSON.parse(values.THP_Sources) : "";
 		if (THP_Sources.AutoEffects != undefined) { barList.THP = THP_Sources.AutoEffects[0]; }
@@ -16887,6 +16893,17 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	exportAilmentList(overrideList, function(ailmentList) { 
 	// console.log(ailmentList)
 
+	/* If targeting is in use, update target ailments and bars */
+	updateTargetAilmentList(returnListAilment => {
+	if (returnListAilment != undefined) {
+		targetAilmentList = returnListAilment;
+	}
+	updateTargetBarLists(returnListBars => {
+	if (returnListBars != undefined) {
+		targetBarList = returnListBars.targetBarList;
+		targetBarDamageList = returnListBars.targetBarDamageList;
+	}
+
 
 	/* Execute each AutoEffect in the AutoScript */
 	AutoScript.forEach(AutoEffect => {
@@ -16923,8 +16940,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
 			if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
 				switch (AutoEffect[0][0]) {
-					case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList); break;
-					case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList); break;
+					case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
+					case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
 					default: tempOutput = {}; break;
 				}
 				if (tempOutput.checkResult == "failure") {
@@ -16942,8 +16959,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	if (autoEffectType != "conditional") {
 		/* Checks and Reset are always processed. Other AutoEffects are not processed if the last check failed */
 		switch (AutoEffect[0][0]) {
-			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, settingLimbusStyle); break;
-			case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, settingLimbusStyle, autoEffectType); break;
+			case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
+			case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
 			case "Reset": tempOutput = autoEffectReset(AutoEffect[0]); break;
 			case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
 			default: tempOutput = {}; break;
@@ -17009,32 +17026,30 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			}
 
 			/* Handle updating ailmentList and barList after a successful AutoEffect */
+			/* If a target is not selected, an error will be thrown instead. May change this behaviour in the future */
 			if (tempOutput.modifyList != undefined) {
-				if (tempOutput.modifyList == "barList") {
-					barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
+				if (tempOutput.modifyList.includes("barList")) {
+					if (tempOutput.modifyList.includes("target")) {
+						targetBarList[tempOutput.modifyTarget] = parseInt(targetBarList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
+					} else {
+						barList[tempOutput.modifyTarget] = parseInt(barList[tempOutput.modifyTarget]) + parseInt(tempOutput.modifyVal);
+					}
 				} else {
 					let targetIndex = 1;
 					if (tempOutput.modifyNextTurn != undefined && tempOutput.modifyNextTurn == "true") {
 						targetIndex = 2;
 					}
-					ailmentList[tempOutput.modifyTarget][targetIndex] = parseInt(ailmentList[tempOutput.modifyTarget][targetIndex]) + parseInt(tempOutput.modifyVal);
+					if (tempOutput.modifyList.includes("target")) {
+						targetAilmentList[tempOutput.modifyTarget][targetIndex] = parseInt(targetAilmentList[tempOutput.modifyTarget][targetIndex]) + parseInt(tempOutput.modifyVal);
+					} else {
+						ailmentList[tempOutput.modifyTarget][targetIndex] = parseInt(ailmentList[tempOutput.modifyTarget][targetIndex]) + parseInt(tempOutput.modifyVal);
+					}
 				}
 				delete tempOutput.modifyList;
 				delete tempOutput.modifyTarget;
 				delete tempOutput.modifyNextTurn;
 				delete tempOutput.modifyVal;
 			}
-
-			/* Handle target checks */
-			/* targetChecks have the following format: [[mode, target, targetmax, value], effectKey, effectValue] */
-			// When running other autoEffects, if autoBuffer is encountered, it will convert following effects into ones that use the check
-			// Reset and any new check, targetCheck or otherwise, will reset the buffet to 0
-			/*
-			let exampleAutoEffect = "(Consume 3 Charge Target) (DicePower 2)";
-			let exampleTargetCheck1 = ["=", "Charge", "", "3", "dicePower", "2"];
-			let exampleTargetCheck2 = ["=", "Charge", "", "3", "autoBuffer", "(Consume 3 Charge)"];
-			returnValues.targetCheck = [exampleTargetCheck1, exampleTargetCheck2];
-			*/
 
 			/* Handle DicePower, DiceMax, DiceCount, Speed with Combat duration, */
 			/* BaseDamage, FlatDamageHP, FlatDamageST and FlatDamageSP */
@@ -17051,8 +17066,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 				}
 			});
 
-			/* Handle target options for Require, Consume, Reset and CustomMessage */
-			effectList = ["autoRequire", "autoConsume", "autoReset", "autoCustomMessage"];
+			/* Handle target options for Reset and CustomMessage */
+			effectList = ["autoReset", "autoCustomMessage"];
 			effectList.forEach(effect => {
 				if (tempOutput[effect] != undefined) {
 					if (autoEffectConditional == "") {
@@ -17063,6 +17078,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			});
 
 			/* Handle Inflict, Give and FlatDamage (for non-attacks) */
+			/* Also handles Consume on the Target, which counts as autoInflict for both bars and ailments (will change this later) */
 			effectList = ["autoInflict", "autoGive", "autoDamage"];
 			effectList.forEach(effect => {
 				if (tempOutput[effect] != undefined) {
@@ -17277,6 +17293,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 
 	setAttrs(output);
 	callback(returnValues);
+	});
+	});
 	});
 	});
 	});
@@ -17611,12 +17629,12 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 
 	/* Check if CustomMessage is silent. No reason to do any formatting being that the message will not be displayed anyways */
 	let silent = "false";
-	if (autoEffectToString(AutoEffect).indexOf("Silent") > autoEffectToString(AutoEffect).lastIndexOf('"')) {
+	if (autoEffectToString(AutoEffect).lastIndexOf("Silent") > autoEffectToString(AutoEffect).lastIndexOf('"')) {
 		silent = "true";
 	}
 
 	/* Handle the target option */
-	if (autoEffectToString(AutoEffect).indexOf("Target") > autoEffectToString(AutoEffect).lastIndexOf('"')) {
+	if (autoEffectToString(AutoEffect).lastIndexOf("Target") > autoEffectToString(AutoEffect).lastIndexOf('"')) {
 		return {autoCustomMessage: autoEffectToString(AutoEffect).replaceAll("Target","") };
 	} else {
 		if (AutoEffect[1] != undefined) { messageFormat = AutoEffect.slice(1).join(" "); }
@@ -17641,12 +17659,23 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	}
 }
 
-function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, settingLimbusStyle) {
+function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle) {
 	let returnValues = {};
 	
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 6) { return autoEffectErrorMessage("Format Error", `Expected format: (Require N #Ailment/#Bar/#BarDamage #Scaling(optional) #Target(optional) #Silent(optional))`, AutoEffect); }
 	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!(["scaling", "silent", "target"].includes(option.toLowerCase()) || (/(scaling[0-9]+)/ig).test(option))) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
+
+	/* Handle the target option */
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		if (Object.keys(targetAilmentList).length > 0) {
+			ailmentList = targetAilmentList;
+			barList = targetBarList;
+			barDamageList = targetBarDamageList;
+		} else {
+			return autoEffectErrorMessage("Targeting Error", `Used the Target option for Require, but not target is selected`, AutoEffect);
+		}
+	}
 
 	/* Get target count */
 	let effectName = AutoEffect[2];
@@ -17692,48 +17721,49 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, sett
 		}
 		returnValues.scaling = scaling;
 	}
-
-	/* Handle the target option */
-	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
-		returnValues.autoRequire = autoEffectToString(AutoEffect).replace(/(target)/ig,"");
-		returnValues.scaling = 1;
+	
+	/* Execute AutoEffect check */
+	if (countImmutable >= effectVal) {
+		returnValues.checkResult = "success";
 	} else {
-	
-		/* Execute AutoEffect check */
-		if (countImmutable >= effectVal) {
-			returnValues.checkResult = "success";
-		} else {
-			returnValues.checkResult = "failure";
-		}
-
-		/* Handle message */
-		let messageFormat = getTranslationByKeyCustom("Require [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-require");
-		
-		let effectIcon = effectName;
-		if (ailmentList.hasOwnProperty(effectName)) {
-			messageFormat = "[/TARGET] " + messageFormat;
-			effectIcon = ailmentList[effectName][5];
-		}
-	
-		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
-			returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
-		}
-		returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
-		
+		returnValues.checkResult = "failure";
 	}
 
+	/* Handle message */
+	let messageFormat = getTranslationByKeyCustom("Require [SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-require");
+	
+	let effectIcon = effectName;
+	if (ailmentList.hasOwnProperty(effectName)) {
+		messageFormat = "[/TARGET] " + messageFormat;
+		effectIcon = ailmentList[effectName][5];
+	}
+
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
+		returnValues.message = autoEffectMessage(messageFormat, effectName, effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
+	}
+	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
 }
 
-function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle, autoEffectType) {
+function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType) {
 	let returnValues = {};
 
 	/* Check format */
 	if (AutoEffect.length < 3 || AutoEffect.length > 6) { return autoEffectErrorMessage("Format Error", `Expected format: (Consume N #Ailment/#Bar #Scaling(optional) #Target(optional) #Silent(optional))`, AutoEffect); }
 	if (AutoEffect.length > 3) { AutoEffect.slice(3).forEach(option => { if (!(["scaling", "silent", "target"].includes(option.toLowerCase()) || (/(scaling[0-9]+)/ig).test(option))) { returnValues = autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 	
+	/* Handle the target option */
+	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+		if (Object.keys(targetAilmentList).length > 0) {
+			ailmentList = targetAilmentList;
+			barList = targetBarList;
+		} else {
+			return autoEffectErrorMessage("Targeting Error", `Used the Target option for Consume, but not target is selected`, AutoEffect);
+		}
+	}
+
 	/* Get consumed value */
 	let effectVal = parseInt(Math.abs(AutoEffect[1]));
 	if (isNaN(effectVal) == true) { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number`, AutoEffect); }
@@ -17770,47 +17800,49 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, settingLimbusStyle,
 		returnValues.scaling = scaling;
 	}
 
-	/* Handle the target option */
-	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
-		returnValues.autoConsume = autoEffectToString(AutoEffect).replace(/(target)/ig,"");
-		returnValues.scaling = 1;
-	} else {
-
-		/* Execute AutoEffect check */
-		if (countImmutable >= effectVal && count >= effectVal) {
-			returnValues[effectTarget] = -effectVal*scaling;
-			returnValues.count = parseInt(count);
-			if (!(count >= 2*effectVal)) {
-				returnValues.checkResult = "last success";
-			} else {
-				returnValues.checkResult = "success";
-			}
-			if (ailmentList.hasOwnProperty(effectName)) { returnValues.modifyList = "ailmentList"; }
-			else { returnValues.modifyList = "barList";  }
-			returnValues.modifyTarget = effectName;
-			returnValues.modifyVal = -effectVal*scaling;
+	/* Execute AutoEffect check */
+	if (countImmutable >= effectVal && count >= effectVal) {
+		returnValues[effectTarget] = -effectVal*scaling;
+		returnValues.count = parseInt(count);
+		if (!(count >= 2*effectVal)) {
+			returnValues.checkResult = "last success";
 		} else {
-			returnValues.checkResult = "failure";
+			returnValues.checkResult = "success";
 		}
+		if (ailmentList.hasOwnProperty(effectName)) { returnValues.modifyList = "ailmentList"; }
+		else { returnValues.modifyList = "barList";  }
+		returnValues.modifyTarget = effectName;
+		returnValues.modifyVal = -effectVal*scaling;
 
-		/* Handle message */
-		let messageFormat = getTranslationByKeyCustom("Consume [-SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-consume");
-		if (returnValues.checkResult != "failure" && (autoEffectType == "standard" || autoEffectType == "section")) {
-			messageFormat += " [[INITIAL] -> [RESULT]]";
+		/* If using the target option, do not Consume ailment/bar values for the character and modify the target's ailment/bar lists instead */
+		if (AutoEffect.some(option => (/(target)/ig).test(option))) {
+			returnValues.modifyList = `target${returnValues.modifyList}`;
 		}
-		
-		let effectIcon = effectName;
-		if (ailmentList.hasOwnProperty(effectName)) {
-			messageFormat = "[/TARGET] " + messageFormat;
-			effectIcon = ailmentList[effectName][5];
-		}
-	
-		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
-			returnValues.message = autoEffectMessage(messageFormat, effectName, -effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
-		}
-		returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: -effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
-		
+	} else {
+		returnValues.checkResult = "failure";
 	}
+
+	/* When using the target option, on a successful check, run the Consume again for the target to actually deduct the consumed ailment/bar value */
+	if (AutoEffect.some(option => (/(target)/ig).test(option)) && returnValues.checkResult != "failure") {
+		returnValues.autoInflict = autoEffectToString(AutoEffect).replace(/(target)/ig,"").replace(/(scaling[0-9]+)/ig,"");
+	}
+
+	/* Handle message */
+	let messageFormat = getTranslationByKeyCustom("Consume [-SCALING NUM] [TARGET]: [CHECK]", "autoeffect-format-consume");
+	if (returnValues.checkResult != "failure" && (autoEffectType == "standard" || autoEffectType == "section")) {
+		messageFormat += " [[INITIAL] -> [RESULT]]";
+	}
+	
+	let effectIcon = effectName;
+	if (ailmentList.hasOwnProperty(effectName)) {
+		messageFormat = "[/TARGET] " + messageFormat;
+		effectIcon = ailmentList[effectName][5];
+	}
+
+	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
+		returnValues.message = autoEffectMessage(messageFormat, effectName, -effectVal, count, Math.max(scaling,1), returnValues.checkResult, settingLimbusStyle, effectIcon);
+	}
+	returnValues.messageValues = { effectTarget: effectName, effectIcon: effectIcon, effectVal: -effectVal, effectCount: count, scaling: Math.max(scaling,1), checkResult: returnValues.checkResult }
 
 	/* Return check result */
 	return returnValues;
