@@ -1,3 +1,45 @@
+# 2024-9-10
+
+The headline feature of this weeks release is using CRP (Custom Roll Parsing)
+for skill rolls. This means we have a lot more descriptive text and information
+in skill rolls; similar to attacks and spells.
+
+Experimental support for custom spells has been added, and there is a way you
+can turn a sheet to a creature sheet.  More on that coming soon.
+
+Othwise there are lot of nits; hiding stun effects when you don't have any; and
+show current ranks when you level up.  For both skills and spells.
+
+- Skills:
+  - Use CRP for rolls
+  - Expand descirption and modifiers for use.
+- Custom Spells now supported (experimental)
+- Status effects like stun/staggered/bleed disappear if empty.
+- Spell mastery masters magic; not manipulates (message change)
+- Remove some injury debug.
+- Religion is now an attribute.
+- Compendium:
+  - Evaporate Liquid is not 1, and it's 1000 cu ft, not 000 cu ft
+  - Darkvision 10 + 5/tier. not 10+10
+  - Golden throat 5/tier
+  - Fix some minor grammar issues in some talent descriptions (.s and the like)
+- Talents:
+  - Fix costs with different per tier costs
+  - Add placeholder support for spell lists.
+- Optimisation: Reduce by ~3 number of API calls in updateSkils.
+- Force ' ' for empty skills when there was a value.
+- Attacks now have parry and 'other' modifiers (Long requested feature)
+- Fix a bug stoppind stun penalies from applying to spells
+- Levelup:
+  - Spells persist their ranks (again)
+  - Show current rank of simple skills
+  - Show current rank of specialised skills.
+  - Show current rank of spells
+- Creatures:
+  - Make creature loading more resiliant
+  - Add a hidden way to turn a sheet into a creature
+- Add a new preview image.
+
 # 2024-9-3
 
 - Bump sheet to version 3
