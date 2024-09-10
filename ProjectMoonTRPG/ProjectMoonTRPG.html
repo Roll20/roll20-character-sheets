@@ -17824,8 +17824,11 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, 
 	}
 
 	/* When using the target option, on a successful check, run the Consume again for the target to actually deduct the consumed ailment/bar value */
-	if (AutoEffect.some(option => (/(target)/ig).test(option)) && returnValues.checkResult != "failure") {
+	/* Also makes certain the Consume uses no ailment/bar value on the user */
+	if (returnValues.checkResult != "failure" && AutoEffect.some(option => (/(target)/ig).test(option))) {
 		returnValues.autoInflict = autoEffectToString(AutoEffect).replace(/(target)/ig,"").replace(/(scaling[0-9]+)/ig,"").replace(/([0-9]+)/ig, effectVal*scaling);
+		delete returnValues[effectTarget];
+		delete returnValues.count;
 	}
 
 	/* Handle message */
