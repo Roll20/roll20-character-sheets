@@ -45,7 +45,8 @@ const paythecost=(sanity_loss,other_costs,fraction=1) => {
             finishRoll(results.rollId,newroll);
 
             setAttrs(update, {silent:true}, () => {
-                updatebreakingpoints() // I need to update the breaking points in the callback
+               console.info('update',update);
+               updatebreakingpoints() // I need to update the breaking points in the callback
 
             });
         });
@@ -370,7 +371,7 @@ const ritual_rolls_info = (repsecid) => {
         update[`${repsecid}_cost_text`] = `${String(costs_text).toUpperCase()}`;
 
         setAttrs(update, {silent:true}, () => {
-
+               console.info('update',update);
         });
     });
 };

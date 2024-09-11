@@ -139,7 +139,9 @@ var definesanroll = function definesanroll(san, sold, bnew, bold, sanflags, char
 
   setAttrs(update, {
     silent: true
-  }, function () {});
+  }, function () {
+    console.info('update', update);
+  });
   startRoll("".concat(rollValue, " {{isSkill=[[").concat(_isSkill, "]]}}"), function (results) {
     var sanity_old = results.results.sanity_old.result;
     var sanity_new = results.results.sanity_new.result;
@@ -170,6 +172,7 @@ var setBondsLocalVariables = function setBondsLocalVariables() {
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         console.log('Bonds updated on open');
       });
     });

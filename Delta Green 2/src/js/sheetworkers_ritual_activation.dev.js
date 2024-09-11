@@ -52,6 +52,7 @@ var paythecost = function paythecost(sanity_loss, other_costs) {
     setAttrs(update, {
       silent: true
     }, function () {
+      console.info('update', update);
       updatebreakingpoints(); // I need to update the breaking points in the callback
     });
   });
@@ -426,6 +427,8 @@ var ritual_rolls_info = function ritual_rolls_info(repsecid) {
     update["".concat(repsecid, "_cost_text")] = "".concat(String(costs_text).toUpperCase());
     setAttrs(update, {
       silent: true
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 };

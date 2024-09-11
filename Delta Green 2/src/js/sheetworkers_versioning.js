@@ -104,7 +104,7 @@ const version_150_170 = () => {
 // UPDATE TO VERSION 2.0
 const version_170_200 = () => {
     let codeversion=2.0;
-    let update={};
+    const update={};
     update['version']=codeversion;
     getAttrs(["motivations","character_name","name","sanity_points","violence_3","helplessness_3","violence_2","helplessness_2",
     "sanity_points_old","sanity_points","breaking_point_old","breaking_point_old"],function(v){
@@ -150,7 +150,7 @@ const version_170_200 = () => {
 // UPDATE TO VERSION 2.0
 const version_200_201 = () => {
     let codeversion=2.01;
-    let update={};
+    const update={};
     console.log('version:',codeversion);
     update['version']=codeversion;
 
@@ -173,8 +173,7 @@ const version_200_201 = () => {
             });
             getAttrs(repfields,(values) => {
                     console.info('fullarray',values);
-                    var update = {};
-
+          
                     ids.forEach(id => {
                         const repsecid= `repeating_${section}_${id}_`;
 
@@ -217,7 +216,7 @@ const version_200_201 = () => {
                             const value_ammo = Math.max(parseInt(values[`${repsecid}ammo`],10) || 0,0)  ;
                             if (value_ammo>0){
                                 update[`${repsecid}ammo_total`]=value_ammo;
-                                update[`${repsecid}hasammo`]=1;
+                                update[`${repsecid}hasammo`]='active';
                                 update[`${repsecid}ammo`]=value_ammo;
                             } else {
                                 update[`${repsecid}hasammo`]=0;
@@ -259,46 +258,47 @@ const version_200_201 = () => {
 
 const version_201_202 = () => {
     let codeversion=2.02;
-    let update={};
+    const update={};
     console.log('verion:',codeversion);
     update['version']=codeversion;
     getAttrs(["sheet_type"], values => {
+        var names=[];
+        var rank=[];
+                
         if (values.sheet_type==='npc'){
             update['sheet_type']='npc';
             getSectionIDs(`skills`, ids => {
-                var names=[];
-                var rank=[];
                 ids.forEach(id => {
                     names.push(`repeating_skills_${id}_name`);
                     rank.push(`repeating_skills_${id}_rank`);
                 });
-                // make it into an object with keys = names and values = rank
-
-
-                getAttrs(names.concat(rank), values => {
-                    const update={};
-                    var ids_to_remove=[]; // for the ids that I copy in the named skills
-                    names.forEach((name,idx) => {
-                        const skillname=values[name].toLowerCase().replace(/ /g, "_");
-                        const rankvalue=values[rank[idx]];
-                        const id_value=name.split('_')[2];
-                        if (arrays['_skills'].includes(skillname)){
-                            update[`${skillname}`]=rankvalue;
-                            update[`${skillname}_visible`]='visible';
-                            ids_to_remove.push(id_value);
-                        }
-                    });
-                    console.info('update npc skills',update);
-                    setAttrs(update, {silent:true}, () => {
-                        console.log('updated skills');
-                        ids_to_remove.forEach(id => {
-                            removeRepeatingRow(`repeating_skills_${id}`);
-                        });
-                        console.log('removed repeating skills');
-                        versioning(codeversion);
-                    });
-                });
             });
-        };
+        };        
+            // make it into an object with keys = names and values = ran
+               
+            
+        getAttrs(names.concat(rank), values => {
+            var ids_to_remove=[]; // for the ids that I copy in the named skills
+            names.forEach((name,idx) => {
+                const skillname=values[name].toLowerCase().replace(/ /g, "_");
+                const rankvalue=values[rank[idx]];
+                const id_value=name.split('_')[2];
+                if (arrays['_skills'].includes(skillname)){
+                    update[`${skillname}`]=rankvalue;
+                    update[`${skillname}_visible`]='visible';
+                    ids_to_remove.push(id_value);
+                }
+            });
+            console.info('update npc skills',update);
+            
+            setAttrs(update, {silent:true}, () => {
+                console.log('updated skills');
+                ids_to_remove.forEach(id => {
+                    removeRepeatingRow(`repeating_skills_${id}`);
+                });
+                console.log('removed repeating skills');
+                versioning(codeversion);
+            });
+            });
     });
 }

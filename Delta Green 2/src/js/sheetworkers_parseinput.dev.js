@@ -33,6 +33,7 @@ var changeBondButtonColorOnOpen = function changeBondButtonColorOnOpen() {
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         console.log('Bond color updated');
       });
     });

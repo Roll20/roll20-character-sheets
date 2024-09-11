@@ -18,7 +18,8 @@ const changeBondButtonColorOnOpen = () => {
                 update['repeating_bonds_'+id+'_color'] = BondButtonColor(score);
             });
             setAttrs(update, {silent:true}, () => {
-                console.log('Bond color updated');
+               console.info('update',update);
+               console.log('Bond color updated');
 
             });
         });

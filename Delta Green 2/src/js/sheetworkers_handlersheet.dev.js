@@ -33,6 +33,7 @@ var update_repeating_agents = function update_repeating_agents(repsecid, charact
     setAttrs(update, {
       silent: true
     }, function () {
+      console.info('update', update);
       console.log("Updated ".concat(repsecid, " with ").concat(character_identification));
     });
     finishRoll(results.rollId);

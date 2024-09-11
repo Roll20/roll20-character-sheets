@@ -1,7 +1,7 @@
 on(`clicked:reset_global_modifier`, () => {
     const update={'global_modifier_number':''};
     setAttrs(update, {silent:true}, () => {
-        
+        console.info('update',update);    
     });
 });
 

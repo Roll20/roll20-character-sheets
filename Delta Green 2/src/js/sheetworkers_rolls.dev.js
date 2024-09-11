@@ -83,6 +83,7 @@ var updateRepeatingRollsonOpen = function updateRepeatingRollsonOpen(update, cha
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         console.log('Repeating and Normal Rolls updated');
       });
     });
@@ -104,7 +105,9 @@ var changeRepeatingRolls = function changeRepeatingRolls(section, attrName, id) 
 
     setAttrs(update, {
       silent: true
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 };
 
@@ -178,7 +181,9 @@ var rollSkillAndStats = function rollSkillAndStats(rollValue, rollName, isSkill)
     update = check_for_failed_skill(rollName, outcome.isSuccess, isSkill);
     setAttrs(update, {
       silent: false
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 };
 
@@ -210,7 +215,9 @@ var rollBonds = function rollBonds(rollValue, _value, _names, _parameters) {
     finishRoll(results.rollId, newroll);
     setAttrs(update, {
       silent: false
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 };
 
@@ -398,7 +405,9 @@ var clicked_repeating_damages = function clicked_repeating_damages(parameters, n
       if (trackAmmo == 1) {
         var _update = {};
         _update[names['ammo']] = newroll['current_ammo'];
-        setAttrs(_update, function () {});
+        setAttrs(_update, function () {
+          console.info('update', _update);
+        });
       }
     });
   });

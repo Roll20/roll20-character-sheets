@@ -69,7 +69,8 @@ const updateRepeatingRollsonOpen = (update,character_id) => {
 				Object.assign(update, updateRepeatingRolls(section, attrName, id, character_id));
 			});					
 			setAttrs(update, {silent:true}, () => {
-				console.log('Repeating and Normal Rolls updated');
+               console.info('update',update);
+			   console.log('Repeating and Normal Rolls updated');
 
 			});				
 		});
@@ -93,7 +94,7 @@ const changeRepeatingRolls = (section,attrName,id) => {
 		}
 
 		setAttrs(update, {silent:true}, () => {
-
+               console.info('update',update);
 		});
 	});
 };
@@ -176,7 +177,7 @@ const rollSkillAndStats=(rollValue,rollName,isSkill) => {
 
 		update=check_for_failed_skill(rollName,outcome.isSuccess,isSkill);
 		setAttrs(update,{silent:false}, () => {
-
+               console.info('update',update);
 		});
 
 	});
@@ -215,7 +216,7 @@ const rollBonds=(rollValue,_value,_names,_parameters) => {
 
 		finishRoll(results.rollId,newroll);
 		setAttrs(update,{silent:false}, () => {
-
+            console.info('update',update);
 		});
 	});
 };
@@ -395,7 +396,7 @@ const clicked_repeating_damages = (parameters,names,type_prefix='damage') => {
 				const update={};
 				update[names['ammo']]=newroll['current_ammo'];
 				setAttrs(update, () => {
-
+               		console.info('update',update);
 				});
 			}
 		});
