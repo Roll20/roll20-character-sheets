@@ -17614,6 +17614,11 @@ function autoEffectToString(AutoEffect) {
 	return "(" + AutoEffect.join(" ") + ")";
 }
 
+function hasOption(AutoEffect, optionName) {
+	let optionRegex = new RegExp(`(${optionName.replace("#","[0-9]+")})`, "ig");
+	return AutoEffect.some(option => optionRegex.test(option));
+}
+
 /* Whispers an error message to the user detailing an AutoEffect error */
 function autoEffectErrorMessage(errorType, errorString, AutoEffect) {
 	AutoEffect = AutoEffect.join(" ").replace("Unknown: ","");
@@ -17860,8 +17865,8 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, 
 
 	/* When using the target option, on a successful check, run the Consume again for the target to actually deduct the consumed ailment/bar value */
 	/* Also makes certain the Consume uses no ailment/bar value on the user */
-	if (returnValues.checkResult != "failure" && AutoEffect.some(option => (/(target)/ig).test(option))) {
-		returnValues.autoInflict = autoEffectToString(AutoEffect).replace(/(target)/ig,"").replace(/(scaling[0-9]+)/ig,"").replace(/([0-9]+)/ig, effectVal*scaling);
+	if (returnValues.checkResult != "failure" && hasOption(AutoEffect, "target")) {
+		returnValues.autoInflict = `(Consume 1 ${effectTarget} Scaling${effectVal*scaling} ${(hasOption(AutoEffect, "silent")) ? "Silent" : ""}) (Reset)` ;
 		delete returnValues[effectTarget];
 		delete returnValues.count;
 	}
