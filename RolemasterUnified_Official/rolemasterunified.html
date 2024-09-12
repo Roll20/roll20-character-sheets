@@ -2498,7 +2498,7 @@ Name <input name="attr_character_name">
     <hr>
    
 <div class='prop_pair'><span class='prop_prop_plain'>Profession</span><span class='prop_value' name='attr_profession'></span><span class='prop_prop_plain'>Race</span><span class='prop_value' name='attr_race'></span><span class='prop_prop_plain'>Level</span><span class='prop_value' name='attr_display_level'></span><span class='prop_prop_plain'>Culture</span><span class='prop_value' name='attr_culture'></span><span class='prop_prop_plain'>Realm</span><span class='prop_value' name='attr_realm'></span><span class='prop_prop_plain'>Religion</span><span class='prop_value'><input type='text' style='width:100%' name='attr_religion'></span><span class='prop_prop_plain'>Age</span><span class='prop_value'><input type='text' style='width:100%' name='attr_age'></span><span class='prop_prop_plain'>Skin</span><span class='prop_value'><input type='text' style='width:100%' name='attr_skin'></span><span class='prop_prop_plain'>Eyes</span><span class='prop_value'><input type='text' style='width:100%' name='attr_eyes'></span><span class='prop_prop_plain'>Gender</span><span class='prop_value' name='attr_gender'></span><span class='prop_prop_plain'>Build</span><span class='prop_value' name='attr_build'></span><span class='prop_prop_plain'>Height</span><span class='prop_value' name='attr_height'></span><span class='prop_prop_plain'>Weight</span><span class='prop_value' name='attr_weight'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
-<span class='prop_value' name='attr_weightallowance'></span><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encpenalty'></span><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manueverpenalty'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_bmr_info'></span>Base Move (BMR)</span></span>
+<span class='prop_value' name='attr_weightallowance'></span><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encumberance_penalty'></span><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manueverpenalty'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_bmr_info'></span>Base Move (BMR)</span></span>
 <span class='prop_value' name='attr_bmr'></span><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span><span class='prop_prop_plain'>Easy</span><span class='prop_value' name='attr_strfeat_easy'></span><span class='prop_prop_plain'>Light</span><span class='prop_value' name='attr_strfeat_light'></span><span class='prop_prop_plain'>Medium</span><span class='prop_value' name='attr_strfeat_medium'></span><span class='prop_prop_plain'>Hard</span><span class='prop_value' name='attr_strfeat_hard'></span><span class='prop_prop_plain'>Very Hard</span><span class='prop_value' name='attr_strfeat_veryhard'></span><span class='prop_prop_plain'>Ext. Hard</span><span class='prop_value' name='attr_strfeat_exthard'></span><span class='prop_prop_plain'>Sheer Folly</span><span class='prop_value' name='attr_strfeat_sheerfolly'></span><span class='prop_prop_plain'>Absurd</span><span class='prop_value' name='attr_strfeat_absurd'></span><span class='prop_prop_plain'>Nigh Impossible</span><span class='prop_value' name='attr_strfeat_nighimpossible'></span>
 
     <span class='prop_prop_plain'>EP</span>
@@ -5346,7 +5346,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 206509e8677ef2f40c99ca9cffe279cf76ef0dd7
+Revision 2e32329e9a28648dcbfa94d7e228eaf22f91faed
 
 
 <hr>
@@ -6519,6 +6519,15 @@ function getCompendiumPagePending(str, func) {
   });
 }
 
+function getCompendiumQueryPending(str, func) {
+  rmuasync ++;
+  getCompendiumQuery(str, (ev) => {
+      if (func) func(ev);
+      rmuasync --;
+      checkPending();
+  });
+}
+
 function getSectionIDsPending(section, func) {
     if (!func) return;
 
@@ -7524,11 +7533,12 @@ RMUSkills.updateFavorites = function() {
 function _spellDoQuery(savedlists, listtype, filter, subtarget, cost, listranks) {
   const costarray = generateCostArray(cost);
   if (!savedlists) {
+    rmuerror("Saved lists is not valid. it should be");
     savedlists = [];
   }
   var data = getCharmancerData();
 
-  getCompendiumQuery(`Category:SpellList ${listtype}`, (lists) => {
+  getCompendiumQueryPending(`Category:SpellList ${listtype}`, (lists) => {
       // So on error we get 1 element and it has an expansion set to 0.
       // That seems the best way to detect and error
       if (!lists || lists[0].expansion == 0) {
@@ -7536,50 +7546,24 @@ function _spellDoQuery(savedlists, listtype, filter, subtarget, cost, listranks)
 	return;
       }
 
-      // Have list of spells in compendium & spells previous created.
-      // So go through previous list, and then add any left over from the
-      let foundlists = {};
-      for (let saved of savedlists) {
-	if (!saved.includes(`${subtarget}spelllist`)) {
-	  continue;
+      for (let list of lists) {
+	// Filter is currently on ListType
+	if (filter && filter.length > 0) {
+	  if (list.data.ListType == filter) {
+	    continue;
+	  }
 	}
+
 	addRepeatingSectionPending(`cmspelllistspell${subtarget}`, 'spelllist',
 	    `${subtarget}spelllist`,
 	    (sectionname) => {
-		cmPopulateListOptions(`${sectionname}_cmranks`, costarray,
-		      data.levelup.values[`${sectionname}_cmranks`]);
-		let listname = data.levelup.values[`${sectionname}_listname`];
-		foundlists[listname] = sectionname;
-		setAttrsPending({[`${sectionname}_listranks`]: listranks[listname] || '-'});
-	});
-      }
-
-      addPendingFunction(`Add new compendium ${subtarget} lists`, function () {
-	  for (let list of lists) {
-	    if (foundlists[list.name]) {
-	      // Already exists
-	      continue;
-	    }
-	    // Filter is currently on ListType
-	    if (filter && filter.length > 0) {
-	      if (list.data.ListType == filter) {
-		continue;
-	      }
-	    }
-
-	    addRepeatingSection(`cmspelllistspell${subtarget}`, 'spelllist',
-		`${subtarget}spelllist`,
-		(sectionname) => {
-		  cmPopulateListOptions(`${sectionname}_cmranks`, costarray,
-		      costarray[0]);
-		  console.log("check list ranks", list.name, listranks);
-		  setAttrsPending({[`${sectionname}_listname`]: list.name,
-		      [`${sectionname}_listranks`]: listranks[list.name] || '-'
-		      });
+	    cmPopulateListOptions(`${sectionname}_cmranks`, costarray,
+		costarray[0]);
+	    setAttrsPending({[`${sectionname}_listname`]: list.name,
+		[`${sectionname}_listranks`]: listranks[list.name]?.ranks || '-'
+		});
 	    });
-	  }
-      });
-      checkPending();
+      }
   });
 }
 
@@ -7593,28 +7577,50 @@ function initSpellListsCM(savedlists, profession, realm, costs, listranks) {
       "cmcategory-spellotherbaseownrealm-cost": costs.Restricted
       });
 
-  _spellDoQuery(savedlists, `ListType:*${profession} Base*`, '', 'ownbase', costs['Base'], listranks);
+  addPendingFunction("Base lists",()=> {
+    _spellDoQuery(savedlists, `ListType:*${profession} Base*`, '', 'ownbase', costs['Base'], listranks);
+  });
 
   if (realm.indexOf('/') > -1) { 
     // Hybrid: Two realms
     realms = realm.split('/');
-    _spellDoQuery(savedlists, `ListType:*${realms[0]} Open*`, '', 'open', costs['Open'], listranks );
-    _spellDoQuery(savedlists, `ListType:*${realms[1]} Open*`, '', 'open', costs['Open']. listranks );
-    _spellDoQuery(savedlists, `ListType:*${realms[0]} Closed*`, '', 'closed',
-	  costs['Closed'], listranks);
-    _spellDoQuery(savedlists, `ListType:*${realms[1]} Closed*`, '', 'closed',
-	  costs['Closed'], listranks);
-    _spellDoQuery(savedlists, `Realm:${realms[0]} Subtype:Base`, `${profession} Base`,
-	  'otherbaseownrealm', costs.Restricted, listranks);
-    _spellDoQuery(savedlists, `Realm:${realms[1]} Subtype:Base`, `${profession} Base`,
-	  'otherbaseownrealm', costs.Restricted, listranks);
-  } else {
-    _spellDoQuery(savedlists, `ListType:*${realm} Open*`, '', 'open', costs['Open'], listranks );
-    _spellDoQuery(savedlists, `ListType:*${realm} Closed*`, '', 'closed', costs['Closed'], listranks);
-    _spellDoQuery(savedlists, `Realm:${realm} Subtype:Base`, `${profession} Base`,
+    addPendingFunction("Hyrid realm 1 open lists",()=> {
+      _spellDoQuery(savedlists, `ListType:*${realms[0]} Open*`, '', 'open', costs['Open'], listranks );
+    });
+    addPendingFunction("Hybrid realm 2 open lists",()=> {
+      _spellDoQuery(savedlists, `ListType:*${realms[1]} Open*`, '', 'open', costs['Open'], listranks );
+    });
+    addPendingFunction("Hybid realm 1 closed lists",()=> {
+      _spellDoQuery(savedlists, `ListType:*${realms[0]} Closed*`, '', 'closed',
+	    costs['Closed'], listranks);
+    });
+    addPendingFunction("Hybid realm 1 closed lists",()=> {
+      _spellDoQuery(savedlists, `ListType:*${realms[1]} Closed*`, '', 'closed',
+	    costs['Closed'], listranks);
+    });
+    addPendingFunction("Hybid realm 1 other base lists",()=> {
+      _spellDoQuery(savedlists, `Realm:${realms[0]} Subtype:Base`, `${profession} Base`,
 	    'otherbaseownrealm', costs.Restricted, listranks);
+    });
+    addPendingFunction("Hybid realm 2 other base lists",()=> {
+      _spellDoQuery(savedlists, `Realm:${realms[1]} Subtype:Base`, `${profession} Base`,
+	    'otherbaseownrealm', costs.Restricted, listranks);
+    });
+  } else {
+    addPendingFunction("Open lists",()=> {
+      _spellDoQuery(savedlists, `ListType:*${realm} Open*`, '', 'open', costs['Open'], listranks );
+    });
+    addPendingFunction("Closed lists",()=> {
+      _spellDoQuery(savedlists, `ListType:*${realm} Closed*`, '', 'closed', costs['Closed'], listranks);
+    });
+    addPendingFunction("Other base lists",()=> {
+      _spellDoQuery(savedlists, `Realm:${realm} Subtype:Base`, `${profession} Base`,
+	      'otherbaseownrealm', costs.Restricted, listranks);
+    });
   }
 }
+
+
 onCheck("mancerchange:repeating_closedspelllist", changeSkillPurchase);
 onCheck("mancerchange:repeating_openspelllist", changeSkillPurchase);
 onCheck("mancerchange:repeating_ownbasespelllist", changeSkillPurchase);
@@ -8680,7 +8686,7 @@ function changeTalentPurchase(ev) {
 	}
       } else {
 	hideChoices([`${basename} .talent_tier_show`]);
-	list.push(`One Tier: ${cost} dp`);
+	list.push(`Tier 1: ${cost} dp`);
       }
       setCharmancerOptions(`${basename}_tier`, list);
 
@@ -8831,7 +8837,6 @@ function levelUpStart(_) {
 
 	const data = getCharmancerData();
 
-//	const costs = getCostsWithWeapons(data.knacks.values);
 	dpspent = 0;
 
 	let catupdates = {}
@@ -8845,7 +8850,7 @@ function levelUpStart(_) {
 	// Update each of the cost fields and the selectors.
 	RMUSkills.forEachSkill((skill, cat, pskill) => {
 	    if (skill.spellgroup) {
-	    return;
+	      return;
 	    }
 	    const skillname = pskill ? pskill.aname : skill.aname;
 	    const costarray = generateCostArray(costs[cat.aname] ?? costs[skillname]);
@@ -8867,6 +8872,7 @@ function levelUpStart(_) {
 	    const prefix = data.levelup.repeating[index];
 	    // See if it's spell list.
 	    if (prefix.includes("spelllist")) {
+	      // We don't do anything with these at the moment
 	      savedspelllists.push(prefix);
 	      continue;
 	    }
@@ -8910,6 +8916,7 @@ function levelUpStart(_) {
       }
     });
 
+    // FIXME: THis is duplicated below.   I hsould make it function
     const listRanks = {};
     {
       const spellRanks = {}
@@ -8937,7 +8944,13 @@ function levelUpStart(_) {
 		  continue;
 		}
 		const ranksid = nameid.replace(/_name$/, "_ranks");
-		listRanks[nr[nameid]] = nr[ranksid]
+		const prefix = nameid.replace(/_name$/, "");
+		// So we grabbed the name, now get the basename 
+
+		listRanks[nr[nameid]] = {
+		    ranks: nr[ranksid],
+		    prefix: prefix
+		}
 	      }
 	  });
       });
@@ -9086,6 +9099,46 @@ onCheck("mancerfinish:levelup", (ev) => {
       }
     });
 
+    // THis is duplicated (exactly) from the start of level up.  I should make it a function
+    // or something,
+    const listRanks = {};
+    {
+      const spellRanks = {}
+      const listIdsToGet = [];
+      addPendingFunction('Levelup: Get Ranks for spells', () => {
+	// So two pieces here.  Get all the lists with ranks.  Put in an array indexed
+	// by spell name. 
+	// FIXME: This is in RMUSkills.lua, should sync
+	const spelltypes = ['spellownbase', 'spellopen', 'spellclosed', 'spellotherbaseownrealm'];
+	spelltypes.forEach(spelltype => {
+	    getSectionIDsPending('spelllist' + spelltype, (ids) => {
+	       ids.forEach(id => {
+		   listIdsToGet.push('repeating_spelllist' + spelltype + '_' + id + '_name');
+		   listIdsToGet.push('repeating_spelllist' + spelltype + '_' + id + '_ranks');
+	       });
+	    });
+	});
+      });
+      // Immediataly after the prior; now get the damn things
+      addPendingFunction("Levelup: Do the damn fetch", () => {
+	  getAttrsPending(listIdsToGet, (nr) => {
+	      // find all the _name and get the ranks from that.
+	      for (nameid in nr) {
+		if (!nameid.endsWith("_name")) {
+		  continue;
+		}
+		const ranksid = nameid.replace(/_name$/, "_ranks");
+		const prefix = nameid.replace(/_name$/, "");
+		// So we grabbed the name, now get the basename 
+
+		listRanks[nr[nameid]] = {
+		    ranks: nr[ranksid],
+		    prefix: prefix
+		}
+	      }
+	  });
+      });
+    }
 
   // Spells; General form is:
   //repeating_-Nmw397npvJdj6tIubKP_closedspelllist_listname : "luminous elements"
@@ -9098,8 +9151,8 @@ onCheck("mancerfinish:levelup", (ev) => {
 	  // Skip non-spelllists
 	  continue;
 	}
-	if (purchase.endsWith("listname")) {
-	  // List name item; just skip it
+	if (!purchase.endsWith("_cmranks")) {
+	  // Not ranks, just skip it
 	  continue;
 	}
 	const [ranks, cost] = optionDecodeIntPair(values[purchase]);
@@ -9110,10 +9163,22 @@ onCheck("mancerfinish:levelup", (ev) => {
 	const id = matches[1];
 	const spellgroup = matches[2];
 	const name = values[`repeating_${id}_${spellgroup}spelllist_listname`];
-	const spellattr = `repeating_spelllistspell${spellgroup}_${id}_ranks_misc`;
-	const spellname = `repeating_spelllistspell${spellgroup}_${id}_name`;
-	setAttrs({[spellname]: name}); 
-	miscAttrSet(spellattr, levelstr, ranks);
+
+	// Look up the name in the listRanks earlier.  If so we use that - otherwise
+	// generate a new list.
+	if (listRanks[name]) {
+	  // Found it.
+	  const info = listRanks[name];
+	  const spellattr = `${info.prefix}_ranks_misc`;
+	  miscAttrSet(spellattr, levelstr, ranks);
+	} else {
+	  // generate ID and send it
+	  const rowid = generateRowID();
+	  const spellattr = `repeating_spelllistspell${spellgroup}_${rowid}_ranks_misc`;
+	  const spellname = `repeating_spelllistspell${spellgroup}_${rowid}_name`;
+	  setAttrs({[spellname]: name}); 
+	  miscAttrSet(spellattr, levelstr, ranks);
+	}
       }
   });
 
