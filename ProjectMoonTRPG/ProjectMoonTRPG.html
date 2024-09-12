@@ -9602,16 +9602,16 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 		<div style="width: 40px;"><b data-i18n="token-bar2">Bar 2</b>:</div>
 		<select name="attr_settingBar2" class="darkInput" style="width: 56px;">
 			<option data-i18n="bar-health" value="HP">Health</option>
-			<option data-i18n="bar-stagres" value="StagRes" selected>Stagger Res</option>
-			<option data-i18n="bar-sanity" value="SP">Sanity</option>
+			<option data-i18n="bar-stagres" value="StagRes">Stagger Res</option>
+			<option data-i18n="bar-sanity" value="SP" selected>Sanity</option>
 			<option data-i18n="token-bar-none" value="None">None</option>
 		</select>
 	</div>
 	<div class="rowContainer settingStyle">
 		<div style="width: 40px;"><b data-i18n="token-bar3">Bar 3</b>:</div>
 		<select name="attr_settingBar3" class="darkInput" style="width: 56px;">
-			<option data-i18n="bar-health" value="HP">Health</option>
-			<option data-i18n="bar-stagres" value="StagRes" selected>Stagger Res</option>
+			<option data-i18n="bar-health" value="HP" selected>Health</option>
+			<option data-i18n="bar-stagres" value="StagRes">Stagger Res</option>
 			<option data-i18n="bar-sanity" value="SP">Sanity</option>
 			<option data-i18n="token-bar-none" value="None">None</option>
 		</select>
@@ -11354,12 +11354,18 @@ function updateTargetAilmentList(callback=()=>{}) {
 			getTargetAttrs(values.targetName, [targetAilmentListName], function(values) {
 
 				let targetAilmentList = values[targetAilmentListName];
-				updateAilmentDisplay("target", 6, Data.unpackage(targetAilmentList));
+				if (targetAilmentList != "") {
 
-				if (callback != "()=>{}") {
-					callback(Data.unpackage(targetAilmentList));
+					updateAilmentDisplay("target", 6, Data.unpackage(targetAilmentList));
+
+					if (callback != "()=>{}") {
+						callback(Data.unpackage(targetAilmentList));
+					} else {
+						setAttrs({"targetAilmentList": targetAilmentList});
+					}
+
 				} else {
-					setAttrs({"targetAilmentList": targetAilmentList});
+					callback()
 				}
 			});
 		} else {
@@ -16875,9 +16881,9 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let LightExpended = values.Light_max - Light;
 		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
 
-		let targetAilmentList = (values.targetAilmentList != undefined) ? Data.unpackage(values.targetAilmentList) : {};
-		let targetBarList = (values.targetBarList != undefined) ? Data.unpackage(values.targetBarList) : {};
-		let targetBarDamageList = (values.targetBarDamageList != undefined) ? Data.unpackage(values.targetBarDamageList) : {};
+		let targetAilmentList = (values.targetAilmentList != undefined && values.targetAilmentList != "") ? Data.unpackage(values.targetAilmentList) : {};
+		let targetBarList = (values.targetBarList != undefined && values.targetBarList != "") ? Data.unpackage(values.targetBarList) : {};
+		let targetBarDamageList = (values.targetBarDamageList != undefined  && values.targetBarDamageList != "") ? Data.unpackage(values.targetBarDamageList) : {};
 
 		let THP_Sources = (values.THP_Sources != "" && values.THP_Sources != "{}") ? JSON.parse(values.THP_Sources) : "";
 		if (THP_Sources.AutoEffects != undefined) { barList.THP = THP_Sources.AutoEffects[0]; }
