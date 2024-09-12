@@ -171,28 +171,36 @@ on("sheet:opened change:character_name", function(eventInfo) {
 	// Build list of attributes
 	var attrsToGet = ["character_name"];
 	var ebeTalents = []
-	for(talent of talents_ebe)
-	{
-		ebeTalents.push(talent + "-ebe");
-	}
-	for(attr of [].concat(talents, ebeTalents, spells, melee))
-	{
-		attrsToGet.push(attr + "_action");
-	}
-	safeGetAttrs(attrsToGet, function(v) {
-		var attrsToChange = {};
+	var repeatingTalents = [];
 
-		for (attr of attrsToGet)
+	getSectionIDs("conjuration-spells-myranor", function(ids) {
+		for (id of ids)
 		{
-			// No action buttons for character name and combat techniques required
-			if (attr.match("t_ka_") || attr === "character_name") continue;
-			attrsToChange[attr] = "%{" + v["character_name"] + "|" + attr.replace(/_action$/gm, "") + "-action}";
+			repeatingTalents.push("repeating_conjuration-spells-myranor_" + id + "_spell");
 		}
+		for(talent of talents_ebe)
+		{
+			ebeTalents.push(talent + "-ebe");
+		}
+		for(attr of [].concat(talents, ebeTalents, spells, melee, reg, repeatingTalents))
+		{
+			attrsToGet.push(attr + "_action");
+		}
+		safeGetAttrs(attrsToGet, function(v) {
+			var attrsToChange = {};
 
-		attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
+			for (attr of attrsToGet)
+			{
+				// No action buttons for character name and combat techniques required
+				if (attr.match("t_ka_") || attr === "character_name") continue;
+				attrsToChange[attr] = "%{" + v["character_name"] + "|" + attr.replace(/_action$/gm, "") + "-action}";
+			}
 
-		debugLog(func, attrsToChange);
-		safeSetAttrs(attrsToChange);
+			attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
+
+			debugLog(func, attrsToChange);
+			safeSetAttrs(attrsToChange);
+		});
 	});
 });
 

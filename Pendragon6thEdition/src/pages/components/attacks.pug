@@ -1,37 +1,47 @@
-.row.grid.attacks
+.grid.attacks
     .header
         h1(data-i18n='attacks')
-    .table
+    .table.damage
+        .grid.header
+            h3.small-caps.text-left(data-i18n='damage type')
+            h3.small-caps.center(data-i18n='damage')
+        .grid.body
+            each attack in attacks
+                - const { name, value } = attack
+                - const i18n = attack.i18n ? attack.i18n : name
+                - const attr = attrName(name)
+                .row.align-center
+                    input.hidden(name=`attr_${attr}`  type='hidden' value=value ? value : '0')
+                    h3.text-left(data-i18n=i18n)
+                    span.display.text-center.uppercase(name=`attr_${attr}`)
+                    +damageButtonD20(name, i18n)
+
+    .repeating-container.table
         .grid.header
             h3.small-caps.text-left(data-i18n='weapon')
-            each value in ['skill', 'value', 'damage']
-                if value === 'skill'
-                    .row
-                        h3.small-caps.text-left(data-i18n=value)
-                else
-                    .flex-center(class=value)
-                        h3.small-caps(data-i18n=value)
-        .grid.brawling.mb
+            h3.small-caps.text-left(data-i18n='skill')
+            h3.small-caps.center(data-i18n='damage')
+        .grid.body
             .row.align-center
-                h3.text-left.ml(data-i18n='brawling')
+                h3.text-left(data-i18n='brawling')
                 span.capitalize(data-i18n='brawling')
-                span.text-center(name="attr_brawling")
                 span.display.text-center(name=`attr_brawling_damage`)
                 +brawlDamageRollButton('brawling damage', 'brawling')
             .row.align-center
-                h3.text-left.ml(data-i18n='brawling (open hand)')
+                h3.text-left(data-i18n='brawling (open hand)')
                 span.capitalize(data-i18n='brawling')
-                span.text-center(name="attr_brawling")
                 span.display.text-center(name=`attr_brawling_damage_open`)
-                +brawlDamageRollButton('brawling damage open', 'brawling')
-        .row.subheader.mt.flex-center
-            +accentSubheader('other')
-        .repeating-container
-            fieldset(class='repeating_attacks')
-                .row.grid
-                    +textInput('name')
-                    +textInput('skill')
-                    +numberInput('value')
-                    label(data-i18n-title=`enter damage` title=`enter damage`)
-                        input(data-i18n-placeholder='5d6+5' name=`attr_damage` placeholder=name title=`@{damage}` type='text' value='')
-                    +repeatingAttackRollButton('name')
+                +brawlDamageRollButton('brawling damage open', 'brawling (open hand)')
+        fieldset(class='repeating_attacks')
+            .row.grid
+                +textInput('name')
+                .grid.auto-flow-col
+                    select(name="attr_skill"  title="@{skill}" value="@{battle}")
+                        each val in combatSkills
+                            option(data-i18n=val value=`@{${attrName(val)}}`)
+                        option(data-i18n='other' value='@{other_skill}'	)
+                    input(type='hidden' name='attr_skill')
+                    +numberInput('other skill')
+                label(data-i18n-title=`damage` title=`damage`)
+                    input(name=`attr_damage` placeholder='5d6+5' title=`@{damage}` type='text' value='') 
+                +repeatingAttackRollButton('name')

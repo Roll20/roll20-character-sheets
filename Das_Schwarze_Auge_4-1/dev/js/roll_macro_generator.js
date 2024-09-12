@@ -104,9 +104,9 @@ function buildMacros(macros, reuse, resultType) {
 
 				// Property existence checking
 				if (
-					(answer.hasOwnProperty("desc") === false)
+					(Object.hasOwn(answer, "desc") === false)
 					||
-					(answer.hasOwnProperty("val") === false)
+					(Object.hasOwn(answer, "val") === false)
 				) {
 					result = false;
 					return result;
@@ -177,11 +177,11 @@ function buildMacros(macros, reuse, resultType) {
 		function analyseObject(obj, macro) {
 			console.log("analyseObject Start", obj, "called by:", macro);
 			macroCalls = [];
-			if (obj.hasOwnProperty("reuse")) {
+			if (Object.hasOwn(obj, "reuse")) {
 				console.log(macro, "reuses", obj["reuse"]);
 				macroCalls.push(obj["reuse"]);
 			} else if (
-				(obj.hasOwnProperty("macro"))
+				(Object.hasOwn(obj, "macro"))
 				&&
 				(typeof(obj["macro"]) === "object")
 			) {
@@ -397,32 +397,32 @@ function buildMacros(macros, reuse, resultType) {
 		// Input type determination (macro or reuse)
 		var type = "";
 		if (
-			(macroObj.hasOwnProperty("macro") === false)
+			(Object.hasOwn(macroObj, "macro") === false)
 			&&
-			(macroObj.hasOwnProperty("reuse") === false)
+			(Object.hasOwn(macroObj, "reuse") === false)
 		) {
 			console.log("buildMacro: macroObj must contain one and only one of these two properties: macro, reuse. It does not contain any of them. No macro found.");
 			return "";
 		}
 		if (
-			(macroObj.hasOwnProperty("macro") === true)
+			(Object.hasOwn(macroObj, "macro") === true)
 			&&
-			(macroObj.hasOwnProperty("reuse") === true)
+			(Object.hasOwn(macroObj, "reuse") === true)
 		) {
 			console.log("buildMacro: macroObj must contain one and only one of these two properties: macro, reuse. It contains both of them. No macro found.");
 			return "";
 		}
 		if (
-			(macroObj.hasOwnProperty("macro") === false)
+			(Object.hasOwn(macroObj, "macro") === false)
 			&&
-			(macroObj.hasOwnProperty("reuse") === true)
+			(Object.hasOwn(macroObj, "reuse") === true)
 		) {
 			type = "reuse";
 		}
 		if (
-			(macroObj.hasOwnProperty("macro") === true)
+			(Object.hasOwn(macroObj, "macro") === true)
 			&&
-			(macroObj.hasOwnProperty("reuse") === false)
+			(Object.hasOwn(macroObj, "reuse") === false)
 		) {
 			type = "macro";
 		}
@@ -434,7 +434,7 @@ function buildMacros(macros, reuse, resultType) {
 				type = "";
 				return "";
 			} else {
-				if (reuse.hasOwnProperty(macroObj["reuse"]) === false) {
+				if (Object.hasOwn(reuse, macroObj["reuse"]) === false) {
 					console.log("buildMacro: reuse macro not found in reuse data.");
 					type = "";
 					return "";
@@ -446,7 +446,7 @@ function buildMacros(macros, reuse, resultType) {
 		if (depth === 0) {
 			// Top-level macros must have a name and must be macro or reuse
 			if (
-				(macroObj.hasOwnProperty("name") === false)
+				(Object.hasOwn(macroObj, "name") === false)
 				||
 				(type !== "macro" && type !== "reuse")
 			) {
@@ -549,9 +549,9 @@ function buildMacros(macros, reuse, resultType) {
 				return "";
 			}
 			if (
-				(currentAnswer.hasOwnProperty("desc") === false)
+				(Object.hasOwn(currentAnswer, "desc") === false)
 				||
-				(currentAnswer.hasOwnProperty("val") === false)
+				(Object.hasOwn(currentAnswer, "val") === false)
 			) {
 				console.log("buildAnswers: Answer object must have the properties 'desc' and 'val'.");
 				return "";
@@ -678,4 +678,4 @@ function buildMacros(macros, reuse, resultType) {
 		return structuredResult;
 	}
 }
-/* roll macro generator begin */
+/* roll macro generator end */

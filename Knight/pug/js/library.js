@@ -878,7 +878,9 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_intimidanteAnathemeCondition = getTranslationByKey("intimidante-anatheme-condition"),
     i18n_retourFlamme = getTranslationByKey("retour-flamme"),
     i18n_sansArmure = getTranslationByKey("sans-armure"),
-    i18n_boost = getTranslationByKey("boost")
+    i18n_boost = getTranslationByKey("boost"),
+    i18n_pointeurLaser = getTranslationByKey("pointeur-laser"),
+    i18n_pointeurLaserCondition = getTranslationByKey("pointeur-laser-condition")
     ;
 
 function maxCar(carac, score, aspect)

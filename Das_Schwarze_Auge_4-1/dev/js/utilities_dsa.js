@@ -236,6 +236,66 @@ function DSAsane (value, type) {
 }
 
 /*
+	Counts occurrences of stats in arrays and returns an object
+*/
+function countStats (statsArray) {
+	var caller = "countStats";
+	const validStats = new Set(["MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK"]);
+	var statsCount = {
+		"MU": 0, "IN": 0, "KL": 0, "CH": 0,
+		"FF": 0, "GE": 0, "KO": 0, "KK": 0
+	};
+
+	if (Array.isArray(statsArray) === false)
+	{
+		debugLog(caller, "statsArray not an array.");
+	}
+	if (statsArray.length === 0)
+	{
+		debugLog(caller, "Array is empty.");
+	}
+
+	for (stat of statsArray)
+	{
+		if (validStats.has(stat))
+		{
+			statsCount[stat] += 1;
+		}
+	}
+	return statsCount;
+}
+
+/*
+	Extracts two-letter stats from an array of strings returning an array with the two-letter stats only
+	Beware: input.length is not necessarily output.length!
+*/
+function extractStats (statsArray) {
+	var caller = "extractStats";
+	const statPattern = /(?:MU|IN|KL|CH|GE|FF|KO|KK)/;
+
+	var results = [];
+
+	if (Array.isArray(statsArray) === false)
+	{
+		debugLog(caller, "statsArray not an array.");
+	}
+	if (statsArray.length === 0)
+	{
+		debugLog(caller, "Array is empty.");
+	}
+
+	for (entry of statsArray)
+	{
+		let result = entry.match(statPattern);
+		if (result)
+		{
+			results.push(result[0]);
+		}
+	}
+	return results;
+}
+
+/*
 	x.5 values are always rounded up in this system, so let's have a function for this.
 */
 function DSAround (num) {

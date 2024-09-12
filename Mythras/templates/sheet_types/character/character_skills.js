@@ -268,8 +268,8 @@ function parseBaseChar(charOption, v) {
 function calcProSkill(skillId, v, sourceAttribute) {
     let newAttrs = {};
     /* If a str or dex skill then it is affected by encumbrance */
-    if (v['${skillId}_char1'] === '@{str}' || v['${skillId}_char1'] === '@{dex}' ||
-        v['${skillId}_char2'] === '@{str}' || v['${skillId}_char2'] === '@{dex}') {
+    if (v[`${skillId}_char1`] === '@{str}' || v[`${skillId}_char1`] === '@{dex}' ||
+        v[`${skillId}_char2`] === '@{str}' || v[`${skillId}_char2`] === '@{dex}') {
         newAttrs[`${skillId}_encumbered`] = 1;
     } else {
         newAttrs[`${skillId}_encumbered`] = 0;
