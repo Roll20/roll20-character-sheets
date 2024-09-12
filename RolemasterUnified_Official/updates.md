@@ -1,3 +1,15 @@
+# 2024-9-12
+
+The first post compendium release... and it's small.  This is a good thing.
+Sooner I get to Treasure Law I guess.
+
+
+- Rewrite the way we track spell lists on level up.
+  - Makes Hybrids happy; stops duplicated lists during level up
+  - Track lists from from the sheet side.  Should stop the annoying
+    duplicate spell list after level up.
+- Fix a problem with single tier talents not applying
+
 # 2024-9-10
 
 The headline feature of this weeks release is using CRP (Custom Roll Parsing)
