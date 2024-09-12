@@ -28,7 +28,7 @@ arrays['_colored_derivative'].forEach(vitality => {
             update[`${vitality}_points`]=value;
 
             setAttrs(update, {silent:false}, ()=>{
-
+               console.info('update',update);
             });
         });
     });
@@ -51,7 +51,7 @@ arrays['_colored_derivative'].forEach(vitality => {
                 update[input]=0;
                 if (section !=='skills') {update[skillspan]=update[input];}
                 setAttrs(update,{silent:true},()=>{
-
+                  console.info('update',update);
                 });
             }
 
@@ -60,7 +60,7 @@ arrays['_colored_derivative'].forEach(vitality => {
                 update[input]=number;
                 if (section !=='skills') {update[skillspan]=update[input];}
                 setAttrs(update,{silent:true},()=>{
-
+                  console.info('update',update);
                 });
             }
 
@@ -71,7 +71,7 @@ arrays['_colored_derivative'].forEach(vitality => {
                     const number= setMinMax(values[skillname]);
                     if (section !=='skills') {update[skillspan]=number;}
                     setAttrs(update,{silent:true},()=>{
-
+                        console.info('update',update);
                     });
                 });
             };
@@ -91,6 +91,7 @@ _only_number.forEach(_sect_object => {
                     const number=setMinMax(value[input]);
                     update[input]=number;
                     setAttrs(update,{silent:true},()=>{
+                        console.info('update',update);
                     });
                 });
             });
@@ -113,6 +114,7 @@ _number_or_roll.forEach(_sect_object => {
                     const number=parseRoll(value[input]);
                     update[input]=number;
                     setAttrs(update,{silent:true},()=>{
+                        console.info('update',update);
                     });
                 });
             });
@@ -127,6 +129,7 @@ arrays['_sanity_loss'].forEach(sanity => {
             const update={};
             update[sanity]=value;
             setAttrs(update, {silent:true}, () => {
+               console.info('update',update);
                console.info(`Sanity points updated`); 
             });
         });    
@@ -161,7 +164,8 @@ _shotgun_or_blast_radius.forEach(main => {
 			}
 
 			setAttrs(update,{silent:true},()=>{
-				console.log('Shotgun or Blast Radius updated');
+               console.info('update',update);
+               console.log('Shotgun or Blast Radius updated');
 
 			});
 		});
@@ -187,7 +191,8 @@ arrays['_settings_wp'].forEach(wp_setting => {
 			}
 
 			setAttrs(update, {silent:true}, () => {
-				console.log('Willpower Settings updated');
+               console.info('update',update);
+               console.log('Willpower Settings updated');
 			});
 		});
 	});
@@ -199,7 +204,8 @@ on(`change:repeating_skills:rank`, (eventInfo) => {
 	update[eventInfo.sourceAttribute]=newValue;
 
 	setAttrs(update,{silent:true},()=>{
-		console.log('Repeating Skills updated on change');
+        console.info('update',update);
+        console.log('Repeating Skills updated on change');
 	});
 });
 
@@ -218,6 +224,7 @@ on(`change:unnatural`, function(eventInfo) {
     update={sanity_points_max: 99-newvalue, unnatural: newvalue};
 
     setAttrs(update,{silent:true},()=>{
+        console.info('update',update);
         console.log('Sanity points updated');
     });
 });
@@ -285,7 +292,7 @@ on(`change:breaking_point_reset`,(eventInfo)=>{
         const update = {};
         update['breaking_point_reset'] = Math.min(Math.max(0,breaking_point_reset),99);
         setAttrs(update, {silent:true}, () => {
-
+            console.info('update',update);
         });
     });
 });
@@ -299,7 +306,7 @@ on(`change:global_modifier_number`, () => {
         const modifier = parseInt(values['global_modifier_number']) || 0;
         const update = {global_modifier_number:modifier};
         setAttrs(update, {silent:true}, () => {
-
+            console.info('update',update);
         });
     });
 });
@@ -310,9 +317,10 @@ on(`change:repeating_skills remove:repeating_skills`, () => {
 
 on(`change:repeating_weapons:armor_piercing`, () => {  
     getAttrs(['repeating_weapons_armor_piercing'], (values) => {
-          const update = {};
-          update_armor_piercing(values.repeating_weapons_armor_piercing,update);
-          setAttrs(update, {silent:true}, () => {
+        const update = {};
+        update_armor_piercing(values.repeating_weapons_armor_piercing,update);
+        setAttrs(update, {silent:true}, () => {
+            console.info('update',update);
         });    
     });
 });
@@ -324,6 +332,7 @@ on(`change:repeating_weapons:ammo_total remove:repeating_weapons`, (values) => {
     update[`repeating_weapons_hasammo`] = ammo_total > 0 ? 'active' : '0';
 
     setAttrs(update, {silent:true}, () => {
+        console.info('update',update);
     });
 });
 
@@ -332,6 +341,7 @@ on(`change:repeating_weapons:ammo`, (values) => {
     const update = {};
     update[`repeating_weapons_ammo`] = ammo;
     setAttrs(update, {silent:true}, () => {
+        console.info('update',update)
     });
 });
 
@@ -363,7 +373,8 @@ arrays['_adaptation'].forEach(adaptation => {
 			const update={};
 			update[`${adaptation}_adapted`]= value===2 ? 1 : 0;
 			setAttrs(update, {silent:true}, () => {
-				update[`${adaptation}_adapted`] == 1 ? console.log(`${adaptation} adapted`) : console.log(`${adaptation} not adapted`);
+               console.info('update',update);
+               update[`${adaptation}_adapted`] == 1 ? console.log(`${adaptation} adapted`) : console.log(`${adaptation} not adapted`);
 			});
 		});
 	});
@@ -382,7 +393,7 @@ on(`change:useKey`, () => {
 
 
         setAttrs(update, {silent:true}, () => {
-
+            console.info('update',update);
         });
     });
 }); 

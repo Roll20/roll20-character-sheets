@@ -32,6 +32,7 @@ const update_repeating_agents = (repsecid,character_identification) => {
         const bpmax=parseInt(results.results.breaking_point_max.result)||0;
         update[`${repsecid}_has_breaking_points`]=bp<bpmax;
         setAttrs(update,{silent:true},()=>{
+            console.info('update',update);
             console.log(`Updated ${repsecid} with ${character_identification}`);
         });
         finishRoll(results.rollId);    

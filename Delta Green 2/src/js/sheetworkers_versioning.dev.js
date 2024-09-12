@@ -192,7 +192,6 @@ var version_200_201 = function version_200_201() {
       });
       getAttrs(repfields, function (values) {
         console.info('fullarray', values);
-        var update = {};
         ids.forEach(function (id) {
           var repsecid = "repeating_".concat(section, "_").concat(id, "_"); /// bond update
 
@@ -239,7 +238,7 @@ var version_200_201 = function version_200_201() {
 
             if (value_ammo > 0) {
               update["".concat(repsecid, "ammo_total")] = value_ammo;
-              update["".concat(repsecid, "hasammo")] = 1;
+              update["".concat(repsecid, "hasammo")] = 'active';
               update["".concat(repsecid, "ammo")] = value_ammo;
             } else {
               update["".concat(repsecid, "hasammo")] = 0;
@@ -288,46 +287,46 @@ var version_201_202 = function version_201_202() {
   console.log('verion:', codeversion);
   update['version'] = codeversion;
   getAttrs(["sheet_type"], function (values) {
+    var names = [];
+    var rank = [];
+
     if (values.sheet_type === 'npc') {
       update['sheet_type'] = 'npc';
       getSectionIDs("skills", function (ids) {
-        var names = [];
-        var rank = [];
         ids.forEach(function (id) {
           names.push("repeating_skills_".concat(id, "_name"));
           rank.push("repeating_skills_".concat(id, "_rank"));
-        }); // make it into an object with keys = names and values = rank
-
-        getAttrs(names.concat(rank), function (values) {
-          var update = {};
-          var ids_to_remove = []; // for the ids that I copy in the named skills
-
-          names.forEach(function (name, idx) {
-            var skillname = values[name].toLowerCase().replace(/ /g, "_");
-            var rankvalue = values[rank[idx]];
-            var id_value = name.split('_')[2];
-
-            if (arrays['_skills'].includes(skillname)) {
-              update["".concat(skillname)] = rankvalue;
-              update["".concat(skillname, "_visible")] = 'visible';
-              ids_to_remove.push(id_value);
-            }
-          });
-          console.info('update npc skills', update);
-          setAttrs(update, {
-            silent: true
-          }, function () {
-            console.log('updated skills');
-            ids_to_remove.forEach(function (id) {
-              removeRepeatingRow("repeating_skills_".concat(id));
-            });
-            console.log('removed repeating skills');
-            versioning(codeversion);
-          });
         });
       });
     }
 
-    ;
+    ; // make it into an object with keys = names and values = ran
+
+    getAttrs(names.concat(rank), function (values) {
+      var ids_to_remove = []; // for the ids that I copy in the named skills
+
+      names.forEach(function (name, idx) {
+        var skillname = values[name].toLowerCase().replace(/ /g, "_");
+        var rankvalue = values[rank[idx]];
+        var id_value = name.split('_')[2];
+
+        if (arrays['_skills'].includes(skillname)) {
+          update["".concat(skillname)] = rankvalue;
+          update["".concat(skillname, "_visible")] = 'visible';
+          ids_to_remove.push(id_value);
+        }
+      });
+      console.info('update npc skills', update);
+      setAttrs(update, {
+        silent: true
+      }, function () {
+        console.log('updated skills');
+        ids_to_remove.forEach(function (id) {
+          removeRepeatingRow("repeating_skills_".concat(id));
+        });
+        console.log('removed repeating skills');
+        versioning(codeversion);
+      });
+    });
   });
 };

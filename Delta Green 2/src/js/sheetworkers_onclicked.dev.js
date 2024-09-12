@@ -14,7 +14,9 @@ on("clicked:reset_global_modifier", function () {
   };
   setAttrs(update, {
     silent: true
-  }, function () {});
+  }, function () {
+    console.info('update', update);
+  });
 });
 $20(selector).on("click", function (e) {
   var roll = e.htmlAttributes.name.match(/^attr_(.*)_r$/)[1];

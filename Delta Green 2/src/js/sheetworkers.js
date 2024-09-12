@@ -100,7 +100,7 @@ const definesanroll=(san,sold,bnew,bold,sanflags,character_name,San2_disorder={}
     }
 
     setAttrs(update, {silent:true},()=>{
-
+               console.info('update',update)
     });
 
     startRoll(`${rollValue} {{isSkill=[[${_isSkill}]]}}`, (results)=> {
@@ -134,7 +134,8 @@ const setBondsLocalVariables = () => {
 			console.log('inside repeating section');
 
 			setAttrs(update,{silent:true},()=>{
-				console.log('Bonds updated on open');
+               console.info('update',update);
+			   console.log('Bonds updated on open');
 			});	
 		});
 	});

@@ -5483,7 +5483,7 @@ const definesanroll=(san,sold,bnew,bold,sanflags,character_name,San2_disorder={}
     }
 
     setAttrs(update, {silent:true},()=>{
-
+               console.info('update',update)
     });
 
     startRoll(`${rollValue} {{isSkill=[[${_isSkill}]]}}`, (results)=> {
@@ -5517,7 +5517,8 @@ const setBondsLocalVariables = () => {
 			console.log('inside repeating section');
 
 			setAttrs(update,{silent:true},()=>{
-				console.log('Bonds updated on open');
+               console.info('update',update);
+			   console.log('Bonds updated on open');
 			});	
 		});
 	});
@@ -5910,7 +5911,7 @@ const version_150_170 = () => {
 // UPDATE TO VERSION 2.0
 const version_170_200 = () => {
     let codeversion=2.0;
-    let update={};
+    const update={};
     update['version']=codeversion;
     getAttrs(["motivations","character_name","name","sanity_points","violence_3","helplessness_3","violence_2","helplessness_2",
     "sanity_points_old","sanity_points","breaking_point_old","breaking_point_old"],function(v){
@@ -5956,7 +5957,7 @@ const version_170_200 = () => {
 // UPDATE TO VERSION 2.0
 const version_200_201 = () => {
     let codeversion=2.01;
-    let update={};
+    const update={};
     console.log('version:',codeversion);
     update['version']=codeversion;
 
@@ -5979,8 +5980,7 @@ const version_200_201 = () => {
             });
             getAttrs(repfields,(values) => {
                     console.info('fullarray',values);
-                    var update = {};
-
+          
                     ids.forEach(id => {
                         const repsecid= `repeating_${section}_${id}_`;
 
@@ -6023,7 +6023,7 @@ const version_200_201 = () => {
                             const value_ammo = Math.max(parseInt(values[`${repsecid}ammo`],10) || 0,0)  ;
                             if (value_ammo>0){
                                 update[`${repsecid}ammo_total`]=value_ammo;
-                                update[`${repsecid}hasammo`]=1;
+                                update[`${repsecid}hasammo`]='active';
                                 update[`${repsecid}ammo`]=value_ammo;
                             } else {
                                 update[`${repsecid}hasammo`]=0;
@@ -6065,47 +6065,48 @@ const version_200_201 = () => {
 
 const version_201_202 = () => {
     let codeversion=2.02;
-    let update={};
+    const update={};
     console.log('verion:',codeversion);
     update['version']=codeversion;
     getAttrs(["sheet_type"], values => {
+        var names=[];
+        var rank=[];
+                
         if (values.sheet_type==='npc'){
             update['sheet_type']='npc';
             getSectionIDs(`skills`, ids => {
-                var names=[];
-                var rank=[];
                 ids.forEach(id => {
                     names.push(`repeating_skills_${id}_name`);
                     rank.push(`repeating_skills_${id}_rank`);
                 });
-                // make it into an object with keys = names and values = rank
-
-
-                getAttrs(names.concat(rank), values => {
-                    const update={};
-                    var ids_to_remove=[]; // for the ids that I copy in the named skills
-                    names.forEach((name,idx) => {
-                        const skillname=values[name].toLowerCase().replace(/ /g, "_");
-                        const rankvalue=values[rank[idx]];
-                        const id_value=name.split('_')[2];
-                        if (arrays['_skills'].includes(skillname)){
-                            update[`${skillname}`]=rankvalue;
-                            update[`${skillname}_visible`]='visible';
-                            ids_to_remove.push(id_value);
-                        }
-                    });
-                    console.info('update npc skills',update);
-                    setAttrs(update, {silent:true}, () => {
-                        console.log('updated skills');
-                        ids_to_remove.forEach(id => {
-                            removeRepeatingRow(`repeating_skills_${id}`);
-                        });
-                        console.log('removed repeating skills');
-                        versioning(codeversion);
-                    });
-                });
             });
-        };
+        };        
+            // make it into an object with keys = names and values = ran
+               
+            
+        getAttrs(names.concat(rank), values => {
+            var ids_to_remove=[]; // for the ids that I copy in the named skills
+            names.forEach((name,idx) => {
+                const skillname=values[name].toLowerCase().replace(/ /g, "_");
+                const rankvalue=values[rank[idx]];
+                const id_value=name.split('_')[2];
+                if (arrays['_skills'].includes(skillname)){
+                    update[`${skillname}`]=rankvalue;
+                    update[`${skillname}_visible`]='visible';
+                    ids_to_remove.push(id_value);
+                }
+            });
+            console.info('update npc skills',update);
+            
+            setAttrs(update, {silent:true}, () => {
+                console.log('updated skills');
+                ids_to_remove.forEach(id => {
+                    removeRepeatingRow(`repeating_skills_${id}`);
+                });
+                console.log('removed repeating skills');
+                versioning(codeversion);
+            });
+            });
     });
 }
 
@@ -6127,7 +6128,8 @@ const changeBondButtonColorOnOpen = () => {
                 update['repeating_bonds_'+id+'_color'] = BondButtonColor(score);
             });
             setAttrs(update, {silent:true}, () => {
-                console.log('Bond color updated');
+               console.info('update',update);
+               console.log('Bond color updated');
 
             });
         });
@@ -6205,7 +6207,8 @@ const updateRepeatingRollsonOpen = (update,character_id) => {
 				Object.assign(update, updateRepeatingRolls(section, attrName, id, character_id));
 			});					
 			setAttrs(update, {silent:true}, () => {
-				console.log('Repeating and Normal Rolls updated');
+               console.info('update',update);
+			   console.log('Repeating and Normal Rolls updated');
 
 			});				
 		});
@@ -6229,7 +6232,7 @@ const changeRepeatingRolls = (section,attrName,id) => {
 		}
 
 		setAttrs(update, {silent:true}, () => {
-
+               console.info('update',update);
 		});
 	});
 };
@@ -6312,7 +6315,7 @@ const rollSkillAndStats=(rollValue,rollName,isSkill) => {
 
 		update=check_for_failed_skill(rollName,outcome.isSuccess,isSkill);
 		setAttrs(update,{silent:false}, () => {
-
+               console.info('update',update);
 		});
 
 	});
@@ -6351,7 +6354,7 @@ const rollBonds=(rollValue,_value,_names,_parameters) => {
 
 		finishRoll(results.rollId,newroll);
 		setAttrs(update,{silent:false}, () => {
-
+            console.info('update',update);
 		});
 	});
 };
@@ -6531,7 +6534,7 @@ const clicked_repeating_damages = (parameters,names,type_prefix='damage') => {
 				const update={};
 				update[names['ammo']]=newroll['current_ammo'];
 				setAttrs(update, () => {
-
+               		console.info('update',update);
 				});
 			}
 		});
@@ -6958,7 +6961,8 @@ const paythecost=(sanity_loss,other_costs,fraction=1) => {
             finishRoll(results.rollId,newroll);
 
             setAttrs(update, {silent:true}, () => {
-                updatebreakingpoints() // I need to update the breaking points in the callback
+               console.info('update',update);
+               updatebreakingpoints() // I need to update the breaking points in the callback
 
             });
         });
@@ -7283,7 +7287,7 @@ const ritual_rolls_info = (repsecid) => {
         update[`${repsecid}_cost_text`] = `${String(costs_text).toUpperCase()}`;
 
         setAttrs(update, {silent:true}, () => {
-
+               console.info('update',update);
         });
     });
 };
@@ -7314,7 +7318,7 @@ usedModifier = (e,callback) => {
   on(`clicked:reset_global_modifier`, () => {
     const update={'global_modifier_number':''};
     setAttrs(update, {silent:true}, () => {
-        
+        console.info('update',update);    
     });
 });
 
@@ -7616,7 +7620,7 @@ arrays['_colored_derivative'].forEach(vitality => {
             update[`${vitality}_points`]=value;
 
             setAttrs(update, {silent:false}, ()=>{
-
+               console.info('update',update);
             });
         });
     });
@@ -7639,7 +7643,7 @@ arrays['_colored_derivative'].forEach(vitality => {
                 update[input]=0;
                 if (section !=='skills') {update[skillspan]=update[input];}
                 setAttrs(update,{silent:true},()=>{
-
+                  console.info('update',update);
                 });
             }
 
@@ -7648,7 +7652,7 @@ arrays['_colored_derivative'].forEach(vitality => {
                 update[input]=number;
                 if (section !=='skills') {update[skillspan]=update[input];}
                 setAttrs(update,{silent:true},()=>{
-
+                  console.info('update',update);
                 });
             }
 
@@ -7659,7 +7663,7 @@ arrays['_colored_derivative'].forEach(vitality => {
                     const number= setMinMax(values[skillname]);
                     if (section !=='skills') {update[skillspan]=number;}
                     setAttrs(update,{silent:true},()=>{
-
+                        console.info('update',update);
                     });
                 });
             };
@@ -7679,6 +7683,7 @@ _only_number.forEach(_sect_object => {
                     const number=setMinMax(value[input]);
                     update[input]=number;
                     setAttrs(update,{silent:true},()=>{
+                        console.info('update',update);
                     });
                 });
             });
@@ -7701,6 +7706,7 @@ _number_or_roll.forEach(_sect_object => {
                     const number=parseRoll(value[input]);
                     update[input]=number;
                     setAttrs(update,{silent:true},()=>{
+                        console.info('update',update);
                     });
                 });
             });
@@ -7715,6 +7721,7 @@ arrays['_sanity_loss'].forEach(sanity => {
             const update={};
             update[sanity]=value;
             setAttrs(update, {silent:true}, () => {
+               console.info('update',update);
                console.info(`Sanity points updated`); 
             });
         });    
@@ -7749,7 +7756,8 @@ _shotgun_or_blast_radius.forEach(main => {
 			}
 
 			setAttrs(update,{silent:true},()=>{
-				console.log('Shotgun or Blast Radius updated');
+               console.info('update',update);
+               console.log('Shotgun or Blast Radius updated');
 
 			});
 		});
@@ -7775,7 +7783,8 @@ arrays['_settings_wp'].forEach(wp_setting => {
 			}
 
 			setAttrs(update, {silent:true}, () => {
-				console.log('Willpower Settings updated');
+               console.info('update',update);
+               console.log('Willpower Settings updated');
 			});
 		});
 	});
@@ -7787,7 +7796,8 @@ on(`change:repeating_skills:rank`, (eventInfo) => {
 	update[eventInfo.sourceAttribute]=newValue;
 
 	setAttrs(update,{silent:true},()=>{
-		console.log('Repeating Skills updated on change');
+        console.info('update',update);
+        console.log('Repeating Skills updated on change');
 	});
 });
 
@@ -7806,6 +7816,7 @@ on(`change:unnatural`, function(eventInfo) {
     update={sanity_points_max: 99-newvalue, unnatural: newvalue};
 
     setAttrs(update,{silent:true},()=>{
+        console.info('update',update);
         console.log('Sanity points updated');
     });
 });
@@ -7873,7 +7884,7 @@ on(`change:breaking_point_reset`,(eventInfo)=>{
         const update = {};
         update['breaking_point_reset'] = Math.min(Math.max(0,breaking_point_reset),99);
         setAttrs(update, {silent:true}, () => {
-
+            console.info('update',update);
         });
     });
 });
@@ -7887,7 +7898,7 @@ on(`change:global_modifier_number`, () => {
         const modifier = parseInt(values['global_modifier_number']) || 0;
         const update = {global_modifier_number:modifier};
         setAttrs(update, {silent:true}, () => {
-
+            console.info('update',update);
         });
     });
 });
@@ -7898,9 +7909,10 @@ on(`change:repeating_skills remove:repeating_skills`, () => {
 
 on(`change:repeating_weapons:armor_piercing`, () => {  
     getAttrs(['repeating_weapons_armor_piercing'], (values) => {
-          const update = {};
-          update_armor_piercing(values.repeating_weapons_armor_piercing,update);
-          setAttrs(update, {silent:true}, () => {
+        const update = {};
+        update_armor_piercing(values.repeating_weapons_armor_piercing,update);
+        setAttrs(update, {silent:true}, () => {
+            console.info('update',update);
         });    
     });
 });
@@ -7912,6 +7924,7 @@ on(`change:repeating_weapons:ammo_total remove:repeating_weapons`, (values) => {
     update[`repeating_weapons_hasammo`] = ammo_total > 0 ? 'active' : '0';
 
     setAttrs(update, {silent:true}, () => {
+        console.info('update',update);
     });
 });
 
@@ -7920,6 +7933,7 @@ on(`change:repeating_weapons:ammo`, (values) => {
     const update = {};
     update[`repeating_weapons_ammo`] = ammo;
     setAttrs(update, {silent:true}, () => {
+        console.info('update',update)
     });
 });
 
@@ -7951,7 +7965,8 @@ arrays['_adaptation'].forEach(adaptation => {
 			const update={};
 			update[`${adaptation}_adapted`]= value===2 ? 1 : 0;
 			setAttrs(update, {silent:true}, () => {
-				update[`${adaptation}_adapted`] == 1 ? console.log(`${adaptation} adapted`) : console.log(`${adaptation} not adapted`);
+               console.info('update',update);
+               update[`${adaptation}_adapted`] == 1 ? console.log(`${adaptation} adapted`) : console.log(`${adaptation} not adapted`);
 			});
 		});
 	});
@@ -7970,7 +7985,7 @@ on(`change:useKey`, () => {
 
 
         setAttrs(update, {silent:true}, () => {
-
+            console.info('update',update);
         });
     });
 }); 
@@ -8290,6 +8305,7 @@ const update_repeating_agents = (repsecid,character_identification) => {
         const bpmax=parseInt(results.results.breaking_point_max.result)||0;
         update[`${repsecid}_has_breaking_points`]=bp<bpmax;
         setAttrs(update,{silent:true},()=>{
+            console.info('update',update);
             console.log(`Updated ${repsecid} with ${character_identification}`);
         });
         finishRoll(results.rollId);    
@@ -8316,7 +8332,3 @@ on(`sheet:opened clicked:update_agents`,()=>{
     });
 });
 </script>
-
-
-
-

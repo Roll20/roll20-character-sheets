@@ -39,7 +39,9 @@ arrays['_colored_derivative'].forEach(function (vitality) {
       update["".concat(vitality, "_points")] = value;
       setAttrs(update, {
         silent: false
-      }, function () {});
+      }, function () {
+        console.info('update', update);
+      });
     });
   });
 });
@@ -66,7 +68,9 @@ _skill_percent.forEach(function (_skill_sec_percent) {
 
         setAttrs(update, {
           silent: true
-        }, function () {});
+        }, function () {
+          console.info('update', update);
+        });
       }
 
       if (isInNumericalForm) {
@@ -79,7 +83,9 @@ _skill_percent.forEach(function (_skill_sec_percent) {
 
         setAttrs(update, {
           silent: true
-        }, function () {});
+        }, function () {
+          console.info('update', update);
+        });
       }
 
       if (isInLinkingForm) {
@@ -94,7 +100,9 @@ _skill_percent.forEach(function (_skill_sec_percent) {
 
           setAttrs(update, {
             silent: true
-          }, function () {});
+          }, function () {
+            console.info('update', update);
+          });
         });
       }
 
@@ -117,7 +125,9 @@ _only_number.forEach(function (_sect_object) {
           update[input] = number;
           setAttrs(update, {
             silent: true
-          }, function () {});
+          }, function () {
+            console.info('update', update);
+          });
         });
       });
     });
@@ -140,7 +150,9 @@ _number_or_roll.forEach(function (_sect_object) {
           update[input] = number;
           setAttrs(update, {
             silent: true
-          }, function () {});
+          }, function () {
+            console.info('update', update);
+          });
         });
       });
     });
@@ -158,6 +170,7 @@ arrays['_sanity_loss'].forEach(function (sanity) {
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         console.info("Sanity points updated");
       });
     });
@@ -195,6 +208,7 @@ _shotgun_or_blast_radius.forEach(function (main) {
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         console.log('Shotgun or Blast Radius updated');
       });
     });
@@ -225,6 +239,7 @@ arrays['_settings_wp'].forEach(function (wp_setting) {
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         console.log('Willpower Settings updated');
       });
     });
@@ -237,6 +252,7 @@ on("change:repeating_skills:rank", function (eventInfo) {
   setAttrs(update, {
     silent: true
   }, function () {
+    console.info('update', update);
     console.log('Repeating Skills updated on change');
   });
 });
@@ -260,6 +276,7 @@ on("change:unnatural", function (eventInfo) {
   setAttrs(update, {
     silent: true
   }, function () {
+    console.info('update', update);
     console.log('Sanity points updated');
   });
 });
@@ -327,7 +344,9 @@ on("change:breaking_point_reset", function (eventInfo) {
     update['breaking_point_reset'] = Math.min(Math.max(0, breaking_point_reset), 99);
     setAttrs(update, {
       silent: true
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 });
 on("clicked:breaking_point_resets", function () {
@@ -341,7 +360,9 @@ on("change:global_modifier_number", function () {
     };
     setAttrs(update, {
       silent: true
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 });
 on("change:repeating_skills remove:repeating_skills", function () {
@@ -353,7 +374,9 @@ on("change:repeating_weapons:armor_piercing", function () {
     update_armor_piercing(values.repeating_weapons_armor_piercing, update);
     setAttrs(update, {
       silent: true
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 });
 on("change:repeating_weapons:ammo_total remove:repeating_weapons", function (values) {
@@ -364,7 +387,9 @@ on("change:repeating_weapons:ammo_total remove:repeating_weapons", function (val
   update["repeating_weapons_hasammo"] = ammo_total > 0 ? 'active' : '0';
   setAttrs(update, {
     silent: true
-  }, function () {});
+  }, function () {
+    console.info('update', update);
+  });
 });
 on("change:repeating_weapons:ammo", function (values) {
   var ammo = Math.max(0, parseInt(values.newValue) || 0);
@@ -372,7 +397,9 @@ on("change:repeating_weapons:ammo", function (values) {
   update["repeating_weapons_ammo"] = ammo;
   setAttrs(update, {
     silent: true
-  }, function () {});
+  }, function () {
+    console.info('update', update);
+  });
 });
 
 _bond_attributes.forEach(function (attrName) {
@@ -405,6 +432,7 @@ arrays['_adaptation'].forEach(function (adaptation) {
       setAttrs(update, {
         silent: true
       }, function () {
+        console.info('update', update);
         update["".concat(adaptation, "_adapted")] == 1 ? console.log("".concat(adaptation, " adapted")) : console.log("".concat(adaptation, " not adapted"));
       });
     });
@@ -428,7 +456,9 @@ on("change:useKey", function () {
     console.log("useKey: ".concat(val));
     setAttrs(update, {
       silent: true
-    }, function () {});
+    }, function () {
+      console.info('update', update);
+    });
   });
 }); // === Update repeating skills on change
 
