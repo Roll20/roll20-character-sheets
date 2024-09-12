@@ -26,6 +26,10 @@ var versioning = function versioning(version) {
   if (version < 2.02) {
     version_201_202();
   }
+
+  if (version < 2.03) {
+    version_202_203();
+  }
 }; // UPDATE TO VERSION 1.05
 
 
@@ -327,6 +331,112 @@ var version_201_202 = function version_201_202() {
         console.log('removed repeating skills');
         versioning(codeversion);
       });
+    });
+  });
+};
+
+var version_202_203 = function version_202_203() {
+  var codeversion = 2.03;
+  var update = {};
+  update['version'] = codeversion;
+  var old_named_skills = ["art", "craft", "pilot", "military_science", "science"];
+  var old_adaptation = ["violence_1", "violence_2", "violence_3", "helplessness_1", "helplessness_2", "helplessness_3"];
+  var old_named_skills_names = old_named_skills.map(function (x) {
+    return "".concat(x, "_name");
+  });
+  getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills), function (values) {
+    if (values.hasOwnProperty('art_name')) {
+      var art_value = setMinMax(values["art"]);
+      var art_name = values["art_name"];
+      update["art_1"] = art_value;
+      update["art_1_name"] = art_name;
+    }
+
+    if (values.hasOwnProperty('craft_name')) {
+      var craft_value = setMinMax(values["craft"]);
+      var craft_name = values["craft_name"];
+      update["craft_1"] = craft_value;
+      update["craft_1_name"] = craft_name;
+    } // complete for pilot, military_science, science
+
+
+    if (values.hasOwnProperty('pilot')) {
+      var pilot_value = setMinMax(values["pilot"]);
+      var pilot_name = values["pilot_name"];
+      update["pilot_1"] = pilot_value;
+      update["pilot_1_name"] = pilot_name;
+    }
+
+    if (values.hasOwnProperty('military_science')) {
+      var military_science_value = setMinMax(values["military_science"]);
+      var military_science_name = values["military_science_name"];
+      update["military_science_1"] = military_science_value;
+      update["military_science_1_name"] = military_science_name;
+    }
+
+    if (values.hasOwnProperty('science')) {
+      var science_value = setMinMax(values["science"]);
+      var science_name = values["science_name"];
+      update["science_1"] = science_value;
+      update["science_1_name"] = science_name;
+    }
+
+    if (values.hasOwnProperty('violence_1')) {
+      var violence_1 = values["violence_1"];
+      var violence_2 = values["violence_2"];
+      var violence_3 = values["violence_3"];
+      var violence = -1;
+
+      if (violence_1 == 1) {
+        violence = 0;
+      }
+
+      if (violence_2 == 2) {
+        violence = 1;
+      }
+
+      if (violence_3 == 3) {
+        violence = 2;
+      }
+
+      update["violence"] = violence;
+
+      if (violence == 2) {
+        update["violence_adapted"] == 1;
+      }
+    }
+
+    if (values.hasOwnProperty('helplessness_1')) {
+      var helplessness_1 = values["helplessness_1"];
+      var helplessness_2 = values["helplessness_2"];
+      var helplessness_3 = values["helplessness_3"];
+      var helplessness = -1;
+
+      if (helplessness_1 == 1) {
+        helplessness = 0;
+      }
+
+      if (helplessness_2 == 2) {
+        helplessness = 1;
+      }
+
+      if (helplessness_3 == 3) {
+        helplessness = 2;
+      }
+
+      update["helplessness"] = helplessness;
+
+      if (helplessness == 2) {
+        update["helplessness_adapted"] == 1;
+      }
+    }
+
+    setAttrs(update, {
+      silent: true
+    }, function () {
+      console.log('updated named skills and adaptations');
+      versioning(codeversion);
+      console.info(update);
     });
   });
 };

@@ -16,12 +16,14 @@
   <input data-i18n-value="alertness" name="attr_alertness_name" value="alertness"/>
   <input data-i18n-value="anthropology" name="attr_anthropology_name" value="anthropology"/>
   <input data-i18n-value="archeology" name="attr_archeology_name" value="archeology"/>
-  <input data-i18n-value="art" name="attr_art_name" value="art"/>
+  <input data-i18n-value="art 1" name="attr_art_1_name" value="art_1"/>
+  <input data-i18n-value="art 2" name="attr_art_2_name" value="art_2"/>
   <input data-i18n-value="artillery" name="attr_artillery_name" value="artillery"/>
   <input data-i18n-value="athletics" name="attr_athletics_name" value="athletics"/>
   <input data-i18n-value="bureaucracy" name="attr_bureaucracy_name" value="bureaucracy"/>
   <input data-i18n-value="computer science" name="attr_computer_science_name" value="computer science"/>
-  <input data-i18n-value="craft" name="attr_craft_name" value="craft"/>
+  <input data-i18n-value="craft 1" name="attr_craft_1_name" value="craft_1"/>
+  <input data-i18n-value="craft 2" name="attr_craft_2_name" value="craft_2"/>
   <input data-i18n-value="criminology" name="attr_criminology_name" value="criminology"/>
   <input data-i18n-value="demolitions" name="attr_demolitions_name" value="demolitions"/>
   <input data-i18n-value="disguise" name="attr_disguise_name" value="disguise"/>
@@ -37,15 +39,18 @@
   <input data-i18n-value="law" name="attr_law_name" value="law"/>
   <input data-i18n-value="medicine" name="attr_medicine_name" value="medicine"/>
   <input data-i18n-value="melee weapons" name="attr_melee_weapons_name" value="melee weapons"/>
-  <input data-i18n-value="military science" name="attr_military_science_name" value="military science"/>
+  <input data-i18n-value="military science 1" name="attr_military_science_1_name" value="military science 1"/>
+  <input data-i18n-value="military science 2" name="attr_military_science_2_name" value="military science 2"/>
   <input data-i18n-value="navigate" name="attr_navigate_name" value="navigate"/>
   <input data-i18n-value="occult" name="attr_occult_name" value="occult"/>
   <input data-i18n-value="persuade" name="attr_persuade_name" value="persuade"/>
   <input data-i18n-value="pharmacy" name="attr_pharmacy_name" value="pharmacy"/>
   <input data-i18n-value="pilot" name="attr_pilot_name" value="pilot"/>
+  <input data-i18n-value="pilot" name="attr_pilot_name" value="pilot"/>
   <input data-i18n-value="psychotherapy" name="attr_psychotherapy_name" value="psychotherapy"/>
   <input data-i18n-value="ride" name="attr_ride_name" value="ride"/>
-  <input data-i18n-value="science" name="attr_science_name" value="science"/>
+  <input data-i18n-value="science 1" name="attr_science_1_name" value="science 1"/>
+  <input data-i18n-value="science 2" name="attr_science_2_name" value="science 2"/>
   <input data-i18n-value="search" name="attr_search_name" value="search"/>
   <input data-i18n-value="sigint" name="attr_sigint_name" value="sigint"/>
   <input data-i18n-value="stealth" name="attr_stealth_name" value="stealth"/>
@@ -5825,6 +5830,9 @@ const setResetBreakingPointsOnOpen = () => {
     if (version<2.02) {
         version_201_202();
     }
+    if (version<2.03) {
+        version_202_203();
+    }
 };
 
 // UPDATE TO VERSION 1.05
@@ -6107,6 +6115,80 @@ const version_201_202 = () => {
                 versioning(codeversion);
             });
             });
+    });
+}
+
+const version_202_203 = () => {
+    const codeversion = 2.03
+    const update ={}
+    update['version'] = codeversion
+    const old_named_skills=[`art`,`craft`,`pilot`,`military_science`,`science`]
+    const old_adaptation = [`violence_1`,`violence_2`,`violence_3`,`helplessness_1`,`helplessness_2`,`helplessness_3`]
+    const old_named_skills_names=old_named_skills.map(x=> `${x}_name`)
+    getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills),values =>{
+        if (values.hasOwnProperty('art_name')){
+            const art_value=setMinMax(values[`art`]);
+            const art_name = values[`art_name`];
+            update[`art_1`]=art_value;
+            update[`art_1_name`]=art_name;
+        }
+        if (values.hasOwnProperty('craft_name')){
+            const craft_value = setMinMax(values[`craft`]);
+            const craft_name  = values[`craft_name`];
+            update[`craft_1`]=craft_value;
+            update[`craft_1_name`]=craft_name;
+        }
+        // complete for pilot, military_science, science
+        if (values.hasOwnProperty('pilot')) {
+            const pilot_value= setMinMax(values[`pilot`]);
+            const pilot_name = values[`pilot_name`];
+            update[`pilot_1`] = pilot_value;
+            update[`pilot_1_name`] = pilot_name;
+        }
+
+                
+        if (values.hasOwnProperty('military_science')) {
+            const military_science_value = setMinMax(values[`military_science`]);
+            const military_science_name = values[`military_science_name`];
+            update[`military_science_1`] = military_science_value;
+            update[`military_science_1_name`] = military_science_name;
+        }
+
+        if (values.hasOwnProperty('science')) {
+            const science_value = setMinMax(values[`science`]);
+            const science_name = values[`science_name`];
+            update[`science_1`] = science_value;
+            update[`science_1_name`] = science_name;
+        }
+
+        if (values.hasOwnProperty('violence_1')) {
+            const violence_1 = values[`violence_1`];
+            const violence_2 = values[`violence_2`];
+            const violence_3 = values[`violence_3`];
+            var violence = -1;
+            if (violence_1 ==1) {violence =0}
+            if (violence_2 ==2) {violence =1}
+            if (violence_3 ==3) {violence =2}
+            update[`violence`] = violence;
+            if (violence ==2) {update[`violence_adapted`]==1}
+        }
+        if (values.hasOwnProperty('helplessness_1')) {
+            const helplessness_1 = values[`helplessness_1`];
+            const helplessness_2 = values[`helplessness_2`];
+            const helplessness_3 = values[`helplessness_3`];
+            var helplessness = -1;
+            if (helplessness_1 ==1) {helplessness =0}
+            if (helplessness_2 ==2) {helplessness =1}
+            if (helplessness_3 ==3) {helplessness =2}
+            update[`helplessness`] = helplessness;
+            if (helplessness ==2) {update[`helplessness_adapted`]==1}
+        }
+        setAttrs(update, {silent:true}, () => {
+            console.log('updated named skills and adaptations');
+            versioning(codeversion);
+            console.info(update);
+        });
+
     });
 }
 
