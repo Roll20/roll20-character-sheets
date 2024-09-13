@@ -338,9 +338,10 @@ var version_201_202 = function version_201_202() {
 var version_202_203 = function version_202_203() {
   var codeversion = 2.03;
   var update = {};
+  console.log('verion:', codeversion);
   update['version'] = codeversion;
-  var old_named_skills = ["art", "craft", "pilot", "military_science", "science"];
-  var old_adaptation = ["violence_1", "violence_2", "violence_3", "helplessness_1", "helplessness_2", "helplessness_3"];
+  var old_named_skills = ['art', 'craft', 'pilot', 'military_science', 'science'];
+  var old_adaptation = ['violence_1', 'violence_2', 'violence_3', 'helplessness_1', 'helplessness_2', 'helplessness_3'];
   var old_named_skills_names = old_named_skills.map(function (x) {
     return "".concat(x, "_name");
   });

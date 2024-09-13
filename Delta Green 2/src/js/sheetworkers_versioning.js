@@ -304,16 +304,17 @@ const version_201_202 = () => {
             });
             });
     });
-}
+};
 
 const version_202_203 = () => {
     const codeversion = 2.03
     const update ={}
-    update['version'] = codeversion
-    const old_named_skills=[`art`,`craft`,`pilot`,`military_science`,`science`]
-    const old_adaptation = [`violence_1`,`violence_2`,`violence_3`,`helplessness_1`,`helplessness_2`,`helplessness_3`]
+    console.log('verion:',codeversion);
+    update['version'] = codeversion;
+    const old_named_skills=['art','craft','pilot','military_science','science'];
+    const old_adaptation = ['violence_1','violence_2','violence_3','helplessness_1','helplessness_2','helplessness_3'];
     const old_named_skills_names=old_named_skills.map(x=> `${x}_name`)
-    getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills),values =>{
+    getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills),(values) =>{
         if (values.hasOwnProperty('art_name')){
             const art_value=setMinMax(values[`art`]);
             const art_name = values[`art_name`];
@@ -378,4 +379,4 @@ const version_202_203 = () => {
         });
 
     });
-}
+};
