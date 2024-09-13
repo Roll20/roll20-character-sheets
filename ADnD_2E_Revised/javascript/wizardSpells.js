@@ -2101,7 +2101,7 @@ wiz3['Hold Person'] = {
 wiz3['Hold Undead'] = {
     'level': '3',
     'school': 'Necromancy',
-    'range': '60 feet',
+    'range': '60 yards',
     'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
     'aoe': '[[1d3]] undead',
     'components': 'V, S, M',
