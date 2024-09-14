@@ -95,7 +95,7 @@ var _repeating_sections = {
   'weapons': 'weapons',
   'ritual': 'rituals'
 };
-var _score_info = ["willpower_points_max", "character_creation_bonds", "repeating_bonds_setScore", "repeating_bonds_score", "repeating_bonds_score_old", "repeating_bonds_color"];
+var _score_info = ["willpower_points_max", "charisma_score", "character_creation_bonds", "repeating_bonds_setScore", "repeating_bonds_score", "repeating_bonds_score_old", "repeating_bonds_color"];
 var _bond_attributes = ["name", "test", "score", "hurt"];
 var _repeating_damages = ['damage', 'damage_critical', 'lethality_percent', 'lethality_percent_critical', 'double_barrel', 'double_barrel_critical', 'selective_fire', 'selective_fire_critical'];
 var _repeating_ammo = ['hasammo', 'ammo', 'ammo_total'];

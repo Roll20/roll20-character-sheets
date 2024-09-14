@@ -5,30 +5,20 @@ var versioning = function versioning(version) {
 
   if (version < 1.05) {
     version_0_105();
-  }
-
-  if (version < 1.5) {
+  } else if (version < 1.5) {
     version_105_150();
-  }
-
-  if (version < 1.7) {
+  } else if (version < 1.7) {
     version_150_170();
-  }
-
-  if (version < 2.0) {
+  } else if (version < 2.0) {
     version_170_200();
-  }
-
-  if (version < 2.01) {
+  } else if (version < 2.01) {
     version_200_201();
-  }
-
-  if (version < 2.02) {
+  } else if (version < 2.02) {
     version_201_202();
-  }
-
-  if (version < 2.03) {
+  } else if (version < 2.03) {
     version_202_203();
+  } else if (version < 2.04) {
+    version_203_204();
   }
 }; // UPDATE TO VERSION 1.05
 
@@ -345,7 +335,7 @@ var version_202_203 = function version_202_203() {
   var old_named_skills_names = old_named_skills.map(function (x) {
     return "".concat(x, "_name");
   });
-  getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills), function (values) {
+  getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills).concat(['willpower_points_max', 'charisma_score']), function (values) {
     if (values.hasOwnProperty('art_name')) {
       var art_value = setMinMax(values["art"]);
       var art_name = values["art_name"];
@@ -438,6 +428,38 @@ var version_202_203 = function version_202_203() {
       console.log('updated named skills and adaptations');
       versioning(codeversion);
       console.info(update);
+    });
+  });
+};
+
+var version_203_204 = function version_203_204() {
+  var codeversion = 2.04;
+  var update = {};
+  console.log('verion:', codeversion);
+  update['version'] = codeversion;
+  getAttrs(['willpower_points_max', 'charisma_score'], function (values) {
+    getSectionIDs('bonds', function (ids) {
+      var repfields = [];
+      ids.forEach(function (id) {
+        repfields.push("repeating_bonds_".concat(id, "_score"));
+      });
+      getAttrs(repfields, function (bond_values) {
+        var willpower_points_max = values['willpower_points_max'];
+        var charisma_score = values['charisma_score'];
+        repfields.forEach(function (field) {
+          if ((parseInt(bond_values[field]) || 0) >= willpower_points_max) {
+            update[field] = charisma_score;
+            update["".concat(field, "_old")] = charisma_score;
+          }
+        });
+        setAttrs(update, {
+          silent: true
+        }, function () {
+          console.log('updated named skills and adaptations');
+          versioning(codeversion);
+          console.info(update);
+        });
+      });
     });
   });
 };

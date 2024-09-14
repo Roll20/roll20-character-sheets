@@ -70,6 +70,7 @@ const _repeating_sections={
 
 const _score_info =  [
 	`willpower_points_max`,
+	`charisma_score`,
 	`character_creation_bonds`,
 	`repeating_bonds_setScore`,
 	`repeating_bonds_score`,

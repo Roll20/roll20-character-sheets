@@ -3,23 +3,26 @@ const versioning = (version) => {
     if (version < 1.05) {
        version_0_105();
     } 
-    if (version <1.5) {
+    else if (version <1.5) {
         version_105_150();
     }
-    if (version<1.7) {
+    else if (version<1.7) {
         version_150_170();
     }
-    if (version<2.0) {
+    else if (version<2.0) {
         version_170_200();
     }
-    if (version<2.01) {
+    else if (version<2.01) {
         version_200_201();
     }
-    if (version<2.02) {
+    else if (version<2.02) {
         version_201_202();
     }
-    if (version<2.03) {
+    else if (version<2.03) {
         version_202_203();
+    }
+    else if (version<2.04) {
+        version_203_204();
     }
 };
 
@@ -314,7 +317,7 @@ const version_202_203 = () => {
     const old_named_skills=['art','craft','pilot','military_science','science'];
     const old_adaptation = ['violence_1','violence_2','violence_3','helplessness_1','helplessness_2','helplessness_3'];
     const old_named_skills_names=old_named_skills.map(x=> `${x}_name`)
-    getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills),(values) =>{
+    getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills).concat(['willpower_points_max','charisma_score']),(values) =>{
         if (values.hasOwnProperty('art_name')){
             const art_value=setMinMax(values[`art`]);
             const art_name = values[`art_name`];
@@ -372,11 +375,45 @@ const version_202_203 = () => {
             update[`helplessness`] = helplessness;
             if (helplessness ==2) {update[`helplessness_adapted`]==1}
         }
+        
         setAttrs(update, {silent:true}, () => {
             console.log('updated named skills and adaptations');
             versioning(codeversion);
             console.info(update);
         });
+    });
+};
 
+const version_203_204= () => {
+    const codeversion = 2.04;
+    const update ={};
+    console.log('verion:',codeversion);
+    update['version'] = codeversion;
+  
+    getAttrs(['willpower_points_max','charisma_score'],values => {
+        getSectionIDs('bonds',ids => {
+            const repfields=[];
+            ids.forEach(id => {
+                repfields.push(`repeating_bonds_${id}_score`);
+            });
+            getAttrs(repfields,bond_values => {
+                const willpower_points_max=values['willpower_points_max'];
+                const charisma_score = values['charisma_score'];
+
+                repfields.forEach(field => {
+                    if ((parseInt(bond_values[field])||0)>=willpower_points_max){
+                        update[field]=charisma_score;
+                        update[`${field}_old`]=charisma_score;
+                    }
+                });
+
+                setAttrs(update, {silent:true}, () => {
+                    console.log('updated named skills and adaptations');
+                    versioning(codeversion);
+                    console.info(update);
+                });
+                
+            });
+        });
     });
 };
