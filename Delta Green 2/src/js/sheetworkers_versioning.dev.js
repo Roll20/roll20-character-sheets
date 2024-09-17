@@ -5,26 +5,20 @@ var versioning = function versioning(version) {
 
   if (version < 1.05) {
     version_0_105();
-  }
-
-  if (version < 1.5) {
+  } else if (version < 1.5) {
     version_105_150();
-  }
-
-  if (version < 1.7) {
+  } else if (version < 1.7) {
     version_150_170();
-  }
-
-  if (version < 2.0) {
+  } else if (version < 2.0) {
     version_170_200();
-  }
-
-  if (version < 2.01) {
+  } else if (version < 2.01) {
     version_200_201();
-  }
-
-  if (version < 2.02) {
+  } else if (version < 2.02) {
     version_201_202();
+  } else if (version < 2.03) {
+    version_202_203();
+  } else if (version < 2.04) {
+    version_203_204();
   }
 }; // UPDATE TO VERSION 1.05
 
@@ -326,6 +320,145 @@ var version_201_202 = function version_201_202() {
         });
         console.log('removed repeating skills');
         versioning(codeversion);
+      });
+    });
+  });
+};
+
+var version_202_203 = function version_202_203() {
+  var codeversion = 2.03;
+  var update = {};
+  console.log('verion:', codeversion);
+  update['version'] = codeversion;
+  var old_named_skills = ['art', 'craft', 'pilot', 'military_science', 'science'];
+  var old_adaptation = ['violence_1', 'violence_2', 'violence_3', 'helplessness_1', 'helplessness_2', 'helplessness_3'];
+  var old_named_skills_names = old_named_skills.map(function (x) {
+    return "".concat(x, "_name");
+  });
+  getAttrs(old_adaptation.concat(old_named_skills_names).concat(old_named_skills).concat(['willpower_points_max', 'charisma_score']), function (values) {
+    if (values.hasOwnProperty('art_name')) {
+      var art_value = setMinMax(values["art"]);
+      var art_name = values["art_name"];
+      update["art_1"] = art_value;
+      update["art_1_name"] = art_name;
+    }
+
+    if (values.hasOwnProperty('craft_name')) {
+      var craft_value = setMinMax(values["craft"]);
+      var craft_name = values["craft_name"];
+      update["craft_1"] = craft_value;
+      update["craft_1_name"] = craft_name;
+    } // complete for pilot, military_science, science
+
+
+    if (values.hasOwnProperty('pilot')) {
+      var pilot_value = setMinMax(values["pilot"]);
+      var pilot_name = values["pilot_name"];
+      update["pilot_1"] = pilot_value;
+      update["pilot_1_name"] = pilot_name;
+    }
+
+    if (values.hasOwnProperty('military_science')) {
+      var military_science_value = setMinMax(values["military_science"]);
+      var military_science_name = values["military_science_name"];
+      update["military_science_1"] = military_science_value;
+      update["military_science_1_name"] = military_science_name;
+    }
+
+    if (values.hasOwnProperty('science')) {
+      var science_value = setMinMax(values["science"]);
+      var science_name = values["science_name"];
+      update["science_1"] = science_value;
+      update["science_1_name"] = science_name;
+    }
+
+    if (values.hasOwnProperty('violence_1')) {
+      var violence_1 = values["violence_1"];
+      var violence_2 = values["violence_2"];
+      var violence_3 = values["violence_3"];
+      var violence = -1;
+
+      if (violence_1 == 1) {
+        violence = 0;
+      }
+
+      if (violence_2 == 2) {
+        violence = 1;
+      }
+
+      if (violence_3 == 3) {
+        violence = 2;
+      }
+
+      update["violence"] = violence;
+
+      if (violence == 2) {
+        update["violence_adapted"] == 1;
+      }
+    }
+
+    if (values.hasOwnProperty('helplessness_1')) {
+      var helplessness_1 = values["helplessness_1"];
+      var helplessness_2 = values["helplessness_2"];
+      var helplessness_3 = values["helplessness_3"];
+      var helplessness = -1;
+
+      if (helplessness_1 == 1) {
+        helplessness = 0;
+      }
+
+      if (helplessness_2 == 2) {
+        helplessness = 1;
+      }
+
+      if (helplessness_3 == 3) {
+        helplessness = 2;
+      }
+
+      update["helplessness"] = helplessness;
+
+      if (helplessness == 2) {
+        update["helplessness_adapted"] == 1;
+      }
+    }
+
+    setAttrs(update, {
+      silent: true
+    }, function () {
+      console.log('updated named skills and adaptations');
+      versioning(codeversion);
+      console.info(update);
+    });
+  });
+};
+
+var version_203_204 = function version_203_204() {
+  var codeversion = 2.04;
+  var update = {};
+  console.log('verion:', codeversion);
+  update['version'] = codeversion;
+  getAttrs(['willpower_points_max', 'charisma_score'], function (values) {
+    getSectionIDs('bonds', function (ids) {
+      var repfields = [];
+      ids.forEach(function (id) {
+        repfields.push("repeating_bonds_".concat(id, "_score"));
+      });
+      getAttrs(repfields, function (bond_values) {
+        var willpower_points_max = values['willpower_points_max'];
+        var charisma_score = values['charisma_score'];
+        repfields.forEach(function (field) {
+          if ((parseInt(bond_values[field]) || 0) >= willpower_points_max) {
+            update[field] = charisma_score;
+            update["".concat(field, "_old")] = charisma_score;
+          }
+        });
+        setAttrs(update, {
+          silent: true
+        }, function () {
+          console.log('updated named skills and adaptations');
+          versioning(codeversion);
+          console.info(update);
+        });
       });
     });
   });
