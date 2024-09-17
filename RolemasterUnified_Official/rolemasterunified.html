@@ -206,10 +206,10 @@
     -->
 <rolltemplate class="sheet-rolltemplate-rmuspell">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
-    {{who}} casts {{computed::spell}}<br>
+    {{who}} casts <i>{{computed::spell}}</i><br>
+    <b>Result</b>: {{computed::total}} = {{computed::roll}} + {{mod}}<br>
     <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
     Modifiers: {{mod}} = {{computed::modlog}}</p>
-    Result: {{computed::total}} = {{computed::roll}} + {{mod}}<br>
     {{computed::result}}<br>
     {{who}} now has {{computed::pp}} PP ({{computed::ppmsg}})
   </div>
@@ -228,10 +228,10 @@
 
 <rolltemplate class="sheet-rolltemplate-rmuskill">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rollattack'>
-    {{computed::who}} rolls {{computed::skill}}<br>
+    {{computed::who}} rolls <i>{{computed::skill}}</i><br>
+    <b>Result</b>: {{computed::total}} = {{computed::rollstr}} + {{computed::mod}}<br>
     <p style='padding-left:1em;text-indent:-1em;' class='hangingindent'>
     Modifiers: {{computed::mod}} = {{computed::modlog}}</p>
-    Result: {{computed::total}} = {{computed::rollstr}} + {{computed::mod}}<br>
     <b>{{computed::result}}</b><br>
     {{#rollTotal() computed::hasextra 1}}
     <i>{{computed::extratext}}</i><br>
@@ -2209,7 +2209,7 @@
   <span>Initiative</span>
   <span>
     <span name='attr_initiative'></span>
-    <button type="action" value="act_rollinitiative" class="editbutton rollbutton"><span style="font-family:dicefontd10;">j</span></button>
+    <button type='action' name='act_rollinitiative' class='editbutton rollbutton'><span style='font-family:dicefontd10;'>j</span></button>
   </span>
 
 
@@ -2217,11 +2217,26 @@
 
 <div class='creaturerrs'>
   <span class='creatureheading'>RRs</span>
-    <span>Channeling</span> <span name='attr_rr_channeling_bonus'></span>
-    <span>Essence</span> <span name='attr_rr_essence_bonus'></span>
-    <span>Mentalism</span> <span name='attr_rr_mentalism_bonus'></span>
-    <span>Physical</span> <span name='attr_rr_physical_bonus'></span>
-    <span>Fear</span> <span name='attr_rr_fear_bonus'></span>
+    <span>Channeling</span> <span><span name='attr_rr_channeling_bonus'></span>
+                            <button type='action' data-rr='channeling' class='editbutton rollbutton'
+                                name='act_rrroll'><span style="font-family:dicefontd10;">j</span></button>
+                            </span>
+    <span>Essence</span> <span><span name='attr_rr_essence_bonus'></span>
+                            <button type='action' data-rr='essence' class='editbutton rollbutton'
+                                name='act_rrroll'><span style="font-family:dicefontd10;">j</span></button>
+                            </span>
+    <span>Mentalism</span> <span><span name='attr_rr_mentalism_bonus'></span>
+                            <button type='action' data-rr='mentalism' class='editbutton rollbutton'
+                                name='act_rrroll'><span style="font-family:dicefontd10;">j</span></button>
+                            </span>
+    <span>Physical</span> <span><span name='attr_rr_physical_bonus'></span>
+                            <button type='action' data-rr='physical' class='editbutton rollbutton'
+                                name='act_rrroll'><span style="font-family:dicefontd10;">j</span></button>
+                            </span>
+    <span>Fear</span>     <span><span name='attr_rr_fear_bonus'></span>
+                            <button type='action' data-rr='fear' class='editbutton rollbutton'
+                                name='act_rrroll'><span style="font-family:dicefontd10;">j</span></button>
+                            </span>
 </div>
 
 
@@ -2319,8 +2334,18 @@
 </div>
     <div>Eat/Drink</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_eat_x' value='0'><input class='aptrack' type='radio' name='attr_aptrack_eat_x' value='1'><input class='aptrack' type='radio' name='attr_aptrack_eat_x' value='2'></div>
 </div>
-    <div class='double'>Concentration</div> <input type='checkbox'>
-    <div>Free Action Used</div> <input type='checkbox'>
+    <div class='double'>Concentration</div> <input name='attr_aptrack_concentration' type='checkbox'>
+    <div>Free Used</div> <input name='attr_aptrack_freeused' type='checkbox'>
+    <div>AP/Phase</div>
+    <div>
+      <select name='attr_actionapperphase' style='width:100%' class='fancyselect'>
+        <option value='1'>1AP</option>
+        <option value='2'>2AP</option>
+        <option value='4'>4AP</option>
+      </select>
+    </div>
+    <div></div>
+    <div><button type='action' name='act_endphase' class='fancybutton fancybuttoninline'>End</button></div>
   </div>
 
 
@@ -2422,6 +2447,20 @@
 
 </div>
 
+<div class='creaturehacks'>
+  <h3>Injuries</h3>
+
+  <p>Apply an injury.<br>
+  <b>H</b>its, <b>P</b>enalty, <b>F</b>atigue, <b>B</b>leed, <b>S</b>taggered,
+  p<b>R</b>one, <b>K</b>nockback, <b>G</b>rappled, Q/W/E Stun 25/50/75,
+  <b>L</b>ocation (1 head, 2, chest, 3 arms, 4 leg) and si<b>D</b>e (1 Left, 2 right).
+  <b>Z</b> ends.
+  </p>
+
+  <input type='text' name='attr_hackinjury'>
+  <button type='action' name='act_applyinjuryhack' class='fancybutton'>Apply Injury</button>
+</div>
+
 <hr>
 
 </div> 
@@ -2441,6 +2480,12 @@
 
 
 Name <input name="attr_character_name">
+
+<div style='float:right'>
+  <input type='hidden' name='attr_workpending' class='hidenext'>
+  <span class="loader"></span>
+</div>
+
 
 <div class='tabset'>
     <input type='radio' name='tabset2' id='maintab1' checked><label for='maintab1'>Stats</label>
@@ -2497,8 +2542,8 @@ Name <input name="attr_character_name">
 
     <hr>
    
-<div class='prop_pair'><span class='prop_prop_plain'>Profession</span><span class='prop_value' name='attr_profession'></span><span class='prop_prop_plain'>Race</span><span class='prop_value' name='attr_race'></span><span class='prop_prop_plain'>Level</span><span class='prop_value' name='attr_display_level'></span><span class='prop_prop_plain'>Culture</span><span class='prop_value' name='attr_culture'></span><span class='prop_prop_plain'>Realm</span><span class='prop_value' name='attr_realm'></span><span class='prop_prop_plain'>Religion</span><span class='prop_value'><input type='text' style='width:100%' name='attr_religion'></span><span class='prop_prop_plain'>Age</span><span class='prop_value'><input type='text' style='width:100%' name='attr_age'></span><span class='prop_prop_plain'>Skin</span><span class='prop_value'><input type='text' style='width:100%' name='attr_skin'></span><span class='prop_prop_plain'>Eyes</span><span class='prop_value'><input type='text' style='width:100%' name='attr_eyes'></span><span class='prop_prop_plain'>Gender</span><span class='prop_value' name='attr_gender'></span><span class='prop_prop_plain'>Build</span><span class='prop_value' name='attr_build'></span><span class='prop_prop_plain'>Height</span><span class='prop_value' name='attr_height'></span><span class='prop_prop_plain'>Weight</span><span class='prop_value' name='attr_weight'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
-<span class='prop_value' name='attr_weightallowance'></span><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encumberance_penalty'></span><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span><span class='prop_prop_plain'>Manuever Penalty</span><span class='prop_value' name='attr_manueverpenalty'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_bmr_info'></span>Base Move (BMR)</span></span>
+<div class='prop_pair'><span class='prop_prop_plain'>Profession</span><span class='prop_value' name='attr_profession'></span><span class='prop_prop_plain'>Race</span><span class='prop_value' name='attr_race'></span><span class='prop_prop_plain'>Level</span><span class='prop_value' name='attr_display_level'></span><span class='prop_prop_plain'>Culture</span><span class='prop_value' name='attr_culture'></span><span class='prop_prop_plain'>Realm</span><span class='prop_value' name='attr_realm'></span><span class='prop_prop_plain'>Religion</span><span class='prop_value'><input type='text' style='width:100%' name='attr_religion'></span><span class='prop_prop_plain'>Age</span><span class='prop_value'><input type='text' style='width:100%' name='attr_age'></span><span class='prop_prop_plain'>Skin</span><span class='prop_value'><input type='text' style='width:100%' name='attr_skin'></span><span class='prop_prop_plain'>Eyes</span><span class='prop_value'><input type='text' style='width:100%' name='attr_eyes'></span><span class='prop_prop_plain'>Hair</span><span class='prop_value'><input type='text' style='width:100%' name='attr_hair'></span><span class='prop_prop_plain'>Gender</span><span class='prop_value'><input type='text' style='width:100%' name='attr_gender'></span><span class='prop_prop_plain'>Build</span><span class='prop_value'><input type='text' style='width:100%' name='attr_build'></span><span class='prop_prop_plain'>Height</span><span class='prop_value'><input type='text' style='width:100%' name='attr_height'></span><span class='prop_prop_plain'>Weight</span><span class='prop_value'><input type='text' style='width:100%' name='attr_weight'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_weightallowance_info'></span>Weight allowance</span></span>
+<span class='prop_value' name='attr_weightallowance'></span><span class='prop_prop_plain'>Carried</span><span class='prop_value' name='attr_carried'></span><span class='prop_prop_plain'>Enc Penalty</span><span class='prop_value' name='attr_encumberance_penalty'></span><span class='prop_prop_plain'>Max Pace</span><span class='prop_value' name='attr_maxpace'></span><span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span><span class='skill_info' name='attr_bmr_info'></span>Base Move (BMR)</span></span>
 <span class='prop_value' name='attr_bmr'></span><span class='prop_prop_plain'>Size</span><span class='prop_value' name='attr_size'></span><span class='prop_prop_plain'>Recovery Multiplier</span><span class='prop_value' name='attr_recovery_multiplier'></span><span class='prop_prop_plain'>Routine</span><span class='prop_value' name='attr_strfeat_routine'></span><span class='prop_prop_plain'>Easy</span><span class='prop_value' name='attr_strfeat_easy'></span><span class='prop_prop_plain'>Light</span><span class='prop_value' name='attr_strfeat_light'></span><span class='prop_prop_plain'>Medium</span><span class='prop_value' name='attr_strfeat_medium'></span><span class='prop_prop_plain'>Hard</span><span class='prop_value' name='attr_strfeat_hard'></span><span class='prop_prop_plain'>Very Hard</span><span class='prop_value' name='attr_strfeat_veryhard'></span><span class='prop_prop_plain'>Ext. Hard</span><span class='prop_value' name='attr_strfeat_exthard'></span><span class='prop_prop_plain'>Sheer Folly</span><span class='prop_value' name='attr_strfeat_sheerfolly'></span><span class='prop_prop_plain'>Absurd</span><span class='prop_value' name='attr_strfeat_absurd'></span><span class='prop_prop_plain'>Nigh Impossible</span><span class='prop_value' name='attr_strfeat_nighimpossible'></span>
 
     <span class='prop_prop_plain'>EP</span>
@@ -2657,7 +2702,7 @@ Name <input name="attr_character_name">
     <div class='prop_pair'>
       <span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span> Initiative</span>
       <span class='prop_value'>
-        <span name='attr_initiative'></span><button type="action" value="act_rollinitiative" class="editbutton rollbutton"><span style="font-family:dicefontd10;">j</span></button>
+        <span name='attr_initiative'></span><button type='action' name='act_rollinitiative' class='editbutton rollbutton'><span style='font-family:dicefontd10;'>j</span></button>
         <button name='act_newcombat' type='action' class='fancybuttoninline fancybutton'>
             New Combat</button>
       </span>
@@ -5302,12 +5347,16 @@ Name <input name="attr_character_name">
 <button type='action' name='act_updateattacks' class='fancybutton'>Attacks</button>
 <button type='action' name='act_editspells' class='fancybutton'>Edit Spells</button>
 
+<p>See orange dots flashing for ages?  Means one of our workers has a problem.  
+Click this to reset and report a bug.</p>
+<button type='action' name='act_resetworkers' class='fancybutton'>Reset Workers</button>
+
 <hr>
 
 <h3>Injuries</h3>
 
-<p>Apply an injury.  Format is Uppercase letter, followed by a number.  Letter
-sare H hits, P penalty, F fatigue, B blleed, S staggered P pRone, K kniocked
+<p>Apply an injury.  Format is Uppercase letter, followed by a number.  Letters
+are H hits, P penalty, F fatigue, B bleed, S staggered P pRone, K kniocked
 back, G grapped %, Q/W/E Stun 25/50/77 X breakage roll, Location (1 head, 2,
 chest, 3 arms, 4 leg) and siDe (1 Left, 2 right).  For bleed and penalties you
 need side and  location.  A Z ends the list.<p>
@@ -5346,7 +5395,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 2e32329e9a28648dcbfa94d7e228eaf22f91faed
+Revision 1c08006943a1f9e620fbedf32c272c900c3ac21a
 
 
 <hr>
@@ -6564,6 +6613,9 @@ function addPendingFunction(name, func) {
       cb: func
   };
   pendingList.push(item);
+  if (pendingList.length == 1) {
+      setAttrs({workpending: 1});
+  }
 }
 
 /* Same as addPendingFunction, but inserts at head of queue.
@@ -6578,6 +6630,9 @@ function addPendingFunctionNext(name, func) {
       cb: func
   };
   pendingList.unshift(item);
+  if (pendingList.length == 1) {
+      setAttrs({workpending: 1});
+  }
 }
 
 let asyncTimeout = false;
@@ -6613,6 +6668,7 @@ function checkPending() {
       rmuasync = 0;
     }
   }
+  setAttrs({workpending: 0});
 }
 
 function pendingInfo() {
@@ -6620,8 +6676,13 @@ function pendingInfo() {
 }
 
 function pendingReset() {
-  let rmuasync = 0;
-  let pendingList = []
+  console.log("Pending reset");
+  if (rmuasync) {
+    console.log(`Pending reset: ${rmuasync} with ${pendingList.length} queued`);
+    rmuasync = 0;
+    pendingList = [];
+    setAttrs({workpending: 0});
+  }
 }
 
 function onCheck(str, func) {
@@ -6643,6 +6704,10 @@ function onCheck(str, func) {
 
   on(str, func);
 }
+
+onCheck("clicked:resetworkers", () => {
+  pendingReset();
+});
 
 
 
@@ -7688,9 +7753,6 @@ function updateSpellCategory(spellgroup, bonus, gracebonus, trickerybonus) {
 	      let scrlog = slog + rlog + `${bonus}   Spell Type bonus\n`
 	      let realmstat = RMUSkills.getStat('rs');
 	      
-	      scrlog += `${realmstat}   Realm Stat`;
-	      
-	      
 	      
 	      let mastery = realmstat + realmstat + RMUSkills.getStat('me') +
 		  RMUSkills.getSkillBonus(ranks);
@@ -8190,6 +8252,8 @@ onCheck("clicked:uploadspelllist", (ev) => {
 	return;
       }
       if (newlist.Category && newlist.Category == 'Creature') {
+	console.log("Doing creature");
+	setAttrs({uploadspelllistmessage: "Creature..."});
 	return creature.newCreature(newlist.Name, newlist);
       }
       console.log("has name");
@@ -8686,7 +8750,7 @@ function changeTalentPurchase(ev) {
 	}
       } else {
 	hideChoices([`${basename} .talent_tier_show`]);
-	list.push(`Tier 1: ${cost} dp`);
+	list.push(`Tier 1: ${cost} dp~${cost}`);
       }
       setCharmancerOptions(`${basename}_tier`, list);
 
@@ -9382,7 +9446,11 @@ RMUStats.doStatGain = function(statname, count, message) {
       const pot = miscBonusTotal(stats[`${statname}_pot_misc`])[0];
       for (let i = 0 ; i < count ; i ++) {
 	let gain = RMUStats.statgainroll(temp, pot);
-	tempraw = miscRawAppend(tempraw, message, gain);
+	let thismessage = message;
+	if (count > 1) {
+	  thismessage = `${message} #{i + 1}`;
+	}
+	tempraw = miscRawAppend(tempraw, thismessage, gain);
 	temp += gain;
       }
       setAttrsPending({[`${statname}_misc`]: miscRawToString(tempraw)});
@@ -9499,13 +9567,13 @@ RMUStats.createStatsFinalize = function(cmdata) {
 	let st1 = svals[stg1]; 
 	const g1 = RMUStats.statgainroll(st1.temp, st1.pot);
 	st1.temp += g1;
-	miscRawAppend(st1.misc, "Creation stat gain", g1);
+	miscRawAppend(st1.misc, `Creation stat gain - ${suffix} A`, g1);
 
 	const stg2 = optionDecode(statsdata[`statgain${suffix}b`]);
 	let st2 = svals[stg2]; 
 	const g2 = RMUStats.statgainroll(st2.temp, st2.pot);
 	st2.temp += g2;
-	miscRawAppend(st2.misc, "Creation stat gain", g2);
+	miscRawAppend(st2.misc, `Creation stat gain - ${suffix} B`, g2);
 	break;
        }
     }
@@ -9703,7 +9771,7 @@ var RMUTalents = function() {
     };
 
     x.getSelectList = function(talentObj) {
-      if (x.talentFuncs[talentObj.data.type].select) {
+      if (x.talentFuncs[talentObj?.data?.type]?.select) {
 	return x.talentFuncs[talentObj.data.type].select(talentObj);
       }
       rmuerror("No select function for ", talentObj.data.type, talentObj);
@@ -9723,7 +9791,8 @@ var RMUTalents = function() {
       tier = parseIntDefault(tier, 1);
 
       console.log(`Looking for '${talentObj.data.type} in `, x.applyFuncs);
-      if (x.talentFuncs[talentObj.data.type].apply) {
+
+      if (x?.talentFuncs[talentObj?.data?.type]?.apply) {
 	x.talentFuncs[talentObj.data.type].apply(talentObj, tier, choice, source);
       } else {
 	rmuerror("Unknown talent type:", talentObj.data.type, talentObj);
@@ -10338,8 +10407,9 @@ onCheck("mancerfinish:newcharacter", (ev) => {
     })
 
     addPendingFunction("CMFinish: Generate Height and Weight", () => {
-	generateHeightWeight(data.race.data.race,
-	      cleanCompendiumName(data.race.values.gender));
+	const gender = cleanCompendiumName(data.race.values.gender)
+	generateHeightWeight(data.race.data.race, gender);
+	setAttrs({gender: gender}); // Nothing depends - just send it
     });
 
     // Culture
@@ -10413,7 +10483,7 @@ onCheck("mancerfinish:newcharacter", (ev) => {
 	    addLanguage(culture, `${name} - S`, sr);
 	  }
 	  if (wr > 0) {
-	    addLanguage(culture, `${name} - W`, sr);
+	    addLanguage(culture, `${name} - W`, wr);
 	  }
 	}
     });
@@ -11341,12 +11411,12 @@ let RMUInventory = {}
 		      updates.at_torso_info = name;
 		      break;
 		    case 'Vambraces':
-		      updates.at_legs = json.AT;
-		      updates.at_legs_info = name;
-		      break;
-		    case 'Greaves':
 		      updates.at_arms = json.AT;
 		      updates.at_arms_info = name;
+		      break;
+		    case 'Greaves':
+		      updates.at_legs = json.AT;
+		      updates.at_legs_info = name;
 		      break
 		    default:
 			updates.at_head = json.AT;
@@ -11355,27 +11425,28 @@ let RMUInventory = {}
 				updates.at_arms = json.AT;
 				updates.at_head_info = updates.at_torso_info = updates.at_legs_info =
 				  updates.at_arms_info = name;
-			  }
-			}
-			if (json['DB Bonus']) {
-			  updates.shield_type_bonus = json['DB Bonus'];
-			  updates.shield_type_nattacks = json['Attacks Blocked'];
-			}
-			if (json['Attack Table']) {
-			  RMUInventory.updateWeapon(name, json);
-			}
+		  }
+		}
+		if (json['DB Bonus']) {
+		  updates.shield_type_bonus = json['DB Bonus'];
+		  updates.shield_type_nattacks = json['Attacks Blocked'];
+		}
+		if (json['Attack Table']) {
+		  RMUInventory.updateWeapon(name, json);
+		}
 
-		    });
-		    setAttrsPending(updates);
-		});
 	    });
+	    setAttrsPending(updates);
+	});
+    });
   }
    
   // Someone changed a system relaed thing; or equpped something
   RMUInventory.updateEquipped = function() {
-    console.log("UPdate equipped");
-    addPendingFunction("Delete creatied attacks", RMUInventory.deleteCreatedAttacks);
-    addPendingFunction("Add Special Equipement", RMUInventory.addSpecialEquipment);
+    console.log("Update equipped");
+    pendingInfo();
+    addPendingFunction("Delete created attacks", RMUInventory.deleteCreatedAttacks);
+    addPendingFunction("Add Special Equipment", RMUInventory.addSpecialEquipment);
     addPendingFunction("Update bonuses for Attacks", attacks.updateAttackBonuses);
     checkPending();
   }
@@ -11491,6 +11562,7 @@ let RMUInventory = {}
     onCheck('clicked:repeating_stuff:deleteitem', (ev) => {
 	const basename = ev.sourceAttribute.replace("_deleteitem", "");
 	removeRepeatingRow(basename);
+	RMUInventory.updateEquipped();
     });
 
 
@@ -13385,10 +13457,10 @@ onCheck("clicked:statusrest", (_) => {
     });
 });
 
-onCheck("clicked:rollinitative", () => {
-  startRoll('&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker} ]] ' +
+onCheck("clicked:rollinitiative", () => {
+  startRoll('&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} &{tracker}]] ' +
       '{\{actor=@{character_name} }} ' +
-      '{]{bonus=@{initiative} }} {\{total=$[[1]]}} {\{roll=$[[0]]}}',
+      '{\{bonus=@{initiative} }} {\{total=$[[1]]}} {\{roll=$[[0]]}}',
       (roll) => {
 	finishRoll(roll.rollId, {});
   });
@@ -13550,7 +13622,12 @@ creature.newCreature = function(name, jdata) {
   updates.rr_fear_bonus = cdata.Fear;
 
   // Attacks:  Format is 8M(5)be.  OB - SizeLetter - Size Numberic - Attack Table
-  let attacks = JSON.parse(cdata['data-attack']);
+  let attacks = "";
+  if (typeof(cdata['data-attack']) == 'string') {
+    attacks = JSON.parse(cdata['data-attack']);
+  } else {
+    attacks = cdata['data-attack'];
+  }
   console.log(attacks);
   for (attack of attacks) {
     // FIXME: Not dealign with additiona criiticals here
@@ -13587,11 +13664,15 @@ creature.newCreature = function(name, jdata) {
           VrmuSetAttrs(nu);
       });
     }
-  
+
     updates[`${prefix}_type`] = type;
   }
 
-  let moves = JSON.parse(cdata['data-move'])
+  console.log('move is', cdata['data-move']);
+  const moves = (typeof(cdata['data-move']) == 'string') ?
+          JSON.parse(cdata['data-move']) :
+          cdata['data-move'];
+
   for (const { type, pace, bmr } of moves) {
   //for (const move of moves) {
     console.log("move", type, pace, bmr);
@@ -13625,7 +13706,7 @@ onCheck('clicked:repeating_creatureattack:creaturemakeattack', (ev) => {
     console.log("basenae", basename);
     const toget = [
       'character_name',
-      'size', 
+      'size',
       `${basename}_ob`,
       `${basename}_attack`,
       `${basename}_attacksize`,

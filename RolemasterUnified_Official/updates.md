@@ -1,3 +1,46 @@
+# 2024-9-17
+
+Miscalenous bug fix week!
+
+After one week of activity there are a number of bugs.  Talents seemed to cause most grief - I've
+fixed a lot of them.  Hopefully this means peoples sheets won't lock up anymore.
+
+Otherwise it's a whole host of little things.
+
+- Hair is now a box you can edit
+- Save gender set during character creation
+- Initiative:
+  - Fix the button so it works again (stupid roll20 quotes)
+  - Show the penalty in the result box
+  - Send the value to the tracker
+- Fix a few missing translation strings.
+- Set correct ranks for written languages.
+- On creation, make sure each stat gain has a unique name
+- Creature:
+  - Allow JSON and string items.
+  - RR rolls for creatures
+  - Injuries for creatures
+- Talents
+  - Save talent cost correctly for single tier talents
+  - Fix some of the talents that cause problems on some browsers.
+  - Handle more errors
+  - Delete a malformed talent in the database
+- Roll templates (side panel)
+  - Add basic darkmode support
+  - Put the results before the mods for skills and spell rolls.
+- Can edit height/weight/build on sheet
+- Stat gains uniquely identified during levelup
+- Fix for item's name's template in the compendium
+- Partial fix for vmabraces`greaves
+- Fix for short bow and long bow attack tables
+- Remove old Claw & Shockbolt hacks from compendium
+- Spells correct display of realm stats
+- Fix vambrace and greave ordering
+- Update equipment on deletion
+- Add a pending reset button to hopefully unjam people.
+- Add an animated icon when doing work
+
+
 # 2024-9-12
 
 The first post compendium release... and it's small.  This is a good thing.
