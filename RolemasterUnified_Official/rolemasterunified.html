@@ -8738,7 +8738,7 @@ function changeTalentPurchase(ev) {
       const tiers = parseIntDefault(tdata.data.Tiers, 1);
       const cost = parseIntDefault(tdata.data.Cost, 0);
       const costpertier = parseIntDefault(tdata.data['Cost per Tier'], cost);
-      console.log("change talen purchase", tiers, cost, costpertier, tdata);
+      console.log("change talent purchase", tiers, cost, costpertier, tdata);
       let list = []
       if (tiers > 1) {
 	showChoices([`${basename} .talent_tier_show`])
@@ -8768,10 +8768,12 @@ function changeTalentPurchase(ev) {
 }
 
 function changeTalentPurchaseTier(ev) {
-  let cost = parseIntDefault(ev.newValue.split("~")[1], -111);
+   // Workaround for the Roll20 API change that added expansion ids to
+   // strings randomly.
+  const str = ev.newValue?.replace(/\?expansion=\d*$/, "") || "";
+  let cost = parseIntDefault(str.split("~")[1], -111) || -111;
   if (cost == -111) {
-    console.log(ev.newValue.split("~"));
-    rmuerror("Unable to extract cost from ", ev.newValue);
+    rmuerror("Unable to extract cost from ", ev.newValue, str);
     cost = 0;
   }
   RMUCosts.update(ev.sourceSection, cost, 1);
@@ -9271,6 +9273,20 @@ onCheck("mancerfinish:levelup", (ev) => {
   })
 
   addPendingFunction("LevelupFinish: update all skills", RMUSkills.updateAllSkills);
+  addPendingFunction("LevelupFinish: Set HP/PP", () => {
+    getAttrsPending(["bodydevelopment_bonus", "powerdevelopment_bonus"], (data) => {
+      updates = {}
+      if (data.bodydevelopment_bonus) {
+	updates.hp = data.bodydevelopment_bonus;
+	updates.hp_max = data.bodydevelopment_bonus;
+      }
+      if (data.powerdevelopment_bonus) {
+	updates.pp = data.powerdevelopment_bonus;
+	updates.pp_max = data.powerdevelopment_bonus;
+      }
+      setAttrsPending(updates);
+    });
+  });
   addPendingFunction("LevelupFinish: Front page", updateFrontPage);
   addPendingFunction("LevelupFinish: Finish cmancer (roll20)", finishCharactermancer)
   pendingInfo();
@@ -10050,7 +10066,10 @@ function optionEncode(aname) {
   return getTranslationByKey(aname) + '~' + aname;
 }
 
-function optionDecode(str) {
+function optionDecode(dirty) {
+  // Workaround for the Roll20 API change that added expansion ids to
+  // strings randomly.
+  const str = dirty.replace(/\?expansion=\d*$/, "");
   if (!str.includes("~")) {
     console.log("optionDecode doesn't have a ~: ", str);
     return str;
@@ -10080,9 +10099,11 @@ function optionDecodeMaybe(str) {
   if (!str || !str.includes("~")) {
     return str;
   }
-  return str.split("~")[1];
+ // Workaround for the Roll20 API change that added expansion ids to
+  // strings randomly.
+  const str2 = str?.replace(/\?expansion=\d*$/, "");
+  return str2.split("~")[1];
 }
-
 
 const weaponGroups = ['meleeweaponsgroup','rangedweaponsgroup','unarmedgroup','shieldgroup'];
 
