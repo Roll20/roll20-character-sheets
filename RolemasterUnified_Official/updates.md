@@ -1,3 +1,15 @@
+# 2024-9-19
+
+Urgent fix for a roll20 API change.  Some of the values in fields from the
+charactermancer started getting expansion ids shoved on the return values.
+(if they contain a ~).
+
+So before we look parse the string, remove any expansion ids on the end.
+
+
+Sheet updates:
+- Force HP and PP to max on levelup
+
 # 2024-9-17
 
 Miscalenous bug fix week!
