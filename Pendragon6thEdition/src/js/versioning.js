@@ -184,11 +184,6 @@ const versioning = async (version) => {
       versionThreeTwo();
       versioning(3.2);
       break;
-    case version < 3.2:
-      updateMessage(3.2);
-      versionThreeTwo();
-      versioning(3.2);
-      break;
     default:
       console.log(
         `%c Pendragon 6th Edition is update to date.`,
