@@ -2355,7 +2355,7 @@
       <div><input type="text" name="attr_bonustodamage" class="standard-input" value="0"/></div>
       <div><input type="text" name="attr_enchdamagedice" class="standard-input" value=""/></div>
       <div><input type="text" name="attr_weapondamagtype" class="standard-input" value=""/></div>
-      <div><input type="checkbox" name="attr_twohanded" value=".5"/></div>
+      <div><input type="checkbox" name="attr_twohanded"/></div>
      </div>
      </div>
      <div style="margin: 0;" class="column-header weapon-column-span">
@@ -2363,21 +2363,17 @@
      </div>
      <div class="ggridc">
       <div class="grr1 ggrid">
+       <input type="hidden" name="attr_weapondamage"/>
+       <input type="hidden" name="attr_critweapondamage"/>
        <div style="padding-bottom: 3px;" class="grc1 titleblock">Normal Damage:&nbsp;<button
         type="roll"
         name="roll_weapondamage"
-        value=
-         "
-        &{template:custom}{{title=Damage}}{{subtitle= with @{character_name}'s @{weaponname} }} {{desc= Deals [[(@{dnum}@{dtype})[Dice]+(@{weapontodamage})+(floor(@{weapontodamage}*@{twohanded}))[Key Ability]+(@{bonustodamage})[Feats]+@{enhancetoattack}[Magic]+(@{enchdamagedice}[Bonus])+(?{Do you have a miscellaneaous bonus to damage?|0})]] damage to their target.}}
-        "
+        value="@{weapondamage}"
        ></button></div>
        <div style="padding-bottom: 3px;" class="grc2 titleblock">Critical Damage:&nbsp;<button
         type="roll"
         name="roll_critweapondamage"
-        value=
-         "
-        &{template:custom}{{title=Damage}}{{subtitle= with @{character_name}'s @{weaponname} }} {{desc= Deals an astonishing [[[[@{weaponcritmod}*@{dnum}]]@{dtype}[Dice]+(0@{weaponcritmod}*(@{weapontodamage}+(floor(0@{weapontodamage}*@{twohanded}))))[Key Ability]+(0@{weaponcritmod}*(@{bonustodamage}[Feats]+@{enhancetoattack}[Magic]+(?{Do you have a miscellaneaous bonus to damage?|0})))+(0@{enchdamagedice})+(0@{extraenchdicecrit})]] damage to their target.}}
-        "
+        value="@{critweapondamage}"
        ></button></div>
       </div>
      </div>
@@ -2536,21 +2532,17 @@
      </div>
      <div class="ggridc">
       <div class="grr1 ggrid">
+       <input type="hidden" name="attr_weapondamage"/>
+       <input type="hidden" name="attr_critweapondamage"/>
        <div style="padding-bottom: 3px;" class="grc1 titleblock">Normal Damage:&nbsp;<button
         type="roll"
         name="roll_weapondamage"
-        value=
-         "
-        &{template:custom}{{title=Damage}}{{subtitle= with @{character_name}'s @{weaponname} }} {{desc= Deals [[(@{dnum}@{dtype})[Dice]+(@{weapontodamage})+(floor(@{weapontodamage}*@{twohanded}))[Key Ability]+(@{bonustodamage})[Feats]+@{enhancetoattack}[Magic]+(@{enchdamagedice}[Bonus])+(?{Do you have a miscellaneaous bonus to damage?|0})]] damage to their target.}}
-        "
+        value="@{weapondamage}"
        ></button></div>
        <div style="padding-bottom: 3px;" class="grc2 titleblock">Critical Damage:&nbsp;<button
         type="roll"
         name="roll_critweapondamage"
-        value=
-         "
-        &{template:custom}{{title=Damage}}{{subtitle= with @{character_name}'s @{weaponname} }} {{desc= Deals an astonishing [[[[@{weaponcritmod}*@{dnum}]]@{dtype}[Dice]+(0@{weaponcritmod}*(@{weapontodamage}+(floor(0@{weapontodamage}*@{twohanded}))))[Key Ability]+(0@{weaponcritmod}*(@{bonustodamage}[Feats]+@{enhancetoattack}[Magic]+(?{Do you have a miscellaneaous bonus to damage?|0})))+(0@{enchdamagedice})+(0@{extraenchdicecrit})]] damage to their target.}}
-         "
+        value="@{critweapondamage}"
        ></button></div>
       </div>
      </div>
@@ -4369,7 +4361,7 @@
                             `+${featbonus}[Feat Bonuses]+${enhance}[Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})]]}}`;
                     }
                 }
-                toSetAttrs = {};
+                let toSetAttrs = {};
                 toSetAttrs[`repeating_weapons${col}_fullattackroll`] = Macro;
                 setAttrs(toSetAttrs);
             });
@@ -4377,6 +4369,95 @@
     });
     // </editor-fold>
 
+    // <editor-fold desc="Damage Rolls">
+
+
+    // <editor-fold desc="Normal Damage">
+    WeaponCol.forEach(col => {
+     on(`change:repeating_weapons${col}:weapontodamage change:repeating_weapons${col}:dnum change:repeating_weapons${col}:dtype` +
+             ` change:repeating_weapons${col}:bonustodamage change:repeating_weapons${col}:enchdamagedice change:repeating_weapons${col}:weapondamagtype` +
+             ` change:repeating_weapons${col}:twohanded change:repeating_weapons${col}:enhancetoattack change:repeating_weapons${col}:weaponminimize`, function(){
+       getAttrs([`repeating_weapons${col}_weapontodamage`,`repeating_weapons${col}_dnum`,`repeating_weapons${col}_dtype`,
+        `repeating_weapons${col}_bonustodamage`,`repeating_weapons${col}_enchdamagedice`,`repeating_weapons${col}_weapondamagtype`,
+        `repeating_weapons${col}_twohanded`,`repeating_weapons${col}_enhancetoattack`],function(values){
+        let numberOfDice = (values[`repeating_weapons${col}_dnum`]) || 0;
+        let dieType = values[`repeating_weapons${col}_dtype`] || 0;
+        let featBonus = values[`repeating_weapons${col}_bonustodamage`];
+        let magicBonus = values[`repeating_weapons${col}_enhancetoattack`];
+        let magicDice = values[`repeating_weapons${col}_enchdamagedice`];
+        let damageType = values[`repeating_weapons${col}_weapondamagtype`];
+        let twoHanded = values[`repeating_weapons${col}_twohanded`];
+        let macro = `&{template:custom}{{title=Damage}}{{subtitle=@{character_name}'s @{weaponname}}}`;
+        if (twoHanded === "on"){
+         macro = macro + `{{desc=@{character_name} deals [[${numberOfDice}${dieType}+[[floor(@{weapontodamage}*1.5)]][Ability]`+
+                 `+${featBonus}[Feats/Other]+${magicBonus}[Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]]] physical damage `
+        }
+        if (twoHanded !=="on") {
+         macro = macro + `{{desc=@{character_name} deals [[${numberOfDice}${dieType}+[[@{weapontodamage}]][Ability]` +
+                 `+${featBonus}[Feats/Other]+${magicBonus}[Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]]] physical damage `
+        }
+        if (magicDice){
+         macro = macro + ` and [[${magicDice}[${damageType}]]] ${damageType} damage`;
+        }
+        macro = macro + ` with @{weaponname}.}}`;
+       let toSetAttrs = {};
+       toSetAttrs[`repeating_weapons${col}_weapondamage`] = macro;
+       setAttrs(toSetAttrs);
+      });
+     });
+    });
+    // </editor-fold>
+
+    // <editor-fold desc="Critical Damage">
+
+    WeaponCol.forEach(col => {
+     on(`change:repeating_weapons${col}:weapontodamage change:repeating_weapons${col}:dnum change:repeating_weapons${col}:dtype` +
+             ` change:repeating_weapons${col}:bonustodamage change:repeating_weapons${col}:enchdamagedice change:repeating_weapons${col}:weapondamagtype` +
+             ` change:repeating_weapons${col}:twohanded change:repeating_weapons${col}:enhancetoattack change:repeating_weapons${col}:weaponminimize` +
+             ` change:repeating_weapons${col}:weaponcritmod change:repeating_weapons${col}:extraenchdicecrit`, function() {
+      getAttrs([`repeating_weapons${col}_weapontodamage`, `repeating_weapons${col}_dnum`, `repeating_weapons${col}_dtype`,
+       `repeating_weapons${col}_bonustodamage`, `repeating_weapons${col}_enchdamagedice`, `repeating_weapons${col}_weapondamagtype`,
+       `repeating_weapons${col}_twohanded`, `repeating_weapons${col}_enhancetoattack`, `repeating_weapons${col}_extraenchdicecrit`,
+       `repeating_weapons${col}_weaponcritmod`], function (values) {
+       let numberOfDice = (values[`repeating_weapons${col}_dnum`]) || 0;
+       let dieType = values[`repeating_weapons${col}_dtype`] || 0;
+       let featBonus = values[`repeating_weapons${col}_bonustodamage`];
+       let magicBonus = values[`repeating_weapons${col}_enhancetoattack`];
+       let magicDice = values[`repeating_weapons${col}_enchdamagedice`];
+       let bonusCriticalDice = values[`repeating_weapons${col}_extraenchdicecrit`];
+       let criticalMultiplier = parseFloat(values[`repeating_weapons${col}_weaponcritmod`]) || 0;
+       let damageType = values[`repeating_weapons${col}_weapondamagtype`];
+       let twoHanded = values[`repeating_weapons${col}_twohanded`];
+       let macro = `&{template:custom}{{title=Critical Damage}}{{subtitle=@{character_name}'s @{weaponname}}}`;
+       if (twoHanded ==="on"){
+        macro = macro + `{{desc=@{character_name} deals an astonishing [[[[${numberOfDice}*${criticalMultiplier}]]${dieType}+`
+                +`[[(floor(@{weapontodamage}*1.5)*${criticalMultiplier})]][Ability]+[[(${featBonus}*${criticalMultiplier})]]`
+                +`[Feats/Other]+[[(${magicBonus}*${criticalMultiplier})]][Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]]]`;
+       }
+       if (twoHanded !=="on") {
+        macro = macro + `{{desc=@{character_name} deals an astonishing [[[[${numberOfDice}*${criticalMultiplier}]]${dieType}+`
+                +`[[(floor(@{weapontodamage})*${criticalMultiplier})]][Ability]+[[(${featBonus}*${criticalMultiplier})]]`
+                +`[Feats/Other]+[[(${magicBonus}*${criticalMultiplier})]][Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]]]`;
+       }
+       if (magicDice){
+        macro = macro + ` + [[${magicDice}[${damageType}]]] ${damageType} damage`;
+       }
+       if (bonusCriticalDice){
+        macro = macro + ` + [[${bonusCriticalDice}[Bonus Dice]]] bonus damage`
+       }
+       macro = macro + ` with @{weaponname}.}}`
+       let toSetAttrs = {};
+       toSetAttrs[`repeating_weapons${col}_critweapondamage`] = macro;
+       setAttrs(toSetAttrs);
+       });
+      });
+     });
+    // </editor-fold>
+
+
+    // </editor-fold>
+
+    // enchdamagedice
 </script>
 
 <!--</editor-fold-->
