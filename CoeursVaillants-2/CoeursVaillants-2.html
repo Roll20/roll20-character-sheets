@@ -1,4 +1,40 @@
-<!-- <input type="checkbox" name="attr_switch" class="sheet-block_switch" value="1"><div class="sheet-infoDesc">PNJ</div> -->
+<!-- ------------------------ -->
+<!-- Version mangement script -->
+<!-- ------------------------ -->
+<input name="attr_sheet_version" type="hidden" />
+<input name="attr_pvmax" type="hidden" />
+<input name="attr_aventureMax" type="hidden" />
+<script type="text/worker">
+// Version update for new or modified attributes
+on("sheet:opened", function() {
+    getAttrs(["pvmax","aventureMax","sheet_version"], function(values) {
+        const sheet_version = parseInt(values.sheet_version) || 0;
+        var attrs = {};
+
+        // get attribute updates for each version until the sheet has completed all steps
+        // NOTE: to maintain backwards compatibility with sheets predating the version attribute, all steps will be performed for new sheets
+        if (sheet_version < 1) {
+            attrs["sheet_version"] = 1;
+            attrs["pv_max"] = values.pvmax;
+            attrs["aventure_max"] = values.aventureMax;
+        }
+        
+        /*
+        * if (sheet_version < 2) {
+        *     attrs["sheet_version"] = 2;
+        * }
+        */
+
+        if (Object.keys(attrs).length) {
+            setAttrs(attrs);
+        }
+    });
+});
+</script>
+
+<!-- -------------- -->
+<!-- Sélecteur type -->
+<!-- -------------- -->
 <input name="attr_type_fiche" type="hidden" value="personnage"/>
 <div style="text-align: left;">
   <select class="sheet-block_switch" name="attr_type_fiche">
@@ -74,7 +110,7 @@
         <input type="checkbox" class="check-button check-buttonComp" id="checkCompVig" value="1" name="attr_CompVig"/>
         <label for="checkCompVig">Comp.</label>
 			</div>
-			<div class="sheet-infoDesc sheet-marginCarac">Vigueur</div> <!-- style="margin: -4px 0 9px 10px;" -->
+			<div class="sheet-infoDesc sheet-marginCarac">Vigueur</div>
       <!-- LIGNE DEX -->
 			<div class="sheet-ligne">
 				<button type='roll' name='roll_testDex' class="sheet-btRoll20deminiv sheet-btBig" value='&{template:jet} {{characterName=@{character_name}}} {{rollname=Test de Dextérité (½Niveau)}} {{carac=[[@{dex}]]}} {{rollResult1=[[1d20+[[floor((@{niveau}+@{niveau}*@{CompDex})/2)]][Bonus]]]}} {{rollResult2=[[1d20+[[floor((@{niveau}+@{niveau}*@{CompDex})/2)]][Bonus]]]}}'>Dex</button>
@@ -308,7 +344,6 @@ Talents :</textarea>
 <!-- FICHE PNJ -->
 <!-- ----------- -->
 <div class="sheet-main sheet-block_b">
-  <!-- <div class="sheet-mycol"> -->
   <!-- NOM -->
     <div class="sheet-ligne">
       <div class="sheet-libel2" style="width: 65px;">Nom</div><input type="text" name="attr_character_name" class='sheet-long'>
@@ -364,7 +399,6 @@ Talents :</textarea>
       <div class="sheet-libel2">Capacités</div>
       <textarea name="attr_pnjPermanent" class="sheet-text3col" style="resize: vertical; height: 300px;" placeholder="Capacités"></textarea>
     </div>
-  <!-- </div> -->
 </div>
 
 <!-- ----------- -->
