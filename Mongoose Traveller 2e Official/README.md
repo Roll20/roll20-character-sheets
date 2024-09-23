@@ -25,4 +25,15 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 
 - Removed all table elements
 
+### Version 1.0.04
+
+- Fixed URL to orange divider
+- Increased and normalised font sizes, borders, colours and spacing across sheet
+- Fixed bug in Ship sheet repeating blocks
+- Added 'Current Characteristic Values' toggle to allow characteristics to use absolute levels rather than 'Temp' offsets and set the _max version of a version of these attributes to allow better representation on tokens
+- Added missing translations
+- Updated character sheet image
+- Fixed Jack-of-All-Trades not updating untrained skill DMs properly
+
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
