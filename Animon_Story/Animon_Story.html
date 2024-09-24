@@ -16,45 +16,146 @@
 		damage: [1, 2, 2, 3, 4],
 	};
 
+	on("clicked:animon_evolve clicked:animon_devolve", function(eventInfo) {
+		const delta = eventInfo.htmlAttributes.name === "act_animon_evolve" ? 1 : -1;
+		getAttrs(["display_animon_evo"], function(values) {
+			var output = {};
+			const evo = values["display_animon_evo"];
+			const newEvo = (animonLevels.indexOf(evo) + delta + animonLevels.length) % animonLevels.length;
+			const evoStage = animonLevels[newEvo];
+
+			output["display_animon_evo"] = evoStage;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:display_animon_evo", function(eventInfo) {
+		const evoStage = eventInfo.newValue;
+
+		var attrs_to_get = [
+			`${evoStage}_animon_name`,
+			`${evoStage}_animon_nature`,
+			`${evoStage}_animon_class`,
+			`${evoStage}_animon_element`,
+			`${evoStage}_animon_heart`,
+			`${evoStage}_animon_power`,
+			`${evoStage}_animon_agility`,
+			`${evoStage}_animon_brains`,
+			`${evoStage}_animon_hp`,
+			`${evoStage}_animon_damage`,
+			`${evoStage}_animon_dodge`,
+			`${evoStage}_animon_initiative`,
+			`${evoStage}_animon_sigAttack_name`,
+			`${evoStage}_animon_sigAttack_rank`,
+			`${evoStage}_animon_sigAttack_element`,
+			`${evoStage}_animon_sigAttack_effect1`,
+			`${evoStage}_animon_sigAttack_effect2`,
+			`${evoStage}_animon_sigAttack_effect3`,
+			`${evoStage}_animon_quality_1`,
+			`${evoStage}_animon_quality_1_rank`,
+			`${evoStage}_animon_quality_2`,
+			`${evoStage}_animon_quality_2_rank`
+		];
+
+		getAttrs(attrs_to_get, function(values) {
+			var output = {};
+
+			const name = values[`${evoStage}_animon_name`];
+			const nature = values[`${evoStage}_animon_nature`];
+			const animonClass = values[`${evoStage}_animon_class`];
+			const element = values[`${evoStage}_animon_element`];
+			const heart = values[`${evoStage}_animon_heart`];
+			const power = values[`${evoStage}_animon_power`];
+			const agility = values[`${evoStage}_animon_agility`];
+			const brains = values[`${evoStage}_animon_brains`];
+			const hp = values[`${evoStage}_animon_hp`];
+			const damage = values[`${evoStage}_animon_damage`];
+			const dodge = values[`${evoStage}_animon_dodge`];
+			const initiative = values[`${evoStage}_animon_initiative`];
+			const sigAttackName = values[`${evoStage}_animon_sigAttack_name`];
+			const sigAttackRank = values[`${evoStage}_animon_sigAttack_rank`];
+			const sigAttackElement = values[`${evoStage}_animon_sigAttack_element`];
+			const sigAttackEffect1 = values[`${evoStage}_animon_sigAttack_effect1`];
+			const sigAttackEffect2 = values[`${evoStage}_animon_sigAttack_effect2`];
+			const sigAttackEffect3 = values[`${evoStage}_animon_sigAttack_effect3`];
+			const quality1 = values[`${evoStage}_animon_quality_1`];
+			const quality1Rank = values[`${evoStage}_animon_quality_1_rank`];
+			const quality2 = values[`${evoStage}_animon_quality_2`];
+			const quality2Rank = values[`${evoStage}_animon_quality_2_rank`];
+
+			output["display_animon_name"] = name;
+			output["display_animon_nature"] = nature;
+			output["display_animon_class"] = animonClass;
+			output["display_animon_element"] = element;
+			output["display_animon_heart"] = heart;
+			output["display_animon_power"] = power;
+			output["display_animon_agility"] = agility;
+			output["display_animon_brains"] = brains;
+			output["display_animon_hp"] = hp;
+			output["display_animon_damage"] = damage;
+			output["display_animon_dodge"] = dodge;
+			output["display_animon_initiative"] = initiative;
+			output["display_animon_sigAttack_name"] = sigAttackName;
+			output["display_animon_sigAttack_rank"] = sigAttackRank;
+			output["display_animon_sigAttack_element"] = sigAttackElement;
+			output["display_animon_sigAttack_effect1"] = sigAttackEffect1;
+			output["display_animon_sigAttack_effect2"] = sigAttackEffect2;
+			output["display_animon_sigAttack_effect3"] = sigAttackEffect3;
+			output["display_animon_quality_1"] = quality1;
+			output["display_animon_quality_1_rank"] = quality1Rank;
+			output["display_animon_quality_2"] = quality2;
+			output["display_animon_quality_2_rank"] = quality2Rank;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
 	animonLevels.forEach((level, index) => {
-		on(`change:${level}_animon_heart`, function(eventInfo) {
-			const baseHeart = parseInt(eventInfo.newValue);
-			const heart = Math.max(1, Math.min(baseHeart, maxValues.maxAttr[index]));
-			const output = {
-				[eventInfo.sourceAttribute]: heart,
-				[`${level}_animon_hp_max`]: maxValues.hp[index] + heart * maxValues.hpMult[index]
-			};
-			setAttrs(output);
+		on(`change:${level}_animon_heart change:bonusHP_${level} change:bonusHPMultiplier_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_heart`, `bonusHP_${level}`, `bonusHPMultiplier_${level}`], function(values) {
+				const heart = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_heart`])));
+				const bonusHp = parseInt(values[`bonusHP_${level}`]);
+				const heartMult = parseInt(values[`bonusHPMultiplier_${level}`]);
+				setAttrs({
+					[`${level}_animon_heart`]: heart,
+					[`${level}_animon_hp_max`]: bonusHp + maxValues.hp[0] + heart * (maxValues.hpMult[0] + heartMult)
+				}, {silent: true});
+			});
 		});
 
-		on(`change:${level}_animon_power`, function(eventInfo) {
-			const basePower = parseInt(eventInfo.newValue);
-			const power = Math.max(1, Math.min(basePower, maxValues.maxAttr[index]));
-			const output = {
-				[eventInfo.sourceAttribute]: power,
-				[`${level}_animon_damage`]: power * maxValues.damage[index]
-			};
-			setAttrs(output);
+		on(`change:${level}_animon_power change:bonusDamage_${level} change:bonusDamageMultiplier_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_power`, `bonusDamage_${level}`, `bonusDamageMultiplier_${level}`], function(values) {
+				const power = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_power`])));
+				const bonusDamage = parseInt(values[`bonusDamage_${level}`]);
+				const powerMult = parseInt(values[`bonusDamageMultiplier_${level}`]);
+				setAttrs({
+					[`${level}_animon_power`]: power,
+					[`${level}_animon_damage`]: bonusDamage + power * (powerMult + maxValues.damage[index])
+				}, {silent: true});
+			});
 		});
 
-		on(`change:${level}_animon_agility`, function(eventInfo) {
-			const baseAgility = parseInt(eventInfo.newValue);
-			const agility = Math.max(1, Math.min(baseAgility, maxValues.maxAttr[index]));
-			const output = {
-				[eventInfo.sourceAttribute]: agility,
-				[`${level}_animon_dodge`]: agility
-			};
-			setAttrs(output);
+		on(`change:${level}_animon_agility change:bonusDodge_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_agility`, `bonusDodge_${level}`], function(values) {
+				const agility = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_agility`])));
+				const bonusDodge = parseInt(values[`bonusDodge_${level}`]);
+				setAttrs({
+					[`${level}_animon_agility`]: agility,
+					[`${level}_animon_dodge`]: bonusDodge + agility
+				}, {silent: true});
+			});
 		});
 
-		on(`change:${level}_animon_brains`, function(eventInfo) {
-			const baseBrains = parseInt(eventInfo.newValue);
-			const brains = Math.max(1, Math.min(baseBrains, maxValues.maxAttr[index]));
-			const output = {
-				[eventInfo.sourceAttribute]: brains,
-				[`${level}_animon_initiative`]: brains
-			};
-			setAttrs(output);
+		on(`change:${level}_animon_brains change:bonusInitiative_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_brains`, `bonusInitiative_${level}`], function(values) {
+				const brains = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_brains`])));
+				const bonusInitiative = parseInt(values[`bonusInitiative_${level}`]);
+				setAttrs({
+					[`${level}_animon_brains`]: brains,
+					[`${level}_animon_initiative`]: bonusInitiative + brains
+				}, {silent: true});
+			});
 		});
 	});
 </script>
@@ -269,7 +370,6 @@
 		</section>
 		<div>
 			<section>
-
 				<article>
 					<header>
 						<h2>Bond Level</h2>
@@ -316,12 +416,126 @@
 				</article>
 			</section>
 			<section>
-				<input type="hidden" name="attr_animon_evo" value="0" />
+				<input type="hidden" name="attr_display_animon_evo" value="basic" />
 				<article>
 					<button type="action" name="act_animon_devolve">←</button>
 					<h2>Animon:</h2>
-					<span name="attr_animon_evo"></span>
-					<span name="attr_animon_name"></span>
+					<div style="display: flex; flex-flow: column;">
+						<div>
+							<span>Stage:</span>
+							<span name="attr_display_animon_evo" class="sheet-stage"></span>
+						</div>
+						<div>
+							<span>Name:</span>
+							<input type="hidden" name="attr_display_animon_name" />
+							<span name="attr_display_animon_name"></span>
+						</div>
+						<div>
+							<span>Nature:</span>
+							<input type="hidden" name="attr_display_animon_nature" />
+							<span name="attr_display_animon_nature"></span>
+						</div>
+						<div>
+							<span>Class:</span>
+							<input type="hidden" name="attr_display_animon_class" />
+							<span name="attr_display_animon_class"></span>
+						</div>
+						<div>
+							<span>Element:</span>
+							<input type="hidden" name="attr_display_animon_element" />
+							<span name="attr_display_animon_element"></span>
+						</div>
+						<div>
+							<span>Heart:</span>
+							<input type="hidden" name="attr_display_animon_heart" />
+							<span name="attr_display_animon_heart"></span>
+						</div>
+						<div>
+							<span>Power:</span>
+							<input type="hidden" name="attr_display_animon_power" />
+							<span name="attr_display_animon_power"></span>
+						</div>
+						<div>
+							<span>Agility:</span>
+							<input type="hidden" name="attr_display_animon_agility" />
+							<span name="attr_display_animon_agility"></span>
+						</div>
+						<div>
+							<span>Brains:</span>
+							<input type="hidden" name="attr_display_animon_brains" />
+							<span name="attr_display_animon_brains"></span>
+						</div>
+						<div>
+							<span>HP:</span>
+							<input type="hidden" name="attr_display_animon_hp" />
+							<span name="attr_display_animon_hp"></span>
+						</div>
+						<div>
+							<span>Damage:</span>
+							<input type="hidden" name="attr_display_animon_damage" />
+							<span name="attr_display_animon_damage"></span>
+						</div>
+						<div>
+							<span>Dodge:</span>
+							<input type="hidden" name="attr_display_animon_dodge" />
+							<span name="attr_display_animon_dodge"></span>
+						</div>
+						<div>
+							<span>Initiative:</span>
+							<input type="hidden" name="attr_display_animon_initiative" />
+							<span name="attr_display_animon_initiative"></span>
+						</div>
+						<div>
+							<span>Sig. Attack:</span>
+							<input type="hidden" name="attr_display_animon_sigAttack_name" />
+							<span name="attr_display_animon_sigAttack_name"></span>
+						</div>
+						<div>
+							<span>Rank:</span>
+							<input type="hidden" name="attr_display_animon_sigAttack_rank" />
+							<span name="attr_display_animon_sigAttack_rank"></span>
+						</div>
+						<div>
+							<span>Element:</span>
+							<input type="hidden" name="attr_display_animon_sigAttack_element" />
+							<span name="attr_display_animon_sigAttack_element"></span>
+						</div>
+						<div>
+							<span>Effect 1:</span>
+							<input type="hidden" name="attr_display_animon_sigAttack_effect1" />
+							<span name="attr_display_animon_sigAttack_effect1"></span>
+						</div>
+						<div>
+							<span>Effect 2:</span>
+							<input type="hidden" name="attr_display_animon_sigAttack_effect2" />
+							<span name="attr_display_animon_sigAttack_effect2"></span>
+						</div>
+						<div>
+							<span>Effect 3:</span>
+							<input type="hidden" name="attr_display_animon_sigAttack_effect3" />
+							<span name="attr_display_animon_sigAttack_effect3"></span>
+						</div>
+						<div>
+							<span>Quality 1:</span>
+							<input type="hidden" name="attr_display_animon_quality_1" />
+							<span name="attr_display_animon_quality_1"></span>
+						</div>
+						<div>
+							<span>Rank:</span>
+							<input type="hidden" name="attr_display_animon_quality_1_rank" />
+							<span name="attr_display_animon_quality_1_rank"></span>
+						</div>
+						<div>
+							<span>Quality 2:</span>
+							<input type="hidden" name="attr_display_animon_quality_2" />
+							<span name="attr_display_animon_quality_2"></span>
+						</div>
+						<div>
+							<span>Rank:</span>
+							<input type="hidden" name="attr_display_animon_quality_2_rank" />
+							<span name="attr_display_animon_quality_2_rank"></span>
+						</div>
+					</div>
 					<button type="action" name="act_animon_evolve">→</button>
 				</article>
 			</section>
@@ -331,7 +545,7 @@
 	<div class="sheet-animon">
 		<section>
 			<article>
-				<h3>Fledgling</h3>
+				<h3 class="sheet-stage">Fledgling</h3>
 			</article>
 			<article>
 				<span>Name:</span>
@@ -401,13 +615,13 @@
 			<input type="hidden" name="attr_fledgling_animon_sigAttack_effect2" value="/" />
 			<input type="hidden" name="attr_fledgling_animon_sigAttack_effect3" value="/" />
 			<input type="hidden" name="attr_fledgling_animon_quality_1" value="/" />
-			<input type="hidden" name="attr_fledgling_animon_quality_2_rank" value="/" />
+			<input type="hidden" name="attr_fledgling_animon_quality_1_rank" value="/" />
 			<input type="hidden" name="attr_fledgling_animon_quality_2" value="/" />
 			<input type="hidden" name="attr_fledgling_animon_quality_2_rank" value="/" />
 		</section>
 		<section>
 			<article>
-				<h3>Basic</h3>
+				<h3 class="sheet-stage">Basic</h3>
 			</article>
 			<article>
 				<h2>Stats</h2>
@@ -524,7 +738,7 @@
 		</section>
 		<section>
 			<article>
-				<h3>Super</h3>
+				<h3 class="sheet-stage">Super</h3>
 			</article>
 			<article>
 				<h2>Stats</h2>
@@ -641,7 +855,7 @@
 		</section>
 		<section>
 			<article>
-				<h3>Ultra</h3>
+				<h3 class="sheet-stage">Ultra</h3>
 			</article>
 			<article>
 				<h2>Stats</h2>
@@ -758,7 +972,7 @@
 		</section>
 		<section>
 			<article>
-				<h3>Giga</h3>
+				<h3 class="sheet-stage">Giga</h3>
 			</article>
 			<article>
 				<h2>Stats</h2>
@@ -876,7 +1090,203 @@
 	</div>
 
 	<div class="sheet-option">
-		<h1>Option</h1>
+		<section>
+			<article>
+				<h3>Roll type</h3>
+				<div>
+					<span>Roll visibility:</span>
+					<select name="attr_rollWhisperType">
+						<option value="" selected><span>Show rolls</span></option>
+						<option value="?{Whisper?|Public Roll,|Whisper Roll,/w gm }"><span>Ask each time</span></option>
+						<option value="/w gm"><span>Always whisper</span></option>
+					</select>
+				</div>
+			</article>
+			<article>
+				<h3>Roll popup</h3>
+				<div>
+					<span>Pops every time:</span>
+					<input type="checkbox" name="attr_rollPopup" />
+				</div>
+				<div>
+					<span>Default bonus dice:</span>
+					<input type="number" name="attr_defaultBonusDice" value="0" />
+				</div>
+				<div>
+					<span>Default modifier:</span>
+					<select name="attr_rollModifier">
+						<option value="6">Double Setback</option>
+						<option value="5">Setback</option>
+						<option value="4" selected>Normal</option>
+						<option value="3">Boost</option>
+						<option value="2">Double Boost</option>
+					</select>
+				</div>
+			</article>
+		</section>
+		<section>
+			<article>
+				<h3>Bonus HP</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusHP_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusHP_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusHP_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusHP_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusHP_giga" value="0" />
+				</div>
+			</article>
+			<article>
+				<h3>Bonus HP Multiplier</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusHPMultiplier_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusHPMultiplier_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusHPMultiplier_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusHPMultiplier_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusHPMultiplier_giga" value="0" />
+				</div>
+			</article>
+			<article>
+				<h3>Bonus Damage</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusDamage_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusDamage_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusDamage_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusDamage_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusDamage_giga" value="0" />
+				</div>
+			</article>
+			<article>
+				<h3>Bonus Damage Multiplier</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusDamageMultiplier_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusDamageMultiplier_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusDamageMultiplier_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusDamageMultiplier_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusDamageMultiplier_giga" value="0" />
+				</div>
+			</article>
+			<article>
+				<h3>Bonus Dodge</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusDodge_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusDodge_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusDodge_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusDodge_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusDodge_giga" value="0" />
+				</div>
+			</article>
+			<article>
+				<h3>Bonus Initiative</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusInitiative_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusInitiative_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusInitiative_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusInitiative_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusInitiative_giga" value="0" />
+				</div>
+			</article>
+			<article>
+				<h3>Bonus Sig. Attack</h3>
+				<div>
+					<span class="sheet-stage">Fledgling:</span>
+					<input type="number" name="attr_bonusSigAttack_fledgling" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Basic:</span>
+					<input type="number" name="attr_bonusSigAttack_basic" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Super:</span>
+					<input type="number" name="attr_bonusSigAttack_super" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Ultra:</span>
+					<input type="number" name="attr_bonusSigAttack_ultra" value="0" />
+				</div>
+				<div>
+					<span class="sheet-stage">Giga:</span>
+					<input type="number" name="attr_bonusSigAttack_giga" value="0" />
+				</div>
+			</article>
+		</section>
 	</div>
 </div>
 </html>
