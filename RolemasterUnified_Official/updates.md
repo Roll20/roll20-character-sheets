@@ -1,3 +1,23 @@
+# 2024-9-24
+
+A number of small updates this week.  Starting some work to fix a mumber of other wierd bugs; but nothing yet.
+Thank you to all who have reported problems.  Please let me know if there are more.
+
+- Dark mode tweaks for side panel, and the crit box.  Dark mode is still a long
+  way from complete on the main sheet; but the side panel should be usual.
+- Spell rank modifier when casting; missed that in the other massive improvements.
+- Don't barf AP updates on New Combat. 
+- Fix for weight allowance (thanks spaturno80).  I totally misread those rules.  Like totally.
+- Creature sheet improvements for skills and other items.
+- Async: Recover is a few more wierd situations (thanks major__havoc).
+- Spells: Show trickery and grace bonuses in spells.  This is the sort of
+  feature you get when I play with the sheet, not just GM with the sheet.
+
+[Compendium]
+Add base lists by profession to the spell law list. Treasure Law data imported
+for most non-magical items.  Chapter 1 complete.  Chapter 2 is 75% complete.
+Monsters for other modules are getting ready too.
+
 # 2024-9-19
 
 Urgent fix for a roll20 API change.  Some of the values in fields from the
