@@ -191,7 +191,7 @@ The only trick to the Complications section is to remember that points gained fr
 
 The last page of this sheet contains a number of options.
 
-Character Options:
+#### Character Options:
 
 ### Use Characteristic Maximums
 
@@ -259,7 +259,7 @@ If you prefer an accounting only of spent character points, uncheck this option.
 
 Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
 
-### `Whisper Rolls to GM
+### Whisper Rolls to GM
 
 This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
@@ -275,7 +275,7 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 ### HERO Roller
 
-If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. It is not currently 100% compatible due to case sensitivity (HS6e uses *OCV* and HS6eH uses *ocv*). Adding a fix for this issue is on my list of things to do.
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. It is not currently 100% compatible due to a case sensitivity problem (HS6e uses *OCV* and HS6eH uses *ocv*). Adding a fix for this issue is on my list of things to do.
 
 # <a id="tokens">Tokens</a>
 
