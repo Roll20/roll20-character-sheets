@@ -5,8 +5,8 @@ This character sheet is designed for use in heroic-level Hero System games such 
 
 The number of skills (30 general skills, 7 combat skills, 9 maneuvers, and 9 languages) and powers (20) is hard-coded to handle the background math and for aesthetics, but should be sufficient for most cases.
 
-> [!TIP]
-> For help, comments, feature requests, or bug reports please contact Villain In Glasses on Roll20 or consider this [HERO Games forum thread](https://www.herogames.com/forums/topic/101627-new-roll20-character-sheet-hero-system-6e-heroic/).
+> [!NOTE]
+> For help, comments, feature requests, or bug reports please contact [Villain In Glasses](https://app.roll20.net/users/633423/villain-in-glasses) on [Roll20](https://roll20.net) or consider this [HERO Games forum thread](https://www.herogames.com/forums/topic/101627-new-roll20-character-sheet-hero-system-6e-heroic/).
 
 ## Contents
 
