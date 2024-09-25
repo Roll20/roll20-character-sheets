@@ -1,165 +1,5 @@
 <!DOCTYPE html>
 
-<script type="text/worker">
-	const buttonList = ["character", "action", "animon", "option"];
-	buttonList.forEach(button => {
-		on(`clicked:${button}`, function() {
-			setAttrs({sheetTab: button});
-		});
-	});
-
-	const animonLevels = ["fledgling", "basic", "super", "ultra", "giga"];
-	const maxValues = {
-		maxAttr: [3, 4, 5, 6, 6],
-		hp: [0, 5, 10, 15, 20],
-		hpMult: [3, 3, 4, 5, 6],
-		damage: [1, 2, 2, 3, 4],
-	};
-
-	on("clicked:animon_evolve clicked:animon_devolve", function(eventInfo) {
-		const delta = eventInfo.htmlAttributes.name === "act_animon_evolve" ? 1 : -1;
-		getAttrs(["display_animon_evo"], function(values) {
-			var output = {};
-			const evo = values["display_animon_evo"];
-			const newEvo = (animonLevels.indexOf(evo) + delta + animonLevels.length) % animonLevels.length;
-			const evoStage = animonLevels[newEvo];
-
-			output["display_animon_evo"] = evoStage;
-
-			setAttrs(output, {silent: false});
-		});
-	});
-
-	on("change:display_animon_evo", function(eventInfo) {
-		const evoStage = eventInfo.newValue;
-
-		var attrs_to_get = [
-			`${evoStage}_animon_name`,
-			`${evoStage}_animon_nature`,
-			`${evoStage}_animon_class`,
-			`${evoStage}_animon_element`,
-			`${evoStage}_animon_heart`,
-			`${evoStage}_animon_power`,
-			`${evoStage}_animon_agility`,
-			`${evoStage}_animon_brains`,
-			`${evoStage}_animon_hp`,
-			`${evoStage}_animon_damage`,
-			`${evoStage}_animon_dodge`,
-			`${evoStage}_animon_initiative`,
-			`${evoStage}_animon_sigAttack_name`,
-			`${evoStage}_animon_sigAttack_rank`,
-			`${evoStage}_animon_sigAttack_element`,
-			`${evoStage}_animon_sigAttack_effect1`,
-			`${evoStage}_animon_sigAttack_effect2`,
-			`${evoStage}_animon_sigAttack_effect3`,
-			`${evoStage}_animon_quality_1`,
-			`${evoStage}_animon_quality_1_rank`,
-			`${evoStage}_animon_quality_2`,
-			`${evoStage}_animon_quality_2_rank`
-		];
-
-		getAttrs(attrs_to_get, function(values) {
-			var output = {};
-
-			const name = values[`${evoStage}_animon_name`];
-			const nature = values[`${evoStage}_animon_nature`];
-			const animonClass = values[`${evoStage}_animon_class`];
-			const element = values[`${evoStage}_animon_element`];
-			const heart = values[`${evoStage}_animon_heart`];
-			const power = values[`${evoStage}_animon_power`];
-			const agility = values[`${evoStage}_animon_agility`];
-			const brains = values[`${evoStage}_animon_brains`];
-			const hp = values[`${evoStage}_animon_hp`];
-			const damage = values[`${evoStage}_animon_damage`];
-			const dodge = values[`${evoStage}_animon_dodge`];
-			const initiative = values[`${evoStage}_animon_initiative`];
-			const sigAttackName = values[`${evoStage}_animon_sigAttack_name`];
-			const sigAttackRank = values[`${evoStage}_animon_sigAttack_rank`];
-			const sigAttackElement = values[`${evoStage}_animon_sigAttack_element`];
-			const sigAttackEffect1 = values[`${evoStage}_animon_sigAttack_effect1`];
-			const sigAttackEffect2 = values[`${evoStage}_animon_sigAttack_effect2`];
-			const sigAttackEffect3 = values[`${evoStage}_animon_sigAttack_effect3`];
-			const quality1 = values[`${evoStage}_animon_quality_1`];
-			const quality1Rank = values[`${evoStage}_animon_quality_1_rank`];
-			const quality2 = values[`${evoStage}_animon_quality_2`];
-			const quality2Rank = values[`${evoStage}_animon_quality_2_rank`];
-
-			output["display_animon_name"] = name;
-			output["display_animon_nature"] = nature;
-			output["display_animon_class"] = animonClass;
-			output["display_animon_element"] = element;
-			output["display_animon_heart"] = heart;
-			output["display_animon_power"] = power;
-			output["display_animon_agility"] = agility;
-			output["display_animon_brains"] = brains;
-			output["display_animon_hp"] = hp;
-			output["display_animon_damage"] = damage;
-			output["display_animon_dodge"] = dodge;
-			output["display_animon_initiative"] = initiative;
-			output["display_animon_sigAttack_name"] = sigAttackName;
-			output["display_animon_sigAttack_rank"] = sigAttackRank;
-			output["display_animon_sigAttack_element"] = sigAttackElement;
-			output["display_animon_sigAttack_effect1"] = sigAttackEffect1;
-			output["display_animon_sigAttack_effect2"] = sigAttackEffect2;
-			output["display_animon_sigAttack_effect3"] = sigAttackEffect3;
-			output["display_animon_quality_1"] = quality1;
-			output["display_animon_quality_1_rank"] = quality1Rank;
-			output["display_animon_quality_2"] = quality2;
-			output["display_animon_quality_2_rank"] = quality2Rank;
-
-			setAttrs(output, {silent: false});
-		});
-	});
-
-	animonLevels.forEach((level, index) => {
-		on(`change:${level}_animon_heart change:bonusHP_${level} change:bonusHPMultiplier_${level}`, function(eventInfo) {
-			getAttrs([`${level}_animon_heart`, `bonusHP_${level}`, `bonusHPMultiplier_${level}`], function(values) {
-				const heart = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_heart`])));
-				const bonusHp = parseInt(values[`bonusHP_${level}`]);
-				const heartMult = parseInt(values[`bonusHPMultiplier_${level}`]);
-				setAttrs({
-					[`${level}_animon_heart`]: heart,
-					[`${level}_animon_hp_max`]: bonusHp + maxValues.hp[0] + heart * (maxValues.hpMult[0] + heartMult)
-				}, {silent: true});
-			});
-		});
-
-		on(`change:${level}_animon_power change:bonusDamage_${level} change:bonusDamageMultiplier_${level}`, function(eventInfo) {
-			getAttrs([`${level}_animon_power`, `bonusDamage_${level}`, `bonusDamageMultiplier_${level}`], function(values) {
-				const power = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_power`])));
-				const bonusDamage = parseInt(values[`bonusDamage_${level}`]);
-				const powerMult = parseInt(values[`bonusDamageMultiplier_${level}`]);
-				setAttrs({
-					[`${level}_animon_power`]: power,
-					[`${level}_animon_damage`]: bonusDamage + power * (powerMult + maxValues.damage[index])
-				}, {silent: true});
-			});
-		});
-
-		on(`change:${level}_animon_agility change:bonusDodge_${level}`, function(eventInfo) {
-			getAttrs([`${level}_animon_agility`, `bonusDodge_${level}`], function(values) {
-				const agility = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_agility`])));
-				const bonusDodge = parseInt(values[`bonusDodge_${level}`]);
-				setAttrs({
-					[`${level}_animon_agility`]: agility,
-					[`${level}_animon_dodge`]: bonusDodge + agility
-				}, {silent: true});
-			});
-		});
-
-		on(`change:${level}_animon_brains change:bonusInitiative_${level}`, function(eventInfo) {
-			getAttrs([`${level}_animon_brains`, `bonusInitiative_${level}`], function(values) {
-				const brains = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_brains`])));
-				const bonusInitiative = parseInt(values[`bonusInitiative_${level}`]);
-				setAttrs({
-					[`${level}_animon_brains`]: brains,
-					[`${level}_animon_initiative`]: bonusInitiative + brains
-				}, {silent: true});
-			});
-		});
-	});
-</script>
-
 <html>
 <div class="charsheet">
 	<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="character" />
@@ -181,36 +21,47 @@
 
 	<div class="sheet-character sheet-tab">
 		<section>
-
 			<header>
 				<h1>Character Sheet</h1>
 			</header>
 			<article>
-				<input type="text" name="attr_character_player" placeholder="Player Name" />
-				<input type="text" name="attr_character_name" placeholder="Character Name" />
-				<input type="text" name="attr_virtue" placeholder="Virtue" />
-				<input type="text" name="attr_desire" placeholder="Desire" />
-				<input type="text" name="attr_flaw" placeholder="Flaw" />
-				<input type="text" name="attr_specialItem" placeholder="Special Item" />
+				<input type="text" name="attr_character_player" placeholder="Player Name" title="Enter the player's name" />
+				<input type="text" name="attr_character_name" placeholder="Character Name" title="Enter the character's name" />
+				<input type="text" name="attr_virtue" placeholder="Virtue" title="Enter the character's virtue" />
+				<input type="text" name="attr_desire" placeholder="Desire" title="Enter the character's desire" />
+				<input type="text" name="attr_flaw" placeholder="Flaw" title="Enter the character's flaw" />
+				<input type="text" name="attr_specialItem" placeholder="Special Item" title="Enter the character's special item" />
 			</article>
 			<article>
 				<header>
 					<h2>Traits</h2>
 				</header>
-				<input type="number" name="attr_trait_logic" value="0" />
-				<input type="number" name="attr_trait_reflex" value="0" />
-				<input type="number" name="attr_trait_spirit" value="0" />
+				<div>
+					<span>Logic</span>
+					<input type="number" name="attr_trait_logic" value="0" />
+					<button type="roll" name="act_roll_trait_logic" value="@{rollWhisperType} &{template:default} {{name=@{character_name} Logic}} {{attack=[[ [[@{trait_logic} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}" />
+				</div>
+				<div>
+					<span>Reflex</span>
+					<input type="number" name="attr_trait_reflex" value="0" />
+					<button type="roll" name="act_roll_trait_reflex" value="@{rollWhisperType} &{template:default} {{name=@{character_name} Reflex}} {{attack=[[ [[@{trait_reflex} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}" />
+				</div>
+				<div>
+					<span>Spirit</span>
+					<input type="number" name="attr_trait_spirit" value="0" />
+					<button type="roll" name="act_roll_trait_spirit" value="@{rollWhisperType} &{template:default} {{name=@{character_name} Spirit}} {{attack=[[ [[@{trait_spirit} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}" />
+				</div>
 			</article>
 			<article>
 				<header>
 					<div>
 						<h2>Kid Type:</h2>
-						<span name="attr_kidType_name"></span>
+						<input type="text" name="attr_kidType_name" placeholder="Kid Type" title="Enter the kid's type" />
 					</div>
 					<div>
 						<legend>Type Feature:</legend>
-						<input type="text" name="attr_kidType_name" placeholder="Name" />
-						<textarea name="attr_kidType_feature" placeholder=""></textarea>
+						<input type="text" name="attr_kidType_name" placeholder="Name" title="Enter the kid's type name" />
+						<textarea name="attr_kidType_feature" placeholder="" title="Describe the kid's type feature"></textarea>
 					</div>
 				</header>
 			</article>
@@ -254,8 +105,9 @@
 				</header>
 				<fieldset class="repeating_talent">
 					<div class="repeating_talent_row">
-						<input type="text" name="attr_talent_name" placeholder="Name" />
-						<input type="number" name="attr_talent_rank" value="0" />
+						<button type="roll" value="@{rollWhisperType} &{template:default} {{name=@{character_name} @{talent_name}}} {{attack=[[ [[@{talent_rank} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}" />
+						<input type="text" name="attr_talent_name" placeholder="Name" title="Talent's name" />
+						<input type="number" name="attr_talent_rank" value="1" title="Talent's rank" />
 					</div>
 				</fieldset>
 			</article>
@@ -305,9 +157,18 @@
 				<header>
 					<h2>Traits</h2>
 				</header>
-				<input type="number" name="attr_trait_logic" value="0" />
-				<input type="number" name="attr_trait_reflex" value="0" />
-				<input type="number" name="attr_trait_spirit" value="0" />
+				<div>
+					<span>Logic</span>
+					<button type="roll" value="@{rollWhisperType} &{template:default} {{name=@{character_name} Logic}} {{attack=[[ [[@{trait_logic} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}"><span name="attr_trait_logic"></span></button>
+				</div>
+				<div>
+					<span>Reflex</span>
+					<button type="roll" value="@{rollWhisperType} &{template:default} {{name=@{character_name} Reflex}} {{attack=[[ [[@{trait_reflex} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}"><span name="attr_trait_reflex"></span></button>
+				</div>
+				<div>
+					<span>Spirit</span>
+					<button type="roll" value="@{rollWhisperType} &{template:default} {{name=@{character_name} Spirit}} {{attack=[[ [[@{trait_spirit} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}"><span name="attr_trait_spirit"></span></button>
+				</div>
 			</article>
 			<article>
 				<header>
@@ -317,8 +178,10 @@
 					</div>
 					<div>
 						<legend>Type Feature:</legend>
-						<input type="text" name="attr_kidType_name" placeholder="Name" />
-						<textarea name="attr_kidType_feature" placeholder=""></textarea>
+						<span name="attr_kidType_name" />
+						<div>
+							<span name="attr_kidType_feature" />
+						</div>
 					</div>
 				</header>
 			</article>
@@ -328,7 +191,6 @@
 						<h2>Stamina</h2>
 					</header>
 					<input type="number" name="attr_stamina" value="0" />
-					<input type="hidden" name="attr_stamina_max" value="10" />
 					<span name="attr_stamina_max"></span>
 				</article>
 				<article>
@@ -360,10 +222,11 @@
 					<h2>Talents:</h2>
 					<h2>Rank:</h2>
 				</header>
-				<fieldset class="repeating_talent">
+				<fieldset class="repeating_talent sheet-noModifs">
 					<div class="repeating_talent_row">
-						<input type="text" name="attr_talent_name" placeholder="Name" />
-						<input type="number" name="attr_talent_rank" value="0" />
+						<button type="roll" value="@{rollWhisperType} &{template:default} {{name=@{character_name} @{talent_name}}} {{attack=[[ [[@{talent_rank} + ?{Bonus dice|0}]]d6>?{Modifier|Normal,4|Double Setback,6|Setback,5|Boost,3|Double Boost,2}]]}}" />
+						<span name="attr_talent_name" />
+						<span name="attr_talent_rank" />
 					</div>
 				</fieldset>
 			</article>
@@ -374,7 +237,7 @@
 					<header>
 						<h2>Bond Level</h2>
 					</header>
-					<input type="number" name="attr_bondLevel" value="0" />
+					<input type="number" name="attr_bondLevel" value="1" />
 				</article>
 				<article>
 					<header>
@@ -398,7 +261,8 @@
 						<h2>Bond points</h2>
 					</header>
 					<input type="number" name="attr_bondPoints" value="0" />
-					<input type="number" name="attr_bondPoints_max" value="6" />
+					<input type="hidden" name="attr_bondPoints_max" value="6" />
+					<span name="attr_bondPoints_max"></span>
 				</article>
 				<article>
 					<header>
@@ -718,22 +582,23 @@
 				</div>
 			</article>
 			<article>
-				<table>
-					<th>
-						<td>Qualities:</td>
-						<td>Rank:</td>
-					</th>
-					<tr>
-						<td><span>1.</span></td>
-						<td><input type="text" name="attr_basic_animon_quality_1" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_basic_animon_quality_1_rank" value="1" /></td>
-					</tr>
-					<tr>
-						<td><span>2.</span></td>
-						<td><input type="text" name="attr_basic_animon_quality_2" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_basic_animon_quality_2_rank" value="1" /></td>
-					</tr>
-				</table>
+				<div class="sheet-table">
+					<div class="sheet-table-header">
+						<div class="sheet-table-cell"></div>
+						<div class="sheet-table-cell">Qualities:</div>
+						<div class="sheet-table-cell">Rank:</div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>1.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_basic_animon_quality_1" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_basic_animon_quality_1_rank" value="1" /></div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>2.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_basic_animon_quality_2" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_basic_animon_quality_2_rank" value="1" /></div>
+					</div>
+				</div>
 			</article>
 		</section>
 		<section>
@@ -835,22 +700,23 @@
 				</div>
 			</article>
 			<article>
-				<table>
-					<th>
-						<td>Qualities:</td>
-						<td>Rank:</td>
-					</th>
-					<tr>
-						<td><span>1.</span></td>
-						<td><input type="text" name="attr_super_animon_quality_1" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_super_animon_quality_1_rank" value="1" /></td>
-					</tr>
-					<tr>
-						<td><span>2.</span></td>
-						<td><input type="text" name="attr_super_animon_quality_2" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_super_animon_quality_2_rank" value="1" /></td>
-					</tr>
-				</table>
+				<div class="sheet-table">
+					<div class="sheet-table-header">
+						<div class="sheet-table-cell"></div>
+						<div class="sheet-table-cell">Qualities:</div>
+						<div class="sheet-table-cell">Rank:</div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>1.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_super_animon_quality_1" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_super_animon_quality_1_rank" value="1" /></div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>2.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_super_animon_quality_2" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_super_animon_quality_2_rank" value="1" /></div>
+					</div>
+				</div>
 			</article>
 		</section>
 		<section>
@@ -952,22 +818,23 @@
 				</div>
 			</article>
 			<article>
-				<table>
-					<th>
-						<td>Qualities:</td>
-						<td>Rank:</td>
-					</th>
-					<tr>
-						<td><span>1.</span></td>
-						<td><input type="text" name="attr_ultra_animon_quality_1" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_ultra_animon_quality_1_rank" value="1" /></td>
-					</tr>
-					<tr>
-						<td><span>2.</span></td>
-						<td><input type="text" name="attr_ultra_animon_quality_2" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_ultra_animon_quality_2_rank" value="1" /></td>
-					</tr>
-				</table>
+				<div class="sheet-table">
+					<div class="sheet-table-header">
+						<div class="sheet-table-cell"></div>
+						<div class="sheet-table-cell">Qualities:</div>
+						<div class="sheet-table-cell">Rank:</div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>1.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_ultra_animon_quality_1" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_ultra_animon_quality_1_rank" value="1" /></div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>2.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_ultra_animon_quality_2" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_ultra_animon_quality_2_rank" value="1" /></div>
+					</div>
+				</div>
 			</article>
 		</section>
 		<section>
@@ -1069,22 +936,23 @@
 				</div>
 			</article>
 			<article>
-				<table>
-					<th>
-						<td>Qualities:</td>
-						<td>Rank:</td>
-					</th>
-					<tr>
-						<td><span>1.</span></td>
-						<td><input type="text" name="attr_giga_animon_quality_1" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_giga_animon_quality_1_rank" value="1" /></td>
-					</tr>
-					<tr>
-						<td><span>2.</span></td>
-						<td><input type="text" name="attr_giga_animon_quality_2" placeholder="Quality" /></td>
-						<td><input type="number" name="attr_giga_animon_quality_2_rank" value="1" /></td>
-					</tr>
-				</table>
+				<div class="sheet-table">
+					<div class="sheet-table-header">
+						<div class="sheet-table-cell"></div>
+						<div class="sheet-table-cell">Qualities:</div>
+						<div class="sheet-table-cell">Rank:</div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>1.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_giga_animon_quality_1" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_giga_animon_quality_1_rank" value="1" /></div>
+					</div>
+					<div class="sheet-table-row">
+						<div class="sheet-table-cell"><span>2.</span></div>
+						<div class="sheet-table-cell"><input type="text" name="attr_giga_animon_quality_2" placeholder="Quality" /></div>
+						<div class="sheet-table-cell"><input type="number" name="attr_giga_animon_quality_2_rank" value="1" /></div>
+					</div>
+				</div>
 			</article>
 		</section>
 	</div>
@@ -1289,4 +1157,195 @@
 		</section>
 	</div>
 </div>
+
+<script type="text/worker">
+	const buttonList = ["character", "action", "animon", "option"];
+	buttonList.forEach(button => {
+		on(`clicked:${button}`, function() {
+			setAttrs({sheetTab: button});
+		});
+	});
+
+	const animonLevels = ["fledgling", "basic", "super", "ultra", "giga"];
+	const maxValues = {
+		maxAttr: [3, 4, 5, 6, 6],
+		hp: [0, 5, 10, 15, 20],
+		hpMult: [3, 3, 4, 5, 6],
+		damage: [1, 2, 2, 3, 4],
+	};
+
+	on("clicked:animon_evolve clicked:animon_devolve", function(eventInfo) {
+		const delta = eventInfo.htmlAttributes.name === "act_animon_evolve" ? 1 : -1;
+		getAttrs(["display_animon_evo"], function(values) {
+			var output = {};
+			const evo = values["display_animon_evo"];
+			const newEvo = (animonLevels.indexOf(evo) + delta + animonLevels.length) % animonLevels.length;
+			const evoStage = animonLevels[newEvo];
+
+			output["display_animon_evo"] = evoStage;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:display_animon_evo", function(eventInfo) {
+		const evoStage = eventInfo.newValue;
+
+		var attrs_to_get = [
+			`${evoStage}_animon_name`,
+			`${evoStage}_animon_nature`,
+			`${evoStage}_animon_class`,
+			`${evoStage}_animon_element`,
+			`${evoStage}_animon_heart`,
+			`${evoStage}_animon_power`,
+			`${evoStage}_animon_agility`,
+			`${evoStage}_animon_brains`,
+			`${evoStage}_animon_hp`,
+			`${evoStage}_animon_damage`,
+			`${evoStage}_animon_dodge`,
+			`${evoStage}_animon_initiative`,
+			`${evoStage}_animon_sigAttack_name`,
+			`${evoStage}_animon_sigAttack_rank`,
+			`${evoStage}_animon_sigAttack_element`,
+			`${evoStage}_animon_sigAttack_effect1`,
+			`${evoStage}_animon_sigAttack_effect2`,
+			`${evoStage}_animon_sigAttack_effect3`,
+			`${evoStage}_animon_quality_1`,
+			`${evoStage}_animon_quality_1_rank`,
+			`${evoStage}_animon_quality_2`,
+			`${evoStage}_animon_quality_2_rank`
+		];
+
+		getAttrs(attrs_to_get, function(values) {
+			var output = {};
+
+			const name = values[`${evoStage}_animon_name`];
+			const nature = values[`${evoStage}_animon_nature`];
+			const animonClass = values[`${evoStage}_animon_class`];
+			const element = values[`${evoStage}_animon_element`];
+			const heart = values[`${evoStage}_animon_heart`];
+			const power = values[`${evoStage}_animon_power`];
+			const agility = values[`${evoStage}_animon_agility`];
+			const brains = values[`${evoStage}_animon_brains`];
+			const hp = values[`${evoStage}_animon_hp`];
+			const damage = values[`${evoStage}_animon_damage`];
+			const dodge = values[`${evoStage}_animon_dodge`];
+			const initiative = values[`${evoStage}_animon_initiative`];
+			const sigAttackName = values[`${evoStage}_animon_sigAttack_name`];
+			const sigAttackRank = values[`${evoStage}_animon_sigAttack_rank`];
+			const sigAttackElement = values[`${evoStage}_animon_sigAttack_element`];
+			const sigAttackEffect1 = values[`${evoStage}_animon_sigAttack_effect1`];
+			const sigAttackEffect2 = values[`${evoStage}_animon_sigAttack_effect2`];
+			const sigAttackEffect3 = values[`${evoStage}_animon_sigAttack_effect3`];
+			const quality1 = values[`${evoStage}_animon_quality_1`];
+			const quality1Rank = values[`${evoStage}_animon_quality_1_rank`];
+			const quality2 = values[`${evoStage}_animon_quality_2`];
+			const quality2Rank = values[`${evoStage}_animon_quality_2_rank`];
+
+			output["display_animon_name"] = name;
+			output["display_animon_nature"] = nature;
+			output["display_animon_class"] = animonClass;
+			output["display_animon_element"] = element;
+			output["display_animon_heart"] = heart;
+			output["display_animon_power"] = power;
+			output["display_animon_agility"] = agility;
+			output["display_animon_brains"] = brains;
+			output["display_animon_hp"] = hp;
+			output["display_animon_damage"] = damage;
+			output["display_animon_dodge"] = dodge;
+			output["display_animon_initiative"] = initiative;
+			output["display_animon_sigAttack_name"] = sigAttackName;
+			output["display_animon_sigAttack_rank"] = sigAttackRank;
+			output["display_animon_sigAttack_element"] = sigAttackElement;
+			output["display_animon_sigAttack_effect1"] = sigAttackEffect1;
+			output["display_animon_sigAttack_effect2"] = sigAttackEffect2;
+			output["display_animon_sigAttack_effect3"] = sigAttackEffect3;
+			output["display_animon_quality_1"] = quality1;
+			output["display_animon_quality_1_rank"] = quality1Rank;
+			output["display_animon_quality_2"] = quality2;
+			output["display_animon_quality_2_rank"] = quality2Rank;
+
+			setAttrs(output, {silent: false});
+		});
+	});
+
+	on("change:display_animon_brains", function(eventInfo) {
+		const oldBrains = parseInt(eventInfo.previousValue);
+		const newBrains = parseInt(eventInfo.newValue);
+
+		getAttrs(["sigAttackUses"], function(values) {
+			var output = {};
+
+			const sigAttackUses = parseInt(values["sigAttackUses"]);
+			const missingUses = oldBrains - sigAttackUses;
+			const newUses = newBrains - missingUses;
+
+			output["sigAttackUses"] = newUses;
+			output["sigAttackUses_max"] = newBrains;
+
+			setAttrs(output, {silent: true});
+		});
+	});
+
+	animonLevels.forEach((level, index) => {
+		on(`change:${level}_animon_heart change:bonusHP_${level} change:bonusHPMultiplier_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_heart`, `bonusHP_${level}`, `bonusHPMultiplier_${level}`], function(values) {
+				const heart = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_heart`])));
+				const bonusHp = parseInt(values[`bonusHP_${level}`]);
+				const heartMult = parseInt(values[`bonusHPMultiplier_${level}`]);
+				setAttrs({
+					[`${level}_animon_heart`]: heart,
+					[`${level}_animon_hp_max`]: bonusHp + maxValues.hp[0] + heart * (maxValues.hpMult[0] + heartMult)
+				}, {silent: true});
+			});
+		});
+
+		on(`change:${level}_animon_power change:bonusDamage_${level} change:bonusDamageMultiplier_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_power`, `bonusDamage_${level}`, `bonusDamageMultiplier_${level}`], function(values) {
+				const power = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_power`])));
+				const bonusDamage = parseInt(values[`bonusDamage_${level}`]);
+				const powerMult = parseInt(values[`bonusDamageMultiplier_${level}`]);
+				setAttrs({
+					[`${level}_animon_power`]: power,
+					[`${level}_animon_damage`]: bonusDamage + power * (powerMult + maxValues.damage[index])
+				}, {silent: true});
+			});
+		});
+
+		on(`change:${level}_animon_agility change:bonusDodge_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_agility`, `bonusDodge_${level}`], function(values) {
+				const agility = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_agility`])));
+				const bonusDodge = parseInt(values[`bonusDodge_${level}`]);
+				setAttrs({
+					[`${level}_animon_agility`]: agility,
+					[`${level}_animon_dodge`]: bonusDodge + agility
+				}, {silent: true});
+			});
+		});
+
+		on(`change:${level}_animon_brains change:bonusInitiative_${level}`, function(eventInfo) {
+			getAttrs([`${level}_animon_brains`, `bonusInitiative_${level}`], function(values) {
+				const brains = Math.max(1, Math.min(maxValues.maxAttr[index], parseInt(values[`${level}_animon_brains`])));
+				const bonusInitiative = parseInt(values[`bonusInitiative_${level}`]);
+				setAttrs({
+					[`${level}_animon_brains`]: brains,
+					[`${level}_animon_initiative`]: bonusInitiative + brains
+				}, {silent: true});
+			});
+		});
+	});
+
+	on("change:bondLevel", function(eventInfo) {
+		var output = {};
+
+		const bondLevel = parseInt(eventInfo.newValue);
+		const bondPointsMax = 5 + bondLevel;
+		const staminaMax = 9 + bondLevel;
+
+		output["bondPoints_max"] = bondPointsMax;
+		output["stamina_max"] = staminaMax;
+
+		setAttrs(output, {silent: true});
+	});
+</script>
 </html>
