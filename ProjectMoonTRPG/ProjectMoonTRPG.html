@@ -10783,31 +10783,6 @@ on('change:prevRoundInit', (info) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* --- Token interaction functions  --- */
 
 /* Select token instance functionality */
@@ -10878,18 +10853,15 @@ on('clicked:addToken', async function(info) {
 	});
 });
 on('clicked:addTokenMultiple', async function(info) {
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => { updateToken(selectAttrs);
-	});});});});});});});});});});
+	addTokenMultiple();
 });
+function addTokenMultiple() {
+	getTokenAttrs(`target|Target`, "add", "true", (selectAttrs) => {
+		updateToken(selectAttrs);
+		addTokenMultiple();
+	});
+}
+
 on('clicked:deleteToken', async function(info) {
 	getAttrs(["tokenId_selected"], function(values) {
 		let selectedId = values.tokenId_selected;
@@ -10911,21 +10883,20 @@ on('clicked:deleteToken', async function(info) {
 on('clicked:deleteTokenMultiple', async function(info) {
 	getAttrs(["tokenId_selected"], async function(values) {
 		let selectedId = values.tokenId_selected;
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		getTokenAttrs("target|Target", "false", "false", (selectAttrs) => { deleteToken(selectAttrs.tokenId); if (selectAttrs.tokenId == selectedId) { setAttrs({"tokenId_selected":""}); };
-		});});});});});});});});});});
+		deleteTokenMultiple(selectedId);
 	});
 });
 function deleteToken(tokenId) {
 	removeRepeatingRow("repeating_tokens_" + tokenId);
+}
+function deleteTokenMultiple(selectedId) {
+	getTokenAttrs("target|Target", "false", "false", (selectAttrs) => {
+		deleteToken(selectAttrs.tokenId);
+		if (selectAttrs.tokenId == selectedId) {
+			setAttrs({"tokenId_selected":""});
+		};
+		deleteTokenMultiple(selectedId);
+	});
 }
 
 /* On changing the selected token, imports the status bars and ailments of that token */
