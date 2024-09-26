@@ -11171,6 +11171,7 @@ on('change:settingGenericTokenMode', (info) => {
 on('change:settingHideCombatOptions', (info) => {
 	if (info.newValue == "true") {
 		resetTarget();
+		setAttrs({lastDefenceRoll: 0});
 	}
 });
 
@@ -13769,7 +13770,7 @@ getSectionIDs(`repeating_global`, idarray => {
 			let skillselect = values.skillSelect;
 			let toolselect = values.toolselect;
 
-        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull",
+        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingHideCombatOptions", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull",
 		`${id}_multiPenalty`, `${id}_multiStyle`, "targetName", "targetTokenId", "character_name", "advState", "difficulty", "baseActNum", "Light",
 		"difficulty", "Bleed", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
 		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
@@ -13787,6 +13788,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	let targettokenid = values.targetTokenId;
 	let simpledisplay = values.settingSimpleDisplay;
 	let hidebaseffect = values.settingHideBaseEffect;
+	let hidecombatoptions = values.settingHideCombatOptions;
 	let whisperrolls = values.settingWhisperRolls;
 	let whispertarget = values.settingWhisperTarget;
 
@@ -14279,7 +14281,7 @@ getSectionIDs(`repeating_global`, idarray => {
 		finishRoll(results.rollId, {} );
 
 		/* Store defensive reaction rolls */
-		if (basetype == "Defend") {
+		if (basetype == "Defend" && hidecombatoptions != "true") {
 			setAttrs({lastDefenceRoll: Math.max(parseInt(rollList["roll1"]),0)})
 		} else {
 			setAttrs({lastDefenceRoll: 0})
@@ -19075,7 +19077,6 @@ function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEn
 		let updatesRemaining = 0;
 
 		/* Immediately callback if no custom ailments exist */
-		console.log(idarray.length)
 		if (idarray.length == 0) {
 			callback({});
 		}
