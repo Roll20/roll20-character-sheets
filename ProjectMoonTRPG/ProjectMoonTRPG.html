@@ -13360,30 +13360,10 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 
 
 	/* Custom Ailments */
-	if (ailmentNames.length >= 15) {
-		getSectionIDs(`repeating_ailments`, idarray => {
-			const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailNextTurn`, `repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`], '');
-			
-			getAttrs([...fieldnames], v => {
-	
-				idarray.forEach(id => {
-	
-					let ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
-					
-					let ailNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
-					let ailNum = v[`repeating_ailments_${id}_ailNum`];
-					let ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
-					
-					if (ailTrigger == "RoundEnd") {
-						updateCustomAilment(id, "standard", "true", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
-					}
-					else {
-						updateCustomAilment(id, "decay", "true", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
-					}
-				});
-			});
-		});
-	}
+	updateCustomAilments(["RoundEnd"], "standard", "true", function(returnValues) {
+	Object.assign(autoScriptOverrideList, returnValues);
+	updateCustomAilments(["OnAction", "WhenHit"], "decay", "true", function(returnValues) {
+	Object.assign(autoScriptOverrideList, returnValues);
 
 	/* Smoke processing */
 	if(ailmentNames.includes("Smoke")) {
@@ -13495,6 +13475,8 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 	});
 	setAttrs(output, {}, () => {
 		callback();
+	});
+	});
 	});
 	});
 	});
@@ -13700,6 +13682,8 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 			setAttrs({"HP":bleedresult, "Bleed":bleednew});
 		}
 		callback({ Bleed: [bleednew, bleedcurrent] });
+	} else {
+		callback();
 	}
 	});
 	});
@@ -14001,27 +13985,17 @@ getSectionIDs(`repeating_global`, idarray => {
 
 		skilleffect = values.selectEffect;
 
-			}
 		}
+	}
 
 	/* Bleed processing */
 	let autoScriptOverrideList = {};
-	updateBleed("standard", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
+	updateBleed("standard", function(returnValues) {
+	Object.assign(autoScriptOverrideList, returnValues);
 
 	/* Custom Ailments processing */
-	getSectionIDs(`repeating_ailments`, idarray => {
-		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNum`], '');
-		getAttrs([...fieldnames], v => {
-		idarray.forEach(id => {
-
-			let current = v[`repeating_ailments_${id}_ailTrigger`];
-
-			if(current == "OnAction"){
-				updateCustomAilment(id, "standard", "false", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
-			}
-		});
-		});
-	});
+	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
+	Object.assign(autoScriptOverrideList, returnValues);
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -14369,6 +14343,8 @@ getSectionIDs(`repeating_global`, idarray => {
 	});
 	});
     });
+	});
+	});
 	});
   });
 });
@@ -15547,22 +15523,11 @@ on('clicked:declareAction', (info) => {
 
 	/* Bleed processing */
 	let autoScriptOverrideList = {};
-	updateBleed("standard", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
+	updateBleed("standard", function(returnValues) {
+	Object.assign(autoScriptOverrideList, returnValues);
 
-	/* Custom Ailments processing */
-	getSectionIDs(`repeating_ailments`, idarray => {
-		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNum`], '');
-		getAttrs([...fieldnames], v => {
-		idarray.forEach(id => {
-
-			let current = v[`repeating_ailments_${id}_ailTrigger`];
-
-			if(current == "OnAction"){
-				updateCustomAilment(id, "standard", "false", function(returnValues) { Object.assign(autoScriptOverrideList, returnValues) });
-			}
-		});
-		});
-	});
+	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
+	Object.assign(autoScriptOverrideList, returnValues);
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -15701,7 +15666,8 @@ on('clicked:declareAction', (info) => {
 
 	setAttrs(output);
 
-
+	});
+	});
 	});
 	});
 	});
@@ -19118,6 +19084,35 @@ function importAilmentList(ailmentList) {
 }
 
 
+/* Function: Update multiple custom ailments */
+/* trigger: None, RoundEnd, OnAction and WhenHit */
+/* See updateCustomAilment() function below for details on modes */
+function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEnd="true", callback=() => {}) {
+	getSectionIDs(`repeating_ailments`, idarray => {
+		let autoScriptOverrideList = {};
+		let updatesRemaining = 0;
+		
+		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNum`], '');
+		getAttrs([...fieldnames], v => {
+			idarray.forEach(id => {
+	
+				let current = v[`repeating_ailments_${id}_ailTrigger`];
+	
+				if(triggerList.includes(current)) {
+					updatesRemaining += 1;
+					updateCustomAilment(id, mode, roundEnd, function(returnValues) {
+						Object.assign(autoScriptOverrideList, returnValues);
+						updatesRemaining -= 1;
+						if (updatesRemaining == 0) {
+							callback(autoScriptOverrideList);
+						}
+					});
+				}
+			});
+		});
+	});
+}
+
 
 /* Function: Update custom ailment */
 /* Has the following modes : */
@@ -19423,6 +19418,8 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 	setAttrs(output);
 	if (count != 0) {
 		callback(returnValues);
+	} else {
+		callback();
 	}
 	});
 }
