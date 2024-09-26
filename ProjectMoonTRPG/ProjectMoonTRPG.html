@@ -11291,8 +11291,14 @@ on('clicked:selectTarget', (info) => {
 					"hideDetailsFromTargeting": values.settingHideDetailsFromTargeting
 				})
 			},{},() => {
-				updateTargetAilmentList();
-				updateTargetBarLists();
+				isValidTarget(result => {
+					if (result == "true") {
+						updateTargetAilmentList();
+						updateTargetBarLists();
+					} else {
+						resetTarget();
+					}
+				});
 
 				if (values.settingHideDetailsFromTargeting == "true") {
 					unknownTarget();
@@ -11327,6 +11333,36 @@ function unknownTarget() {
 	});
 	resetAilmentDisplay("target", 6);
 }
+
+/* Checks if a token is an invalid target. Currently happens if genericTokenMode is enabled but the token has not been added as an instance  */
+function isValidTarget(callback=()=>{}) {
+	getAttrs(["character_name", "targetName", "targetTokenId", "targetSettings"], function(values) {
+		let characterName = values.character_name;
+		let targetTokenId = values.targetTokenId;
+		let targetSettings = Data.unpackage(values.targetSettings);
+
+		if (targetSettings.genericTokenMode == "true") {
+			getTargetAttrs(values.targetName, [`repeating_tokens_${targetTokenId}_tokenId`], function(values) {
+				if (targetTokenId != values[`repeating_tokens_${targetTokenId}_tokenId`]) {
+					
+					let alertIcon = "<img src='https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Aggro.png' style='width: 25px; height: 25px;' >"
+					let alertMessage = getTranslationByKeyCustom("Invalid Target: Token is not a token instance", "message-invalid-target");
+					setAttrs({"dummy":alertMessage, "dummyIcon":alertIcon});
+					startRoll(("/w " + characterName + "&{template:errorMessage} {{icon=@{dummyIcon}}} {{message=@{dummy} }}"), (results) => {
+						finishRoll(results.rollId, {} );
+					});
+	
+					callback("false");
+				} else {
+					callback("true");
+				}
+			});
+		} else {
+			callback("true");
+		}
+	});
+}
+
 
 function updateTargetAilmentList(callback=()=>{}) {
 	getAttrs(["settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings"], function(values) {
