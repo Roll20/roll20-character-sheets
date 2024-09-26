@@ -19027,28 +19027,44 @@ function importAilmentList(ailmentList) {
 
 
 /* Function: Update multiple custom ailments */
-/* trigger: None, RoundEnd, OnAction and WhenHit */
+/* triggerList: array which contains at least one of None, RoundEnd, OnAction and WhenHit */
 /* See updateCustomAilment() function below for details on modes */
 function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEnd="true", callback=() => {}) {
 	getSectionIDs(`repeating_ailments`, idarray => {
 		let autoScriptOverrideList = {};
 		let updatesRemaining = 0;
+
+		/* Immediately callback if no custom ailments exist */
+		if (idarray.length == 0) {
+			callback({});
+		}
 		
-		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNum`], '');
+		const fieldnames = idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailName`], '');
 		getAttrs([...fieldnames], v => {
+
 			idarray.forEach(id => {
 	
 				let current = v[`repeating_ailments_${id}_ailTrigger`];
 	
+				/* Update each custom ailment with the requested trigger(s). After the last valid ailment updates, callback */
 				if(triggerList.includes(current)) {
 					updatesRemaining += 1;
+					//console.log(updatesRemaining)
 					updateCustomAilment(id, mode, roundEnd, function(returnValues) {
 						Object.assign(autoScriptOverrideList, returnValues);
 						updatesRemaining -= 1;
+						//console.log(updatesRemaining)
+						//console.log(v[`repeating_ailments_${id}_ailName`] + ": finished updating")
 						if (updatesRemaining == 0) {
 							callback(autoScriptOverrideList);
 						}
 					});
+				}
+				//console.log(v[`repeating_ailments_${id}_ailName`] + ": " + updatesRemaining);
+
+				/* If no custom ailments have the requested trigger(s), callback */
+				if (idarray.indexOf(id) == idarray.length-1 && updatesRemaining == 0) {
+					callback({});
 				}
 			});
 		});
