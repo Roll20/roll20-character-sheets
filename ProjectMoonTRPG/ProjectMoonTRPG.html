@@ -14329,18 +14329,23 @@ getSectionIDs(`repeating_global`, idarray => {
 			setAttrs({lastDefenceRoll: 0})
 		}
 
-		/* Action Buttons */
-		let damage_data = {
-			baseHPOverride: autoeffectBaseDamageHP,
-			baseSTOverride: autoeffectBaseDamageST,
-			flatHPOverride: autoeffectFlatDamageHP,
-			flatSTOverride: autoeffectFlatDamageST,
-			flatSPOverride: autoeffectFlatDamageSP,
-			flatLightOverride: autoeffectFlatDamageLight,
-			damageTypeOverride: weapontype,
-			autoScriptOverride: damageAutoScript
-		}
+		/* Handle Apply Damage action button for attacks */
 		if (basetype == "Attack") {
+			/* Remove any (Add N HP/ST/SP) from damageAutoScript, leaving only (Add N Light) and any non-Add effects */
+			/* This functionality is already handeled by the flatBarOverrides */
+			damageAutoScript = damageAutoScript.replaceAll(/(\(Add -?\d+ \w{2}\))/g, "");
+		
+			let damage_data = {
+				baseHPOverride: autoeffectBaseDamageHP,
+				baseSTOverride: autoeffectBaseDamageST,
+				flatHPOverride: autoeffectFlatDamageHP,
+				flatSTOverride: autoeffectFlatDamageST,
+				flatSPOverride: autoeffectFlatDamageSP,
+				flatLightOverride: autoeffectFlatDamageLight,
+				damageTypeOverride: weapontype,
+				autoScriptOverride: damageAutoScript
+			}
+
 			for (const rollKey in rollList) {
 				damage_data.baseOverride = Math.max(parseInt(rollList[rollKey]) + parseInt(autoeffectBaseDamage),0);
 
@@ -18310,7 +18315,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	/* Execute AutoEffect */
 	returnValues = { ...returnValues, [`${autoEffectVariant}${effectTarget}`]: effectVal, message: message, messageValues: messageValues }
 	if (autoEffectVariant != "baseDamage") {
-		returnValues.autoDamage = `(Add -${effectVal} ${AutoEffect[2]})`;
+		returnValues.autoDamage = `(Add ${effectVal * -1} ${AutoEffect[2]})`;
 	}
 	return returnValues;
 }
