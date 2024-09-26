@@ -2945,14 +2945,14 @@
 
 		<!-- Target statistics -->
 		<div class="columnAlign helpers" style="margin-left: 3px;">
-			<input type="text" class="tokenName" name="attr_targetTokenName" style="width: 150px;" placeholder="No target selected" data-i18n-placeholder="helper-text-notarget" readonly="">
+			<input type="text" class="tokenName" name="attr_targetTokenName" value="" style="width: 150px;" placeholder="No target selected" data-i18n-placeholder="helper-text-notarget" readonly="">
 			<input type="text" name="attr_targetName" value="" hidden="true">
 			<input type="text" name="attr_targetTokenId" value="" hidden="true">
 			<input type="text" name="attr_targetSettings" value="{}" hidden="true">
 			
 			<!-- Target bars -->
-			<input type="text" name="attr_targetBarList" hidden="true">
-			<input type="text" name="attr_targetBarDamageList" hidden="true">
+			<input type="text" name="attr_targetBarList" value="{}" hidden="true">
+			<input type="text" name="attr_targetBarDamageList" value="{}"  hidden="true">
 			<div class="rowContainer" style="width: 150px;">
 				<div class="bars"><input class="Cstat HPtext" type="text" name="attr_HP_target" value="---" disabled="true" data-i18n-title="helper-target-hp" title="Target Health"></div>
 				<div class="bars"><input class="Cstat egoSTGRtext" type="text" name="attr_StagRes_target" value="---" disabled="true" data-i18n-title="helper-target-stagres" title="Target Stagger Res"></div>
@@ -2960,7 +2960,7 @@
 			</div>
 
 			<!-- Target ailments -->
-			<input type="text" name="attr_targetAilmentList" hidden="true">
+			<input type="text" name="attr_targetAilmentList" value="{}" hidden="true">
 			<div class="rowContainer">
 				<input type="checkbox" class="hide-toggle-rev" name="attr_targetAilment1Num" value="0" hidden="true">
 				<div class="targetAilment hide-item-rev">
@@ -10901,11 +10901,13 @@ function deleteTokenMultiple(selectedId) {
 
 /* On changing the selected token, imports the status bars and ailments of that token */
 on('change:tokenId_selected', (info) => {
-	getAttrs(["tokenId_suppressUpdate"], function(values) {
+	getAttrs(["tokenId_suppressUpdate", "settingGenericTokenMode"], function(values) {
 		if (values.tokenId_suppressUpdate == "true") {
 			setAttrs({"tokenId_suppressUpdate": "false"});
 		} else {
-			updateSelectedToken(info);
+			if (values.settingGenericTokenMode == "true") {
+				updateSelectedToken(info);
+			}
 		}
 	});
 });
@@ -11001,10 +11003,12 @@ barList.forEach(bar => {
 		} else {
 			attr_token = `${info.sourceAttribute}` + "_token";
 		}
-		getAttrs([`${attr_sheet}`, `${attr_token}`], function(values) {
-			let bar_sheet = values[`${attr_sheet}`];
-			let bar_token = values[`${attr_token}`];
-			setAttrs({[`${attr_token + "_display"}`]:"" + (bar_sheet != bar_token)});
+		getAttrs(["settingGenericTokenMode", `${attr_sheet}`, `${attr_token}`], function(values) {
+			if (values.settingGenericTokenMode == "true") {
+				let bar_sheet = values[`${attr_sheet}`];
+				let bar_token = values[`${attr_token}`];
+				setAttrs({[`${attr_token + "_display"}`]:"" + (bar_sheet != bar_token)});
+			}
 		});
 	});
 });
@@ -11013,14 +11017,16 @@ barList.forEach(bar => {
 barList.forEach(bar => {
 	on(`change:${bar} change:repeating_tokens:${bar}`, (info) => {
 		if (info.newValue != undefined) {
-			getAttrs(["tokenId_selected"], function(values) {
-				let selectedId = values.tokenId_selected;
-				if (selectedId != "") {
-					if (barList.includes(info.sourceAttribute)) {
-						setAttrs({[`repeating_tokens_${selectedId}_${bar}`]:info.newValue})
-					}
-					else if (info.sourceAttribute.includes(selectedId.toLowerCase())) {
-						setAttrs({[`${bar}`]:info.newValue})
+			getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
+				if (values.settingGenericTokenMode == "true") {
+					let selectedId = values.tokenId_selected;
+					if (selectedId != "") {
+						if (barList.includes(info.sourceAttribute)) {
+							setAttrs({[`repeating_tokens_${selectedId}_${bar}`]:info.newValue})
+						}
+						else if (info.sourceAttribute.includes(selectedId.toLowerCase())) {
+							setAttrs({[`${bar}`]:info.newValue})
+						}
 					}
 				}
 			});
@@ -11033,11 +11039,13 @@ let tempBarList = ["thp", "tst"];
 tempBarList.forEach(tempBar => {
 	on(`change:${tempBar}_sources`, (info) => {
 		if (info.newValue != undefined) {
-			getAttrs(["tokenId_selected"], function(values) {
-				let selectedId = values.tokenId_selected;
-				if (selectedId != "") {
-					if (tempBarList.includes(info.sourceAttribute.replace("_sources", ""))) {
-						setAttrs({[`repeating_tokens_${selectedId}_token${tempBar}_sources`]:info.newValue});
+			getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
+				if (values.settingGenericTokenMode == "true") {
+					let selectedId = values.tokenId_selected;
+					if (selectedId != "") {
+						if (tempBarList.includes(info.sourceAttribute.replace("_sources", ""))) {
+							setAttrs({[`repeating_tokens_${selectedId}_token${tempBar}_sources`]:info.newValue});
+						}
 					}
 				}
 			});
@@ -11049,15 +11057,17 @@ tempBarList.forEach(tempBar => {
 let stateList = ["panicstate", "staggerstate", "staggerduration", "sealstate", "immobilestate", "defeatstate"];
 stateList.forEach(state => {
 	on(`change:${state}`, (info) => {
-		getAttrs(["tokenId_selected"], function(values) {
-			let selectedId = values.tokenId_selected;
-			if (selectedId != "") {
-				if (stateList.includes(info.sourceAttribute)) {
-					/* newValue will in some cases not be set when decreasing staggerduration. This ensures the value is properly decreased */
-					if (info.newValue == undefined && info.sourceAttribute == "staggerduration") {
-						info.newValue = parseInt(info.previousValue) - 1;
+		getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
+			if (values.settingGenericTokenMode == "true") {
+				let selectedId = values.tokenId_selected;
+				if (selectedId != "") {
+					if (stateList.includes(info.sourceAttribute)) {
+						/* newValue will in some cases not be set when decreasing staggerduration. This ensures the value is properly decreased */
+						if (info.newValue == undefined && info.sourceAttribute == "staggerduration") {
+							info.newValue = parseInt(info.previousValue) - 1;
+						}
+						setAttrs({[`repeating_tokens_${selectedId}_token${state}`]:info.newValue});
 					}
-					setAttrs({[`repeating_tokens_${selectedId}_token${state}`]:info.newValue});
 				}
 			}
 		});
@@ -11067,12 +11077,14 @@ stateList.forEach(state => {
 /* Sync: Token Ailments */
 on(`change:ailmentList`, (info) => {
 	if (info.newValue != undefined) {
-		getAttrs(["tokenId_selected"], function(values) {
-			let ailmentList = Data.unpackage(info.newValue);
-			let selectedId = values.tokenId_selected;
-			if (selectedId != "") {
-				setAttrs({[`repeating_tokens_${selectedId}_tokenAilmentList`]:info.newValue});
-				updateAilmentDisplay(`repeating_tokens_${selectedId}_token`, 4, ailmentList);
+		getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
+			if (values.settingGenericTokenMode == "true") {
+				let ailmentList = Data.unpackage(info.newValue);
+				let selectedId = values.tokenId_selected;
+				if (selectedId != "") {
+					setAttrs({[`repeating_tokens_${selectedId}_tokenAilmentList`]:info.newValue});
+					updateAilmentDisplay(`repeating_tokens_${selectedId}_token`, 4, ailmentList);
+				}
 			}
 		});
 	}
@@ -11082,27 +11094,31 @@ for (let i = 0; i <= 4; i++) {
 		if (info.newValue != undefined) {
 			let tokenPrefix = info.sourceAttribute.match((/(repeating_tokens_[^_]+)/g))[0];
 			let tokenIndex = info.sourceAttribute.match((/([\d])num/g))[0].replace("num","");
-			getAttrs(["tokenId_selected", `${tokenPrefix}_tokenAilmentList`,
+			getAttrs(["tokenId_selected", "settingGenericTokenMode", `${tokenPrefix}_tokenAilmentList`,
 				`${tokenPrefix}_tokenAilment${tokenIndex}Name`, `${tokenPrefix}_tokenAilment${tokenIndex}Num`], function(values) {
-				let selectedId = values.tokenId_selected;
-				let ailmentList = Data.unpackage(values[`${tokenPrefix}_tokenAilmentList`]);
-				let ailmentName = values[`${tokenPrefix}_tokenAilment${tokenIndex}Name`];
-				let ailmentNum = values[`${tokenPrefix}_tokenAilment${tokenIndex}Num`];
-				let output = {}
+				
+				if (values.settingGenericTokenMode == "true") {
 
-				ailmentList[ailmentName][1] = ailmentNum;
-				ailmentList[ailmentName][3] = ailmentNum;
-				output[`${tokenPrefix}_tokenAilmentList`] = Data.package(ailmentList);
-
-				if (tokenPrefix.includes(selectedId.toLowerCase())) {
-					output["ailmentList"] = Data.package(ailmentList);
-					if (ailmentList[ailmentName][4] != 0) {
-						output[`repeating_ailments_${ailmentList[ailmentName][4]}_ailNum`] = ailmentNum;
-					} else {
-						output[`${ailmentName}`] = ailmentNum;
+					let selectedId = values.tokenId_selected;
+					let ailmentList = Data.unpackage(values[`${tokenPrefix}_tokenAilmentList`]);
+					let ailmentName = values[`${tokenPrefix}_tokenAilment${tokenIndex}Name`];
+					let ailmentNum = values[`${tokenPrefix}_tokenAilment${tokenIndex}Num`];
+					let output = {}
+	
+					ailmentList[ailmentName][1] = ailmentNum;
+					ailmentList[ailmentName][3] = ailmentNum;
+					output[`${tokenPrefix}_tokenAilmentList`] = Data.package(ailmentList);
+	
+					if (tokenPrefix.includes(selectedId.toLowerCase())) {
+						output["ailmentList"] = Data.package(ailmentList);
+						if (ailmentList[ailmentName][4] != 0) {
+							output[`repeating_ailments_${ailmentList[ailmentName][4]}_ailNum`] = ailmentNum;
+						} else {
+							output[`${ailmentName}`] = ailmentNum;
+						}
 					}
+					setAttrs(output);
 				}
-				setAttrs(output);
 			});
 		}
 	});
@@ -11142,8 +11158,8 @@ on('change:settingGenericTokenMode', (info) => {
 		getSectionIDs(`repeating_tokens`, async function(idarray) {
 			idarray.forEach(tokenId => {
 				removeRepeatingRow("repeating_tokens_" + tokenId);
-				setAttrs({"tokenId_selected":""});
 			});
+			setAttrs({"tokenId_selected":""});
 		});
 	}
 });
@@ -11154,22 +11170,10 @@ on('change:settingHideCombatOptions', (info) => {
 	}
 });
 
-
-
-/* Syncs the ailments of the sheet and selected token */
-/* Whenever a display ailment is incremented or the ailment list updates */
-
-
-
-
 /* Sync: Action number */
-on(`change:actNum change:repeating_tokens:actNum`, (info) => {
+/*on(`change:actNum change:repeating_tokens:actNum`, (info) => {
 	
-});
-/* Sync: Combat states */
-
-
-
+});*/
 
 
 /* --- Token helper functions --- */
@@ -11261,9 +11265,11 @@ async function changeActiveToken(tokenId, callback=()=>{}) {
 		}
 	});
 }
+/* --- Token interaction functions end  --- */
 
 
-/* Select target functionality */
+
+/* --- Select target functionality --- */
 on('clicked:selectTarget', (info) => {
 	getTargetAttrs("target", ["character_name", "selfToken", "token_name", "token_id", "settingGenericTokenMode", "settingHideBarUpdate", "settingHideDetailsFromTargeting"], function(values) {
 
@@ -11408,8 +11414,11 @@ async function getTargetAttrs(target, attrList, callback=()=>{}) {
 
 	callback(targetAttrs);
 }
+/* --- Select target functionality end --- */
 
 
+
+/* --- Action button functionality --- */
 /*
 async function createActionButtons(buttonList, override="") {
 	
@@ -11514,37 +11523,7 @@ function generateActionButton(name, icon, color, action, data, target) {
 	icon = icon.replaceAll('<img src="',"").replaceAll('" >',"");
 	
 	return [name, icon, color, action, data, target];
-}	
-
-/* Takes in arguments of the format: [returnValue, queryText, {label1:value1, label2:value2, ...}] */
-/* Sends one query for each argument included and returns an array of results */
-async function sendQuery(...args) {
-	let queryList = [];
-	args.forEach(arg => { if(arg != [] && arg != "") { queryList.push(arg); } });
-	
-	let rollBase = "! ";
-	queryList.forEach(query => {
-		rollBase += `{{${query[0]}=[[0[?{${query[1]}`;
-		
-		for (const [label, value] of Object.entries(query[2])) {
-			rollBase += `|${label},${value}`;
-		}
-
-		rollBase += "}]]]}}";
-	});
-
-	//?{Name of Query|Label 1, value1|Label 2, value2}
-	
-	let queryRoll = await startRoll(rollBase);
-	
-	let queryResults = {}
-	queryList.forEach(query => {
-		queryResults[query[0]] = queryRoll.results[query[0]].expression.match(/^0\[(.*)\]\s*$/)[1];
-	});
-    finishRoll(queryRoll.rollId);
-	return queryResults;
 }
-
 
 /* Action button functions */
 on('clicked:actionButtonDamage', async (data) => {
@@ -11610,15 +11589,7 @@ function actionButtonTokenIdHelper(targetTokenId, callback=()=>{}) {
 		}
 	});
 }
-
-
-
-
-
-
-
-
-
+/* --- Action button functionality --- */
 
 
 
@@ -19675,6 +19646,35 @@ getSectionIDs("repeating_global", function(idarray) {
 
 
 /* --- Generic helper functions --- */
+
+/* Takes in arguments of the format: [returnValue, queryText, {label1:value1, label2:value2, ...}] */
+/* Sends one query for each argument included and returns an array of results */
+async function sendQuery(...args) {
+	let queryList = [];
+	args.forEach(arg => { if(arg != [] && arg != "") { queryList.push(arg); } });
+	
+	let rollBase = "! ";
+	queryList.forEach(query => {
+		rollBase += `{{${query[0]}=[[0[?{${query[1]}`;
+		
+		for (const [label, value] of Object.entries(query[2])) {
+			rollBase += `|${label},${value}`;
+		}
+
+		rollBase += "}]]]}}";
+	});
+
+	//?{Name of Query|Label 1, value1|Label 2, value2}
+	
+	let queryRoll = await startRoll(rollBase);
+	
+	let queryResults = {}
+	queryList.forEach(query => {
+		queryResults[query[0]] = queryRoll.results[query[0]].expression.match(/^0\[(.*)\]\s*$/)[1];
+	});
+    finishRoll(queryRoll.rollId);
+	return queryResults;
+}
 
 function getIcon(iconFolder, iconName, settingLimbusStyle = "false", style="") {
 	if (settingLimbusStyle == "true") {
