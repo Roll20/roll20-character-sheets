@@ -11329,8 +11329,8 @@ for (let i = 0; i <= 4; i++) {
 	
 					if (tokenPrefix.includes(selectedId.toLowerCase())) {
 						output["ailmentList"] = Data.package(ailmentList);
-						if (ailmentList[ailmentName][4] != 0) {
-							output[`repeating_ailments_${ailmentList[ailmentName][4]}_ailNum`] = ailmentNum;
+						if (ailmentList[ailmentName][5] != 0) {
+							output[`repeating_ailments_${ailmentList[ailmentName][5]}_ailNum`] = ailmentNum;
 						} else {
 							output[`${ailmentName}`] = ailmentNum;
 						}
@@ -11354,7 +11354,7 @@ function updateAilmentDisplay(ailmentPrefix, ailmentDisplayCount, ailmentList) {
 		
 		let output = {}
 		for (i = 0; i < ailmentDisplayCount; i++) {
-			output[`${ailmentPrefix}Ailment${i+1}Icon`] = getIcon("ailments", ailmentDisplayList[i][1][5], values.settingLimbusStyle).replace('<img src="','').replace('" >','');
+			output[`${ailmentPrefix}Ailment${i+1}Icon`] = getIcon("ailments", ailmentDisplayList[i][1][6], values.settingLimbusStyle).replace('<img src="','').replace('" >','');
 			output[`${ailmentPrefix}Ailment${i+1}Num`] = ailmentDisplayList[i][1][1];
 			output[`${ailmentPrefix}Ailment${i+1}Name`] = ailmentDisplayList[i][0];
 		}
@@ -12912,10 +12912,10 @@ getSectionIDs(`repeating_global`, idarray => {
 
 /* Auto: Update ailment list */
 let ailments = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"];
-let ailmentAttributes = `sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ailNum change:repeating_ailments:ailNumNextTurn change:repeating_ailments:ailName clicked:importRepeating clicked:importGlobal
+let ailmentAttributes = `sheet:opened change:repeating_ailments:ailIcon change:repeating_ailments:ailNum change:repeating_ailments:ailNumNextTurn change:repeating_ailments:ailName change:repeating_ailments:ailDecayPause clicked:importRepeating clicked:importGlobal
 	change:settingHideNextTurn change:repeating_global:burnNextTurnSetting change:repeating_global:bleedNextTurnSetting change:repeating_global:smokeNextTurnSetting change:repeating_global:chargeNextTurnSetting`;
 ailments.forEach(ailment => {
-	ailmentAttributes += ` change:${ailment} change:${ailment}NextTurn`;
+	ailmentAttributes += ` change:${ailment} change:${ailment}NextTurn change:${ailment}DecayPause`;
 });
 on(ailmentAttributes, function() {
 	exportAilmentList({}, function(ailmentList) {
@@ -17100,9 +17100,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		let messageValues = {};
 		
 	/* Get all ailments */
-	/* Gives a list with the following format: hasNextTurnField, count, nextTurnCount, countImmutable, repeatingAilmentId, ailmentIconName */
-	/* countImmutable: Matches the count at the beginning of the AutoEffect execution. Should never be modified */
-	/* repeatingAilmentId: Is set to 0 for standard ailments */
 	exportAilmentList(overrideList, function(ailmentList) { 
 	// console.log(ailmentList)
 
@@ -17962,7 +17959,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, targ
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
 		messageFormat = "[/TARGET] " + messageFormat;
-		effectIcon = ailmentList[effectName][5];
+		effectIcon = ailmentList[effectName][6];
 	}
 
 	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
@@ -18005,8 +18002,8 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, 
 	
 	/* Handle ailment target */
 	if (ailmentList.hasOwnProperty(effectName)) {
-		if (ailmentList[effectName][4] == "0") { effectTarget = effectName; } /* If standard ailment */
-		else { effectTarget = `repeating_ailments_${ailmentList[effectName][4]}_ailNum`; } /* If custom ailment */
+		if (ailmentList[effectName][5] == "0") { effectTarget = effectName; } /* If standard ailment */
+		else { effectTarget = `repeating_ailments_${ailmentList[effectName][5]}_ailNum`; } /* If custom ailment */
 		count = ailmentList[effectName][1]; countImmutable = ailmentList[effectName][3];
 	}
 	/* Handle bar target */
@@ -18071,7 +18068,7 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, 
 	let effectIcon = effectName;
 	if (ailmentList.hasOwnProperty(effectName)) {
 		messageFormat = "[/TARGET] " + messageFormat;
-		effectIcon = ailmentList[effectName][5];
+		effectIcon = ailmentList[effectName][6];
 	}
 
 	if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
@@ -18131,10 +18128,10 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle,
 
 	/* Get target attribute */
 	let effectTarget = "";
-	let effectRepeatingId = ailmentList[effectAilment][4];
+	let effectRepeatingId = ailmentList[effectAilment][5];
 	let effectHasNextTurn = ailmentList[effectAilment][0];
 	if (effectRepeatingId == 0) { effectTarget = effectAilment; } /* If standard ailment */
-	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][4]}_ailNum`; } /* If custom ailment */
+	else { effectTarget = `repeating_ailments_${effectRepeatingId}_ailNum`; } /* If custom ailment */
 	
 	/* Update target list */
 	if (autoEffectVariant == "Gain") {
@@ -18162,7 +18159,7 @@ function autoEffectAilment(AutoEffect, ailmentList, scaling, settingLimbusStyle,
 		case "Give": messageFormat = getTranslationByKeyCustom("[/TARGET] Give [SCALING NUM] [TARGET] to ally", "autoeffect-format-give"); break;
 	}
 	
-	let effectIcon = ailmentList[effectAilment][5];
+	let effectIcon = ailmentList[effectAilment][6];
 	if (effectHasNextTurn == 'true' && forceTarget != "This round") { messageFormat += " next round"; }
 	if (autoEffectType == "standard" || autoEffectType == "section") { messageFormat += " [[INITIAL] -> [RESULT]]" }
 
@@ -18501,7 +18498,7 @@ function autoEffectProc(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 	
 	/* Get ailment name or id */
 	let effectAilment = AutoEffect[1];
-	let effectRepeatingId = ailmentList[effectAilment][4];
+	let effectRepeatingId = ailmentList[effectAilment][5];
 	if (!ailmentList.hasOwnProperty(effectAilment)) { return autoEffectErrorMessage("Invalid Target", `Ailment "${effectAilment}" does not exist`, AutoEffect); }
 	
 	/* Get target */
@@ -18519,7 +18516,7 @@ function autoEffectProc(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 		let message = "";
 		let messageValues = {};
 		let messageFormat = getTranslationByKeyCustom("[/TARGET] Proc [TARGET]", "autoeffect-format-proc");
-		let effectIcon = ailmentList[effectAilment][5];
+		let effectIcon = ailmentList[effectAilment][6];
 		
 		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 			message = autoEffectMessage(messageFormat, effectAilment, 0, 0, 1, "success", settingLimbusStyle, effectIcon);
@@ -18553,10 +18550,10 @@ function autoEffectPause(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 
 	/* Get target attribute */
 	let effectTarget = "";
-	let effectRepeatingId = ailmentList[effectAilment][4];
+	let effectRepeatingId = ailmentList[effectAilment][5];
 	let effectHasNextTurn = ailmentList[effectAilment][0];
 	if (effectRepeatingId == 0) { effectTarget = `${effectAilment}DecayPause`; } /* If standard ailment */
-	else { effectTarget = `repeating_ailments_${ailmentList[effectAilment][4]}_ailDecayPause`; } /* If custom ailment */
+	else { effectTarget = `repeating_ailments_${effectRepeatingId}_ailDecayPause`; } /* If custom ailment */
 
 	/* Handle the target option */
 	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
@@ -18567,7 +18564,7 @@ function autoEffectPause(AutoEffect, ailmentList, scaling, settingLimbusStyle) {
 		let message = "";
 		let messageValues = {};
 		let messageFormat = getTranslationByKeyCustom("[/TARGET] Paused [TARGET] for [SCALING NUM] activations", "autoeffect-format-pause");
-		let effectIcon = ailmentList[effectAilment][5];
+		let effectIcon = ailmentList[effectAilment][6];
 
 		if (!AutoEffect.some(option => (/(silent)/ig).test(option))) {
 			message = autoEffectMessage(messageFormat, effectAilment, effectVal/scaling, count, scaling, "success", settingLimbusStyle, effectIcon);
@@ -19212,23 +19209,31 @@ getSectionIDs(`repeating_global`, idarray => {
 	});
 });
 
+/* Gives a list with the following format: hasNextTurnField, count, nextTurnCount, countImmutable, countDecayPause, repeatingAilmentId, ailmentIconName */
+/* countImmutable: Matches the count at the beginning of the AutoEffect execution. Should never be modified */
+/* repeatingAilmentId: Is set to 0 for standard ailments */
 async function exportAilmentList(overrideList={}, callback=() => {}) {
-	let ailmentList = {}
+	getSectionIDs(`repeating_ailments`, idarray => {
 	
-	getAttrs(["settingHideNextTurn", "burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting",
-	"Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune",
-	"BurnNextTurn", "BleedNextTurn", "ParalysisNextTurn", "ProtectionNextTurn", "StaggerProtectionNextTurn", "FragileNextTurn", "StrengthNextTurn", "FeebleNextTurn", "EnduranceNextTurn", "DisarmNextTurn", "HasteNextTurn", "BindNextTurn", "SmokeNextTurn", "ChargeNextTurn", "FortuneNextTurn"], function(values) {
+	let ailmentList = {}
+	let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"];
+	const fieldnames = ailmentNames.concat(
+		ailmentNames.reduce((rows,ailment) => [...rows, `${ailment}NextTurn`, `${ailment}DecayPause`], ''),
+		idarray.reduce((rows,id) => [...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`, `repeating_ailments_${id}_ailDecayPause`], '')
+	);
+
+	getAttrs([...fieldnames, "settingHideNextTurn", "burnNextTurnSetting", "bleedNextTurnSetting", "smokeNextTurnSetting", "chargeNextTurnSetting"], function(values) {
 		
 		let settingHideNextTurn = values.settingHideNextTurn;
 		const HasNextTurn = settingHideNextTurn == "true" ? 'false' : 'true';
 
-		let ailmentNames = ["Burn", "Bleed", "Paralysis", "Protection", "StaggerProtection", "Fragile", "Strength", "Feeble", "Endurance", "Disarm", "Haste", "Bind", "Smoke", "Charge", "Fortune"];
+		/* Export default ailments */
 		ailmentNames.forEach(ailment => {
 			if (["Burn", "Bleed", "Smoke", "Charge"].includes(ailment)) {
-				let ailmentNextTurnSetting = settingHideNextTurn == "true" ? "false" : values[ailment.toLowerCase()+"NextTurnSetting"];
-				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
+				let ailmentNextTurnSetting = (settingHideNextTurn == "true") ? "false" : values[ailment.toLowerCase()+"NextTurnSetting"];
+				ailmentList[ailment] = [ailmentNextTurnSetting, values[ailment], values[`${ailment}NextTurn`], values[ailment], values[`${ailment}DecayPause`], 0, ailment];
 			} else {
-				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], values[ailment], 0, ailment];
+				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], values[ailment], values[`${ailment}DecayPause`], 0, ailment];
 			}
 			if (overrideList.hasOwnProperty(ailment)) {
 				ailmentList[ailment][1] = Math.max(overrideList[ailment][0], 0);
@@ -19236,35 +19241,27 @@ async function exportAilmentList(overrideList={}, callback=() => {}) {
 			}
 		});
 
-	/* Get all custom ailments */
-	getSectionIDs(`repeating_ailments`, idarray => {
-	const fieldnames = idarray.reduce((rows,id) =>
-	[...rows, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailNextTurn`,`repeating_ailments_${id}_ailNum`,
-	`repeating_ailments_${id}_ailNumNextTurn`, `repeating_ailments_${id}_ailIcon`], '');
-	
-		let ailName = "";
-		let ailHasNextTurn = "";
-		let ailNum = 0;
-		let ailNumNextTurn = 0;
-		
-		getAttrs([...fieldnames], async function(v) {
+		/* Export custom ailments */
 		idarray.forEach(id => {
-			ailName = v[`repeating_ailments_${id}_ailName`].replaceAll(" ","_");
-			ailHasNextTurn = v[`repeating_ailments_${id}_ailNextTurn`];
-			ailNum = v[`repeating_ailments_${id}_ailNum`];
-			ailNumNextTurn = v[`repeating_ailments_${id}_ailNumNextTurn`];
-			ailIcon = v[`repeating_ailments_${id}_ailIcon`];
-			ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
-			
-			ailmentList[ailName] = [ailHasNextTurn, ailNum, ailNumNextTurn, ailNum, id, ailIcon];
+			let ailName = values[`repeating_ailments_${id}_ailName`].replaceAll(" ","_");
+
+			ailmentList[ailName] = [
+				values[`repeating_ailments_${id}_ailNextTurn`],
+				values[`repeating_ailments_${id}_ailNum`],
+				values[`repeating_ailments_${id}_ailNumNextTurn`],
+				values[`repeating_ailments_${id}_ailNum`],
+				values[`repeating_ailments_${id}_ailDecayPause`],
+				id,
+				values[`repeating_ailments_${id}_ailIcon`]
+			];
 
 			if (overrideList.hasOwnProperty(ailName)) {
 				ailmentList[ailName][1] = Math.max(overrideList[ailName.replaceAll(" ","_")][0], 0);
 				ailmentList[ailName][3] = Math.max(overrideList[ailName.replaceAll(" ","_")][1], 0);
 			}
 		});
+
 		callback(ailmentList);
-	});
 	});
 	});
 }
@@ -19273,16 +19270,19 @@ function importAilmentList(ailmentList) {
 	let output = {}
 	for (const [ailmentName, ailmentValues] of Object.entries(ailmentList)) {
 		/* Default ailments */
-		if (ailmentValues[4] != 0) {
-			output[`repeating_ailments_${ailmentValues[4]}_ailNum`] = ailmentValues[1];
-			output[`repeating_ailments_${ailmentValues[4]}_ailNumNextTurn`]  = ailmentValues[2];
+		if (ailmentValues[5] != 0) {
+			output[`repeating_ailments_${ailmentValues[5]}_ailNum`] = ailmentValues[1];
+			output[`repeating_ailments_${ailmentValues[5]}_ailNumNextTurn`]  = ailmentValues[2];
+			output[`repeating_ailments_${ailmentValues[5]}_ailDecayPause`]  = ailmentValues[4];
 		}
 		/* Custom ailments */
 		else {
 			output[`${ailmentName}`] = ailmentValues[1];
 			output[`${ailmentName}NextTurn`] = ailmentValues[2];
+			output[`${ailmentName}DecayPause`] = ailmentValues[4];
 		}
 	}
+	console.log(ailmentList)
 	setAttrs(output);
 }
 
