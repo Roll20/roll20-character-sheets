@@ -9600,6 +9600,7 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 <input type="text" name="attr_editKey" hidden="true">
 <textarea name="attr_gameSettingSource" hidden="true"></textarea>
 <textarea name="attr_ailmentSettingSource" hidden="true"></textarea>
+<textarea name="attr_sheetSettingSource" hidden="true"></textarea>
 
 <div class="rowContainer">
 
@@ -19723,9 +19724,9 @@ getSectionIDs("repeating_global", function(idarray) {
 	}
 
     getAttrs(["syncStateGame", "syncStateAilment", "syncLockGame", "syncLockAilment",
-	"global_access", "global_editMode", "global_editKey", "global_gameSettingSource", "global_ailmentSettingSource", "gameEditor", "ailmentEditor",
-	`repeating_global_${rowid}_editKey`, `repeating_global_${rowid}_gameSettingSource`, `repeating_global_${rowid}_ailmentSettingSource`, "settingEvdInfluence", "settingTestOption",
-	"autoScriptStyling", "autoScriptEditorTarget", "autoScriptEditorInput",
+	"global_access", "global_editMode", "global_editKey", "global_gameSettingSource", "global_ailmentSettingSource", "global_sheetSettingSource", "gameEditor", "ailmentEditor",
+	`repeating_global_${rowid}_editKey`, `repeating_global_${rowid}_gameSettingSource`, `repeating_global_${rowid}_ailmentSettingSource`, `repeating_global_${rowid}_sheetSettingSource`,
+	"settingEvdInfluence", "settingTestOption", "autoScriptStyling", "autoScriptEditorTarget", "autoScriptEditorInput",
 	"weapon1AutoScript", "weapon2AutoScript", "weapon3AutoScript", "weapon4AutoScript", "augmentAutoScript", "outfitAutoScript",
 	"tool1AutoScript", "tool2AutoScript", "tool3AutoScript", "tool4AutoScript", "special1AutoScript", "special2AutoScript",
 	"skill1AutoScript", "skill2AutoScript", "skill3AutoScript", "skill4AutoScript", "skill5AutoScript", "skill6AutoScript",
@@ -19735,6 +19736,7 @@ getSectionIDs("repeating_global", function(idarray) {
 	let langUpdate = "Update";
 	let langGameSettings = "Game Settings";
 	let langCustomAilments = "Custom Ailments";
+	let langSheetSettings = "Sheet Settings";
 	let langSyncSuccess = "Update synced.";
 	let langSyncFail = "Update detected, but section is locked.";
 
@@ -19743,6 +19745,7 @@ getSectionIDs("repeating_global", function(idarray) {
 	langUpdate = getTranslationByKey("pop-update");
 	langGameSettings = getTranslationByKey("editor-gamesettings");
 	langCustomAilments = getTranslationByKey("editor-customailments");
+	langSheetSettings = getTranslationByKey("editor-sheetsettings")
 	langSyncSuccess = getTranslationByKey("pop-update-success");
 	langSyncFail = getTranslationByKey("pop-update-fail");
 	}
@@ -19754,9 +19757,11 @@ getSectionIDs("repeating_global", function(idarray) {
 
 	let gameSettings = values[`repeating_global_${rowid}_gameSettingSource`];
 	let ailmentSettings = values[`repeating_global_${rowid}_ailmentSettingSource`];
+	let sheetSettings = values[`repeating_global_${rowid}_sheetSettingSource`];
 
 	let updateFlagGame = "0";
 	let updateFlagAilments = "0";
+	let updateFlagSheet = "0";
 
 	let passCompare = values[`repeating_global_${rowid}_editKey`];
 	let passInput = values.global_access;
@@ -19765,28 +19770,34 @@ getSectionIDs("repeating_global", function(idarray) {
 
 	/* Check: External (Default Sheet Settings) updates */
 		if(values.global_editKey.toLowerCase() != comparekey){
-		output[`repeating_global_${rowid}_editKey`] = values.global_editKey;
-		output["global_editKey"] = rowid;
+			output[`repeating_global_${rowid}_editKey`] = values.global_editKey;
+			output["global_editKey"] = rowid;
 
-		passCompare = values.global_editKey;
+			passCompare = values.global_editKey;
 		}
 
 		if(values.global_gameSettingSource != null && values.global_gameSettingSource.toLowerCase() != comparekey){
-		output[`repeating_global_${rowid}_gameSettingSource`] = values.global_gameSettingSource;
-		output["global_gameSettingSource"] = rowid;
-		gameSettings = values.global_gameSettingSource;
+			output[`repeating_global_${rowid}_gameSettingSource`] = values.global_gameSettingSource;
+			output["global_gameSettingSource"] = rowid;
+			gameSettings = values.global_gameSettingSource;
 
-		updateFlagGame = "true";
-
+			updateFlagGame = "true";
 		}
 
 		if(values.global_ailmentSettingSource != null && values.global_ailmentSettingSource.toLowerCase() != comparekey){
-		output[`repeating_global_${rowid}_ailmentSettingSource`] = values.global_ailmentSettingSource;
-		output["global_ailmentSettingSource"] = rowid;
-		ailmentSettings = values.global_ailmentSettingSource;
+			output[`repeating_global_${rowid}_ailmentSettingSource`] = values.global_ailmentSettingSource;
+			output["global_ailmentSettingSource"] = rowid;
+			ailmentSettings = values.global_ailmentSettingSource;
 
-		updateFlagAilments = "true";
+			updateFlagAilments = "true";
+		}
 
+		if(values.global_sheetSettingSource != null && values.global_sheetSettingSource.toLowerCase() != comparekey){
+			output[`repeating_global_${rowid}_sheetSettingSource`] = values.global_sheetSettingSource;
+			output["global_sheetSettingSource"] = rowid;
+			sheetSettings = values.global_sheetSettingSource;
+
+			updateFlagSheet = "true";
 		}
 
 
@@ -19805,54 +19816,64 @@ getSectionIDs("repeating_global", function(idarray) {
 
 	/* Check: Internal setting updates */
 	if(gameSettings != "" && gameSettings != null && updateFlagGame != "0"){
-	if(gameSettings != values.gameEditor && lockGame != "true"){
+		if(gameSettings != values.gameEditor && lockGame != "true"){
 
-	setAttrs({"gameEditor":gameSettings});
-	dataImport("gameEditor", `repeating_global_${rowid}_`, "global_");
-	output["syncStateGame"] = "0";
+			setAttrs({"gameEditor":gameSettings});
+			dataImport("gameEditor", `repeating_global_${rowid}_`, "global_");
+			output["syncStateGame"] = "0";
 
-	syncToggle = "true";
-	syncHeader = langUpdate; 
-	syncBody += langGameSettings + ": " + langSyncSuccess + "\n";
+			syncToggle = "true";
+			syncHeader = langUpdate; 
+			syncBody += langGameSettings + ": " + langSyncSuccess + "\n";
 		}
-	else if(gameSettings != values.gameEditor && lockGame == "true"){
+		else if(gameSettings != values.gameEditor && lockGame == "true"){
 
-		output["syncStateGame"] = "true";
+			output["syncStateGame"] = "true";
 
-		if(syncGame != "true"){
-		syncToggle = "true";
-		syncHeader = langUpdate; 
-		syncBody += langGameSettings + ": " + langSyncFail + "\n";
+			if(syncGame != "true"){
+				syncToggle = "true";
+				syncHeader = langUpdate; 
+				syncBody += langGameSettings + ": " + langSyncFail + "\n";
 			}
 		}
 	}
 
 	if(ailmentSettings != "" && ailmentSettings != null && updateFlagAilments != "0"){
-	if(ailmentSettings != values.ailmentEditor && lockAilment != "true"){
+		if(ailmentSettings != values.ailmentEditor && lockAilment != "true"){
 
-	setAttrs({"ailmentEditor":ailmentSettings});
-	dataImportRepeating("ailments", "Replace");
-	output["syncStateAilment"] = "0";
+			setAttrs({"ailmentEditor":ailmentSettings});
+			dataImportRepeating("ailments", "Replace");
+			output["syncStateAilment"] = "0";
 
-	syncToggle = "true";
-	syncHeader = langUpdate; 
-	syncBody += langCustomAilments + ": " + langSyncSuccess + "\n";
+			syncToggle = "true";
+			syncHeader = langUpdate; 
+			syncBody += langCustomAilments + ": " + langSyncSuccess + "\n";
 		}
-	else if(ailmentSettings != values.ailmentEditor && lockAilment == "true"){
+		else if(ailmentSettings != values.ailmentEditor && lockAilment == "true"){
 
-		output["syncStateAilment"] = "true";
+			output["syncStateAilment"] = "true";
 
-		if(syncAilment != "true"){
-		syncToggle = "true";
-		syncHeader = langUpdate; 
-		syncBody += langCustomAilments + ": " + langSyncFail + "\n";
+			if(syncAilment != "true"){
+				syncToggle = "true";
+				syncHeader = langUpdate; 
+				syncBody += langCustomAilments + ": " + langSyncFail + "\n";
 			}
 		}
 	}
 
+	if(sheetSettings != "" && sheetSettings != null && updateFlagSheet != "0"){
+
+		setAttrs({"editorInput":sheetSettings});
+		dataImport();
+
+		syncToggle = "true";
+		syncHeader = langUpdate; 
+		syncBody += langSheetSettings + ": " + langSyncSuccess + "\n";
+	}
+
 	/* Check missing AutoScript styling */
 	let autoScriptStyling = values.autoScriptStyling;
-	if (autoScriptStyling == "") {
+	if (autoScriptStyling == "" && !sheetSettings.includes("`AutoScriptStyling`")) {
 		loadDefaultAutoScriptStyling();
 	}
 
