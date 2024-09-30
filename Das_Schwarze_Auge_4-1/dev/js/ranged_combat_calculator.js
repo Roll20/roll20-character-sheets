@@ -14,6 +14,9 @@ function FKWgetType(typeRaw)
 		case '@{AT_Bogen}':
 			FKWtype = 'Bogen';
 			break;
+		case '@{AT_feuerwaffen}':
+			FKWtype = 'Feuerwaffen';
+			break;
 		case '@{AT_Schleuder}':
 			FKWtype = 'Schleuder';
 			break;
@@ -152,6 +155,7 @@ on(
 	"change:fkw_aktiv_schuetzentyp change:sf_scharfschutze_armbrust change:sf_meisterschutze_armbrust " +
 	"change:sf_scharfschutze_blasrohr change:sf_meisterschutze_blasrohr " +
 	"change:sf_scharfschutze_bogen change:sf_meisterschutze_bogen " +
+	"change:sf_scharfschutze_feuerwaffen change:sf_meisterschutze_feuerwaffen " +
 	"change:sf_scharfschutze_wurfbeile change:sf_meisterschutze_wurfbeile " +
 	"change:sf_scharfschutze_wurfmesser change:sf_meisterschutze_wurfmesser " +
 	"change:sf_scharfschutze_wurfspeere change:sf_meisterschutze_wurfspeere " +
@@ -234,6 +238,8 @@ on(
 				'sf_meisterschutze_blasrohr',
 				'sf_scharfschutze_bogen',
 				'sf_meisterschutze_bogen',
+				'sf_scharfschutze_feuerwaffen',
+				'sf_meisterschutze_feuerwaffen',
 				'sf_scharfschutze_schleuder',
 				'sf_meisterschutze_schleuder',
 				'sf_scharfschutze_wurfbeile',
@@ -449,6 +455,10 @@ on(
 						case "Bogen":
 							if(v.sf_scharfschutze_bogen == "1") {FKW.schuetze = 1;}
 							if(v.sf_meisterschutze_bogen == "1") {FKW.schuetze = 2;}
+							break;
+						case "Feuerwaffen":
+							if(v.sf_scharfschutze_feuerwaffen == "1") {FKW.schuetze = 1;}
+							if(v.sf_meisterschutze_feuerwaffen == "1") {FKW.schuetze = 2;}
 							break;
 						case "Schleuder":
 							if(v.sf_scharfschutze_schleuder == "1") {FKW.schuetze = 1;}
@@ -919,6 +929,7 @@ on(
 								case "Belagerungswaffen":
 								case "Blasrohr":
 								case "Bogen":
+								case "Feuerwaffen":
 								case "Schleuder":
 									mods = 4;
 									break;
@@ -954,6 +965,7 @@ on(
 										case "Belagerungswaffen":
 										case "Blasrohr":
 										case "Bogen":
+										case "Feuerwaffen":
 										case "Schleuder":
 											mods = 4;
 											break;
