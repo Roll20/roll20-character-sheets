@@ -181,7 +181,6 @@ const defaultValues = {
 	"AT_Blasrohr": 5,
 	"AT_Bogen": 5,
 	"AT_Diskus": 5,
-	"AT_peitsche": 5,
 	"AT_Schleuder": 5,
 	"AT_Wurfbeile": 5,
 	"AT_Wurfmesser": 5,
@@ -2329,7 +2328,7 @@ const meleeData = {
 		*/
 	},
 	'k_meisterliches_entwaffnen_parade_parierwaffe': {
-		'ui': 'Meisterliches Entwaffnen (Pairerwaffenparade)',
+		'ui': 'Meisterliches Entwaffnen (Parierwaffenparade)',
 		'typ': 'pa-parierwaffe',
 		'rollCount': 1,
 		'mod': '0',

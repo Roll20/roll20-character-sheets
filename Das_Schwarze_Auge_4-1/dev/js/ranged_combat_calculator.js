@@ -611,7 +611,7 @@ on(
 
 					// Helligkeit
 					// absolute Dunkelheit immer "finsternis"
-					
+
 					if(FKR.licht != "nd")
 					{
 						var finsternis = 8;

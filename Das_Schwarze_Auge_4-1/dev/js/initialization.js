@@ -35,7 +35,7 @@ function initializeSheet(migrationChain) {
 
 		/// Ranged Combat
 		"FK_Aktiv", "fkbasis",
-		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_peitsche", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
+		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
 		"FKWFK1", "FKWFK2", "FKWFK3", "FKWFK4",
 		"FKWtyp1", "FKWtyp2", "FKWtyp3", "FKWtyp4",
 
@@ -93,7 +93,7 @@ function initializeSheet(migrationChain) {
 		safeguardAttrs.concat(["data_version"]),
 		function(v, missing, badDef)
 		{
-				debugLog(caller, "Safeguard attributes:", v);
+			debugLog(caller, "Safeguard attributes:", v);
 			var attrs = { "sheet_initialized": false };
 			var dataVersionSet = true;
 
