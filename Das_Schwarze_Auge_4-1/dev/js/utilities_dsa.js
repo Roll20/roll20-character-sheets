@@ -216,7 +216,8 @@ function DSAsane (value, type) {
 			// Limited set of combat techniques to choose from
 			// Must be within the set
 			const meleeCombatTechniques = [
-					"anderthalbhander", "dolche",              "fechtwaffen",
+					"anderthalbhander", "bastardstaebe",       "dolche",
+					"fechtwaffen",
 					"hiebwaffen",       "infanteriewaffen",    "kettenstabe",
 					"kettenwaffen",     "lanzenreiten",        "peitsche",
 					"raufen",           "ringen",              "sabel",

@@ -162,19 +162,22 @@ function(eventInfos) {
 // Not working: Peitsche
 on(
 "change:kk change:kk_basis change:kk_mod "+
-"change:taw_anderthalbhander change:taw_dolche change:taw_fechtwaffen " +
+"change:taw_anderthalbhander change:taw_bastardstaebe change:taw_dolche " +
+"change:taw_fechtwaffen " +
 "change:taw_hiebwaffen change:taw_infanteriewaffen change:taw_kettenstabe " +
 "change:taw_kettenwaffen change:taw_lanzenreiten change:taw_peitsche " +
 "change:taw_raufen change:taw_ringen change:taw_sabel change:taw_schwerter " +
 "change:taw_speere change:taw_stabe change:taw_zweihandflegel " +
 "change:taw_zweihand-hiebwaffen change:taw_zweihandschwerter " +
-"change:at_anderthalbhander change:at_dolche change:at_fechtwaffen change:at_hiebwaffen " +
+"change:at_anderthalbhander change:at_bastardstaebe change:at_dolche change:at_fechtwaffen " +
+"change:at_hiebwaffen " +
 "change:at_infanteriewaffen change:at_kettenstabe change:at_kettenwaffen " +
 "change:at_lanzenreiten change:at_peitsche change:at_raufen change:at_ringen change:at_sabel " +
 "change:at_schwerter change:at_speere change:at_stabe change:at_zweihandflegel " +
 "change:at_zweihand-hiebwaffen change:at_zweihandschwerter " +
 "change:pabasis " +
-"change:pa_anderthalbhander change:pa_dolche change:pa_fechtwaffen change:pa_hiebwaffen " +
+"change:pa_anderthalbhander change: pa_bastardstaebe change:pa_dolche change:pa_fechtwaffen " +
+"change:pa_hiebwaffen " +
 "change:pa_infanteriewaffen change:pa_kettenstabe change:pa_kettenwaffen " +
 "change:pa_lanzenreiten change:pa_peitsche change:pa_raufen change:pa_ringen change:pa_sabel " +
 "change:pa_schwerter change:pa_speere change:pa_stabe change:pa_zweihandflegel " +
@@ -229,14 +232,14 @@ function calculateCombatValues() {
 			"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
 			"INIModNKW" + weapon,
 			"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
-			"TaW_anderthalbhander", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
+			"TaW_anderthalbhander", "TaW_bastardstaebe", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
 			"TaW_infanteriewaffen", "TaW_kettenstabe", "TaW_kettenwaffen", "TaW_lanzenreiten", "TaW_peitsche", "TaW_raufen", "TaW_ringen", "TaW_sabel",
 			"TaW_schwerter", "TaW_speere", "TaW_stabe", "TaW_zweihandflegel", "TaW_zweihand-hiebwaffen", "TaW_zweihandschwerter",
-			"AT_anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
+			"AT_anderthalbhander", "AT_bastardstaebe", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
 			"AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel",
 			"AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
 			"AT_mod_wounds",
-			"PA_anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
+			"PA_anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
 			"PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel",
 			"PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 			"PA_mod_wounds",

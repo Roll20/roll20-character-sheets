@@ -13,6 +13,7 @@ const statAttrs = [
 const combatTechniques = {
 		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
 		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
+		"bastardstaebe":       { type: "melee",  ebe: -2,        "at-only": false },
 		"belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
 		"blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
 		"bogen":               { type: "ranged", ebe: -3,        "at-only": true },
@@ -115,6 +116,7 @@ const defaultValues = {
 	"atbasis": 5,
 
 	"AT_Anderthalbhander": 5,
+	"AT_bastardstaebe": 5,
 	"AT_dolche": 5,
 	"AT_fechtwaffen": 5,
 	"AT_hiebwaffen": 5,
@@ -139,6 +141,7 @@ const defaultValues = {
 	"pabasis": 5,
 
 	"PA_Anderthalbhander": 5,
+	"PA_bastardstaebe": 5,
 	"PA_dolche": 5,
 	"PA_fechtwaffen": 5,
 	"PA_hiebwaffen": 5,
@@ -351,6 +354,7 @@ Individual spell names are generally based on a/the short name. One of the excep
 const talents = [
 	't_ka_anderthalbhaender',
 	't_ka_armbrust',
+	't_ka_bastardstaebe',
 	't_ka_belagerungswaffen',
 	't_ka_blasrohr',
 	't_ka_bogen',
@@ -1054,6 +1058,7 @@ In the long run, all attributes should be migrated to the new ones.
 const talentsData = {
 	't_ka_anderthalbhaender': {'internal': "Anderthalbhander", 'ui': "Anderthalbhänder"},
 	't_ka_armbrust': {'internal': "armbrust", 'ui': "Armbrust"},
+	't_ka_bastardstaebe': {'internal': "bastardstaebe", 'ui': "Bastardstäbe"},
 	't_ka_belagerungswaffen': {'internal': "belagerungswaffen", 'ui': "Belagerungswaffen"},
 	't_ka_blasrohr': {'internal': "blasrohr", 'ui': "Blasrohr"},
 	't_ka_bogen': {'internal': "bogen", 'ui': "Bogen"},
