@@ -2849,7 +2849,7 @@
         on(`clicked:${button}`, function () {
             setAttrs({
                 sheet_type: button
-            });
+            }, {silent: false});
         });
     });
     
@@ -2887,7 +2887,7 @@
             }
             setAttrs({
                 [attr]: button
-            });
+            }, {silent: true});
         });
     });
     on('change:sheet_type', function(eventInfo){
@@ -2950,7 +2950,7 @@
             initializeAttrs(Object.getOwnPropertyNames(v), Object.values(v));
         });
         
-        getAttrs(['professions_total', 'character_level', 'tenacity_current', 'tenacity_current_max', 'amulets_total', 'npc_owner', 'group_size', 'npc_characteristic'], function(v) {
+        getAttrs(['professions_total', 'character_level', 'tenacity_current', 'tenacity_current_max', 'amulets_total', 'npc_owner', 'group_size', 'npc_characteristic', 'danger', 'advantages'], function(v) {
             //workerLog(`Initializing\n[${Object.getOwnPropertyNames(v)}] = [${Object.values(v)}]`);
             setAttrs({
                 professions_total: parseInt(v.professions_total)||0,
@@ -2960,7 +2960,9 @@
                 amulets_total: parseInt(v.amulets_total)||0,
                 npc_owner: String(v.npc_owner),
                 group_size: String(v.group_size),
-                npc_characteristic: parseInt(v.npc_characteristic)||0
+                npc_characteristic: parseInt(v.npc_characteristic)||0,
+                danger: parseInt(v.danger)||0,
+                advantages: parseInt(v.advantages)||0
             }, {silent: true});
         });
 
@@ -3031,7 +3033,7 @@
                 $20(`button[name="act_show_${category}"]`).toggleClass('drd-toggled');
                 setAttrs({
                     categories_shown: array.join(',')
-                });
+                }, {silent: true});
             });
         });
     });
@@ -3054,7 +3056,7 @@
             }
             setAttrs({
                 categories_sorted: newChar
-            });
+            }, {silent: true});
         });
     });
     
@@ -3076,7 +3078,7 @@
         on(`change:${attr}`, function(eventInfo){
             let prevVal = parseInt(eventInfo.previousValue)||0;
             let newVal = parseInt(eventInfo.newValue)||0;
-            if(newVal != prevVal) {
+            if(newVal !== prevVal) {
                 orderProfessions();
                 getAttrs(standardProfessions, function(v){
                     let professionLevels = Object.values(v).map(function(v) {
@@ -3085,7 +3087,7 @@
                     let professionsTotal = professionLevels.reduce((a, b) => a + b, 0);
                     setAttrs({
                         professions_total: professionsTotal
-                    });
+                    }, {silent: false});
                 });
             }
         });
@@ -3094,7 +3096,7 @@
         on(`change:${attr}`, function(eventInfo){
             let prevVal = parseInt(eventInfo.previousValue)||0;
             let newVal = parseInt(eventInfo.newValue)||0;
-            if(newVal != prevVal) {
+            if(newVal !== prevVal) {
                 orderProfessions();
             }
         });
@@ -3119,40 +3121,40 @@
             }
             setAttrs({
                 character_level: characterLevel
-            });
+            }, {silent: true});
         });
     }
     on('change:body_level change:spirit_level change:influence_level change:professions_total', function(eventInfo){
         let prevVal = parseInt(eventInfo.previousValue)||0;
         let newVal = parseInt(eventInfo.newValue)||0;
         //workerLog(`change:${eventInfo.sourceAttribute}`, { eventInfo });
-        if(newVal != prevVal) {
+        if(newVal !== prevVal) {
             calculateLevel();
         }
     });
     
     /* JQuery to show/hide group count */
     function showGroupCount(groupSize) {
-        if((groupSize == 'individual') || (groupSize == 'swarm')) {
+        if((groupSize === 'individual') || (groupSize === 'swarm')) {
             $20('.drd-group-count').addClass('drd-hidden');
         }else $20('.drd-group-count').removeClass('drd-hidden');
     }
     on('change:group_size', function(eventInfo){
         let srcAttr = eventInfo.sourceAttribute;
-        let prevVal = eventInfo.previousValue;
-        let newVal = eventInfo.newValue;
-        if(newVal != prevVal){
+        let prevVal = String(eventInfo.previousValue);
+        let newVal = String(eventInfo.newValue);
+        if(newVal !== prevVal){
             showGroupCount(newVal);
         }
     });
 
     /* JQuery to show/hide companion stats */
     function showCompanionStats(isCompanion) {
-        if(isCompanion == '✗') {
+        if(isCompanion === '✗') {
             $20('.drd-companion-wage').addClass('drd-hidden');
             $20('.drd-npc-companion').addClass('drd-hidden');
             $20('.drd-companion-butt').removeClass('drd-toggled');
-        }else if(isCompanion == '✓') {
+        }else if(isCompanion === '✓') {
             $20('.drd-companion-wage').removeClass('drd-hidden');
             $20('.drd-npc-companion').removeClass('drd-hidden');
             $20('.drd-companion-butt').addClass('drd-toggled');
@@ -3162,7 +3164,7 @@
         let srcAttr = eventInfo.sourceAttribute;
         let prevVal = eventInfo.previousValue;
         let newVal = eventInfo.newValue;
-        if(newVal != prevVal){
+        if(newVal !== prevVal){
             showCompanionStats(newVal);
         }
     });
@@ -3215,25 +3217,30 @@
             let srcAttr = eventInfo.sourceAttribute;
             let prevVal = parseInt(eventInfo.previousValue)||0;
             let newVal = parseInt(eventInfo.newValue)||0;
-            if(newVal != prevVal || (srcAttr.includes('current'))){
+            // srcAttr.includes('current') to register changes on token bars
+            if(newVal !== prevVal || srcAttr.includes('current')){
                 //workerLog(`change:${srcAttr}`, { eventInfo });
                 let attrs = [`${group}_level`, `${group}_pool`, `${group}_current`, `${group}_scarred`, `${group}_exhausted`, 'sheet_type'];
                 getAttrs(attrs, function(v){
-                    let level = parseInt(Object.values(v)[0]);
-                    let pool = parseInt(Object.values(v)[1]);
-                    let current = parseInt(Object.values(v)[2]);
-                    let scarred = parseInt(Object.values(v)[3]);
-                    let exhausted = parseInt(Object.values(v)[4]);
+                    let level = parseInt(Object.values(v)[0])||0;
+                    let pool = parseInt(Object.values(v)[1])||0;
+                    let current = parseInt(Object.values(v)[2])||0;
+                    let scarred = parseInt(Object.values(v)[3])||0;
+                    let exhausted = parseInt(Object.values(v)[4])||0;
                     let sheetType = String(Object.values(v)[5]);
+                    if(scarred < 0) {scarred = 0;}
+                    if(current < 0) {current = 0;}
                     let currentMax = (level - scarred);
                     if(currentMax <= 0){
                         currentMax = 0;
                         current = (level - scarred);
-                    }else if(currentMax < current) {
-                        current = currentMax;
-                    }else if(current < 0) {
-                        current = 0;
                     }
+                    if(currentMax < current) {
+                        current = currentMax;
+                    }
+                    if(scarred >= level){exhausted = 0;}
+                    if(exhausted < 0){exhausted = 0;}
+                    if(exhausted > level){exhausted = level;}
                     
                     if(srcAttr.includes('level')){
                         if(srcAttr.includes('bond') && level > 5) {
@@ -3253,22 +3260,18 @@
                             current = currentMax;
                         }
                     }else if(srcAttr.includes('scarred')){
-                        if(scarred < 0) {scarred = 0;}
-                        if(sheetType == 'npc' && !srcAttr.includes('bond')) current = currentMax;
+                        if(sheetType === 'npc' && !srcAttr.includes('bond')) {current = currentMax;}
                         exhausted = currentMax - Math.abs(current);
                     }
-                    
-                    if(exhausted < 0){exhausted = 0;}
-                    if(exhausted > level){exhausted = level;}
                     
                     setAttrs({
                         [`${group}_level`]: level,
                         [`${group}_pool`]: pool,
                         [`${group}_current`]: current,
                         [`${group}_current_max`]: currentMax,
-                        [`${group}_exhausted`]: exhausted,
-                        [`${group}_scarred`]: scarred
+                        [`${group}_exhausted`]: exhausted
                     }, {silent: true});
+                    setAttrs({[`${group}_scarred`]: scarred}, {silent: false});
                     setSquares(group, level, scarred, exhausted, current, sheetType);
                 });
             }
@@ -3286,19 +3289,19 @@
                 let values = Object.values(v);
                 let prevChar = values[0];
                 let newChar = '';
-                let current = parseInt(values[1]);
-                let scarred = parseInt(values[2]);
+                let current = parseInt(values[1])||0;
+                let scarred = parseInt(values[2])||0;
                 let sheetType = String(values[3]);
                 //workerLog(`(${sheetType}) ${button} square clicked`);
-                if (prevChar == '/') {
+                if (prevChar === '/') {
                     newChar = 'X';
                     scarred++;
-                } else if (prevChar == 'X') {
+                } else if (prevChar === 'X') {
                     newChar = ' ';
                     scarred--;
                     current++;
-                } else if (prevChar == ' ') {
-                    if(sheetType == 'pc') {
+                } else if (prevChar === ' ') {
+                    if(sheetType === 'pc') {
                         newChar='/';
                         current--;
                     }else {
@@ -3308,13 +3311,13 @@
                 }
                 setAttrs({
                     [button]: newChar
-                }, {silent: false});
-                if(current != values[1]){
+                }, {silent: true});
+                if(current !== parseInt(values[1])){
                     setAttrs({
                         [`${stat}_current`]: current
                     }, {silent: false});
                 }
-                if(scarred != values[2]){
+                if(scarred !== parseInt(values[2])){
                     setAttrs({
                         [`${stat}_scarred`]: scarred
                     }, {silent: false});
@@ -3334,30 +3337,30 @@
                 let values = Object.values(v);
                 let prevChar = values[0];
                 let newChar = '';
-                let current = parseInt(values[1]);
-                let scarred = parseInt(values[2]);
+                let current = parseInt(values[1])||0;
+                let scarred = parseInt(values[2])||0;
                 let sheetType = String(values[3]);
                 //workerLog(`[${sheetType}] ${button} square clicked`);
-                if (prevChar == '/') {
+                if (prevChar === '/') {
                     newChar = 'X';
                     scarred++;
-                } else if (prevChar == 'X') {
+                } else if (prevChar === 'X') {
                     newChar = ' ';
                     scarred--;
                     current++;
-                } else if (prevChar == ' ') {
+                } else if (prevChar === ' ') {
                     newChar='/';
                     current--;
                 }
                 setAttrs({
                     [button]: newChar
-                }, {silent: false});
-                if(current != values[1]){
+                }, {silent: true});
+                if(current !== parseInt(values[1])){
                     setAttrs({
                         [`${stat}_current`]: current
                     }, {silent: false});
                 }
-                if(scarred != values[2]){
+                if(scarred !== parseInt(values[2])){
                     setAttrs({
                         [`${stat}_scarred`]: scarred
                     }, {silent: false});
@@ -3377,29 +3380,29 @@
                 let values = Object.values(v);
                 let prevChar = values[0];
                 let newChar = '';
-                let current = parseInt(values[1]);
-                let scarred = parseInt(values[2]);
+                let current = parseInt(values[1])||0;
+                let scarred = parseInt(values[2])||0;
                 //workerLog(`${button} square clicked`);
-                if (prevChar == '/') {
+                if (prevChar === '/') {
                     newChar = 'X';
                     scarred++;
-                } else if (prevChar == 'X') {
+                } else if (prevChar === 'X') {
                     newChar = ' ';
                     scarred--;
                     current++;
-                } else if (prevChar == ' ') {
+                } else if (prevChar === ' ') {
                     newChar='/';
                     current--;
                 }
                 setAttrs({
                     [button]: newChar
-                }, {silent: false});
-                if(current != values[1]){
+                }, {silent: true});
+                if(current !== parseInt(values[1])){
                     setAttrs({
                         [`${networkId}_bond_current`]: current
                     }, {silent: false});
                 }
-                if(scarred != values[2]){
+                if(scarred !== parseInt(values[2])){
                     setAttrs({
                         [`${networkId}_bond_scarred`]: scarred
                     }, {silent: false});
@@ -3417,14 +3420,14 @@
             let newChar = 'L';
             if (!prevChar) {
                 newChar = 'S';
-            } else if (prevChar == 'L') {
+            } else if (prevChar === 'L') {
                 newChar = 'S';
-            } else if (prevChar == 'S') {
+            } else if (prevChar === 'S') {
                 newChar = 'T';
             }
             setAttrs({
                 load: newChar
-            });
+            }, {silent: true});
         });
     });
 
@@ -3435,12 +3438,12 @@
         getAttrs(['is_companion'], function (v) {
             let prevChar = v.is_companion;
             let newChar = '✓';
-            if (prevChar == '✓') {
+            if (prevChar === '✓') {
                 newChar = '✗';
             }
             setAttrs({
                 is_companion: newChar
-            });
+            }, {silent: false});
         });
     });
 
@@ -3510,7 +3513,7 @@
      * current = current number of blank squares
      */
     function setSquares(squareGroup, level, scarred, exhausted, current, sheetType){
-        if(sheetType == 'npc' && !squareGroup.includes('companion')) {exhausted = 0;}
+        if(sheetType === 'npc' && !squareGroup.includes('companion')) {exhausted = 0;}
         let scarSquares = [];
         let exhaustedSquares = [];
         let blankSquares = [];
@@ -3576,7 +3579,7 @@
         let newVal = parseInt(eventInfo.newValue)||0;
         let sourceType = eventInfo.sourceType;
         //workerLog('change:amulets_total', { eventInfo });
-        if(sourceType == 'player') {
+        if(sourceType === 'player') {
             repeatingSum('amulets_total', 'amulets', 'amulet_charge');
         }
     });

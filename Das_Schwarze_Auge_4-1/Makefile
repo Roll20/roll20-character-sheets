@@ -39,6 +39,7 @@ JS = \
 	dev/js/advantages_disadvantages.js \
 	dev/js/talents.js \
 	dev/js/magic.js \
+	dev/js/magic_myranor.js \
 	dev/js/liturgies.js \
 	dev/js/melee.js \
 	dev/js/ranged_combat_calculator.js \

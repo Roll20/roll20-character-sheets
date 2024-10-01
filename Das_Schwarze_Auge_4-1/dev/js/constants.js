@@ -312,7 +312,23 @@ const defaultValues = {
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
 	"reg_sleep_sleep_disorder_trigger": "1d0",
-	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}",
+
+	// Repeating sections
+	"repeating_conjuration-spells-myranor": {
+		"spell_action": '&{template:default} {{Hinweis=Attribut "spell_action" eines myranischen Beschwörungszaubers noch nicht gesetzt. Versuchen Sie den Charakterbogen zu schließen und wieder zu öffnen. Alternativ sollte eine Änderung an der Quelle, der Kategorie, der Repräsentation oder den Probeneigenschaften dazu führen, dass der Würfelknopf korrekt funktioniert.}}',
+		"sphere": "Sphäre unbekannt",
+		"stats": "MU/KL/CH",
+		"value": 0,
+		"source": "Quelle?",
+		"type": "?",
+		"representation_full": "??????",
+		"representation_short": "???",
+		"stat0": "MU",
+		"stat1": "KL",
+		"stat2": "CH",
+		"name": "Quelle? (?), ???"
+	}
 };
 
 /*
@@ -1640,6 +1656,63 @@ const spellsData = {
 	'z_zungelaehmen': {'internal': "zunge", 'ui': "Zunge lähmen", 'stats': ['MU', 'CH', 'FF']},
 	'z_zwingtanz': {'internal': "zwingtanz", 'ui': "Zwingtanz", 'stats': ['MU', 'KL', 'CH']}
 };
+/*
+	Myranor-only
+	Map sources to spheres
+ */
+const sourcesSpheresData = {
+	'Abgrund': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggari': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggression': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Avastada': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Begierde': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Carafai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Darcalya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Dya\'Khol': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Eis': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Endgültigkeit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erfolg': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erkenntnis': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erz': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Eskates': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Feenwesen': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Feuer': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Freiheit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Galkuzul': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Ghorgumor': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Harmonie': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Humus': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Iryabaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Khalyanar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Kraft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Kreativität': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Luft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Mishkarya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Naggarach': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Thesephai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Tiergeister': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Totenwesen': { "internal": 'Tod', "ui": 'Sphäre des Todes' },
+	'Tyakaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Wahnsinn': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Wasser': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Xolovar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Zauberei': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Zeit': { "internal": 'Zeit', "ui": 'Sphäre der Zeit' }
+};
+
+/*
+	Myranor-only
+	Map spheres to stats required for checks
+*/
+const spheresStatsData = {
+	'Zeit': [ 'MU', 'KL', 'IN' ],
+	'Elemente': [ 'MU', 'KL', 'CH' ],
+	'Natur': [ 'MU', 'KL', 'IN' ],
+	'Tod': [ 'MU', 'MU', 'CH' ],
+	'Stellare': [ 'KL', 'IN', 'CH' ],
+	'Dämonen': [ 'MU', 'MU', 'CH' ]
+}
+
 /*
 	Constants for effective encumbrance for talent/spell checks
 */
