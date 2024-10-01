@@ -93,11 +93,11 @@ Along the top is an accounting of your carried weight and DCV and movement penal
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-The sheet includes space for four suits or pieces of armor. If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation approach, there is a field for hit locations if your GM chooses to use that system.
+To the right of encumbrance bar you will find OCV* and DCV*, these combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the last action was use of a mental power, these values represent OMCV and DMCV. One exception are roll modifiers. These will not be applied to OCV* and DCV* due limitations of Roll20's roll actions.
 
 ![Ephemeral CVs](/HeroSystem6eHeroic/images/ephemeralCVs.png)
 
-To the right of encumbrance bar you will find OCV* and DCV*, these combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the last action was use of a mental power, these values represent OMCV and DMCV. One exception are roll modifiers. These will not be applied to OCV* and DCV* due limitations of Roll20's roll actions.
+The sheet includes space for four suits or pieces of armor. If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation approach, there is a field for hit locations if your GM chooses to use that system.
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
