@@ -107,7 +107,7 @@ Click the "Roll" button to roll armor activation. A message like the one shown b
 
 The weapons section contains space for five weapons (or spells or abilities with weapon-like action). Most of these fields may simply be entered after referring to equipment tables. The weapon damage "field" is actually a button that brings up the Weapon Worksheet, which prepares a base weapon for a character's use.
 
-![Weapons Table B](/HeroSystem6eHeroic/images/weaponsAB.png)
+![Weapons Table B](/HeroSystem6eHeroic/images/weapons.png)
 
 With the Weapon Worksheet open, begin by entering a weapon's base damage (the shield works the same way). HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (if "Normal Damage" is checked). The resulting dice value appears on the right under "Results." Next, set the weapon's minimum strength value and the strength the character actually applies. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
 
@@ -115,7 +115,7 @@ With the Weapon Worksheet open, begin by entering a weapon's base damage (the sh
 
 HERO System 6th Edition considers certain power advantages when determining enhancements to damage (e.g., armor piercing, see 6E2 98-100). HS6eH uses an algorithm that duplicates the *Damage Classes Quick-Reference Tables* found on 6E2 101 plus a best attempt to expand them using the *Expanded Damage Class Tables* available for a small fee separately from Hero Games. The expanded tables were used only as guidance since they do not always agree with the rulebook (and are missing some important common values).
 
-![Weapons Table A](/HeroSystem6eHeroic/images/weapons.png)
+![Weapons Table A](/HeroSystem6eHeroic/images/weaponsAB.png)
 
 ![A/B Button](/HeroSystem6eHeroic/images/ABButton.png) The "A/B" button in the title bar swaps the visible set of weapons (or armor) with a second set. One set could be an adventurer's traveling kit and the second a heavier battlefield loadout. Alternatively, a hero such as Neo in the Matrix might just need as many weapons as they can carry. The "up" mover button of top item of the visible set moves the item to the second set. The "down" mover button of the bottom item likewise exchanges the bottom items of each set. 
 
