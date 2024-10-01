@@ -488,6 +488,11 @@
 				<input type="number" name="attr_weightEndPenalty" title="@{weightEndPenalty}" value="0" readonly tabindex="-1"/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
+				<h1>Movement</h1>
+				<h1>Penalty</h1>
+				<input type="number" name="attr_weightMovePenalty" title="@{weightMovePenalty}" value="0" readonly tabindex="-1"/>
+			</div>
+			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>DCV & DEX</h1>
 				<h1>Penalty</h1>
 				<input type="number" name="attr_weightDexDCVPenalty" title="@{weightDexDCVPenalty}" value="0" readonly tabindex="-1"/>
@@ -507,23 +512,18 @@
 					</div>
 				</div>
 			</div>
-			<div class="subitem-tab-gear-flex-container-encumbrance">
-				<h1>Movement</h1>
-				<h1>Penalty</h1>
-				<input type="number" name="attr_weightMovePenalty" title="@{weightMovePenalty}" value="0" readonly tabindex="-1"/>
-			</div>
 			<div class="subitem-tab-gear-flex-container-cv-status">
 				<div class="subitem-tab-gear-flex-container-ocv-status">
 					<div class="cv-status-label-container">
 						<h1>OCV*</h1>
 					</div>
-					<input type="number" name="attr_ocvNet" title="@{ocvNet}" value="0" readonly tabindex="-1"/>
+					<input type="number" name="attr_ephemeralOCV" title="@{ephemeralOCV}" value="0" readonly tabindex="-1"/>
 				</div>
 				<div class="subitem-tab-gear-flex-container-dcv-status">
 					<div class="cv-status-label-container">
 						<h1>DCV*</h1>
 					</div>
-					<input type="number" name="attr_currentDCV" title="@{currentDCV}" value="0" readonly tabindex="-1"/>
+					<input type="number" name="attr_ephemeralDCV" title="@{ephemeralDCV}" value="0" readonly tabindex="-1"/>
 				</div>
 			</div>
 		</div>
@@ -12660,8 +12660,8 @@
 <input type="hidden" name="attr_currentDCV" value="0"/>
 
 <!-- Transitional CVs for Display -->
-<input type="hidden" name="attr_ephemeralOCV" value="0"/>
-<input type="hidden" name="attr_ephemeralDCV" value="0"/>
+<!-- <input type="hidden" name="attr_ephemeralOCV" value="0"/>
+<input type="hidden" name="attr_ephemeralDCV" value="0"/> -->
 
 <!-- Set B armor variables -->
 <input type="hidden" name="attr_armorName11" value=""/>
@@ -13814,7 +13814,7 @@
 	// Reset endurance and stun in item-characteristics-health when the reset action button is clicked.
 	// Also resets targeting choices if that option is checked.
 	on("clicked:resetHealth", function () {
-		getAttrs(["enduranceNet", "stunNet", "optionResetTargeting", "optionResetCSLs", "targetSelection", "rangeMartial", "rangeManeuver", "maneuverSelection", "running", "gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "martialManeuverOCVmod01", "martialManeuverOCVmod02", "martialManeuverOCVmod03", "martialManeuverOCVmod04", "martialManeuverOCVmod05", "martialManeuverOCVmod06", "martialManeuverOCVmod07", "martialManeuverOCVmod08", "martialManeuverOCVmod09", "martialManeuverOCVmod10", "martialManeuverDCVmod01", "martialManeuverDCVmod02", "martialManeuverDCVmod03", "martialManeuverDCVmod04", "martialManeuverDCVmod05", "martialManeuverDCVmod06", "martialManeuverDCVmod07", "martialManeuverDCVmod08", "martialManeuverDCVmod09", "martialManeuverDCVmod10", "martialManeuverCSLmod01", "martialManeuverCSLmod02", "martialManeuverCSLmod03", "martialManeuverCSLmod04", "martialManeuverCSLmod05", "martialManeuverCSLmod06", "martialManeuverCSLmod07", "martialManeuverCSLmod08", "martialManeuverCSLmod09", "martialManeuverCSLmod10", "weaponCSL01", "weaponCSL02", "weaponCSL03", "weaponCSL04", "weaponCSL05", "weaponCSL06"], function(values) {
+		getAttrs(["enduranceNet", "stunNet", "optionResetTargeting", "optionResetCSLs", "targetSelection", "rangeMartial", "rangeManeuver", "maneuverSelection", "running", "gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "martialManeuverOCVmod01", "martialManeuverOCVmod02", "martialManeuverOCVmod03", "martialManeuverOCVmod04", "martialManeuverOCVmod05", "martialManeuverOCVmod06", "martialManeuverOCVmod07", "martialManeuverOCVmod08", "martialManeuverOCVmod09", "martialManeuverOCVmod10", "martialManeuverDCVmod01", "martialManeuverDCVmod02", "martialManeuverDCVmod03", "martialManeuverDCVmod04", "martialManeuverDCVmod05", "martialManeuverDCVmod06", "martialManeuverDCVmod07", "martialManeuverDCVmod08", "martialManeuverDCVmod09", "martialManeuverDCVmod10", "martialManeuverCSLmod01", "martialManeuverCSLmod02", "martialManeuverCSLmod03", "martialManeuverCSLmod04", "martialManeuverCSLmod05", "martialManeuverCSLmod06", "martialManeuverCSLmod07", "martialManeuverCSLmod08", "martialManeuverCSLmod09", "martialManeuverCSLmod10", "weaponCSL01", "weaponCSL02", "weaponCSL03", "weaponCSL04", "weaponCSL05", "weaponCSL06", "currentDCV", "ocvNet"], function(values) {
 			var attributes = new Object();
 			
 			const maxEND = parseInt(values.enduranceNet);
@@ -13887,6 +13887,8 @@
 			
 			attributes.currentSTUN = maxSTUN;
 			attributes.currentEND = maxEND;
+			attributes.ephemeralOCV = parseInt(values["ocvNet"])||3;
+			attributes.ephemeralDCV = parseInt(values["currentDCV"])||3;
 			
 			setAttrs(attributes);
 		});
@@ -15057,7 +15059,7 @@
 	arrayOf(maxPowerNum).forEach(num => {
 		var powerId = String(num).padStart(2,'0');
 		on("clicked:powerRoll"+powerId, function() {
-			getAttrs(["displayDegreeOfSuccess", "optionD6MinusOne", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEffect"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerDamageAdvantage"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "powerCSL", "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat"], function(values) {
+			getAttrs(["displayDegreeOfSuccess", "optionD6MinusOne", "whisperToGM", "character_title", "displayDegreeOfSuccess", "showPowerDescriptions", "currentDCV", "optionAutoSubtractEND", "powerName"+powerId, "powerEffect"+powerId, "powerStunMod"+powerId, "powerActivate"+powerId, "powerAttack"+powerId, "powerDamageAdvantage"+powerId, "powerAoE"+powerId, "powerEND"+powerId, "powerDamageType"+powerId, "hiddenPowerDice"+powerId, "powerDCV"+powerId, "powerRMod"+powerId, "powerCSL", "rangeToTarget", "rangeOCVpenalty", "checkBrace", "checkSet", "powerManeuver", "dingbat", "ocvNet", "omcvNet", "dmcvNet", "targetOCVpenalty"], function(values) {
 				var attributes = new Object();
 				
 				var theRoll = values.whisperToGM||"";
@@ -15072,6 +15074,8 @@
 				let subtractENDAmt = parseInt(values["powerEND"+powerId])||0;
 				let netDCV = parseInt(values["currentDCV"])||3;
 				let halfDCV = false;
+				let netOCV = parseInt(values["ocvNet"])||3;
+				let penaltyOCV = parseInt(values["targetOCVpenalty"])||0;
 				let modDCV = 0;
 				let modDC = 0;
 				let theAdvantage = parseFloat(values["powerDamageAdvantage"+powerId])||0;
@@ -15088,9 +15092,9 @@
 				let isBraced = (values.checkBrace === "on") ? true : false;
 				let isSpecialDamage = false;
 				let braceMod = 0;
+				let isRanged = (values.rangeToTarget > 8) ? true : false;
 				let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 				let hasRangePenalty = (theRangePenalty > 0) ? true : false;
-				let isRangedAttack = (values.rangeToTarget > 8) ? true : false;
 				
 				// Range Mod
 				switch (values["powerRMod"+powerId]) {
@@ -15115,11 +15119,6 @@
 				if (isBraced) {
 					braceMod = 2;
 					halfDCV = true;
-					
-					// Check to see if Brace nullifies the RMod penalty.
-					if (braceMod >= theRangePenalty) {
-						hasRangePenalty = false;
-					}
 				}
 				
 				// Establish damage and attack types.
@@ -15151,6 +15150,8 @@
 									attributes.hiddenIsMental = "true";
 									attributes.powerCSL = 0;
 									isMental = true;
+									netOCV = parseInt(values["omcvNet"])||0;
+									netDCV = parseInt(values["dmcvNet"])||0;
 									break;
 					default:		attributes.hiddenIsNormal = "false";
 									attributes.hiddenIsPower = "true";
@@ -15243,6 +15244,16 @@
 				attributes.hiddenIsAoE = isAoE ? "true" : "false";
 				attributes.hiddenIsContest = "false";
 				
+				// Experimental
+				if (isAttack && !isMental) {
+					netOCV -= (isAoE ? 0 : 1)*penaltyOCV;
+					netOCV += (isSet ? 1 : 0);
+					netOCV -= Math.max(0, theRangePenalty - (isBraced ? braceMod : 0));
+				}
+				
+				attributes.ephemeralOCV = netOCV;
+				attributes.ephemeralDCV = netDCV;
+				
 				// Send changes for use with damage roll template functions.
 				setAttrs(attributes);
 				
@@ -15262,17 +15273,24 @@
 				}
 				
 				if (isAttack) {
-					if  (isRangedAttack && hasRangePenalty) {
+					if (isMental) {
 						if (dispDoS) {
+							theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1+@{omcv}[OMCV]+?{MOCV Modifier|0}[Modifiers]]]}} ";
+						} else {
+							theRoll	+= "{{OMCV=[[@{omcv}[OMCV]+?{MOCV Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
+						}
+					} else if  (isRanged && hasRangePenalty) {
+						if (dispDoS) {
+							// Keeping Mental CV functionality here if future cases come up where it becomes needed.
 							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}} ";
 						} else {
 							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
 						}
 					} else {
 						if (dispDoS) {
-							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRangedAttack ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}} ";
+							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRanged ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}} ";
 						} else {
-							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRangedAttack ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
+							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRanged ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
 						}
 					}
 				}
@@ -17055,14 +17073,6 @@
 	/* ----------------- */
 	/* Armor Movers      */
 	/* ----------------- */
-		
-	// arrayOf(maxArmorNum).forEach(num => {
-	// 	var lowId = String(num).padStart(2,'0');
-	// 	var highId = String(num === maxArmorNum ? 1 : num + 1).padStart(2,'0');
-	// 	
-	// 	swapArmorPositions(lowId, highId);
-	// });
-	// 
 	
 	arrayOf(maxArmorNum).forEach(num => {
 		// For armor 01 and 04 we need to swap with the alternates 14 and 11.
@@ -17243,9 +17253,10 @@
 		on(`clicked:maneuverAttack${maneuverId}`, (info)  => {
 			// Roll attack and damage dice for Martial Maneuver XX if the maneuver is not a weapon maneuver.
 			
-			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCVmod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverCSLmod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem",  "optionD6MinusOne", "whisperToGM", "character_title",  "displayDegreeOfSuccess", "rangeMartial", "strengthNet", "currentDCV", "dingbat"], function(values) {
+			getAttrs(["hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverOCVmod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverCSLmod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCV"+maneuverId, "martialManeuverDCV"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem",  "optionD6MinusOne", "whisperToGM", "character_title",  "displayDegreeOfSuccess", "rangeMartial", "strengthNet", "currentDCV", "dingbat", "ocvNet", "targetOCVpenalty", "rangeOCVpenalty", "checkBrace", "checkSet"], function(values) {
 				var theRoll = values.whisperToGM||"";
-				// const useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
+				var attributes = new Object();
+				
 				const dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 				const optionMinusOne = (values.optionD6MinusOne === "on") ? true : false;
 				let isNormal = (values["martialManeuverNormal"+maneuverId] === "on") ? true : false;
@@ -17272,67 +17283,94 @@
 				// CV
 				let netDCV = parseInt(values["currentDCV"])||3;
 				let maneuverDCV = parseInt(values["martialManeuverDCV"+maneuverId])||0;
+				let halfDCV = false;
+				let netOCV = parseInt(values["ocvNet"])||3;
+				let maneuverOCV = parseInt(values["martialManeuverOCV"+maneuverId])||0;
+				let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
 				
 				// Martial maneuvers by default cost no endurance. Endurance costs used for flexibility.
 				let subtractENDAmt =  parseInt(values["martialManeuverEndurance"+maneuverId])||0;	
-				let isRanged = false;
-				
-				if (values.rangeMartial > 8) {
-					isRanged = true;
-				}
+				let isSet = (values.checkSet === "on") ? true : false;
+				let isBraced = (values.checkBrace === "on") ? true : false;
+				let braceMod = 0;
+				let isAoE = false;
+				let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
+				let hasRangePenalty = (theRangePenalty > 0) ? true : false;
+				let isRanged = (values.rangeMartial > 8) ? true : false;
 				
 				// Keep mods within reasonable limits.
 				ocvMod = Math.max(0, (Math.min(modLimit, ocvMod)) );
 				dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
 				cslMod = Math.max(0, (Math.min(modLimit, cslMod)) );
 				
+				// Braced modifiers.
+				if (isBraced) {
+					braceMod = 2;
+					halfDCV = true;
+					
+					// Check to see if Brace nullifies the RMod penalty.
+					if (braceMod >= theRangePenalty) {
+						hasRangePenalty = false;
+					}
+				}
+				
 				// Without Brace or another 1/2 DCV modifier, DCV should be the characters current DCV plus the Maneuver DCV and adds.
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
+				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, halfDCV);
+				netOCV += maneuverOCV + ocvMod;
 				
 				// Prepare hidden variables for the maneuver roll.
 				if (isBlocking) {
 					
-					setAttrs({
-						"hiddenIsContest": "false",
-						"hiddenIsPower": "false",
-						"rangeManeuver":0,
-						"checkSet":0,
-						"checkBrace":0
-					});	
+					attributes.hiddenIsContest = "false";
+					attributes.hiddenIsPower = "false";
+					attributes.rangeManeuver = 0;
+					attributes.checkSet = 0;
+					attributes.checkBrace = 0;
+					
 				} else if (isContest) {
 					rollMessage = values["martialManeuverName"+maneuverId];
 					damageLabel = "Contest";
 					
-					setAttrs({
-						"hiddenDamage": contestDice,
-						"hiddenIsNormal": "false",
-						"hiddenIsContest": "true",
-						"hiddenIsPower": "false",
-						"hiddenMessage": rollMessage
-					});
+					attributes.hiddenDamage = contestDice;
+					attributes.hiddenIsNormal = false;
+					attributes.hiddenIsContest = true;
+					attributes.hiddenIsPower = false;
+					attributes.hiddenMessage = rollMessage;
+					
 				} else if (isAttack) {
 					// Damage
 					damageObject = createDamageObject(values["hiddenMartialManeuverDamage"+maneuverId], isNormal, 0);
 					
-					setAttrs({
-						"hiddenDamage": getDamageDice(damageObject.DC + modDC, 0, damageObject.normal, damageObject.pip),
-						"hiddenStunMod": stunMod,
-						"hiddenIsNormal": isNormal ? "true" : "false",
-						"hiddenIsContest": "false",
-						"hiddenMessage": rollMessage,
-						"hiddenIsAoE": "false"
-					});
+					attributes.hiddenDamage = getDamageDice(damageObject.DC + modDC, 0, damageObject.normal, damageObject.pip);
+					attributes.hiddenStunMod = stunMod;
+					attributes.hiddenIsNormal = isNormal ? "true" : "false";
+					attributes.hiddenIsContest = false;
+					attributes.hiddenMessage = rollMessage;
+					attributes.hiddenIsAoE = false;
+					
 				} else if (isDodging) {
-					setAttrs({
-						"hiddenIsContest": "false",
-						"hiddenIsPower": "false",
-						"rangeManeuver":0,
-						"checkSet":0,
-						"checkBrace":0
-					});
+					
+					attributes.hiddenIsContest = false;
+					attributes.hiddenIsPower = false;
+					attributes.rangeManeuver = 0;
+					attributes.checkSet = 0;
+					attributes.checkBrace = 0;
+					
 				} else {
 					return;
 				}
+				
+				// Experimental
+				if (! isDodging) {
+					netOCV -= (isAoE ? 0 : 1)*targetPenalty;
+					netOCV += isSet ? 1 : 0;
+					netOCV -= (hasRangePenalty ? (theRangePenalty - (isBraced ? braceMod : 0)) : 0);
+				}
+				attributes.ephemeralOCV = netOCV;
+				attributes.ephemeralDCV = netDCV;
+				
+				// Send changes for use with damage roll template functions.
+				setAttrs(attributes);
 				
 				// Create dice rolling script to send to a roll dialog.
 				if (isAttack || isContest) {
@@ -18431,8 +18469,10 @@
 	
 	// Function for handling standard maneuver weapon attacks.
 	function weaponAttack(weaponId) {
-		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat"], function(values) {
+		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			var attributes = new Object();
+			
 			let isAoE = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 			const useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			const optionMinusOne = (values.optionD6MinusOne === "on") ? true : false;
@@ -18462,8 +18502,10 @@
 			
 			// CV
 			let netDCV = parseInt(values["currentDCV"])||3;
+			let netOCV = parseInt(values["ocvNet"])||3;
 			let maneuverOCV = 0;
 			let maneuverDCV = 0;
+			let weaponOCV =parseInt(values["weaponOCV"+weaponId])||0;
 			let penaltyOCV = 0;
 			let strengthPenalty = false;
 			let halfDCV = false;
@@ -18473,12 +18515,23 @@
 			let isSet = (values.checkSet === "on") ? true : false;
 			let isBraced = (values.checkBrace === "on") ? true : false;
 			let braceMod = 0;
+			let rangeMod = (parseInt(values["weaponRangeMod"+weaponId])||0);
 			let dcvMod = parseInt(values.maneuverDCVmod)||0;
-			let isRangedAttack = false;
+			let ocvMod = parseInt(values.maneuverOCVmod)||0;
+			let isRanged = false;
+			let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 			let hasRangePenalty = true;
+			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
 			
 			// Limit DCV mod.
-			dcvMod = Math.max(0, Math.min(modLimit, dcvMod));
+			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
+			ocvMod = Math.max(0, (Math.min(modLimit, ocvMod)) );
+			
+			// Braced modifiers.
+			if (isBraced) {
+				braceMod = 2;
+				halfDCV = true;
+			}
 			
 			// Maneuver message and DCV and damage mods.
 			if (values.maneuverSelection === "haymaker") {
@@ -18500,15 +18553,14 @@
 					adjustedDC += 4;
 				}
 				
-				setAttrs({
-					"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
-					"hiddenStunMod": stunMod,
-					"hiddenIsNormal": isNormal ? "true" : "false",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": isAoE ? "true" : "false"
-				});
+				attributes.hiddenDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, theSign);
+				attributes.hiddenStunMod = stunMod;
+				attributes.hiddenIsNormal = isNormal ? "true" : "false";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = isAoE ? "true" : "false";
+				
 			} else if ( (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "moveThrough") ) {
 				
 				if (values.maneuverSelection === "moveBy") {
@@ -18571,18 +18623,17 @@
 					adjstedDC = 0;
 				}
 				
-				setAttrs({
-					"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
-					"hiddenStunMod": stunMod,
-					"hiddenIsNormal": isNormal ? "true" : "false",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false",
-					"rangeManeuver": 0,
-					"checkSet": 0,
-					"checkBrace": 0
-				});
+				attributes.hiddenDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, theSign);
+				attributes.hiddenStunMod = stunMod;
+				attributes.hiddenIsNormal = isNormal ? "true" : "false";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} if (values.maneuverSelection === "multipleAttack") {
 				rollMessage = "Multiple " + (isNormal ? "" : "Killing ") + "Attack";
 				
@@ -18591,15 +18642,14 @@
 				maneuverDCV = 0;
 				halfDCV = true;
 				
-				setAttrs({
-					"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
-					"hiddenStunMod": stunMod,
-					"hiddenIsNormal": isNormal ? "true" : "false",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": isAoE ? "true" : "false"
-				});
+				attributes.hiddenDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, theSign);
+				attributes.hiddenStunMod = stunMod;
+				attributes.hiddenIsNormal = isNormal ? "true" : "false";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = isAoE ? "true" : "false";
+				
 			} else if (values.maneuverSelection === "strike") {
 				rollMessage = (isNormal ? "" : "Killing ") + "Strike";
 				
@@ -18608,15 +18658,14 @@
 				maneuverDCV = 0;
 				halfDCV = isBraced ? true : false;
 				
-				setAttrs({
-					"hiddenDamage": values["hiddenWeaponDamage"+weaponId]||0,
-					"hiddenStunMod": stunMod,
-					"hiddenIsNormal": isNormal ? "true" : "false",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": isAoE ? "true" : "false"
-				});
+				attributes.hiddenDamage = values["hiddenWeaponDamage"+weaponId]||0;
+				attributes.hiddenStunMod = stunMod;
+				attributes.hiddenIsNormal = isNormal ? "true" : "false";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = isAoE ? "true" : "false";
+				
 			} else if (values.maneuverSelection === "disarm") {
 				rollMessage = "Disarm";
 				damageLabel = "Contest";
@@ -18625,46 +18674,50 @@
 				maneuverDCV = 0;
 				
 				if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
-					isRangedAttack = true;
+					isRanged = true;
 				}
 				
-				setAttrs({
-					"hiddenDamage": isRangedAttack ? getDamageDice(baseDC, 0, true, 1) : values.hiddenBasicDamage,
-					"hiddenIsNormal": "false",
-					"hiddenIsContest": "true",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage
-				});
+				attributes.hiddenDamage = isRanged ? getDamageDice(baseDC, 0, true, 1) : values.hiddenBasicDamage;
+				attributes.hiddenIsNormal = "false";
+				attributes.hiddenIsContest = "true";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				
 			} else if (values.maneuverSelection === "block") {
 				
 				// CV
 				maneuverOCV = 0;
 				maneuverDCV = 0;
 				
-				setAttrs({
-					"hiddenMessage": rollMessage,
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenMessage = rollMessage;
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
 			}
 			
 			netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, halfDCV);
+			netOCV += maneuverOCV + ocvMod + weaponOCV;
+			
+			// Experimental
+			netOCV -= (isAoE ? 0 : 1)*targetPenalty;
+			netOCV += isSet ? 1 : 0;
+			netOCV -= Math.max(0, theRangePenalty - rangeMod - (isBraced ? braceMod : 0));
+			
+			attributes.ephemeralOCV = netOCV;
+			attributes.ephemeralDCV = netDCV;
+			
+			// Send changes for use with damage roll template functions.
+			setAttrs(attributes);
 			
 			// Create dice rolling text to send to a roll dialog.
 			if ((values.maneuverSelection === "haymaker") || (values.maneuverSelection === "multipleAttack") || (values.maneuverSelection === "strike") || (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "disarm")) {
 				
 				// First, check to see if this is a ranged attack.
 				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") ) {
-					isRangedAttack = false;
+					isRanged = false;
 				} else if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
-					isRangedAttack = true;
+					isRanged = true;
 					rollMessage = "Ranged " + rollMessage;
-					
-					// Braced modifiers.
-					if (isBraced) {
-						braceMod = 2;
-					}
 				}
 				
 				// However, if the weapon's RMod plus braceMod is better than the range penalty, we'll skip range modifiers.
@@ -18690,7 +18743,7 @@
 				}
 				
 				// Attack and damage rolls.
-				if (isRangedAttack && hasRangePenalty) {
+				if (isRanged && hasRangePenalty) {
 					if (dispDoS) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
 					} else {
@@ -18698,9 +18751,9 @@
 					}
 				} else {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
 					}
 				}
 				
@@ -18738,9 +18791,11 @@
 	
 	// Function for handling martial maneuver weapon attacks.
 	function weaponMartialAttack(weaponId, maneuverId) {
-		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverRNGmod"+maneuverId, "martialManeuverOCV"+maneuverId,"martialManeuverDCV"+maneuverId, "martialManeuverDC"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat"], 
+		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCVmod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverRNGmod"+maneuverId, "martialManeuverOCV"+maneuverId,"martialManeuverDCV"+maneuverId, "martialManeuverDC"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty"], 
 		function(values) {
 			var theRoll = values.whisperToGM||"";
+			var attributes = new Object();
+			
 			let isAoE = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 			let useHitLocations = values.optionHitLocationSystem != 0;
 			let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
@@ -18771,8 +18826,10 @@
 			
 			// CV
 			let netDCV = parseInt(values["currentDCV"])||3;
+			let netOCV = parseInt(values["ocvNet"])||3;
 			let maneuverOCV = parseInt(values["martialManeuverOCV"+maneuverId])||0;
 			let maneuverDCV = parseInt(values["martialManeuverDCV"+maneuverId])||0;
+			let weaponOCV =parseInt(values["weaponOCV"+weaponId])||0;
 			let penaltyOCV = 0;
 			let strengthPenalty = false;
 			let halfDCV = false;
@@ -18784,50 +18841,51 @@
 			let isBraced = (values.checkBrace === "on") ? true : false;
 			let braceMod = 0;
 			let maneuverRmod = parseInt(values["martialManeuverRNGmod"+maneuverId])||0;
+			let rangeMod = (parseInt(values["weaponRangeMod"+weaponId])||0) + maneuverRmod;
 			let dcvMod = parseInt(values["martialManeuverDCVmod"+maneuverId])||0;
-			let isRangedAttack = false;
+			let ocvMod = parseInt(values["martialManeuverOCVmod"+maneuverId])||0;
+			let isRanged = ( ((parseInt(values.rangeMartial)||0) > 8) || isSet || isBraced ) ? true : false;
+			let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 			let hasRangePenalty = true;
+			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
 			
 			// Add the weapon's base END cost to the maneuver's listed END.
 			let subtractENDAmt = parseInt(values["martialManeuverEndurance"+maneuverId])||0;	
-			let isRanged = false;
-			
-			if (values.rangeMartial > 8) {
-				isRanged = true;
-			}
 			
 			// Keep mod within reasonable limits.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
+			ocvMod = Math.max(0, (Math.min(modLimit, ocvMod)) );
+			
+			// Braced modifiers.
+			if (isBraced) {
+				braceMod = 2;
+				halfDCV = true;
+			}
 			
 			// Prepare hidden variables for the maneuver roll.
 			if (isBlocking) {
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
-				setAttrs({
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (isContest) {
 				rollMessage = values["martialManeuverName"+maneuverId];
 				subtractENDAmt += parseInt(values["weaponEndurance"+weaponId])||0;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, isBraced);
 				damageLabel = "Contest";
 				
-				setAttrs({
-					"hiddenDamage": contestDice,
-					"hiddenIsContest": "true",
-					"hiddenIsPower": "false",
-					"hiddenIsNormal": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": isAoE ? "true" : "false"
-				});
+				attributes.hiddenDamage = contestDice;
+				attributes.hiddenIsContest = "true";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenIsNormal = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = isAoE ? "true" : "false";
+				
 			} else if (isAttack){
 				rollMessage = values["weaponName"+weaponId] + " Attack";
 				subtractENDAmt += parseInt(values["weaponEndurance"+weaponId])||0;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, isBraced);
 				
 				if (capDamage) {
 					if ((adjustedDC + maneuverDC) > 2 * baseDC) {
@@ -18839,18 +18897,31 @@
 					adjustedDC += maneuverDC;
 				}
 				
-				setAttrs({
-					"hiddenDamage": getDamageDice(adjustedDC, theAdvantage, isNormal, theSign),
-					"hiddenStunMod": stunMod,
-					"hiddenIsNormal": isNormal ? "true" : "false",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": isAoE ? "true" : "false"
-				});
+				attributes.hiddenDamage = getDamageDice(adjustedDC, theAdvantage, isNormal, theSign);
+				attributes.hiddenStunMod = stunMod;
+				attributes.hiddenIsNormal = isNormal ? "true" : "false";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = isAoE ? "true" : "false";
+				
 			} else {
 				return;
 			}
+			
+			netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, isBraced);
+			netOCV += maneuverOCV + ocvMod  + weaponOCV;
+			
+			// Experimental
+			netOCV -= (isAoE ? 0 : 1)*targetPenalty;
+			netOCV += isSet ? 1 : 0;
+			netOCV -= Math.max(0, theRangePenalty - rangeMod - (isBraced ? braceMod : 0));
+			
+			attributes.ephemeralOCV = netOCV;
+			attributes.ephemeralDCV = netDCV;
+			
+			// Send changes for use with damage roll template functions.
+			setAttrs(attributes);
 			
 			// Create dice rolling script to send to a roll dialog.
 			if (isBlocking) {
@@ -18876,13 +18947,8 @@
 				
 				// First, check to see if this is a ranged attack.				
 				if ( ((parseInt(values.rangeToTarget)||0) > 8) || isBraced || isSet) {
-					isRangedAttack = true;
+					isRanged = true;
 					rollMessage = "Ranged " + rollMessage;
-					
-					// Braced modifiers.
-					if (isBraced) {
-						braceMod = 2;
-					}
 				}
 				
 				// However, if the weapon's RMod plus braceMod plus maneuverRmod is better than the range penalty, we'll skip range modifiers.
@@ -18907,7 +18973,7 @@
 				}
 				
 				// Roll details.
-				if (isRangedAttack && hasRangePenalty) {
+				if (isRanged && hasRangePenalty) {
 					if (dispDoS) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[STR]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RMod]+@{martialManeuverRNGmod"+maneuverId+"}[ManRMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
 					} else {
@@ -18915,9 +18981,9 @@
 					}
 				} else {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRangedAttack ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
 					}
 				}
 				
@@ -18949,12 +19015,15 @@
 	on('clicked:maneuverDodge', (info) => {
 		// Display chat message and add DCV.
 			
-		getAttrs(["currentDCV", "maneuverDCVmod", "whisperToGM", "character_title", "dingbat"], function(values) {
+		getAttrs(["currentDCV", "maneuverDCVmod", "whisperToGM", "character_title", "dingbat", "ocvNet"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			var attributes = new Object();
+			
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			const maneuverDCV = +3;
 			const subtractENDAmt = 1;
 			let netDCV = getNetDCV (parseInt(values.currentDCV)||0, maneuverDCV, false);
+			let netOCV = parseInt(values["ocvNet"])||3;
 			let dcvMod = parseInt(values.maneuverDCVmod)||0;
 			const modLimit = 20;
 			
@@ -18962,17 +19031,21 @@
 			dcvMod = Math.max(0, Math.min(modLimit, dcvMod));
 			netDCV = getNetDCV(netDCV, dcvMod, false);
 			
+			attributes.rangeManeuver = 0;
+			attributes.checkSet = 0;
+			attributes.checkBrace = 0;
+			
+			attributes.ephemeralOCV = netOCV;
+			attributes.ephemeralDCV = netDCV;
+			
+			// Send changes for use with damage roll template functions.
+			setAttrs(attributes);
+			
 			theRoll += "&{template:custom-defense} {{title=@{character_name}"+dingbat+"@{character_title}}}";
 			theRoll += "{{subtitle=Dodges}} ";
 			theRoll += "{{label=DCV}}";
 			theRoll += "{{data="+netDCV+"}}";
 			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
-			
-			setAttrs({
-				"rangeManeuver":0,
-				"checkSet":0,
-				"checkBrace":0
-			});
 			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
@@ -18991,22 +19064,28 @@
 	on('clicked:maneuverSet', (info) => {
 		// Display chat message and add DCV.
 			
-		getAttrs(["currentDCV", "whisperToGM", "character_title", "dingbat"], function(values) {
+		getAttrs(["currentDCV", "whisperToGM", "character_title", "dingbat", "ocvNet"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			var attributes = new Object();
+			
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			const maneuverDCV = 0;
 			const subtractENDAmt = 1;
 			let netDCV = getNetDCV (parseInt(values.currentDCV)||0, maneuverDCV, false);
+			let netOCV = parseInt(values["ocvNet"])||3;
+			
+			attributes.checkSet = "on";
+			attributes.ephemeralOCV = netOCV;
+			attributes.ephemeralDCV = netDCV;
+			
+			// Send changes for use with damage roll template functions.
+			setAttrs(attributes);
 			
 			theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
 			theRoll += "{{subtitle=Set}} ";
 			theRoll += "{{label=DCV}}";
 			theRoll += "{{data="+netDCV+"}}";
 			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
-			
-			setAttrs({
-				"checkSet":"on"
-			});
 			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
@@ -19025,17 +19104,21 @@
 	// Roll attack and damage dice for Weapon XX.
 	on(`clicked:attackStrength`, (info) => {
 		
-		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat"], function(values) {
+		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			var attributes = new Object();
+			
+			const isAoE = false;
 			const useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			const optionMinusOne = (values.optionD6MinusOne === "on") ? true : false;
 			let isNormal = true;
 			let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 			let isBraced = (values.checkBrace === "on") ? true : false;
-			let isSet = (values.checkSet === "on") ? true : false;
-			let isRangedAttack = false;
-			let hasRangePenalty = true;
 			let braceMod = 0;
+			let isSet = (values.checkSet === "on") ? true : false;
+			let isRanged = ( ((parseInt(values.rangeToTarget)||0) > 8) || isSet || isBraced ) ? true : false;
+			let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
+			let hasRangePenalty = isRanged;
 			let subtractENDAmt = parseInt(values.hiddenBasicEndurance)||0;
 			let rollMessage = "attack";
 			let damageLabel = "Damage";
@@ -19050,13 +19133,25 @@
 			
 			// CV
 			let netDCV = parseInt(values["currentDCV"])||3;
+			let netOCV = parseInt(values["ocvNet"])||3;
 			let maneuverOCV = 0;
 			let maneuverDCV = 0;
-			let halfDCV = false;
-			let dcvMod = parseInt(values.maneuverDCVmod)||0;
 			
-			// Limit DCV mod.
-			dcvMod = Math.max(0, Math.min(modLimit, dcvMod));
+			// CV Mods
+			let halfDCV = isBraced ? true : false;
+			let dcvMod = parseInt(values.maneuverDCVmod)||0;
+			let ocvMod = parseInt(values.maneuverOCVmod)||0;
+			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
+			
+			// Keep mod within reasonable limits.
+			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
+			ocvMod = Math.max(0, (Math.min(modLimit, ocvMod)) );
+			
+			// Braced modifiers.
+			if (isBraced) {
+				braceMod = 2;
+				halfDCV = true;
+			}
 			
 			if (values.maneuverSelection === "haymaker") {
 				rollMessage = "Haymaker Attack";
@@ -19064,20 +19159,18 @@
 				// CV
 				maneuverOCV = 0;
 				maneuverDCV = -5;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
 				// Damage
 				modifyDC += 4;
 				adjustedStatValue += modifyDC * 5;
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage(adjustedStatValue),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false"
-				});
+				attributes.hiddenDamage = calculateBasicDamage(adjustedStatValue);
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				
 			} else if (values.maneuverSelection === "moveBy") {
 				
 				// Message
@@ -19086,25 +19179,24 @@
 				// CV
 				maneuverOCV = -2;
 				maneuverDCV = -2;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
 				isBraced = false;
 				isSet = false;
+				theRangePenalty = 0;
 				
 				// Damage
 				adjustedStatValue = heroRoundHigh(parseInt(adjustedStatValue/2)) + Math.floor(velocity/10)*5 + modifyDC*5;
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage(adjustedStatValue),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false",
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenDamage = calculateBasicDamage(adjustedStatValue);
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "moveThrough") {
 				
 				// Message
@@ -19113,25 +19205,24 @@
 				// CV
 				maneuverDCV = -3;
 				maneuverOCV = -1 * Math.floor(velocity/10);
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
 				isBraced = false;
 				isSet = false;
+				theRangePenalty = 0;
 				
 				// Damage
 				adjustedStatValue += Math.floor(velocity/6)*5 + modifyDC*5;
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage( adjustedStatValue ),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false",
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenDamage = calculateBasicDamage( adjustedStatValue );
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "multipleAttack") {
 				rollMessage = "Multiple Attack";
 				
@@ -19139,52 +19230,50 @@
 				maneuverOCV = 0;
 				maneuverDCV = 0;
 				halfDCV = true;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, halfDCV);
 				
 				// Damage
 				adjustedStatValue += modifyDC * 5;
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage( adjustedStatValue ),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false"
-				});
+				attributes.hiddenDamage = calculateBasicDamage( adjustedStatValue );
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				
 			} else if (values.maneuverSelection === "strike") {
 				rollMessage = "Normal Strike";
 				
 				// CV
 				maneuverOCV = 0;
 				maneuverDCV = 0;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
 				// Damage
 				adjustedStatValue += modifyDC * 5;
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage( adjustedStatValue ),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false"
-				});
+				attributes.hiddenDamage = calculateBasicDamage( adjustedStatValue );
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				
 			} else if (values.maneuverSelection === "grab") {
 				rollMessage = "Grab";
 				
 				maneuverOCV = -1;
 				maneuverDCV = -2;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
+				
+				isBraced = false;
+				isSet = false;
+				theRangePenalty = 0;
 				
 				subtractENDAmt = 1;
 				
-				setAttrs({
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "grabBy") {
 				rollMessage = "Grab By";
 				damageLabel = "Contest";
@@ -19192,64 +19281,63 @@
 				// CV
 				maneuverOCV = -3;
 				maneuverDCV = -4;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
 				isBraced = false;
 				isSet = false;
+				theRangePenalty = 0;
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage(parseInt(values.strengthNet) + Math.floor(velocity/10)),
-					"hiddenIsNormal": "false",
-					"hiddenIsContest": "true",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenDamage = calculateBasicDamage(parseInt(values.strengthNet) + Math.floor(velocity/10));
+				attributes.hiddenIsNormal = "false";
+				attributes.hiddenIsContest = "true";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "shove") {
 				rollMessage = "Shove up to " + Math.floor((parseInt(values.strengthNet)||0)/5) + " m";
 				
 				// CV
 				maneuverOCV = -1;
 				maneuverDCV = -1;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
+				
+				isBraced = false;
+				isSet = false;
+				theRangePenalty = 0;
 				
 				// Damage
 				// Do CSLs add to shove damage?
 				// adjustedStatValue = Math.min(adjustedStatValue + modifyDC*5, (parseInt(values.maneuverDCLimit)||0)*5 );
 				adjustedStatValue = Math.min(adjustedStatValue, (parseInt(values.maneuverDCLimit)||0)*5 );
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage(adjustedStatValue),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false",
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenDamage = calculateBasicDamage(adjustedStatValue);
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "throw") {
 				rollMessage = "Throw Object";
 				
 				// CV
 				maneuverOCV = 0;
 				maneuverDCV = 0;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
 				// Damage
 				adjustedStatValue = Math.min(adjustedStatValue + modifyDC*5, (parseInt(values.maneuverDCLimit)||0)*5 );
 				
-				setAttrs({
-					"hiddenDamage": calculateBasicDamage(adjustedStatValue),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false"
-				});
+				attributes.hiddenDamage = calculateBasicDamage(adjustedStatValue);
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				
 			} else if (values.maneuverSelection === "trip") {
 				// Message
 				rollMessage = "Trip Attack";
@@ -19257,7 +19345,10 @@
 				// CV
 				maneuverOCV = -1;
 				maneuverDCV = -2;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
+				
+				isBraced = false;
+				isSet = false;
+				theRangePenalty = 0;
 				
 				// Damage
 				velocityDC = Math.floor(velocity/20);
@@ -19265,17 +19356,16 @@
 				// Endurance
 				subtractENDAmt = 1;
 				
-				setAttrs({
-					"hiddenDamage": getDamageDice(velocityDC, 0, true, 1),
-					"hiddenIsNormal": "true",
-					"hiddenIsContest": "false",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"hiddenIsAoE": "false",
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				attributes.hiddenDamage = getDamageDice(velocityDC, 0, true, 1);
+				attributes.hiddenIsNormal = "true";
+				attributes.hiddenIsContest = "false";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.hiddenIsAoE = "false";
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "disarm") {
 				rollMessage = "Unarmed Disarm";
 				damageLabel = "Contest";
@@ -19283,30 +19373,47 @@
 				// CV
 				maneuverOCV = -2;
 				maneuverDCV = 0;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
-				setAttrs({
-					"hiddenDamage": values.hiddenBasicDamage,
-					"hiddenIsNormal": "false",
-					"hiddenIsContest": "true",
-					"hiddenIsPower": "false",
-					"hiddenMessage": rollMessage,
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				isBraced = false;
+				isSet = false;
+				theRangePenalty = 0;
+				
+				attributes.hiddenDamage = values.hiddenBasicDamage;
+				attributes.hiddenIsNormal = "false";
+				attributes.hiddenIsContest = "true";
+				attributes.hiddenIsPower = "false";
+				attributes.hiddenMessage = rollMessage;
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
+				
 			} else if (values.maneuverSelection === "block") {
 				// CV
 				maneuverOCV = 0;
 				maneuverDCV = 0;
-				netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, false);
 				
-				setAttrs({
-					"rangeManeuver":0,
-					"checkSet":0,
-					"checkBrace":0
-				});
+				isBraced = false;
+				isSet = false;
+				theRangePenalty = 0;
+				
+				attributes.rangeManeuver = 0;
+				attributes.checkSet = 0;
+				attributes.checkBrace = 0;
 			}
+			
+			netDCV = getNetDCV(netDCV, maneuverDCV+dcvMod, halfDCV);
+			netOCV += maneuverOCV + ocvMod;
+			
+			// Experimental
+			netOCV -= (isAoE ? 0 : 1)*targetPenalty;
+			netOCV += isSet ? 1 : 0;
+			netOCV -= Math.max(0, theRangePenalty - (isBraced ? braceMod : 0));
+			
+			attributes.ephemeralOCV = netOCV;
+			attributes.ephemeralDCV = netDCV;
+			
+			// Send changes for use with damage roll template functions.
+			setAttrs(attributes);
 			
 			
 			// Create dice rolling text to send to a roll dialog.
@@ -19314,18 +19421,12 @@
 				
 				// First, check to see if this is a ranged attack.
 				if ( (values.maneuverSelection === "moveThrough") || (values.maneuverSelection === "moveBy") || (values.maneuverSelection === "shove") || (values.maneuverSelection === "disarm") ) {
-					isRangedAttack = false;
+					isRanged = false;
 				} else if ( ((parseInt(values.rangeToTarget)||0) > 0) || isBraced || isSet || (values.maneuverSelection === "throw")) {
-					isRangedAttack = true;
+					isRanged = true;
 					
 					if (values.maneuverSelection !== "throw") {
 						rollMessage = "Ranged " + rollMessage;
-					}
-					
-					// Braced modifiers.
-					if (isBraced) {
-						braceMod = 2;
-						halfDCV = true;
 					}
 				}
 				
@@ -19351,7 +19452,7 @@
 				}
 				
 				// Attack and damage rolls.
-				if (isRangedAttack && hasRangePenalty) {
+				if (isRanged && hasRangePenalty) {
 					if (dispDoS) {
 						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") + "-[[@{targetOCVPenalty}]][TargetOCV]-@{rangeOCVPenalty}[RangeOCV]"+ (isBraced ? "+2[Braced]+" :"+") +"(?{Modifiers|0})[Modifiers]]]}} ";
 					} else {
@@ -19359,9 +19460,9 @@
 					}
 				} else {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() +"[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") + "-[[@{targetOCVPenalty}]][TargetOCV]"+ (isRangedAttack ? "-0[NetRangePenalty]+" :"+") +"(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() +"[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") + "-[[@{targetOCVPenalty}]][TargetOCV]"+ (isRanged ? "-0[NetRangePenalty]+" :"+") +"(?{Modifiers|0})[Modifiers]]]}} ";
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") + "-[[@{targetOCVPenalty}]][TargetOCV]"+ (isRangedAttack ? "-0[NetRangePenalty]+" :"+") +"(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
+						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") + "-[[@{targetOCVPenalty}]][TargetOCV]"+ (isRanged ? "-0[NetRangePenalty]+" :"+") +"(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 					}
 				}
 				
