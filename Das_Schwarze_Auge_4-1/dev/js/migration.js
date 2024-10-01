@@ -14,7 +14,8 @@ var versionsWithMigrations = [
 		20230618,
 		20240414,
 		20240510,
-		20240519
+		20240519,
+		20241002
 ];
 
 /*
@@ -1129,6 +1130,46 @@ function migrateTo20240519(migrationChain) {
 		}
 		debugLog(caller, attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function () {
+			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize newly added attributes (Bastardstäbe, Feuerwaffen, hints for mods from encumbrance)
+*/
+function migrateTo20241002(migrationChain) {
+	const caller = "migrateTo20241002";
+	debugLog(caller, "Invoked.");
+
+	const attrsToGet = [ "be_at_mod", "be_pa_mod"];
+	safeGetAttrs(attrsToGet, function(values) {
+		let attrsToInit = {
+			"AT_bastardstaebe": 5,
+			"PA_bastardstaebe": 5,
+			"AT_feuerwaffen": 5,
+			"be_at_mod_hint": 0,
+			"be_pa_mod_hint": 0
+		};
+
+		for (let attr of attrsToGet)
+		{
+			if (DSAsane(values[attr], "int"))
+			{
+				let value = values[attr];
+				let hintAttr = attr + "_hint";
+				if (value > 0)
+				{
+					attrsToInit[hintAttr] = 1;
+				} else {
+					attrsToInit[hintAttr] = 0;
+				}
+			}
+		}
+
+		debugLog(caller, "attrsToInit", attrsToInit);
+		safeSetAttrs(attrsToInit, {}, function () {
 			callNextMigration(migrationChain);
 		});
 	});
