@@ -1,3 +1,20 @@
+# 2024-9-26
+
+Start work on fully supporting encumbrance and maneuver penalties.  So now we
+calculate load (we did not before), our max pace (been empty forever), change
+the property name to carried_weight (was set, but never used before).
+
+- Creatures:
+  - Handle more attack types
+  - Creature attacks work again with the new maneuver penalties.
+  - Fix issue with creatures without skills failing
+- Update maxpace and load %s on sheet
+  - Need to update equipment in the compendium to make this effective.
+- Add a dot to show skills you have a profession bonus in
+- Update DB:
+  - Add passive block to active dodges and passive dodge to active block
+  - Cap running ranks, not passive DB at 50.
+
 # 2024-9-24
 
 A number of small updates this week.  Starting some work to fix a mumber of other wierd bugs; but nothing yet.
@@ -6,7 +23,7 @@ Thank you to all who have reported problems.  Please let me know if there are mo
 - Dark mode tweaks for side panel, and the crit box.  Dark mode is still a long
   way from complete on the main sheet; but the side panel should be usual.
 - Spell rank modifier when casting; missed that in the other massive improvements.
-- Don't barf AP updates on New Combat. 
+- Don't barf AP updates on New Combat.
 - Fix for weight allowance (thanks spaturno80).  I totally misread those rules.  Like totally.
 - Creature sheet improvements for skills and other items.
 - Async: Recover is a few more wierd situations (thanks major__havoc).
