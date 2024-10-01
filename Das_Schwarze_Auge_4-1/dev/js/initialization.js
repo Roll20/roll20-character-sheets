@@ -80,9 +80,9 @@ function initializeSheet(migrationChain) {
 	defaults = { "Basis": 8, "Mod": 0 };
 
 	safeguardAttrs = [];
-	for ( stem of attrStems )
+	for ( let stem of attrStems )
 	{
-		for ( ext of attrExtensions )
+		for ( let ext of attrExtensions )
 		{
 			safeguardAttrs.push(stem + "_" + ext);
 		}
@@ -104,7 +104,7 @@ function initializeSheet(migrationChain) {
 			}
 			if ( dataVersionSet === false )
 			{
-				for ( attr of safeguardAttrs )
+				for ( let attr of safeguardAttrs )
 				{
 					// None of the safeguard attributes should be undefined (missing) or have a bad value (NaN, undefined)
 					if (
@@ -120,9 +120,9 @@ function initializeSheet(migrationChain) {
 				{
 					// The safeguard attributes should all be at their default values
 					debugLog(caller, "Checking safeguard attributes ...");
-					for ( attr of safeguardAttrs )
+					for ( let attr of safeguardAttrs )
 					{
-						for ( ext of attrExtensions )
+						for ( let ext of attrExtensions )
 						{
 							if ( attr.search(ext) > -1 )
 							{
@@ -142,7 +142,7 @@ function initializeSheet(migrationChain) {
 				}
 				if ( attrs["sheet_initialized"] === false )
 				{
-					for ( attr of attrsToInit )
+					for ( let attr of attrsToInit )
 					{
 						attrs[attr] = getDefaultValue(attr);
 					}

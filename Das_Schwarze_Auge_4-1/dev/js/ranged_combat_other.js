@@ -41,7 +41,7 @@ on(
 		}
 
 		// Calculation of FK values
-		for (FKTalent of FKTalente) {
+		for (let FKTalent of FKTalente) {
 			var TaW = "TaW_" + FKTalent;
 			if (isNaN(v[TaW])) {
 				v[TaW] = 0;
@@ -49,7 +49,7 @@ on(
 			attrsToChange["AT_" + FKTalent] = parseInt(v["FKBasis"]) + parseInt(v[TaW]);
 		}
 
-		for (var i = 1; i <= 4; i++) {
+		for (let i = 1; i <= 4; i++) {
 			v["FKWtyp" + i] = v["FKWtyp" + i].replace(/[^_a-zA-ZäöüÄÖÜß|]/g, "");
 			if (v["FKWtyp" + i] === "") {
 				v["FKWtyp" + i] = "--";

@@ -147,7 +147,7 @@ function generateShortRollTag (integer) {
 	var result = [];
 	var rest = integer;
 
-	for (n = digits; n >= 0; n--) {
+	for (let n = digits; n >= 0; n--) {
 		result.push(charset[Math.trunc(rest/Math.pow(base, n))]);
 		rest = rest % Math.pow(base, n);
 	}
@@ -256,7 +256,7 @@ function countStats (statsArray) {
 		debugLog(caller, "Array is empty.");
 	}
 
-	for (stat of statsArray)
+	for (let stat of statsArray)
 	{
 		if (validStats.has(stat))
 		{
@@ -285,7 +285,7 @@ function extractStats (statsArray) {
 		debugLog(caller, "Array is empty.");
 	}
 
-	for (entry of statsArray)
+	for (let entry of statsArray)
 	{
 		let result = entry.match(statPattern);
 		if (result)

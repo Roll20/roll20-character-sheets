@@ -19,7 +19,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 
 		// Gather all the shield_active states (as attribute names)
 		var attrsToGet = [];
-		for(id of idarray) {
+		for(let id of idarray) {
 			attrsToGet.push(prefix + id + suffix);
 		}
 
@@ -28,7 +28,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 			var activeShields = [];
 			var activeShieldRowId = "";
 
-			for (attr of attrsToGet) {
+			for (let attr of attrsToGet) {
 				if (shieldActiveStates[ attr ] === "on") {
 					activeShields.push(attr);
 				}
@@ -50,7 +50,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 				if (mode === "on") {
 					activeShieldRowId = sourceShieldId;
 					debugLog(caller, "Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
-					for (activeShield of activeShields) {
+					for (let activeShield of activeShields) {
 						if (activeShield !== sourceShield) {
 							attrsToChange[ activeShield ] = 0;
 						}
@@ -59,7 +59,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 				// If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
 					debugLog(caller, "Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
 					activeShieldRowId = extractRowId(activeShields[0]);
-					for (var i = 1; i < activeShields.length; i++) {
+					for (let i = 1; i < activeShields.length; i++) {
 							attrsToChange[ activeShields[i] ] = 0;
 					}
 				}
@@ -551,7 +551,7 @@ on("change:nkw_aktiv1 change:nkw_aktiv2 change:nkw_aktiv3 change:nkw_aktiv4", fu
 		return;
 	}
 	var attrsToChange = {};
-	for (var i = 1; i <= 4; i++) {
+	for (let i = 1; i <= 4; i++) {
 		if (eventInfo.sourceAttribute !== "nkw_aktiv" + i) {
 			attrsToChange["NKW_Aktiv" + i] = 0;
 		}
@@ -667,7 +667,7 @@ on(
 	// Changes to KK (strength) can affect all weapons
 	// Compare with lowercase as all attribute names are lowercase in eventInfo
 	if (eventInfo.sourceAttribute === "kk") {
-		for (var weapon = 1; weapon <= 4; weapon++) {
+		for (let weapon = 1; weapon <= 4; weapon++) {
 			weaponsToCalculate.push(weapon);
 			attrsToGet.push("NKW" + weapon + "_Schwellenwert");
 			attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
@@ -687,7 +687,7 @@ on(
 			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
 		}
 		let attrsToChange = {};
-		for (var i = 0; i < weaponsToCalculate.length; i++) {
+		for (let i = 0; i < weaponsToCalculate.length; i++) {
 			let weapon = weaponsToCalculate[i];
 			attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, weapon);
 		}
@@ -1143,7 +1143,7 @@ on(
 			};
 
 		// Add contents to the results data structure
-		for (macro of elements) {
+		for (let macro of elements) {
 			if (Object.hasOwn(macro, "prefix")) {
 				transformed["common"]["prefix"] += macro["prefix"] + " ";
 			} else if (Object.hasOwn(macro, "suffix")) {
