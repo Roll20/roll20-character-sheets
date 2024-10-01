@@ -196,6 +196,7 @@ on("sheet:opened change:character_name", function(eventInfo) {
 				attrsToChange[attr] = "%{" + v["character_name"] + "|" + attr.replace(/_action$/gm, "") + "-action}";
 			}
 
+			attrsToChange["rc_attack_action"] = "%{" + v["character_name"] + "|rc_attack-action}";
 			attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
 
 			debugLog(func, attrsToChange);
