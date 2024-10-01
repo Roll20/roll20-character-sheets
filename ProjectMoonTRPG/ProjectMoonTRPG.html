@@ -10947,30 +10947,36 @@ on('change:loopEnabled', (info) => {
 });
 function stepLoop() {
 	setTimeout(function() {
-		getAttrs(["loopEnabled", "prevRoundInitAttempts"], async function(values) {
+		getAttrs(["loopEnabled", "prevRoundInitAttempts", "settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings", "settingLimbusStyle"], async function(values) {
 			//console.log(values.prevRoundInitAttempts)
 			if (values.loopEnabled == "true" && parseInt(values.prevRoundInitAttempts) < 6) {
-				
+				let output = {}
+
 				/* Auto: Update */
 				let newRoundInit = await getInitiative(trackerItemName);
 				if (newRoundInit == "") {
-					setAttrs({prevRoundInitAttempts: parseInt(values.prevRoundInitAttempts) + 1});
+					output = {...output, prevRoundInitAttempts: parseInt(values.prevRoundInitAttempts) + 1}
 				} else {
-					setAttrs({prevRoundInit: newRoundInit, prevRoundInitAttempts: 0});
+					output = {...output, prevRoundInit: newRoundInit, prevRoundInitAttempts: 0}
 				}
 
 				/* Sync: Target Ailment/Bar lists */
-				getAttrs(["targetName", "targetSettings"], async function(values) {
-					if (values.targetName != "" && !values.targetName.includes("@{target|")) {
-						updateTargetAilmentList();
-						updateTargetBarLists();
-					}
+				let targetSettings = Data.unpackage(values.targetSettings);
 
-					let targetSettings = Data.unpackage(values.targetSettings);
-					if (targetSettings.hideDetailsFromTargeting == "true") {
-						unknownTarget();
-					}
-				});
+				if (values.targetName != "" && !values.targetName.includes("@{target|")) {
+					updateTargetAilmentList(values.settingHideCombatOptions, values.targetName, values.targetTokenId, targetSettings, values.settingLimbusStyle, (returnListAilment) => {
+					updateTargetBarLists(values.settingHideCombatOptions, values.targetName, values.targetTokenId, targetSettings, (returnListBars) => {
+						output = {...output, ...returnListAilment, ...returnListBars}
+
+						if (targetSettings.hideDetailsFromTargeting == "true") {
+							setAttrs({...output, ...unknownTarget()});
+						} else {
+							setAttrs(output);
+						}
+					});});
+				} else {
+					setAttrs(output);
+				}
 
 				setTimeout(stepLoop, loopDelay);
 			} else {
@@ -11010,11 +11016,11 @@ on('clicked:repeating_tokens:selectinstance', async function(info) {
 /* Gets the tokenId, tokenName and bar values of a token. Also gets the bar and bar max values from the sheet */
 /* setSelectModes: select (always set selection or bars), false (do not set selection or bars), unset (set if unset)*/
 function getTokenAttrs(target="selected", setSelectMode="false", queryGenericMode="false", callback=()=>{}) {
-	getAttrs(["tokenId_selected"], function(values) {
+	getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
 		let tokenId_selected = values.tokenId_selected;
 	
 	/* If setting is disabled, ask if it should be enabled. Continue if yes */
-	checkGenericMode(queryGenericMode, async function(genericModeCheck) {
+	checkGenericMode(values.settingGenericTokenMode, queryGenericMode, async function(genericModeCheck) {
 		if (genericModeCheck == "false") { return; }
 
 		/* Get selected token attributes */
@@ -11130,9 +11136,11 @@ on('change:tokenId_selected', (info) => {
 	});
 });
 function updateSelectedToken(info, callback=()=>{}) {
+	let output = {}
+	
 	/* Clear the old selection if there was one */
 	if (info.previousValue != undefined && info.newValue != undefined) {
-		setAttrs({[`repeating_tokens_${info.previousValue}_token_selected`]:"false"});
+		output = {[`repeating_tokens_${info.previousValue}_token_selected`]:"false"}
 	}
 
 	/* Import values from new selection */
@@ -11156,7 +11164,6 @@ function updateSelectedToken(info, callback=()=>{}) {
 		});
 
 		getAttrs([...tokenValues], async function(values) {
-			let output = {}
 
 			/* Set bars to that of the token instance */
 			barlist.forEach(bar => {
@@ -11187,7 +11194,7 @@ function updateSelectedToken(info, callback=()=>{}) {
 			/* Sets ailments to those of the token instance. If ailmentList is unset, initialize a new empty ailmentList */
 			let ailmentList = values[`${tokenPrefix}_tokenAilmentList`];
 			if (ailmentList != "") {
-				importAilmentList(Data.unpackage(ailmentList));
+				output = {...output, ...importAilmentList(Data.unpackage(ailmentList), "true")}
 			} else {
 				resetAilments(() => {
 					exportAilmentList({}, function(newAilmentList) {
@@ -11202,6 +11209,8 @@ function updateSelectedToken(info, callback=()=>{}) {
 				callback();
 			});
 		});
+	} else {
+		setAttrs(output);
 	}
 }
 function getSelectedToken(callback=()=>{}) {
@@ -11295,13 +11304,15 @@ stateList.forEach(state => {
 /* Sync: Token Ailments */
 on(`change:ailmentList`, (info) => {
 	if (info.newValue != undefined) {
-		getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
+		getAttrs(["tokenId_selected", "settingGenericTokenMode", "settingLimbusStyle"], function(values) {
 			if (values.settingGenericTokenMode == "true") {
 				let ailmentList = Data.unpackage(info.newValue);
 				let selectedId = values.tokenId_selected;
 				if (selectedId != "") {
-					setAttrs({[`repeating_tokens_${selectedId}_tokenAilmentList`]:info.newValue});
-					updateAilmentDisplay(`repeating_tokens_${selectedId}_token`, 4, ailmentList);
+					setAttrs({
+						[`repeating_tokens_${selectedId}_tokenAilmentList`]: info.newValue,
+						...updateAilmentDisplay(`repeating_tokens_${selectedId}_token`, 4, ailmentList, values.settingLimbusStyle, "true")
+					});
 				}
 			}
 		});
@@ -11341,34 +11352,41 @@ for (let i = 0; i <= 4; i++) {
 		}
 	});
 }
-function updateAilmentDisplay(ailmentPrefix, ailmentDisplayCount, ailmentList) {
-	getAttrs(["settingLimbusStyle"], function(values) {
-		let ailmentDisplayList = [];
-		for (var ailmentName in ailmentList) {
-			ailmentDisplayList.push([ailmentName, ailmentList[ailmentName]]);
-		}
-		ailmentDisplayList.sort(function(ail1, ail2) {
-			return ail1[1][1] - ail2[1][1];
-		});
-		ailmentDisplayList = ailmentDisplayList.slice(ailmentDisplayList.length - ailmentDisplayCount).reverse();
-		
-		let output = {}
-		for (i = 0; i < ailmentDisplayCount; i++) {
-			output[`${ailmentPrefix}Ailment${i+1}Icon`] = getIcon("ailments", ailmentDisplayList[i][1][6], values.settingLimbusStyle).replace('<img src="','').replace('" >','');
-			output[`${ailmentPrefix}Ailment${i+1}Num`] = ailmentDisplayList[i][1][1];
-			output[`${ailmentPrefix}Ailment${i+1}Name`] = ailmentDisplayList[i][0];
-		}
-		setAttrs(output);
+function updateAilmentDisplay(ailmentPrefix, ailmentDisplayCount, ailmentList, settingLimbusStyle, returnMode="false") {
+	let ailmentDisplayList = [];
+	for (var ailmentName in ailmentList) {
+		ailmentDisplayList.push([ailmentName, ailmentList[ailmentName]]);
+	}
+	ailmentDisplayList.sort(function(ail1, ail2) {
+		return ail1[1][1] - ail2[1][1];
 	});
-}
-function resetAilmentDisplay(ailmentPrefix, ailmentDisplayCount) {
+	ailmentDisplayList = ailmentDisplayList.slice(ailmentDisplayList.length - ailmentDisplayCount).reverse();
+	
 	let output = {}
-		for (i = 0; i < ailmentDisplayCount; i++) {
-			output[`${ailmentPrefix}Ailment${i+1}Icon`] = "";
-			output[`${ailmentPrefix}Ailment${i+1}Num`] = 0;
-			output[`${ailmentPrefix}Ailment${i+1}Name`] = "";
-		}
+	for (i = 0; i < ailmentDisplayCount; i++) {
+		output[`${ailmentPrefix}Ailment${i+1}Icon`] = getIcon("ailments", ailmentDisplayList[i][1][6], settingLimbusStyle).replace('<img src="','').replace('" >','');
+		output[`${ailmentPrefix}Ailment${i+1}Num`] = ailmentDisplayList[i][1][1];
+		output[`${ailmentPrefix}Ailment${i+1}Name`] = ailmentDisplayList[i][0];
+	}
+
+	if (returnMode == "true") {
+		return output;
+	} else {
 		setAttrs(output);
+	}
+}
+function resetAilmentDisplay(ailmentPrefix, ailmentDisplayCount, returnMode="false") {
+	let output = {}
+	for (i = 0; i < ailmentDisplayCount; i++) {
+		output[`${ailmentPrefix}Ailment${i+1}Icon`] = "";
+		output[`${ailmentPrefix}Ailment${i+1}Num`] = 0;
+		output[`${ailmentPrefix}Ailment${i+1}Name`] = "";
+	}
+	if (returnMode == "true") {
+		return output;
+	} else {
+		setAttrs(output);
+	}
 }
 
 on('change:settingGenericTokenMode', (info) => { 
@@ -11384,8 +11402,7 @@ on('change:settingGenericTokenMode', (info) => {
 
 on('change:settingHideCombatOptions', (info) => {
 	if (info.newValue == "true") {
-		resetTarget();
-		setAttrs({lastDefenceRoll: 0});
+		setAttrs({...resetTarget("true"), "lastDefenceRoll": 0});
 	}
 });
 
@@ -11396,25 +11413,21 @@ on('change:settingHideCombatOptions', (info) => {
 
 
 /* --- Token helper functions --- */
-async function checkGenericMode(executeQuery, callback=()=>{}) {
-	getAttrs(["settingGenericTokenMode"], async function(values) {
-		let genericMode = values.settingGenericTokenMode;
-		
-		if (genericMode != "true" && executeQuery == "true") {
-			let queryResults = await sendQuery(["enableGenericMode",
-				getTranslationByKeyCustom("Generic token mode not enabled for sheet. Enable setting?", "query-enable-generic-mode"), {
-					[getTranslationByKeyCustom("No","query-no")]:"false",
-					[getTranslationByKeyCustom("Yes","query-yes")]:"true"
-				}
-			]);
-			if (queryResults.enableGenericMode == "true") {
-				setAttrs({"settingGenericTokenMode":"true"});
+async function checkGenericMode(genericMode, executeQuery, callback=()=>{}) {
+	if (genericMode != "true" && executeQuery == "true") {
+		let queryResults = await sendQuery(["enableGenericMode",
+			getTranslationByKeyCustom("Generic token mode not enabled for sheet. Enable setting?", "query-enable-generic-mode"), {
+				[getTranslationByKeyCustom("No","query-no")]:"false",
+				[getTranslationByKeyCustom("Yes","query-yes")]:"true"
 			}
-			callback(queryResults.enableGenericMode);
-		} else {
-			callback(genericMode);
+		]);
+		if (queryResults.enableGenericMode == "true") {
+			setAttrs({"settingGenericTokenMode":"true"});
 		}
-	});
+		callback(queryResults.enableGenericMode);
+	} else {
+		callback(genericMode);
+	}
 }
 async function checkTokenInstance(selectAttrs, setSelectMode, callback=()=>{}) {
 	getSectionIDs(`repeating_tokens`, async function(idarray) {
@@ -11490,37 +11503,43 @@ async function changeActiveToken(tokenId, callback=()=>{}) {
 
 /* --- Select target functionality --- */
 on('clicked:selectTarget', (info) => {
-	getTargetAttrs("target", ["character_name", "selfToken", "token_name", "token_id", "settingGenericTokenMode", "settingHideBarUpdate", "settingHideDetailsFromTargeting"], function(values) {
+	getAttrs(["settingHideCombatOptions", "character_name", "settingLimbusStyle"], function(selfValues) {
+		getTargetAttrs("target", ["character_name", "selfToken", "token_name", "token_id", "settingGenericTokenMode", "settingHideBarUpdate", "settingHideDetailsFromTargeting"], function(targetValues) {
+	
+			let targetSettings = {
+				"genericTokenMode": targetValues.settingGenericTokenMode,
+				"hideBarUpdate": targetValues.settingHideBarUpdate,
+				"hideDetailsFromTargeting": targetValues.settingHideDetailsFromTargeting
+			}
+			let output = {
+				"targetName": targetValues.character_name,
+				"targetToken": targetValues.selfToken,
+				"targetTokenName": targetValues.token_name,
+				"targetTokenId": targetValues.token_id.replaceAll("_","Ø"),
+				"targetSettings": Data.package(targetSettings)
+			}
 
-		if (values.character_name.includes("@{target|")) {
-			resetTarget();
-		} else {
-			setAttrs({
-				"targetName": values.character_name,
-				"targetToken": values.selfToken,
-				"targetTokenName": values.token_name,
-				"targetTokenId": values.token_id.replaceAll("_","Ø"),
-				"targetSettings": Data.package({
-					"genericTokenMode": values.settingGenericTokenMode,
-					"hideBarUpdate": values.settingHideBarUpdate,
-					"hideDetailsFromTargeting": values.settingHideDetailsFromTargeting
-				})
-			},{},() => {
-				isValidTarget(result => {
+			if (output.targetName.includes("@{target|")) {
+				resetTarget();
+			} else {
+				isValidTarget(selfValues.character_name, output.targetName, output.targetTokenId, targetSettings, (result) => {
 					if (result == "true") {
-						updateTargetAilmentList();
-						updateTargetBarLists();
+						updateTargetAilmentList(selfValues.settingHideCombatOptions, output.targetName, output.targetTokenId, targetSettings, selfValues.settingLimbusStyle, (returnListAilment) => {
+						updateTargetBarLists(selfValues.settingHideCombatOptions, output.targetName, output.targetTokenId, targetSettings, (returnListBars) => {
+						setAttrs({...output, ...returnListAilment, ...returnListBars});
+						});});
 					} else {
-						resetTarget();
+						setAttrs({...output, ...resetTarget("true")});
 					}
 				});
-			});
-		}
-	});
+			}
+		});
+	}); 
 });
 
-function resetTarget() {
-	setAttrs({
+function resetTarget(returnMode="false") {
+	let output = {
+		...resetAilmentDisplay("target", 6, "true"),
 		"targetName": "",
 		"targetToken": "",
 		"targetTokenName": "",
@@ -11532,122 +11551,126 @@ function resetTarget() {
 		"targetAilmentList":"{}",
 		"targetBarList":"{}",
 		"targetBarDamageList":"{}"
-	});
-	resetAilmentDisplay("target", 6);
+	}
+
+	if (returnMode == "true") {
+		return output;
+	} else {
+		setAttrs(output);
+	}
 }
-function unknownTarget() {
-	setAttrs({
+function unknownTarget(returnMode="false") {
+	let output = {
+		...resetAilmentDisplay("target", 6, "true"),
 		"targetTokenName": "?????",
 		"HP_target":"???",
 		"StagRes_target":"???",
 		"SP_target":"???"
-	});
-	resetAilmentDisplay("target", 6);
+	}
+
+	if (returnMode == "true") {
+		return output;
+	} else {
+		setAttrs(output);
+	}
 }
 
 /* Checks if a token is an invalid target. Currently happens if genericTokenMode is enabled but the token has not been added as an instance  */
-function isValidTarget(callback=()=>{}) {
-	getAttrs(["character_name", "targetName", "targetTokenId", "targetSettings"], function(values) {
-		let characterName = values.character_name;
-		let targetTokenId = values.targetTokenId;
-		let targetSettings = Data.unpackage(values.targetSettings);
-
-		if (targetSettings.genericTokenMode == "true") {
-			getTargetAttrs(values.targetName, [`repeating_tokens_${targetTokenId}_tokenId`], function(values) {
-				if (targetTokenId != values[`repeating_tokens_${targetTokenId}_tokenId`]) {
-					
-					let alertIcon = "<img src='https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Aggro.png' style='width: 25px; height: 25px;' >"
-					let alertMessage = getTranslationByKeyCustom("Invalid Target: Token is not a token instance", "message-invalid-target");
-					setAttrs({"dummy":alertMessage, "dummyIcon":alertIcon});
-					startRoll(("/w " + characterName + "&{template:errorMessage} {{icon=@{dummyIcon}}} {{message=@{dummy} }}"), (results) => {
-						finishRoll(results.rollId, {} );
-					});
-	
-					callback("false");
-				} else {
-					callback("true");
-				}
-			});
-		} else {
-			callback("true");
-		}
-	});
-}
-
-
-function updateTargetAilmentList(callback=()=>{}) {
-	getAttrs(["settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings"], function(values) {
-		if (values.settingHideCombatOptions == "0" && values.targetName != "") {
-
-			let targetSettings = Data.unpackage(values.targetSettings);
-			let targetAilmentListName = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${values.targetTokenId}_tokenAilmentList` : "ailmentList";
-			getTargetAttrs(values.targetName, [targetAilmentListName], function(values) {
-
-				let targetAilmentList = values[targetAilmentListName];
-				if (targetAilmentList != "") {
-
-					updateAilmentDisplay("target", 6, Data.unpackage(targetAilmentList));
-
-					if (callback != "()=>{}") {
-						callback(Data.unpackage(targetAilmentList));
-					} else {
-						setAttrs({"targetAilmentList": targetAilmentList});
-					}
-
-				} else {
-					callback()
-				}
-			});
-		} else {
-			callback();
-		}
-	});
-}
-function updateTargetBarLists(callback=()=>{}) {
-	getAttrs(["settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings"], function(values) {
-		if (values.settingHideCombatOptions == "0" && values.targetName != "") {
-
-			let targetBarAttrs = [];
-			let targetSettings = Data.unpackage(values.targetSettings);
-			let targetPrefix = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${values.targetTokenId}_` : "";
-			barList.forEach(bar => {
-				targetBarAttrs.push(`${targetPrefix}${bar}`, `${targetPrefix}${bar}_max`);
-			});
-			getTargetAttrs(values.targetName, targetBarAttrs, function(values) {
-
-				let targetBarList = {}
-				let targetBarDamageList = {}
-				barList.forEach(bar => {
-					let barName = "";
-					switch (bar) {
-						case "hp": barName = "HP"; break;
-						case "stagres": barName = "ST"; break;
-						case "sp": barName = "SP"; break;
-						case "light": barName = "Light"; break;
-					}
-					targetBarList[`${barName}`] = parseInt(values[`${targetPrefix}${bar}`]); 
-					targetBarDamageList[`-${barName}`] = parseInt(values[`${targetPrefix}${bar}_max`]) - targetBarList[`${barName}`];
+function isValidTarget(characterName, targetName, targetTokenId, targetSettings, callback=()=>{}) {
+	if (targetSettings.genericTokenMode == "true") {
+		getTargetAttrs(targetName, [`repeating_tokens_${targetTokenId}_tokenId`], function(values) {
+			if (targetTokenId != values[`repeating_tokens_${targetTokenId}_tokenId`]) {
+				
+				let alertIcon = "<img src='https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Aggro.png' style='width: 25px; height: 25px;' >"
+				let alertMessage = getTranslationByKeyCustom("Invalid Target: Token is not a token instance", "message-invalid-target");
+				setAttrs({"dummy":alertMessage, "dummyIcon":alertIcon});
+				startRoll(("/w " + characterName + "&{template:errorMessage} {{icon=@{dummyIcon}}} {{message=@{dummy} }}"), (results) => {
+					finishRoll(results.rollId, {} );
 				});
 
-				if (targetSettings.hideDetailsFromTargeting == "true") {
-					unknownTarget();
-				} else if (targetSettings.hideBarUpdate == "true") {
-					setAttrs({"HP_target":"???", "StagRes_target":"???", "SP_target":"???"});
-				} else {
-					setAttrs({"HP_target":targetBarList.HP, "StagRes_target":targetBarList.ST, "SP_target":targetBarList.SP});
+				callback("false");
+			} else {
+				callback("true");
+			}
+		});
+	} else {
+		callback("true");
+	}
+}
+
+
+function updateTargetAilmentList(hideCombatOptions, targetName="", targetTokenId, targetSettings, settingLimbusStyle, callback=()=>{}) {
+	if (hideCombatOptions == "0" && targetName != "") {
+
+		let targetAilmentListName = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${targetTokenId}_tokenAilmentList` : "ailmentList";
+		getTargetAttrs(targetName, [targetAilmentListName], function(values) {
+
+			let targetAilmentList = values[targetAilmentListName];
+			if (targetAilmentList != "") {
+
+				let output = {
+					...updateAilmentDisplay("target", 6, Data.unpackage(targetAilmentList), settingLimbusStyle, "true"),
+					"targetAilmentList": targetAilmentList
 				}
 
 				if (callback != "()=>{}") {
-					callback({"targetBarList": targetBarList, "targetBarDamageList": targetBarDamageList});
+					callback(output);
 				} else {
-					setAttrs({"targetBarList": Data.package(targetBarList), "targetBarDamageList": Data.package(targetBarDamageList)});
+					setAttrs(output);
 				}
+
+			} else {
+				callback()
+			}
+		});
+	} else {
+		callback();
+	}
+}
+function updateTargetBarLists(settingHideCombatOptions, targetName, targetTokenId, targetSettings, callback=()=>{}) {
+	if (settingHideCombatOptions == "0" && targetName != "") {
+
+		let targetBarAttrs = [];
+		let targetPrefix = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${targetTokenId}_` : "";
+		barList.forEach(bar => {
+			targetBarAttrs.push(`${targetPrefix}${bar}`, `${targetPrefix}${bar}_max`);
+		});
+		getTargetAttrs(targetName, targetBarAttrs, function(values) {
+
+			let output = {}
+			let targetBarList = {}
+			let targetBarDamageList = {}
+			barList.forEach(bar => {
+				let barName = "";
+				switch (bar) {
+					case "hp": barName = "HP"; break;
+					case "stagres": barName = "ST"; break;
+					case "sp": barName = "SP"; break;
+					case "light": barName = "Light"; break;
+				}
+				targetBarList[`${barName}`] = parseInt(values[`${targetPrefix}${bar}`]); 
+				targetBarDamageList[`-${barName}`] = parseInt(values[`${targetPrefix}${bar}_max`]) - targetBarList[`${barName}`];
 			});
-		}
-		else {
-			callback();
-		}
-	});
+
+			if (targetSettings.hideDetailsFromTargeting == "true") {
+				output = unknownTarget();
+			} else if (targetSettings.hideBarUpdate == "true") {
+				output = {"HP_target":"???", "StagRes_target":"???", "SP_target":"???"}
+			} else {
+				output = {"HP_target":targetBarList.HP, "StagRes_target":targetBarList.ST, "SP_target":targetBarList.SP}
+			}
+			output = {...output, "targetBarList": Data.package(targetBarList), "targetBarDamageList": Data.package(targetBarDamageList)}
+
+			if (callback != "()=>{}") {
+				callback(output);
+			} else {
+				setAttrs(output);
+			}
+		});
+	}
+	else {
+		callback();
+	}
 }
 
 async function getTargetAttrs(target, attrList, callback=()=>{}) {
@@ -13393,9 +13416,6 @@ function delayUpdateAilments(tokenidarray) {
 	}, updateDelay); // For my PC 500ms seems fine, but leaving it at 1000ms to hopefully make it run properly for lower spec PCs
 }
 
-/* Has the following modes: */
-/* single: updates main sheet */
-/* multiple: updates all token's sheets */
 function updateAilments(ailmentOverride=[], callback=()=>{}) {
 	
 	getSectionIDs(`repeating_global`, idarray => {
@@ -14834,8 +14854,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	}
 
 	/* Get resistance values based on outfit type. On stagger, resistances are fatal (2x) */
-	getAttrs([`${outfitType}Immune1`, `${outfitType}Immune2`, `${outfitType}Immune3`, `${outfitType}Immune4`, `${outfitType}Immune5`, `${outfitType}Immune6`],
-	function(values) {
+	getAttrs([`${outfitType}Immune1`, `${outfitType}Immune2`, `${outfitType}Immune3`, `${outfitType}Immune4`, `${outfitType}Immune5`, `${outfitType}Immune6`], function(values) {
 	
 	if (staggerState == "Staggered") {
 		hpResistance = 2.0; stResistance = 2.0;
@@ -16963,6 +16982,98 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	/* If using generic token mode, switches to the correct token before applying incoming AutoEffects */
 	let tokenId = (overrideList.tokenId != undefined) ? overrideList.tokenId : "";
 	changeActiveToken(tokenId, () => {
+
+	let autoScriptList = ["weapon1", "weapon2", "weapon3", "weapon4", "augment", "outfit", "ego", "tool1", "tool2", "tool3", "tool4", "special1", "special2",
+	"skill1", "skill2", "skill3", "skill4", "skill5", "skill6", "egoSkill1", "egoSkill2", "egoSkill3", "egoSkill4", "egoSkill5", "egoSkill6"];
+	autoScriptList = autoScriptList.map(prefix => prefix + "AutoScript");
+
+	/* Get relevant attributes */
+	getAttrs([...autoScriptList, "isFirstRound", "autoScriptStyling",
+	"settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
+	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", "settingHideCombatOptions", //"settingTargetMode",
+	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "THP_Sources", "TST_Sources",
+	"thisRoundSpeed", "nextRoundSpeed", "StaggerState", "distortState", "egoActiveState", "egoType",
+	"targetAilmentList", "targetBarList", "targetBarDamageList", "targetName", "targetTokenId", "targetSettings"], function(values) {
+		
+	let settingMuteMessage = values.settingMuteMessage;
+	let settingWhisperRolls = values.settingWhisperRolls;
+	let settingWhisperTarget = values.settingWhisperTarget;
+	let settingLimbusStyle = values.settingLimbusStyle;
+	let settingHideNextTurn = values.settingHideNextTurn;
+	let settingCollapseSections = values.settingCollapseAutoEffectSections;
+	let settingConditionalButtonReminder = values.settingHideConditionalButtonReminder;
+	let settingHideCombatOptions = values.settingHideCombatOptions;
+
+	let targetName = values.targetName;
+	let targetTokenId = values.targetTokenId;
+	let targetSettings = Data.unpackage(values.targetSettings);
+	//let targetmode = values.settingTargetMode;
+	//if (overrideList.targetmode != undefined) { targetmode = overrideList.targetmode; }
+
+	let HP = values.HP;
+	let ST = values.StagRes;
+	let SP = values.SP;
+	let Light = values.Light;
+	let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP), Light:parseInt(Light), THP:0, TST:0 };
+	let HPdamage = values.HP_max - HP;
+	let STdamage = values.StagRes_max - ST;
+	let SPdamage = values.SP_max - SP;
+	let LightExpended = values.Light_max - Light;
+	let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
+
+	let targetAilmentList = (values.targetAilmentList != undefined && values.targetAilmentList != "") ? Data.unpackage(values.targetAilmentList) : {};
+	let targetBarList = (values.targetBarList != undefined && values.targetBarList != "") ? Data.unpackage(values.targetBarList) : {};
+	let targetBarDamageList = (values.targetBarDamageList != undefined  && values.targetBarDamageList != "") ? Data.unpackage(values.targetBarDamageList) : {};
+
+	let THP_Sources = (values.THP_Sources != "" && values.THP_Sources != "{}") ? JSON.parse(values.THP_Sources) : "";
+	if (THP_Sources.AutoEffects != undefined) { barList.THP = THP_Sources.AutoEffects[0]; }
+	let TST_Sources = (values.TST_Sources != "" && values.TST_Sources != "{}") ? JSON.parse(values.TST_Sources) : "";
+	if (TST_Sources.AutoEffects != undefined) { barList.TST = TST_Sources.AutoEffects[0]; }
+
+	let thisRoundSpeed = parseInt(values.thisRoundSpeed);
+	let nextRoundSpeed = parseInt(values.nextRoundSpeed);
+	
+	let StaggerState = values.StaggerState;
+	let distortState = values.distortState;
+	let egoActiveState = values.egoActiveState;
+	let egoType = values.egoType;
+	
+	let scaling = 1;
+	let checkResult = "success";
+	let autoEffectType = "standard";
+	let autoBuffer = "";
+
+	let autoEffectConditional = "";
+	let conditionalMessageList = {};
+	let conditionalButtonList = {};
+	let conditionalButtonSilent = "";
+	let errorMessageList = {};
+	
+	let stylingList = parseAutoScriptStyling(values.autoScriptStyling);
+	
+	let output = {};
+	let tempOutput = {};
+	let returnValues = { checkResult:"success", error:false };
+	let challengeRollList = {};
+	let procAilmentList = {};
+	let message = "";
+	let messageValues = {};
+		
+	/* Get all ailments */
+	exportAilmentList(overrideList, function(ailmentList) { 
+
+	/* If targeting is in use, update target ailments and bars */
+	updateTargetAilmentList(settingHideCombatOptions, targetName, targetTokenId, targetSettings, settingLimbusStyle, (returnListAilment) => {
+	if (returnListAilment != undefined) {
+		targetAilmentList = Data.unpackage(returnListAilment.targetAilmentList);
+		output = {...output, ...returnListAilment}
+	}
+	updateTargetBarLists(settingHideCombatOptions, targetName, targetTokenId, targetSettings, (returnListBars) => {
+	if (returnListBars != undefined) {
+		targetBarList = Data.unpackage(returnListBars.targetBarList);
+		targetBarDamageList = Data.unpackage(returnListBars.targetBarDamageList);
+		output = {...output, ...returnListBars}
+	}
 	
 	/* Adds the input AutoScript */
 	let AutoScript = "";
@@ -16991,126 +17102,39 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		}
 	}
 
-	let autoScriptList = ["weapon1", "weapon2", "weapon3", "weapon4", "augment", "outfit", "ego", "tool1", "tool2", "tool3", "tool4", "special1", "special2",
-	"skill1", "skill2", "skill3", "skill4", "skill5", "skill6", "egoSkill1", "egoSkill2", "egoSkill3", "egoSkill4", "egoSkill5", "egoSkill6"];
-	autoScriptList = autoScriptList.map(prefix => prefix + "AutoScript");
-	
-	getAttrs([...autoScriptList, "distortState", "egoActiveState", "isFirstRound"], function(values) {
+	/* Collects all AutoScripts that use triggers */
+	let collectedAutoScripts = "";
+	autoScriptList.forEach(autoScript => {
+
+		/* Finds all substrings that begin with "[#" and end with "#]" */
+		if (autoScript.includes("ego") && !(values.distortState == "true" || values.egoActiveState == "true")) {
+			return;
+		}
+		if ((/\[([#][^]+[#])\]/g).test(values[`${autoScript}`])) {
+			collectedAutoScripts += values[`${autoScript}`].match(/\[([#][^]+[#])\]/g);
+		}
+	});
+	collectedAutoScripts = parseAutoScript(collectedAutoScripts, "nested");
+
+	let firstRound = getTranslationByKeyCustom("#First round", "autoeffect-option-firstround")
+
+	/* Append any collected AutoScripts with a relevant trigger */
+	collectedAutoScripts.forEach((trigger) => {
 		
-		let collectedAutoScripts = "";
-		autoScriptList.forEach(autoScript => {
+		/* Accept #First round triggers if it is currently the first round. Otherwise discard them */
+		if (trigger[0].includes(firstRound) && values.isFirstRound == "true") { trigger[0] = trigger[0].replace(firstRound,"").trim(); }
 
-			/* Finds all substrings that begin with "[#" and end with "#]" */
-			if (autoScript.includes("ego") && !(values.distortState == "true" || values.egoActiveState == "true")) {
-				return;
-			}
-			if ((/\[([#][^]+[#])\]/g).test(values[`${autoScript}`])) {
-				collectedAutoScripts += values[`${autoScript}`].match(/\[([#][^]+[#])\]/g);
-			}
-		});
-		collectedAutoScripts = parseAutoScript(collectedAutoScripts, "nested");
-
-		let firstRound = getTranslationByKeyCustom("#First round", "autoeffect-option-firstround")
-
-		collectedAutoScripts.forEach((trigger) => {
-			
-			/* Accept #First round triggers if it is currently the first round. Otherwise discard them */
-			if (trigger[0].includes(firstRound) && values.isFirstRound == "true") { trigger[0] = trigger[0].replace(firstRound,"").trim(); }
-
-			if (autoScriptTriggers.includes(getTriggerFromTranslation(trigger[0]))) {
-				if (AutoScript != "") { AutoScript += "(Reset)"; }
-				AutoScript += trigger[1];
-			}
-		});
+		if (autoScriptTriggers.includes(getTriggerFromTranslation(trigger[0]))) {
+			if (AutoScript != "") { AutoScript += "(Reset)"; }
+			AutoScript += trigger[1];
+		}
+	});
 
 	/* Convert AutoScript to an array */
 	AutoScript = parseAutoScript(AutoScript);
 
 	/* Translates AutoEffect names, bars and ailments to English */
 	AutoScript = translateAutoScriptToEnglish(AutoScript);
-
-	/* Get relevant attributes */
-	getAttrs(["settingMuteMessage", "settingWhisperRolls", "settingWhisperTarget", "settingLimbusStyle", "settingHideNextTurn",
-	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", "targetTokenId", //"settingTargetMode",
-	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "thisRoundSpeed", "nextRoundSpeed", 
-	"StaggerState", "distortState", "egoActiveState", "egoType", "autoScriptStyling",
-	"THP_Sources", "TST_Sources", "targetAilmentList", "targetBarList", "targetBarDamageList"], function(values) {
-		
-		let settingMuteMessage = values.settingMuteMessage;
-		let settingWhisperRolls = values.settingWhisperRolls;
-		let settingWhisperTarget = values.settingWhisperTarget;
-		let settingLimbusStyle = values.settingLimbusStyle;
-		let settingHideNextTurn = values.settingHideNextTurn;
-		let settingCollapseSections = values.settingCollapseAutoEffectSections;
-		let settingConditionalButtonReminder = values.settingHideConditionalButtonReminder;
-
-		let targetTokenId = values.targetTokenId;
-		//let targetmode = values.settingTargetMode;
-		//if (overrideList.targetmode != undefined) { targetmode = overrideList.targetmode; }
-
-		let HP = values.HP;
-		let ST = values.StagRes;
-		let SP = values.SP;
-		let Light = values.Light;
-		let barList = { HP: parseInt(HP), ST:parseInt(ST), SP:parseInt(SP), Light:parseInt(Light), THP:0, TST:0 };
-		let HPdamage = values.HP_max - HP;
-		let STdamage = values.StagRes_max - ST;
-		let SPdamage = values.SP_max - SP;
-		let LightExpended = values.Light_max - Light;
-		let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
-
-		let targetAilmentList = (values.targetAilmentList != undefined && values.targetAilmentList != "") ? Data.unpackage(values.targetAilmentList) : {};
-		let targetBarList = (values.targetBarList != undefined && values.targetBarList != "") ? Data.unpackage(values.targetBarList) : {};
-		let targetBarDamageList = (values.targetBarDamageList != undefined  && values.targetBarDamageList != "") ? Data.unpackage(values.targetBarDamageList) : {};
-
-		let THP_Sources = (values.THP_Sources != "" && values.THP_Sources != "{}") ? JSON.parse(values.THP_Sources) : "";
-		if (THP_Sources.AutoEffects != undefined) { barList.THP = THP_Sources.AutoEffects[0]; }
-		let TST_Sources = (values.TST_Sources != "" && values.TST_Sources != "{}") ? JSON.parse(values.TST_Sources) : "";
-		if (TST_Sources.AutoEffects != undefined) { barList.TST = TST_Sources.AutoEffects[0]; }
-
-		let thisRoundSpeed = parseInt(values.thisRoundSpeed);
-		let nextRoundSpeed = parseInt(values.nextRoundSpeed);
-		
-		let StaggerState = values.StaggerState;
-		let distortState = values.distortState;
-		let egoActiveState = values.egoActiveState;
-		let egoType = values.egoType;
-		
-		let scaling = 1;
-		let checkResult = "success";
-		let autoEffectType = "standard";
-		let autoBuffer = "";
-
-		let autoEffectConditional = "";
-		let conditionalMessageList = {};
-		let conditionalButtonList = {};
-		let conditionalButtonSilent = "";
-		let errorMessageList = {};
-		
-		let stylingList = parseAutoScriptStyling(values.autoScriptStyling);
-		
-		let output = {};
-		let tempOutput = {};
-		let returnValues = { checkResult:"success", error:false };
-		let challengeRollList = {};
-		let procAilmentList = {};
-		let message = "";
-		let messageValues = {};
-		
-	/* Get all ailments */
-	exportAilmentList(overrideList, function(ailmentList) { 
-	// console.log(ailmentList)
-
-	/* If targeting is in use, update target ailments and bars */
-	updateTargetAilmentList(returnListAilment => {
-	if (returnListAilment != undefined) {
-		targetAilmentList = returnListAilment;
-	}
-	updateTargetBarLists(returnListBars => {
-	if (returnListBars != undefined) {
-		targetBarList = returnListBars.targetBarList;
-		targetBarDamageList = returnListBars.targetBarDamageList;
-	}
 
 
 	/* Execute each AutoEffect in the AutoScript */
@@ -17503,7 +17527,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 
 	setAttrs(output);
 	callback(returnValues);
-	});
 	});
 	});
 	});
@@ -19264,7 +19287,7 @@ async function exportAilmentList(overrideList={}, callback=() => {}) {
 	});
 }
 
-function importAilmentList(ailmentList) {
+function importAilmentList(ailmentList, returnMode="false") {
 	let output = {}
 	for (const [ailmentName, ailmentValues] of Object.entries(ailmentList)) {
 		/* Default ailments */
@@ -19280,7 +19303,12 @@ function importAilmentList(ailmentList) {
 			output[`${ailmentName}DecayPause`] = ailmentValues[4];
 		}
 	}
-	setAttrs(output);
+
+	if (returnMode == "true") {
+		return output;
+	} else {
+		setAttrs(output);
+	}
 }
 
 
