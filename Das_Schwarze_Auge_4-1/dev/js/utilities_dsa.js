@@ -176,6 +176,24 @@ function DSAsane (value, type) {
 	}
 
 	switch(type) {
+		case "int":
+			// General
+			// Must be number of parseInt()-able number
+			// integer
+			if (!limitedIntValid(value, -Infinity, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
+		case "non-negative int":
+			// General
+			// Must be number of parseInt()-able number
+			// Non-negative integer
+			if (!limitedIntValid(value, 0, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
 		case "stat":
 			// MU, KL, IN, ...
 			// Must be number or parseInt()-able number
