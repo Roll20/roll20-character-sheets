@@ -81,6 +81,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Oct 1st 2024 v1.73
+
+- Added distracted (-20 to all tests) to the condition bar. Distracted with stack with the 1 highest other condition if possible.
+- Removed the limit of -30 modifier for condition, there is now no limit.
+
 
 July 25th 2024 v1.72c
 
