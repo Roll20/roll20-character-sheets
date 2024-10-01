@@ -14771,12 +14771,24 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	if (overrideList.tokenId != undefined) {tokenId = overrideList.tokenId; }
 	changeActiveToken(tokenId, () => {
 
+	/* Retrieve global settings for Smoke settings */
+	getSectionIDs(`repeating_global`, idarray => {
+	let id = `repeating_global_${idarray[0]}`;
+
+	/* Get custom ailment attributes */
+	getSectionIDs(`repeating_ailments`, idarray => {
+		const fieldnames = idarray.map(id => `repeating_ailments_${id}_`).reduce((rows,prefix) =>  [...rows, `${prefix}ailTrigger`, `${prefix}ailDamageTypeTrigger`,
+		`${prefix}ailBeforeResistance`, `${prefix}ailPositiveType`, `${prefix}ailDecayWhenHit`, `${prefix}ailEffect`, `${prefix}ailEffectMode`, `${prefix}ailEffectVal`,
+		`${prefix}ailCustomResistanceNum`, `${prefix}ailCustomResistanceNumEgo`, `${prefix}ailNum`, `${prefix}ailName`, `${prefix}ailIcon`], '');
+
 	/* Get attribute values */
-	getAttrs(["character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max",
+	getAttrs([...fieldnames, "character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max", "THP_Sources", "TST_Sources",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
 	"baseDamage", "flatDamageHP", "flatDamageST", "damageHelperType",
 	"distortState", "egoActiveState", "egoType", "StaggerState", "damageResist", "damageResist_ego",
-	"THP_Sources", "TST_Sources"], function(values) {
+	"Fragile", "Protection", "StaggerProtection", "Smoke", `${id}_smokeCalculationMode`, `${id}_smokeCalculationVal`,
+	"outfitImmune1", "outfitImmune2", "outfitImmune3", "outfitImmune4", "outfitImmune5", "outfitImmune6",
+	"egoImmune1", "egoImmune2", "egoImmune3", "egoImmune4", "egoImmune5", "egoImmune6"], function(values) {
 
 	const output = {};
 
@@ -14854,8 +14866,6 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	}
 
 	/* Get resistance values based on outfit type. On stagger, resistances are fatal (2x) */
-	getAttrs([`${outfitType}Immune1`, `${outfitType}Immune2`, `${outfitType}Immune3`, `${outfitType}Immune4`, `${outfitType}Immune5`, `${outfitType}Immune6`], function(values) {
-	
 	if (staggerState == "Staggered") {
 		hpResistance = 2.0; stResistance = 2.0;
 	} else {
@@ -14908,13 +14918,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	/* Sum of all modifiers that do not take resistance into consideration */
 	let sumSanity = -flatDamageSP;
 
-	/* Retrieve global settings for Smoke settings */
-	getSectionIDs(`repeating_global`, idarray => {
-    let id = `repeating_global_${idarray[0]}`;
-
 	/* Get damage modifiers from status ailments */
-	getAttrs(["Fragile", "Protection", "StaggerProtection", "Smoke", `${id}_smokeCalculationMode`, `${id}_smokeCalculationVal`], function(values) {
-	
 	let hpFragile = parseInt(values.Fragile);
 	let hpProtection = parseInt(values.Protection);
 	let stProtection = parseInt(values.StaggerProtection);
@@ -14926,161 +14930,154 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	sumHpAfter -= hpFragile;
 
 	/* Get damage modifiers from When Hit custom status ailments */
-	getSectionIDs(`repeating_ailments`, idarray => {
-		const fieldnames = idarray.reduce((rows,id) => 
-		[...rows, `repeating_ailments_${id}_ailTrigger`, `repeating_ailments_${id}_ailDamageTypeTrigger`, `repeating_ailments_${id}_ailBeforeResistance`, `repeating_ailments_${id}_ailPositiveType`, `repeating_ailments_${id}_ailDecayWhenHit`,
-		`repeating_ailments_${id}_ailEffect`, `repeating_ailments_${id}_ailEffectMode`, `repeating_ailments_${id}_ailEffectVal`, `repeating_ailments_${id}_ailCustomResistanceNum`, `repeating_ailments_${id}_ailCustomResistanceNumEgo`,,
-		`repeating_ailments_${id}_ailNum`, `repeating_ailments_${id}_ailName`, `repeating_ailments_${id}_ailIcon`], '');
-		
-		let ailTrigger = "";
-		let ailDamageTypeTrigger = "";
-		let ailBeforeResistance = "";
-		let ailDecayWhenHit = "";
-		let ailEffect = "";
-		let ailEffectMode = "";
-		let ailEffectVal = 0;
-		let ailType = "";
-		let ailCustomResistanceNum = 0;
-		let ailCustomResistanceNumEgo = 0;
-		let ailName = "";
-		let ailIcon = "";
-		let count = 0;
+	let ailTrigger = "";
+	let ailDamageTypeTrigger = "";
+	let ailBeforeResistance = "";
+	let ailDecayWhenHit = "";
+	let ailEffect = "";
+	let ailEffectMode = "";
+	let ailEffectVal = 0;
+	let ailType = "";
+	let ailCustomResistanceNum = 0;
+	let ailCustomResistanceNumEgo = 0;
+	let ailName = "";
+	let ailIcon = "";
+	let count = 0;
 
-		let hpStRegen = 0;
-		let stRegen = -flatDamageST;
-		let hpRegen = -flatDamageHP;
-		let spRegen = -flatDamageSP;
+	let hpStRegen = 0;
+	let stRegen = -flatDamageST;
+	let hpRegen = -flatDamageHP;
+	let spRegen = -flatDamageSP;
 
-		getAttrs([...fieldnames], v => {
-			idarray.forEach(id => {
+	idarray.forEach(id => {
+
+		ailTrigger = values[`repeating_ailments_${id}_ailTrigger`];
+		ailDamageTypeTrigger = values[`repeating_ailments_${id}_ailDamageTypeTrigger`];
+		ailBeforeResistance = values[`repeating_ailments_${id}_ailBeforeResistance`];
+		ailDecayWhenHit = values[`repeating_ailments_${id}_ailDecayWhenHit`];
+		ailEffect = values[`repeating_ailments_${id}_ailEffect`];
+		ailEffectMode = values[`repeating_ailments_${id}_ailEffectMode`];
+		ailEffectVal = values[`repeating_ailments_${id}_ailEffectVal`];
+		ailCustomResistanceNum = parseInt(values[`repeating_ailments_${id}_ailCustomResistanceNum`]);
+		ailCustomResistanceNumEgo = parseInt(values[`repeating_ailments_${id}_ailCustomResistanceNumEgo`]);
 		
-				ailTrigger = v[`repeating_ailments_${id}_ailTrigger`];
-				ailDamageTypeTrigger = v[`repeating_ailments_${id}_ailDamageTypeTrigger`];
-				ailBeforeResistance = v[`repeating_ailments_${id}_ailBeforeResistance`];
-				ailDecayWhenHit = v[`repeating_ailments_${id}_ailDecayWhenHit`];
-				ailEffect = v[`repeating_ailments_${id}_ailEffect`];
-				ailEffectMode = v[`repeating_ailments_${id}_ailEffectMode`];
-				ailEffectVal = v[`repeating_ailments_${id}_ailEffectVal`];
-				ailCustomResistanceNum = parseInt(v[`repeating_ailments_${id}_ailCustomResistanceNum`]);
-				ailCustomResistanceNumEgo = parseInt(v[`repeating_ailments_${id}_ailCustomResistanceNumEgo`]);
+		ailName = values[`repeating_ailments_${id}_ailName`];
+		ailIcon = values[`repeating_ailments_${id}_ailIcon`];
+		count = values[`repeating_ailments_${id}_ailNum`];
+
+		if ((/(-[0-9]*n)/).test(ailEffectVal)) {
+			ailType = "Damage";
+		} else {
+			if (ailBeforeResistance == "beforeResistance") { ailType = "Reduction"; }
+			else { ailType = values[`repeating_ailments_${id}_ailPositiveType`]; }
+		}
+
+		if (egoActiveState == "true" && egoType == "Outfit" && distortState != "true") {
+			ailCustomResistanceNum = parseInt(ailCustomResistanceNumEgo);
+		}
+		else if (distortState == "true") {
+			ailCustomResistanceNum += parseInt(ailCustomResistanceNumEgo);
+		}
+		
+		let tempSumBoth = 0;
+		let tempSumHp = 0;
+		let tempSumSt = 0;
+		
+		if (ailTrigger == "WhenHit") {
+
+			if ((ailDamageTypeTrigger == "Any" || ailDamageTypeTrigger == damageType) && (ailEffect != "None" && ailEffect != null && count != 0)) {
+
+				/* Calculate base attribute change and its polarity */
 				
-				ailName = v[`repeating_ailments_${id}_ailName`];
-				ailIcon = v[`repeating_ailments_${id}_ailIcon`];
-				count = v[`repeating_ailments_${id}_ailNum`];
+				/* Ailment is n or -n multiplied by a number */
+				if ((/([0-9]+n)/).test(ailEffectVal)) {
+					ailEffectVal = ailEffectVal.replaceAll("n","");
+					ailEffectVal = parseInt(count) * parseInt(ailEffectVal)
+				}
+				else if ((/(-[0-9]+n)/).test(ailEffectVal)) {
+					ailEffectVal = (0 - parseInt(count)) * parseInt(ailEffectVal)
+				}
+				/* Ailment is n or -n */
+				else if (ailEffectVal == "n") {
+					ailEffectVal = parseInt(count);
+				}
+				else if (ailEffectVal == "-n") {
+					ailEffectVal = (0 - parseInt(count)) + Math.min(count, ailCustomResistanceNum);
+				}
 
-				if ((/(-[0-9]*n)/).test(ailEffectVal)) {
-					ailType = "Damage";
+				let apply_effect_mode = {
+					"x": function (x, y, res) {
+						if (y < 1) {
+							return Math.floor(x * y) + Math.min(Math.floor(x-(x*y)), ailCustomResistanceNum);
+						} else {
+							return Math.floor(x * y);
+						} 
+					},
+					"=": function (x, y, res) {
+						if (y < x) {
+							return x = y + Math.min((x-y), ailCustomResistanceNum);
+						} else {
+							return x = y;
+						}
+					}
+				};
+
+				
+				/* Get effect mode. "x" and "=" apply directly to the relevant stat */
+				if (ailEffectMode == "+") {
+					switch (ailEffect) {
+						case "HPStagRes": tempSumBoth += parseInt(ailEffectVal); break;
+						case "HP": tempSumHp += parseInt(ailEffectVal); break;
+						case "StagRes": tempSumSt += parseInt(ailEffectVal); break;
+						case "SP": sumSanity += parseInt(ailEffectVal); break;
+					}
 				} else {
-					if (ailBeforeResistance == "beforeResistance") { ailType = "Reduction"; }
-					else { ailType = v[`repeating_ailments_${id}_ailPositiveType`]; }
-				}
-
-				if (egoActiveState == "true" && egoType == "Outfit" && distortState != "true") {
-					ailCustomResistanceNum = parseInt(ailCustomResistanceNumEgo);
-				}
-				else if (distortState == "true") {
-					ailCustomResistanceNum += parseInt(ailCustomResistanceNumEgo);
-				}
-				
-				let tempSumBoth = 0;
-				let tempSumHp = 0;
-				let tempSumSt = 0;
-				
-				if (ailTrigger == "WhenHit") {
-
-					if ((ailDamageTypeTrigger == "Any" || ailDamageTypeTrigger == damageType) && (ailEffect != "None" && ailEffect != null && count != 0)) {
-
-						/* Calculate base attribute change and its polarity */
-						
-						/* Ailment is n or -n multiplied by a number */
-						if ((/([0-9]+n)/).test(ailEffectVal)) {
-							ailEffectVal = ailEffectVal.replaceAll("n","");
-							ailEffectVal = parseInt(count) * parseInt(ailEffectVal)
-						}
-						else if ((/(-[0-9]+n)/).test(ailEffectVal)) {
-							ailEffectVal = (0 - parseInt(count)) * parseInt(ailEffectVal)
-						}
-						/* Ailment is n or -n */
-						else if (ailEffectVal == "n") {
-							ailEffectVal = parseInt(count);
-						}
-						else if (ailEffectVal == "-n") {
-							ailEffectVal = (0 - parseInt(count)) + Math.min(count, ailCustomResistanceNum);
-						}
-
-						let apply_effect_mode = {
-							"x": function (x, y, res) {
-								if (y < 1) {
-									return Math.floor(x * y) + Math.min(Math.floor(x-(x*y)), ailCustomResistanceNum);
-								} else {
-									return Math.floor(x * y);
-								} 
-							},
-							"=": function (x, y, res) {
-								if (y < x) {
-									return x = y + Math.min((x-y), ailCustomResistanceNum);
-								} else {
-									return x = y;
-								}
-							}
-						};
-
-						
-						/* Get effect mode. "x" and "=" apply directly to the relevant stat */
-						if (ailEffectMode == "+") {
-							switch (ailEffect) {
-								case "HPStagRes": tempSumBoth += parseInt(ailEffectVal); break;
-								case "HP": tempSumHp += parseInt(ailEffectVal); break;
-								case "StagRes": tempSumSt += parseInt(ailEffectVal); break;
-								case "SP": sumSanity += parseInt(ailEffectVal); break;
-							}
-						} else {
-							switch (true) {
-								case ailEffect == "HPStagRes": 
-									newHP = apply_effect_mode[ailEffectMode](newHP, parseFloat(ailEffectVal), ailCustomResistanceNum); /* No break. Intentional fall through */
-								case ailEffect == "StagRes":
-									newST = apply_effect_mode[ailEffectMode](newST, parseFloat(ailEffectVal), ailCustomResistanceNum);
-									ailEffectVal = newST - oldST; break;
-								case ailEffect == "HP" : 
-									newHP = apply_effect_mode[ailEffectMode](newHP, parseFloat(ailEffectVal), ailCustomResistanceNum);
-									ailEffectVal = newHP - oldHP; break;
-								case ailEffect == "SP":
-									newSP = apply_effect_mode[ailEffectMode](newSP, parseFloat(ailEffectVal), ailCustomResistanceNum);
-									ailEffectVal = newSP - oldSP; break;
-							}
-						}
-
-						/* Select sum to apply modifier to based on damage being before or after resistance */
-						if (ailBeforeResistance == "beforeResistance") {
-							sumBothBefore += tempSumBoth; sumHpBefore += tempSumHp; sumStBefore += tempSumSt;
-						} else {
-							sumBothAfter += tempSumBoth; sumHpAfter += tempSumHp; sumStAfter += tempSumSt; 
-						}
-
-						/* Regen tracking  */
-						if (ailType == "Regen") {
-							switch (ailEffect) {
-								case "HPStagRes": hpStRegen += tempSumBoth;
-								case "StagRes": stRegen += tempSumSt;
-								case "HP": hpRegen += tempSumHp;
-								case "SP": spRegen += sumSanity;
-							}
-						}
-
-						/* Temp sum cleanup */
-						tempSumBoth = 0; tempSumHp = 0; tempSumSt = 0;
-
-						/* Used to generate a damage calculation message later in this function */
-						ailCalculationList[id] = {name: ailName, icon: ailIcon, effect: ailEffect, count: count, effectVal: ailEffectVal, type: ailType, beforeRes: ailBeforeResistance, customRes: ailCustomResistanceNum}
-					}
-				
-					// Decay status ailment
-					if (ailDecayWhenHit == "true") {
-						updateCustomAilment(id, "decay", "false");
+					switch (true) {
+						case ailEffect == "HPStagRes": 
+							newHP = apply_effect_mode[ailEffectMode](newHP, parseFloat(ailEffectVal), ailCustomResistanceNum); /* No break. Intentional fall through */
+						case ailEffect == "StagRes":
+							newST = apply_effect_mode[ailEffectMode](newST, parseFloat(ailEffectVal), ailCustomResistanceNum);
+							ailEffectVal = newST - oldST; break;
+						case ailEffect == "HP" : 
+							newHP = apply_effect_mode[ailEffectMode](newHP, parseFloat(ailEffectVal), ailCustomResistanceNum);
+							ailEffectVal = newHP - oldHP; break;
+						case ailEffect == "SP":
+							newSP = apply_effect_mode[ailEffectMode](newSP, parseFloat(ailEffectVal), ailCustomResistanceNum);
+							ailEffectVal = newSP - oldSP; break;
 					}
 				}
-				
-			});
+
+				/* Select sum to apply modifier to based on damage being before or after resistance */
+				if (ailBeforeResistance == "beforeResistance") {
+					sumBothBefore += tempSumBoth; sumHpBefore += tempSumHp; sumStBefore += tempSumSt;
+				} else {
+					sumBothAfter += tempSumBoth; sumHpAfter += tempSumHp; sumStAfter += tempSumSt; 
+				}
+
+				/* Regen tracking  */
+				if (ailType == "Regen") {
+					switch (ailEffect) {
+						case "HPStagRes": hpStRegen += tempSumBoth;
+						case "StagRes": stRegen += tempSumSt;
+						case "HP": hpRegen += tempSumHp;
+						case "SP": spRegen += sumSanity;
+					}
+				}
+
+				/* Temp sum cleanup */
+				tempSumBoth = 0; tempSumHp = 0; tempSumSt = 0;
+
+				/* Used to generate a damage calculation message later in this function */
+				ailCalculationList[id] = {name: ailName, icon: ailIcon, effect: ailEffect, count: count, effectVal: ailEffectVal, type: ailType, beforeRes: ailBeforeResistance, customRes: ailCustomResistanceNum}
+			}
+		
+			// Decay status ailment
+			if (ailDecayWhenHit == "true") {
+				updateCustomAilment(id, "decay", "false");
+			}
+		}
+		
+	});
 
 
 	/* Calculate smoke damage */
@@ -15334,9 +15331,6 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	/* Cleanup */
 	setAttrs({"dummy":" "});
 
-	});
-	});
-	});
 	});
 	});
 	});
