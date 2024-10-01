@@ -2319,8 +2319,8 @@
 							<div class="item-maneuver-block-stats-standard-row">
 								<h2>Full Phase</h2>
 							</div>
-							<div class="item-maneuver-block-stats-standard-row">
-								<h2>OCV: varies&emsp;+</h2><input type="number" name="attr_maneuverOCVmod" title="@{maneuverOCVmod}" value="0" step="1"  min="0" max="10" tabindex="174"/><h2>CSLs</h2>
+							<div class="item-maneuver-block-stats-special-row">
+								<h2>OCV:</h2><input type="number" name="attr_variableOCVmod" title="@{variableOCVmod}" value="0" step="2"  min="-10" max="0" tabindex="173"/><h2>+</h2><input type="number" name="attr_maneuverOCVmod" title="@{maneuverOCVmod}" value="0" step="1"  min="0" max="10" tabindex="174"/><h2>CSLs</h2>
 							</div>
 							<div class="item-maneuver-block-stats-standard-row">
 								<h2>DCV: 1/2&emsp;+</h2><input type="number" name="attr_maneuverDCVmod" title="@{maneuverDCVmod}" value="0" step="1"  min="0" max="10" tabindex="175"/><h2>CSLs</h2>
@@ -13861,6 +13861,7 @@
 				attributes.moveVelocity = parseInt(values.running)||12;
 				attributes.powerManeuver = "strike";
 				attributes.maneuverDamageCSL = "0";
+				attributes.variableOCVmod = 0;
 				
 				updateWeaponStates("strike");
 			}
@@ -15280,8 +15281,8 @@
 							theRoll	+= "{{OMCV=[[@{omcv}[OMCV]+?{MOCV Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
 						}
 					} else if  (isRanged && hasRangePenalty) {
+						// Keeping Mental CV functionality here if future cases come up where it becomes needed.
 						if (dispDoS) {
-							// Keeping Mental CV functionality here if future cases come up where it becomes needed.
 							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}} ";
 						} else {
 							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
@@ -18469,7 +18470,7 @@
 	
 	// Function for handling standard maneuver weapon attacks.
 	function weaponAttack(weaponId) {
-		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
+		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty", "variableOCVmod"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			var attributes = new Object();
 			
@@ -18638,7 +18639,7 @@
 				rollMessage = "Multiple " + (isNormal ? "" : "Killing ") + "Attack";
 				
 				// CV
-				maneuverOCV = 0;
+				maneuverOCV = parseInt(values.variableOCVmod)||0;
 				maneuverDCV = 0;
 				halfDCV = true;
 				
@@ -19104,7 +19105,7 @@
 	// Roll attack and damage dice for Weapon XX.
 	on(`clicked:attackStrength`, (info) => {
 		
-		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
+		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			var attributes = new Object();
 			
@@ -19227,7 +19228,7 @@
 				rollMessage = "Multiple Attack";
 				
 				// CV
-				maneuverOCV = 0;
+				maneuverOCV = parseInt(values.variableOCVmod)||0;
 				maneuverDCV = 0;
 				halfDCV = true;
 				
