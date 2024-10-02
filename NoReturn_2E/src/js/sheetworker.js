@@ -1,6 +1,7 @@
 /*
     CREATED by          Gorthian
-    Letzte Änderung		2023-09-13
+    Version				1.1 HF4
+    Letzte Änderung		2023-12-16
 */
 
 /* TAB MENU */
@@ -168,7 +169,7 @@ skilllist.forEach(skills => {
     let skill = skills[0];
     let attribut = skills[1];
     on(`clicked:probe-${skill}-${attribut}`, function() {        
-        getAttrs([skill, skill+"_mod", skill+"_biomechanik",  attribut, attribut+"-mod1", attribut+"-mod2", attribut+"-biomechanik"], function(values) {
+        getAttrs([skill, skill+"_mod", skill+"_biomechanik",  attribut, attribut+"-biomechanik"], function(values) {
             let summeSkill = 0;
             let summeAttribut = 0;
             let summe = 0;
@@ -176,9 +177,7 @@ skilllist.forEach(skills => {
             let skillNotiz = values[skill+"_mod"];
             let biomechanik_skill = parseInt(values[skill+"_biomechanik"]||0);
             let biomechanik_attribut = parseInt(values[attribut+"-biomechanik"]||0);
-            let attributWert = parseInt(values[attribut]||0);
-            let attributMod1 = parseInt(values[attribut+"-mod1"]||0);
-            let attributMod2 = parseInt(values[attribut+"-mod2"]||0);
+            let attributWert = parseInt(values[attribut]||0);            
     
             summeSkill = parseInt(values[skill]);
             summeAttribut = attributWert;
@@ -212,6 +211,8 @@ attributeslist.forEach(attribut => {
      
             if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
                 hazard = summe;
+            } else { //Andernfalls wird der Hazard-Di auf 1 gesetzt
+                hazard = 1;
             }
             setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard);
         });
@@ -415,7 +416,6 @@ on("change:probe_hazard_wuerfel", function(){
         let hazard = parseInt(values["probe_hazard_wuerfel"]);
 
         standard = summe - hazard;
-        if(hazard < 1) {hazard = 1}
         if(standard < 0) {standard = 0}        
         
         setAttrs({

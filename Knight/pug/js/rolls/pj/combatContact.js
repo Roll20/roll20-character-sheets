@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable no-plusplus */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
@@ -352,6 +353,7 @@ rollCombatContact.forEach((button) => {
     let isEAmbidextrie = false;
     let isELourd = false;
     let isEDeuxMains = false;
+    let isTirSecurite = false;
 
     let isAAgressive = false;
     let isASoeur = false;
@@ -447,7 +449,12 @@ rollCombatContact.forEach((button) => {
     // GESTION DES BONUS DE BASE
     let dForce = vForce;
 
-    if (hasArmure) { dForce += oForce * 3; }
+    if (hasArmure) {
+      if (oForce > 5) {
+        dForce += 5 * 3;
+        dForce += (oForce - 5);
+      } else dForce += oForce * 3;
+    }
 
     bDegats.push(dForce);
     exec.push(`{{vForce=${dForce}}}`);
@@ -523,6 +530,7 @@ rollCombatContact.forEach((button) => {
 
       isEAkimbo = effets.isAkimbo;
       isEAmbidextrie = effets.isAmbidextrie;
+      isTirSecurite = effets.isTirSecurite;
 
       isBourreau = effets.isBourreau;
       isDevastation = effets.isDevastation;
@@ -640,7 +648,7 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd);
+    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);

@@ -6,30 +6,47 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const merge = require('gulp-merge-json');
+const { starforged } = require('dataforged')
+const { buildAssetTranslations, buildOracleTranslations } = require('./buildTranslations')
 
-axios.defaults.baseURL =
-  'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
+axios.defaults.baseURL = 'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
 
 gulp.task('dataforge', async function() {
-  const rawData = {
-    oracles: await axios.get('/oracles.json'),
-    assets: await axios.get('/assets.json'),
-    moves: await axios.get('/moves.json'),
+  const apiData = {
     movegroups: await axios.get('/movegroups.json'),
     rolls: await axios.get('/rolls.json'),
+    oracles: await axios.get('/oracles.json'),
+    moves: await axios.get('/moves.json'),
+    legacyassets: await axios.get('/assets.json'),
+  }
+
+  const rawData = {
+    oracles: starforged['Oracle Categories'],
+    assets: starforged['Asset Types'],
+    moves: apiData.moves.data,
+    // moves: starforged['Move Categories'],
+    truths: starforged['Setting Truths'],
+    encounters: starforged['Encounters'],
+    movegroups: apiData.movegroups.data,
+    rolls: apiData.rolls.data,
+    legacyassets: apiData.legacyassets.data
   };
+
   const translationData = {
-    'translation-assets': await axios.get('/translation-assets.json'),
+    'translation-assets': buildAssetTranslations(),
+    'translation-oracles': buildOracleTranslations()
   };
 
   for (let key in rawData) {
-    const data = rawData[key].data;
+    const data = rawData[key];
     const fileName = path.join(__dirname, `./app/data/${key}.json`);
     fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
   }
+
   for (let key in translationData) {
-    const data = translationData[key].data;
+    const data = translationData[key]
     const fileName = path.join(__dirname, `./app/translations/${key}.json`);
+    console.log(fileName);
     fs.writeFileSync(fileName, JSON.stringify(data, null, 2));
   }
 });
@@ -89,7 +106,7 @@ gulp.task('html', () => {
 
 gulp.task(
   'watch',
-  gulp.series(['dataforge', 'css', 'data', 'html'], () => {
+  gulp.series(['dataforge', 'mergeTranslation', 'data', 'css', 'html'], () => {
     gulp.watch('./app/**/*.styl', gulp.series(['css']));
     gulp.watch(['./app/**/*.pug', './app/**/*.js'], gulp.series(['html']));
   })

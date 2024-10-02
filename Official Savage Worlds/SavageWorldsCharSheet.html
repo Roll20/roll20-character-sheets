@@ -1,7 +1,8 @@
 
 <script type="text/worker">
-  const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.30';
+  //# sourceURL=SWADE.js
+const sheetVersionPrefix = 'Official Savage Worlds v';
+const sheetVersion = '1.00.31';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -589,6 +590,10 @@ const upgradeSheet = function (
     if (versionthree < 0.3) {
       log('Sheet Version', 'Upgrading to version 0.0.30', '#CCCCFF');
       fauxChange(`repeating_weapons:weaponskill`, 'fighting');
+      setattrvals['newcontent'] = 'unread';
+    }
+    if (versionthree < 0.31) {
+      log('Sheet Version', 'Upgrading to version 0.0.31', '#CCCCFF');
       setattrvals['newcontent'] = 'unread';
     }
     setAttrs(setattrvals);
@@ -1810,19 +1815,24 @@ on(
 
 const setPace = function () {
   getAttrs(
-    ['pace', 'paceMod', 'woundsMod', 'paceignoreswounds'],
+    ['pace', 'paceMod', 'woundsMod', 'paceignoreswounds', 'encumbrance', 'encumbrancerules'],
     function (pvalue) {
       console.log('pace value: ' + pvalue.pace);
       console.log('mod value: ' + pvalue.paceMod);
       let pace_base = parseInt(pvalue.pace) || 0;
       let pace_mod = parseInt(pvalue.paceMod) || 0;
       let wound_mod = parseInt(pvalue.woundsMod) || 0;
+      let enc_mod = parseInt(pvalue.encumbrance) || 0;
       let totPace = 0;
-      if (pvalue.paceignoreswounds === 'on') {
+      if (pvalue.encumbrancerules === '1' && pvalue.paceignoreswounds === 'on') {
+        totPace = pace_base + pace_mod + enc_mod;
+      } else if (pvalue.paceignoreswounds === 'on') {
         totPace = pace_base + pace_mod;
+      } else if (pvalue.encumbrancerules === '1') {
+        totPace = pace_base + pace_mod - wound_mod + enc_mod;
       } else {
         totPace = pace_base + pace_mod - wound_mod;
-      }
+      } 
 
       if (totPace < 1) {
         totPace = 1;
@@ -1834,7 +1844,7 @@ const setPace = function () {
 
 //Set Pace
 on(
-  'change:pace change:pacemod change:woundsmod change:paceignoreswounds',
+  'change:pace change:pacemod change:woundsmod change:paceignoreswounds change:encumbrance change:encumbrancerules',
   function () {
     setPace();
   }
@@ -2245,6 +2255,7 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
+        debugger;
         lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
 };
@@ -2341,6 +2352,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
             return false;
         }
     });
+    
     if (!compendiumObj) { //If we didn't find an object matching the expansion pathways and the object name, just find the first item with a matching name
         compendiumObj = dataArr.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
         if (!compendiumObj) { //If there still isn't a matching compendium object, return the original PHEG
@@ -2359,6 +2371,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
 //Reset Compendium fields to empty
 const getDropInfoCommand = (category, source) => {
   const PHEGCategoryTypes = {
+    Gear: 'gear',
     Edges: 'npc_Edge',
     Hindrances: 'npc_hindrance',
     Weapons: 'weapons', //Needs handling for PA/Vehicle/RA
@@ -2671,14 +2684,14 @@ const determineWeaponOptions = function (
     ? (targetObj[`${section}_damageatt`] = 'na')
     : log('damageatt', 'Found...will set appropriately', r20color);
   targetObj[`${section}_weaponcarried`] = 'on';
-  if (jsonObj['dmgdietype'] === 'dmgdietype') {
+  if (jsonObj.hasOwnProperty('dmgdietype')) {
     //check if the format is correct
     typeof jsonObj['dmgdietype'] !== 'undefined' &&
     parseInt(jsonObj['dmgdietype'] || 0) > 0
-      ? (jsonObj['dmgdietype'] = 'd' + jsonObj['dmgdietype'] + '!')
+      ? (jsonObj['dmgdietype'] = `d${jsonObj['dmgdietype']}!`)
       : log(
           'dmgdietype',
-          "Either isn't defined or is formatted correctly, hopefully",
+          "Either isn't defined or is not formatted correctly, hopefully",
           r20color
         );
   }
@@ -2764,7 +2777,7 @@ const dropSpecialAbilities = function({repSectionID,repSection,targetObj}){
 };
 
 const dropWeapons = function({repSectionID,repSection,targetObj,jsonObj,attributes}){
-  jsonObj['weaponnotes'] = jsonObj['description'];
+  jsonObj['weaponnotes'] = jsonObj['description'] ?? '';
   targetObj[`repeating_${repSection}_${repSectionID}_showweaponconfig`] = 0;
   determineWeaponOptions(
     jsonObj,
@@ -2906,11 +2919,18 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
       if (/^(pa|ra)/.test(repSection)) {
       }
       fields.forEach(field => {
-        jsonObj[`${field}`] !== undefined
-          ? (targetObj[
-              `repeating_${repSection}_${repSectionID}_${prefix}${field}`
-            ] = jsonObj[`${field}`])
-          : log(`${field}`, 'Not Found', r20color);
+        const ref = jsonObj.hasOwnProperty(field) ?
+          field :
+          jsonObj.hasOwnProperty(`data-cs-${field}`) ?
+            `data-cs-${field}` :
+            null;
+        if(!ref){
+          log(`${field}`, 'Not Found', r20color);
+          return;
+        }
+        targetObj[
+          `repeating_${repSection}_${repSectionID}_${prefix}${field}`
+        ] = jsonObj[ref]
       });
     } else {
       log('Non-Repeating Fields', 'Fields Found', r20color);
@@ -3279,6 +3299,7 @@ const compendiumBestiary = function () {
               'Write PHEG data and all remaining attributes to character sheet',
               r20color
             );
+            debugger;
             setAttrs(finalCharacterDetails);
           });
         },
@@ -3288,6 +3309,7 @@ const compendiumBestiary = function () {
 };
 
 const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster){
+  debugger;
   const PHEGCategoryExtraSets = {
     Edges: {
       edgeCount: obj => obj['data-Edges'].length,
@@ -3348,6 +3370,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
           dropType,
           monster
         );
+        
       });
     }
   });
@@ -6711,7 +6734,7 @@ on(
 <input type="hidden" name="attr_unshakeTemplate" value="{{shaken=[[0d6+@{isShaken}]]}} {{unshake=[&lt;span data-i18n='roll-unshake-button'&gt;&lt;/span&gt;](~unshakeroll)}}"/>
 <input type="hidden" name="attr_templateConditions" value="{{wildcard=[[@{is_npc}d1]]}} {{wcicon=@{WCI}}} {{vulnerable=[[0d6+@{vulnerable}]]}} {{stunned=[[0d6+@{stunned}]]}} {{distracteds=[[0d6+@{distracted}]]}}"/>
 <div class="version"><span name="attr_character_sheet"></span></div>
-<div class="maindiv compendium-drop-target bestiary">
+<div class="maindiv compendium-drop-target bestiary swade_archetypes">
   <!--Compendium Fields-->
   <input class="hiddenInput" type="text" name="attr_CompendiumName" accept="Name"/>
   <input class="hiddenInput" type="text" name="attr_CompendiumCategory" accept="Category"/>
@@ -7006,7 +7029,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tAcademicsRoll" title="@{tAcademicsRoll}" value="@{academicsRollValue} {{skill_roll=[[ @{academicsSkillRollFormula} ]]}} {{wild_die=[[ @{academicsWildDieFormula} ]]}}"> <span name="attr_academicsname"> </span>&nbsp;(<span name="attr_academics_display"></span>)
                   </button></span>
                 <fieldset class="repeating_academicsspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tAcademicsSpecRoll" title="@{tAcademicsSpecRoll}" value="@{academicsSpecRollValue}"><span name="attr_academicsSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tAcademicsSpecRoll" title="@{tAcademicsSpecRoll}" value="@{academicsSpecRollValue} {{skill_roll=[[ @{academicsSkillRollFormula} ]]}} {{wild_die=[[ @{academicsWildDieFormula} ]]}}"><span name="attr_academicsSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7023,7 +7046,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tAthleticsRoll" title="@{tAthleticsRoll}" value="@{athleticsRollValue} {{skill_roll=[[ @{athleticsSkillRollFormula} ]]}} {{wild_die=[[ @{athleticsWildDieFormula} ]]}}"> <span name="attr_athleticsname"> </span>&nbsp;(<span name="attr_athletics_display"></span>)
                   </button></span>
                 <fieldset class="repeating_athleticsspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tAthleticsSpecRoll" title="@{tAthleticsSpecRoll}" value="@{athleticsSpecRollValue}"><span name="attr_athleticsSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tAthleticsSpecRoll" title="@{tAthleticsSpecRoll}" value="@{athleticsSpecRollValue} {{skill_roll=[[ @{athleticsSkillRollFormula} ]]}} {{wild_die=[[ @{athleticsWildDieFormula} ]]}}"><span name="attr_athleticsSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7040,7 +7063,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tBattleRoll" title="@{tBattleRoll}" value="@{battleRollValue} {{skill_roll=[[ @{battleSkillRollFormula} ]]}} {{wild_die=[[ @{battleWildDieFormula} ]]}}"> <span name="attr_battlename"> </span>&nbsp;(<span name="attr_battle_display"></span>)
                   </button></span>
                 <fieldset class="repeating_battlespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tBattleSpecRoll" title="@{tBattleSpecRoll}" value="@{battleSpecRollValue}"><span name="attr_battleSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tBattleSpecRoll" title="@{tBattleSpecRoll}" value="@{battleSpecRollValue} {{skill_roll=[[ @{battleSkillRollFormula} ]]}} {{wild_die=[[ @{battleWildDieFormula} ]]}}"><span name="attr_battleSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7057,7 +7080,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tBoatingRoll" title="@{tBoatingRoll}" value="@{boatingRollValue} {{skill_roll=[[ @{boatingSkillRollFormula} ]]}} {{wild_die=[[ @{boatingWildDieFormula} ]]}}"> <span name="attr_boatingname"> </span>&nbsp;(<span name="attr_boating_display"></span>)
                   </button></span>
                 <fieldset class="repeating_boatingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tBoatingSpecRoll" title="@{tBoatingSpecRoll}" value="@{boatingSpecRollValue}"><span name="attr_boatingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tBoatingSpecRoll" title="@{tBoatingSpecRoll}" value="@{boatingSpecRollValue} {{skill_roll=[[ @{boatingSkillRollFormula} ]]}} {{wild_die=[[ @{boatingWildDieFormula} ]]}}"><span name="attr_boatingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7074,7 +7097,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tCommonknowledgeRoll" title="@{tCommonknowledgeRoll}" value="@{commonknowledgeRollValue} {{skill_roll=[[ @{commonknowledgeSkillRollFormula} ]]}} {{wild_die=[[ @{commonknowledgeWildDieFormula} ]]}}"> <span name="attr_commonknowledgename"> </span>&nbsp;(<span name="attr_commonknowledge_display"></span>)
                   </button></span>
                 <fieldset class="repeating_commonknowledgespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tCommonknowledgeSpecRoll" title="@{tCommonknowledgeSpecRoll}" value="@{commonknowledgeSpecRollValue}"><span name="attr_commonknowledgeSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tCommonknowledgeSpecRoll" title="@{tCommonknowledgeSpecRoll}" value="@{commonknowledgeSpecRollValue} {{skill_roll=[[ @{commonknowledgeSkillRollFormula} ]]}} {{wild_die=[[ @{commonknowledgeWildDieFormula} ]]}}"><span name="attr_commonknowledgeSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7091,7 +7114,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tDrivingRoll" title="@{tDrivingRoll}" value="@{drivingRollValue} {{skill_roll=[[ @{drivingSkillRollFormula} ]]}} {{wild_die=[[ @{drivingWildDieFormula} ]]}}"> <span name="attr_drivingname"> </span>&nbsp;(<span name="attr_driving_display"></span>)
                   </button></span>
                 <fieldset class="repeating_drivingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tDrivingSpecRoll" title="@{tDrivingSpecRoll}" value="@{drivingSpecRollValue}"><span name="attr_drivingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tDrivingSpecRoll" title="@{tDrivingSpecRoll}" value="@{drivingSpecRollValue} {{skill_roll=[[ @{drivingSkillRollFormula} ]]}} {{wild_die=[[ @{drivingWildDieFormula} ]]}}"><span name="attr_drivingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7108,7 +7131,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tElectronicsRoll" title="@{tElectronicsRoll}" value="@{electronicsRollValue} {{skill_roll=[[ @{electronicsSkillRollFormula} ]]}} {{wild_die=[[ @{electronicsWildDieFormula} ]]}}"> <span name="attr_electronicsname"> </span>&nbsp;(<span name="attr_electronics_display"></span>)
                   </button></span>
                 <fieldset class="repeating_electronicsspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tElectronicsSpecRoll" title="@{tElectronicsSpecRoll}" value="@{electronicsSpecRollValue}"><span name="attr_electronicsSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tElectronicsSpecRoll" title="@{tElectronicsSpecRoll}" value="@{electronicsSpecRollValue} {{skill_roll=[[ @{electronicsSkillRollFormula} ]]}} {{wild_die=[[ @{electronicsWildDieFormula} ]]}}"><span name="attr_electronicsSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7125,7 +7148,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tFaithRoll" title="@{tFaithRoll}" value="@{faithRollValue} {{skill_roll=[[ @{faithSkillRollFormula} ]]}} {{wild_die=[[ @{faithWildDieFormula} ]]}}"> <span name="attr_faithname"> </span>&nbsp;(<span name="attr_faith_display"></span>)
                   </button></span>
                 <fieldset class="repeating_faithspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tFaithSpecRoll" title="@{tFaithSpecRoll}" value="@{faithSpecRollValue}"><span name="attr_faithSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tFaithSpecRoll" title="@{tFaithSpecRoll}" value="@{faithSpecRollValue} {{skill_roll=[[ @{faithSkillRollFormula} ]]}} {{wild_die=[[ @{faithWildDieFormula} ]]}}"><span name="attr_faithSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7142,7 +7165,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tFightingRoll" title="@{tFightingRoll}" value="@{fightingRollValue} {{skill_roll=[[ @{fightingSkillRollFormula} ]]}} {{wild_die=[[ @{fightingWildDieFormula} ]]}}"> <span name="attr_fightingname"> </span>&nbsp;(<span name="attr_fighting_display"></span>)
                   </button></span>
                 <fieldset class="repeating_fightingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tFightingSpecRoll" title="@{tFightingSpecRoll}" value="@{fightingSpecRollValue}"><span name="attr_fightingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tFightingSpecRoll" title="@{tFightingSpecRoll}" value="@{fightingSpecRollValue} {{skill_roll=[[ @{fightingSkillRollFormula} ]]}} {{wild_die=[[ @{fightingWildDieFormula} ]]}}"><span name="attr_fightingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7159,7 +7182,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tFocusRoll" title="@{tFocusRoll}" value="@{focusRollValue} {{skill_roll=[[ @{focusSkillRollFormula} ]]}} {{wild_die=[[ @{focusWildDieFormula} ]]}}"> <span name="attr_focusname"> </span>&nbsp;(<span name="attr_focus_display"></span>)
                   </button></span>
                 <fieldset class="repeating_focusspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tFocusSpecRoll" title="@{tFocusSpecRoll}" value="@{focusSpecRollValue}"><span name="attr_focusSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tFocusSpecRoll" title="@{tFocusSpecRoll}" value="@{focusSpecRollValue} {{skill_roll=[[ @{focusSkillRollFormula} ]]}} {{wild_die=[[ @{focusWildDieFormula} ]]}}"><span name="attr_focusSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7176,7 +7199,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tGamblingRoll" title="@{tGamblingRoll}" value="@{gamblingRollValue} {{skill_roll=[[ @{gamblingSkillRollFormula} ]]}} {{wild_die=[[ @{gamblingWildDieFormula} ]]}}"> <span name="attr_gamblingname"> </span>&nbsp;(<span name="attr_gambling_display"></span>)
                   </button></span>
                 <fieldset class="repeating_gamblingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tGamblingSpecRoll" title="@{tGamblingSpecRoll}" value="@{gamblingSpecRollValue}"><span name="attr_gamblingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tGamblingSpecRoll" title="@{tGamblingSpecRoll}" value="@{gamblingSpecRollValue} {{skill_roll=[[ @{gamblingSkillRollFormula} ]]}} {{wild_die=[[ @{gamblingWildDieFormula} ]]}}"><span name="attr_gamblingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7193,7 +7216,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tHackingRoll" title="@{tHackingRoll}" value="@{hackingRollValue} {{skill_roll=[[ @{hackingSkillRollFormula} ]]}} {{wild_die=[[ @{hackingWildDieFormula} ]]}}"> <span name="attr_hackingname"> </span>&nbsp;(<span name="attr_hacking_display"></span>)
                   </button></span>
                 <fieldset class="repeating_hackingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tHackingSpecRoll" title="@{tHackingSpecRoll}" value="@{hackingSpecRollValue}"><span name="attr_hackingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tHackingSpecRoll" title="@{tHackingSpecRoll}" value="@{hackingSpecRollValue} {{skill_roll=[[ @{hackingSkillRollFormula} ]]}} {{wild_die=[[ @{hackingWildDieFormula} ]]}}"><span name="attr_hackingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7210,7 +7233,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tHealingRoll" title="@{tHealingRoll}" value="@{healingRollValue} {{skill_roll=[[ @{healingSkillRollFormula} ]]}} {{wild_die=[[ @{healingWildDieFormula} ]]}}"> <span name="attr_healingname"> </span>&nbsp;(<span name="attr_healing_display"></span>)
                   </button></span>
                 <fieldset class="repeating_healingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tHealingSpecRoll" title="@{tHealingSpecRoll}" value="@{healingSpecRollValue}"><span name="attr_healingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tHealingSpecRoll" title="@{tHealingSpecRoll}" value="@{healingSpecRollValue} {{skill_roll=[[ @{healingSkillRollFormula} ]]}} {{wild_die=[[ @{healingWildDieFormula} ]]}}"><span name="attr_healingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7227,7 +7250,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tIntimidationRoll" title="@{tIntimidationRoll}" value="@{intimidationRollValue} {{skill_roll=[[ @{intimidationSkillRollFormula} ]]}} {{wild_die=[[ @{intimidationWildDieFormula} ]]}}"> <span name="attr_intimidationname"> </span>&nbsp;(<span name="attr_intimidation_display"></span>)
                   </button></span>
                 <fieldset class="repeating_intimidationspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tIntimidationSpecRoll" title="@{tIntimidationSpecRoll}" value="@{intimidationSpecRollValue}"><span name="attr_intimidationSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tIntimidationSpecRoll" title="@{tIntimidationSpecRoll}" value="@{intimidationSpecRollValue} {{skill_roll=[[ @{intimidationSkillRollFormula} ]]}} {{wild_die=[[ @{intimidationWildDieFormula} ]]}}"><span name="attr_intimidationSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7244,7 +7267,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tLanguageRoll" title="@{tLanguageRoll}" value="@{languageRollValue} {{skill_roll=[[ @{languageSkillRollFormula} ]]}} {{wild_die=[[ @{languageWildDieFormula} ]]}}"> <span name="attr_native-languagename"> </span>&nbsp;(<span name="attr_language_display"></span>)
                   </button></span>
                 <fieldset class="repeating_languagespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tLanguageSpecRoll" title="@{tLanguageSpecRoll}" value="@{languageSpecRollValue}"><span name="attr_languageSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tLanguageSpecRoll" title="@{tLanguageSpecRoll}" value="@{languageSpecRollValue} {{skill_roll=[[ @{languageSkillRollFormula} ]]}} {{wild_die=[[ @{languageWildDieFormula} ]]}}"><span name="attr_languageSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7261,7 +7284,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tNoticeRoll" title="@{tNoticeRoll}" value="@{noticeRollValue} {{skill_roll=[[ @{noticeSkillRollFormula} ]]}} {{wild_die=[[ @{noticeWildDieFormula} ]]}}"> <span name="attr_noticename"> </span>&nbsp;(<span name="attr_notice_display"></span>)
                   </button></span>
                 <fieldset class="repeating_noticespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tNoticeSpecRoll" title="@{tNoticeSpecRoll}" value="@{noticeSpecRollValue}"><span name="attr_noticeSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tNoticeSpecRoll" title="@{tNoticeSpecRoll}" value="@{noticeSpecRollValue} {{skill_roll=[[ @{noticeSkillRollFormula} ]]}} {{wild_die=[[ @{noticeWildDieFormula} ]]}}"><span name="attr_noticeSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7278,7 +7301,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tOccultRoll" title="@{tOccultRoll}" value="@{occultRollValue} {{skill_roll=[[ @{occultSkillRollFormula} ]]}} {{wild_die=[[ @{occultWildDieFormula} ]]}}"> <span name="attr_occultname"> </span>&nbsp;(<span name="attr_occult_display"></span>)
                   </button></span>
                 <fieldset class="repeating_occultspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tOccultSpecRoll" title="@{tOccultSpecRoll}" value="@{occultSpecRollValue}"><span name="attr_occultSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tOccultSpecRoll" title="@{tOccultSpecRoll}" value="@{occultSpecRollValue} {{skill_roll=[[ @{occultSkillRollFormula} ]]}} {{wild_die=[[ @{occultWildDieFormula} ]]}}"><span name="attr_occultSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7295,7 +7318,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tPerformanceRoll" title="@{tPerformanceRoll}" value="@{performanceRollValue} {{skill_roll=[[ @{performanceSkillRollFormula} ]]}} {{wild_die=[[ @{performanceWildDieFormula} ]]}}"> <span name="attr_performancename"> </span>&nbsp;(<span name="attr_performance_display"></span>)
                   </button></span>
                 <fieldset class="repeating_performancespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPerformanceSpecRoll" title="@{tPerformanceSpecRoll}" value="@{performanceSpecRollValue}"><span name="attr_performanceSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPerformanceSpecRoll" title="@{tPerformanceSpecRoll}" value="@{performanceSpecRollValue} {{skill_roll=[[ @{performanceSkillRollFormula} ]]}} {{wild_die=[[ @{performanceWildDieFormula} ]]}}"><span name="attr_performanceSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7312,7 +7335,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tPersuasionRoll" title="@{tPersuasionRoll}" value="@{persuasionRollValue} {{skill_roll=[[ @{persuasionSkillRollFormula} ]]}} {{wild_die=[[ @{persuasionWildDieFormula} ]]}}"> <span name="attr_persuasionname"> </span>&nbsp;(<span name="attr_persuasion_display"></span>)
                   </button></span>
                 <fieldset class="repeating_persuasionspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPersuasionSpecRoll" title="@{tPersuasionSpecRoll}" value="@{persuasionSpecRollValue}"><span name="attr_persuasionSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPersuasionSpecRoll" title="@{tPersuasionSpecRoll}" value="@{persuasionSpecRollValue} {{skill_roll=[[ @{persuasionSkillRollFormula} ]]}} {{wild_die=[[ @{persuasionWildDieFormula} ]]}}"><span name="attr_persuasionSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7329,7 +7352,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tPilotingRoll" title="@{tPilotingRoll}" value="@{pilotingRollValue} {{skill_roll=[[ @{pilotingSkillRollFormula} ]]}} {{wild_die=[[ @{pilotingWildDieFormula} ]]}}"> <span name="attr_pilotingname"> </span>&nbsp;(<span name="attr_piloting_display"></span>)
                   </button></span>
                 <fieldset class="repeating_pilotingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPilotingSpecRoll" title="@{tPilotingSpecRoll}" value="@{pilotingSpecRollValue}"><span name="attr_pilotingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPilotingSpecRoll" title="@{tPilotingSpecRoll}" value="@{pilotingSpecRollValue} {{skill_roll=[[ @{pilotingSkillRollFormula} ]]}} {{wild_die=[[ @{pilotingWildDieFormula} ]]}}"><span name="attr_pilotingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7346,7 +7369,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tPsionicsRoll" title="@{tPsionicsRoll}" value="@{psionicsRollValue} {{skill_roll=[[ @{psionicsSkillRollFormula} ]]}} {{wild_die=[[ @{psionicsWildDieFormula} ]]}}"> <span name="attr_psionicsname"> </span>&nbsp;(<span name="attr_psionics_display"></span>)
                   </button></span>
                 <fieldset class="repeating_psionicsspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPsionicsSpecRoll" title="@{tPsionicsSpecRoll}" value="@{psionicsSpecRollValue}"><span name="attr_psionicsSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tPsionicsSpecRoll" title="@{tPsionicsSpecRoll}" value="@{psionicsSpecRollValue} {{skill_roll=[[ @{psionicsSkillRollFormula} ]]}} {{wild_die=[[ @{psionicsWildDieFormula} ]]}}"><span name="attr_psionicsSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7363,7 +7386,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tRepairRoll" title="@{tRepairRoll}" value="@{repairRollValue} {{skill_roll=[[ @{repairSkillRollFormula} ]]}} {{wild_die=[[ @{repairWildDieFormula} ]]}}"> <span name="attr_repairname"> </span>&nbsp;(<span name="attr_repair_display"></span>)
                   </button></span>
                 <fieldset class="repeating_repairspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tRepairSpecRoll" title="@{tRepairSpecRoll}" value="@{repairSpecRollValue}"><span name="attr_repairSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tRepairSpecRoll" title="@{tRepairSpecRoll}" value="@{repairSpecRollValue} {{skill_roll=[[ @{repairSkillRollFormula} ]]}} {{wild_die=[[ @{repairWildDieFormula} ]]}}"><span name="attr_repairSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7380,7 +7403,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tResearchRoll" title="@{tResearchRoll}" value="@{researchRollValue} {{skill_roll=[[ @{researchSkillRollFormula} ]]}} {{wild_die=[[ @{researchWildDieFormula} ]]}}"> <span name="attr_researchname"> </span>&nbsp;(<span name="attr_research_display"></span>)
                   </button></span>
                 <fieldset class="repeating_researchspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tResearchSpecRoll" title="@{tResearchSpecRoll}" value="@{researchSpecRollValue}"><span name="attr_researchSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tResearchSpecRoll" title="@{tResearchSpecRoll}" value="@{researchSpecRollValue} {{skill_roll=[[ @{researchSkillRollFormula} ]]}} {{wild_die=[[ @{researchWildDieFormula} ]]}}"><span name="attr_researchSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7397,7 +7420,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tRidingRoll" title="@{tRidingRoll}" value="@{ridingRollValue} {{skill_roll=[[ @{ridingSkillRollFormula} ]]}} {{wild_die=[[ @{ridingWildDieFormula} ]]}}"> <span name="attr_ridingname"> </span>&nbsp;(<span name="attr_riding_display"></span>)
                   </button></span>
                 <fieldset class="repeating_ridingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tRidingSpecRoll" title="@{tRidingSpecRoll}" value="@{ridingSpecRollValue}"><span name="attr_ridingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tRidingSpecRoll" title="@{tRidingSpecRoll}" value="@{ridingSpecRollValue} {{skill_roll=[[ @{ridingSkillRollFormula} ]]}} {{wild_die=[[ @{ridingWildDieFormula} ]]}}"><span name="attr_ridingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7414,7 +7437,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tScienceRoll" title="@{tScienceRoll}" value="@{scienceRollValue} {{skill_roll=[[ @{scienceSkillRollFormula} ]]}} {{wild_die=[[ @{scienceWildDieFormula} ]]}}"> <span name="attr_sciencename"> </span>&nbsp;(<span name="attr_science_display"></span>)
                   </button></span>
                 <fieldset class="repeating_sciencespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tScienceSpecRoll" title="@{tScienceSpecRoll}" value="@{scienceSpecRollValue}"><span name="attr_scienceSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tScienceSpecRoll" title="@{tScienceSpecRoll}" value="@{scienceSpecRollValue} {{skill_roll=[[ @{scienceSkillRollFormula} ]]}} {{wild_die=[[ @{scienceWildDieFormula} ]]}}"><span name="attr_scienceSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7431,7 +7454,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tShootingRoll" title="@{tShootingRoll}" value="@{shootingRollValue} {{skill_roll=[[ @{shootingSkillRollFormula} ]]}} {{wild_die=[[ @{shootingWildDieFormula} ]]}}"> <span name="attr_shootingname"> </span>&nbsp;(<span name="attr_shooting_display"></span>)
                   </button></span>
                 <fieldset class="repeating_shootingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tShootingSpecRoll" title="@{tShootingSpecRoll}" value="@{shootingSpecRollValue}"><span name="attr_shootingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tShootingSpecRoll" title="@{tShootingSpecRoll}" value="@{shootingSpecRollValue} {{skill_roll=[[ @{shootingSkillRollFormula} ]]}} {{wild_die=[[ @{shootingWildDieFormula} ]]}}"><span name="attr_shootingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7448,7 +7471,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tSpellcastingRoll" title="@{tSpellcastingRoll}" value="@{spellcastingRollValue} {{skill_roll=[[ @{spellcastingSkillRollFormula} ]]}} {{wild_die=[[ @{spellcastingWildDieFormula} ]]}}"> <span name="attr_spellcastingname"> </span>&nbsp;(<span name="attr_spellcasting_display"></span>)
                   </button></span>
                 <fieldset class="repeating_spellcastingspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tSpellcastingSpecRoll" title="@{tSpellcastingSpecRoll}" value="@{spellcastingSpecRollValue}"><span name="attr_spellcastingSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tSpellcastingSpecRoll" title="@{tSpellcastingSpecRoll}" value="@{spellcastingSpecRollValue} {{skill_roll=[[ @{spellcastingSkillRollFormula} ]]}} {{wild_die=[[ @{spellcastingWildDieFormula} ]]}}"><span name="attr_spellcastingSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7465,7 +7488,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tStealthRoll" title="@{tStealthRoll}" value="@{stealthRollValue} {{skill_roll=[[ @{stealthSkillRollFormula} ]]}} {{wild_die=[[ @{stealthWildDieFormula} ]]}}"> <span name="attr_stealthname"> </span>&nbsp;(<span name="attr_stealth_display"></span>)
                   </button></span>
                 <fieldset class="repeating_stealthspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tStealthSpecRoll" title="@{tStealthSpecRoll}" value="@{stealthSpecRollValue}"><span name="attr_stealthSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tStealthSpecRoll" title="@{tStealthSpecRoll}" value="@{stealthSpecRollValue} {{skill_roll=[[ @{stealthSkillRollFormula} ]]}} {{wild_die=[[ @{stealthWildDieFormula} ]]}}"><span name="attr_stealthSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7482,7 +7505,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tSurvivalRoll" title="@{tSurvivalRoll}" value="@{survivalRollValue} {{skill_roll=[[ @{survivalSkillRollFormula} ]]}} {{wild_die=[[ @{survivalWildDieFormula} ]]}}"> <span name="attr_survivalname"> </span>&nbsp;(<span name="attr_survival_display"></span>)
                   </button></span>
                 <fieldset class="repeating_survivalspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tSurvivalSpecRoll" title="@{tSurvivalSpecRoll}" value="@{survivalSpecRollValue}"><span name="attr_survivalSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tSurvivalSpecRoll" title="@{tSurvivalSpecRoll}" value="@{survivalSpecRollValue} {{skill_roll=[[ @{survivalSkillRollFormula} ]]}} {{wild_die=[[ @{survivalWildDieFormula} ]]}}"><span name="attr_survivalSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7499,7 +7522,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tTauntRoll" title="@{tTauntRoll}" value="@{tauntRollValue} {{skill_roll=[[ @{tauntSkillRollFormula} ]]}} {{wild_die=[[ @{tauntWildDieFormula} ]]}}"> <span name="attr_tauntname"> </span>&nbsp;(<span name="attr_taunt_display"></span>)
                   </button></span>
                 <fieldset class="repeating_tauntspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tTauntSpecRoll" title="@{tTauntSpecRoll}" value="@{tauntSpecRollValue}"><span name="attr_tauntSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tTauntSpecRoll" title="@{tTauntSpecRoll}" value="@{tauntSpecRollValue} {{skill_roll=[[ @{tauntSkillRollFormula} ]]}} {{wild_die=[[ @{tauntWildDieFormula} ]]}}"><span name="attr_tauntSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7516,7 +7539,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tThieveryRoll" title="@{tThieveryRoll}" value="@{thieveryRollValue} {{skill_roll=[[ @{thieverySkillRollFormula} ]]}} {{wild_die=[[ @{thieveryWildDieFormula} ]]}}"> <span name="attr_thieveryname"> </span>&nbsp;(<span name="attr_thievery_display"></span>)
                   </button></span>
                 <fieldset class="repeating_thieveryspec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tThieverySpecRoll" title="@{tThieverySpecRoll}" value="@{thieverySpecRollValue}"><span name="attr_thieverySpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tThieverySpecRoll" title="@{tThieverySpecRoll}" value="@{thieverySpecRollValue} {{skill_roll=[[ @{thieverySkillRollFormula} ]]}} {{wild_die=[[ @{thieveryWildDieFormula} ]]}}"><span name="attr_thieverySpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7533,7 +7556,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tTradeRoll" title="@{tTradeRoll}" value="@{tradeRollValue} {{skill_roll=[[ @{tradeSkillRollFormula} ]]}} {{wild_die=[[ @{tradeWildDieFormula} ]]}}"> <span name="attr_tradename"> </span>&nbsp;(<span name="attr_trade_display"></span>)
                   </button></span>
                 <fieldset class="repeating_tradespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tTradeSpecRoll" title="@{tTradeSpecRoll}" value="@{tradeSpecRollValue}"><span name="attr_tradeSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tTradeSpecRoll" title="@{tTradeSpecRoll}" value="@{tradeSpecRollValue} {{skill_roll=[[ @{tradeSkillRollFormula} ]]}} {{wild_die=[[ @{tradeWildDieFormula} ]]}}"><span name="attr_tradeSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -7550,7 +7573,7 @@ on(
                   <button class="traitbutton miniButton" type="roll" name="roll_tWeirdscienceRoll" title="@{tWeirdscienceRoll}" value="@{weirdscienceRollValue} {{skill_roll=[[ @{weirdscienceSkillRollFormula} ]]}} {{wild_die=[[ @{weirdscienceWildDieFormula} ]]}}"> <span name="attr_weirdsciencename"> </span>&nbsp;(<span name="attr_weirdscience_display"></span>)
                   </button></span>
                 <fieldset class="repeating_weirdsciencespec">
-                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tWeirdscienceSpecRoll" title="@{tWeirdscienceSpecRoll}" value="@{weirdscienceSpecRollValue}"><span name="attr_weirdscienceSpecName"></span>
+                  <button class="traitbutton miniButton condensedSkill" type="roll" name="roll_tWeirdscienceSpecRoll" title="@{tWeirdscienceSpecRoll}" value="@{weirdscienceSpecRollValue} {{skill_roll=[[ @{weirdscienceSkillRollFormula} ]]}} {{wild_die=[[ @{weirdscienceWildDieFormula} ]]}}"><span name="attr_weirdscienceSpecName"></span>
                     <!--
                     | &nbsp;(
                     span(name=`attr_${skill}_specialty_display`)
@@ -8416,7 +8439,7 @@ on(
                 <input class="deltabutton" type="hidden" name="attr_agility_delta" value="0"/>
                 <button class="traitbutton traitflexattbutton" type="roll" name="roll_tagilityRoll" value="@{agilitybutton} {{skill_roll=[[@{agilityRollFormula}]]}} {{wild_die=[[@{agilityWildDieFormula}]]}} @{unshakeTemplate}" title="@{tagilityRoll}"><span data-i18n="agility"></span>
                 </button>
-                <input type="hidden" name="attr_agilitybutton" value="@{whisperagility} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltagility} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
+                <input type="hidden" name="attr_agilitybutton" value="@{whisperagility} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltagility} @{setmods} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="agility-die-type-d4">
                     <input class="traitradio" type="radio" name="attr_agility" value="4" checked="checked"/><span class="d4"></span>
@@ -8463,14 +8486,17 @@ on(
                 <input type="hidden" name="attr_agility_rank" value="1d4!"/>
                 <input type="hidden" name="attr_agility_display" value="d4"/>
                 <input type="hidden" name="attr_rolltagility" value="{{name=@{character_name} }} {{trait=^{agility}}} {{skill_rank=@{agility_display} }} {{mook=[[1d0+@{wdNum}]]}} {{button=y}} {{ReRoll=^{reroll}(~tagilityRoll)}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                <input type="hidden" name="attr_agilityRollFormula" value="@{agility_rank} + @{agrollMod} [@{agModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_agilitybutton" value="@{whisperagility} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltagility} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                 <input type="hidden" name="attr_agilityRollFormula" value="@{agility_rank} + @{agrollMod} [@{agModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
-                <input type="hidden" name="attr_agilityWildDieFormula" value="1d@{agwilddie}! + @{agilitymod} + @{agrollMod} [@{agModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods}"/>
+                <input type="hidden" name="attr_agilityWildDieFormula" value="1d@{agwilddie}! + @{agilitymod} + @{agrollMod} [@{agModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_agilityWildDieFormula" value="1d@{agwilddie}! + @{agilitymod} + @{agrollMod} [@{agModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_smarts_delta" value="0"/>
                 <button class="traitbutton traitflexattbutton" type="roll" name="roll_tsmartsRoll" value="@{smartsbutton} {{skill_roll=[[@{smartsRollFormula}]]}} {{wild_die=[[@{smartsWildDieFormula}]]}} @{unshakeTemplate}" title="@{tsmartsRoll}"><span data-i18n="smarts"></span><span class="isAnimal" name="attr_animalsmarts_display"></span>
                 </button>
-                <input type="hidden" name="attr_smartsbutton" value="@{whispersmarts} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltsmarts} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
+                <input type="hidden" name="attr_smartsbutton" value="@{whispersmarts} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltsmarts} @{setmods} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="smarts-die-type-d4">
                     <input class="traitradio" type="radio" name="attr_smarts" value="4" checked="checked"/><span class="d4"></span>
@@ -8519,14 +8545,14 @@ on(
                 <input type="hidden" name="attr_smarts_rank" value="1d4!"/>
                 <input type="hidden" name="attr_smarts_display" value="d4"/>
                 <input type="hidden" name="attr_rolltsmarts" value="{{name=@{character_name} }} {{trait=^{smarts}}} {{skill_rank=@{smarts_display} }} {{mook=[[1d0+@{wdNum}]]}} {{button=y}} {{ReRoll=^{reroll}(~tsmartsRoll)}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
-                <input type="hidden" name="attr_smartsRollFormula" value="@{smarts_rank} + @{smrollMod} [@{smModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
-                <input type="hidden" name="attr_smartsWildDieFormula" value="1d@{smwilddie}! + @{smartsmod} + @{smrollMod} [@{smModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods}"/>
+                <input type="hidden" name="attr_smartsRollFormula" value="@{smarts_rank} + @{smrollMod} [@{smModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_smartsWildDieFormula" value="1d@{smwilddie}! + @{smartsmod} + @{smrollMod} [@{smModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_spirit_delta" value="0"/>
                 <button class="traitbutton traitflexattbutton" type="roll" name="roll_tspiritRoll" value="@{spiritbutton} {{skill_roll=[[@{spiritRollFormula}]]}} {{wild_die=[[@{spiritWildDieFormula}]]}} @{unshakeTemplate}" title="@{tspiritRoll}"><span data-i18n="spirit"></span>
                 </button>
-                <input type="hidden" name="attr_spiritbutton" value="@{whisperspirit} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltspirit} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
+                <input type="hidden" name="attr_spiritbutton" value="@{whisperspirit} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltspirit} @{setmods} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="spirit-die-type-d4">
                     <input class="traitradio" type="radio" name="attr_spirit" value="4" checked="checked"/><span class="d4"></span>
@@ -8573,14 +8599,14 @@ on(
                 <input type="hidden" name="attr_spirit_rank" value="1d4!"/>
                 <input type="hidden" name="attr_spirit_display" value="d4"/>
                 <input type="hidden" name="attr_rolltspirit" value="{{name=@{character_name} }} {{trait=^{spirit}}} {{skill_rank=@{spirit_display} }} {{mook=[[1d0+@{wdNum}]]}} {{button=y}} {{ReRoll=^{reroll}(~tspiritRoll)}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
-                <input type="hidden" name="attr_spiritRollFormula" value="@{spirit_rank} + @{sprollMod} [@{spModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
-                <input type="hidden" name="attr_spiritWildDieFormula" value="1d@{spwilddie}! + @{spiritmod} + @{sprollMod} [@{spModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods}"/>
+                <input type="hidden" name="attr_spiritRollFormula" value="@{spirit_rank} + @{sprollMod} [@{spModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_spiritWildDieFormula" value="1d@{spwilddie}! + @{spiritmod} + @{sprollMod} [@{spModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_strength_delta" value="0"/>
                 <button class="traitbutton traitflexattbutton" type="roll" name="roll_tstrengthRoll" value="@{strengthbutton} {{skill_roll=[[@{strengthRollFormula}]]}} {{wild_die=[[@{strengthWildDieFormula}]]}} @{unshakeTemplate}" title="@{tstrengthRoll}"><span data-i18n="strength"></span>
                 </button>
-                <input type="hidden" name="attr_strengthbutton" value="@{whisperstrength} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltstrength} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
+                <input type="hidden" name="attr_strengthbutton" value="@{whisperstrength} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltstrength} @{setmods} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="strength-die-type-d4">
                     <input class="traitradio" type="radio" name="attr_strength" value="4" checked="checked"/><span class="d4"></span>
@@ -8627,14 +8653,14 @@ on(
                 <input type="hidden" name="attr_strength_rank" value="1d4!"/>
                 <input type="hidden" name="attr_strength_display" value="d4"/>
                 <input type="hidden" name="attr_rolltstrength" value="{{name=@{character_name} }} {{trait=^{strength}}} {{skill_rank=@{strength_display} }} {{mook=[[1d0+@{wdNum}]]}} {{button=y}} {{ReRoll=^{reroll}(~tstrengthRoll)}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
-                <input type="hidden" name="attr_strengthRollFormula" value="@{strength_rank} + @{strollMod} [@{stModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
-                <input type="hidden" name="attr_strengthWildDieFormula" value="1d@{stwilddie}! + @{strengthmod} + @{strollMod} [@{stModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods}"/>
+                <input type="hidden" name="attr_strengthRollFormula" value="@{strength_rank} + @{strollMod} [@{stModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_strengthWildDieFormula" value="1d@{stwilddie}! + @{strengthmod} + @{strollMod} [@{stModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_vigor_delta" value="0"/>
                 <button class="traitbutton traitflexattbutton" type="roll" name="roll_tvigorRoll" value="@{vigorbutton} {{skill_roll=[[@{vigorRollFormula}]]}} {{wild_die=[[@{vigorWildDieFormula}]]}} @{unshakeTemplate}" title="@{tvigorRoll}"><span data-i18n="vigor"></span>
                 </button>
-                <input type="hidden" name="attr_vigorbutton" value="@{whispervigor} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltvigor} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
+                <input type="hidden" name="attr_vigorbutton" value="@{whispervigor} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltvigor} @{setmods} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="vigor-die-type-d4">
                     <input class="traitradio" type="radio" name="attr_vigor" value="4" checked="checked"/><span class="d4"></span>
@@ -8681,8 +8707,11 @@ on(
                 <input type="hidden" name="attr_vigor_rank" value="1d4!"/>
                 <input type="hidden" name="attr_vigor_display" value="d4"/>
                 <input type="hidden" name="attr_rolltvigor" value="{{name=@{character_name} }} {{trait=^{vigor}}} {{skill_rank=@{vigor_display} }} {{mook=[[1d0+@{wdNum}]]}} {{button=y}} {{ReRoll=^{reroll}(~tvigorRoll)}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                <input type="hidden" name="attr_vigorRollFormula" value="@{vigor_rank} + @{virollMod} [@{viModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_vigorbutton" value="@{whispervigor} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltvigor} @{setmodsenc} @{showtraitmods} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                 <input type="hidden" name="attr_vigorRollFormula" value="@{vigor_rank} + @{virollMod} [@{viModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
-                <input type="hidden" name="attr_vigorWildDieFormula" value="1d@{viwilddie}! + @{vigormod} + @{virollMod} [@{viModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods}"/>
+                <input type="hidden" name="attr_vigorWildDieFormula" value="1d@{viwilddie}! + @{vigormod} + @{virollMod} [@{viModType}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}"/>
+                <input type="hidden" name="attr_vigorWildDieFormula" value="1d@{viwilddie}! + @{vigormod} + @{virollMod} [@{viModType}] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods}"/>
               </div>
             </div>
             <div class="skills">
@@ -8973,7 +9002,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_academicsspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tAcademicsSpecRoll" title="@{tAcademicsSpecRoll}" value="@{academicsSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tAcademicsSpecRoll" title="@{tAcademicsSpecRoll}" value="@{academicsSpecRollValue} {{skill_roll=[[ @{academicsSkillRollFormula} ]]}} {{wild_die=[[ @{academicsWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_academicsSpecRollValue" value="@{whisperacademics} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_academicsspec_tAcademicsSpecRoll)}} {{trait=@{academicsSpecName} }} @{rolltAcademics} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_academicsSpecName" title="@{repeating_academicsSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_academics_specialty_display" value="d4"/>
@@ -9090,7 +9119,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_athleticsspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tAthleticsSpecRoll" title="@{tAthleticsSpecRoll}" value="@{athleticsSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tAthleticsSpecRoll" title="@{tAthleticsSpecRoll}" value="@{athleticsSpecRollValue} {{skill_roll=[[ @{athleticsSkillRollFormula} ]]}} {{wild_die=[[ @{athleticsWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_athleticsSpecRollValue" value="@{whisperathletics} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_athleticsspec_tAthleticsSpecRoll)}} {{trait=@{athleticsSpecName} }} @{rolltAthletics} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_athleticsSpecName" title="@{repeating_athleticsSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_athletics_specialty_display" value="d4"/>
@@ -9202,7 +9231,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_battlespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tBattleSpecRoll" title="@{tBattleSpecRoll}" value="@{battleSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tBattleSpecRoll" title="@{tBattleSpecRoll}" value="@{battleSpecRollValue} {{skill_roll=[[ @{battleSkillRollFormula} ]]}} {{wild_die=[[ @{battleWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_battleSpecRollValue" value="@{whisperbattle} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_battlespec_tBattleSpecRoll)}} {{trait=@{battleSpecName} }} @{rolltBattle} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_battleSpecName" title="@{repeating_battleSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_battle_specialty_display" value="d4"/>
@@ -9314,7 +9343,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_boatingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tBoatingSpecRoll" title="@{tBoatingSpecRoll}" value="@{boatingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tBoatingSpecRoll" title="@{tBoatingSpecRoll}" value="@{boatingSpecRollValue} {{skill_roll=[[ @{boatingSkillRollFormula} ]]}} {{wild_die=[[ @{boatingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_boatingSpecRollValue" value="@{whisperboating} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_boatingspec_tBoatingSpecRoll)}} {{trait=@{boatingSpecName} }} @{rolltBoating} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_boatingSpecName" title="@{repeating_boatingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_boating_specialty_display" value="d4"/>
@@ -9426,7 +9455,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_commonknowledgespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tCommonknowledgeSpecRoll" title="@{tCommonknowledgeSpecRoll}" value="@{commonknowledgeSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tCommonknowledgeSpecRoll" title="@{tCommonknowledgeSpecRoll}" value="@{commonknowledgeSpecRollValue} {{skill_roll=[[ @{commonknowledgeSkillRollFormula} ]]}} {{wild_die=[[ @{commonknowledgeWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_commonknowledgeSpecRollValue" value="@{whispercommonknowledge} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_commonknowledgespec_tCommonknowledgeSpecRoll)}} {{trait=@{commonknowledgeSpecName} }} @{rolltCommonknowledge} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_commonknowledgeSpecName" title="@{repeating_commonknowledgeSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_commonknowledge_specialty_display" value="d4"/>
@@ -9538,7 +9567,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_drivingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tDrivingSpecRoll" title="@{tDrivingSpecRoll}" value="@{drivingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tDrivingSpecRoll" title="@{tDrivingSpecRoll}" value="@{drivingSpecRollValue} {{skill_roll=[[ @{drivingSkillRollFormula} ]]}} {{wild_die=[[ @{drivingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_drivingSpecRollValue" value="@{whisperdriving} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_drivingspec_tDrivingSpecRoll)}} {{trait=@{drivingSpecName} }} @{rolltDriving} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_drivingSpecName" title="@{repeating_drivingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_driving_specialty_display" value="d4"/>
@@ -9650,7 +9679,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_electronicsspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tElectronicsSpecRoll" title="@{tElectronicsSpecRoll}" value="@{electronicsSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tElectronicsSpecRoll" title="@{tElectronicsSpecRoll}" value="@{electronicsSpecRollValue} {{skill_roll=[[ @{electronicsSkillRollFormula} ]]}} {{wild_die=[[ @{electronicsWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_electronicsSpecRollValue" value="@{whisperelectronics} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_electronicsspec_tElectronicsSpecRoll)}} {{trait=@{electronicsSpecName} }} @{rolltElectronics} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_electronicsSpecName" title="@{repeating_electronicsSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_electronics_specialty_display" value="d4"/>
@@ -9762,7 +9791,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_faithspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tFaithSpecRoll" title="@{tFaithSpecRoll}" value="@{faithSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tFaithSpecRoll" title="@{tFaithSpecRoll}" value="@{faithSpecRollValue} {{skill_roll=[[ @{faithSkillRollFormula} ]]}} {{wild_die=[[ @{faithWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_faithSpecRollValue" value="@{whisperfaith} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_faithspec_tFaithSpecRoll)}} {{trait=@{faithSpecName} }} @{rolltFaith} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_faithSpecName" title="@{repeating_faithSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_faith_specialty_display" value="d4"/>
@@ -9874,7 +9903,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_fightingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tFightingSpecRoll" title="@{tFightingSpecRoll}" value="@{fightingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tFightingSpecRoll" title="@{tFightingSpecRoll}" value="@{fightingSpecRollValue} {{skill_roll=[[ @{fightingSkillRollFormula} ]]}} {{wild_die=[[ @{fightingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_fightingSpecRollValue" value="@{whisperfighting} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_fightingspec_tFightingSpecRoll)}} {{trait=@{fightingSpecName} }} @{rolltFighting} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_fightingSpecName" title="@{repeating_fightingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_fighting_specialty_display" value="d4"/>
@@ -9986,7 +10015,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_focusspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tFocusSpecRoll" title="@{tFocusSpecRoll}" value="@{focusSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tFocusSpecRoll" title="@{tFocusSpecRoll}" value="@{focusSpecRollValue} {{skill_roll=[[ @{focusSkillRollFormula} ]]}} {{wild_die=[[ @{focusWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_focusSpecRollValue" value="@{whisperfocus} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_focusspec_tFocusSpecRoll)}} {{trait=@{focusSpecName} }} @{rolltFocus} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_focusSpecName" title="@{repeating_focusSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_focus_specialty_display" value="d4"/>
@@ -10098,7 +10127,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_gamblingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tGamblingSpecRoll" title="@{tGamblingSpecRoll}" value="@{gamblingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tGamblingSpecRoll" title="@{tGamblingSpecRoll}" value="@{gamblingSpecRollValue} {{skill_roll=[[ @{gamblingSkillRollFormula} ]]}} {{wild_die=[[ @{gamblingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_gamblingSpecRollValue" value="@{whispergambling} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_gamblingspec_tGamblingSpecRoll)}} {{trait=@{gamblingSpecName} }} @{rolltGambling} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_gamblingSpecName" title="@{repeating_gamblingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_gambling_specialty_display" value="d4"/>
@@ -10210,7 +10239,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_hackingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tHackingSpecRoll" title="@{tHackingSpecRoll}" value="@{hackingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tHackingSpecRoll" title="@{tHackingSpecRoll}" value="@{hackingSpecRollValue} {{skill_roll=[[ @{hackingSkillRollFormula} ]]}} {{wild_die=[[ @{hackingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_hackingSpecRollValue" value="@{whisperhacking} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_hackingspec_tHackingSpecRoll)}} {{trait=@{hackingSpecName} }} @{rolltHacking} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_hackingSpecName" title="@{repeating_hackingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_hacking_specialty_display" value="d4"/>
@@ -10322,7 +10351,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_healingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tHealingSpecRoll" title="@{tHealingSpecRoll}" value="@{healingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tHealingSpecRoll" title="@{tHealingSpecRoll}" value="@{healingSpecRollValue} {{skill_roll=[[ @{healingSkillRollFormula} ]]}} {{wild_die=[[ @{healingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_healingSpecRollValue" value="@{whisperhealing} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_healingspec_tHealingSpecRoll)}} {{trait=@{healingSpecName} }} @{rolltHealing} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_healingSpecName" title="@{repeating_healingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_healing_specialty_display" value="d4"/>
@@ -10434,7 +10463,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_intimidationspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tIntimidationSpecRoll" title="@{tIntimidationSpecRoll}" value="@{intimidationSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tIntimidationSpecRoll" title="@{tIntimidationSpecRoll}" value="@{intimidationSpecRollValue} {{skill_roll=[[ @{intimidationSkillRollFormula} ]]}} {{wild_die=[[ @{intimidationWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_intimidationSpecRollValue" value="@{whisperintimidation} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_intimidationspec_tIntimidationSpecRoll)}} {{trait=@{intimidationSpecName} }} @{rolltIntimidation} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_intimidationSpecName" title="@{repeating_intimidationSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_intimidation_specialty_display" value="d4"/>
@@ -10546,7 +10575,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_languagespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tLanguageSpecRoll" title="@{tLanguageSpecRoll}" value="@{languageSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tLanguageSpecRoll" title="@{tLanguageSpecRoll}" value="@{languageSpecRollValue} {{skill_roll=[[ @{languageSkillRollFormula} ]]}} {{wild_die=[[ @{languageWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_languageSpecRollValue" value="@{whisperlanguage} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_languagespec_tLanguageSpecRoll)}} {{trait=@{languageSpecName} }} @{rolltLanguage} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_languageSpecName" title="@{repeating_languageSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_language_specialty_display" value="d4"/>
@@ -10658,7 +10687,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_noticespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tNoticeSpecRoll" title="@{tNoticeSpecRoll}" value="@{noticeSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tNoticeSpecRoll" title="@{tNoticeSpecRoll}" value="@{noticeSpecRollValue} {{skill_roll=[[ @{noticeSkillRollFormula} ]]}} {{wild_die=[[ @{noticeWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_noticeSpecRollValue" value="@{whispernotice} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_noticespec_tNoticeSpecRoll)}} {{trait=@{noticeSpecName} }} @{rolltNotice} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_noticeSpecName" title="@{repeating_noticeSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_notice_specialty_display" value="d4"/>
@@ -10770,7 +10799,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_occultspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tOccultSpecRoll" title="@{tOccultSpecRoll}" value="@{occultSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tOccultSpecRoll" title="@{tOccultSpecRoll}" value="@{occultSpecRollValue} {{skill_roll=[[ @{occultSkillRollFormula} ]]}} {{wild_die=[[ @{occultWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_occultSpecRollValue" value="@{whisperoccult} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_occultspec_tOccultSpecRoll)}} {{trait=@{occultSpecName} }} @{rolltOccult} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_occultSpecName" title="@{repeating_occultSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_occult_specialty_display" value="d4"/>
@@ -10882,7 +10911,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_performancespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPerformanceSpecRoll" title="@{tPerformanceSpecRoll}" value="@{performanceSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPerformanceSpecRoll" title="@{tPerformanceSpecRoll}" value="@{performanceSpecRollValue} {{skill_roll=[[ @{performanceSkillRollFormula} ]]}} {{wild_die=[[ @{performanceWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_performanceSpecRollValue" value="@{whisperperformance} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_performancespec_tPerformanceSpecRoll)}} {{trait=@{performanceSpecName} }} @{rolltPerformance} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_performanceSpecName" title="@{repeating_performanceSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_performance_specialty_display" value="d4"/>
@@ -10994,7 +11023,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_persuasionspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPersuasionSpecRoll" title="@{tPersuasionSpecRoll}" value="@{persuasionSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPersuasionSpecRoll" title="@{tPersuasionSpecRoll}" value="@{persuasionSpecRollValue} {{skill_roll=[[ @{persuasionSkillRollFormula} ]]}} {{wild_die=[[ @{persuasionWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_persuasionSpecRollValue" value="@{whisperpersuasion} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_persuasionspec_tPersuasionSpecRoll)}} {{trait=@{persuasionSpecName} }} @{rolltPersuasion} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_persuasionSpecName" title="@{repeating_persuasionSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_persuasion_specialty_display" value="d4"/>
@@ -11106,7 +11135,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_pilotingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPilotingSpecRoll" title="@{tPilotingSpecRoll}" value="@{pilotingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPilotingSpecRoll" title="@{tPilotingSpecRoll}" value="@{pilotingSpecRollValue} {{skill_roll=[[ @{pilotingSkillRollFormula} ]]}} {{wild_die=[[ @{pilotingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_pilotingSpecRollValue" value="@{whisperpiloting} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_pilotingspec_tPilotingSpecRoll)}} {{trait=@{pilotingSpecName} }} @{rolltPiloting} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_pilotingSpecName" title="@{repeating_pilotingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_piloting_specialty_display" value="d4"/>
@@ -11223,7 +11252,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_psionicsspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPsionicsSpecRoll" title="@{tPsionicsSpecRoll}" value="@{psionicsSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPsionicsSpecRoll" title="@{tPsionicsSpecRoll}" value="@{psionicsSpecRollValue} {{skill_roll=[[ @{psionicsSkillRollFormula} ]]}} {{wild_die=[[ @{psionicsWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_psionicsSpecRollValue" value="@{whisperpsionics} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_psionicsspec_tPsionicsSpecRoll)}} {{trait=@{psionicsSpecName} }} @{rolltPsionics} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_psionicsSpecName" title="@{repeating_psionicsSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_psionics_specialty_display" value="d4"/>
@@ -11335,7 +11364,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_repairspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tRepairSpecRoll" title="@{tRepairSpecRoll}" value="@{repairSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tRepairSpecRoll" title="@{tRepairSpecRoll}" value="@{repairSpecRollValue} {{skill_roll=[[ @{repairSkillRollFormula} ]]}} {{wild_die=[[ @{repairWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_repairSpecRollValue" value="@{whisperrepair} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_repairspec_tRepairSpecRoll)}} {{trait=@{repairSpecName} }} @{rolltRepair} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_repairSpecName" title="@{repeating_repairSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_repair_specialty_display" value="d4"/>
@@ -11447,7 +11476,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_researchspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tResearchSpecRoll" title="@{tResearchSpecRoll}" value="@{researchSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tResearchSpecRoll" title="@{tResearchSpecRoll}" value="@{researchSpecRollValue} {{skill_roll=[[ @{researchSkillRollFormula} ]]}} {{wild_die=[[ @{researchWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_researchSpecRollValue" value="@{whisperresearch} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_researchspec_tResearchSpecRoll)}} {{trait=@{researchSpecName} }} @{rolltResearch} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_researchSpecName" title="@{repeating_researchSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_research_specialty_display" value="d4"/>
@@ -11559,7 +11588,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_ridingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tRidingSpecRoll" title="@{tRidingSpecRoll}" value="@{ridingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tRidingSpecRoll" title="@{tRidingSpecRoll}" value="@{ridingSpecRollValue} {{skill_roll=[[ @{ridingSkillRollFormula} ]]}} {{wild_die=[[ @{ridingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_ridingSpecRollValue" value="@{whisperriding} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_ridingspec_tRidingSpecRoll)}} {{trait=@{ridingSpecName} }} @{rolltRiding} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_ridingSpecName" title="@{repeating_ridingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_riding_specialty_display" value="d4"/>
@@ -11671,7 +11700,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_sciencespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tScienceSpecRoll" title="@{tScienceSpecRoll}" value="@{scienceSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tScienceSpecRoll" title="@{tScienceSpecRoll}" value="@{scienceSpecRollValue} {{skill_roll=[[ @{scienceSkillRollFormula} ]]}} {{wild_die=[[ @{scienceWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_scienceSpecRollValue" value="@{whisperscience} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_sciencespec_tScienceSpecRoll)}} {{trait=@{scienceSpecName} }} @{rolltScience} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_scienceSpecName" title="@{repeating_scienceSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_science_specialty_display" value="d4"/>
@@ -11783,7 +11812,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_shootingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tShootingSpecRoll" title="@{tShootingSpecRoll}" value="@{shootingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tShootingSpecRoll" title="@{tShootingSpecRoll}" value="@{shootingSpecRollValue} {{skill_roll=[[ @{shootingSkillRollFormula} ]]}} {{wild_die=[[ @{shootingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_shootingSpecRollValue" value="@{whispershooting} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_shootingspec_tShootingSpecRoll)}} {{trait=@{shootingSpecName} }} @{rolltShooting} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_shootingSpecName" title="@{repeating_shootingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_shooting_specialty_display" value="d4"/>
@@ -11903,7 +11932,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_spellcastingspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tSpellcastingSpecRoll" title="@{tSpellcastingSpecRoll}" value="@{spellcastingSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tSpellcastingSpecRoll" title="@{tSpellcastingSpecRoll}" value="@{spellcastingSpecRollValue} {{skill_roll=[[ @{spellcastingSkillRollFormula} ]]}} {{wild_die=[[ @{spellcastingWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_spellcastingSpecRollValue" value="@{whisperspellcasting} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_spellcastingspec_tSpellcastingSpecRoll)}} {{trait=@{spellcastingSpecName} }} @{rolltSpellcasting} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_spellcastingSpecName" title="@{repeating_spellcastingSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_spellcasting_specialty_display" value="d4"/>
@@ -12015,7 +12044,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_stealthspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tStealthSpecRoll" title="@{tStealthSpecRoll}" value="@{stealthSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tStealthSpecRoll" title="@{tStealthSpecRoll}" value="@{stealthSpecRollValue} {{skill_roll=[[ @{stealthSkillRollFormula} ]]}} {{wild_die=[[ @{stealthWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_stealthSpecRollValue" value="@{whisperstealth} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_stealthspec_tStealthSpecRoll)}} {{trait=@{stealthSpecName} }} @{rolltStealth} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_stealthSpecName" title="@{repeating_stealthSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_stealth_specialty_display" value="d4"/>
@@ -12132,7 +12161,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_survivalspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tSurvivalSpecRoll" title="@{tSurvivalSpecRoll}" value="@{survivalSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tSurvivalSpecRoll" title="@{tSurvivalSpecRoll}" value="@{survivalSpecRollValue} {{skill_roll=[[ @{survivalSkillRollFormula} ]]}} {{wild_die=[[ @{survivalWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_survivalSpecRollValue" value="@{whispersurvival} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_survivalspec_tSurvivalSpecRoll)}} {{trait=@{survivalSpecName} }} @{rolltSurvival} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_survivalSpecName" title="@{repeating_survivalSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_survival_specialty_display" value="d4"/>
@@ -12244,7 +12273,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_tauntspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tTauntSpecRoll" title="@{tTauntSpecRoll}" value="@{tauntSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tTauntSpecRoll" title="@{tTauntSpecRoll}" value="@{tauntSpecRollValue} {{skill_roll=[[ @{tauntSkillRollFormula} ]]}} {{wild_die=[[ @{tauntWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_tauntSpecRollValue" value="@{whispertaunt} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_tauntspec_tTauntSpecRoll)}} {{trait=@{tauntSpecName} }} @{rolltTaunt} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_tauntSpecName" title="@{repeating_tauntSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_taunt_specialty_display" value="d4"/>
@@ -12356,7 +12385,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_thieveryspec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tThieverySpecRoll" title="@{tThieverySpecRoll}" value="@{thieverySpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tThieverySpecRoll" title="@{tThieverySpecRoll}" value="@{thieverySpecRollValue} {{skill_roll=[[ @{thieverySkillRollFormula} ]]}} {{wild_die=[[ @{thieveryWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_thieverySpecRollValue" value="@{whisperthievery} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_thieveryspec_tThieverySpecRoll)}} {{trait=@{thieverySpecName} }} @{rolltThievery} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_thieverySpecName" title="@{repeating_thieverySpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_thievery_specialty_display" value="d4"/>
@@ -12468,7 +12497,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_tradespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tTradeSpecRoll" title="@{tTradeSpecRoll}" value="@{tradeSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tTradeSpecRoll" title="@{tTradeSpecRoll}" value="@{tradeSpecRollValue} {{skill_roll=[[ @{tradeSkillRollFormula} ]]}} {{wild_die=[[ @{tradeWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_tradeSpecRollValue" value="@{whispertrade} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_tradespec_tTradeSpecRoll)}} {{trait=@{tradeSpecName} }} @{rolltTrade} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_tradeSpecName" title="@{repeating_tradeSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_trade_specialty_display" value="d4"/>
@@ -12588,7 +12617,7 @@ on(
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
                     <fieldset class="repeating_weirdsciencespec">
-                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tWeirdscienceSpecRoll" title="@{tWeirdscienceSpecRoll}" value="@{weirdscienceSpecRollValue}"></button>
+                      <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tWeirdscienceSpecRoll" title="@{tWeirdscienceSpecRoll}" value="@{weirdscienceSpecRollValue} {{skill_roll=[[ @{weirdscienceSkillRollFormula} ]]}} {{wild_die=[[ @{weirdscienceWildDieFormula} ]]}}"></button>
                       <input type="hidden" name="attr_weirdscienceSpecRollValue" value="@{whisperweirdscience} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_weirdsciencespec_tWeirdscienceSpecRoll)}} {{trait=@{weirdscienceSpecName} }} @{rolltWeirdscience} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                       <input class="speciality" type="text" name="attr_weirdscienceSpecName" title="@{repeating_weirdscienceSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                       <input class="hiddenInput" type="text" name="attr_weirdscience_specialty_display" value="d4"/>
@@ -12804,7 +12833,7 @@ on(
                   <input class="moremods hiddenInput" type="checkbox" name="attr_showPaceMod"/>
                   <button class="curPaceButton" type="action" name="act_paceCur"><span name="attr_paceCur"></span>&nbsp;<span class="cog shiftLeft">y</span></button>
                 </div>
-                <input type="hidden" name="attr_running_formula" value="&amp;{template:emote} {{name=@{character_name}}} {{does=^{running-text-before-number} [[@{paceCur}+@{runningDie}]] ^{running-text-after-number} }}"/>
+                <input type="hidden" name="attr_running_formula" value="&amp;{template:emote} {{name=@{character_name}}} {{does=^{running-text-before-number} [[@{paceCur}+@{runningDie}+@{encumbrance}]] ^{running-text-after-number} }}"/>
                 <button class="traitbutton deriveflexbutton paceButton" type="roll" name="roll_RunningRoll" title="@{RunningRoll}" value="@{running_formula}">&nbsp;<span data-i18n="pace">Pace</span></button>
               </div><!-- Parry -->
               <div class="base characterParry">
@@ -14840,7 +14869,7 @@ on(
                 <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                 <div class="SkillSpec">
                   <fieldset class="repeating_pastrengthspec">
-                    <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPastrengthSpecRoll" title="@{tPastrengthSpecRoll}" value="@{pastrengthSpecRollValue}"></button>
+                    <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tPastrengthSpecRoll" title="@{tPastrengthSpecRoll}" value="@{pastrengthSpecRollValue} {{skill_roll=[[ @{pastrengthSkillRollFormula} ]]}} {{wild_die=[[ @{pastrengthWildDieFormula} ]]}}"></button>
                     <input type="hidden" name="attr_pastrengthSpecRollValue" value="@{whisperpastrength} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_pastrengthspec_tPastrengthSpecRoll)}} {{trait=@{pastrengthSpecName} }} @{rolltPastrength} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                     <input class="speciality" type="text" name="attr_pastrengthSpecName" title="@{repeating_pastrengthSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                     <input class="hiddenInput" type="text" name="attr_pastrength_specialty_display" value="d4"/>
@@ -15277,7 +15306,7 @@ on(
                 <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                 <div class="SkillSpec">
                   <fieldset class="repeating_rastrengthspec">
-                    <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tRastrengthSpecRoll" title="@{tRastrengthSpecRoll}" value="@{rastrengthSpecRollValue}"></button>
+                    <button class="skillbutton smallskillflexattbutton specbutton" type="roll" name="roll_tRastrengthSpecRoll" title="@{tRastrengthSpecRoll}" value="@{rastrengthSpecRollValue} {{skill_roll=[[ @{rastrengthSkillRollFormula} ]]}} {{wild_die=[[ @{rastrengthWildDieFormula} ]]}}"></button>
                     <input type="hidden" name="attr_rastrengthSpecRollValue" value="@{whisperrastrength} &amp;{template:roll} {{namelength=@{namelength}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_rastrengthspec_tRastrengthSpecRoll)}} {{trait=@{rastrengthSpecName} }} @{rolltRastrength} @{unshakeTemplate} {{theme=@{rolltemplate_theme}}} {{showToken=[[0d6+@{show_token}]]}} @{roll_template_token}"/>
                     <input class="speciality" type="text" name="attr_rastrengthSpecName" title="@{repeating_rastrengthSpec_$#_SpecName}" placeholder="Specialization" data-i18n-placeholder="specialization"/>
                     <input class="hiddenInput" type="text" name="attr_rastrength_specialty_display" value="d4"/>
@@ -15950,6 +15979,22 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.31-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10031" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.31</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10031" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="encumbrance-penalty-fixes">Fixed encumbrance issues. The encumbrance penalty is no longer applied to all attributes and it now automatically subracts 2 from Pace and running rolls.</span></li>
+            <li> <span class="black" data-i18n="specialization-roll">Fixed an issue where dice rolls for skill specialization were not appearing.</span></li>
+            <li> <span class="black" data-i18n="token-display">Fixed a bug that showed the token on damage rolls when "Show Token with Roll Template" was unchecked.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.30-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10030" value="1"/><span class="releasenotesVersion">
@@ -16878,11 +16923,13 @@ on(
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-damage">
-	{{#token}}
-		<div class="sheet-tokenImage">
-			{{token}}
-		</div>
-	{{/token}}
+	{{#rollGreater() showToken 0}}
+		{{#token}}
+			<div class="sheet-tokenImage">
+				{{token}}
+			</div>
+		{{/token}}
+	{{/rollGreater() showToken 0}}
 	<div class="sheet-templateMain sheet-{{theme}}">
 		<div class="sheet-templateHeader">
             {{#namelength}}

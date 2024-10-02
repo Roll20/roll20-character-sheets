@@ -296,12 +296,14 @@ rollCombatDistance.forEach((button) => {
     let isTenebricide = false;
     let isTirRafale = false;
     let isUltraviolence = false;
+    let isLourd = false;
 
     let isELumiere = false;
     let lumiereValue = 0;
 
     let isEAkimbo = false;
     let isEAmbidextrie = false;
+    let isTirSecurite = false;
 
     let isBourreau = false;
     let isDevastation = false;
@@ -416,7 +418,6 @@ rollCombatDistance.forEach((button) => {
 
     isAntiAnatheme = effets.isAntiAnatheme;
 
-    isAssassin = effets.isAssassin;
     isAssistantAttaque = effets.isAssistantAttaque;
 
     isCadence = effets.isCadence;
@@ -446,6 +447,7 @@ rollCombatDistance.forEach((button) => {
 
     isEAkimbo = effets.isAkimbo;
     isEAmbidextrie = effets.isAmbidextrie;
+    isTirSecurite = effets.isTirSecurite;
 
     isBourreau = effets.isBourreau;
     isDevastation = effets.isDevastation;
@@ -468,7 +470,6 @@ rollCombatDistance.forEach((button) => {
     const ameliorationsA = getWeaponsDistanceAA(prefix, attrs, vDiscretion, oDiscretion, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
 
     exec = exec.concat(ameliorationsA.exec);
-
     bonus = bonus.concat(ameliorationsA.bonus);
 
     baseDegats += ameliorationsA.diceDegats;
@@ -511,7 +512,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
+    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);

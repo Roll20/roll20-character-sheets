@@ -132,6 +132,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   let isSilencieux = false;
   let isTenebricide = false;
   let isTirRafale = false;
+  let isTirSecurite = false;
   let isUltraviolence = false;
 
   let isBourreau = false;
@@ -515,7 +516,10 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
 
   if (eReaction) { autresEffets.push(`${i18n_reaction} ${eReactionV}`); }
 
-  if (eTirSecurite) { autresEffets.push(i18n_tirSecurite); }
+  if (eTirSecurite) {
+    autresEffets.push(i18n_tirSecurite);
+    isTirSecurite = true;
+  }
 
   if (eCdF) { autresEffets.push(`${i18n_cdf} ${eCdFV}`); }
 
@@ -583,6 +587,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
   result.isAmbidextrie = isAmbidextrie;
   result.isDeuxMains = isDeuxMains;
   result.isLourd = isLourd;
+  result.isTirSecurite = isTirSecurite;
 
   result.attaquesSurprises = attaquesSurprises;
   result.attaquesSurprisesValue = attaquesSurprisesValue;
@@ -2844,8 +2849,8 @@ function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceA
   }
 
   if (aPointeurLaser) {
-    exec.push('{{vMPLaser=+1}}');
-    bonus.push(1);
+    isConditionnelA = true;
+    exec.push(`{{pointeurLaserValue=[[3D6]]}} {{pointeurLaser=${i18n_pointeurLaser}}} {{pointeurLaserCondition=${i18n_pointeurLaserCondition}}}`);
   }
 
   if (aRevetementOmega) {
@@ -3027,8 +3032,8 @@ function getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, eAssistanceA
   }
 
   if (aPointeurLaser) {
-    exec.push('{{vMPLaser=+1}}');
-    bonus.push(1);
+    isConditionnelA = true;
+    exec.push(`{{pointeurLaserValue=[[3D6]]}} {{pointeurLaser=${i18n_pointeurLaser}}} {{pointeurLaserCondition=${i18n_pointeurLaserCondition}}}`);
   }
 
   if (aRevetementOmega) {
@@ -3208,8 +3213,8 @@ function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isC
   if (aMunitionsSubsoniques) { autresAmeliorations.push(i18n_munitionsSubsoniques); }
 
   if (aPointeurLaser) {
-    exec.push('{{vMPLaser=+1}}');
-    bonus.push(1);
+    isConditionnelA = true;
+    exec.push(`{{pointeurLaserValue=[[3D6]]}} {{pointeurLaser=${i18n_pointeurLaser}}} {{pointeurLaserCondition=${i18n_pointeurLaserCondition}}}`);
   }
 
   if (aRevetementOmega) {
@@ -3746,7 +3751,7 @@ async function getMALBonus(value, armureL, isELumiere, isASLumiere, vDiscretion,
   return result;
 }
 
-function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd) {
+function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -3769,11 +3774,14 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
 
       if (isAAgressive) { autresAmeliorationsS.push(i18n_agressive); }
       break;
@@ -3926,7 +3934,7 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
   return result;
 }
 
-function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd) {
+function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite) {
   const result = {};
 
   const exec = [];
@@ -3946,11 +3954,14 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
 
     case 'couvert':
       bName = 'atkCouvert';
-      modA = value[bName];
-
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
-      exec.push(`{{vMStyleA=${modA}D}}`);
-      cRoll.push(Number(modA));
+
+      if (!isTirSecurite) {
+        modA = value[bName];
+
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(Number(modA));
+      }
       break;
 
     case 'agressif':
@@ -4089,6 +4100,7 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, pilonna
 }
 
 function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegats, totalViolence, diceViolence, bonusViolence, conditions, conditionsValues = {}) {
+  const tPointeurLaser = roll.results.pointeurLaserValue || undefined;
   const tSurprise = roll.results.attaqueSurpriseValue || {};
   const tDestructeur = roll.results.destructeurValue || {};
   const tFureur = roll.results.fureurValue || {};
@@ -4143,6 +4155,7 @@ function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegat
   let hMeurtrier = 0;
   let hSurprise = 0;
   let hUltraviolence = 0;
+  let hPointeurLaser = 0;
 
   let hArmeAzurineValueD = 0;
   let hArmeAzurineValueV = 0;
@@ -4168,6 +4181,7 @@ function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegat
 
     return accumulateur + nV;
   }, 0);
+
   tJet = baseJet + bonusJet;
 
   if (isSurprise) { hSurprise = tSurprise.result; }
@@ -4175,6 +4189,19 @@ function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegat
   if (isFureur) { hFureur = tFureur.result; }
   if (isMeurtrier) { hMeurtrier = tMeurtrier.result; }
   if (isUltraviolence) { hUltraviolence = tUltraviolence.result; }
+
+  if(tPointeurLaser) {
+    hPointeurLaser = tPointeurLaser.dice.reduce((accumulateur, valeurCourante) => {
+      const vC = valeurCourante;
+      let nV = 0;
+  
+      if (vC % 2 === pairOrImpair) {
+        nV = 1;
+      }
+  
+      return accumulateur + nV;
+    }, 0);
+  }
 
   if (isArmeAzurine) {
     hArmeAzurineValueD = tArmeAzurineValueD.result;
@@ -4723,6 +4750,7 @@ function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegat
     tUltraviolenceValue: vTUltraviolence,
     tCheneSculpteValue: vTCheneSculpte,
     vRegularite: regularite,
+    pointeurLaserValue: hPointeurLaser,
   };
 
   return computed;

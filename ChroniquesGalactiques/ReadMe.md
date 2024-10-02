@@ -12,11 +12,52 @@ Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données tech
 
 # Version courante
 
-V4.4.0 [Screenshot](cog_v4.png)
+V4.7.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+## V4.7.0 (2024.08.24)
+
+- Gestion des capacités avec nombre d'utilisations limitées
+  - Configuration dans l'onglet Capacités
+  - Décompte d'utilisation, message d'alerte de dépassement, bouton de rechargement
+  - Chargement automatique à l'import d'un profil
+- Boutons gain/perte de PV
+- Refactorisation code JS
+
+## V4.6.0 (2024.06.24)
+
+- Migration de la fiche en CSE
+- Ajout de zones rétractables/extensibles
+  - Dans l'onglet Capacités
+  - Dans l'onglet Equipements
+- Correction de bugs mineurs dans les fonctions d'import de profil et statblock
+
+## V4.5.1 (2024.05.26)
+
+- Fix du bug Roll20 des styles CSS in-line
+- Pas de changement fonctionnel
+
+## V4.5.0 (2024.05.01)
+
+- Fiche de personnage
+  - Modification de l'onglet "Capacités", avec 4 sous-onglets
+    - Jets de capacités
+    - Traits & Relations
+    - Modificateurs de situation
+    - Buffs
+  - Prise en compte des virgules dans le texte d'un MOD de situation
+    La "roll-query" affiche une ligne pour chaque situation séparée
+  - Ajout de boutons "Information" pour afficher des textes d'aide dans le chat
+    - Onglet Capacités - Buffs
+    - Onglet Equipement
+
+## V4.4.1 (2023.10.31)
+
+- Fiche de personnage
+  - Correction d'un bug empêchant l'exécution du Javascript de la fiche
 
 ## V4.4.0 (2023.09.30)
 

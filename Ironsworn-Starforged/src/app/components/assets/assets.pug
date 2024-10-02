@@ -1,19 +1,47 @@
 include ./asset-custom
 include ./asset-builder
+include ./asset-builder-legacy
 
 mixin assets()
+  input(class=`hide-element legacy-button-box` type='checkbox' name=`attr_hide_legacy_assets_button_box`)
+  .legacy-button-box.hide-element
+    - const i18nDesc = 'legacy-assets-description'
+    p.legacy-assets-text(data-i18n=i18nDesc)=translation[i18nDesc]
+    .legacy-assets-actions
+      +btn({type: 'checkbox', text: 'TOGGLE LEGACY ASSETS', classes: 'legacy-assets-button', translationId: 'legacy-assets-toggle-btn', attribute: `legacy_assets_toggle`, action: 'toggle', checked: true})
+      +btn({type: 'checkbox', text: 'HIDE THIS BOX', classes: 'legacy-assets-button', translationId: 'hide-legacy-button-box', attribute: `hide_legacy_assets`, action: 'static'})
+
   - let onAssetsPage = ["Path", "Companion", "Deed"];
   .assets
-    fieldset.repeating_assets.fixed-width
+    fieldset.repeating_assets-final.fixed-width
       .asset.surface
-        - let assetsArray = assets.Assets.filter((asset) => onAssetsPage.includes(asset["Asset Type"]))
-        //- - let assetsArray = assets.Assets;
-        +genericAssetBuilder(assetsArray, 'assetList')
+        - let assetsArray = assets.filter((assetGroup) => onAssetsPage.includes(assetGroup["Name"]))
+        - let finalisedAssetList = assetsArray.map((assetGroup) => assetGroup.Assets).flat()
+        +genericAssetBuilder(finalisedAssetList, 'assetList')
         +customAssets
     .hidden-fields.hide-element
-      each asset in assets.Assets
-        - let assetClassName = asset.id.replace(/asset-/i, "")
+      each asset in finalisedAssetList
+        - let assetClassName = asset.Name.replace(" ", "-").toLowerCase()
         each ability, index in asset.Abilities
-          - let assetAbility = `'${asset.id}-ability-${index + 1}',`
+          - let assetAbility = `asset-'${assetClassName}-ability-${index + 1}',`
+          //- For Testing Purposes
           //- - console.log(asset.id)
         input(class=`hide-element` type='checkbox' name=`attr_${assetClassName}`)
+
+  input(class=`hide-element legacy-assets` type='checkbox' name=`attr_showhide_legacy_assets`)
+  .legacy-assets.hide-element
+    h3.legacy-assets-header LEGACY ASSETS
+    .assets
+      fieldset.repeating_assets.fixed-width
+        .asset.surface
+          - let legacyAssetsArray = legacyassets.Assets.filter((asset) => onAssetsPage.includes(asset["Asset Type"]))
+          //- - let assetsArray = assets.Assets;
+          +genericAssetBuilderLegacy(legacyAssetsArray, 'assetList')
+          +customAssets
+      .hidden-fields.hide-element
+        each asset in legacyassets.Assets
+          - let assetClassName = asset.id.replace(/asset-/i, "")
+          each ability, index in asset.Abilities
+            - let assetAbility = `'${asset.id}-ability-${index + 1}',`
+            //- - console.log(asset.id)
+          input(class=`hide-element` type='checkbox' name=`attr_${assetClassName}`)

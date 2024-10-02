@@ -1,0 +1,138 @@
+
+
+.npc
+	input.use_global_modifier(type='hidden' name='attr_use_global_modifier')
+	.grid_npc.name-and-description.border(id='personal-data-npc')
+		.header
+			h1.grid__item_last(data-i18n="name and description") name and description
+		.inner-grid.inner-main
+			.grid__item_last.colheader
+				h2.npc(data-i18n="name:") name:
+			.grid__item_last
+				input(data-i18n-placeholder='character name' name='attr_character_name' placeholder='Character name' title='@{name}' type='text')
+			.grid__item_last.colheader.align_top
+				h2.npc(data-i18n="description:") description:
+			.grid__item_last.align_top 
+				textarea(name='attr_npc_description' placeholder='description' title='@{npc_description}')
+			+sanlossbutton()
+	.grid_npc.sources-of-information.border(id='source-information-npc')
+		.header 
+			h1.grid__item_last(data-i18n="sources of information") sources of information
+		.right-grid
+				textarea.area(style="height:15rem;" name='attr_npc_sources' data-i18n-placeholder='sources of information' placeholder='sources of information')
+				
+	.grid_npc.stat-data.border(id='statistical-data-npc')
+		.header.stat-grid 
+			button.link.roll(type='action' name='attr_strength_r')
+				h1.grid__item STR 
+			button.link.roll(type='action' name='attr_constitution_r')
+				h1.grid__item CON 
+			button.link.roll(type='action' name='attr_dexterity_r')
+				h1.grid__item DEX 
+			button.link.roll(type='action' name='attr_intelligence_r')
+				h1.grid__item INT 
+			button.link.roll(type='action' name='attr_power_r')
+				h1.grid__item POW 
+			button.link.roll(type='action' name='attr_charisma_r')
+				h1.grid__item CHA 
+			h1.grid__item HP 
+			h1.grid__item_last WP
+			button.link.roll(type='action' name='attr_sanity_points_r')
+				h1.grid__item SAN 
+			h1.grid__item BP 
+		.inner-main.stat-grid
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_strength_score' placeholder='-' title='@{STR}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_constitution_score' placeholder='-' title='@{CON}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_dexterity_score' placeholder='-' title='@{DEX}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_intelligence_score' placeholder='-' title='@{INT}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_power_score' placeholder='-' title='@{POW}' type='text')
+			.grid__item
+				input(data-i18n-placeholder='0' name='attr_charisma_score' placeholder='-' title='@{CHA}' type='text')
+			.grid__item
+				input(style='width:3em !important;'  data-i18n-placeholder='0' name='attr_hit_points' placeholder='-' title='@{HP}' type='text' )
+				span /
+				span.center(style='width:40%' name='attr_hit_points_max')
+			.grid__item
+				input(style='width:3em !important;'  data-i18n-placeholder='0' name='attr_willpower_points' placeholder='-' title='@{WP}' type='text' )
+				span /
+				span.center(style='width:40%' name='attr_willpower_points_max')
+			.grid__item
+				input(style='width:3em !important;' data-i18n-placeholder='0' name='attr_sanity_points' placeholder='-' title='@{WP}' type='text' )
+				span /
+				span.center(style='width:40%' name='attr_sanity_points_max')
+			.grid__item_last
+				input(style='width:3em !important;' data-i18n-placeholder='0' name='attr_breaking_point' placeholder='-' title='@{BP}' type='text' )
+				span /
+				span.center(style='width:40%' name='attr_breaking_point_max')
+	
+			
+	.grid_npc.armor-skills-abilities-other.border(id='applicable-skills-npc')
+		.header
+			h1(data-i18n="armor, skills, abilities, and other notes") "armor, skills, abilities, and other notes
+		.header
+			h2.npc.colon(data-i18n='skills') skills.inner-main
+		.inner-main
+			h2.npc.formatted(data-i18n='general') general
+			.skill-summary-container 
+				each val, key in skills1
+					+npcskill(val, key,true)
+				each val, key in skills2
+					+npcskill(val, key,true)
+				each val, key in skills3
+					+npcskill(val, key,true)
+				+npcskill(0, 'unnatural',true)
+			h2.npc.formatted(data-i18n='extra') extra
+
+			.skill-summary-repeat
+				fieldset.repeating_skills
+					.buttonwrapper_rep
+						+editablebetterbutton_npc_rep('skill','pressable additional_div')
+
+			details.arrow
+				summary.allskills(data-i18n='all skills') all skills 
+				.skill-container
+					each val, key in skills1
+						.section-skill-col
+							+npcskill(val, key,false)
+					each val, key in skills2
+						.section-skill-col
+							+npcskill(val, key,false)
+					each val, key in skills3
+						.section-skill-col
+							+npcskill(val, key,false)
+					.section-skill-col
+						+npcskill(0, 'unnatural',false)
+					.section-repeating-container
+						.section-title.border-bottom
+							h3.margin-left(data-i18n='foriegn languages and other skills:' data-i18n-title='foriegn languages and other skills:') foriegn languages and other skills:	
+						.section-body
+							fieldset.repeating_skills
+								.section-skill-col
+									.form-skill-group 
+										label.skill-button
+											input(type='hidden' class='edit_test' name='attr_test')
+											span.edit_text
+												input(style='width:100%;'  name='attr_name' title='@{repeating_skills_${x}__name}' type='text' value='skill' )
+											span.unedit_text
+												- const rskillrollName = `skill`;
+												+editablebetterbutton_rep(rskillrollName,'','pressable additional_div',`(${val}%)`,true)
+					
+										label.switch-edit
+											input(type='checkbox' name='attr_test' value='editable')
+											span.vslider
+									label.rank(data-i18n-title='skill rank' title='skill rank' )
+										input(data-i18n-placeholder='0' name='attr_rank' title='@{repeating_skills_${x}_rank}' placeholder='0' type='text' value='')
+	+allequipment('npc')
+	+allabilities()
+			
+	.grid_npc.remarks.border(id='remarks-npc')
+		.header
+			h1(data-i18n="remarks") remarks
+		.inner-main
+			textarea(name='attr_npc_remarks' data-i18n-placeholder='remarks' placeholder='remarks')
+	

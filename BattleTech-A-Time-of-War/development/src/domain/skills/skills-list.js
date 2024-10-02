@@ -66,6 +66,15 @@ export const skillsList = {
             "archery": "Archery",
         },
     },
+    "art": {
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
+        "targetNumber": 9,
+        "complexity": "CA",
+        "subSkills": true,
+        "displayName": {
+            "art": "Art",
+        },
+    },
     "artillery": {
         "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK, ],
         "targetNumber": 8,
@@ -91,6 +100,15 @@ export const skillsList = {
         "subSkills": false,
         "displayName": {
             "climbing": "Climbing",
+        },
+    },
+    "computers": {
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
+        "targetNumber": 9,
+        "complexity": "CA",
+        "subSkills": false,
+        "displayName": {
+            "computers": "Computers",
         },
     },
     "communications": {
@@ -177,6 +195,15 @@ export const skillsList = {
             "gunnery_turret": "Gunnery/Turret",
         },
     },
+    "interest": {
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK, ],
+        "targetNumber": 9,
+        "complexity": "CA",
+        "subSkills": true,
+        "displayName": {
+            "interest": "Interest",
+        },
+    },
     "interrogation": {
         "linkedAttributes": [WILL_LINK, CHARISMA_LINK, ],
         "targetNumber": 9,
@@ -213,6 +240,15 @@ export const skillsList = {
             "leadership": "Leadership",
         },
     },
+    "martial": {
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
+        "targetNumber": 8,
+        "complexity": "SA",
+        "subSkills": false,
+        "displayName": {
+            "martial_arts": "Martial Arts",
+        },
+    },
     "medtech": {
         "linkedAttributes": [INTELLIGENCE_LINK, ],
         "targetNumber": 7,
@@ -221,6 +257,15 @@ export const skillsList = {
         "displayName": {
             "medtech_general": "MedTech/General",
             "medtech_veterinary": "MedTech/Veterinary",
+        },
+    },
+    "melee": {
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
+        "targetNumber": 8,
+        "complexity": "SA",
+        "subSkills": false,
+        "displayName": {
+            "melee_weapons": "Melee Weapons",
         },
     },
     "navigation": {
@@ -269,6 +314,17 @@ export const skillsList = {
             "piloting_rail_vehicle": "Piloting/Rail Vehicle",
             "piloting_sea_vehicle": "Piloting/Sea Vehicle",
             "piloting_spacecraft": "Piloting/Spacecraft",
+        },
+    },
+    "prestidigitation": {
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
+        "targetNumber": 8,
+        "complexity": "SA",
+        "subSkills": false,
+        "displayName": {
+            "prestidigitation_pick_pocket": "Prestidigitation/Pick Pocket",
+            "prestidigitation_quickdraw": "Prestidigitation/Quickdraw",
+            "prestidigitation_sleight_of_hand": "Prestidigitation/Sleight of Hand",
         },
     },
     "protocol": {
@@ -458,130 +514,3 @@ export const skillsList = {
         },
     },
 }
-
-export const tieredSkillsBasic = {
-    "art": {
-        "linkedAttributes": [DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": true,
-        "displayName": {
-            "art": "Art",
-        },
-    },
-    "computers": {
-        "linkedAttributes": [INTELLIGENCE_LINK, ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": false,
-        "displayName": {
-            "computers": "Computers",
-        },
-    },
-    "interest": {
-        "linkedAttributes": [INTELLIGENCE_LINK, ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": true,
-        "displayName": {
-            "interest": "Interest",
-        },
-    },
-    "martial": {
-        "linkedAttributes": [REFLEX_LINK, ],
-        "targetNumber": 7,
-        "complexity": "SB",
-        "subSkills": false,
-        "displayName": {
-            "martial_arts": "Martial Arts",
-        },
-    },
-    "melee": {
-        "linkedAttributes": [DEXTERITY_LINK, ],
-        "targetNumber": 7,
-        "complexity": "SB",
-        "subSkills": false,
-        "displayName": {
-            "melee_weapons": "Melee Weapons",
-        },
-    },
-    "prestidigitation": {
-        "linkedAttributes": [DEXTERITY_LINK, ],
-        "targetNumber": 7,
-        "complexity": "SB",
-        "subSkills": false,
-        "displayName": {
-            "prestidigitation_pick_pocket": "Prestidigitation/Pick Pocket",
-            "prestidigitation_quickdraw": "Prestidigitation/Quickdraw",
-            "prestidigitation_sleight_of_hand": "Prestidigitation/Sleight of Hand",
-        },
-    },
-}
-
-export const tieredSkillsAdvanced = {
-    "art": {
-        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
-        "targetNumber": 9,
-        "complexity": "CA",
-        "subSkills": true,
-        "displayName": {
-            "art": "Art",
-        },
-    },
-    "computers": {
-        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
-        "targetNumber": 9,
-        "complexity": "CA",
-        "subSkills": false,
-        "displayName": {
-            "computers": "Computers",
-        },
-    },
-    "interest": {
-        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK, ],
-        "targetNumber": 9,
-        "complexity": "CA",
-        "subSkills": true,
-        "displayName": {
-            "interest": "Interest",
-        },
-    },
-    "martial": {
-        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "martial_arts": "Martial Arts",
-        },
-    },
-    "melee": {
-        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "melee_weapons": "Melee Weapons",
-        },
-    },
-    "prestidigitation": {
-        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "prestidigitation_pick_pocket": "Prestidigitation/Pick Pocket",
-            "prestidigitation_quickdraw": "Prestidigitation/Quickdraw",
-            "prestidigitation_sleight_of_hand": "Prestidigitation/Sleight of Hand",
-        },
-    },
-}
-
-export const tieredSkills = [
-    "art",
-    "computers",
-    "interest",
-    "martial",
-    "melee",
-    "prestidigitation",
-]

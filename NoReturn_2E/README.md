@@ -13,6 +13,41 @@ https://www.mannifest-games.com/
 
 # Release Notes
 
+**2024-07-29 v1.2**
+
+* Verbesserungen
+    * Einige kleinere Layout-Optimierungen
+
+**2024-02-17 v1.1 HF5**
+
+* Bugfix
+    * Die Spezies-Felder bei Charakterdaten und Fertigkeiten unterscheiden. Das Textfeld bei den Charakterdaten muss dadurch neu befüllt werden.
+
+**2024-01-23 v1.1 HF4**
+
+* Bugfix
+    * Text bei "Physiologische Störungen" korrigiert
+    * Schmerztoleranz bei neuen Charakteren mit 3 vorbelegen
+    * Standardwert für Spezies auf 0 gesetzt
+
+* Redesign
+    * Überschriften jetzt besser lesbar
+
+**2023-12-16 v1.1 HF3**
+
+* Bugfix
+    * Bei Attributsproben ebenfalls einen Hazard-Di vorbelegen
+
+**2023-12-10 v1.1 HF2**
+
+* New Feature
+  * Würfe mir 0 Hazard-Di ermöglichen
+
+**2023-10-05 v1.1 HF1**
+
+* Bugfixes
+  * Aufklappen von Fertigkeiten korrigiert
+
 **2023-09-23 v1.1 released**
 
 * Redesign
