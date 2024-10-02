@@ -544,6 +544,34 @@ function calculateCombatValues() {
 	});
 }
 
+// Toggling hints for encumbrance affecting AT/PA
+on([
+		"be_at_mod",
+		"be_pa_mod",
+	].map(attr => `change:${attr}`).join(" "), function(eventInfo) {
+		const caller = "Action Listener for Toggling Hints for Encumbrance Affecting AT/PA";
+		const sourceAttr = eventInfo["sourceAttribute"];
+		const hintAttr = sourceAttr + "_hint";
+		let attrsToChange = {};
+
+		switch (sourceAttr)
+		{
+			case "be_at_mod":
+			case "be_pa_mod":
+				if (eventInfo["newValue"] > 0)
+				{
+					attrsToChange[hintAttr] = 1;
+				} else {
+					attrsToChange[hintAttr] = 0;
+				}
+				break;
+			default:
+				debugLog(caller, "sourceAttribute not be_at_mod or be_pa_mod.");
+				break;
+		}
+		safeSetAttrs(attrsToChange);
+});
+
 // Wird eine Nahkampfwaffe aktiviert, werden alle anderen deaktiviert. Auf diese Weise wird sichergestellt, dass immer maximal eine Nahkampfwaffe aktiv ist.
 // Funktionsweise siehe Methode unten zum deaktivieren der Schilde
 on("change:nkw_aktiv1 change:nkw_aktiv2 change:nkw_aktiv3 change:nkw_aktiv4", function(eventInfo) {

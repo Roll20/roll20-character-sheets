@@ -267,6 +267,8 @@ const defaultValues = {
 	"BE": 0,
 	"be_at_mod": 0,
 	"be_pa_mod": 0,
+	"be_at_mod_hint": 0,
+	"be_pa_mod_hint": 0,
 	"BE_RG": 0,
 	"BE_RG_INI": 0,
 
