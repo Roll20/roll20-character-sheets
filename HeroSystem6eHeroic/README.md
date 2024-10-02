@@ -115,7 +115,7 @@ With the Weapon Worksheet open, begin by entering a weapon's base damage (the sh
 
 HERO System 6th Edition considers certain power advantages when determining enhancements to damage (e.g., armor piercing, see 6E2 98-100). HS6eH uses an algorithm that duplicates the *Damage Classes Quick-Reference Tables* found on 6E2 101 plus a best attempt to expand them using the *Expanded Damage Class Tables* available for a small fee separately from Hero Games. The expanded tables were used only as guidance since they do not always agree with the rulebook (and are missing some important common values).
 
-![A/B Button](/HeroSystem6eHeroic/images/ABButton.png) The "A/B" button in the title bar swaps the visible set of weapons (or armor) with a second set. One set could be an adventurer's traveling kit and the second a heavier battlefield loadout. Alternatively, a hero such as Neo in the Matrix might just need as many weapons as they can carry. The "up" mover button of top item of the visible set moves the item to the second set. The "down" mover button of the bottom item likewise exchanges the bottom items of each set.
+![A/B Button](/HeroSystem6eHeroic/images/ABButton.png) The "A/B" buttons in the Weapons and Armor title bars swap the visible set with an alternate set. One set could be an adventurer's traveling kit and the second a heavier battlefield loadout. Alternatively, a hero such as Neo in the Matrix might just need as many weapons as they can carry. The "up" mover button of the top item exchanges the top items of each set. The "down" mover button of the bottom item likewise exchanges the bottom items of each set.
 
 ![Weapons Table A](/HeroSystem6eHeroic/images/weaponsAB.png)
 
