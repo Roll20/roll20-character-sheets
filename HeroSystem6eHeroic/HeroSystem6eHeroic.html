@@ -13608,7 +13608,7 @@
 	gearSlideList.forEach(button => {
 		// Adding weapons to martial maneuvers adds the complexity of needing to recall their standard and martial states.
 		on(`clicked:${button}`, function() {
-			getAttrs(["gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection"], function(values) {
+			getAttrs(["gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection", "ocvNet", "currentDCV"], function(values) {
 				var attributes = new Object();
 				let states = values.weaponStates;
 				var weaponId;
@@ -13630,7 +13630,11 @@
 							default:			states = setCharAt(states, i-1, 'O');
 												break;
 						}
-					}			
+					}
+					
+					attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+					attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
+					
 				} else if (values.gearSlideSelection === "gearMartialManeuvers") {
 					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
@@ -13648,6 +13652,9 @@
 												break;
 						}
 					}
+					
+					attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+					attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
 				}
 				
 				// Recall weapon states when switching between standard and martial maneuvers.
@@ -15325,7 +15332,7 @@
 	/* -------------- */
 	/* Power Movers   */
 	/* -------------- */
-		
+	
 	arrayOf(maxPowerNum).forEach(num => {
 		var lowId = String(num).padStart(2,'0');
 		var highId = String(num == maxPowerNum ? 1 : num + 1).padStart(2,'0');
@@ -16183,6 +16190,7 @@
 		});
 	});
 	
+	
 	function calculateCombatSkillCost(skillType, numberOfLevels) {
 		// Used to calculate costs of general combat skill and familiarities.
 		let skillBaseCost=0;
@@ -16506,7 +16514,7 @@
 	});
 	
 	function updateWeaponStates(button) {
-		getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"], function(values) {
+		getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "ocvNet", "currentDCV"], function(values) {
 			
 			let weapon01 = "killing";
 			let weapon02 = "killing";
@@ -16565,6 +16573,9 @@
 				"weaponType04": weapon04,
 				"weaponType05": weapon05,
 				"weaponType06": weapon06,
+				"variableOCVmod": 0,
+				"ephemeralOCV": parseInt(values.ocvNet)||0,
+				"ephemeralDCV": parseInt(values.currentDCV)||0,
 				"checkMultipleAttack": (button === "multipleAttack") ? "on" : 0
 			});
 		});
@@ -16759,7 +16770,7 @@
 	
 	// Function for changing martial maneuver roll button attack type color states.
 	function updateMartialManeuvers(maneuverId) {
-		getAttrs(["martialManeuverType"+maneuverId, "martialManeuverNormal"+maneuverId, "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"], function(values) {
+		getAttrs(["martialManeuverType"+maneuverId, "martialManeuverNormal"+maneuverId, "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "ocvNet", "currentDCV"], function(values) {
 			
 			var attributes = new Object();
 			
@@ -16843,6 +16854,8 @@
 			attributes.weaponType04 = weapon04;
 			attributes.weaponType05 = weapon05;
 			attributes.weaponType06 = weapon06;
+			attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+			attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
 			attributes["martialDamageDisplay"+maneuverId] = display;
 			
 			setAttrs(attributes);
