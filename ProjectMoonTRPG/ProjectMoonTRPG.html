@@ -17187,7 +17187,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		AutoEffect.slice(1).forEach(conditional => {
 			
 			/* Reset if new conditional doesn't match previous one */
-			if (conditional.replaceAll("#Section","").trim() != autoEffectConditional) {
+			if (conditional.replaceAll("#Section","").replaceAll("#IgnoreFailure").trim() != autoEffectConditional) {
 				scaling = 1; checkResult = "success";
 			}
 
@@ -17198,25 +17198,26 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 			}
 			/* If conditional buttons are requested, do not execute any conditional AutoEffects and store them in conditional buttons to be executed later */
 			else {
-				autoEffectConditional = conditional.replaceAll("#Conditional","").trim();
 				autoEffectType = "conditional";
+				autoEffectConditional = conditional.replaceAll("#IgnoreFailure","").trim();
 
 				if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
 					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
 				} else {
 					conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
 				}
-			}
 
-			/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
-			if (AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") {
-				switch (AutoEffect[0][0]) {
-					case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
-					case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
-					default: tempOutput = {}; break;
-				}
-				if (tempOutput.checkResult == "failure") {
-					conditionalButtonList[autoEffectConditional] = "#Do not display#";
+				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
+				/* Ignore this rule if #IgnoreFailure is used */
+				if ((AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") && !conditional.includes("#IgnoreFailure")) {
+					switch (AutoEffect[0][0]) {
+						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
+						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
+						default: tempOutput = {}; break;
+					}
+					if (tempOutput.checkResult == "failure") {
+						conditionalButtonList[autoEffectConditional] = "#Do not display#";
+					}
 				}
 			}
 		});
