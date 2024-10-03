@@ -2449,7 +2449,7 @@
 
 <div class='creatureskills'>
   <span class='creatureheading'>Skills</span>
-  <fieldset class='repeating_creaturemove'>
+  <fieldset class='repeating_creatureskill'>
     <span name='attr_name'></span>
     <button type='action' class='editbutton rollbutton'
                                 name='act_creatureskill'>
@@ -2476,6 +2476,14 @@
 
 <div class='creaturespells'>
   <span class='creatureheading'>Spells</span>
+  <fieldset class='repeating_creaturespell'>
+    <span name='attr_name'></span>
+    <button type='action' class='editbutton rollbutton'
+                                name='act_creatureskill'>
+      <span name='attr_ranks'></span>
+      <span style="font-family:dicefontd10;">j</span>
+    </button>
+  </fieldset>
 </div>
 
 <div class='creaturenotes'>
@@ -5489,7 +5497,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 561214c5cfaab5910c390c11fd81ba40d5bcfe8f
+Revision a422657e39c19c769aafe3d4684ababbdd52134b
 
 
 <hr>
@@ -7733,10 +7741,6 @@ function initSpellListsCM(savedlists, profession, realm, costs, listranks) {
   const lu = cmdata?.levelup;
   const previousranks = {};
   if (lu && savedlists && savedlists.length > 0) {
-    console.log("Restoring spell ranks: build index of names");
-    console.log(cmdata);
-    console.log(savedlists);
-
     // So we loop through; get each's visble name and then set the ranks based on that
     savedlists.forEach(listid => {
       const listranks = lu.values[listid + '_cmranks'];
@@ -7745,7 +7749,6 @@ function initSpellListsCM(savedlists, profession, realm, costs, listranks) {
 	previousranks[listname] = listranks;
       }
     });
-    console.log(previousranks);
   }
 
   // Set the costs cmcategory-spellownbase-cost
@@ -11554,7 +11557,6 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	      toget.push(`repeating_stuffpack_${pid}_itemcount`);
 	});
 	getAttrsPending(toget, (stuff) => {
-	  console.log(stuff);
 	  let carried = 0;
 	  let chweight = parseIntDefault(stuff.weight, 200);
 	  let chwa = parseIntDefault(stuff.weightallowance, 10);
@@ -11581,9 +11583,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	  });
 	  let packcarried = 0;
 	  pids.forEach(pid => {
-	      console.log(pid);
 	      const weightstr = stuff[`repeating_stuffpack_${pid}_itemweight`] || "";
-	      console.log(weightstr);
 	      let weight = 0;
 	      if (typeof(weightstr) == 'string' && weightstr.endsWith('%')) {
 		let weightp = parseIntDefault(weightstr.match(/\d+/)[0],0);
@@ -11593,7 +11593,6 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	      }
 	      const count = parseIntDefault(stuff[`repeating_stuffpack_${pid}_itemcount`], 1);
 	      packcarried += weight * count;
-	      console.log('pcc', packcarried, weight, count);
 	  });
 
 	  let updates = {};
@@ -11609,7 +11608,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 
 	  // Start with load -> % carried based wieght.  No modifiers
 	  updates.load = Math.floor((carried / chweight) * 100);
-	  console.log(`Carried: ${carried} ${chweight} ${updates.load}`);
+	  console.log(`Carried: ${carried} Chwieght ${chweight} Load ${updates.load}`);
 	  // Get our Max Pace
 	  const pace = RMUInventory.getMaxPace(updates.load);
 	  updates.maxpace = pace.maxpace;
@@ -11894,16 +11893,14 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 
     // Get all the old properties
     getAttrs(fromprops, (props) => {
-      console.log(props);
       const updates = {};
       // rename
       for (const [key, value] of Object.entries(props)) {
 	const nk = key.replace(from, to);
 	updates[nk] = value;
       }
-      console.log(updates);
       // save
-      setAttrs(updates, console.log, () => {
+      setAttrs(updates, () => {
 	removeRepeatingRow(from);
 	if (done) {
 	  done();
@@ -11958,7 +11955,6 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
   onCheck('change:packcarried',  RMUInventory.updateEncumberance);
 
   onCheck('clicked:inventoryadd', (_) => {
-    console.log("inventory add");
       setAttrs({"inventoryaddshow" : "on",  "inventoryaddmessage" : ""});
   });
 
@@ -12037,17 +12033,20 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 
 let drop = {};
 
+/* this does nothing */
+
 onCheck("change:drop_data", event => drop.handleDrop());
+
 
 drop.handleDrop = function() {
   console.log("Handle drop");
 
-  getAttrs(['drop_name', 'drop_data', 'drop_category', 'drop_creature'], (drop) => {
-      console.log("Drop data", drop);
+  getAttrs(['drop_name', 'drop_data', 'drop_category'], (drop) => {
+      console.log(drop);
       if (drop.drop_category === 'Item') {
 	RMUInventory.itemDrop(drop.drop_name, drop.drop_data);
-      } else if (drop.drop_category == 'Creature') {
-	creature.newCreature(drop.drop_name, drop.drop_data);
+      } else if (drop.drop_category == 'Creature' || drop.drop_category == 'NPC') {
+	creature.newCreature(drop.drop_data);
       } else {
 	console.log("Don't know how to handle a ", drop.drop_category);
       }
@@ -12055,6 +12054,7 @@ drop.handleDrop = function() {
 }
 
 
+/**/
 
 
 
@@ -14097,13 +14097,24 @@ creature.newCreature = function(name, jdata) {
 
   // "data-skills": [ { "skill": "Running", "bonus": 43 } ],
   const skills = creature.parseJSONMaybe(cdata['data-skills'], [])
+  console.log("skills is", skills);
   for (const { skill, bonus } of skills) {
+    console.log('skills', skill, bonus);
     const rowid = generateRowID();
     const prefix = `repeating_creatureskill_${rowid}`;
     updates[`${prefix}_name`] = skill;
     updates[`${prefix}_bonus`] = bonus;
   }
 
+  // "data-skills": [ { "skill": "Running", "bonus": 43 } ],
+  // "data-spellLists": [  { "list": "Concussions Ways ", "ranks": "1" } ]
+  const spells = creature.parseJSONMaybe(cdata['data-spellLists'], [])
+  for (const { list, ranks } of spells) {
+    const rowid = generateRowID();
+    const prefix = `repeating_creaturespell_${rowid}`;
+    updates[`${prefix}_name`] = list;
+    updates[`${prefix}_ranks`] = ranks;
+  }
 
   VrmuSetAttrs(updates);
   /*
