@@ -14612,6 +14612,19 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="false") {
 	if (collectAutoScripts == "true") { resetConditionals(); }
 	AutoScriptMain("", autoScriptTriggers, collectAutoScripts, "false", { targetmode: "false" }, function(returnValues) {
 
+	/* Action buttons */
+	let buttonList = [];
+	let giveButtonList = [];
+	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
+		if (buttonKey.startsWith("auto")) {
+			switch (buttonKey.split(" ")[0]) {
+				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
+				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+			}
+		}
+	}
+
 	let autoEffectDiceCount = 0;
 	let autoEffectDiceMax = 0;
 	let autoEffectSpeedCombat = 0;
@@ -15161,6 +15174,19 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	
 	resetConditionals();
 	AutoScriptMain(autoScript, autoScriptTriggers, "true", "false", { targetmode: "false" }, function(returnValues) {
+
+	/* Action buttons */
+	let buttonList = [];
+	let giveButtonList = [];
+	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
+		if (buttonKey.startsWith("auto")) {
+			switch (buttonKey.split(" ")[0]) {
+				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
+				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+			}
+		}
+	}
 
 	let autoScriptMessage = "";
 	if (returnValues.message != undefined) { autoScriptMessage = returnValues.message }
