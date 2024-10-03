@@ -1,3 +1,9 @@
+# 2024-10-3
+
+- Remove a lot of debug in level up and stuff.
+- Allow creatures to be called NPCs on drop
+- Creatures (NPCS) now display spells
+
 # 2024-10-1
 
 Work continues on improving 'stuff' (aka Inventory or items).  So first up we have casting penalties
