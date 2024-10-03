@@ -13564,6 +13564,7 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 	
 			setAttrs({"HP":burnresult, "dummy":burnmessage, "dummyIcon":iconnew});
 			autoScriptOverrideList.Burn = [burnnew, burncurrent];
+			output.Burn = burnnew;
 	
 			if(nomessage != "true" && burnimmune != "true"){
 				startRoll((whisper + "&{template:message} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{message=@{dummy} }}"), (results) => {
@@ -13572,16 +13573,6 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 			}
 		}
 	}
-
-
-	/* Custom Ailments */
-	/* Do not process if only specific ailments are being updated */
-	updateCustomAilments((ailmentNames.length == 15) ? ["RoundEnd"] : [], "standard", "true", function(returnValues) {
-	Object.assign(autoScriptOverrideList, returnValues);
-
-	updateCustomAilments((ailmentNames.length == 15) ? ["OnAction", "WhenHit"] : [], "decay", "true", function(returnValues) {
-	Object.assign(autoScriptOverrideList, returnValues);
-
 
 	/* Smoke processing */
 	if(ailmentNames.includes("Smoke")) {
@@ -13609,6 +13600,7 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 				}
 			}
 			autoScriptOverrideList.Smoke = [smokenew, smokecurrent];
+			output.Smoke = smokenew;
 		}
 	}
 
@@ -13638,63 +13630,72 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 				}
 			}
 			autoScriptOverrideList.Charge = [chargenew, chargecurrent];
+			output.Charge = chargenew;
 		}
 	}
 
-
-	/* Stagger processing */
-	if(stagcheck == "Staggered"){
-		if(stagduration == 0) {
-			stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
-			setAttrs({"StaggerState":"0", "StaggerDuration":stagdurationmax, "StagRes":stagnew});
-		} else {
-			setAttrs({"StaggerDuration":stagduration-1});
-		}
-	}
-
-	/* Seal processing */
-	if(sealcheck != "0"){
-		setAttrs({"SealState":"0"});
-	}
-
-	/* Immobile processing */
-	if(immobilecheck != "0"){
-		setAttrs({"ImmobileState":"0"});
-	}
-
-	/* AutoScripts */
-	resetConditionals();
-	AutoScriptMain("", "Round start", "true", "true", {...autoScriptOverrideList, targetmode: "false"});
-
-	output = {
-		...output, "thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "isFirstRound":"false", "baseActNum":"0",
-		"Bleed":bleednew, "Burn": burnnew, "Smoke":smokenew, "Charge": chargenew
-	}
-
-	/*output = {
-		...output, "thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "isFirstRound":"false", "baseActNum":"0",
-		"Bleed":bleednew, "BleedNextTurn":"0", "Burn": burnnew, "BurnNextTurn":"0", "Paralysis": paralysisnew, "ParalysisNextTurn":"0", "Protection": protectionnew, "ProtectionNextTurn":"0",
-		"StaggerProtection": staggerprotectionnew, "StaggerProtectionNextTurn":"0", "Fragile": fragilenew, "FragileNextTurn":"0", "Strength": strengthnew, "StrengthNextTurn":"0",
-		"Feeble": feeblenew, "FeebleNextTurn":"0", "Endurance": endurancenew, "EnduranceNextTurn":"0", "Disarm": disarmnew, "DisarmNextTurn":"0", "Haste": hastenew, "HasteNextTurn":"0",
-		"Bind": bindnew, "BindNextTurn":"0", "Smoke": smokenew, "SmokeNextTurn":"0", "Charge":chargenew, "ChargeNextTurn":"0", "Fortune":fortunenew, "FortuneNextTurn":"0"
-	}*/
-
+	/* If decay pause is active, keep current count and decrease the pause count by 1 */
 	ailmentNames.forEach(ailment => {
-		/* If decay pause is active, keep current count and decrease the pause count by 1 */
 		if (parseInt(values[`${ailment}DecayPause`]) > 0 && ailment != "Bleed") {
 			output[`${ailment}`] = parseInt(values[`${ailment}`]);
 			output[`${ailment}DecayPause`] = parseInt(values[`${ailment}DecayPause`]) - 1;
+			autoScriptOverrideList[`${ailment}`] = [output[`${ailment}`], output[`${ailment}`]];
+		}
+	});
+
+
+	/* Round end Update processing */
+	/* Do not process if only specific ailments are being updated */
+	if (ailmentNames.length == 15) {
+
+		output = {
+			...output, "thisRoundSpeed":nextRoundSpeed, "nextRoundSpeed":0, "isFirstRound":"false", "baseActNum":"0",
+			"Bleed":bleednew
 		}
 
 		/* Add NextTurn count */
-		if (output[`${ailment}`] != undefined) { output[`${ailment}`] += parseInt(values[`${ailment}NextTurn`]); }
-		else { output[`${ailment}`] = parseInt(values[`${ailment}NextTurn`]); }
-		output[`${ailment}NextTurn`] = 0;
-	});
+		ailmentNames.forEach(ailment => {
+			if (output[`${ailment}`] != undefined) { output[`${ailment}`] += parseInt(values[`${ailment}NextTurn`]); }
+			else { output[`${ailment}`] = parseInt(values[`${ailment}NextTurn`]); }
+			output[`${ailment}NextTurn`] = 0;
+		});
+	
+		/* Stagger processing */
+		if(stagcheck == "Staggered"){
+			if(stagduration == 0) {
+				stagnew = parseInt((values.StagRes_max) * parseFloat(parseInt(values[`${id}_staggerRecoverPercent`])/100) + parseInt(values[`${id}_staggerRecoverBase`]));
+				output = {...output, "StaggerState":"0", "StaggerDuration":stagdurationmax, "StagRes":stagnew};
+			} else {
+				output = {...output, "StaggerDuration":stagduration-1};
+			}
+		}
+	
+		/* Seal processing */
+		if(sealcheck != "0"){
+			output.SealState = "0";
+		}
+	
+		/* Immobile processing */
+		if(immobilecheck != "0"){
+			output.ImmobileState = "0";
+		}
+	
+		/* Custom Ailments */
+		updateCustomAilments(["RoundEnd"], "standard", "true", function(returnValues) {
+		Object.assign(autoScriptOverrideList, returnValues);
+	
+		updateCustomAilments(["OnAction", "WhenHit"], "decay", "true", function(returnValues) {
+		Object.assign(autoScriptOverrideList, returnValues);
+	
+		/* AutoScripts */
+		resetConditionals();
+		AutoScriptMain("", "Round start", "true", "true", {...autoScriptOverrideList, targetmode: "false"});
+		});
+		});
+	}
+	
 	setAttrs(output, {}, () => {
 		callback();
-	});
-	});
 	});
 	});
 	});
@@ -17411,6 +17412,8 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		/* Checks if any checks failed and the button should not be displayed */
 		rollChallenge(statName, rollDifficulty, "false");
 	}
+
+	console.log(output)
 
 	/* Execute proc effects */
 	for (const [ailmentName, procCount] of Object.entries(procAilmentList)) {
