@@ -5,6 +5,10 @@ const dropWarning = (v) => {
   );
 };
 
+const handle_equipment = (page) => handle_item(page, getRow("equipment"));
+
+const handle_arms = (page) => handle_item(page, getRow("arms"));
+
 const handle_npc = (page) => {
   const attrs = [
     "size",
@@ -23,18 +27,94 @@ const handle_npc = (page) => {
     "healing_rate",
     "glory_award",
     "description",
+    "movement  ",
+    "valorous modifier",
   ];
 
-  let update = getStaticUpdate(attrs, page);
+  const update = getStaticUpdate(attrs, page);
 
   update["character_name"] = page.name;
+  update["sheet_type"] = "npc";
+  update["flag_description"] = false;
 
-  //TODO: handle all repeating sections
+  ["equipment", "arms", "abilities"].forEach((section) => {
+    const data = page.data[section];
+    if (data) {
+      const sectionUpdate = processDataArrays(data, (data) =>
+        update_item(data, getRow(section))
+      );
+      Object.assign(update, sectionUpdate);
+    } else update[`hide_${section}`] = "on";
+  });
+
+  if (page.data.attacks) {
+    const attacks = processDataArrays(page.data.attacks, (data) =>
+      update_attack(data)
+    );
+    Object.assign(update, attacks);
+
+    const parsed = parseJSON(page.data.attacks);
+    const attackSkills = parsed
+      .filter(({ skill, target_value }) => skill && target_value)
+      .map(({ skill, target_value }) => ({
+        name: skill.toLowerCase(),
+        target_value,
+      }));
+
+    if (attackSkills.length > 0) {
+      const askills = update_mix_section(attackSkills, "skills", combatSkills);
+      Object.assign(update, askills);
+    }
+  } else {
+    update["hide_attacks"] = "on";
+  }
+
+  if (page.data.skills) {
+    const dataSkills = update_mix_section(
+      page.data.skills,
+      "skills",
+      combatSkills
+    );
+    Object.assign(update, dataSkills);
+  } else {
+    update["hide_skills"] = "on";
+  }
+
+  if (page.data.passions) {
+    const passions = processDataArrays(
+      page.data.passions,
+      updateSection("passions")
+    );
+    Object.assign(update, passions);
+  } else {
+    update["hide_passions"] = "on";
+  }
+
+  if (page.data.traits) {
+    const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+    Object.entries(personalityTraits).forEach(([positive, negative]) => {
+      const keys = Object.keys(dataTraits);
+      if (keys.includes(positive) && !keys.includes(negative)) {
+        const targetValue = dataTraits[positive];
+        dataTraits[negative] = 20 - targetValue;
+      } else if (!keys.includes(positive) && keys.includes(negative)) {
+        const targetValue = dataTraits[negative];
+        dataTraits[positive] = 20 - targetValue;
+      } else if (!keys.includes(positive) && !keys.includes(negative)) {
+        dataTraits[positive] = 10;
+        dataTraits[negative] = 10;
+      }
+    });
+
+    Object.assign(update, dataTraits);
+  } else {
+    update["hide_personality_traits"] = "on";
+  }
+
+  setAttrs(update, {
+    silent: true,
+  });
 };
-
-const handle_equipment = (page) => handle_item(page, getRow("equipment"));
-
-const handle_arms = (page) => handle_item(page, getRow("arms"));
 
 const handle_character = (page) => {
   const attrs = [
@@ -59,69 +139,50 @@ const handle_character = (page) => {
   const update = getStaticUpdate(attrs, page);
   update["character_name"] = page.name;
 
-  const addEntries = (object) => {
-    Object.entries(object).forEach(([key, value]) => {
-      update[key] = value;
+  try {
+    if (page.data.arms) {
+      const arms = processDataArrays(page.data.arms, (data) =>
+        update_item(data, getRow("arms"))
+      );
+      Object.assign(update, arms);
+    }
+    if (page.data.attacks) {
+      const attacks = processDataArrays(page.data.attacks, (data) =>
+        update_attack(data)
+      );
+      Object.assign(update, attacks);
+    }
+
+    if (page.data.passions) {
+      const passions = processDataArrays(
+        page.data.passions,
+        updateSection("passions")
+      );
+      Object.assign(update, passions);
+    }
+
+    if (page.data.skills) {
+      const dataSkills = update_mix_section(page.data.skills, "skills", [
+        ...skills,
+        ...combatSkills,
+      ]);
+      Object.assign(update, dataSkills);
+    }
+
+    if (page.data.traits) {
+      const dataTraits = update_mix_section(page.data.traits, "traits", traits);
+      Object.assign(update, dataTraits);
+    }
+    if (page.data.squire_notes) {
+      update["flag_squire_notes"] = false;
+    }
+
+    setAttrs(update, {
+      silent: true,
     });
-  };
-
-  const arms = processDataArrays(page.data.arms, (data) =>
-    update_item(data, getRow("arms"))
-  );
-  addEntries(arms);
-
-  const attacks = processDataArrays(page.data.attacks, (data) =>
-    update_attack(data)
-  );
-  addEntries(attacks);
-
-  const updateSection = (section) => {
-    return (data) => update_section(data, section);
-  };
-
-  const passions = processDataArrays(
-    page.data.passions,
-    updateSection("passions")
-  );
-  addEntries(passions);
-
-  const dataSkills = parseJSON(page.data.skills);
-  dataSkills.forEach(({ name, target_value }) => {
-    const isStaticSkill = [...skills, ...combatSkills].includes(
-      name.toLowerCase()
-    );
-    if (isStaticSkill) {
-      update[attrName(name)] = target_value;
-    } else {
-      const custom = processDataArrays(
-        [{ name, target_value }],
-        updateSection("skills")
-      );
-      addEntries(custom);
-    }
-  });
-
-  const dataTraits = parseJSON(page.data.traits);
-  dataTraits.forEach(({ name, target_value }) => {
-    const isStaticTrait = traits.includes(name.toLowerCase());
-    if (isStaticTrait) {
-      update[attrName(name)] = target_value;
-    } else {
-      const custom = processDataArrays(
-        [{ name, target_value }],
-        updateSection("traits")
-      );
-      addEntries(custom);
-    }
-  });
-
-  if (page.data.squire_notes) {
-    update["flag_squire_notes"] = false;
+  } catch (error) {
+    console.warn(error);
   }
-
-  setAttrs(update, {
-    silent: true,
-  });
 };
 
 const handle_items = (page) => {
@@ -170,6 +231,8 @@ const handle_drop = () => {
 
     switch (Category) {
       case "Creatures":
+        resetRepeatingRows(repeatingSections);
+        resetSkillList(page.data.skills);
         handle_npc(page);
         break;
       case "Horses":
@@ -195,6 +258,7 @@ const handle_drop = () => {
         drop_name: "",
         drop_data: "",
         drop_content: "",
+        drop_category: "",
       },
       {
         silent: true,

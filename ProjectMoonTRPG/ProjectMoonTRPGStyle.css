@@ -162,6 +162,14 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
 .helperText:checked ~ .helperTextContainer .helpers b {
     display: none !important;
 }
+.helperText:checked ~ .damageHelperContainer.helperTextContainer :is(.slash, .pierce) {
+    margin-right: 28px;
+}
+.helperText:checked ~ .damageHelperContainer.helperTextContainer .blunt {
+    position: absolute;
+    top: 0px;
+    left: 28px;
+}
 .editCover > .rowContainer,
 .editCover > .hide-item,
 .editCover > .hide-item > .rowContainer {
@@ -203,7 +211,7 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
     font-size: 16pt; 
     font-weight: bold;
 }
-.Cstat{
+.Cstat, .Tstat {
     color: #111; 
     background-color: transparent !important; 
     width: 125% !important; 
@@ -215,7 +223,7 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
     opacity: 80%;
     padding-left: 5px;
 }
-.Mstat{
+.Mstat {
     color: rgba(0,0,0,0.5);
     position: absolute; 
     top: 0; 
@@ -246,8 +254,24 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
     right: 0;
     z-index: 20;
 }
-.bars {position: relative; background-color: #111; width: 90px !important; height: 25px; height: 37px; border-radius: 5px;}
+.bars {position: relative; background-color: #111; width: 90px !important; height: 37px; border-radius: 5px;}
 .contentBlock { width: 100%; display: flex; justify-content: start; align-items: start; }
+
+/* Blue border for Temporary HP and ST */
+.bars:has(> .style-toggle-rev:not(:checked)) {
+    border: 2px solid #1f9bd9c0 !important;
+    top: -3px;
+    left: -3px;
+    z-index: 1;
+}
+.bars:has(> .style-toggle-rev:checked) {
+    border: 0px !important;
+}
+.banner:has(.style-toggle-rev:not(:checked)) span {
+    position: relative;
+    top: -1px;
+    z-index: 2;
+}
 
 #Counter span {
     font-weight: bold;
@@ -394,9 +418,10 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
     font-weight: bold;
     z-index: 150;
 }
+/*#settings {*/
 #settings:hover {
-    height: 500px;
-    width: 300px;
+    height: auto;
+    width: 530px;
     border: 1px #fee2b0 solid;
     border-radius: 5px 15px 5px 5px;
     background-color: rgba(0,0,0,0.8);
@@ -416,7 +441,19 @@ textarea::placeholder, .CharSmallNotes::placeholder, .CharDetail::placeholder, .
     border: 1px #fee2b0 solid;
 }
 .settingsText {
+    width: 220px;
     padding: 35px;
+    padding-bottom: 25px;
+}
+.settingsText input[type="checkbox"] {
+    position: absolute;
+}
+.settingsText span:not(.settingsTitle) {
+    position: relative;
+    left: 21px;
+}
+.settingsTitle {
+    line-height: 1.8em;
 }
 
 
@@ -1490,6 +1527,10 @@ margin-bottom: 2px !important;}
     margin-top: 2px !important;
     margin-left: 5px !important;
 }
+.skillN select.whiteInput:focus,
+.settingStyle select.whiteInput:focus {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
 /* Ego skills */
 .skillE .icon {
     border: 1px #888 solid !important;
@@ -1581,14 +1622,17 @@ margin-bottom: 2px !important;}
     border-radius: 5px;
     background-color: #222 !important;
     border: 1px #111 solid;
+    pointer-events: none;
 }
 .damageHelperType:has(input:checked:not([value="None"])) ~ .applyDamage .applyDamageInput {
     opacity: 100%;
+    pointer-events: auto;
 }
 .damageHelperType:has(input:checked:not([value="None"])) ~ .applyDamage .applyDamageInput:hover {
     background-color: #000 !important;
     cursor: pointer;
 }
+
 
 
 /* Roll helpers */
@@ -1611,7 +1655,8 @@ margin-bottom: 2px !important;}
     border: 1px #111 solid;
     margin: 1px;
 }
-.speed:hover,  button[type=roll].NDice:hover, button[type=action].NDice:hover, .challengeButton:hover, .declare:hover, .btn:hover {
+.speed:hover,  button[type=roll].NDice:hover, button[type=action].NDice:hover,
+.challengeButton:hover, .declare:hover, .btn:hover, .selectTargetButton:hover, .defenceDice:hover {
     background-color: #000 !important;
 }
 .expand-toggle:checked ~ .whisper {
@@ -1668,6 +1713,30 @@ margin-bottom: 2px !important;}
     margin-bottom: 2px !important;
     width: 40px !important;
 }
+
+
+/* Auto Update Indicator */
+.autoUpdateIndicator {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    opacity: 80%;
+    border-radius: 4px;
+    pointer-events: none;
+}
+.loopEnabledToggle:not(:checked) ~ .autoUpdateIndicator {
+    display: none;
+}
+.loopEnabledToggle:checked ~ .autoUpdateIndicator {
+    border: 4px solid #dbb748;
+}
+.loopEnabledToggle:checked + .loopSearchingToggle:checked ~ .autoUpdateIndicator {
+    border: 4px solid #93c47d;
+}
+.loopEnabledToggle:checked ~ .loopStandbyToggle:checked + .autoUpdateIndicator {
+    border: 4px solid #cc4125;
+}
+
 
 
 /* Character stats */
@@ -1977,10 +2046,10 @@ background-image: url('https://raw.githubusercontent.com/punibird/roll20-charact
 .whisper {
 background-image: url('https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/icons/whisper.png');}
 .damageResist {
-    background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/ProjectMoonTRPG-LoR-Rework/ProjectMoonTRPG/imagesResized/ailments/DamageResist.png');
+    background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/DamageResist.png');
 }
 .damageResist-limbus {
-    background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/ProjectMoonTRPG-LoR-Rework/ProjectMoonTRPG/imagesResized/ailments/limbus/DamageResist.png');
+    background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/ailments/limbus/DamageResist.png');
 }
 
 /* Ailment Icons */
@@ -2240,6 +2309,10 @@ background-image: url('https://raw.githubusercontent.com/punibird/roll20-charact
 background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/RottingSkin.png');
 }
 
+.blood  {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.6.3/ProjectMoonTRPG/images/ailments/Blood.png');
+}
+
 .slashprotection-limbus {
 background-image: url('https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/SlashProtection.png');
 }
@@ -2281,6 +2354,13 @@ background-image: url('https://raw.githubusercontent.com/punibird/roll20-charact
 background-image: url('https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Envy.png');
 }
 
+.damageup-limbus {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/ailments/limbus/DamageUp.png');
+}
+.damagedown-limbus {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/ailments/limbus/DamageDown.png');
+}
+
 /* Community icons */
 .style-community {
 background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/community/Style.png');
@@ -2292,7 +2372,21 @@ background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-cha
 background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/community/Rhythm.png');
 }
 
-
+.frenzy-community {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/community/Frenzy.png');
+}
+.shock-community {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/community/Shock.png');
+}
+.terror-community {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/community/Terror.png');
+}
+.staggerdamageup-community {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/community/StaggerDamageUp.png');
+}
+.staggerdamagedown-community {
+background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.7/ProjectMoonTRPG/images/community/StaggerDamageDown.png');
+}
 /* Ailment Icons END */
 
 .next { /* Aka update */
@@ -2482,6 +2576,24 @@ height: 35px;}
 .sheet-rolltemplate-damagecalculation .userscript-spCalculationContainer div:first-child { color: #6d9eeb; background-color: #111; }
 
 
+/* Description and effect container styling */
+.sheet-rolltemplate-baseRoll .userscript-descriptionContainer {
+    width: 50%;
+    height: auto;
+    float: left;
+}
+/* If only one description is present, expand its width */
+.sheet-rolltemplate-baseRoll :nth-child(1 of div.userscript-descriptionContainer):not(:has(+ .userscript-descriptionContainer)) {
+    width: 100% !important;
+}
+.sheet-rolltemplate-baseRoll .userscript-effectDescription {
+    max-height: 70px;
+    overflow: auto;
+    border: 1px #555 solid;
+    padding-bottom: 1px;
+}
+
+
 /* AutoEffect message styling */
 /* Yes, you have to write them all out like this... */
 .sheet-rolltemplate-damagecalculation .userscript-autoeffectContainer .userscript-autoEffectImage,
@@ -2501,7 +2613,7 @@ height: 35px;}
 .sheet-rolltemplate-autoeffect .userscript-autoeffectContainer,
 .sheet-rolltemplate-message .userscript-autoeffectContainer,
 .sheet-rolltemplate-baseRoll .userscript-autoeffectContainer {
-    margin-top: 10px;
+    margin-top: 5px;
     border-radius: 5px;
     border: 1px solid #555;
     position: relative;
@@ -2509,7 +2621,6 @@ height: 35px;}
 .sheet-rolltemplate-baseRoll .userscript-autoeffectContainer {
     float: left;
     width: 99.3%;
-    margin-top: 10px;
 }
 .sheet-rolltemplate-damagecalculation .userscript-autoeffectContainer > .userscript-autoeffectEntry,
 .sheet-rolltemplate-autoeffect .userscript-autoeffectContainer > .userscript-autoeffectEntry,
@@ -2520,6 +2631,12 @@ height: 35px;}
     min-height: 25px;
     line-height: 20px;
     border-bottom: 1px solid #555;
+}
+.sheet-rolltemplate-damagecalculation .userscript-autoeffectContainer .userscript-autoEffectTitle,
+.sheet-rolltemplate-autoeffect .userscript-autoeffectContainer .userscript-autoEffectTitle,
+.sheet-rolltemplate-message .userscript-autoeffectContainer .userscript-autoEffectTitle,
+.sheet-rolltemplate-baseRoll .userscript-autoeffectContainer .userscript-autoEffectTitle {
+    width: calc(100% - 40px);
 }
 .sheet-rolltemplate-damagecalculation .userscript-autoeffectEntry div,
 .sheet-rolltemplate-autoeffect .userscript-autoeffectEntry div,
@@ -2540,6 +2657,47 @@ height: 35px;}
 .sheet-rolltemplate-baseRoll .userscript-autoeffectContainer > .userscript-autoeffectEntry > img:first-child {
     position: absolute;
     left: 0;
+}
+/* Collapseable section styling */
+.sheet-rolltemplate-damagecalculation .userscript-collapseSection,
+.sheet-rolltemplate-message .userscript-collapseSection,
+.sheet-rolltemplate-baseRoll .userscript-collapseSection {
+    max-height: 29px;
+    transition: max-height 10s 0.1s ease-in;
+    overflow: hidden;
+}
+.sheet-rolltemplate-damagecalculation .userscript-collapseSection:hover,
+.sheet-rolltemplate-message .userscript-collapseSection:hover,
+.sheet-rolltemplate-baseRoll .userscript-collapseSection:hover {
+    max-height: 500px;
+    transition: max-height 3s 0.1s ease;
+}
+/* Removed mergin for every section but the first */
+.sheet-rolltemplate-damagecalculation .userscript-collapseSection ~ .userscript-collapseSection,
+.sheet-rolltemplate-message .userscript-collapseSection ~ .userscript-collapseSection,
+.sheet-rolltemplate-baseRoll .userscript-collapseSection ~ .userscript-collapseSection {
+    margin-top: 0px;
+}
+/* Create arrow to indicate if the section is collapsed or expanded */
+.sheet-rolltemplate-damagecalculation .userscript-collapseSection .userscript-arrow,
+.sheet-rolltemplate-message .userscript-collapseSection .userscript-arrow,
+.sheet-rolltemplate-baseRoll .userscript-collapseSection .userscript-arrow {
+    position: absolute; top: 10px; right: 10px;   
+    width: 0px; 
+    height: 0px; 
+    border-bottom: none;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 10px solid #fff;
+    opacity: 50%;
+    transition: opacity 10s 0.1s ease;
+}
+/* Create arrow to indicate if the section is collapsed or expanded */
+.sheet-rolltemplate-damagecalculation .userscript-collapseSection:hover .userscript-arrow,
+.sheet-rolltemplate-message .userscript-collapseSection:hover .userscript-arrow,
+.sheet-rolltemplate-baseRoll .userscript-collapseSection:hover .userscript-arrow {
+    opacity: 0%;
+    transition: opacity 0.6s 0.1s ease;
 }
 
 
@@ -2598,7 +2756,8 @@ height: 35px;}
 
 /* Chat avatar fix */
 /* For the love of all that is holy do not change these styling rules. I cannot describe to you how long it took to get them right */
-.sheet-rolltemplate-actionbuttons:not(:first-child) .sheet-actionButtonBlocker {
+.sheet-rolltemplate-actionbuttons:not(:first-child) .sheet-actionButtonBlocker,
+.sheet-rolltemplate-actionbuttons:not(:first-child) .sheet-actionButtonBlockerWhisper {
     position: absolute;
     height: calc(100% + 16px);
     margin-top: -60px;
@@ -2608,14 +2767,17 @@ height: 35px;}
     right: -50px;
 }
 .sheet-rolltemplate-darkmode .sheet-actionButtonBlocker {
-    background-color: #353535 !important;
+    background-color: var(--surface-dark2) !important;
+}
+.sheet-rolltemplate-darkmode .sheet-actionButtonBlockerWhisper {
+    background-color: var(--surface-dark-gamecard) !important;
 }
 .sheet-rolltemplate-actionbuttons:not(:first-child):has(:nth-child(3):not(:empty)) {
     position: relative;
 }
 .sheet-rolltemplate-actionbuttons:not(:first-child) {
     position: relative;
-    margin-bottom: -10%;
+    margin-bottom: -25px;
 }
 .sheet-rolltemplate-actionbuttons:not(:first-child) .sheet-actionButtonContainer {
     top: -35px;
@@ -2666,6 +2828,261 @@ justify-content: center;
     justify-content: center;
     background-color: #111;
     color: #888 !important;
+}
+
+
+/* Combat options */
+.combatOptionsContainer {
+    margin-bottom: 6px;
+}
+.combatOptionsContainer b {
+    display: inline-block;
+}
+.combatOptionsContainer .tokenName {
+    display: inline-block;
+    width: 100%;
+    height: 12px !important;
+    padding: 0;
+    font-size: 9pt;
+    font-weight: bold;
+    text-align: center;
+    opacity: 30%;
+    color: #fff;
+    background-color: transparent;
+    pointer-events: none;
+}
+.combatOptionsContainer .tokenName::placeholder {
+    opacity: 100% !important;
+}
+.combatOptionsContainer :is(b, .tokenName) {
+    margin-bottom: 2px; 
+}
+.combatOptionsContainer :is(img[src=""], img:not([src])) {
+    display: none;
+}
+.combatOptionsContainer :is(img[src=""], img:not([src])) + input[type="number"] {
+    display: none;
+}
+.combatOptionsContainer .bars {
+    height: 24px;
+    background-color: #222;
+}
+.combatOptionsContainer .bars.bars:not(:first-child) {
+    margin-left: 2px;
+}
+.combatOptionsContainer .Cstat {
+    width: 100% !important;
+    font-size: 12pt;
+    pointer-events: none;
+}
+.combatOptionsContainer .Cstat::-webkit-inner-spin-button,
+.combatOptionsContainer .Cstat::-webkit-outer-spin-button {
+    display: none;
+}
+/* This disables the spinner in Firefox */
+.combatOptionsContainer .Cstat {
+    appearance: textfield;
+}
+.hide-toggle-rev ~ .combatOptionsContainer.hide-item-rev {
+    display: flex;
+}
+.selectTargetButton, .targetToken {
+    height: 44px; 
+    width: 44px;
+}
+.selectTargetButton {
+    padding: 3px;
+    border-radius: 5px;
+    background-color: #222 !important;
+    border: 1px #111 solid;
+}
+.targetToken {
+    opacity: 0.5;
+}
+.selectTargetIcon {
+    height: 50px; 
+    width: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.6.2/ProjectMoonTRPG/imagesResized/icons/target.png');
+}
+/* Last defence dice display */
+.defenceDice {
+    height: 52px !important;
+    width: 52px !important;
+    padding: 4px;
+    font-size: 20px;
+    text-shadow: #000 0 0 3px, #000 0 0 10px;
+    text-align: center;
+    border: 1px #111 solid !important;
+    border-radius: 5px;
+    background-color: #222 !important;
+    background-size: 45px;
+    background-position: 45% 45%;
+    background-repeat: no-repeat;
+    background-image: url('https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/Release-v0.6.2/ProjectMoonTRPG/imagesResized/icons/egoDef.png');
+}
+
+.defenceDice:not(:hover):not(:focus)::-webkit-inner-spin-button,
+.defenceDice:not(:hover):not(:focus)::-webkit-outer-spin-button {
+    display: none;
+}
+/* This disables the spinner in Firefox */
+.defenceDice {
+    appearance: textfield;
+}
+.defenceDice:focus, .defenceDice:hover {
+    appearance: auto;
+}
+
+
+/* Generic token mode display */
+.genericTokenContainer {
+    position: fixed;
+    bottom: 0px;
+    left: 0%;
+    width: calc(99% - 14px);
+    z-index: 999;
+    padding: 5px;
+    background-color: #1F1F1F !important;
+}
+#genericTokenModeToggle + .genericTokenContainer {
+    display: none !important;
+}
+#genericTokenModeToggle:checked + .genericTokenContainer {
+    display: flex !important;
+}
+.genericTokenInstanceContainer {
+    resize: vertical;
+    max-height: 450px;
+    min-height: 150px;
+    overflow-y: auto;
+}
+.genericTokenInstanceContainer .repcontainer {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: calc(99% - 64px);
+}
+.genericTokenInstanceContainer .repcontrol { 
+    display: none;
+}
+.genericTokenInstanceContainer .hide-toggle-rev + .hide-item-rev {
+    display: inline-block !important;
+}
+.genericTokenInstanceContainer .hide-toggle-rev:checked + .hide-item-rev {
+    display: none !important;
+}
+
+/* Generic token controls */
+.genericTokenSelectButton {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    height: 20%;
+    width: calc(100% + 2px);
+    background-color: transparent;
+}
+.genericToken_controls {
+    justify-content: space-around;
+    width: 50px;
+    height: 130px;
+    margin: 10px 5px 10px 5px;
+}
+.genericToken_controls button {
+    background-color: transparent;
+}
+
+/* Individual generic token*/
+.genericToken {
+    height: 130px;
+    width: 120px;
+    margin: 5px;
+}
+.style-toggle:checked + .genericToken {
+    height: 126px;
+    border: 2px solid #666;
+}
+.genericToken .tokenName {
+    background-color: transparent;
+    color: #999;
+    width: 100%;
+    padding: 0;
+    pointer-events: none;
+    overflow: ellipsis;
+}
+.genericToken .bars {
+    width: 100px !important;
+    height: 20px;
+}
+.genericToken .bars:not(:first-child) {
+    margin-top: 2px;
+}
+.genericToken :is(.Cstat, .Mstat, .Tstat) {
+    font-size: 12pt;
+}
+.genericToken .Mstat{
+    width: 33% !important;
+    padding: 4px 2px 4px 2px;
+}
+.genericToken .Tstat {
+    width: auto !important;
+    left: 30px;
+    z-index: 3;
+}
+.tokenAilment, .targetAilment {
+    width: 25px;
+    height: 25px;
+    margin-top: 2px;
+}
+:is(.tokenAilment, .targetAilment) img {
+    position: relative;
+    opacity: 90%;
+    left: 0;
+    width: 25px;
+    height: 25px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+:is(.tokenAilment, .targetAilment) input[type="number"] {
+    position: relative;
+    top: -25px;
+    left: -2px;
+    background-color: transparent;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: #000 0 0 3px, #000 0 0 5px, #000 0 0 10px;
+    padding-left: 2px;
+    text-align: center;
+    z-index: 2;
+}
+.targetAilment {
+    pointer-events: none;
+}
+.tokenAilment input[type="number"]:not(:hover):not(:focus)::-webkit-inner-spin-button,
+.tokenAilment input[type="number"]:not(:hover):not(:focus)::-webkit-outer-spin-button {
+    display: none;
+}
+.tokenAilment input[type="number"]:hover, :hover::-webkit-inner-spin-button,
+.tokenAilment input[type="number"]:hover, :hover::-webkit-outer-spin-button,
+.tokenAilment input[type="number"]:focus, :hover::-webkit-inner-spin-button,
+.tokenAilment input[type="number"]:focus, :hover::-webkit-outer-spin-button {
+    z-index: 3;
+}
+.tokenAilment input[type="number"] {
+    appearance: textfield;
+}
+.tokenAilment input[type="number"]:not(:hover):not(:focus) {
+    width: 31px !important;
+}
+.tokenAilment input[type="number"]:focus, .tokenAilment input[type="number"]:hover {
+    appearance: auto;
+    width: 3.5em;
 }
 
 

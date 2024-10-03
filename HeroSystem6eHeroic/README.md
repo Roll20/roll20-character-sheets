@@ -5,7 +5,8 @@ This character sheet is designed for use in heroic-level Hero System games such 
 
 The number of skills (30 general skills, 7 combat skills, 9 maneuvers, and 9 languages) and powers (20) is hard-coded to handle the background math and for aesthetics, but should be sufficient for most cases.
 
-For help, comments, feature requests, or bug reports please contact Villain In Glasses on Roll20 or consider this [HERO Games forum thread](https://www.herogames.com/forums/topic/101627-new-roll20-character-sheet-hero-system-6e-heroic/).
+> [!NOTE]
+> For help, comments, feature requests, or bug reports please contact [Villain In Glasses](https://app.roll20.net/users/633423/villain-in-glasses) on [Roll20](https://roll20.net) or consider this [HERO Games forum thread](https://www.herogames.com/forums/topic/101627-new-roll20-character-sheet-hero-system-6e-heroic/).
 
 ## Contents
 
@@ -190,91 +191,91 @@ The only trick to the Complications section is to remember that points gained fr
 
 The last page of this sheet contains a number of options.
 
-Character Options:
+#### Character Options:
 
-`Use Characteristic Maximums` 
+### Use Characteristic Maximums
 
 If checked, character point costs are doubled above the standard Hero System maximums.
 
-`Literacy Costs Character Points` 
+### Literacy Costs Character Points
 
 If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
-`Takes No Stun` 
+### Takes No Stun
 
 This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
 
-`Untiring` 
+### Untiring
 
 Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
 
-`Super-heroic Campaign Endurance` 
+### Super-heroic Campaign Endurance 
 
 If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
-`Weapon Damage Limited to 2x Base Damage` 
+### Weapon Damage Limited to 2x Base Damage
 
 Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
 
-`Choose d6-1 over d3 when Adjusted Damage is ambiguous` 
+### Choose d6-1 over d3 when Adjusted Damage is ambiguous
 
 HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
 
-Gameplay Options:
+## Gameplay Options:
 
-`Display Degree of Success` 
+### Display Degree of Success
 
 By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
 
-`Use Hit Location System` 
+### Use Hit Location System
 
 Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-`Health Reset Buttons reset Combat Choices` 
+### Health Reset Buttons reset Combat Choices
 
 When checked a reset returns maneuver and targeting selections to their default states.
 
-`Health Reset Buttons reset applied CSLs` 
+### Health Reset Buttons reset applied CSLs
 
 Similarly, here a reset also returns applied Combat Skill Levels to zero.
 
-`Attack and Power Buttons Apply END Costs` 
+### Attack and Power Buttons Apply END Costs
 
 If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
 
-`Show Power Descriptions in Chat` 
+### Show Power Descriptions in Chat
 
 Uncheck if you would like to tidy up powers in the chat area.
 
-`Show Tally Bar` 
+### Show Tally Bar
 
 Uncheck to hide the Tally Bar.
 
-`Tally Net CP instead of Spent CP` 
+### Tally Net CP instead of Spent CP
 
 If you prefer an accounting only of spent character points, uncheck this option. This method is more in keeping with 6th Edition sources.
 
-`Name-Title Separator` 
+### Name-Title Separator 
 
 Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
 
-`Whisper Rolls to GM` 
+### Whisper Rolls to GM
 
 This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
 # <a id="mods">Mod Support</a>
 
-`HERO System 6e Heroic HD Importer`
+### HERO System 6e Heroic HD Importer
 
 The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install menu) imports characters created in or purchased for [HERO Designer](https://www.herogames.com/store/category/4-hero-system-software/). Please refer to the mod [README](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroSystem6eHeroic_HDImporter) for further information and instructions for use.
 
-`HERO Markdown`
+### HERO Markdown
 
 [HeroMarkdown](https://github.com/Villain1nGlasses/HeroMarkdown) is a style specification for BaldarSilveraxe's Roll20 markdown script modeled after Slugnet's Alien RPG conversion. Markdown can make creating attractive handouts easier.
 
-`HERO Roller`
+### HERO Roller
 
-If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. It is not currently 100% compatible due to case sensitivity (HS6e uses *OCV* and HS6eH uses *ocv*). Adding a fix for this issue is on my list of things to do.
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. It is not currently 100% compatible due to a case sensitivity problem (HS6e uses *OCV* and HS6eH uses *ocv*). Adding a fix for this issue is on my list of things to do.
 
 # <a id="tokens">Tokens</a>
 
@@ -309,4 +310,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
-*Last updated by Villain in Glasses on August 2, 2024 to represent the sheet as of version 3.14.*
+*Last updated by Villain in Glasses on September 25, 2024 to represent the sheet as of version 3.30.*

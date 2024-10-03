@@ -10,11 +10,19 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.18.0 [Screenshot](coc_v2.png)
+v3.19.0 [Screenshot](coc_v2.png)
 
 # Notes de version
 
-## v3.18.0 (2024-06-15)
+## v3.19.0 (2024-08-24)
+
+- Gestion des capacités avec nomre d'utilisations limitées
+  - Configuration dans l'onglet Capacités
+  - Décompte d'utilisation, message d'alerte de dépassement, bouton de rechargement
+  - Chargement automatique à l'import d'un profil
+- Boutons gain/perte de PV
+
+## v3.18.0 (2024-06-24)
 
 - Migration de la fiche en CSE
 - Ajout de zones rétractables/extensibles

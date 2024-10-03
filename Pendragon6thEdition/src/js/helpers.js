@@ -41,4 +41,4 @@ const sliceAttr = (attribute) => attribute.slice(2, -1);
 
 const sumIntegers = (numbers) => numbers.reduce((a, b) => a + b, 0);
 
-const attrName = (name) => name.replace(/ /g, "_").toLowerCase();
+const attrName = (name) => name?.replace(/ /g, "_").toLowerCase();
