@@ -3724,7 +3724,11 @@
                                 );
                             break;
                             case 'attribute':
+                            case 'configuration':
+                            case 'enhancements':
                             case 'level':
+                            case 'limiters':
+                            case 'stat':
                                 temp.push(
                                     'attrdb',
                                     'defectdb',
@@ -8258,7 +8262,11 @@
             case 'repeating':
                 switch (cache.source_attribute) {
                     case 'attribute':
+                    case 'configuration':
+                    case 'enhancements':
                     case 'level':
+                    case 'limiters':
+                    case 'stat':
                         query.next = `repeating_${cache.source_section}_${cache.source_attribute}`;
                         for (let a = 0; a < all_attributes.length; a++) {
                             for (let b = 0; b < cache.attrdb[all_attributes[a]].length; b++) {
@@ -8804,6 +8812,8 @@
                 break;
                 case 'static_attribute_group_enhancements':
                 case 'static_attribute_group_limiters':
+                case 'repeating_attribute_enhancements':
+                case 'repeating_attribute_limiters':
                 case 'enhancements_add':
                     query.title = `${getTranslationByKey(cache.source_attribute)}`;
                     const normalized_enhancements = {
@@ -9180,6 +9190,7 @@
                 break;
                 case 'stat_menu':
                 case 'static_attribute_group_stat':
+                case 'repeating_attribute_stat':
                     query.title = 
                         `${cache.source_id === 'group' ? getTranslationByKey("group") : getTranslationByKey("attribute")} ` +
                         `${getTranslationByKey("stat")}`;
@@ -9385,6 +9396,8 @@
                     break;
                     case 'static_attribute_group_enhancements':
                     case 'static_attribute_group_limiters':
+                    case 'repeating_attribute_enhancements':
+                    case 'repeating_attribute_limiters':
                         if (query.selection !== 'exit') {
                             query.customization = query.selection.split('~').map(s => isNaN(s) ? s : Number(s));
                             query.next = 'customization_rank';
@@ -9851,13 +9864,14 @@
                     break;
                     case 'stat_menu':
                     case 'static_attribute_group_stat':
+                    case 'repeating_attribute_stat':
                         /*
                         if (query.selection !== 'attribute_menu') {
                             query.stat = query.selection;
                         }
                         */
                         query.stat = query.selection;
-                        query.next = 'write_groupstat';
+                        query.next = `write_stat`;
                     break;
                     default:
                         query.commit === true;
@@ -10406,9 +10420,14 @@
                         set_values[`${cache.source_path}_level`] = `${query.level} (${query.elevel})`;
                     }
                     await setGroupCharacterPoints(cache, set_values);
-                } else if (query.next === 'write_groupstat') {
-                    cache.groupdb[cache.static_group_visible_id].stat = query.stat;
-                    set_values.static_attribute_group_stat = query.stat.capitalize();
+                } else if (query.next === 'write_stat') {
+                    if (query.type === 'group') {
+                        cache.groupdb[cache.static_group_visible_id].stat = query.stat;
+                        set_values.static_attribute_group_stat = query.stat.capitalize();
+                    } else {
+                        cache.attrdb[query.attribute][query.index].stat = query.stat;
+                        set_values[`${cache.source_path}_stat`] = query.stat.capitalize();
+                    }
                 } else if (query.next === 'write_customizations') {
                     for (let i = 0; i < query.customizations.length; i++) {
                         if (query.type === 'group') {
@@ -10439,7 +10458,31 @@
                             }
                         } else {
                             //=> setup Attribute customizations here.
-                            set_values.attrdb[query.attribute][0][cache.source_attribute];
+                            const index = cache.attrdb[query.attribute][query.index][cache.source_attribute].findIndex(c => c.name === query.customizations[i].name);
+                            if (query.customizations[i].rank !== 0) {
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute][index].rank = 
+                                    query.customizations[i].rank;
+                            } else {
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(index, 1);
+                            }
+                            const enhancement_ranks =
+                                cache.attrdb[query.attribute][query.index].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
+                            const limiter_ranks =
+                                cache.attrdb[query.attribute][query.index].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
+                            cache.attrdb[query.attribute][query.index].elevel = 
+                                cache.attrdb[query.attribute][query.index].level + limiter_ranks - enhancement_ranks;
+                            set_values[`${cache.source_path}_level`] = 
+                                `${cache.attrdb[query.attribute][query.index].level} ` +
+                                `(${cache.attrdb[query.attribute][query.index].elevel})`;
+                            set_values[cache.source] = '';
+                            for (let i = 0; i < cache.attrdb[query.attribute][query.index][cache.source_attribute].length; i++) {
+                                set_values[cache.source] += 
+                                    cache.attrdb[query.attribute][query.index][cache.source_attribute][i].name.capitalize() + 
+                                    ` (${cache.attrdb[query.attribute][query.index][cache.source_attribute][i].rank})`;
+                                if (i !== cache.attrdb[query.attribute][query.index][cache.source_attribute].length - 1) {
+                                    set_values[cache.source] += '\n';
+                                }
+                            }
                         }
                     }
                     
@@ -11647,7 +11690,11 @@
                                 }
                             break;
                             case 'attribute':
+                            case 'configuration':
+                            case 'enhancements':
                             case 'level':
+                            case 'limiters':
+                            case 'stat':
                                 await attributesMenu(cache, set_values);
                             break;
                         }
