@@ -13682,21 +13682,27 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 	
 		/* Custom Ailments */
 		updateCustomAilments(["RoundEnd"], "standard", "true", function(returnValues) {
-		Object.assign(autoScriptOverrideList, returnValues);
+		Object.assign(autoScriptOverrideList, returnValues.overrideList);
+		Object.assign(output, returnValues.output);
 	
 		updateCustomAilments(["OnAction", "WhenHit"], "decay", "true", function(returnValues) {
-		Object.assign(autoScriptOverrideList, returnValues);
+		Object.assign(autoScriptOverrideList, returnValues.overrideList);
+		Object.assign(output, returnValues.output);
 	
 		/* AutoScripts */
 		resetConditionals();
 		AutoScriptMain("", "Round start", "true", "true", {...autoScriptOverrideList, targetmode: "false"});
+
+		setAttrs(output, {}, () => {
+			callback();
 		});
+		});
+		});
+	} else {
+		setAttrs(output, {}, () => {
+			callback();
 		});
 	}
-	
-	setAttrs(output, {}, () => {
-		callback();
-	});
 	});
 	});
 }
@@ -13766,7 +13772,7 @@ getAttrs(["Paralysis", "Fortune", "advState", "advNum", "disadvNum"], function(v
 /* standard - Triggers both decay and damage like normal */
 /* decay - Triggers only decay */
 /* damage - Triggers only damage */
-function updateBleed(mode="standard", callback=() => {}) {
+function updateBleed(mode="standard", callback=()=>{}) {
 getSectionIDs(`repeating_global`, idarray => {
            let id = `repeating_global_${idarray[0]}`;
 
@@ -13792,6 +13798,8 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 	let egostate = values.egoActiveState;
 	let egotype = values.egoType;
 
+	let output = {}
+
 	if(egostate == "true" && egotype == "Outfit" && distortstate != "true"){
 		bleedresist = values.bleedResist_ego;
 	}
@@ -13801,7 +13809,7 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 
 	if (bleeddecaypause > 0) {
 		mode = "damage";
-		setAttrs({"BleedDecayPause":bleeddecaypause - 1});
+		output.BleedDecayPause = bleeddecaypause - 1;
 	}
 
 	let THP_Sources = {};
@@ -13898,11 +13906,16 @@ getAttrs(["Bleed", "BleedDecayPause", "bleedResist", "bleedResist_ego", "distort
 
 		/* Apply damage */
 		if (bleedimmune != "true") {
-			setAttrs({"HP":bleedresult, "Bleed":bleednew});
+			output = {...output, "HP":bleedresult, "Bleed":bleednew};
 		}
-		callback({ Bleed: [bleednew, bleedcurrent] });
+
+		if (callback != "()=>{}") {
+			callback({"output": output, "overrideList": { Bleed: [bleednew, bleedcurrent] }});
+		} else {
+			setAttrs({output});
+		}
 	} else {
-		callback();
+		callback({});
 	}
 	});
 	});
@@ -14211,11 +14224,13 @@ getSectionIDs(`repeating_global`, idarray => {
 	/* Bleed processing */
 	let autoScriptOverrideList = {};
 	updateBleed("standard", function(returnValues) {
-	Object.assign(autoScriptOverrideList, returnValues);
-
+	Object.assign(autoScriptOverrideList, returnValues.overrideList);
+	Object.assign(output, returnValues.output);
+		
 	/* Custom Ailments processing */
 	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
-	Object.assign(autoScriptOverrideList, returnValues);
+	Object.assign(autoScriptOverrideList, returnValues.overrideList);
+	Object.assign(output, returnValues.output);
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -15763,10 +15778,13 @@ on('clicked:declareAction', (info) => {
 	/* Bleed processing */
 	let autoScriptOverrideList = {};
 	updateBleed("standard", function(returnValues) {
-	Object.assign(autoScriptOverrideList, returnValues);
+	Object.assign(autoScriptOverrideList, returnValues.overrideList);
+	Object.assign(output, returnValues.output);
 
+	/* Custom Ailments processing */
 	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
-	Object.assign(autoScriptOverrideList, returnValues);
+	Object.assign(autoScriptOverrideList, returnValues.overrideList);
+	Object.assign(output, returnValues.output);
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -17438,8 +17456,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 		/* Checks if any checks failed and the button should not be displayed */
 		rollChallenge(statName, rollDifficulty, "false");
 	}
-
-	console.log(output)
 
 	/* Execute proc effects */
 	for (const [ailmentName, procCount] of Object.entries(procAilmentList)) {
@@ -19338,9 +19354,10 @@ function importAilmentList(ailmentList, returnMode="false") {
 /* Function: Update multiple custom ailments */
 /* triggerList: array which contains at least one of None, RoundEnd, OnAction and WhenHit */
 /* See updateCustomAilment() function below for details on modes */
-function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEnd="true", callback=() => {}) {
+function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEnd="true", callback=()=>{}) {
 	getSectionIDs(`repeating_ailments`, idarray => {
-		let autoScriptOverrideList = {};
+		let autoScriptOverrideList = {}
+		let output = {}
 		let updatesRemaining = 0;
 
 		/* Immediately callback if no custom ailments exist */
@@ -19354,18 +19371,23 @@ function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEn
 			idarray.forEach(id => {
 	
 				let current = v[`repeating_ailments_${id}_ailTrigger`];
-	
+				
 				/* Update each custom ailment with the requested trigger(s). After the last valid ailment updates, callback */
 				if(triggerList.includes(current)) {
 					updatesRemaining += 1;
 					//console.log(updatesRemaining)
 					updateCustomAilment(id, mode, roundEnd, function(returnValues) {
-						Object.assign(autoScriptOverrideList, returnValues);
+						Object.assign(autoScriptOverrideList, returnValues.overrideList);
+						Object.assign(output, returnValues.output);
 						updatesRemaining -= 1;
 						//console.log(updatesRemaining)
 						//console.log(v[`repeating_ailments_${id}_ailName`] + ": finished updating")
 						if (updatesRemaining == 0) {
-							callback(autoScriptOverrideList);
+							if (callback != "()=>{}") {
+								callback({"output": output, "overrideList": autoScriptOverrideList});
+							} else {
+								setAttrs(output);
+							}
 						}
 					});
 				}
@@ -19386,7 +19408,7 @@ function updateCustomAilments(triggerList=["OnAction"], mode="standard", roundEn
 /* standard - Triggers both decay and effect */
 /* decay - Triggers only decay */
 /* effect - Triggers only effect */
-function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=() => {}) {
+function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=()=>{}) {
 
     getAttrs(["distortState", "egoActiveState", "egoType", "settingWhisperRolls", "settingWhisperTarget", "settingMuteMessage",
 		`repeating_ailments_${rowid}_ailNum`, `repeating_ailments_${rowid}_ailNumNextTurn`, `repeating_ailments_${rowid}_ailDecayPause`, `repeating_ailments_${rowid}_ailName`,
@@ -19407,6 +19429,9 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 	let icon = values[`repeating_ailments_${rowid}_ailIcon`];
 	let count = parseInt(values[`repeating_ailments_${rowid}_ailNum`]);
 	let countnextturn = parseInt(values[`repeating_ailments_${rowid}_ailNumNextTurn`]);
+
+	let output = { [`repeating_ailments_${rowid}_ailNum`]: count };
+	let returnValues = { [ailname]: [count, count] };
 
 	let trigger = values[`repeating_ailments_${rowid}_ailTrigger`];
 
@@ -19430,7 +19455,7 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 	if (decaypause > 0) {
 		if (trigger != "OnAction" || (trigger == "OnAction" && mode == "standard")) {
 			mode = "effect";
-			setAttrs({[`repeating_ailments_${rowid}_ailDecayPause`]:decaypause - 1});
+			output[`repeating_ailments_${rowid}_ailDecayPause`] = decaypause - 1;
 		}
 	}
 
@@ -19450,9 +19475,6 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 	let message = values[`repeating_ailments_${rowid}_ailMessage`]; 
 
 	//console.log("Name: " + name + " | Icon: " + icon + " | Count: " + count + " | Trigger: " + trigger + " | Effect: " + effecttarget + effectmode + effectval + " | Decay: Count " + decaymode + decayval + " | Message: (" + messagecheck + ")" + message);
-
-	let output = { [`repeating_ailments_${rowid}_ailNum`]: count };
-	let returnValues = { [ailname]: [count, count] };
 
 	let newcount = parseInt(count);
 	let newmessage = message;
@@ -19682,11 +19704,10 @@ function updateCustomAilment(rowid, mode="standard", roundEnd="true", callback=(
 	/*--Message end --*/
 
 	/* Apply to target */
-	setAttrs(output);
-	if (count != 0) {
-		callback(returnValues);
+	if (callback != "()=>{}") {
+		callback({"output": output, "overrideList": returnValues});
 	} else {
-		callback();
+		setAttrs(output);
 	}
 	});
 }
