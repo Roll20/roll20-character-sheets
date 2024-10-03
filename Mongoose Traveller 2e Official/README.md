@@ -35,5 +35,11 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Updated character sheet image
 - Fixed Jack-of-All-Trades not updating untrained skill DMs properly
 
+### Version 1.0.05
+
+- Fixed darkmode rolltemplates to be more visible
+- Changed font to be more readable after user feedback
+- Removed fail, crit and important borders from roll results in rolltemplates
+- Added code to add 'combat item weight' to total item weight, and added sub-totals
 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
