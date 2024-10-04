@@ -1,3 +1,35 @@
+# 2024-10-3
+
+- Remove a lot of debug in level up and stuff.
+- Allow creatures to be called NPCs on drop
+- Creatures (NPCS) now display spells
+
+# 2024-10-1
+
+Work continues on improving 'stuff' (aka Inventory or items).  So first up we have casting penalties
+for armor calculated and working.  This may may the spell casters in your group most unhappy.  I hope
+they stocked up on Transcendance.   We have also added a 'pack' and 'store'.  A pack is backpack or
+similar item you can drop if in combat.   Or maybe on your horse.  There is a toggle button to carry
+or not carry it.  Encumberance pnealties are calcualted depending if carried or not.   Store is for
+stuff you character doesn't have with them.  Homewares or buried treaures.  You can move items between
+the three lists easily.
+
+Then there is a pile of small items; Spells persist previous ranks on levelup.  Lots of people have
+asked for this - Enjoy!
+
+- Stuff (aka Inventory)
+  - Spell equipped correctly.
+  - Items only count to encumberance% if equipped (w/ test)
+  - Add Store & Backpack sections
+  - Add toggle for backpack carried
+  - Allow items to move between sections with a click
+- Add support for transcendance and spell Enc% penalties
+- Make bleed a local (internal change)
+- Reset current round/phase on new combat.
+- Show the current round in the action box
+- Don't set negative PP on the character sheet (min 0)
+- Spells remember how many you got on level up.
+
 # 2024-9-26
 
 Start work on fully supporting encumbrance and maneuver penalties.  So now we
