@@ -3005,6 +3005,8 @@
 	<!-- Combat options -->
 	<input type="checkbox" class="hide-toggle-rev" name="attr_settingHideCombatOptions" value="true">
 	<div class="rowContainer combatOptionsContainer hide-item-rev">
+
+		<input type="text" name="attr_selfToken" hidden>
 		
 		<!-- Target selector -->
 		<div class="columnAlign helpers">
@@ -3021,10 +3023,11 @@
 			<input type="text" name="attr_targetName" value="" hidden="true">
 			<input type="text" name="attr_targetTokenId" value="" hidden="true">
 			<input type="text" name="attr_targetSettings" value="{}" hidden="true">
+
+			<input type="text" name="attr_targetedBy" value="{}" hidden="true">
+			<input type="text" name="attr_announceTargeting" value="" hidden="true">
 			
 			<!-- Target bars -->
-			<input type="text" name="attr_targetBarList" value="{}" hidden="true">
-			<input type="text" name="attr_targetBarDamageList" value="{}"  hidden="true">
 			<div class="rowContainer" style="width: 150px;">
 				<div class="bars"><input class="Cstat HPtext" type="text" name="attr_HP_target" value="---"></div>
 				<div class="bars"><input class="Cstat egoSTGRtext" type="text" name="attr_StagRes_target" value="---"></div>
@@ -3032,7 +3035,6 @@
 			</div>
 
 			<!-- Target ailments -->
-			<input type="text" name="attr_targetAilmentList" value="{}" hidden="true">
 			<div class="rowContainer">
 				<input type="checkbox" class="hide-toggle-rev" name="attr_targetAilment1Num" value="0" hidden="true">
 				<div class="targetAilment hide-item-rev">
@@ -3071,7 +3073,6 @@
 		<div class="columnAlign helpers" style="margin-left: 3px;">
 			<b data-i18n="helper-text-defencedice">Defence</b>
 			<input type="number" class="darkInput defenceDice" name="attr_lastDefenceRoll" min="0" value="0" data-i18n-title="helper-text-lastdefenceroll" title="Last Defence roll"> <!-- delete this later -->
-			<input type="text" name="attr_selfToken" hidden>
 		</div>
 	</div>
 
@@ -10838,8 +10839,8 @@ data-i18n-placeholder="tool-effect" placeholder="Tool effects."></textarea>
 //      getSectionIDsAsync
 //      
 function isRunningOnServer() { return self.dispatchEvent == undefined; }
-function setActiveCharacterId(charId){
-    var oldAcid=getActiveCharacterId();
+function setActiveCharacterId(charId) {
+    var oldActId=getActiveCharacterId();
     var msg={"id":"0", "type":"setActiveCharacter", "data":charId};
     
     if(isRunningOnServer()==false){ //if in a browser, use "dispatchEvent" to process the message
@@ -10849,75 +10850,87 @@ function setActiveCharacterId(charId){
     }else{ //otherwise, use the API (server) message processor, "onmessage"
         self.onmessage({data:msg});
     }
-    return oldAcid; //return what the value used to be, so calling code can be a little cleaner 
+    return oldActId; //return what the value used to be, so calling code can be a little cleaner 
 } 
 var _sIn=setInterval;
-setInterval=function(callback, timeout){
-    var acid=getActiveCharacterId();
+setInterval=function(callback, timeout) {
+    var actId=getActiveCharacterId();
     _sIn(
         function(){
-            var prevAcid=setActiveCharacterId(acid);
+            var prevActId=setActiveCharacterId(actId);
             callback();
-            setActiveCharacterId(prevAcid);
+            setActiveCharacterId(prevActId);
         }
     ,timeout);
 }
 var _sto=setTimeout
-setTimeout=function(callback, timeout){
-    var acid=getActiveCharacterId();
+setTimeout=function(callback, timeout) {
+    var actId=getActiveCharacterId();
     _sto(
         function(){
-            var prevAcid=setActiveCharacterId(acid);
+            var prevActId=setActiveCharacterId(actId);
             callback();
-            setActiveCharacterId(prevAcid);
+            setActiveCharacterId(prevActId);
         }
     ,timeout);
 }
-function getAttrsAsync(props){
-    var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
-    var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+function getAttrsAsync(props) {
+    var actId=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+    var prevActId=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
     return new Promise((resolve,reject)=>{
-            prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
-            try{
-                getAttrs(props,(values)=>{  resolve(values); }); 
-            }
+            prevActId=setActiveCharacterId(actId);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try{ getAttrs(props,(values)=>{ resolve(values); }); }
             catch{ reject(); }
     }).finally(()=>{
-        setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+        setActiveCharacterId(prevActId); //restore activeCharcterId to what it was when the promise first ran
     });
 }
-//use the same pattern for each of the following...
-function setAttrsAsync(propObj, options){
-    var acid=getActiveCharacterId(); 
-    var prevAcid=null;               
+function setAttrsAsync(propObj, options={}) {
+    var actId=getActiveCharacterId();
+    var prevActId=null;
     return new Promise((resolve,reject)=>{
-            prevAcid=setActiveCharacterId(acid);  
-            try{
-                setAttrs(propObj,options,(values)=>{ resolve(values); });
-            }
+            prevActId=setActiveCharacterId(actId);
+            try{ setAttrs(propObj,options,(values)=>{ resolve(values); }); }
             catch{ reject(); }
     }).finally(()=>{
-        setActiveCharacterId(prevAcid); 
+        setActiveCharacterId(prevActId);
     });
 }
-
-function getSectionIDsAsync(sectionName){
-    var acid = getActiveCharacterId(); 
-    var prevAcid=null;               
+function getSectionIDsAsync(sectionName) {
+    var actId = getActiveCharacterId();
+    var prevActId=null;
     return new Promise((resolve,reject)=>{
-            prevAcid = setActiveCharacterId(acid);  
-            try{
-                getSectionIDs(sectionName,(values)=>{ resolve(values); });
-            }
+            prevActId = setActiveCharacterId(actId);
+            try{ getSectionIDs(sectionName,(values)=>{ resolve(values); }); }
             catch{ reject(); }
     }).finally(()=>{
-        setActiveCharacterId(prevAcid); 
+        setActiveCharacterId(prevActId);
+    });
+}
+function getAttrsById(actId, props) {
+    var prevActId = getActiveCharacterId();
+    return new Promise((resolve,reject)=>{
+            setActiveCharacterId(actId);
+            try{ getAttrs(props,(values)=>{ resolve(values); }); }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevActId);
+    });
+}
+function setAttrsById(actId, propObj, options={}) {
+    var prevActId = getActiveCharacterId();
+    return new Promise((resolve,reject)=>{
+            setActiveCharacterId(actId);
+            try{ setAttrs(propObj,options,(values)=>{ resolve(values); }); }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevActId);
     });
 }
 
 
 
-/* Update Loop begins */
+/* --- Update Loop begins --- */
 let loopDelay = 10000;
 let trackerItemName = "Round end";
 on('sheet:opened change:settingLoopEnabled change:configLoopDelay change:configTrackerItemName change:prevRoundInitAttempts', (info) => {
@@ -10941,48 +10954,41 @@ function restartLoop() {
 
 on('change:loopEnabled', (info) => {
 	if (info.newValue == "true") {
-		//console.log("beginning loop")
-		stepLoop();
+		getAttrs(["character_id"], function(values) {
+			//console.log("beginning loop")
+			stepLoop(values.character_id);
+		});
 	}
 });
-function stepLoop() {
-	setTimeout(function() {
-		getAttrs(["loopEnabled", "prevRoundInitAttempts", "settingHideCombatOptions", "targetName", "targetTokenId", "targetSettings", "settingLimbusStyle"], async function(values) {
-			//console.log(values.prevRoundInitAttempts)
-			if (values.loopEnabled == "true" && parseInt(values.prevRoundInitAttempts) < 6) {
-				let output = {}
+function stepLoop(charId) {
+	setActiveCharacterId(charId);
+	getAttrs(["loopEnabled", "prevRoundInitAttempts", "settingHideCombatOptions", "targetId", "targetTokenId", "targetSettings", "settingLimbusStyle"], async function(values) {
+		//console.log(values.prevRoundInitAttempts)
+		if (values.loopEnabled == "true" && parseInt(values.prevRoundInitAttempts) < 6) {
+			let output = {}
 
-				/* Auto: Update */
-				let newRoundInit = await getInitiative(trackerItemName);
-				if (newRoundInit == "") {
-					output = {...output, prevRoundInitAttempts: parseInt(values.prevRoundInitAttempts) + 1}
-				} else {
-					output = {...output, prevRoundInit: newRoundInit, prevRoundInitAttempts: 0}
-				}
+			/* Auto: Update */
+			let newRoundInit = await getInitiative(trackerItemName);
+			if (newRoundInit == "") {
+				output = {...output, prevRoundInitAttempts: parseInt(values.prevRoundInitAttempts) + 1}
+			} else {
+				output = {...output, prevRoundInit: newRoundInit, prevRoundInitAttempts: 0}
+			}
 
-				/* Sync: Target Ailment/Bar lists */
-				let targetSettings = Data.unpackage(values.targetSettings);
-
-				if (values.targetName != "" && !values.targetName.includes("@{target|")) {
-					updateTargetAilmentList(values.settingHideCombatOptions, values.targetName, values.targetTokenId, targetSettings, values.settingLimbusStyle, (returnListAilment) => {
-					updateTargetBarLists(values.settingHideCombatOptions, values.targetName, values.targetTokenId, targetSettings, (returnListBars) => {
-						output = {...output, ...returnListAilment, ...returnListBars}
-
-						if (targetSettings.hideDetailsFromTargeting == "true") {
-							setAttrs({...output, ...unknownTarget()});
-						} else {
-							setAttrs(output);
-						}
-					});});
+			/* Sync: Target Ailment/Bar lists */
+			/*let targetSettings = Data.unpackage(values.targetSettings);
+			updateTargetAttrLists(values.settingHideCombatOptions, values.targetId, values.targetTokenId, targetSettings, values.settingLimbusStyle, (targetAttrs) => {
+				if (values.targetId != "") {
+					setAttrs({...output, ...targetAttrs});
 				} else {
 					setAttrs(output);
 				}
-
-				setTimeout(stepLoop, loopDelay);
-			} else {
-				//console.log("ending loop");
-			}
-		});
+			});*/
+			
+			setTimeout(stepLoop.bind(this, charId), loopDelay);
+		} else {
+			//console.log("ending loop");
+		}
 	});
 }
 
@@ -10990,7 +10996,7 @@ async function getInitiative(trackerName="") {
 	let selectAttrs = {}
 	let rollBase = `! {{trackerInitiative=[[0[@{tracker|${trackerName}}]]]}}`;
 	let selectRoll = await startRoll(rollBase);
-	let trackerInitiative =  selectRoll.results.trackerInitiative.expression.match(/^0\[(.*)\]\s*$/)[1]
+	let trackerInitiative = selectRoll.results.trackerInitiative.expression.match(/^0\[(.*)\]\s*$/)[1];
 	finishRoll(selectRoll.rollId);
 	return trackerInitiative;
 }
@@ -11244,15 +11250,20 @@ barList.forEach(bar => {
 barList.forEach(bar => {
 	on(`change:${bar} change:repeating_tokens:${bar}`, (info) => {
 		if (info.newValue != undefined) {
-			getAttrs(["tokenId_selected", "settingGenericTokenMode"], function(values) {
+			getAttrs(["tokenId_selected", "settingGenericTokenMode", "targetedBy"], function(values) {
 				if (values.settingGenericTokenMode == "true") {
 					let selectedId = values.tokenId_selected;
 					if (selectedId != "") {
 						if (barList.includes(info.sourceAttribute)) {
-							setAttrs({[`repeating_tokens_${selectedId}_${bar}`]:info.newValue})
-						}
-						else if (info.sourceAttribute.includes(selectedId.toLowerCase())) {
-							setAttrs({[`${bar}`]:info.newValue})
+							setAttrs({[`repeating_tokens_${selectedId}_${bar}`]:info.newValue});
+						} else {
+							if (info.sourceAttribute.includes(selectedId.toLowerCase())) {
+								setAttrs({[`${bar}`]:info.newValue});
+							}
+
+							/* Announce instance bar change */
+							let tokenId = info.sourceAttribute.match(/(-[\w\d_]{19})/)[0];
+							announceBarChange(Data.unpackage(values.targetedBy), tokenId, `${bar}_target`, info.newValue);
 						}
 					}
 				}
@@ -11323,8 +11334,9 @@ for (let i = 0; i <= 4; i++) {
 		if (info.newValue != undefined) {
 			let tokenPrefix = info.sourceAttribute.match((/(repeating_tokens_[^_]+)/g))[0];
 			let tokenIndex = info.sourceAttribute.match((/([\d])num/g))[0].replace("num","");
-			getAttrs(["tokenId_selected", "settingGenericTokenMode", `${tokenPrefix}_tokenAilmentList`,
-				`${tokenPrefix}_tokenAilment${tokenIndex}Name`, `${tokenPrefix}_tokenAilment${tokenIndex}Num`], function(values) {
+			let tokenId = info.sourceAttribute.match(/(-[\w\d_]{19})/)[0];
+			getAttrs(["tokenId_selected", "settingGenericTokenMode", "settingLimbusStyle", `${tokenPrefix}_tokenAilmentList`,
+				`${tokenPrefix}_tokenAilment${tokenIndex}Name`, `${tokenPrefix}_tokenAilment${tokenIndex}Num`, "targetedBy"], function(values) {
 				
 				if (values.settingGenericTokenMode == "true") {
 
@@ -11347,6 +11359,9 @@ for (let i = 0; i <= 4; i++) {
 						}
 					}
 					setAttrs(output);
+
+					/* Announce instance ailment change */
+					announceAilmentChange(Data.unpackage(values.targetedBy), tokenId, ailmentList, values.settingLimbusStyle);
 				}
 			});
 		}
@@ -11401,9 +11416,11 @@ on('change:settingGenericTokenMode', (info) => {
 });
 
 on('change:settingHideCombatOptions', (info) => {
-	if (info.newValue == "true") {
-		setAttrs({...resetTarget("true"), "lastDefenceRoll": 0});
-	}
+	getAttrs(["character_id", "targetId"], function(values) {
+		if (info.newValue == "true") {
+			setAttrs({...resetTarget(values.character_id, values.targetId, "true"), "lastDefenceRoll": 0});
+		}
+	});
 });
 
 /* Sync: Action number */
@@ -11502,55 +11519,190 @@ async function changeActiveToken(tokenId, callback=()=>{}) {
 
 
 /* --- Select target functionality --- */
-on('clicked:selectTarget', (info) => {
-	getAttrs(["settingHideCombatOptions", "character_name", "settingLimbusStyle"], function(selfValues) {
-		getTargetAttrs("target", ["character_name", "selfToken", "token_name", "token_id", "settingGenericTokenMode", "settingHideBarUpdate", "settingHideDetailsFromTargeting"], function(targetValues) {
+async function getTargetAttrs(attrList, callback=()=>{}) {
 	
+	let rollBase = "! ";
+	attrList.forEach(attribute => {
+		rollBase += `{{${attribute}=[[0[@{target|${attribute}}]]]}}`;
+	});
+	
+	let targetRoll = await startRoll(rollBase);
+	
+	let values = {}
+	attrList.forEach(attribute => {
+		values[attribute] = targetRoll.results[attribute].expression.match(/^0\[(.*)\]\s*$/)[1];
+	});
+	finishRoll(targetRoll.rollId);
+
+	callback(values);
+}
+
+on('clicked:selectTarget', (info) => {
+	getAttrs(["settingHideCombatOptions", "character_id", "character_name", "settingLimbusStyle", "targetId"], function(selfValues) {
+		getTargetAttrs(["character_id", "character_name", "selfToken", "token_name", "token_id",
+			"settingGenericTokenMode", "settingHideBarUpdate", "settingHideDetailsFromTargeting", "settingLimbusStyle"], async function(targetValues) {
+
 			let targetSettings = {
 				"genericTokenMode": targetValues.settingGenericTokenMode,
 				"hideBarUpdate": targetValues.settingHideBarUpdate,
-				"hideDetailsFromTargeting": targetValues.settingHideDetailsFromTargeting
+				"hideDetailsFromTargeting": targetValues.settingHideDetailsFromTargeting,
+				"settingLimbusStyle": targetValues.settingLimbusStyle
 			}
 			let output = {
+				"targetId": targetValues.character_id,
 				"targetName": targetValues.character_name,
 				"targetToken": targetValues.selfToken,
-				"targetTokenName": targetValues.token_name,
 				"targetTokenId": targetValues.token_id.replaceAll("_","Ø"),
+				"targetTokenName": targetValues.token_name,
 				"targetSettings": Data.package(targetSettings)
 			}
+			console.log(output)
 
-			if (output.targetName.includes("@{target|")) {
-				resetTarget();
+			if (output.targetId.includes("@{target|")) {
+				resetTarget(selfValues.character_id, selfValues.targetId);
 			} else {
-				isValidTarget(selfValues.character_name, output.targetName, output.targetTokenId, targetSettings, (result) => {
-					if (result == "true") {
-						updateTargetAilmentList(selfValues.settingHideCombatOptions, output.targetName, output.targetTokenId, targetSettings, selfValues.settingLimbusStyle, (returnListAilment) => {
-						updateTargetBarLists(selfValues.settingHideCombatOptions, output.targetName, output.targetTokenId, targetSettings, (returnListBars) => {
-						setAttrs({...output, ...returnListAilment, ...returnListBars});
-						});});
-					} else {
-						setAttrs({...output, ...resetTarget("true")});
-					}
-				});
+				if (isValidTarget(selfValues.character_name, output.targetId, output.targetTokenId, targetSettings)) {
+					updateTargetAttrLists(selfValues.settingHideCombatOptions, output.targetId, output.targetTokenId, targetSettings, selfValues.settingLimbusStyle, (targetAttrs) => {
+						setAttrsById(output.targetId, {"announceTargeting": Data.package({"add": {[`${selfValues.character_id}`]: output.targetTokenId}})});
+						setActiveCharacterId(selfValues.character_id);
+						setAttrs({...output, ...targetAttrs});
+					});
+				} else {
+					resetTarget(selfValues.character_id, selfValues.targetId);
+				}
 			}
 		});
 	}); 
 });
 
-function resetTarget(returnMode="false") {
+/* Field used by other characters to announce they are targeting the character */
+on("change:announceTargeting", function(info) {
+	getAttrs(["targetedBy"], function(values) {
+		let input = Data.unpackage(info.newValue);
+		let targetedBy = Data.unpackage(values.targetedBy);
+		console.log(input)
+
+		if (input.add != undefined) {
+			targetedBy = {...targetedBy, ...input.add}
+			console.log("Targeting - adding: "); console.log(input.add);
+		}
+		else if (input.remove != undefined) {
+			delete targetedBy[input.remove];
+			console.log("Targeting - removing: "); console.log(input.remove);
+		}
+		console.log(targetedBy);
+		setAttrs({"targetedBy": Data.package(targetedBy)});
+	});
+});
+
+/* Checks if a token is an invalid target. Currently happens if genericTokenMode is enabled but the token has not been added as an instance  */
+async function isValidTarget(characterName, targetId, targetTokenId, targetSettings) {
+	if (targetSettings.genericTokenMode == "true") {
+		let values = await getAttrsById(targetId, [`repeating_tokens_${targetTokenId}_tokenId`]);
+		
+		if (targetTokenId != values[`repeating_tokens_${targetTokenId}_tokenId`]) {
+			
+			let alertIcon = "<img src='https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Aggro.png' style='width: 25px; height: 25px;' >"
+			let alertMessage = getTranslationByKeyCustom("Invalid Target: Token is not a token instance", "message-invalid-target");
+			setAttrs({"dummy":alertMessage, "dummyIcon":alertIcon});
+			startRoll(("/w " + characterName + "&{template:errorMessage} {{icon=@{dummyIcon}}} {{message=@{dummy} }}"), (results) => {
+				finishRoll(results.rollId, {} );
+			});
+
+			return false;
+		} else {
+			return true;
+		}
+	} else {
+		return true;
+	}
+}
+
+async function updateTargetAttrLists(settingHideCombatOptions, targetId, targetTokenId, targetSettings, settingLimbusStyle, callback=()=>{}) {
+	if (settingHideCombatOptions == "0" && targetId != "") {
+		
+		let output = {}
+
+		/* Get target attributes  */
+		let targetPrefix = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${targetTokenId}_` : "";
+		let targetBarAttrs = barList.reduce((rows,bar) => [...rows, `${targetPrefix}${bar}`, `${targetPrefix}${bar}_max`], '');
+		let targetAilmentListName = (targetSettings.genericTokenMode == "true") ? `${targetPrefix}tokenAilmentList` : "ailmentList";
+		let values = await getAttrsById(targetId, [...targetBarAttrs, targetAilmentListName]);
+
+		/* Update target bar lists */
+		let targetBarList = {}
+		let targetBarDamageList = {}
+		barList.forEach(bar => {
+			let barName = "";
+			switch (bar) {
+				case "hp": barName = "HP"; break;
+				case "stagres": barName = "ST"; break;
+				case "sp": barName = "SP"; break;
+				case "light": barName = "Light"; break;
+			}
+			targetBarList[`${barName}`] = parseInt(values[`${targetPrefix}${bar}`]);
+			targetBarDamageList[`-${barName}`] = parseInt(values[`${targetPrefix}${bar}_max`]) - targetBarList[`${barName}`];
+		});
+
+		if (targetSettings.hideDetailsFromTargeting == "true") {
+			output = unknownTarget();
+		} else if (targetSettings.hideBarUpdate == "true") {
+			output = {"HP_target":"???", "StagRes_target":"???", "SP_target":"???"}
+		} else {
+			output = {"HP_target":targetBarList.HP, "StagRes_target":targetBarList.ST, "SP_target":targetBarList.SP}
+		}
+
+		/* Update target ailment list */
+		let targetAilmentList = values[targetAilmentListName];
+		if (targetAilmentList != "") {
+			output = {...output, ...updateAilmentDisplay("target", 6, Data.unpackage(targetAilmentList), settingLimbusStyle, "true")}
+		}
+
+		if (callback != "()=>{}") {
+			callback({...output, "targetBarList":targetBarList, "targetBarDamageList":targetBarDamageList, "targetAilmentList":targetAilmentList});
+		} else {
+			setAttrs(output);
+		}
+	} else {
+		callback({});
+	}
+}
+
+function announceAilmentChange(targetedBy, tokenId, ailmentList, settingLimbusStyle) {
+	let output = updateAilmentDisplay("target", 6, ailmentList, settingLimbusStyle, "true");
+	for (const [targeterId, targetedTokenId] of Object.entries(targetedBy)) {
+		if (tokenId == 0 || tokenId == targetedTokenId.toLowerCase()) {
+			setAttrsById(targeterId, output);
+		}
+	}
+}
+function announceBarChange(targetedBy, tokenId, barName, barVal) {
+	console.log(barName + ": " + barVal)
+	for (const [targeterId, targetedTokenId] of Object.entries(targetedBy)) {
+		console.log(tokenId)
+		console.log(targetedTokenId.toLowerCase())
+		
+		if (tokenId == 0 || tokenId == targetedTokenId.toLowerCase()) {
+			setAttrsById(targeterId, {[`${barName}`]: barVal});
+		}
+	}
+}
+
+function resetTarget(character_id, targetId, returnMode="false") {
+	setAttrsById(targetId, {"announceTargeting": Data.package({"remove": character_id})});
+	setActiveCharacterId(character_id);
+	
 	let output = {
 		...resetAilmentDisplay("target", 6, "true"),
+		"targetId": "",
 		"targetName": "",
 		"targetToken": "",
-		"targetTokenName": "",
 		"targetTokenId": "",
+		"targetTokenName": "",
 		"targetSettings": "{}",
 		"HP_target":"---",
 		"StagRes_target":"---",
-		"SP_target":"---",
-		"targetAilmentList":"{}",
-		"targetBarList":"{}",
-		"targetBarDamageList":"{}"
+		"SP_target":"---"
 	}
 
 	if (returnMode == "true") {
@@ -11573,122 +11725,6 @@ function unknownTarget(returnMode="false") {
 	} else {
 		setAttrs(output);
 	}
-}
-
-/* Checks if a token is an invalid target. Currently happens if genericTokenMode is enabled but the token has not been added as an instance  */
-function isValidTarget(characterName, targetName, targetTokenId, targetSettings, callback=()=>{}) {
-	if (targetSettings.genericTokenMode == "true") {
-		getTargetAttrs(targetName, [`repeating_tokens_${targetTokenId}_tokenId`], function(values) {
-			if (targetTokenId != values[`repeating_tokens_${targetTokenId}_tokenId`]) {
-				
-				let alertIcon = "<img src='https://raw.githubusercontent.com/beautidemise/roll20-character-sheets/master/ProjectMoonTRPG/images/ailments/limbus/Aggro.png' style='width: 25px; height: 25px;' >"
-				let alertMessage = getTranslationByKeyCustom("Invalid Target: Token is not a token instance", "message-invalid-target");
-				setAttrs({"dummy":alertMessage, "dummyIcon":alertIcon});
-				startRoll(("/w " + characterName + "&{template:errorMessage} {{icon=@{dummyIcon}}} {{message=@{dummy} }}"), (results) => {
-					finishRoll(results.rollId, {} );
-				});
-
-				callback("false");
-			} else {
-				callback("true");
-			}
-		});
-	} else {
-		callback("true");
-	}
-}
-
-
-function updateTargetAilmentList(hideCombatOptions, targetName="", targetTokenId, targetSettings, settingLimbusStyle, callback=()=>{}) {
-	if (hideCombatOptions == "0" && targetName != "") {
-
-		let targetAilmentListName = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${targetTokenId}_tokenAilmentList` : "ailmentList";
-		getTargetAttrs(targetName, [targetAilmentListName], function(values) {
-
-			let targetAilmentList = values[targetAilmentListName];
-			if (targetAilmentList != "") {
-
-				let output = {
-					...updateAilmentDisplay("target", 6, Data.unpackage(targetAilmentList), settingLimbusStyle, "true"),
-					"targetAilmentList": targetAilmentList
-				}
-
-				if (callback != "()=>{}") {
-					callback(output);
-				} else {
-					setAttrs(output);
-				}
-
-			} else {
-				callback()
-			}
-		});
-	} else {
-		callback();
-	}
-}
-function updateTargetBarLists(settingHideCombatOptions, targetName, targetTokenId, targetSettings, callback=()=>{}) {
-	if (settingHideCombatOptions == "0" && targetName != "") {
-
-		let targetBarAttrs = [];
-		let targetPrefix = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${targetTokenId}_` : "";
-		barList.forEach(bar => {
-			targetBarAttrs.push(`${targetPrefix}${bar}`, `${targetPrefix}${bar}_max`);
-		});
-		getTargetAttrs(targetName, targetBarAttrs, function(values) {
-
-			let output = {}
-			let targetBarList = {}
-			let targetBarDamageList = {}
-			barList.forEach(bar => {
-				let barName = "";
-				switch (bar) {
-					case "hp": barName = "HP"; break;
-					case "stagres": barName = "ST"; break;
-					case "sp": barName = "SP"; break;
-					case "light": barName = "Light"; break;
-				}
-				targetBarList[`${barName}`] = parseInt(values[`${targetPrefix}${bar}`]); 
-				targetBarDamageList[`-${barName}`] = parseInt(values[`${targetPrefix}${bar}_max`]) - targetBarList[`${barName}`];
-			});
-
-			if (targetSettings.hideDetailsFromTargeting == "true") {
-				output = unknownTarget();
-			} else if (targetSettings.hideBarUpdate == "true") {
-				output = {"HP_target":"???", "StagRes_target":"???", "SP_target":"???"}
-			} else {
-				output = {"HP_target":targetBarList.HP, "StagRes_target":targetBarList.ST, "SP_target":targetBarList.SP}
-			}
-			output = {...output, "targetBarList": Data.package(targetBarList), "targetBarDamageList": Data.package(targetBarDamageList)}
-
-			if (callback != "()=>{}") {
-				callback(output);
-			} else {
-				setAttrs(output);
-			}
-		});
-	}
-	else {
-		callback();
-	}
-}
-
-async function getTargetAttrs(target, attrList, callback=()=>{}) {
-	
-	let rollBase = "! ";
-	attrList.forEach(attribute => {
-		rollBase += `{{${attribute}=[[0[@{${target}|${attribute}}]]]}}`;
-	});
-	
-	let targetRoll = await startRoll(rollBase);
-	
-	let targetAttrs = {}
-	attrList.forEach(attribute => {
-		targetAttrs[attribute] = targetRoll.results[attribute].expression.match(/^0\[(.*)\]\s*$/)[1];
-	});
-	finishRoll(targetRoll.rollId);
-
-	callback(targetAttrs);
 }
 /* --- Select target functionality end --- */
 
@@ -12301,17 +12337,22 @@ on("change:StagRes", function() {
 	getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["StagRes", "StaggerState", `${id}_staggerDurationMax`], function(values) {
+	getAttrs(["StagRes", "StaggerState", `${id}_staggerDurationMax`, "settingGenericTokenMode"], function(values) {
 	let currentstag = parseInt(values.StagRes);
 	let currentstate = values.StaggerState;
 	let statedurationmax = parseInt(values[`${id}_staggerDurationMax`]);
 
-		if(currentstag <= 0 && currentstate == "0"){
+	if(currentstag <= 0 && currentstate == "0"){
 
 		setAttrs({"StaggerState":"Staggered"});
 		setAttrs({"StaggerDuration":statedurationmax});
 
-		} /* Value check end */
+	} /* Value check end */
+
+	/* Announce update */
+	if (values.settingGenericTokenMode != "true") {
+		announceBarChange(Data.unpackage(values.targetedBy), 0, "StagRes_target", currentstag);
+	}
 
 	});
 	});
@@ -12397,7 +12438,7 @@ on("change:distortCounter", function() {
 
 /* Auto: Detect Panic */
 on("change:SP", function() {
-	getAttrs(["settingAutoDetect", "settingMuteMessage", "PanicState", "SP"], function(values) {
+	getAttrs(["settingAutoDetect", "settingMuteMessage", "settingGenericTokenMode", "PanicState", "SP", "targetedBy"], function(values) {
 	let detect = values.settingAutoDetect;
 	let mutemessage = values.settingMuteMessage;
 	let panicstate = values.PanicState;
@@ -12418,13 +12459,19 @@ on("change:SP", function() {
 
 	} /* AutoDetect check end */
 
+	/* Announce update */
+	if (values.settingGenericTokenMode != "true") {
+		announceBarChange(Data.unpackage(values.targetedBy), 0, "SP_target", currentsan);
+	}
+
 	});
 });
 
 /* Auto: HP related updates (Detect Defeat, Detect EGO activation) */
 on("change:HP", function() {
 
-	getAttrs(["settingAutoDetect", "settingMuteMessage", "DefeatState", "egoActiveState", "HP", "HP_max", "egoCondition"], function(values) {
+	getAttrs(["settingAutoDetect", "settingMuteMessage", "settingGenericTokenMode",
+	"DefeatState", "egoActiveState", "HP", "HP_max", "egoCondition", "targetedBy"], function(values) {
 	let detect = values.settingAutoDetect;
 	let mutemessage = values.settingMuteMessage;
 	let defeatstate = values.DefeatState;
@@ -12444,10 +12491,14 @@ on("change:HP", function() {
 
 		setAttrs({"DefeatState":"Defeated"});
 
-		} /* Defeat check end */
+	} /* Defeat check end */
+
+	/* Announce update */
+	if (values.settingGenericTokenMode != "true") {
+		announceBarChange(Data.unpackage(values.targetedBy), 0, "HP_target", currenthp);
+	}
 
 	});
-
 });
 
 /* Auto: EGO - Clear skill select */
@@ -12939,11 +12990,17 @@ ailments.forEach(ailment => {
 	ailmentAttributes += ` change:${ailment} change:${ailment}NextTurn change:${ailment}DecayPause`;
 });
 on(ailmentAttributes, function() {
-	exportAilmentList({}, function(ailmentList) {
-		setAttrs({ailmentList: Data.package(ailmentList)});
+	getAttrs(["targetedBy", "settingLimbusStyle", "settingGenericTokenMode"], function(values) {
+		exportAilmentList({}, function(ailmentList) {
+			setAttrs({ailmentList: Data.package(ailmentList)});
+			
+			/* Announce update */
+			if (values.settingGenericTokenMode != "true") {
+				announceAilmentChange(Data.unpackage(values.targetedBy), 0, ailmentList, values.settingLimbusStyle);
+			}
+		});
 	});
 });
-
 
 /* Action: Reset Ailments */
 on('clicked:resetAilments', function() {
@@ -17016,7 +17073,7 @@ Block and Evade also include Defensive */
 /* sendMessage: If true, the function print a standard chat message */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
-function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
+async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
 	
 	/* If using generic token mode, switches to the correct token before applying incoming AutoEffects */
 	let tokenId = (overrideList.tokenId != undefined) ? overrideList.tokenId : "";
@@ -17032,7 +17089,7 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", "settingHideCombatOptions", //"settingTargetMode",
 	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "THP_Sources", "TST_Sources",
 	"thisRoundSpeed", "nextRoundSpeed", "StaggerState", "distortState", "egoActiveState", "egoType",
-	"targetAilmentList", "targetBarList", "targetBarDamageList", "targetName", "targetTokenId", "targetSettings"], function(values) {
+	"targetId", "targetName", "targetTokenId", "targetSettings"], async function(values) {
 		
 	let settingMuteMessage = values.settingMuteMessage;
 	let settingWhisperRolls = values.settingWhisperRolls;
@@ -17043,11 +17100,10 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	let settingConditionalButtonReminder = values.settingHideConditionalButtonReminder;
 	let settingHideCombatOptions = values.settingHideCombatOptions;
 
+	let targetId = values.targetId;
 	let targetName = values.targetName;
 	let targetTokenId = values.targetTokenId;
 	let targetSettings = Data.unpackage(values.targetSettings);
-	//let targetmode = values.settingTargetMode;
-	//if (overrideList.targetmode != undefined) { targetmode = overrideList.targetmode; }
 
 	let HP = values.HP;
 	let ST = values.StagRes;
@@ -17059,10 +17115,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	let SPdamage = values.SP_max - SP;
 	let LightExpended = values.Light_max - Light;
 	let barDamageList = { "-HP": HPdamage, "-ST":STdamage, "-SP":SPdamage, "-Light":LightExpended }
-
-	let targetAilmentList = (values.targetAilmentList != undefined && values.targetAilmentList != "") ? Data.unpackage(values.targetAilmentList) : {};
-	let targetBarList = (values.targetBarList != undefined && values.targetBarList != "") ? Data.unpackage(values.targetBarList) : {};
-	let targetBarDamageList = (values.targetBarDamageList != undefined  && values.targetBarDamageList != "") ? Data.unpackage(values.targetBarDamageList) : {};
 
 	let THP_Sources = (values.THP_Sources != "" && values.THP_Sources != "{}") ? JSON.parse(values.THP_Sources) : "";
 	if (THP_Sources.AutoEffects != undefined) { barList.THP = THP_Sources.AutoEffects[0]; }
@@ -17099,26 +17151,23 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 	let messageValues = {};
 		
 	/* Get all ailments */
-	exportAilmentList(overrideList, function(ailmentList) { 
+	exportAilmentList(overrideList, (ailmentList) => {
 
-	/* If targeting is in use, update target ailments and bars */
-	updateTargetAilmentList(settingHideCombatOptions, targetName, targetTokenId, targetSettings, settingLimbusStyle, (returnListAilment) => {
-	if (returnListAilment != undefined) {
-		targetAilmentList = Data.unpackage(returnListAilment.targetAilmentList);
-		output = {...output, ...returnListAilment}
-	}
-	updateTargetBarLists(settingHideCombatOptions, targetName, targetTokenId, targetSettings, (returnListBars) => {
-	if (returnListBars != undefined) {
-		targetBarList = Data.unpackage(returnListBars.targetBarList);
-		targetBarDamageList = Data.unpackage(returnListBars.targetBarDamageList);
-		output = {...output, ...returnListBars}
+	/* If targeting is in use, get target ailments and bars */
+	let targetAilmentList = {};
+	let targetBarList = {};
+	let targetBarDamageList = {};
+	
+	updateTargetAttrLists(settingHideCombatOptions, targetId, targetTokenId, targetSettings, settingLimbusStyle, (targetLists) => {
+	if (targetLists.targetAilmentList != undefined) {
+		targetAilmentList = Data.unpackage(targetLists.targetAilmentList);
+		targetBarList = targetLists.targetBarList;
+		targetBarDamageList = targetLists.targetBarDamageList;
+		output = {...output, targetLists}
 	}
 	
 	/* Adds the input AutoScript */
-	let AutoScript = "";
-	if (inputAutoScript != "") {
-		AutoScript = inputAutoScript;
-	}
+	let AutoScript = inputAutoScript;
 	
 	/* Appends one or more AutoScripts based on the trigger type */
 	let autoScriptTriggers = [];
@@ -17569,7 +17618,6 @@ function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sen
 
 	setAttrs(output);
 	callback(returnValues);
-	});
 	});
 	});
 	});
@@ -19828,7 +19876,7 @@ getSectionIDs("repeating_global", function(idarray) {
 	langUpdate = getTranslationByKey("pop-update");
 	langGameSettings = getTranslationByKey("editor-gamesettings");
 	langCustomAilments = getTranslationByKey("editor-customailments");
-	langGeneralSettings = getTranslationByKey("editor-generalsettings")
+	langGeneralSettings = getTranslationByKey("editor-generalsettings");
 	langSyncSuccess = getTranslationByKey("pop-update-success");
 	langSyncFail = getTranslationByKey("pop-update-fail");
 	}
