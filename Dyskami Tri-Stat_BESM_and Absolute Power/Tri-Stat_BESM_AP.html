@@ -599,7 +599,7 @@
                         <span class="material-icons">auto_stories</span>
                     </button>
                     <button name="act_static_attributes_edit_button" class="styling-section-button button-click-animation theme-button" type="action">
-                        <span class="material-icons">edit</span>
+                        <span class="material-icons">add</span>
                     </button>
                     <button name="act_static_attributes_accordions_button" class="styling-section-button button-click-animation theme-button" type="action">
                         <span class="material-icons expand">expand_less</span>
@@ -2734,6 +2734,25 @@
             type:'minor'
         },
     ];
+    const new_group_template = {
+        attribute_ids: [],
+        configuration: [],
+        defect_ids: [],
+        elevel: 0,
+        enhancements: [],
+        group_id: 0,
+        item: 'no',
+        level: 0,
+        limiters: [],
+        name: 'Default Group',
+        poolname: '',
+        poolpoints: 0,
+        removed: false,
+        source: 'high-technology',
+        stat: 'none',
+        totalpoints: 0,
+        type: 'standard',
+    };
 
     /* Custom Prototypes */
     String.prototype.toSnakeCase = function() {
@@ -8281,6 +8300,7 @@
             break;
             case 'static':
                 switch (cache.source_id) {
+                    case 'edit':
                     case 'group':
                         query.next = cache.source;
                     break;
@@ -8359,6 +8379,7 @@
                     query.last = query.next;
                 break;
                 case 'add_attribute':
+                case 'static_attributes_edit_button':
                     query.name = '';
                     query.config = [];
                     query.enhancements = [];
@@ -8381,7 +8402,7 @@
                     query.attributes.sort();
                     query.attribute_translations = query.attributes.toKebobCase();
                     query.options = '';
-                    for (let i = 0, n = query.attribute_translations.length; i < n; i++) {
+                    for (let i = 0; i < query.attribute_translations.length; i++) {
                         query.options += `|${getTranslationByKey(query.attribute_translations[i])},${query.attributes[i]}`;
                     }
                     query.last = query.next;
@@ -8770,15 +8791,21 @@
                 break;
                 case 'set_group_item':
                 case 'static_attribute_group_item':
-                    query.title = 'Is this group an item or shield?';
-                    query.options = 
-                        `|${getTranslationByKey("no")},no` +
-                        //`|${getTranslationByKey("gear")},gear` +
-                        `|${getTranslationByKey("yes")},yes` +
-                        //`|${getTranslationByKey("mini-object")},mini object` +
-                        `|${getTranslationByKey("shield")},shield`;
-                        //`|${getTranslationByKey("go-back")},group_menu`;
-                    query.last = query.next;
+                    if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
+                        clog(cache, 'Cannot change item type when Attribute is Gear.', 'ERROR');
+                        query.next = 'exit';
+                        query.title = '';
+                        query.commit = true;
+                    } else {
+                        query.title = 'Is this group an item or shield?';
+                        query.options = 
+                            `|${getTranslationByKey("no")},no` +
+                            `|${getTranslationByKey("yes")},yes` +
+                            `|${getTranslationByKey("shield")},shield`;
+                            //`|${getTranslationByKey("gear")},gear` +
+                            //`|${getTranslationByKey("exit")},exit`;
+                        query.last = query.next;
+                    }
                 break;
                 case 'lock_group':
                     query.title = 'Lock Group';
@@ -9251,10 +9278,11 @@
                         query.next = query.selection === '' ? 'choose_enemy' : 'defect_menu';
                     break;
                     case 'add_attribute':
+                    case 'static_attributes_edit_button':
                         query.attribute = query.selection;
                         query.attribute_translation = query.attribute.toKebobCase();
                         query.stat = all_attributes_stats[query.attribute] || 'none';
-                        query.next = query.selection === 'skill group' ? 'set_skill' : 'attribute_menu';
+                        query.next = query.selection === 'skill group' ? 'set_skill' : 'write_newattr';//'attribute_menu';
                     break;
                     case 'add_group':
                         query.group_id = cache.groupdb.length;
@@ -10009,7 +10037,7 @@
                                 value = `${query.level} (${query.elevel})`;
                             break;
                             case 'name':
-                                value = `${query[fields[i]].capitalize()}${query.attribute === 'skill group' ?
+                                value = `${getTranslationByKey('new-attribute')}${query.attribute === 'skill group' ?//`${query[fields[i]].capitalize()}${query.attribute === 'skill group' ?
                                     ' (' + query.attribute.capitalize() + ')' : ''}`;
                             break;
                             case 'points':
@@ -10032,15 +10060,11 @@
                     attrdb_entry.visibility = 1;
                     cache.attrdb[query.attribute].push(attrdb_entry);
                     cache.groupdb[cache.static_group_visible_id].attribute_ids.push(row_id);
-                    //cache.groupdb[attrdb_entry.group_id].points += 
-                    //    cache.groupdb[attrdb_entry.group_id].group_type === 'power flux' ? 0 : attrdb_entry.points;
                     if (cache.groupdb[attrdb_entry.group_id].group_type === 'power flux') {
                         setPowerFluxPoolPoints(cache, set_values);
                     } else if (cache.groupdb[attrdb_entry.group_id].group_type === 'power variation') {
                         setPowerVariationGroupPoints(cache, set_values);
                         setPowerVariationPoolPoints(cache, set_values);
-                        //cache.groupdb[cache.static_group_visible_id].group_points += attrdb_entry.points;
-                        //set_values.static_attribute_group_totalpoints += attrdb_entry.points;
                     } else if (cache.groupdb[attrdb_entry.group_id].group_type === 'dynamic powers') {
                         setDynamicPowersPoolLevels(cache, set_values);
                     } else {
@@ -11505,10 +11529,12 @@
             const defectdb = createDatabase(cache, all_defects);
             set_values.defectdb = JSON.stringify(defectdb);
             // Groups database
-            const groupdb = [
+            const groupdb = [...groupdb, new_group_template];
+            /*
+            [
                 {
                     attribute_ids: [],
-                    configuration: '',
+                    configuration: [],
                     defect_ids: [],
                     elevel: 0,
                     enhancements: [],
@@ -11526,6 +11552,7 @@
                     type: 'standard',
                 },
             ];
+            */
             const journaldb = [
                 {
                     entries: [],
