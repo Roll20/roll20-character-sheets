@@ -3025,7 +3025,8 @@
 			<input type="text" name="attr_targetSettings" value="{}" hidden="true">
 
 			<input type="text" name="attr_targetedBy" value="{}" hidden="true">
-			<input type="text" name="attr_announceTargeting" value="" hidden="true">
+			<!-- <input type="text" name="attr_announceTargeting" value="" hidden="true">
+			<input type="text" name="attr_testIsGM" value="unset" hidden="true"> -->
 			
 			<!-- Target bars -->
 			<div class="rowContainer" style="width: 150px;">
@@ -10921,7 +10922,9 @@ function setAttrsById(actId, propObj, options={}) {
     var prevActId = getActiveCharacterId();
     return new Promise((resolve,reject)=>{
             setActiveCharacterId(actId);
-            try{ setAttrs(propObj,options,(values)=>{ resolve(values); }); }
+            try{ setAttrs(propObj,options,(values)=>{
+					setActiveCharacterId(prevActId);
+					resolve(values); }); }
             catch{ reject(); }
     }).finally(()=>{
         setActiveCharacterId(prevActId);
@@ -10962,7 +10965,7 @@ on('change:loopEnabled', (info) => {
 });
 function stepLoop(charId) {
 	setActiveCharacterId(charId);
-	getAttrs(["loopEnabled", "prevRoundInitAttempts", "settingHideCombatOptions", "targetId", "targetTokenId", "targetSettings", "settingLimbusStyle"], async function(values) {
+	getAttrs(["loopEnabled", "prevRoundInitAttempts", "settingHideCombatOptions", "character_id", "targetId", "targetTokenId", "targetSettings", "settingLimbusStyle"], async function(values) {
 		//console.log(values.prevRoundInitAttempts)
 		if (values.loopEnabled == "true" && parseInt(values.prevRoundInitAttempts) < 6) {
 			let output = {}
@@ -10976,14 +10979,14 @@ function stepLoop(charId) {
 			}
 
 			/* Sync: Target Ailment/Bar lists */
-			/*let targetSettings = Data.unpackage(values.targetSettings);
-			updateTargetAttrLists(values.settingHideCombatOptions, values.targetId, values.targetTokenId, targetSettings, values.settingLimbusStyle, (targetAttrs) => {
-				if (values.targetId != "") {
+			let targetSettings = Data.unpackage(values.targetSettings);
+			updateTargetAttrLists(values.settingHideCombatOptions, values.character_id, values.targetId, values.targetTokenId, targetSettings, values.settingLimbusStyle, (targetAttrs) => {
+				if (values.targetId != "" && values.targetId != undefined) {
 					setAttrs({...output, ...targetAttrs});
 				} else {
 					setAttrs(output);
 				}
-			});*/
+			});
 			
 			setTimeout(stepLoop.bind(this, charId), loopDelay);
 		} else {
@@ -11250,7 +11253,7 @@ barList.forEach(bar => {
 barList.forEach(bar => {
 	on(`change:${bar} change:repeating_tokens:${bar}`, (info) => {
 		if (info.newValue != undefined) {
-			getAttrs(["tokenId_selected", "settingGenericTokenMode", "targetedBy"], function(values) {
+			getAttrs(["tokenId_selected", "settingGenericTokenMode", "character_id", "targetedBy"], function(values) {
 				if (values.settingGenericTokenMode == "true") {
 					let selectedId = values.tokenId_selected;
 					if (selectedId != "") {
@@ -11262,8 +11265,8 @@ barList.forEach(bar => {
 							}
 
 							/* Announce instance bar change */
-							let tokenId = info.sourceAttribute.match(/(-[\w\d_]{19})/)[0];
-							announceBarChange(Data.unpackage(values.targetedBy), tokenId, `${bar}_target`, info.newValue);
+							//let tokenId = info.sourceAttribute.match(/(-[\w\dø]{19})/)[0];
+							//announceBarChange(Data.unpackage(values.targetedBy), values.character_id, tokenId, `${bar}_target`, info.newValue);
 						}
 					}
 				}
@@ -11332,11 +11335,12 @@ on(`change:ailmentList`, (info) => {
 for (let i = 0; i <= 4; i++) {
 	on(`change:repeating_tokens:tokenAilment${i}Num`, (info) => {
 		if (info.newValue != undefined) {
-			let tokenPrefix = info.sourceAttribute.match((/(repeating_tokens_[^_]+)/g))[0];
-			let tokenIndex = info.sourceAttribute.match((/([\d])num/g))[0].replace("num","");
-			let tokenId = info.sourceAttribute.match(/(-[\w\d_]{19})/)[0];
+			let tokenPrefix = info.sourceAttribute.match(/(repeating_tokens_[^_]+)/g)[0];
+			let tokenIndex = info.sourceAttribute.match(/([\d])num/g)[0].replace("num","");
+			//let tokenId = info.sourceAttribute.match(/(-[\w\dø]{19})/g)[0];
+
 			getAttrs(["tokenId_selected", "settingGenericTokenMode", "settingLimbusStyle", `${tokenPrefix}_tokenAilmentList`,
-				`${tokenPrefix}_tokenAilment${tokenIndex}Name`, `${tokenPrefix}_tokenAilment${tokenIndex}Num`, "targetedBy"], function(values) {
+				`${tokenPrefix}_tokenAilment${tokenIndex}Name`, `${tokenPrefix}_tokenAilment${tokenIndex}Num`, "character_id", "targetedBy"], function(values) {
 				
 				if (values.settingGenericTokenMode == "true") {
 
@@ -11361,7 +11365,7 @@ for (let i = 0; i <= 4; i++) {
 					setAttrs(output);
 
 					/* Announce instance ailment change */
-					announceAilmentChange(Data.unpackage(values.targetedBy), tokenId, ailmentList, values.settingLimbusStyle);
+					//announceAilmentChange(Data.unpackage(values.targetedBy), values.character_id, tokenId, ailmentList, values.settingLimbusStyle);
 				}
 			});
 		}
@@ -11556,49 +11560,102 @@ on('clicked:selectTarget', (info) => {
 				"targetTokenName": targetValues.token_name,
 				"targetSettings": Data.package(targetSettings)
 			}
-			console.log(output)
 
-			if (output.targetId.includes("@{target|")) {
+			if (output.targetId.includes("@{target|") || output.targetId == selfValues.character_id) {
 				resetTarget(selfValues.character_id, selfValues.targetId);
 			} else {
-				if (isValidTarget(selfValues.character_name, output.targetId, output.targetTokenId, targetSettings)) {
-					updateTargetAttrLists(selfValues.settingHideCombatOptions, output.targetId, output.targetTokenId, targetSettings, selfValues.settingLimbusStyle, (targetAttrs) => {
-						setAttrsById(output.targetId, {"announceTargeting": Data.package({"add": {[`${selfValues.character_id}`]: output.targetTokenId}})});
-						setActiveCharacterId(selfValues.character_id);
-						setAttrs({...output, ...targetAttrs});
-					});
-				} else {
-					resetTarget(selfValues.character_id, selfValues.targetId);
-				}
+				isValidTarget(selfValues.character_name, selfValues.character_id, output.targetId, output.targetTokenId, targetSettings, (result) => {
+					if (result) {
+						updateTargetAttrLists(selfValues.settingHideCombatOptions, selfValues.character_id, output.targetId, output.targetTokenId, targetSettings, selfValues.settingLimbusStyle, (targetAttrs) => {
+							setAttrs({...output, ...targetAttrs});
+							//checkGM(output.targetId, selfValues.character_id, () => {
+							//	setAttrsById(output.targetId, addTargeting(selfValues.character_id, output.targetTokenId));
+							//	setActiveCharacterId(selfValues.character_id);
+							//});
+						});
+					} else {
+						resetTarget(selfValues.character_id, selfValues.targetId);
+					}
+				});
 			}
 		});
 	}); 
 });
 
-/* Field used by other characters to announce they are targeting the character */
-on("change:announceTargeting", function(info) {
-	getAttrs(["targetedBy"], function(values) {
-		let input = Data.unpackage(info.newValue);
-		let targetedBy = Data.unpackage(values.targetedBy);
-		console.log(input)
 
-		if (input.add != undefined) {
-			targetedBy = {...targetedBy, ...input.add}
-			console.log("Targeting - adding: "); console.log(input.add);
+/* Callback if the character is controlled by a GM */
+/* If isGM is currently unset, executes a test to check if the character is a GM or not */
+/*var isGM = "unset";
+on("sheet:opened", function(info) {
+	getAttrs(["targetId", "character_id", "testIsGM"], function(values) {
+		if (values.targetId != "" && values.targetId != undefined) {
+			checkGM(values.targetId, values.character_id);
 		}
-		else if (input.remove != undefined) {
-			delete targetedBy[input.remove];
-			console.log("Targeting - removing: "); console.log(input.remove);
+		if (values.testIsGM == "unset") {
+			setAttrs({"testIsGM": values.character_id});
 		}
-		console.log(targetedBy);
-		setAttrs({"targetedBy": Data.package(targetedBy)});
+	});
+})
+async function checkGM(targetId, charId, callback=()=>{}) {
+	if (targetId != "" && targetId != charId) {
+		if (isGM == "unset") {
+			let initialValue = await getAttrsById(targetId, ["testIsGM"]);
+			let newValue = await setAttrsById(targetId, {"testIsGM": (initialValue.testIsGM != charId) ? charId : generateRowID()});
+			let finalValue = await getAttrsById(targetId, ["testIsGM"]);
+			setActiveCharacterId(charId);
+			initialValue = initialValue.testIsGM;
+			finalValue = finalValue.testIsGM;
+			
+			if (initialValue != "unset" && initialValue != finalValue && (initialValue == charId || finalValue == charId)) {
+				isGM = "true";
+				callback();
+			} else {
+				isGM = "false";
+				return;
+			}
+		} else if (isGM == "true") {
+			callback();
+		} else {
+			return;
+		}
+	}
+}
+
+
+/* Field used by other characters to announce they are targeting the character */
+/*on("change:announceTargeting", function(info) {
+	getAttrs(["targetedBy"], function(values) {
+		updateTargetedBy(Data.unpackage(info.newValue), Data.unpackage(values.targetedBy));
 	});
 });
+function updateTargetedBy(input, targetedBy) {
+	
+	if(isGM == "true") {
+		if (input.remove != undefined) {
+			delete targetedBy[input.remove];
+		}
+		if (input.add != undefined) {
+			targetedBy = {...targetedBy, ...input.add}
+		}
+		setAttrs({"targetedBy": Data.package(targetedBy)});
+	}
+}
+function addTargeting(charId, targetTokenId, package="package") {
+	let targetingData = {"announceTargeting": {"remove": charId, "add": {[`${charId}`]: targetTokenId}}}
+	if (package == "package") { targetingData.announceTargeting = Data.package(targetingData.announceTargeting) }
+	return targetingData;
+}
+function removeTargeting(charId, package="package") {
+	let targetingData = {"announceTargeting": {"remove": charId}}
+	if (package == "package") { targetingData.announceTargeting = Data.package(targetingData.announceTargeting) }
+	return targetingData;
+}*/
 
 /* Checks if a token is an invalid target. Currently happens if genericTokenMode is enabled but the token has not been added as an instance  */
-async function isValidTarget(characterName, targetId, targetTokenId, targetSettings) {
+async function isValidTarget(characterName, charId, targetId, targetTokenId, targetSettings, callback=()=>{}) {
 	if (targetSettings.genericTokenMode == "true") {
 		let values = await getAttrsById(targetId, [`repeating_tokens_${targetTokenId}_tokenId`]);
+		setActiveCharacterId(charId);
 		
 		if (targetTokenId != values[`repeating_tokens_${targetTokenId}_tokenId`]) {
 			
@@ -11609,25 +11666,26 @@ async function isValidTarget(characterName, targetId, targetTokenId, targetSetti
 				finishRoll(results.rollId, {} );
 			});
 
-			return false;
+			callback(false);
 		} else {
-			return true;
+			callback(true);
 		}
 	} else {
-		return true;
+		callback(true);
 	}
 }
 
-async function updateTargetAttrLists(settingHideCombatOptions, targetId, targetTokenId, targetSettings, settingLimbusStyle, callback=()=>{}) {
-	if (settingHideCombatOptions == "0" && targetId != "") {
+async function updateTargetAttrLists(settingHideCombatOptions, charId, targetId, targetTokenId, targetSettings, settingLimbusStyle, callback=()=>{}) {
+	if (settingHideCombatOptions == "0" && targetId != "" && targetId != undefined) {
 		
 		let output = {}
-
+		
 		/* Get target attributes  */
 		let targetPrefix = (targetSettings.genericTokenMode == "true") ? `repeating_tokens_${targetTokenId}_` : "";
 		let targetBarAttrs = barList.reduce((rows,bar) => [...rows, `${targetPrefix}${bar}`, `${targetPrefix}${bar}_max`], '');
 		let targetAilmentListName = (targetSettings.genericTokenMode == "true") ? `${targetPrefix}tokenAilmentList` : "ailmentList";
 		let values = await getAttrsById(targetId, [...targetBarAttrs, targetAilmentListName]);
+		setActiveCharacterId(charId);
 
 		/* Update target bar lists */
 		let targetBarList = {}
@@ -11668,29 +11726,31 @@ async function updateTargetAttrLists(settingHideCombatOptions, targetId, targetT
 	}
 }
 
-function announceAilmentChange(targetedBy, tokenId, ailmentList, settingLimbusStyle) {
-	let output = updateAilmentDisplay("target", 6, ailmentList, settingLimbusStyle, "true");
-	for (const [targeterId, targetedTokenId] of Object.entries(targetedBy)) {
-		if (tokenId == 0 || tokenId == targetedTokenId.toLowerCase()) {
-			setAttrsById(targeterId, output);
+/*function announceAilmentChange(targetedBy, charId, tokenId, ailmentList, settingLimbusStyle) {
+	if (isGM == "true") {
+		let output = updateAilmentDisplay("target", 6, ailmentList, settingLimbusStyle, "true");
+		for (const [targeterId, targetedTokenId] of Object.entries(targetedBy)) {
+			if (tokenId == 0 || tokenId == targetedTokenId.toLowerCase()) {
+				setAttrsById(targeterId, output);
+				setActiveCharacterId(charId);
+			}
 		}
 	}
 }
-function announceBarChange(targetedBy, tokenId, barName, barVal) {
-	console.log(barName + ": " + barVal)
-	for (const [targeterId, targetedTokenId] of Object.entries(targetedBy)) {
-		console.log(tokenId)
-		console.log(targetedTokenId.toLowerCase())
-		
-		if (tokenId == 0 || tokenId == targetedTokenId.toLowerCase()) {
-			setAttrsById(targeterId, {[`${barName}`]: barVal});
+function announceBarChange(targetedBy, charId, tokenId, barName, barVal) {
+	if (isGM == "true") {
+		for (const [targeterId, targetedTokenId] of Object.entries(targetedBy)) {
+			if (tokenId == 0 || tokenId == targetedTokenId.toLowerCase()) {
+				setAttrsById(targeterId, {[`${barName}`]: barVal});
+				setActiveCharacterId(charId);
+			}
 		}
 	}
-}
+}*/
 
-function resetTarget(character_id, targetId, returnMode="false") {
-	setAttrsById(targetId, {"announceTargeting": Data.package({"remove": character_id})});
-	setActiveCharacterId(character_id);
+function resetTarget(charId, targetId, returnMode="false") {
+	//setAttrsById(targetId, removeTargeting(charId));
+	//setActiveCharacterId(charId);
 	
 	let output = {
 		...resetAilmentDisplay("target", 6, "true"),
@@ -11731,40 +11791,6 @@ function unknownTarget(returnMode="false") {
 
 
 /* --- Action button functionality --- */
-/*
-async function createActionButtons(buttonList, override="") {
-	
-	getAttrs(["targetName"], async function(values) {
-
-	*//* Configure whisper */
-	/* If no target exists or the "selected" override is included for the function, reveal the button to all character *//*
-	let whisper = "";
-	let targetName = values.targetName;
-	if (targetName != "" && override != "selected") {
-		whisper = `/w ${targetName.split(" ")[0]} `;
-	}
-	else {
-		whisper = "";
-	}
-
-	let rollBase = whisper + "&{template:actionbuttons}";
-	let dataList = {}
-
-	*//* Convert buttonList to action buttons *//*
-	if (buttonList[0] != undefined) {
-		for (let i = 0; i < buttonList.length; i++) {
-			rollBase += ` {{targetid${i}=[[0]]}} {{datapackage${i}=[[0]]}} {{buttonlabel${i}=${buttonList[i][0]}}} {{icon${i}=${buttonList[i][1]}}} {{color${i}=${buttonList[i][2]}}} {{buttonlink${i}=${buttonList[i][3]}}}`;
-			dataList[`datapackage${i}`] = Data.package([buttonList[i][4]]);
-			
-			*//* If no target exists or the "selected" targetOverride is included for the button, use selected for targetting *//*
-			dataList[`targetid${i}`] = (buttonList[i][5] == "selected" || targetName == "") ? "selected" : targetName;
-		}
-		let buttonRoll = await startRoll(rollBase); 
-		finishRoll(buttonRoll.rollId, dataList);
-	}
-	});
-}*/
-
 function generateActionButton(name, icon, color, action, data, target) {
 	name = name.replace("autoDamage", getTranslationByKeyCustom("Apply damage", "helper-text-applydamage")) ;
 	name = name.replace("autoInflict", getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
@@ -11779,12 +11805,14 @@ function generateActionButton(name, icon, color, action, data, target) {
 /* Taken in a buttonList of the format: label, icon, color, transferFunction, transferData, targetOverride */
 async function createActionButtons(buttonList, targetOverride="") {
 
-	getAttrs(["settingHideActionButtons", "settingWhisperRolls", "settingWhisperTarget", "targetName", "targetTokenId"], async function(values) {
+	getAttrs(["settingHideActionButtons", "settingWhisperRolls", "settingWhisperTarget", "character_id", "targetName", "targetId", "targetTokenId"], async function(values) {
 
 	if (values.settingHideActionButtons == "true") {
 		return;
 	}
 
+	let charId = values.character_id;
+	let targetId = values.targetId;
 	let targetName = values.targetName;
 	let targetTokenId = values.targetTokenId;
 
@@ -11808,9 +11836,9 @@ async function createActionButtons(buttonList, targetOverride="") {
 	if (buttonList[0] != undefined) {
 		for (let i = 0; i < buttonList.length; i++) {
 			rollBase += ` {{targetid${i}=[[0]]}} {{datapackage${i}=[[0]]}} {{buttonlabel${i}=${buttonList[i][0]}}} {{icon${i}=${buttonList[i][1]}}} {{color${i}=${buttonList[i][2]}}} {{buttonlink${i}=${buttonList[i][3]}}}`;
-			dataList[`datapackage${i}`] = Data.package([buttonList[i][4]]);
+			dataList[`datapackage${i}`] = buttonList[i][4];
 
-			// For the target, use this function's override if set, otherwise use the generateActionButton target if set, otherwise use the sheet's targetId if it's set. If all else fails use "selected"
+			// For the target, use this function's override if set, otherwise use the generateActionButton target if set, otherwise use the sheet's target if one exists. If all else fails use "selected"
 			if (targetOverride != "") {
 				dataList[`targetid${i}`] = targetOverride;
 			} else if (buttonList[i][5] != undefined) {
@@ -11820,6 +11848,13 @@ async function createActionButtons(buttonList, targetOverride="") {
 			} else {
 				dataList[`targetid${i}`] = "selected";
 			}
+
+			/* If targeting, add targeting update data to the action button */
+			//if (isGM == "false" && dataList[`targetid${i}`] == targetName) {
+			//	let targetingData = (targetId != "" && targetId != undefined) ? addTargeting(charId, targetTokenId, "unpackage") : removeTargeting(charId, "unpackage");
+			//	dataList[`datapackage${i}`] = {...dataList[`datapackage${i}`], ...targetingData};
+			//}
+			dataList[`datapackage${i}`] = Data.package(dataList[`datapackage${i}`]);
 		}
 		let buttonRoll = await startRoll(rollBase); 
 		finishRoll(buttonRoll.rollId, dataList);
@@ -11839,11 +11874,10 @@ function generateActionButton(name, icon, color, action, data, target) {
 
 /* Action button functions */
 on('clicked:actionButtonDamage', async (data) => {
-	getAttrs(["lastDefenceRoll"], async function(values) {
-
+	getAttrs(["lastDefenceRoll", "targetedBy"], async function(values) {
+		
 		let defenceRoll = parseInt(values.lastDefenceRoll);
 		data = Data.unpackage(data.originalRollId);
-		data = data[0];
 		actionButtonTokenIdHelper(data.targetTokenId, async (tokenId) => {
 
 			/* If the damage type is unset (such as for ranged weapon) query the player for a damage type */
@@ -11870,20 +11904,22 @@ on('clicked:actionButtonDamage', async (data) => {
 				damageHelper({...data, tokenId: tokenId}, defenceRoll);
 			}
 
+			//updateTargetedBy(data.announceTargeting, Data.unpackage(values.targetedBy));
 			setAttrs({"lastDefenceRoll": 0});
 		});
 	});
 });
 on('clicked:actionButtonInflict', async (data) => {
-	data = Data.unpackage(data.originalRollId);
-	data = data[0];
-	actionButtonTokenIdHelper(data.targetTokenId, (tokenId) => {
-		AutoScriptMain(data.AutoScript, "None", "false", "true", { tokenId: tokenId }, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
-	});
+	//getAttrs(["targetedBy"], async function(values) {
+		data = Data.unpackage(data.originalRollId);
+		actionButtonTokenIdHelper(data.targetTokenId, (tokenId) => {
+			AutoScriptMain(data.AutoScript, "None", "false", "true", { tokenId: tokenId }, () => {}, getTranslationByKeyCustom("Apply ailments", "helper-text-applyailments"));
+		});
+		//updateTargetedBy(data.announceTargeting, Data.unpackage(values.targetedBy));
+	//});
 });
 on('clicked:actionButtonGive', async (data) => {
 	data = Data.unpackage(data.originalRollId);
-	data = data[0];
 	actionButtonTokenIdHelper("", (tokenId) => {
 		AutoScriptMain(data, "None", "false", "true", { tokenId: tokenId }, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
 	});
@@ -12337,7 +12373,7 @@ on("change:StagRes", function() {
 	getSectionIDs(`repeating_global`, idarray => {
         let id = `repeating_global_${idarray[0]}`;
 
-	getAttrs(["StagRes", "StaggerState", `${id}_staggerDurationMax`, "settingGenericTokenMode", "targetedBy"], function(values) {
+	getAttrs(["StagRes", "StaggerState", `${id}_staggerDurationMax`, "settingGenericTokenMode", "character_id", "targetedBy"], function(values) {
 	let currentstag = parseInt(values.StagRes);
 	let currentstate = values.StaggerState;
 	let statedurationmax = parseInt(values[`${id}_staggerDurationMax`]);
@@ -12350,9 +12386,9 @@ on("change:StagRes", function() {
 	} /* Value check end */
 
 	/* Announce update */
-	if (values.settingGenericTokenMode != "true") {
-		announceBarChange(Data.unpackage(values.targetedBy), 0, "StagRes_target", currentstag);
-	}
+	//if (values.settingGenericTokenMode != "true") {
+	//	announceBarChange(Data.unpackage(values.targetedBy), values.character_id, 0, "StagRes_target", currentstag);
+	//}
 
 	});
 	});
@@ -12438,7 +12474,7 @@ on("change:distortCounter", function() {
 
 /* Auto: Detect Panic */
 on("change:SP", function() {
-	getAttrs(["settingAutoDetect", "settingMuteMessage", "settingGenericTokenMode", "PanicState", "SP", "targetedBy"], function(values) {
+	getAttrs(["settingAutoDetect", "settingMuteMessage", "settingGenericTokenMode", "PanicState", "SP", "character_id", "targetedBy"], function(values) {
 	let detect = values.settingAutoDetect;
 	let mutemessage = values.settingMuteMessage;
 	let panicstate = values.PanicState;
@@ -12460,9 +12496,9 @@ on("change:SP", function() {
 	} /* AutoDetect check end */
 
 	/* Announce update */
-	if (values.settingGenericTokenMode != "true") {
-		announceBarChange(Data.unpackage(values.targetedBy), 0, "SP_target", currentsan);
-	}
+	//if (values.settingGenericTokenMode != "true") {
+	//	announceBarChange(Data.unpackage(values.targetedBy), values.character_id, 0, "SP_target", currentsan);
+	//}
 
 	});
 });
@@ -12471,7 +12507,7 @@ on("change:SP", function() {
 on("change:HP", function() {
 
 	getAttrs(["settingAutoDetect", "settingMuteMessage", "settingGenericTokenMode",
-	"DefeatState", "egoActiveState", "HP", "HP_max", "egoCondition", "targetedBy"], function(values) {
+	"DefeatState", "egoActiveState", "HP", "HP_max", "egoCondition", "character_id", "targetedBy"], function(values) {
 	let detect = values.settingAutoDetect;
 	let mutemessage = values.settingMuteMessage;
 	let defeatstate = values.DefeatState;
@@ -12494,9 +12530,9 @@ on("change:HP", function() {
 	} /* Defeat check end */
 
 	/* Announce update */
-	if (values.settingGenericTokenMode != "true") {
-		announceBarChange(Data.unpackage(values.targetedBy), 0, "HP_target", currenthp);
-	}
+	//if (values.settingGenericTokenMode != "true") {
+	//	announceBarChange(Data.unpackage(values.targetedBy), values.character_id, 0, "HP_target", currenthp);
+	//}
 
 	});
 });
@@ -12990,14 +13026,14 @@ ailments.forEach(ailment => {
 	ailmentAttributes += ` change:${ailment} change:${ailment}NextTurn change:${ailment}DecayPause`;
 });
 on(ailmentAttributes, function() {
-	getAttrs(["targetedBy", "settingLimbusStyle", "settingGenericTokenMode"], function(values) {
+	getAttrs(["targetedBy", "character_id", "settingLimbusStyle", "settingGenericTokenMode"], function(values) {
 		exportAilmentList({}, function(ailmentList) {
 			setAttrs({ailmentList: Data.package(ailmentList)});
 			
 			/* Announce update */
-			if (values.settingGenericTokenMode != "true") {
-				announceAilmentChange(Data.unpackage(values.targetedBy), 0, ailmentList, values.settingLimbusStyle);
-			}
+			//if (values.settingGenericTokenMode != "true") {
+			//	announceAilmentChange(Data.unpackage(values.targetedBy), values.character_id, 0, ailmentList, values.settingLimbusStyle);
+			//}
 		});
 	});
 });
@@ -14067,23 +14103,22 @@ on('clicked:rollCombat', (info) => {
 	
 
 	/* Get attributes */
+	getSectionIDs(`repeating_global`, idarray => {
+    let id = `repeating_global_${idarray[0]}`;
 
-getSectionIDs(`repeating_global`, idarray => {
-           let id = `repeating_global_${idarray[0]}`;
+	/* Get skillSelect and toolSelect first as they're used to gather further values */
+	getAttrs(["skillSelect", "toolselect"], function(values) {
+	let skillselect = values.skillSelect;
+	let toolselect = values.toolselect;
 
-		/* Get skillSelect and toolSelect first as they're used to gather further values */
-		getAttrs(["skillSelect", "toolselect"], function(values) {
-			let skillselect = values.skillSelect;
-			let toolselect = values.toolselect;
-
-        getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingHideCombatOptions", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull",
-		`${id}_multiPenalty`, `${id}_multiStyle`, "targetName", "targetTokenId", "character_name", "advState", "difficulty", "baseActNum", "Light",
-		"difficulty", "Bleed", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
-		"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
-		"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
-		`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,
-		`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript",
-		`${skillselect}AutoScript`, `${toolselect}Name`, `${toolselect}Description`, `${toolselect}Effect`, `${toolselect}Uses`, `${toolselect}Uses_max`, `${toolselect}Reusable`, `${toolselect}AutoScript`], function(values) {
+    getAttrs(["egoActiveState", "settingSimpleDisplay", "settingHideBaseEffect", "settingHideCombatOptions", "settingWhisperRolls", "settingWhisperTarget", "settingMultihitFull",
+	`${id}_multiPenalty`, `${id}_multiStyle`, "targetName", "targetTokenId", "character_name", "advState", "difficulty", "baseActNum", "Light",
+	"difficulty", "Bleed", "Endurance", "Disarm", "Strength", "Feeble", "evdPositive", "evdNegative", "advNum", "disadvNum", "attPower", "defPower", "evdPower",
+	"selectName", "selectLight", "selectType", "selectDice1", "selectDice2", "selectDice3", "selectEffect",
+	"distortWeaponDice1", "distortWeaponDice2", "distortWeaponDice3", "distortDefDice1", "distortDefDice2", "distortDefDice3", "distortEvdDice1", "distortEvdDice2", "distortEvdDice3", "distortEffect", "distortEffect2", "settingMultihitUses", "settingHideUses",
+	`${name}`, `${type}`, `${range}`, `${effect}`, `${diceA}`, `${diceB}`, `${diceC}`, `${uses}`, `${usesmax}`, `${usetype}`,
+	`${buttonid}AutoScript`, "outfitAutoScript", "egoAutoScript",
+	`${skillselect}AutoScript`, `${toolselect}Name`, `${toolselect}Description`, `${toolselect}Effect`, `${toolselect}Uses`, `${toolselect}Uses_max`, `${toolselect}Reusable`, `${toolselect}AutoScript`], function(values) {
 
 	let output = {}
 
@@ -14316,7 +14351,7 @@ getSectionIDs(`repeating_global`, idarray => {
 	if ((skillselect != undefined || skillselect != "0") && basetype == skilltype) {
 		AutoScript += "(Reset)" + values[`${skillselect}AutoScript`];
 	}
-
+	
 	/* Clean AutoScript. Remove nested and undefined */
 	AutoScript = AutoScript.replace(/\[([#][^]+[#])\]/g, "");
 	AutoScript = AutoScript.replace("undefined", "");
@@ -17089,7 +17124,7 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 	"settingCollapseAutoEffectSections", "settingHideConditionalButtonReminder", "settingHideCombatOptions", //"settingTargetMode",
 	"HP", "HP_max", "StagRes", "StagRes_max", "SP", "SP_max", "Light", "Light_max", "THP_Sources", "TST_Sources",
 	"thisRoundSpeed", "nextRoundSpeed", "StaggerState", "distortState", "egoActiveState", "egoType",
-	"targetId", "targetName", "targetTokenId", "targetSettings"], async function(values) {
+	"character_id", "targetId", "targetName", "targetTokenId", "targetSettings"], async function(values) {
 		
 	let settingMuteMessage = values.settingMuteMessage;
 	let settingWhisperRolls = values.settingWhisperRolls;
@@ -17100,6 +17135,7 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 	let settingConditionalButtonReminder = values.settingHideConditionalButtonReminder;
 	let settingHideCombatOptions = values.settingHideCombatOptions;
 
+	let charId = values.character_id;
 	let targetId = values.targetId;
 	let targetName = values.targetName;
 	let targetTokenId = values.targetTokenId;
@@ -17158,7 +17194,7 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 	let targetBarList = {};
 	let targetBarDamageList = {};
 	
-	updateTargetAttrLists(settingHideCombatOptions, targetId, targetTokenId, targetSettings, settingLimbusStyle, (targetLists) => {
+	updateTargetAttrLists(settingHideCombatOptions, charId, targetId, targetTokenId, targetSettings, settingLimbusStyle, (targetLists) => {
 	if (targetLists.targetAilmentList != undefined) {
 		targetAilmentList = Data.unpackage(targetLists.targetAilmentList);
 		targetBarList = targetLists.targetBarList;
