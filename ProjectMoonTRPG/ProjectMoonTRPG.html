@@ -17204,7 +17204,6 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 		delete targetLists.targetBarDamageList;
 		output = {...output, ...targetLists}
 	}
-	console.log(output)
 	
 	/* Adds the input AutoScript */
 	let AutoScript = inputAutoScript;
@@ -17291,9 +17290,9 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 				autoEffectConditional = conditional.replaceAll("#IgnoreFailure","").trim();
 
 				if (conditionalButtonList.hasOwnProperty(autoEffectConditional)) {
-					conditionalButtonList[autoEffectConditional] += " (" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
+					conditionalButtonList[autoEffectConditional] += autoEffectToString(AutoEffect[0]);
 				} else {
-					conditionalButtonList[autoEffectConditional] = "(" + AutoEffect[0].join(" ") + conditionalButtonSilent + ")";
+					conditionalButtonList[autoEffectConditional] = autoEffectToString(AutoEffect[0]);
 				}
 
 				/* If AutoEffect is Require or Consume, do not display the button if the check will fail */
@@ -17732,22 +17731,28 @@ function parseAutoScript(inputAutoScript, mode="normal") {
 				AutoEffectArray = AutoEffect.split("£");
 				AutoEffectArray = AutoEffectArray.map(e => e.trim());
 			} else {
-				/* For CustomMessage AutoScripts, preserve commas in the messages format by extracting the format before splitting over "," */
+				/* For CustomMessage AutoScripts, preserve commas and quotes in the messages format by extracting the format before splitting over "," */
 				if (AutoEffect.includes("CustomMessage")) {
-					if (AutoEffect.lastIndexOf(",") > AutoEffect.lastIndexOf('"')) {
-						AutoEffectArray = AutoEffect.trim().split(",");
-					} else {
-						let messageFormat = AutoEffect.match(/"(.*?)"/g);
-						AutoEffect = AutoEffect.replace(/"(.*?)"/g,"£").replace(",","").trim();
-						AutoEffectArray = [AutoEffect.replace("£", messageFormat)];
+					let lastCommaIndex = AutoEffect.lastIndexOf(",");
+					let lastQuoteIndex = AutoEffect.lastIndexOf('"');
+					AutoEffectArray = [AutoEffect];
+
+					/* Seperate out any conditionals */
+					while (lastCommaIndex > lastQuoteIndex) {
+						AutoEffectArray = [AutoEffectArray[0].substring(0, lastCommaIndex), AutoEffectArray[0].substring(lastCommaIndex+1), ...AutoEffectArray.slice(1)];
+						lastCommaIndex = AutoEffectArray[0].lastIndexOf(",");
 					}
+					
+					/* Store the message format. Remove the surrounding quotes */
+					let messageFormat = AutoEffectArray[0].match(/"(.*)"/g)[0].slice(1,-1);
+					AutoEffectArray[0] = AutoEffectArray[0].replace(messageFormat,"£").trim();
+					AutoEffectArray[0] = AutoEffectArray[0].split(/\s+/);
+					AutoEffectArray[0][1] = messageFormat;
 				} else {
 					AutoEffectArray = AutoEffect.trim().split(",");
+					AutoEffectArray[0] = AutoEffectArray[0].split(/\s+/);
 				}
-				//AutoEffectArray = AutoEffectArray.map(e => e.trim());
-				AutoEffectArray[0] = AutoEffectArray[0].split(/\s+/);
 			}
-
 			AutoScriptArray.push(AutoEffectArray);
 		} else {
 			break;
@@ -17893,16 +17898,16 @@ function autoEffectMessage(messageFormat, effectTarget="No target", effectVal=0,
 		/* Question mark icon */
 		message = message.replaceAll("[/Question]", getIcon("icons", "Question", "false", `class="autoEffectImage" style="background-color: ${iconColor}"`));
 
+		/* Get custom icon. Is in one of these formats: [/iconName], [/limbus/iconName], [/community/iconName]*/
 		if ((/\[\/([^0-9]+)\]/g).test(message)) {
-			/* Get custom icon. Is in one of these formats: [/iconName], [/limbus/iconName], [/community/iconName]*/
 			message = message.replaceAll("[/community/", "[community, ");
 			message = message.replaceAll("[/limbus/", "[ailments, limbus/");
 			message = message.replaceAll("[/", "[ailments, ");
 			
 			message.match((/\[([^0-9]+)\]/g)).forEach(icon => {
-				let iconSelector = icon.replaceAll("[","").replaceAll("]","");
-				let iconFolder = iconSelector.split(", ")[0];
-				let iconName = iconSelector.split(", ")[1]
+				let iconSelector = icon.slice(1,-1).split(", ");
+				let iconFolder = iconSelector[0];
+				let iconName = iconSelector[1];
 				message = message.replace(icon, getIcon(iconFolder, iconName, "false", `class="autoEffectImage" style="background-color: ${iconColor}"`));
 			});
 		}
@@ -17947,6 +17952,10 @@ function autoEffectTranslateMessage(message) {
 
 /* Converts an AutoEffect from an array back into its string form */
 function autoEffectToString(AutoEffect) {
+	/* Add back in the surrounding quotes for CustomMessage formats */
+	if (AutoEffect[0] == "CustomMessage" && !(/^".+"$/).test(AutoEffect[1])) {
+		AutoEffect[1] = '"' + AutoEffect[1] + '"';
+	}
 	return "(" + AutoEffect.join(" ") + ")";
 }
 
@@ -17985,43 +17994,32 @@ function resetConditionals() {
 }
 
 function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
-	if (AutoEffect.length > 2) { AutoEffect.slice(3).forEach(option => { if (!["checksuccess", "checkfailure", "checkignore", "target"].includes(option.toLowerCase())) { return autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
+	if (AutoEffect.length > 2) { AutoEffect.slice(2).forEach(option => { if (!["#checksuccess", "#checkfailure", "#checkignore", "target", "silent"].includes(option.toLowerCase())) { return autoEffectErrorMessage("Invalid Option", `Option "${option}" is not a valid option`, AutoEffect); } }); }
 
-	let messageFormat = "";
+	let messageFormat = AutoEffect[1] || "";
 	let checkResultOption = "success";
-	let effectTarget = "No target";
-	let effectIcon = "No icon";
-	let effectVal = 0;
-	let effectCount = 0;
-	let scaling = 1;
-	let checkResult = "success";
-	let settingLimbusStyle = "false";
+	let effectTarget = messageValues.effectTarget || "No target";
+	let effectIcon = messageValues.effectIcon || "No icon";
+	let effectVal = messageValues.effectVal || 0;
+	let effectCount = messageValues.effectCount || 0;
+	let scaling = messageValues.scaling || 1;
+	let checkResult = messageValues.checkResult.replace("last ","").replace("no target","failure") || "success";
+	let settingLimbusStyle = messageValues.settingLimbusStyle || "false";
 
 	/* Check if CustomMessage is silent. No reason to do any formatting being that the message will not be displayed anyways */
-	let silent = "false";
-	if (autoEffectToString(AutoEffect).lastIndexOf("Silent") > autoEffectToString(AutoEffect).lastIndexOf('"')) {
-		silent = "true";
+	if (AutoEffect.some(option => (/^silent$/ig).test(option))) {
+		return {}
 	}
 
 	/* Handle the target option */
-	if (autoEffectToString(AutoEffect).lastIndexOf("Target") > autoEffectToString(AutoEffect).lastIndexOf('"')) {
-		return {autoCustomMessage: autoEffectToString(AutoEffect).replaceAll("Target","") };
+	if (AutoEffect.some(option => (/^target$/ig).test(option))) {
+		AutoEffect.filter(option => !option.match(/^target$/ig));
+		return {autoCustomMessage: autoEffectToString(AutoEffect)};
 	} else {
-		if (AutoEffect[1] != undefined) { messageFormat = AutoEffect.slice(1).join(" "); }
-		if ((/\"[ \t]*(checksuccess)/ig).test(messageFormat)) { messageFormat = messageFormat.replaceAll((/\"[ \t]*(checksuccess)/ig), "") }
-		else if ((/\"[ \t]*(checkfailure)/ig).test(messageFormat)) { checkResultOption = "failure"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkfailure)/ig, "") }
-		else if ((/\"[ \t]*(checkignore)/ig).test(messageFormat)) { checkResultOption = "ignore"; messageFormat = messageFormat.replaceAll(/\"[ \t]*(checkignore)/ig, "")}
-		messageFormat = messageFormat.replaceAll('"','');
+		if (AutoEffect.some(option => (/^#*checkfailure$/ig).test(option))) { checkResultOption = "failure"; }
+		else if (AutoEffect.some(option => (/^#*checkignore$/ig).test(option))) { checkResultOption = "ignore"; }
 
-		if (messageValues.effectTarget != undefined) { effectTarget = messageValues.effectTarget; }
-		if (messageValues.effectIcon != undefined) { effectIcon = messageValues.effectIcon; }
-		if (messageValues.effectVal != undefined) { effectVal = messageValues.effectVal; }
-		if (messageValues.effectCount != undefined) { effectCount = messageValues.effectCount; }
-		if (messageValues.scaling != undefined) { scaling = messageValues.scaling; }
-		if (messageValues.checkResult != undefined) { checkResult = messageValues.checkResult.replace("last ","");}
-		if (messageValues.settingLimbusStyle != undefined) { settingLimbusStyle = messageValues.settingLimbusStyle; }
-
-		if (silent == "false" && (checkResult == checkResultOption || checkResultOption == "ignore")) {
+		if (checkResult == checkResultOption || checkResultOption == "ignore") {
 			return { message: autoEffectMessage(messageFormat, effectTarget, effectVal, effectCount, scaling, checkResult, settingLimbusStyle, effectIcon) }
 		} else {
 			return {}
