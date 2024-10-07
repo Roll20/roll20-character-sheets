@@ -20277,6 +20277,44 @@ function capitalize(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+// Helper used to quickly log data during testing
+// Can use property value shorthand log({var1, var2, ...}) to get a more detailed console message
+function log(...args) {
+	const callFunction = new Error().stack.split('\n')[2].slice(6).match(/\w+/)[0];
+	var styleName = "color: purple; font-weight: bold";
+	var styleNumber = "color: darkblue; margin-bottom: 4px";
+	var styleString = "color: black; margin-bottom: 4px";
+	var logText = `%cLog: ${callFunction}%c\n`;
+	var logStyle = ["font-weight: bold; padding: 2px; margin-bottom: 2px; background-color: lightgrey; border: 1px solid darkgrey; border-radius: 4px", styleName]
+	var logObjects = []
+
+	args.forEach(variable => {
+		if (typeof variable == "object") {
+			for (const [key, value] of Object.entries(variable)) {
+				switch (typeof value) {
+					case "object": case "array":
+						logObjects.push(`${key}:`, value, "\n");
+						break;
+					case "number":
+						logText += `%c${key}: %c${value}\n`;
+						logStyle.push(styleName, styleNumber);
+						break;
+					default:
+						logText += `%c${key}: %c${value}\n`;
+						logStyle.push(styleName, styleString);
+						break;
+				}
+			}
+		} else if (typeof variable == "array") {
+			logObjects.push(variable, "\n")
+		} else {
+			logText += `%c(${typeof variable}): %c${variable}`;
+			logStyle.push(styleName, styleString);
+		}
+	});
+	console.log.apply(console, [logText.slice(0,-1), ...logStyle, ...logObjects]);
+}
+
 // Helper used to package and unpackage data transferred through action buttons
 // Read more about this system at https://app.roll20.net/forum/post/10346883/adventures-with-startroll/?pageforid=10346884#post-10346884
 const Data = {
