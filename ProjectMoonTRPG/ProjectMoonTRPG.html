@@ -17299,8 +17299,8 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 				/* Ignore this rule if #IgnoreFailure is used */
 				if ((AutoEffect[0][0] == "Require" || AutoEffect[0][0] == "Consume") && !conditional.includes("#IgnoreFailure")) {
 					switch (AutoEffect[0][0]) {
-						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
-						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
+						case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, scaling, settingLimbusStyle); break;
+						case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, scaling, settingLimbusStyle, autoEffectType); break;
 						default: tempOutput = {}; break;
 					}
 					if (tempOutput.checkResult == "failure") {
@@ -17328,8 +17328,8 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 		if (checkResult != "failure") {
 			switch (AutoEffect[0][0]) {
 				case "Reset": case "CustomMessage": break; /* Already executed above */
-				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
-				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
+				case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, scaling, settingLimbusStyle); break;
+				case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, scaling, settingLimbusStyle, autoEffectType); break;
 				case "Gain": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle, autoEffectType); break;
 				case "Inflict": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
 				case "Give": tempOutput = autoEffectAilment(AutoEffect[0], ailmentList, scaling, settingLimbusStyle); break;
@@ -18027,7 +18027,7 @@ function autoEffectCustomMessage(AutoEffect, messageValues = {}) {
 	}
 }
 
-function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle) {
+function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, scaling, settingLimbusStyle) {
 	let returnValues = {};
 	
 	/* Check format */
@@ -18081,7 +18081,6 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, targ
 	else { return autoEffectErrorMessage("Invalid Value", `Value "${AutoEffect[1]}" is not a number or percentage`, AutoEffect); }
 
 	/* Handle the scaling option */
-	let scaling = 1;
 	let scalingOption = AutoEffect.find(option => (/(scaling)/ig).test(option));
 	if (scalingOption != undefined) {
 		if ((/(scaling[0-9]+)/ig).test(scalingOption)) {
@@ -18120,7 +18119,7 @@ function autoEffectRequire(AutoEffect, ailmentList, barList, barDamageList, targ
 	return returnValues;
 }
 
-function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType) {
+function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, targetBarList, scaling, settingLimbusStyle, autoEffectType) {
 	let returnValues = {};
 
 	/* Check format */
@@ -18164,7 +18163,6 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, 
 	else { return autoEffectErrorMessage("Invalid Target", `Ailment or Bar "${effectName}" does not exist`, AutoEffect); }
 	
 	/* Handle the scaling option */
-	let scaling = 1;
 	let scalingOption = AutoEffect.find(option => (/(scaling)/ig).test(option));
 	if (scalingOption != undefined) {
 		if ((/(scaling[0-9]+)/ig).test(scalingOption)) {
