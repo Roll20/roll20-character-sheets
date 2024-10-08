@@ -24,6 +24,9 @@ const versioning = (version) => {
     else if (version<2.04) {
         version_203_204();
     }
+    else if (version<2.05) {
+        version_204_205();
+    }
 };
 
 // UPDATE TO VERSION 1.05
@@ -417,3 +420,23 @@ const version_203_204= () => {
         });
     });
 };
+
+const version_204_205 = () => {
+    const codeversion = 2.05;
+    const update ={};
+    console.log('verion:',codeversion);
+    update['version'] = codeversion;
+    getAttrs(['sheet_type','breaking_point','breaking_point_max'], values => {
+        if (values[`sheet_type`] !== 'handler'){
+            current_bp=parseInt(values[`breaking_point`])||0;
+            max_bp=parseInt(values[`breaking_point_max`])||0;
+            update[`reached_breaking_point`]=current_bp<max_bp ? 1 : 0;
+            
+        }
+        setAttrs(update, {silent:true}, () => {
+            console.log('updated reached breaking point');
+            versioning(codeversion);
+            console.info(update);
+        });
+    });
+}
