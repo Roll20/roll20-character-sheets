@@ -2058,14 +2058,14 @@
 							<div class="item-maneuver-block-stats-standard-row">
 								<h2>1/2 Phase</h2>
 							</div>
-							<div class="item-maneuver-block-stats-standard-row">
-								<h2>OCV: +0&emsp;+</h2><input type="number" name="attr_maneuverOCVmod" title="@{maneuverOCVmod}" value="0" step="1"  min="0" max="10" tabindex="174"/>
+							<div class="item-maneuver-block-stats-special-row">
+								<h2>OCV:</h2><input type="number" name="attr_variableOCVmod" title="@{variableOCVmod}" value="0" step="2"  min="-10" max="0" tabindex="173"/><h2>+</h2><input type="number" name="attr_maneuverOCVmod" title="@{maneuverOCVmod}" value="0" step="1"  min="0" max="10" tabindex="174"/>
 							</div>
 							<div class="item-maneuver-block-stats-standard-row">
 								<h2>DCV: +0&emsp;+</h2><input type="number" name="attr_maneuverDCVmod" title="@{maneuverDCVmod}" value="0" step="1"  min="0" max="10" tabindex="175"/>
 							</div>
 							<div class ="item-maneuver-block-text">
-								<p>Block HTH attacks with successful OCV vs. OCV roll. Additional blocks suffer cumulative -2 OCV penalties. Gives priority over standard initiative order on next attack. May Abort next phase to use.</p>
+								<p>Block HTH attacks with successful OCV vs. OCV roll. Additional blocks suffer cumulative -2 OCV penalties. Gives priority over standard initiative order on next attack. May abort next phase to use.</p>
 							</div>
 							<div class="item-maneuver-button-line">
 								<button type="action" class="button buttonDefense" tabindex="-1" name="act_attackStrength" title="@{attackStrength}">Unarmed</button>
@@ -12432,7 +12432,7 @@
 					<input type="checkbox" name="attr_optionCarryAllSets">
 					<span class="checkmark" title="@{optionCarryAllSets}"></span>
 				</label>
-				<h1>Carry All Gear Sets</h1>
+				<h1>Carry all Gear Sets</h1>
 			</div>
 			
 			<div class="item-thematic-break">
@@ -12527,7 +12527,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="3.40" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="3.41" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -13459,9 +13459,9 @@
 			version = 3.05;
 		}
 		
-		if (version < 3.40) {
+		if (version < 3.41) {
 			// No updates needed.
-			version = 3.40;
+			version = 3.41;
 		}
 		
 		if (version != origVersion) {
@@ -13608,7 +13608,7 @@
 	gearSlideList.forEach(button => {
 		// Adding weapons to martial maneuvers adds the complexity of needing to recall their standard and martial states.
 		on(`clicked:${button}`, function() {
-			getAttrs(["gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection"], function(values) {
+			getAttrs(["gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection", "ocvNet", "currentDCV"], function(values) {
 				var attributes = new Object();
 				let states = values.weaponStates;
 				var weaponId;
@@ -13630,7 +13630,11 @@
 							default:			states = setCharAt(states, i-1, 'O');
 												break;
 						}
-					}			
+					}
+					
+					attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+					attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
+					
 				} else if (values.gearSlideSelection === "gearMartialManeuvers") {
 					for (let i=1; i <= maxWeaponNum; i++) {
 						weaponId = String(i).padStart(2,'0');
@@ -13648,6 +13652,9 @@
 												break;
 						}
 					}
+					
+					attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+					attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
 				}
 				
 				// Recall weapon states when switching between standard and martial maneuvers.
@@ -15325,7 +15332,7 @@
 	/* -------------- */
 	/* Power Movers   */
 	/* -------------- */
-		
+	
 	arrayOf(maxPowerNum).forEach(num => {
 		var lowId = String(num).padStart(2,'0');
 		var highId = String(num == maxPowerNum ? 1 : num + 1).padStart(2,'0');
@@ -16183,6 +16190,7 @@
 		});
 	});
 	
+	
 	function calculateCombatSkillCost(skillType, numberOfLevels) {
 		// Used to calculate costs of general combat skill and familiarities.
 		let skillBaseCost=0;
@@ -16506,7 +16514,7 @@
 	});
 	
 	function updateWeaponStates(button) {
-		getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"], function(values) {
+		getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "ocvNet", "currentDCV"], function(values) {
 			
 			let weapon01 = "killing";
 			let weapon02 = "killing";
@@ -16565,6 +16573,9 @@
 				"weaponType04": weapon04,
 				"weaponType05": weapon05,
 				"weaponType06": weapon06,
+				"variableOCVmod": 0,
+				"ephemeralOCV": parseInt(values.ocvNet)||0,
+				"ephemeralDCV": parseInt(values.currentDCV)||0,
 				"checkMultipleAttack": (button === "multipleAttack") ? "on" : 0
 			});
 		});
@@ -16759,7 +16770,7 @@
 	
 	// Function for changing martial maneuver roll button attack type color states.
 	function updateMartialManeuvers(maneuverId) {
-		getAttrs(["martialManeuverType"+maneuverId, "martialManeuverNormal"+maneuverId, "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"], function(values) {
+		getAttrs(["martialManeuverType"+maneuverId, "martialManeuverNormal"+maneuverId, "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "ocvNet", "currentDCV"], function(values) {
 			
 			var attributes = new Object();
 			
@@ -16843,6 +16854,8 @@
 			attributes.weaponType04 = weapon04;
 			attributes.weaponType05 = weapon05;
 			attributes.weaponType06 = weapon06;
+			attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+			attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
 			attributes["martialDamageDisplay"+maneuverId] = display;
 			
 			setAttrs(attributes);
@@ -18341,35 +18354,37 @@
 				let strMin = 0;
 				let delta = 0;
 				
-				if (mass <= 8) {
-					strMin = 1;
-				} else if (mass <= 16) {
-					strMin = 2;
-				} else if (mass <= 25) {
-					strMin = 3;
-				} else if (mass <= 38) {
-					strMin = 4;
-				} else {
-					strMin = 5 * Math.log2(mass/25);
+				if (getRange) {
+					if (mass <= 8) {
+						strMin = 1;
+					} else if (mass <= 16) {
+						strMin = 2;
+					} else if (mass <= 25) {
+						strMin = 3;
+					} else if (mass <= 38) {
+						strMin = 4;
+					} else {
+						strMin = 5 * Math.log2(mass/25);
+					}
+					
+					delta = Math.floor(strengthUsed - strMin);
+					
+					if ((getRange) && (delta > 0)) {
+						for (let i = 1; i < delta; i++) {
+							if (i < 4) {
+								range += 2;
+							} else if ( (i % 5) < 2) {
+								range += 1;
+							} else {
+								range += 2;
+							}
+						}	
+					}
+					
+					attributes["weaponRange"+weaponId] = range/2;
+					
+					setAttrs(attributes);
 				}
-				
-				delta = Math.floor(strengthUsed - strMin);
-				
-				if ((getRange) && (delta > 0)) {
-					for (let i = 1; i < delta; i++) {
-						if (i < 4) {
-							range += 2;
-						} else if ( (i % 5) < 2) {
-							range += 1;
-						} else {
-							range += 2;
-						}
-					}	
-				}
-				
-				attributes["weaponRange"+weaponId] = range/2;
-				
-				setAttrs(attributes);
 			});
 		});
 	});
@@ -18687,7 +18702,7 @@
 			} else if (values.maneuverSelection === "block") {
 				
 				// CV
-				maneuverOCV = 0;
+				maneuverOCV = parseInt(values.variableOCVmod)||0;
 				maneuverDCV = 0;
 				
 				attributes.hiddenMessage = rollMessage;
@@ -18769,9 +18784,9 @@
 				theRoll += "{{data="+netDCV+"}}";
 				
 				if (dispDoS) {
-					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{maneuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+(?{Modifiers|0})[Modifiers]]]}} ";
+					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+(?{Modifiers|0})[Modifiers]]]}} ";
 				} else {
-					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]+@{maneuverOCVmod}[CSL]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+(?{Modifiers|0})[Modifiers]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
+					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+(?{Modifiers|0})[Modifiers]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
 			}
@@ -19390,7 +19405,7 @@
 				
 			} else if (values.maneuverSelection === "block") {
 				// CV
-				maneuverOCV = 0;
+				maneuverOCV = parseInt(values.variableOCVmod)||0;
 				maneuverDCV = 0;
 				
 				isBraced = false;
@@ -19478,9 +19493,9 @@
 				theRoll += "{{data="+netDCV+"}}";
 				
 				if (dispDoS) {
-					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{maneuverOCVmod}[CSL]+(?{Modifiers|0})[Modifiers]]]}} ";
+					theRoll	+= "{{versus OCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+(?{Modifiers|0})[Modifiers]]]}} ";
 				} else {
-					theRoll += "{{OCV=[[@{ocv}[OCV]+@{maneuverOCVmod}[CSL]+(?{Modifiers|0})[Modifiers]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
+					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+(?{Modifiers|0})[Modifiers]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
 				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
