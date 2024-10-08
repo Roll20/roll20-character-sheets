@@ -2466,7 +2466,7 @@
   <p>Apply an injury.<br>
   <b>H</b>its, <b>P</b>enalty, <b>F</b>atigue, <b>B</b>leed, <b>S</b>taggered,
   p<b>R</b>one, <b>K</b>nockback, <b>G</b>rappled, Q/W/E Stun 25/50/75,
-  <b>L</b>ocation (1 head, 2, chest, 3 arms, 4 leg) and si<b>D</b>e (1 Left, 2 right).
+  <b>L</b>ocation (1 head, 2, chest, 3 arms, 4 leg) and side (<b>O</b>) (1 Left, 2 right).
   <b>Z</b> ends.
   </p>
 
@@ -5459,9 +5459,9 @@ Click this to reset and report a bug.</p>
 
 <p>Apply an injury.  Format is Uppercase letter, followed by a number.  Letters
 are H hits, P penalty, F fatigue, B bleed, S staggered P pRone, K kniocked
-back, G grapped %, Q/W/E Stun 25/50/77 X breakage roll, Location (1 head, 2,
-chest, 3 arms, 4 leg) and siDe (1 Left, 2 right).  For bleed and penalties you
-need side and  location.  A Z ends the list.<p>
+back, G grapped %, Q/W/E Stun 25/50/77 X breakage roll, D death (n rounds),
+Location (1 head, 2, chest, 3 arms, 4 leg) and O side (1 Left, 2 right).  For
+bleed and penalties you need side and  location.  A Z ends the list.<p>
 
 <input type='text' name='attr_hackinjury'>  
 <button type='action' name='act_applyinjuryhack' class='fancybutton'>Apply Injury</button>
@@ -5497,7 +5497,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision a422657e39c19c769aafe3d4684ababbdd52134b
+Revision 485d2239673c5ca054c70a787ee0c6e91ca67fce
 
 
 <hr>
@@ -12046,7 +12046,7 @@ drop.handleDrop = function() {
       if (drop.drop_category === 'Item') {
 	RMUInventory.itemDrop(drop.drop_name, drop.drop_data);
       } else if (drop.drop_category == 'Creature' || drop.drop_category == 'NPC') {
-	creature.newCreature(drop.drop_data);
+	creature.newCreature("Creature", drop.drop_data);
       } else {
 	console.log("Don't know how to handle a ", drop.drop_category);
       }
@@ -12645,11 +12645,6 @@ J E + C + B
 	}
 
 	let sevcode = numericToCritCode(severity);
-	console.log("severity", severity, sevcode);
-
-	console.log("get crit", severity, type, index, donefn);
-	console.log(attacks.knownCrits);
-	console.log(attacks.knownCrits[type]);
 
 	// So need to A-effect & A-description
 	let effect = sevcode + "-effect";
@@ -12665,7 +12660,6 @@ J E + C + B
 		    results[res.substring(2)] = crit[res];
 		}
 	    }
-
 
 	    donefn(
 		attacks.knownCrits[type][index][desc],
@@ -12818,12 +12812,16 @@ J E + C + B
 	// what is our column (at)
 	let at = 1;
 	if (cdata.targetat) {
-	    const res = cdata.targetat.match(/(\d+),(\d+),(\d+),(\d+)/)
-	    if (res) {
-		at = res[hit.atindex]
-		at = +at || 1; 
+	    if (typeof(cdata.targetat) == 'number') {
+		at = cdata.targetat;
 	    } else {
-		at = +cdata.targetat || 1;
+		const res = cdata.targetat.match(/(\d+),(\d+),(\d+),(\d+)/);
+		if (res) {
+		    at = res[hit.atindex];
+		    at = +at || 1;
+		} else {
+		    at = +cdata.targetat || 1;
+		}
 	    }
 	}
 
@@ -13421,6 +13419,14 @@ onCheck("clicked:newcombat", () => {
       aptrack_stand: 0,
       aptrack_freeused: 0,
       aptrack_concentraction: 0,
+      aptrack_melee_x: 0,
+      aptrack_missile_x: 0,
+      aptrack_spell_x: 0,
+      aptrack_perception_x: 0,
+      aptrack_eat_x: 0,
+      aptrack_stand_x: 0,
+      aptrack_freeused_x: 0,
+      aptrack_concentraction_x: 0,
       currentphase: 0,
       currentphasedisplay: 0,
       freeactionphase: -1 },
@@ -13983,6 +13989,7 @@ creature.parseJSONMaybe = function(jdata, def) {
 
 
 creature.newCreature = function(name, jdata) {
+  console.log("new creatures", name, jdata, typeof(jdata));
   let cdata = jdata;
   if (typeof(jdata) == 'string') {
     cdata = JSON.parse(jdata);
@@ -14228,7 +14235,12 @@ injury.updateInjuryString = function(hits, critical, attacker, result) {
 	return istr;
     }
 
+    // So get all the effects that we care about, except H
     for (let [critfield, value] of Object.entries(critical)) {
+	if (critfield == 'description' || critfield == 'effect' || critfield == 'H') {
+	    // Ignore this; we deal elsewhere. (effect is just a composite)
+	    continue;
+	}
 	const istrfield = injury.criticalmaps[critfield];
 	if (typeof(istrfield) !== 'string') {
 	    rmuerror("Unknown critical type", critfield, value, critical);
@@ -14248,8 +14260,8 @@ injury.updateInjuryString = function(hits, critical, attacker, result) {
     }
 
     if (result.side) {
-	if (result.side == 'Left') istr += 'D1';
-	else istr += 'D2';
+	if (result.side == 'Left') istr += 'O1';
+	else istr += 'O2';
     }
 
     // Indicate the end of the numeric items
@@ -14369,7 +14381,7 @@ injury.parseInjuryString = function (str) {
 		    updates.grapplestatus = parseIntDefault(cdata.grapplestatus, 0) + value;
 		    sendMessage(`${cdata.character_name} is grappled at ${value}`);
 		    break;
-		case 'L': case 'D': // Already saved... do notihing
+		case 'L': case 'O': // Already saved... do notihing
 		    break;
 		default:
 		    rmuerror("Can't handle ${res[0]} in injury ${str}");
@@ -14402,7 +14414,7 @@ function addSpecificInjury(injury) {
 	updates[`${prefix}_severity`] = 'Mild';
     }
     let ilocation = 'Right ';
-    if (injury.D == 1) {
+    if (injury.O == 1) {
 	ilocation = 'Left ';
     } 
     if (injury.L) {
