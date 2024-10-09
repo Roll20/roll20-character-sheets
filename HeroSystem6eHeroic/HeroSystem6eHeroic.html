@@ -467,20 +467,21 @@
 <div class="sheet-gear">
 	<div class="grid-container-tab-gear">
 		<div class="item-tab-gear-flex-container-encumbrance">
+			
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Lift</h1>
 				<h1>Weight</h1>
-				<input type="number" name="attr_liftWeight" title="@{liftWeight}" value="100" readonly tabindex="-1"/>
+				<input type="text" name="attr_liftWeightDisplay" title="@{liftWeight}" value="100" readonly tabindex="-1"/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Free</h1>
 				<h1>Carry</h1>
-				<input type="number" name="attr_encumbranceFreeCarry" title="@{encumbranceFreeCarry}" value="10" readonly tabindex="-1"/>
+				<input type="text" name="attr_freeCarryDisplay" title="@{freeCarry}" value="10" readonly tabindex="-1"/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Carried</h1>
 				<h1>Load</h1>
-				<input type="number" name="attr_carriedWeight" title="@{carriedWeight}" value="0" readonly tabindex="-1"/>
+				<input type="text" name="attr_carriedWeightDisplay" title="@{carriedWeight}" value="0" readonly tabindex="-1"/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>END</h1>
@@ -12596,6 +12597,11 @@
 <input type="hidden" name="attr_hiddenEnhancerSkillsCost"  value="0"/>
 <input type="hidden" name="attr_hiddenMartialSkillsCost"  value="0"/>
 
+<!-- Variables for displaying formatted numbers related carried weight -->
+<input type="hidden" name="attr_liftWeight" value="0"/>
+<input type="hidden" name="attr_freeCarry" value="0"/>
+<input type="hidden" name="attr_carriedWeight" value="0"/>
+
 <!-- Hidden variables for clean weapon damage strings -->
 <input type="hidden" name="attr_hiddenWeaponDamage01"  value="0"/>
 <input type="hidden" name="attr_hiddenWeaponDamage02"  value="0"/>
@@ -12658,10 +12664,6 @@
 
 <!-- Hidden variable for token display -->
 <input type="hidden" name="attr_currentDCV" value="0"/>
-
-<!-- Transitional CVs for Display -->
-<!-- <input type="hidden" name="attr_ephemeralOCV" value="0"/>
-<input type="hidden" name="attr_ephemeralDCV" value="0"/> -->
 
 <!-- Set B armor variables -->
 <input type="hidden" name="attr_armorName11" value=""/>
@@ -13460,7 +13462,14 @@
 		}
 		
 		if (version < 3.42) {
-			// No updates needed.
+			// Update carry weight
+			values = await _getAttrs(["carriedWeight", "liftWeight", "encumbranceFreeCarry"]);
+			
+			attributes.freeCarry = parseFloat(values.encumbranceFreeCarry)||0;
+			attributes.freeCarryDisplay = displayMass(parseFloat(values.encumbranceFreeCarry)||0);
+			attributes.carriedWeightDisplay = displayMass(parseFloat(values.carriedWeight)||0);
+			attributes.liftWeightDisplay = displayMass(parseFloat(values.liftWeight)||0);
+			
 			version = 3.42;
 		}
 		
@@ -14045,7 +14054,9 @@
 				"strengthCP": statCP,
 				"strengthChance": calculateRoll(Math.max(0, statValue + statMod)),
 				"liftWeight": liftCapability,
-				"encumbranceFreeCarry": freeCarry,
+				"liftWeightDisplay": displayMass(liftCapability),
+				"freeCarry": freeCarry,
+				"freeCarryDisplay": displayMass(freeCarry),
 				"hiddenBasicDamage": hiddenDamage,
 				"hiddenBasicEndurance": enduranceCostBasic
 			});
@@ -16981,7 +16992,7 @@
 			}
 			
 			carriedWeight=armorCarried+weaponsCarried+equipCarried;
-			carriedWeight=Math.floor(10*carriedWeight)/10;
+			// carriedWeight=Math.floor(10*carriedWeight)/10;
 			
 			
 			// Determine penalties
@@ -17018,16 +17029,57 @@
 			}
 			
 			setAttrs({
-				"carriedWeight":carriedWeight,
-				"weightEndPenalty":enduranceCost,
-				"weightDexDCVPenalty":dexPenalty,
-				"weightMovePenalty":movePenalty,
-				"runningPenalty":movePenalty,
-				"leapingPenalty":movePenalty,
-				"swimmingPenalty":movePenalty
+				"carriedWeight": carriedWeight,
+				"carriedWeightDisplay": displayMass(carriedWeight),
+				"weightEndPenalty": enduranceCost,
+				"weightDexDCVPenalty": dexPenalty,
+				"weightMovePenalty": movePenalty,
+				"runningPenalty": movePenalty,
+				"leapingPenalty": movePenalty,
+				"swimmingPenalty": movePenalty
 			});
 		});
 	});
+	
+	
+	// Num to text for display mass.
+	function displayMass(theMass) {
+		let mass = theMass;
+		let theString = theMass.toString();
+		
+		if (theMass > 1e6) {
+			if (theMass < 1e7) {
+				mass = (Math.round(mass/1e5))/10;
+				theString = mass.toString();
+				theString += " kt";
+			} else {
+				mass = Math.round(mass/1e6);
+				theString = mass.toString();
+				theString += " kt";
+			}
+		} else if (theMass > 1000) {
+			if (theMass < 1e4) {
+				mass = (Math.round(mass/100))/10;
+				theString = mass.toString();
+				theString += " t";
+			} else {
+				mass = Math.round(mass/1000);
+				theString = mass.toString();
+				theString += " t";
+			}
+		} else {
+			if (theMass < 100) {
+				mass = (Math.round(mass*10))/10;
+				theString = mass.toString();
+			} else {
+				mass = Math.round(mass);
+				theString = mass.toString();
+			}
+		}
+		
+		return theString;
+	} 
+	
 	
 	// Open with first tab (thanks to GiGs)
 	on("sheet:opened", function() {
@@ -17707,7 +17759,7 @@
 		
 		normalMessage = hitLocation + ": " + theMessage;
 		killMessage = normalMessage;
-
+		
 		if (NSTUN != 1) {
 			normalMessage += " STUNx" + NSTUN;
 		}
@@ -17715,7 +17767,7 @@
 			normalMessage += " BODYx" + BODYx;
 			killMessage += " BODYx" + BODYx;
 		}
-
+		
 		var theHitLocation = {
 			normalMessage: normalMessage,
 			killMessage: killMessage,
@@ -17724,7 +17776,7 @@
 			NSTUN: NSTUN,
 			BODYx: BODYx
 		};
-					
+		
 		return theHitLocation;
 	}
 	
@@ -17754,8 +17806,8 @@
 						computed = computed+1;
 					}
 				}
-				}
-					}
+			}
+		}
 		return computed;
 	}
 	
