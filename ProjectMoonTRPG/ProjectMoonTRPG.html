@@ -11921,7 +11921,7 @@ on('clicked:actionButtonInflict', async (data) => {
 on('clicked:actionButtonGive', async (data) => {
 	data = Data.unpackage(data.originalRollId);
 	actionButtonTokenIdHelper("", (tokenId) => {
-		AutoScriptMain(data, "None", "false", "true", { tokenId: tokenId }, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
+		AutoScriptMain(data.AutoScript, "None", "false", "true", { tokenId: tokenId }, () => {}, getTranslationByKeyCustom("Give ailments", "helper-text-giveailments"));
 	});
 });
 /* Helper function that gets and returns to the selected token's instance if generic token mode is enabled but targeting is not used */
@@ -14373,7 +14373,7 @@ on('clicked:rollCombat', (info) => {
 						damageAutoScript = buttonValue;
 					}; break;
 				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
-				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", {AutoScript: buttonValue}, "selected")); break;
 			}
 		}
 	}
@@ -14727,7 +14727,7 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="false") {
 			switch (buttonKey.split(" ")[0]) {
 				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
 				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
-				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", {AutoScript: buttonValue}, "selected")); break;
 			}
 		}
 	}
@@ -15290,7 +15290,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 			switch (buttonKey.split(" ")[0]) {
 				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
 				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
-				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", {AutoScript: buttonValue}, "selected")); break;
 			}
 		}
 	}
@@ -15911,7 +15911,7 @@ on('clicked:declareAction', (info) => {
 			switch (buttonKey.split(" ")[0]) {
 				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
 				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
-				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", {AutoScript: buttonValue}, "selected")); break;
 			}
 		}
 	}
@@ -17651,7 +17651,7 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 					switch (buttonKey.split(" ")[0]) {
 						case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targetTokenId})); break;
 						case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targetTokenId})); break;
-						case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", buttonValue, "selected")); break;
+						case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", {AutoScript: buttonValue}, "selected")); break;
 					}
 				}
 			}
@@ -18640,7 +18640,7 @@ function autoEffectDamage(AutoEffect, barList, scaling) {
 	/* Execute AutoEffect */
 	returnValues = { ...returnValues, [`${autoEffectVariant}${effectTarget}`]: effectVal, message: message, messageValues: messageValues }
 	if (autoEffectVariant != "baseDamage") {
-		returnValues.autoDamage = `(Add ${effectVal * -1} ${AutoEffect[2]})`;
+		returnValues.autoDamage = autoEffectToString(AutoEffect).replace("FlatDamage","Add").replace(effectVal, effectVal * -1);
 	}
 	return returnValues;
 }
