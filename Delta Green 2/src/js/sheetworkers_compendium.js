@@ -239,8 +239,10 @@ const handleDragandDrop = () => {
 			return console.warn("Drag and drop returned  broken value");
 		}
 		const updateAttrsTot = {...updateAttrs, ...{drop_name:"", drop_data:"",drop_category:""}};
-		console.log(updateAttrsTot);
-		setAttrs(updateAttrsTot);
+		
+		setAttrs(updateAttrsTot,{silent:false},()=>{
+				console.info("Dropped Values:",updateAttrsTot);
+		});
 
 	});
 }
