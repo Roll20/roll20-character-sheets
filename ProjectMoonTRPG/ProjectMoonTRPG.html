@@ -17321,7 +17321,7 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 		switch (AutoEffect[0][0]) {
 			//case "Require": tempOutput = autoEffectRequire(AutoEffect[0], ailmentList, barList, barDamageList, targetAilmentList, targetBarList, targetBarDamageList, settingLimbusStyle); break;
 			//case "Consume": tempOutput = autoEffectConsume(AutoEffect[0], ailmentList, barList, targetAilmentList, targetBarList, settingLimbusStyle, autoEffectType); break;
-			case "Reset": tempOutput = autoEffectReset(AutoEffect[0]); break;
+			case "Reset": tempOutput = autoEffectReset(AutoEffect[0], conditionalButtonList); break;
 			case "CustomMessage": tempOutput = autoEffectCustomMessage(AutoEffect[0], messageValues); break;
 			default: tempOutput = {}; break;
 		}
@@ -17366,6 +17366,11 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 				}
 				output = {};
 				return;
+			}
+
+			/* Handle changes to conditionalButtonList */
+			if ("conditionalButtonList" in tempOutput) {
+				conditionalButtonList = tempOutput.conditionalButtonList;
 			}
 
 			/* Handle changes to scaling */
@@ -18227,12 +18232,18 @@ function autoEffectConsume(AutoEffect, ailmentList, barList, targetAilmentList, 
 	return returnValues;
 }
 
-function autoEffectReset(AutoEffect) {
+function autoEffectReset(AutoEffect, conditionalButtonList) {
 	/* Handle the target option */
 	if (AutoEffect.some(option => (/(target)/ig).test(option))) {
 		return { autoReset: autoEffectToString(AutoEffect).replace(/(target)/ig,"") };
 	} else {
-		return { checkResult: "success", scaling: 1, messageValues: {checkResult:"success"} };
+		/* Also resets all conditionals */
+		for (const [conditional, AutoScript] of Object.entries(conditionalButtonList)) {
+			if (!conditionalButtonList[conditional].endsWith("(Reset)")) {
+				conditionalButtonList[conditional] += "(Reset)";
+			}
+		}
+		return { checkResult: "success", scaling: 1, messageValues: {checkResult:"success"}, conditionalButtonList };
 	}
 }
 
