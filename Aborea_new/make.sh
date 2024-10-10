@@ -105,7 +105,7 @@ generate_spruchlisten() {
                 s/{{effekt2}}/${effekt2}/g; \
                 s/{{effekt3}}/${effekt3}/g; \
                 s/{{effekt4}}/${effekt4}/g; \
-                s/{{effekt5}}/${effekt5}/g" \
+                s/{{effekt5}}/${effekt5}/g;" \
                 "${YAML_HML_TEMPLATE_MAIN}" >> "${output_file}"
         done
         
