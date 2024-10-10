@@ -14695,9 +14695,10 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="false") {
 	newicon = "https://raw.githubusercontent.com/punibird/roll20-character-sheets/master/ProjectMoonTRPG/imagesResized/icons/Portable.png";
 
 	/* Get attributes */
-        getAttrs([`${buttonid}`, "advState", "difficulty", "justice", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "character_name", "advNum", "disadvNum"], function(values) {
+        getAttrs([`${buttonid}`, "advState", "difficulty", "justice", "settingSimpleDisplay", "settingWhisperRolls", "settingWhisperTarget", "character_name", "targetTokenId", "advNum", "disadvNum"], function(values) {
 
 	let charname = values.character_name;
+	let targettokenid = values.targetTokenId;
 	let stat = values[buttonid];
 	let statn = "";
 	let advstate = values.advState;
@@ -14859,9 +14860,11 @@ function rollChallenge(buttonid, rollDifficulty=0, collectAutoScripts="false") {
 	else if(statn == "Speed"){
 	setAttrs({"baseSpeed": total, "isFirstRound": "true", "prevRoundInitAttempts": 0});
 	}
-
 		finishRoll(results.rollId,{});
 		
+		/* Create action Buttons */
+		createActionButtons(buttonList);
+		createActionButtons(giveButtonList, "selected");
 	});
 	/*--- send roll end ---*/
 
@@ -14903,7 +14906,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 		`${prefix}ailCustomResistanceNum`, `${prefix}ailCustomResistanceNumEgo`, `${prefix}ailNum`, `${prefix}ailName`, `${prefix}ailIcon`], '');
 
 	/* Get attribute values */
-	getAttrs([...fieldnames, "character_name", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max", "THP_Sources", "TST_Sources",
+	getAttrs([...fieldnames, "character_name", "targetTokenId", "HP", "StagRes", "SP", "HP_max", "StagRes_max", "SP_max", "THP_Sources", "TST_Sources",
 	"settingLimbusStyle", "settingWhisperRolls", "settingWhisperTarget", "settingSimpleDisplay", "settingAutoApplyDamage", "settingHideBarUpdate",
 	"baseDamage", "flatDamageHP", "flatDamageST", "damageHelperType",
 	"distortState", "egoActiveState", "egoType", "StaggerState", "damageResist", "damageResist_ego",
@@ -14921,6 +14924,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	let hidebarupdate = values.settingHideBarUpdate;
 	
 	let characterName = values.character_name;
+	let targetTokenId = values.targetTokenId;
 
 	let maxHP = parseInt(values.HP_max);
 	let maxST = parseInt(values.StagRes_max);
@@ -14940,13 +14944,13 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	let flatDamageSP = 0;
 	let damageType = values.damageHelperType;
 
-	if (overrideList.baseOverride != undefined) { baseDamage = overrideList.baseOverride; }
-	if (overrideList.baseHPOverride != undefined) { baseDamageHP = overrideList.baseHPOverride; }
-	if (overrideList.baseSTOverride != undefined) { baseDamageST = overrideList.baseSTOverride; }
-	if (overrideList.flatHPOverride != undefined) { flatDamageHP = overrideList.flatHPOverride; }
-	if (overrideList.flatSTOverride != undefined) { flatDamageST = overrideList.flatSTOverride; }
-	if (overrideList.flatSPOverride != undefined) { flatDamageSP = overrideList.flatSPOverride; }
-	if (overrideList.damageTypeOverride != undefined) { damageType = overrideList.damageTypeOverride; }
+	if (overrideList.baseOverride) { baseDamage = overrideList.baseOverride; }
+	if (overrideList.baseHPOverride) { baseDamageHP = overrideList.baseHPOverride; }
+	if (overrideList.baseSTOverride) { baseDamageST = overrideList.baseSTOverride; }
+	if (overrideList.flatHPOverride) { flatDamageHP = overrideList.flatHPOverride; }
+	if (overrideList.flatSTOverride) { flatDamageST = overrideList.flatSTOverride; }
+	if (overrideList.flatSPOverride) { flatDamageSP = overrideList.flatSPOverride; }
+	if (overrideList.damageTypeOverride) { damageType = overrideList.damageTypeOverride; }
 
 	let hpResistance = 1.0;
 	let stResistance = 1.0;
@@ -15274,7 +15278,7 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	}
 
 	/* AutoScripts */
-	let autoScriptTriggers = ["None"];
+	let autoScriptTriggers = [];
 	if (newHP < oldHP) { autoScriptTriggers.push("DamagedHP"); }
 	if (newST < oldST) { autoScriptTriggers.push("DamagedST"); }
 	if (newSP < oldSP) { autoScriptTriggers.push("DamagedSP"); }
@@ -15288,8 +15292,8 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 	for (const [buttonKey, buttonValue] of Object.entries(returnValues)) {
 		if (buttonKey.startsWith("auto")) {
 			switch (buttonKey.split(" ")[0]) {
-				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
-				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targettokenid})); break;
+				case "autoDamage": buttonList.push(generateActionButton(buttonKey, getIcon("icons","damage"), "red", "actionButtonDamage", {AutoScript: buttonValue, targetTokenId: targetTokenId})); break;
+				case "autoInflict": buttonList.push(generateActionButton(buttonKey, getIcon("icons","lose"), "purple", "actionButtonInflict", {AutoScript: buttonValue, targetTokenId: targetTokenId})); break;
 				case "autoGive": giveButtonList.push(generateActionButton(buttonKey, getIcon("icons","win"), "blue", "actionButtonGive", {AutoScript: buttonValue}, "selected")); break;
 			}
 		}
@@ -15459,6 +15463,10 @@ function damageHelper(overrideList={}, defenceRoll=0) {
 
 	startRoll((whisper + `&{template:damagecalculation} {{icon=@{dummyIcon}}} {{name=@{character_name}}} {{title=${getTranslationByKeyCustom("Damage Calculation", "heading-damagecalculation")}}} {{damagecalculations=@{dummy} }}`), (results) => {
 		finishRoll(results.rollId, {} );
+
+		/* Create action buttons */
+		createActionButtons(buttonList);
+		createActionButtons(giveButtonList, "selected");
 	});
 	/* Damage calculation chat message block end */
 
@@ -16001,7 +16009,7 @@ on('clicked:declareAction', (info) => {
 	startRoll((whisper + "&{template:baseRoll} {{infodump=@{dummy} }}"), (results) => {
         finishRoll(results.rollId,{});
 
-		/* Action Buttons */
+		/* Create action Buttons */
 		createActionButtons(buttonList);
 		createActionButtons(giveButtonList, "selected");
     });
