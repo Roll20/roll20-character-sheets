@@ -84,11 +84,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 Oct  9th 2024 v1.73a
 
-- Optimized sheet code and reduced overall size of the html
-- Fixed not being able to use certain symbols in the character name without breaking sheet functionality, e.g.: " ). Some still don't work, e.g.: | }. 
-- RT clicky button code unified
-- Added Critical Damage Rules Houserule 3 to default settings options (outside the game)
+- Optimized sheet code and the reduced overall size by ~5%
+- Fixed not being able to use certain symbols in the character name without breaking sheet functionality, e.g.: " (). Some still don't work, e.g.: | {}
+- PC & NPC RT clicky button code unified, should resolve some odd issues
 - Allow Endurance test when Unconscious
+- Added Critical Damage Rules Houserule 3 to default settings options (outside the game)
+- Fixed Enc Penalty not applying to Agility correctly
 
 
 Oct  1st 2024 v1.73
