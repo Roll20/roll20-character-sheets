@@ -1,3 +1,15 @@
+# 2024-10-8
+
+- (Hopefully) quieten monsters AP messages.
+- Handle a numeric AT (some monsters)
+- Updated attack testing significantly.
+- Remove some not-an-error errors in attacks
+- Stop using D for side.  That's death/defeat.  O is now side. (Odd)
+- Fix for monsters dropped from compendium
+
+Compendium: Fix the couple of corrupted attack tables which were causing random failures on
+some attacks.  This has been bugging up a few characters (and creatures).
+
 # 2024-10-3
 
 - Remove a lot of debug in level up and stuff.
