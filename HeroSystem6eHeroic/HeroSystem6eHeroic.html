@@ -13463,12 +13463,14 @@
 		
 		if (version < 3.42) {
 			// Update carry weight
-			values = await _getAttrs(["carriedWeight", "liftWeight", "encumbranceFreeCarry"]);
+			values = await _getAttrs(["carriedWeight", "strength", "strengthMod"]);
 			
-			attributes.freeCarry = parseFloat(values.encumbranceFreeCarry)||0;
-			attributes.freeCarryDisplay = displayMass(parseFloat(values.encumbranceFreeCarry)||0);
+			statValue = (parseInt(values.strength)||0) + (parseInt(values.strengthMod)||0);
+			
+			attributes.liftWeightDisplay = displayMass( calculateLift(statValue) );
+			attributes.freeCarry = calculateLift(statValue)/10;
+			attributes.freeCarryDisplay = displayMass( calculateLift(statValue)/10 );
 			attributes.carriedWeightDisplay = displayMass(parseFloat(values.carriedWeight)||0);
-			attributes.liftWeightDisplay = displayMass(parseFloat(values.liftWeight)||0);
 			
 			version = 3.42;
 		}
@@ -14011,7 +14013,7 @@
 			const costStat = 1;
 			let statCP = 0;
 			let enduranceCostBasic = 0;
-			var liftCapability;
+			var liftCapacity;
 			var freeCarry;
 			
 			// Basic damage
@@ -14032,29 +14034,17 @@
 				statCP=(statValue-baseStat)*costStat;
 			}	
 			
-			switch (statValue + statMod) {
-				case 0:	liftCapability = 0;
-						break;
-				case 1:	liftCapability = 8;
-						break;
-				case 2:	liftCapability = 16;
-						break;
-				case 3:	liftCapability = 25;
-						break;
-				case 4:	liftCapability = 38;
-						break;
-				default: liftCapability = Math.round(25*Math.pow(2,( (Math.max(0, statValue + statMod))/5)));
-			}
+
+			liftCapacity = calculateLift(statValue+statMod);
+			freeCarry = liftCapacity/10;
 			
-			freeCarry=liftCapability/10;
-			
-			// Update cost and roll chance		
+			// Update cost and roll chance and carry values		
 			setAttrs({
 				"strengthNet": Math.max(0, statValue + statMod),
 				"strengthCP": statCP,
 				"strengthChance": calculateRoll(Math.max(0, statValue + statMod)),
-				"liftWeight": liftCapability,
-				"liftWeightDisplay": displayMass(liftCapability),
+				"liftWeight": calculateLift(statValue+statMod),
+				"liftWeightDisplay": displayMass(liftCapacity),
 				"freeCarry": freeCarry,
 				"freeCarryDisplay": displayMass(freeCarry),
 				"hiddenBasicDamage": hiddenDamage,
@@ -14065,6 +14055,28 @@
 			sumCharacteristicPoints();
 		});
 	});
+	
+	
+	function calculateLift (statValue) {
+		// Returns calculated value consistent with HERO standard lift chart.
+		let lift = 0;
+		
+		switch (statValue) {
+			case 0:	lift = 0;
+					break;
+			case 1:	lift = 8;
+					break;
+			case 2:	lift = 16;
+					break;
+			case 3:	lift = 25;
+					break;
+			case 4:	lift = 38;
+					break;
+			default: lift = Math.round(25*Math.pow(2,( (Math.max(0, statValue))/5)));
+		}
+		
+		return lift;
+	}
 	
 	
 	function calculateBasicDamage (statValue) {
