@@ -122,8 +122,6 @@ const handle_drop = () => {
 
     const { Category } = page.data;
 
-    console.log(`Dropping ${Category} ${page.name}`);
-
     switch (Category) {
       case "Creatures":
         resetRepeatingRows(repeatingSections);
