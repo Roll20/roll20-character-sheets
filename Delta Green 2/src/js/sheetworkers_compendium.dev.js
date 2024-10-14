@@ -391,8 +391,11 @@ var handleDragandDrop = function handleDragandDrop() {
       drop_category: ""
     });
 
-    console.log(updateAttrsTot);
-    setAttrs(updateAttrsTot);
+    setAttrs(updateAttrsTot, {
+      silent: false
+    }, function () {
+      console.info("Dropped Values:", updateAttrsTot);
+    });
   });
 };
 
