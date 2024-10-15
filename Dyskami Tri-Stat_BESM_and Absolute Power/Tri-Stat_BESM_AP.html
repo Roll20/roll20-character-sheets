@@ -3822,6 +3822,7 @@
                             case 'stat':
                                 temp.push(
                                     'attrdb',
+                                    'rulesdb',
                                     'static_skills_visible_id'
                                 );
                             break;
@@ -5096,7 +5097,6 @@
         clog(cache, temp, 'setSkillsPointTotal()');
         temp.skills = cache.attrdb.skills[cache.skill_index].individual;
         temp.spent = temp.skills.map(s => s.points).reduce((a, b) => a + b, 0);
-        temp.spent += temp.skills.map(s => s.specializations.length - 1).reduce((a, b) => a + b, 0);
         temp.index = cache.attrdb.skills[cache.skill_index].config.findIndex(c => c.name === 'skill points');
         temp.total = cache.attrdb.skills[cache.skill_index].config[temp.index].rank;
         set_values.static_skills_points_remaining = temp.total - temp.spent;
@@ -7996,6 +7996,12 @@
             `skill_${cache.source_attribute}` : cache.source;
         query.commit = false;
         cache.skill_index = cache.static_skills_visible_id;
+        if (cache.source_type === 'repeating') {
+            query.individual_index = 
+                cache.attrdb.skills[cache.skill_index].individual.findIndex(i => i.row_id.toLowerCase() === cache.source_id);
+            query.skill = 
+                cache.attrdb.skills[cache.skill_index].individual[query.individual_index].skill;
+        }
         while (!query.commit) {
             switch (query.next) {
                 case 'select_task':
@@ -8135,16 +8141,18 @@
                         'wilderness tracking':['aquatic','arctic','desert','forest','jungle','mountain','plains'],
                         'writing':['academic','fiction','journalistic','poetic','religious','technical']
                     };
+                    query.specializations = cache.attrdb.skills[cache.skill_index].individual[query.individual_index].specializations;
                     query.title = `${getTranslationByKey("select-specializations")}`;
                     query.options = '';
                     for (let i = 0; i < skill_specializations[`${query.skill}`].length; i++) {
-                        const bracket = query.specializations.findIndex(s => s === skill_specializations[`${query.skill}`][i]) !== -1;
+                        const bracket = 
+                            query.specializations.findIndex(s => s === skill_specializations[`${query.skill}`][i]) !== -1;
                         const specialization = `${getTranslationByKey(skill_specializations[`${query.skill}`][i])}`;
                         query.options += `|${bracket ? '[ ' : ''}${specialization}${bracket ? ' ]' : ''},` +
                             `${skill_specializations[`${query.skill}`][i]}`;
                     }
                     query.options += `|${getTranslationByKey("unique-specialization")},unique_specialization` +
-                        `|${getTranslationByKey("done")},skill_menu`;
+                        `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'select_stat':
@@ -8232,15 +8240,17 @@
                             query.selection : query.last;
                     break;
                     case 'select_rank':
+                    case 'skill_rank':
                         if (isNaN(query.selection)) {
                             query.next = 'select_rank';
                         } else {
                             query.rank = int(query.selection);
-                            query.next = 'skill_menu';
+                            query.next = 'write_skillrank';
                         }
                     break;
                     case 'select_specializations':
-                        if (query.selection !== 'skill_menu') {
+                    case 'skill_specializations':
+                        if (query.selection !== 'exit') {
                             query.spec_index = query.specializations.findIndex(s => s === query.selection);
                             if (query.spec_index === -1) {
                                 query.specializations.push(query.selection);
@@ -8248,7 +8258,7 @@
                                 query.specializations.splice(query.spec_index, 1);
                             }
                         }
-                        query.next = query.selection !== 'skill_menu' ? 'select_specializations' : 'skill_menu';
+                        query.next = query.selection === 'exit' ? 'exit' : 'write_skillspecializations';
                     break;
                     case 'select_stat':
                     case 'skill_stat':
@@ -8258,6 +8268,8 @@
                     break;
                 }
             } else {
+                const skilldb = cache.attrdb.skills[cache.skill_index].individual[query.individual_index];
+                const cost = skills_cost[skilldb.skill][cache.rulesdb.rules_optional_genre_status];
                 switch (query.next) {
                     case 'write_newskill'://-> write skill object into cache and create repeating section
                         const fields = ['cost','points','rank','skill','specializations','stat'];
@@ -8309,12 +8321,30 @@
                         set_values[`repeating_skill_${row_id}_active`] = 1;
                         setSkillsPointTotal(cache, set_values);
                     break;
+                    case 'write_skillspecializations':
+                        skilldb.specializations = query.specializations;
+                        skilldb.points = (skilldb.rank * cost) + Math.max(0, skilldb.specializations.length - 1);
+                        set_values[`${cache.source_path}_points`] = skilldb.points;
+                        set_values[`${cache.source_path}_specializations`] = '';
+                        for (let i = 0; i < query.specializations.length; i++) {
+                            set_values[`${cache.source_path}_specializations`] += 
+                                getTranslationByKey(query.specializations[i]) || query.specializations[i];
+                            set_values[`${cache.source_path}_specializations`] += i !== query.specializations.length -1 ?
+                                '\n' : '';
+                        }
+                        setSkillsPointTotal(cache, set_values);
+                    break;
+                    case 'write_skillrank':
+                        skilldb.points = (cost * query.rank) + Math.max(0, skilldb.specializations.length - 1);
+                        skilldb.rank = query.rank;
+                        set_values[`${cache.source_path}_rank`] = query.rank;
+                        set_values[`${cache.source_path}_points`] = skilldb.points;
+                        setSkillsPointTotal(cache, set_values);
+                    break;
                     case 'write_skillstat':
-                        cache.individual_index = 
-                            cache.attrdb.skills[cache.skill_index].individual.findIndex(i => i.row_id.toLowerCase() === cache.source_id);
-                        cache.attrdb.skills[cache.skill_index].individual[cache.individual_index].stat = query.stat;
-                        //query.display_stat = query.stat.length !== 1 ? 'Avg ' : '';
-                        query.display_stat = `${query.stat.capitalize().join('+')}`;
+                        cache.attrdb.skills[cache.skill_index].individual[query.individual_index].stat = query.stat;
+                        query.transpated_stat = query.stat.map(s => getTranslationByKey(s));
+                        query.display_stat = `${query.transpated_stat.join('+')}`;
                         set_values[`${cache.source_path}_stat`] = query.display_stat;
                     break;
                 }
