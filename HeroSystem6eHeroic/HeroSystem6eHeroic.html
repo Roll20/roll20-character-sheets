@@ -782,14 +782,28 @@
 			<!-- Shield -->			
 			<div class="subitem-tab-gear-flex-container-shield">
 				
+				<input type="hidden" class="shield-checks" name="attr_shieldChecks"  value="carry"/>
+				
+				<div class="subitem-tab-gear-flex-container-shield-checks">
+					<label class="tiny-xbox-dummy-container">
+						<div class="tiny-xbox-dummy">
+						</div>
+					</label>
+					<label class="tiny-xbox-empty-container">
+						<div class="tiny-xbox-empty">
+						</div>
+					</label>
+					<label class="container-checkbox-tiny">
+						<input type="checkbox" checked="checked" name="attr_shieldCarried">
+						<span class="checkmark-tiny" title="@{shieldCarried}"></span>
+					</label>
+					<label class="container-xbox-tiny">
+						<input type="checkbox" name="attr_weaponDelete06">
+						<span class="checkmark" title="@{weaponDelete06}"></span>
+					</label>
+				</div>
 				<div class="subitem-tab-gear-flex-container-shield-heading">
-					<div class="shield-title-container">
-						<label class="container-checkbox-tiny">
-							<input type="checkbox" checked="checked" name="attr_shieldCarried">
-							<span class="checkmark-tiny" title="@{shieldCarried}"></span>
-						</label>
-						<h1>Shield</h1>
-					</div>
+					<h1>Shield</h1>
 					<input type="text" name="attr_weaponName06" title="@{weaponName06}" value="" maxlength="20" tabindex="76"/>
 				</div>
 				<div class="subitem-tab-gear-flex-container-shield-heading">
@@ -12640,7 +12654,7 @@
 					<input type="checkbox" name="attr_activateDeleteChecks">
 					<span class="checkmark" title="@{activateDeleteChecks}"></span>
 				</label>
-				<h1>Activate Item Delete Boxes. Deactivate to Delete. </h1>
+				<h1>Activate Item Delete Boxes. Deactivate to complete delete. </h1>
 			</div>
 		</div>
 		
@@ -17056,6 +17070,7 @@
 			
 			if (values.activateDeleteChecks === "on") {
 				attributes.armorChecks = "delete";
+				attributes.setDamageToggle = "0";
 				
 				// Clear all delete checks for safety.
 				clearArmorDeleteChecks();
@@ -17098,6 +17113,64 @@
 	}
 	
 	
+	// Show carried armor checks or delete items marked for deletion.
+	// DANGER: Risk of data loss.
+	on("change:activateDeleteChecks", function() {
+		getAttrs(["activateDeleteChecks", "weaponDelete06"], function(values) {
+			var attributes = new Object();
+			
+			if (values.activateDeleteChecks === "on") {
+				attributes.shieldChecks = "delete";
+				attributes.setDamageToggle = "0";
+				
+				// Clear all delete checks for safety.
+				clearShieldDeleteChecks();
+			} else {
+				attributes.shieldChecks = "carry";
+				
+				if (values["weaponDelete06"] === "on") {
+					attributes["weaponName06"] = "";
+					attributes["shieldDCV"] = 0;
+					attributes["weaponCSL06"] = 0;
+					attributes["weaponOCV06"] = 0;
+					attributes["weaponStunMod06"] = 0;
+					attributes["weaponEndurance06"] = "0";
+					attributes["shieldBody"] = 0;
+					attributes["shieldDefense"] = 0;
+					attributes["shieldMass"] = 0;
+					
+					// Damage Worksheet Values
+					attributes["weaponDamage06"] = "0";
+					attributes["weaponNormalDamage06"] = "on";
+					attributes["weaponStrengthMin06"] = 1;
+					attributes["weaponStrength06"] = 1;
+					attributes["weaponDC06"] = 0;
+					attributes["rangeBasedOnStr06"] = 0;
+					attributes["weaponEnhancedByStr06"] = 0;
+					attributes["weaponAdvantage06"] = 0;
+					attributes["weaponCSL06"] = 0;
+					attributes["weaponEndMod06"] = 0;
+					attributes["weaponAdjustedDamage06"] = "0";
+					attributes["weaponAdjustedDC06"] = 0;
+					attributes["weaponPenalty06"] = "0";
+					attributes["weaponEndurance06"] = "0";
+				}
+			}
+			
+			setAttrs(attributes);
+		});
+	});
+	
+	
+	function clearShieldDeleteChecks() {
+		var attributes = new Object();
+		
+		attributes["weaponDelete06"] = 0;
+		
+		setAttrs(attributes);
+	}
+	
+	
 	// Show carried weapon checks or delete items marked for deletion.
 	// DANGER: Risk of data loss.
 	on("change:checkWielded change:activateDeleteChecks", function() {
@@ -17107,6 +17180,7 @@
 			
 			if (values.activateDeleteChecks === "on") {
 				attributes.weaponChecks = "delete";
+				attributes.setDamageToggle = "0";
 				
 				// Clear all delete checks for safety.
 				clearWeaponDeleteChecks();
@@ -17213,16 +17287,22 @@
 		var attributes = new Object();
 		var itemId = "";
 		
+		// Armor
 		for (var i = 1; i <= maxArmorNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["armorDelete"+itemId] = 0;
 		}
 		
+		// Shield
+		attributes["weaponDelete06"] = 0;
+		
+		// Weapons
 		for (var i = 1; i <= maxWeaponNum-1; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["weaponDelete"+itemId] = 0;
 		}
 		
+		// Equipment
 		for (var i = 1; i <= maxEquipmentNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["equipDelete"+itemId] = 0;
