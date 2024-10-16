@@ -275,6 +275,13 @@ Paste a single Unicode character in this text field if you would like a custom d
 
 This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
+>[!CAUTION]
+> Use of the delete option may lead to unwanted data loss. Deleted items are not recoverable.
+
+### Activate Item Delete Boxes. Deactivate to complete Deletion.
+
+This "option" activates or deactivates the line item deletion mode for armor, weapons, equipment, and the shield. Select whichever items you would like to remove. These items will not be deleted until you deactivate the option. If you close the character sheet the deletion marks will be reset, aborting the action.
+
 # <a id="mods">Mod Support</a>
 
 ### HERO System 6e Heroic HD Importer
@@ -322,4 +329,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
-*Last updated by Villain in Glasses on October 1, 2024 to represent the sheet as of version 3.41.*
+*Last updated by Villain in Glasses on October 15, 2024 to represent the sheet as of version 3.50.*
