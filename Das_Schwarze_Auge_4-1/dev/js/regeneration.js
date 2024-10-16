@@ -948,7 +948,7 @@ on('clicked:reg_sleep-action', async (info) => {
 		{
 			let successes = 0;
 			let failures = 0;
-			for (roll of rolls)
+			for (let roll of rolls)
 			{
 				if (roll <= success)
 				{
@@ -980,7 +980,7 @@ on('clicked:reg_sleep-action', async (info) => {
 		} else {
 			if (effTaW < 0)
 			{
-				for (roll in rolls)
+				for (let roll in rolls)
 				{
 					effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 				}
@@ -988,7 +988,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			}
 
 			// TaP-Verbrauch für jeden Wurf
-			for (roll in effRolls)
+			for (let roll in effRolls)
 			{
 				TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 			}

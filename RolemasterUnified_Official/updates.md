@@ -1,3 +1,34 @@
+# 2024-10-15
+
+- Start of Power Level support
+    - Sheet version to 4: Set everyones powerlevel to Superior
+    - Show powerlevel on sheet
+    - Add create step for power level
+    - Add support for powerlevel during stat rolling
+- Use the roll20 dice roller for dice; not the js one.
+- Send stat rolls to the chat.
+- More messages when injuries are applied.
+- Make checkboxes a standard size,
+- NPC upload button on the front page.
+
+# 2024-10-8
+
+- (Hopefully) quieten monsters AP messages.
+- Handle a numeric AT (some monsters)
+- Updated attack testing significantly.
+- Remove some not-an-error errors in attacks
+- Stop using D for side.  That's death/defeat.  O is now side. (Odd)
+- Fix for monsters dropped from compendium
+
+Compendium: Fix the couple of corrupted attack tables which were causing random failures on
+some attacks.  This has been bugging up a few characters (and creatures).
+
+# 2024-10-3
+
+- Remove a lot of debug in level up and stuff.
+- Allow creatures to be called NPCs on drop
+- Creatures (NPCS) now display spells
+
 # 2024-10-1
 
 Work continues on improving 'stuff' (aka Inventory or items).  So first up we have casting penalties
