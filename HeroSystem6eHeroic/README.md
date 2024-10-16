@@ -276,9 +276,9 @@ Paste a single Unicode character in this text field if you would like a custom d
 This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
 >[!CAUTION]
-> Use of the delete option may lead to unwanted data loss. Deleted items are not recoverable.
+> Use of the following option may lead to unwanted data loss. Deleted items are not recoverable.
 
-### Activate Item Delete Boxes. Deactivate to complete Deletion.
+### Activate Item Delete Mode. Deactivate to complete Deletion
 
 This "option" activates or deactivates the line item deletion mode for armor, weapons, equipment, and the shield. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. If you close the character sheet the deletion marks will be reset, aborting the action.
 
