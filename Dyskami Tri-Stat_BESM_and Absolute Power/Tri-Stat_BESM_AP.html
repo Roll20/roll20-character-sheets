@@ -8077,6 +8077,12 @@
                     query.options = '';
                     query.last = query.next;
                 break;
+                case 'custom_specialization':
+                    query.title = `${getTranslationByKey(query.selection)}`;
+                    query.options = '';
+                    query.last = query.next;
+                    query.next = 'skill_specializations';
+                break;
                 case 'select_specializations':
                 case 'skill_specializations':
                     const skill_specializations = {
@@ -8144,10 +8150,18 @@
                     query.specializations = cache.attrdb.skills[cache.skill_index].individual[query.individual_index].specializations;
                     query.title = `${getTranslationByKey("select-specializations")}`;
                     query.options = '';
+                    const custom_specializations = query.specializations.filter(s => !skill_specializations[`${query.skill}`].includes(s));
+                    for (let i = 0; i < custom_specializations.length; i++) {
+                        skill_specializations[`${query.skill}`].push(custom_specializations[i]);
+                    }
                     for (let i = 0; i < skill_specializations[`${query.skill}`].length; i++) {
                         const bracket = 
                             query.specializations.findIndex(s => s === skill_specializations[`${query.skill}`][i]) !== -1;
-                        const specialization = `${getTranslationByKey(skill_specializations[`${query.skill}`][i])}`;
+                        const specialization = 
+                            `${
+                                getTranslationByKey(skill_specializations[`${query.skill}`][i]) ||
+                                skill_specializations[`${query.skill}`][i]
+                            }`;
                         query.options += `|${bracket ? '[ ' : ''}${specialization}${bracket ? ' ]' : ''},` +
                             `${skill_specializations[`${query.skill}`][i]}`;
                     }
@@ -8249,8 +8263,19 @@
                         }
                     break;
                     case 'select_specializations':
+                    case 'custom_specialization':
                     case 'skill_specializations':
-                        if (query.selection !== 'exit') {
+                        if (
+                            query.selection === 'any-single-animal' ||
+                            query.selection === 'one-specific-locale' ||
+                            query.selection === 'one-specific-culture-or-population' ||
+                            query.selection === 'one-specific-occupation' ||
+                            query.selection === 'by-species' ||
+                            query.selection === 'one-specific-sport' ||
+                            query.selection === 'unique_specialization'
+                        ) {
+                            query.next = 'custom_specialization';
+                        } else if (query.selection !== 'exit') {
                             query.spec_index = query.specializations.findIndex(s => s === query.selection);
                             if (query.spec_index === -1) {
                                 query.specializations.push(query.selection);
@@ -8258,7 +8283,9 @@
                                 query.specializations.splice(query.spec_index, 1);
                             }
                         }
-                        query.next = query.selection === 'exit' ? 'exit' : 'write_skillspecializations';
+                        query.next = query.next === 'custom_specialization' ? 'custom_specialization' :
+                            query.selection === 'exit' ? 'exit' : 
+                            'write_skillspecializations';
                     break;
                     case 'select_stat':
                     case 'skill_stat':
