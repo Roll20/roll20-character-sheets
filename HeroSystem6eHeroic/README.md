@@ -280,7 +280,7 @@ This dropdown offers three options: Never, Always, or Prompt. These give the opt
 
 ### Activate Item Delete Boxes. Deactivate to complete Deletion.
 
-This "option" activates or deactivates the line item deletion mode for armor, weapons, equipment, and the shield. Select whichever items you would like to remove. These items will not be deleted until you deactivate the option. If you close the character sheet the deletion marks will be reset, aborting the action.
+This "option" activates or deactivates the line item deletion mode for armor, weapons, equipment, and the shield. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. If you close the character sheet the deletion marks will be reset, aborting the action.
 
 # <a id="mods">Mod Support</a>
 
