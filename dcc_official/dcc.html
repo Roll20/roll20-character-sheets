@@ -2134,11 +2134,11 @@
           <select name="attr_alignment" title="@{alignment}">
             <option value="" data-i18n="choose...">
             </option>
-            <option value="l" data-i18n="lawful">
+            <option value="lawful" data-i18n="lawful">
             </option>
-            <option value="c" data-i18n="chaotic">
+            <option value="chaotic" data-i18n="chaotic">
             </option>
-            <option value="n" data-i18n="neutral">
+            <option value="neutral" data-i18n="neutral">
             </option>
           </select>
         </div>
@@ -3546,7 +3546,7 @@ const kTabOnOpen = function({trigger,attributes,sections,casc}){
 registerFuncs({ kTabOnOpen },{type:['opener']});
   return kFuncs;
   }());
-  const actionAttributes = ["repeating_rollable-tables_$X_action","crit_action","fumble_action","repeating_spells_$X_corruption_action","repeating_spells_$X_misfire_action"];const itemCategories = ["Wizard Spells","Cleric Spells","Weapons","Armor","Equipment","Attacks"];const specialCategories = {"Wizard":"Wizard Spells","wizard":"Wizard Spells","Cleric":"Cleric Spells","cleric":"Cleric Spells"};const maxAttr = [];const sectionLookup = {"Wizard":"spells","wizard":"spells","Cleric":"spells","cleric":"spells"};const scores = ["strength","agility","stamina","personality","luck","intelligence"];const levelUpAttributes = ["level"];const levelUpSections = ["mancer-class-options","mancer-class-table"];const mancerStageFuncs = {"refresh":{"load":["resetWipe"],"exit":["resetWipe"]},"startup":{"load":[],"exit":[]},"create":{"load":[],"exit":[]},"class":{"load":[],"exit":[]},"level":{"load":["setupLevelMancer"],"exit":["leaveLevelMancer"]},"spells":{"load":["loadMancerSpells"],"exit":[]},"tables":{"load":[],"exit":[]}};const dynamicSelects = {".class-select":[{"value":"","data-i18n":"none","selected":"","condition":"static"},{"value":"Category:Classes","condition":"compendium"}]};const dynamicAttributes = {".class-select":["mancer_class"]};const dynamicSources = {"compendium:class":[".class-select"]};k.version = 1.03;
+  const actionAttributes = ["repeating_rollable-tables_$X_action","crit_action","fumble_action","repeating_spells_$X_corruption_action","repeating_spells_$X_misfire_action"];const itemCategories = ["Wizard Spells","Cleric Spells","Weapons","Armor","Equipment","Attacks"];const specialCategories = {"Wizard":"Wizard Spells","wizard":"Wizard Spells","Cleric":"Cleric Spells","cleric":"Cleric Spells"};const maxAttr = [];const sectionLookup = {"Wizard":"spells","wizard":"spells","Cleric":"spells","cleric":"spells"};const scores = ["strength","agility","stamina","personality","luck","intelligence"];const levelUpAttributes = ["level"];const levelUpSections = ["mancer-class-options","mancer-class-table"];const mancerStageFuncs = {"refresh":{"load":["resetWipe"],"exit":["resetWipe"]},"startup":{"load":[],"exit":[]},"create":{"load":[],"exit":[]},"class":{"load":[],"exit":[]},"level":{"load":["setupLevelMancer"],"exit":["leaveLevelMancer"]},"spells":{"load":["loadMancerSpells"],"exit":[]},"tables":{"load":[],"exit":[]}};const dynamicSelects = {".class-select":[{"value":"","data-i18n":"none","selected":"","condition":"static"},{"value":"Category:Classes","condition":"compendium"}]};const dynamicAttributes = {".class-select":["mancer_class"]};const dynamicSources = {"compendium:class":[".class-select"]};k.version = 1.04;
 k.defaultRollStart = '&{template:dcc}';
   
 const expandEffects = (attributes,casc,queue,recurred = []) => {
@@ -4715,7 +4715,24 @@ k.registerFuncs({deedRoll});const rollSomething = (customSettings = {}) => {
           finish
       );
   });
+};/**
+ * updates to 1.04, converts old npc alignment values
+ * @param {object} trigger - The trigger that caused the function to be called
+ * @param {object} attributes - The attribute values of the character
+ * @param {object[]} sections - All the repeating section IDs
+ * @param {object} casc - Expanded cascade object
+ */
+const v1x04 = function({trigger,attributes,sections,casc}){
+  if(attributes.is_npc){
+    const alignConvert = {
+      'l': 'lawful',
+      'c': 'chaotic',
+      'n': 'neutral'
+    };
+    attributes.alignment = alignConvert[attributes.alignment] || attributes.alignment;
+  }
 };
+k.registerFuncs({'1.04':v1x04},{type:['updater']});
   
   
   /**
@@ -5863,6 +5880,7 @@ k.registerFuncs({deedRoll});const rollSomething = (customSettings = {}) => {
   }
   const calculateCritDieValue = function({trigger,attributes,sections,casc}) {
     if(attributes.is_npc){
+      if(!attributes.critTable || !attributes.hd) return;
       const npcCritDice = {
         humanoid: ['d4','d6','d8','d8','d10','d10','d12','d12','d14','d14','d16','d16','d20','d20','2d10','2d10','2d12','2d12','2d14','2d14','3d10','3d10'],
         demon: ['d3','d4','d4','d4','d4','d6','d6','d8','d8','d10','d10','d12','d12','d14','d14','d16','d16','d20','d20','d24','d24','d30'],
