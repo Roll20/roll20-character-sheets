@@ -3,7 +3,8 @@ on(
 	"change:safe-sheet-open " +
 	"change:FKBasis " +
 	"change:TaW_Armbrust change:TaW_Belagerungswaffen change:TaW_Blasrohr " +
-	"change:TaW_Bogen change:TaW_Diskus change:TaW_Schleuder " +
+	"change:TaW_Bogen change:TaW_Diskus change:TaW_feuerwaffen " +
+	"change:TaW_Schleuder " +
 	"change:TaW_Wurfbeile change:TaW_Wurfmesser change:TaW_Wurfspeere " +
 	"change:FKWFK1 change:FKW_Aktiv1 change:FKW1_Spez change:FKWtyp1 " +
 	"change:FKWFK2 change:FKW_Aktiv2 change:FKW2_Spez change:FKWtyp2 " +
@@ -14,7 +15,8 @@ on(
 	safeGetAttrs([
 		"FKBasis",
 		"TaW_Armbrust", "TaW_Belagerungswaffen", "TaW_Blasrohr",
-		"TaW_Bogen", "TaW_Diskus", "TaW_Schleuder",
+		"TaW_Bogen", "TaW_Diskus", "TaW_feuerwaffen",
+		"TaW_Schleuder",
 		"TaW_Wurfbeile", "TaW_Wurfmesser", "TaW_Wurfspeere",
 		"FKWFK1", "FKW_Aktiv1", "FKW1_Spez", "FKWtyp1",
 		"FKWFK2", "FKW_Aktiv2", "FKW2_Spez", "FKWtyp2",
@@ -25,7 +27,8 @@ on(
 		var attrsToChange = {"FK_Aktiv": 0};
 		var FKTalente = [
 			"Armbrust", "Belagerungswaffen", "Blasrohr",
-			"Bogen", "Diskus", "Schleuder",
+			"Bogen", "Diskus", "feuerwaffen",
+			"Schleuder",
 			"Wurfbeile", "Wurfmesser", "Wurfspeere"
 		];
 		// Todo: Proper sanity checking of input data
@@ -38,7 +41,7 @@ on(
 		}
 
 		// Calculation of FK values
-		for (FKTalent of FKTalente) {
+		for (let FKTalent of FKTalente) {
 			var TaW = "TaW_" + FKTalent;
 			if (isNaN(v[TaW])) {
 				v[TaW] = 0;
@@ -46,7 +49,7 @@ on(
 			attrsToChange["AT_" + FKTalent] = parseInt(v["FKBasis"]) + parseInt(v[TaW]);
 		}
 
-		for (var i = 1; i <= 4; i++) {
+		for (let i = 1; i <= 4; i++) {
 			v["FKWtyp" + i] = v["FKWtyp" + i].replace(/[^_a-zA-ZäöüÄÖÜß|]/g, "");
 			if (v["FKWtyp" + i] === "") {
 				v["FKWtyp" + i] = "--";

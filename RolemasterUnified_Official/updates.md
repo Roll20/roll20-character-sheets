@@ -1,3 +1,77 @@
+# 2024-10-15
+
+- Start of Power Level support
+    - Sheet version to 4: Set everyones powerlevel to Superior
+    - Show powerlevel on sheet
+    - Add create step for power level
+    - Add support for powerlevel during stat rolling
+- Use the roll20 dice roller for dice; not the js one.
+- Send stat rolls to the chat.
+- More messages when injuries are applied.
+- Make checkboxes a standard size,
+- NPC upload button on the front page.
+
+# 2024-10-8
+
+- (Hopefully) quieten monsters AP messages.
+- Handle a numeric AT (some monsters)
+- Updated attack testing significantly.
+- Remove some not-an-error errors in attacks
+- Stop using D for side.  That's death/defeat.  O is now side. (Odd)
+- Fix for monsters dropped from compendium
+
+Compendium: Fix the couple of corrupted attack tables which were causing random failures on
+some attacks.  This has been bugging up a few characters (and creatures).
+
+# 2024-10-3
+
+- Remove a lot of debug in level up and stuff.
+- Allow creatures to be called NPCs on drop
+- Creatures (NPCS) now display spells
+
+# 2024-10-1
+
+Work continues on improving 'stuff' (aka Inventory or items).  So first up we have casting penalties
+for armor calculated and working.  This may may the spell casters in your group most unhappy.  I hope
+they stocked up on Transcendance.   We have also added a 'pack' and 'store'.  A pack is backpack or
+similar item you can drop if in combat.   Or maybe on your horse.  There is a toggle button to carry
+or not carry it.  Encumberance pnealties are calcualted depending if carried or not.   Store is for
+stuff you character doesn't have with them.  Homewares or buried treaures.  You can move items between
+the three lists easily.
+
+Then there is a pile of small items; Spells persist previous ranks on levelup.  Lots of people have
+asked for this - Enjoy!
+
+- Stuff (aka Inventory)
+  - Spell equipped correctly.
+  - Items only count to encumberance% if equipped (w/ test)
+  - Add Store & Backpack sections
+  - Add toggle for backpack carried
+  - Allow items to move between sections with a click
+- Add support for transcendance and spell Enc% penalties
+- Make bleed a local (internal change)
+- Reset current round/phase on new combat.
+- Show the current round in the action box
+- Don't set negative PP on the character sheet (min 0)
+- Spells remember how many you got on level up.
+
+# 2024-9-26
+
+Start work on fully supporting encumbrance and maneuver penalties.  So now we
+calculate load (we did not before), our max pace (been empty forever), change
+the property name to carried_weight (was set, but never used before).
+
+- Creatures:
+  - Handle more attack types
+  - Creature attacks work again with the new maneuver penalties.
+  - Fix issue with creatures without skills failing
+- Update maxpace and load %s on sheet
+  - Need to update equipment in the compendium to make this effective.
+- Add a dot to show skills you have a profession bonus in
+- Update DB:
+  - Add passive block to active dodges and passive dodge to active block
+  - Cap running ranks, not passive DB at 50.
+
 # 2024-9-24
 
 A number of small updates this week.  Starting some work to fix a mumber of other wierd bugs; but nothing yet.
@@ -6,7 +80,7 @@ Thank you to all who have reported problems.  Please let me know if there are mo
 - Dark mode tweaks for side panel, and the crit box.  Dark mode is still a long
   way from complete on the main sheet; but the side panel should be usual.
 - Spell rank modifier when casting; missed that in the other massive improvements.
-- Don't barf AP updates on New Combat. 
+- Don't barf AP updates on New Combat.
 - Fix for weight allowance (thanks spaturno80).  I totally misread those rules.  Like totally.
 - Creature sheet improvements for skills and other items.
 - Async: Recover is a few more wierd situations (thanks major__havoc).
