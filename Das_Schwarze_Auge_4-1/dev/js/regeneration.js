@@ -736,7 +736,8 @@ on(
 			"&{template:reg-sleep}",
 			`{{charactername=${values["character_name"]}}}`,
 			`{{le=${values["LE"]}}}`,
-			`{{lebase=[[1d6 + [Vor- und Nachteile](${values["reg_sleep_le_mod_advantages_disadvantages"]}) + [Nahrungsrestriktion](${values["reg_sleep_le_mod_food_restriction"]}) + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
+			`{{lebase=[[1d6 + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
+			`{{lead=[[(${values["reg_sleep_le_mod_advantages_disadvantages"]})]]}}`,
 			`{{leko=[[${values["reg_sleep_le_ko"]}]]}}`,
 			"{{leneu=[[0d1]]}}"
 		];
@@ -751,7 +752,10 @@ on(
 			`{{kebase=[[1d1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
 			"{{keneu=[[0d1]]}}"
 		];
-		const foodRestrictionRoll = "{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}";
+		const foodRestrictionRoll = [
+			'{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}',
+			`{{lefr=[[${values["reg_sleep_le_mod_food_restriction"]}]]}}`
+		];
 		const sleepDisorderRoll = [
 			// general decision for triggering sleep disorder or not
 			`{{schlafstoerung=[[${values["reg_sleep_sleep_disorder_trigger"]}]]}}`,
@@ -1027,6 +1031,13 @@ on('clicked:reg_sleep-action', async (info) => {
 
 		if (values["reg_sleep_le_fixed"] === "off")
 		{
+			// Base regeneration
+			LERegTotal = results["lebase"].result;
+
+			// Regeneration from advantages/disadvantages
+			computed["lead"] = results["lead"].result;
+			LERegTotal += results["lead"].result;
+
 			// Additional regeneration from KO check
 			var LEKO = 0;
 			if (results["leko"].result >= 0) {
@@ -1039,7 +1050,15 @@ on('clicked:reg_sleep-action', async (info) => {
 				}
 			}
 			computed["leko"] = LEKO;
-			LERegTotal = results["lebase"].result + LEKO;
+			LERegTotal += LEKO;
+
+			// Regeneration from food restrction
+			if (Object.hasOwn(results, "lefr"))
+			{
+				LERegTotal += results["lefr"].result;
+			}
+
+			// Sleep disorder
 			if (
 				Object.hasOwn(results, "schlafstoerungfall") &&
 				(
@@ -1055,6 +1074,8 @@ on('clicked:reg_sleep-action', async (info) => {
 				results["leschlafstoerung"]["result"] = -results["leschlafstoerung"]["result"];
 				LERegTotal += results["leschlafstoerung"]["result"];
 			}
+
+			// Somnambulism
 			if (Object.hasOwn(results, "schlafwandeln"))
 			{
 				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
@@ -1062,6 +1083,7 @@ on('clicked:reg_sleep-action', async (info) => {
 		} else {
 			// required for roll template
 			results["lebase"] = { "result": parseInt(values["reg_sleep_le_fixed"]) };
+			computed["lead"] = 0;
 			computed["leko"] = 0;
 			LERegTotal = parseInt(values["reg_sleep_le_fixed"]);
 		}
@@ -1150,11 +1172,13 @@ on('clicked:reg_sleep-action', async (info) => {
 		// Prettify certain output
 		{
 			let useComputed = [
+				"lead",
 				"leko",
 				"aein"
 			];
 			let useResults = [
 				"lebase",
+				"lefr",
 				"aebase",
 				"kebase",
 				"nahrungsrestriktion",
