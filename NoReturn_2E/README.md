@@ -13,6 +13,16 @@ https://www.mannifest-games.com/
 
 # Release Notes
 
+**2024-07-29 v1.2**
+
+* Verbesserungen
+    * Einige kleinere Layout-Optimierungen
+
+**2024-02-17 v1.1 HF5**
+
+* Bugfix
+    * Die Spezies-Felder bei Charakterdaten und Fertigkeiten unterscheiden. Das Textfeld bei den Charakterdaten muss dadurch neu befüllt werden.
+
 **2024-01-23 v1.1 HF4**
 
 * Bugfix

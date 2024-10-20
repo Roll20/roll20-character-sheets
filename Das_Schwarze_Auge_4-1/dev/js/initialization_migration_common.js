@@ -18,6 +18,7 @@ Relevant character sheet versions
 * 20220604: Visibili Vanitar spelling fixes
 * 20220821: Sheet Initialization
 * 20230618: Confirmation/Reaction Buttons
+* 20240414: Regeneration (Sleep)
 */
 function migrationCheck() {
 		safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
@@ -68,7 +69,7 @@ function migrationCheck() {
 								if not and it is the first migration, than the function name is saved as "firstFunction"
 								if it is not the first migration to apply it is added to "functionsToCall" array
 						*/
-						for (version of versionsWithMigrations) {
+						for (let version of versionsWithMigrations) {
 								if (dataVersion < version) {
 										var functionName = "migrateTo" + version;
 										debugLog(caller, "dataVersion " + dataVersion + " is older than version " + version + " which needs a migration. Invoking migration function: " + functionName);

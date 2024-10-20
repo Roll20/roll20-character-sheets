@@ -14,6 +14,7 @@ HTML = \
 	dev/html/sheet/section_magie.html \
 	dev/html/sheet/section_liturgien.html \
 	dev/html/sheet/section_kampfwerte.html \
+	dev/html/sheet/section_regeneration.html \
 	dev/html/sheet/section_notizen.html \
 	dev/html/sheet/section_config.html \
 	dev/html/sheet/section_info.html \
@@ -21,6 +22,7 @@ HTML = \
 	dev/html/sheet/outro.html \
 	dev/html/roll\ templates/intro.html \
 	dev/html/roll\ templates/crp.html \
+	dev/html/roll\ templates/regeneration.html \
 	dev/html/roll\ templates/legacy.html \
 	dev/html/roll\ templates/tests.html \
 	dev/html/roll\ templates/outro.html \
@@ -37,12 +39,14 @@ JS = \
 	dev/js/advantages_disadvantages.js \
 	dev/js/talents.js \
 	dev/js/magic.js \
+	dev/js/magic_myranor.js \
 	dev/js/liturgies.js \
 	dev/js/melee.js \
 	dev/js/ranged_combat_calculator.js \
 	dev/js/ranged_combat_other.js \
 	dev/js/armour_encumbrance_initiative.js \
 	dev/js/wounds.js \
+	dev/js/regeneration.js \
 	dev/js/debug_mode.js \
 	dev/js/roll_macro_generator.js \
 	dev/js/other.js \

@@ -1290,3 +1290,48 @@ function upgradeCharacter3Dot4() {
         });
     });
 }
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.4+ to 3.6
+ */
+function upgradeCharacter3Dot6() {
+    console.log("Upgrading character to 3.6");
+
+    getSectionIDs("repeating_professionalskill", function(proSkillIds) {
+        getSectionIDs("repeating_combatstyle", function(combatStyleIds) {
+            let proSkillGetAttrs = [];
+            proSkillIds.forEach(id => {
+                proSkillGetAttrs.push(`repeating_professionalskill_${id}_char1`, `repeating_professionalskill_${id}_char2`);
+            });
+
+            let combatStyleGetAttrs = [];
+            combatStyleIds.forEach(id => {
+                combatStyleGetAttrs.push(`repeating_combatstyle_${id}_char1`, `repeating_combatstyle_${id}_char2`);
+            });
+
+            getAttrs(proSkillGetAttrs.concat(combatStyleGetAttrs), function(v) {
+                let newAttrs = {"version": '3.6'};
+
+                proSkillIds.forEach(id => {
+                    if (v[`repeating_professionalskill_${id}_char1`] === '@{str}' || v[`repeating_professionalskill_${id}_char1`] === '@{dex}' ||
+                        v[`repeating_professionalskill_${id}_char2`] === '@{str}' || v[`repeating_professionalskill_${id}_char2`] === '@{dex}') {
+                        newAttrs[`repeating_professionalskill_${id}_encumbered`] = 1;
+                    } else {
+                        newAttrs[`repeating_professionalskill_${id}_encumbered`] = 0;
+                    }
+                });
+
+                combatStyleIds.forEach(id => {
+                    if (v[`repeating_combatstyle_${id}_char1`] === '@{str}' || v[`repeating_combatstyle_${id}_char1`] === '@{dex}' ||
+                        v[`repeating_combatstyle_${id}_char2`] === '@{str}' || v[`repeating_combatstyle_${id}_char2`] === '@{dex}') {
+                        newAttrs[`repeating_combatstyle_${id}_encumbered`] = 1;
+                    } else {
+                        newAttrs[`repeating_combatstyle_${id}_encumbered`] = 0;
+                    }
+                });
+
+                setAttrs(newAttrs);
+            });
+        });
+    });
+}

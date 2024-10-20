@@ -5,13 +5,13 @@ function initializeSheet(migrationChain) {
 	var attrsToInit = [
 		// Stats and derived values
 		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK", "GS",
-		"legrundw", "LE_max",
-		"AU_max", "ausgrundw", "aus_max",
+		"LE", "legrundw", "LE_max",
+		"AU", "AU_max", "ausgrundw", "aus_max",
 		"erschoepfung_basis", "erschoepfung_max",
 		"ueberanstrengung_max",
 		"mrgrundw", "MR", "wundschwelle",
-		"AE_max", "aspgrundw", "asp_max",
-		"KE_max",
+		"AE", "AE_max", "aspgrundw", "asp_max", "sf_meisterliche_regeneration_leiteigenschaft",
+		"KE", "KE_max",
 		"ap_verfuegbar",
 
 		// Rolls
@@ -21,11 +21,11 @@ function initializeSheet(migrationChain) {
 		// Combat
 		/// Melee AT Values
 		"AT_Aktiv", "AT_Aktiv_TaW", "atbasis",
-		"AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
+		"AT_Anderthalbhander", "AT_bastardstaebe", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
 
 		/// Melee PA Values
 		"PA_Aktiv", "PA_Aktiv_TaW", "pabasis",
-		"PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+		"PA_Anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 
 		/// Melee other
 		"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",
@@ -35,7 +35,7 @@ function initializeSheet(migrationChain) {
 
 		/// Ranged Combat
 		"FK_Aktiv", "fkbasis",
-		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_peitsche", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
+		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_feuerwaffen", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
 		"FKWFK1", "FKWFK2", "FKWFK3", "FKWFK4",
 		"FKWtyp1", "FKWtyp2", "FKWtyp3", "FKWtyp4",
 
@@ -59,7 +59,18 @@ function initializeSheet(migrationChain) {
 		"AT_mod_wounds", "PA_mod_wounds", "FK_mod_wounds",
 		"MU_mod_wounds", "IN_mod_wounds", "KL_mod_wounds", "FF_mod_wounds", "GE_mod_wounds", "KO_mod_wounds", "KK_mod_wounds",
 		"GS_mod_wounds", "IB_mod_wounds",
-		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb"
+		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb",
+
+		// Regeneration
+		"reg_sleep_le_ko", "reg_sleep_le_fixed",
+		"reg_sleep_le_mod_advantages_disadvantages", "reg_sleep_le_mod_food_restriction",
+		"reg_sleep_ae_base", "reg_sleep_ae_in", "reg_sleep_ae_fixed",
+		"reg_sleep_ae_mod_advantages_disadvantages", "reg_sleep_ae_mod_special_skills", "reg_sleep_ae_mod_food_restriction", "reg_sleep_ae_mod_homesickness",
+		"reg_sleep_addiction_withdrawal_effect",
+		"reg_sleep_food_restriction_effect",
+		"reg_sleep_mod_somnambulism",
+		"reg_sleep_sleep_disorder_effect", "reg_sleep_sleep_disorder_trigger",
+		"reg_sleep_roll"
 	];
 	// Initialization Second Safeguard Check (function not called based on sixteen attributes and data_version)
 	// These attributes have been picked, because no character generated according to the official rules will have all their attributes at 8, so comparing these attributes will almost guarantee that old sheets are correctly detected and no initialization will take place.
@@ -69,9 +80,9 @@ function initializeSheet(migrationChain) {
 	defaults = { "Basis": 8, "Mod": 0 };
 
 	safeguardAttrs = [];
-	for ( stem of attrStems )
+	for ( let stem of attrStems )
 	{
-		for ( ext of attrExtensions )
+		for ( let ext of attrExtensions )
 		{
 			safeguardAttrs.push(stem + "_" + ext);
 		}
@@ -82,7 +93,7 @@ function initializeSheet(migrationChain) {
 		safeguardAttrs.concat(["data_version"]),
 		function(v, missing, badDef)
 		{
-				debugLog(caller, "Safeguard attributes:", v);
+			debugLog(caller, "Safeguard attributes:", v);
 			var attrs = { "sheet_initialized": false };
 			var dataVersionSet = true;
 
@@ -93,7 +104,7 @@ function initializeSheet(migrationChain) {
 			}
 			if ( dataVersionSet === false )
 			{
-				for ( attr of safeguardAttrs )
+				for ( let attr of safeguardAttrs )
 				{
 					// None of the safeguard attributes should be undefined (missing) or have a bad value (NaN, undefined)
 					if (
@@ -109,9 +120,9 @@ function initializeSheet(migrationChain) {
 				{
 					// The safeguard attributes should all be at their default values
 					debugLog(caller, "Checking safeguard attributes ...");
-					for ( attr of safeguardAttrs )
+					for ( let attr of safeguardAttrs )
 					{
-						for ( ext of attrExtensions )
+						for ( let ext of attrExtensions )
 						{
 							if ( attr.search(ext) > -1 )
 							{
@@ -131,9 +142,9 @@ function initializeSheet(migrationChain) {
 				}
 				if ( attrs["sheet_initialized"] === false )
 				{
-					for ( attr of attrsToInit )
+					for ( let attr of attrsToInit )
 					{
-						attrs[attr] = defaultValues[attr];
+						attrs[attr] = getDefaultValue(attr);
 					}
 					debugLog(caller, "Attributes after initialization: ", attrs);
 				}

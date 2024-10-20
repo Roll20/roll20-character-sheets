@@ -470,7 +470,6 @@ rollCombatDistance.forEach((button) => {
     const ameliorationsA = getWeaponsDistanceAA(prefix, attrs, vDiscretion, oDiscretion, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
 
     exec = exec.concat(ameliorationsA.exec);
-
     bonus = bonus.concat(ameliorationsA.bonus);
 
     baseDegats += ameliorationsA.diceDegats;

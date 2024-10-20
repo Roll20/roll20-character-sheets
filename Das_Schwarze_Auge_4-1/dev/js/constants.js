@@ -1,13 +1,26 @@
 /* constants begin */
+const statAttrs = [
+	"MU",
+	"KL",
+	"IN",
+	"CH",
+	"FF",
+	"GE",
+	"KO",
+	"KK"
+];
+
 const combatTechniques = {
 		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
 		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
+		"bastardstaebe":       { type: "melee",  ebe: -2,        "at-only": false },
 		"belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
 		"blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
 		"bogen":               { type: "ranged", ebe: -3,        "at-only": true },
 		"diskus":              { type: "ranged", ebe: -2,        "at-only": true },
 		"dolche":              { type: "melee",  ebe: -1,        "at-only": false },
 		"fechtwaffen":         { type: "melee",  ebe: -1,        "at-only": false },
+		"feuerwaffen":         { type: "ranged", ebe: -5,        "at-only": true },
 		"hiebwaffen":          { type: "melee",  ebe: -4,        "at-only": false },
 		"infanteriewaffen":    { type: "melee",  ebe: -3,        "at-only": false },
 		"kettenstabe":         { type: "melee",  ebe: -1,        "at-only": false },
@@ -53,9 +66,11 @@ const defaultValues = {
 	"KK": 8,
 	"GS": 8,
 
+	"LE": 12,
 	"legrundw": 12,
 	"LE_max": 12,
 
+	"AU": 12,
 	"AU_max": 12,
 	"ausgrundw": 12,
 	"aus_max": 12, // Old attributes kept for compatibility (used in token bars)
@@ -69,10 +84,13 @@ const defaultValues = {
 	"MR": 5,
 	"wundschwelle": 4,
 
+	"AE": 12,
 	"AE_max": 12,
 	"aspgrundw": 12,
 	"asp_max": 12, // Old attributes kept for compatibility (used in token bars)
+	"sf_meisterliche_regeneration_leiteigenschaft": "@{KL}",
 
+	"KE": 0,
 	"KE_max": 0,
 
 	"ap_verfuegbar": 0,
@@ -99,6 +117,7 @@ const defaultValues = {
 	"atbasis": 5,
 
 	"AT_Anderthalbhander": 5,
+	"AT_bastardstaebe": 5,
 	"AT_dolche": 5,
 	"AT_fechtwaffen": 5,
 	"AT_hiebwaffen": 5,
@@ -123,6 +142,7 @@ const defaultValues = {
 	"pabasis": 5,
 
 	"PA_Anderthalbhander": 5,
+	"PA_bastardstaebe": 5,
 	"PA_dolche": 5,
 	"PA_fechtwaffen": 5,
 	"PA_hiebwaffen": 5,
@@ -165,7 +185,7 @@ const defaultValues = {
 	"AT_Blasrohr": 5,
 	"AT_Bogen": 5,
 	"AT_Diskus": 5,
-	"AT_peitsche": 5,
+	"AT_feuerwaffen": 5,
 	"AT_Schleuder": 5,
 	"AT_Wurfbeile": 5,
 	"AT_Wurfmesser": 5,
@@ -247,6 +267,8 @@ const defaultValues = {
 	"BE": 0,
 	"be_at_mod": 0,
 	"be_pa_mod": 0,
+	"be_at_mod_hint": 0,
+	"be_pa_mod_hint": 0,
 	"BE_RG": 0,
 	"BE_RG_INI": 0,
 
@@ -277,7 +299,42 @@ const defaultValues = {
 	"wound_la": 0,
 	"wound_lb": 0,
 	"wound_ra": 0,
-	"wound_rb": 0
+	"wound_rb": 0,
+
+	// Regeneration
+	"reg_sleep_le_ko": "@{KO} - 1d20",
+	"reg_sleep_le_fixed": "off",
+	"reg_sleep_le_mod_advantages_disadvantages": 0,
+	"reg_sleep_le_mod_food_restriction": 0,
+	"reg_sleep_ae_base": "1d6",
+	"reg_sleep_ae_in": "@{IN} - 1d20",
+	"reg_sleep_ae_fixed": "off",
+	"reg_sleep_ae_mod_advantages_disadvantages": 0,
+	"reg_sleep_ae_mod_special_skills": 0,
+	"reg_sleep_ae_mod_food_restriction": 0,
+	"reg_sleep_ae_mod_homesickness": 0,
+	"reg_sleep_addiction_withdrawal_effect": "0",
+	"reg_sleep_food_restriction_effect": 0,
+	"reg_sleep_mod_somnambulism": "0",
+	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
+	"reg_sleep_sleep_disorder_trigger": "1d0",
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}",
+
+	// Repeating sections
+	"repeating_conjuration-spells-myranor": {
+		"spell_action": '&{template:default} {{Hinweis=Attribut "spell_action" eines myranischen Beschwörungszaubers noch nicht gesetzt. Versuchen Sie den Charakterbogen zu schließen und wieder zu öffnen. Alternativ sollte eine Änderung an der Quelle, der Kategorie, der Repräsentation oder den Probeneigenschaften dazu führen, dass der Würfelknopf korrekt funktioniert.}}',
+		"sphere": "Sphäre unbekannt",
+		"stats": "MU/KL/CH",
+		"value": 0,
+		"source": "Quelle?",
+		"type": "?",
+		"representation_full": "??????",
+		"representation_short": "???",
+		"stat0": "MU",
+		"stat1": "KL",
+		"stat2": "CH",
+		"name": "Quelle? (?), ???"
+	}
 };
 
 /*
@@ -301,12 +358,14 @@ Individual spell names are generally based on a/the short name. One of the excep
 const talents = [
 	't_ka_anderthalbhaender',
 	't_ka_armbrust',
+	't_ka_bastardstaebe',
 	't_ka_belagerungswaffen',
 	't_ka_blasrohr',
 	't_ka_bogen',
 	't_ka_diskus',
 	't_ka_dolche',
 	't_ka_fechtwaffen',
+	't_ka_feuerwaffen',
 	't_ka_hiebwaffen',
 	't_ka_infanteriewaffen',
 	't_ka_kettenstaebe',
@@ -329,7 +388,9 @@ const talents = [
 	't_ko_akrobatik',
 	't_ko_athletik',
 	't_ko_fliegen',
+	't_ko_freiesfliegen',
 	't_ko_gaukeleien',
+	't_ko_immanspiel',
 	't_ko_klettern',
 	't_ko_koerperbeherrschung',
 	't_ko_reiten',
@@ -415,6 +476,7 @@ const talents = [
 	't_sp_neckergesang',
 	't_sp_nujuka',
 	't_sp_rssahh',
+	't_sp_sprachederblumen',
 	't_sp_trollisch',
 	't_sp_waldmenschensprachen',
 	't_sp_zlit',
@@ -457,6 +519,7 @@ const talents = [
 	't_h_feinmechanik',
 	't_h_feuersteinbearbeitung',
 	't_h_fleischer',
+	't_h_fluggeraetesteuern',
 	't_h_gerber',
 	't_h_glaskunst',
 	't_h_grobschmied',
@@ -490,13 +553,93 @@ const talents = [
 	't_h_viehzucht',
 	't_h_webkunst',
 	't_h_winzer',
-	't_h_zimmermann'
+	't_h_zimmermann',
+	/* Myranor */
+	't_sp_gemeinimperial',
+	't_sp_hieroimperial',
+	't_sp_fruehimperial',
+	't_sp_dorinthisch',
+	't_sp_kentorisch',
+	't_sp_draydalanisch',
+	't_sp_yachyach',
+	't_sp_alamarasharielitisch',
+	't_sp_ravesaran',
+	't_sp_pristidial',
+	't_sp_gemeinamaunal',
+	't_sp_hieroamaunal',
+	't_sp_leonal',
+	't_sp_pardiral',
+	't_sp_tighral',
+	't_sp_lyncal',
+	't_sp_sumurrisch',
+	't_sp_altnarkramarisch',
+	't_sp_alttesumurrisch',
+	't_sp_narkramarisch',
+	't_sp_mahapratisch',
+	't_sp_kerrishitisch',
+	't_sp_tesumurrisch',
+	't_sp_vinshinisch',
+	't_sp_boagorambanbarguinisch',
+	't_sp_lishshioderwolfalbisch',
+	't_sp_dagathimisch',
+	't_sp_krakonisch',
+	't_sp_mholurisch',
+	't_sp_iaril',
+	't_sp_loualilisch',
+	't_sp_altneristal',
+	't_sp_neristal',
+	't_sp_gemeinvesayitisch',
+	't_sp_altvesayitisch',
+	't_sp_urvesayitisch',
+	't_sp_abishant',
+	't_sp_bashurisch',
+	't_sp_bramscho',
+	't_sp_eupherban',
+	't_sp_grolmurisch',
+	't_sp_hippocampir',
+	't_sp_horngesang',
+	't_sp_lieddergemeinschaft',
+	't_sp_lutral',
+	't_sp_myranisch',
+	't_sp_myrmidal',
+	't_sp_nequanerwasserschallcode',
+	't_sp_nequanerzeichensprache',
+	't_sp_norkoshal',
+	't_sp_rhoglossa',
+	't_sp_ruritin',
+	't_sp_shingwanisch',
+	't_sp_shinoq',
+	't_sc_altetesumurrischeglyphen',
+	't_sc_altnarkramarischebilderschrift',
+	't_sc_alttauralsilbenzeichen',
+	't_sc_amaunischekratzschrift',
+	't_sc_anneristalyabilderschrift',
+	't_sc_banshibilderschrift',
+	't_sc_bramschoromk',
+	't_sc_draydalanischeschriftzeichen',
+	't_sc_eupherbancode',
+	't_sc_fruehimperialeglyphen',
+	't_sc_grolmurischesilbenzeichen',
+	't_sc_imperialebuchstaben',
+	't_sc_kalshinshi',
+	't_sc_kerrishitischesilbenzeichen',
+	't_sc_khorrzusymbole',
+	't_sc_lahmarischeglyphen',
+	't_sc_lyncilsymbole',
+	't_sc_mahapratischesilbenzeichen',
+	't_sc_narkramarischesilbenzeichen',
+	't_sc_nequanischebuchstaben',
+	't_sc_vesayitischesilbenzeichen',
+	't_sc_vesayosilbenzeichen',
+	't_sc_vorimperialepiktogramme',
+	't_sc_wasserschallzeichen'
 ];
 
 const talents_ebe = [
 	't_ko_akrobatik',
 	't_ko_athletik',
 	't_ko_fliegen',
+	't_ko_freiesfliegen',
 	't_ko_gaukeleien',
 	't_ko_klettern',
 	't_ko_koerperbeherrschung',
@@ -888,6 +1031,31 @@ const melee = [
 ];
 
 /*
+	Constants for regeneration-related things
+*/
+// Regeneration buttons
+const reg = [
+	'reg_sleep'
+];
+
+// Minimum regeneration per regeneration phase (sleep)
+const regLimitLower = {
+	'le': 0,
+	'ae': 0,
+	'ke': 0
+};
+
+// Astral regeneration-related attributes
+const astralRegenerationAttrs =
+[
+	"sf_regeneration_i",
+	"sf_regeneration_i",
+	"sf_regeneration_ii",
+	"sf_meisterliche_regeneration",
+	"sf_meisterliche_regeneration_leiteigenschaft"
+];
+
+/*
 	Constants for translating (new) internal name to (old) internal name and UI name
 
 In the long run, all attributes should be migrated to the new ones.
@@ -895,12 +1063,14 @@ In the long run, all attributes should be migrated to the new ones.
 const talentsData = {
 	't_ka_anderthalbhaender': {'internal': "Anderthalbhander", 'ui': "Anderthalbhänder"},
 	't_ka_armbrust': {'internal': "armbrust", 'ui': "Armbrust"},
+	't_ka_bastardstaebe': {'internal': "bastardstaebe", 'ui': "Bastardstäbe"},
 	't_ka_belagerungswaffen': {'internal': "belagerungswaffen", 'ui': "Belagerungswaffen"},
 	't_ka_blasrohr': {'internal': "blasrohr", 'ui': "Blasrohr"},
 	't_ka_bogen': {'internal': "bogen", 'ui': "Bogen"},
 	't_ka_diskus': {'internal': "diskus", 'ui': "Diskus"},
 	't_ka_dolche': {'internal': "dolche", 'ui': "Dolche"},
 	't_ka_fechtwaffen': {'internal': "fechtwaffen", 'ui': "Fechtwaffen"},
+	't_ka_feuerwaffen': {'internal': "feuerwaffen", 'ui': "Feuerwaffen"},
 	't_ka_hiebwaffen': {'internal': "hiebwaffen", 'ui': "Hiebwaffen"},
 	't_ka_infanteriewaffen': {'internal': "infanteriewaffen", 'ui': "Infanteriewaffen"},
 	't_ka_kettenstaebe': {'internal': "kettenstabe", 'ui': "Kettenstäbe"},
@@ -923,7 +1093,9 @@ const talentsData = {
 	't_ko_akrobatik': {'internal': "akrobatik", 'ui': "Akrobatik"},
 	't_ko_athletik': {'internal': "athletik", 'ui': "Athletik"},
 	't_ko_fliegen': {'internal': "fliegen", 'ui': "Fliegen"},
+	't_ko_freiesfliegen': {'internal': "freiesfliegen", 'ui': "Freies Fliegen"},
 	't_ko_gaukeleien': {'internal': "gaukeleien", 'ui': "Gaukeleien"},
+	't_ko_immanspiel': {'internal': "immanspiel", 'ui': "Immanspiel"},
 	't_ko_klettern': {'internal': "klettern", 'ui': "Klettern"},
 	't_ko_koerperbeherrschung': {'internal': "korperbeherrschung", 'ui': "Körperbeherrschung"},
 	't_ko_reiten': {'internal': "reiten", 'ui': "Reiten"},
@@ -980,7 +1152,7 @@ const talentsData = {
 	't_w_tierkunde': {'internal': "tierkunde", 'ui': "Tierkunde"},
 	't_sp_garethi': {'internal': "garethi", 'ui': "Garethi"},
 	't_sp_bosparano': {'internal': "bosparano", 'ui': "Bosparano"},
-	't_sp_aureliani': {'internal': "aureliani", 'ui': "Aureliani"},
+	't_sp_aureliani': {'internal': "aureliani", 'ui': "Aureliani/Alt-Imperial/Alt-Güldenländisch"},
 	't_sp_zyklopaeisch': {'internal': "zyklopaisch", 'ui': "Zyklopäisch"},
 	't_sp_tulamidya': {'internal': "tulamidya", 'ui': "Tulamidya"},
 	't_sp_urtulamidya': {'internal': "urtulamidya", 'ui': "Urtulamidya"},
@@ -992,7 +1164,7 @@ const talentsData = {
 	't_sp_alteskemi': {'internal': "alteskemi", 'ui': "Altes Kemi"},
 	't_sp_rabensprache': {'internal': "rabensprache", 'ui': "Rabensprache"},
 	't_sp_thorwalsch': {'internal': "thorwalsch", 'ui': "Thorwalsch"},
-	't_sp_hjaldingsch': {'internal': "hjaldingsch", 'ui': "Hjaldingsch"},
+	't_sp_hjaldingsch': {'internal': "hjaldingsch", 'ui': "Hjaldingsch/Saga-Thorwalsch"},
 	't_sp_isdira': {'internal': "isdira", 'ui': "Isdira"},
 	't_sp_asdharia': {'internal': "asdharia", 'ui': "Asdharia"},
 	't_sp_rogolan': {'internal': "rogolan", 'ui': "Rogolan"},
@@ -1009,6 +1181,7 @@ const talentsData = {
 	't_sp_neckergesang': {'internal': "neckergesang", 'ui': "Neckergesang"},
 	't_sp_nujuka': {'internal': "nujuka", 'ui': "Nujuka"},
 	't_sp_rssahh': {'internal': "rssahh", 'ui': "Rssahh"},
+	't_sp_sprachederblumen': {'internal': "sprachederblumen", 'ui': "Sprache der Blumen"},
 	't_sp_trollisch': {'internal': "trollisch", 'ui': "Trollisch"},
 	't_sp_waldmenschensprachen': {'internal': "waldmenschensprache", 'ui': "Waldmenschensprachen"},
 	't_sp_zlit': {'internal': "zlit", 'ui': "Z'Lit"},
@@ -1027,8 +1200,8 @@ const talentsData = {
 	't_sc_geheiligteglyphenvonunau': {'internal': "schrift_glyphenvonunau", 'ui': "Geheiligte Glyphen von Unau"},
 	't_sc_gimaril': {'internal': "schrift_gimaril", 'ui': "Gimaril"},
 	't_sc_gjalskisch': {'internal': "schrift_gjalskisch", 'ui': "Gjalskisch"},
-	't_sc_hjaldingscherunen': {'internal': "schrift_hjaldingscherunen", 'ui': "Hjaldingsche Runen"},
-	't_sc_imperialezeichen': {'internal': "schrift_imperialezeichen", 'ui': "Imperiale Zeichen"},
+	't_sc_hjaldingscherunen': {'internal': "schrift_hjaldingscherunen", 'ui': "Hjaldingsche Runen/Runenzeichen"},
+	't_sc_imperialezeichen': {'internal': "schrift_imperialezeichen", 'ui': "(Alt-)Imperiale Zeichen/Alt-Imperiale Buchstaben"},
 	't_sc_isdiraasdharia': {'internal': "schrift_isdira", 'ui': "Isdira/Asdharia"},
 	't_sc_kuslikerzeichen': {'internal': "schrift_kuslikerzeichen", 'ui': "Kusliker Zeichen"},
 	't_sc_mahrischeglyphen': {'internal': "schrift_mahrischeglyphen", 'ui': "Mahrische Glyphen"},
@@ -1051,6 +1224,7 @@ const talentsData = {
 	't_h_feinmechanik': {'internal': "feinmechanik", 'ui': "Feinmechanik"},
 	't_h_feuersteinbearbeitung': {'internal': "feuersteinbearbeitung", 'ui': "Feuersteinbearbeitung"},
 	't_h_fleischer': {'internal': "fleischer", 'ui': "Fleischer"},
+	't_h_fluggeraetesteuern': {'internal': "fluggeraetesteuern", 'ui': "Fluggerätesteuern"},
 	't_h_gerber': {'internal': "gerber", 'ui': "Gerber"},
 	't_h_glaskunst': {'internal': "glaskunst", 'ui': "Glaskunst"},
 	't_h_grobschmied': {'internal': "grobschmied", 'ui': "Grobschmied"},
@@ -1084,7 +1258,86 @@ const talentsData = {
 	't_h_viehzucht': {'internal': "viehzucht", 'ui': "Viehzucht"},
 	't_h_webkunst': {'internal': "webkunst", 'ui': "Webkunst"},
 	't_h_winzer': {'internal': "winzer", 'ui': "Winzer"},
-	't_h_zimmermann': {'internal': "zimmermann", 'ui': "Zimmermann"}
+	't_h_zimmermann': {'internal': "zimmermann", 'ui': "Zimmermann"},
+	/* Myranor */
+	't_sp_gemeinimperial': {'internal': "gemeinimperial", 'ui': "Gemein-Imperial"},
+	't_sp_hieroimperial': {'internal': "hieroimperial", 'ui': "Hiero-Imperial"},
+	't_sp_fruehimperial': {'internal': "fruehimperial", 'ui': "Früh-Imperial"},
+	't_sp_dorinthisch': {'internal': "dorinthisch", 'ui': "Proto-Imperial/Dorinthisch"},
+	't_sp_kentorisch': {'internal': "kentorisch", 'ui': "Kentorisch"},
+	't_sp_draydalanisch': {'internal': "draydalanisch", 'ui': "Draydalanisch"},
+	't_sp_yachyach': {'internal': "yachyach", 'ui': "Yachyach"},
+	't_sp_alamarasharielitisch': {'internal': "alamarasharielitisch", 'ui': "Alamar-Asharielitisch"},
+	't_sp_ravesaran': {'internal': "ravesaran", 'ui': "Ravesaran"},
+	't_sp_pristidial': {'internal': "pristidial", 'ui': "Pristidial"},
+	't_sp_gemeinamaunal': {'internal': "gemeinamaunal", 'ui': "Gemein-Amaunal/AhMa"},
+	't_sp_hieroamaunal': {'internal': "hieroamaunal", 'ui': "Hiero-Amaunal/AhMaGao"},
+	't_sp_leonal': {'internal': "leonal", 'ui': "Leonal/Khorrzu"},
+	't_sp_pardiral': {'internal': "pardiral", 'ui': "Pardiral/Bhagrach"},
+	't_sp_tighral': {'internal': "tighral", 'ui': "Tighral/Tharr'Orr"},
+	't_sp_lyncal': {'internal': "lyncal", 'ui': "Lyncal/Fhi'ai"},
+	't_sp_sumurrisch': {'internal': "sumurrisch", 'ui': "Sumurrisch/Ur-Bansumitisch"},
+	't_sp_altnarkramarisch': {'internal': "altnarkramarisch", 'ui': "Alt-Narkramarisch"},
+	't_sp_alttesumurrisch': {'internal': "alttesumurrisch", 'ui': "Alt-Tesumurrisch"},
+	't_sp_narkramarisch': {'internal': "narkramarisch", 'ui': "Narkramarisch"},
+	't_sp_mahapratisch': {'internal': "mahapratisch", 'ui': "Mahapratisch"},
+	't_sp_kerrishitisch': {'internal': "kerrishitisch", 'ui': "Kerrishitisch"},
+	't_sp_tesumurrisch': {'internal': "tesumurrisch", 'ui': "Tesumurrisch"},
+	't_sp_vinshinisch': {'internal': "vinshinisch", 'ui': "Vinshinisch"},
+	't_sp_boagorambanbarguinisch': {'internal': "boagorambanbarguinisch", 'ui': "Boa'goram Banbarguinisch"},
+	't_sp_lishshioderwolfalbisch': {'internal': "lishshioderwolfalbisch", 'ui': "Lish'shioder Wolfalbisch"},
+	't_sp_dagathimisch': {'internal': "dagathimisch", 'ui': "Dagathimisch"},
+	't_sp_krakonisch': {'internal': "krakonisch", 'ui': "Krakonisch"},
+	't_sp_mholurisch': {'internal': "mholurisch", 'ui': "Mholurisch"},
+	't_sp_iaril': {'internal': "iaril", 'ui': "Iaril"},
+	't_sp_loualilisch': {'internal': "loualilisch", 'ui': "Loualilisch"},
+	't_sp_altneristal': {'internal': "altneristal", 'ui': "Alt-Neristal"},
+	't_sp_neristal': {'internal': "neristal", 'ui': "Neristal"},
+	't_sp_gemeinvesayitisch': {'internal': "gemeinvesayitisch", 'ui': "Gemein-Vesayitisch/Vesayo"},
+	't_sp_altvesayitisch': {'internal': "altvesayitisch", 'ui': "Alt-Vesayitisch"},
+	't_sp_urvesayitisch': {'internal': "urvesayitisch", 'ui': "Ur-Vesayitisch"},
+	't_sp_abishant': {'internal': "abishant", 'ui': "Abishant"},
+	't_sp_bashurisch': {'internal': "bashurisch", 'ui': "Archäisch/Bashurisch"},
+	't_sp_bramscho': {'internal': "bramscho", 'ui': "Bramscho/Baramunisch"},
+	't_sp_eupherban': {'internal': "eupherban", 'ui': "Eupherban-Haussprache"},
+	't_sp_grolmurisch': {'internal': "grolmurisch", 'ui': "Grolmurisch"},
+	't_sp_hippocampir': {'internal': "hippocampir", 'ui': "Hippocampir-Zeichensprache"},
+	't_sp_horngesang': {'internal': "horngesang", 'ui': "Horngesang"},
+	't_sp_lieddergemeinschaft': {'internal': "lieddergemeinschaft", 'ui': "Lied der Gemeinschaft"},
+	't_sp_lutral': {'internal': "lutral", 'ui': "Lutral"},
+	't_sp_myranisch': {'internal': "myranisch", 'ui': "Myranisch"},
+	't_sp_myrmidal': {'internal': "myrmidal", 'ui': "Myrmidal"},
+	't_sp_nequanerwasserschallcode': {'internal': "nequanerwasserschallcode", 'ui': "Nequaner-Wasserschall-Code"},
+	't_sp_nequanerzeichensprache': {'internal': "nequanerzeichensprache", 'ui': "Nequaner-Zeichensprache"},
+	't_sp_norkoshal': {'internal': "norkoshal", 'ui': "Norkoshal"},
+	't_sp_rhoglossa': {'internal': "rhoglossa", 'ui': "Alt-Zwergisch/Rhoglossa"},
+	't_sp_ruritin': {'internal': "ruritin", 'ui': "Ruritin"},
+	't_sp_shingwanisch': {'internal': "shingwanisch", 'ui': "Shingwanisch"},
+	't_sp_shinoq': {'internal': "shinoq", 'ui': "Shinoq"},
+	't_sc_altetesumurrischeglyphen': {'internal': "schrift_altetesumurrischeglyphen", 'ui': "Alte Tesumurrische Glyphen"},
+	't_sc_altnarkramarischebilderschrift': {'internal': "schrift_altnarkramarischebilderschrift", 'ui': "Alt-Narkramarische Bilderschrift"},
+	't_sc_alttauralsilbenzeichen': {'internal': "schrift_alttauralsilbenzeichen", 'ui': "Alt-Taural-Silbenzeichen"},
+	't_sc_amaunischekratzschrift': {'internal': "schrift_amaunischekratzschrift", 'ui': "Amaunische Kratzschrift"},
+	't_sc_anneristalyabilderschrift': {'internal': "schrift_anneristalyabilderschrift", 'ui': "Anneristalya-Bilderschrift"},
+	't_sc_banshibilderschrift': {'internal': "schrift_banshibilderschrift", 'ui': "Ban'shi-Bilderschrift"},
+	't_sc_bramschoromk': {'internal': "schrift_bramschoromk", 'ui': "Bramschoromk"},
+	't_sc_draydalanischeschriftzeichen': {'internal': "schrift_draydalanischeschriftzeichen", 'ui': "Draydalanische Schriftzeichen"},
+	't_sc_eupherbancode': {'internal': "schrift_eupherbancode", 'ui': "Eupherban-Code"},
+	't_sc_fruehimperialeglyphen': {'internal': "schrift_fruehimperialeglyphen", 'ui': "Früh-Imperiale Glyphen"},
+	't_sc_grolmurischesilbenzeichen': {'internal': "schrift_grolmurischesilbenzeichen", 'ui': "Grolmurische Silbenzeichen"},
+	't_sc_imperialebuchstaben': {'internal': "schrift_imperialebuchstaben", 'ui': "Imperiale Buchstaben"},
+	't_sc_kalshinshi': {'internal': "schrift_kalshinshi", 'ui': "Kalshinshi"},
+	't_sc_kerrishitischesilbenzeichen': {'internal': "schrift_kerrishitischesilbenzeichen", 'ui': "Kerrishitische Silbenzeichen"},
+	't_sc_khorrzusymbole': {'internal': "schrift_khorrzusymbole", 'ui': "Khorrzu-Symbole"},
+	't_sc_lahmarischeglyphen': {'internal': "schrift_lahmarischeglyphen", 'ui': "Lahmarische Glyphen"},
+	't_sc_lyncilsymbole': {'internal': "schrift_lyncilsymbole", 'ui': "Lyncil-Symbole"},
+	't_sc_mahapratischesilbenzeichen': {'internal': "schrift_mahapratischesilbenzeichen", 'ui': "Mahapratische Silbenzeichen"},
+	't_sc_narkramarischesilbenzeichen': {'internal': "schrift_narkramarischesilbenzeichen", 'ui': "Narkramarische Silbenzeichen"},
+	't_sc_nequanischebuchstaben': {'internal': "schrift_nequanischebuchstaben", 'ui': "Nequanische Buchstaben"},
+	't_sc_vesayitischesilbenzeichen': {'internal': "schrift_vesayitischesilbenzeichen", 'ui': "Vesayitische Wort- und Silbenzeichen"},
+	't_sc_vesayosilbenzeichen': {'internal': "schrift_vesayosilbenzeichen", 'ui': "Vesayo-Silbenzeichen"},
+	't_sc_vorimperialepiktogramme': {'internal': "schrift_vorimperialepiktogramme", 'ui': "Vor-Imperiale Piktogramme"},
+	't_sc_wasserschallzeichen': {'internal': "schrift_wasserschallzeichen", 'ui': "Wasserschallzeichen"}
 };
 const spellsData = {
 	'z_abvenenum': {'internal': "abvenenum", 'ui': "Abvenenum Reine Speise", 'stats': ['KL', 'KL', 'FF']},
@@ -1419,12 +1672,70 @@ const spellsData = {
 	'z_zwingtanz': {'internal': "zwingtanz", 'ui': "Zwingtanz", 'stats': ['MU', 'KL', 'CH']}
 };
 /*
+	Myranor-only
+	Map sources to spheres
+ */
+const sourcesSpheresData = {
+	'Abgrund': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggari': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggression': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Avastada': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Begierde': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Carafai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Darcalya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Dya\'Khol': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Eis': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Endgültigkeit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erfolg': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erkenntnis': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erz': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Eskates': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Feenwesen': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Feuer': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Freiheit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Galkuzul': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Ghorgumor': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Harmonie': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Humus': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Iryabaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Khalyanar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Kraft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Kreativität': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Luft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Mishkarya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Naggarach': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Thesephai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Tiergeister': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Totenwesen': { "internal": 'Tod', "ui": 'Sphäre des Todes' },
+	'Tyakaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Wahnsinn': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Wasser': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Xolovar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Zauberei': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Zeit': { "internal": 'Zeit', "ui": 'Sphäre der Zeit' }
+};
+
+/*
+	Myranor-only
+	Map spheres to stats required for checks
+*/
+const spheresStatsData = {
+	'Zeit': [ 'MU', 'KL', 'IN' ],
+	'Elemente': [ 'MU', 'KL', 'CH' ],
+	'Natur': [ 'MU', 'KL', 'IN' ],
+	'Tod': [ 'MU', 'MU', 'CH' ],
+	'Stellare': [ 'KL', 'IN', 'CH' ],
+	'Dämonen': [ 'MU', 'MU', 'CH' ]
+}
+
+/*
 	Constants for effective encumbrance for talent/spell checks
 */
 const effectiveEncumbrance = {
 	"t_ko_akrobatik":           { "value":  2, "type": "factor" },
 	"t_ko_athletik":            { "value":  2, "type": "factor" },
 	"t_ko_fliegen":             { "value":  1, "type": "factor" },
+	"t_ko_freiesfliegen":       { "value":  2, "type": "factor" },
 	"t_ko_gaukeleien":          { "value":  2, "type": "factor" },
 	"t_ko_klettern":            { "value":  2, "type": "factor" },
 	"t_ko_koerperbeherrschung": { "value":  2, "type": "factor" },
@@ -2034,7 +2345,7 @@ const meleeData = {
 		*/
 	},
 	'k_meisterliches_entwaffnen_parade_parierwaffe': {
-		'ui': 'Meisterliches Entwaffnen (Pairerwaffenparade)',
+		'ui': 'Meisterliches Entwaffnen (Parierwaffenparade)',
 		'typ': 'pa-parierwaffe',
 		'rollCount': 1,
 		'mod': '0',

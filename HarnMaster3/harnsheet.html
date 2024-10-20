@@ -923,7 +923,7 @@
 			<label for=horseagl>AGL</label>
 			<input id=horseagl type="number" name="attr_hagl" class="skill-value" value="0">
 			<label for=horsewil>WILL</label>
-			<input id=horsewil type="number" name="attr_hwill" class="skill-value" value="0">
+			<input id=horsewil type="number" name="attr_hwil" class="skill-value" value="0">
 			<label for=horseeye >EYE</label>
 			<input id=horseeye type="number" name="attr_heye" class="skill-value" value="0">
 			<label for=horsemove>Move</label>
@@ -975,13 +975,13 @@
 			<div class="skill-section-title">COMBAT</div>
 			<label for=horseinit>Horse Init</label>
 			<input id=horseinit type="number" name="attr_hcombat_initiative" value="0" class="skill-value" readonly>
-			<div>&nbsp </div>
+			<div>&nbsp; </div>
 			<label for=horseendurance>Endurance</label>
 			<input id=horseendurance type="number" name="attr_hcombat_endurance" class="skill-value" value="0" readonly>
-			<div>&nbsp </div>
+			<div>&nbsp; </div>
 			<label for=horseagility>Agility</label>
 			<input id=horseagility type="number" name="attr_hagl" readonly class="skill-value"> 
-			<div>&nbsp </div>
+			<div>&nbsp; </div>
 			<label for=horsecombatmove>Move / min. move</label>
 			<input id=horsecombatmove type="number" name="attr_hcombat_move" class="skill-value" value="0" readonly>
 			<div>/ 
@@ -989,7 +989,7 @@
 			</div>
 			<label for=horseturn>60&deg; turn (hex)</label>
 			<input id=horseturn type="number" name="attr_hturn" readonly value="0" class="skill-value">
-			<div>&nbsp </div>
+			<div>&nbsp; </div>
 			<label for=horsecombatdodge>Dodge</label>
 			<input id=horsecombatdodge type="number" name="attr_hdodge_ml" class="skill-value" readonly>
 			<button type="roll" value="&{template:custom} {{color=harn}} {{title=@{hname} dodges}}  {{rolltarget=[[{[[{[[@{hdodge_ml} - [[(@{hphysical_penalty})*5]] + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{Mastery Lvl=[[@{hdodge_ml}]]}} {{Modifiers=[[?{Target Modifier?|0}]]}} {{penalty=[[(@{hphysical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}}" name="roll_HorseCombatDodgeCheck">
@@ -1592,13 +1592,32 @@
 			<input id=legacycharname name="attr_name" type="text" class="full-width" readonly>
 			<div class="full-width skill-header">Sheet version</div>
 			<div class="full-width">
-			  <input name="attr_character_sheet_version" type="number" value="20240208" readonly>
+			  <input name="attr_character_sheet_version" type="number" value="20240927" readonly>
 			  <input type="hidden" name="attr_data_version" value="" readonly>
 			</div>
     	</div>
 	</div>
 	<div class="changelog">
 		<h2>Changelog</h2>
+		<h3>20240927 - Version 3.0.2</h3>
+		<details>
+			<summary class="changelog-summary">
+				<p class="changelog-summary">Minor typo fix</p>
+			</summary>
+			<ul>
+				<li>Missing ";"in html resulted in "nbsp" tag showing on horse combat stats</li>
+			</ul>
+		</details>			
+		<h3>20240917 - Version 3.0.1</h3>
+		<details>
+			<summary class="changelog-summary">
+				<p class="changelog-summary">Minor fix in horse endurance calculation</p>
+			</summary>
+			<ul>
+				<li>Due to a typo horse willpower wasn't used in horse endurance calculation. Fixed now.</li>
+				<li>Old data will be migrated automatically</li>
+			</ul>
+		</details>			
 		<h3>20240208 - Version 3.0.0</h3>
 		<details>
 			<summary class="changelog-summary">
@@ -1944,11 +1963,13 @@ Relevant character sheet versions
 */
 
 function migrationCheck() {
-    getAttrs(["character_sheet_version", "data_version" , "name"], function(v) {
+    getAttrs(["character_sheet_version", "data_version" , "name", "HWILL", "hwil"], function(v) {
         
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
 		let oldName = v["name"]||0;
+		let oldhwill = parseInt(v["HWILL"]);
+		let newhwill = parseInt(v["hwil"])||0;
 
         /*
         If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
@@ -1968,6 +1989,10 @@ function migrationCheck() {
 			dataVersion = 20171225;
 			console.log("Old name detected, data version set to", dataVersion);
 			} 
+		else if (oldhwill !== 0 && newhwill === 0 ) {
+			dataVersion = 20210801;
+			console.log("Horse willpower in wrong attribute, data version set to", dataVersion);
+			}
 		else if (oldName === 0 && isNaN(dataVersion)) {
 		    setCurrentVersion();
             console.log("New character detected, data version set to", dataVersion);
@@ -2021,7 +2046,8 @@ function callNextMigration(migrationChain) {
  this list has to be always ordered ascending in order to apply the migration steps in the correct order
 */
 var versionsWithMigrations = [
-    20210801
+    20210801,
+	20240917
 ]
 
 /*
@@ -2084,6 +2110,18 @@ function migrateTo20210801 (migrationChain) {
 				setAttrs(update, {}, function() {callNextMigration(migrationChain);} );
 			});
 		});
+}
+
+function migrateTo20240917 (migrationChain) {
+    console.log("migrateTo20240917 invoked");
+	/* move horse willpwoer from old "hwill"  attribute to hwil */
+    getAttrs(["HWILL", "hwil"], function(values) {
+      var oldhwil = parseInt(values['HWILL']);
+	  const update = {};
+	  update[`hwil`] = oldhwil;
+	  update[`notifyupgrade`] = 1; /* We're updating so turn on upgrade notification */ 
+	  setAttrs(update, function() {callNextMigration(migrationChain);}	);
+      });
 }
 
 // restore Character name in old name variable in parallel to new character_name for backward compatibility (old variable was empty out by migration script 
@@ -2601,3 +2639,7 @@ on("clicked:dismissupgradenotice", function() {
 });
 
 </script>
+
+
+
+
