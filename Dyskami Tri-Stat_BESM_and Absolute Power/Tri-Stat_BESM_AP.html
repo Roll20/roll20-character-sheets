@@ -996,8 +996,11 @@
                     <button name="act_static_journal_select_button" class="styling-section-button button-click-animation theme-button" type="action">
                         <span class="material-icons">auto_stories</span>
                     </button>
-                    <button name="act_static_journal_edit_button" class="styling-section-button button-click-animation theme-button" type="action">
-                        <span class="material-icons">edit</span>
+                    <button name="act_static_journal_add_button" class="styling-section-button button-click-animation theme-button" type="action">
+                        <span class="material-icons">add</span>
+                    </button>
+                    <button name="act_static_journal_delete_button" class="styling-section-button button-click-animation theme-button" type="action">
+                        <span class="material-icons">remove</span>
                     </button>
                     <button name="act_static_journal_accordion_button" class="styling-section-button accordion-button button-click-animation theme-button" type="action">
                         <span class="material-icons expand">expand_less</span>
@@ -1009,13 +1012,17 @@
                 <div class="container-journal styling-background theme-background">
                     <input name="attr_static_journal_visible_id" type="hidden" value="0" readonly />
                     <div class="grid-major-journal">
-                        <div class="grid-minor-journal-page styling-pill theme-major">
+                        <button name="act_static_journal_page_number" class="grid-minor-journal-page styling-pill button-click-animation input-button theme-major" type="action">
+                        <!--<div class="grid-minor-journal-page styling-pill theme-major">-->
                             <span data-i18n="page">Page</span>
-                        </div>
+                        <!--</div>-->
+                        </button>
                         <input name="attr_static_journal_page_number" class="grid-minor-input-page styling-pill-input theme-input-major" type="text" value="1" readonly />
-                        <div class="grid-minor-journal-title styling-pill theme-major">
+                        <button name="act_static_journal_title_name" class="grid-minor-journal-title styling-pill button-click-animation input-button theme-major" type="action">
+                        <!--<div class="grid-minor-journal-title styling-pill theme-major">-->
                             <span data-i18n="title">Title</span>
-                        </div>
+                        <!--</div>-->
+                        </button>
                         <input name="attr_static_journal_title_name" class="grid-minor-input-title styling-long-pill-input theme-input-major" type="text" value="Default Journal Entry" readonly />
                         <textarea name="attr_static_journal_page_entry" class="grid-minor-input-entry styling-big-pill-textarea-journal theme-input-major" placeholder="Enter text here" wrap="soft"></textarea>
                     </div>
@@ -3867,6 +3874,8 @@
                     case 'delete':
                     case 'details':
                     case 'edit':
+                    case 'page':
+                    case 'title':
                         switch (cache.source_section) {
                             case 'character':
                             case 'screen':
@@ -3919,7 +3928,9 @@
                             case 'journal':
                                 temp.push(
                                     'journaldb',
-                                    'static_journal_visible_id',
+                                    'static_journal_page_entry',
+                                    'static_journal_page_number',
+                                    'static_journal_visible_id'
                                 );
                             break;
                         }
@@ -7722,149 +7733,6 @@
         }
     }
 
-    async function journalMenu(cache, set_values) {
-        const query = {} ;
-        clog(cache, query, 'journalMenu()');
-        query.next = 'select_task';
-        cache.static_journal_visible_id = int(cache.static_journal_visible_id);
-        query.commit = false;
-        while (!query.commit) {
-            switch (query.next) {
-                // Journal Menu Options
-                case 'select_task':
-                    query.length = cache.journaldb.length;
-                    query.title = `${getTranslationByKey("choose-task")}`;
-                    query.options = 
-                        `|${getTranslationByKey("add")},add` +
-                        `|${getTranslationByKey("edit")},edit`;
-                    query.options += query.length !== 1 ? 
-                        `|${getTranslationByKey("remove")},remove` : '';
-                    query.last = query.next;
-                break;
-                case 'select_type':
-                    query.title = `${getTranslationByKey(query.task)}`;
-                    query.options = 
-                        `|${getTranslationByKey("journal")},journal`;
-                    query.options += query.task !== 'edit' ?
-                        `|${getTranslationByKey("page")},page` : '';
-                    query.options +=
-                        `|${getTranslationByKey("go-back")},select_task`;
-                    query.last = query.next;
-                break;
-                case 'edit_journal':
-                    query.title = 'Select Journal to Rename';//`${getTranslationByKey("enter-new-title")}`;
-                    query.options = '';
-                    for (i = 0, n = cache.journaldb.length; i < n; i++) {
-                        query.options += `|${cache.journaldb[i].name},${i}`;
-                    }
-                    query.options += `|${getTranslationByKey("go-back")},select_task`;
-                    query.last = query.next;
-                break;
-                case 'remove_journal':
-
-                break;
-                case 'remove_page':
-                    query.get = await getAttrsAsync([
-                        'static_journal_page_number'
-                    ]);
-                    query.title = `Page Number to Remove (1-${query.get.static_journal_page_number})`;//`${getTranslationByKey("enter-new-title")}`;
-                    query.options = '';
-                    query.last = query.next;
-                break;
-                case 'remove_confirm':
-                    query.title = `Confirm Remove ${
-                        query.last === 'remove_page' ?
-                        'Page' : 'Journal'
-                    }`;
-                    query.options = `|No,${query.last}|Yes,yes`;
-                    query.last = query.next;
-                break;
-                case 'rename_journal':
-                    query.title = `${getTranslationByKey("enter-new-title")}`;//query.title = 'Rename Journal';
-                    query.options = '';
-                    query.last = query.next;
-                break;
-                default:
-                    query.commit = true;
-            }
-            if (!query.commit) {
-                await crpQuery(cache, query, query.last);
-                switch (query.last) {
-                    case 'select_task':
-                        query.task = query.selection;
-                        query.next = query.selection === 'edit' ?
-                            'edit_journal' : 'select_type';
-                    break;
-                    case 'select_type':
-                        query.type = query.selection;
-                        query.next = query.selection === 'select_task' ? 
-                            'select_task' : 'done';
-                    break;
-                    case 'edit_journal':
-                        query.journal_id = query.selection;
-                        query.next = 'rename_journal';
-                    break;
-                    case 'remove_journal':
-
-                    break;
-                    case 'remove_page':
-                        query.remove = query.selection;
-                        query.next = 'remove_confirm';
-                    break;
-                    case 'remove_confirm':
-                        if (query.selection !== 'yes') {
-                            query.next = query.selection;
-                        }
-                    break;
-                    case 'rename_journal':
-                        cache.journaldb[query.journal_id].name = query.selection;
-                        if (cache.static_journal_visible_id === query.journal_id) {
-                            set_values.static_journal_title_name = query.selection;
-                        }
-                        query.commit = true;
-                    break;
-                }
-            } else {
-                switch(`${query.task}_${query.type}`) {
-                    case 'add_journal':
-                        const new_journal = {
-                            entries: [],
-                            journal_id: 0,
-                            last_index: 0,
-                            name: '',
-                            removed: false,
-                        };
-                        cache.journaldb.push(new_journal);
-                        query.length = cache.journaldb.length;
-                        query.index = query.length - 1;
-                        cache.journaldb[query.index].journal_id = query.index;
-                        cache.journaldb[query.index].name = `Journal Entry ${query.length}`;
-                        set_values.static_journal_visible_id = query.index;
-                        set_values.static_journal_page_entry = '';
-                        set_values.static_journal_page_number = '1';
-                        set_values.static_journal_title_name = cache.journaldb[query.index].name;
-                    break;
-                    case 'add_page':
-                        const save = await getAttrsAsync([
-                            'static_journal_page_entry',
-                            'static_journal_page_number'
-                        ]);
-                        // Get the current page number (-1 to get index)
-                        const current_page = int(save.static_journal_page_number);
-                        // Save the current journal entry to the correct index
-                        cache.journaldb[cache.static_journal_visible_id].entries[current_page - 1] = 
-                            save.static_journal_page_entry;
-                        // Create new journal entry
-                        cache.journaldb[cache.static_journal_visible_id].entries.push('');
-                        set_values.static_journal_page_number =
-                            cache.journaldb[cache.static_journal_visible_id].entries.length;
-                        set_values.static_journal_page_entry = '';
-                    break;
-                }
-            }
-        }            
-    }
-
     async function skillsMenu(cache, set_values) {
         const query = {} ;
         clog(cache, query,'skillsMenu()');
@@ -10845,6 +10713,163 @@
         }
     }
 
+    async function journalMenu(cache, set_values) {
+        const query = {} ;
+        clog(cache, query, 'journalMenu()');
+        query.next = cache.source;//'select_task';
+        cache.static_journal_visible_id = int(cache.static_journal_visible_id);
+        query.commit = false;
+        while (!query.commit) {
+            switch (query.next) {
+                // Journal Menu Options
+                case 'select_task':
+                    query.length = cache.journaldb.length;
+                    query.title = `${getTranslationByKey("choose-task")}`;
+                    query.options = 
+                        `|${getTranslationByKey("add")},add` +
+                        `|${getTranslationByKey("edit")},edit`;
+                    query.options += query.length !== 1 ? 
+                        `|${getTranslationByKey("remove")},remove` : '';
+                    query.last = query.next;
+                break;
+                case 'select_type':
+                case 'static_journal_add_button':
+                case 'static_journal_delete_button':
+                    query.title = cache.source_id === 'add' ? 
+                        `${getTranslationByKey("add")}` : `${getTranslationByKey("remove")}`;
+                    query.options = 
+                        `|${getTranslationByKey("journal")},journal` +
+                        `|${getTranslationByKey("page")},page` +
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'edit_journal':
+                    query.title = 'Select Journal to Rename';//`${getTranslationByKey("enter-new-title")}`;
+                    query.options = '';
+                    for (i = 0, n = cache.journaldb.length; i < n; i++) {
+                        query.options += `|${cache.journaldb[i].name},${i}`;
+                    }
+                    query.options += `|${getTranslationByKey("go-back")},select_task`;
+                    query.last = query.next;
+                break;
+                case 'remove_confirm':
+                    query.title = getTranslationByKey(`confirm-remove-${query.selection}`);
+                    query.options = 
+                        `|${getTranslationByKey("no")},exit` +
+                        `|${getTranslationByKey("yes")},${cache.source_id}_${query.selection}`;
+                    query.last = query.next;
+                break;
+                case 'rename_journal':
+                    query.title = `${getTranslationByKey("enter-new-title")}`;//query.title = 'Rename Journal';
+                    query.options = '';
+                    query.last = query.next;
+                break;
+                default:
+                    query.commit = true;
+            }
+            if (!query.commit) {
+                await crpQuery(cache, query, query.last);
+                switch (query.last) {
+                    case 'select_task':
+                        query.task = query.selection;
+                        query.next = query.selection === 'edit' ?
+                            'edit_journal' : 'select_type';
+                    break;
+                    case 'select_type':
+                    case 'static_journal_add_button':
+                    case 'static_journal_delete_button':
+                        if (query.selection === 'exit') {
+                            query.next = 'exit';
+                            query.commit = true;
+                        } else {
+                            query.task = `${cache.source_id}_${query.selection}`;
+                            query.next = cache.source_id === 'delete' ?
+                                'remove_confirm' : `${cache.source_id}_${query.selection}`;
+                        }
+                    break;
+                    case 'edit_journal':
+                        query.journal_id = query.selection;
+                        query.next = 'rename_journal';
+                    break;
+                    case 'remove_confirm':
+                        query.next = query.selection;
+                    break;
+                    case 'rename_journal':
+                        cache.journaldb[cache.static_journal_visible_id].name = query.selection;
+                        set_values.static_journal_title_name = query.selection;
+                        query.commit = true;
+                    break;
+                }
+            } else {
+                switch(query.next) {//`${query.task}_${query.type}`) {
+                    case 'add_journal':
+                        const new_journal = {
+                            entries: [''],
+                            //journal_id: 0,
+                            last_index: 0,
+                            name: '',
+                            removed: false,
+                        };
+                        query.index = cache.journaldb.push(new_journal) - 1;
+                        //cache.journaldb[query.index].journal_id = query.index;
+                        //query.length = cache.journaldb.length;
+                        //query.index = query.length - 1;
+                        
+                        cache.journaldb[query.index].name = `Journal Entry ${cache.journaldb.length}`;
+                        set_values.static_journal_visible_id = query.index;
+                        set_values.static_journal_page_entry = '';
+                        set_values.static_journal_page_number = '1';
+                        set_values.static_journal_title_name = cache.journaldb[query.index].name;
+                    break;
+                    case 'add_page':
+                        const save = await getAttrsAsync([
+                            'static_journal_page_entry',
+                            'static_journal_page_number'
+                        ]);
+                        // Get the current page number (-1 to get index)
+                        const current_page = int(save.static_journal_page_number);
+                        
+                        // Save the current journal entry to the correct index
+                        cache.journaldb[cache.static_journal_visible_id].entries[current_page - 1] = 
+                            save.static_journal_page_entry;
+                        // Create new journal entry
+                        cache.journaldb[cache.static_journal_visible_id].entries.push('');
+                        set_values.static_journal_page_number =
+                            cache.journaldb[cache.static_journal_visible_id].entries.length;
+                        set_values.static_journal_page_entry = '';
+                    break;
+                    case 'delete_journal':
+                        if (cache.journaldb[cache.static_journal_visible_id].length === 0) {
+                            clog(cache, 'Cannot remove the last journal.', 'ERROR');
+                            return;
+                        } else {
+                            // Remove the current journal
+                            cache.journaldb.splice(cache.static_journal_visible_id, 1);
+                            query.new_journal_index = cache.journaldb.length - 1;
+                            query.new_entry_index = cache.journaldb[query.new_journal_index].last_index;
+                            set_values.static_journal_title_name = cache.journaldb[query.new_journal_index].name;
+                            set_values.static_journal_page_entry = cache.journaldb[query.new_journal_index].entries[query.new_entry_index];
+                            set_values.static_journal_page_number = query.new_entry_index + 1;
+                            set_values.static_journal_visible_id = query.new_journal_index;
+                        }
+                    break;
+                    case 'delete_page':
+                        if (cache.journaldb[cache.static_journal_visible_id].entries.length === 0) {
+                            clog(cache, 'Cannot remove last page in a journal. Remove the journal instead.', 'ERROR');
+                            return;
+                        } else {
+                            // Remove the current page of the journal
+                            cache.journaldb[cache.static_journal_visible_id].entries.splice(cache.static_journal_page_number - 1, 1);
+                            cache.journaldb[cache.static_journal_visible_id].last_index = cache.journaldb[cache.static_journal_visible_id].entries.length - 1;
+                            set_values.static_journal_page_number = cache.journaldb[cache.static_journal_visible_id].entries.length;
+                            set_values.static_journal_page_entry = cache.journaldb[cache.static_journal_visible_id].entries[cache.journaldb[cache.static_journal_visible_id].entries.length - 1] || "";
+                        }
+                    break;
+                }
+            }
+        }            
+    }
+
     async function journalSavePage(cache, set_values) {
         const temp = {};
         clog(cache, temp, 'journalSavePage()');
@@ -10860,10 +10885,9 @@
         cache.static_journal_page_number = int(cache.static_journal_page_number);
         const query = {};
         clog(cache, query, 'journalSelectMenu()');
-        query.next = 'select_menu';
+        query.next = cache.source;//'select_menu';
         query.commit = false;
         query.db_length = cache.journaldb.length;
-        query.pages = cache.journaldb[cache.static_journal_visible_id].entries.length;
         while (!query.commit) {
             switch (query.next) {
                 case 'select_menu':
@@ -10878,21 +10902,23 @@
                     query.last = query.next;
                 break;
                 case 'select_journal':
+                case 'static_journal_select_button':
                     query.title = getTranslationByKey("journal");
                     query.options = '';
                     for (let i = 0; i < query.db_length; i++) {
-                        query.options += `|${cache.journaldb[i].name},${cache.journaldb[i].journal_id}`;
+                        query.options += `|${cache.journaldb[i].name},${i}`;//${cache.journaldb[i].journal_id}`;
                     }
-                    query.options += `|${getTranslationByKey("go-back")},select_menu`;
+                    query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'select_page':
+                case 'static_journal_page_number':
                     query.title = getTranslationByKey("page");
                     query.options = '';
-                    for (let i = 0; i < query.pages; i++) {
+                    for (let i = 0; i < cache.journaldb[cache.static_journal_visible_id].entries.length; i++) {
                         query.options += `|${i + 1},${i}`;
                     }
-                    query.options += `|${getTranslationByKey("go-back")},select_menu`;
+                    query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 default: query.commit = true;
@@ -10909,47 +10935,38 @@
                     break;
                     case 'select_journal':
                     case 'select_page':
+                    case 'static_journal_page_number':
+                    case 'static_journal_select_button':
+                        if (query.selection === 'exit') {
+                            query.next = 'exit';
+                            return;
+                        }
                         query.id = query.selection;
-                        query.next = `set_${query.type}`;
+                        query.next = cache.source === 'static_journal_page_number' ?
+                            'set_page': 'set_journal';
                     break;
                 }
             } else {
                 switch (query.next) {
                     case 'set_journal':
-                        query.new_journal = 
-                            query.task === 'next' ?
-                                cache.static_journal_visible_id < query.db_length - 1 ?
-                                cache.static_journal_visible_id + 1 : 0 :
-                            query.task === 'previous' ?
-                                cache.static_journal_visible_id === 0 ?
-                                query.db_length - 1 : cache.static_journal_visible_id - 1 :
-                            query.id;
+                        query.new_journal = cache.journaldb[query.id];
+                        query.save_index = cache.static_journal_page_number - 1;
                         query.save_journal = cache.journaldb[cache.static_journal_visible_id];
-                        query.set_journal = cache.journaldb[query.new_journal];
-                        query.save_journal.entries[query.save_journal.last_index] = 
-                            cache.static_journal_page_entry;
-                        set_values.static_journal_title_name = query.set_journal.name;
-                        set_values.static_journal_page_entry = query.set_journal.entries[query.set_journal.last_index];
-                        set_values.static_journal_page_number = query.set_journal.last_index + 1;
-                        set_values.static_journal_visible_id = query.new_journal;
+                        query.save_journal.entries[query.save_index] = cache.static_journal_page_entry;
+                        query.save_journal.last_index = query.save_index;
+                        set_values.static_journal_title_name = query.new_journal.name;
+                        set_values.static_journal_page_entry = query.new_journal.entries[query.new_journal.last_index];
+                        set_values.static_journal_page_number = query.new_journal.last_index + 1;
+                        set_values.static_journal_visible_id = query.id;
                     break;
                     case 'set_page':
-                        query.new_page = 
-                            query.task === 'next' ?
-                                cache.static_journal_page_number < query.pages ?
-                                cache.static_journal_page_number + 1 : 1 :
-                            query.task === 'previous' ?
-                                cache.static_journal_page_number === 1 ?
-                                query.pages : cache.static_journal_page_number - 1 :
-                            query.id + 1;
-                        query.new_index = query.new_page - 1;
+                        query.new_page_number = query.id + 1;
                         query.save_index = cache.static_journal_page_number - 1;
                         query.journal = cache.journaldb[cache.static_journal_visible_id];
-                        query.journal.entries[query.save_index] =
-                            cache.static_journal_page_entry;
-                            query.journal.last_index = query.new_index;
-                        set_values.static_journal_page_entry = query.journal.entries[query.new_index];
-                        set_values.static_journal_page_number = query.new_page;
+                        query.journal.entries[query.save_index] = cache.static_journal_page_entry;
+                        query.journal.last_index = query.save_index;
+                        set_values.static_journal_page_entry = query.journal.entries[query.id];
+                        set_values.static_journal_page_number = query.new_page_number;
                     break;
                 }
             }
@@ -11582,6 +11599,9 @@
         temp.event_string = `change:${temp.change_events.join(" change:")}`;
         // Button names
         temp.button_events = [
+            'static_journal_page_number',
+            'static_journal_title_name',
+            'static_journal_delete_button',
             'static_attributes_lock_button',
             'static_character_details_class',
             'static_character_details_height',
@@ -11634,7 +11654,7 @@
             'static_stats_accordion_button',
             'static_capabilities_accordion_button',
             'static_journal_accordion_button',
-            'static_journal_edit_button',
+            'static_journal_add_button',
             'static_journal_save_button',
             'static_journal_select_button',
             'static_gmscreen_edit_button',
@@ -12142,12 +12162,16 @@
                             case 'accordion':
                                 setAccordion(cache, set_values);
                             break;
+                            case 'add':
+                            case 'delete':
                             case 'edit':
+                            case 'title':
                                 await journalMenu(cache, set_values);
                             break;
                             case 'save':
                                 await journalSavePage(cache, set_values);
                             break;
+                            case 'page':
                             case 'select':
                                 await journalSelectMenu(cache, set_values);
                             break;
