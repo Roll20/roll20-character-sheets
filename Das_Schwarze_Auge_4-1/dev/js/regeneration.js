@@ -1254,4 +1254,253 @@ on('clicked:reg_sleep-action', async (info) => {
 });
 
 
+// Generating Regeneration Roll (Deep Breath)
+on(
+	[
+		"character_name",
+		"gm_roll_opt",
+		"au", "erschoepfung", "ueberanstrengung",
+		"au_max", "erschoepfung_max", "ueberanstrengung_max",
+		"verstecke_erschoepfung", "verstecke_ueberanstrengung",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"character_name",
+			"gm_roll_opt",
+			"AU", "erschoepfung", "ueberanstrengung",
+			"AU_max", "erschoepfung_max", "ueberanstrengung_max",
+			"verstecke_erschoepfung", "verstecke_ueberanstrengung",
+		], function(values) {
+		// Boilerplate
+		const caller = "Action Listener for Generation of Regeneration Roll (Deep Breath)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		let attrsToChange = {};
+
+		// Rolls
+		const rollHead = [
+			values["gm_roll_opt"],
+			"&{template:reg-deepbreath}",
+			`{{charactername=${values["character_name"]}}}`,
+			`{{au=[[${values["AU"]}]]}}`,
+			`{{xh=[[${values["erschoepfung"]}]]}}`,
+			`{{ox=[[${values["ueberanstrengung"]}]]}}`,
+		];
+		const AURoll = [
+			`{{aumax=[[${values["AU_max"]}]]}}`,
+			`{{aubase=[[@{KO}]]}}`,
+			'{{aunew=[[0]]}}',
+			"{{aurequired=[[1]]}}",
+		];
+		const noAURoll = [ "{{aurequired=[[0]]}}" ];
+		const exhaustionRoll = [
+			`{{xhmax=[[${values["erschoepfung_max"]}]]}}`,
+			'{{xhnew=[[0]]}}',
+			"{{xhrequired=[[1]]}}",
+		];
+		const noExhaustionRoll = [ "{{xhrequired=[[0]]}}" ];
+		const overexertionRoll = [
+			`{{oxmax=[[${values["ueberanstrengung_max"]}]]}}`,
+			'{{oxnew=[[0]]}}',
+			"{{oxrequired=[[1]]}}",
+		]
+		const overexertionMaxRoll = [
+			`{{oxmax=[[${values["ueberanstrengung_max"]}]]}}`,
+			"{{oxrequired=[[1]]}}",
+			"{{impossible=[[1]]}}",
+		]
+		const noOverexertionRoll = [ "{{oxrequired=[[0]]}}" ];
+		const nonerequiredRoll = [ "{{nonerequired=[[1]]}}" ];
+
+		// Build roll
+		let roll = [];
+		roll = roll.concat(rollHead);
+
+		if (parseInt(values["AU"]) < parseInt(values["AU_max"]))
+		{
+			roll = roll.concat(AURoll);
+		} else {
+			roll = roll.concat(noAURoll);
+		}
+
+		if (values["verstecke_erschoepfung"] === "0")
+		{
+			roll = roll.concat(exhaustionRoll);
+		} else {
+			roll = roll.concat(noExhaustionRoll);
+		}
+
+		if (values["verstecke_ueberanstrengung"] === "0")
+		{
+			roll = roll.concat(overexertionRoll);
+		} else {
+			roll = roll.concat(noOverexertionRoll);
+		}
+
+		/// Regeneration required?
+		if (parseInt(values["AU"]) >= parseInt(values["AU_max"]))
+		{
+			roll = [];
+			roll = roll.concat(rollHead);
+			roll = roll.concat(nonerequiredRoll);
+		}
+
+		/// Regeneration impossible?
+		if (
+			(parseInt(values["ueberanstrengung"]) >= parseInt(values["ueberanstrengung_max"]))
+			&&
+			(values["verstecke_ueberanstrengung"] === "0")
+		)
+		{
+			roll = [];
+			roll = roll.concat(rollHead);
+			roll = roll.concat(overexertionMaxRoll);
+		}
+
+		// Finish
+		attrsToChange["reg_deepbreath_roll"] = roll.join(" ").trim();
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
+
+on('clicked:reg_deepbreath-action', async (info) => {
+	// Boilerplate
+	const caller = "Action Listener for Regeneration Button (Deep Breath)";
+	let computed = {};
+	let attrsToChange = {};
+
+	// Roll
+	let results = await startRoll("@{reg_deepbreath_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+
+	// Convenience
+	let rollID = results.rollId;
+
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results["results"])
+	{
+		resultsOnly[property] = results["results"][property].result;
+	}
+	Object.freeze(resultsOnly);
+
+	// Fast Decision
+	if (Object.hasOwn(resultsOnly, "nonerequired"))
+	{
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
+		finishRoll(rollID);
+	} else if (Object.hasOwn(resultsOnly, "impossible"))
+	{
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
+		finishRoll(rollID);
+	} else {
+		// AU
+		/// Preparation
+		const AU = resultsOnly["au"];
+		const AUMax = resultsOnly["aumax"];
+		let AURegTotal = 0;
+		let AUNew = AU;
+
+		if (resultsOnly["aurequired"] === 1)
+		{
+			// Calculations
+			AURegTotal += resultsOnly["aubase"];
+			AUNew += AURegTotal;
+		} else {
+			AUNew = AU;
+		}
+		AUNew = Math.min(AUNew, AUMax);
+
+		/// Finish
+		computed["aunew"] = AUNew;
+		if (AUNew !== AU)
+		{
+			attrsToChange["AU"] = AUNew;
+		}
+
+		// Exhaustion or Overexertion
+		/// Preparations
+		const exhaustion = resultsOnly["xh"];
+		const exhaustionMax = resultsOnly["xhmax"];
+		const exhaustionMin = 0;
+		const overexertion = resultsOnly["ox"];
+		const overexertionMax = resultsOnly["oxmax"];
+		const overexertionMin = 0;
+		let exhaustionNew = 0;
+		let exhaustionChanged = 0;
+		let overexertionNew = 0;
+		let overexertionChanged = 0;
+
+		/// Regeneration Order: Overexertion, Exhaustion
+		/// As long as there is overexertion, there cannot be exhaustion regeneration
+		//// Take into account that people can turn off exhaustion but keep overexertion turned on
+		//// In case both are disabled, nothing happens (see checks below).
+		//// If only overexertion is disabled, exhaustion changes accordingly, excess exhaustion will be lost.
+		//// If only exhaustion is disabled, use overexertion like it's exhaustion.
+		exhaustionNew = exhaustion;
+		overexertionNew = overexertion;
+
+		/// Build-up rate for exhaustion
+		const buildUpRate = 1;
+
+		/// Calculations
+		if (resultsOnly["xhrequired"] === 1 & resultsOnly["oxrequired"] === 1)
+		{
+			exhaustionNew = exhaustion + buildUpRate;
+			if (exhaustionNew > exhaustionMax)
+			{
+				overexertionNew = overexertionNew + 1;
+			}
+		} else if (resultsOnly["xhrequired"] === 1 & resultsOnly["oxrequired"] === 0)
+		{
+			exhaustionNew = exhaustion + buildUpRate;
+			overexertionNew = 0;
+		} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 1) {
+			exhaustionNew = 0;
+			overexertionNew = overexertion + buildUpRate;
+		} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 0) {
+			exhaustionNew = 0;
+			overexertionNew = 0;
+		}
+		exhaustionNew = Math.min(exhaustionNew, exhaustionMax);
+		overexertionNew = Math.min(overexertionNew, overexertionMax);
+
+		/// Finish
+		/// Always show what's active/required
+		if (resultsOnly["xhrequired"] === 1)
+		{
+			computed["xhnew"] = exhaustionNew;
+			attrsToChange["erschoepfung"] = exhaustionNew;
+		}
+		if (resultsOnly["oxrequired"] === 1)
+		{
+			computed["oxnew"] = overexertionNew;
+			attrsToChange["ueberanstrengung"] = overexertionNew;
+		}
+
+		// Prettify certain output
+		{
+			let useResults = [
+				"aubase",
+			];
+			for (let part of useResults)
+			{
+				if (Object.hasOwn(resultsOnly, part))
+				{
+					computed[part] = prettifyMod(parseInt(resultsOnly[part]));
+				}
+			}
+		}
+
+		// Finish
+		debugLog(caller, "tail", "rollID", rollID, "AURegTotal", AURegTotal, "attrsToChange", attrsToChange, "computed", computed);
+		safeSetAttrs(attrsToChange);
+
+		finishRoll(
+			rollID,
+			computed
+		);
+	}
+});
 /* regeneration end */

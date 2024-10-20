@@ -1035,12 +1035,14 @@ const melee = [
 */
 // Regeneration buttons
 const reg = [
+	'reg_deepbreath',
 	'reg_sleep'
 ];
 
-// Minimum regeneration per regeneration phase (sleep)
+// Minimum regeneration
 const regLimitLower = {
 	'le': 0,
+	'au': 0,
 	'ae': 0,
 	'ke': 0
 };
