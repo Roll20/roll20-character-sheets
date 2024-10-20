@@ -13,12 +13,14 @@ const statAttrs = [
 const combatTechniques = {
 		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
 		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
+		"bastardstaebe":       { type: "melee",  ebe: -2,        "at-only": false },
 		"belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
 		"blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
 		"bogen":               { type: "ranged", ebe: -3,        "at-only": true },
 		"diskus":              { type: "ranged", ebe: -2,        "at-only": true },
 		"dolche":              { type: "melee",  ebe: -1,        "at-only": false },
 		"fechtwaffen":         { type: "melee",  ebe: -1,        "at-only": false },
+		"feuerwaffen":         { type: "ranged", ebe: -5,        "at-only": true },
 		"hiebwaffen":          { type: "melee",  ebe: -4,        "at-only": false },
 		"infanteriewaffen":    { type: "melee",  ebe: -3,        "at-only": false },
 		"kettenstabe":         { type: "melee",  ebe: -1,        "at-only": false },
@@ -115,6 +117,7 @@ const defaultValues = {
 	"atbasis": 5,
 
 	"AT_Anderthalbhander": 5,
+	"AT_bastardstaebe": 5,
 	"AT_dolche": 5,
 	"AT_fechtwaffen": 5,
 	"AT_hiebwaffen": 5,
@@ -139,6 +142,7 @@ const defaultValues = {
 	"pabasis": 5,
 
 	"PA_Anderthalbhander": 5,
+	"PA_bastardstaebe": 5,
 	"PA_dolche": 5,
 	"PA_fechtwaffen": 5,
 	"PA_hiebwaffen": 5,
@@ -181,7 +185,7 @@ const defaultValues = {
 	"AT_Blasrohr": 5,
 	"AT_Bogen": 5,
 	"AT_Diskus": 5,
-	"AT_peitsche": 5,
+	"AT_feuerwaffen": 5,
 	"AT_Schleuder": 5,
 	"AT_Wurfbeile": 5,
 	"AT_Wurfmesser": 5,
@@ -263,6 +267,8 @@ const defaultValues = {
 	"BE": 0,
 	"be_at_mod": 0,
 	"be_pa_mod": 0,
+	"be_at_mod_hint": 0,
+	"be_pa_mod_hint": 0,
 	"BE_RG": 0,
 	"BE_RG_INI": 0,
 
@@ -312,7 +318,23 @@ const defaultValues = {
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
 	"reg_sleep_sleep_disorder_trigger": "1d0",
-	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}",
+
+	// Repeating sections
+	"repeating_conjuration-spells-myranor": {
+		"spell_action": '&{template:default} {{Hinweis=Attribut "spell_action" eines myranischen Beschwörungszaubers noch nicht gesetzt. Versuchen Sie den Charakterbogen zu schließen und wieder zu öffnen. Alternativ sollte eine Änderung an der Quelle, der Kategorie, der Repräsentation oder den Probeneigenschaften dazu führen, dass der Würfelknopf korrekt funktioniert.}}',
+		"sphere": "Sphäre unbekannt",
+		"stats": "MU/KL/CH",
+		"value": 0,
+		"source": "Quelle?",
+		"type": "?",
+		"representation_full": "??????",
+		"representation_short": "???",
+		"stat0": "MU",
+		"stat1": "KL",
+		"stat2": "CH",
+		"name": "Quelle? (?), ???"
+	}
 };
 
 /*
@@ -336,12 +358,14 @@ Individual spell names are generally based on a/the short name. One of the excep
 const talents = [
 	't_ka_anderthalbhaender',
 	't_ka_armbrust',
+	't_ka_bastardstaebe',
 	't_ka_belagerungswaffen',
 	't_ka_blasrohr',
 	't_ka_bogen',
 	't_ka_diskus',
 	't_ka_dolche',
 	't_ka_fechtwaffen',
+	't_ka_feuerwaffen',
 	't_ka_hiebwaffen',
 	't_ka_infanteriewaffen',
 	't_ka_kettenstaebe',
@@ -364,6 +388,7 @@ const talents = [
 	't_ko_akrobatik',
 	't_ko_athletik',
 	't_ko_fliegen',
+	't_ko_freiesfliegen',
 	't_ko_gaukeleien',
 	't_ko_immanspiel',
 	't_ko_klettern',
@@ -494,6 +519,7 @@ const talents = [
 	't_h_feinmechanik',
 	't_h_feuersteinbearbeitung',
 	't_h_fleischer',
+	't_h_fluggeraetesteuern',
 	't_h_gerber',
 	't_h_glaskunst',
 	't_h_grobschmied',
@@ -613,6 +639,7 @@ const talents_ebe = [
 	't_ko_akrobatik',
 	't_ko_athletik',
 	't_ko_fliegen',
+	't_ko_freiesfliegen',
 	't_ko_gaukeleien',
 	't_ko_klettern',
 	't_ko_koerperbeherrschung',
@@ -1036,12 +1063,14 @@ In the long run, all attributes should be migrated to the new ones.
 const talentsData = {
 	't_ka_anderthalbhaender': {'internal': "Anderthalbhander", 'ui': "Anderthalbhänder"},
 	't_ka_armbrust': {'internal': "armbrust", 'ui': "Armbrust"},
+	't_ka_bastardstaebe': {'internal': "bastardstaebe", 'ui': "Bastardstäbe"},
 	't_ka_belagerungswaffen': {'internal': "belagerungswaffen", 'ui': "Belagerungswaffen"},
 	't_ka_blasrohr': {'internal': "blasrohr", 'ui': "Blasrohr"},
 	't_ka_bogen': {'internal': "bogen", 'ui': "Bogen"},
 	't_ka_diskus': {'internal': "diskus", 'ui': "Diskus"},
 	't_ka_dolche': {'internal': "dolche", 'ui': "Dolche"},
 	't_ka_fechtwaffen': {'internal': "fechtwaffen", 'ui': "Fechtwaffen"},
+	't_ka_feuerwaffen': {'internal': "feuerwaffen", 'ui': "Feuerwaffen"},
 	't_ka_hiebwaffen': {'internal': "hiebwaffen", 'ui': "Hiebwaffen"},
 	't_ka_infanteriewaffen': {'internal': "infanteriewaffen", 'ui': "Infanteriewaffen"},
 	't_ka_kettenstaebe': {'internal': "kettenstabe", 'ui': "Kettenstäbe"},
@@ -1064,6 +1093,7 @@ const talentsData = {
 	't_ko_akrobatik': {'internal': "akrobatik", 'ui': "Akrobatik"},
 	't_ko_athletik': {'internal': "athletik", 'ui': "Athletik"},
 	't_ko_fliegen': {'internal': "fliegen", 'ui': "Fliegen"},
+	't_ko_freiesfliegen': {'internal': "freiesfliegen", 'ui': "Freies Fliegen"},
 	't_ko_gaukeleien': {'internal': "gaukeleien", 'ui': "Gaukeleien"},
 	't_ko_immanspiel': {'internal': "immanspiel", 'ui': "Immanspiel"},
 	't_ko_klettern': {'internal': "klettern", 'ui': "Klettern"},
@@ -1194,6 +1224,7 @@ const talentsData = {
 	't_h_feinmechanik': {'internal': "feinmechanik", 'ui': "Feinmechanik"},
 	't_h_feuersteinbearbeitung': {'internal': "feuersteinbearbeitung", 'ui': "Feuersteinbearbeitung"},
 	't_h_fleischer': {'internal': "fleischer", 'ui': "Fleischer"},
+	't_h_fluggeraetesteuern': {'internal': "fluggeraetesteuern", 'ui': "Fluggerätesteuern"},
 	't_h_gerber': {'internal': "gerber", 'ui': "Gerber"},
 	't_h_glaskunst': {'internal': "glaskunst", 'ui': "Glaskunst"},
 	't_h_grobschmied': {'internal': "grobschmied", 'ui': "Grobschmied"},
@@ -1641,12 +1672,70 @@ const spellsData = {
 	'z_zwingtanz': {'internal': "zwingtanz", 'ui': "Zwingtanz", 'stats': ['MU', 'KL', 'CH']}
 };
 /*
+	Myranor-only
+	Map sources to spheres
+ */
+const sourcesSpheresData = {
+	'Abgrund': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggari': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Aggression': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Avastada': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Begierde': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Carafai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Darcalya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Dya\'Khol': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Eis': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Endgültigkeit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erfolg': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erkenntnis': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Erz': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Eskates': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Feenwesen': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Feuer': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Freiheit': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Galkuzul': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Ghorgumor': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Harmonie': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Humus': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Iryabaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Khalyanar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Kraft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Kreativität': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Luft': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Mishkarya': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Naggarach': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Thesephai': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Tiergeister': { "internal": 'Natur', "ui": 'Sphäre der Natur' },
+	'Totenwesen': { "internal": 'Tod', "ui": 'Sphäre des Todes' },
+	'Tyakaar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Wahnsinn': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Wasser': { "internal": 'Elemente', "ui": 'Sphäre der Elemente' },
+	'Xolovar': { "internal": 'Dämonen', "ui": 'Sphäre der Dämonen' },
+	'Zauberei': { "internal": 'Stellare', "ui": 'Sphäre der Stellare' },
+	'Zeit': { "internal": 'Zeit', "ui": 'Sphäre der Zeit' }
+};
+
+/*
+	Myranor-only
+	Map spheres to stats required for checks
+*/
+const spheresStatsData = {
+	'Zeit': [ 'MU', 'KL', 'IN' ],
+	'Elemente': [ 'MU', 'KL', 'CH' ],
+	'Natur': [ 'MU', 'KL', 'IN' ],
+	'Tod': [ 'MU', 'MU', 'CH' ],
+	'Stellare': [ 'KL', 'IN', 'CH' ],
+	'Dämonen': [ 'MU', 'MU', 'CH' ]
+}
+
+/*
 	Constants for effective encumbrance for talent/spell checks
 */
 const effectiveEncumbrance = {
 	"t_ko_akrobatik":           { "value":  2, "type": "factor" },
 	"t_ko_athletik":            { "value":  2, "type": "factor" },
 	"t_ko_fliegen":             { "value":  1, "type": "factor" },
+	"t_ko_freiesfliegen":       { "value":  2, "type": "factor" },
 	"t_ko_gaukeleien":          { "value":  2, "type": "factor" },
 	"t_ko_klettern":            { "value":  2, "type": "factor" },
 	"t_ko_koerperbeherrschung": { "value":  2, "type": "factor" },
@@ -2256,7 +2345,7 @@ const meleeData = {
 		*/
 	},
 	'k_meisterliches_entwaffnen_parade_parierwaffe': {
-		'ui': 'Meisterliches Entwaffnen (Pairerwaffenparade)',
+		'ui': 'Meisterliches Entwaffnen (Parierwaffenparade)',
 		'typ': 'pa-parierwaffe',
 		'rollCount': 1,
 		'mod': '0',

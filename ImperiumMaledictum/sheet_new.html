@@ -18,13 +18,22 @@
 
     <div class="roller">
         <select class="input character" name="attr_difficulty">
-            <option value="60">Very Easy (+60)</option>
-            <option value="40">Easy (+40)</option>
-            <option value="20">Routine (+20)</option>
-            <option value="0" selected>Challenging (+0)</option>
-            <option value="-10">Difficult (-10)</option>
-            <option value="-20">Hard (-20)</option>
-            <option value="-30">Very Hard (-30)</option>
+          <option value="60">Very Easy (+60)</option>
+          <option value="40">Easy (+40)</option>
+          <option value="20">Routine (+20)</option>
+          <option value="0" selected>Challenging (+0)</option>
+          <option value="-10">Difficult (-10)</option>
+          <option value="-20">Hard (-20)</option>
+          <option value="-30">Very Hard (-30)</option>
+        </select>
+        <select class="input character" name="attr_superiority">
+          <option value="0">No Superiority</option>
+          <option value="1">+1 Superiority</option>
+          <option value="2">+2 Superiority</option>
+          <option value="3">+3 Superiority</option>
+          <option value="4">+4 Superiority</option>
+          <option value="5">+5 Superiority</option>
+          <option value="6">+6 Superiority</option>
         </select>
         <select class="input character" name="attr_circumstances">
             <option value="3">Advantage (+20)</option>
@@ -614,7 +623,7 @@
                         <input type="number" name="attr_warp_charge_current" />
 
                         <label>Threshold</label>
-                        <span class="input" name="attr_warp_charge_threshold" />
+                        <input  type="number" name="attr_warp_charge_threshold" />
                     </div>
                     <label class="hint">WilB (×2 if Sanctioned)</label>
                 </div>
@@ -635,7 +644,7 @@
                 <input type="number" name="attr_wounds_current" />
 
                 <label>Maximum</label>
-                <span class="input" name="attr_wounds_maximum" />
+                <input type="number" name="attr_wounds_maximum" />
             </div>
         </div>
 
@@ -871,7 +880,7 @@
                       <input type="number" name="attr_encumbrance_current" />
 
                       <label>Maximum</label>
-                      <span class="input" name="attr_encumbrance_max" />
+                      <input type="number" name="attr_encumbrance_max" />
                   </div>
 
                   <label class="hint">StrB + TghB</label>
@@ -1633,7 +1642,7 @@
         });
     });
 
-    const test_list = ["difficulty","circumstances","psychic_focus"];
+    const test_list = ["difficulty","circumstances","superiority","psychic_focus"];
     const button_list = chars_list.concat(skill_list).concat(npc_chars_list);
     button_list.forEach(trigger => {
         on(`clicked:${trigger}`, function(eventInfo) {
@@ -1650,8 +1659,9 @@
                 let skill_total = parseInt(values[`${field}`])||0;
                 let diff_roll = parseInt(values["difficulty"])||0;
                 let circ = parseInt(values["circumstances"])||0;
+                let superiority = parseInt(values["superiority"])||0;
 
-                rollTest(reroll, skill_name, skill_total, diff_roll, circ);
+                rollTest(reroll, skill_name, skill_total, diff_roll, circ, superiority);
             });
         });
     });
@@ -1678,17 +1688,18 @@
                     diff_roll = parseInt(values[`${trigger}_${key}_difficulty`])||0;
                 }
                 let circ = parseInt(values["circumstances"])||0;
+                let superiority = parseInt(values["superiority"])||0;
                 let slmod = trigger == "repeating_powers" ? (parseInt(values["psychic_focus"])||0) : 0;
                 let dmg = parseInt(values[`${trigger}_${key}_damage_total`])||-1;
                 let dmg_info = values[`${trigger}_${key}_damage_info`];
                 let critfum = trigger == "repeating_weapons";
 
-                rollTest(reroll, skill_name, skill_total, diff_roll, circ, dmg, dmg_info, slmod, critfum);
+                rollTest(reroll, skill_name, skill_total, diff_roll, circ, superiority, dmg, dmg_info, slmod, critfum);
             });
         });
     });
 
-    const rollTest = function(reroll, skill_name, skill_total, diff_roll, circ, dmg=-1, dmgi="", slmod=0, critfum=false) {
+    const rollTest = function(reroll, skill_name, skill_total, diff_roll, circ, superiority, dmg=-1, dmgi="", slmod=0, critfum=false) {
         let circ_bonus = 0;
         let circ_roll = "";
         let adv_roll = "";
@@ -1722,7 +1733,8 @@
             .concat(`{{name=@{character_name}}} {{skill_name=${skill_name}}} `)
             .concat(`{{skill_total=[[${skill_total}]]}} {{difficulty=[[${diff_roll}]]}} `)
             .concat(`{{result=[[1d100]]}}${adv_roll}${disadv_roll}${circ_roll}${dmg_roll}${dmg_info}${hitloc} `)
-            .concat(`{{sl=[[0]]}} {{sl_info=[[0]]}} {{critical=[[0]]}} {{fumble=[[0]]}}${adjustedsl}`), (results) => {
+            .concat(`{{sl=[[0]]}} {{sl_info=[[0]]}} {{critical=[[0]]}} {{fumble=[[0]]}}${adjustedsl}`)
+            .concat(`{{superiority=${superiority}}}`), (results) => {
             const result = results.results.result.result;
             let digits = result.toString().split('').map(Number);
             if (digits.length == 1) {
@@ -1733,17 +1745,17 @@
             // account for original SL that is better/worse
             let final_result = result;
             let final_total = skill_total + difficulty;
-            let final_sl = getSl(final_total, final_result, slmod);
+            let final_sl = getSl(final_total, final_result, slmod, superiority);
             if (circ != 0) {
                 final_total += circ_bonus;
 
                 let hi_result = result == 100 ? 100 :
                     Math.min(...digits) * 10 + Math.max(...digits);
-                let hi_sl = getSl(final_total, hi_result, slmod);
+                let hi_sl = getSl(final_total, hi_result, slmod, superiority);
 
                 let lo_result = result == 100 ? 100 :
                     Math.max(...digits) * 10 + Math.min(...digits);
-                let lo_sl = getSl(final_total, lo_result, slmod);
+                let lo_sl = getSl(final_total, lo_result, slmod, superiority);
 
                 if ((circ > 0 && parseInt(hi_sl) >= parseInt(lo_sl)) ||
                     (circ < 0 && parseInt(hi_sl) <= parseInt(lo_sl))) {
@@ -1777,8 +1789,8 @@
         });
     };
 
-    const getSl = function(skill, result, mod) {
-        let sl = Math.floor(skill / 10) - Math.floor(result / 10);
+    const getSl = function(skill, result, mod, superiority) {
+        let sl = Math.floor(skill / 10) - Math.floor(result / 10) + superiority;
         sl += mod;
         if ((result >= 96) && (sl > 0)) { // && skill > result) {
             sl = `-0`;
@@ -2296,6 +2308,11 @@
         {{#circumstances}}
             <p>//Unmodified roll: {{result}}</p>
         {{/circumstances}}
+        {{#rollLess() superiority 1 }}
+        {{#superiority}}
+            <p>//Superiority: {{superiority}}</p>
+        {{/superiority}}
+        {{/rollLess() superiority 1 }}
         {{#damage}}
             <p>Attack:</p>
             <p>-Damage- {{damage}} {{computed::sl}} SL</p>

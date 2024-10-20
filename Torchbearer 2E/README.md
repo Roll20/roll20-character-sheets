@@ -5,12 +5,21 @@ Use `npm install` to download dependancies and `npm install pug-cli -g` to downl
 
 Start compiling for SCSS & PUG with `npm start` from the Torchbearer 2E directory.
 
-## Feature Log
+## Prioritized Slices
 
-- Make the sheet responsive
-- Add wises help text
+- Improve calculate dice firing too much
+- Roll template details
+- Opponent successes
+- Show successes on roll page
+- Might and precedence for rolling
 
-## Known Bugs
+## Nice to Haves
 
-- Backpacks have a bug requiring toggling twice to make it work
-- Fresh does not get counted for a new character
+- Dynamic beginner's luck menu
+- Spend artha button
+- Upgrade skills and abilities option
+- Hidable relics & spells
+- Dynamic trait dropdown
+- Auto add wise advancement
+- Dark theme 
+- i18n

@@ -477,7 +477,7 @@ function generateAEBaseMasterlyRegenerationRoll (statValue) {
 	if (isNaN(roll))
 	{
 		debugLog(func, "statValue cannot be parsed as integer. Using default value.");
-		roll = defaultValues["reg_sleep_ae_base"];
+		roll = getDefaultValue("reg_sleep_ae_base");
 	} else {
 		roll = DSAround(roll);
 		roll = roll.toString() + "d1cs2cf0";
@@ -866,7 +866,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			-> results for both cases passed to "reaction" roll
 			-> self-control +7 -> roll + regeneration results (stored from initial roll)
 	*/
-	if (results.hasOwnProperty("schlafstoerungfall"))
+	if (Object.hasOwn(results, "schlafstoerungfall"))
 	{
 		var sleepDisorder = {"level": 0, "triggered": -1};
 
@@ -915,7 +915,7 @@ on('clicked:reg_sleep-action', async (info) => {
 	}
 
 	// Process potential self-control roll for sleep disorder
-	if (results.hasOwnProperty("selbstbeherrschung"))
+	if (Object.hasOwn(results, "selbstbeherrschung"))
 	{
 		var TaW = results.taw.result;
 		var mod = results.mod.result;
@@ -948,7 +948,7 @@ on('clicked:reg_sleep-action', async (info) => {
 		{
 			let successes = 0;
 			let failures = 0;
-			for (roll of rolls)
+			for (let roll of rolls)
 			{
 				if (roll <= success)
 				{
@@ -980,7 +980,7 @@ on('clicked:reg_sleep-action', async (info) => {
 		} else {
 			if (effTaW < 0)
 			{
-				for (roll in rolls)
+				for (let roll in rolls)
 				{
 					effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 				}
@@ -988,7 +988,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			}
 
 			// TaP-Verbrauch für jeden Wurf
-			for (roll in effRolls)
+			for (let roll in effRolls)
 			{
 				TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 			}
@@ -1041,7 +1041,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			computed["leko"] = LEKO;
 			LERegTotal = results["lebase"].result + LEKO;
 			if (
-				results.hasOwnProperty("schlafstoerungfall") &&
+				Object.hasOwn(results, "schlafstoerungfall") &&
 				(
 					sleepDisorder["triggered"] === 1 ||
 					(
@@ -1055,7 +1055,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				results["leschlafstoerung"]["result"] = -results["leschlafstoerung"]["result"];
 				LERegTotal += results["leschlafstoerung"]["result"];
 			}
-			if (results.hasOwnProperty("schlafwandeln"))
+			if (Object.hasOwn(results, "schlafwandeln"))
 			{
 				LERegTotal += parseInt(results["schlafwandeln"]["result"]);
 			}
@@ -1096,7 +1096,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				computed["aein"] = AEIN;
 				AERegTotal = results["aebase"].result + AEIN;
 				if (
-					results.hasOwnProperty("schlafstoerungfall") &&
+					Object.hasOwn(results, "schlafstoerungfall") &&
 					(
 						sleepDisorder["triggered"] === 1 ||
 						(
@@ -1110,7 +1110,7 @@ on('clicked:reg_sleep-action', async (info) => {
 					results["aeschlafstoerung"]["result"] = -results["aeschlafstoerung"]["result"];
 					AERegTotal += results["aeschlafstoerung"]["result"];
 				}
-				if (results.hasOwnProperty("schlafwandeln"))
+				if (Object.hasOwn(results, "schlafwandeln"))
 				{
 					AERegTotal += parseInt(results["schlafwandeln"]["result"]);
 				}
@@ -1164,14 +1164,14 @@ on('clicked:reg_sleep-action', async (info) => {
 			];
 			for (let part of useComputed)
 			{
-				if (computed.hasOwnProperty(part))
+				if (Object.hasOwn(computed, part))
 				{
 					computed[part] = prettifyMod(computed[part]);
 				}
 			}
 			for (let part of useResults)
 			{
-				if (results.hasOwnProperty(part))
+				if (Object.hasOwn(results, part))
 				{
 					computed[part] = prettifyMod(parseInt(results[part].result));
 				}

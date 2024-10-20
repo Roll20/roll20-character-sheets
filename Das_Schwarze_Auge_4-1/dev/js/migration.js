@@ -14,7 +14,8 @@ var versionsWithMigrations = [
 		20230618,
 		20240414,
 		20240510,
-		20240519
+		20240519,
+		20241002
 ];
 
 /*
@@ -98,7 +99,7 @@ function migrateTo20190427 (migrationChain) {
 								debugLog(caller, "Migration: No gifts found, nothing to migrate.");
 						} else {
 								debugLog(caller, "Migration: Found old gifts, continuing ...");
-								for(var i=0; i < gabenIDs.length; i++) {
+								for(let i=0; i < gabenIDs.length; i++) {
 										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TalentName");
 										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1");
 										attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft2");
@@ -113,7 +114,7 @@ function migrateTo20190427 (migrationChain) {
 								debugLog(caller, "Migration: No meta-talents found, nothing to migrate.");
 						} else {
 								debugLog(caller, "Migration: Found old meta-talents, continuing ...");
-								for(var i=0; i < metatalenteIDs.length; i++) {
+								for(let i=0; i < metatalenteIDs.length; i++) {
 										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName");
 										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1");
 										attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft2");
@@ -130,7 +131,7 @@ function migrateTo20190427 (migrationChain) {
 										let defaultGiftTaW = 3;
 										let defaultMetaTaW = 0;
 										let update = {};
-										for(var i=0; i < gabenIDs.length; i++) {
+										for(let i=0; i < gabenIDs.length; i++) {
 												let newrow = generateRowID();
 												let current = gabenIDs[i];
 												let prefixNew = "repeating_Gaben_" + newrow;
@@ -171,7 +172,7 @@ function migrateTo20190427 (migrationChain) {
 										}
 										debugLog(caller, update);
 
-										for(var i=0; i < metatalenteIDs.length; i++) {
+										for(let i=0; i < metatalenteIDs.length; i++) {
 												let newrow = generateRowID();
 												let current = metatalenteIDs[i];
 												let prefixNew = "repeating_Metatalente201904_" + newrow;
@@ -245,7 +246,7 @@ function migrateTo20200809(migrationChain) {
 				
 				var attrsToChange = {};
 				var activeCount = 0;
-				for (var i = 1; i <= 4; i++) {
+				for (let i = 1; i <= 4; i++) {
 						if (v["NKW_Aktiv" + i] === "1") {
 								activeCount += 1;
 						}
@@ -349,7 +350,7 @@ function migrateTo20210413(migrationChain) {
 			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
 				let attrsToChange = {};
 
-				for (var i = 1; i <= 4; i++) {
+				for (let i = 1; i <= 4; i++) {
 						attrsToChange["NKW" + i + "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, i);
 				}
 
@@ -380,7 +381,7 @@ function migrateTo20210413(migrationChain) {
 			// Updates for INI modifiers
 			// Set INI modifier from (main) weapon
 			var weaponini = 0;
-			for (weapon = 1; weapon <= 4; weapon++) {
+			for (let weapon = 1; weapon <= 4; weapon++) {
 				if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
 					debugLog(caller, "INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
 					weaponini = parseInt(values["INIModNKW" + weapon]);
@@ -469,15 +470,15 @@ function migrateTo20210718 (migrationChain) {
 		results = checkRequiredProperties(requirements, values);
 		if (results["errors"] >= 1) {
 			debugLog(caller, "Missing properties: '" + results["missing"].toString() + "'. Using default values. 0 for 'Ges_BE', 'BE_Last', 'BE_TaW' and 'sf_rustungsgewohnungIII'.");
-			for (req of requirements) {
-				if (!values.hasOwnProperty(req)) {
+			for (let req of requirements) {
+				if (!Object.hasOwn(values, req)) {
 					values[req] = defaultValue;
 				}
 			}
 		}
 		// Check sanity
 		var reqsToCheck = requirements.slice(0,3);
-		for (req of reqsToCheck) {
+		for (let req of reqsToCheck) {
 			if (!DSAsane(values[req], "encumbrance")) {
 				debugLog(caller, "'" + req + "' not sane, set to default value (" + defaultValue + ").");
 				values[req] = defaultValue;
@@ -547,16 +548,16 @@ function migrateTo20220116(migrationChain) {
 	// Build list of attributes
 	var attrsToGet = ["character_name"];
 	var ebeTalents = []
-	for(talent of talents_ebe)
+	for(let talent of talents_ebe)
 	{
 		ebeTalents.push(talent + "-ebe");
 	}
-	for(attr of [].concat(talents, ebeTalents, spells))
+	for(let attr of [].concat(talents, ebeTalents, spells))
 	{
 		attrsToGet.push(attr + "_action");
 	}
 	safeGetAttrs(attrsToGet, function(v) {
-		for (attr of attrsToGet)
+		for (let attr of attrsToGet)
 		{
 			// No action buttons for character name and combat techniques required
 			if (attr.match("t_ka_") || attr === "character_name") continue;
@@ -590,7 +591,7 @@ function migrateTo20220604(migrationChain) {
 	var attrsToChange = {};
 
 	safeGetAttrs(attrsToGet, function(v) {
-		for (attr of attrsToGet)
+		for (let attr of attrsToGet)
 		{
 			if (attr.match("visibli"))
 			{
@@ -928,7 +929,7 @@ function migrateTo20240510(migrationChain) {
 	safeGetAttrs(["subtag1"], function (v) {
 		var attrsToChange = {};
 
-		if (valueMap.hasOwnProperty(v["subtag1"]))
+		if (Object.hasOwn(valueMap, v["subtag1"]))
 		{
 			attrsToChange["sf_representations"] = valueMap[v["subtag1"]];
 		}
@@ -1118,7 +1119,7 @@ function migrateTo20240519(migrationChain) {
 	safeGetAttrs(attrsToGet, function (v) {
 		var attrsToChange = {};
 
-		for (property in attrMap)
+		for (let property in attrMap)
 		{
 			let oldAttr = attrMap[property];
 			if (v[oldAttr] === 0)
@@ -1129,6 +1130,46 @@ function migrateTo20240519(migrationChain) {
 		}
 		debugLog(caller, attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function () {
+			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize newly added attributes (Bastardstäbe, Feuerwaffen, hints for mods from encumbrance)
+*/
+function migrateTo20241002(migrationChain) {
+	const caller = "migrateTo20241002";
+	debugLog(caller, "Invoked.");
+
+	const attrsToGet = [ "be_at_mod", "be_pa_mod"];
+	safeGetAttrs(attrsToGet, function(values) {
+		let attrsToInit = {
+			"AT_bastardstaebe": 5,
+			"PA_bastardstaebe": 5,
+			"AT_feuerwaffen": 5,
+			"be_at_mod_hint": 0,
+			"be_pa_mod_hint": 0
+		};
+
+		for (let attr of attrsToGet)
+		{
+			if (DSAsane(values[attr], "int"))
+			{
+				let value = values[attr];
+				let hintAttr = attr + "_hint";
+				if (value > 0)
+				{
+					attrsToInit[hintAttr] = 1;
+				} else {
+					attrsToInit[hintAttr] = 0;
+				}
+			}
+		}
+
+		debugLog(caller, "attrsToInit", attrsToInit);
+		safeSetAttrs(attrsToInit, {}, function () {
 			callNextMigration(migrationChain);
 		});
 	});
