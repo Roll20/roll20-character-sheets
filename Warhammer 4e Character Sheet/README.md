@@ -21,13 +21,13 @@ Please report issues on Github or Discord : Justi#7934
 ///// ============ Main Features ============ /////  
 
 
-- Mainhand / Offhand / Ranged with active weapon selection system. with integrated integated Skill, Talent & Quality mechanics. 
+- Mainhand / Offhand / Ranged active weapon selection system, inc Dual Wield. Integrated Skill, Talent & Item Quality mechanics. 
 
-- Combat Roll Modifier Quick Menu dropdown for Melee and Ranged, mod calculator with dymanic situation (Def Stance/Called Shot/Reach/Size/xVsy/Prone) and talent +SL/lvl integration (Stirke to Stun/Infighter/Fury..). Talent trigger's will onyl show if learned.
+- Combat Roll Modifier Quick Menu dropdown for Melee and Ranged, mod calculator with dynamic situation (Def Stance/Called Shot/Reach/Size/xVsy/Prone) and talent +SL/lvl integration (Strike to Stun/Infighter/Fury..). Trigger's will only show if learned.
 
-- Skill system, Basic / Advanced Skill List is fully implemented. 
+- Skill system, Basic / Advanced Skill List is fully implemented.
 
-- Talent system, all Core+++ official talent integrated into roll system. Add SL to all outcome and automatically add up for total outcome. Integrated into sheet Charactistics, Carry Weigth etc, and Movement Rolls from the Action bar and and Quick menu's.
+- Talent system, all Core+++ official talent integrated into roll system. Add SL to all outcome and automatically add up for total outcome. Integrated into sheet Characteristics, Carry Weight etc. Movement Roll Dropdown and and Quick menu's.
 
 - Item Qualities system, Weapons, Armor and Damage absorption system with Qualities, Enc, AP, Durable, Damage, Damage point & Talent integration. 
 
@@ -35,9 +35,9 @@ Please report issues on Github or Discord : Justi#7934
 
 - Roll Tables for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God integrated, also traggerable from clicky buttons in the roll template output when they occur.  
 
-- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ https://pdfcoffee.com/unofficial-grimoire-12-pdf-pdf-free.html).
+- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lore's. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Integrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clicky's in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ https://pdfcoffee.com/unofficial-grimoire-12-pdf-pdf-free.html).
 
-- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs. Including Group Advantage rule option to disable roll intregation!
+- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs. Including Group Advantage rule option to disable roll integration!
 
 - Inventory: Full Encumbrance Management system, with integrated Over encumbrance modifiers (-move/Agi), and Container & Vehicle Management section (TEW compatible) . 
 
@@ -60,11 +60,11 @@ Please report issues on Github or Discord : Justi#7934
 - Weapons/Spells Target fields, display the final roll target including all variables calculated by the sheet at that moment, e.g. CHAR + SKILL + MOD + ADVANTAGE - CONDITIONS. 
 - On Weapons ensure you select the corresponding skill (e.g. Melee Basic, Melee Parrying, Ranged Bow, Ranged Black powder etc), and that the correct skill is learned with advance points in it. 
 - Themes, see setting tab for various theme which change the look of the char sheet overall. Including Empire/Dwarf & Elf themes. 
-- Extended Channeling Test (spell book tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channeling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. 
+- Extended Channeling Test (spell book tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channeling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. Now includes auto Accu Ext SL calculation and rest after casting.
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage integration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommend separate character sheet for actual NPC bosses/major characters).  
 - Condition Tracking integration into roll template. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stunned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too.  
 
-This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v4 @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip // UiA Edition @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip
+This sheet has TokenMod integrated (TokenMod API needs to be installed in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v4 @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip // UiA Edition @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip
 
 Condition effects are currently hard coded as follows (updated June 15th 2021): 
 
@@ -80,6 +80,27 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
  
 ///// ============ Change Log ============ /////  
+
+
+Oct  9th 2024 v1.73a
+
+- Optimized sheet code and the reduced overall size by ~5%
+- Fixed not being able to use certain symbols in the character name without breaking sheet functionality, e.g.: " (). Some still don't work, e.g.: | {}
+- PC & NPC RT clicky button code unified, should resolve some odd issues
+- Allow Endurance test when Unconscious
+- Added Critical Damage Rules Houserule 3 to default settings options (outside the game)
+- Fixed Enc Penalty not applying to Agility correctly
+
+
+Oct  1st 2024 v1.73
+
+- Add Distracted (-20 all tests) to the condition bar, but as this is not technically a condition it adds its modifier separately from normal conditions. Similar to Drunk.
+- Removed condition limit of -30
+
+
+July 25th 2024 v1.72c
+
+- Critical Damage Rules Houserule 3#: Changed spells RT crit button, will now Default to Elemental table on the drop down menu.
 
 
 June 28th 2024 v1.72b
