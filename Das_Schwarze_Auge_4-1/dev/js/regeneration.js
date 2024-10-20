@@ -1181,7 +1181,6 @@ on('clicked:reg_sleep-action', async (info) => {
 				"lefr",
 				"aebase",
 				"kebase",
-				"nahrungsrestriktion",
 				"leschlafstoerung",
 				"aeschlafstoerung",
 				"schlafwandeln"
