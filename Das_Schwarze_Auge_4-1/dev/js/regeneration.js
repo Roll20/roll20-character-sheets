@@ -743,7 +743,9 @@ on(
 		];
 		const AERoll = [
 			`{{ae=${values["AE"]}}}`,
-			`{{aebase=[[${values["reg_sleep_ae_base"]} + [Vor- und Nachteile](${values["reg_sleep_ae_mod_advantages_disadvantages"]}) + [Heimwehkrank](${values["reg_sleep_ae_mod_homesickness"]}) + [Nahrungsrestriktion](${values["reg_sleep_ae_mod_food_restriction"]}) + [Sonderfertigkeiten](${values["reg_sleep_ae_mod_special_skills"]}) + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für AE-Regeneration](${values["reg_sleep_ae_mod_general"]})]]}}`,
+			`{{aebase=[[${values["reg_sleep_ae_base"]} + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für AE-Regeneration](${values["reg_sleep_ae_mod_general"]})]]}}`,
+			`{{aead=[[${values["reg_sleep_ae_mod_advantages_disadvantages"]}]]}}`,
+			`{{aess=[[${values["reg_sleep_ae_mod_special_skills"]}]]}}`,
 			`{{aein=[[${values["reg_sleep_ae_in"]}]]}}`,
 			"{{aeneu=[[0d1]]}}"
 		];
@@ -752,9 +754,11 @@ on(
 			`{{kebase=[[1d1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
 			"{{keneu=[[0d1]]}}"
 		];
+		const homesicknessRoll = `{{heimwehkrank=[[${values["reg_sleep_ae_mod_homesickness"]}]]}}`;
 		const foodRestrictionRoll = [
 			'{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}',
-			`{{lefr=[[${values["reg_sleep_le_mod_food_restriction"]}]]}}`
+			`{{lefr=[[${values["reg_sleep_le_mod_food_restriction"]}]]}}`,
+			`{{aefr=[[${values["reg_sleep_ae_mod_food_restriction"]}]]}}`
 		];
 		const sleepDisorderRoll = [
 			// general decision for triggering sleep disorder or not
@@ -802,6 +806,12 @@ on(
 		if (values["LiturgienTab"] === "0")
 		{
 			roll = roll.concat(KERoll);
+		}
+
+		// Additional property for homesickness
+		if (values["reg_sleep_ae_mod_homesickness"] !== 0)
+		{
+			roll = roll.concat(homesicknessRoll);
 		}
 
 		// Additional property for food restriction
@@ -1104,6 +1114,17 @@ on('clicked:reg_sleep-action', async (info) => {
 		{
 			if (values["reg_sleep_ae_fixed"] === "off")
 			{
+				// Base regeneration
+				AERegTotal = results["aebase"].result;
+
+				// Regeneration from advantages/disadvantages
+				computed["aead"] = results["aead"].result;
+				AERegTotal += results["aead"].result;
+
+				// Regeneration from special skills
+				computed["aess"] = results["aess"].result;
+				AERegTotal += results["aess"].result;
+
 				// Additional regeneration from IN check
 				var AEIN = 0;
 				if (results["aein"].result >= 0) {
@@ -1116,7 +1137,21 @@ on('clicked:reg_sleep-action', async (info) => {
 					}
 				}
 				computed["aein"] = AEIN;
-				AERegTotal = results["aebase"].result + AEIN;
+				AERegTotal += AEIN;
+
+				// Regeneration from homesickness
+				if (Object.hasOwn(results, "heimwehkrank"))
+				{
+					AERegTotal += results["heimwehkrank"].result;
+				}
+
+				// Regeneration from food restriction
+				if (Object.hasOwn(results, "aefr"))
+				{
+					AERegTotal += results["aefr"].result;
+				}
+
+				// Sleep disorder
 				if (
 					Object.hasOwn(results, "schlafstoerungfall") &&
 					(
@@ -1132,6 +1167,8 @@ on('clicked:reg_sleep-action', async (info) => {
 					results["aeschlafstoerung"]["result"] = -results["aeschlafstoerung"]["result"];
 					AERegTotal += results["aeschlafstoerung"]["result"];
 				}
+
+				// Somnambulism
 				if (Object.hasOwn(results, "schlafwandeln"))
 				{
 					AERegTotal += parseInt(results["schlafwandeln"]["result"]);
@@ -1139,6 +1176,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			} else {
 				// required for roll template
 				results["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
+				computed["aead"] = 0;
 				computed["aein"] = 0;
 				AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
 			}
@@ -1174,12 +1212,16 @@ on('clicked:reg_sleep-action', async (info) => {
 			let useComputed = [
 				"lead",
 				"leko",
+				"aead",
+				"aess",
 				"aein"
 			];
 			let useResults = [
 				"lebase",
 				"lefr",
 				"aebase",
+				"heimwehkrank",
+				"aefr",
 				"kebase",
 				"leschlafstoerung",
 				"aeschlafstoerung",
