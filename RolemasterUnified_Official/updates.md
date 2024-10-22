@@ -1,3 +1,15 @@
+# Next
+
+- Spells: Fix a nbs[ instead of a space
+- Less message spew during creation.
+- Less message spew during attacks.
+- Fix actions code to not break level up
+- Attacks small layout changes.
+- Heading for feats of strength
+- Move New Combat to the status block
+- move EP near level.
+- CC updates.
+
 # 2024-10-15
 
 - Start of Power Level support
@@ -10,6 +22,8 @@
 - More messages when injuries are applied.
 - Make checkboxes a standard size,
 - NPC upload button on the front page.
+- Directly rolled crits now have injury string
+
 
 # 2024-10-8
 
