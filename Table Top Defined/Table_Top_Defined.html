@@ -181,6 +181,13 @@
    <div class="saving-throw-block">
     <div class="column-header grcsa">Saving Throws</div>
     <div id="save-name">
+    <div class="titleblock">Ego</div>
+    <div class="titleblock">
+     <select type="text" name="attr_EgoBaseStr" id="EgoBase">
+      <option value="Low">Low</option>
+      <option value="High">High</option>
+     </select>
+    </div>
      <div class="titleblock">Fortitude</div>
      <div class="titleblock">
       <select type="text" name="attr_FortBaseStr" id="FortBase">
@@ -204,6 +211,8 @@
      </div>
     </div>
     <div id="save-total">
+    <div><b>Total</b></div>
+    <div><input type="number" readonly name="attr_EgoTotal"/></div>
      <div><b>Total</b></div>
      <div><input type="number" readonly name="attr_FortTotal"/></div>
      <div><b>Total</b></div>
@@ -213,6 +222,8 @@
     </div>
     <div id="save-base">
      <div>Base</div>
+     <div><input type="number" name="attr_EgoBaseNum" readonly="true"/></div>
+    <div>Base</div>
      <div><input type="number" name="attr_FortBaseNum" readonly="true"/></div>
      <div>Base</div>
      <div><input type="number" name="attr_RefBaseNum" readonly="true"/></div>
@@ -220,6 +231,8 @@
      <div><input type="number" name="attr_WilBaseNum" readonly="true"/></div>
     </div>
     <div id="save-key">
+    <div>Cha</div>
+    <div><input type="number" name="attr_chamod" readonly="true"/></div>
      <div>Con</div>
      <div><input type="number" name="attr_conmod" readonly="true"/></div>
      <div>Dex</div>
@@ -228,6 +241,8 @@
      <div><input type="number" name="attr_wismod" readonly="true"/></div>
     </div>
     <div id="save-magic">
+    <div>Magic</div>
+    <div><input type="number" name="attr_EgoMagic"/></div>
      <div>Magic</div>
      <div><input type="number" name="attr_FortMagic"/></div>
      <div>Magic</div>
@@ -236,6 +251,8 @@
      <div><input type="number" name="attr_WilMagic"/></div>
     </div>
     <div id="save-misc">
+    <div>Misc.</div>
+    <div><input type="number" name="attr_EgoMiscNum"/></div>
      <div>Misc.</div>
      <div><input type="number" name="attr_FortMiscNum"/></div>
      <div>Misc.</div>
@@ -244,6 +261,8 @@
      <div><input type="number" name="attr_WilMiscNum"/></div>
     </div>
     <div id="save-temp">
+    <div>Temp</div>
+    <div><input type="number" name="attr_EgoTempNum"/></div>
      <div>Temp</div>
      <div><input type="number" name="attr_FortTempNum"/></div>
      <div>Temp</div>
@@ -252,6 +271,13 @@
      <div><input type="number" name="attr_WilTempNum"/></div>
     </div>
     <div id="save-check">
+     <div class="titleblock">Save</div>
+     <div class="titleblock">
+      <button title="Ego Save"
+              type="roll"
+              value="&{template:custom}{{title=Ego Save}}{{subtitle=@{character_name}}}{{Result:= [[1d20+@{EgoTotal}]]}}"
+              name="roll_Ego-save"></button>
+     </div>
      <div class="titleblock">Save</div>
      <div class="titleblock">
       <button title="Fortitude Save"
@@ -3651,6 +3677,20 @@
     //</editor-fold>
 
     //<editor-fold desc="Saves">
+    on("change:egobasestr change:chamod change:charisma change:hd sheet:opened",function (){
+     getAttrs(["EgoBaseStr","HD"],function(values){
+      let HD = parseFloat(values.HD);
+      let base = 0;
+      if(values.EgoBaseStr === "Low") {
+       base = Math.min(6, Math.floor(HD / 3));
+      }if(values.EgoBaseStr === "High"){
+       base = Math.min(12, Math.floor(2+(HD / 2)));
+      }
+      setAttrs({
+       EgoBaseNum: base
+      });
+     });
+    });
 
     on("change:fortbasestr change:conmod change:constitution change:hd sheet:opened",function (){
         getAttrs(["FortBaseStr","HD"],function(values){
@@ -3698,6 +3738,22 @@
             });
         });
     });
+
+    on("change:egobasestr change:chamod change:charisma change:hd change:egobasenum " +
+            "change:egomiscnum change:egomagic change:egotempnum sheet:opened",function (){
+     getAttrs(["EgoBaseNum","chamod","EgoMagic","EgoMiscNum","EgoTempNum"],function(values){
+      let base = parseFloat(values.EgoBaseNum)||0;
+      let stat = parseFloat(values.chamod)||0;
+      let magic = parseFloat(values.EgoMagic)||0;
+      let misc = parseFloat(values.EgoMiscNum)||0;
+      let temp = parseFloat(values.EgoTempNum)||0;
+      let total = base + stat + magic + temp + misc;
+      setAttrs({
+       EgoTotal: total
+      });
+     });
+    });
+
 
     on("change:fortbasestr change:conmod change:constitution change:hd change:fortbasenum " +
         "change:fortmiscnum change:fortmagic change:forttempnum sheet:opened",function (){
@@ -4461,7 +4517,3 @@
 </script>
 
 <!--</editor-fold-->
-
-
-
-
