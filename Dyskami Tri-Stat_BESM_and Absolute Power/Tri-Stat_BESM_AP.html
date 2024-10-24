@@ -828,22 +828,31 @@
                             <div class="styling-border theme-border accordion-defect">
                                 <div class="styling-background theme-background">
                                     <div class="grid-major-defect">
-                                        <div class="grid-minor-defect styling-pill theme-minor">
+                                        <button name="act_defect" class="grid-minor-defect styling-pill button-click-animation input-button theme-minor" type="action">
+                                        <!--<div class="grid-minor-defect styling-pill theme-minor">-->
                                             <span data-i18n="defect">Defect</span>
-                                        </div>
+                                        <!--</div>-->
+                                        </button>
                                         <input name="attr_defect" class="grid-minor-input-defect styling-pill-input theme-input" type="text" value="" readonly />
-                                        <div class="grid-minor-rank styling-pill theme-minor">
+                                        
+                                        <button name="act_rank" class="grid-minor-rank styling-pill button-click-animation input-button theme-minor" type="action">
+                                        <!--<div class="grid-minor-rank styling-pill theme-minor">-->
                                             <span data-i18n="rank">Rank</span>
-                                        </div>
+                                        <!--</div>-->
+                                        </button>
                                         <input name="attr_rank" class="grid-minor-input-rank styling-pill-input theme-input" type="text" value="" readonly />
+                                        
                                         <div class="grid-minor-points styling-pill theme-minor">
                                             <span data-i18n="points">Points</span>
                                         </div>
                                         <input name="attr_points" class="grid-minor-input-defectpoints styling-pill-input theme-input" type="text" value="" readonly />
-                                        <div class="grid-minor-defectconfiguration styling-big-pill theme-minor">
+                                        
+                                        <button name="act_configuration" class="grid-minor-defectconfiguration styling-big-pill-button button-click-animation input-button theme-minor" type="action">
+                                        <!--<div class="grid-minor-defectconfiguration styling-big-pill theme-minor">-->
                                             <span data-i18n="configuration">Configuration</span>
-                                            <textarea name="attr_configuration" class="grid-minor-input-defectconfiguration styling-big-pill-textarea-attribute theme-input" wrap="soft" placeholder="No special configuration" readonly></textarea>
-                                        </div>
+                                        <!--</div>-->
+                                        </button>
+                                        <textarea name="attr_configuration" class="grid-minor-input-defectconfiguration styling-big-pill-textarea-attribute theme-input" wrap="soft" placeholder="No special configuration" readonly></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -3796,6 +3805,7 @@
                             break;
                             case 'attribute':
                             case 'configuration':
+                            case 'defect':
                             case 'enhancements':
                             case 'level':
                             case 'limiters':
@@ -8257,26 +8267,50 @@
             5:'26-50',
             6:'51-100'
         };
-        query.type = cache.source_id === 'group' ? 'group' : 'attribute';
+        query.type = cache.source_id === 'group' ? 'group' : cache.source_section;
         clog(cache, query, 'attributesMenu()');
         switch (cache.source_type) {
             case 'repeating':
                 switch (cache.source_attribute) {
                     case 'attribute':
                     case 'configuration':
+                    case 'defect':
                     case 'enhancements':
                     case 'level':
                     case 'limiters':
+                    case 'rank':
                     case 'stat':
                         query.next = `repeating_${cache.source_section}_${cache.source_attribute}`;
-                        query.type = 'attribute';
-                        for (let a = 0; a < all_attributes.length; a++) {
-                            for (let b = 0; b < cache.attrdb[all_attributes[a]].length; b++) {
-                                if (cache.attrdb[all_attributes[a]][b].row_id.toLowerCase() === cache.source_id) {
-                                    query.attribute = all_attributes[a];
+                        //query.type = cache.source_attribute;
+                        const all_list = cache.source_section === 'attribute' ? all_attributes : all_defects;
+                        //const db = cache.source_section === 'attribute' ? cache.attrdb : cache.defectdb;
+                        for (let a = 0; a < all_list.length; a++) {
+                            query.db = cache.source_section === 'attribute' ? 
+                                cache.attrdb[all_list[a]].find((b, i) => {
+                                    if (b.row_id.toLowerCase() === cache.source_id) {
+                                        query[cache.source_section] = all_list[a];
+                                        query.index = i;
+                                        return true;
+                                    }
+                                }) : 
+                                cache.defectdb[all_list[a]].find(b => {
+                                    if (b.row_id.toLowerCase() === cache.source_id) {
+                                        query[cache.source_section] = all_list[a];
+                                        query.index = i;
+                                        return true;
+                                    }
+                            });
+                            if (_.isObject(query.db)) { break; }
+                            
+                            /*
+                            for (let b = 0; b < db[all_list[a]].length; b++) {
+                                if (db[all_list[a]][b].row_id.toLowerCase() === cache.source_id) {
+                                    query[cache.source_section] = all_list[a];
                                     query.index = b;
+                                    query.db = db[all_list[a]][b];
                                 }
                             }
+                            */
                         }
                     break;
                 }
@@ -8288,7 +8322,7 @@
                     case 'edit':
                     case 'group':
                         query.next = cache.source;
-                        query.type = 'group';
+                        //query.type = 'group';
                     break;
                 }
             break;
@@ -8522,10 +8556,10 @@
                         query.name :
                         getTranslationByKey(query.attribute_translation)
                     }`;
-                    const customization_types = ['enhancements','limiters'];
-                    for (let i = 0; i < 2; i++) {
-                        query[`${customization_types[i]}_ranks`] = 
-                            query[`${customization_types[i]}`].map(c => {
+                    //const customization_types = ['enhancements','limiters'];
+                    for (let i = 0; i < customization_type.length; i++) {
+                        query[`${customization_type[i]}_ranks`] = 
+                            query[`${customization_type[i]}`].map(c => {
                                 return c.rank || 0;
                             }).reduce((m, n) => { return m + n; }, 0) || 0;
                     }
@@ -8700,19 +8734,22 @@
                 break;
                 case 'weapon_class':
                     const weapon_classes = 
-                        query.attribute === 'melee attack' ||
-                        query.attribute === 'melee defense' ? melee_types : 
-                        query.attribute === 'ranged attack' ? ranged_types :
+                        query[`${query.type}`] === 'melee attack' ||
+                        query[`${query.type}`] === 'melee defense' ? melee_types : 
+                        query[`${query.type}`] === 'ranged attack' ? ranged_types :
                         melee_types.concat(ranged_types).sort();
                     query.title = `${getTranslationByKey("choose-weapon-class")}`;
                     query.options = query[`${query.type}`] === 'inept attack' ? 
                         `|${getTranslationByKey("any")},any` : '';
+                    const classes = [];
                     for (let i = 0; i < weapon_classes.length; i++) {
-                        query.options += 
-                            `|${getTranslationByKey(weapon_classes[i].toKebobCase())},` +
-                            `${weapon_classes[i]}`;
+                        classes.push(
+                            `${getTranslationByKey(weapon_classes[i].toKebobCase())},${weapon_classes[i]}`
+                        ); 
+                            
                     }
-                    query.options += `|${getTranslationByKey("go-back")},${query.type}_menu`;
+                    query.options += '|' + classes.sort().join("|") + 
+                        `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'set_skill':
@@ -8760,18 +8797,13 @@
                 case 'set_name':
                 case 'static_attribute_group_name':
                 case 'repeating_attribute_attribute':
+                case 'repeating_defect_defect':
                     const type = 
                         cache.source_type === 'repeating' && cache.source_section === 'attribute' ? 'attribute' : 
                         cache.source_type === 'repeating' && cache.source_section === 'defect' ? 'defect' : 
                         'group';
                     query.title = `${getTranslationByKey("rename-" + type)}`;
                     query.options = '';
-                    /*
-                    query.options = `|Rename,rename_${query.type}` +
-                        '|Remove,?{Remove?' +
-                        '&#124;No&#44;exit' +
-                        `&#124;Yes&#44;remove_${query.type}&#125;`;
-                    */
                     query.last = query.next;
                 break;
                 case 'set_group_source':
@@ -8813,7 +8845,9 @@
                 case 'select_level':
                 case 'static_attribute_group_level':
                 case 'repeating_attribute_level':
-                    query.title = //`${getTranslationByKey(query.attribute_translation)} ` +
+                case 'repeating_defect_rank':
+                    query.title = cache.source_section === 'defect' ?
+                        `${getTranslationByKey("rank")}` :
                         `${getTranslationByKey("level")}`;
                     query.options = '';
                     query.last = query.next;
@@ -9108,26 +9142,64 @@
                     query.last = query.next;
                 break;
                 case 'config_customization':
-                    query.title = `${getTranslationByKey(query.attribute_translation)}`;
-                    switch (query.limiters[query.index].name) {
-                        case 'focussed damage':
-                            query.options = '';
-                            const weapon_types = melee_types.concat(ranged_types).sort();
-                            //const weapon_types_translations = weapon_types.toKebobCase()
-                            for (let i = 0, n = weapon_types.length; i < n; i++) {
-                                query.options += 
-                                    //`|${getTranslationByKey(weapon_types_translations[i])}` +
-                                    `|${weapon_types[i].capitalize()}` +//`|${capitalize(weapon_types[i])}` +
-                                    `,${weapon_types[i]}`;
-                            }
-                            query.last = query.next;
-                        break;
-                        case 'targeted damage':
-                            query.title = 'Target';
-                            query.options = '';
-                            query.last = query.next;
-                        break;
+                case 'repeating_attribute_configuration':
+                case 'repeating_defect_configuration':
+                    const all_configurations = [
+                        'attacktype',
+                        'attributetype',
+                        'broad category',
+                        'capped',
+                        'damage_type',
+                        'defense type',
+                        'focused damage',
+                        'group',
+                        'material category',
+                        'movements',
+                        'senses',
+                        'species',
+                        'targeted damage',
+                        'techniques',
+                        'transform',
+                        'weapon_class'
+                    ];
+                    query.configurations = [];
+                    for (let i = 0; i < query.db.config.length; i++) {
+                        if (all_configurations.includes(query.db.config[i].name)) {
+                            query.configurations.push(
+                                `${query.db.config[i].name.fromSnakeCase().capitalize()},${query.db.config[i].name}~${i}`
+                            );
+                        }
                     }
+                    if (query.configurations.length === 0) {
+                        clog(cache, `There is nothing to configure for ${query.db.name}.`, 'ERROR');
+                        return;
+                    }
+                    query.options = '|' + query.configurations.sort().join('|') + 
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                    /*
+                    if (cache.source_section === 'attribute') {
+                        query.title = `${getTranslationByKey(query.attribute_translation)}`;
+                        switch (query.limiters[query.index].name) {
+                            case 'focussed damage':
+                                const weapon_types = melee_types.concat(ranged_types).sort();
+                                //const weapon_types_translations = weapon_types.toKebobCase()
+                                for (let i = 0, n = weapon_types.length; i < n; i++) {
+                                    query.options += 
+                                        //`|${getTranslationByKey(weapon_types_translations[i])}` +
+                                        `|${weapon_types[i].capitalize()}` +
+                                        `,${weapon_types[i]}`;
+                                }
+                            break;
+                            case 'targeted damage':
+                                query.title = 'Target';
+                                query.options = '';
+                            break;
+                        }
+                    } else { //=> is defect
+
+                    }
+                    */
                 break;
                 case 'add_defect':
                     query.config = [];
@@ -9145,7 +9217,7 @@
                     query.title = `${getTranslationByKey("add")} ${getTranslationByKey("defect")}`;
                     query.options = '';
                     for (let i = 0, n = query.defects.length; i < n; i++) {
-                        query.options += `|${query.defects[i].capitalize()},` +//`|${capitalize(query.defects[i])},` +
+                        query.options += `|${query.defects[i].capitalize()},` +
                         `${query.defects[i]}`;
                     }
                     query.options += `|${getTranslationByKey("go-back")},attribute_menu`;
@@ -9344,17 +9416,12 @@
                     break;
                     case 'damage_type':
                     case 'weapon_class':
-                        query.config_index = query.config.findIndex(c => c.name === query.last); 
-                        if (query.config_index !== -1) {
-                            query.config[query.config_index].rank = query.selection;
-                        } else {
-                            query.config.push({
-                                name: query.last,
-                                rank: query.selection
-                            });
-                        }
-                        query[`${query.last}`] = query.selection;
-                        query.next = `${query.type}_menu`;
+                        const config = cache[`${query.type === 'attribute' ? 'attrdb' : 'defectdb'}`][`${query[query.type]}`][query.index].config;
+                        config[query.config_index].rank = query.selection;
+                        set_values[`repeating_${cache.source_section}_${cache.source_id}_configuration`] =
+                            config.map(c => `${c.name.fromSnakeCase().capitalize()} (${c.rank.capitalize()})`).sort().join("\n");
+                        query[`${query.last}`] = query.name;
+                        query.next = `exit`;
                     break;
                     case 'set_skill':
                         if (query.selection !== 'add_attribute') {
@@ -9380,6 +9447,7 @@
                     break;
                     case 'static_attribute_group_name':
                     case 'repeating_attribute_attribute':
+                    case 'repeating_defect_defect':
                         query.next = 'write_attributename';
                     break;
                     case 'static_attribute_group_type':
@@ -9412,6 +9480,7 @@
                     case 'select_level':
                     case 'static_attribute_group_level':
                     case 'repeating_attribute_level':
+                    case 'repeating_defect_rank':
                         if (isNaN(query.selection)) {
                             query.next = 'select_level';
                         } else {
@@ -9864,8 +9933,13 @@
                             'config_flare' : 'config_attribute';
                     break;
                     case 'config_customization':
-                        query.limiters[query.index].config = query.selection;
-                        query.next = 'attribute_menu';
+                    case 'repeating_attribute_configuration':
+                    case 'repeating_defect_configuration':
+                        if (query.selection === 'exit') { return; }
+                        query.load = query.selection.split("~");
+                        query.config_index = int(query.load[1]);
+                        query.config_name = query.load[0];
+                        query.next = query.config_name;
                     break;
                     case 'add_defect':
                         query.defect = query.selection;
@@ -10401,8 +10475,9 @@
                 }
                 */
                 if (query.next === 'write_attributename') {
-                    cache.attrdb[query.attribute][query.index].name = query.selection;
-                    set_values[`repeating_attribute_${cache.source_id}_name`] = query.selection;
+                    const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
+                    db[query[`${cache.source_attribute}`]][query.index].name = query.selection;
+                    set_values[`repeating_${cache.source_attribute}_${cache.source_id}_name`] = query.selection;
                 }
 
                 if (query.next === 'write_groupname') {
@@ -10472,19 +10547,33 @@
                         set_values.static_attribute_group_points = query.points;
                         set_values.static_attribute_group_level = `${query.level} (${query.elevel})`;
                     } else {
-                        for (let i = 0; i < customization_type.length; i++) {
-                            query[`${customization_type[i]}_ranks`] = 
-                            cache.attrdb[query.attribute][query.index][`${customization_type[i]}`].map(c => c.rank).reduce((a, b) => a + b, 0);    
+                        if (cache.source_section === 'attribute') {
+                            for (let i = 0; i < customization_type.length; i++) {
+                                query[`${customization_type[i]}_ranks`] = 
+                                cache.attrdb[query.attribute][query.index][`${customization_type[i]}`].map(c => c.rank).reduce((a, b) => a + b, 0);    
+                            }
+                            query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
+                            cache.attrdb[query.attribute][query.index].elevel = query.elevel;
                         }
-                        query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
-                        query.cost = attribute_costs[query.attribute];
+                        query.cost = cache.source_section === 'attribute' ?
+                            attribute_costs[query.attribute] :
+                            defect_costs[query.defect];
                         query.points = query.cost * query.level;
-                        cache.attrdb[query.attribute][query.index].points = query.points;
-                        cache.attrdb[query.attribute][query.index].elevel = query.elevel;
-                        cache.attrdb[query.attribute][query.index].level = query.level;
-                        set_values[`${cache.source_path}_points`] = query.points;
-                        set_values[`${cache.source_path}_level`] = `${query.level} (${query.elevel})`;
+                        const db = cache.source_section === 'attribute' ? cache.attrdb : cache.defectdb;
+                        db[query[cache.source_section]][query.index].points = query.points * int(`${
+                            cache.source_section === 'attribute' ? 1 : -1
+                        }`);
+                        db[query[cache.source_section]][query.index].level = query.level;
+                        set_values[`${cache.source_path}_points`] = query.points * int(`${
+                            cache.source_section === 'attribute' ? 1 : -1
+                        }`);
+                        set_values[`${cache.source_path}_${
+                            cache.source_section === 'attribute' ? 'level' : 'rank'
+                        }`] = `${query.level}${
+                            cache.source_section === 'attribute' ? ' (' + query.elevel + ')' : ''
+                        }`;
                         if (
+                            cache.source_section === 'attribute' &&
                             cache.groupdb[cache.static_group_visible_id].group_type === 'power variation' &&
                             !cache.groupdb[cache.static_group_visible_id].locked
                         ) {
@@ -10493,7 +10582,8 @@
                             set_values[`${cache.source_path}_configuration`] = '';
                             for (let i = 0; i < cache.attrdb[query.attribute][query.index].config.length; i++) {
                                 set_values[`${cache.source_path}_configuration`] += 
-                                    `${cache.attrdb[query.attribute][query.index].config[i].name.capitalize()} (${cache.attrdb[query.attribute][query.index].config[i].rank})\n`;
+                                    `${cache.attrdb[query.attribute][query.index].config[i].name.capitalize()} ` +
+                                    `(${cache.attrdb[query.attribute][query.index].config[i].rank})\n`;
                             }
                         }
                         setLevelDependantConfigurations(cache, set_values, query);
@@ -10760,6 +10850,7 @@
                     query.last = query.next;
                 break;
                 case 'rename_journal':
+                case 'static_journal_title_name':
                     query.title = `${getTranslationByKey("enter-new-title")}`;//query.title = 'Rename Journal';
                     query.options = '';
                     query.last = query.next;
@@ -10795,6 +10886,7 @@
                         query.next = query.selection;
                     break;
                     case 'rename_journal':
+                    case 'static_journal_title_name':
                         cache.journaldb[cache.static_journal_visible_id].name = query.selection;
                         set_values.static_journal_title_name = query.selection;
                         query.commit = true;
@@ -10905,10 +10997,11 @@
                 case 'static_journal_select_button':
                     query.title = getTranslationByKey("journal");
                     query.options = '';
+                    const options = [];
                     for (let i = 0; i < query.db_length; i++) {
-                        query.options += `|${cache.journaldb[i].name},${i}`;//${cache.journaldb[i].journal_id}`;
+                        options.push(`${cache.journaldb[i].name},${i}`);
                     }
-                    query.options += `|${getTranslationByKey("exit")},exit`;
+                    query.options = "|" + options.sort().join("|") + `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'select_page':
@@ -10990,16 +11083,13 @@
                         return name;
                     });
                     query.title = getTranslationByKey("switch-to-group");
-                    //query.options = '';
-                    query.alphabetize_groups = [];
+                    const options = [];
                     for (let i = 0, n = query.group_names.length; i < n; i++) {
                         if (!cache.groupdb[i].removed) {
-                            query.alphabetize_groups.push(`|${query.group_names[i]},${i}`);
+                            options.push(`${query.group_names[i]},${i}`);
                         }
                     }
-                    
-                    query.options = query.alphabetize_groups.sort();
-                    query.options += '|Exit,done';
+                    query.options = '|' + options.sort().join("|") + '|Exit,done';
                     query.last = query.next;
                 break;
                 // Break out of while loop when there is no query.next step
@@ -11730,6 +11820,9 @@
             'repeating_attribute:limiters',
             'repeating_condition:delete',
             'repeating_defect:accordion',
+            'repeating_defect:defect',
+            'repeating_defect:rank',
+            'repeating_defect:configuration',
             'repeating_skill:accordion',
             'repeating_skill:stat',
             'repeating_skill:rank',
@@ -11994,9 +12087,11 @@
                             break;
                             case 'attribute':
                             case 'configuration':
+                            case 'defect':
                             case 'enhancements':
                             case 'level':
                             case 'limiters':
+                            case 'rank':
                             case 'stat':
                                 await attributesMenu(cache, set_values);
                             break;
