@@ -63,6 +63,7 @@ function initializeSheet(migrationChain) {
 
 		// Regeneration
 		"reg_deepbreath_roll",
+		"reg_relax_roll",
 		"reg_sleep_le_ko", "reg_sleep_le_fixed",
 		"reg_sleep_le_mod_advantages_disadvantages", "reg_sleep_le_mod_food_restriction",
 		"reg_sleep_ae_base", "reg_sleep_ae_in", "reg_sleep_ae_fixed",

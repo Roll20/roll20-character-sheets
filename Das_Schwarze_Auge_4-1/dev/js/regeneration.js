@@ -1503,4 +1503,126 @@ on('clicked:reg_deepbreath-action', async (info) => {
 		);
 	}
 });
+
+// Generating Regeneration Roll (Relax)
+on(
+	[
+		"character_name",
+		"gm_roll_opt",
+		"reg_relax_duration",
+		"au",
+		"ko",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"character_name",
+			"gm_roll_opt",
+			"reg_relax_duration",
+			"AU",
+			"KO",
+		], function(values) {
+		const caller = "Action Listener for Generation of Regeneration Roll (Relax)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		const baseRoll = [
+			values["gm_roll_opt"],
+			"&{template:reg-relax}",
+			`{{charactername=${values["character_name"]}}}`,
+			`{{duration=[[${values["reg_relax_duration"]}]]}}`,
+			`{{au=[[${values["AU"]}]]}}`,
+			`{{aureg=[[[[${values["reg_relax_duration"]}*3]]d6cs0cf7]]}}`,
+			`{{auko=[[${values["reg_relax_duration"]}d20cs0cf21]]}}`,
+			'{{auneu=[[0d1]]}}',
+		];
+
+		// Build roll
+		var roll = [];
+		roll = roll.concat(baseRoll);
+
+		safeSetAttrs({"reg_relax_roll": roll.join(" ")});
+	});
+});
+
+on('clicked:reg_relax-action', async (info) => {
+	const caller = "Action Listener for Regeneration Button (Relax)";
+	let results = await startRoll("@{reg_relax_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+	let rollID = results.rollId;
+	results = results.results;
+	let computed = {};
+
+	safeGetAttrs([
+			'AU', 'AU_max',
+			'KO'
+		], function(values) {
+		let attrsToChange = {};
+
+		// AU Regeneration (Stamina)
+		let AUReg = 0;
+		let AUneu = parseInt(values["AU"]);
+		AUReg += results["aureg"].result;
+
+		AUneu += AUReg;
+		console.log("AUneu2", AUneu);
+		computed["aureg"] = results["aureg"].result;
+
+		// KO Bonus
+		let AUKO = 0;
+		for (let die of results["auko"].dice)
+		{
+			if (die <= values["KO"])
+			{
+				AUKO += 6;
+			}
+		}
+
+		AUneu += AUKO;
+		console.log("AUneu3", AUneu);
+		computed["auko"] = AUKO;
+
+		// Cap regeneration
+		AUneu = Math.min(AUneu, values["AU_max"]);
+		console.log("AUneu4", AUneu);
+
+		// Change only if regeneration actually changed something
+		if (parseInt(values["AU"]) !== AUneu)
+		{
+			attrsToChange["AU"] = AUneu;
+		}
+		computed["auneu"] = AUneu;
+
+		// Prettify certain output
+		{
+
+			let useComputed = [
+				"auko",
+			];
+			for (let part of useComputed)
+			{
+				if (Object.hasOwn(computed, part))
+				{
+					computed[part] = prettifyMod(computed[part]);
+				}
+			}
+			let useResults = [
+				"aureg",
+			];
+			for (let part of useResults)
+			{
+				if (Object.hasOwn(results, part))
+				{
+					computed[part] = prettifyMod(parseInt(results[part].result));
+				}
+			}
+		}
+
+		debugLog(caller, "tail", "rollID", rollID, "values", values, "AUKO", AUKO, "attrsToChange", attrsToChange, "computed", computed);
+		safeSetAttrs(attrsToChange);
+
+		finishRoll(
+			rollID,
+			computed
+		);
+	});
+});
 /* regeneration end */
