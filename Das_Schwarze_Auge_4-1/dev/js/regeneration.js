@@ -1625,4 +1625,120 @@ on('clicked:reg_relax-action', async (info) => {
 		);
 	});
 });
+
+
+// Generating Regeneration Roll (Rest)
+on(
+	[
+		"character_name",
+		"gm_roll_opt",
+		"reg_rest_duration",
+		"au",
+		"au_max",
+		"erschoepfung",
+		"ueberanstrengung",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"character_name",
+			"gm_roll_opt",
+			"reg_rest_duration",
+			"AU",
+			"AU_max",
+			"erschoepfung",
+			"ueberanstrengung",
+		], function(values) {
+		const caller = "Action Listener for Generation of Regeneration Roll (Rest)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		const baseRoll = [
+			values["gm_roll_opt"],
+			"&{template:reg-rest}",
+			`{{charactername=${values["character_name"]}}}`,
+			`{{duration=[[${values["reg_rest_duration"]}]]}}`,
+			`{{au=[[${values["AU"]}]]}}`,
+			`{{aumax=[[${values["AU_max"]}]]}}`,
+			`{{erschoepfung=[[${values["erschoepfung"]}]]}}`,
+			'{{erschoepfungneu=[[0d1]]}}',
+			`{{ueberanstrengung=[[${values["ueberanstrengung"]}]]}}`,
+			'{{ueberanstrengungneu=[[0d1]]}}',
+		];
+
+		// Build roll
+		var roll = [];
+		roll = roll.concat(baseRoll);
+
+		safeSetAttrs({"reg_rest_roll": roll.join(" ")});
+	});
+});
+
+on('clicked:reg_rest-action', async (info) => {
+	const caller = "Action Listener for Regeneration Button (Rest)";
+	let results = await startRoll("@{reg_rest_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+	let rollID = results.rollId;
+	results = results.results;
+	let computed = {};
+
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results)
+	{
+		resultsOnly[property] = results[property].result;
+	}
+
+	let attrsToChange = {};
+
+	// Regeneration Order: Overexertion, Exhaustion
+	// As long as there is overexertion, there cannot be exhaustion regeneration
+	let exhaustionNeu = resultsOnly["erschoepfung"];
+	let overexertionNeu = resultsOnly["ueberanstrengung"];
+
+	// Hourly regeneration rates
+	const exhaustionReg = -2;
+	const overexertionReg = -1;
+
+	for (let hour = 0; hour < resultsOnly["duration"]; hour++)
+	{
+		if (overexertionNeu > 0)
+		{
+			overexertionNeu += overexertionReg;
+		} else if (exhaustionNeu > 0) {
+			exhaustionNeu += exhaustionReg;
+		} else {
+			break;
+		}
+	}
+
+	// Cap at 0
+	exhaustionNeu = Math.max(0, exhaustionNeu);
+	overexertionNeu = Math.max(0, overexertionNeu);
+
+	computed["erschoepfungneu"] = exhaustionNeu;
+	computed["ueberanstrengungneu"] = overexertionNeu;
+
+	// Change only if regeneration actually changed something
+	// Stamina will always be full after 1 h (min. regeneration is 36d6 = 36, KO checks not even considered!)
+	if (parseInt(resultsOnly["au"]) !== parseInt(resultsOnly["aumax"]))
+	{
+		attrsToChange["AU"] = resultsOnly["aumax"];
+		computed["au"] = resultsOnly["aumax"];
+	}
+	if (parseInt(resultsOnly["erschoepfung"]) !== exhaustionNeu)
+	{
+		attrsToChange["erschoepfung"] = exhaustionNeu;
+	}
+	if (parseInt(resultsOnly["ueberanstrengung"]) !== overexertionNeu)
+	{
+		attrsToChange["ueberanstrengung"] = overexertionNeu;
+	}
+
+	debugLog(caller, "tail", "rollID", rollID, "resultsOnly", resultsOnly, "attrsToChange", attrsToChange, "computed", computed);
+	safeSetAttrs(attrsToChange);
+
+	finishRoll(
+		rollID,
+		computed
+	);
+});
 /* regeneration end */

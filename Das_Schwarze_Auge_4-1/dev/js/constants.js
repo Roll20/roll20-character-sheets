@@ -1037,6 +1037,7 @@ const melee = [
 const reg = [
 	'reg_deepbreath',
 	'reg_relax',
+	'reg_rest',
 	'reg_sleep'
 ];
 
