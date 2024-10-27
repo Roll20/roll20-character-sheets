@@ -779,8 +779,8 @@ on(
 				`[Eigenschaft 3:] [[${values["Eigenschaft3selbstbeherrschung"]}]]d1cs0cf2 + ` +
 				"]]}}",
 			`{{selbstbeherrschung=[[3d20cs<${values["cs_talent"]}cf>${values["cf_talent"]}]]}}`,
-			"{{result=[[0]]}}",
-			"{{criticality=[[0]]}}",
+			"{{selbstbeherrschungresult=[[0]]}}",
+			"{{selbstbeherrschungcriticality=[[0]]}}",
 			`{{critThresholds=[[[[${values["cs_talent"]}]]d1cs0cf2 + [[${values["cf_talent"]}]]d1cs0cf2]]}}`
 		];
 		const somnambulismRoll = "{{schlafwandeln=[[(@{reg_sleep_mod_somnambulism})]]}}";
@@ -1019,8 +1019,8 @@ on('clicked:reg_sleep-action', async (info) => {
 			}
 		}
 		computed["selbstbeherrschung"] = TaPstar;
-		computed["result"] = result;
-		computed["criticality"] = criticality;
+		computed["selbstbeherrschungresult"] = result;
+		computed["selbstbeherrschungcriticality"] = criticality;
 		computed["stats"] = stats.toString().replaceAll(",", "/");
 	}
 
@@ -1075,7 +1075,7 @@ on('clicked:reg_sleep-action', async (info) => {
 					sleepDisorder["triggered"] === 1 ||
 					(
 						sleepDisorder["triggered"] === 2 &&
-						computed["result"] === 0
+						computed["selbstbeherrschungresult"] === 0
 					)
 				)
 			)
@@ -1158,7 +1158,7 @@ on('clicked:reg_sleep-action', async (info) => {
 						sleepDisorder["triggered"] === 1 ||
 						(
 							sleepDisorder["triggered"] === 2 &&
-							computed["result"] === 0
+							computed["selbstbeherrschungresult"] === 0
 						)
 					)
 				)
