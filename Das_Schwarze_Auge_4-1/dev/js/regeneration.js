@@ -684,6 +684,7 @@ on(
 		"reg_sleep_ae_mod_food_restriction",
 		"reg_sleep_ae_mod_special_skills",
 		"reg_sleep_ae_mod_advantages_disadvantages",
+		"reg_sleep_duration",
 		"reg_sleep_mod_general", "reg_sleep_ae_mod_general", "reg_sleep_ke_mod_general", "reg_sleep_le_mod_general",
 		"reg_sleep_mod_somnambulism",
 		"reg_sleep_food_restriction_effect",
@@ -717,6 +718,7 @@ on(
 			'reg_sleep_ae_mod_food_restriction',
 			'reg_sleep_ae_mod_special_skills',
 			'reg_sleep_ae_mod_advantages_disadvantages',
+			'reg_sleep_duration',
 			'reg_sleep_mod_general', 'reg_sleep_ae_mod_general', 'reg_sleep_ke_mod_general', 'reg_sleep_le_mod_general',
 			'reg_sleep_mod_somnambulism',
 			'reg_sleep_food_restriction_effect',
@@ -735,6 +737,7 @@ on(
 			values["gm_roll_opt"],
 			"&{template:reg-sleep}",
 			`{{charactername=${values["character_name"]}}}`,
+			`{{duration=[[${values["reg_sleep_duration"]}]]}}`,
 			`{{le=${values["LE"]}}}`,
 			`{{lebase=[[1d6 + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
 			`{{lead=[[(${values["reg_sleep_le_mod_advantages_disadvantages"]})]]}}`,
@@ -1035,6 +1038,30 @@ on('clicked:reg_sleep-action', async (info) => {
 		], function(values) {
 		var attrsToChange = {};
 
+		// Sleep Duration
+		// Sleeping disorder reduces the sleep time, rules are not comprehensive
+		// Default sleep duration: 6 h, shortened to 4 h (according to rules)
+		// Apply that to longer durations as well (no rules)
+		// What happens for sleep duration < 6 h? (no rules) -> 2/3
+		if (
+			Object.hasOwn(results, "schlafstoerungfall") &&
+			(
+				sleepDisorder["triggered"] === 1 ||
+				(
+					sleepDisorder["triggered"] === 2 &&
+					computed["selbstbeherrschungresult"] === 0
+				)
+			)
+		)
+		{
+			if (results["duration"]["result"] >= 6)
+			{
+				computed["duration"] = 4;
+			} else {
+				computed["duration"] = Math.floor(results["duration"]["result"] * 2 / 3);
+			}
+		}
+
 		// LE Regeneration
 		var LERegTotal = 0;
 		var LEneu = parseInt(values["LE"]);
@@ -1043,6 +1070,7 @@ on('clicked:reg_sleep-action', async (info) => {
 		{
 			// Base regeneration
 			LERegTotal = results["lebase"].result;
+			computed["lebase"] = LERegTotal;
 
 			// Regeneration from advantages/disadvantages
 			computed["lead"] = results["lead"].result;
@@ -1092,12 +1120,21 @@ on('clicked:reg_sleep-action', async (info) => {
 			}
 		} else {
 			// required for roll template
-			results["lebase"] = { "result": parseInt(values["reg_sleep_le_fixed"]) };
+			computed["lebase"] = { "result": parseInt(values["reg_sleep_le_fixed"]) };
 			computed["lead"] = 0;
 			computed["leko"] = 0;
 			LERegTotal = parseInt(values["reg_sleep_le_fixed"]);
 		}
 		LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
+
+		// No sleep, no regeneration
+		if (computed["duration"] === 0)
+		{
+			LERegTotal = 0;
+			computed["lebase"] = 0;
+			computed["lead"] = 0;
+			computed["leko"] = 0;
+		}
 		LEneu += LERegTotal;
 		LEneu = Math.min(LEneu, values["LE_max"]);
 		if (parseInt(values["LE"]) !== LEneu)
@@ -1116,6 +1153,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			{
 				// Base regeneration
 				AERegTotal = results["aebase"].result;
+				computed["aebase"] = AERegTotal;
 
 				// Regeneration from advantages/disadvantages
 				computed["aead"] = results["aead"].result;
@@ -1175,13 +1213,23 @@ on('clicked:reg_sleep-action', async (info) => {
 				}
 			} else {
 				// required for roll template
-				results["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
+				computed["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
 				computed["aead"] = 0;
 				computed["aein"] = 0;
 				AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
 			}
 			computed["aeneu"] = attrsToChange["AE"];
 			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
+
+			// No sleep, no regeneration
+			if (computed["duration"] === 0)
+			{
+				AERegTotal = 0;
+				computed["aebase"] = 0;
+				computed["aead"] = 0;
+				computed["aess"] = 0;
+				computed["aein"] = 0;
+			}
 			AEneu += AERegTotal;
 			AEneu = Math.min(AEneu, values["AE_max"]);
 			if (parseInt(values["AE"]) !== AEneu)
@@ -1196,6 +1244,14 @@ on('clicked:reg_sleep-action', async (info) => {
 		var KERegTotal = 1;
 		if (results["kebase"])
 		{
+			// No sleep, no regeneration
+			if (computed["duration"] === 0)
+			{
+				KERegTotal = 0;
+				computed["kebase"] = 0;
+			}
+
+			computed["kebase"] = KERegTotal;
 			var KEneu = parseInt(values["KE"]);
 
 			KEneu += KERegTotal;
@@ -1210,19 +1266,19 @@ on('clicked:reg_sleep-action', async (info) => {
 		// Prettify certain output
 		{
 			let useComputed = [
+				"lebase",
 				"lead",
 				"leko",
+				"aebase",
 				"aead",
 				"aess",
-				"aein"
+				"aein",
+				"kebase",
 			];
 			let useResults = [
-				"lebase",
 				"lefr",
-				"aebase",
 				"heimwehkrank",
 				"aefr",
-				"kebase",
 				"leschlafstoerung",
 				"aeschlafstoerung",
 				"schlafwandeln"
