@@ -669,8 +669,10 @@ on(
 	[
 		"character_name",
 		"gm_roll_opt",
-		"le", "ae", "ke",
-		"le_max", "ae_max", "ke_max",
+		"le", "au", "ae", "ke",
+		"le_max", "au_max", "ae_max", "ke_max",
+		"erschoepfung",
+		"ueberanstrengung",
 		"nachteil_sucht_suchtmittel",
 		"nachteil_verwoehnt",
 		"reg_sleep_le_fixed",
@@ -703,8 +705,10 @@ on(
 		[
 			'character_name',
 			'gm_roll_opt',
-			'LE', 'AE', 'KE',
-			'LE_max', 'AE_max', 'KE_max',
+			'LE', 'AU', 'AE', 'KE',
+			'LE_max', 'AU_max', 'AE_max', 'KE_max',
+			'erschoepfung',
+			'ueberanstrengung',
 			'nachteil_sucht_suchtmittel',
 			'nachteil_verwoehnt',
 			'reg_sleep_le_fixed',
@@ -738,6 +742,12 @@ on(
 			"&{template:reg-sleep}",
 			`{{charactername=${values["character_name"]}}}`,
 			`{{duration=[[${values["reg_sleep_duration"]}]]}}`,
+			`{{au=[[${values["AU"]}]]}}`,
+			`{{aumax=[[${values["AU_max"]}]]}}`,
+			`{{erschoepfung=[[${values["erschoepfung"]}]]}}`,
+			'{{erschoepfungneu=[[0d1]]}}',
+			`{{ueberanstrengung=[[${values["ueberanstrengung"]}]]}}`,
+			'{{ueberanstrengungneu=[[0d1]]}}',
 			`{{le=${values["LE"]}}}`,
 			`{{lebase=[[1d6 + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
 			`{{lead=[[(${values["reg_sleep_le_mod_advantages_disadvantages"]})]]}}`,
@@ -867,7 +877,7 @@ on('clicked:reg_sleep-action', async (info) => {
 	debugLog(caller, "head", "info:", info, "results:", results);
 	var rollID = results.rollId;
 	var results = results.results;
-	var computed = {};
+	var computed = { "duration": results["duration"]["result"] };
 
 	/* Sleep Disorder 2 can have convoluted consequences
 	If the sleep disorder did not trigger, the character needs to roll a
@@ -1062,12 +1072,56 @@ on('clicked:reg_sleep-action', async (info) => {
 			}
 		}
 
-		// LE Regeneration
+		// AU/exhaustion/overexertion/LE Regeneration
+		// Regeneration Order: Overexertion, Exhaustion
+		// As long as there is overexertion, there cannot be exhaustion regeneration
+		let exhaustionNeu = results["erschoepfung"]["result"];
+		let overexertionNeu = results["ueberanstrengung"]["result"];
+
+		// Hourly regeneration rates
+		const exhaustionReg = -4;
+		const overexertionReg = -2;
+
 		var LERegTotal = 0;
 		var LEneu = parseInt(values["LE"]);
 
 		if (values["reg_sleep_le_fixed"] === "off")
 		{
+			for (let hour = 0; hour < computed["duration"]; hour++)
+			{
+				if (overexertionNeu > 0)
+				{
+					overexertionNeu += overexertionReg;
+				} else if (exhaustionNeu > 0) {
+					exhaustionNeu += exhaustionReg;
+				} else {
+					break;
+				}
+			}
+
+			// Cap at 0
+			exhaustionNeu = Math.max(0, exhaustionNeu);
+			overexertionNeu = Math.max(0, overexertionNeu);
+
+			computed["erschoepfungneu"] = exhaustionNeu;
+			computed["ueberanstrengungneu"] = overexertionNeu;
+
+			// Change only if regeneration actually changed something
+			// Stamina will always be full even after 1 h
+			if (parseInt(results["au"]["result"]) !== parseInt(results["aumax"]["result"]))
+			{
+				attrsToChange["AU"] = results["aumax"]["result"];
+				computed["au"] = results["aumax"]["result"];
+			}
+			if (parseInt(results["erschoepfung"]["result"]) !== exhaustionNeu)
+			{
+				attrsToChange["erschoepfung"] = exhaustionNeu;
+			}
+			if (parseInt(results["ueberanstrengung"]["result"]) !== overexertionNeu)
+			{
+				attrsToChange["ueberanstrengung"] = overexertionNeu;
+			}
+
 			// Base regeneration
 			LERegTotal = results["lebase"].result;
 			computed["lebase"] = LERegTotal;
@@ -1131,6 +1185,12 @@ on('clicked:reg_sleep-action', async (info) => {
 		if (computed["duration"] === 0)
 		{
 			LERegTotal = 0;
+			computed["au"] = results["au"]["result"];
+			delete attrsToChange["AU"];
+			computed["erschoepfungneu"] = results["erschoepfung"]["result"];
+			delete attrsToChange["erschoepfung"];
+			computed["ueberanstrengungneu"] = results["ueberanstrengung"]["result"];
+			delete attrsToChange["ueberanstrengung"];
 			computed["lebase"] = 0;
 			computed["lead"] = 0;
 			computed["leko"] = 0;
