@@ -1,4 +1,17 @@
-# Next
+# 2024-10-29
+
+- Finally update skills to show specilisations,
+- Fix translation issue identified by Jon_joe.
+    - Seems French has 2 strings translated.  And one exposed a bug
+    - Add tests for case
+    - improve code flow.  My JS has improved.
+- Add injury string to direcly rolled cripts
+- New combat has moved; now in creatures too
+- Improve favourite skills buttons and layout
+- Remove some spurious nil class descriptions
+- RRs can now click on number or die
+
+# 2024-10-22
 
 - Spells: Fix a nbs[ instead of a space
 - Less message spew during creation.
