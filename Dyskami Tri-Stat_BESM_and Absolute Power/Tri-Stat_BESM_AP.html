@@ -3092,6 +3092,11 @@
         }
     }
 
+    function isObjectEmpty(obj) { 
+        for (let x in obj) { return false; }
+        return true;
+     }
+
     async function crpQuery(cache, query, tag = '') {
         const rxGrab = /^0\[(.*)\]\s*$/;
         clog(cache, query, `crpQuery(${tag})`);
@@ -3800,7 +3805,8 @@
                                     'defectdb',
                                     `${cache.source_path}_${cache.source_section}`,
                                     'groupdb',
-                                    'static_group_visible_id'
+                                    'static_group_visible_id',
+                                    'statsdb'
                                 );
                             break;
                             case 'attribute':
@@ -3815,7 +3821,8 @@
                                     'defectdb',
                                     'groupdb',
                                     'static_group_visible_id',
-                                    'static_skills_visible_id'
+                                    'static_skills_visible_id',
+                                    'statsdb'
                                 );
                             break;
                         }
@@ -5393,6 +5400,29 @@
             if (result) { break; }
         }
         return result;
+    }
+
+    async function setShortcomingAspectTypeAll(cache, set_values, query = {}) {
+        const temp = Object.assign({}, query);
+        clog(cache, temp, 'setShortcomingAspectTypeAll()');
+        if (isObjectEmpty(query)) {
+            temp.index = cache.defectdb.shortcoming.findIndex(i => i.row_id.toLowerCase() === cache.source_id);
+            temp.rank = cache.defectdb.shortcoming[temp.index].rank;
+        } else {
+            temp.rank = temp.level;
+        }
+        temp.aspect_index = cache.defectdb.shortcoming[temp.index].config.findIndex(i => i.name === 'aspect_stat');
+        temp.aspect_stat = cache.defectdb.shortcoming[temp.index].config[temp.aspect_index].rank;
+        cache.statsdb[temp.aspect_stat].shortcoming = temp.rank;
+        set_values[`static_character_${temp.aspect_stat}_remaining`] =
+            cache.statsdb[temp.aspect_stat].base +
+            cache.statsdb[temp.aspect_stat].temp -
+            cache.statsdb[temp.aspect_stat].damage -
+            int(`${
+                cache.defectdb.shortcoming[temp.index].active ? 
+                cache.statsdb[temp.aspect_stat].shortcoming || 0 : 0
+            }`);
+        await setDerivedValues(cache, set_values);
     }
 
     /* Button Functions */
@@ -8285,6 +8315,26 @@
                         const all_list = cache.source_section === 'attribute' ? all_attributes : all_defects;
                         //const db = cache.source_section === 'attribute' ? cache.attrdb : cache.defectdb;
                         for (let a = 0; a < all_list.length; a++) {
+                            if (cache.source_section === 'attribute') {
+                                query.db = cache.attrdb[all_list[a]].find((b, i) => {
+                                    if (b.row_id.toLowerCase() === cache.source_id) {
+                                        query[cache.source_section] = all_list[a];
+                                        query.index = i;
+                                        return true;
+                                    }
+                                });
+                            } else {
+                                const test_section = all_list[a];
+                                const testdb = cache.defectdb[test_section];
+                                query.db = testdb.find((b, i) => {
+                                    if (b.row_id.toLowerCase() === cache.source_id) {
+                                        query[cache.source_section] = all_list[a];
+                                        query.index = i;
+                                        return true;
+                                    }
+                                });
+                            }
+                            /*
                             query.db = cache.source_section === 'attribute' ? 
                                 cache.attrdb[all_list[a]].find((b, i) => {
                                     if (b.row_id.toLowerCase() === cache.source_id) {
@@ -8293,14 +8343,15 @@
                                         return true;
                                     }
                                 }) : 
-                                cache.defectdb[all_list[a]].find(b => {
+                                cache.defectdb[all_list[a]].find((b, i) => {
                                     if (b.row_id.toLowerCase() === cache.source_id) {
                                         query[cache.source_section] = all_list[a];
                                         query.index = i;
                                         return true;
                                     }
                             });
-                            if (_.isObject(query.db)) { break; }
+                            */
+                            if (!_.isEmpty(query.db)) { break; }
                             
                             /*
                             for (let b = 0; b < db[all_list[a]].length; b++) {
@@ -8707,12 +8758,15 @@
                         `${getTranslationByKey("choose")} ` +
                         `${getTranslationByKey("damage-type")}`;
                     query.options = '';
+                    const temp_damage_types = [];
                     for (let i = 0; i < damage_types.length; i++) {
-                        query.options += 
-                            `|${getTranslationByKey(damage_types[i])},` +
-                            `${damage_types[i]}`;
+                        temp_damage_types.push(
+                            `${getTranslationByKey(damage_types[i].toKebobCase())},${damage_types[i]}`
+                        ); 
+                            
                     }
-                    query.options += `|${getTranslationByKey("go-back")},attribute_menu`;
+                    query.options += '|' + temp_damage_types.sort().join("|") + 
+                        `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'attribute_type':
@@ -9145,6 +9199,7 @@
                 case 'repeating_attribute_configuration':
                 case 'repeating_defect_configuration':
                     const all_configurations = [
+                        'aspect_stat',
                         'attacktype',
                         'attributetype',
                         'broad category',
@@ -9162,6 +9217,7 @@
                         'transform',
                         'weapon_class'
                     ];
+                    query.title = getTranslationByKey("configuration");
                     query.configurations = [];
                     for (let i = 0; i < query.db.config.length; i++) {
                         if (all_configurations.includes(query.db.config[i].name)) {
@@ -9177,29 +9233,26 @@
                     query.options = '|' + query.configurations.sort().join('|') + 
                         `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
-                    /*
-                    if (cache.source_section === 'attribute') {
-                        query.title = `${getTranslationByKey(query.attribute_translation)}`;
-                        switch (query.limiters[query.index].name) {
-                            case 'focussed damage':
-                                const weapon_types = melee_types.concat(ranged_types).sort();
-                                //const weapon_types_translations = weapon_types.toKebobCase()
-                                for (let i = 0, n = weapon_types.length; i < n; i++) {
-                                    query.options += 
-                                        //`|${getTranslationByKey(weapon_types_translations[i])}` +
-                                        `|${weapon_types[i].capitalize()}` +
-                                        `,${weapon_types[i]}`;
-                                }
-                            break;
-                            case 'targeted damage':
-                                query.title = 'Target';
-                                query.options = '';
-                            break;
-                        }
-                    } else { //=> is defect
-
+                break;
+                case 'aspect_stat':
+                    query.title = getTranslationByKey("choose-aspect");
+                    query.options = '';
+                    const aspects = [];
+                    for (let i = 0, n = shortcomings.length; i < n; i++) {
+                        const display = 
+                            `${getTranslationByKey(shortcomings[i].stat)} - ` +
+                            `${getTranslationByKey(shortcomings[i].type)} ${getTranslationByKey("aspect")}` +
+                            `${
+                                shortcomings[i].aspect === shortcomings[i].stat ? "" :
+                                " (" + getTranslationByKey(shortcomings[i].aspect.toKebobCase()) + ")"
+                            }`;
+                        aspects.push(
+                            `${display},${display}~${shortcomings[i].aspect}~${shortcomings[i].stat}~${shortcomings[i].type}`
+                        );
                     }
-                    */
+                    query.options = '|' + aspects.sort().join('|') + 
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
                 break;
                 case 'add_defect':
                     query.config = [];
@@ -9416,6 +9469,7 @@
                     break;
                     case 'damage_type':
                     case 'weapon_class':
+                        if (query.selection === 'exit') { return; }
                         const config = cache[`${query.type === 'attribute' ? 'attrdb' : 'defectdb'}`][`${query[query.type]}`][query.index].config;
                         config[query.config_index].rank = query.selection;
                         set_values[`repeating_${cache.source_section}_${cache.source_id}_configuration`] =
@@ -9941,6 +9995,18 @@
                         query.config_name = query.load[0];
                         query.next = query.config_name;
                     break;
+                    case 'aspect_stat':
+                        if (query.selection === 'exit') { return; }
+                        query.load = query.selection.split("~");
+                        cache.defectdb.shortcoming[query.index].config = [
+                            {name:'aspect_name',rank:query.load[1]},
+                            {name:'aspect_stat',rank:query.load[2]},
+                            {name:'aspect_type',rank:query.load[3]},
+                        ];
+                        set_values[`repeating_defect_${cache.source_id}_configuration`] = query.load[0];
+                        await setDerivedValues(cache, set_values);
+                        query.next = 'exit';
+                    break;
                     case 'add_defect':
                         query.defect = query.selection;
                         query.defect_translation = query.defect.toKebobCase();
@@ -10245,6 +10311,8 @@
                         query.visibility : 1;
                     if (query.defect === 'shortcoming') {
                         if (query.aspect_type === 'all') {
+                            await setShortcomingAspectTypeAll(cache, set_values);
+                            /*
                             cache.statsdb[query.aspect_stat].shortcoming = query.rank;
                             set_values[`static_character_${query.aspect_stat}_remaining`] =
                                 cache.statsdb[query.aspect_stat].base +
@@ -10252,6 +10320,7 @@
                                 cache.statsdb[query.aspect_stat].damage -
                                 (cache.statsdb[query.aspect_stat].shortcoming || 0);
                             await setDerivedValues(cache, set_values);
+                            */
                         }
                     }
                     if (query.next === 'write_newdefect') {
@@ -10584,6 +10653,14 @@
                                 set_values[`${cache.source_path}_configuration`] += 
                                     `${cache.attrdb[query.attribute][query.index].config[i].name.capitalize()} ` +
                                     `(${cache.attrdb[query.attribute][query.index].config[i].rank})\n`;
+                            }
+                        } else if (query.last === 'repeating_defect_rank') {
+                            if (query.defect === 'shortcoming') {
+                                const aspect_type_index = query.db.config.findIndex(i => i.name === 'aspect_type');
+                                const aspect_type = query.db.config[aspect_type_index].rank;
+                                if (aspect_type === 'all') {
+                                    await setShortcomingAspectTypeAll(cache, set_values, query);
+                                }
                             }
                         }
                         setLevelDependantConfigurations(cache, set_values, query);
@@ -11339,7 +11416,10 @@
             derived_values.push(derived_values_points[i]);
         }
         clog(cache, '', `setDerivedValues()`);
-        
+        if (cache.rulesdb === undefined) {
+            const rulesdb = await crpGet(cache, 'rulesdb');
+            cache.rulesdb = JSON.parse(rulesdb);
+        }
         for (let i = 0; i < all_stats.length; i++) {
             cache[all_stats[i]] = 
             cache.statsdb[all_stats[i]].base +
@@ -12077,6 +12157,13 @@
                                     if (cache.attribute[0] === 'social mastery') {
                                         set_values[`static_character_${attr_to_value[cache.attribute[0]][1]}_base`] = 
                                         cache[attr_to_value[cache.attribute[0]][1]];
+                                    }
+                                }
+                                if (cache.source_attribute === 'active' && cache.source_section === 'defect') {
+                                    const index = cache.defectdb.shortcoming.findIndex(s => s.row_id.toLowerCase() === cache.source_id);
+                                    const aspect_type = cache.defectdb.shortcoming[index].config.findIndex(s => s.name === 'aspect_type');
+                                    if (index !== -1 && cache.defectdb.shortcoming[index].config[aspect_type].rank === 'all') {
+                                        await setShortcomingAspectTypeAll(cache, set_values);
                                     }
                                 }
                                 if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
