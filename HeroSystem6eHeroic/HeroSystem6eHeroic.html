@@ -2753,6 +2753,8 @@
 			</div>
 			
 			<div class="item-tab-gear-slide-flex-container-martial-maneuvers">
+				<input type="hidden" class="maneuver-checks" name="attr_maneuverChecks" value="hide"/>
+				
 				<!-- Slide showing special martial arts maneuvers. Entries need to be supplied by the user. -->
 				<div class="subitem-tab-gear-slide-flex-container-martial-maneuvers-heading">
 					<h1>Martial and Custom Maneuvers</h1>
@@ -2761,44 +2763,44 @@
 				<!-- Martial skill delete buttons -->
 				<div class="item-martial-skill-delete-panel">	
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete01">
-						<span class="checkmark" title="@{maneuverDelete01}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete01">
+						<span class="checkmark" title="@{martialManeuverDelete01}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete02">
-						<span class="checkmark" title="@{maneuverDelete02}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete02">
+						<span class="checkmark" title="@{martialManeuverDelete02}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete03">
-						<span class="checkmark" title="@{maneuverDelete03}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete03">
+						<span class="checkmark" title="@{martialManeuverDelete03}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete04">
-						<span class="checkmark" title="@{maneuverDelete04}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete04">
+						<span class="checkmark" title="@{martialManeuverDelete04}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete05">
-						<span class="checkmark" title="@{maneuverDelete05}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete05">
+						<span class="checkmark" title="@{martialManeuverDelete05}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete06">
-						<span class="checkmark" title="@{maneuverDelete06}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete06">
+						<span class="checkmark" title="@{martialManeuverDelete06}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete07">
-						<span class="checkmark" title="@{maneuverDelete07}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete07">
+						<span class="checkmark" title="@{martialManeuverDelete07}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete08">
-						<span class="checkmark" title="@{maneuverDelete08}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete08">
+						<span class="checkmark" title="@{martialManeuverDelete08}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete09">
-						<span class="checkmark" title="@{maneuverDelete09}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete09">
+						<span class="checkmark" title="@{martialManeuverDelete09}"></span>
 					</label>
 					<label class="container-xbox-tiny">
-						<input type="checkbox" name="attr_maneuverDelete10">
-						<span class="checkmark" title="@{maneuverDelete10}"></span>
+						<input type="checkbox" name="attr_martialManeuverDelete10">
+						<span class="checkmark" title="@{martialManeuverDelete10}"></span>
 					</label>
 				</div>
 				
@@ -13817,103 +13819,108 @@
 	gearSlideList.forEach(button => {
 		// Adding weapons to martial maneuvers adds the complexity of needing to recall their standard and martial states.
 		on(`clicked:${button}`, function() {
-			getAttrs(["gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection", "ocvNet", "currentDCV"], function(values) {
+			getAttrs(["gearSlideSelection", "activateDeleteChecks", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "maneuverSelection", "ocvNet", "currentDCV"], function(values) {
 				var attributes = new Object();
+				const deleteActive = (values.activateDeleteChecks === "on") ? true : false;
 				let states = values.weaponStates;
 				var weaponId;
 				
-				// Store weapon states when switching away from standard and martial maneuvers.
-				if (values.gearSlideSelection === "gearManeuvers") {
-					for (let i=1; i <= maxWeaponNum; i++) {
-						weaponId = String(i).padStart(2,'0');
+				if (! deleteActive) {
+					// Store weapon states when switching away from standard and martial maneuvers.
+					if (values.gearSlideSelection === "gearManeuvers") {
+						for (let i=1; i <= maxWeaponNum; i++) {
+							weaponId = String(i).padStart(2,'0');
+							
+							switch (values["weaponType"+weaponId]) {
+								case "killing": 	states = setCharAt(states, i-1, 'K');
+													break;
+								case "normal":		states = setCharAt(states, i-1, 'N');
+													break;
+								case "defense": 	states = setCharAt(states, i-1, 'D');
+													break;
+								case "maneuver": 	states = setCharAt(states, i-1, 'M');
+													break;
+								default:			states = setCharAt(states, i-1, 'O');
+													break;
+							}
+						}
 						
-						switch (values["weaponType"+weaponId]) {
-							case "killing": 	states = setCharAt(states, i-1, 'K');
-												break;
-							case "normal":		states = setCharAt(states, i-1, 'N');
-												break;
-							case "defense": 	states = setCharAt(states, i-1, 'D');
-												break;
-							case "maneuver": 	states = setCharAt(states, i-1, 'M');
-												break;
-							default:			states = setCharAt(states, i-1, 'O');
-												break;
+						attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+						attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
+						
+					} else if (values.gearSlideSelection === "gearMartialManeuvers") {
+						for (let i=1; i <= maxWeaponNum; i++) {
+							weaponId = String(i).padStart(2,'0');
+							
+							switch (values["weaponType"+weaponId]) {
+								case "killing": 	states = setCharAt(states, i+maxWeaponNum-1, 'K');
+													break;
+								case "normal":		states = setCharAt(states, i+maxWeaponNum-1, 'N');
+													break;
+								case "defense": 	states = setCharAt(states, i+maxWeaponNum-1, 'D');
+													break;
+								case "maneuver": 	states = setCharAt(states, i+maxWeaponNum-1, 'M');
+													break;
+								default:			states = setCharAt(states, i+maxWeaponNum-1, 'O');
+													break;
+							}
+						}
+						
+						attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
+						attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
+					}
+					
+					// Recall weapon states when switching between standard and martial maneuvers.
+					if (button === "gearMartialManeuvers") {
+						for (let i=1; i <= maxWeaponNum; i++) {
+							weaponId = String(i).padStart(2,'0');
+							
+							switch (states[i-1+maxWeaponNum]) {
+								case "K": 	attributes["weaponType"+weaponId] = "killing";
+											break;
+								case "N":	attributes["weaponType"+weaponId] = "normal";
+											break;
+								case "D": 	attributes["weaponType"+weaponId] = "defense";
+											break;
+								case "M": 	attributes["weaponType"+weaponId] = "maneuver";
+											break;
+								default:	attributes["weaponType"+weaponId] = "override";
+											break;
+							}
+						}
+					} else if (button === "gearManeuvers") {
+						for (let i=1; i <= maxWeaponNum; i++) {
+							weaponId = String(i).padStart(2,'0');
+							
+							switch (states[i-1]) {
+								case "K": 	attributes["weaponType"+weaponId] = "killing";
+											break;
+								case "N":	attributes["weaponType"+weaponId] = "normal";
+											break;
+								case "D": 	attributes["weaponType"+weaponId] = "defense";
+											break;
+								case "M": 	attributes["weaponType"+weaponId] = "maneuver";
+											break;
+								default:	attributes["weaponType"+weaponId] = "override";
+											break;
+							}
 						}
 					}
 					
-					attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
-					attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
-					
-				} else if (values.gearSlideSelection === "gearMartialManeuvers") {
-					for (let i=1; i <= maxWeaponNum; i++) {
-						weaponId = String(i).padStart(2,'0');
-						
-						switch (values["weaponType"+weaponId]) {
-							case "killing": 	states = setCharAt(states, i+maxWeaponNum-1, 'K');
-												break;
-							case "normal":		states = setCharAt(states, i+maxWeaponNum-1, 'N');
-												break;
-							case "defense": 	states = setCharAt(states, i+maxWeaponNum-1, 'D');
-												break;
-							case "maneuver": 	states = setCharAt(states, i+maxWeaponNum-1, 'M');
-												break;
-							default:			states = setCharAt(states, i+maxWeaponNum-1, 'O');
-												break;
-						}
+					// Keep track of the user's maneuver selection intent in case they switch to targeting or notes.
+					if (button ===  "gearManeuvers") {
+						attributes.useManeuvers = "true";
+					} else if (button === "gearMartialManeuvers") {
+						attributes.useManeuvers = "false";
 					}
 					
-					attributes.ephemeralOCV = parseInt(values.ocvNet)||0;
-					attributes.ephemeralDCV = parseInt(values.currentDCV)||0;
+					attributes.gearSlideSelection = button;
+					attributes.weaponStates = states;
+					
+					setAttrs(attributes);
+				} else {
+					return;
 				}
-				
-				// Recall weapon states when switching between standard and martial maneuvers.
-				if (button === "gearMartialManeuvers") {
-					for (let i=1; i <= maxWeaponNum; i++) {
-						weaponId = String(i).padStart(2,'0');
-						
-						switch (states[i-1+maxWeaponNum]) {
-							case "K": 	attributes["weaponType"+weaponId] = "killing";
-										break;
-							case "N":	attributes["weaponType"+weaponId] = "normal";
-										break;
-							case "D": 	attributes["weaponType"+weaponId] = "defense";
-										break;
-							case "M": 	attributes["weaponType"+weaponId] = "maneuver";
-										break;
-							default:	attributes["weaponType"+weaponId] = "override";
-										break;
-						}
-					}
-				} else if (button === "gearManeuvers") {
-					for (let i=1; i <= maxWeaponNum; i++) {
-						weaponId = String(i).padStart(2,'0');
-						
-						switch (states[i-1]) {
-							case "K": 	attributes["weaponType"+weaponId] = "killing";
-										break;
-							case "N":	attributes["weaponType"+weaponId] = "normal";
-										break;
-							case "D": 	attributes["weaponType"+weaponId] = "defense";
-										break;
-							case "M": 	attributes["weaponType"+weaponId] = "maneuver";
-										break;
-							default:	attributes["weaponType"+weaponId] = "override";
-										break;
-						}
-					}
-				}
-				
-				// Keep track of the user's maneuver selection intent in case they switch to targeting or notes.
-				if (button ===  "gearManeuvers") {
-					attributes.useManeuvers = "true";
-				} else if (button === "gearMartialManeuvers") {
-					attributes.useManeuvers = "false";
-				}
-				
-				attributes.gearSlideSelection = button;
-				attributes.weaponStates = states;
-				
-				setAttrs(attributes);
 			});
 		});
 	});
@@ -14108,6 +14115,7 @@
 			attributes.ephemeralDCV = parseInt(values["currentDCV"])||3;
 			
 			setAttrs(attributes);
+			clearDeleteChecks();
 		});
 	});
 	
@@ -17332,6 +17340,69 @@
 	}
 	
 	
+	// Mark maneuver for deletion.
+	// DANGER: Risk of data loss.
+	on("change:activateDeleteChecks", function() {
+		getAttrs(["activateDeleteChecks", "martialManeuverDelete01", "martialManeuverDelete02", "martialManeuverDelete03", "martialManeuverDelete04", "martialManeuverDelete05", "martialManeuverDelete06", "martialManeuverDelete07", "martialManeuverDelete08", "martialManeuverDelete09", "martialManeuverDelete10"], function(values) {
+			var attributes = new Object();
+			var itemId = "";
+			
+			if (values.activateDeleteChecks === "on") {
+				attributes.maneuverChecks = "delete";
+				attributes.gearSlideSelection = "gearMartialManeuvers";
+				
+				// Clear all delete checks for safety.
+				clearMartialManeuverDeleteChecks();
+			} else {
+				attributes.maneuverChecks = "hide";
+				
+				for (var i = 1; i <= maxManeuverNum; i++) {
+					itemId = String(i).padStart(2,'0');
+					
+					if (values["martialManeuverDelete"+itemId] === "on") {
+						// Reset the maneuver to defaults.
+						attributes["martialManeuverDelete"+itemId] = 0;
+						attributes["martialManeuverTypeIndicator"+itemId] = "normal";
+						attributes["martialManeuverName"+itemId] = "";
+						attributes["martialManeuverCP"+itemId] = 0;
+						attributes["martialManeuverOCV"+itemId] = 0;
+						attributes["martialManeuverOCVmod"+itemId] = 0;
+						attributes["martialManeuverType"+itemId] = "attack";
+						attributes["martialManeuverDCV"+itemId] = 0;
+						attributes["martialManeuverDCVmod"+itemId] = 0;
+						attributes["martialManeuverPhase"+itemId] = "1/2";
+						attributes["martialDamageDisplay"+itemId] = "attack";
+						attributes["martialManeuverDamage"+itemId] = 0;
+						attributes["martialManeuverEndurance"+itemId] = 0;
+						attributes["martialManeuverCSLmod"+itemId] = 0;
+						attributes["martialManeuverNormal"+itemId] = "on";
+						attributes["martialManeuverStunMod"+itemId] = 0;
+						attributes["martialManeuverStrMod"+itemId] = 0;
+						attributes["martialManeuverDC"+itemId] = 0;
+						attributes["martialManeuverRNGmod"+itemId] = 0;
+						attributes["martialManeuverEffect"+itemId] = "";
+					}
+				}
+			}
+			
+			setAttrs(attributes);
+		});
+	});
+	
+	
+	function clearMartialManeuverDeleteChecks() {
+		var attributes = new Object();
+		var itemId = "";
+		
+		for (var i = 1; i <= maxManeuverNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["martialManeuverDelete"+itemId] = 0;
+		}
+		
+		setAttrs(attributes);
+	}
+	
+	
 	function clearDeleteChecks() {
 		var attributes = new Object();
 		var itemId = "";
@@ -17356,6 +17427,14 @@
 			itemId = String(i).padStart(2,'0');
 			attributes["equipDelete"+itemId] = 0;
 		}
+		
+		// Skills
+		for (var i = 1; i <= maxManeuverNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["martialManeuverDelete"+itemId] = 0;
+		}
+		
+		attributes.activateDeleteChecks = 0;
 		
 		setAttrs(attributes);
 	}
