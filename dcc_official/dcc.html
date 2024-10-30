@@ -5269,17 +5269,17 @@ k.registerFuncs({'1.04':v1x04},{type:['updater']});
       getCompendiumPage(`Equipment:${k.capitalize(trade)}`, async (data) => {
         Object.assign(data,data.data);
         await processDropData({data,attributes,sections,casc,section: tradeRow});
-        clearDuplicateTrade(attributes,sections);
         propagateEffects(attributes,sections,casc);
+        clearDuplicateTrade(attributes,sections);
         attributes.set();
       })
-      // getCompendiumPage(`Armor:${k.capitalize(trade)}`,async (data) => {
-      //   Object.assign(data,data.data);
-      //   await weaponDrop('Armor',[data],attributes,sections,casc);
-      //   clearDuplicateTrade(attributes,sections);
-      //   propagateEffects(attributes,sections,casc);
-      //   attributes.set();
-      // })
+      getCompendiumPage(`Armor:${k.capitalize(trade)}`,async (data) => {
+        Object.assign(data,data.data);
+        await armorDrop('Armor',[data],attributes,sections,casc);
+        propagateEffects(attributes,sections,casc);
+        clearDuplicateTrade(attributes,sections);
+        attributes.set();
+      })
     }
   }
   
@@ -5289,9 +5289,15 @@ k.registerFuncs({'1.04':v1x04},{type:['updater']});
     sections.repeating_equipment.forEach(id => {
       const row = `repeating_equipment_${id}`;
       if(
-        !found[attributes[`${row}_name`]] && 
-        found[attributes[`${row}_linked`]]
+        !found[attributes[`${row}_name`]] || 
+        attributes[`${row}_linked`]
       ){
+        if(
+          found[attributes[`${row}_name`]] &&
+          attributes[`${row}_linked`]
+        ){
+          dups.push(found[attributes[`${row}_name`]]);
+        }
         found[attributes[`${row}_name`]] = id;
       }else if(found[attributes[`${row}_name`]]){
         dups.push(id);
