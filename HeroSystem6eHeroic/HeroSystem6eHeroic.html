@@ -2804,6 +2804,8 @@
 					</label>
 				</div>
 				
+				<!-- Martial skill slides and selection buttons -->
+				
 				<div class="flex-container-maneuvers">
 					<input type="hidden" class="item-martial-maneuver-selection" name="attr_martialManeuverSelection"  value="martialManeuver01"/>
 					
@@ -11188,8 +11190,56 @@
 		<div class="flex-container-talents-title">
 			<h2> Perks and Talents</h2>
 		</div>
+		
 		<div class="flex-container-talents">
 			<input type="hidden" class="item-talent-selection" name="attr_talentSelection" value="talent01"/>
+			<input type="hidden" class="talent-checks" name="attr_talentChecks" value="hide"/>
+			
+			<!-- Talent delete buttons -->
+			<div class="item-talent-delete-panel">	
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete01">
+					<span class="checkmark" title="@{talentDelete01}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete02">
+					<span class="checkmark" title="@{talentDelete02}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete03">
+					<span class="checkmark" title="@{talentDelete03}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete04">
+					<span class="checkmark" title="@{talentDelete04}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete05">
+					<span class="checkmark" title="@{talentDelete05}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete06">
+					<span class="checkmark" title="@{talentDelete06}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete07">
+					<span class="checkmark" title="@{talentDelete07}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete08">
+					<span class="checkmark" title="@{talentDelete08}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete09">
+					<span class="checkmark" title="@{talentDelete09}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_talentDelete10">
+					<span class="checkmark" title="@{talentDelete10}"></span>
+				</label>
+			</div>
+			
+			<!-- Talent selection buttons -->
 			
 			<div class="flex-container-talent-selectors">
 				<button type="action" name="act_talent01" ><span name="attr_talentName01"></span></button>
@@ -17340,7 +17390,7 @@
 	}
 	
 	
-	// Mark maneuver for deletion.
+	// Mark maneuvers for deletion.
 	// DANGER: Risk of data loss.
 	on("change:activateDeleteChecks", function() {
 		getAttrs(["activateDeleteChecks", "martialManeuverDelete01", "martialManeuverDelete02", "martialManeuverDelete03", "martialManeuverDelete04", "martialManeuverDelete05", "martialManeuverDelete06", "martialManeuverDelete07", "martialManeuverDelete08", "martialManeuverDelete09", "martialManeuverDelete10"], function(values) {
@@ -17372,7 +17422,7 @@
 						attributes["martialManeuverDCVmod"+itemId] = 0;
 						attributes["martialManeuverPhase"+itemId] = "1/2";
 						attributes["martialDamageDisplay"+itemId] = "attack";
-						attributes["martialManeuverDamage"+itemId] = 0;
+						attributes["martialManeuverDamage"+itemId] = "0";
 						attributes["martialManeuverEndurance"+itemId] = 0;
 						attributes["martialManeuverCSLmod"+itemId] = 0;
 						attributes["martialManeuverNormal"+itemId] = "on";
@@ -17403,6 +17453,56 @@
 	}
 	
 	
+	// Mark talents for deletion.
+	// DANGER: Risk of data loss.
+	on("change:activateDeleteChecks", function() {
+		getAttrs(["activateDeleteChecks", "talentDelete01", "talentDelete02", "talentDelete03", "talentDelete04", "talentDelete05", "talentDelete06", "talentDelete07", "talentDelete08", "talentDelete09", "talentDelete10"], function(values) {
+			var attributes = new Object();
+			var itemId = "";
+			
+			if (values.activateDeleteChecks === "on") {
+				attributes.talentChecks = "delete";
+				
+				// Clear all delete checks for safety.
+				clearTalentDeleteChecks();
+			} else {
+				attributes.talentChecks = "hide";
+				
+				for (var i = 1; i <= maxTalentNum; i++) {
+					itemId = String(i).padStart(2,'0');
+					
+					if (values["talentDelete"+itemId] === "on") {
+						// Reset the talent to defaults.
+						attributes["talentDelete"+itemId] = 0;
+						attributes["talentName"+itemId] = "";
+						attributes["talentCP"+itemId] = 0;
+						attributes["talentDice"+itemId] = "0";
+						attributes["talentActivate"+itemId] = 0;
+						attributes["talentRollChance"+itemId] = 18;
+						attributes["talentText"+itemId] = "";
+					}
+				}
+			}
+			
+			setAttrs(attributes);
+		});
+	});
+	
+	
+	function clearTalentDeleteChecks() {
+		var attributes = new Object();
+		var itemId = "";
+		
+		for (var i = 1; i <= maxTalentNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["talentDelete"+itemId] = 0;
+		}
+		
+		setAttrs(attributes);
+	}
+	
+	
+	// Clear all delete checks
 	function clearDeleteChecks() {
 		var attributes = new Object();
 		var itemId = "";
@@ -17432,6 +17532,12 @@
 		for (var i = 1; i <= maxManeuverNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["martialManeuverDelete"+itemId] = 0;
+		}
+		
+		// Talents
+		for (var i = 1; i <= maxTalentNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["talentDelete"+itemId] = 0;
 		}
 		
 		attributes.activateDeleteChecks = 0;
