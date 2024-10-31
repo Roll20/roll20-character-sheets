@@ -7550,6 +7550,51 @@
 		<!-- Upper set of powers (01-10) -->
 		<div class="flex-container-upper-powers">
 			<input type="hidden" class="item-upper-power-selection" name="attr_upperPowerSelection" value="power01"/>
+			<input type="hidden" class="upper-power-checks" name="attr_upperPowerChecks" value="hide"/>
+			
+			<!-- Lower power delete buttons -->
+			<div class="item-upper-power-delete-panel">	
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete01">
+					<span class="checkmark" title="@{powerDelete01}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete02">
+					<span class="checkmark" title="@{powerDelete02}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete03">
+					<span class="checkmark" title="@{powerDelete03}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete04">
+					<span class="checkmark" title="@{powerDelete04}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete05">
+					<span class="checkmark" title="@{powerDelete05}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete06">
+					<span class="checkmark" title="@{powerDelete06}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete07">
+					<span class="checkmark" title="@{powerDelete07}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete08">
+					<span class="checkmark" title="@{powerDelete08}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete09">
+					<span class="checkmark" title="@{powerDelete09}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete10">
+					<span class="checkmark" title="@{powerDelete10}"></span>
+				</label>
+			</div>
 			
 			<div class="flex-container-power-actions">
 				
@@ -9367,6 +9412,51 @@
 		<!-- Lower set of powers (11-20) -->
 		<div class="flex-container-lower-powers">
 			<input type="hidden" class="item-lower-power-selection" name="attr_lowerPowerSelection"  value="power11"/>
+			<input type="hidden" class="lower-power-checks" name="attr_lowerPowerChecks" value="hide"/>
+			
+			<!-- Lower power delete buttons -->
+			<div class="item-lower-power-delete-panel">	
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete11">
+					<span class="checkmark" title="@{powerDelete11}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete12">
+					<span class="checkmark" title="@{powerDelete12}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete13">
+					<span class="checkmark" title="@{powerDelete13}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete14">
+					<span class="checkmark" title="@{powerDelete14}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete15">
+					<span class="checkmark" title="@{powerDelete15}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete16">
+					<span class="checkmark" title="@{powerDelete16}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete17">
+					<span class="checkmark" title="@{powerDelete17}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete18">
+					<span class="checkmark" title="@{powerDelete18}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete19">
+					<span class="checkmark" title="@{powerDelete19}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_powerDelete20">
+					<span class="checkmark" title="@{powerDelete20}"></span>
+				</label>
+			</div>
 			
 			<div class="flex-container-power-actions">
 				
@@ -17500,6 +17590,73 @@
 	}
 	
 	
+	// Prepare for or delete marked powers.
+	// DANGER: Risk of data loss.
+	on("change:activateDeleteChecks", function() {
+		getAttrs(["activateDeleteChecks", "powerDelete01", "powerDelete02", "powerDelete03", "powerDelete04", "powerDelete05", "powerDelete06", "powerDelete07", "powerDelete08", "powerDelete09", "powerDelete10", "powerDelete11", "powerDelete12", "powerDelete13", "powerDelete14", "powerDelete15", "powerDelete16", "powerDelete17", "powerDelete18", "powerDelete19", "powerDelete20"], function(values) {
+			var attributes = new Object();
+			var itemId = "";
+			
+			if (values.activateDeleteChecks === "on") {
+				attributes.upperPowerChecks = "delete";
+				attributes.lowerPowerChecks = "delete";
+				
+				// Clear all delete checks for safety.
+				clearPowerDeleteChecks();
+			} else {
+				attributes.upperPowerChecks = "hide";
+				attributes.lowerPowerChecks = "hide";
+				
+				for (var i = 1; i <= maxPowerNum; i++) {
+					itemId = String(i).padStart(2,'0');
+					
+					if (values["powerDelete"+itemId] === "on") {
+						// Reset the talent to defaults.
+						attributes["powerDelete"+itemId] = 0;
+						attributes["powerAction"+itemId] = "false";
+						attributes["powerName"+itemId] = "";
+						attributes["powerCP"+itemId] = 0;
+						attributes["powerType"+itemId] = "single";
+						attributes["powerEffect"+itemId] = "";
+						attributes["powerDice"+itemId] = "0";
+						attributes["powerDamageType"+itemId] = "power";
+						attributes["powerAttack"+itemId] = 0;
+						attributes["powerDamageAdvantage"+itemId] = 0;
+						attributes["powerStunMod"+itemId] = 0;
+						attributes["powerActivate"+itemId] = 0;
+						attributes["powerSkillRoll"+itemId] = 18;
+						attributes["powerAoE"+itemId] = 0;
+						attributes["powerDCV"+itemId] = "full";
+						attributes["powerRMod"+itemId] = "standard";
+						attributes["powerReducedEND"+itemId] = "standardEND";
+						attributes["powerEND"+itemId] = 0;
+						attributes["powerAdvantages"+itemId] = 0;
+						attributes["powerLimitations"+itemId] = 0;
+						attributes["powerBaseCost"+itemId] = 0;
+						attributes["powerActiveCost"+itemId] = 0;
+						attributes["powerText"+itemId] = "";
+					}
+				}
+			}
+			
+			setAttrs(attributes);
+		});
+	});
+	
+	
+	function clearPowerDeleteChecks() {
+		var attributes = new Object();
+		var itemId = "";
+		
+		for (var i = 1; i <= maxPowerNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["powerDelete"+itemId] = 0;
+		}
+		
+		setAttrs(attributes);
+	}
+	
+	
 	// Mark talents for deletion.
 	// DANGER: Risk of data loss.
 	on("change:activateDeleteChecks", function() {
@@ -17629,6 +17786,12 @@
 		for (var i = 1; i <= maxManeuverNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["martialManeuverDelete"+itemId] = 0;
+		}
+		
+		// Powers
+		for (var i = 1; i <= maxPowerNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["powerDelete"+itemId] = 0;
 		}
 		
 		// Talents
