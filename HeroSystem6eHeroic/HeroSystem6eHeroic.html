@@ -11800,6 +11800,53 @@
 		
 		<div class="flex-container-complications">
 			<input type="hidden" class="item-complication-selection" name="attr_complicationSelection" value="complication01"/>
+			<input type="hidden" class="complication-checks" name="attr_complicationChecks" value="hide"/>
+			
+			<!-- complication delete buttons -->
+			<div class="item-complication-delete-panel">	
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete01">
+					<span class="checkmark" title="@{complicationDelete01}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete02">
+					<span class="checkmark" title="@{complicationDelete02}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete03">
+					<span class="checkmark" title="@{complicationDelete03}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete04">
+					<span class="checkmark" title="@{complicationDelete04}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete05">
+					<span class="checkmark" title="@{complicationDelete05}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete06">
+					<span class="checkmark" title="@{complicationDelete06}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete07">
+					<span class="checkmark" title="@{complicationDelete07}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete08">
+					<span class="checkmark" title="@{complicationDelete08}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete09">
+					<span class="checkmark" title="@{complicationDelete09}"></span>
+				</label>
+				<label class="container-xbox-tiny">
+					<input type="checkbox" name="attr_complicationDelete10">
+					<span class="checkmark" title="@{complicationDelete10}"></span>
+				</label>
+			</div>
+			
+			<!-- Complication selection buttons -->
 			
 			<div class="flex-container-complication-selectors">
 				<button type="action" name="act_complication01" ><span name="attr_complicationName01"></span></button>
@@ -17502,6 +17549,56 @@
 	}
 	
 	
+	// Mark complications for deletion.
+	// DANGER: Risk of data loss.
+	on("change:activateDeleteChecks", function() {
+		getAttrs(["activateDeleteChecks", "complicationDelete01", "complicationDelete02", "complicationDelete03", "complicationDelete04", "complicationDelete05", "complicationDelete06", "complicationDelete07", "complicationDelete08", "complicationDelete09", "complicationDelete10"], function(values) {
+			var attributes = new Object();
+			var itemId = "";
+			
+			if (values.activateDeleteChecks === "on") {
+				attributes.complicationChecks = "delete";
+				
+				// Clear all delete checks for safety.
+				clearComplicationDeleteChecks();
+			} else {
+				attributes.complicationChecks = "hide";
+				
+				for (var i = 1; i <= maxComplicationNum; i++) {
+					itemId = String(i).padStart(2,'0');
+					
+					if (values["complicationDelete"+itemId] === "on") {
+						// Reset the complication to defaults.
+						attributes["complicationDelete"+itemId] = 0;
+						attributes["complicationType"+itemId] = "none";
+						attributes["complicationName"+itemId] = "";
+						attributes["complicationCP"+itemId] = 0;
+						attributes["complicationDice"+itemId] = "0";
+						attributes["complicationActivate"+itemId] = 0;
+						attributes["complicationRollChance"+itemId] = 18;
+						attributes["complicationText"+itemId] = "";
+					}
+				}
+			}
+			
+			setAttrs(attributes);
+		});
+	});
+	
+	
+	function clearComplicationDeleteChecks() {
+		var attributes = new Object();
+		var itemId = "";
+		
+		for (var i = 1; i <= maxComplicationNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["complicationDelete"+itemId] = 0;
+		}
+		
+		setAttrs(attributes);
+	}
+	
+	
 	// Clear all delete checks
 	function clearDeleteChecks() {
 		var attributes = new Object();
@@ -17538,6 +17635,12 @@
 		for (var i = 1; i <= maxTalentNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["talentDelete"+itemId] = 0;
+		}
+		
+		// Complications
+		for (var i = 1; i <= maxComplicationNum; i++) {
+			itemId = String(i).padStart(2,'0');
+			attributes["complicationDelete"+itemId] = 0;
 		}
 		
 		attributes.activateDeleteChecks = 0;
