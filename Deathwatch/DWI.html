@@ -4266,8 +4266,14 @@
 <div class="psykana">
     <!--hidden atributes for sustained powers-->
     <input type="hidden" name="attr_sustainingPowerTotal" value="0" />
+    <input type="hidden" name="attr_psychicPhenomenaMalus" value="0" />
     <div>
-        <div class="spacing" style="width:24.5%"></div>
+        <button name="roll_psychicPhenomena" type="roll" style="width:20%"
+            data-i18n-title="rollPsychicPhenomenaTitle" title="Rolls on the Psychic Phenomena Table&#10;1d100 +10 per Power Sustained + 15 if Pushing"
+            value="@{gmroll}&{template:custom} {{name=^{rollPsychicPhenomenaHeader}}} {{psytable=[[1d100cs1cf100 + @{psychicPhenomenaMalus} + ?{@{queryModifier}|0} + (@{sustaining} * 10)]] }} {{d5add=[[d5]]}} {{d10add=[[d10]]}} {{2d10add=[[2d10]]}} {{3d10add=[[3d10]]}} {{4d10add=[[4d10]]}} {{5d10add=[[5d10]]}} {{d100add=[[d100]]}}">
+            <label><span data-i18n="rollPsychicPhenomenaLabel">Roll Psychic Phenomena</span> &#128712;</label>
+        </button>
+        <div class="spacing" style="width:4.5%"></div>
         <label style="width:9%"><span data-i18n="PsyRating">Psy Rating</span>:</label>
         <input class="major" style="width:4%" name="attr_psyRating" type="number" value="0" />
         <div class="spacing" style="width:0.5%"></div>
@@ -4792,6 +4798,7 @@ on("change:psyRating change:powerLevel sheet:opened", () => {
         const psyRating = +values["psyRating"];
         var effectivePsyRating = "";
         var psyDice = "1d100cs>0cf>91";
+        var psychicPhenomenaMalus = 0;
 
         if (powerLevel == 1) {
             effectivePsyRating = Math.ceil(psyRating / 2);
@@ -4801,11 +4808,13 @@ on("change:psyRating change:powerLevel sheet:opened", () => {
             psyDice = "1d100cs11cs22cs33cs44cs55cs66cs77cs88cs99cs100cf>91";
         } else if (powerLevel == 3) {
             effectivePsyRating = psyRating + 3;
+            psychicPhenomenaMalus = 15;
         } else if (powerLevel == 4) {
             effectivePsyRating = psyRating + 4;
+            psychicPhenomenaMalus = 10;
         }
 
-        setAttrs({ "psyDice": psyDice, "effectivePsyRating": effectivePsyRating });
+        setAttrs({ "psyDice": psyDice, "effectivePsyRating": effectivePsyRating, "psychicPhenomenaMalus": psychicPhenomenaMalus });
     });
 });
 
@@ -5257,10 +5266,10 @@ const migrateSheetToDeathwatchImproved = version => {
                 <div class="sheet-name">{{name}}</div>
             {{/name}}
         <!--section that allows the 2 columns to show key and value side by side -->
-            {{#allprops() batable field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit}}
+            {{#allprops() field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit psytable d5add d10add 2d10add 3d10add 4d10add 5d10add d100add}}
                 <div class="sheet-key">{{key}}</div>
                 <div class="sheet-value">{{value}}</div>
-            {{/allprops() batable field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit}}
+            {{/allprops() field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit psytable d5add d10add 2d10add 3d10add 4d10add 5d10add d100add}}
          <!--section for regular rolls show success and failure-->
             {{#testtarget}}
                 <div class="sheet-result">{{testtarget}}&#160;<span data-i18n="rollThreshold">Threshold</span></div>
@@ -5423,6 +5432,38 @@ const migrateSheetToDeathwatchImproved = version => {
                     {{/^rollGreater() roll testtarget}}
                 </div>
             {{/powerparry}}
+        <!--section for psychic phenomena table-->
+            {{#psytable}} <!-- vars = {0} = d5add, {1} = d10add, {2} = 2d10add, {3} = 3d10add, {4} = 4d10add, {5} = 5d10add, {6} = d100add-->
+                <div class="sheet-desc">
+                    {{psytable}}&#160;
+                    {{#rollBetween() psytable 01 03}}<span data-i18n="rollPsychicPhenomena0103Title">Dark Foreboding</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena0103Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">A faint breeze blows past the psyker and those near him, and everyone gets the feeling that doom is about to befall them.</span>{{/rollBetween() psytable 01 03}}
+                    {{#rollBetween() psytable 04 05}}<span data-i18n="rollPsychicPhenomena0405Title">Warp Echo</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena0405Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">For a few seconds, all noises cause sinister echoes, regardless of the surroundings.</span>{{/rollBetween() psytable 04 05}}
+                    {{#rollBetween() psytable 06 08}}<span data-i18n="rollPsychicPhenomena0608Title">Unholy Stench</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena0608Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The air around the psyker becomes permeated with a bizarre and foul smell.</span>{{/rollBetween() psytable 06 08}}
+                    {{#rollBetween() psytable 09 11}}<span data-i18n="rollPsychicPhenomena0911Title">Mind Warp</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena0911Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The psyker suffers 1 Insanity Point as his own inherent phobias, suspicions, and hatred surge to the surface of his mind in a wave of negative emotion.</span>{{/rollBetween() psytable 09 11}}
+                    {{#rollBetween() psytable 12 14}}<span data-i18n="rollPsychicPhenomena1214Title">Hoarfrost</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena1214Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The temperature plummets for an instant and a thin coating of frost covers everything within {3} metres of the psyker.</span>{{/rollBetween() psytable 12 14}}
+                    {{#rollBetween() psytable 15 17}}<span data-i18n="rollPsychicPhenomena1517Title">Aura of Taint</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena1517Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">All animals within {6} metres of the psyker become spooked and agitated. Characters with Psyniscience can pinpoint the psyker as the cause.</span>{{/rollBetween() psytable 15 17}}
+                    {{#rollBetween() psytable 18 20}}<span data-i18n="rollPsychicPhenomena1820Title">Memory Worm</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena1820Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">All people within line of sight of the psyker forget something trivial.</span>{{/rollBetween() psytable 18 20}}
+                    {{#rollBetween() psytable 21 23}}<span data-i18n="rollPsychicPhenomena2123Title">Spoilage</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena2123Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Food and drink go bad within {5} metres of the psyker.</span>{{/rollBetween() psytable 21 23}}
+                    {{#rollBetween() psytable 24 26}}<span data-i18n="rollPsychicPhenomena2426Title">Haunting Breeze</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena2426Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Winds whip up around the psyker for a few seconds, blowing light objects about and guttering fires within {3} metres of him.</span>{{/rollBetween() psytable 24 26}}
+                    {{#rollBetween() psytable 27 29}}<span data-i18n="rollPsychicPhenomena2729Title">Veil of Darkness</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena2729Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">For a brief moment (effectively the remainder of the Round), an area within {3} metres of the psyker is plunged into immediate darkness.</span>{{/rollBetween() psytable 27 29}}
+                    {{#rollBetween() psytable 30 32}}<span data-i18n="rollPsychicPhenomena3032Title">Distorted Reflections</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena3032Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Mirrors and other reflective surfaces within {5} metres of the psyker distort or shatter.</span>{{/rollBetween() psytable 30 32}}
+                    {{#rollBetween() psytable 33 35}}<span data-i18n="rollPsychicPhenomena3335Title">Breath Leech</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena3335Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Everyone (including the psyker) becomes short of breath for 1 Round and cannot make any Run or Charge actions.</span>{{/rollBetween() psytable 33 35}}
+                    {{#rollBetween() psytable 36 38}}<span data-i18n="rollPsychicPhenomena3638Title">Daemonic Mask</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena3638Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">For a fleeting moment the psyker takes on a Daemonic appearance and gains a Fear rating of 1 for the rest of the Round. He also gains 1 Corruption Point.</span>{{/rollBetween() psytable 36 38}}
+                    {{#rollBetween() psytable 39 41}}<span data-i18n="rollPsychicPhenomena3941Title">Unnatural Decay</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena3941Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">All plant life within {3} metres of the psyker withers and dies.</span>{{/rollBetween() psytable 39 41}}
+                    {{#rollBetween() psytable 42 44}}<span data-i18n="rollPsychicPhenomena4244Title">Spectral Gale</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena4244Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Howling winds erupt around the psyker. The psyker and anyone within {4} metres of him must make an Easy (+30) Agility or Strength Test to avoid being knocked to the ground.</span>{{/rollBetween() psytable 42 44}}
+                    {{#rollBetween() psytable 45 47}}<span data-i18n="rollPsychicPhenomena4547Title">Bloody Tears</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena4547Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Blood weeps from stone and wood within {3} metres of the psyker. If there are any pictures or statues of people within this area, they appear to be crying blood.</span>{{/rollBetween() psytable 45 47}}
+                    {{#rollBetween() psytable 48 50}}<span data-i18n="rollPsychicPhenomena4850Title">The Earth Protests</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena4850Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The ground suddenly shakes and everyone (including the psyker) within {5} metres of the psyker must make a Routine (+10) Agility Test or be knocked down.</span>{{/rollBetween() psytable 48 50}}
+                    {{#rollBetween() psytable 51 53}}<span data-i18n="rollPsychicPhenomena5153Title">Psy Discharge</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena5153Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Static Electricity fills the air within {5} metres of the psyker, causing hair to stand on end and unprotected electrics to short out. The psyker is illuminated by eldritch light.</span>{{/rollBetween() psytable 51 53}}
+                    {{#rollBetween() psytable 54 56}}<span data-i18n="rollPsychicPhenomena5456Title">Warp Ghosts</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena5456Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Ghostly apparitions fill the air within {3} metres of the psyker, flying around and howling in pain for a few brief moments. Everyone within this area must test against Fear (1).</span>{{/rollBetween() psytable 54 56}}
+                    {{#rollBetween() psytable 57 59}}<span data-i18n="rollPsychicPhenomena5759Title">Falling Upwards</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena5759Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">Everything within {2} metres of the psyker (including the psyker himself) rises {1} metres into the air as gravity briefly ceases. After a second or two, everything crashes back to earth. (See page 261 for rules on Falling Damage).</span>{{/rollBetween() psytable 57 59}}
+                    {{#rollBetween() psytable 60 62}}<span data-i18n="rollPsychicPhenomena6062Title">Banshee Howl</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena6062Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">A shrill keening rings out across the immediate area, shattering glass and forcing every mortal creature able to hear it (including the psyker) to make a Challenging (+0) Toughness Test or be deafened for {1} rounds.</span>{{/rollBetween() psytable 60 62}}
+                    {{#rollBetween() psytable 63 65}}<span data-i18n="rollPsychicPhenomena6365Title">The Furies</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena6365Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The psyker is assailed by unseen horrors. He is slammed to the ground and suffers {0} Wounds in damage (Toughness protects, but armour, unless warded does not). The psyker must test against Fear (2).</span>{{/rollBetween() psytable 63 65}}
+                    {{#rollBetween() psytable 66 68}}<span data-i18n="rollPsychicPhenomena6668Title">Shadow of the Warp</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena6668Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">For a split second the world changes in appearance and everyone within {6} metres of the psyker has a mercifully brief glimpse of the shadow of the Warp. Everyone in the area (including the psyker) must make a Difficult (–10) Willpower Test or gain {0} Insanity points.</span>{{/rollBetween() psytable 66 68}}
+                    {{#rollBetween() psytable 69 71}}<span data-i18n="rollPsychicPhenomena6971Title">Tech Scorn</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena6971Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The machine spirits reject you’re the psyker’s unnatural ways. All unwarded tech devices within {5} metres of the psyker malfunction momentarily, and all ranged weapons within this area Jam (see page 249). Characters with cybernetic implants must pass a Routine (+10) Toughness Test or suffer {0} damage.</span>{{/rollBetween() psytable 69 71}}
+                    {{#rollBetween() psytable 72 74}}<span data-i18n="rollPsychicPhenomena7274Title">Warp Madness</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena7274Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">A violent ripple of tainted discord causes all creatures within {2} metres of the psyker (with the exception of the psyker himself ) to become Frenzied for 1 Round. Affected creatures gain {0} Corruption Points unless they can pass a Difficult (–10) Willpower Test.</span>{{/rollBetween() psytable 72 74}}
+                    {{#rollGreater() psytable 74}}<span data-i18n="rollPsychicPhenomena75100Title">Perils of the Warp</span><br /><span class="sheet-textDesc" data-i18n="rollPsychicPhenomena75100Desc" data-i18n-vars="{{d5add}}|{{d10add}}|{{2d10add}}|{{3d10add}}|{{4d10add}}|{{5d10add}}|{{d100add}}">The Warp opens in a maelstrom of energy. Immediately make a roll on Perils of the Warp.</span>{{/rollGreater() psytable 74}}
+                </div>
+            {{/psytable}}
         <!--section for scatter diagram-->
             {{#scatter}}
                 <div class="sheet-result">
