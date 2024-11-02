@@ -1857,4 +1857,658 @@ on('clicked:reg_rest-action', async (info) => {
 		computed
 	);
 });
+
+// Determine value and source of bonus on astral meditation roll
+// reg_astralmeditation_mod_skill_source
+// reg_astralmeditation_mod_skill_value
+on(
+	[ ...
+		[
+			"sf_representations",
+			"ritualkenntnis", "ritualkenntniswert",
+			"taw_musizieren", "talent_musizieren",
+			"taw_selbstbeherrschung",
+			"zauber_blendwerk",
+			"zauber_koboldgeschenk",
+			"zauber_komm",
+			"zauber_lachkrampf",
+			"zauber_schabernack",
+			"repeating_magie-sonderfertigkeiten",
+		].map(attr => "change:" + attr),
+		"remove:repeating_magie-sonderfertigkeiten"
+	].join(" "),
+	function(eventInfo) {
+	getSectionIDs(
+		"Magie-Sonderfertigkeiten", function(IDs) {
+		let magicSpecialSkillAttrs = [];
+		for (let id of IDs)
+		{
+			magicSpecialSkillAttrs.push(`repeating_Magie-Sonderfertigkeiten_${id}_MagieSK`);
+		}
+		safeGetAttrs(
+			[
+				"sf_representations",
+				"Ritualkenntnis", "RitualkenntnisWert",
+				"TaW_musizieren", "talent_musizieren",
+				"TaW_selbstbeherrschung",
+				"zauber_blendwerk",
+				"zauber_koboldgeschenk",
+				"zauber_komm",
+				"zauber_lachkrampf",
+				"zauber_schabernack",
+				...magicSpecialSkillAttrs,
+			], function(values) {
+			const caller = "Action Listener for the Determination of the Bonus for Astral Meditation";
+			debugLog(caller, "eventInfo", eventInfo, "values", values, "magicSpecialSkillAttrs", magicSpecialSkillAttrs);
+
+			let attrsToChange = {};
+			/*
+			Heuristic for the determination of the correct source
+				Representations set
+					If not "^(Elf|Sch)" -> use ritual knowledge
+					Elf -> Use Music Making talent
+					Sch -> Use Self-Control Talent
+				Representations not set
+					Ritual knowledge set -> use ritual knowledge
+					Knows Rascal-only spells -> use self-control
+					Knows Elf-only "Song of Friendship" and has "Music Making" -> use music-making
+					else: inform user and use "0" as value
+			*/
+
+			let heuristicResult = "";
+			if (values["sf_representations"] !== "")
+			{
+				const repRegex = /^(Elf|Sch)/;
+				const repMatch = values["sf_representations"].match(repRegex);
+				if (repMatch)
+				{
+					switch(repMatch[0])
+					{
+						case "Elf":
+							heuristicResult = "Musizieren";
+							break;
+						case "Sch":
+							heuristicResult = "Selbstbeherrschung";
+							break;
+						default:
+							debugLog(caller, "Regex matched, but no appropriate case in switch statement found.", "repMatch", repMatch);
+							break;
+					}
+				} else {
+					heuristicResult = "Ritualkenntnis";
+				}
+			} else {
+				if (values["Ritualkenntnis"] !== "")
+				{
+					heuristicResult = "Ritualkenntnis";
+				} else if
+				(
+					values["zauber_blendwerk"] === "1" &&
+					values["zauber_koboldgeschenk"] === "1" &&
+					values["zauber_komm"] === "1" &&
+					values["zauber_lachkrampf"] === "1" &&
+					values["zauber_schabernack"] === "1"
+				)
+				{
+					heuristicResult = "Selbstbeherrschung";
+				} else {
+					const songRegexp = /.*?Freundschaftslied.*/;
+					for (let entry of magicSpecialSkillAttrs)
+					{
+						if (values[entry].match(songRegexp))
+						{
+							heuristicResult = "Musizieren";
+							break;
+						}
+					}
+				}
+			}
+
+			// Prepare attribute
+			let skillSource = "Wert nicht ermittelbar";
+			let skillValue = 0;
+			let skillHint = "1";
+
+			switch(heuristicResult)
+			{
+				case "Ritualkenntnis":
+					let source = [ "Ritualkenntnis" ];
+					if (values["Ritualkenntnis"] !== "")
+					{
+						source.push(values["Ritualkenntnis"]);
+					}
+					skillSource = source.join(" ").trim();
+					skillValue = parseInt(values["RitualkenntnisWert"]);
+					skillHint = "0";
+					break;
+				case "Musizieren":
+					skillSource = "Musizieren";
+					skillValue = parseInt(values["TaW_musizieren"]);
+					skillHint = "0";
+					break;
+				case "Selbstbeherrschung":
+					skillSource = "Selbstbeherrschung";
+					skillValue = parseInt(values["TaW_selbstbeherrschung"]);
+					skillHint = "0";
+					break;
+				default:
+					skillSource = "Wert nicht ermittelbar";
+					skillValue = 0;
+					skillHint = "1";
+					break;
+			}
+
+			attrsToChange["reg_astralmeditation_mod_skill_source"] = skillSource;
+			attrsToChange["reg_astralmeditation_mod_skill_value"] = skillValue;
+			attrsToChange["reg_astralmeditation_mod_skill_show_hint"] = skillHint;
+			debugLog(caller, "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange);
+		});
+	});
+});
+
+
+
+// Generating Regeneration Roll (Astral Meditation)
+on(
+	[
+		"character_name",
+		"gm_roll_opt",
+		"in", "ch", "ko",
+		"le", "ae", "ae_max",
+		"eisern", "vorteil_zaeher_hund",
+		"sf_astrale_meditation",
+		"reg_astralmeditation_mod_skill_value",
+		"reg_astralmeditation_mod_other",
+		"reg_astralmeditation_use_thonnys",
+		"reg_astralmeditation_use_thonnys_amount",
+		"reg_astralmeditation_conversion_target",
+		"reg_astralmeditation_location_limbo",
+		"reg_astralmeditation_limit_life_energy_soft",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"character_name",
+			"gm_roll_opt",
+			"IN", "CH", "KO",
+			"LE", "AE", "AE_max",
+			"Eisern", "vorteil_zaeher_hund",
+			"sf_astrale_meditation",
+			"reg_astralmeditation_mod_skill_value",
+			"reg_astralmeditation_mod_other",
+			"reg_astralmeditation_use_thonnys",
+			"reg_astralmeditation_use_thonnys_amount",
+			"reg_astralmeditation_conversion_target",
+			"reg_astralmeditation_location_limbo",
+			"reg_astralmeditation_limit_life_energy_soft",
+		], function(values) {
+		const caller = "Action Listener for Generation of Regeneration Roll (Astral Meditation)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+
+		/*
+		Roll Code Generation
+		Preparation
+		*/
+		const LE = parseInt(values["LE"]);
+		const AE = parseInt(values["AE"]);
+		const AEMax = values["AE_max"];
+		const eisern = values["Eisern"];
+		const tough = values["vorteil_zaeher_hund"];
+		const specialSkill = parseInt(values["sf_astrale_meditation"]);
+		const thonnysUse = parseInt(values["reg_astralmeditation_use_thonnys"]);
+		const thonnysLeaves = parseInt(values["reg_astralmeditation_use_thonnys_amount"]);
+		// Combined with the special skill Thonnys grants reduced cost only at full dose
+		const thonnysFullDoseLeaves = 7;
+		const targetRaw = parseInt(values["reg_astralmeditation_conversion_target"]);
+		const limitLifeEnergySoftRaw = parseInt(values["reg_astralmeditation_limit_life_energy_soft"]);
+		// Explanation for that magic number
+		/// Character incapacitated at 5 LeP or below
+		/// 1 LeP minimum conversion
+		/// (1W3 - 1) LeP = 2 LeP additional LE loss
+		const LEAliveMinimum = 1;
+		const LEIncapacitatedMin = 5;
+		const LECostConversionMin = 1;
+		const LECostAdditionalMax = 2;
+		const limitLifeEnergyHardMaxDefault = LEIncapacitatedMin + LECostConversionMin + LECostAdditionalMax;
+		const AECostInitiationDefault = 1;
+		let attrsToChange = {};
+
+		// Determination of setup
+		/// 	0: no special skill, no Thonnys
+		/// 	1: Special skill Astral Meditation only
+		/// 	2: Herb Thonnys used only
+		/// 	3: Astral Meditation + Thonnys used
+		let setup = 0;
+
+		if (specialSkill === 1)
+		{
+			setup += 1;
+		}
+		if (
+			(thonnysUse === 1) && (thonnysLeaves >= thonnysFullDoseLeaves)
+		)
+		{
+			setup += 2;
+		}
+
+		// Determination of Maximum Required Life Points to Convert
+		let maxConversionRequired = AEMax - AE;
+		if (setup !== 3)
+		{
+			maxConversionRequired += AECostInitiationDefault;
+		}
+
+		// Determination of hard limit
+		// Set hard limit to default value:
+		let limitLifeEnergyHard = limitLifeEnergyHardMaxDefault;
+		if (
+			(eisern !== "2") && (tough !== "1") && (setup !== 3)
+		)
+		{
+			// Incapacitation at 5, 1 conversion, 2 max. additional loss
+			limitLifeEnergyHard = LEIncapacitatedMin + LECostConversionMin + LECostAdditionalMax;
+		} else if (
+		 (
+		 	(eisern !== "2") && (tough !== "1")
+		 ) && (setup === 3)
+		)
+		{
+			// Incapacitation at 5, 1 conversion, no additional loss
+			limitLifeEnergyHard = LEIncapacitatedMin + LECostConversionMin;
+		} else if (
+		 (
+		 	(eisern === "2") || (tough === "1")
+		 ) && (setup !== 3)
+		)
+		{
+			// No incapacitation, 1 conversion, 2 max. additional loss
+			limitLifeEnergyHard = LEAliveMinimum + LECostConversionMin + LECostAdditionalMax;
+		} else if (
+		 (
+		 	(eisern === "2") || (tough === "1")
+		 ) && (setup === 3)
+		)
+		{
+			// No incapacitation, 1 conversion, no additional loss
+			limitLifeEnergyHard = LEAliveMinimum + LECostConversionMin;
+		}
+
+		// Determination of soft limit
+		// Must be >= hard limit
+		let limitLifeEnergySoft = limitLifeEnergyHard;
+		if (limitLifeEnergySoftRaw >= limitLifeEnergyHard)
+		{
+			limitLifeEnergySoft = limitLifeEnergySoftRaw;
+		} else {
+			debugLog(caller, `Soft limit (pre-roll) (${limitLifeEnergySoftRaw}) less than hard limit (pre-roll) (${limitLifeEnergyHard}). Setting soft limit to hard limit.`);
+			attrsToChange["reg_astralmeditation_limit_life_energy_soft"] = limitLifeEnergyHard;
+		}
+
+		// Determination of conversion target
+		// Limited by max. astral energy
+		let target = targetRaw;
+		let targetAdapted = false;
+		if (targetRaw > maxConversionRequired)
+		{
+			target = maxConversionRequired;
+			targetAdapted = true;
+		}
+
+		// Determination of max. LE cost
+		let LECostMax = 0;
+		LECostMax += target;
+		if (setup !== 3)
+		{
+			LECostMax += LECostAdditionalMax;
+		}
+
+		/*
+		Three main outcomes must be distinguished:
+			* Meditation impossible
+			** no special skill AND no Thonnys
+			** no astral energy for meditation initiation if required (not required if special skill AND Thonnys)
+			** not enough life energy left for safely performing the ritual (regarding soft/hard limits)
+			* Meditation not required
+			** astral energy is full
+			* Meditation possible (all other cases)
+		*/
+		let outcome = "unset";
+		// Meditation impossible
+		if (
+			// No special skill, no Thonnys ("setup")
+			(setup === 0)
+			||
+			// no astral energy for meditation initiation if required
+			( (AE < 1) && (setup < 3) )
+			||
+			// not enough life energy left for safely performing the ritual (regarding soft/hard limits)
+			(limitLifeEnergySoft > LE - LECostMax)
+		)
+		{
+			outcome = "impossible";
+		} else if (AE >= AEMax) {
+			outcome = "not required";
+		} else {
+			outcome = "possible";
+		}
+
+		// Preparation for Main Outcomes
+		let baseRoll = [
+			values["gm_roll_opt"],
+			"&{template:reg-astralmeditation}",
+			`{{setup=[[${setup}]]}}`,
+		];
+		switch(outcome)
+		{
+			case "impossible":
+				baseRoll = [
+					... baseRoll,
+					'{{impossible=[[0d1]]}}',
+				];
+				break;
+			case "not required":
+				baseRoll = [
+					... baseRoll,
+					'{{notrequired=[[0d1]]}}',
+					`{{ae=[[${values["AE"]}]]}}`,
+					`{{aemax=[[${values["AE_max"]}]]}}`,
+				];
+				break;
+			case "possible":
+				// Setup-independent parts
+				/// Bonus is half of whatever was selected for reg_astralmeditation_mod_skill_value
+				let mod = parseInt(values["reg_astralmeditation_mod_skill_value"]);
+				mod = -DSAround(mod / 2);
+
+				let LELossAdditional = '1d3cs1cf3 - 1';
+				let AELossInitiation = '1';
+
+				// Adaptation of target
+				if (targetAdapted === true)
+				{
+					debugLog(caller, `Conversion target (${targetRaw}) higher than necessary. Reducing to appropriate value (${target}).`);
+					attrsToChange["reg_astralmeditation_conversion_target"] = target;
+				}
+
+				switch(setup)
+				{
+					case 1: // Special skill only
+						break;
+					case 2: // Thonnys only
+						// Calculate full and fractional rolls
+						const thonnysFullDoseRoll = '2 + 2d6';
+						const thonnysFullDoses = Math.floor(thonnysLeaves / thonnysFullDoseLeaves);
+						const thonnysLeavesRest = thonnysLeaves % thonnysFullDoseLeaves;
+						let thonnysFractionalRoll = '';
+						if (thonnysLeavesRest !== 0)
+						{
+							thonnysFractionalRoll = `( floor( (${thonnysLeavesRest} / ${thonnysFullDoseLeaves}) * (${thonnysFullDoseRoll}) ) )`;
+						}
+
+						// Build roll array
+						let thonnysLimitRoll = [];
+
+						for (let counter = 0; counter < thonnysFullDoses; counter++)
+						{
+							thonnysLimitRoll.push(thonnysFullDoseRoll);
+						}
+
+						if (thonnysFractionalRoll)
+						{
+							thonnysLimitRoll.push(thonnysFractionalRoll);
+						}
+						thonnysLimitRoll = thonnysLimitRoll.join(' + ');
+
+						baseRoll = [
+							... baseRoll,
+							`{{thonnyslimit=[[${thonnysLimitRoll}]]}}`,
+						];
+						break;
+					case 3: // Special skill + Thonnys
+						const modThonnys = -3;
+						mod += modThonnys;
+						LELossAdditional = '0d1';
+						AELossInitiation = '0';
+						break;
+					default:
+						debugLog(caller, "switch(setup) default case triggered. Should not happen.");
+						break;
+				}
+				baseRoll = [
+					... baseRoll,
+					`{{charactername=${values["character_name"]}}}`,
+					'{{stats=[[ ' +
+						`[IN] [[${values["IN"]}]]d1cs0cf2 + ` +
+						`[CH] [[${values["CH"]}]]d1cs0cf2 + ` +
+						`[KO] [[${values["KO"]}]]d1cs0cf2 + ` +
+						']]}}',
+					'{{checkrollresults=[[ [IN-Wurf:] 1d20cs1cf20 + [CH-Wurf:] 1d20cs1cf20 + [KO-Wurf:] 1d20cs1cf20]]}}',
+					`{{mod=[[${mod}]]}}`,
+					'{{checkresult=[[0d1]]}}',
+					'{{criticality=[[0d1]]}}',
+					`{{duration=[[${target}]]}}`,
+					`{{conversiontarget=[[${target}]]}}`,
+					`{{le=[[${values["LE"]}]]}}`,
+					'{{leneu=[[0d1]]}}',
+					'{{lelossconversion=[[0d1]]}}',
+					`{{lelossadditional=[[${LELossAdditional}]]}}`,
+					`{{ae=[[${values["AE"]}]]}}`,
+					`{{aemax=[[${values["AE_max"]}]]}}`,
+					'{{aeneu=[[0d1]]}}',
+					`{{aelossinitiation=[[${AELossInitiation}]]}}`,
+					'{{aegainconversion=[[0d1]]}}',
+				];
+				break;
+			default:
+				debugLog(caller, `switch(outcome) default case (${outcome}) triggered. Should not happen.`);
+				baseRoll = [
+					... baseRoll,
+					'{{unset=[[0d1]]}}',
+				];
+				break;
+		}
+		// Build roll
+		var roll = [];
+		roll = roll.concat(baseRoll);
+
+		attrsToChange["reg_astralmeditation_roll"] = roll.join(" ");
+
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
+
+on('clicked:reg_astralmeditation-action', async (info) => {
+	const caller = "Action Listener for Regeneration Button (Astral Meditation)";
+	let results = await startRoll("@{reg_astralmeditation_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+	let rollID = results.rollId;
+	results = results.results;
+	let computed = {};
+
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results)
+	{
+		resultsOnly[property] = results[property].result;
+	}
+
+	const setup = resultsOnly["setup"];
+	let attrsToChange = {};
+
+	// Replicate structure of roll generator
+	let outcome = "";
+	if (Object.hasOwn(resultsOnly, "impossible"))
+	{
+		outcome = "impossible";
+	} else if (Object.hasOwn(resultsOnly, "notrequired")) {
+		outcome = "notrequired";
+	} else if (Object.hasOwn(resultsOnly, "unset")) {
+		outcome = "unset";
+	} else {
+		outcome = "possible";
+	}
+
+	switch(outcome)
+	{
+		case "notrequired":
+		case "impossible":
+			finishRoll(rollID);
+			break;
+		case "possible":
+			// 3d20 Check
+			let mod = resultsOnly["mod"];
+			computed["mod"] = mod;
+			let stats = [
+				results.stats.rolls[0].dice,
+				results.stats.rolls[1].dice,
+				results.stats.rolls[2].dice
+			];
+			let rolls = [
+				results["checkrollresults"]["rolls"][0].results[0],
+				results["checkrollresults"]["rolls"][1].results[0],
+				results["checkrollresults"]["rolls"][2].results[0],
+			];
+			const success = 1;
+			const failure = 20;
+
+			/* Result
+			0	Failure
+			1	Success
+			*/
+			let result = 0;
+
+			/* Criticality
+			-3	Triple 20
+			-2	Double 20
+			 0	no double 1/20
+			+2	Double 1
+			+3	Triple 1
+			*/
+			let criticality = 0;
+
+			// Multi Crits Calculation
+			{
+				let successes = 0;
+				let failures = 0;
+				for (let roll of rolls)
+				{
+					if (roll <= success)
+					{
+						successes += 1;
+					} else if (roll >= failure) {
+						failures += 1;
+					}
+					if (successes >= 2)
+					{
+						criticality = successes;
+					} else if (failures >= 2) {
+						criticality = -failures;
+					}
+				}
+			}
+
+			// Check Result Calculation
+			// This special check does not have a fixed value to counter unlucky rolls, so assume 0.
+			// The only way to counter unlucky rolls is by using the bonus (aka "mod").
+			// Reminder: A negative mod is a bonus.
+			let modRequired = 0;
+			for (let roll in rolls)
+			{
+				modRequired -= Math.max(0, rolls[roll] - stats[roll]);
+			}
+
+			if (mod <= modRequired)
+			{
+				result = 1;
+			} else {
+				result = 0;
+			}
+
+			computed["checkresult"] = result;
+			computed["criticality"] = criticality;
+			computed["checkrollresults"] = rolls.toString().replaceAll(",", "/");
+			computed["stats"] = stats.toString().replaceAll(",", "/");
+
+			// Regeneration
+			let AELossInitiation = 0;
+			if ( setup !== 3 )
+			{
+				AELossInitiation = 1;
+			}
+
+			if ( result === 1 )
+			{
+				let conversion = 0;
+				if ( setup === 2 )
+				{
+					let thonnysLimit = 0;
+					if ( Object.hasOwn(resultsOnly, "thonnyslimit") )
+					{
+						thonnysLimit = resultsOnly["thonnyslimit"];
+					}
+					conversion = Math.min(thonnysLimit, resultsOnly["conversiontarget"]);
+					computed["duration"] = conversion;
+				} else {
+					conversion = resultsOnly["conversiontarget"];
+				}
+				// Life energy
+				let LEneu = resultsOnly["le"];
+				let LELossAdditional = resultsOnly["lelossadditional"];
+				LEneu = LEneu - LELossAdditional - conversion;
+				computed["leneu"] = LEneu;
+				computed["lelossconversion"] = -conversion;
+				computed["lelossadditional"] = -LELossAdditional;
+				attrsToChange["LE"] = LEneu;
+
+				// Astral energy
+				let AEneu = resultsOnly["ae"];
+				AEneu = AEneu - AELossInitiation + conversion;
+				AEneu = Math.min(resultsOnly["aemax"], AEneu);
+				computed["aeneu"] = AEneu;
+				computed["aelossinitiation"] = -AELossInitiation;
+				computed["aegainconversion"] = conversion;
+				attrsToChange["AE"] = AEneu;
+			} else {
+				const AEmin = 0;
+				let AEneu = resultsOnly["ae"];
+				AEneu = AEneu - AELossInitiation;
+				AEneu = Math.max(AEmin, AEneu);
+				computed["aeneu"] = AEneu;
+				computed["aelossinitiation"] = -AELossInitiation;
+				attrsToChange["AE"] = AEneu;
+			}
+
+			// Prettify certain output
+			{
+
+				let useComputed = [
+					"lelossconversion",
+					"lelossadditional",
+					"aelossinitiation",
+					"aegainconversion",
+					"mod"
+				];
+				for (let part of useComputed)
+				{
+					if (Object.hasOwn(computed, part))
+					{
+						computed[part] = prettifyMod(computed[part]);
+					}
+				}
+			}
+
+			debugLog(caller, "tail", "rollID", rollID, "resultsOnly", resultsOnly, "attrsToChange", attrsToChange, "computed", computed);
+			safeSetAttrs(attrsToChange);
+
+			finishRoll(rollID, computed);
+			break;
+		default:
+			debugLog(caller, `switch(outcome) default case (${outcome}) triggered. Should not happen.`);
+			finishRoll(rollID);
+			break;
+	}
+});
+
 /* regeneration end */

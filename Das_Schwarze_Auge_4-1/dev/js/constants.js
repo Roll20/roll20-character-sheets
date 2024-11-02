@@ -1035,6 +1035,7 @@ const melee = [
 */
 // Regeneration buttons
 const reg = [
+	'reg_astralmeditation',
 	'reg_deepbreath',
 	'reg_relax',
 	'reg_rest',
