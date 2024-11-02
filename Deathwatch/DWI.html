@@ -4505,7 +4505,11 @@
                     value="@{gmroll}&{template:custom} {{name=@{character_name} - ^{traumaTest}}} {{dosdof=[[([[@{calculatedWillpower} + @{madnessDegree} + ?{@{queryModifier}|0}]] - [[1d100cs1cf100]]) * 100 % 999 % 100]]}} {{testtarget=$[[0]]}} {{roll=$[[1]]}}">
                     <label data-i18n="rollTraumaTest">Trauma Test</label>
                 </button>
-                <div class="spacing" style="width:23%"></div>
+                <div class="spacing" style="width:3%"></div>
+                <button type="roll" name="roll_traumaTable" style="width:20%" data-i18n-title="rollTraumaTableTitle" title="Rolls the Trauma Table"
+                    value="@{gmroll}&{template:custom} {{name=@{character_name} - ^{rollTraumaTable}}} {{traumatable=[[1d100cs1cf100 + (?{Degrees of Failure?|0}*10) ]]}} {{d5add=[[d5]]}} {{d10add=[[d10]]}} {{3d10add=[[3d10]]}}">
+                    <label data-i18n="rollTraumaTable">Trauma Table</label>
+                </button>
                 <!--end of line-->
                 <div class="spacing" style="width:1%"></div>
                 <select name="attr_madnessDegree" style="width:42%">
@@ -5275,10 +5279,10 @@ const migrateSheetToDeathwatchImproved = version => {
                 <div class="sheet-name">{{name}}</div>
             {{/name}}
         <!--section that allows the 2 columns to show key and value side by side -->
-            {{#allprops() field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit psytable perilstable shocktable d5add d5_2add d5p1add d10add d10p5add 2d10add 3d10add 4d10add 5d10add d100add}}
+            {{#allprops() field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit psytable perilstable shocktable traumatable d5add d5_2add d5p1add d10add d10p5add 2d10add 3d10add 4d10add 5d10add d100add}}
                 <div class="sheet-key">{{key}}</div>
                 <div class="sheet-value">{{value}}</div>
-            {{/allprops() field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit psytable perilstable shocktable d5add d5_2add d5p1add d10add d10p5add 2d10add 3d10add 4d10add 5d10add d100add}}
+            {{/allprops() field haywire damage psydmg damagetype damagepen psydamage stun powerparry dosdof testtarget roll desc name attack fallhitloc bloodloss fury scatter multihit psytable perilstable shocktable traumatable d5add d5_2add d5p1add d10add d10p5add 2d10add 3d10add 4d10add 5d10add d100add}}
          <!--section for regular rolls show success and failure-->
             {{#testtarget}}
                 <div class="sheet-result">{{testtarget}}&#160;<span data-i18n="rollThreshold">Threshold</span></div>
@@ -5514,6 +5518,22 @@ const migrateSheetToDeathwatchImproved = version => {
                     {{#rollGreater() shocktable 170}}<span class="sheet-textDesc" data-i18n="rollShockTable171Plus" data-i18n-vars="{{d5add}}|{{d5p1add}}">The character is so over come with fear that his heart stops. He must make a Challenging (+0) Toughness or die. If successful, he falls catatonic for {0} hours as above.</span>{{/rollGreater() shocktable 170}}
                 </div>
             {{/shocktable}}
+        <!--section for trauma table -->
+            {{#traumatable}} <!-- vars = {0} = d5add, {1} = d10add, {2} = 3d10add -->
+                <div class="sheet-desc">
+                    {{traumatable}}<br>
+                    {{#rollBetween() traumatable 000 040}}<span class="sheet-textDesc" data-i18n="rollTraumaTable001040">The character becomes withdrawn and quiet. The character is at –10 to all Fellowship-based Tests. This lasts for {2} hours.</span>{{/rollBetween() traumatable 000 040}}
+                    {{#rollBetween() traumatable 041 070}}<span class="sheet-textDesc" data-i18n="rollTraumaTable041070">The character must compulsively perform an action such as fevered praying, frantically cleaning a weapon, reciting verse, and so on, and pays little attention to anything else. All Tests that are based on Intelligence, Fellowship, or Perception suffer a –10 penalty. This effect lasts for {2} hours.</span>{{/rollBetween() traumatable 041 070}}
+                    {{#rollBetween() traumatable 071 100}}<span class="sheet-textDesc" data-i18n="rollTraumaTable071100">The character is constantly fearful, seeing danger everywhere, and is extremely jumpy. The character gains a +10 bonus to all Perception-based Tests and is at a –10 penalty to his Willpower for the next {0} days.</span>{{/rollBetween() traumatable 071 100}}
+                    {{#rollBetween() traumatable 101 120}}<span class="sheet-textDesc" data-i18n="rollTraumaTable101120">The character suffers from a temporary severe phobia (see Disorders, page 296). This effect lasts for {0} days.</span>{{/rollBetween() traumatable 101 120}}
+                    {{#rollBetween() traumatable 121 130}}<span class="sheet-textDesc" data-i18n="rollTraumaTable121130">The character reacts to the slightest stress or pressure by becoming extremely agitated. When performing any task that involves a Test, the character must first pass a Willpower Test or suffer a –10 modifier to the Test. If the character gets into combat, all Tests during combat automatically suffer a –10 modifier. This effect lasts for {0} days.</span>{{/rollBetween() traumatable 121 130}}
+                    {{#rollBetween() traumatable 131 140}}<span class="sheet-textDesc" data-i18n="rollTraumaTable131140">The character suffers vivid and extreme nightmares whenever he tries to sleep. The next day and for the next {1} days, the character will be exhausted by lack of sleep and gains a level of fatigue. This effect lasts for {0} days.</span>{{/rollBetween() traumatable 131 140}}
+                    {{#rollBetween() traumatable 141 150}}<span class="sheet-textDesc" data-i18n="rollTraumaTable141150">The character is struck dumb and is unable to speak. This lasts for {0} days.</span>{{/rollBetween() traumatable 141 150}}
+                    {{#rollBetween() traumatable 151 160}}<span class="sheet-textDesc" data-i18n="rollTraumaTable151160">Extremely distressed and unfocused, the character refuses to eat or drink and looks in a terrible state. The character takes a –10 penalty to all Characteristics (no Characteristic can be reduced below 1) for {1} days.</span>{{/rollBetween() traumatable 151 160}}
+                    {{#rollBetween() traumatable 161 170}}<span class="sheet-textDesc" data-i18n="rollTraumaTable161170">The character temporarily becomes hysterically blind or deaf. This effect lasts for {1} days.</span>{{/rollBetween() traumatable 161 170}}
+                    {{#rollGreater() traumatable 170}}<span class="sheet-textDesc" data-i18n="rollTraumaTable171Plus">The character becomes completely traumatised and virtually unresponsive. He can’t initiate actions but may be gently led. This effect lasts for {1} days.</span>{{/rollGreater() traumatable 170}}
+                </div>
+            {{/traumatable}}
         <!--section for scatter diagram-->
             {{#scatter}}
                 <div class="sheet-result">
