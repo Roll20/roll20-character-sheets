@@ -3168,7 +3168,7 @@
         {{/name}} {{/character_name}} 
         {{#name}}
         <div class="template-grid-item template-span-two template-header">
-          {{#rollGreater() pushroll 0}} Push {{pushroll}} : <br/>{{/rollGreater() pushroll 0}}
+          {{#rollGreater() pushroll 0}} Push {{#rollGreater() pushroll 1}}{{pushroll}}{{/rollGreater() pushroll 1}} : <br/>{{/rollGreater() pushroll 0}}
           {{name}}
         </div>
         {{/name}}
@@ -3738,11 +3738,11 @@
       {{#footer}}
       <div class="template-grid-item template-span-six template-footer">{{footer}}</div>
       {{/footer}}
-      {{#rollGreater() push 0}}
+      {{#rollGreater() computed::push 0}}
       <div class="template-grid-item template-span-six template-footer push-option">
         [Push the roll](~{{character_name}}|push||{{computed::pushroll}})
       </div>
-      {{/rollGreater() push 0}}
+      {{/rollGreater() computed::push 0}}
     </div>
   </div>
 </rolltemplate>
@@ -5224,7 +5224,7 @@ function getSingleAttrAsync(prop){
       gear_die_one: 0,
       current_preset: getTranslationByKey(`custom-roll`),
       include_with_roll: "",
-      pushable: 0,
+      pushable: 1,
       push_latest: "",
     });
   });
@@ -5304,7 +5304,8 @@ function getSingleAttrAsync(prop){
           attribute: int(values.attribute),
           skill: int(values.skill),
           gear: int(values.gear),
-          pushable: int(values.pushables),
+          totalDice: int(values.attribute)+int(values.skill)+int(values.gear),
+          pushable: int(values.pushable),
           pushroll: 0,
           whisper: values.whisper_option,
         };
@@ -5317,9 +5318,6 @@ function getSingleAttrAsync(prop){
         skillStr = "",
         gearStr = "",
         rollStr = "";
-    
-    // FOR TESTING 
-    roll.pushable = 1;
 
     clog(`TEST: Roll object: ${JSON.stringify(roll)}`);
     clog(`TEST: Roll pushRollStr: ${!!roll.pushRollStr}`);
@@ -5327,7 +5325,7 @@ function getSingleAttrAsync(prop){
 
     if (roll.pushRollStr) {
       rollStr = roll.pushRollStr;
-    } else {      
+    } else {     
       for(let i = 1; i <= roll.attribute; i++) { attributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}= [[1d6]] }} `; }
       for(let i = 1; i <= roll.skill; i++) { skillStr += `{{skill-die-${litnum[i]}= [[1]] }} {{skill-roll-${litnum[i]}= [[1d6]] }} `; }
       for(let i = 1; i <= roll.gear; i++) { gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6]] }} `; }
@@ -5394,6 +5392,10 @@ function getSingleAttrAsync(prop){
         }
       }
 
+      if ( (successes + failures) == roll.totalDice ) {
+        roll.pushable = 0;
+      }
+
       roll.pushRollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
       
       const pushRoll = {
@@ -5403,15 +5405,18 @@ function getSingleAttrAsync(prop){
         successes: successes,
         failures: failures,
         gearfails: gearfails,
+        totalDice: roll.totalDice,
       };
       
       setAttrs({
         push_latest: pushRoll,
+        pushable: 1,
       });
       
       clog("Push data: "+ JSON.stringify(pushRoll));
       finishRoll(results.rollId, {
         pushroll: rollEscape.escape(pushRoll),
+        push: roll.pushable,
       });
     });
   }
@@ -5568,6 +5573,7 @@ function getSingleAttrAsync(prop){
           skill: 0,
           current_preset: getTranslationByKey(`armor-roll`),
           include_with_roll: `{{armor-rating=[[ ${ar_total} ]]}}`,
+          pushable: 0,
         });
       }
     );
@@ -5585,6 +5591,7 @@ function getSingleAttrAsync(prop){
           skill: 0,
           current_preset: getTranslationByKey(`rot-roll`),
           include_with_roll: `{{rot-level=[[ ${rot} ]]}} {{rot-permanent=[[ ${rot_permanent} ]]}}`,
+          pushable: 0,
         });
       }
     );
