@@ -9,7 +9,7 @@ This version of the sheet incorporates roll templates and autocalculates hit and
 
 * GS = Great Success
 * TF = Terrible Failure
-(Tales of Argosa page 64, "Great SucceSS and terrible Failure")
+(Tales of Argosa page 64, "Great Success and terrible Failure")
 
 ### Changelog
 * -- LFG --
