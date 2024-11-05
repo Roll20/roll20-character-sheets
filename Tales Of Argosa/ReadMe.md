@@ -12,13 +12,13 @@ This version of the sheet incorporates roll templates and autocalculates hit and
 (Low Fantasy Gaming page 64, "Great SucceSS and terrible Failure")
 
 ### Changelog
--- LFG --
+* -- LFG --
 * 12 June 2016 original version.
 * 06 November 2018 expanded fields and features.
 * 18 February 2019 several fixes and updates for deluxe edition of LFG.
 * 02 October 2019 fixed/refined repeating skills
 * 08 March 2023 overhauled, bug fixed, and updated
--- TOA --
+* -- TOA --
 * 05 November 2024 adaptation to the second edition "Tales of Argosa".
 
 ### Credit Where Credit is Due
