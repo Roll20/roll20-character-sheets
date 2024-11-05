@@ -1,29 +1,25 @@
 mixin oracleRoll(id, table, row, index)
-  - var initChance
-  if index === 0
-    - initChance = row.Chance - (row.Chance - 1)
-  else
-    - initChance = table[index - 1].Chance + 1
-  - var finalChance = row.Chance
-  - var result = row.Description
-  if initChance === finalChance
-    | {{#rollTotal() #{id} #{finalChance}}}
+  -
+    //- appends any Assets or Details info to the row
+    var chanceFloor = row.Floor
+    var chanceCeiling = row.Ceiling;
+    const result = translation[row.$id]
+  if chanceFloor === chanceCeiling
+    | {{#rollTotal() #{id} #{chanceCeiling}}}
     |
-    span=result
+    span!=result
     |
-    | {{/rollTotal() #{id} #{finalChance}}}
+    | {{/rollTotal() #{id} #{chanceCeiling}}}
   else
     |
-    | {{#rollBetween() #{id} #{initChance} #{finalChance}}}
+    | {{#rollBetween() #{id} #{chanceFloor} #{chanceCeiling}}}
     |
-    span=result
+    span!=result
     |
-    | {{/rollBetween() #{id} #{initChance} #{finalChance}}}
+    | {{/rollBetween() #{id} #{chanceFloor} #{chanceCeiling}}}
 
-mixin oracleTemplate(oracle, category)
-  - const groupFormattedName = category.toLowerCase().replace(/\s/g, '-')
-  - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
-  - const id = (oracleFormattedName === 'encountered-behavior') ? `${groupFormattedName}-encountered-beehavior` : `${groupFormattedName}-${oracleFormattedName}`
+mixin oracleTemplate(oracle)
+  - const id = oracle.$id;
   |
   | {{##{id}}}
   .sheet-result-row
@@ -34,13 +30,37 @@ mixin oracleTemplate(oracle, category)
         each row, index in oracle.Table
           +oracleRoll(id, oracle.Table, row, index)
       else if oracle.Tables
-        each table, index in oracle.Tables
+        each subtable, index in oracle.Tables
           |
           | {{#rollTotal() tableChoice #{index}}}
-          each row, index in table.Table
-            +oracleRoll(id, table.Table, row, index)
-          |
+          each row, index in subtable.Table
+            +oracleRoll(id, subtable.Table, row, index)
+            |
           | {{/rollTotal() tableChoice #{index}}}
+      else if oracle.Oracles
+        - let counter = 0;
+        //- uses a counter instead of index to better handle any nested subtables
+        each subCatOracle in oracle.Oracles
+          if subCatOracle.Table
+            |
+            | {{#rollTotal() tableChoice #{counter}}}
+            each row, index in subCatOracle.Table
+              +oracleRoll(id, subCatOracle.Table, row, index)
+              |
+            | {{/rollTotal() tableChoice #{counter}}}
+            - counter++
+          if subCatOracle.Oracles
+            each subSubCatOracle in subCatOracle.Oracles
+              |
+              | {{#rollTotal() tableChoice #{counter}}}
+              each row, index in subSubCatOracle.Table
+                +oracleRoll(id, subSubCatOracle.Table, row, index)
+                |
+              | {{/rollTotal() tableChoice #{counter}}}
+              - counter++
+
+
+
   |
   | {{/#{id}}}
 
@@ -52,6 +72,9 @@ rolltemplate(class=`sheet-rolltemplate-starforged_oracles`)
       .sheet-oracle-table-text {{custom-oracle}}
     | {{/custom-oracle}}
 
-    each category, index in oracles
+    each category in oracles
       each oracle in category.Oracles
-        +oracleTemplate(oracle, category.Name)
+        +oracleTemplate(oracle)
+      if category.Categories
+        each subCategory in category.Categories
+          +oracleTemplate(subCategory)

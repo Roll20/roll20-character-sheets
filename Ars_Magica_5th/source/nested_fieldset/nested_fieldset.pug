@@ -1,0 +1,76 @@
+
+
+mixin nestedFieldset({name,trigger,addClass})
+    //- Check passed arguments
+    - name = replaceProblems(replaceSpaces(name));
+    -
+        if (varObjects.nestedFieldsetDetails.hasOwnProperty(name)) {
+            throw `k-scaffold error: nested repeating section "${name}" already defined`;
+        }
+
+    //- Nested mixin to accept multiple levels
+    - const levels = [];
+    mixin level({name, locked})
+        //- Check args of the level
+        - name = replaceProblems(replaceSpaces(name));
+        - locked = locked ? locked : false
+        - levels.push({name, locked, attributes, block});
+
+    //- Create a surrounding div with a custom class, and passed attributes
+    //- We do this because Roll20 will add the actual HTML elements after the fieldset
+    - attributes.class = actionButtonName(replaceProblems(attributes.class ? attributes.class : ""));
+    - attributes.class = `nestedFieldset nestedFieldset-${name}` + attributes.clas;
+    div&attributes(attributes)
+        //- Then put the +fieldset mixin
+        +fieldset({name,trigger,addClass})
+            //- Execute the passed block, so that levels is field
+            - block ? block() : undefined
+
+            //- Make each level
+            each level, index in levels
+                //- 1. A hidden input that is used to show only the active level
+                //-    Since repeating section cannot actually be nested, each item
+                //-    contains every level -- but only the actve one is displayed
+                //- NOTE: not using +hidden as it doesn't carry other attributes
+                +input({
+                    name:`nestedfieldset_${name}_level_${index}`,
+                    class=`nestedFieldsetToggle nestedFieldsetLevel${index}`,
+                    type="hidden"
+                })(data-fieldset-name=name data-level-index=index data-level-name=level.name)
+                //- 2. A containing div with classes to hook into
+                div(
+                    class=`nestedFieldsetContainer nestedFieldsetLevel${index}`
+                )(
+                    data-level-index=index data-level-name=level.name
+                )&attributes(level.attributes)
+                    //- Execute the stored block() function of the level to add content
+                    - level.block ? level.block() : undefined
+        
+        //- Add custom controls, as the item needs to be initialized by sheetworkers
+        //- Add button -- only added for unlocked levels
+        - const unlockedLevels = levels.filter(level => !level.locked);
+        each level, index in unlockedLevels
+        +action({
+            name:`nestedfieldset-${name}-add-${level.name}`,
+            class:`btn repcontrol_edit repcontrol-button repcontrol-button--add repcontrol-button-add-${index} repcontrol-button-add-${name} repcontrol-button-add-${name}-${level.name}`,
+            trigger:{triggeredFuncs:[_kNestedFieldsetAdd]}
+        })(data-fieldset-name=name data-level-name=level.name data-i18n=`nested-fieldset-add-${name}`)
+            if unlockedLevels.length == 1
+                | +Add
+            else
+                | +Add #{level.name}
+        //- fieldset edition buttons
+        +action({
+            name:`nestedfieldset-${name}-modify`,
+            class:`btn repcontrol_edit repcontrol-button repcontrol-button--edit repcontrol-button-edit-${name}`,
+            trigger:{triggeredFuncs:[_kNestedFieldsetModify]}
+        })(data-fieldset-name=name data-i18n="nestedfieldset-modifiy")
+        +action({
+            name:`nestedfieldset-${name}-modify-done`,
+            class:`btn repcontrol_edit repcontrol-button repcontrol-button--done repcontrol-button-done-${name}`,
+            trigger:{triggeredFuncs:[_kNestedFieldsetModifyDone]}
+        })(data-fieldset-name=name data-i18n="nestedfieldset-done")
+
+        //- Finally, store the relevant data
+        - const levels = levels.map(level => {const {block, ...rest} = level; return rest;});
+        - varObjects.nestedFieldsetData[name] = {name, levels};

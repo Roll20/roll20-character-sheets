@@ -1,6 +1,6 @@
 A custom Roll20 character sheet for Das Schwarze Auge: Ilaris (an alternative ruleset for roleplaying in Aventuria).
 
-Currently only available in German, since the ruleset itself is so far not localized.
+Currently only available in German and English. The ruleset itself is so far not localized.
 
 Ruleset is available for free at ilarisblog.wordpress.com!
 
@@ -144,3 +144,9 @@ Neue Features:
 - Kleine Layout-Anpassungen.
 
 1.7.1: Fix der Anzeige bei Verschlagenheit III(u).
+
+1.8:
+Translation:
+- The Sheet now has an English translation (best effort)
+Design:
+- The sheet is now using tabulated areas instead of one looooong scroll area.

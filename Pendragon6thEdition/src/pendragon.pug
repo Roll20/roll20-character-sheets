@@ -1,0 +1,94 @@
+//- Semantic Versioning MAJOR.MINORPATCH
+input(name='attr_version' type='hidden' value='3.3')
+
+//- Do not manually change this. Hidden attribute used by versioning script
+input(name='attr_latest_versioning_upgrade' type='hidden' value='3')
+
+//- MIXINS
+  =============================
+include pug/mixins/mixins.pug
+include pug/mixins/buttons.pug
+include pug/mixins/headers.pug
+include pug/mixins/inputs.pug
+
+//- VARIABLES
+ =============================
+include pug/abstracts/variables.pug
+
+//- Dropzone categories for the characters sheets must be added here
+.dropzone.compendium-drop-target.creatures.pregens(data-licensedsheet='attr_licensedsheet')
+  //- Drag and drop target for compendium
+  each val in ['Name', 'data', 'Content', "Category"]
+    input(name=`attr_drop_${val.toLowerCase()}` type='hidden' value='' accept=val)
+  div
+    //- TABS
+      =============================
+    input(name='attr_settings_toggle' type='hidden' value='')
+    input(name='attr_sheet_type' type='hidden' value='character')
+    input(name='attr_character_type' type='hidden' value='knight')
+
+    .grid.tabs
+      .col.sheet-type.grid
+        each val in ['character', 'holdings']
+          - const defaultSelected = val === 'character' ? true : false
+          +tabButtons(val, 'character', defaultSelected)
+
+      .col.settings.grid
+        label(data-i18n-title='settings')
+          input(name=`attr_settings_toggle` title=`@{settings_toggle}` type='checkbox' value='settings')
+          span.pictos.text-lowercase.text-center y
+
+
+    //-NPC SHEET
+      =============================
+    include pages/npc.pug
+
+    //-PC SHEET
+      =============================
+    include pages/character.pug
+
+    include pages/holdings.pug
+
+    include pages/settings.pug
+
+
+.compendium_warning
+  span(data-i18n="accepting drop") ACCEPTING DROP FROM COMPENDIUM
+
+//-FOOTER
+  =============================
+.footer
+  .div
+    span.mr © 2023 Chaosium Inc.
+    span.mr Version
+    span(name='attr_version')
+
+//-ROLL TEMPLATE
+  =============================
+include pug/vendor/rolltemplate.pug
+
+
+//- SCRIPTS
+script(type="text/worker")
+  include js/variables.js
+  include js/helpers.js
+  include js/scripts.js
+  include js/versioning.js
+  include js/drop.js
+  include js/drag_and_drop/get_rep_update.js
+  include js/drag_and_drop/get_row.js
+  include js/drag_and_drop/get_static_update.js
+  include js/drag_and_drop/handle_horse.js
+  include js/drag_and_drop/handle_item.js
+  include js/drag_and_drop/handle_npc.js
+  include js/drag_and_drop/handle_squire.js
+  include js/drag_and_drop/handle_weapon.js
+  include js/drag_and_drop/parse_json.js
+  include js/drag_and_drop/process_data_arrays.js
+  include js/drag_and_drop/reset_repeating_rows.js
+  include js/drag_and_drop/reset_skill_list.js
+  include js/drag_and_drop/roll_20_attribute.js
+  include js/drag_and_drop/update_attack.js
+  include js/drag_and_drop/update_item.js
+  include js/drag_and_drop/update_section.js
+  include js/drag_and_drop/update_mix_section.js

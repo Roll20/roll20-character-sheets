@@ -1,17 +1,22 @@
 async function iqBonus(value, prefix = "") {
   console.log("iqBonus", value, prefix);
-  const iq_bonus = value > 15 ? value - 14 : 0;
-  const perception_bonus = getBiAttributeBonus(value);
-  const attrs = {
-    [`${prefix}iq_bonus`]: iq_bonus,
-    [`${prefix}perception_bonus`]: perception_bonus,
-  };
+
+  const attrs = {};
+  attrs[`${prefix}iq_bonus`] = value > 15 ? value - 14 : 0;
+
+  // check if Perception option is enabled
+  const { opt_iq_perception } = await getAttrsAsync(["opt_iq_perception"]);
+  if (!!+opt_iq_perception) {
+    const perception_bonus = getBiAttributeBonus(value);
+    attrs[`${prefix}perception_bonus`] = perception_bonus;
+  }
+
   console.log(attrs);
   await setAttrsAsync(attrs);
 
-  // this should check and only get called if the default (top) profile changes
-  const profilesSections = await getSectionIDsOrderedAsync("profiles");
-  if (!profilesSections || prefix.includes(profilesSections[0])) {
+  const defaultProfile = await getDefaultProfileID();
+  const profilesSections = await getSectionIDsAsync("profiles");
+  if (!profilesSections || prefix.includes(defaultProfile)) {
     await updateSkills();
   }
 }
@@ -49,7 +54,8 @@ async function maBonus(value, prefix = "") {
       : 0;
   setAttrs({
     [`${prefix}ma_bonus`]: ma_bonus,
-    [`${prefix}trustintimidate`]: ma_bonus,
+    [`${prefix}trust`]: ma_bonus,
+    [`${prefix}intimidate`]: ma_bonus,
   });
 }
 
@@ -66,10 +72,16 @@ async function psBonusComplete(prefix = "") {
     `${prefix}ps`,
     `${prefix}character_ps_type`,
     `${prefix}pe`,
+    `${prefix}liftcarry_weight_multiplier`,
+    `${prefix}liftcarry_duration_multiplier`,
   ]);
   const ps = +a[`${prefix}ps`];
   const pe = +a[`${prefix}pe`];
   const ps_type = a[`${prefix}character_ps_type`];
+  const liftcarry_weight_multiplier =
+    +a[`${prefix}liftcarry_weight_multiplier`];
+  const liftcarry_duration_multiplier =
+    +a[`${prefix}liftcarry_duration_multiplier`];
   const ps_bonus = ps > 15 ? ps - 15 : 0;
 
   let restrained_punch = (punch = power_punch = kick = leap_kick = "");
@@ -124,9 +136,8 @@ async function psBonusComplete(prefix = "") {
       }
       break;
     case "3":
-      name = "Robotic";
     case "3.5":
-      name = "Giant Robotic";
+      name = ps_type === "3" ? "Robotic" : "Giant Robotic";
       if (ps >= 17) {
         if (ps_type == "3") {
           lift = carry = ps * 25;
@@ -282,6 +293,14 @@ async function psBonusComplete(prefix = "") {
       }
       break;
   }
+  if (liftcarry_weight_multiplier > 0) {
+    lift *= liftcarry_weight_multiplier;
+    carry *= liftcarry_weight_multiplier;
+    throw_distance *= liftcarry_weight_multiplier;
+  }
+  if (liftcarry_duration_multiplier > 0) {
+    hold_max *= liftcarry_duration_multiplier;
+  }
   const attrs = {
     [`${prefix}character_ps_type_name`]: name,
     [`${prefix}ps_bonus`]: ps_bonus,
@@ -321,6 +340,7 @@ async function pbBonus(value, prefix = "") {
   });
 }
 
+// DEPRECATED
 async function spdBonus(value) {
   const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
   const a = await getAttrsAsync([
@@ -358,5 +378,5 @@ on("change:pb", async (e) => {
 });
 
 on("change:spd", async (e) => {
-  await spdBonus(e.newValue);
+  recalculateMovement();
 });

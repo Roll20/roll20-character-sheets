@@ -1,25 +1,29 @@
 include ./container
-include ./oracle-table
+include ../../oracles/mixins/oracle-table
+include ../../oracles/mixins/oracle-roll-btn
 
 mixin movePreviewFactory(move, options)
   +container(move, options)
-    p!=move.Text
+    .rules-text !{move.Text}
     if move.Oracle
       .move-oracle-container
-        if move.Name === 'Ask the Oracle'
-          - var multiOracles = oracles.find(group => { return group.Name === move.Name }).Oracles
-          each oracle in multiOracles
-            +oracleTable(oracle, 'ask-the-oracle')
-        else
-          - var singleOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
-          +oracleTable(singleOracle)
+        - let btnText = `Roll the ${move.Name} oracle`
+        - var moveOracle = oracles.find(group => { return group.Name === 'Moves' }).Oracles.find(oracle => { return oracle.Name === move.Name })
+        if moveOracle.Table
+          +oracleSingleButton(moveOracle, btnText)
+          +oracleTable(moveOracle)
+        else if moveOracle.Oracles
+          +oracleMultiBtn(moveOracle)
+          +oracleMultiSubTable(moveOracle, btnText)
 
-mixin preview(move, options)
+mixin movePreview(move, options)
   if options.no_title
     div
   else
     div.move-title.move-preview=move.Name
-  - const statCheck = move.Triggers.find(trigger => { return trigger.Stat })
+      if move['Progress Move']
+        span.move-progress-label='Progress Move'
+  - const statCheck = move.Triggers.find(trigger => { return trigger["Stat Options"] })
   if move['Progress Move']
     +rollLabel
       +progressRoll(move, 'hide-element')
@@ -31,13 +35,12 @@ mixin preview(move, options)
   .oracle-footer.move-page-footer=move.page
 
 mixin container(move, options = false)
-  - var formattedName = move.Name.replace(/\s/g, '-').toLowerCase()
   if options.visibility
-    div.move-visible
-      +preview(move, options)
+    div.move-visible.surface
+      +movePreview(move, options)
         block
   else
-    input(type='radio' name='attr_move_preview' class=`${formattedName} hide-element` value=move.Name)
-    div(class=`${formattedName} showhide`)
-      +preview(move, options)
+    input(type='radio' name='attr_move_preview' class=`${move.id} hide-element` value=move.Name)
+    div(class=`${move.id} surface showhide`)
+      +movePreview(move, options)
         block

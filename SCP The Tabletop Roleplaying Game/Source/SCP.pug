@@ -1,0 +1,275 @@
+include Mixins/_htmlelements.pug
+include Mixins/_rolltemplate mixins.pug
+include Mixins/_SCP Mixins.pug
++action({name:'reroll',style:'display:none;'})
++input({name:'template_start',type:'hidden',value:'&{template:scp}'})
++input({name:'character state',type:'hidden',value:'new'})
+main#main
+	#summary
+		+span({name:'character name',class:'character_name h4'})
+		+span({name:'alias',class:'alias h5'})
+		each abbr,ability in abilityScoreAbbrv
+			- format;
+			+div({class:`ability-summary ${ability}`})
+				h6(data-i18n=abbr,class:`${abbr}-label`)
+				each die in dice
+					- format;
+					+span({name:`${ability} d${die}`,class:`die-num`}) 0
+					+span({'data-i18n':`d${die}`,class:`die-size`})
+	#section-tabs
+		each value in ['all','character details','attributes','actions','attacks','equipment']
+			-format;
+			- let id = `${replaceSpaces(value)}-radio`;
+			- let inputObj = {name:'section',type:'radio',value:replaceSpaces(value),class:`hidden`,id};
+			if value === 'all'
+				- inputObj.checked = '';
+			+input(inputObj)
+			+label({for:id,'data-i18n':value,class:`${id} section-control h5`})
+	+input-label('experience',{name:'experience',type:'text',class:'number h5'},{class:'thick-right thick-bottom boxed',id:'experience'},{class:'h5'})
+	#purchase_guide.boxed
+		each num in [100,200,500]
+			-format;
+			h6(data-i18n=`${num} exp cost`)
+	+input-label('player name',{name:'player name',type:'text',class:'h5'},{class:'thick-left thick-bottom boxed',id:'player_name'},{class:'h5'})
+	.background.sticky-sub
+	section#reverence.active-section.sticky-sub
+		h4(data-i18n='reverence')
+		+fillTracker('reverence',reverence)
+		span(data-i18n='reverence help').help
+	section#defenses.active-section.sticky-sub
+		+input-label('hp',{name:'hp',type:'text',class:`number h5 underlined`,value:'20'},{class:'hp stacked'})
+		+input-label('max hp',{name:'hp max',type:'text',class:'number h5 underlined',value:'20'},{class:'hp_max stacked'})
+		+input-label('damage reduction',{name:'damage reduction',type:'text',class:'number h5 underlined'},{class:'damage_reduction stacked'})
+		each name in ['reaction defense','move speed','cognitive resistance']
+			-format;
+			+input-label(name,{name,type:'text',class:`number h5 underlined`,readonly:''},{class:`${replaceSpaces(name)} stacked`})
+	section#exertion.active-section.sticky-sub
+		h4(data-i18n='exertion').header
+		+fillTracker('exertion',reverence)
+		+fillTracker('exertion max',reverence,true)
+		span(data-i18n='exertion help').help
+	//- The character details
+	section#character_details.active-section
+		//-A div for handling the background color of the details section
+		.background
+		+input-label('character name',{name:'character name',type:'text',class:'underlined'},{class:'underline-label over stacked character_name'},{class:'h5'})
+		+input-label('alias',{name:'alias',type:'text',class:'underlined'},{class:'underline-label over stacked alias'},{class:'h5'})
+		each text in ['gender','weight','height','age','hair','eyes']
+			-format;
+			+input-label(text,{name:text,type:'text',class:'underlined'},{class:text},{class:'h5'})
+		+select-label('appearance',{name:'appearance'},{class:'appearance'},{class:'h5'})
+			each value,index in appearances
+				-format;
+				- let obj = {value,'data-i18n':value};
+				if index === 2
+					- obj.selected="";
+				+option(obj)
+		+select-label('body type',{name:'body type'},{class:'body_type'},{class:'h5'})
+			each value,index in bodyTypes
+				-format;
+				- let obj = {value,'data-i18n':value};
+				if index === 2
+					- obj.selected="";
+				+option(obj)
+		+select-label('reasoning',{name:'reasoning'},{class:'reasoning'},{class:'h5'})
+			each value,index in reasonings
+				-format;
+				- let obj = {value,'data-i18n':value};
+				if index === 2
+					- obj.selected="";
+				+option(obj)
+		+headedTextarea({name:'character description',class:'underlined'},'character description').character_description
+		.personnel_class
+			h5(data-i18n='personnel class')
+			each letter in personnelClass
+				-format;
+				- let inputObj = {name:`personnel class`,type:'radio',value:letter,id:`personnel-${letter}`,class:'hidden'};
+				if letter === 'c'
+					-inputObj.checked=true;
+				+input(inputObj)
+				+label({for:`personnel-${letter}`,class:`personnel-label personnel-${letter} ratio1-1 circle boxed`,'data-i18n':letter})
+		#security_level
+			.head
+				h1(data-i18n='scp').header
+				h5(data-i18n='secure contain protect').sub-header
+				.transparent-logo
+				+input-label('security level',{name:'security level',type:'text',class:'number ratio1-1 boxed thick-left thick-bottom thick-right thick-top',id:'security-input'},{class:'stacked over security_level'},{class:'h5'})
+			.qr-code
+			.merit
+				h5(data-i18n='merit count')
+				+fillTracker('merit',[1,2,3,4,5,6,7,8,9,10])
+			.id
+				.black-logo
+					.black-diamond
+					.logo
+				+span({name:'operative id'}) A3224991799321997
+		+input-label('credits',{name:'credits',type:'text',class:'number number'},{class:'thick-left thick-bottom thick-right thick-top boxed',id:'credits'})
+	//- The ability score divs down the left side
+	section#attributes.active-section
+		.available-dice
+			h4(data-i18n='available dice')
+			each die in dice
+				-format;
+				+input({name:`available d${die}`,type:'hidden',value:defaultDieNum[die]})
+				+input({name:`purchased d${die}`,type:'hidden',value:0})
+				+input({name:`total d${die}`,type:'hidden',value:defaultDieNum[die]})
+				+action({name:`purchase d${die}`,class:'die-purchase','data-i18n-title':'alt-click to refund dice','data-i18n-vars':`%{purchase_d${die}}`})
+					+span({name:`available d${die}`,'data-i18n-title':'alt-click to refund dice','data-i18n-vars':`@{available_d${die}}`})
+					+span({'data-i18n':`d${die}`,class:`die-size`})
+		each ability in abilities
+			- format;
+			+div({class:`${ability} ability_score`})
+				+roll-label({class:`${ability} attribute`,title:buttonTitle(ability)})
+					+roller({'data-i18n':ability,name:ability,class:'h3'})
+				each die in dice
+					-format;
+					- let pool;
+					if die===8
+						- pool = 12;
+					else if die=== 10
+						- pool = 6;
+					else
+						- pool = 3;
+					- pool = [...Array(pool).keys()].map(k=>k+1);
+					h5(data-i18n=`d${die}`)
+					+fillTracker(`${ability} d${die}`,pool)
+	section#actions.active-section
+		each arr,header in derivativeStats
+			- format;
+			+div({class:`derivative_stat_div`,id:header})
+				h4(data-i18n=header).header
+				each obj in arr
+					-format;
+					div(class=obj.subsectionend ? 'underlined thick' :'')
+						+roll-label({class:'attribute',title:buttonTitle(obj.name)})
+							+roller({'data-i18n':`${obj.name} (${abilityScoreAbbrv[obj.ability]})`,name:obj.name,value:`@{template_start} {{title=${obj.name}}}`})
+						+input({name:`${obj.name}_proficiency`,type:'text',class:'number underlined',step:'0.1'})
+						if !obj.nomod
+							-format;
+							+input({name:`${obj.name}_base_mod`,type:'text',class:'number underlined',step:'0.1'})
+							+input({name:`${obj.name}_mod`,type:'text',class:'number underlined',readonly:'',step:'0.1'})
+	section#attacks.active-section
+		h4(data-i18n='attacks')
+		+input-label('melee multiplier',{name:'melee multiplier',type:'text',value:1,class:'number h5 boxed'},{class:'melee-mult'},{class:'h5'})
+		+input-label('ranged multiplier',{name:'ranged multiplier',type:'text',value:1,class:'number h5 boxed'},{class:'ranged-mult'},{class:'h5'})
+		.repeat-columns
+			each type,head in attackColumns
+				-format;
+				if typeof type === 'object'
+					h6(data-i18n=head,class=head)
+					each t,name in type
+						-format;
+						h5(data-i18n=name,class=name)
+				else
+					h5(data-i18n=head,class=head)
+		+fieldset('attack')
+			- let stanceVal = 0;
+			+input({name:'stance',type:'hidden',value:0})
+			+action({name:'damage roll',style:'display:none;'})
+			+roll-label({title:repeatButtonTitle('attack','roll')})
+				+roller({name:'roll'})
+			each type,head in attackColumns
+				-format;
+				- let inputObj;
+				if typeof type === 'object'
+					-format;
+					each t,name in type
+						-format;
+						if /base|x/.test(name)
+							- name = `${name} damage`;
+						else
+							- name = `${name} attack`;
+						span.hover-button-container(class=name.replace(/([^\s]+)\s+.+/,'$1'))
+							if /hip|ready|aim/.test(name)
+								-format;
+								-stanceVal++;
+								label
+									+input({name:`stance`,type:'radio',value:stanceVal,'data-i18n-vars':`${repeatAttrTitle('attack','stance')}`,'data-i18n-title':'alt-click to clear'})
+								+input({name:'stance',type:'hidden',value:0})
+							+attackInput(`${name}`,t)
+				else if head === 'clip'
+					+attackInput('clip',type)
+					+attackInput('clip_max',type)
+				else
+					+attackInput(head,type)
+	+repeating_section('equipment','equipment')
+		+input({name:'carried',type:'checkbox',class:'carry-check',hidden:''})
+		.item-container
+			+input-label('name',{name:'name',type:'text',class:'underlined'},{id:'experience'})
+			+input-label('carried',{name:'carried',type:'checkbox',class:'accented'},{id:'experience'})
+//-Rolltemplate definitions
++rolltemplate('scp')
+	+templateConditionalDisplay('continuation',true)
+		div(class='template-head{{#element}} element{{/element}}')
+			.black-logo
+				.logo
+				.black-diamond
+			+characterLink()
+			+templateConditionalDisplay('element')
+				h5.element {{element}}
+	+templateConditionalDisplay('display_results')
+		.roll-content
+			.results
+				+templateConditionalDisplay('continuation',true)
+					h5(data-i18n='initial roll').color-cond
+				+templateConditionalDisplay('continuation')
+					+templateConditionalDisplay('first')
+						h5(data-i18n='explosions').color-cond
+				.result-values
+					each value in dieValues
+						-format;
+						+dieField(value)
+	+templateHelperFunction({func:'rollTotal',invert:true,values:'computed::finished 0'})
+		+templateConditionalDisplay('total')
+			.total
+				h5(data-i18n='highest 2').high-label.color-cond
+				span.high-dice
+					each num in [1,2]
+						each die in [20,12,10,8]
+							-format;
+							+templateHelperFunction({func:'rollBetween',values:`computed::high_sides_${num} ${die} ${die}`})
+								each value in dieValues
+									-format;
+									-format;
+									if value <= die
+										-format;
+										+dieLogic(die,`computed::high_${num}`,value,'high')
+				span.modifier
+					+templateConditionalDisplay('modifier')
+						|{{computed::modifier}}
+					+templateConditionalDisplay('modifier',true)
+						|+0
+				span.ones
+					+templateConditionalDisplay('ones')
+						|{{computed::ones}}
+					+templateConditionalDisplay('ones',true)
+						|-0
+				h5(data-i18n="total").total-label.color-cond
+				span.total-value {{computed::total}}
+		.roll-buttons
+			+templateConditionalDisplay('reverence')
+				span.reverence-reroll {{reverence}}
+			+templateConditionalDisplay('damage_button')
+				span.roll-damage {{damage_button}}
+		+templateConditionalDisplay('base_damage')
+			.damage
+				h5(data-i18n='base').base-label.color-cond
+				span.base-damage {{base_damage}}
+				+templateConditionalDisplay('x_damage')
+					h5(data-i18n='x').x-label.color-cond
+					span.x-damage {{x_damage}}
+				h5(data-i18n='total').total-label.color-cond
+				span.total-damage {{computed::total_damage}}
+		div.description
+			+templateConditionalDisplay('range')
+				div.range
+					h5(data-i18n="range")
+					|{{range}}
+			+templateConditionalDisplay('description')
+				div
+					|{{description}}
++script()
+	include Javascript/utility.js
+	include Javascript/SCP.js
+	include Javascript/listeners.js
+	include Javascript/variables.js

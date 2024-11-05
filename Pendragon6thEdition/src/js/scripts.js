@@ -1,0 +1,116 @@
+//When performing calculations in King Arthur Pendragon, round
+//0.5 and higher fractions upward and lesser fractions downward.
+//For example, a character with a Damage value of 4.43 would
+//have an effective value of 4, while a character with a Damage val-
+//ue of 4.5 would have a 5.
+const round = (sum) => (sum % 1 >= 0.5 ? Math.ceil(sum) : Math.floor(sum));
+
+const total = (v) =>
+  Object.values(v).reduce((partialSum, a) => partialSum + parseFloat(a), 0);
+
+const updateBrawling = () => {
+  const brawlingDamage = (values) => {
+    //Brawl Damage =  (STR+SIZ)/6
+    const damage = round(total(values) / 6);
+    return {
+      character_damage: `${damage}D6`,
+      brawling_damage: `${damage}`,
+      brawling_damage_open: `${round(damage / 2)}`,
+    };
+  };
+
+  getAttrs(characteristics.brawlDamage, (values) => {
+    setAttrs(brawlingDamage(values));
+  });
+};
+
+characteristics.brawlDamage.forEach((attr) => {
+  on(`change:${attr}`, () => updateBrawling());
+});
+
+characteristics.movement.forEach((attr) => {
+  on(`change:${attr}`, () => {
+    getAttrs(characteristics.movement, (values) => {
+      //Movement Rate = [(STR + DEX) /2] + 5
+      setAttrs({
+        movement: round(total(values) / 2) + 5,
+      });
+    });
+  });
+});
+
+characteristics.healingRate.forEach((attr) => {
+  on(`change:${attr}`, ({ newValue }) => {
+    //Healing Rate = CON/5
+    setAttrs({
+      healing_rate: round(newValue / 5),
+    });
+  });
+});
+
+characteristics.hp.forEach((attr) => {
+  on(`change:${attr}`, () => {
+    getAttrs(characteristics.hp, (values) => {
+      //Total Hit Points = CON+SIZ
+      setAttrs({
+        hit_points: total(values),
+      });
+    });
+  });
+});
+
+characteristics.unconscious.forEach((attr) => {
+  on(`change:${attr}`, () =>
+    getAttrs(characteristics.unconscious, (values) => {
+      //Unconscious = Total Hit Points/4
+      setAttrs({
+        unconscious: round(total(values) / 4),
+      });
+    })
+  );
+});
+
+characteristics.knockdown.forEach((attr) => {
+  on(`change:${attr}`, ({ newValue }) => {
+    setAttrs({
+      knockdown: newValue,
+    });
+  });
+});
+
+characteristics.majorWound.forEach((attr) => {
+  on(`change:${attr}`, ({ newValue }) => {
+    setAttrs({
+      [`major_wound`]: newValue,
+    });
+  });
+});
+
+on(`change:sheet_select`, ({ newValue }) => {
+  setAttrs({
+    sheet_type: newValue === "knight" ? "character" : newValue,
+    character_type: "knight",
+  });
+});
+
+on(`change:repeating_events:new_glory`, ({ triggerName }) => {
+  const repeatingRow = getReprowid(triggerName);
+
+  getSectionIDs("events", (idArray) => {
+    let characteristics = [];
+    idArray.forEach((id) =>
+      characteristics.push(`repeating_events_${id}_new_glory`)
+    );
+
+    getAttrs(characteristics, (values) => {
+      const parsedNums = parseIntegers(values);
+      const gloryValues = Object.values(parsedNums);
+      const sum = sumIntegers(gloryValues);
+
+      setAttrs({
+        glory_total: sum,
+        [`${repeatingRow}_total_glory`]: sum,
+      });
+    });
+  });
+});

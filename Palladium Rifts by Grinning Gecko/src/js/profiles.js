@@ -1,3 +1,31 @@
+async function getDefaultProfileID() {
+  const { default_profile } = await getAttrsAsync(["default_profile"]);
+  return default_profile;
+}
+
+async function updateActiveProfile(rowId) {
+  console.log("updateActiveProfile", REPEATING_BONUS_KEYS.length);
+  const attrKeys = REPEATING_BONUS_KEYS.map(
+    (key) => `repeating_profiles_${rowId}_${key}`
+  );
+  const a = await getAttrsAsync(attrKeys);
+  const attrs = REPEATING_BONUS_KEYS.reduce((acc, cur, idx) => {
+    if (a[`repeating_profiles_${rowId}_${cur}`] !== undefined) {
+      acc[`active_profile_${cur}`] = a[`repeating_profiles_${rowId}_${cur}`];
+      acc[`active_profile_${cur}_max`] =
+        a[`repeating_profiles_${rowId}_${cur}`];
+    }
+    return acc;
+  }, {});
+  console.log(attrs);
+  await setAttrsAsync(attrs);
+}
+
+//   const a = await getAttrsAsync(["psionic_ability"]);
+//   const attrs = {};
+//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+//     a["psionic_ability"];
+
 async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])
@@ -10,11 +38,18 @@ async function updateProfile(rowId) {
     (acc, cur) => `${acc}     ✔︎${cur}`.trim(),
     ""
   );
+  const globals = await getAttrsAsync(["psionic_ability"]);
   await setAttrsAsync({
     [`repeating_profiles_${rowId}_bonus_names`]: names,
     [`repeating_profiles_${rowId}_rowid`]: `repeating_profiles_${rowId}_`,
+    [`repeating_profiles_${rowId}_global_psionic_ability`]:
+      globals["psionic_ability"],
   });
   await combineBonuses(bonusIds, `repeating_profiles_${rowId}`);
+  const isActive = await isDefault("profiles", rowId);
+  if (isActive) {
+    await updateActiveProfile(rowId);
+  }
 }
 
 async function setSingleAttributeFromDefaultProfile(attrName, profileAttrName) {
@@ -119,6 +154,7 @@ on("change:default_profile", async (e) => {
   const a = await getAttrsAsync([`${prefix}_mdc`]);
   await setAttrsAsync({ default_mdc: a[`${prefix}_mdc`] });
   await updateSkills();
+  await updateActiveProfile(e.newValue);
 });
 
 on("change:repeating_profiles:is_default", async (e) => {
@@ -174,15 +210,15 @@ on(
   }
 );
 
-on("change:repeating_profiles", async (e) => {
-  console.log("change:repeating_profiles", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const a = await getAttrsAsync(["psionic_ability"]);
-  const attrs = {};
-  attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
-    a["psionic_ability"];
-  await setAttrsAsync(attrs);
-});
+// on("change:repeating_profiles", async (e) => {
+//   console.log("change:repeating_profiles", e);
+//   const [r, section, rowId] = e.sourceAttribute.split("_");
+//   const a = await getAttrsAsync(["psionic_ability"]);
+//   const attrs = {};
+//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+//     a["psionic_ability"];
+//   await setAttrsAsync(attrs);
+// });
 
 on("change:_reporder:profiles", async (e) => {
   console.log("change:_reporder:profiles", e);
@@ -205,4 +241,12 @@ on("clicked:getdefaultprofile", async (e) => {
   console.log("clicked:getdefaultprofile", e);
   const a = await getAttrsAsync(["default_profile", "default_mdc"]);
   console.log(a);
+});
+
+on("clicked:active_profile_initiative_turntracker", async (e) => {
+  console.log("clicked:active_profile_initiative_turntracker", e);
+  await palladiumAddToTurnTracker(
+    "active_profile_initiative",
+    "active_profile_attacks"
+  );
 });

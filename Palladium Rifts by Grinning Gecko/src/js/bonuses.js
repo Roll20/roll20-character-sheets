@@ -74,7 +74,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     "spdfly",
     "hf",
     "spellstrength",
-    "trustintimidate",
+    "trust",
+    "intimidate",
     "charmimpress",
   ];
   const fieldNames = rowIds.reduce((acc, rowId) => {
@@ -93,14 +94,17 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     rowIds.forEach((rowId) => {
       const rowFieldAbs = a[`repeating_bonuses_${rowId}_${field}_abs`];
       if (Boolean(Number(rowFieldAbs)) == true) {
-        rowFieldValue = a[`repeating_bonuses_${rowId}_mod_${field}`];
-        fieldAbsValue =
-          fieldAbsValue > rowFieldValue ? fieldAbsValue : rowFieldValue;
+        rowFieldValue = +a[`repeating_bonuses_${rowId}_mod_${field}`];
+        fieldAbsValue = +(fieldAbsValue > rowFieldValue
+          ? fieldAbsValue
+          : rowFieldValue);
       }
     });
     if (fieldAbsValue) {
       // compare the modified absolute value against the original attribute
-      const coreValue = (await getAttrsAsync([field]))[field];
+      // const coreValue = (await getAttrsAsync([field]))[field];
+      const { [field]: rawCoreValue } = await getAttrsAsync([field]);
+      const coreValue = +rawCoreValue;
       const newValue = coreValue > fieldAbsValue ? coreValue : fieldAbsValue;
       const attr = {
         [`${destinationPrefix}_mod_${field}`]: newValue,
@@ -111,7 +115,7 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
       const rsaDestinations = [`${destinationPrefix}_mod_${field}`];
       const rsaFields = [`mod_${field}`];
       let base = field;
-      if (field == "trustintimidate") {
+      if (field == "trust" || field == "intimidate") {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
@@ -134,15 +138,31 @@ async function combineBonuses(rowIds, destinationPrefix) {
 
   console.log("combineBonuses", rowIds, destinationPrefix);
 
+  const options = await getAttrsAsync(["opt_pp_extras"]);
+  const optPpExtras = Boolean(+options["opt_pp_extras"]);
+
   await repeatingAbsoluteAttributes(rowIds, destinationPrefix);
 
   await repeatingStringConcatAsync({
     destinations: [
       `${destinationPrefix}_damage`,
+      `${destinationPrefix}_damage_paired`,
+      `${destinationPrefix}_damage_mainhand`,
+      `${destinationPrefix}_damage_offhand`,
       `${destinationPrefix}_damage_range`,
+      `${destinationPrefix}_damage_range_single`,
+      `${destinationPrefix}_damage_range_burst`,
     ],
     section: "bonuses",
-    fields: ["damage", "damage_range"],
+    fields: [
+      "damage",
+      "damage_paired",
+      "damage_mainhand",
+      "damage_offhand",
+      "damage_range",
+      "damage_range_single",
+      "damage_range_burst",
+    ],
     filter: rowIds,
   });
 
@@ -152,6 +172,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "knockout",
     "deathblow",
     "mod_character_ps_type",
+    "mod_liftcarry_weight_multiplier",
+    "mod_liftcarry_duration_multiplier",
   ];
   const pickBestDestinations = pickBestFieldsBase.map(
     (field) => `${destinationPrefix}_${field}`
@@ -162,16 +184,17 @@ async function combineBonuses(rowIds, destinationPrefix) {
     destinations: pickBestDestinations,
     section: "bonuses",
     fields: pickBestFields,
-    defaultValues: [0, 20, 0, 0, core.character_ps_type],
-    ranks: ["high", "low", "low", "low", "high", "high"],
+    defaultValues: [0, 20, 0, 0, core.character_ps_type, 1, 1],
+    ranks: ["high", "low", "low", "low", "high", "high", "high", "high"],
     filter: rowIds,
   });
 
-  const noAttributeBonusFields = [
+  let noAttributeBonusFields = [
     "attacks",
     "initiative",
     "pull",
     "roll",
+    "breakfall",
     "strike_range",
     "strike_range_single",
     "strike_range_burst",
@@ -179,6 +202,30 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "strike_range_called",
     "disarm_range",
   ];
+
+  let ppBonusFields = [
+    "strike",
+    "parry",
+    "dodge",
+    "throw",
+    "dodge_flight",
+    "dodge_auto",
+    "dodge_teleport",
+    "dodge_motion",
+    "dodge_underwater",
+    "flipthrow",
+    "tackle",
+    "leghook",
+    "backwardsweepkick",
+  ];
+
+  const ppExtras = ["disarm", "entangle"];
+  if (optPpExtras) {
+    ppBonusFields = ppBonusFields.concat(ppExtras);
+  } else {
+    noAttributeBonusFields = noAttributeBonusFields.concat(ppExtras);
+  }
+
   // No attribute bonuses.
   await repeatingSumAsync(
     noAttributeBonusFields.map((field) => `${destinationPrefix}_${field}`),
@@ -235,19 +282,6 @@ async function combineBonuses(rowIds, destinationPrefix) {
     `filter:${rowIds.toString()}`
   );
 
-  const ppBonusFields = [
-    "strike",
-    "parry",
-    "dodge",
-    "throw",
-    "disarm",
-    "entangle",
-    "dodge_flight",
-    "dodge_auto",
-    "dodge_teleport",
-    "dodge_motion",
-    "flipthrow",
-  ];
   await repeatingSumAsync(
     ppBonusFields.map((field) => `${destinationPrefix}_${field}`),
     "bonuses",
@@ -271,6 +305,59 @@ async function combineBonuses(rowIds, destinationPrefix) {
       );
     }
   );
+
+  await updateMovement(destinationPrefix);
+}
+
+async function updateMovement(destinationPrefix) {
+  console.log("updateMovement", destinationPrefix);
+  const {
+    [`${destinationPrefix}_mod_spd`]: spd,
+    [`${destinationPrefix}_mod_spdfly`]: spdfly,
+    [`${destinationPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([
+    `${destinationPrefix}_mod_spd`,
+    `${destinationPrefix}_mod_spdfly`,
+    `${destinationPrefix}_attacks`,
+  ]);
+  console.log(spd, spdfly, attacks);
+  const run_ft_second = +spd;
+  const fly_ft_second = +spdfly;
+  const apm = +attacks;
+  const run_m_second = run_ft_second / 3.28084;
+  const fly_m_second = fly_ft_second / 3.28084;
+  const attrs = {
+    [`${destinationPrefix}_run_mph`]: Math.round(
+      (run_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_run_ft_melee`]: run_ft_second * 15,
+    [`${destinationPrefix}_run_ft_action`]: Math.round(
+      (run_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_m_melee`]: Math.round(run_m_second * 15),
+    [`${destinationPrefix}_run_m_action`]: Math.round(
+      (run_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_kmh`]: Math.round(
+      (run_m_second * 60 * 60) / 1000
+    ),
+    [`${destinationPrefix}_fly_mph`]: Math.round(
+      (fly_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_fly_ft_melee`]: fly_ft_second * 15,
+    [`${destinationPrefix}_fly_ft_action`]: Math.round(
+      (fly_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_m_melee`]: Math.round(fly_m_second * 15),
+    [`${destinationPrefix}_fly_m_action`]: Math.round(
+      (fly_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_kmh`]: Math.round(
+      (fly_m_second * 60 * 60) / 1000
+    ),
+  };
+  console.log(attrs);
+  await setAttrsAsync(attrs);
 }
 
 async function removeBonusSelectionsRowAsync(bonusRowId) {
@@ -321,36 +408,52 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-async function insertSelection(name, bonusRowId) {
-  console.log("insertSelection", name, bonusRowId);
+const insertedBonuses = [];
+async function insertSelection(name, bonusRowId, level) {
+  console.log("insertSelection", name, bonusRowId, level);
+  if (insertedBonuses.includes(bonusRowId)) {
+    return;
+  } else {
+    insertedBonuses.push(bonusRowId);
+  }
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   attrs[`repeating_bonuses_${bonusRowId}_selection_id`] = selectionRowId;
   console.log(attrs);
   await setAttrsAsync(attrs);
 }
 
-async function updateSelection(name, selectionRowId) {
-  console.log("updateSelection", name, selectionRowId);
+async function updateSelection(name, selectionRowId, level) {
+  console.log("updateSelection", name, selectionRowId, level);
   const attrs = {};
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_bonuses:name", async (e) => {
-  console.log("change:repeating_bonuses:name", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
-  const a = await getAttrsAsync([selectionIdKey]);
-  console.log(a);
-  if (a[selectionIdKey]) {
-    await updateSelection(e.newValue, a[selectionIdKey]);
-  } else {
-    await insertSelection(e.newValue, rowId);
+on(
+  "change:repeating_bonuses:name \
+  change:repeating_bonuses:level",
+  async (e) => {
+    console.log("change:repeating_bonuses:name", e);
+    const [r, section, rowId] = e.sourceAttribute.split("_");
+    const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
+    const levelKey = `repeating_bonuses_${rowId}_level`;
+    const nameKey = `repeating_bonuses_${rowId}_name`;
+    const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
+    console.log(a);
+    if (a[selectionIdKey]) {
+      await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
+    } else {
+      await insertSelection(a[nameKey], rowId, a[levelKey]);
+    }
   }
-});
+);
 
 on("change:repeating_profiles:name", async (e) => {
   console.log("change:repeating_profiles:name", e);
@@ -384,7 +487,9 @@ on("change:repeating_profiles:mod_ma", async (e) => {
 
 on(
   "change:repeating_profiles:mod_ps \
-  change:repeating_profiles:mod_character_ps_type",
+  change:repeating_profiles:mod_character_ps_type \
+  change:repeating_profiles:mod_liftcarry_weight_multiplier \
+  change:repeating_profiles:mod_liftcarry_duration_multiplier",
   async (e) => {
     console.log("change:repeating_profiles:mod_ps", e);
     const [r, section, rowId] = e.sourceAttribute.split("_");

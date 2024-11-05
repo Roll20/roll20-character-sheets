@@ -1,0 +1,65 @@
+
+//- base mixin for all inputs
+//- [name] is prepended with attr_
+//- [title] defaults to the attribute @{...}
+//- [id] is prepended with attr_ or left null to remove from html
+//-      the reference for calling it in chat and custom macros
+//- (class!=attributes.class) allows you to pass classes with +input({}).class
+mixin input(obj)
+  - obj = handleInput(obj);
+  input&attributes(obj)(class!=attributes.class)
+
+mixin checkbox(obj)
+  - obj.type = "checkbox";
+  +input(obj)&attributes(obj)(class!=attributes.class)
+
+mixin radio(obj)
+  - obj.type = "radio";
+  +input(obj)&attributes(obj)(class!=attributes.class)
+
+mixin textbox(obj)
+  - obj.type = "text";
+  +input(obj)&attributes(obj)(class!=attributes.class)
+
+mixin number(obj)
+  - obj.type = "number";
+  +input(obj)&attributes(obj)(class!=attributes.class)
+
+mixin textarea(obj)
+  - obj = handleInput(obj);
+  textarea&attributes(obj)(class!=attributes.class)
+
+mixin hidden(obj)
+  - obj.type = "hidden";
+  +input(obj)&attributes(obj)(class!=attributes.class)
+
+mixin select(obj)
+  - obj = handleInput(obj);
+  select&attributes(obj)(class!=attributes.class)
+    if block
+      block
+    else
+      +option({ value: "empty select, pebkac", selected: true})
+
+mixin option(obj)
+  - obj.tag = "option";
+  - obj.data_i18n = obj.data_i18n || obj.value;
+  +tag(obj)&attributes(obj)
+
+mixin textarea(obj)
+  - obj = handleInput(obj);
+  textarea&attributes(obj)(class!=attributes.class spellcheck="false")
+
+mixin fill-in-radios(obj)
+  +div({ class: obj.class }).radio__ranks
+    +radio({ name: obj.name, value: 0, checked: true, class: obj.class }).radio__rank.reset
+    each x in range(obj.max)
+      +radio({ name: obj.name, value: x, class: obj.class }).radio__rank
+
+mixin alt-radios
+  .fill-in__container
+    .fill-in__major
+      +hidden({ name: `test`, value: 0 }).fill-in__control
+      +radio({ name: `test`, value: 0, checked: true }).fill-in__minor.reset
+      each minor in [4, 3, 2, 1]
+        +radio({ name: `test`, value: minor, title: minor }).fill-in__minor

@@ -19,7 +19,21 @@ on("change:drop_category", function(eventinfo) {
 var lastDropID = '';
 var handle_drop = function(category, eventinfo) {
     getAttrs(["speed", "hp_max", "hp", "drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base", "class_resource_name", "other_resource_name", "multiclass1_lvl", "multiclass2_lvl", "multiclass3_lvl"], function(v) {
-        if((v['drop_name'] && v['drop_name'] == lastDropID) || (v['character_id'] && v['character_id'] == lastDropID)) return;
+        setAttrs({
+            drop_category: "",
+            drop_name: "",
+            drop_data: "",
+            drop_content: "",
+        }, {silent: true});
+        if((v['drop_name'] && v['drop_name'] == lastDropID) || (v['character_id'] && v['character_id'] == lastDropID)) {
+            lastDropID = "";
+            return;
+        } else {
+            setTimeout(() => {
+                console.log("cleaning last ID");
+                lastDropID = "";
+            }, 2000);
+        };
         if(v['drop_name']) {
             lastDropID = v['drop_name'];
         } else if(v['character_id']) {
@@ -45,7 +59,6 @@ var handle_drop = function(category, eventinfo) {
         });
 
     });
-
 };
 
 var processDrop = function(page, currentData, repeating, looped) {

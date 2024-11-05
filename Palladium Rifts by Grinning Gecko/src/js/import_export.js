@@ -15,7 +15,7 @@
   }
 
   async function getRepeatingRowsAsync(section) {
-    const ids = await getSectionIDsAsync(section);
+    const ids = await getSectionIDsOrderedAsync(section);
     const attrNames = ids.reduce((acc, id) => {
       SECTIONS[section].forEach((key) => {
         acc.push(`repeating_${section}_${id}_${key}`);
@@ -33,6 +33,7 @@
   on("clicked:export", async (e) => {
     console.log("export", e);
     const attrs = {};
+    attrs.h2h = await getRepeatingRowsAsync("h2h");
     attrs.wp = await getRepeatingRowsAsync("wp");
     attrs.wpmodern = await getRepeatingRowsAsync("wpmodern");
     attrs.skills = await getRepeatingRowsAsync("skills");
@@ -41,6 +42,8 @@
     attrs.movement = await getRepeatingRowsAsync("movement");
     attrs.powersabilities = await getRepeatingRowsAsync("powersabilities");
     attrs.modifiers = await getRepeatingRowsAsync("modifiers");
+    attrs.armor = await getRepeatingRowsAsync("armor");
+    attrs.equipment = await getRepeatingRowsAsync("equipment");
     // Profiles are tricky to export because IDs that they refer to won't line up
     // attrs.profiles = await getRepeatingRowsAsync("profiles");
     attrs.core = await getAttrsAsync(CORE_KEYS);
@@ -96,6 +99,7 @@
     // importAll(data);
     // return;
     await setAttrsAsync(data.core);
+    await setRepeatingRowsAsync("h2h", data.h2h);
     await setRepeatingRowsAsync("wp", data.wp);
     await setRepeatingRowsAsync("wpmodern", data.wpmodern);
     await setRepeatingRowsAsync("skills", data.skills);
@@ -104,9 +108,36 @@
     await setRepeatingRowsAsync("movement", data.movement);
     await setRepeatingRowsAsync("powersabilities", data.powersabilities);
     await setRepeatingRowsAsync("modifiers", data.modifiers);
+    await setRepeatingRowsAsync("armor", data.armor);
+    await setRepeatingRowsAsync("equipment", data.equipment);
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
     });
   });
 })();
+
+on("sheet:opened", async (e) => {
+  console.log("sheet:opened", e);
+  await setAttrsAsync({ debug: "0" });
+  // await migrateAttributes();
+});
+
+on("clicked:migrate", async (e) => {
+  console.log("clicked:migrate", e);
+  await migrateAttributes();
+});
+
+// $20("button.test").on("mouseenter", (e) => {
+//   console.log(e);
+// });
+
+// on("clicked:test", async (e) => {
+//   console.log("test");
+//   const acid = getActiveCharacterId();
+//   const attrs = findObjs({
+//     _type: "attribute",
+//     _characterid: acid,
+//   });
+//   console.log(acid, attrs);
+// });

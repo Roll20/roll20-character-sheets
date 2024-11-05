@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.9.3
+
+### Fixed
+
+- Fix a bug where "AttackMatrix6:#" appears when rolling dice with DAC
+
 ## 1.9.2
 
 ### Fixed

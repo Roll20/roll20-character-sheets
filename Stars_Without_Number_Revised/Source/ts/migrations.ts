@@ -214,6 +214,14 @@ const upgradeSheet = (version: string, firstTime = false, finalTime = false) => 
             })
         }
 
+        /** v2.6.3
+         * Regenerate weapon displays (to fix incorrect bonus displayed with Sunblade)
+         */
+        else if (major === 2 && minor < 6) {
+            generateWeaponDisplay()
+            upgradeSheet("2.6.3")
+        }
+
         /** Final upgrade clause, always leave this around */
         else upgradeSheet(sheetVersion, false, true);
     };

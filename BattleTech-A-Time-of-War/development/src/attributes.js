@@ -17,100 +17,88 @@ export const CHARISMA_LINK = "charisma_link"
 const EDGE_LINK = "edge_link"
 
 export const linkedAttributeDisplayNames = {
-    STRENGTH_LINK: "STR",
-    BODY_LINK: "BOD",
-    REFLEX_LINK: "RFL",
-    DEXTERITY_LINK: "DEX",
-    INTELLIGENCE_LINK: "INT",
-    WILL_LINK: "WIL",
-    CHARISMA_LINK: "CHA",
-    EDGE_LINK: "EDG",
+    [STRENGTH_LINK]: "STR",
+    [BODY_LINK]: "BOD",
+    [REFLEX_LINK]: "RFL",
+    [DEXTERITY_LINK]: "DEX",
+    [INTELLIGENCE_LINK]: "INT",
+    [WILL_LINK]: "WIL",
+    [CHARISMA_LINK]: "CHA",
+    [EDGE_LINK]: "EDG",
 }
 
-export const calculateAbilityScore = ({
-    sourceAttribute,
-    newValue
-}) => {
-    if (typeof newValue !== "number") {
-        console.error("Expected numerical value for attribute [ " + sourceAttribute + " ] but got [ " + newValue + " ]")
+export const calculateAttributeScore = (attributeXPName, attributeXP) => {
+    const attributeXPAsNumber = parseInt(attributeXP)
+
+    if (isNaN(attributeXPAsNumber)) {
+        console.error("Expected numerical value for attribute [ " + attributeXPName + " ] but got [ " + attributeXP + " ]")
         return undefined
     }
 
-    const attributeValue = Math.floor(newValue / 100)
+    const attributeValue = Math.floor(attributeXPAsNumber / 100)
     const attributeLinkedValue = calculateLinkedAttributeValue(attributeValue)
 
-    let attribute
-
-    switch (sourceAttribute) {
+    switch (attributeXPName) {
         case STRENGTH_XP:
-            attribute = {
+            return {
                 name: "strength",
                 value: attributeValue,
                 linkName: STRENGTH_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case BODY_XP:
-            attribute = {
+            return {
                 name: "body",
                 value: attributeValue,
                 linkName: BODY_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case REFLEX_XP:
-            attribute = {
+            return {
                 name: "reflex",
                 value: attributeValue,
                 linkName: REFLEX_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case DEXTERITY_XP:
-            attribute = {
+            return {
                 name: "dexterity",
                 value: attributeValue,
                 linkName: DEXTERITY_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case INTELLIGENCE_XP:
-            attribute = {
+            return {
                 name: "intelligence",
                 value: attributeValue,
                 linkName: INTELLIGENCE_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case WILL_XP:
-            attribute = {
+            return {
                 name: "will",
                 value: attributeValue,
                 linkName: WILL_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case CHARISMA_XP:
-            attribute = {
+            return {
                 name: "charisma",
                 value: attributeValue,
                 linkName: CHARISMA_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         case EDGE_XP:
-            attribute = {
+            return {
                 name: "edge",
                 value: attributeValue,
                 linkName: EDGE_LINK,
                 linkValue: attributeLinkedValue,
             }
-            break
         default:
-            console.error("unknown attribute type passed in to basic attribute on change function")
+            console.error("unknown attributeData type passed in to basic attributeData on change function")
+            return undefined
     }
-
-    return attribute
 }
 
 export const calculateLinkedAttributeValue = attribute => {
