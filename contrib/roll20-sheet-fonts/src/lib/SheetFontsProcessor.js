@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises';
 import { join } from 'path';
 import { CONFIG } from '../config.js';
 
-export default class SheetFontsProcessor {
+export class SheetFontsProcessor {
     constructor(options = {}) {
         this.clientId = CONFIG.DISCORD_ACTIVITY_CLIENT_ID;
         this.baseGithubUrl = CONFIG.GITHUB_BASE_URL;
@@ -144,3 +144,5 @@ export default class SheetFontsProcessor {
         }
     }
 }
+
+export default SheetFontsProcessor;
