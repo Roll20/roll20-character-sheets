@@ -1,6 +1,14 @@
+# 2024-11-5
+
+- Bump sheet version to 5
+- Vocational skills are now dynamic specialisations.  No longer a fixed list.
+  - Cleans up a lot of space on the sheet
+  - Update the level up process to match
+  - Automatically move old skills across
+
 # 2024-10-29
 
-- Finally update skills to show specilisations,
+- Finaly update skills to show specilisations,
 - Fix translation issue identified by Jon_joe.
     - Seems French has 2 strings translated.  And one exposed a bug
     - Add tests for case
