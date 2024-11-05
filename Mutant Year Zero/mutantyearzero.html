@@ -1443,6 +1443,9 @@
                 </div>
               </div>
               
+              <div class="dice-rolls-info" data-i18n="dice-rolls-info">
+                
+              </div> 
               <!-- Needs to be handled in dice pool and clear dice pool
               <div class="api-button dice-rolls-copy hidden">
                 <input type="checkbox" class="dice-pool dice-rolls-copy-button" name="attr_command_toggle" value="@{whisper_option_api} [[(@{skill})d6]] [[(@{attribute})d6]] [[(@{gear})d6]] --Character|@{character_name} --Roll|@{current_preset}" title="Copy macro">
@@ -2978,8 +2981,8 @@
       <li>Added custom roll parsing - push rolls within the roll result in chat        
         <ul>
           <li>Rolls will now use the custom roll parsing functionality, and can thus be pushable without using the API.</li>     
-          <li>Once a roll has been made, the output in the chat message will include a push option. </li>  
-          <li>There is (currently) no limit to how many times you can push, to support talents and auto-fire. 
+          <li>Once a roll has been made, the output in the chat message will include a push button. </li>  
+          <li>There is (currently) no limit to how many times you can push, to support certain talents and auto-fire. 
               Once past the first push, the number of pushed rolls will show in the header. </li>
         </ul>
       </li>
@@ -3753,80 +3756,102 @@
 
   "use strict";
   
-/* START ASYNC FUNCTIONS
-Function from https://github.com/onyxring/Roll20Async, Many thanks Onyx RIng
-*/
-
-function setActiveCharacterId(charId){
- var oldAcid=getActiveCharacterId();
- var ev = new CustomEvent("message");
- ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
- self.dispatchEvent(ev); 
- return oldAcid;
-}
-/* var _sIn=setInterval;
-setInterval=function(callback, timeout){
- var acid=getActiveCharacterId();
- _sIn(
-     function(){
-         var prevAcid=setActiveCharacterId(acid);
-         callback();
-         setActiveCharacterId(prevAcid);
-     }
- ,timeout);
-}
-var _sto=setTimeout
-setTimeout=function(callback, timeout){
- var acid=getActiveCharacterId();
- _sto(
-     function(){
-         var prevAcid=setActiveCharacterId(acid);
-         callback();
-         setActiveCharacterId(prevAcid);
-     }
- ,timeout);
-} */
-function getAttrsAsync(props){
- var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
- var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
- return new Promise((resolve,reject)=>{
-         prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
-         try{
-             getAttrs(props,(values)=>{  resolve(values); }); 
-         }
-         catch{ reject(); }
- }).finally(()=>{
-     setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
- });
-}
-//use the same pattern for each of the following...
-function setAttrsAsync(propObj, options){
- var acid=getActiveCharacterId(); 
- var prevAcid=null;               
- return new Promise((resolve,reject)=>{
-         prevAcid=setActiveCharacterId(acid);  
-         try{
-             setAttrs(propObj,options,(values)=>{ resolve(values); });
-         }
-         catch{ reject(); }
- }).finally(()=>{
-     setActiveCharacterId(prevAcid); 
- });
-}
-
-function getSectionIDsAsync(sectionName){
- var acid=getActiveCharacterId(); 
- var prevAcid=null;               
- return new Promise((resolve,reject)=>{
-         prevAcid=setActiveCharacterId(acid);  
-         try{
-             getSectionIDs(sectionName,(values)=>{ resolve(values); });
-         }
-         catch{ reject(); }
- }).finally(()=>{
-     setActiveCharacterId(prevAcid); 
- });
-}
+  //-------------------------------------------------------------------------------------
+  // orcsAsync - https://github.com/onyxring/orcsAsync
+  // Compensates for a defect in the underlying Roll20 system, where it "loses context"
+  // (forgets which player is active) during asynchronous methods and callbacks, 
+  // resulting in error messages like:
+  //
+  //      Error: Trying to do getAttrs when no character is active in sandbox.
+  //
+  // Include this script at the top of your character sheet's code setion to have 
+  // setTimeout() and setInterval() just start working as expected; no additional setup
+  // required.  Additionally, async-safe versions of the typical attribute functions will 
+  // be available:
+  //
+  //      getAttrsAsync
+  //      setAttrsAsync
+  //      getSectionIDsAsync
+  //      
+  function isRunningOnServer() { return self.dispatchEvent == undefined; }
+  function setActiveCharacterId(charId){
+      var oldAcid=getActiveCharacterId();
+      var msg={"id":"0", "type":"setActiveCharacter", "data":charId};
+      
+      if(isRunningOnServer()==false){ //if in a browser, use "dispatchEvent" to process the message
+          var ev = new CustomEvent("message");
+          ev.data=msg; 
+          self.dispatchEvent(ev);
+      }else{ //otherwise, use the API (server) message processor, "onmessage"
+          self.onmessage({data:msg});
+      }
+      return oldAcid; //return what the value used to be, so calling code can be a little cleaner 
+  } 
+  /*
+  var _sIn=setInterval;
+  setInterval=function(callback, timeout){
+      var acid=getActiveCharacterId();
+      _sIn(
+          function(){
+              var prevAcid=setActiveCharacterId(acid);
+              callback();
+              setActiveCharacterId(prevAcid);
+          }
+      ,timeout);
+  }
+  var _sto=setTimeout
+  setTimeout=function(callback, timeout){
+      var acid=getActiveCharacterId();
+      _sto(
+          function(){
+              var prevAcid=setActiveCharacterId(acid);
+              callback();
+              setActiveCharacterId(prevAcid);
+          }
+      ,timeout);
+  }
+  */
+  function getAttrsAsync(props){
+      var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+      var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+      return new Promise((resolve,reject)=>{
+              prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+              try{
+                  getAttrs(props,(values)=>{  resolve(values); }); 
+              }
+              catch{ reject(); }
+      }).finally(()=>{
+          setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+      });
+  }
+  //use the same pattern for each of the following...
+  function setAttrsAsync(propObj, options){
+      var acid=getActiveCharacterId(); 
+      var prevAcid=null;               
+      return new Promise((resolve,reject)=>{
+              prevAcid=setActiveCharacterId(acid);  
+              try{
+                  setAttrs(propObj,options,(values)=>{ resolve(values); });
+              }
+              catch{ reject(); }
+      }).finally(()=>{
+          setActiveCharacterId(prevAcid); 
+      });
+  }
+  
+  function getSectionIDsAsync(sectionName){
+      var acid = getActiveCharacterId(); 
+      var prevAcid=null;               
+      return new Promise((resolve,reject)=>{
+              prevAcid = setActiveCharacterId(acid);  
+              try{
+                  getSectionIDs(sectionName,(values)=>{ resolve(values); });
+              }
+              catch{ reject(); }
+      }).finally(()=>{
+          setActiveCharacterId(prevAcid); 
+      });
+  }
 
 function getSingleAttrAsync(prop){ 
  var acid=getActiveCharacterId(); 
@@ -4152,7 +4177,7 @@ function getSingleAttrAsync(prop){
     const prev_version_one = ( test.strength_max === undefined && test.agility_max === undefined && test.wits_max === undefined && test.empathy_max === undefined ) ? 0 : 1;
     //clog("prev_version_one: "+prev_version_one);
 
-    // Test for upgrade from previous version 1.x (by checking for previous Attributes)
+    // Test for upgrade from previous version 2.x (by checking for previous Attributes)
     var test2 = await getAttrsAsync(["strength_total", "agility_total", "wits_total", "empathy_total"]); 
     //clog("Test prev version two: " + JSON.stringify(test2));
     //clog("Test prev version two 1: " + (( test2.strength_total && test2.agility_total && test2.wits_total && test2.empathy_total ) === 0));
@@ -4195,32 +4220,27 @@ function getSingleAttrAsync(prop){
             await setAttrsAsync({is_new_character: 0});
             new_character = (await getAttrsAsync(["is_new_character"])).is_new_character;
             clog("New character: "+ new_character);
-            break;
+            break; 
         case old_version < 2.02 && prev_version_one == 1 && prev_version_two == 1:
             clog("---- Updating from v1 to version 2.02 from 2.01");
             update_to_2_0(float(2.01), float(2.02));
             await setAttrsAsync({is_new_character: 0});
             new_character = (await getAttrsAsync(["is_new_character"])).is_new_character;
             clog("New character: "+ new_character);
-            break;
+            break; 
         case old_version < 3.00:            
             clog("---- Updating to version 3.00");
             update_to_3_00(float(2.04), float(3.00));
             await setAttrsAsync({is_new_character: 0});
             new_character = (await getAttrsAsync(["is_new_character"])).is_new_character;
-            clog("New character: "+ new_character);
+            //clog("New character: 0");
+            show_announcement = 1;
             break; 
-        /* case old_version < 2.02 && prev_version_one == 0: // Should be no need to upgrade
-            clog("----- Updating to version 2.02");
-            update_to_2_0(float(2.01), float(2.02));
-            new_character = (await getAttrsAsync(["is_new_character"])).is_new_character;
-            clog("New character: "+ new_character);
-            break; */
         default:
-            clog("----- In switch default. ");
+            clog("----- In switch default, no update needed. ");            
             await setAttrsAsync({is_new_character: 0});
             new_character = (await getAttrsAsync(["is_new_character"])).is_new_character;
-            clog("New character: "+ new_character);
+            clog("New character: 0");
             // if reach this, all codeversion upgrades are complete
             // can run your recalculate function to show announcements
             newAnnouncement(old_version, new_version, show_announcement);
@@ -4251,7 +4271,6 @@ function getSingleAttrAsync(prop){
     setter.version = upgraded_version;
 
     setAttrs(setter, { silent: true }, versionator(upgraded_version));
-    clog("updating misspelled items");
 
   };
 
