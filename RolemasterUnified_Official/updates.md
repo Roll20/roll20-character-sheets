@@ -1,3 +1,51 @@
+# 2024-11-5
+
+- Bump sheet version to 5
+- Vocational skills are now dynamic specialisations.  No longer a fixed list.
+  - Cleans up a lot of space on the sheet
+  - Update the level up process to match
+  - Automatically move old skills across
+
+# 2024-10-29
+
+- Finaly update skills to show specilisations,
+- Fix translation issue identified by Jon_joe.
+    - Seems French has 2 strings translated.  And one exposed a bug
+    - Add tests for case
+    - improve code flow.  My JS has improved.
+- Add injury string to direcly rolled cripts
+- New combat has moved; now in creatures too
+- Improve favourite skills buttons and layout
+- Remove some spurious nil class descriptions
+- RRs can now click on number or die
+
+# 2024-10-22
+
+- Spells: Fix a nbs[ instead of a space
+- Less message spew during creation.
+- Less message spew during attacks.
+- Fix actions code to not break level up
+- Attacks small layout changes.
+- Heading for feats of strength
+- Move New Combat to the status block
+- move EP near level.
+- CC updates.
+
+# 2024-10-15
+
+- Start of Power Level support
+    - Sheet version to 4: Set everyones powerlevel to Superior
+    - Show powerlevel on sheet
+    - Add create step for power level
+    - Add support for powerlevel during stat rolling
+- Use the roll20 dice roller for dice; not the js one.
+- Send stat rolls to the chat.
+- More messages when injuries are applied.
+- Make checkboxes a standard size,
+- NPC upload button on the front page.
+- Directly rolled crits now have injury string
+
+
 # 2024-10-8
 
 - (Hopefully) quieten monsters AP messages.
