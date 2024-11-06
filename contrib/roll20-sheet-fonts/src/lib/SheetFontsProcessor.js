@@ -5,15 +5,14 @@ import { join } from 'path';
 import { CONFIG } from '../config.js';
 
 export class SheetFontsProcessor {
-    constructor(options = {}) {
+    constructor() {
         this.clientId = CONFIG.DISCORD_ACTIVITY_CLIENT_ID;
         this.baseGithubUrl = CONFIG.GITHUB_BASE_URL;
         this.userAgent = CONFIG.USER_AGENT;
-        this.outputDir = options.outputDir || CONFIG.OUTPUT_DIR;
         
         // Initialize logger
         this.log = log.getLogger('SheetFontsProcessor');
-        this.log.setLevel(options.logLevel || CONFIG.LOG_LEVEL);
+        this.log.setLevel(CONFIG.LOG_LEVEL);
     }
 
     getSheetJsonUrl(sheetName) {
@@ -99,50 +98,41 @@ export class SheetFontsProcessor {
         }
     }
 
-    async process(sheetName) {
-        try {
-            this.log.info(`Processing sheet: ${sheetName}`);
+   // Remove outputDir-related methods as we're now handling file output in the script
+   async process(sheetName) {
+    try {
+        this.log.info(`Processing sheet: ${sheetName}`);
 
-            // Fetch sheet.json
-            const sheetJsonUrl = this.getSheetJsonUrl(sheetName);
-            const sheetDataText = await this.fetchWithHeaders(sheetJsonUrl);
-            const sheetData = JSON.parse(sheetDataText);
+        const sheetJsonUrl = this.getSheetJsonUrl(sheetName);
+        const sheetDataText = await this.fetchWithHeaders(sheetJsonUrl);
+        const sheetData = JSON.parse(sheetDataText);
 
-            // Fetch CSS content
-            const cssUrl = this.getSheetCssUrl(sheetName, sheetData.css);
-            const cssContent = await this.fetchWithHeaders(cssUrl);
+        const cssUrl = this.getSheetCssUrl(sheetName, sheetData.css);
+        const cssContent = await this.fetchWithHeaders(cssUrl);
 
-            // Extract and process Google Fonts URLs
-            const fontUrls = this.extractGoogleFontsUrls(cssContent);
-            this.log.debug(`Found ${fontUrls.length} font URLs`);
-            
-            // Transform each Google Fonts CSS
-            const transformedFontsCss = await Promise.all(
-                fontUrls.map(url => this.transformGoogleFontsCss(url))
-            );
+        const fontUrls = this.extractGoogleFontsUrls(cssContent);
+        this.log.debug(`Found ${fontUrls.length} font URLs`);
+        
+        const transformedFontsCss = await Promise.all(
+            fontUrls.map(url => this.transformGoogleFontsCss(url))
+        );
 
-            const combinedCss = transformedFontsCss.join('\n\n');
-            
-            // Write to file
-            const outputPath = await this.writeOutput(sheetName, combinedCss);
+        return {
+            originalUrls: fontUrls,
+            transformedCss: transformedFontsCss.join('\n\n'),
+            sheetData
+        };
 
-            return {
-                originalUrls: fontUrls,
-                transformedCss: combinedCss,
-                sheetData,
-                outputPath
-            };
-
-        } catch (error) {
-            this.log.error(`Error processing sheet ${sheetName}:`, error);
-            return {
-                originalUrls: [],
-                transformedCss: '',
-                sheetData: null,
-                error: error.message
-            };
-        }
+    } catch (error) {
+        this.log.error(`Error processing sheet ${sheetName}:`, error);
+        return {
+            originalUrls: [],
+            transformedCss: '',
+            sheetData: null,
+            error: error.message
+        };
     }
+}
 }
 
 export default SheetFontsProcessor;
