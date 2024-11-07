@@ -1,7 +1,7 @@
 <!--5/31/20 set data version manually with currentVersion IN SHEETWORKERS -->
 <input type="hidden" name="attr_version" value="0" />
 <!--6/21/21 set sheet version manually with currentVersion HERE -->
-<input type="hidden" name="attr_sheetversion" value="3.00" />
+<input type="hidden" name="attr_sheetversion" value="3.01" />
 <!--6/21/21 sets indicator of new sheet HERE -->
 <input type="hidden" name="attr_is_new_character" value="1" />
 <!--6/21/21 sets verbose debugging, if implemented -->
@@ -1443,7 +1443,7 @@
                 </div>
               </div>
               
-              <div class="dice-rolls-info" data-i18n="dice-rolls-info">
+              <div class="dice-rolls-info">
                 
               </div> 
               <!-- Needs to be handled in dice pool and clear dice pool
@@ -3644,13 +3644,23 @@
       <div class="template-grid-item template-span-left">
         <span class="template-smaller sheet-small-caps template-label-dice-column" data-i18n="base-dice">Base Dice</span>
       </div>
+      {{/attribute-die-one}}      
+      {{#skill-die-one}}
       <div class="template-grid-item template-span-center">
         <span class="template-smaller sheet-small-caps template-label-dice-column" data-i18n="skill-dice">Skill Dice</span>
-      </div>
+      </div>     
+      {{/skill-die-one}}    
+      {{#negative-die-one}}
+      <div class="template-grid-item template-span-center">
+        <span class="template-smaller sheet-small-caps template-label-dice-column" data-i18n="negative-dice">Negative Dice</span>
+      </div>     
+      {{/negative-die-one}}     
+      {{#gear-die-one}}
       <div class="template-grid-item template-span-right">
         <span class="template-smaller sheet-small-caps template-label-dice-column" data-i18n="gear-dice">Gear Dice</span>
-      </div>
-      {{/attribute-die-one}}
+      </div>    
+      {{/gear-die-one}}
+
 
       <!--- attack -->
       {{#weapon-bonus}}
@@ -3743,7 +3753,7 @@
       {{/footer}}
       {{#rollGreater() computed::push 0}}
       <div class="template-grid-item template-span-six template-footer push-option">
-        [Push the roll](~{{character_name}}|push||{{computed::pushroll}})
+        [<span data-i18n:'push-the-roll'>Push the Roll</span>](~{{character_name}}|push||{{computed::pushroll}})
       </div>
       {{/rollGreater() computed::push 0}}
     </div>
@@ -5304,7 +5314,7 @@ function getSingleAttrAsync(prop){
     clog("Starting push roll!");
     clog(JSON.stringify(ev));
     const reroll = rollEscape.unescape(ev.originalRollId);
-    clog(`reroll object: ${JSON.stringify(reroll)}`);
+    clog(`Reroll object: ${JSON.stringify(reroll)}`);
     const attributes = reroll.attributes,
        roll = reroll.roll;
     executeRoll({ev,attributes,roll});
@@ -5323,7 +5333,7 @@ function getSingleAttrAsync(prop){
           attribute: int(values.attribute),
           skill: int(values.skill),
           gear: int(values.gear),
-          totalDice: int(values.attribute)+int(values.skill)+int(values.gear),
+          totalDice: int(values.attribute)+Math.abs(int(values.skill))+int(values.gear),
           pushable: int(values.pushable),
           pushroll: 0,
           whisper: values.whisper_option,
@@ -5338,20 +5348,24 @@ function getSingleAttrAsync(prop){
         gearStr = "",
         rollStr = "";
 
-    clog(`TEST: Roll object: ${JSON.stringify(roll)}`);
-    clog(`TEST: Roll pushRollStr: ${!!roll.pushRollStr}`);
+    //clog(`TEST: Roll object: ${JSON.stringify(roll)}`);
+    //clog(`TEST: Roll pushRollStr: ${!!roll.pushRollStr}`);
     
 
     if (roll.pushRollStr) {
       rollStr = roll.pushRollStr;
     } else {     
       for(let i = 1; i <= roll.attribute; i++) { attributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}= [[1d6]] }} `; }
-      for(let i = 1; i <= roll.skill; i++) { skillStr += `{{skill-die-${litnum[i]}= [[1]] }} {{skill-roll-${litnum[i]}= [[1d6]] }} `; }
+      if( roll.skill >= 0 ) {
+        for(let i = 1; i <= roll.skill; i++) { skillStr += `{{skill-die-${litnum[i]}= [[1]] }} {{skill-roll-${litnum[i]}= [[1d6]] }} `; }
+      } else if ( roll.skill < 0) {
+        for(let i = 1; i <= Math.abs(roll.skill); i++) { skillStr += `{{negative-die-${litnum[i]}= [[1]] }} {{negative-roll-${litnum[i]}= [[1d6]] }} `; }
+      }
       for(let i = 1; i <= roll.gear; i++) { gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6]] }} `; }
       rollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
     }    
 
-    clog("Roll string; "+ rollStr);
+    //clog("Roll string; "+ rollStr);
 
     startRoll(rollStr, (results) => {
       clog("Roll results: "+ JSON.stringify(results));
@@ -5367,50 +5381,66 @@ function getSingleAttrAsync(prop){
 
       for(let i = 1; i <= roll.attribute; i++) { 
         let r = (results.results[`attribute-roll-${litnum[i]}`]).result;
-        console.log(`results attribute ${i} : ${r}`);
+        //clog(`results attribute ${i} : ${r}`);
         if ( r == '6' || r == 6 ) {        
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[6]]}} `; 
           successes++;
-          console.log(`results attribute die ${i} is 6, total ${successes} successes`);
+          //clog(`results attribute die ${i} is 6, total ${successes} successes`);
         } else if ( r == '1' || r == 1 ) {     
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1]]}} `; 
           failures++;          
-          console.log(`results attribute die ${i} is 0, total ${failures} failures`);
+          //clog(`results attribute die ${i} is 0, total ${failures} failures`);
         } else {
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1d6]]}} `; 
-          console.log(`results attribute die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          //clog(`results attribute die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
-      for(let i = 1; i <= roll.skill; i++) { 
-        let r = (results.results[`skill-roll-${litnum[i]}`]).result;
-        console.log(`results skill ${i} : ${r}`);
-        if ( r == '6' || r == 6 ) {        
-          pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6]]}} `; 
-          successes++;  
-          console.log(`results skill die ${i} is 6, total ${successes} successes`);
-        } else {
-          pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[1d6]]}} `; 
-          console.log(`results skill die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+      if ( roll.skill >= 0 ) {
+        for(let i = 1; i <= roll.skill; i++) { 
+          let r = (results.results[`skill-roll-${litnum[i]}`]).result;
+          //clog(`results skill ${i} : ${r}`);
+          if ( r == '6' || r == 6 ) {        
+            pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6]]}} `; 
+            successes++;  
+            //clog(`results skill die ${i} is 6, total ${successes} successes`);
+          } else {
+            pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[1d6]]}} `; 
+            //clog(`results skill die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          }
+        }
+      } else if ( roll.skill < 0 ) {
+        for(let i = 1; i <= Math.abs(roll.skill); i++) { 
+          let r = (results.results[`negative-roll-${litnum[i]}`]).result;
+          //clog(`negative skill ${i} : ${r}`);
+          if ( r == '6' || r == 6 ) {        
+            pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[6]]}} `; 
+            successes++;  
+            //clog(`results negative skill die ${i} is 6, total ${successes} successes (decreased)`);
+          } else {
+            pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[1d6]]}} `; 
+            //clog(`results skill die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          }
         }
       }
       for(let i = 1; i <= roll.gear; i++) { 
         let r = (results.results[`gear-roll-${litnum[i]}`]).result;
-        console.log(`results gear ${i} : ${r}`);
+        //clog(`results gear ${i} : ${r}`);
         if ( r == '6' || r == 6 ) {        
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[6]]}} `; 
           successes++;
-          console.log(`results gear die ${i} is 6, total ${successes} successes`);
+          //clog(`results gear die ${i} is 6, total ${successes} successes`);
         } else if ( r == '1' || r == 1 ) {     
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1]]}} `; 
           failures++;   
           gearfails++;       
-          console.log(`results gear die ${i} is 0, total ${failures} failures and ${gearfails} from gear`);
+          //clog(`results gear die ${i} is 0, total ${failures} failures and ${gearfails} from gear`);
         } else {
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1d6]]}} `;  
-          console.log(`results gear die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          //clog(`results gear die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
-
+      // NB: Successes and failures counts number fo dice which cannot be rerolled. 
+      // In case of negative skill dice, the actual successes may be lower  
       if ( (successes + failures) == roll.totalDice ) {
         roll.pushable = 0;
       }
@@ -5418,7 +5448,6 @@ function getSingleAttrAsync(prop){
       roll.pushRollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
       
       const pushRoll = {
-        pushRollStr: `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`,
         attributes: attributes,
         roll: roll,
         successes: successes,
@@ -5432,7 +5461,7 @@ function getSingleAttrAsync(prop){
         pushable: 1,
       });
       
-      clog("Push data: "+ JSON.stringify(pushRoll));
+      //clog("Push data: "+ JSON.stringify(pushRoll));
       finishRoll(results.rollId, {
         pushroll: rollEscape.escape(pushRoll),
         push: roll.pushable,
