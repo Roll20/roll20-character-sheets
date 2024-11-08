@@ -2637,7 +2637,7 @@
           <span class="ark-influence ark-influence-subheader ark-influence-subheader4 column-header chartype-background-darkest" data-i18n="kilgore">Kilgore</span>
           <span class="ark-influence ark-influence-subheader ark-influence-subheader5 column-header chartype-background-darkest" data-i18n="morningstar">Morningstar</span>
         </div>
-        <div class="ark-influence-row">
+        <!-- <div class="ark-influence-row">
           <span class="ark-influence ark-influence-col ark-influence-col1">&nbsp;</span>
           <span class="ark-influence ark-influence-col ark-influence-col2"><input type="number" disabled readonly name="attr_total_warburg" class="input-number" value="(@{novapaloma_warburg}+@{oldkoly_warburg}+@{pirius_warburg}+@{tindertuft_warburg}+@{northolme_warburg}+@{calista_warburg}+@{hindenburg_warburg}+@{mosel_warburg}+@{laborum_warburg}+@{arcadium_warburg}+@{cinderfalls_warburg}+@{cogsofhel_warburg})" min="0" /></span>
           
@@ -2646,6 +2646,16 @@
           <span class="ark-influence ark-influence-col ark-influence-col4"><input type="number" disabled readonly name="attr_total_kilgore" class="input-number" value="(@{novapaloma_kilgore}+@{oldkoly_kilgore}+@{pirius_kilgore}+@{tindertuft_kilgore}+@{northolme_kilgore}+@{calista_kilgore}+@{hindenburg_kilgore}+@{mosel_kilgore}+@{laborum_kilgore}+@{arcadium_kilgore}+@{cinderfalls_kilgore}+@{cogsofhel_kilgore})" min="0" /></span>
           
           <span class="ark-influence ark-influence-col ark-influence-col5"><input type="number" disabled readonly name="attr_total_morningstar" class="input-number" value="(@{novapaloma_morningstar}+@{oldkoly_morningstar}+@{pirius_morningstar}+@{tindertuft_morningstar}+@{northolme_morningstar}+@{calista_morningstar}+@{hindenburg_morningstar}+@{mosel_morningstar}+@{laborum_morningstar}+@{arcadium_morningstar}+@{cinderfalls_morningstar}+@{cogsofhel_morningstar})" min="0" /></span>
+        </div> -->
+        <div class="ark-influence-row">
+          <span class="ark-influence ark-influence-col ark-influence-col1">&nbsp;</span>
+          <span class="ark-influence ark-influence-col ark-influence-col2"><span class="input-span" name="attr_influence_warburg" value="0" title="@{influence_warburg}">0</span></span>
+          
+          <span class="ark-influence ark-influence-col ark-influence-col3"><span class="input-span" name="attr_influence_fortescue" value="0" title="@{influence_fortescue}">0</span></span>
+          
+          <span class="ark-influence ark-influence-col ark-influence-col4"><span class="input-span" name="attr_influence_kilgore" value="0" title="@{influence_kilgore}">0</span></span>
+          
+          <span class="ark-influence ark-influence-col ark-influence-col5"><span class="input-span" name="attr_influence_morningstar" value="0" title="@{influence_morningstar}">0</span></span>
         </div>
       </div>
 
@@ -4815,6 +4825,44 @@ function getSingleAttrAsync(prop){
       });
     });
     */
+  });
+
+  const houses = ['warburg','fortescue','kilgore','morningstar'],
+        sectors = ['novapaloma','oldkoly','pirius','tindertuft','northolme','calista','hindenburg','mosel','laborum','arcadium','cinderfalls','cogsofhel'],
+        houseSectors = {},
+        houseAttrs = {};
+  houseSectors.warburg = sectors.map( (sector) => sector + '_warburg' );
+  houseSectors.fortescue = sectors.map( (sector) => sector + '_fortescue' );
+  houseSectors.kilgore = sectors.map( (sector) => sector + '_kilgore' );
+  houseSectors.morningstar = sectors.map( (sector) => sector + '_morningstar' );
+  //clog(`Warburg: ${houseSectors.warburg}`);
+  //clog(`Fortescue: ${houseSectors.fortescue}`);
+  //clog(`kilgore: ${houseSectors.kilgore}`);
+  //clog(`morningstar: ${houseSectors.morningstar}`);
+
+  houses.forEach( (house) => {
+    //clog(`SW for ${house}`);
+    sectors.forEach( (sector) => {
+      //clog(`SW for ${house} and ${sector}`);
+      on(`change:${sector}_${house}`, () => {
+        updateInfluence(house);
+      });
+    });
+  }); 
+  const updateInfluence = (house) => {
+    //clog(`Updating influence for ${house}`);
+    getAttrs(houseSectors[`${house}`], (values) => {
+      //clog(`House influence values: ${JSON.stringify(values)}`);
+      const houseTotal = (Object.values(values)).reduce( (a,n) => a + int(n), 0);
+      clog(`House ${house} influence : ${houseTotal}`);
+      setAttrs({
+        [`influence_${house}`] : houseTotal,
+      });
+    });
+  }
+  on('sheet:opened', () => {
+    clog('Updating the influence of the four great houses.');
+    houses.forEach( (house) => { updateInfluence(house); });
   });
   
   /* Monster or PC Strength handling. updates attr_strength depending on sheet tab*/
