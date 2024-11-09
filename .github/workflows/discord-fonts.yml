@@ -1,0 +1,51 @@
+name: Process and Upload Fonts
+
+on:
+  push:
+    branches:
+      - staging
+      - master
+    paths:
+      - '**.css'
+
+jobs:
+  process-fonts:
+    environment: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install required tools
+        run: sudo apt-get update && sudo apt-get install -y zsh perl curl
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.SHEET_HTTP_GCP_KEYFILE }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Process Font URLs
+        run: |
+          chmod +x ./process-fonts.sh
+          CLIENT_ID=${{ github.ref_name == 'master' && '1199271093882589195' || '1199270539278164008' }}
+          DISCORD_ACTIVITY_CLIENT_ID=$CLIENT_ID \
+          ./process-fonts.sh --no-prompt fonts.css
+
+      - name: Upload to GCS
+        run: |
+          DEST_NAME="${{ github.ref_name == 'master' && 'production' || 'staging' }}.css"
+
+          # Create temp directory and copy fonts.css to it
+          TEMP_DIR="${{ runner.temp }}/fonts"
+          mkdir -p "$TEMP_DIR"
+          cp fonts.css "$TEMP_DIR/$DEST_NAME"
+
+          # Sync to GCS
+          gcloud storage rsync \
+            --project=roll20-actual \
+            "$TEMP_DIR" \
+            gs://roll20-cdn/discord/fonts \
+            --cache-control='no-cache' \
+            --recursive
