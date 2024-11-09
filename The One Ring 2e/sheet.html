@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-10-01" />
+<input type="hidden" name="attr_version" value="03-11-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -1636,7 +1636,8 @@
         const rxGrab = /^0\[(.*)\]\s*$/;
         // target charactername roll is tricky, as we can only make rolls on numeric attributes. Thus we use roll labels to get alphanumeric attributes from the target
         let rollBase = `! {{charname=[[0[@{target|character_name}]]]}} {{stanceattackbonus=[[@{target|stanceattackbonus}]]}} {{parrytotal=[[@{target|totalparry}]]}} {{parry=[[@{target|parry}]]}}`;
-
+        clog (`target rollbase: ${rollBase})`);
+    
         let targetRoll = await startRoll(rollBase);
         clog (`targetRoll: ${JSON.stringify(targetRoll)})`);
         finishRoll(targetRoll.rollId);
@@ -2153,20 +2154,20 @@
                 ["stanceattack_active", 0],
                 ["stanceattackbonus", 0]
             ]);
-            
-            if (values.stance === "1"){
-                console.log("Handle forward stance toggle");
+            clog(`Stance: ${values.stance}`)
+            if (values.stance == 1){
+                clog("Handle forward stance toggle");
                 attr.set("stanceattack_active", 1);
                 attr.set("stanceattackbonus", 1);
-            } else if (values.stance === "2"){
-                console.log("Handle open stance toggle");
+            } else if (values.stance == 2){
+                clog("Handle open stance toggle");
                 attr.set("stanceparry_active", 1);
-            } else if (values.stance === "3"){
-                console.log("Handle defensive stance toggle");
+            } else if (values.stance == 3){
+                clog("Handle defensive stance toggle");
                 attr.set("stanceprot_active", 1);
                 attr.set("stanceattackbonus", -1);
-            } else if (values.stance === "4"){
-                console.log("Handle rearward stance toggle");
+            } else if (values.stance == 4){
+                clog("Handle rearward stance toggle");
             }
             clog(`Attackbonus: ${attr.get("stanceattackbonus")}`);
             setAttrs({
@@ -3150,6 +3151,24 @@
                         hlog(`
 ### Fixed
 - fixed minor CSS bug
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+            if (build < 33) {
+                attrs["build"] = 33;
+                let releaselog = {msg:""};
+                hlog(`Release 03.11.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### Fixed
+- fixed stance toggle
                         `, releaselog);
                         hlog("==============", releaselog);
                         attrs['releaselog'] =  releaselog.msg + values['releaselog'];

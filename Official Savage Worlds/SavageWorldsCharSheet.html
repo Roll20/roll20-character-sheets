@@ -2,7 +2,7 @@
 <script type="text/worker">
   //# sourceURL=SWADE.js
 const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.31';
+const sheetVersion = '1.00.32';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -2255,7 +2255,6 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
-        debugger;
         lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
 };
@@ -2269,6 +2268,9 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
 const lookupBurndown = function(statblock, productArray, searchArray, callback, origBlock,IDPathways) {
     getCompendiumQuery(searchArray, (dataArr) => {
         debug({dataArr});
+        if(!Array.isArray(dataArr)){
+            dataArr = [];
+        }
         PHEGCategories.forEach((category) => {
             if (origBlock[`data-${category}`]) {
                 origBlock[`data-${category}`] = origBlock[`data-${category}`].map((obj) => {
@@ -2343,8 +2345,8 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
         }
     });
     let compendiumObj;
-    const objExpansion = productArray.find((id) => {
-        compendiumObj = dataArr.find((dataObj) => +dataObj.data.Expansion === id && 
+    const objExpansion = productArray?.find((id) => {
+        compendiumObj = dataArr?.find((dataObj) => +dataObj.data.Expansion === id && 
             (dataObj.data[nameAttrLookup[phegObj.lookupType]] || dataObj.name) === objName);
         if (compendiumObj) {
             return true;
@@ -2354,7 +2356,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
     });
     
     if (!compendiumObj) { //If we didn't find an object matching the expansion pathways and the object name, just find the first item with a matching name
-        compendiumObj = dataArr.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
+        compendiumObj = dataArr?.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
         if (!compendiumObj) { //If there still isn't a matching compendium object, return the original PHEG
             phegObj.data[requiredAttrLookup[phegObj.type]] = phegObj.data[requiredAttrLookup[phegObj.type]] || phegObj.name;
             return phegObj;
@@ -3299,7 +3301,6 @@ const compendiumBestiary = function () {
               'Write PHEG data and all remaining attributes to character sheet',
               r20color
             );
-            debugger;
             setAttrs(finalCharacterDetails);
           });
         },
@@ -3309,7 +3310,6 @@ const compendiumBestiary = function () {
 };
 
 const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster){
-  debugger;
   const PHEGCategoryExtraSets = {
     Edges: {
       edgeCount: obj => obj['data-Edges'].length,

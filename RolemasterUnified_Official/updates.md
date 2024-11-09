@@ -1,3 +1,79 @@
+# 2024-11-7
+
+- Sheet version to 6.  Funny how lots happen at once.
+- Force a skill recalculation after update.
+- Fix dependancy issue in edit.js: It depends on the skill list.   Can now edit dynamic specialisations for
+the new vocational skills.
+- Remove some dead code in skills.
+- Update similar skills modifier for fixed specialisations.
+- Make roll button for dynamic specialisations actually visible.  0 width buttons are really hard to see and click.
+
+# 2024-11-5
+
+- Bump sheet version to 5
+- Vocational skills are now dynamic specialisations.  No longer a fixed list.
+  - Cleans up a lot of space on the sheet
+  - Update the level up process to match
+  - Automatically move old skills across
+
+# 2024-10-29
+
+- Finaly update skills to show specilisations,
+- Fix translation issue identified by Jon_joe.
+    - Seems French has 2 strings translated.  And one exposed a bug
+    - Add tests for case
+    - improve code flow.  My JS has improved.
+- Add injury string to direcly rolled cripts
+- New combat has moved; now in creatures too
+- Improve favourite skills buttons and layout
+- Remove some spurious nil class descriptions
+- RRs can now click on number or die
+
+# 2024-10-22
+
+- Spells: Fix a nbs[ instead of a space
+- Less message spew during creation.
+- Less message spew during attacks.
+- Fix actions code to not break level up
+- Attacks small layout changes.
+- Heading for feats of strength
+- Move New Combat to the status block
+- move EP near level.
+- CC updates.
+
+# 2024-10-15
+
+- Start of Power Level support
+    - Sheet version to 4: Set everyones powerlevel to Superior
+    - Show powerlevel on sheet
+    - Add create step for power level
+    - Add support for powerlevel during stat rolling
+- Use the roll20 dice roller for dice; not the js one.
+- Send stat rolls to the chat.
+- More messages when injuries are applied.
+- Make checkboxes a standard size,
+- NPC upload button on the front page.
+- Directly rolled crits now have injury string
+
+
+# 2024-10-8
+
+- (Hopefully) quieten monsters AP messages.
+- Handle a numeric AT (some monsters)
+- Updated attack testing significantly.
+- Remove some not-an-error errors in attacks
+- Stop using D for side.  That's death/defeat.  O is now side. (Odd)
+- Fix for monsters dropped from compendium
+
+Compendium: Fix the couple of corrupted attack tables which were causing random failures on
+some attacks.  This has been bugging up a few characters (and creatures).
+
+# 2024-10-3
+
+- Remove a lot of debug in level up and stuff.
+- Allow creatures to be called NPCs on drop
+- Creatures (NPCS) now display spells
+
 # 2024-10-1
 
 Work continues on improving 'stuff' (aka Inventory or items).  So first up we have casting penalties
