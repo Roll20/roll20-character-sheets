@@ -159,6 +159,21 @@ div.sheet-v1-data-show {
   display: none;
 }
 
+span.sheet-informative-qmark {
+  display: inline-flex;
+  aspect-ratio: 1 / 1;
+  font-size: 10px;
+  padding: 1px;
+  margin-inline: 3px;
+  border-radius: 50%;
+  border: 1px solid black;
+  height: 10px;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  cursor: help;
+}
+
 
 /* Hide actual checkbox */
 
@@ -745,18 +760,23 @@ button.sheet-roll-button-textonly span {
 
 /* Update the Dice Pool indicator  */
 .sheet-box-indicator button,
-.sheet-box-api-indicator button {
+.sheet-box-api-indicator button,
+.sheet-dice-rolls-roll button {
   z-index: 1;
   color: #fff;
   border: 1px solid #000;
   background: #a60100;
   box-shadow: 0 2px 4px 2px #000;
 }
+.sheet-dice-rolls-roll button[type="action"] span {
+  color: white;
+}
 
 .sheet-box-indicator button:hover,
-.sheet-box-api-indicator button:hover {
+.sheet-box-api-indicator button:hover,
+.sheet-dice-rolls-roll button:hover {
   border: 1px solid #a60100;
-  box-shadow: 0 1px 4px 2px #808080;
+  box-shadow: 0 1px 2px 1px #000;
 }
 
 .sheet-box-indicator,
@@ -804,49 +824,6 @@ button.sheet-roll-button-textonly span {
   opacity: 1;
 }
 
-/* api dice toggle */
-button.sheet-api-button {
-  border: 1px solid lightblue;
-  box-shadow: 2px 2px 3px darkgrey;
-  line-height: 0.85em;
-}
-
-input[type="checkbox"].sheet-hidden,
-.sheet-hidden {
-  display: none;
-}
-
-input.sheet-hidden.sheet-api-toggle-show:checked ~ div.sheet-template-roll {
-  display: none;
-}
-
-input.sheet-hidden.sheet-api-toggle-show:not(:checked) ~ .sheet-dice-rolls-copy {
-  display: none;
-}
-
-.sheet-dice-rolls-copy-button::before {
-  content: "" !important; 
-}
-
-div.sheet-api-roll {
-  display: none;
-}
-
-input.sheet-hidden.sheet-api-toggle-show:checked
-  ~ div.sheet-api-roll {
-  display: block;
-}
-
-input.sheet-hidden.sheet-api-toggle-show:checked
-  ~ div.sheet-api-roll
-  button::after {
-  margin-right: 2px;
-  content: "(API)";
-}
-
-input.sheet-hidden.sheet-api-toggle-show:checked button.sheet-dice-footer-api {
-  background: #a60100;
-}
 
 /* repcontrol */
 
@@ -1030,7 +1007,8 @@ input[name="attr_chartype"][value="Human"] ~ div .sheet-chartype-border-darkest 
 .sheet-char-mutant-flex,
 .sheet-char-robot-flex,
 .sheet-char-animal-flex,
-.sheet-char-human-flex {
+.sheet-char-human-flex,
+.sheet-character-rotpoints {
   display: none;
 }
 
@@ -1049,7 +1027,8 @@ input[name="attr_force_show_arklevels"]:checked ~ .sheet-ark-development,
 input[name="attr_force_show_arkdetails"]:checked ~ .sheet-ark-details,
 input[name="attr_force_show_arkdetails"]:checked ~ .sheet-ark-bosses,
 input[name="attr_force_show_arkdetails"]:checked ~ .sheet-ark-other,
-input[name="attr_force_show_projects"]:checked ~ .sheet-ark-projects {
+input[name="attr_force_show_projects"]:checked ~ .sheet-ark-projects,
+input[name="attr_force_show_rot"]:checked ~ .sheet-character-rotpoints {
   display: block;
 }
 /*
@@ -3268,9 +3247,25 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
   margin-right: 5px;
 }
 
+/* .sheet-dice_pool-grid {
+  display: grid;
+  grid-template-areas: 
+    "sheet-dice-header sheet-dice-header sheet-dice-header" 
+    "sheet-dice-base sheet-dice-skill sheet-dice-gear" 
+    "sheet-dice-rolls sheet-dice-rolls sheet-dice-rolls" 
+    "sheet-dice-preset sheet-dice-preset sheet-dice-preset" 
+    "sheet-dice-footer sheet-dice-footer sheet-dice-footer";
+  grid-template-columns: 1fr 1fr 1fr;
+} */
 .sheet-dice_pool-grid {
   display: grid;
-  grid-template-areas: "sheet-dice-header sheet-dice-header sheet-dice-header" "sheet-dice-base sheet-dice-skill sheet-dice-gear" "sheet-dice-rolls sheet-dice-rolls sheet-dice-rolls" "sheet-dice-preset sheet-dice-preset sheet-dice-preset" "sheet-dice-footer sheet-dice-footer sheet-dice-footer";
+  grid-template-areas: 
+    "sheet-dice-header sheet-dice-header sheet-dice-header" 
+    "sheet-dice-base sheet-dice-skill sheet-dice-gear" 
+    "sheet-dice-rolls sheet-dice-rolls sheet-dice-rolls"
+    "sheet-dice-rolls-clear sheet-dice-rolls-clear sheet-dice-rolls-d66"
+    "sheet-dice-rolls-api sheet-dice-rolls-api sheet-dice-rolls-d666"
+    "sheet-dice-rolls-info sheet-dice-rolls-info sheet-dice-rolls-init";
   grid-template-columns: 1fr 1fr 1fr;
 }
 
@@ -3280,7 +3275,7 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
 
 .sheet-dice-base {
   display: grid;
-  margin: 2px 0 0 0;
+  margin: 0;
   padding: 2px 2px 0 2px;
   text-align: center;
   border: 1px solid #000;
@@ -3311,7 +3306,7 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
 
 .sheet-dice-skill {
   display: grid;
-  margin: 2px 0 0 0;
+  margin: 0;
   padding: 2px 2px 0 2px;
   text-align: center;
   -color: #fff;
@@ -3344,7 +3339,7 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
 
 .sheet-dice-gear {
   display: grid;
-  margin: 2px 0 0 0;
+  margin: 0;
   padding: 2px 2px 0 2px;
   text-align: center;
   color: #fff;
@@ -3373,42 +3368,25 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
   grid-area: sheet-dice-gear-col1;
 }
 
-.sheet-dice-artifact {
-  display: none;
-  -display: grid;
-  grid-area: sheet-dice-artifact;
-  grid-template-areas: "sheet-dice-artifact-header sheet-dice-artifact-header sheet-dice-artifact-header sheet-dice-artifact-header" "sheet-dice-artifact-rolls sheet-dice-artifact-rolls sheet-dice-artifact-rolls sheet-dice-artifact-rolls";
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 2.5em 2em;
-}
-
-.sheet-dice-artifact-header {
-  margin: 5px 0 0 0;
-  text-align: center;
-  grid-area: sheet-dice-artifact-header;
-}
-
-.sheet-dice-artifact-rolls {
-  display: flex;
-  flex-flow: row;
-  justify-content: space-evenly;
-  height: 0.5em;
-  margin: -5px 0 0 0;
-  background-color: black;
-  grid-area: sheet-dice-artifact-rolls;
-}
-
 .sheet-dice-rolls {
   display: grid;
   justify-content: space-between;
-  -margin-top: 10px;
-  padding: 10px;
+  padding: 5px;
   grid-area: sheet-dice-rolls; 
   grid-template-areas: "sheet-dice-rolls1 sheet-dice-rolls2";
   grid-template-columns: 1fr 1fr;
 }
 
-.sheet-dice-rolls1 {
+.sheet-dice-rolls {
+  grid-template-columns: auto auto auto;
+  grid-template-areas: 
+    "sheet-dice-roll sheet-dice-roll sheet-dice-roll"
+    "sheet-dice-rolls-clear sheet-dice-rolls-clear sheet-dice-rolls-d66"
+    "sheet-dice-rolls-api sheet-dice-rolls-api sheet-dice-rolls-d666"
+    "sheet-dice-rolls-init";
+}
+
+/* .sheet-dice-rolls1 {
   display: flex;
   flex-flow: row;
   justify-content: space-between;
@@ -3416,11 +3394,43 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
   -padding: 10px;
   grid-area: sheet-dice-rolls1; 
   grid-template-areas: "sheet-dice-rolls-roll sheet-dice-rolls-push";
+} */
+.sheet-dice-roll-input {
+  grid-area: sheet-dice-rolls;
+  width: auto;
+  padding: 5px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  justify-items: stretch;
+ }
+.sheet-dice-roll-input button,
+.sheet-dice-rolls-roll {
+  grid-area: sheet-dice-rolls-roll;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-content: center;
+  align-items: center;
 }
-.sheet-dice-rolls button {
+/* .sheet-dice-rolls button {
   max-height: 20px; 
+} */
+.sheet-dice-rolls-roll button span {
+  color: white; 
+  font-size: 14px;
+
 }
-.sheet-dice-rolls2 {
+
+.sheet-dice-preset {
+  grid-area: sheet-dice-preset;
+  flex: 1;
+  padding-right: 10px;
+}
+.sheet-dice-preset input[type="text"] {
+  width: 100%;
+}
+/* .sheet-dice-rolls2 {
   display: flex;
   flex-flow: column;
   justify-content: space-between;
@@ -3428,9 +3438,7 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
   -padding: 10px;
   grid-area: sheet-dice-rolls2;
   grid-template-areas: "sheet-dice-rolls-d66" "sheet-dice-rolls-d666" "sheet-dice-rolls-init";
-}
-
-.sheet-dice-rolls-roll {
+}  .sheet-dice-rolls-roll {
   display: flex;
   justify-content: flex-start;
   padding-bottom: 10px;
@@ -3441,26 +3449,36 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
   display: flex;
   justify-content: flex-start;
   grid-area: sheet-dice-rolls-push;
-}
+}*/
 
 .sheet-dice-rolls-init {
   display: flex;
   justify-content: flex-end;
+  padding-block: 2px;
   grid-area: sheet-dice-rolls-init;
 }
 
 .sheet-dice-rolls-d66 {
   display: flex;
   justify-content: flex-end;
-  padding-bottom: 5px;
+  padding-block: 2px;
   grid-area: sheet-dice-rolls-d66;
 }
 
 .sheet-dice-rolls-d666 {
   display: flex;
   justify-content: flex-end;
-  padding-bottom: 5px;
+  padding-block: 2px;
   grid-area: sheet-dice-rolls-d666;
+} 
+.sheet-dice-rolls-info {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 4px;
+  text-align: center;
+  grid-area: sheet-dice-rolls-info;
 }
 
 .sheet-dice-rolls-smaller {
@@ -3468,56 +3486,80 @@ input.sheet-conditions-cold:checked ~ div.sheet-conditions-cold {
   font-size: 1em !important;
 }
 
-.sheet-dice-preset {
-  display: grid;
-  -margin-top: 10px;
-  grid-area: sheet-dice-preset;
-  grid-template-areas: "sheet-dice-preset-header" "sheet-dice-preset-preset";
-  justify-items: center;
-}
-
+/* */
 .sheet-dice-preset-header {
-  grid-area: sheet-dice-preset-header;
+  font-size: 12px;
+  margin-bottom: 0px;
+  float: left;
+  justify-self: flex-start;
+  text-indent: 5px;
 }
-
-.sheet-dice-preset-preset {
-  grid-area: sheet-dice-preset-preset;
+.sheet-dice-preset-preset {  
   text-align: center;
   border-width: 0 1px 1px 1px;
-}
-
-.sheet-dice-preset-preset::before,
-.sheet-dice-preset-preset::after {
-  margin-right: 2px;
-  content: "‟";
-}
-
-.sheet-dice-preset-preset::after {
-  margin-left: 2px;
-  content: "”";
-}
-
-.sheet-dice-footer {
-  display: grid;
-  margin: 10px 0 10px 0;
-  grid-area: sheet-dice-footer;
-  grid-template-areas: "sheet-dice-footer-clear . sheet-dice-footer-api";
-  grid-template-columns: auto;
-  grid-template-rows: 2.25em;
-  justify-items: center;
-}
-
+} 
 .sheet-dice-footer-clear {
-  grid-area: sheet-dice-footer-clear;
+  grid-area: sheet-dice-rolls-clear;
 }
-
 .sheet-dice-footer-api {
-  margin: 0 0 2px 0;
-  grid-area: sheet-dice-footer-api;
+  grid-area: sheet-dice-rolls-api;
+}
+.sheet-dice-footer-clear,
+.sheet-dice-footer-api {
+  justify-self: flex-start;
+  width: auto;
+  align-self: center;
+  width: fit-content;
+  margin-left: 5px;
 }
 
-.sheet-api-toggle-show:checked .sheet-dice-footer-api {
-  background: #a60100; 
+.sheet-dice-footer-api button[type="action"].sheet-api-button:focus,
+.sheet-dice-footer-api button[type="action"].sheet-api-button:focus-visible {
+  border-width: 1px;
+  border-style: solid;
+  border-image: unset;
+  color: inherit;
+  border: 1px solid lightblue;
+  background: var(--color-surface2);
+}
+
+
+/* api dice toggle */
+button.sheet-api-button {
+  border: 1px solid lightblue;
+  box-shadow: 2px 2px 3px darkgrey;
+  width: auto;
+  justify-self: flex-start;
+}
+
+input[type="checkbox"].sheet-hidden,
+.sheet-hidden {
+  display: none;
+}
+
+.charsheet div.sheet-api-roll.sheet-dice-rolls-roll,
+.charsheet div.sheet-template-roll.sheet-dice-rolls-roll,
+.charsheet div.sheet-computed-roll.sheet-dice-rolls-roll {
+  display: none;
+}
+input.sheet-hidden.sheet-api-toggle-show:checked ~ div div.sheet-api-roll,
+input.sheet-hidden.sheet-api-toggle-show:not(:checked) ~ div .sheet-computed-roll {
+  display: flex;
+}
+.sheet-dice-rolls-roll button::before {
+  content: "" !important; 
+}
+input.sheet-hidden.sheet-api-toggle-show:checked
+  ~ div div.sheet-api-roll
+  button::after {
+  margin-right: 2px;
+  font-size: 14px;
+  content: "(API)";
+}
+
+input.sheet-api-toggle-show:checked ~ .sheet-dice-footer-api button {
+  background: #a60100;
+  color: white;
 }
 
 /* ---------------------------------- Experience */
@@ -3788,6 +3830,7 @@ input[name="attr_rot_permanent"][value="10"] ~ .sheet-rot10 {
   -max-width: 95px;
   -min-width: 95px;
   width: 100%;
+  width: calc(100% - 10px);
   max-height: 2.25em;
   padding: 5px;
 }
@@ -4034,6 +4077,9 @@ div.sheet-repeating_skills .sheet-input-skills-base-attr {
   
   justify-items: right;
   align-items: baseline;
+}
+.sheet-armor-box10 .repcontainer {
+  width: 100%;
 }
 
 .sheet-armor-ar {
@@ -5795,10 +5841,23 @@ button[type="roll"]:hover {
   color: #fff;
   background: #a60100;
 }
-
+.sheet-dice-rolls button[type="action"].sheet-dice-pool {
+  padding: 2px 3px;
+   font-size: 1.3em;
+   margin: 0px 3px 0px 3px;
+}
+/*
+.sheet-dice-rolls button[type="action"].sheet-dice-pool:before {
+  font-family: "dicefontd6";
+  content: "f";
+} */ 
+.sheet-dice-rolls button[type="action"].sheet-dice-pool span {
+  color: #fff;
+  text-transform: capitalize;
+}
 button[type="action"] > span {
   -font-size: 95%;
-  color: #333;
+  color: #333; 
 }
 
 input.sheet-dice-selection {
@@ -5946,14 +6005,14 @@ input[type="checkbox"].sheet-legendary:checked + span::before {
   background: linear-gradient(0deg, rgba(124,78,8,1) 0%, rgba(224,184,15,1) 100%);
   background-image: url('https://s3.amazonaws.com/files.d20.io/images/16289834/HuG1AuH9EWsSI2tLJZubBA/original.png?1455490062');
   background-size: cover;
-}
+  }
 
 .sheet-rolltemplate-mutantyearzero div.sheet-template-header {
   font-family: 'Didact Gothic', 'DidactGothic', Verdana, Helvetica, Arial, sans-serif;
   font-size: 1em;
   font-weight: bold;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   justify-self: center;
   width: 105%;
   margin: 2px -9px 2px -9px;
@@ -5966,9 +6025,33 @@ input[type="checkbox"].sheet-legendary:checked + span::before {
   border-bottom-left-radius: 9px;
   background-color: #000;
 }
+.sheet-rolltemplate-mutantyearzero div.sheet-template-header.sheet-template-span-one,
+.sheet-rolltemplate-mutantyearzero div.sheet-template-header.sheet-template-span-two {
+  display: inline-block;
+  align-content: center;
+  align-items: center;
+}
+
+.sheet-rolltemplate-mutantyearzero .sheet-push-option a[href^="~"] {
+  background-color: #a52a2a;
+  border: 3px outset black;
+  border-radius: 5px;
+  padding-inline: 15px;
+  padding-block: 3px;
+  margin-top: 3px;
+}
 
 .sheet-rolltemplate-mutantyearzero .sheet-template-header a {
   color: #fff;
+}
+.sheet-rolltemplate-mutantyearzero .sheet-template-header span.inlinerollresult {
+  font-family: 'Didact Gothic', 'DidactGothic', Verdana, Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  color: #fff;
+  background-color: transparent;
+  padding: 0; 
+  cursor: auto;
 }
 
 .sheet-rolltemplate-mutantyearzero

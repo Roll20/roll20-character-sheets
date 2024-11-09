@@ -279,7 +279,7 @@ This dropdown offers three options: Never, Always, or Prompt. These give the opt
 
 ### Activate Item Delete Mode. Deactivate to complete Deletion
 
-This option activates or deactivates the line item deletion mode for armor, weapons, equipment, and the shield. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. If you close the character sheet the deletion marks will be reset, aborting the action.
+This option activates or deactivates the line item deletion mode for gear, skills, powers, talents, and complications. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. You may abandon your selections and abort the mode by either pressing one of the *reset* buttons or by closing the character sheet.
 
 >[!CAUTION]
 > Use of the Delete Mode may lead to unwanted data loss. Deleted items are not recoverable.
@@ -331,4 +331,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
-*Last updated by Villain in Glasses on October 15, 2024 to represent the sheet as of version 3.50.*
+*Last updated by Villain in Glasses on October 31, 2024 to represent the sheet as of version 3.61.*
