@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.34 20241104
+v3.34 20241111
 
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
@@ -4172,6 +4172,7 @@ Comments JBF@CD are action/reminders to Chris
                   <!--Section Talents - Fieldset-->
             <fieldset class="repeating_talents">
               <span class="sheet-hidden"><input name="attr_T_Target-TA" type="text"> <input name="attr_T_RollType" type="text"><input name="attr_T_ModPrefix" type="hidden" value="?"> </span>
+              <input name="attr_T_Name"  placeholder="Name" class="sheet-talentType2 sheet-hidden" >
               <input name="attr_T_TypeOther" type="hidden" value="" class="sheet-talentType" >
               <input name="attr_T_Type" type="hidden" value="D1-Novice" class="sheet-talentType" >
               <div class="sheet-filter-box2 sheet-ShowIfObject">
@@ -16350,6 +16351,36 @@ var repSpellName = function fnrepSpellName( eventInfo ) {
 on("change:repeating_spell:sp_name change:repeating_spell:sp_circle", fn(repSpellName ) );
 
 
+// New Talent, make sure the Type matches the current tab
+var repTalentType = function fnrepTalentType( eventInfo ) {
+  'use strict';
+  try{
+  if( eventInfo && eventInfo[ "sourceType" ] !== "player" ) //Only do if player change
+    return;
+  let pre=buildShortPre(eventInfo,"T");
+  var rowID = _.isString( eventInfo ) ? eventInfo : eventInfo["sourceAttribute"].slice(16, eventInfo["sourceAttribute"].lastIndexOf("_") -3);
+  var strS1 = pre+"Type";
+  getAttrs([ strS1, "tab-talent-filter", "tab" ], function gaRsSTalentType(values) {
+    'use strict';
+    logvalues( values);
+    let vals = {};
+    if(values["tab"]=="3" && values["tab-talent-filter"]!=="D1" && values["tab-talent-filter"]!=="All") //We just filled a line while being on another tab than the All/Discipline/ Match the type
+      vals[strS1]= values["tab-talent-filter"]=="QD" ? "QD-Follower" :
+                   (values["tab-talent-filter"]=="PA" ? "PA-Journeyman":
+                   (values["tab-talent-filter"]=="Other" ? "Dummy": values["tab-talent-filter"]+"-Novice"  ));
+
+    if( Object.keys(vals).length > 0)
+    setAttrsLog( vals );
+  });
+} catch(err) {log("Earthdawn:repTalentType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+}; // End repSpellName
+on("change:repeating_talents:t_name change:repeating_talent:t_textimport", fn(repTalentType ) );
+
+
+
+
+
+
 
 // Copies the spell Effect of the current spell in all talents
 var updateSSWillEffect = function fnupdateSSWillEffect(  ) {
@@ -19451,6 +19482,42 @@ else if( fromSheetVersion < 3.33 ) {
   });
 } // End ver 3.33
 
+else if( fromSheetVersion < 3.34 ) {
+  toSheetVersion = 3.34;
+
+  var newNotes = "Earthdawn by FASA Character Sheet version: " + toSheetVersion + " by Chris Dickey and JB Faure .\n"
+  // Note: Put update stuff here.
+  + "Access the WIKI by pressing the red '?' button at the top right of the character name. "
+  + "Alternatively the url is 'https://wiki.roll20.net/Earthdawn_-_FASA_Official'. Read it.\n"
+  + "-Solved Bug reharding dropping Creatures from Compendium\n"
+  + "-Solved Bug for Strain Calculation from API\n"
+  + "-Solved Bug for the 1 Free Spell per Circle LP Option, for a second Discipline when first is not a spellcaster! BEWARE this may have changed your LP total, change your offset\n"
+
+
+  + notes;
+  // Comment this line out if not to change tab to force release notes visible.
+  showNotes = (showNotes === -1) ? -1 : 1;
+
+
+    let i,pre,newflags;
+    let getV=[];
+
+
+
+        getAttrs( getV , function gaUpdateCharacterSheet(values) {
+          'use strict';
+
+
+  if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
+  setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
+    'use strict';
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  });
+  else{
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  }
+});
+} // End ver 3.34
 
     else  {
 
@@ -19901,7 +19968,6 @@ var UpdateKarmaGlobalMode = function fnUpdateKarmaGlobalMode(eventInfo) {
     return;
   }
   getAttrs( [ kdp, kdp+"GlobalMode" , kdp+"GlobalMode2"] , function gaUpdateKarmaGlobalMode(values) {
-    log(JSON.stringify(values));
     'use strict';
     let vals={};
     vals[kdp+"GlobalMode2"] = getInt(values,kdp)>0 ? values[kdp+"GlobalMode"]: "0";
@@ -20683,8 +20749,8 @@ var updateLPSummary = function fnupdateLPSummary() {
                         nbsc++;
                         rnk=getInt(values,pre+"Circle");
                         inc=0;
-                        for(let j=(nbsc==1?2:1); j<=rnk; j++){
-                          inc+=fibocost[j];   //For first SC discipline, first circle no free spell
+                        for(let j=(i==0?2:1); j<=rnk; j++){
+                          inc+=fibocost[j];   //For first discipline, first circle no free spell
                           s+="Credit for 1 Free Spell per Circle (Optional Rule) for Discipline "+values[pre+"Name"] + " Circle " + j+ " LP-Credit "+fibocost[j] +"\n";
                         }
                         spval-=inc;
@@ -28431,94 +28497,7 @@ var LinkAddByName = function fnLinkAddByName(codeget,ridget,codeprov,nmprovlst) 
   } catch(err){ log("Earthdawn LinkAddByName Error :" + err)}
 };//End LinkAddByName
 
-// var CheckLink = function fnCheckLink(rid,code,lgv,lgvm,lpv,lpvm,values) {
-//   'use strict';
-//   try{
-//     let llst,dlst,llst2,code2,rid2,
-//     mod=false,mod2=false,
-//     pre,pre2,
-//     vals={};
-//
-//     //Start by the LinksGetValue
-//     if(safeString(lgv).length>0 || safeString(lgvm).length>0){
-//       llst = safeString(lgvm).split( "," );
-//       dlst = safeString(lgv).split( "," );
-//       if( llst.length != dlst.length ) {
-//         log( "Checklink : Warning! internal data mismatch in the Links Resetting.");
-//         log( dlst );
-//         log( llst);
-//         llst = [];
-//         dlst = [];
-//         mod=true;
-//       } else {
-//         for( let i = llst.length - 1; i > -1; --i ){
-//           let lnk=llst[i]; //LinksGetValue the list element is a full attribute name repeating_talents_xxx_T_Effective-Rank
-//           code2=repeatSection(3,lnk);
-//           rid2=repeatSection(2,lnk);
-//           pre2=buildPre(rid2,code2);
-//           llst2=safeString(values[pre2+"LinksProvideValueList"]); //This is the list of links from the other half, we have to check if it is consistent
-//           if(!llst2.match(new RegExp(code+";"+rid,"i"))){ //The other half of the link is missing, pop this link
-//             log( "Checklink : Warning! Missing other half link between " + values[buildPre(code,rid)+"Name"] +" and " + dlst[i]);
-//
-//             llst.splice( i, 1);
-//             dlst.splice( i, 1);
-//             mod=true;
-//
-//           }else if(dlst[i]!== values[pre2+"Name"]){//The other half of the link is OK, but check the name
-//             log( "Checklink : Warning! Unconsistent Link Name between " + values[buildPre(code,rid)+"Name"] +" and " + dlst[i]);
-//
-//               dlist=values[pre2+"Name"];
-//               mod=true;
-//             }
-//         }
-//       }
-//
-//       if(mod){
-//       vals[buildPre(code,rid)+"LinksGetValueList"]=llst.join();
-//       vals[buildPre(code,rid)+"LinksGetValue"]=dlst.join();
-//     }
-//
-//     } //end LinksGetValue
-//
-//     //Start  the LinksProvideValue
-//     if(safeString(lpv).length>0 || safeString(lpvm).length>0){
-//       llst = safeString(lpvm).split( "," );
-//       dlst = safeString(lpvm).split( "," );
-//       if( llst.length != dlst.length ) {
-//         log( "Checklink : Warning! internal data mismatch in linkremove.");
-//         log( dlst );
-//         log( llst);
-//         llst = [];
-//         dlst = [];
-//         mod2=true;
-//       } else {
-//         for( let i = llst.length - 1; i > -1; --i ){
-//           let lnk=llst[i]; //LinksProvideValue the list element is CodeRowID
-//           code2=safeString(lnk).split( ";" )[0];
-//           rid2=safeString(lnk).split( ";" )[1];
-//           pre2=buildPre(rid2,code2);
-//           llst2=safeString(values[pre2+"LinksGetValueList"]); //This is the list of links from the other half, we have to check if it is consistent
-//           if(!llst2.match(new RegExp(buildPre(code,rid),"i"))){ //The other half of the link is missing, pop this link
-//             log( "Checklink : Warning! Missing other half link between " + values[buildPre(code,rid)+"Name"] +" and " + dlst[i]);
-//             llst.splice( i, 1);
-//             dlst.splice( i, 1);
-//             mod2=true;
-//           }
-//         }
-//       }
-//
-//       if(mod2){
-//       vals[buildPre(code,rid)+"LinksProvideValueList"]=llst.join();
-//       vals[buildPre(code,rid)+"LinksProvideValue"]=dlst.join();
-//     }
-//
-//   } //end LinksProvideValue
-//
-//     if(mod ||mod2) setAttrsLog(vals);
-//
-//
-// } catch(err){ log("Earthdawn CheckLink Error :" + err)}
-// };//End CheckLink
+
 
 
 </script>
