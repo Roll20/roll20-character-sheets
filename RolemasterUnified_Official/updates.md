@@ -1,6 +1,24 @@
+# 2024-11-7
+
+- Sheet version to 6.  Funny how lots happen at once.
+- Force a skill recalculation after update.
+- Fix dependancy issue in edit.js: It depends on the skill list.   Can now edit dynamic specialisations for
+the new vocational skills.
+- Remove some dead code in skills.
+- Update similar skills modifier for fixed specialisations.
+- Make roll button for dynamic specialisations actually visible.  0 width buttons are really hard to see and click.
+
+# 2024-11-5
+
+- Bump sheet version to 5
+- Vocational skills are now dynamic specialisations.  No longer a fixed list.
+  - Cleans up a lot of space on the sheet
+  - Update the level up process to match
+  - Automatically move old skills across
+
 # 2024-10-29
 
-- Finally update skills to show specilisations,
+- Finaly update skills to show specilisations,
 - Fix translation issue identified by Jon_joe.
     - Seems French has 2 strings translated.  And one exposed a bug
     - Add tests for case
