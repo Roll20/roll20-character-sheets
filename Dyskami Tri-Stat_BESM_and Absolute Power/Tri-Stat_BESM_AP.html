@@ -2351,6 +2351,99 @@
         'power flux':['skill flux'],
         'default':[]
     };
+    const customization_ranks = {
+        'absorption':{'capped':{rank:1},'synergistic':{rank:1}},
+        'alternate form':{},
+        'alternate identity':{},
+        'armor':{'disperse':{rank:1},'emphasized':{rank:1},'gap':{rank:1},'optimized':{rank:2}},
+        'attack mastery':{},
+        'augmented':{},
+        'capacity':{},
+        'change state':{'quick change':{rank:1}},
+        'cognition':{},
+        'combat technique':{},
+        'companion':{},
+        'connected':{'great power':{rank:2},'significant power':{rank:1}},
+        'control environment':{},
+        'conversion':{'escalate':{rank:2}},
+        'data access':{},
+        'defense mastery':{},
+        'dimension walk':{},
+        'dynamic powers':{'major category':{rank:1},'primal category':{rank:2}},
+        'elasticity':{},
+        'enemy attack':{},
+        'enemy defense':{},
+        'energized':{},
+        'exorcism':{},
+        'expertise':{},
+        'extra actions':{},
+        'extra defenses':{},
+        'extra arms':{},
+        'features':{},
+        'flight':{'glide':{rank:1},'maintain':{rank:1},'skim':{rank:1},'spread':{rank:1}},
+        'force field':{'air-tight':{rank:1},'blocks incorporeal':{rank:1},'blocks teleport':{rank:1},'field-penetrating':{rank:1},'offensive':{rank:1},'regenerating':{rank:1},'both directions':{rank:1},'specific':{rank:1},'impacting':{rank:1},'internal':{rank:1}},
+        'ground speed':{'road-bound':{rank:1}},
+        'healing':{},
+        'heightened awareness':{},
+        'heightened senses':{},
+        'illusion':{},//{'extra sense':{rank:1},'multiple illusions':{rank:1}},
+        'immovable':{},
+        'immunity':{},
+        'immutable':{},
+        'inspire':{'galvanize':{rank:2}},
+        'jumping':{},
+        'massive damage':{'focussed damage':{rank:1},'targeted damage':{rank:1}},
+        'melee attack':{},
+        'melee defense':{},
+        'merge':{'proportional damage':{rank:1}},
+        'metamorphosis':{'any form':{rank:2},'multiform':{rank:1}},
+        'mimic':{'all powers':{rank:2}},
+        'mind control':{'broad category':{rank:1},'narrow category':{rank:2},'single category':{rank:4},'specific category':{rank:3}},
+        'mind shield':{},
+        'mini object':{},
+        'minions':{},
+        'mulligan':{},
+        'nullify':{'multiple attributes':{rank:2}},
+        'plant control':{'group':{rank:1},'species':{rank:2}},
+        'pocket dimension':{},
+        'portal':{},
+        'power flux':{'debuff':{rank:1},'major category':{rank:1},'primal category':{rank:2},'skill flux':{rank:1}},
+        'power variation':{},
+        'projection':{'few projections':{rank:1},'several projections':{rank:2}},
+        'ranged attack':{},
+        'ranged defense':{},
+        'regeneration':{'conditional':{rank:1}},
+        'reincarnation':{'difficult to stop':{rank:1}},
+        'resilient':{'complete':{rank:1}},
+        'sensory block':{},
+        'sixth sense':{},
+        'size change':{'both ways':{rank:1},'modified shrinking':{rank:1}},
+        'skill group':{},
+        'social mastery':{},
+        'spaceflight':{},
+        'special movement':{},
+        'summon creatures':{'dimensional':{rank:2},'supernatural':{rank:1}},
+        'super sense':{},
+        'super speed':{},
+        'superstrength':{},
+        'swarm':{},
+        'taunt':{},
+        'telekinesis':{'focussed':{rank:1}},
+        'telepathy':{'broad category':{rank:1},'narrow category':{rank:2},'single category':{rank:4},'specific category':{rank:3}},
+        'teleport':{'blind':{rank:1}},
+        'tough':{},
+        'transfer':{'all attributes':{rank:2},'specific attribute':{rank:2}},
+        'transmute':{'resize':{rank:1},'broad category':{rank:1},'gaseous':{rank:2},'material category':{rank:2}},
+        'tunneling':{},
+        'unaffected':{'all attributes':{rank:3},'all weapons':{rank:1},'many attributes':{rank:2},'several attributes':{rank:1}},
+        'unassailable':{},
+        'undetectable':{'nonadjacent':{rank:1}},
+        'unique attribute':{},
+        'unknown power':{},
+        'water speed':{},
+        'wealth':{},
+        'weapon':{'alt-munition':{rank:0},'fieldless':{rank:1},'hands':{rank:1},'ingest':{rank:1}}
+    };
     const limiter_ranks = {
         'absorption':{'capped':{rank:1}},
         'alternate form':{},
@@ -3040,6 +3133,25 @@
         return parseInt(integer) || fallback;
     }
 
+    function get1or3(level, start) {
+        let result = 0;
+        if (start == 1) {
+            result = (level & 1) ? 1 : 3;
+        } else if (start == 3) {
+            result = (level & 1) ? 3 : 1;
+        }
+        return result;
+    }
+    
+    function get1or2andHalfor5(level) {
+        const oneTwoAndHalfOrFive = mod =>
+            mod == 0 ? 1 :
+            mod == 1 ? 2.5 :
+            mod == 2 ? 5 :
+            0;
+        return oneTwoAndHalfOrFive(level % 3);
+    }
+
     function clog(cache, data, title, type = 'event') {
         //types = 'info', 'event'
         //debug = 0:none, 1:info, 2:event, 3:performance
@@ -3406,9 +3518,11 @@
                 }
             }
         }
-        temp.flux_points_available = cache.groupdb[cache.static_group_visible_id].pool_points;
+        temp.flux_points_available = cache.groupdb[cache.static_group_visible_id].elevel * 5;
         set_values.static_attribute_group_poolpoints = 
             `${temp.flux_points_used} / ${temp.flux_points_available}`;
+        set_values.static_attribute_group_totalpoints = 
+            cache.groupdb[cache.static_group_visible_id].level * 10;
     }
 
     function setDynamicPowersPoolLevels(cache, set_values) {
@@ -3442,7 +3556,7 @@
             for (let j = 0; j < attributes.length; j++) {
                 if (attributes[j].group_id === cache.static_group_visible_id) {
                     const point_index = attributes[j].config.findIndex(c => c.name === 'base points');
-                    temp.variation_points_max += attributes[j].config[point_index].rank;
+                    temp.variation_points_max += point_index !== -1 ? attributes[j].config[point_index].rank : 0;
                     temp.variation_points_used += attributes[j].active ? attributes[j].points : 0;
                 }
             }
@@ -3466,7 +3580,7 @@
             for (let j = 0; j < attributes.length; j++) {
                 if (attributes[j].group_id === cache.static_group_visible_id) {
                     const point_index = attributes[j].config.findIndex(c => c.name === 'base points');
-                    temp.totalpoints += attributes[j].config[point_index].rank;
+                    temp.totalpoints += point_index !== -1 ? attributes[j].config[point_index].rank : 0;
                 }
             }
         }
@@ -3820,6 +3934,7 @@
                                     'attrdb',
                                     'defectdb',
                                     'groupdb',
+                                    'rulesdb',
                                     'static_group_visible_id',
                                     'static_skills_visible_id',
                                     'statsdb'
@@ -5382,6 +5497,827 @@
                 }
             }
         }
+    }
+
+    function setDefectCharacteristic(debug, timer,attrdb, value, rowID, setObj){
+        const defect = value[`repeating_attr_${rowID}_defect`];
+        const defectid = removeWhiteSpace(defect);
+        const shortcoming = value[`repeating_attr_${rowID}_defectaspect`];
+        const rank = parseInt(value[`repeating_attr_${rowID}_rank`]) || 0;
+        const shortcomingCharacteristics = {
+            "body": `Body -${rank}`,
+            "mind": `Mind -${rank}`,
+            "soul": `Soul -${rank}`,
+            "agi": `Agility -${rank}`,
+            "con": `Constitution -${rank}`,
+            "dex": `Dexterity -${rank}`,
+            "str": `Strength -${rank}`,
+            "cre": `Creativity -${rank}`,
+            "int": `Intellect -${rank}`,
+            "per": `Perception -${rank}`,
+            "rea": `Reasoning -${rank}`,
+            "awa": `Awareness -${rank}`,
+            "cha": `Charisma -${rank}`,
+            "com": `Composure -${rank}`,
+            "wil": `Willpower -${rank}`
+        };
+        const defectCharacteristics = {
+            "achillesheel":{
+                1: "rare attack form",
+                2: "uncommon attack form",
+                3: "common attack form",
+                "default": ""
+            },
+            "awkwardsize":{
+                0: "Medium",
+                1: "Large",
+                2: "Huge",
+                3: "Mammoth",
+                4: "Gigantic",
+                5: "Gargantuan",
+                6: "Colossal",
+                7: "Enormous",
+                8: "Monstrous",
+                9: "Titanic",
+                10: "Monumental"
+            },
+            "bane":{
+                1: "10 damage/round exposed",
+                2: "20 damage/round exposed",
+                3: "30 damage/round exposed",
+                "default": ""
+            },
+            "blindfury":{
+                1: "difficult initiate; easy revert",
+                2: "moderately difficult initiate/revert",
+                3: "easy initiate; difficult revert",
+                "default": ""
+            },
+            "conditionalownership":{
+                1: "mild conditions",
+                2: "strict conditions",
+                3: "severe conditions",
+                "default": ""
+            },
+            "confined":{
+                1: "large area (100 km radius)",
+                2: "moderate area (1 km radius)",
+                3: "small area (100 m radius)",
+                "default": ""
+            },
+            "cursed":{
+                1: "slight disadvantage",
+                2: "moderate disadvantage",
+                3: "severe disadvantage",
+                "default": ""
+            },
+            "demure":{
+                1: "Social Combat Value -2",
+                2: "Social Combat Value -4",
+                3: "Social Combat Value -6",
+                "default": ""
+            },
+            "easilydistracted":{
+                1: "triggered infrequently",
+                2: "triggered frequently",
+                3: "triggered constantly",
+                "default": ""
+            },
+            "fragile":{
+                1: "Health Points -10",
+                2: "Health Points -20",
+                3: "Health Points -30",
+                "default": ""
+            },
+            "hounded":{
+                1: "slightly inconvenient",
+                2: "moderately inconvenient",
+                3: "severely inconvenient",
+                "default": ""
+            },
+            "impairedmanipulation":{
+                1: "only one usable arm",
+                2: "rudimentary manipulative ability",
+                3: "no usable arms",
+                "default": ""
+            },
+            "impairedspeech":{
+                1: "severe speech impediment",
+                2: "sounds that carry emotional content",
+                3: "completely mute",
+                "default": ""
+            },
+            "ineptattack":{
+                1: "-1 Attack Combat Value",
+                2: "-2 Attack Combat Value",
+                3: "-3 Attack Combat Value",
+                "default": ""
+            },
+            "ineptdefence":{
+                1: "-1 Defence Combat Value",
+                2: "-2 Defence Combat Value",
+                3: "-3 Defence Combat Value",
+                "default": ""
+            },
+            "involuntarychange":{
+                1: "Difficult to trigger",
+                2: "Moderately easy to trigger",
+                3: "Easy to trigger",
+                "default": ""
+            },
+            "ism":{
+                1: "slight discrimination",
+                2: "moderate discrimination",
+                3: "severe discrimination",
+                "default": ""
+            },
+            "magnet":{
+                1: "few adoring fans",
+                2: "handful of adoring fans",
+                3: "swarms of adoring fans",
+                "default": ""
+            },
+            "marked":{
+                1: "easily concealable",
+                2: "concealed with moderate difficulty",
+                3: "cannot be concealed in most circumstances",
+                "default": ""
+            },
+            "nemesis":{
+                1: "interferes infrequently",
+                2: "interferes frequently",
+                3: "interferes constantly",
+                "default": ""
+            },
+            "nightmares":{
+                1: "occur infrequently",
+                2: "occur frequently",
+                3: "occur constantly",
+                "default": ""
+            },
+            "nohealing":{
+                1: "healing/recovery at slight disadvantage",
+                2: "healing/recovery at moderate disadvantage",
+                3: "healing/recovery at severe disadvantage",
+                "default": ""
+            },
+            "obligated":{
+                1: "small obligation",
+                2: "moderate obligation",
+                3: "large obligation",
+                "default": ""
+            },
+            "phobia":{
+                1: "slight- encountered infrequently",
+                2: "moderate- encountered frequently",
+                3: "severe- encountered constantly",
+                "default": ""
+            },
+            "physicalimpairment":{
+                1: "slight inconvenience",
+                2: "moderate inconvenience",
+                3: "severe inconvenience",
+                "default": ""
+            },
+            "redtape":{
+                1: "generally easy to manage",
+                2: "moderately difficult to manage",
+                3: "difficult to manage",
+                "default": ""
+            },
+            "reduceddamage":{
+                1: "Damage Multiplier -1",
+                2: "Damage Multiplier -2",
+                3: "Damage Multiplier -3",
+                "default": ""
+            },
+            "sensoryimpairment":{
+                1: "minor obstacle",
+                2: "major obstacle",
+                3: "loss of sense",
+                "default": ""
+            },
+            "significantother":{
+                1: "appears infrequently",
+                2: "appears frequently",
+                3: "appears constantly",
+                "default": ""
+            },
+            "skeletoninthecloset":{
+                1: "difficult to discover",
+                2: "moderately easy to discover",
+                3: "easy to discover",
+                "default": ""
+            },
+            "socialfault":{
+                1: "slight disadvantage",
+                2: "moderate disadvantage",
+                3: "severe disadvantage",
+                "default": ""
+            },
+            "specialrequirement":{
+                1: "easy/infrequent",
+                2: "moderately difficult/frequent",
+                3: "difficult/constant",
+                "default": ""
+            },
+            "unappealing":{
+                1: "slightly",
+                2: "moderately",
+                3: "severely",
+                "default": ""
+            },
+            "unique":{
+                1: "infrequent/slight effect",
+                2: "frequent/moderate effect",
+                3: "constant/severe effect",
+                "default": ""
+            },
+            "unsettled":{
+                1: "Sanity Points -2",
+                2: "Sanity Points -4",
+                3: "Sanity Points -6",
+                "default": ""
+            },
+            "vulnerability":{
+                1: "drop by one quarter",
+                2: "drop by one half",
+                3: "cannot be used",
+                "default": ""
+            },
+            "wanted":{
+                1: "incentive offered is slight",
+                2: "incentive offered is moderate",
+                3: "incentive offered is extreme",
+                "default": ""
+            },
+            "weakpoint":{
+                1: "difficult to hit",
+                2: "moderately easy to hit",
+                3: "easy to hit",
+                "default": ""
+            }
+        };
+        const characteristic = defect == 'shortcoming' ?
+            shortcomingCharacteristics[`${shortcoming}`] :
+            defectCharacteristics[`${defectid}`][rank] || 
+            defectCharacteristics[`${defectid}`]["default"];
+        const result = `${capital(defect)}, ${characteristic}`;
+        clog(debug, timer, 'characteristic =', result, 'setDefectCharacteristic()');
+        setObj[`repeating_attr_${rowID}_characteristic`] = result;
+    }
+
+    function setConfiguration(cache, set_values, query) {
+        const configurations = {
+            "absorption":'absorb',
+            "armor":'armor rating',
+            "augmented":'augmented_stat',
+            "capacity":'capacity_type',
+        };
+        const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
+        const configuration =
+            db.map(c =>
+                `${c.name.capitalize()} ` +
+                `(${c.name === query.attribute || c.name === configurations[query.attribute] ?
+                    setAttrCharacteristic(cache, set_values, query) : 
+                    isNaN(c.rank) ? c.rank.capitalize() : c.rank})`
+        ).sort().join("\n");
+        return configuration;
+    }
+    
+    function setAttrCharacteristic(cache, set_values, query = {}) {//(debug, timer, value, rowID, setObj) {
+        clog(cache, query, 'setAttrCharacteristic()');
+        query.attribute = query.attribute === undefined ? cache.attribute[0] : query.attribute;
+        query.elevel = query.elevel === undefined ? 0 : query.elevel;
+        let description = "";
+        switch (query.attribute) {
+            case "absorption": description = `${query.elevel * 5} Damage Absorbed`; break;
+            case "alternate form": description = `${query.elevel * 5} Character Points`; break;
+            case "alternate identity": description = `${query.elevel} Alternate Identities`; break;
+            case "armor": description = query.elevel * 5; break;
+            case "attack mastery": description = `+${query.elevel} ACV`; break;
+            case "augmented": description = `+${query.elevel} ${query.db.config[capacity_index].rank}`; break;
+            case "capacity": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "change state": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "cognition": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "combat technique": description = `${query.elevel} Techniques Remaining`; break;
+            case "companion": description = `${query.elevel * 10} Character Points`; break;
+            case "connected": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "control environment": description = getCharacteristicByCustomizations(cache, set_values, query); break;
+            case "conversion": description = `${query.elevel} Character Points/10 Damage`; break;
+            case "data access": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "defense mastery": description = `DCV +${query.elevel}`; break;
+            case "dimension walk": description = getCharacteristicByAttr(cache, set_values, query); break;
+            //case "dynamic powers": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "elasticity": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "enemy attack": description = `ACV +${query.elevel * 2} vs. ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
+            case "enemy defense": description = `DCV +${query.elevel * 2} vs. ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
+            case "energized": description = `Energy Points +${query.elevel * 10}`; break;
+            case "exorcism": description = `Soul +${query.elevel * 2}`; break;
+            case "extra actions": description = `+${query.elevel} additional actions each round`; break;
+            case "extra arms": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "extra defenses": description = `+${query.elevel} defensive actions each round`; break;
+            case "features": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "flight": description = `Flight speed up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} kph`; break;
+            case "force field": description = `${query.elevel * 10} Armor Rating`; break;
+            //case "gear": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "ground speed": description = `${query.elevel} kph`; break;
+            case "healing": description = `Restore ${query.elevel * 5} Health Points`; break;
+            case "heightened awareness": description = `${query.elevel} Awareness Bonus`; break;
+            case "heightened senses": description = `${query.elevel} Senses Remaining`; break;
+            case "illusion": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "immovable": description = `Knockback reduced by ${query.elevel * 10} m`; break;
+            case "immunity": description = `Immune to ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
+            case "immutable": const immutablestat = getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute); characteristic = `+${query.elevel * 2} ${capital(immutablestat)} roll to resist effects`; break;
+            case "inspire": description = `Stat/Skill Rolls +${query.elevel}`; break;
+            case "jumping": description = `${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 1) / 2)))} Times Normal Distance`; break;
+            case "massive damage": description = setMassiveDamageCharacteristic(debug, timer, value, rowID, level, setObj); break;
+            case "melee attack": description = `ACV +${query.elevel * 2} with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
+            case "melee defense": description = `DCV +${query.elevel * 2} with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
+            case "merge": description = `Contribute ${query.elevel * 10} Character Points`; break;
+            case "metamorphosis": description = `Race Template +/- ${query.elevel * 5} Character Points`; break;
+            case "mimic": description = `Mimic Level ${query.elevel} Attributes`; break;
+            case "mind control": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "mind shield": description = `${query.elevel} + Mind`; break;
+            case "minions": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "mulligan": description = `${query.elevel * 2} re-rolls each game session`; break;
+            case "nullify": description = `Nullify ${query.elevel} Levels of an attribute`; break;
+            case "plant control": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "pocket dimension": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "portal": description = `${query.elevel} one-way portals`; break;
+            //case "power flux": description = `${query.elevel * 5} Flux Points`; break;
+            //case "power variation": description = `${query.elevel + 1} Variable Attributes`; break;
+            case "projection": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "range dattack": description = `ACV +${query.elevel * 2} with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
+            case "range ddefense": description = `DCV +${query.elevel * 2} ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} Ranged Defense`; break;
+            case "regeneration": description = `Regenerate ${query.elevel * 5} Heath Points/Round`; break;
+            case "reincarnation": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "resilient": description = `${query.elevel} Resiliencies Remaining`; break;
+            case "sensory block": description = `Block ${getCharacteristicByCustomizations(debug, timer, value, rowID, attribute)}`; break;
+            case "sixth sense": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "size change": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "skill": description = `${query.elevel * 10} Skill Points to Skill Group ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
+            case "social mastery": description = `SCV +${query.elevel * 2}`; break;
+            case "space flight": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "summon creatures": description = `Summon up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} Creatures`; break;
+            case "supersense": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "superspeed": description = `Superspeed up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel + 2) / 2)))} kph`; break;
+            case "superstrength": description = `${query.elevel} tonns`; break;
+            case "swarm": description = `Health Points * ${query.elevel} Creatures`; break;
+            case "telekinesis": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "telepathy": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "teleport": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "tough": description = `Health Points +${query.elevel * 10}`; break;
+            case "transfer": description = `Transer Attributes as Level ${query.elevel}`; break;
+            case "transmute": description = `Transmute objects of ${query.elevel * 5} Character Points`; break;
+            case "tunneling": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "unaffected": description = `Attacker's roll ${query.elevel * -2}`; break;
+            case "unassailable": description = `Sanity Points +${query.elevel * 2}`; break;
+            case "undetectable": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "unique attribute": description = ""; break;
+            case "unknown power": description = `${query.elevel} Character Points`; break;
+            case "water speed": description = `Water speed up tp ${get1or3(query.elevel, 1) * (10 ** (Math.ceil(query.elevel / 2)))} kph`; break;
+            case "wealth": description = getCharacteristicByAttr(cache, set_values, query); break;
+            case "weapon": description = `${query.elevel} Damage`; break;
+            default: description = "";
+        }
+        //set_values[`${cache.source_path}_configuration`] = characteristic;
+        return description;
+    }
+    
+    function setMassiveDamageCharacteristic(debug, timer, value, rowID, level, setObj) {
+        const targeted = getIsTargeted(debug, timer, value, rowID, setObj);
+        const focused = getCustomizationValue(debug, timer, value, rowID, 'rank', 'focuseddamage');
+        const enemy = value[`repeating_attr_${rowID}_enemy`] || '<not configured>';
+        const weaponclass = value[`repeating_attr_${rowID}_weaponclass`];
+        let characteristic = `DM +${temp.elevel}`;
+        if (targeted) characteristic = characteristic + ` vs. ${enemy}`;
+        if (focused > 0) characteristic = characteristic + ` with ${weaponclass} weapons`;
+        return characteristic;
+    }
+    
+    function getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute) {
+        const obj = {
+            "meleeattack": "weaponclass",
+            "rangedattack": "weaponclass",
+            "meleedefense": "weaponclass",
+            "enemyattack": "enemy",
+            "enemydefense": "enemy",
+            "immunity": "immunityrole",
+            "immutable": "stat",
+            "rangeddefense": "defenseclass",
+            "skill": "skillgroup"
+        };
+        const default_obj = {
+            "meleeattack": "<select weapon class>",
+            "rangedattack": "<select weapon class>",
+            "meleedefense": "<select weapon class>",
+            "enemyattack": "<not configured>",
+            "enemydefense": "<not configured>",
+            "immunity": "<not configured>",
+            "immutable": "body",
+            "rangeddefense": "personal",
+            "skill": 1
+        }
+        const characteristic = (obj[attribute]);
+        clog(debug, timer, 'characteristic =', characteristic, 'getCharacteristicSpecializationByAttr()');
+        const characteristicValue = value[`repeating_attr_${rowID}_${characteristic}`];
+        clog(debug, timer, 'characteristicValue =', characteristicValue);
+        const result = characteristicValue === undefined ? 
+            default_obj[attribute] :
+            capital(characteristicValue);
+        clog(debug, timer, 'result =', result);//, 'getCharacteristicSpecializationByAttr()');
+        return result;
+    }
+    
+    function getCharacteristicByAttr(cache, set_values, query = {}) {
+        clog(cache, query, 'getCharacteristicByAttr()');
+        //query.attribute = query.attribute === undefined ? cache.attribute[0] : query.attribute;
+        //query.elevel = query.elevel === undefined ? 0 : query.elevel;
+        //const level = parseInt(setObj[`repeating_attr_${rowID}_effectivelevel`]) || parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) || 0,
+        const chardb = {
+                "capacity": {
+                    "cargo": {
+                        0: "0 kg",
+                        1: "200 kg",
+                        2: "500 kg",
+                        3: "1 tonne",
+                        4: "2 tonnes",
+                        5: "5 tonnes",
+                        6: "10 tonnes",
+                        7: "25 tonnes",
+                        8: "50 tonnes",
+                        9: "100 tonnes",
+                        10: "200 tonnes",
+                        "default": ""
+                    },
+                    "carry": {
+                        0: "+0 people",
+                        1: "+1 person",
+                        2: "+2 people",
+                        3: "+5 people",
+                        4: "+10 people",
+                        5: "+25 people",
+                        6: "+50 people",
+                        7: "+100 people",
+                        8: "+250 people",
+                        9: "+500 people",
+                        10: "+1,000 people",
+                        "default": ""
+                    }
+                },
+                "change state": {
+                    1: "Liquid state, short duration",
+                    2: "Liquid state, long duration",
+                    3: "Gaseous state, short duration",
+                    4: "Gaseous state, long duration",
+                    5: "Incorpreal state, short duration",
+                    6: "Incorpreal state, long duration",
+                    7: "Energy state, short duration",
+                    8: "Energy state, long duration",
+                    "default": "Does not improve beyond level 8"
+                },
+                "cognition": {
+                    1: "Future: a few seconds; Past: 1 minute",
+                    2: "Future: 1 minute; Past: 1 hour",
+                    3: "Future: 10 minutes; Past: 1 day",
+                    4: "Future: 1 hour; Past: 1 week",
+                    5: "Future: 1 day; Past: 1 month",
+                    6: "Future: 1 week; Past: 1 year",
+                    7: "Future: 1 month; Past: 2 years",
+                    8: "Future: 1 year; Past: 4 years",
+                    "default": ""
+                },
+                "connected": {
+                    1: "Associated",
+                    2: "Respected",
+                    3: "Modest Authority",
+                    4: "Local Authority",
+                    5: "Regional Authority.",
+                    6: "Provincial Authority",
+                    7: "National Authority",
+                    8: "International Authority",
+                    9: "Planetary Authority",
+                    10: "Extraplanetary Authority",
+                    "default": "Does not improve beyond level 10"
+                },
+                "data access": {
+                    1: "Tiny-sized (10 cm radius)",
+                    2: "Small-sized (1 m radius)",
+                    3: "Moderately-sized (10 m radius)",
+                    4: "Building-sized (100 m radius)",
+                    5: "Neighbourhood-sized (1 km radius)",
+                    6: "City-sized (10 km radius)",
+                    "default": ""
+                },
+                "dimension walk": {
+                    1: "Reflect insignificant changes",
+                    2: "Reflect specific changes",
+                    3: "Reflect minor changes",
+                    4: "Reflect moderate changes",
+                    5: "Reflect significant changes",
+                    6: "Reflect major changes",
+                    "default": "Does not improve beyond level 6"
+                },
+                "dynamic powers": {
+                    1: "Minimal control",
+                    2: "Minor control",
+                    3: "Moderate control",
+                    4: "Good control",
+                    5: "Significant control",
+                    6: "Major control",
+                    "default": "Does not improve beyond level 6"
+                },
+                "elasticity": {
+                    1: "Stretch up to 10 cm",
+                    2: "Stretch up to 30 cm",
+                    3: "Stretch up to 1 m",
+                    4: "Stretch up to 3 m",
+                    5: "Stretch up to 10 m",
+                    6: "Stretch up to 30 m",
+                    "default": ""
+                },
+                "extra arms": {
+                    1: "1 additional arm",
+                    2: "2 additional arms",
+                    3: "Up to 5 additional arms",
+                    4: "Up to 10 additional arms",
+                    5: "Up to 25 additional arms",
+                    6: "Up to 50 additional arms",
+                    "default": "Does not improve beyond level 6"
+                },
+                "features": {
+                    1: "Up to 2 features",
+                    2: "Up to 5 features",
+                    3: "Up to 10 features",
+                    4: "Up to 25 features",
+                    5: "Up to 50 features",
+                    6: "Up to 100 features",
+                    "default": "Does not improve beyond level 6"
+                },
+                "gear": {
+                    1: "Up to 2 pieces of gear",
+                    2: "Up to 5 pieces of gear",
+                    3: "Up to 10 pieces of gear",
+                    4: "Up to 25 pieces of gear",
+                    5: "Up to 50 pieces of gear",
+                    6: "Up to 100 pieces of gear",
+                    "default": "Does not improve beyond level 6"
+                },
+                "ground speed": {
+                    1: "Ground speed up to 10 kph",
+                    2: "Ground speed up to 25 kph",
+                    3: "Ground speed up to 50 kph",
+                    4: "Ground speed up to 100 kph",
+                    5: "Ground speed up to 250 kph",
+                    6: "Ground speed up to 500 kph",
+                    "default": "Does not improve beyond level 6"
+                },
+                "illusion": {
+                    1: "Tiny-sized (10 cm radius)",
+                    2: "Small-sized (1 m radius)",
+                    3: "Moderately-sized (10 m radius)",
+                    4: "Building-sized (100 m radius)",
+                    5: "Neighbourhood-sized (1 km radius)",
+                    6: "City-sized (10 km radius)",
+                    "default": "Does not improve beyond level 6"
+                },
+                "mind control": {
+                    1: "Extremely basic, non-aggressive suggestions",
+                    2: "Simple, non-aggressive suggestions",
+                    3: "Copmlex, non-aggressive suggestions",
+                    4: "Complex, aggressive suggestions",
+                    5: "Complex/aggressive suggestions, erase brief events",
+                    6: "Complex/aggressive suggestions, alter events",
+                    "default": ""
+                },
+                "minions": {
+                    1: "Up to 5 Minions",
+                    2: "Up to 10 Minions",
+                    3: "Up to 25 Minions",
+                    4: "Up to 50 Minions",
+                    5: "Up to 100 Minions",
+                    6: "Up to 200 Minions",
+                    "default": ""
+                },
+                "plant control": {
+                    1: "Control 10 cm radius, Growth 3x",
+                    2: "Control 1 m radius, Growth 10x",
+                    3: "Control 10 m radius, Growth 30x",
+                    4: "Control 100 m radius, Growth 100x",
+                    5: "Control 1 km radius, Growth 300x",
+                    6: "Control 10 km radius, Growth 1000x",
+                    "default": ""
+                },
+                "pocket dimension": {
+                    1: "Tiny-sized (10 cm radius)",
+                    2: "Small-sized (1 m radius)",
+                    3: "Moderately-sized (10 m radius)",
+                    4: "Building-sized (100 m radius)",
+                    5: "Neighbourhood-sized (1 km radius)",
+                    6: "City-sized (10 km radius)",
+                    "default": ""
+                },
+                "projection": {
+                    1: "Tiny-sized (10 cm radius)",
+                    2: "Small-sized (1 m radius)",
+                    3: "Moderately-sized (10 m radius)",
+                    4: "Building-sized (100 m radius)",
+                    5: "Neighbourhood-sized (1 km radius)",
+                    6: "City-sized (10 km radius)",
+                    "default": ""
+                },
+                "reincarnation": {
+                    1: "Up to 1 month to reincarnate",
+                    2: "Up to 1 week to reincarnate",
+                    3: "Up to 1 day to reincarnate",
+                    4: "Up to 12 hours to reincarnate",
+                    5: "Up to 1 hour to reincarnate",
+                    6: "Up to 1 minute to reincarnate",
+                    "default": "Does not improve beyond level 6"
+                },
+                "space flight": {
+                    1: "Primitive near-planetary Spaceflight",
+                    2: "Slow interplanetary Spaceflight",
+                    3: "Average interplanetary Spaceflight",
+                    4: "Fast interplanetary Spaceflight",
+                    5: "Extrasolar Spaceflight",
+                    6: "Slow faster-than-light Spaceflight",
+                    "default": "Does not improve beyond level 6"
+                },
+                "telekinesis": {
+                    1: "Move 1 kg",
+                    2: "Move 10 kg",
+                    3: "Move 100 kg",
+                    4: "Move 1 tonne",
+                    5: "Move 10 tonnes",
+                    6: "Move 100 tonnes",
+                    "default": ""
+                },
+                "telepathy": {
+                    "default": "See rulebook for capabilities"
+                },
+                "teleport": {
+                    1: "10 m teleportation distance",
+                    2: "100 m teleportation distance",
+                    3: "1 km teleportation distance",
+                    4: "10 km teleportation distance",
+                    5: "100 km teleportation distance",
+                    6: "1000 km teleportation distance",
+                    "default": ""
+                },
+                "tunneling": {
+                    1: "10 meters per hour",
+                    2: "30 meters per hour",
+                    3: "100 meters per hour",
+                    4: "300 meters per hour",
+                    5: "1 kph",
+                    6: "3 kph",
+                    "default": ""
+                },
+                "wealth": {
+                    1: "Financially stable ($300,000)",
+                    2: "Well off ($1M)",
+                    3: "Moderately rich ($3M)",
+                    4: "Very rich ($10M)",
+                    5: "Extremely rich ($30M)",
+                    6: "Moderately wealthy ($100M)",
+                    "default": ""
+                }
+            };
+        let characteristic = '';
+        if (query.elevel === 0) {
+            return characteristic = getTranslationByKey("not-configured");
+        } else {
+            switch(query.attribute) {
+                case 'capacity':
+                    //query.capacity_type = parseInt(setObj[`repeating_attr_${rowID}_capacitytype`]) || parseInt(value[`repeating_attr_${rowID}_capacitytype`]) || 0;
+                    const capacity_index = query.db.config.findIndex(c => c.name === 'capacity_type');
+                    query.capacity_type = query.db.config[capacity_index].rank;
+                    characteristic = (query.elevel < 11) ? 
+                        chardb[`${query.attribute}`][query.capacity_type][query.elevel] || '' : 
+                        query.selection === "cargo" ? 
+                            `${(2 ** (query.elevel - 9)) * 100} tonnes` : 
+                        query.selection === "carry" ? 
+                            `+${(2 ** (query.elevel - 10)) * 1000} people` : '';
+                break;
+                case 'cognition':
+                    characteristic = (query.elevel < 9) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Future: ${2 ** (query.elevel - 8)} years; Past: ${2 ** (query.elevel - 6)} years`;
+                break;
+                case 'data access':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `${10 ** (query.elevel - 5)} km radius`;
+                break;
+                case 'elasticity':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Stretch body up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 4) / 2)))} km`;
+                break;
+                case 'mind control':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        chardb[`${query.attribute}`][6];
+                break;
+                case 'minions':
+                    characteristic = (query.elevel < 7) ? 
+                    (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                    `Up to ${400 * (query.elevel - 6)} Minions`;
+                break;
+                case 'plant control':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Control ${(10 ** (query.elevel - 5))} km radius\nGrowth ${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 4) / 2)))}x`;
+                break;
+                case 'pocket dimension':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Massive dimension (${(10 ** (query.elevel - 5))} km radius)`;
+                break;
+                case 'projection':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Massive-sized projection (${(10 ** (query.elevel - 5))} km radius)`;
+                break;
+                case 'size change':
+                    characteristic = (query.elevel < 11) ? 
+                        `Grow/Shrink by ${temp.elevel} Size Ranks` : `Does not improve beyond level 10`;
+                break;
+                case 'telekinesis':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Move ${(10 ** (query.elevel - 4))} tonnes`;
+                break;
+                case 'teleport':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `${(10 ** (query.elevel - 3))} km teleportation distance`;
+                break;
+                case 'tunneling':
+                    const highlevel = `${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 6) / 2)))} kph`;
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : highlevel;
+                break;
+                case 'wealth':
+                    characteristic = (query.elevel < 7) ? 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        `Extremely wealthy ($${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 3) / 2)))}M)`;
+                break;
+                default:
+                    characteristic = 
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) || '';
+            }
+        }
+        return characteristic;
+    }
+    
+    function getConfigurationByCustomization(cache, query) {
+        const customizations = {
+            "emphasized":'damage_type',
+            "optimized":'damage_type',
+        };
+        return customizations[query.customization[0]] || false;
+    }
+
+    function customizationHasRank(query) {
+        const customizations = [
+            'acceleration',
+            'activation',
+            'area',
+            'assisted',
+            'backlash',
+            'charges',
+            'concentration',
+            'consumable',
+            'delay',
+            'dependent',
+            'deplete',
+            'detectable',
+            'duration',
+            'emotional',
+            'environmental',
+            'equipment',
+            'haywire',
+            'ignore',
+            'imbue',
+            'irreversible',
+            'localized',
+            'maximum',
+            'object',
+            'permanent',
+            'potent',
+            'range',
+            'recovery',
+            'semi-permanent',
+            'targets',
+            'timed',
+            'unique',
+            'unpredictable'
+        ];
+        return customizations.indexOf(query.customization[0]) !== -1;
     }
 
     /* Defect Functions */
@@ -8334,35 +9270,9 @@
                                     }
                                 });
                             }
-                            /*
-                            query.db = cache.source_section === 'attribute' ? 
-                                cache.attrdb[all_list[a]].find((b, i) => {
-                                    if (b.row_id.toLowerCase() === cache.source_id) {
-                                        query[cache.source_section] = all_list[a];
-                                        query.index = i;
-                                        return true;
-                                    }
-                                }) : 
-                                cache.defectdb[all_list[a]].find((b, i) => {
-                                    if (b.row_id.toLowerCase() === cache.source_id) {
-                                        query[cache.source_section] = all_list[a];
-                                        query.index = i;
-                                        return true;
-                                    }
-                            });
-                            */
                             if (!_.isEmpty(query.db)) { break; }
-                            
-                            /*
-                            for (let b = 0; b < db[all_list[a]].length; b++) {
-                                if (db[all_list[a]][b].row_id.toLowerCase() === cache.source_id) {
-                                    query[cache.source_section] = all_list[a];
-                                    query.index = b;
-                                    query.db = db[all_list[a]][b];
-                                }
-                            }
-                            */
                         }
+                        query.elevel = query.db.elevel;
                     break;
                 }
             break;
@@ -8399,6 +9309,7 @@
                         `|${getTranslationByKey("group")},group`;
                     query.last = query.next;
                 break;
+                /*
                 case 'select_task':
                     query.db = `${query.type === 'attribute' ? 'attr' : 'defect'}db`;
                     query.total = query.type === 'group' ? 1 : 0;
@@ -8450,6 +9361,7 @@
                     query.options += `|${getTranslationByKey("go-back")},select_type`;
                     query.last = query.next;
                 break;
+                */
                 case 'add_attribute':
                 //case 'static_attributes_add_button':
                     query.name = '';
@@ -8565,9 +9477,9 @@
                     query.options = `|No,${query.last}|Yes,yes`;
                     query.last = query.next;
                 break;
-                case 'edit_attribute':
+                //case 'edit_attribute':
                 case 'reset_attribute':
-                    query.title = `${query.type === 'edit' ? getTranslationByKey("edit") : getTranslationByKey("reset")}`;
+                    query.title = getTranslationByKey("reset");
                     query.options = '';
                     for (let i = 0; i < all_attributes.length; i++) {
                         for (let j = 0; j < cache.attrdb[all_attributes[i]].length; j++) {
@@ -8581,6 +9493,7 @@
                     query.options += `|${getTranslationByKey("go-back")},select_task`;
                     query.last = query.next;
                 break;
+                /*
                 case 'edit_defect':
                     query.title = `${getTranslationByKey("edit")}`;
                     query.options = '';
@@ -8601,6 +9514,8 @@
                     query.selection = `${cache.groupdb[cache.static_group_visible_id].name}~${cache.static_group_visible_id}`;
                     query.last = query.next;
                 break;
+                */
+                /*
                 case 'attribute_menu':
                     query.title = `${
                         query.attribute === 'skill group' ?
@@ -8651,18 +9566,6 @@
                     query.options +=
                         `|${getTranslationByKey("level")} [ ${query.level} (${query.elevel}) ],select_level` +
                         `|${getTranslationByKey("limiters")} [ +${query.limiters_ranks} ],limiter_task`;
-                    /* => Why is this code here?  What limiter requires special configuration?
-                    if (query.limiters_ranks !== 0) {
-                        for (let i = 0, n = query.limiters.length; i < n; i++) {
-                            const config = query.limiters[i].config !== undefined ?
-                                capitalize(query.limiters[i].config) : '';
-                            query.options += 
-                                `|${getTranslationByKey(query.limiters[i].name.toKebobCase())}` +
-                                ` [ ${config} ]` +
-                                `,config_customization~${i}`;
-                        }
-                    }
-                    */
                     if (query.attribute === 'special movement') {
                         const movements = query.config.length;
                         query.options += `|${getTranslationByKey("movements")} [ ${movements} ],config_attribute`;
@@ -8722,6 +9625,8 @@
                         }`;
                     query.last = query.next;
                 break;
+                */
+                /*
                 case 'group_menu':
                     query.title = `${getTranslationByKey(query.attribute_translation)}`;
                     query.options = 
@@ -8753,22 +9658,8 @@
                         'update_group' : 'write_newgroup'}`;
                     query.last = query.next;
                 break;
-                case 'damage_type':
-                    query.title =
-                        `${getTranslationByKey("choose")} ` +
-                        `${getTranslationByKey("damage-type")}`;
-                    query.options = '';
-                    const temp_damage_types = [];
-                    for (let i = 0; i < damage_types.length; i++) {
-                        temp_damage_types.push(
-                            `${getTranslationByKey(damage_types[i].toKebobCase())},${damage_types[i]}`
-                        ); 
-                            
-                    }
-                    query.options += '|' + temp_damage_types.sort().join("|") + 
-                        `|${getTranslationByKey("exit")},exit`;
-                    query.last = query.next;
-                break;
+                */
+                
                 case 'attribute_type':
                     query.title = `${getTranslationByKey("select-defense-type")}`;
                     query.options =
@@ -8786,26 +9677,7 @@
                         `|${getTranslationByKey("ranged")},ranged attack`;
                     query.last = query.next;
                 break;
-                case 'weapon_class':
-                    const weapon_classes = 
-                        query[`${query.type}`] === 'melee attack' ||
-                        query[`${query.type}`] === 'melee defense' ? melee_types : 
-                        query[`${query.type}`] === 'ranged attack' ? ranged_types :
-                        melee_types.concat(ranged_types).sort();
-                    query.title = `${getTranslationByKey("choose-weapon-class")}`;
-                    query.options = query[`${query.type}`] === 'inept attack' ? 
-                        `|${getTranslationByKey("any")},any` : '';
-                    const classes = [];
-                    for (let i = 0; i < weapon_classes.length; i++) {
-                        classes.push(
-                            `${getTranslationByKey(weapon_classes[i].toKebobCase())},${weapon_classes[i]}`
-                        ); 
-                            
-                    }
-                    query.options += '|' + classes.sort().join("|") + 
-                        `|${getTranslationByKey("exit")},exit`;
-                    query.last = query.next;
-                break;
+                
                 case 'set_skill':
                     //skill group
                     const skill_categories = ["background","field","action"];
@@ -8906,6 +9778,7 @@
                     query.options = '';
                     query.last = query.next;
                 break;
+                /*
                 case 'enhancement_task':
                 case 'limiter_task':
                     query.customization_type = query.next.slice(0, 23);//query.selection.length-5);
@@ -8913,13 +9786,10 @@
                     query.options = 
                         `|${getTranslationByKey("add")},${query.customization_type}_add` +
                         `|${getTranslationByKey("remove")},${query.customization_type}_remove`;
-                    /*
-                    query.options += query.customization_type.length !== 0 ?
-                        `|${getTranslationByKey("remove")},${query.customization_type}_remove` : '';
-                    */
                     //query.options += `|${getTranslationByKey("go-back")},attribute_menu`;
                     query.last = query.next;
                 break;
+                */
                 case 'static_attribute_group_enhancements':
                 case 'static_attribute_group_limiters':
                 case 'repeating_attribute_enhancements':
@@ -8983,7 +9853,7 @@
                         if (query.customizations === undefined) {
                             query.customizations = query.type === 'group' ?
                                 cache.groupdb[cache.static_group_visible_id][cache.source_attribute] :
-                                cache.attrdb[query.attribute][0][cache.source_attribute];
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute];
                         }
                         const index = query.customizations.findIndex(e => e.name === customizations[i]);
                         const rank = index !== -1 ? query.customizations[index].rank : 0;
@@ -9203,6 +10073,7 @@
                         'attacktype',
                         'attributetype',
                         'broad category',
+                        'capacity_type',
                         'capped',
                         'damage_type',
                         'defense type',
@@ -9217,7 +10088,6 @@
                         'transform',
                         'weapon_class'
                     ];
-                    query.title = getTranslationByKey("configuration");
                     query.configurations = [];
                     for (let i = 0; i < query.db.config.length; i++) {
                         if (all_configurations.includes(query.db.config[i].name)) {
@@ -9229,11 +10099,16 @@
                     if (query.configurations.length === 0) {
                         clog(cache, `There is nothing to configure for ${query.db.name}.`, 'ERROR');
                         return;
-                    }
-                    query.options = '|' + query.configurations.sort().join('|') + 
+                    } else if (query.configurations.length === 1) {
+                        query.title = '';
+                    } else {
+                        query.title = getTranslationByKey("configuration");
+                        query.options = '|' + query.configurations.sort().join('|') + 
                         `|${getTranslationByKey("exit")},exit`;
+                    }
                     query.last = query.next;
                 break;
+                // => configurations
                 case 'aspect_stat':
                     query.title = getTranslationByKey("choose-aspect");
                     query.options = '';
@@ -9254,6 +10129,90 @@
                         `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
+                case 'capacity_type':
+                    query.title = `${getTranslationByKey("choose-capacity-type")}`;
+                    query.options = 
+                        `|${getTranslationByKey("cargo")},cargo` +
+                        `|${getTranslationByKey("carry")},carry` +
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'choose_aspect_name':
+                    query.title = `${getTranslationByKey("choose-aspect")}`;
+                    query.options = '';
+                    for (let i = 0; i < shortcomings.length; i++) {
+                        query.options +=
+                            shortcomings[i].stat === query.aspect_stat &&
+                            shortcomings[i].type === query.aspect_type ?
+                            `|${getTranslationByKey(shortcomings[i].aspect.toKebobCase())},${shortcomings[i].aspect}` : '';
+                    }
+                    query.last = query.next;
+                break;
+                case 'choose_aspect_stat':
+                    query.title = `${getTranslationByKey("choose-stat")}`;
+                    query.options = 
+                        `|${getTranslationByKey("body")},body` +
+                        `|${getTranslationByKey("mind")},mind` +
+                        `|${getTranslationByKey("soul")},soul`;
+                    query.last = query.next;
+                break;
+                case 'choose_aspect_type':
+                    query.title = `${getTranslationByKey("choose-aspect-type")}`;
+                    query.options = 
+                        `|${getTranslationByKey("all")},all` +
+                        `|${getTranslationByKey("major")},major` +
+                        `|${getTranslationByKey("minor")},minor`;
+                    query.last = query.next;
+                break;
+                case 'choose_enemy':
+                    query.title = `${getTranslationByKey("choose-enemy")}`;
+                    query.options = '';
+                    query.last = query.next;
+                break;
+                case 'damage_type':
+                    query.title =
+                        `${getTranslationByKey("choose")} ` +
+                        `${getTranslationByKey("damage-type")}`;
+                    query.options = '';
+                    const temp_damage_types = [];
+                    for (let i = 0; i < damage_types.length; i++) {
+                        temp_damage_types.push(
+                            `${getTranslationByKey(damage_types[i].toKebobCase())},${damage_types[i]}`
+                        ); 
+                    }
+                    query.options += '|' + temp_damage_types.sort().join("|") + 
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'transform':
+                    query.title = `${getTranslationByKey("damage-is-transfored-into")}`;
+                    query.options = 
+                        `|${getTranslationByKey("energy-points")},energy points` +
+                        `|${getTranslationByKey("health-points")},health points` +
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'weapon_class':
+                    const weapon_classes = 
+                        query[`${query.type}`] === 'melee attack' ||
+                        query[`${query.type}`] === 'melee defense' ? melee_types : 
+                        query[`${query.type}`] === 'ranged attack' ? ranged_types :
+                        melee_types.concat(ranged_types).sort();
+                    query.title = `${getTranslationByKey("choose-weapon-class")}`;
+                    query.options = query[`${query.type}`] === 'inept attack' ? 
+                        `|${getTranslationByKey("any")},any` : '';
+                    const classes = [];
+                    for (let i = 0; i < weapon_classes.length; i++) {
+                        classes.push(
+                            `${getTranslationByKey(weapon_classes[i].toKebobCase())},${weapon_classes[i]}`
+                        ); 
+                            
+                    }
+                    query.options += '|' + classes.sort().join("|") + 
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+
                 case 'add_defect':
                     query.config = [];
                     query.name = '';
@@ -9276,6 +10235,8 @@
                     query.options += `|${getTranslationByKey("go-back")},attribute_menu`;
                     query.last = 'add_defect';
                 break;
+                
+                /*
                 case 'defect_menu':
                     query.title = `${getTranslationByKey(query.defect.toKebobCase())}`;
                     query.options = 
@@ -9298,38 +10259,8 @@
                         'update_defect' : 'write_newdefect'}`;
                     query.last = query.next;
                 break;
-                case 'choose_enemy':
-                    query.title = `${getTranslationByKey("choose-enemy")}`;
-                    query.options = '';
-                    query.last = query.next;
-                break;
-                case 'choose_aspect_stat':
-                    query.title = `${getTranslationByKey("choose-stat")}`;
-                    query.options = 
-                        `|${getTranslationByKey("body")},body` +
-                        `|${getTranslationByKey("mind")},mind` +
-                        `|${getTranslationByKey("soul")},soul`;
-                    query.last = query.next;
-                break;
-                case 'choose_aspect_type':
-                    query.title = `${getTranslationByKey("choose-aspect-type")}`;
-                    query.options = 
-                        `|${getTranslationByKey("all")},all` +
-                        `|${getTranslationByKey("major")},major` +
-                        `|${getTranslationByKey("minor")},minor`;
-                    query.last = query.next;
-                break;
-                case 'choose_aspect_name':
-                    query.title = `${getTranslationByKey("choose-aspect")}`;
-                    query.options = '';
-                    for (let i = 0; i < shortcomings.length; i++) {
-                        query.options +=
-                            shortcomings[i].stat === query.aspect_stat &&
-                            shortcomings[i].type === query.aspect_type ?
-                            `|${getTranslationByKey(shortcomings[i].aspect.toKebobCase())},${shortcomings[i].aspect}` : '';
-                    }
-                    query.last = query.next;
-                break;
+                */
+                
                 case 'defect_rank':
                     query.title = `${getTranslationByKey("defect")} ${getTranslationByKey("rank")}`;
                     query.options = '';
@@ -9467,16 +10398,7 @@
                         query.attack_type = query.selection;
                         query.next = query.selection === 'enemy' ? 'choose_enemy' : 'defect_menu';
                     break;
-                    case 'damage_type':
-                    case 'weapon_class':
-                        if (query.selection === 'exit') { return; }
-                        const config = cache[`${query.type === 'attribute' ? 'attrdb' : 'defectdb'}`][`${query[query.type]}`][query.index].config;
-                        config[query.config_index].rank = query.selection;
-                        set_values[`repeating_${cache.source_section}_${cache.source_id}_configuration`] =
-                            config.map(c => `${c.name.fromSnakeCase().capitalize()} (${c.rank.capitalize()})`).sort().join("\n");
-                        query[`${query.last}`] = query.name;
-                        query.next = `exit`;
-                    break;
+                    
                     case 'set_skill':
                         if (query.selection !== 'add_attribute') {
                             const skill_and_group = query.selection.split("~");
@@ -9500,6 +10422,8 @@
                         query.next = `write_${query.type}name`;
                     break;
                     case 'static_attribute_group_name':
+                        query.next = 'write_groupname';
+                    break;
                     case 'repeating_attribute_attribute':
                     case 'repeating_defect_defect':
                         query.next = 'write_attributename';
@@ -9550,10 +10474,17 @@
                     case 'static_attribute_group_limiters':
                     case 'repeating_attribute_enhancements':
                     case 'repeating_attribute_limiters':
-                        if (query.selection !== 'exit') {
-                            query.customization = query.selection.split('~').map(s => isNaN(s) ? s : Number(s));
-                            query.next = 'customization_rank';
-                        } else { query.commit = true; }
+                        if (query.selection === 'exit') { return; }
+                        query.customization = query.selection.split('~').map(s => isNaN(s) ? s : Number(s));
+                        /*
+                        query.selection = query.next.indexOf('enhancements') !== -1 ?
+                            enhancement_ranks[`${query.attribute}`][`${query.customization[0]}`] === undefined ? 0 :
+                            enhancement_ranks[`${query.attribute}`][`${query.customization[0]}`].rank :
+                            limiter_ranks[`${query.attribute}`][`${query.customization[0]}`] === undefined ? 0 :
+                            limiter_ranks[`${query.attribute}`][`${query.customization[0]}`].rank;
+                        */
+                        query.has_rank = customizationHasRank(query);
+                        query.next = query.has_rank ? 'customization_rank' : 'write_customizations';
                     break;
                     case 'enhancement_add':
                         if (query.selection === `${query.type}_menu`) {
@@ -9578,7 +10509,7 @@
                             query.next = query.selection;
                         } else {
                             query.rank = 
-                                limiter_ranks[`${query.attribute}`] === undefined ? 0 ://[`${query.selection}`] === undefined ? 0 :
+                                limiter_ranks[`${query.attribute}`] === undefined ? 0 :
                                 limiter_ranks[`${query.attribute}`][`${query.selection}`].rank;
                             query.limiters.push({
                                 name:query.selection,
@@ -9620,16 +10551,6 @@
                             query.next = query.last;
                         } else {
                             query.rank = int(query.selection);
-                            if (query.customization[2] === -1) {
-                                query.customizations.push({
-                                    name: query.customization[0],
-                                    rank: query.rank,
-                                });
-                            } else if (query.customization[2] !== -1) {
-                                query.customizations[query.customization[2]].rank = query.rank;
-                            }/* else if (query.customization[2] !== -1 && query.rank === 0) {
-                                query.customizations.splice(query.customization[2]);
-                            }*/                            
                             query.next = 'write_customizations';
                         }
                     break;
@@ -9989,12 +10910,16 @@
                     case 'config_customization':
                     case 'repeating_attribute_configuration':
                     case 'repeating_defect_configuration':
-                        if (query.selection === 'exit') { return; }
+                        if (query.selection === undefined && query.configurations.length === 1) {
+                            const selection = query.configurations[0].split(",");
+                            query.selection = selection[1];
+                        } else if (query.selection === 'exit') { return; }
                         query.load = query.selection.split("~");
                         query.config_index = int(query.load[1]);
                         query.config_name = query.load[0];
                         query.next = query.config_name;
                     break;
+                    // => configurations
                     case 'aspect_stat':
                         if (query.selection === 'exit') { return; }
                         query.load = query.selection.split("~");
@@ -10007,9 +10932,15 @@
                         await setDerivedValues(cache, set_values);
                         query.next = 'exit';
                     break;
-                    case 'add_defect':
-                        query.defect = query.selection;
-                        query.defect_translation = query.defect.toKebobCase();
+                    case 'capacity_type':
+                        if (query.selection === 'exit') { return; }
+                        cache.attrdb.capacity[query.index].config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        query.next = 'exit';
+                    break;
+                    /*
+                    case 'choose_aspect_name':
+                        query.aspect_name = query.selection;
                         query.next = 'defect_menu';
                     break;
                     case 'choose_aspect_stat':
@@ -10020,10 +10951,40 @@
                         query.aspect_type = query.selection;
                         query.next = query.aspect_type === 'all' ? 'defect_menu' : 'choose_aspect_name';
                     break;
-                    case 'choose_aspect_name':
-                        query.aspect_name = query.selection;
+                    */
+                    case 'damage_type':
+                    case 'weapon_class':
+                        if (query.selection === 'exit') { return; }
+                        /*
+                        const config = cache[`${query.type === 'attribute' ? 'attrdb' : 'defectdb'}`][`${query[query.type]}`][query.index].config;
+                        config[query.config_index].rank = query.selection;
+                        set_values[`repeating_${cache.source_section}_${cache.source_id}_configuration`] =
+                            config.map(c => `${c.name.fromSnakeCase().capitalize()} (${c.rank.capitalize()})`).sort().join("\n");
+                        */
+                        //query[`${query.last}`] = query.name;
+                        cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
+                        /*
+                        set_values[`${cache.source_path}_configuration`] =
+                            cache.attrdb[query.attribute][query.index].config.map(c => `${
+                                c.name.capitalize()} (${isNaN(c.rank) ? c.rank.capitalize() : c.rank
+                            })`).sort().join("\n");
+                        */
+                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        query.next = 'exit';
+                    break;
+                    case 'transform':
+                        if (query.selection === 'exit') { return; }
+                        cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        query.next = 'exit';
+                    break;
+
+                    case 'add_defect':
+                        query.defect = query.selection;
+                        query.defect_translation = query.defect.toKebobCase();
                         query.next = 'defect_menu';
                     break;
+                    
                     case 'defect_rank':
                         if (isNaN(query.selection)) {
                             query.next = 'defect_rank';
@@ -10054,7 +11015,7 @@
                 };
                 if (query.next === 'write_newattr') {
                     //-> write attribute object into cache and create repeating section
-                    const fields = ['attribute','cost','level','name','points','stat','configuration'];
+                    const fields = ['attribute','cost','level','name','points','stat'];//,'configuration'];
                     //const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
                     const row_id = generateRowID();
                     const attrdb_entry = {};
@@ -10067,65 +11028,56 @@
                             case 'stat':
                                 value = getTranslationByKey(`${query[fields[i]]}`).capitalize();
                             break;
+                            /*
                             case 'configuration':
-                                if (
-                                    query.attribute === 'absorption' ||
-                                    query.attribute === 'armor' ||
-                                    query.attribute === 'conversion' ||
-                                    query.attribute === 'force field'
-                                ) {
-                                    query.config.push({
-                                        name: `${
-                                            query.attribute === 'absorption' ? 'absorb' :
-                                            query.attribute === 'conversion' ? 'convert' :
-                                                'armor rating'
-                                        }`,
-                                        rank: 0/*int(`${query.elevel * (
-                                            query.attribute === 'absorption' ||
-                                            query.attribute === 'armor' ? 
-                                                5 :
-                                            query.attribute === 'conversion' ||
-                                            query.attribute === 'force field' ? 
-                                                10 : 0
-                                        )}`)*/
-                                    });
-                                    if (
-                                        query.attribute === 'absorption' &&
-                                        query.config.findIndex(c => c.name === 'transform') === -1
-                                    ) {
+                                switch (query.attribute) {
+                                    case 'absorption':
                                         query.config.push({
                                             name: 'transform',
-                                            rank: getTranslationByKey("health-points")//query.transform
+                                            rank: getTranslationByKey("health-points")
                                         });
-                                    }
-                                } else if (query.attribute === 'ranged defense') {
-                                    query.config.push({
-                                        name: 'defense type',
-                                        rank: getTranslationByKey("personal")//query.attribute_type
-                                    })
-                                } else if (query.attribute === 'skills') {
-                                    query.config.push({
-                                        name: 'skill points',
-                                        rank: 0//query.elevel * 10
-                                    });
+                                    case 'armor':
+                                    case 'conversion':
+                                    case 'force field':
+                                        query.config.push({
+                                            name: `${
+                                                query.attribute === 'absorption' ? 'absorb' :
+                                                query.attribute === 'conversion' ? 'convert' :
+                                                'armor rating'
+                                            }`,
+                                            rank: 0
+                                        });
+                                    break;
+                                    case 'capacity':
+                                        query.config.push({
+                                            name: 'capacity_type',
+                                            rank: getTranslationByKey("carry")
+                                        });
+                                    break;
+                                    case 'ranged defense':
+                                        query.config.push({
+                                            name: 'defense type',
+                                            rank: getTranslationByKey("personal")
+                                        });
+                                    break;
+                                    case 'skills':
+                                        query.config.push({
+                                            name: 'skill points',
+                                            rank: 0
+                                        });
+                                    break;
+                                    default:
+                                        query.config.push({
+                                            name: query.attribute,
+                                            rank: 0//setAttrCharacteristic(cache, set_values, query);
+                                        });
                                 }
                                 if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
                                     query.config.push({
                                         name: 'base points',
-                                        rank: 0//query.cost * query.level
+                                        rank: 0
                                     });
-                                    /*
-                                    for (let j = 0; j < customization_type.length; j++) {
-                                        for (let k = 0; k < query[customization_type[j]].length; k++) {
-                                            query.config.push({
-                                                name: query[customization_type[j]][k].name,
-                                                rank: query[customization_type[j]][k].rank
-                                            });
-                                        }
-                                    }
-                                    */
                                 }
-                                //const length = query.config.length;
                                 if (query.config.length !== 0) {
                                     query.config.sort();
                                     const configurable = ['absorb','convert','defense type','transform','senses']
@@ -10161,37 +11113,78 @@
                                     }
                                 }
                             break;
+                            */
                             case 'cost':
                                 query.cost = query.attribute === 'skill group' ?
                                     skill_group_costs[query.category] :
                                     attribute_costs[query.attribute];
                                 value = query.cost;
                             break;
-                            /*
-                            case 'enhancements':
-                            case 'limiters':
-                                const data = query[`${fields[i]}`];
-                                for (let i = 0; i < data.length; i++) {
-                                    const config = data[i].config !== undefined ?
-                                        ` [${data[i].config.capitalize()}]` : '';
-                                    value += `${data[i].name.capitalize()}${config}: ${data[i].rank}`;
-                                    value += i < data.length - 1 ? '\n' : '';
-                                }
-                            break;
-                            */
                             case 'level':
-                                value = '0 (0)';//`${query.level} (${query.elevel})`;
+                                value = '0 (0)';
                             break;
                             case 'name':
-                                value = `${getTranslationByKey('new-attribute')}${query.attribute === 'skill group' ?//`${query[fields[i]].capitalize()}${query.attribute === 'skill group' ?
+                                value = `${getTranslationByKey('new-attribute')}${query.attribute === 'skill group' ?
                                     ' (' + query.attribute.capitalize() + ')' : ''}`;
                             break;
                             case 'points':
-                                value = 0;//query.cost * query.level;
+                                value = 0;
                             break;
                         }
                         set_values[`repeating_attribute_${row_id}_${fields[i]}`] = value;
                     }
+                    //if (query.config.length !== 0) {
+                        switch (query.attribute) {
+                            case 'absorption':
+                                query.config.push({
+                                    name: 'transform',
+                                    rank: getTranslationByKey("health-points")
+                                });
+                            case 'armor':
+                            case 'conversion':
+                            case 'force field':
+                                query.config.push({
+                                    name: `${
+                                        query.attribute === 'absorption' ? 'absorb' :
+                                        query.attribute === 'conversion' ? 'convert' :
+                                        'armor rating'
+                                    }`,
+                                    rank: 0
+                                });
+                            break;
+                            case 'capacity':
+                                query.config.push({
+                                    name: 'capacity_type',
+                                    rank: getTranslationByKey("carry")
+                                });
+                            break;
+                            case 'ranged defense':
+                                query.config.push({
+                                    name: 'defense type',
+                                    rank: getTranslationByKey("personal")
+                                });
+                            break;
+                            case 'skills':
+                                query.config.push({
+                                    name: 'skill points',
+                                    rank: 0
+                                });
+                            break;
+                            default:
+                                query.config.push({
+                                    name: query.attribute,
+                                    rank: 0//setAttrCharacteristic(cache, set_values, query);
+                                });
+                        }
+                        if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
+                            query.config.push({
+                                name: 'base points',
+                                rank: 0
+                            });
+                        }
+                        set_values[`repeating_attribute_${row_id}_configuration`] = setConfiguration(cache, set_values, query);
+                    //}
+                    
                     attrdb_entry.active = true;
                     attrdb_entry.config = query.config;
                     attrdb_entry.elevel = query.elevel;
@@ -10440,8 +11433,6 @@
                                         }
                                     }
                                 }
-                                //updateAttributeConfiguration(cache, query);
-
                             break;
                             case 'cost':
                                 if (query.attribute === 'skills') {
@@ -10502,7 +11493,6 @@
                     for (let i = 0, n = keys.length; i < n; i++) {
                         cache.attrdb[query.attribute][query.load[1]][keys[i]] = attrdb_entry[keys[i]];
                     }
-                    //const group_id = cache.attrdb[query.attribute][query.load[1]].group_id;
                     if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                         setPowerFluxPoolPoints(cache, set_values);
                     } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
@@ -10513,36 +11503,11 @@
                     } else {
                         setGroupCharacterPoints(cache, set_values, attrdb_entry.group_id);
                     }
-                    /*
-                    if (cache.groupdb[group_id].group_type === 'power flux') {
-                        setPowerFluxPoolPoints(cache, set_values);
-                    } else {
-                        setGroupCharacterPoints(cache, set_values, group_id);
-                    }
-                    */
-                    //setGroupCharacterPoints(cache, set_values, cache.attrdb[query.attribute][query.load[1]].group_id);
                     if (query.attribute === 'skills') {
                         query.skill_index = int(cache.static_skills_visible_id);
                         setSkillsPointTotal(cache, set_values);
                     }
-                } //else if (query.next === 'update_defect') {}
-                // Save changes to attrdb when changes to attrdb are made
-                /*
-                if (
-                    query.next === 'write_newattr' ||
-                    query.next === 'update_attr' ||
-                    query.next === 'write_attrdb'
-                ) {
-                    set_values.attrdb = JSON.stringify(cache.attrdb);
-                // Save changes to defectdb when changes to defectdb are made
-                } else if (
-                    query.next === 'write_newdefect' ||
-                    query.next === 'update_defect' ||
-                    query.next === 'write_defectdb'
-                ) {
-                    set_values.defectdb = JSON.stringify(cache.defectdb);
                 }
-                */
                 if (query.next === 'write_attributename') {
                     const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
                     db[query[`${cache.source_attribute}`]][query.index].name = query.selection;
@@ -10563,40 +11528,6 @@
                     cache.groupdb[cache.static_group_visible_id].group_type = query.selection;
                     set_values.static_attribute_group_type = 
                         cache.groupdb[cache.static_group_visible_id].group_type.capitalize();
-                    /*
-                    if (cache.groupdb[cache.static_group_visible_id].group_type !== 'standard') {
-                        set_values.static_attribute_group_cost = 
-                            attribute_costs[cache.groupdb[cache.static_group_visible_id].group_type];
-                        //groupdb_entry.enhancements = query.enhancements;
-                        set_values.static_attribute_group_level = 
-                            `${cache.groupdb[cache.static_group_visible_id].level} ` +
-                            `(${cache.groupdb[cache.static_group_visible_id].elevel})`;
-                        //groupdb_entry.limiters = query.limiters;
-                        set_values.static_attribute_group_stat = 
-                            cache.groupdb[cache.static_group_visible_id].stat.capitalize();
-                        set_values.static_attribute_group_points = 
-                            cache.groupdb[cache.static_group_visible_id].points;
-                            set_values.static_attribute_group_poolpoints = query.elevel * int(`${
-                            query.attribute === 'power flux' ? 5 : 
-                            query.attribute === 'dynamic powers' ? 2 :
-                            query.attribute === 'gear' ? 1 : 0
-                        }`);
-                        if (query.attribute === 'gear') {
-                            set_values.static_attribute_group_poolpoints = 
-                                gear_amount[query.elevel] || 'unsupported';
-                        }
-                        set_values.static_attribute_group_poolname = 
-                            cache.groupdb[cache.static_group_visible_id].pool_name;
-                        if (query.attribute === 'power variation') {
-                            groupdb_entry.locked = false;
-                        }
-                        set_values.static_attribute_group_totalpoints = 
-                            cache.groupdb[cache.static_group_visible_id].group_points;
-                    }
-
-                    set_values.static_attribute_group_type = query.selection.capitalize();
-                    set_values.static_attributes_powervariation_state = query.selection === 'power variation' ? 1 : 0;
-                    */
                     showDynamicGroupFields(cache, set_values);
                     setAttributeGroupVisibility(cache, set_values);
                 } else if (query.next === 'write_level') {
@@ -10648,12 +11579,7 @@
                         ) {
                             const index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'base points');
                             cache.attrdb[query.attribute][query.index].config[index].rank = query.points;
-                            set_values[`${cache.source_path}_configuration`] = '';
-                            for (let i = 0; i < cache.attrdb[query.attribute][query.index].config.length; i++) {
-                                set_values[`${cache.source_path}_configuration`] += 
-                                    `${cache.attrdb[query.attribute][query.index].config[i].name.capitalize()} ` +
-                                    `(${cache.attrdb[query.attribute][query.index].config[i].rank})\n`;
-                            }
+                            //set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
                         } else if (query.last === 'repeating_defect_rank') {
                             if (query.defect === 'shortcoming') {
                                 const aspect_type_index = query.db.config.findIndex(i => i.name === 'aspect_type');
@@ -10663,42 +11589,8 @@
                                 }
                             }
                         }
-                        setLevelDependantConfigurations(cache, set_values, query);
-                        /*
-                        if (
-                            query.attribute === 'absorption' ||
-                            query.attribute === 'armor' ||
-                            query.attribute === 'conversion' ||
-                            query.attribute === 'force field' ||
-                            query.attribute === 'skills'
-                        ) {
-                            const name = 
-                                query.attribute === 'skills' ? 'skill points':
-                                query.attribute === 'absorption' ? 'absorb' :
-                                query.attribute === 'conversion' ? 'convert' : 
-                                'armor rating';
-                            const index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === name);
-                            cache.attrdb[query.attribute][query.index].config[index].rank =
-                                int(`${query.elevel * (
-                                    query.attribute === 'absorption' ||
-                                    query.attribute === 'armor' ? 
-                                        5 :
-                                    query.attribute === 'conversion' ||
-                                    query.attribute === 'force field' ||
-                                    query.attribute === 'skills' ? 
-                                        10 : 0
-                                )}`);
-                            set_values[`${cache.source_path}_configuration`] = '';
-                            for (let i = 0; i < cache.attrdb[query.attribute][query.index].config.length; i++) {
-                                set_values[`${cache.source_path}_configuration`] += 
-                                    `${cache.attrdb[query.attribute][query.index].config[i].name.capitalize()} ` +
-                                    `(${cache.attrdb[query.attribute][query.index].config[i].rank})`;
-                                if (i !== cache.attrdb[query.attribute][query.index].config.length - 1) {
-                                    set_values[`${cache.source_path}_configuration`] += '\n';
-                                }
-                            }
-                        }
-                        */
+                        //setLevelDependantConfigurations(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
                     }
                     if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                         setPowerFluxPoolPoints(cache, set_values);
@@ -10719,63 +11611,88 @@
                         set_values[`${cache.source_path}_stat`] = query.stat.capitalize();
                     }
                 } else if (query.next === 'write_customizations') {
-                    for (let i = 0; i < query.customizations.length; i++) {
-                        if (query.type === 'group') {
-                            const index = cache.groupdb[cache.static_group_visible_id][cache.source_attribute].findIndex(c => c.name === query.customizations[i].name);
-                            if (query.customizations[i].rank !== 0) {
-                                cache.groupdb[cache.static_group_visible_id][cache.source_attribute][index].rank = 
-                                    query.customizations[i].rank;
-                            } else {
-                                cache.groupdb[cache.static_group_visible_id][cache.source_attribute].splice(index, 1);
-                            }
-                            const enhancement_ranks =
-                                cache.groupdb[cache.static_group_visible_id].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
-                            const limiter_ranks =
-                                cache.groupdb[cache.static_group_visible_id].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
-                            cache.groupdb[cache.static_group_visible_id].elevel = 
-                                cache.groupdb[cache.static_group_visible_id].level + limiter_ranks - enhancement_ranks;
-                            set_values.static_attribute_group_level = 
-                                `${cache.groupdb[cache.static_group_visible_id].level} ` +
-                                `(${cache.groupdb[cache.static_group_visible_id].elevel})`;
-                            set_values[cache.source] = '';
-                            for (let i = 0; i < cache.groupdb[cache.static_group_visible_id][cache.source_attribute].length; i++) {
-                                set_values[cache.source] += 
-                                    cache.groupdb[cache.static_group_visible_id][cache.source_attribute][i].name.capitalize() + 
-                                    ` (${cache.groupdb[cache.static_group_visible_id][cache.source_attribute][i].rank})`;
-                                if (i !== cache.groupdb[cache.static_group_visible_id][cache.source_attribute].length - 1) {
-                                    set_values[cache.source] += '\n';
-                                }
-                            }
+                    
+                    //for (let i = 0; i < query.customizations.length; i++) {
+                    if (query.type === 'group') {
+                        if (query.customization[2] === -1 && query.rank !== 0) {
+                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute].push({
+                                name: query.customization[0],
+                                rank: query.rank
+                            });
+                        } else if (query.customization[2] !== -1 && query.rank !== 0) {
+                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute][query.customization[2]].rank = 
+                                query.rank;
+                        } else if (query.customization[2] !== -1 && query.rank === 0) {
+                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute].splice(query.customization[2], 1);
                         } else {
-                            //=> setup Attribute customizations here.
-                            const index = cache.attrdb[query.attribute][query.index][cache.source_attribute].findIndex(c => c.name === query.customizations[i].name);
-                            if (query.customizations[i].rank !== 0) {
-                                cache.attrdb[query.attribute][query.index][cache.source_attribute][index].rank = 
-                                    query.customizations[i].rank;
-                            } else {
-                                cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(index, 1);
+                            return;
+                        }
+                        const enhancement_ranks =
+                            cache.groupdb[cache.static_group_visible_id].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
+                        const limiter_ranks =
+                            cache.groupdb[cache.static_group_visible_id].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
+                        cache.groupdb[cache.static_group_visible_id].elevel = 
+                            cache.groupdb[cache.static_group_visible_id].level + limiter_ranks - enhancement_ranks;
+                        set_values.static_attribute_group_level = 
+                            `${cache.groupdb[cache.static_group_visible_id].level} ` +
+                            `(${cache.groupdb[cache.static_group_visible_id].elevel})`;
+                        set_values[cache.source] = 
+                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute].map(c => 
+                                `${c.name.capitalize()} (${c.rank})`
+                            ).sort().join("\n");
+                        if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
+                            setPowerFluxPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
+                            setPowerVariationGroupPoints(cache, set_values);
+                            setPowerVariationPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
+                            setDynamicPowersPoolLevels(cache, set_values);
+                        }
+                    } else {//=> setup Attribute customizations here.
+                        if (query.customization[2] === -1) {//=> add customization
+                            cache.attrdb[query.attribute][query.index][cache.source_attribute].push({
+                                name: query.customization[0],
+                                rank: !query.has_rank ? customization_ranks[`${query.attribute}`][`${query.customization[0]}`].rank : query.rank,
+                            });
+                            const configuration = getConfigurationByCustomization(cache, query);
+                            if (configuration) {
+                                cache.attrdb[query.attribute][query.index].config.push({
+                                    name: configuration,
+                                    rank:'not configured',
+                                });
+                                //set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
                             }
-                            const enhancement_ranks =
-                                cache.attrdb[query.attribute][query.index].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
-                            const limiter_ranks =
-                                cache.attrdb[query.attribute][query.index].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
-                            cache.attrdb[query.attribute][query.index].elevel = 
-                                cache.attrdb[query.attribute][query.index].level + limiter_ranks - enhancement_ranks;
-                            set_values[`${cache.source_path}_level`] = 
-                                `${cache.attrdb[query.attribute][query.index].level} ` +
-                                `(${cache.attrdb[query.attribute][query.index].elevel})`;
-                            set_values[cache.source] = '';
-                            for (let i = 0; i < cache.attrdb[query.attribute][query.index][cache.source_attribute].length; i++) {
-                                set_values[cache.source] += 
-                                    cache.attrdb[query.attribute][query.index][cache.source_attribute][i].name.capitalize() + 
-                                    ` (${cache.attrdb[query.attribute][query.index][cache.source_attribute][i].rank})`;
-                                if (i !== cache.attrdb[query.attribute][query.index][cache.source_attribute].length - 1) {
-                                    set_values[cache.source] += '\n';
+                        } else {//=> remove customization or update rank
+                            query.rank = query.has_rank ? query.rank : 0;
+                            if (query.rank === 0) {
+                                const configuration = getConfigurationByCustomization(cache, query);
+                                if (configuration) {
+                                    const config_index = 
+                                        cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === configuration);
+                                    cache.attrdb[query.attribute][query.index].config.splice(config_index, 1);
+                                    //set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
                                 }
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(query.customization[2], 1);
+                            } else {
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute][query.customization[2]].rank = query.rank;
                             }
                         }
+                        const enhancement_ranks =
+                            cache.attrdb[query.attribute][query.index].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
+                        const limiter_ranks =
+                            cache.attrdb[query.attribute][query.index].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
+                        cache.attrdb[query.attribute][query.index].elevel = 
+                            cache.attrdb[query.attribute][query.index].level + limiter_ranks - enhancement_ranks;
+                        set_values[`${cache.source_path}_level`] = 
+                            `${cache.attrdb[query.attribute][query.index].level} ` +
+                            `(${cache.attrdb[query.attribute][query.index].elevel})`;
+                        set_values[cache.source] = 
+                            cache.attrdb[query.attribute][query.index][cache.source_attribute].map(c => 
+                                `${c.name.capitalize()} (${c.rank})`
+                            ).sort().join("\n");
+                        query.elevel = cache.attrdb[query.attribute][query.index].elevel;
+                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
                     }
-                    
                 }
                 // Create and display new group
                 if (query.next === 'write_newgroup') {
@@ -11978,7 +12895,8 @@
             const defectdb = createDatabase(cache, all_defects);
             set_values.defectdb = JSON.stringify(defectdb);
             // Groups database
-            const groupdb = [...groupdb, new_group_template];
+            const groupdb = [];
+            groupdb.push(new_group_template);
             /*
             [
                 {
