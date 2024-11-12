@@ -3135,9 +3135,9 @@
 
     function get1or3(level, start) {
         let result = 0;
-        if (start == 1) {
+        if (start === 1) {
             result = (level & 1) ? 1 : 3;
-        } else if (start == 3) {
+        } else if (start === 3) {
             result = (level & 1) ? 3 : 1;
         }
         return result;
@@ -3145,9 +3145,9 @@
     
     function get1or2andHalfor5(level) {
         const oneTwoAndHalfOrFive = mod =>
-            mod == 0 ? 1 :
-            mod == 1 ? 2.5 :
-            mod == 2 ? 5 :
+            mod === 0 ? 1 :
+            mod === 1 ? 2.5 :
+            mod === 2 ? 5 :
             0;
         return oneTwoAndHalfOrFive(level % 3);
     }
@@ -3522,7 +3522,7 @@
         set_values.static_attribute_group_poolpoints = 
             `${temp.flux_points_used} / ${temp.flux_points_available}`;
         set_values.static_attribute_group_totalpoints = 
-            cache.groupdb[cache.static_group_visible_id].level * 10;
+            cache.groupdb[cache.static_group_visible_id].level * attribute_costs['power flux'];
     }
 
     function setDynamicPowersPoolLevels(cache, set_values) {
@@ -3545,6 +3545,35 @@
             `${temp.dynamic_levels_used} / ${temp.dynamic_levels_available}`;
     }
 
+    function setGearPoolLevels(cache, set_values, query) {
+        if (cache.is_sheetopened) { return; }
+        const gear_by_level = {
+            1:2,
+            2:5
+        };
+        clog(cache, query,'setGearPoolLevels()');
+        query.gear_levels_used = cache.groupdb[cache.static_group_visible_id].attribute_ids.length;
+        query.gear_max = query.elevel < 3 ? 
+            gear_by_level[query.elevel] : 
+            get1or2andHalfor5(query.elevel) * (10 ** (Math.floor(query.elevel / 3)));
+        set_values.static_attribute_group_poolpoints = `${query.gear_levels_used} / ${query.gear_max}`;
+        cache.groupdb[cache.static_group_visible_id].pool_points = query.gear_max;
+    }
+
+    function setNonStandardGroupPoints(cache, set_values) {
+        if (cache.is_sheetopened) { return; }
+        const temp = {};
+        clog(cache, temp,'setNonStandardGroupPoints()');
+        temp.totalpoints = 
+            cache.groupdb[cache.static_group_visible_id].elevel * attribute_costs[cache.groupdb[cache.static_group_visible_id].group_type];
+        for (let i = 0; i < all_attributes.length; i++) {
+            const attributes = cache.attrdb[all_attributes[i]];
+            temp.totalpoints += attributes.map(a => a.points).reduce((a, b) => a + b, 0);
+        }
+        cache.groupdb[cache.static_group_visible_id].totalpoints = temp.totalpoints;
+        set_values.static_attribute_group_totalpoints = temp.totalpoints;
+    }
+
     function setPowerVariationPoolPoints(cache, set_values) {
         if (cache.is_sheetopened) { return; }
         const temp = {};
@@ -3561,7 +3590,6 @@
                 }
             }
         }
-        //temp.variation_points_used += cache.groupdb[cache.static_group_visible_id].points;
         set_values.static_attribute_group_poolpoints = 
             `${temp.variation_points_used} / ${temp.variation_points_max}`;
     }
@@ -4577,9 +4605,27 @@
                 case 'attack mastery':
                     if (cache.acv === undefined) {
                         cache.acv = Math.round((
-                            cache.statsdb.body.base +
-                            cache.statsdb.mind.base +
-                            cache.statsdb.soul.base
+                            (
+                                cache.statsdb.body.base +
+                                (cache.statsdb.body.augmented || 0) +
+                                cache.statsdb.body.temp -
+                                cache.statsdb.body.damage -
+                                (cache.statsdb.body.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.mind.base +
+                                (cache.statsdb.mind.augmented || 0) +
+                                cache.statsdb.mind.temp -
+                                cache.statsdb.mind.damage -
+                                (cache.statsdb.mind.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.soul.base +
+                                (cache.statsdb.soul.augmented || 0) +
+                                cache.statsdb.soul.temp -
+                                cache.statsdb.soul.damage -
+                                (cache.statsdb.soul.shortcoming || 0)
+                            )
                         ) / 3);
                     }
                 break;
@@ -5250,7 +5296,24 @@
         clog(cache, temp, 'setGroupCharacterPoints()');
         temp.group_id = cache.static_group_visible_id === undefined ? 
             int(group_id) : cache.static_group_visible_id;
-        temp.spent = cache.groupdb[temp.group_id].points || 0;
+
+        temp.spent = cache.groupdb[temp.group_id].group_type !== 'standard' ?
+            cache.groupdb[temp.group_id].elevel * 
+            attribute_costs[cache.groupdb[temp.group_id].group_type] : 0;
+        //temp.spent = cache.groupdb[temp.group_id].points || 0;
+        for (let i = 0; i < all_attributes.length; i++) {
+            const attributes = cache.attrdb[all_attributes[i]];
+            temp.spent += attributes.map(a => 
+                a.group_id === temp.group_id ? a.points : 0
+            ).reduce((a, b) => a + b, 0);
+        }
+        for (let i = 0; i < all_defects.length; i++) {
+            const defects = cache.defectdb[all_defects[i]];
+            temp.spent += defects.map(d => 
+                d.group_id === temp.group_id ? d.points : 0
+            ).reduce((a, b) => a + b, 0);
+        }
+        /*
         for (let i = 0; i < all_attributes.length; i++) {
             const attribute = cache.attrdb[all_attributes[i]];
             for (let j = 0; j < attribute.length; j++) {
@@ -5265,6 +5328,7 @@
                 defect[j].points : 0;
             }
         }
+        */
         temp.group_points = 
             cache.groupdb[temp.group_id].item === 'yes' ||
             cache.groupdb[temp.group_id].item === 'shield' ? 
@@ -5767,7 +5831,7 @@
         setObj[`repeating_attr_${rowID}_characteristic`] = result;
     }
 
-    function setConfiguration(cache, set_values, query) {
+    async function setConfiguration(cache, set_values, query) {
         const configurations = {
             "absorption":'absorb',
             "armor":'armor rating',
@@ -5775,20 +5839,21 @@
             "capacity":'capacity_type',
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
+        const characteristic = await setAttrCharacteristic(cache, set_values, query);
         const configuration =
             db.map(c =>
                 `${c.name.capitalize()} ` +
                 `(${c.name === query.attribute || c.name === configurations[query.attribute] ?
-                    setAttrCharacteristic(cache, set_values, query) : 
-                    isNaN(c.rank) ? c.rank.capitalize() : c.rank})`
+                    characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank})`
         ).sort().join("\n");
         return configuration;
     }
     
-    function setAttrCharacteristic(cache, set_values, query = {}) {//(debug, timer, value, rowID, setObj) {
+    async function setAttrCharacteristic(cache, set_values, query = {}) {//(debug, timer, value, rowID, setObj) {
         clog(cache, query, 'setAttrCharacteristic()');
         query.attribute = query.attribute === undefined ? cache.attribute[0] : query.attribute;
         query.elevel = query.elevel === undefined ? 0 : query.elevel;
+        query.config = query.config === undefined ? query.db.config : query.config;
         let description = "";
         switch (query.attribute) {
             case "absorption": description = `${query.elevel * 5} Damage Absorbed`; break;
@@ -5796,7 +5861,18 @@
             case "alternate identity": description = `${query.elevel} Alternate Identities`; break;
             case "armor": description = query.elevel * 5; break;
             case "attack mastery": description = `+${query.elevel} ACV`; break;
-            case "augmented": description = `+${query.elevel} ${query.db.config[capacity_index].rank}`; break;
+            case "augmented":
+                query.stat = query.config[query.config.findIndex(c => c.name === 'augmented_stat')].rank;
+                description = `+${query.elevel} ${getTranslationByKey(query.stat).capitalize()}`;
+                cache.statsdb[query.stat].augmented = query.elevel;
+                set_values[`static_character_${query.stat}_remaining`] = 
+                    cache.statsdb[query.stat].base +
+                    cache.statsdb[query.stat].augmented +
+                    cache.statsdb[query.stat].temp -
+                    cache.statsdb[query.stat].damage -
+                    (cache.statsdb[query.stat].shortcoming || 0);
+                await setDerivedValues(cache, set_values);
+            break;
             case "capacity": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "change state": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "cognition": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -5882,7 +5958,6 @@
             case "weapon": description = `${query.elevel} Damage`; break;
             default: description = "";
         }
-        //set_values[`${cache.source_path}_configuration`] = characteristic;
         return description;
     }
     
@@ -5896,41 +5971,7 @@
         if (focused > 0) characteristic = characteristic + ` with ${weaponclass} weapons`;
         return characteristic;
     }
-    
-    function getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute) {
-        const obj = {
-            "meleeattack": "weaponclass",
-            "rangedattack": "weaponclass",
-            "meleedefense": "weaponclass",
-            "enemyattack": "enemy",
-            "enemydefense": "enemy",
-            "immunity": "immunityrole",
-            "immutable": "stat",
-            "rangeddefense": "defenseclass",
-            "skill": "skillgroup"
-        };
-        const default_obj = {
-            "meleeattack": "<select weapon class>",
-            "rangedattack": "<select weapon class>",
-            "meleedefense": "<select weapon class>",
-            "enemyattack": "<not configured>",
-            "enemydefense": "<not configured>",
-            "immunity": "<not configured>",
-            "immutable": "body",
-            "rangeddefense": "personal",
-            "skill": 1
-        }
-        const characteristic = (obj[attribute]);
-        clog(debug, timer, 'characteristic =', characteristic, 'getCharacteristicSpecializationByAttr()');
-        const characteristicValue = value[`repeating_attr_${rowID}_${characteristic}`];
-        clog(debug, timer, 'characteristicValue =', characteristicValue);
-        const result = characteristicValue === undefined ? 
-            default_obj[attribute] :
-            capital(characteristicValue);
-        clog(debug, timer, 'result =', result);//, 'getCharacteristicSpecializationByAttr()');
-        return result;
-    }
-    
+        
     function getCharacteristicByAttr(cache, set_values, query = {}) {
         clog(cache, query, 'getCharacteristicByAttr()');
         //query.attribute = query.attribute === undefined ? cache.attribute[0] : query.attribute;
@@ -10072,6 +10113,7 @@
                         'aspect_stat',
                         'attacktype',
                         'attributetype',
+                        'augmented_stat',
                         'broad category',
                         'capacity_type',
                         'capped',
@@ -10129,6 +10171,16 @@
                         `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
+                case 'augmented_stat':
+                case 'choose_aspect_stat':
+                    query.title = `${getTranslationByKey("choose-stat")}`;
+                    query.options = 
+                        `|${getTranslationByKey("body")},body` +
+                        `|${getTranslationByKey("mind")},mind` +
+                        `|${getTranslationByKey("soul")},soul` +
+                        `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
                 case 'capacity_type':
                     query.title = `${getTranslationByKey("choose-capacity-type")}`;
                     query.options = 
@@ -10146,14 +10198,6 @@
                             shortcomings[i].type === query.aspect_type ?
                             `|${getTranslationByKey(shortcomings[i].aspect.toKebobCase())},${shortcomings[i].aspect}` : '';
                     }
-                    query.last = query.next;
-                break;
-                case 'choose_aspect_stat':
-                    query.title = `${getTranslationByKey("choose-stat")}`;
-                    query.options = 
-                        `|${getTranslationByKey("body")},body` +
-                        `|${getTranslationByKey("mind")},mind` +
-                        `|${getTranslationByKey("soul")},soul`;
                     query.last = query.next;
                 break;
                 case 'choose_aspect_type':
@@ -10601,8 +10645,9 @@
                                 delete cache.statsdb[s_stat].shortcoming;
                                 set_values[`static_character_${s_stat}_remaining`] =
                                     cache.statsdb[s_stat].base +
+                                    (cache.statsdb[s_stat].augmented || 0) +
                                     cache.statsdb[s_stat].temp -
-                                    cache.statsdb[s_stat].damage || 0;
+                                    (cache.statsdb[s_stat].damage || 0);
                                 await setDerivedValues(cache, set_values);
                             }
                         }
@@ -10932,10 +10977,16 @@
                         await setDerivedValues(cache, set_values);
                         query.next = 'exit';
                     break;
+                    case 'augmented_stat':
+                        if (query.selection === 'exit') { return; }
+                        cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
+                        query.next = 'exit';
+                    break;
                     case 'capacity_type':
                         if (query.selection === 'exit') { return; }
-                        cache.attrdb.capacity[query.index].config[query.config_index].rank = query.selection;
-                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
                     /*
@@ -10969,13 +11020,13 @@
                                 c.name.capitalize()} (${isNaN(c.rank) ? c.rank.capitalize() : c.rank
                             })`).sort().join("\n");
                         */
-                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
                     case 'transform':
                         if (query.selection === 'exit') { return; }
                         cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
-                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
 
@@ -11138,7 +11189,7 @@
                             case 'absorption':
                                 query.config.push({
                                     name: 'transform',
-                                    rank: getTranslationByKey("health-points")
+                                    rank: 'health-points'
                                 });
                             case 'armor':
                             case 'conversion':
@@ -11152,16 +11203,22 @@
                                     rank: 0
                                 });
                             break;
+                            case 'augmented':
+                                query.config.push({
+                                    name: 'augmented_stat',
+                                    rank: 'body'
+                                });
+                            break;
                             case 'capacity':
                                 query.config.push({
                                     name: 'capacity_type',
-                                    rank: getTranslationByKey("carry")
+                                    rank: 'carry'
                                 });
                             break;
                             case 'ranged defense':
                                 query.config.push({
                                     name: 'defense type',
-                                    rank: getTranslationByKey("personal")
+                                    rank: 'personal'
                                 });
                             break;
                             case 'skills':
@@ -11173,7 +11230,7 @@
                             default:
                                 query.config.push({
                                     name: query.attribute,
-                                    rank: 0//setAttrCharacteristic(cache, set_values, query);
+                                    rank: 0
                                 });
                         }
                         if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
@@ -11182,7 +11239,7 @@
                                 rank: 0
                             });
                         }
-                        set_values[`repeating_attribute_${row_id}_configuration`] = setConfiguration(cache, set_values, query);
+                        set_values[`repeating_attribute_${row_id}_configuration`] = await setConfiguration(cache, set_values, query);
                     //}
                     
                     attrdb_entry.active = true;
@@ -11528,6 +11585,11 @@
                     cache.groupdb[cache.static_group_visible_id].group_type = query.selection;
                     set_values.static_attribute_group_type = 
                         cache.groupdb[cache.static_group_visible_id].group_type.capitalize();
+                    if (query.selection === 'gear') {
+                        cache.groupdb[cache.static_group_visible_id].item = 'gear';
+                        set_values.static_attribute_group_item = 
+                            cache.groupdb[cache.static_group_visible_id].item.capitalize();
+                    }
                     showDynamicGroupFields(cache, set_values);
                     setAttributeGroupVisibility(cache, set_values);
                 } else if (query.next === 'write_level') {
@@ -11579,7 +11641,7 @@
                         ) {
                             const index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'base points');
                             cache.attrdb[query.attribute][query.index].config[index].rank = query.points;
-                            //set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                            //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         } else if (query.last === 'repeating_defect_rank') {
                             if (query.defect === 'shortcoming') {
                                 const aspect_type_index = query.db.config.findIndex(i => i.name === 'aspect_type');
@@ -11590,7 +11652,7 @@
                             }
                         }
                         //setLevelDependantConfigurations(cache, set_values, query);
-                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                     }
                     if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                         setPowerFluxPoolPoints(cache, set_values);
@@ -11599,6 +11661,11 @@
                         setPowerVariationPoolPoints(cache, set_values);
                     } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
                         setDynamicPowersPoolLevels(cache, set_values);
+                        //setNonStandardGroupPoints(cache, set_values);
+                        setGroupCharacterPoints(cache, set_values);
+                    } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
+                        setGearPoolLevels(cache, set_values, query);
+                        setGroupCharacterPoints(cache, set_values);
                     } else {
                         setGroupCharacterPoints(cache, set_values);
                     }
@@ -11658,9 +11725,9 @@
                             if (configuration) {
                                 cache.attrdb[query.attribute][query.index].config.push({
                                     name: configuration,
-                                    rank:'not configured',
+                                    rank:'carry',
                                 });
-                                //set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                                //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                             }
                         } else {//=> remove customization or update rank
                             query.rank = query.has_rank ? query.rank : 0;
@@ -11670,7 +11737,7 @@
                                     const config_index = 
                                         cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === configuration);
                                     cache.attrdb[query.attribute][query.index].config.splice(config_index, 1);
-                                    //set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                                    //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                                 }
                                 cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(query.customization[2], 1);
                             } else {
@@ -11691,7 +11758,7 @@
                                 `${c.name.capitalize()} (${c.rank})`
                             ).sort().join("\n");
                         query.elevel = cache.attrdb[query.attribute][query.index].elevel;
-                        set_values[`${cache.source_path}_configuration`] = setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                     }
                 }
                 // Create and display new group
@@ -12273,7 +12340,7 @@
         }
         temp[temp.point_type] = Math.max(temp[temp.point_type], 0);
         set_values[`static_character_${temp.stat}_remaining`] =
-            temp.base + temp.temp - temp.damage - 
+            temp.base + (cache.statsdb[temp.stat].augmented || 0) + temp.temp - temp.damage - 
             (cache.statsdb[temp.stat].shortcoming || 0);
         if (temp.point_type === 'base') {
             temp.cp_spent =
@@ -12340,6 +12407,7 @@
         for (let i = 0; i < all_stats.length; i++) {
             cache[all_stats[i]] = 
             cache.statsdb[all_stats[i]].base +
+            (cache.statsdb[all_stats[i]].augmented || 0) +
             cache.statsdb[all_stats[i]].temp -
             cache.statsdb[all_stats[i]].damage -
             (cache.statsdb[all_stats[i]].shortcoming || 0);
