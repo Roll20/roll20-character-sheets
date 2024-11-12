@@ -1728,6 +1728,9 @@
 					</div>
 				</label>
 				<h1>Equipment</h1>
+				<div class="set-AtoB-button-light">
+					<button type="action" name="act_equipSetAtoB" tabindex="-1" class="button button-gear-set"><div>A/B</div></button>
+				</div>
 				<h1>Mass</h1>
 			</div>
 			
@@ -13939,6 +13942,71 @@
 <input type="hidden" name="attr_weaponMass15" value="0"/>
 <input type="hidden" name="attr_rangeBasedOnStr15" value=""/>
 
+<!-- Set B Equipment variables -->
+<input type="hidden" name="attr_equipCarried17" value=""/>
+<input type="hidden" name="attr_equipText17" value=""/>
+<input type="hidden" name="attr_equipMass17" value=""/>
+
+<input type="hidden" name="attr_equipCarried18" value=""/>
+<input type="hidden" name="attr_equipText18" value=""/>
+<input type="hidden" name="attr_equipMass18" value=""/>
+
+<input type="hidden" name="attr_equipCarried19" value=""/>
+<input type="hidden" name="attr_equipText19" value=""/>
+<input type="hidden" name="attr_equipMass19" value=""/>
+
+<input type="hidden" name="attr_equipCarried20" value=""/>
+<input type="hidden" name="attr_equipText20" value=""/>
+<input type="hidden" name="attr_equipMass20" value=""/>
+
+<input type="hidden" name="attr_equipCarried21" value=""/>
+<input type="hidden" name="attr_equipText21" value=""/>
+<input type="hidden" name="attr_equipMass21" value=""/>
+
+<input type="hidden" name="attr_equipCarried22" value=""/>
+<input type="hidden" name="attr_equipText22" value=""/>
+<input type="hidden" name="attr_equipMass22" value=""/>
+
+<input type="hidden" name="attr_equipCarried23" value=""/>
+<input type="hidden" name="attr_equipText23" value=""/>
+<input type="hidden" name="attr_equipMass23" value=""/>
+
+<input type="hidden" name="attr_equipCarried24" value=""/>
+<input type="hidden" name="attr_equipText24" value=""/>
+<input type="hidden" name="attr_equipMass24" value=""/>
+
+<input type="hidden" name="attr_equipCarried25" value=""/>
+<input type="hidden" name="attr_equipText25" value=""/>
+<input type="hidden" name="attr_equipMass25" value=""/>
+
+<input type="hidden" name="attr_equipCarried26" value=""/>
+<input type="hidden" name="attr_equipText26" value=""/>
+<input type="hidden" name="attr_equipMass26" value=""/>
+
+<input type="hidden" name="attr_equipCarried27" value=""/>
+<input type="hidden" name="attr_equipText27" value=""/>
+<input type="hidden" name="attr_equipMass27" value=""/>
+
+<input type="hidden" name="attr_equipCarried28" value=""/>
+<input type="hidden" name="attr_equipText28" value=""/>
+<input type="hidden" name="attr_equipMass28" value=""/>
+
+<input type="hidden" name="attr_equipCarried29" value=""/>
+<input type="hidden" name="attr_equipText29" value=""/>
+<input type="hidden" name="attr_equipMass29" value=""/>
+
+<input type="hidden" name="attr_equipCarried30" value=""/>
+<input type="hidden" name="attr_equipText30" value=""/>
+<input type="hidden" name="attr_equipMass30" value=""/>
+
+<input type="hidden" name="attr_equipCarried31" value=""/>
+<input type="hidden" name="attr_equipText31" value=""/>
+<input type="hidden" name="attr_equipMass31" value=""/>
+
+<input type="hidden" name="attr_equipCarried32" value=""/>
+<input type="hidden" name="attr_equipText32" value=""/>
+<input type="hidden" name="attr_equipMass32" value=""/>
+
 
 <!-- Jackob's Roll Template -->
 <!-- Basic checks -->
@@ -21532,40 +21600,88 @@
 	/* ---------------- */
 	
 	arrayOf(maxEquipmentNum).forEach(num => {
-		var lowId = String(num).padStart(2,'0');
-		var highId = String(num == maxEquipmentNum ? 1 : num + 1).padStart(2,'0');
+		// For equipment 01 and 16 we need to swap with the alternates 17 and 32.
 		
-		swapEquipmentPositions(lowId, highId);
+		const stepId = 16;
+		
+		var lowId = String(num).padStart(2,'0');
+		var highId = String(num === (maxEquipmentNum) ? maxEquipmentNum + stepId : num + 1).padStart(2,'0');
+		
+		on("clicked:equipDown"+lowId, function() {
+			swapEquipmentPositions(lowId, highId);
+		});
+	});
+	
+	
+	arrayOf(maxEquipmentNum).forEach(num => {
+		// For equipment 01 and 16 we need to swap with the alternates 17 and 32.
+		
+		const stepId = 16;
+		
+		var lowId = String(num === 1 ? stepId + 1 : num - 1).padStart(2,'0');
+		var highId = String(num).padStart(2,'0');
+		
+		on("clicked:equipUp"+highId, function() {
+			swapEquipmentPositions(lowId, highId);
+		});
 	});
 	
 	
 	function swapEquipmentPositions(lowId, highId) {
-		on("clicked:equipDown"+lowId+" clicked:equipUp"+highId, function () {
-			getAttrs(["equipText"+lowId, "equipText"+highId, "equipCarried"+lowId, "equipCarried"+highId, "equipMass"+lowId, "equipMass"+highId], function(values) {
-				var attributes = new Object();
-				
-				let theString = values["equipText"+lowId];
-				if ( (theString.length === 0) || (theString === null) ) {
-					attributes["equipText"+highId] = "";
-				} else {
-					attributes["equipText"+highId] = values["equipText"+lowId];
-				}
-				
-				theString = values["equipText"+highId];
-				if ( (theString.length === 0) || (theString === null) ) {
-					attributes["equipText"+lowId] = "";
-				} else {
-					attributes["equipText"+lowId] = values["equipText"+highId];
-				}
-				
-				attributes["equipCarried"+lowId] = values["equipCarried"+highId];
-				attributes["equipCarried"+highId] = values["equipCarried"+lowId];
-				attributes["equipMass"+lowId] = values["equipMass"+highId];
-				attributes["equipMass"+highId] = values["equipMass"+lowId];
-				
-				setAttrs(attributes);
-			});
+		getAttrs(["equipText"+lowId, "equipText"+highId, "equipCarried"+lowId, "equipCarried"+highId, "equipMass"+lowId, "equipMass"+highId], function(values) {
+			var attributes = new Object();
+			
+			let theString = values["equipText"+lowId];
+			if ( (theString.length === 0) || (theString === null) ) {
+				attributes["equipText"+highId] = "";
+			} else {
+				attributes["equipText"+highId] = values["equipText"+lowId];
+			}
+			
+			theString = values["equipText"+highId];
+			if ( (theString.length === 0) || (theString === null) ) {
+				attributes["equipText"+lowId] = "";
+			} else {
+				attributes["equipText"+lowId] = values["equipText"+highId];
+			}
+			
+			attributes["equipCarried"+lowId] = values["equipCarried"+highId];
+			attributes["equipCarried"+highId] = values["equipCarried"+lowId];
+			attributes["equipMass"+lowId] = values["equipMass"+highId];
+			attributes["equipMass"+highId] = values["equipMass"+lowId];
+			
+			setAttrs(attributes);
 		});
+	}
+	
+	
+	// Exchange all equipment by set.
+	on("clicked:equipSetAtoB", function() {
+		getAttrs(["activateDeleteChecks"], function(values) {
+			if (values.activateDeleteChecks !== "on") {
+				swapEquipmentSet();
+			}
+		});
+	});
+	
+	
+	function swapEquipmentSet() {
+		const stepId = 16;
+		
+		for (let i=1; i <= maxEquipmentNum; i++) {
+			lowId = String(i).padStart(2,'0');
+			highId = String(i+stepId).padStart(2,'0');
+			
+			if (i===1) {
+				setAttrs({
+					"complicationsTextRight":lowId + " " + highId
+				});
+			}
+			
+			swapEquipmentPositions(lowId, highId);
+		}
+		
+		
 	}
 	
 	
