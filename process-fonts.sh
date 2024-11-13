@@ -74,6 +74,7 @@ extract_font_urls() {
 # Process each directory
 for dir in ${dirs[@]}; do
     print "Checking directory: $dir" >&2
+    mkdir -p "$output_dir/$dir"
 
     # Find CSS files directly in this directory
     css_files=($dir/*.css(.N))
@@ -110,6 +111,7 @@ for dir in ${dirs[@]}; do
 
                 if [[ "$response" != "y" ]]; then
                     print "Skipping $dir" >&2
+                    touch "$output_dir/$dir/fonts.css"
                     continue
                 fi
             fi
@@ -140,11 +142,18 @@ for dir in ${dirs[@]}; do
             done
 
             if [[ -s "$raw_file" ]]; then
-                # Create directory for this sheet
-                mkdir -p "$output_dir/$dir"
                 mv "$raw_file" "$output_dir/$dir/fonts.css"
                 print "Generated fonts.css for $dir" >&2
+            else
+                touch "$output_dir/$dir/fonts.css"
+                print "Generated empty fonts.css for $dir (no valid content)" >&2
             fi
+        else
+            touch "$output_dir/$dir/fonts.css"
+            print "Generated empty fonts.css for $dir (no URLs found)" >&2
         fi
+    else
+        touch "$output_dir/$dir/fonts.css"
+        print "Generated empty fonts.css for $dir (no CSS files)" >&2
     fi
 done
