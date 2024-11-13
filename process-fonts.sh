@@ -12,7 +12,7 @@ fi
 # Process arguments
 test_mode=0
 no_prompt=0
-output_file="fonts.css"
+output_dir="/tmp/discord-fonts"
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -24,12 +24,21 @@ while [[ $# -gt 0 ]]; do
             no_prompt=1
             shift
             ;;
+        --output-dir)
+            output_dir="$2"
+            shift 2
+            ;;
         *)
-            output_file="$1"
             shift
             ;;
     esac
 done
+
+# Clean/create output directory
+if [[ -d "$output_dir" ]]; then
+    rm -rf "$output_dir"
+fi
+mkdir -p "$output_dir"
 
 print "Starting directory search..." >&2
 
@@ -52,10 +61,7 @@ fi
 print "\nFound directories:" >&2
 print -l "  ${dirs[@]}" >&2
 
-# First collect all URLs
-urls_file=$(mktemp)
-trap "rm -f '$urls_file'" EXIT
-
+# Extract URLs function
 extract_font_urls() {
     perl -ne '
         next if /^\s*\/\*/;  # Skip comment lines
@@ -65,7 +71,7 @@ extract_font_urls() {
     ' "$1"
 }
 
-# Process each directory to collect URLs
+# Process each directory
 for dir in ${dirs[@]}; do
     print "Checking directory: $dir" >&2
 
@@ -75,6 +81,10 @@ for dir in ${dirs[@]}; do
     if [[ ${#css_files} -gt 0 ]]; then
         print "Found CSS files in $dir:" >&2
         print -l "    ${css_files[@]}" >&2
+
+        # Collect URLs for this directory
+        urls_file=$(mktemp)
+        trap "rm -f '$urls_file'" EXIT
 
         for css_file in ${css_files[@]}; do
             print "Processing: $css_file" >&2
@@ -87,79 +97,54 @@ for dir in ${dirs[@]}; do
                 print "$found_urls" >> "$urls_file"
             fi
         done
-    else
-        print "No CSS files found in $dir" >&2
-    fi
-done
 
-# Get unique URLs and show summary
-unique_urls=($(sort -u "$urls_file"))
-total_urls=${#unique_urls}
+        # If we found URLs in this directory
+        unique_urls=($(sort -u "$urls_file"))
+        if [[ ${#unique_urls} -gt 0 ]]; then
+            print "\nFound ${#unique_urls} unique font URLs in $dir" >&2
 
-if [[ $total_urls -eq 0 ]]; then
-    print "No Google Font URLs found" >&2
-    exit 1
-fi
+            if [[ $no_prompt -eq 0 ]]; then
+                print "Proceed with fetching and transforming URLs for $dir? [y/N] " >&2
+                read -q response || true
+                print >&2
 
-print "\nFound $total_urls unique Google Font URLs:" >&2
-print -l "  ${unique_urls[@]}" >&2
+                if [[ "$response" != "y" ]]; then
+                    print "Skipping $dir" >&2
+                    continue
+                fi
+            fi
 
-if [[ $no_prompt -eq 0 ]]; then
-    print "\nProceed with fetching and transforming these URLs? [y/N] " >&2
-    read -q response || true
-    print >&2
+            raw_file=$(mktemp)
+            trap "rm -f '$raw_file'" EXIT
 
-    if [[ "$response" != "y" ]]; then
-        print "Operation cancelled" >&2
-        exit 0
-    fi
-fi
+            # Process URLs for this directory
+            for font_url in $unique_urls; do
+                response=$(curl -sS -w "\n%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" \
+                     "$font_url")
 
-# Create temporary files for the transformed CSS
-raw_file=$(mktemp)
-temp_file=$(mktemp)
-trap "rm -f '$temp_file' '$urls_file' '$raw_file'" EXIT
+                if [[ $? -eq 0 ]]; then
+                    http_code=$(print "$response" | tail -n1)
+                    content=$(print "$response" | sed '$d')
 
-# Process each unique URL
-for font_url in $unique_urls; do
-    response=$(curl -sS -w "\n%{http_code}" -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" \
-         "$font_url")
+                    if [[ "$http_code" = "200" ]]; then
+                        print "$content" | \
+                        sed "s/fonts\.gstatic\.com/${DISCORD_ACTIVITY_CLIENT_ID}.discordsays.com\/.proxy\/gstatic\/fonts/g" \
+                        >> "$raw_file"
+                        print >> "$raw_file"
+                    else
+                        print "Error: HTTP $http_code for $font_url" >&2
+                    fi
+                else
+                    print "Error: Failed to fetch $font_url" >&2
+                fi
+            done
 
-    if [[ $? -eq 0 ]]; then
-        http_code=$(print "$response" | tail -n1)
-        content=$(print "$response" | sed '$d')
-
-        if [[ "$http_code" = "200" ]]; then
-            print "$content" >> "$raw_file"
-            print >> "$raw_file" # Add newline between font definitions
-        else
-            print "Error: HTTP $http_code for $font_url" >&2
+            if [[ -s "$raw_file" ]]; then
+                # Create directory for this sheet
+                mkdir -p "$output_dir/$dir"
+                mv "$raw_file" "$output_dir/$dir/fonts.css"
+                print "Generated fonts.css for $dir" >&2
+            fi
         fi
-    else
-        print "Error: Failed to fetch $font_url" >&2
     fi
 done
-
-# Deduplicate font declarations and transform URLs
-if [[ -s "$raw_file" ]]; then
-    # Extract unique @font-face blocks and transform URLs
-    perl -0777 -ne '
-        while (/(\@font-face\s*\{[^}]+\})/gs) {
-            $block = $1;
-            $seen{$block}++ or print "$block\n\n";
-        }
-    ' "$raw_file" | \
-    sed "s/fonts\.gstatic\.com/${DISCORD_ACTIVITY_CLIENT_ID}.discordsays.com\/.proxy\/gstatic\/fonts/g" \
-    > "$temp_file"
-
-    if [[ -s "$temp_file" ]]; then
-        mv "$temp_file" "$output_file"
-        print "Generated $output_file" >&2
-    else
-        print "Error: No valid font definitions found after deduplication" >&2
-        exit 1
-    fi
-else
-    print "Error: No valid font definitions found" >&2
-    exit 1
-fi
