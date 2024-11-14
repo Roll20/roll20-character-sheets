@@ -3994,7 +3994,7 @@
       <!-- ARTIFACT DICE -->
     <div class="template-grid">
       {{#rollTotal() artifact-die-eight 1}}
-      <div class="template-grid-item template-span-five template-maroon-dice">
+      <div class="template-grid-item template-span-five template-green-dice">
         {{#rollBetween() artifact-roll-eight 1 5}} {{artifact-roll-eight}} {{/rollBetween() artifact-roll-eight 1 5}}
         {{#rollBetween() artifact-roll-eight 6 7}}
         <div class="template-artifact-1">
@@ -4007,7 +4007,7 @@
         {{/rollWasCrit() artifact-roll-eight}}
       </div>
       {{/rollTotal() artifact-die-eight 1}} {{#rollTotal() artifact-die-ocho 1}}
-      <div class="template-grid-item template-span-shix template-maroon-dice">
+      <div class="template-grid-item template-span-shix template-green-dice">
         {{#rollBetween() artifact-roll-ocho 1 5}} {{artifact-roll-ocho}} {{/rollBetween() artifact-roll-ocho 1 5}}
         {{#rollBetween() artifact-roll-ocho 6 7}}
         <div class="template-artifact-1">
@@ -5444,31 +5444,62 @@
   });
 
   on('clicked:roll_the_dice', () => {
-    getAttrs(['character_name', 'character_id', 'attribute', 'skill', 'gear', 'current_preset', 'whisper_option', 'pushable'], async (values) => {
-      const trigger = {name: values.current_preset},
-        attributes = {
-          character_name: values.character_name || 'Unknown',
-          character_id: values.character_id || 0,
-        },
-        roll = {
-          name: values.current_preset || 'Roll',
-          attribute: int(values.attribute),
-          skill: int(values.skill),
-          gear: int(values.gear),
-          totalDice: int(values.attribute) + Math.abs(int(values.skill)) + int(values.gear),
-          pushable: int(values.pushable),
-          pushroll: 0,
-          whisper: values.whisper_option,
-        };
-      executeRoll({trigger, attributes, roll});
-    });
+    getAttrs(
+      [
+        'character_name',
+        'character_id',
+        'attribute',
+        'skill',
+        'gear',
+        'artifact_die_eight',
+        'artifact_die_ocho',
+        'artifact_die_ten',
+        'artifact_die_twelve',
+        'current_preset',
+        'whisper_option',
+        'pushable',
+      ],
+      async (values) => {
+        const trigger = {name: values.current_preset},
+          attributes = {
+            character_name: values.character_name || 'Unknown',
+            character_id: values.character_id || 0,
+          },
+          roll = {
+            name: values.current_preset || 'Roll',
+            attribute: int(values.attribute),
+            skill: int(values.skill),
+            gear: int(values.gear),
+            artifact_die_eight: int(values.artifact_die_eight),
+            artifact_die_ocho: int(values.artifact_die_ocho),
+            artifact_die_ten: int(values.artifact_die_ten),
+            artifact_die_twelve: int(values.artifact_die_twelve),
+            totalDice:
+              int(values.attribute) +
+              Math.abs(int(values.skill)) +
+              int(values.gear) +
+              int(values.artifact_die_eight) +
+              int(values.artifact_die_ocho) +
+              int(values.artifact_die_ten) +
+              int(values.artifact_die_twelve),
+            pushable: int(values.pushable),
+            pushroll: 0,
+            whisper: values.whisper_option,
+          };
+        executeRoll({trigger, attributes, roll});
+      },
+    );
   });
 
   const executeRoll = function ({trigger, attributes, roll}) {
     var attributeStr = '',
       skillStr = '',
       gearStr = '',
-      rollStr = '';
+      rollStr = '',
+      artifact_eightStr = '',
+      artifact_ochoStr = '',
+      artifact_tenStr = '',
+      artifact_twelveStr = '';
 
     //clog(`TEST: Roll object: ${JSON.stringify(roll)}`);
     //clog(`TEST: Roll pushRollStr: ${!!roll.pushRollStr}`);
@@ -5491,7 +5522,19 @@
       for (let i = 1; i <= roll.gear; i++) {
         gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6]] }} `;
       }
-      rollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
+      for (let i = 1; i <= roll.artifact_die_eight; i++) {
+        artifact_eightStr += `{{artifact-die-eight= [[1]] }} {{artifact-roll-eight= [[1d8]] }} `;
+      }
+      for (let i = 1; i <= roll.artifact_die_ocho; i++) {
+        artifact_ochoStr += `{{artifact-die-ocho= [[1]] }} {{artifact-roll-ocho= [[1d8]] }} `;
+      }
+      for (let i = 1; i <= roll.artifact_die_ten; i++) {
+        artifact_tenStr += `{{artifact-die-ten= [[1]] }} {{artifact-roll-ten= [[1d10]] }} `;
+      }
+      for (let i = 1; i <= roll.artifact_die_twelve; i++) {
+        artifact_twelveStr += `{{artifact-die-twelve= [[1]] }} {{artifact-roll-twelve= [[1d12]] }} `;
+      }
+      rollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr} ${artifact_eightStr} ${artifact_ochoStr} ${artifact_tenStr} ${artifact_twelveStr}`;
     }
 
     //clog("Roll string; "+ rollStr);
@@ -5502,6 +5545,10 @@
       var pushAttributeStr = '',
         pushSkillStr = '',
         pushGearStr = '',
+        pushArtifact_eightStr = '',
+        pushArtifact_ochoStr = '',
+        pushArtifact_tenStr = '',
+        pushArtifact_twelveStr = '',
         successes = 0,
         failures = 0,
         gearfails = 0;
@@ -5568,13 +5615,93 @@
           //clog(`results gear die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
+
+      // artifact dice
+      // thoughts... shouldn't the roll (r) be a number? why check string value in the IF() ?
+      // instead of incrimenting success++, artifact die could add more than one success
+      // need to use a formula for any artifact r>=6 ie x=r-6 where x is the scuccesses
+
+      for (let i = 1; i <= roll.artifact_die_eight; i++) {
+        let r = results.results[`artifact-roll-eight`].result;
+        //clog(`results artifact_die_eight ${i} : ${r}`);
+        if (r == '6' || r === 6) {
+          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[6]]}} `;
+          successes++;
+          //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
+        }
+        if (r == '7' || r === 7) {
+          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[7]]}} `;
+          successes++;
+          //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
+        }
+        if (r == '8' || r === 8) {
+          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[8]]}} `;
+          successes++;
+          //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
+        } else if (r == '1' || r == 1) {
+          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[1]]}} `;
+          failures++;
+          //clog(`results artifact_die_eight die ${i} is 0, total ${failures} failures`);
+        } else {
+          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[1d8]]}} `;
+          //clog(`results artifact_die_eight die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+        }
+      }
+      for (let i = 1; i <= roll.artifact_die_ocho; i++) {
+        let r = results.results[`artifact-roll-ocho`].result;
+        //clog(`results artifact_die_ocho ${i} : ${r}`);
+        if (r == '6' || r >= 6) {
+          pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[8]]}} `;
+          successes++;
+          //clog(`results artifact_die_ocho die ${i} is 6, total ${successes} successes`);
+        } else if (r == '1' || r == 1) {
+          pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[1]]}} `;
+          failures++;
+          //clog(`results artifact_die_ocho die ${i} is 0, total ${failures} failures`);
+        } else {
+          pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[1d8]]}} `;
+          //clog(`results artifact_die_ocho die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+        }
+      }
+      for (let i = 1; i <= roll.artifact_die_ten; i++) {
+        let r = results.results[`artifact-roll-ten`].result;
+        //clog(`results artifact_die_ten ${i} : ${r}`);
+        if (r == '6' || r >= 6) {
+          pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[10]]}} `;
+          successes++;
+          //clog(`results artifact_die_ten die ${i} is 6, total ${successes} successes`);
+        } else if (r == '1' || r == 1) {
+          pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[1]]}} `;
+          failures++;
+          //clog(`results artifact_die_ten die ${i} is 0, total ${failures} failures`);
+        } else {
+          pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[1d10]]}} `;
+          //clog(`results artifact_die_ten die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+        }
+      }
+      for (let i = 1; i <= roll.artifact_die_twelve; i++) {
+        let r = results.results[`artifact-roll-twelve`].result;
+        //clog(`results artifact_die_twelve ${i} : ${r}`);
+        if (r == '6' || r >= 6) {
+          pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[12]]}} `;
+          successes++;
+          //clog(`results artifact_die_twelve die ${i} is 6, total ${successes} successes`);
+        } else if (r == '1' || r == 1) {
+          pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[1]]}} `;
+          failures++;
+          //clog(`results artifact_die_twelve die ${i} is 0, total ${failures} failures`);
+        } else {
+          pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[1d12]]}} `;
+          //clog(`results artifact_die_twelve die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+        }
+      }
       // NB: Successes and failures counts number fo dice which cannot be rerolled.
       // In case of negative skill dice, the actual successes may be lower
       if (successes + failures == roll.totalDice) {
         roll.pushable = 0;
       }
 
-      roll.pushRollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
+      roll.pushRollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr} ${pushArtifact_eightStr} ${pushArtifact_ochoStr} ${pushArtifact_tenStr} ${pushArtifact_twelveStr}`;
 
       const pushRoll = {
         attributes: attributes,
@@ -6540,8 +6667,6 @@
       });
     });
   });
-
-  /* CRP for Dice Pool */
 </script>
 
 <!--
