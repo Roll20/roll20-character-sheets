@@ -4375,6 +4375,13 @@
     }
   };
 
+  const incrementWith = (primary, secondary) => {
+    if (typeof primary !== 'number' || typeof secondary !== 'number') {
+      throw new Error('Both inputs must be numbers.');
+    }
+    return primary + secondary;
+  };
+
   /* version tracking */
   const newAnnouncement = (old_version, new_version, show_announcement) => {
     const setter = {};
@@ -5559,13 +5566,12 @@
 
       for (let i = 1; i <= roll.attribute; i++) {
         let r = +results.results[`attribute-roll-${litnum[i]}`].result;
-        clog(`~~~ r = ${r} and is a ${typeof r} ~~~`);
         //clog(`results attribute ${i} : ${r}`);
         if (r === 6) {
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[6]]}} `;
           successes++;
           //clog(`results attribute die ${i} is 6, total ${successes} successes`);
-        } else if (r == '1' || r == 1) {
+        } else if (r === 1) {
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1]]}} `;
           failures++;
           //clog(`results attribute die ${i} is 0, total ${failures} failures`);
@@ -5576,7 +5582,7 @@
       }
       if (roll.skill >= 0) {
         for (let i = 1; i <= roll.skill; i++) {
-          let r = results.results[`skill-roll-${litnum[i]}`].result;
+          let r = +results.results[`skill-roll-${litnum[i]}`].result;
           //clog(`results skill ${i} : ${r}`);
           if (r === 6) {
             pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6]]}} `;
@@ -5589,7 +5595,7 @@
         }
       } else if (roll.skill < 0) {
         for (let i = 1; i <= Math.abs(roll.skill); i++) {
-          let r = results.results[`negative-roll-${litnum[i]}`].result;
+          let r = +results.results[`negative-roll-${litnum[i]}`].result;
           //clog(`negative skill ${i} : ${r}`);
           if (r === 6) {
             pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[6]]}} `;
@@ -5602,13 +5608,13 @@
         }
       }
       for (let i = 1; i <= roll.gear; i++) {
-        let r = results.results[`gear-roll-${litnum[i]}`].result;
+        let r = +results.results[`gear-roll-${litnum[i]}`].result;
         //clog(`results gear ${i} : ${r}`);
         if (r === 6) {
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[6]]}} `;
           successes++;
           //clog(`results gear die ${i} is 6, total ${successes} successes`);
-        } else if (r == '1' || r == 1) {
+        } else if (r === 1) {
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1]]}} `;
           failures++;
           gearfails++;
@@ -5620,79 +5626,54 @@
       }
 
       // artifact dice
-      // thoughts... shouldn't the roll (r) be a number? why check string value in the IF() ?
       // instead of incrimenting success++, artifact die could add more than one success
-      // need to use a formula for any artifact r>=6 ie x=r-6 where x is the scuccesses
-
+      // need to use a formula for any artifact r>=6 ie x=r-6 where x is the scuccesses and add to successes
       for (let i = 1; i <= roll.artifact_die_eight; i++) {
-        let r = results.results[`artifact-roll-eight`].result;
+        let r = +results.results[`artifact-roll-eight`].result;
         //clog(`results artifact_die_eight ${i} : ${r}`);
-        if (r === 6) {
-          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[6]]}} `;
-          successes++;
+        if (r >= 6) {
+          let bonus = r - 6 + 1;
+          clog(`~~~ bonus:${bonus} ~~~`);
+          incrementWith(successes, bonus);
+          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[${r}]]}} `;
+          // successes++;
           //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
-        }
-        if (r == '7' || r === 7) {
-          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[7]]}} `;
-          successes++;
-          //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
-        }
-        if (r == '8' || r === 8) {
-          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[8]]}} `;
-          successes++;
-          //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
-        } else if (r == '1' || r == 1) {
-          pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[1]]}} `;
-          failures++;
-          //clog(`results artifact_die_eight die ${i} is 0, total ${failures} failures`);
         } else {
           pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[1d8]]}} `;
           //clog(`results artifact_die_eight die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       for (let i = 1; i <= roll.artifact_die_ocho; i++) {
-        let r = results.results[`artifact-roll-ocho`].result;
+        let r = +results.results[`artifact-roll-ocho`].result;
         //clog(`results artifact_die_ocho ${i} : ${r}`);
         if (r >= 6) {
           pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[8]]}} `;
           successes++;
           //clog(`results artifact_die_ocho die ${i} is 6, total ${successes} successes`);
-        } else if (r == '1' || r == 1) {
-          pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[1]]}} `;
-          failures++;
-          //clog(`results artifact_die_ocho die ${i} is 0, total ${failures} failures`);
         } else {
           pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[1d8]]}} `;
           //clog(`results artifact_die_ocho die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       for (let i = 1; i <= roll.artifact_die_ten; i++) {
-        let r = results.results[`artifact-roll-ten`].result;
+        let r = +results.results[`artifact-roll-ten`].result;
         //clog(`results artifact_die_ten ${i} : ${r}`);
         if (r >= 6) {
           pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[10]]}} `;
           successes++;
           //clog(`results artifact_die_ten die ${i} is 6, total ${successes} successes`);
-        } else if (r == '1' || r == 1) {
-          pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[1]]}} `;
-          failures++;
-          //clog(`results artifact_die_ten die ${i} is 0, total ${failures} failures`);
         } else {
           pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[1d10]]}} `;
           //clog(`results artifact_die_ten die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       for (let i = 1; i <= roll.artifact_die_twelve; i++) {
-        let r = results.results[`artifact-roll-twelve`].result;
+        let r = +results.results[`artifact-roll-twelve`].result;
         //clog(`results artifact_die_twelve ${i} : ${r}`);
         if (r == '6' || r >= 6) {
           pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[12]]}} `;
           successes++;
           //clog(`results artifact_die_twelve die ${i} is 6, total ${successes} successes`);
-        } else if (r == '1' || r == 1) {
-          pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[1]]}} `;
-          failures++;
-          //clog(`results artifact_die_twelve die ${i} is 0, total ${failures} failures`);
         } else {
           pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[1d12]]}} `;
           //clog(`results artifact_die_twelve die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
