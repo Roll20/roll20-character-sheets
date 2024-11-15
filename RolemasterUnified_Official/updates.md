@@ -1,3 +1,14 @@
+# 2024-11-14
+
+- Add description to each step of the Charactermancer buttons
+- Clear ranks on specialised skills if 0.  Previously worked for non specilised skills, this fixes
+    specialised skills as well (@ixs)
+- Add base lists selection in charactermancer.   Useful for professions with base lists.  Additionally
+base lists are now stored on the sheet.  So they persist.
+- Add control to stop progression until you have entered all data on the sheet required.
+- Bump sheet version 7
+  - Existing charaacters will have their base lists updated on the main sheet.
+
 # 2024-11-7
 
 - Sheet version to 6.  Funny how lots happen at once.
