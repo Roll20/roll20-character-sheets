@@ -4330,9 +4330,9 @@
       <div class="template-grid-item template-span-six template-footer">{{footer}}</div>
       {{/footer}}
       <div class="template-grid-item template-span-six template-footer">
-        {{#successes}}<span data-i18n="successes">Successes</span>:<span class="results">{{successes}}</span>{{/successes}}
-        {{#failures}}<span data-i18n="fails">Fails</span>:<span class="results">{{failures}}</span>{{/failures}}
-        {{#gearfails}}<span data-i18n="gear-fails">Gear Fails</span>:<span class="results">{{gearfails}}</span>{{/gearfails}}
+        {{#rollGreater() successes 1}}{{#successes}}<span data-i18n="successes">Successes</span>:<span class="results">{{successes}}</span>{{/successes}}{{/rollGreater() successes 1}}
+        {{#rollGreater() failures 1}}{{#failures}}<span data-i18n="fails">Fails</span>:<span class="results">{{failures}}</span>{{/failures}}{{/rollGreater() failures 1}}
+        {{#rollGreater() gearfails 1}}{{#gearfails}}<span data-i18n="gear-fails">Gear Fails</span>:<span class="results">{{gearfails}}</span>{{/gearfails}}{{/rollGreater() gearfails 1}}
       </div>
       <!-- PUSH BUTTON -->
       {{#rollGreater() computed::push 0}}
@@ -5508,7 +5508,10 @@
       artifact_eightStr = '',
       artifact_ochoStr = '',
       artifact_tenStr = '',
-      artifact_twelveStr = '';
+      artifact_twelveStr = '',
+      successes = 0,
+      failures = 0,
+      gearfails = 0;
 
     //clog(`TEST: Roll object: ${JSON.stringify(roll)}`);
     //clog(`TEST: Roll pushRollStr: ${!!roll.pushRollStr}`);
@@ -5543,7 +5546,7 @@
       for (let i = 1; i <= roll.artifact_die_twelve; i++) {
         artifact_twelveStr += `{{artifact-die-twelve= [[1]] }} {{artifact-roll-twelve= [[1d12]] }} `;
       }
-      rollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{dice-pool-flag=[[@{attribute_die_one} + @{skill_die_one} + @{gear_die_one}]]}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr} ${artifact_eightStr} ${artifact_ochoStr} ${artifact_tenStr} ${artifact_twelveStr}`;
+      rollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{dice-pool-flag=[[@{attribute_die_one} + @{skill_die_one} + @{gear_die_one}]]}} {{name=${roll.name}}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr} ${artifact_eightStr} ${artifact_ochoStr} ${artifact_tenStr} ${artifact_twelveStr}`;
     }
 
     //clog("Roll string; "+ rollStr);
@@ -5557,15 +5560,15 @@
         pushArtifact_eightStr = '',
         pushArtifact_ochoStr = '',
         pushArtifact_tenStr = '',
-        pushArtifact_twelveStr = '',
-        successes = 0,
-        failures = 0,
-        gearfails = 0;
+        pushArtifact_twelveStr = '';
+      // successes = 0,
+      // failures = 0,
+      // gearfails = 0;
 
       roll.pushroll = roll.pushroll + 1;
 
       for (let i = 1; i <= roll.attribute; i++) {
-        let r = +results.results[`attribute-roll-${litnum[i]}`].result;
+        let r = +results.results[`attribute-roll-${litnum[i]}`].result || 0;
         //clog(`results attribute ${i} : ${r}`);
         if (r === 6) {
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[6]]}} `;
@@ -5582,7 +5585,7 @@
       }
       if (roll.skill >= 0) {
         for (let i = 1; i <= roll.skill; i++) {
-          let r = +results.results[`skill-roll-${litnum[i]}`].result;
+          let r = +results.results[`skill-roll-${litnum[i]}`].result || 0;
           //clog(`results skill ${i} : ${r}`);
           if (r === 6) {
             pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6]]}} `;
@@ -5595,7 +5598,7 @@
         }
       } else if (roll.skill < 0) {
         for (let i = 1; i <= Math.abs(roll.skill); i++) {
-          let r = +results.results[`negative-roll-${litnum[i]}`].result;
+          let r = +results.results[`negative-roll-${litnum[i]}`].result || 0;
           //clog(`negative skill ${i} : ${r}`);
           if (r === 6) {
             pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[6]]}} `;
@@ -5608,7 +5611,7 @@
         }
       }
       for (let i = 1; i <= roll.gear; i++) {
-        let r = +results.results[`gear-roll-${litnum[i]}`].result;
+        let r = +results.results[`gear-roll-${litnum[i]}`].result || 0;
         //clog(`results gear ${i} : ${r}`);
         if (r === 6) {
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[6]]}} `;
@@ -5626,83 +5629,100 @@
       }
 
       // artifact dice
-      // instead of incrimenting success++, artifact die could add more than one success
-      // need to use a formula for any artifact r>=6 ie x=r-6 where x is the scuccesses and add to successes
       for (let i = 1; i <= roll.artifact_die_eight; i++) {
-        let r = +results.results[`artifact-roll-eight`].result;
-        //clog(`results artifact_die_eight ${i} : ${r}`);
+        let r = +results.results[`artifact-roll-eight`].result || 0;
+        clog(`results artifact_die_eight ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
-          bonus = r <= 7 ? 1 : 2;
+          switch (r) {
+            case 8:
+              bonus = 2;
+              clog(`results artifact_die_eight die ${i} is 8, total ${successes} successes`);
+              break;
+            default:
+              bonus = 1;
+              clog(`results artifact_die_eight die ${i} is 6||7, total ${successes} successes`);
+          }
           pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[${r}]]}} `;
           successes = incrementWith(successes, bonus);
-          //clog(`results artifact_die_eight die ${i} is 6, total ${successes} successes`);
         } else {
           pushArtifact_eightStr += `{{artifact-die-eight=[[1]]}} {{artifact-roll-eight=[[1d8]]}} `;
-          //clog(`results artifact_die_eight die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          clog(`results artifact_die_eight die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       for (let i = 1; i <= roll.artifact_die_ocho; i++) {
-        let r = +results.results[`artifact-roll-ocho`].result;
-        //clog(`results artifact_die_ocho ${i} : ${r}`);
+        let r = +results.results[`artifact-roll-ocho`].result || 0;
+        clog(`results artifact_die_ocho ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
-          bonus = r <= 7 ? 1 : 2;
+          switch (r) {
+            case 8:
+              bonus = 2;
+              clog(`results artifact_die_ocho die ${i} is 8, total ${successes} successes`);
+              break;
+            default:
+              bonus = 1;
+              clog(`results artifact_die_ocho die ${i} is 6||7, total ${successes} successes`);
+          }
           pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[${r}]]}} `;
           successes = incrementWith(successes, bonus);
-          //clog(`results artifact_die_ocho die ${i} is 6, total ${successes} successes`);
         } else {
           pushArtifact_ochoStr += `{{artifact-die-ocho=[[1]]}} {{artifact-roll-ocho=[[1d8]]}} `;
-          //clog(`results artifact_die_ocho die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          clog(`results artifact_die_ocho die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       for (let i = 1; i <= roll.artifact_die_ten; i++) {
-        let r = +results.results[`artifact-roll-ten`].result;
-        //clog(`results artifact_die_ten ${i} : ${r}`);
+        let r = +results.results[`artifact-roll-ten`].result || 0;
+        clog(`results artifact_die_ten ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
           switch (r) {
             case 10:
               bonus = 3;
+              clog(`results artifact_die_ten die ${i} is 10, total ${successes} successes`);
               break;
             case (8, 9):
               bonus = 2;
+              clog(`results artifact_die_ten die ${i} is 8||9, total ${successes} successes`);
               break;
             default:
               bonus = 1;
+              clog(`results artifact_die_ten die ${i} is 6||7, total ${successes} successes`);
           }
           pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[${r}]]}} `;
           successes = incrementWith(successes, bonus);
-          //clog(`results artifact_die_ten die ${i} is 6, total ${successes} successes`);
         } else {
           pushArtifact_tenStr += `{{artifact-die-ten=[[1]]}} {{artifact-roll-ten=[[1d10]]}} `;
-          //clog(`results artifact_die_ten die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          clog(`results artifact_die_ten die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       for (let i = 1; i <= roll.artifact_die_twelve; i++) {
-        let r = +results.results[`artifact-roll-twelve`].result;
-        //clog(`results artifact_die_twelve ${i} : ${r}`);
+        let r = +results.results[`artifact-roll-twelve`].result || 0;
+        clog(`results artifact_die_twelve ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
           switch (r) {
             case 12:
               bonus = 4;
+              clog(`results artifact_die_twelve die ${i} is 12, total ${successes} successes`);
               break;
             case (10, 11):
               bonus = 3;
+              clog(`results artifact_die_twelve die ${i} is 10||11, total ${successes} successes`);
               break;
             case (8, 9):
               bonus = 2;
+              clog(`results artifact_die_twelve die ${i} is 8||9, total ${successes} successes`);
               break;
             default:
               bonus = 1;
+              clog(`results artifact_die_twelve die ${i} is 6||7, total ${successes} successes`);
           }
           pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[${r}]]}} `;
           successes = incrementWith(successes, bonus);
-          //clog(`results artifact_die_twelve die ${i} is 6, total ${successes} successes`);
         } else {
           pushArtifact_twelveStr += `{{artifact-die-twelve=[[1]]}} {{artifact-roll-twelve=[[1d12]]}} `;
-          //clog(`results artifact_die_twelve die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
+          clog(`results artifact_die_twelve die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
       // NB: Successes and failures counts number fo dice which cannot be rerolled.
@@ -5721,6 +5741,12 @@
         gearfails: gearfails,
         totalDice: roll.totalDice,
       };
+
+      // ensure the regular rolls also include latest totals
+      successes = successes;
+      failures = failures;
+      gearfails = gearfails;
+      clog(`~~~ successes: ${successes} failures:${failures} ~~~`);
 
       setAttrs({
         push_latest: pushRoll,
