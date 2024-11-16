@@ -5843,8 +5843,12 @@
         const configuration =
             db.map(c =>
                 `${c.name.capitalize()} ` +
-                `(${c.name === query.attribute || c.name === configurations[query.attribute] ?
-                    characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank})`
+                `(${
+                    c.name === 'techniques' ?
+                        c.rank.map(t => t.name.capitalize() + ' (' + t.rank + ')').sort().join(", ") :
+                    c.name === query.attribute || c.name === configurations[query.attribute] ?
+                    characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank
+                })`
         ).sort().join("\n");
         return configuration;
     }
@@ -9974,9 +9978,12 @@
                     query.last = `${query.customization_type}_remove`;
                     query.next = 'write_customizations';
                 break;
+                case 'technique_rank':
                 case 'customization_rank':
                     query.title = `${getTranslationByKey("set-value")}`;
-                    query.options = `|${query.customization[1]}`;
+                    query.options = query.next === 'technique_rank' ? 
+                        `|${query.has_technique !== -1 ? query.techniques[query.techniques.findIndex(t => t.name === query.technique)].rank : 0}` : 
+                        `|${query.customization[1]}`;
                     query.last = query.next;
                 break;
                 case 'enhancement_rank':
@@ -10226,6 +10233,55 @@
                     }
                     query.options += '|' + temp_damage_types.sort().join("|") + 
                         `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'techniques':
+                    const standard_techniques = [
+                        'blind fighting',
+                        'blind shooting',
+                        'brutal',
+                        'concealment',
+                        'deflection',
+                        'extended range',
+                        'judge opponent',
+                        'lethal blow',
+                        'lightning reflexes',
+                        'portable armory',
+                        'reflection',
+                        'weapons encyclopedia',
+                    ];
+                    const optional_techniques = [
+                        'blackout',
+                        'critical strike',
+                        'dead eye',
+                        'debilitate',
+                        'enhanced knockback',
+                        'far shot',
+                        'flanking defense',
+                        'hardboiled',
+                        'multiple targets',
+                        'precise aim',
+                        'rush attack',
+                        'steady hand',
+                        'tournament encyclopedia',
+                        'two weapons',
+                    ];
+                    query.techniques = [];
+                    query.title = getTranslationByKey("choose-combat-techniques");
+                    for (let i = 0; i < optional_techniques.length; i++) {
+                        if (cache.rulesdb[`rules_attribute_${optional_techniques[i].removeWhiteSpace()}_status`]) {
+                            standard_techniques.push(optional_techniques[i]);
+                        }
+                    }
+                    for (let i = 0; i < standard_techniques.length; i++) {
+                        const has_technique = query.db.config[query.load[1]].rank.findIndex(r => r.name === standard_techniques[i]);
+                        query.techniques.push(
+                            `${standard_techniques[i].capitalize()}` +
+                            `${has_technique !== -1 ? ' (' + query.db.config[query.load[1]].rank[has_technique].rank + ')' : ''}` +
+                            `,${standard_techniques[i]}`
+                        );
+                    }
+                    query.options = '|' + query.techniques.sort().join('|');
                     query.last = query.next;
                 break;
                 case 'transform':
@@ -10520,13 +10576,6 @@
                     case 'repeating_attribute_limiters':
                         if (query.selection === 'exit') { return; }
                         query.customization = query.selection.split('~').map(s => isNaN(s) ? s : Number(s));
-                        /*
-                        query.selection = query.next.indexOf('enhancements') !== -1 ?
-                            enhancement_ranks[`${query.attribute}`][`${query.customization[0]}`] === undefined ? 0 :
-                            enhancement_ranks[`${query.attribute}`][`${query.customization[0]}`].rank :
-                            limiter_ranks[`${query.attribute}`][`${query.customization[0]}`] === undefined ? 0 :
-                            limiter_ranks[`${query.attribute}`][`${query.customization[0]}`].rank;
-                        */
                         query.has_rank = customizationHasRank(query);
                         query.next = query.has_rank ? 'customization_rank' : 'write_customizations';
                     break;
@@ -10589,13 +10638,15 @@
                             query.config.splice(query.customization_index, 1);
                         }
                     break;
+                    case 'technique_rank':
                     case 'customization_rank':
                         if (isNaN(query.selection)) {
                             clog(cache, 'Value must be an integer.', 'ERROR');
                             query.next = query.last;
                         } else {
                             query.rank = int(query.selection);
-                            query.next = 'write_customizations';
+                            query.next = query.next === 'customization_rank' ?
+                                'write_customizations' : 'write_technique';
                         }
                     break;
                     case 'enhancement_rank':
@@ -11023,6 +11074,44 @@
                         set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
+                    case 'techniques':
+                        const combat_techinique_ranks = {
+                            'blackout':{rank:1},
+                            'blind fighting':{rank:1},
+                            'blind shooting':{rank:1},
+                            'brutal':{rank:1},
+                            'concealment':{rank:1},
+                            'critical strike':{rank:1},
+                            'dead eye':{rank:1},
+                            'death dodge':{rank:1},
+                            'debilitate':{rank:1},
+                            'deflection':{rank:1},
+                            'enhanced knockback':{rank:1},
+                            'extended range':{rank:1},
+                            'far shot':{rank:1},
+                            'flanking defense':{rank:1},
+                            'hardboiled':{},
+                            'judge opponent':{rank:1},
+                            'lethal blow':{rank:1},
+                            'lightning reflexes':{},
+                            'multiple targets':{rank:1},
+                            'portable armory':{rank:1},
+                            'precise aim':{rank:1},
+                            'reflection':{rank:1},
+                            'rush attack':{rank:1},
+                            'steady hand':{rank:1},
+                            'tournament encyclopedia':{rank:1},
+                            'two weapons':{rank:1},
+                            'weapons encyclopedia':{rank:1},
+                        };
+                        query.technique = query.selection;
+                        query.rank = combat_techinique_ranks[query.technique].rank;
+                        query.has_rank = query.rank === undefined ? true : false;
+                        query.technique_index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'techniques');
+                        query.techniques = cache.attrdb[query.attribute][query.index].config[query.technique_index].rank;
+                        query.has_technique = query.techniques.findIndex(t => t.name === query.technique);
+                        query.next = query.rank === undefined ? 'technique_rank' : 'write_technique';
+                    break;
                     case 'transform':
                         if (query.selection === 'exit') { return; }
                         cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
@@ -11059,132 +11148,48 @@
                         query.commit === true;
                 }
             } else {
-                const skill_group_costs = {
-                    'background': 1,
-                    'field': 2,
-                    'action': 3
-                };
-                if (query.next === 'write_newattr') {
-                    //-> write attribute object into cache and create repeating section
-                    const fields = ['attribute','cost','level','name','points','stat'];//,'configuration'];
-                    //const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
-                    const row_id = generateRowID();
-                    const attrdb_entry = {};
-                    for (let i = 0; i < fields.length; i++) {
-                        let value = '';
-                        switch (fields[i]) {
-                            case 'attribute':
-                                value = getTranslationByKey(query.attribute_translation).capitalize();
-                            break;
-                            case 'stat':
-                                value = getTranslationByKey(`${query[fields[i]]}`).capitalize();
-                            break;
-                            /*
-                            case 'configuration':
-                                switch (query.attribute) {
-                                    case 'absorption':
-                                        query.config.push({
-                                            name: 'transform',
-                                            rank: getTranslationByKey("health-points")
-                                        });
-                                    case 'armor':
-                                    case 'conversion':
-                                    case 'force field':
-                                        query.config.push({
-                                            name: `${
-                                                query.attribute === 'absorption' ? 'absorb' :
-                                                query.attribute === 'conversion' ? 'convert' :
-                                                'armor rating'
-                                            }`,
-                                            rank: 0
-                                        });
-                                    break;
-                                    case 'capacity':
-                                        query.config.push({
-                                            name: 'capacity_type',
-                                            rank: getTranslationByKey("carry")
-                                        });
-                                    break;
-                                    case 'ranged defense':
-                                        query.config.push({
-                                            name: 'defense type',
-                                            rank: getTranslationByKey("personal")
-                                        });
-                                    break;
-                                    case 'skills':
-                                        query.config.push({
-                                            name: 'skill points',
-                                            rank: 0
-                                        });
-                                    break;
-                                    default:
-                                        query.config.push({
-                                            name: query.attribute,
-                                            rank: 0//setAttrCharacteristic(cache, set_values, query);
-                                        });
-                                }
-                                if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
-                                    query.config.push({
-                                        name: 'base points',
-                                        rank: 0
-                                    });
-                                }
-                                if (query.config.length !== 0) {
-                                    query.config.sort();
-                                    const configurable = ['absorb','convert','defense type','transform','senses']
-                                    for (let i = 0; i < query.config.length; i++) {
-                                        if (query.config[i].name === 'flare') {
-                                            value += `Flare\n`;
-                                            for (let j = 0; j < senses.length; j++) {
-                                                value += query.config[i].senses[j].rank ?
-                                                    `   ${query.config[i].senses[j].name.capitalize()} (` +
-                                                    `${query.config[i].senses[j].rank === 1 ?
-                                                        'minor' : 'major'} obstacle)\n` : '';
-                                            }
-                                        } else {
-                                            value += `${query.config[i].name.capitalize()}`;
-                                            value += `${
-                                                query.config[i].name === 'absorb' ? ' up to ' :
-                                                query.config[i].name === 'convert' ? 
-                                                    query.elevel !== 1 ? ' 10 to ' : ' ' :
-                                                ' ('
-                                            }`;
-                                            value += `${
-                                                isNaN(query.config[i].rank) ?
-                                                query.config[i].rank.capitalize() : 
-                                                int(query.config[i].rank)
-                                            }`;
-                                            value += `${
-                                                query.config[i].name === 'absorb' ? ' damage' :
-                                                query.config[i].name === 'convert' ? ' damage into character points' :
-                                                ')'
-                                            }`;
-                                            value += '\n';
-                                        }
-                                    }
-                                }
-                            break;
-                            */
-                            case 'cost':
-                                query.cost = query.attribute === 'skill group' ?
-                                    skill_group_costs[query.category] :
-                                    attribute_costs[query.attribute];
-                                value = query.cost;
-                            break;
-                            case 'level':
-                                value = '0 (0)';
-                            break;
-                            case 'name':
-                                value = `${getTranslationByKey('new-attribute')}${query.attribute === 'skill group' ?
-                                    ' (' + query.attribute.capitalize() + ')' : ''}`;
-                            break;
-                            case 'points':
-                                value = 0;
-                            break;
+                query.fields = 
+                    query.next === 'write_newattr' ? ['attribute','cost','level','name','points','stat'] :
+                    query.next === 'write_newdefect' ? ['defect','name','points','rank'] : [];
+                query.row_id = query.next === 'write_newattr' || query.next === 'write_newdefect' ? generateRowID() : '';
+                switch (query.next) {
+                    case 'write_newattr':
+                        //-> write attribute object into cache and create repeating section
+                        const skill_group_costs = {
+                            'background': 1,
+                            'field': 2,
+                            'action': 3
+                        };
+                        //const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
+                        const attrdb_entry = {};
+                        for (let i = 0; i < query.fields.length; i++) {
+                            let value = '';
+                            switch (query.fields[i]) {
+                                case 'attribute':
+                                    value = getTranslationByKey(query.attribute_translation).capitalize();
+                                break;
+                                case 'stat':
+                                    value = getTranslationByKey(`${query[query.fields[i]]}`).capitalize();
+                                break;
+                                case 'cost':
+                                    query.cost = query.attribute === 'skill group' ?
+                                        skill_group_costs[query.category] :
+                                        attribute_costs[query.attribute];
+                                    value = query.cost;
+                                break;
+                                case 'level':
+                                    value = '0 (0)';
+                                break;
+                                case 'name':
+                                    value = `${getTranslationByKey('new-attribute')}${query.attribute === 'skill group' ?
+                                        ' (' + query.attribute.capitalize() + ')' : ''}`;
+                                break;
+                                case 'points':
+                                    value = 0;
+                                break;
+                            }
+                            set_values[`repeating_attribute_${query.row_id}_${query.fields[i]}`] = value;
                         }
-                        set_values[`repeating_attribute_${row_id}_${fields[i]}`] = value;
-                    }
-                    //if (query.config.length !== 0) {
                         switch (query.attribute) {
                             case 'absorption':
                                 query.config.push({
@@ -11215,6 +11220,12 @@
                                     rank: 'carry'
                                 });
                             break;
+                            case 'combat technique':
+                                query.config.push({
+                                    name: 'techniques',
+                                    rank: []
+                                });
+                            break;
                             case 'ranged defense':
                                 query.config.push({
                                     name: 'defense type',
@@ -11239,474 +11250,319 @@
                                 rank: 0
                             });
                         }
-                        set_values[`repeating_attribute_${row_id}_configuration`] = await setConfiguration(cache, set_values, query);
-                    //}
-                    
-                    attrdb_entry.active = true;
-                    attrdb_entry.config = query.config;
-                    attrdb_entry.elevel = query.elevel;
-                    attrdb_entry.enhancements = query.enhancements;
-                    attrdb_entry.group_id = cache.static_group_visible_id;
-                    attrdb_entry.level = query.level;
-                    attrdb_entry.limiters = query.limiters;
-                    attrdb_entry.name = query.name;
-                    attrdb_entry.row_id = row_id;
-                    attrdb_entry.stat = query.stat;
-                    attrdb_entry.points = query.cost * query.level;
-                    attrdb_entry.visibility = 1;
-                    cache.attrdb[query.attribute].push(attrdb_entry);
-                    cache.groupdb[cache.static_group_visible_id].attribute_ids.push(row_id);
-                    if (cache.groupdb[attrdb_entry.group_id].group_type === 'power flux') {
-                        setPowerFluxPoolPoints(cache, set_values);
-                    } else if (cache.groupdb[attrdb_entry.group_id].group_type === 'power variation') {
-                        setPowerVariationGroupPoints(cache, set_values);
-                        setPowerVariationPoolPoints(cache, set_values);
-                    } else if (cache.groupdb[attrdb_entry.group_id].group_type === 'dynamic powers') {
-                        setDynamicPowersPoolLevels(cache, set_values);
-                    } else {
-                        setGroupCharacterPoints(cache, set_values, attrdb_entry.group_id);
-                    }
-                    if (query.attribute === 'skills') {
-                        cache.attrdb.skills[cache.attrdb.skills.length - 1].individual = [];
-                        set_values.static_skills_attribute_name = query.name;
-                        set_values.static_skills_points_total = query.config[0].rank;
-                        set_values.static_skills_points_remaining = query.config[0].rank;
-                        set_values.static_skills_visible_id = cache.attrdb.skills.length - 1;
-                        setSkillUiVisibility(cache, set_values);
-                    }
-                    set_values[`repeating_attribute_${row_id}_active`] = 1;
-                } else if (
-                    query.next === 'write_newdefect' ||
-                    query.next === 'update_defect'
-                ) {
-                    const fields = ['defect','name','points','rank'];
-                    if (query.task === 'add') {
-                        fields.push('configuration');
-                    }
-                    const row_id = query.next === 'update_defect' ?
-                        query.row_id : generateRowID();
-                    for (let i = 0; i < fields.length; i++) {
-                        let value = '';
-                        switch (fields[i]) {
-                            case 'configuration':
-                                if (query.defect === 'shortcoming') {
-                                    const aspect_fields = ['stat','type'];
-                                    if (query.aspect_type !== 'all') {
-                                        aspect_fields.push('name');
-                                    }
-                                    for (let j = 0; j < aspect_fields.length; j++) {
-                                        query.config.push({
-                                            name: `aspect_${aspect_fields[j]}`,
-                                            rank: query[`aspect_${aspect_fields[j]}`]
-                                        });
-                                    }
-                                }
-                                if (query.config.length !== 0) {
-                                    query.config.sort();
-                                    for (let i = 0; i < query.config.length; i++) {
-                                        if (query.defect === 'shortcoming') {
-                                            value += query.aspect_type !== 'all' ?
-                                                `${query.aspect_stat.capitalize()} ` +
-                                                `${query.aspect_type.capitalize()} ` +
-                                                `Aspect: ${query.aspect_name.capitalize()}\n` :
-                                                `${query.aspect_stat.capitalize()} ` +
-                                                `Aspect: ${query.aspect_type.capitalize()}\n`;
-                                                break;
-                                        } else {
-                                            value += `${query.config[i].name.capitalize()}`;
-                                            value += ' (';
-                                            value += `${
-                                                isNaN(query.config[i].rank) ?
-                                                query.config[i].rank.capitalize() : 
-                                                int(query.config[i].rank)
-                                            }`;
-                                            value += query.defect === 'inept defense' && query.enemy !== undefined ?
-                                                `: ${query.enemy}` : '';
-                                            value += ')';
+                        set_values[`repeating_attribute_${query.row_id}_configuration`] = await setConfiguration(cache, set_values, query);
+                        
+                        attrdb_entry.active = true;
+                        attrdb_entry.config = query.config;
+                        attrdb_entry.elevel = query.elevel;
+                        attrdb_entry.enhancements = query.enhancements;
+                        attrdb_entry.group_id = cache.static_group_visible_id;
+                        attrdb_entry.level = query.level;
+                        attrdb_entry.limiters = query.limiters;
+                        attrdb_entry.name = query.name;
+                        attrdb_entry.row_id = query.row_id;
+                        attrdb_entry.stat = query.stat;
+                        attrdb_entry.points = query.cost * query.level;
+                        attrdb_entry.visibility = 1;
+                        cache.attrdb[query.attribute].push(attrdb_entry);
+                        cache.groupdb[cache.static_group_visible_id].attribute_ids.push(query.row_id);
+                        if (cache.groupdb[attrdb_entry.group_id].group_type === 'power flux') {
+                            setPowerFluxPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[attrdb_entry.group_id].group_type === 'power variation') {
+                            setPowerVariationGroupPoints(cache, set_values);
+                            setPowerVariationPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[attrdb_entry.group_id].group_type === 'dynamic powers') {
+                            setDynamicPowersPoolLevels(cache, set_values);
+                        } else {
+                            setGroupCharacterPoints(cache, set_values, attrdb_entry.group_id);
+                        }
+                        if (query.attribute === 'skills') {
+                            cache.attrdb.skills[cache.attrdb.skills.length - 1].individual = [];
+                            set_values.static_skills_attribute_name = query.name;
+                            set_values.static_skills_points_total = query.config[0].rank;
+                            set_values.static_skills_points_remaining = query.config[0].rank;
+                            set_values.static_skills_visible_id = cache.attrdb.skills.length - 1;
+                            setSkillUiVisibility(cache, set_values);
+                        }
+                        set_values[`repeating_attribute_${query.row_id}_active`] = 1;
+                    break;
+                    case 'write_newdefect':
+                    //case 'update_defect':
+                        
+                        if (query.task === 'add') {
+                            query.fields.push('configuration');
+                        }
+                        /*
+                        const row_id = query.next === 'update_defect' ?
+                            query.row_id : generateRowID();
+                        */
+                        for (let i = 0; i < query.fields.length; i++) {
+                            let value = '';
+                            switch (query.fields[i]) {
+                                case 'configuration':
+                                    if (query.defect === 'shortcoming') {
+                                        const aspect_fields = ['stat','type'];
+                                        if (query.aspect_type !== 'all') {
+                                            aspect_fields.push('name');
                                         }
-                                        if (i !== query.config.length - 1) {
-                                            value += '\n';
+                                        for (let j = 0; j < aspect_fields.length; j++) {
+                                            query.config.push({
+                                                name: `aspect_${aspect_fields[j]}`,
+                                                rank: query[`aspect_${aspect_fields[j]}`]
+                                            });
                                         }
                                     }
-                                }
-                                if (query.next === 'write_newdefect') {
-                                    set_values[`repeating_defect_${row_id}_active`] = 1;
-                                }
-                            break;
-                            case 'defect':
-                                value = getTranslationByKey(query.defect_translation).capitalize();
-                            break;
-                            case 'name':
-                                value = query[fields[i]].capitalize();
-                            break;
-                            case 'points':
-                                value = (defect_costs[query.defect] * query.rank) * -1;
-                            break;
-                            case 'rank':
-                                value = query.rank;
-                            break;
+                                    if (query.config.length !== 0) {
+                                        query.config.sort();
+                                        for (let i = 0; i < query.config.length; i++) {
+                                            if (query.defect === 'shortcoming') {
+                                                value += query.aspect_type !== 'all' ?
+                                                    `${query.aspect_stat.capitalize()} ` +
+                                                    `${query.aspect_type.capitalize()} ` +
+                                                    `Aspect: ${query.aspect_name.capitalize()}\n` :
+                                                    `${query.aspect_stat.capitalize()} ` +
+                                                    `Aspect: ${query.aspect_type.capitalize()}\n`;
+                                                    break;
+                                            } else {
+                                                value += `${query.config[i].name.capitalize()}`;
+                                                value += ' (';
+                                                value += `${
+                                                    isNaN(query.config[i].rank) ?
+                                                    query.config[i].rank.capitalize() : 
+                                                    int(query.config[i].rank)
+                                                }`;
+                                                value += query.defect === 'inept defense' && query.enemy !== undefined ?
+                                                    `: ${query.enemy}` : '';
+                                                value += ')';
+                                            }
+                                            if (i !== query.config.length - 1) {
+                                                value += '\n';
+                                            }
+                                        }
+                                    }
+                                    if (query.next === 'write_newdefect') {
+                                        set_values[`repeating_defect_${query.row_id}_active`] = 1;
+                                    }
+                                break;
+                                case 'defect':
+                                    value = getTranslationByKey(query.defect_translation).capitalize();
+                                break;
+                                case 'name':
+                                    value = query[query.fields[i]].capitalize();
+                                break;
+                                case 'points':
+                                    value = (defect_costs[query.defect] * query.rank) * -1;
+                                break;
+                                case 'rank':
+                                    value = query.rank;
+                                break;
+                            }
+                            set_values[`repeating_defect_${query.row_id}_${query.fields[i]}`] = value;
                         }
-                        set_values[`repeating_defect_${row_id}_${fields[i]}`] = value;
-                    }
-                    const defectdb_entry = {};
-                    defectdb_entry.active = true;
-                    defectdb_entry.config = query.config;
-                    defectdb_entry.group_id = query.next === 'update_defect' ?
-                        query.group_id : cache.static_group_visible_id;
-                    defectdb_entry.rank = query.rank;
-                    defectdb_entry.name = query.name;
-                    defectdb_entry.row_id = row_id;
-                    defectdb_entry.points = (defect_costs[query.defect] * query.rank) * -1;
-                    defectdb_entry.visibility = query.next === 'update_defect' ?
-                        query.visibility : 1;
-                    if (query.defect === 'shortcoming') {
-                        if (query.aspect_type === 'all') {
-                            await setShortcomingAspectTypeAll(cache, set_values);
-                            /*
-                            cache.statsdb[query.aspect_stat].shortcoming = query.rank;
-                            set_values[`static_character_${query.aspect_stat}_remaining`] =
-                                cache.statsdb[query.aspect_stat].base +
-                                cache.statsdb[query.aspect_stat].temp -
-                                cache.statsdb[query.aspect_stat].damage -
-                                (cache.statsdb[query.aspect_stat].shortcoming || 0);
-                            await setDerivedValues(cache, set_values);
-                            */
+                        const defectdb_entry = {};
+                        defectdb_entry.active = true;
+                        defectdb_entry.config = query.config;
+                        defectdb_entry.group_id = query.next === 'update_defect' ?
+                            query.group_id : cache.static_group_visible_id;
+                        defectdb_entry.rank = query.rank;
+                        defectdb_entry.name = query.name;
+                        defectdb_entry.row_id = query.row_id;
+                        defectdb_entry.points = (defect_costs[query.defect] * query.rank) * -1;
+                        defectdb_entry.visibility = query.next === 'update_defect' ?
+                            query.visibility : 1;
+                        if (query.defect === 'shortcoming') {
+                            if (query.aspect_type === 'all') {
+                                await setShortcomingAspectTypeAll(cache, set_values);
+                                /*
+                                cache.statsdb[query.aspect_stat].shortcoming = query.rank;
+                                set_values[`static_character_${query.aspect_stat}_remaining`] =
+                                    cache.statsdb[query.aspect_stat].base +
+                                    cache.statsdb[query.aspect_stat].temp -
+                                    cache.statsdb[query.aspect_stat].damage -
+                                    (cache.statsdb[query.aspect_stat].shortcoming || 0);
+                                await setDerivedValues(cache, set_values);
+                                */
+                            }
                         }
-                    }
-                    if (query.next === 'write_newdefect') {
-                        const groupdb = cache.groupdb[cache.static_group_visible_id];
-                        groupdb.defect_ids.push(row_id);
-                        cache.defectdb[query.defect].push(defectdb_entry);
-                    } else {
-                        for (let i = 1; i < fields.length; i++) {
-                            cache.defectdb[query.defect][query.load[1]][`${fields[i]}`] = defectdb_entry[`${fields[i]}`];
+                        if (query.next === 'write_newdefect') {
+                            const groupdb = cache.groupdb[cache.static_group_visible_id];
+                            groupdb.defect_ids.push(query.row_id);
+                            cache.defectdb[query.defect].push(defectdb_entry);
+                        } else {
+                            for (let i = 1; i < query.fields.length; i++) {
+                                cache.defectdb[query.defect][query.load[1]][`${query.fields[i]}`] = defectdb_entry[`${query.fields[i]}`];
+                            }
                         }
-                    }
-                    cache.groupdb[defectdb_entry.group_id].points += defectdb_entry.points;
-                    setGroupCharacterPoints(cache, set_values, defectdb_entry.group_id);
-                } else if (query.next === 'update_attr') {
-                    const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
-                    const row_id = query.row_id.toLowerCase();
-                    const attrdb_entry = {};
-                    for (let i = 0; i < fields.length; i++) {
-                        let value = '';
-                        switch (fields[i]) {
-                            case 'attribute':
-                                value = query.attribute.capitalize();
-                            break;
-                            case 'configuration':
-                                if (
-                                    query.attribute === 'absorption' ||
-                                    query.attribute === 'armor' ||
-                                    query.attribute === 'conversion' ||
-                                    query.attribute === 'force field'
-                                ) {
-                                    query.armor_rating = int(`${query.elevel * (
+                        cache.groupdb[defectdb_entry.group_id].points += defectdb_entry.points;
+                        setGroupCharacterPoints(cache, set_values, defectdb_entry.group_id);
+                    break;
+                    /*
+                    case 'update_attr':
+                        const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
+                        const row_id = query.row_id.toLowerCase();
+                        const attrdb_entry = {};
+                        for (let i = 0; i < fields.length; i++) {
+                            let value = '';
+                            switch (fields[i]) {
+                                case 'attribute':
+                                    value = query.attribute.capitalize();
+                                break;
+                                case 'configuration':
+                                    if (
                                         query.attribute === 'absorption' ||
-                                        query.attribute === 'armor' ? 
-                                            5 :
+                                        query.attribute === 'armor' ||
                                         query.attribute === 'conversion' ||
-                                        query.attribute === 'force field' ? 
-                                            10 : 0
-                                    )}`);
-                                    const ar_index = query.config.findIndex(c => {
-                                        return c.name === 'armor rating' || c.name === 'absorb' || c.name === 'convert';
-                                    });
-                                    if (ar_index !== -1) {
-                                        query.config[ar_index].rank = query.armor_rating;
-                                    } else {
-                                        query.config.push({
-                                            name: `${
-                                                query.attribute === 'absorption' ? 'absorb' :
-                                                query.attribute === 'conversion' ? 'convert' :
-                                                    'armor rating'
-                                            }`,
-                                            rank: query.armor_rating
+                                        query.attribute === 'force field'
+                                    ) {
+                                        query.armor_rating = int(`${query.elevel * (
+                                            query.attribute === 'absorption' ||
+                                            query.attribute === 'armor' ? 
+                                                5 :
+                                            query.attribute === 'conversion' ||
+                                            query.attribute === 'force field' ? 
+                                                10 : 0
+                                        )}`);
+                                        const ar_index = query.config.findIndex(c => {
+                                            return c.name === 'armor rating' || c.name === 'absorb' || c.name === 'convert';
                                         });
+                                        if (ar_index !== -1) {
+                                            query.config[ar_index].rank = query.armor_rating;
+                                        } else {
+                                            query.config.push({
+                                                name: `${
+                                                    query.attribute === 'absorption' ? 'absorb' :
+                                                    query.attribute === 'conversion' ? 'convert' :
+                                                        'armor rating'
+                                                }`,
+                                                rank: query.armor_rating
+                                            });
+                                        }
+                                        if (
+                                            query.attribute === 'absorption' &&
+                                            query.config.findIndex(c => {
+                                                return c.name === 'transform'
+                                            }) === -1
+                                        ) {
+                                            query.config.push({
+                                                name: 'transform',
+                                                rank: query.transform
+                                            });
+                                        }
+                                    } else if (query.attribute === 'ranged defense') {
+                                        query.config.push({
+                                            name: 'defense type',
+                                            rank: query.attribute_type
+                                        })
                                     }
                                     if (
-                                        query.attribute === 'absorption' &&
-                                        query.config.findIndex(c => {
-                                            return c.name === 'transform'
-                                        }) === -1
+                                        cache.groupdb[cache.static_group_visible_id].group_type === 'power variation' &&
+                                        cache.groupdb[cache.static_group_visible_id].locked === false
                                     ) {
-                                        query.config.push({
-                                            name: 'transform',
-                                            rank: query.transform
-                                        });
-                                    }
-                                } else if (query.attribute === 'ranged defense') {
-                                    query.config.push({
-                                        name: 'defense type',
-                                        rank: query.attribute_type
-                                    })
-                                }
-                                if (
-                                    cache.groupdb[cache.static_group_visible_id].group_type === 'power variation' &&
-                                    cache.groupdb[cache.static_group_visible_id].locked === false
-                                ) {
-                                    const base_index = query.config.findIndex(c => c.name === 'base points');
-                                    if (base_index === -1) {
-                                        query.config.push({
-                                            name: 'base points',
-                                            rank: query.cost * query.level
-                                        });
-                                    } else {
-                                        query.config[base_index].rank = query.cost * query.level;
-                                    }
-                                }
-                                if (query.config.length !== 0) {
-                                    query.config.sort();
-                                    for (let i = 0; i < query.config.length; i++) {
-                                        if (query.config[i].name === 'flare') {
-                                            value += `Flare\n`;
-                                            for (let j = 0; j < senses.length; j++) {
-                                                value += query.config[i].senses[j].rank ?
-                                                    `   ${query.config[i].senses[j].name.capitalize()} (` +
-                                                    `${query.config[i].senses[j].rank === 1 ?
-                                                        'minor' : 'major'} obstacle)\n` : '';
-                                            }
-                                        } else if (query.config[i].name === 'skill points') {
-                                            query.config[i].rank = query.elevel * 10;
+                                        const base_index = query.config.findIndex(c => c.name === 'base points');
+                                        if (base_index === -1) {
+                                            query.config.push({
+                                                name: 'base points',
+                                                rank: query.cost * query.level
+                                            });
                                         } else {
-                                            value += `${query.config[i].name.capitalize()}`;
-                                            value += `${
-                                                query.config[i].name === 'absorb' ? ' up to ' :
-                                                query.config[i].name === 'convert' ? 
-                                                    query.elevel !== 1 ? ' 10 to ' : ' ' :
-                                                ' ('
-                                            }`;
-                                            value += `${
-                                                isNaN(query.config[i].rank) ?
-                                                query.config[i].rank.capitalize() : 
-                                                int(query.config[i].rank)
-                                            }`;
-                                            value += `${
-                                                query.config[i].name === 'absorb' ? ' damage' :
-                                                query.config[i].name === 'convert' ? ' damage into character points' :
-                                                ')'
-                                            }`;
-                                            value += '\n';
+                                            query.config[base_index].rank = query.cost * query.level;
                                         }
                                     }
-                                }
-                            break;
-                            case 'cost':
-                                if (query.attribute === 'skills') {
-                                    
-                                } else if (query.attribute === 'skill group') {
-                                    const index = query.config.findIndex(c => {
-                                        const skill_type = 
-                                            cache.rulesdb.rules_optional_individual_status ?
-                                            'skills' : 'skill group';
-                                        return c.name === skill_type;
-                                    });
-                                    query.cost = skill_group_costs[query.config[index].rank.toLowerCase()];
-                                } else {
-                                    query.cost = attribute_costs[query.attribute];
-                                }
-                                value = query.cost;
-                            break;
-                            case 'enhancements':
-                            case 'limiters':
-                                const data = query[`${fields[i]}`];
-                                for (let i = 0; i < data.length; i++) {
-                                    const config = data[i].config !== undefined ? 
-                                        ` (${data[i].config.capitalize()})` : '';
-                                    value += `${data[i].name.capitalize()}${config}:` +
-                                        ` ${data[i].rank}`;
-                                    value += i < data.length - 1 ? '\n' : '';
-                                }
-                            break;
-                            case 'level':
-                                value = `${query.level} (${query.elevel})`;
-                            break;
-                            case 'name':
-                                value = `${query[fields[i]].capitalize()}${query.attribute === 'skill group' ?
-                                    ' (' + query.attribute.capitalize() + ')' : ''}`;
-                            break;
-                            case 'points':
-                                value = int(
-                                    `${query.attribute === 'skills' ?
-                                    query.cost : attribute_costs[query.attribute]}`
-                                ) * query.level;
-                            break;
-                            case 'stat':
-                                value = getTranslationByKey(`${query.stat}`).capitalize();
-                            break;
-                        }
-                        set_values[`repeating_attribute_${row_id}_${fields[i]}`] = value;
-                    }
-                    attrdb_entry.config = query.config;
-                    attrdb_entry.elevel = query.elevel;
-                    attrdb_entry.enhancements = query.enhancements;
-                    attrdb_entry.level = query.level;
-                    attrdb_entry.limiters = query.limiters;
-                    attrdb_entry.name = `${query.name}${query.attribute === 'skill group' ?
-                        ' (' + query.attribute.capitalize() + ')' : ''}`;
-                    attrdb_entry.stat = query.stat;
-                    attrdb_entry.points = query.cost * query.level;
-                    const keys = Object.keys(attrdb_entry);
-                    for (let i = 0, n = keys.length; i < n; i++) {
-                        cache.attrdb[query.attribute][query.load[1]][keys[i]] = attrdb_entry[keys[i]];
-                    }
-                    if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
-                        setPowerFluxPoolPoints(cache, set_values);
-                    } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
-                        setPowerVariationGroupPoints(cache, set_values);
-                        setPowerVariationPoolPoints(cache, set_values);
-                    } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
-                        setDynamicPowersPoolLevels(cache, set_values);
-                    } else {
-                        setGroupCharacterPoints(cache, set_values, attrdb_entry.group_id);
-                    }
-                    if (query.attribute === 'skills') {
-                        query.skill_index = int(cache.static_skills_visible_id);
-                        setSkillsPointTotal(cache, set_values);
-                    }
-                }
-                if (query.next === 'write_attributename') {
-                    const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
-                    db[query[`${cache.source_attribute}`]][query.index].name = query.selection;
-                    set_values[`repeating_${cache.source_attribute}_${cache.source_id}_name`] = query.selection;
-                }
-
-                if (query.next === 'write_groupname') {
-                    cache.groupdb[cache.static_group_visible_id].name = query.selection;
-                    set_values.static_attribute_group_name = query.selection;
-                } else if (query.next === 'write_groupsource') {
-                    cache.groupdb[cache.static_group_visible_id].source = query.selection;
-                    set_values.static_attribute_group_source = query.selection.capitalize();
-                } else if (query.next === 'write_groupitem') {
-                    cache.groupdb[cache.static_group_visible_id].item = query.selection;
-                    set_values.static_attribute_group_item = query.selection.capitalize();
-                    await setGroupCharacterPoints(cache, set_values);
-                } else if (query.next === 'write_grouptype') {
-                    cache.groupdb[cache.static_group_visible_id].group_type = query.selection;
-                    set_values.static_attribute_group_type = 
-                        cache.groupdb[cache.static_group_visible_id].group_type.capitalize();
-                    if (query.selection === 'gear') {
-                        cache.groupdb[cache.static_group_visible_id].item = 'gear';
-                        set_values.static_attribute_group_item = 
-                            cache.groupdb[cache.static_group_visible_id].item.capitalize();
-                    }
-                    showDynamicGroupFields(cache, set_values);
-                    setAttributeGroupVisibility(cache, set_values);
-                } else if (query.next === 'write_level') {
-                    if (query.type === 'group') {
-                        query.enhancements_ranks = 
-                            cache.groupdb[cache.static_group_visible_id].group_type === 'standard' ? 
-                            0 : cache.groupdb[cache.static_group_visible_id].enhancements.length;
-                        query.limiters_ranks = 
-                            cache.groupdb[cache.static_group_visible_id].group_type === 'standard' ? 
-                            0 : cache.groupdb[cache.static_group_visible_id].limiters.length;
-                        query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
-                        query.cost = attribute_costs[cache.groupdb[cache.static_group_visible_id].group_type];
-                        query.points = query.cost * query.level;
-                        cache.groupdb[cache.static_group_visible_id].points = query.points;
-                        cache.groupdb[cache.static_group_visible_id].elevel = query.elevel;
-                        cache.groupdb[cache.static_group_visible_id].level = query.level;
-                        set_values.static_attribute_group_points = query.points;
-                        set_values.static_attribute_group_level = `${query.level} (${query.elevel})`;
-                    } else {
-                        if (cache.source_section === 'attribute') {
-                            for (let i = 0; i < customization_type.length; i++) {
-                                query[`${customization_type[i]}_ranks`] = 
-                                cache.attrdb[query.attribute][query.index][`${customization_type[i]}`].map(c => c.rank).reduce((a, b) => a + b, 0);    
+                                    if (query.config.length !== 0) {
+                                        query.config.sort();
+                                        for (let i = 0; i < query.config.length; i++) {
+                                            if (query.config[i].name === 'flare') {
+                                                value += `Flare\n`;
+                                                for (let j = 0; j < senses.length; j++) {
+                                                    value += query.config[i].senses[j].rank ?
+                                                        `   ${query.config[i].senses[j].name.capitalize()} (` +
+                                                        `${query.config[i].senses[j].rank === 1 ?
+                                                            'minor' : 'major'} obstacle)\n` : '';
+                                                }
+                                            } else if (query.config[i].name === 'skill points') {
+                                                query.config[i].rank = query.elevel * 10;
+                                            } else {
+                                                value += `${query.config[i].name.capitalize()}`;
+                                                value += `${
+                                                    query.config[i].name === 'absorb' ? ' up to ' :
+                                                    query.config[i].name === 'convert' ? 
+                                                        query.elevel !== 1 ? ' 10 to ' : ' ' :
+                                                    ' ('
+                                                }`;
+                                                value += `${
+                                                    isNaN(query.config[i].rank) ?
+                                                    query.config[i].rank.capitalize() : 
+                                                    int(query.config[i].rank)
+                                                }`;
+                                                value += `${
+                                                    query.config[i].name === 'absorb' ? ' damage' :
+                                                    query.config[i].name === 'convert' ? ' damage into character points' :
+                                                    ')'
+                                                }`;
+                                                value += '\n';
+                                            }
+                                        }
+                                    }
+                                break;
+                                case 'cost':
+                                    if (query.attribute === 'skills') {
+                                        
+                                    } else if (query.attribute === 'skill group') {
+                                        const index = query.config.findIndex(c => {
+                                            const skill_type = 
+                                                cache.rulesdb.rules_optional_individual_status ?
+                                                'skills' : 'skill group';
+                                            return c.name === skill_type;
+                                        });
+                                        query.cost = skill_group_costs[query.config[index].rank.toLowerCase()];
+                                    } else {
+                                        query.cost = attribute_costs[query.attribute];
+                                    }
+                                    value = query.cost;
+                                break;
+                                case 'enhancements':
+                                case 'limiters':
+                                    const data = query[`${fields[i]}`];
+                                    for (let i = 0; i < data.length; i++) {
+                                        const config = data[i].config !== undefined ? 
+                                            ` (${data[i].config.capitalize()})` : '';
+                                        value += `${data[i].name.capitalize()}${config}:` +
+                                            ` ${data[i].rank}`;
+                                        value += i < data.length - 1 ? '\n' : '';
+                                    }
+                                break;
+                                case 'level':
+                                    value = `${query.level} (${query.elevel})`;
+                                break;
+                                case 'name':
+                                    value = `${query[fields[i]].capitalize()}${query.attribute === 'skill group' ?
+                                        ' (' + query.attribute.capitalize() + ')' : ''}`;
+                                break;
+                                case 'points':
+                                    value = int(
+                                        `${query.attribute === 'skills' ?
+                                        query.cost : attribute_costs[query.attribute]}`
+                                    ) * query.level;
+                                break;
+                                case 'stat':
+                                    value = getTranslationByKey(`${query.stat}`).capitalize();
+                                break;
                             }
-                            query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
-                            cache.attrdb[query.attribute][query.index].elevel = query.elevel;
+                            set_values[`repeating_attribute_${row_id}_${fields[i]}`] = value;
                         }
-                        query.cost = cache.source_section === 'attribute' ?
-                            attribute_costs[query.attribute] :
-                            defect_costs[query.defect];
-                        query.points = query.cost * query.level;
-                        const db = cache.source_section === 'attribute' ? cache.attrdb : cache.defectdb;
-                        db[query[cache.source_section]][query.index].points = query.points * int(`${
-                            cache.source_section === 'attribute' ? 1 : -1
-                        }`);
-                        db[query[cache.source_section]][query.index].level = query.level;
-                        set_values[`${cache.source_path}_points`] = query.points * int(`${
-                            cache.source_section === 'attribute' ? 1 : -1
-                        }`);
-                        set_values[`${cache.source_path}_${
-                            cache.source_section === 'attribute' ? 'level' : 'rank'
-                        }`] = `${query.level}${
-                            cache.source_section === 'attribute' ? ' (' + query.elevel + ')' : ''
-                        }`;
-                        if (
-                            cache.source_section === 'attribute' &&
-                            cache.groupdb[cache.static_group_visible_id].group_type === 'power variation' &&
-                            !cache.groupdb[cache.static_group_visible_id].locked
-                        ) {
-                            const index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'base points');
-                            cache.attrdb[query.attribute][query.index].config[index].rank = query.points;
-                            //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
-                        } else if (query.last === 'repeating_defect_rank') {
-                            if (query.defect === 'shortcoming') {
-                                const aspect_type_index = query.db.config.findIndex(i => i.name === 'aspect_type');
-                                const aspect_type = query.db.config[aspect_type_index].rank;
-                                if (aspect_type === 'all') {
-                                    await setShortcomingAspectTypeAll(cache, set_values, query);
-                                }
-                            }
+                        attrdb_entry.config = query.config;
+                        attrdb_entry.elevel = query.elevel;
+                        attrdb_entry.enhancements = query.enhancements;
+                        attrdb_entry.level = query.level;
+                        attrdb_entry.limiters = query.limiters;
+                        attrdb_entry.name = `${query.name}${query.attribute === 'skill group' ?
+                            ' (' + query.attribute.capitalize() + ')' : ''}`;
+                        attrdb_entry.stat = query.stat;
+                        attrdb_entry.points = query.cost * query.level;
+                        const keys = Object.keys(attrdb_entry);
+                        for (let i = 0, n = keys.length; i < n; i++) {
+                            cache.attrdb[query.attribute][query.load[1]][keys[i]] = attrdb_entry[keys[i]];
                         }
-                        //setLevelDependantConfigurations(cache, set_values, query);
-                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
-                    }
-                    if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
-                        setPowerFluxPoolPoints(cache, set_values);
-                    } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
-                        setPowerVariationGroupPoints(cache, set_values);
-                        setPowerVariationPoolPoints(cache, set_values);
-                    } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
-                        setDynamicPowersPoolLevels(cache, set_values);
-                        //setNonStandardGroupPoints(cache, set_values);
-                        setGroupCharacterPoints(cache, set_values);
-                    } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
-                        setGearPoolLevels(cache, set_values, query);
-                        setGroupCharacterPoints(cache, set_values);
-                    } else {
-                        setGroupCharacterPoints(cache, set_values);
-                    }
-                } else if (query.next === 'write_stat') {
-                    if (query.type === 'group') {
-                        cache.groupdb[cache.static_group_visible_id].stat = query.stat;
-                        set_values.static_attribute_group_stat = query.stat.capitalize();
-                    } else {
-                        cache.attrdb[query.attribute][query.index].stat = query.stat;
-                        set_values[`${cache.source_path}_stat`] = query.stat.capitalize();
-                    }
-                } else if (query.next === 'write_customizations') {
-                    
-                    //for (let i = 0; i < query.customizations.length; i++) {
-                    if (query.type === 'group') {
-                        if (query.customization[2] === -1 && query.rank !== 0) {
-                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute].push({
-                                name: query.customization[0],
-                                rank: query.rank
-                            });
-                        } else if (query.customization[2] !== -1 && query.rank !== 0) {
-                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute][query.customization[2]].rank = 
-                                query.rank;
-                        } else if (query.customization[2] !== -1 && query.rank === 0) {
-                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute].splice(query.customization[2], 1);
-                        } else {
-                            return;
-                        }
-                        const enhancement_ranks =
-                            cache.groupdb[cache.static_group_visible_id].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
-                        const limiter_ranks =
-                            cache.groupdb[cache.static_group_visible_id].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
-                        cache.groupdb[cache.static_group_visible_id].elevel = 
-                            cache.groupdb[cache.static_group_visible_id].level + limiter_ranks - enhancement_ranks;
-                        set_values.static_attribute_group_level = 
-                            `${cache.groupdb[cache.static_group_visible_id].level} ` +
-                            `(${cache.groupdb[cache.static_group_visible_id].elevel})`;
-                        set_values[cache.source] = 
-                            cache.groupdb[cache.static_group_visible_id][cache.source_attribute].map(c => 
-                                `${c.name.capitalize()} (${c.rank})`
-                            ).sort().join("\n");
                         if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                             setPowerFluxPoolPoints(cache, set_values);
                         } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
@@ -11714,152 +11570,290 @@
                             setPowerVariationPoolPoints(cache, set_values);
                         } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
                             setDynamicPowersPoolLevels(cache, set_values);
+                        } else {
+                            setGroupCharacterPoints(cache, set_values, attrdb_entry.group_id);
                         }
-                    } else {//=> setup Attribute customizations here.
-                        if (query.customization[2] === -1) {//=> add customization
-                            cache.attrdb[query.attribute][query.index][cache.source_attribute].push({
-                                name: query.customization[0],
-                                rank: !query.has_rank ? customization_ranks[`${query.attribute}`][`${query.customization[0]}`].rank : query.rank,
-                            });
-                            const configuration = getConfigurationByCustomization(cache, query);
-                            if (configuration) {
-                                cache.attrdb[query.attribute][query.index].config.push({
-                                    name: configuration,
-                                    rank:'carry',
-                                });
-                                //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                        if (query.attribute === 'skills') {
+                            query.skill_index = int(cache.static_skills_visible_id);
+                            setSkillsPointTotal(cache, set_values);
+                        }
+                    break;
+                    */
+                    case 'write_attributename':
+                        const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
+                        db[query[`${cache.source_attribute}`]][query.index].name = query.selection;
+                        set_values[`repeating_${cache.source_attribute}_${cache.source_id}_name`] = query.selection;
+                    break;
+                    case 'write_groupname':
+                        cache.groupdb[cache.static_group_visible_id].name = query.selection;
+                        set_values.static_attribute_group_name = query.selection;
+                    break;
+                    case 'write_groupsource':
+                        cache.groupdb[cache.static_group_visible_id].source = query.selection;
+                        set_values.static_attribute_group_source = query.selection.capitalize();
+                    break;
+                    case 'write_groupitem':
+                        cache.groupdb[cache.static_group_visible_id].item = query.selection;
+                        set_values.static_attribute_group_item = query.selection.capitalize();
+                        await setGroupCharacterPoints(cache, set_values);
+                    break;
+                    case 'write_grouptype':
+                        cache.groupdb[cache.static_group_visible_id].group_type = query.selection;
+                        set_values.static_attribute_group_type = 
+                            cache.groupdb[cache.static_group_visible_id].group_type.capitalize();
+                        if (query.selection === 'gear') {
+                            cache.groupdb[cache.static_group_visible_id].item = 'gear';
+                            set_values.static_attribute_group_item = 
+                                cache.groupdb[cache.static_group_visible_id].item.capitalize();
+                        }
+                        showDynamicGroupFields(cache, set_values);
+                        setAttributeGroupVisibility(cache, set_values);
+                    break;
+                    case 'write_level':
+                        if (query.type === 'group') {
+                            query.enhancements_ranks = 
+                                cache.groupdb[cache.static_group_visible_id].group_type === 'standard' ? 
+                                0 : cache.groupdb[cache.static_group_visible_id].enhancements.length;
+                            query.limiters_ranks = 
+                                cache.groupdb[cache.static_group_visible_id].group_type === 'standard' ? 
+                                0 : cache.groupdb[cache.static_group_visible_id].limiters.length;
+                            query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
+                            query.cost = attribute_costs[cache.groupdb[cache.static_group_visible_id].group_type];
+                            query.points = query.cost * query.level;
+                            cache.groupdb[cache.static_group_visible_id].points = query.points;
+                            cache.groupdb[cache.static_group_visible_id].elevel = query.elevel;
+                            cache.groupdb[cache.static_group_visible_id].level = query.level;
+                            set_values.static_attribute_group_points = query.points;
+                            set_values.static_attribute_group_level = `${query.level} (${query.elevel})`;
+                        } else {
+                            if (cache.source_section === 'attribute') {
+                                for (let i = 0; i < customization_type.length; i++) {
+                                    query[`${customization_type[i]}_ranks`] = 
+                                    cache.attrdb[query.attribute][query.index][`${customization_type[i]}`].map(c => c.rank).reduce((a, b) => a + b, 0);    
+                                }
+                                query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
+                                cache.attrdb[query.attribute][query.index].elevel = query.elevel;
                             }
-                        } else {//=> remove customization or update rank
-                            query.rank = query.has_rank ? query.rank : 0;
-                            if (query.rank === 0) {
+                            query.cost = cache.source_section === 'attribute' ?
+                                attribute_costs[query.attribute] :
+                                defect_costs[query.defect];
+                            query.points = query.cost * query.level;
+                            const db = cache.source_section === 'attribute' ? cache.attrdb : cache.defectdb;
+                            db[query[cache.source_section]][query.index].points = query.points * int(`${
+                                cache.source_section === 'attribute' ? 1 : -1
+                            }`);
+                            db[query[cache.source_section]][query.index].level = query.level;
+                            set_values[`${cache.source_path}_points`] = query.points * int(`${
+                                cache.source_section === 'attribute' ? 1 : -1
+                            }`);
+                            set_values[`${cache.source_path}_${
+                                cache.source_section === 'attribute' ? 'level' : 'rank'
+                            }`] = `${query.level}${
+                                cache.source_section === 'attribute' ? ' (' + query.elevel + ')' : ''
+                            }`;
+                            if (
+                                cache.source_section === 'attribute' &&
+                                cache.groupdb[cache.static_group_visible_id].group_type === 'power variation' &&
+                                !cache.groupdb[cache.static_group_visible_id].locked
+                            ) {
+                                const index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'base points');
+                                cache.attrdb[query.attribute][query.index].config[index].rank = query.points;
+                                //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                            } else if (query.last === 'repeating_defect_rank') {
+                                if (query.defect === 'shortcoming') {
+                                    const aspect_type_index = query.db.config.findIndex(i => i.name === 'aspect_type');
+                                    const aspect_type = query.db.config[aspect_type_index].rank;
+                                    if (aspect_type === 'all') {
+                                        await setShortcomingAspectTypeAll(cache, set_values, query);
+                                    }
+                                }
+                            }
+                            //setLevelDependantConfigurations(cache, set_values, query);
+                            set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                        }
+                        if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
+                            setPowerFluxPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
+                            setPowerVariationGroupPoints(cache, set_values);
+                            setPowerVariationPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
+                            setDynamicPowersPoolLevels(cache, set_values);
+                            //setNonStandardGroupPoints(cache, set_values);
+                            setGroupCharacterPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
+                            setGearPoolLevels(cache, set_values, query);
+                            setGroupCharacterPoints(cache, set_values);
+                        } else {
+                            setGroupCharacterPoints(cache, set_values);
+                        }
+                    break;
+                    case 'write_stat':
+                        if (query.type === 'group') {
+                            cache.groupdb[cache.static_group_visible_id].stat = query.stat;
+                            set_values.static_attribute_group_stat = query.stat.capitalize();
+                        } else {
+                            cache.attrdb[query.attribute][query.index].stat = query.stat;
+                            set_values[`${cache.source_path}_stat`] = query.stat.capitalize();
+                        }
+                    break;
+                    case 'write_customizations':
+                        if (query.type === 'group') {
+                            if (query.customization[2] === -1 && query.rank !== 0) {
+                                cache.groupdb[cache.static_group_visible_id][cache.source_attribute].push({
+                                    name: query.customization[0],
+                                    rank: query.rank
+                                });
+                            } else if (query.customization[2] !== -1 && query.rank !== 0) {
+                                cache.groupdb[cache.static_group_visible_id][cache.source_attribute][query.customization[2]].rank = 
+                                    query.rank;
+                            } else if (query.customization[2] !== -1 && query.rank === 0) {
+                                cache.groupdb[cache.static_group_visible_id][cache.source_attribute].splice(query.customization[2], 1);
+                            } else {
+                                return;
+                            }
+                            const enhancement_ranks =
+                                cache.groupdb[cache.static_group_visible_id].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
+                            const limiter_ranks =
+                                cache.groupdb[cache.static_group_visible_id].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
+                            cache.groupdb[cache.static_group_visible_id].elevel = 
+                                cache.groupdb[cache.static_group_visible_id].level + limiter_ranks - enhancement_ranks;
+                            set_values.static_attribute_group_level = 
+                                `${cache.groupdb[cache.static_group_visible_id].level} ` +
+                                `(${cache.groupdb[cache.static_group_visible_id].elevel})`;
+                            set_values[cache.source] = 
+                                cache.groupdb[cache.static_group_visible_id][cache.source_attribute].map(c => 
+                                    `${c.name.capitalize()} (${c.rank})`
+                                ).sort().join("\n");
+                            if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
+                                setPowerFluxPoolPoints(cache, set_values);
+                            } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
+                                setPowerVariationGroupPoints(cache, set_values);
+                                setPowerVariationPoolPoints(cache, set_values);
+                            } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
+                                setDynamicPowersPoolLevels(cache, set_values);
+                            }
+                        } else {//=> setup Attribute customizations here.
+                            if (query.customization[2] === -1) {//=> add customization
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute].push({
+                                    name: query.customization[0],
+                                    rank: !query.has_rank ? customization_ranks[`${query.attribute}`][`${query.customization[0]}`].rank : query.rank,
+                                });
                                 const configuration = getConfigurationByCustomization(cache, query);
                                 if (configuration) {
-                                    const config_index = 
-                                        cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === configuration);
-                                    cache.attrdb[query.attribute][query.index].config.splice(config_index, 1);
+                                    cache.attrdb[query.attribute][query.index].config.push({
+                                        name: configuration,
+                                        rank:'carry',
+                                    });
                                     //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                                 }
-                                cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(query.customization[2], 1);
-                            } else {
-                                cache.attrdb[query.attribute][query.index][cache.source_attribute][query.customization[2]].rank = query.rank;
+                            } else {//=> remove customization or update rank
+                                query.rank = query.has_rank ? query.rank : 0;
+                                if (query.rank === 0) {
+                                    const configuration = getConfigurationByCustomization(cache, query);
+                                    if (configuration) {
+                                        const config_index = 
+                                            cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === configuration);
+                                        cache.attrdb[query.attribute][query.index].config.splice(config_index, 1);
+                                        //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                                    }
+                                    cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(query.customization[2], 1);
+                                } else {
+                                    cache.attrdb[query.attribute][query.index][cache.source_attribute][query.customization[2]].rank = query.rank;
+                                }
+                            }
+                            const enhancement_ranks =
+                                cache.attrdb[query.attribute][query.index].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
+                            const limiter_ranks =
+                                cache.attrdb[query.attribute][query.index].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
+                            cache.attrdb[query.attribute][query.index].elevel = 
+                                cache.attrdb[query.attribute][query.index].level + limiter_ranks - enhancement_ranks;
+                            set_values[`${cache.source_path}_level`] = 
+                                `${cache.attrdb[query.attribute][query.index].level} ` +
+                                `(${cache.attrdb[query.attribute][query.index].elevel})`;
+                            set_values[cache.source] = 
+                                cache.attrdb[query.attribute][query.index][cache.source_attribute].map(c => 
+                                    `${c.name.capitalize()} (${c.rank})`
+                                ).sort().join("\n");
+                            query.elevel = cache.attrdb[query.attribute][query.index].elevel;
+                            set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                        }
+                    break;
+                    case 'write_technique':
+                        if (query.has_technique === -1 && query.rank !== 0) {
+                            cache.attrdb[query.attribute][query.index].config[query.technique_index].rank.push(
+                                {
+                                    name: query.technique,
+                                    rank: query.rank
+                                }
+                            );
+                        } else if (
+                            query.has_technique !== -1 &&
+                            ((query.has_rank && query.rank === 0) || !query.has_rank)
+                        ) {
+                            cache.attrdb[query.attribute][query.index].config[query.technique_index].rank.splice(query.has_technique, 1);
+                        } else if (query.has_technique !== -1 && query.has_rank && query.rank !== 0) {
+                            cache.attrdb[query.attribute][query.index].config[query.technique_index].rank[query.has_technique].rank = query.rank;
+                        } else {
+                            return;
+                        }
+                        const config_techniques = cache.attrdb[query.attribute][query.index].config[query.technique_index].rank.map(t => `${t.name.capitalize()} (${t.rank})`).sort().join(", ");
+                        set_values[cache.source] = `${query.load[0].capitalize()} (${config_techniques})`;
+                            
+                    break;
+                    case 'write_newgroup':
+                        const groupdb_entry = Object.assign({}, new_group_template);
+                        groupdb_entry.group_id = cache.groupdb.length;
+                        groupdb_entry.name = `${getTranslationByKey("group")} ${groupdb_entry.group_id}`;
+                        cache.groupdb.push(groupdb_entry);
+                        cache.static_group_visible_id = groupdb_entry.group_id;
+                        showDynamicGroupFields(cache, set_values);
+                        setAttributeGroupVisibility(cache, set_values);
+                        set_values.static_group_visible_id = groupdb_entry.group_id;
+                    break;
+                    /*
+                    case 'update_group':
+                        cache.groupdb[query.load[1]].item = query.item;
+                        cache.groupdb[query.load[1]].name = query.name;
+                        cache.groupdb[query.load[1]].group_points = query.group_points;
+                        cache.groupdb[query.load[1]].source = query.source;
+                        if (query.type !== 'standard') {
+                            cache.groupdb[query.load[1]].elevel = query.elevel;
+                            cache.groupdb[query.load[1]].enhancements = query.enhancements;
+                            cache.groupdb[query.load[1]].level = query.level;
+                            cache.groupdb[query.load[1]].limiters = query.limiters;
+                            cache.groupdb[query.load[1]].stat = query.stat;
+                            cache.groupdb[query.load[1]].points = attribute_costs[query.attribute] * query.level;
+                            if (query.attribute === 'power variation') {
+                                cache.groupdb[query.load[1]].locked = query.locked;
+                                setPowerVariationGroupPoints(cache, set_values);
+                            } else if (query.attribute === 'power flux') {
+                                cache.groupdb[query.load[1]].pool_points = query.elevel * 5;
+                            } else if (query.attribute === 'dynamic powers') {
+                                cache.groupdb[query.load[1]].pool_points = query.elevel * 2;
+                            } else if (query.attribute === 'gear') {
+                                set_values.static_attribute_group_poolpoints = 
+                                    gear_amount[query.elevel] || 'unsupported';
                             }
                         }
-                        const enhancement_ranks =
-                            cache.attrdb[query.attribute][query.index].enhancements.map(c => c.rank).reduce((a, b) => a + b, 0);
-                        const limiter_ranks =
-                            cache.attrdb[query.attribute][query.index].limiters.map(c => c.rank).reduce((a, b) => a + b, 0);
-                        cache.attrdb[query.attribute][query.index].elevel = 
-                            cache.attrdb[query.attribute][query.index].level + limiter_ranks - enhancement_ranks;
-                        set_values[`${cache.source_path}_level`] = 
-                            `${cache.attrdb[query.attribute][query.index].level} ` +
-                            `(${cache.attrdb[query.attribute][query.index].elevel})`;
-                        set_values[cache.source] = 
-                            cache.attrdb[query.attribute][query.index][cache.source_attribute].map(c => 
-                                `${c.name.capitalize()} (${c.rank})`
-                            ).sort().join("\n");
-                        query.elevel = cache.attrdb[query.attribute][query.index].elevel;
-                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
-                    }
+                        setAttributeGroupVisibility(cache, set_values);
+                    break;
+                    */
+                    case 'removed_group':
+                        cache.static_group_visible_id = 0;
+                            //cache.static_group_visible_id === query.remove[1] ? 0 : cache.static_group_visible_id;
+                        showDynamicGroupFields(cache, set_values);
+                        setAttributeGroupVisibility(cache, set_values);
+                        if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
+                            //setPowerFluxPoolPoints(cache, set_values);
+                            cache.statsdb.cp.spent = cache.groupdb.map((g, i) => 
+                                i !== cache.static_group_visible_id ? g.group_points : 0
+                            ).reduce((m, n) => m + n, 0);
+                            //set_values.static_character_points_spent = cache.statsdb.cp.spent;
+                            //setCharacterPointsRemaining(cache, set_values);
+                        }
+                        set_values.static_group_visible_id = cache.static_group_visible_id;
+                    break;
                 }
-                // Create and display new group
-                if (query.next === 'write_newgroup') {
-                    const groupdb_entry = Object.assign({}, new_group_template);
-                    groupdb_entry.group_id = cache.groupdb.length;
-                    groupdb_entry.name = `${getTranslationByKey("group")} ${groupdb_entry.group_id}`;
-                    cache.groupdb.push(groupdb_entry);
-                    cache.static_group_visible_id = groupdb_entry.group_id;
-                    showDynamicGroupFields(cache, set_values);
-                    setAttributeGroupVisibility(cache, set_values);
-                    set_values.static_group_visible_id = groupdb_entry.group_id;
-                    /*
-                    groupdb_entry.group_id = query.group_id;
-                    groupdb_entry.group_type = query.group_type;
-                    groupdb_entry.attribute_ids = [];
-                    groupdb_entry.defect_ids = [];
-                    groupdb_entry.item = query.item;
-                    groupdb_entry.name = query.name;
-                    groupdb_entry.group_points = 0;
-                    groupdb_entry.source = query.source;
-                    if (groupdb_entry.group_type !== 'standard') {
-                        cache.group_cost = attribute_costs[query.attribute];
-                        groupdb_entry.elevel = query.elevel;
-                        groupdb_entry.enhancements = query.enhancements;
-                        groupdb_entry.level = query.level;
-                        groupdb_entry.limiters = query.limiters;
-                        groupdb_entry.stat = query.stat;
-                        groupdb_entry.points = attribute_costs[query.attribute] * query.level;
-                        groupdb_entry.pool_points = query.elevel * int(`${
-                            query.attribute === 'power flux' ? 5 : 
-                            query.attribute === 'dynamic powers' ? 2 :
-                            query.attribute === 'gear' ? 1 : 0
-                        }`);
-                        if (query.attribute === 'gear') {
-                            set_values.static_attribute_group_poolpoints = 
-                                gear_amount[query.elevel] || 'unsupported';
-                        }
-                        groupdb_entry.pool_name = query.pointpool;
-                        if (query.attribute === 'power variation') {
-                            groupdb_entry.locked = false;
-                        }
-                        groupdb_entry.group_points = groupdb_entry.points;
-                        set_values.static_attribute_group_totalpoints = groupdb_entry.points;
-                    }*/
-                // Update group details when group details are changed
-                } else if (query.next === 'update_group') {
-                    cache.groupdb[query.load[1]].item = query.item;
-                    cache.groupdb[query.load[1]].name = query.name;
-                    cache.groupdb[query.load[1]].group_points = query.group_points;
-                    cache.groupdb[query.load[1]].source = query.source;
-                    if (query.type !== 'standard') {
-                        cache.groupdb[query.load[1]].elevel = query.elevel;
-                        cache.groupdb[query.load[1]].enhancements = query.enhancements;
-                        cache.groupdb[query.load[1]].level = query.level;
-                        cache.groupdb[query.load[1]].limiters = query.limiters;
-                        cache.groupdb[query.load[1]].stat = query.stat;
-                        cache.groupdb[query.load[1]].points = attribute_costs[query.attribute] * query.level;
-                        if (query.attribute === 'power variation') {
-                            cache.groupdb[query.load[1]].locked = query.locked;
-                            setPowerVariationGroupPoints(cache, set_values);
-                        } else if (query.attribute === 'power flux') {
-                            cache.groupdb[query.load[1]].pool_points = query.elevel * 5;
-                        } else if (query.attribute === 'dynamic powers') {
-                            cache.groupdb[query.load[1]].pool_points = query.elevel * 2;
-                        } else if (query.attribute === 'gear') {
-                            set_values.static_attribute_group_poolpoints = 
-                                gear_amount[query.elevel] || 'unsupported';
-                        }
-                    }
-                    setAttributeGroupVisibility(cache, set_values);
-                // Dispay default group when group is removed
-                } else if (query.next === 'removed_group') {
-                    cache.static_group_visible_id = 0;
-                        //cache.static_group_visible_id === query.remove[1] ? 0 : cache.static_group_visible_id;
-                    showDynamicGroupFields(cache, set_values);
-                    setAttributeGroupVisibility(cache, set_values);
-                    if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
-                        //setPowerFluxPoolPoints(cache, set_values);
-                        cache.statsdb.cp.spent = cache.groupdb.map((g, i) => 
-                            i !== cache.static_group_visible_id ? g.group_points : 0
-                        ).reduce((m, n) => m + n, 0);
-                        //set_values.static_character_points_spent = cache.statsdb.cp.spent;
-                        //setCharacterPointsRemaining(cache, set_values);
-                    }
-                    set_values.static_group_visible_id = cache.static_group_visible_id;
-                }
-                // Update total character points spent and remaining
-                
-                //setCharacterPointsRemaining(cache, set_values);
-                
-                /*
-                const spent = getSpentCharacterPoints(cache);
-                set_values.static_character_points_spent = spent;
-                set_values.static_character_points_remaining = 
-                (
-                    cache.statsdb.cp.base + 
-                    cache.statsdb.cp.gained + 
-                    cache.statsdb.cp.temp
-                ) - spent;
-                */
             }
         }
     }
