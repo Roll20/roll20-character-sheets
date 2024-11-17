@@ -5855,7 +5855,8 @@
             "armor":'armor rating',
             "augmented":'augmented_stat',
             "capacity":'capacity_type',
-            "conversion":'convert'
+            "conversion":'convert',
+            "enemy attack":'enemy'
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
         const characteristic = await setAttrCharacteristic(cache, set_values, query);
@@ -5909,7 +5910,10 @@
             case "dimension walk": description = getCharacteristicByAttr(cache, set_values, query); break;
             //case "dynamic powers": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "elasticity": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "enemy attack": description = `ACV +${query.elevel * 2} vs. ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
+            case "enemy attack": 
+                query.enemy = query.config[query.config.findIndex(c => c.name === 'enemy')].rank;
+                description = `ACV +${query.elevel * 2} vs. ${query.enemy}`;
+            break;
             case "enemy defense": description = `DCV +${query.elevel * 2} vs. ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
             case "energized": description = `Energy Points +${query.elevel * 10}`; break;
             case "exorcism": description = `Soul +${query.elevel * 2}`; break;
@@ -10146,6 +10150,7 @@
                         'convert',
                         'damage_type',
                         'defense type',
+                        'enemy',
                         'environments',
                         'focused damage',
                         'group',
@@ -10254,6 +10259,11 @@
                     }
                     query.options += '|' + temp_damage_types.sort().join("|") + 
                         `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'enemy':
+                    query.title = `${getTranslationByKey("choose-enemy")}`;
+                    query.options = '';
                     query.last = query.next;
                 break;
                 case 'environment':
@@ -11110,6 +11120,13 @@
                         set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
+                    case 'enemy':
+                        if (query.selection !== 0) {
+                            query.db.config[query.db.config.findIndex(c => c.name === 'enemy')].rank = query.selection;
+                            set_values[cache.source] = await setConfiguration(cache, set_values, query);
+                            query.next = 'exit';
+                        }
+                    break;
                     case 'environment':
                         query.environment = query.selection === 0 ? '' : query.selection;
                         query.next = 'write_environment';
@@ -11277,6 +11294,12 @@
                                 query.config.push({
                                     name: 'environments',
                                     rank: []
+                                });
+                            break;
+                            case 'enemy attack':
+                                query.config.push({
+                                    name: 'enemy',
+                                    rank: 'not configued'
                                 });
                             break;
                             case 'ranged defense':
