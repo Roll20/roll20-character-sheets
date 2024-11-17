@@ -2123,7 +2123,7 @@
 <!-- Sheet Workers -->
 <script type="text/worker">
     /* Global Variables */
-    const all_attributes = ['absorption','alternate form','alternate identity','armor','attack mastery','augmented','capacity','change state','cognition','combat technique','companion','connected','control environment','conversion','data access','defense mastery','dimension walk','dynamic powers','elasticity','enemy attack','enemy defenses','energized','exorcism','expertise','extra actions','extra arms','extra defenses','features','flight','force field','ground speed','healing','heightened awareness','heightened senses','illusion','immovable','immunity','immutable','inspire','jumping','massive damage','melee attack','melee defense','merge','metamorphosis','mimic','mind control','mind shield','minions','mulligan','nullify','plant control','pocket dimension','portal','power flux','power variation','projection','ranged attack','ranged defense','regeneration','reincarnation','resilient','sensory block','sixth sense','size change','skill group','skills','social mastery','spaceflight','special movement','summon creatures','supersense','superspeed','superstrength','swarm','taunt','telekinesis','telepathy','teleport','tough','transfer','transmute','tunneling','unaffected','unassailable','undetectable',/*'unique attribute',*/'unknown power','water speed','wealth','weapon'];
+    const all_attributes = ['absorption','alternate form','alternate identity','armor','attack mastery','augmented','capacity','change state','cognition','combat technique','companion','connected','control environment','conversion','data access','defense mastery','dimension walk','dynamic powers','elasticity','enemy attack','enemy defense','energized','exorcism','expertise','extra actions','extra arms','extra defenses','features','flight','force field','ground speed','healing','heightened awareness','heightened senses','illusion','immovable','immunity','immutable','inspire','jumping','massive damage','melee attack','melee defense','merge','metamorphosis','mimic','mind control','mind shield','minions','mulligan','nullify','plant control','pocket dimension','portal','power flux','power variation','projection','ranged attack','ranged defense','regeneration','reincarnation','resilient','sensory block','sixth sense','size change','skill group','skills','social mastery','spaceflight','special movement','summon creatures','supersense','superspeed','superstrength','swarm','taunt','telekinesis','telepathy','teleport','tough','transfer','transmute','tunneling','unaffected','unassailable','undetectable',/*'unique attribute',*/'unknown power','water speed','wealth','weapon'];
     const all_conditions = ['anemic','blinded','contagious','continuing','dead','demoralized','drained','incapacitated','incurable','irritant','lethargic','prone','serious injury','stunned','tangled','unconscious'];
     const all_defects = ['achilles heel','awkward size','bane','blind fury','conditional ownership','confined','cursed','demure','easily distracted','fragile','hounded','impaired manipulation','impaired speech','inept attack','inept defense','involuntary change','ism','magnet','marked','nemesis','nightmares','no healing','obligated','phobia','physical impairment','red tape','reduced damage','sensory impairment','shortcoming','significant other','skeleton in the closet','social fault','special requirement','unappealing','unique defect','unsettled','vulnerability','wanted','weak point'];
     const all_stats = ['body','mind','soul'];
@@ -2625,7 +2625,7 @@
         'dynamic powers':10,
         'elasticity':1,
         'enemy attack':1,
-        'enemy defenses':1,
+        'enemy defense':1,
         'energised':1,
         'exorcism':1,
         'expertise':1,
@@ -5856,7 +5856,8 @@
             "augmented":'augmented_stat',
             "capacity":'capacity_type',
             "conversion":'convert',
-            "enemy attack":'enemy'
+            "enemy attack":'enemy',
+            "enemy defense":'enemy'
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
         const characteristic = await setAttrCharacteristic(cache, set_values, query);
@@ -5910,11 +5911,13 @@
             case "dimension walk": description = getCharacteristicByAttr(cache, set_values, query); break;
             //case "dynamic powers": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "elasticity": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "enemy attack": 
+            case "enemy attack":
+            case "enemy defense":
                 query.enemy = query.config[query.config.findIndex(c => c.name === 'enemy')].rank;
-                description = `ACV +${query.elevel * 2} vs. ${query.enemy}`;
+                description = 
+                    `${query.attribute === 'enemy attack' ? 'ACV' : 'DCV'} ` +
+                    `+${query.elevel * 2} vs. ${query.enemy}`;
             break;
-            case "enemy defense": description = `DCV +${query.elevel * 2} vs. ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
             case "energized": description = `Energy Points +${query.elevel * 10}`; break;
             case "exorcism": description = `Soul +${query.elevel * 2}`; break;
             case "extra actions": description = `+${query.elevel} additional actions each round`; break;
@@ -11297,6 +11300,7 @@
                                 });
                             break;
                             case 'enemy attack':
+                            case 'enemy defense':
                                 query.config.push({
                                     name: 'enemy',
                                     rank: 'not configued'
