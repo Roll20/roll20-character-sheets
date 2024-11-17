@@ -4643,9 +4643,27 @@
                 case 'defense mastery':
                     if (cache.dcv === undefined) {
                         cache.dcv = Math.round((
-                            cache.statsdb.body.base +
-                            cache.statsdb.mind.base +
-                            cache.statsdb.soul.base
+                            (
+                                cache.statsdb.body.base +
+                                (cache.statsdb.body.augmented || 0) +
+                                cache.statsdb.body.temp -
+                                cache.statsdb.body.damage -
+                                (cache.statsdb.body.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.mind.base +
+                                (cache.statsdb.mind.augmented || 0) +
+                                cache.statsdb.mind.temp -
+                                cache.statsdb.mind.damage -
+                                (cache.statsdb.mind.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.soul.base +
+                                (cache.statsdb.soul.augmented || 0) +
+                                cache.statsdb.soul.temp -
+                                cache.statsdb.soul.damage -
+                                (cache.statsdb.soul.shortcoming || 0)
+                            )
                         ) / 3);
                     }
                 break;
@@ -5887,7 +5905,7 @@
             case "control environment": description = `${query.elevel} Environments Remaining`; break;
             case "conversion": description = `${query.elevel} Character Points/10 Damage`; break;
             case "data access": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "defense mastery": description = `DCV +${query.elevel}`; break;
+            case "defense mastery": description = `DCV +${query.elevel}`; await setDerivedValues(cache, set_values); break;
             case "dimension walk": description = getCharacteristicByAttr(cache, set_values, query); break;
             //case "dynamic powers": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "elasticity": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -11733,6 +11751,7 @@
                         } else {
                             setGroupCharacterPoints(cache, set_values);
                         }
+                        if (query.attribute === 'defense mastery') {}
                     break;
                     case 'write_stat':
                         if (query.type === 'group') {
@@ -13185,6 +13204,27 @@
                                         set_values[`static_character_${attr_to_value[cache.attribute[0]][1]}_base`] = 
                                         cache[attr_to_value[cache.attribute[0]][1]];
                                     }
+                                }
+                                if (cache.attribute[0] === 'augmented') {
+                                    cache.aug_index = cache.attrdb.augmented[cache.index].config.findIndex(c => c.name === 'augmented_stat');
+                                    cache.augmented_stat = cache.attrdb.augmented[cache.index].config[cache.aug_index].rank;
+                                    cache.augmented_rank = 0;
+                                    for (let i = 0; i < cache.attrdb.augmented.length; i++) {
+                                        const index = cache.attrdb.augmented[i].config.findIndex(c => c.name === 'augmented_stat');
+                                        if (cache.attrdb.augmented[i].config[index].rank === cache.augmented_stat) {
+                                            cache.augmented_rank += cache.attrdb.augmented[i].elevel * (
+                                                cache.attrdb.augmented[i].row_id.toLowerCase() === cache.source_id ? cache.newValue : 1
+                                            );
+                                        }
+                                    }
+                                    cache.statsdb[cache.augmented_stat].augmented = cache.augmented_rank;
+                                    await setDerivedValues(cache, set_values);
+                                    set_values[`static_character_${cache.augmented_stat}_remaining`] = 
+                                        cache.statsdb[cache.augmented_stat].base +
+                                        cache.statsdb[cache.augmented_stat].augmented +
+                                        cache.statsdb[cache.augmented_stat].temp -
+                                        cache.statsdb[cache.augmented_stat].damage -
+                                        (cache.statsdb[cache.augmented_stat].shortcoming || 0);
                                 }
                                 if (cache.source_attribute === 'active' && cache.source_section === 'defect') {
                                     const index = cache.defectdb.shortcoming.findIndex(s => s.row_id.toLowerCase() === cache.source_id);
