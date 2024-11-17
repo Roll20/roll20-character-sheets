@@ -4330,9 +4330,9 @@
       <div class="template-grid-item template-span-six template-footer">{{footer}}</div>
       {{/footer}}
       <div class="template-grid-item template-span-six template-footer">
-        {{#rollGreater() successes 1}}{{#successes}}<span data-i18n="successes">Successes</span>:<span class="results">{{successes}}</span>{{/successes}}{{/rollGreater() successes 1}}
-        {{#rollGreater() failures 1}}{{#failures}}<span data-i18n="fails">Fails</span>:<span class="results">{{failures}}</span>{{/failures}}{{/rollGreater() failures 1}}
-        {{#rollGreater() gearfails 1}}{{#gearfails}}<span data-i18n="gear-fails">Gear Fails</span>:<span class="results">{{gearfails}}</span>{{/gearfails}}{{/rollGreater() gearfails 1}}
+        {{#rollGreater() computed::successes 0}}<span data-i18n="successes">Successes</span>:<span class="results">{{computed::successes}}</span>{{/rollGreater() computed::successes 0}}
+        {{#rollGreater() computed::failures 0}}<span data-i18n="fails">Fails</span>:<span class="results">{{computed::failures}}</span>{{/rollGreater() computed::failures 0}}
+        {{#rollGreater() computed::gearfails 0}}<span data-i18n="gear-fails">Gear Fails</span>:<span class="results">{{computed::gearfails}}</span>{{/rollGreater() computed::gearfails 0}}
       </div>
       <!-- PUSH BUTTON -->
       {{#rollGreater() computed::push 0}}
@@ -5250,10 +5250,7 @@
         const whichKey = getTranslationByKey(getSkillKey(which));
 
         setAttrs({
-          attribute: stat > 0 ? stat : 0, // this is a Ternary Operator, it starts with a question (e.g. is stat > 0)
-          // and if true, returns the bit after the ? and if false returns the bit after the :
-          // you can often replace simple if/then expressions with a single line ternary operator.
-          // uses the translation key
+          attribute: stat > 0 ? stat : 0,
           gear: miscGear_score,
           skill: int(values[getSkill(which)]) + miscSkill_score,
           artifact_die_eight,
@@ -5551,9 +5548,8 @@
 
     //clog("Roll string; "+ rollStr);
 
-    startRoll(rollStr, (results) => {
-      clog('Roll results: ' + JSON.stringify(results));
-
+    startRoll(rollStr, (dicePoolRoll) => {
+      clog('Roll results: ' + JSON.stringify(dicePoolRoll));
       var pushAttributeStr = '',
         pushSkillStr = '',
         pushGearStr = '',
@@ -5568,7 +5564,7 @@
       roll.pushroll = roll.pushroll + 1;
 
       for (let i = 1; i <= roll.attribute; i++) {
-        let r = +results.results[`attribute-roll-${litnum[i]}`].result || 0;
+        let r = +dicePoolRoll.results[`attribute-roll-${litnum[i]}`].result || 0;
         //clog(`results attribute ${i} : ${r}`);
         if (r === 6) {
           pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[6]]}} `;
@@ -5585,7 +5581,7 @@
       }
       if (roll.skill >= 0) {
         for (let i = 1; i <= roll.skill; i++) {
-          let r = +results.results[`skill-roll-${litnum[i]}`].result || 0;
+          let r = +dicePoolRoll.results[`skill-roll-${litnum[i]}`].result || 0;
           //clog(`results skill ${i} : ${r}`);
           if (r === 6) {
             pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6]]}} `;
@@ -5598,7 +5594,7 @@
         }
       } else if (roll.skill < 0) {
         for (let i = 1; i <= Math.abs(roll.skill); i++) {
-          let r = +results.results[`negative-roll-${litnum[i]}`].result || 0;
+          let r = +dicePoolRoll.results[`negative-roll-${litnum[i]}`].result || 0;
           //clog(`negative skill ${i} : ${r}`);
           if (r === 6) {
             pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[6]]}} `;
@@ -5611,7 +5607,7 @@
         }
       }
       for (let i = 1; i <= roll.gear; i++) {
-        let r = +results.results[`gear-roll-${litnum[i]}`].result || 0;
+        let r = +dicePoolRoll.results[`gear-roll-${litnum[i]}`].result || 0;
         //clog(`results gear ${i} : ${r}`);
         if (r === 6) {
           pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[6]]}} `;
@@ -5630,7 +5626,7 @@
 
       // artifact dice
       for (let i = 1; i <= roll.artifact_die_eight; i++) {
-        let r = +results.results[`artifact-roll-eight`].result || 0;
+        let r = +dicePoolRoll.results[`artifact-roll-eight`].result || 0;
         clog(`results artifact_die_eight ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
@@ -5651,7 +5647,7 @@
         }
       }
       for (let i = 1; i <= roll.artifact_die_ocho; i++) {
-        let r = +results.results[`artifact-roll-ocho`].result || 0;
+        let r = +dicePoolRoll.results[`artifact-roll-ocho`].result || 0;
         clog(`results artifact_die_ocho ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
@@ -5672,7 +5668,7 @@
         }
       }
       for (let i = 1; i <= roll.artifact_die_ten; i++) {
-        let r = +results.results[`artifact-roll-ten`].result || 0;
+        let r = +dicePoolRoll.results[`artifact-roll-ten`].result || 0;
         clog(`results artifact_die_ten ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
@@ -5697,7 +5693,7 @@
         }
       }
       for (let i = 1; i <= roll.artifact_die_twelve; i++) {
-        let r = +results.results[`artifact-roll-twelve`].result || 0;
+        let r = +dicePoolRoll.results[`artifact-roll-twelve`].result || 0;
         clog(`results artifact_die_twelve ${i} : ${r}`);
         if (r >= 6) {
           let bonus = 0;
@@ -5742,10 +5738,6 @@
         totalDice: roll.totalDice,
       };
 
-      // ensure the regular rolls also include latest totals
-      successes = successes;
-      failures = failures;
-      gearfails = gearfails;
       clog(`~~~ successes: ${successes} failures:${failures} ~~~`);
 
       setAttrs({
@@ -5754,9 +5746,12 @@
       });
 
       //clog("Push data: "+ JSON.stringify(pushRoll));
-      finishRoll(results.rollId, {
+      finishRoll(dicePoolRoll.rollId, {
         pushroll: rollEscape.escape(pushRoll),
         push: roll.pushable,
+        successes: successes,
+        failures: failures,
+        gearfails: gearfails,
       });
     });
   };
