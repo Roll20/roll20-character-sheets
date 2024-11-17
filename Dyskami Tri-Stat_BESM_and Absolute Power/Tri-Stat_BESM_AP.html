@@ -5880,10 +5880,10 @@
             case "capacity": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "change state": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "cognition": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "combat technique": description = `${query.elevel} Techniques Remaining`; break;
+            //case "combat technique": description = `${query.elevel} Techniques Remaining`; break;
             case "companion": description = `${query.elevel * 10} Character Points`; break;
             case "connected": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "control environment": description = getCharacteristicByCustomizations(cache, set_values, query); break;
+            case "control environment": description = `${query.elevel} Environments Remaining`; break;
             case "conversion": description = `${query.elevel} Character Points/10 Damage`; break;
             case "data access": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "defense mastery": description = `DCV +${query.elevel}`; break;
@@ -10126,6 +10126,7 @@
                         'capped',
                         'damage_type',
                         'defense type',
+                        'environments',
                         'focused damage',
                         'group',
                         'material category',
@@ -10233,6 +10234,21 @@
                     }
                     query.options += '|' + temp_damage_types.sort().join("|") + 
                         `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'environment':
+                    query.title = getTranslationByKey("set-environment");
+                    query.options = `|${query.environment}`;
+                    query.last = query.next;
+                break;
+                case 'environments':
+                    query.config_index = query.db.config.findIndex(c => c.name === 'environments');
+                    query.title = getTranslationByKey("choose-environments");
+                    query.options = `|${getTranslationByKey("add")},add`;
+                    for (let i = 0; i < query.db.config[query.config_index].rank.length; i++) {
+                        query.options += `|${query.db.config[query.config_index].rank[i]},${i}`;
+                    }
+                    query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'techniques':
@@ -11074,6 +11090,17 @@
                         set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
+                    case 'environment':
+                        query.environment = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_environment';
+                    break;
+                    case 'environments':
+                        if (query.selection === 'exit') { return; }
+                        query.env_index = query.selection === 'add' ? -1 : int(query.selection);
+                        query.environment = query.selection === 'add' ? 
+                            '' : query.db.config[query.config_index].rank[query.env_index];
+                        query.next = 'environment';
+                    break;
                     case 'techniques':
                         const combat_techinique_ranks = {
                             'blackout':{rank:1},
@@ -11223,6 +11250,12 @@
                             case 'combat technique':
                                 query.config.push({
                                     name: 'techniques',
+                                    rank: []
+                                });
+                            break;
+                            case 'control environment':
+                                query.config.push({
+                                    name: 'environments',
                                     rank: []
                                 });
                             break;
@@ -11583,6 +11616,18 @@
                         const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
                         db[query[`${cache.source_attribute}`]][query.index].name = query.selection;
                         set_values[`repeating_${cache.source_attribute}_${cache.source_id}_name`] = query.selection;
+                    break;
+                    case 'write_environment':
+                        if (query.env_index === -1) {
+                            query.db.config[query.config_index].rank.push(query.environment);
+                        } else if (query.env_index !== -1 && query.environment === '') {
+                            query.db.config[query.config_index].rank.splice(query.env_index, 1);
+                        } else {
+                            query.db.config[query.config_index].rank[query.env_index] = query.environment;
+                        }
+                        set_values[`${cache.source}`] = 
+                            `${query.db.config[query.config_index].name.capitalize()} ` +
+                            `(${query.db.config[query.config_index].rank.sort().join(", ")})`;
                     break;
                     case 'write_groupname':
                         cache.groupdb[cache.static_group_visible_id].name = query.selection;
