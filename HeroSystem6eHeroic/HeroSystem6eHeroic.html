@@ -2304,7 +2304,7 @@
 								<p>Grab object while making a Full Move. Adds velocity/10 to STR for the purpose of making Strength checks.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
-									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="100" value="12" tabindex="-1"/>
+									<input type="number" name="attr_velocity" title="@{velocity}" step="1" min="1" max="100" value="12" tabindex="-1"/>
 								</div>
 							</div>
 							<div class="item-maneuver-button-line">
@@ -2381,7 +2381,7 @@
 								<p>Attack while making a Full Move past opponent. Strength is halved, but maneuver adds (velocity/10) DCs. Attacker or weapon takes 1/3 of this damage.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
-									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="2" max="100" value="12" tabindex="-1"/>
+									<input type="number" name="attr_velocity" title="@{velocity}" step="1" min="2" max="100" value="12" tabindex="-1"/>
 								</div>
 							</div>
 							<div class="item-maneuver-button-line">
@@ -2422,7 +2422,7 @@
 								<p>Collide with opponent at the end of a Full or Half Move. Does full STR or weapon at half STR plus (velocity/6) DCs. Attacker takes 1/2 damage or full damage if attack does no Knockback or Knockdown.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
-									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
+									<input type="number" name="attr_velocity" title="@{velocity}" step="1" min="1" max="99" value="12" tabindex="-1"/>
 								</div>
 							</div>
 							<div class="item-maneuver-button-line">
@@ -2669,7 +2669,7 @@
 								<p>Knock target down prone (half DCV) with a successful attack roll. A moving target takes (velocity/20)d6 damage.</p>
 								<div class ="item-maneuver-line-flex">
 									<p>Velocity:</p>
-									<input type="number" name="attr_moveVelocity" title="@{moveVelocity}" step="1" min="0" max="100" value="0" tabindex="-1"/>
+									<input type="number" name="attr_velocity" title="@{velocity}" step="1" min="0" max="100" value="0" tabindex="-1"/>
 								</div>
 							</div>
 							<div class="item-maneuver-button-line">
@@ -15147,7 +15147,7 @@
 				attributes.checkBrace = "unchecked";
 				attributes.checkSet = "unchecked";
 				attributes.maneuverDCLimit = 5;
-				attributes.moveVelocity = parseInt(values.running)||12;
+				attributes.velocity = parseInt(values.running)||12;
 				attributes.powerManeuver = "strike";
 				attributes.maneuverDamageCSL = "0";
 				attributes.variableOCVmod = 0;
@@ -19579,7 +19579,7 @@
 								targetString = "1d6cs0cf0+12";
 								break;
 					default:	penalty = 0;
-				};
+				}
 				
 				if (values.halveTargetOCVpenalty != 0) {
 					penalty = heroRoundHigh(penalty/2);
@@ -20463,7 +20463,7 @@
 	
 	// Function for handling standard maneuver weapon attacks.
 	function weaponAttack(weaponId) {
-		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty", "variableOCVmod"], function(values) {
+		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "velocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty", "variableOCVmod"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			var attributes = new Object();
 			
@@ -20491,7 +20491,7 @@
 			let minStrength = parseInt(values["weaponStrengthMin"+weaponId])||0;
 			let strengthEnhanced = (values["weaponEnhancedByStr"+weaponId] === "on") ? true : false;
 			let damageLevels =  parseInt(values["weaponCSL"+weaponId]/2)||0;
-			let velocity = parseInt(values["moveVelocity"])||0;
+			let velocity = parseInt(values["velocity"])||0;
 			let velocityDC = 0;
 			
 			// CV
@@ -20785,7 +20785,7 @@
 	
 	// Function for handling martial maneuver weapon attacks.
 	function weaponMartialAttack(weaponId, maneuverId) {
-		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCVmod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverRNGmod"+maneuverId, "martialManeuverOCV"+maneuverId,"martialManeuverDCV"+maneuverId, "martialManeuverDC"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty"], 
+		getAttrs(["weaponName"+weaponId, "weaponNormalDamage"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCVmod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverRNGmod"+maneuverId, "martialManeuverOCV"+maneuverId,"martialManeuverDCV"+maneuverId, "martialManeuverDC"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "velocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty"], 
 		function(values) {
 			var theRoll = values.whisperToGM||"";
 			var attributes = new Object();
@@ -21098,7 +21098,7 @@
 	// Roll attack and damage dice for Weapon XX.
 	on(`clicked:attackStrength`, (info) => {
 		
-		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "moveVelocity", "maneuverDCLimit", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
+		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "velocity", "maneuverDCLimit", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			var attributes = new Object();
 			
@@ -21122,7 +21122,7 @@
 			// Update damage for maneuvers that add damage.
 			let adjustedStatValue = parseInt(values.strengthNet)||0;			
 			let modifyDC = Math.floor( (parseInt(values.maneuverDamageCSL)||0)/2 );
-			let velocity = parseInt(values["moveVelocity"])||0;
+			let velocity = parseInt(values["velocity"])||0;
 			let velocityDC = 0;
 			
 			// CV
