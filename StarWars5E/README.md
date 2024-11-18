@@ -8,6 +8,8 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
+## 2024-11-16
+* correction following problem in PR 13282 : Npc traits visibility & Sheet Refresh problem
 ## 2024-07-06
 * Changed the npc Layout
 * Added the possibility to switch "edit/view" of npc traits
