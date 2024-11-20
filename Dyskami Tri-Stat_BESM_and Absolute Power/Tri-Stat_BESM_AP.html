@@ -2626,7 +2626,7 @@
         'elasticity':1,
         'enemy attack':1,
         'enemy defense':1,
-        'energised':1,
+        'energized':1,
         'exorcism':1,
         'expertise':1,
         'extra actions':4,
@@ -4600,7 +4600,7 @@
             cache.attribute = string_to_array;
         }
         // Calculate Base Value
-        for (let i = 0, n = cache.attribute.length; i < n; i++) {
+        for (let i = 0; i < cache.attribute.length; i++) {
             switch(cache.attribute[i]) {
                 case 'attack mastery':
                     if (cache.acv === undefined) {
@@ -11778,7 +11778,16 @@
                         } else {
                             setGroupCharacterPoints(cache, set_values);
                         }
-                        if (query.attribute === 'defense mastery') {}
+                        if (query.attribute === 'defense mastery') {
+
+                        } else if (query.attribute === 'energized') {
+                            cache.statsdb.energy.energized = 0;
+                            for (let i = 0; i < cache.attrdb.energized.length; i++) {
+                                cache.statsdb.energy.energized += cache.attrdb.energized[i].active ? 
+                                    cache.attrdb.energized[i].elevel * 10 : 0;
+                            }
+                            setDerivedValues(cache, set_values);
+                        }
                     break;
                     case 'write_stat':
                         if (query.type === 'group') {
@@ -12504,11 +12513,6 @@
         cache.sanity = (cache.mind + cache.soul) * int(cache.rulesdb.rules_optional_sanity_status);
         cache.society = Math.round((cache.mind + cache.soul) / 2) * int(cache.rulesdb.rules_optional_society_status);
         cache.shockvalue = (cache.body + cache.soul) * int(cache.rulesdb.rules_optional_shockvalue_status);
-        /*
-        for (let i = 0; i < all_stats.length; i++) {
-            cache[all_stats[i]] -= cache.statsdb[all_stats[i]].damage;
-        }
-        */
         // Calculate base combat values
         cache.acv = Math.round((cache.body + cache.mind + cache.soul) / 3);
         cache.dcv = Math.round((cache.body + cache.mind + cache.soul) / 3);
@@ -12525,14 +12529,14 @@
         // Record new values
         for (let i = 0; i < derived_values.length; i++) {
             if (derived_values_points.indexOf(derived_values[i]) !== -1) {
-                cache.statsdb[derived_values[i]].base = cache[derived_values[i]];//[cache.point_type] = cache[derived_values[i]];
-                set_values[`static_character_${derived_values[i]}_base`] = cache[derived_values[i]];//${cache.point_type}`] = cache[derived_values[i]];
+                cache.statsdb[derived_values[i]].base = cache[derived_values[i]];
+                set_values[`static_character_${derived_values[i]}_base`] = cache[derived_values[i]];
                 const point_max = 
                     cache.statsdb[derived_values[i]].base +
                     cache.statsdb[derived_values[i]].temp;
                 const point_loss = 
                     cache.statsdb[derived_values[i]].damage +
-                    cache.statsdb[derived_values[i]].stun || 0;
+                    (cache.statsdb[derived_values[i]].stun || 0);
                 setStatusStateDescription(cache, set_values, derived_values[i], point_max, point_loss);
             } else {
                 cache.statsdb[derived_values[i]].base = cache[derived_values[i]];
@@ -13223,14 +13227,15 @@
                                 cache.active = cache.newValue === 1 ? true : false;
                                 cache[db][cache.attribute][cache.index].active = 
                                     cache.active;
-                                await setActiveAttribute(cache, set_values);
-                                if (Object.keys(attr_to_value).indexOf(cache.attribute[0]) !== -1) {
-                                    set_values[`static_character_${attr_to_value[cache.attribute[0]][0]}_base`] = 
-                                        cache[attr_to_value[cache.attribute[0]][0]];
+                                //await setActiveAttribute(cache, set_values);
+                                if (Object.keys(attr_to_value).indexOf(cache.attribute) !== -1) {
+                                    set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = 
+                                        cache[attr_to_value[cache.attribute]];
                                     if (cache.attribute[0] === 'social mastery') {
-                                        set_values[`static_character_${attr_to_value[cache.attribute[0]][1]}_base`] = 
-                                        cache[attr_to_value[cache.attribute[0]][1]];
+                                        set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = 
+                                            cache[attr_to_value[cache.attribute]];
                                     }
+                                    await setDerivedValues(cache, set_values);
                                 }
                                 if (cache.attribute[0] === 'augmented') {
                                     cache.aug_index = cache.attrdb.augmented[cache.index].config.findIndex(c => c.name === 'augmented_stat');
