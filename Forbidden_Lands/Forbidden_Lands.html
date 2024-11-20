@@ -286,7 +286,7 @@
             </div>
           </div>
           <div class="attributes-box2">
-            <button type="action" name="act_strength-roll" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            <button type="action" name="act_strength-roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
               <span class="label broken-str" data-i18n="strength">Strength</span>
             </button>
             <button class="rollme-relative" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
@@ -4402,6 +4402,8 @@
     return primary + secondary;
   };
 
+  const stats = ['strength', 'agility', 'wits', 'empathy'];
+
   /* version tracking */
   const newAnnouncement = (old_version, new_version, show_announcement) => {
     const setter = {};
@@ -6361,7 +6363,8 @@
   });
 
   // attribute and skill maximum
-  // function which takes an attribute name, its score, and its max, and checks the score is valid.
+  // (name, score, max)
+  // checks the score is valid.
   // if not, resets its value.
   const checkMax = (stat, score, max) => {
     const settings = {};
@@ -6372,23 +6375,26 @@
     }
     return settings;
   };
+
   stats.forEach((stat) => {
-    on(`change:${stat} change:tab`, function () {
+    on(`change:${stat} change:tab`, function (eventInfo) {
       getAttrs([stat, 'tab'], function (values) {
         const total = int(values[stat]);
         const tab = int(values.tab);
-        const max = tab === 3 && stat === 'strength_monster' ? 7 : 48;
-        //            const max = 48;
+        // monsters(tab 3) can have a 48 max
+        const max = tab === 3 && stat === 'strength' ? 48 : 7;
         const settings = checkMax(stat, total, max);
         if (settings) setAttrs(settings);
       });
     });
   });
+
   Object.keys(attributes).forEach((stat) => {
     on(`change:${stat}`, function () {
       getAttrs([stat], function (values) {
         const total = int(values[stat]);
-        const {max} = pools.skill;
+        // const {max} = pools.skill;
+        const max = pools.skill.max;
         const settings = checkMax(stat, total, max);
         if (settings) setAttrs(settings);
       });
