@@ -2283,7 +2283,7 @@
                   <div class="gear-box4 column-header-bottom">
                     <span data-i18n="weight-abbr">Wt</span>
                   </div>
-                  <button class="roll-button-textonly header-h1" type="roll" name="roll_food" title="%{food}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{food_macro}">
+                  <button class="roll-button-textonly header-h1 food" type="action" name="act_food">
                       <span data-i18n="food">Food</span>
                   </button>
                   <select class="input" name="attr_food" title="@{food}">
@@ -2300,7 +2300,7 @@
                     <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
                     <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
                   </select>
-                  <button class="roll-button-textonly header-h1" type="roll" name="roll_water" title="%{water}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{water_macro}">
+                  <button class="roll-button-textonly header-h1 water" type="action" name="act_water">
                       <span data-i18n="water">Water</span>
                   </button>
                   <select class="input" name="attr_water" title="@{water}">
@@ -2317,7 +2317,7 @@
                     <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
                     <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
                   </select>
-                  <button class="roll-button-textonly header-h1" type="roll" name="roll_arrows" title="%{arrows}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{arrows_macro}">
+                  <button class="roll-button-textonly header-h1 arrows" type="action" name="act_arrows">
                       <span data-i18n="arrows">Arrows</span>
                   </button>
                   <select class="input" name="attr_arrows" title="@{arrows}">
@@ -2334,7 +2334,7 @@
                     <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
                     <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
                   </select>
-                  <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer}} {{consumable-flag=1}} @{torches_macro}">
+                  <button class="roll-button-textonly header-h1 torches" type="action" name="act_torches">
                       <span data-i18n="torches">Torches</span>
                   </button>
                   <select class="input" name="attr_torches" title="@{torches}">
@@ -3544,7 +3544,7 @@
         {{/name}}{{/character_name}}
         {{#name}}
         <div class="template-grid-item template-header">
-          {{#rollGreater() pushroll 0}}<span data-i18n="push">Push</span>{{#rollGreater() pushroll 1}}:<span class="results push-total">{{pushroll}}{{/rollGreater() pushroll 1}}</span>{{/rollGreater() pushroll 0}}
+          {{#rollGreater() pushroll 0}}<span data-i18n="pushed">Pushed</span>{{#rollGreater() pushroll 1}}:<span class="results push-total">{{pushroll}}{{/rollGreater() pushroll 1}}</span>{{/rollGreater() pushroll 0}}
           {{#name_link}}<span>[{{name}}]({{name_link}})</span>{{/name_link}}{{^name_link}}<span>{{name}}</span>{{/name_link}}
         </div>
         {{/name}}
@@ -4395,11 +4395,16 @@
     }
   };
 
+  // adds to primary and returns updated primary
   const incrementWith = (primary, secondary) => {
     if (typeof primary !== 'number' || typeof secondary !== 'number') {
       throw new Error('Both inputs must be numbers.');
     }
     return primary + secondary;
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   const stats = ['strength', 'agility', 'wits', 'empathy'];
@@ -4631,111 +4636,6 @@
       });
     },
   );
-
-  /* consumables macro */
-  on('sheet:opened change:food change:water change:arrows change:torches', function (eventInfo) {
-    //clog(`~~~ Change Detected: ${eventInfo.sourceAttribute}`);
-    getAttrs(['food', 'water', 'arrows', 'torches'], function (values) {
-      const settings = {};
-      const {food} = values;
-      const {water} = values;
-      const {arrows} = values;
-      const {torches} = values;
-      // const {food_macro} = values;
-      // const {water_macro} = values;
-      // const {arrows_macro} = values;
-      // const {torches_macro} = values;
-      if (food) {
-        switch (values.food) {
-          case '0':
-            settings.food_macro = '{{subtitle=^{out-of-food}}} {{imageInsertFood= }}';
-            break;
-          case '1':
-            settings.food_macro = '{{subtitle=^{die-6-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
-            break;
-          case '2':
-            settings.food_macro = '{{subtitle=^{die-8-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
-            break;
-          case '3':
-            settings.food_macro = '{{subtitle=^{die-10-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
-            break;
-          case '4':
-            settings.food_macro = '{{subtitle=^{die-12-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
-            break;
-          default:
-            clog('~~~ ERROR: Food macro was not changed.');
-            break;
-        }
-      }
-      if (water) {
-        switch (values.water) {
-          case '0':
-            settings.water_macro = '{{subtitle=^{out-of-water}}}';
-            break;
-          case '1':
-            settings.water_macro = '{{subtitle=^{die-6-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
-            break;
-          case '2':
-            settings.water_macro = '{{subtitle=^{die-8-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
-            break;
-          case '3':
-            settings.water_macro = '{{subtitle=^{die-10-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
-            break;
-          case '4':
-            settings.water_macro = '{{subtitle=^{die-12-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
-            break;
-          default:
-            clog('~~~ ERROR: water macro was not changed.');
-            break;
-        }
-      }
-      if (arrows) {
-        switch (values.arrows) {
-          case '0':
-            settings.arrows_macro = '{{subtitle=^{out-of-arrows}}}';
-            break;
-          case '1':
-            settings.arrows_macro = '{{subtitle=^{die-6-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
-            break;
-          case '2':
-            settings.arrows_macro = '{{subtitle=^{die-8-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
-            break;
-          case '3':
-            settings.arrows_macro = '{{subtitle=^{die-10-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
-            break;
-          case '4':
-            settings.arrows_macro = '{{subtitle=^{die-12-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
-            break;
-          default:
-            clog('~~~ ERROR: arrows macro was not changed.');
-            break;
-        }
-      }
-      if (torches) {
-        switch (values.torches) {
-          case '0':
-            settings.torches_macro = '{{subtitle=^{out-of-torches}}}';
-            break;
-          case '1':
-            settings.torches_macro = '{{subtitle=^{die-6-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
-            break;
-          case '2':
-            settings.torches_macro = '{{subtitle=^{die-8-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
-            break;
-          case '3':
-            settings.torches_macro = '{{subtitle=^{die-10-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
-            break;
-          case '4':
-            settings.torches_macro = '{{subtitle=^{die-12-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
-            break;
-          default:
-            clog('~~~ ERROR: torches macro was not changed.');
-            break;
-        }
-      }
-      setAttrs(settings);
-    });
-  });
 
   /* consumables weight */
   on(
@@ -5562,8 +5462,6 @@
       for (let i = 1; i <= roll.artifact_die_twelve; i++) {
         artifact_twelveStr += `{{artifact-die-twelve=[[ 1 ]]}} {{artifact-roll-twelve=[[ 1d12 ]]}} `;
       }
-      // rollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{successes=[[ ${successes} ]]}} {{failures=[[ ${failures} ]]}} {{gearfails=[[ ${gearfails} ]]}} {{push=[[ ${roll.pushable} ]]}} {{pushroll=[[ ${roll.pushroll} ]]}} ${attributeStr} ${skillStr} ${gearStr} ${artifact_eightStr} ${artifact_ochoStr} ${artifact_tenStr} ${artifact_twelveStr}`;
-
       rollStr = `@{whisper_option} &{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{subtitle=@{current_preset}}} {{subtitle2=@{subtitle2}}} {{name=${roll.name}}} {{successes=[[ ${successes} ]]}} {{failures=[[ ${failures} ]]}} {{gearfails=[[ ${gearfails} ]]}} {{push=[[ ${roll.pushable} ]]}} {{pushroll=[[ ${roll.pushroll} ]]}} ${attributeStr} ${skillStr} ${gearStr} ${artifact_eightStr} ${artifact_ochoStr} ${artifact_tenStr} ${artifact_twelveStr} {{free-text}} {{footer}} @{include_with_roll}`;
     }
 
@@ -5725,16 +5623,14 @@
       }
 
       // removes total artifact successes but adds back the # of successful artifact dice
-      const adjustedSuccesses = successes - totalArtifactBonus + successfulArtifactDie;
       // use adjustedSuccesses to determine if a push is still an option for the roll
+      const adjustedSuccesses = successes - totalArtifactBonus + successfulArtifactDie;
 
       // NB: Successes and failures counts number of dice which cannot be rerolled.
       // In case of negative skill dice, the actual successes may be lower
       if (adjustedSuccesses + failures >= roll.totalDice) {
         roll.pushable = 0;
       }
-
-      // roll.pushRollStr = `&{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[ ${roll.pushable} ]]}} {{pushroll=[[ ${roll.pushroll} ]]}} {{successes=[[ ${successes} ]]}} {{failures=[[ ${failures} ]]}} {{gearfails=[[ ${gearfails} ]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr} ${pushArtifact_eightStr} ${pushArtifact_ochoStr} ${pushArtifact_tenStr} ${pushArtifact_twelveStr}`;
 
       roll.pushRollStr = `@{whisper_option} &{template:forbiddenlands} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{subtitle=@{current_preset}}} {{subtitle2=@{subtitle2}}} {{name=${roll.name}}} {{push=[[ ${roll.pushable} ]]}} {{pushroll=[[ ${roll.pushroll} ]]}} {{successes=[[ ${successes} ]]}} {{failures=[[ ${failures} ]]}} {{gearfails=[[ ${gearfails} ]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr} ${pushArtifact_eightStr} ${pushArtifact_ochoStr} ${pushArtifact_tenStr} ${pushArtifact_twelveStr} {{free-text}} {{footer}} @{include_with_roll}`;
 
@@ -6708,6 +6604,150 @@
             });
           });
         });
+      });
+    });
+  });
+
+  /* consumables macro */
+  on('sheet:opened change:food change:water change:arrows change:torches', function (eventInfo) {
+    //clog(`~~~ Change Detected: ${eventInfo.sourceAttribute}`);
+    getAttrs(['food', 'water', 'arrows', 'torches'], function (values) {
+      const settings = {};
+      const {food} = values;
+      const {water} = values;
+      const {arrows} = values;
+      const {torches} = values;
+      // const {food_macro} = values;
+      // const {water_macro} = values;
+      // const {arrows_macro} = values;
+      // const {torches_macro} = values;
+      if (food) {
+        switch (values.food) {
+          case '0':
+            settings.food_macro = '{{subtitle=^{out-of-food}}} {{imageInsertFood= }}';
+            break;
+          case '1':
+            settings.food_macro = '{{subtitle=^{die-6-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
+            break;
+          case '2':
+            settings.food_macro = '{{subtitle=^{die-8-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
+            break;
+          case '3':
+            settings.food_macro = '{{subtitle=^{die-10-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
+            break;
+          case '4':
+            settings.food_macro = '{{subtitle=^{die-12-u} ^{of-food}}} {{imageInsertFood= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
+            break;
+          default:
+            clog('~~~ ERROR: Food macro was not changed.');
+            break;
+        }
+      }
+      if (water) {
+        switch (values.water) {
+          case '0':
+            settings.water_macro = '{{subtitle=^{out-of-water}}}';
+            break;
+          case '1':
+            settings.water_macro = '{{subtitle=^{die-6-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
+            break;
+          case '2':
+            settings.water_macro = '{{subtitle=^{die-8-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
+            break;
+          case '3':
+            settings.water_macro = '{{subtitle=^{die-10-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
+            break;
+          case '4':
+            settings.water_macro = '{{subtitle=^{die-12-u} ^{of-water}}} {{imageInsertWater= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
+            break;
+          default:
+            clog('~~~ ERROR: water macro was not changed.');
+            break;
+        }
+      }
+      if (arrows) {
+        switch (values.arrows) {
+          case '0':
+            settings.arrows_macro = '{{subtitle=^{out-of-arrows}}}';
+            break;
+          case '1':
+            settings.arrows_macro = '{{subtitle=^{die-6-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
+            break;
+          case '2':
+            settings.arrows_macro = '{{subtitle=^{die-8-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
+            break;
+          case '3':
+            settings.arrows_macro = '{{subtitle=^{die-10-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
+            break;
+          case '4':
+            settings.arrows_macro = '{{subtitle=^{die-12-u} ^{of-arrows}}} {{imageInsertArrows= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
+            break;
+          default:
+            clog('~~~ ERROR: arrows macro was not changed.');
+            break;
+        }
+      }
+      if (torches) {
+        switch (values.torches) {
+          case '0':
+            settings.torches_macro = '{{subtitle=^{out-of-torches}}}';
+            break;
+          case '1':
+            settings.torches_macro = '{{subtitle=^{die-6-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-six=[[ 1 ]]}} {{consumable-roll-six=[[ 1d6 ]]}}';
+            break;
+          case '2':
+            settings.torches_macro = '{{subtitle=^{die-8-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-eight=[[ 1 ]]}} {{consumable-roll-eight=[[ 1d8 ]]}}';
+            break;
+          case '3':
+            settings.torches_macro = '{{subtitle=^{die-10-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-ten=[[ 1 ]]}} {{consumable-roll-ten=[[ 1d10 ]]}}';
+            break;
+          case '4':
+            settings.torches_macro = '{{subtitle=^{die-12-u} ^{of-torches}}} {{imageInsertTorches= }} {{consumable-die-twelve=[[ 1 ]]}} {{consumable-roll-twelve=[[ 1d12 ]]}}';
+            break;
+          default:
+            clog('~~~ ERROR: torches macro was not changed.');
+            break;
+        }
+      }
+      setAttrs(settings);
+    });
+  });
+
+  const consumables = ['food', 'water', 'arrows', 'torches'];
+  const consumableRolled = consumables.map((thisConsumable) => `clicked:${thisConsumable}`).join(' ');
+  on(consumableRolled, (eventInfo) => {
+    console.log(eventInfo);
+    const resource = eventInfo.triggerName.replace('clicked:', '');
+    getAttrs([resource], (values) => {
+      let resourceDieSize = +values[resource] || 0;
+      clog(`resourceDieSize:${resourceDieSize}`);
+      switch (resourceDieSize) {
+        case 0:
+          resourceDieSize = 0;
+          break;
+        case 1:
+          resourceDieSize = 6;
+          break;
+        case 2:
+          resourceDieSize = 8;
+          break;
+        case 3:
+          resourceDieSize = 10;
+          break;
+        case 4:
+          resourceDieSize = 12;
+          break;
+        default:
+          clog('~~~ ERROR: out of range.');
+          break;
+      }
+      const resourceDieSizeWord = `${litnum[resourceDieSize]}`;
+      const resourceTitle = capitalizeFirstLetter(resource);
+      const resourceSubtitle = resourceDieSize === 0 ? '{out-of-food}' : `{die-${resourceDieSize}-u}`;
+      const rollString = `@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{subtitle=^${resourceSubtitle} ^{of-${resource}}}} {{imageInsert${resourceTitle}= }} {{consumable-die-${resourceDieSizeWord}=[[ 1 ]]}} {{consumable-roll-${resourceDieSizeWord}=[[ 1d${resourceDieSize} ]]}} {{footer}} {{consumable-flag= [[ 1 ]]}}`;
+      startRoll(rollString, (roll) => {
+        console.log(eventInfo);
+        finishRoll(roll.rollId);
       });
     });
   });
