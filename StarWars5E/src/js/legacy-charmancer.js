@@ -2323,3 +2323,1082 @@ on("page:l1-summary", function() {
         setCharmancerText(set);
     });
 });
+
+on("mancer:cancel", function(eventinfo) {
+    if(!eventinfo["value"]) {return;};
+    var update = {};
+
+    if(eventinfo["value"] === "l1-welcome" || eventinfo["value"] === "l1-cancel") {
+        update["l1mancer_status"] = "completed";
+        update["charactermancer_step"] = "l1-welcome";
+        deleteCharmancerData(["l1-welcome","l1-race","l1-class","l1-abilities","l1-background","l1-equipment","l1-powers","l1-summary"]);
+    }
+    else if(eventinfo["value"].substring(0,3) === "l1-") {
+        update["l1mancer_status"] = eventinfo["value"];
+    };
+
+    setAttrs(update);
+});
+
+on("mancerfinish:l1-mancer", function(eventinfo) {
+    var noEquipmentDrop = false;
+    if(eventinfo.data["l1-equipment"]) {
+        noEquipmentDrop = eventinfo.data["l1-equipment"].values["equipment_type"] == "gold";
+    }
+    var getMancerPowers = function(mancerdata) {
+        var powersKnown = [];
+        if(mancerdata["l1-race"].data.subrace) {
+            _.each(mancerdata["l1-race"].data.subrace["data-Powers"], function(power) {
+                if(power.Name) {
+                    powersKnown.push( {name: power.Name, ability: power.Ability} );
+                }
+            });
+        }
+        if(mancerdata["l1-race"].data.race) {
+            _.each(mancerdata["l1-race"].data.race["data-Powers"], function(power) {
+                if(power.Name) {
+                    powersKnown.push( {name: power.Name, ability: power.Ability} );
+                }
+            });
+        }
+        if(mancerdata["l1-class"].data.subclass) {
+            _.each(mancerdata["l1-class"].data.subclass["data-Class Powers"], function(power, level) {
+                _.each(power.Known, function(known) {
+                    powersKnown.push( {name: known, ability: mancerdata["l1-class"].data.class["Powercasting Ability"]} );
+                });
+            });
+            _.each(mancerdata["l1-class"].data.subclass["data-Powers"], function(power) {
+                if(power.Name) {
+                    powersKnown.push( {name: power.Name, ability: power.Ability} );
+                }
+            });
+        }
+        if(mancerdata["l1-class"].data.class) {
+            _.each(mancerdata["l1-class"].data.class["data-Class Powers"], function(power, level) {
+                _.each(power.Known, function(known) {
+                    powersKnown.push( {name: known, ability: mancerdata["l1-class"].data.class["Powercasting Ability"]} );
+                });
+            });
+            _.each(mancerdata["l1-class"].data.class["data-Powers"], function(power) {
+                if(power.Name) {
+                    powersKnown.push( {name: power.Name, ability: power.Ability} );
+                }
+            });
+        }
+        if(mancerdata["l1-powers"] && mancerdata["l1-powers"].values) {
+            _.each(mancerdata["l1-powers"].values, function(value, name) {
+                if(value.substr(0,7) == "Powers:") {
+                    powersKnown.push( {name: value.substring(7), ability: mancerdata["l1-powers"].values[name + "_casting"]} );
+                }
+            });
+        }
+        return powersKnown;
+    };
+    var getMancerStats = function(mancerdata) {
+        //Recalculate Ability Scores
+        //var hp = 0;
+        var allAbilities = {race: {}, subrace: {}};
+        var disableAbilities = {};
+        var allProficiencies = {};
+        var toSet = {};
+        var proficiencyList = ["Weapon", "Armor", "Skill", "Tool", "Language"];
+        var abilityList = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"];
+        var proficiencyNum = 4;
+        var hitpoints = mancerdata["l1-class"].data.class ? mancerdata["l1-class"].data.class["Hit Die"] : mancerdata["l1-class"].values["custom_hit_die"];
+        hitpoints = parseInt(hitpoints.replace("d", ""));
+
+        _.each(mancerdata, function(page){
+            _.each(page.values, function(value, name) {
+                if(name.search("ability") !== -1) {
+                    //var choiceSection = name.split("_")[0].replace("sub", "");
+                    var choiceSection = name.split("_")[0];
+                    if(page.data[choiceSection] && page.data[choiceSection]["data-Ability Score Choice"]) {
+                        var increase = 1;
+                        if(typeof page.data[choiceSection]["data-Ability Score Choice"] == "string") {
+                            parseInt( _.last( page.data[choiceSection]["data-Ability Score Choice"].split("+") ) );
+                        }
+                        allAbilities[choiceSection] = allAbilities[choiceSection] || {};
+                        allAbilities[choiceSection][value.toLowerCase()] = increase;
+                        disableAbilities[choiceSection] = disableAbilities[choiceSection] || [];
+                        disableAbilities[choiceSection].push(value);
+                    }
+                }
+            });
+            _.each(page.data, function(pagedata, increaseSection) {
+                if(pagedata["data-Ability Score Increase"]) {
+                    _.each(pagedata["data-Ability Score Increase"], function(amount, ability) {
+                        allAbilities[increaseSection] = allAbilities[increaseSection] || {};
+                        allAbilities[increaseSection][ability.toLowerCase()] = amount;
+                        disableAbilities[increaseSection] = disableAbilities[increaseSection] || [];
+                        disableAbilities[increaseSection].push(ability.toLowerCase());
+                    });
+                }
+                if(pagedata["data-HP per level"]) {
+                    hitpoints += pagedata["data-HP per level"];
+                }
+            });
+        });
+        if(mancerdata["l1-race"] && mancerdata["l1-race"].values.race == "Rules:Races") {
+            _.each(abilityList, function(ability){
+                var custom = mancerdata["l1-race"].values["race_custom_" + ability.toLowerCase()] || false;
+                if(custom) {
+                    allAbilities.race[ability.toLowerCase()] = parseInt(custom);
+                }
+            });
+        }
+        if(mancerdata["l1-race"] && mancerdata["l1-race"].values.subrace == "Rules:Races") {
+            _.each(abilityList, function(ability){
+                var custom = mancerdata["l1-race"].values["subrace_custom_" + ability.toLowerCase()] || false;
+                if(custom) {
+                    allAbilities.subrace[ability.toLowerCase()] = parseInt(custom);
+                }
+            });
+        }
+        var abilityTotals = {}
+        _.each(allAbilities, function(abilities) {
+            _.each(abilities, function(amount, ability) {
+                abilityTotals[ability] = abilityTotals[ability] || {bonus: 0};
+                abilityTotals[ability].bonus += amount;
+            });
+        });
+        _.each(abilityList, function(upperAbility) {
+            var ability = upperAbility.toLowerCase();
+            abilityTotals[ability] = abilityTotals[ability] || {bonus: 0, mod: 0};
+            if(mancerdata["l1-abilities"].values[ability]) {
+                abilityTotals[ability].base = parseInt( mancerdata["l1-abilities"].values[ability].split("~")[0] );
+            } else {
+                abilityTotals[ability].base = 0;
+            }
+            abilityTotals[ability].total = abilityTotals[ability].bonus + abilityTotals[ability].base;
+            abilityTotals[ability].mod = Math.floor((abilityTotals[ability].total - 10)/2);
+        });
+        allAbilities.totals = abilityTotals;
+
+        hitpoints += abilityTotals.constitution.mod;
+
+        //Recalculate Proficiencies
+        _.each(proficiencyList, function(prof){
+            //First get a list of all proficiencies
+            var finalProfs = [];
+            _.each(mancerdata, function(page){
+                _.each(page.values, function(value, name) {
+                    if(name.search(prof.toLowerCase()) !== -1 || prof.toLowerCase() == "language" && name.search("class_feature_choice") !== -1) {
+                        if (value.split(":")[0] == "Proficiencies") {
+                            finalProfs.push( _.last(value.split(":")) );
+                        }
+                    }
+                });
+                _.each(page.data, function(pagedata) {
+                    if(pagedata["data-" + prof + " Proficiency"] && pagedata["data-" + prof + " Proficiency"].Proficiencies) {
+                        finalProfs = finalProfs.concat(pagedata["data-" + prof + " Proficiency"].Proficiencies);
+                    }
+                });
+            });
+            allProficiencies[prof.toLowerCase()] = _.without(_.uniq(finalProfs), "custom");
+        });
+
+        var expertiseSelects = {};
+        var currentExpertise = [];
+        //Get a list of active expertise selects
+        _.each(mancerdata, function(page, pagename) {
+            _.each(page.data, function(data, section) {
+                for(var num=1; num<=proficiencyNum; num++) {
+                    if( _.keys(data).indexOf("data-Expertise Choice " + num) != -1 ) {
+                        expertiseSelects[section + "_expertise_choice_" + num] = data["data-Expertise Choice " + num];
+                    }
+                }
+            });
+        });
+        _.each(expertiseSelects, function(fillArray, selectName) {
+            var expertChoices = [];
+            var options = {category: "Proficiencies", silent: true}
+            var currentValue = "";
+            //Create the list of values for this select
+            _.each(fillArray, function(expert) {
+                if(expert == "KNOWN") {
+                    expertChoices = expertChoices.concat(allProficiencies.skill);
+                } else {
+                    expertChoices.push(expert);
+                }
+            });
+            //Get the current value of the select
+            _.each(mancerdata, function(page){
+                _.each(page.values, function(value, name) {
+                    if(name == selectName) {
+                        currentValue = _.last(value.split(":"));
+                    }
+                });
+            });
+
+            if(currentValue != "") {
+                //If the current value is not available, set it to blank. otherwise, add it to the list of expertise skills
+                if(expertChoices.indexOf(currentValue) == -1) {
+                    options.selected = "";
+                    toSet[selectName] = "";
+                } else {
+                    currentExpertise.push(currentValue);
+                }
+            }
+        });
+
+        return {abilities: allAbilities, proficiencies: allProficiencies, expertise: _.uniq(currentExpertise), hp: hitpoints}
+    };
+    var doAllDrops = function(dropArray, callback) {
+        var thisPage = dropArray.shift();
+        var pageName = thisPage;
+        var additionalData = {};
+        if(typeof thisPage == "object") {
+            pageName = thisPage.name;
+            additionalData = thisPage.data || {};
+        }
+
+        getCompendiumPage(pageName, function(pageData) {
+            pageName = pageName.indexOf("@@!!@@") > -1 ? pageName.replace(/@@!!@@/g,"") : pageName; // Hacky bugfix to prevent custom names from matching unavailable content
+            currentDrop++;
+            if(typeof pageData == "string") {
+                console.log("Creating custom drop for " + pageName);
+                pageData = {name: pageName.split(":")[1], content: "", data: {Category: pageName.split(":")[0], Source: "Charactermancer"}};
+            };
+            setCharmancerText({"mancer_category": pageData.data.Category, "mancer_progress":"Applying change " + currentDrop + " out of " + totalDrops});
+            pageData.data = _.extend(pageData.data, additionalData);
+            if(pageData.data["data-Equipment"]) {
+                var json = JSON.parse(pageData.data["data-Equipment"]);
+                var newItems = makeItemData(json.default);
+                console.log("ADDING ADDITIONAL ITEMS:");
+                totalDrops += newItems.length;
+                dropArray = dropArray.concat(newItems);
+            }
+            if(pageData.data["data-Starting Gold"] && !noEquipmentDrop) {
+                set["gp"] += parseInt(pageData.data["data-Starting Gold"]);
+            }
+            if(pageData.data["data-Bundle"]) {
+                var json = JSON.parse(pageData.data["data-Bundle"]);
+                var newItems = makeItemData(json);
+                console.log("ADDING ADDITIONAL ITEMS (FROM BUNDLE):");
+                totalDrops += newItems.length
+                dropArray = dropArray.concat(newItems);
+                doAllDrops(dropArray, callback);
+            } else {
+                dropCompendiumData("licensecontainer", pageData, function(data) {
+                    console.log("Dropped " + pageName);
+                    if(dropArray.length > 0) {
+                        doAllDrops(dropArray, callback);
+                    } else {
+                        callback();
+                    }
+                });
+            }
+        });
+    };
+    var makeItemData = function(items) {
+        if (noEquipmentDrop) {
+            return [];
+        } else {
+            var itemArray = [];
+            var splitItems = [];
+            _.each(items, function(item) {
+                item = item.split(",");
+                _.each(item, function(splitItem) {
+                    splitItems.push(splitItem.trim());
+                });
+            })
+            _.each(splitItems, function(item) {
+                var itemname = item.split("(")[0].trim().replace("Items:", "");
+                itemname = itemname.substring(0,4) == "and " ? itemname.substr(4) : itemname;
+                var itemdata = {name:"Items:" + itemname, data:{}}
+                if(item.includes("(")) {
+                    var par = item.split("(")[1].split(")")[0];
+                    if( !isNaN(parseInt(par)) ) {
+                        itemdata.data["itemcount"] = parseInt(par);
+                    }
+                }
+                if(itemname != "") {
+                    itemArray.push(itemdata);
+                }
+            });
+            return itemArray;
+        }
+    };
+    var eraseRepeating = function(sectionArray, callback) {
+        var thisSection = sectionArray.shift();
+        getSectionIDs(thisSection, function(itemids) {
+            _.each(itemids, function(item) {
+                removeRepeatingRow("repeating_" + thisSection + "_" + item);
+            });
+            if(sectionArray.length > 0) {
+                eraseRepeating(sectionArray, callback);
+            } else {
+                callback();
+            }
+
+        });
+    }
+    var data = eventinfo.data;
+    var stats = getMancerStats(data);
+    var powers = getMancerPowers(data);
+    var equipment = [];
+    var silentset = {};
+    var clearset = {};
+    var set = {gp: 0};
+    var allDrops = [];
+    var currentDrop = 0;
+    var totalDrops = 1;
+    var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "technology", "lore", "investigation", "nature", "piloting", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
+    var allAbilities = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
+    var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "power-cantrip"];
+    for(var x=1; x<=9; x++) {
+        eraseSections.push("power-" + x);
+    }
+    //first set is silent to make sure certain things don't trigger workers
+    silentset["class_resource_name"] = "";
+    silentset["class_resource"] = "";
+    silentset["class_resource_max"] = "";
+    silentset["other_resource_name"] = "";
+    silentset["other_resource"] = "";
+    silentset["other_resource_max"] = "";
+    silentset["other_resource_itemid"] = "";
+    silentset["class"] = "";
+    silentset["class_display"] = "";
+    silentset["subclass"] = "";
+    silentset["hitdietype"] = "";
+    silentset["hitdie_final"] = "";
+    silentset["race"] = "";
+    silentset["subrace"] = "";
+    silentset["race_display"] = "";
+    silentset["custom_class"] = "";
+    silentset["cust_classname"] = "";
+    //Set up setAttrs to erase some fields
+    clearset["precognition_flag"] = "0";
+    clearset["age"] = "";
+    clearset["hp"] = "";
+    clearset["hp_max"] = "";
+    clearset["size"] = "";
+    clearset["speed"] = "";
+    clearset["gp"] = "";
+    clearset["alignment"] = "";
+    clearset["global_damage_mod_flag"] = "";
+    clearset["powercasting_ability"] = "";
+    clearset["cust_hitdietype"] = "";
+    clearset["cust_powerslots"] = "";
+    clearset["cust_powercasting_ability"] = "";
+    clearset["tab"] = "core";
+    clearset["ac"] = "";
+    clearset["jack_bonsu"] = "";
+    clearset["jack_attr"] = "";
+    clearset["death_save_bonus"] = "";
+    clearset["weighttotal"] = "";
+    clearset["hiddenweighttotal"] = "";
+    clearset["initiative_bonus"] = "";
+    clearset["hit_dice"] = "";
+    clearset["hit_dice_max"] = "";
+    clearset["base_level"] = "1";
+    clearset["level"] = "1";
+    clearset["pb"] = "";
+    clearset["jack"] = "";
+    clearset["caster_level"] = "";
+    clearset["power_attack_mod"] = "";
+    clearset["power_attack_bonus"] = "";
+    clearset["power_save_dc"] = "";
+    clearset["armorwarningflag"] = "hide";
+    clearset["armorwarning"] = "0";
+    clearset["passive_wisdom"] = "";
+    _.each(allSkills, function(skill) {
+        clearset[skill + "_prof"] = "";//0
+        clearset[skill + "_type"] = "";//1
+        clearset[skill + "_bonus"] = "";
+    });
+    _.each(allAbilities, function(ability) {
+        clearset[ability + "_save_prof"] = "";
+        clearset[ability + "_save_bonus"] = "";
+        clearset[ability + "_bonus"] = "0";
+        clearset["cust_" + ability + "_save_prof"] = "";
+    });
+    clearset["personality_traits"] = "";
+    _.each(["ideal", "bond", "flaw"], function(type) {
+        clearset[type + "s"] = "";
+    });
+    clearset["background"] = "";
+    //Set up second setAttrs with ability scores
+    _.each(stats.abilities.totals, function(scores, name) {
+        clearset[name + "_base"] = scores.total;
+    });
+    //Add class features to first setAttrs [name, desc, source"Class", source_type:"Fighter", options-flag: 0]
+    for(var x=1; x<=4; x++) {
+        if(data["l1-class"].values["class_feature_choice_" + x] && data["l1-class"].values["class_feature_choice_" + x].search("Proficiencies:") == -1) {
+            if (data["l1-class"].values["class_feature_choice_" + x + "_manual"]) {
+                var newrowid1 = generateRowID();
+                var name = data["l1-class"].values["class_feature_choice_" + x + "_name"] || "";
+                name += ": " + data["l1-class"].values["class_feature_choice_" + x + "_manual"];
+                clearset["repeating_traits_" + newrowid1 + "_name"] = name;
+                clearset["repeating_traits_" + newrowid1 + "_source"] = "Class";
+                clearset["repeating_traits_" + newrowid1 + "_source_type"] = _.last(data["l1-class"].values.class.split(":"));
+                clearset["repeating_traits_" + newrowid1 + "_description"] = data["l1-class"].values["class_feature_choice_" + x + "_desc"] || "";
+                clearset["repeating_traits_" + newrowid1 + "_options-flag"] = 0;
+                clearset["repeating_traits_" + newrowid1 + "_display_flag"] = "on";
+                if (data["l1-class"].values["class_feature_choice_" + x + "_manual2"]) {
+                    var newrowid2 = generateRowID();
+                    var name = data["l1-class"].values["class_feature_choice_" + x + "_name"] || "";
+                    name += ": " + data["l1-class"].values["class_feature_choice_" + x + "_manual2"];
+                    clearset["repeating_traits_" + newrowid2 + "_name"] = name;
+                    clearset["repeating_traits_" + newrowid2 + "_source"] = "Class";
+                    clearset["repeating_traits_" + newrowid2 + "_source_type"] = _.last(data["l1-class"].values.class.split(":"));
+                    clearset["repeating_traits_" + newrowid2 + "_description"] = data["l1-class"].values["class_feature_choice_" + x + "_desc"] || "";
+                    clearset["repeating_traits_" + newrowid2 + "_options-flag"] = 0;
+                    clearset["repeating_traits_" + newrowid2 + "_display_flag"] = "on";
+                }
+            } else {
+                var newrowid = generateRowID();
+                var name = data["l1-class"].values["class_feature_choice_" + x + "_name"] || "";
+                name += ": " + data["l1-class"].values["class_feature_choice_" + x];
+                clearset["repeating_traits_" + newrowid + "_name"] = name;
+                clearset["repeating_traits_" + newrowid + "_source"] = "Class";
+                clearset["repeating_traits_" + newrowid + "_source_type"] = _.last(data["l1-class"].values.class.split(":"));
+                clearset["repeating_traits_" + newrowid + "_description"] = data["l1-class"].values["class_feature_choice_" + x + "_desc"] || "";
+                clearset["repeating_traits_" + newrowid + "_options-flag"] = 0;
+                clearset["repeating_traits_" + newrowid + "_display_flag"] = "on";
+            }
+        };
+    }
+    if(data["l1-class"].values.subclass) {
+        for(var x=1; x<=4; x++) {
+            if(data["l1-class"].values["subclass_feature_choice_" + x]) {
+                var newrowid = generateRowID();
+                var name = data["l1-class"].values["subclass_feature_choice_" + x + "_name"] || "";
+                name += ": " + data["l1-class"].values["subclass_feature_choice_" + x];
+                clearset["repeating_traits_" + newrowid + "_name"] = name;
+                clearset["repeating_traits_" + newrowid + "_source"] = "Class";
+                clearset["repeating_traits_" + newrowid + "_source_type"] = _.last(data["l1-class"].values.class.split(":")) + " - " + _.last(data["l1-class"].values.subclass.split(":"));
+                clearset["repeating_traits_" + newrowid + "_description"] = data["l1-class"].values["subclass_feature_choice_" + x + "_desc"] || "";
+                clearset["repeating_traits_" + newrowid + "_options-flag"] = 0;
+                clearset["repeating_traits_" + newrowid + "_display_flag"] = "on";
+            };
+        }
+    }
+
+    //Set up drops. start with class, subclass, race, subrace, background
+    if(data["l1-class"].values["class_name"] && !data["l1-class"].data.class) {
+        var customClass = {data: {}};
+        customClass.name = "Classes@@!!@@:" + data["l1-class"].values["class_name"];
+        set["custom_class"] = "1";
+        set["cust_classname"] = data["l1-class"].values["class_name"];
+        set["cust_hitdietype"] = data["l1-class"].values["custom_hit_die"];
+        if(data["l1-class"].values["custom_class_power_ability"]) {
+            set["cust_powerslots"] = "full";
+            set["cust_powercasting_ability"] = "@{" + data["l1-class"].values["custom_class_power_ability"].toLowerCase() + "_mod}+";
+        }
+        traits = [];
+        for(var x = 1; x <= 4; x++) {
+            var trait = {};
+            if(data["l1-class"].values["custom_class_trait_name_" + x]) {
+                trait.Name = data["l1-class"].values["custom_class_trait_name_" + x];
+                trait.Desc = data["l1-class"].values["custom_class_trait_desc_" + x] || "";
+                traits.push(trait);
+            }
+        }
+        if(traits.length > 0) {
+            customClass.data["data-Traits"] = JSON.stringify(traits);
+        }
+        _.each(allAbilities, function(ability) {
+            if(data["l1-class"].values[ability.toLowerCase() + "_save"]) {
+                set["cust_" + ability + "_save_prof"] = "(@{pb})";
+            }
+        });
+        allDrops.push(customClass);
+    } else {
+        allDrops.push(data["l1-class"].values.class);
+    };
+    //set up subclass drop
+    if(data["l1-class"].values.subclass && data["l1-class"].values["subclass_name"]) {
+        var customSubclass  = {data:{}};
+        customSubclass.name = "Subclasses@@!!@@:" + data["l1-class"].values["subclass_name"];
+        traits = [];
+        for(var x = 1; x <= 4; x++) {
+            var trait = {};
+            if(data["l1-class"].values["custom_class_trait_name_" + x]) {
+                trait.Name = data["l1-class"].values["custom_class_trait_name_" + x];
+                trait.Desc = data["l1-class"].values["custom_class_trait_desc_" + x] || "";
+                traits.push(trait);
+            }
+        }
+        if(traits.length > 0) {
+            customSubclass.data["data-Traits"] = JSON.stringify(traits);
+        }
+        allDrops.push(customSubclass);
+    } else if(data["l1-class"].values.subclass) {
+        allDrops.push(data["l1-class"].values.subclass);
+    };
+    //set up race drop
+    if(data["l1-race"].values["race_name"] && !data["l1-race"].data.race) {
+        var customRace = {data: {}};
+        customRace.name = "Races@@!!@@:" + data["l1-race"].values["race_name"];
+        if(data["l1-race"].values.size) {
+            customRace.data.Size = data["l1-race"].values.size;
+        }
+        if(data["l1-race"].values.speed) {
+            customRace.data.Speed = data["l1-race"].values.speed;
+        }
+        traits = [];
+        for(var x = 1; x <= 4; x++) {
+            var trait = {};
+            if(data["l1-race"].values["custom_race_trait_name_" + x]) {
+                trait.Name = data["l1-race"].values["custom_race_trait_name_" + x];
+                trait.Desc = data["l1-race"].values["custom_race_trait_desc_" + x] || "";
+                traits.push(trait);
+            }
+        }
+        if(traits.length > 0) {
+            customRace.data["data-Traits"] = JSON.stringify(traits);
+        }
+        allDrops.push(customRace);
+    } else {
+        allDrops.push(data["l1-race"].values.race);
+    }
+    //set up subrace drop
+    if(data["l1-race"].values.subrace && data["l1-race"].values["subrace_name"]) {
+        var customSubrace = {data: {}};
+        customSubrace.name = "Subraces@@!!@@:" + data["l1-race"].values["subrace_name"];
+        customSubrace.data["data-Parent"] = data["l1-race"].values.race.split(":")[1];
+        if(data["l1-race"].values.speed) {
+            customSubrace.data.Speed = data["l1-race"].values.speed;
+        }
+        traits = [];
+        for(var x = 1; x <= 4; x++) {
+            var trait = {};
+            if(data["l1-race"].values["custom_race_trait_name_" + x]) {
+                trait.Name = data["l1-race"].values["custom_race_trait_name_" + x];
+                trait.Desc = data["l1-race"].values["custom_race_trait_desc_" + x] || "";
+                traits.push(trait);
+            }
+        }
+        if(traits.length > 0) {
+            customSubrace.data["data-Traits"] = JSON.stringify(traits);
+        }
+        allDrops.push(customSubrace);
+    } else if(data["l1-race"].values.subrace) {
+        allDrops.push(data["l1-race"].values.subrace);
+    };
+    //set up feat drop
+    if(data["l1-feat"] && data["l1-feat"].values.feat) {
+        var feat = {name: data["l1-feat"].values.feat, data: {Properties: "1st Level"}};
+        allDrops.push(feat);
+    }
+    //set up background drop
+    if(data["l1-background"].values.background) {
+        if(data["l1-background"].values.background == "Rules:Backgrounds") {
+            var customBg  = {data:{}};
+            customBg.name = "Backgrounds@@!!@@:" + data["l1-background"].values["background_name"];
+            if(data["l1-background"].values["custom_background_trait_name"]) {
+                var trait = {};
+                trait.Name = data["l1-background"].values["custom_background_trait_name"];
+                trait.Desc = data["l1-background"].values["custom_background_trait_desc"] || "";
+                customBg.data["data-Traits"] = JSON.stringify([trait]);
+            }
+            //console.log(customBg);
+            allDrops.push(customBg);
+        } else {
+            allDrops.push(data["l1-background"].values.background);
+        }
+    }
+
+    //Now add proficiency drops
+    _.each(["Armor", "Language", "Tool", "Weapon"], function(proftype) {
+        _.each(stats.proficiencies[proftype.toLowerCase()], function(prof) {
+            var profdata = {name: "Proficiencies:" + prof, data: {Type: proftype}}
+            if(stats.expertise.indexOf(prof) != -1) {
+                profdata.data["toolbonus_base"] = "(@{pb}*2)";
+            }
+            allDrops.push(profdata);
+        });
+    });
+    //add custom proficiencies
+    _.each(["race", "class"], function(section) {
+        if(data["l1-" + section].values["custom_" + section + "_prof_name_choice1"]) {
+            for(var x=1; x<=4; x++) {
+                if(data["l1-" + section].values["custom_" + section + "_prof_name_choice" + x]
+                    && data["l1-" + section].values["custom_" + section + "_prof_type_choice" + x]) {
+                    var profdata = {data: {}}
+                    profdata["name"] = "Proficiencies:" + data["l1-" + section].values["custom_" + section + "_prof_name_choice" + x];
+                    profdata.data.Type = data["l1-" + section].values["custom_" + section + "_prof_type_choice" + x].toLowerCase().replace("skill", "skillcustom");
+                    allDrops.push(profdata);
+                }
+            }
+        }
+    })
+
+    //Next, add power drops
+    _.each(powers, function(power) {
+        var powerdata = {name: "Powers:" + power.name};
+        powerdata.data = {"powercasting_ability": "@{" +power.ability.toLowerCase() + "_mod}+"};
+        allDrops.push(powerdata);
+    });
+
+    //Add equipment choice drops unless starting gold was chosen
+    if (data["l1-equipment"].values["equipment_type"] != "gold") {
+        _.each(data["l1-equipment"].values, function(val, name) {
+            if(name.includes("background_equipment_choice")) {
+                equipment = equipment.concat(val.split(" and "));
+            }
+        });
+    }
+
+    //Set up the final setAttrs()
+    set["alignment"] = data["l1-race"].values.alignment || "";
+    set["age"] = data["l1-race"].values.age || "";
+    set["hp"] = stats.hp;
+    set["hp_max"] = stats.hp;
+    set["l1mancer_status"] = "completed";
+    set["options-class-selection"] = "0";
+    if(data["l1-equipment"].values["equipment_type"] == "class") {
+        _.each(data["l1-equipment"].values, function(val, name) {
+            if(name.includes("class_equipment_choice")) {
+                equipment = equipment.concat(val.split(" and "));
+            }
+        });
+    } else if(data["l1-equipment"].values["equipment_type"] == "gold" && data["l1-equipment"].values["starting_gold"]) {
+        set["gp"] = parseInt(data["l1-equipment"].values["starting_gold"]);
+    }
+    //Add skill proficiencies
+    _.each(_.uniq(stats.proficiencies.skill.concat(stats.expertise)), function(prof) {
+        var profName = prof.toLowerCase().replace(" " , "_");
+        set[profName + "_prof"] = "(@{pb}*@{" + profName + "_type})";
+        if(stats.expertise.indexOf(prof) != -1) {
+            set[profName + "_type"] = 2;
+        }
+    });
+    //Add background traits
+    if(data["l1-background"].values["background_personality_choice1"] || data["l1-background"].values["background_personality_choice2"]) {
+        var choice1 = data["l1-background"].values["background_personality_choice1"] || false;
+        var choice2 = data["l1-background"].values["background_personality_choice2"] || false;
+        choice1 = choice1 || choice2;
+        if(choice1) {
+            set["personality_traits"] = choice1;
+        }
+        if(choice2) {
+            set["personality_traits"] += "\n\n" + choice2;
+        }
+        set["options-flag-personality"] = 0;
+    }
+    _.each(["ideal", "bond", "flaw"], function(type) {
+        if(data["l1-background"].values["background_" + type + "_choice"]) {
+            set[type + "s"] = data["l1-background"].values["background_" + type + "_choice"];
+            set["options-flag-" + type + "s"] = 0;
+        }
+    });
+    if(data["l1-background"].values["background_detail_choice"]) {
+        set["background"] = _.last(data["l1-background"].values["background"].split(":")) + " (" + data["l1-background"].values["background_detail_choice"] + ")";
+    }
+    allDrops = allDrops.concat(makeItemData(equipment));
+    totalDrops += allDrops.length;
+
+    //erase all repeating sections
+    eraseRepeating(eraseSections, function() {
+        //first set is silent to prevent unwanted sheet workers
+        setAttrs(silentset, {silent:true}, function() {
+            //reset remaining attributes, and set ability scores/custom info
+            setAttrs(clearset, function() {
+                doAllDrops(allDrops, function() {
+                    console.log("DOING THE FINAL SET!!");
+                    setAttrs(set, function() {
+                        update_skills(allSkills);
+                        update_attacks("all");
+                        organize_section_proficiencies();
+                        if(set["cust_classname"]) {
+                            update_class();
+                        }
+                        finishCharactermancer();
+                    });
+                });
+            });
+        });
+    });
+});
+
+on("sheet:opened", function(eventinfo) {
+    versioning(function() {
+        if(eventinfo.sourceType === "sheetworker") {
+            setAttrs({l1mancer_status: "completed"})
+        }
+        else {
+            check_l1_mancer();
+        }
+    });
+    // cleanup_drop_fields();
+    // v2_old_values_check();
+});
+
+on("clicked:relaunch_lvl1mancer", function(eventinfo) {
+    getAttrs(["l1mancer_status"], function(v) {
+        if(v["l1mancer_status"] === "completed") {
+            setAttrs({l1mancer_status: ""});
+        }
+        check_l1_mancer();
+    });
+});
+
+var check_l1_mancer = function() {
+    getAttrs(["class", "base_level", "strength_base","dexterity_base","constitution_base","intelligence_base","wisdom_base","charisma_base","l1mancer_status","version","charactermancer_step"], function(v) {
+        if(!v["version"] || parseFloat(v["version"]) < 2.2) {
+            return;
+        }
+        if(v["l1mancer_status"] && v["l1mancer_status"] === "completed") {
+            return;
+        }
+
+        if(v["charactermancer_step"]) {
+            startCharactermancer(v["charactermancer_step"]);
+        }
+        else {
+            startCharactermancer("l1-welcome");
+        }
+    });
+};
+
+var upgrade_to_2_0 = function(doneupdating) {
+    getAttrs(["npc","strength","dexterity","constitution","intelligence","wisdom","charisma","strength_base","dexterity_base","constitution_base","intelligence_base","wisdom_base","charisma_base","deathsavemod","death_save_mod","npc_str_save","npc_dex_save","npc_con_save","npc_int_save","npc_wis_save","npc_cha_save","npc_str_save_base","npc_dex_save_base","npc_con_save_base","npc_int_save_base","npc_wis_save_base","npc_cha_save_base","npc_acrobatics_base", "npc_animal_handling_base", "npc_technology_base", "npc_athletics_base", "npc_deception_base", "npc_lore_base", "npc_insight_base", "npc_intimidation_base", "npc_investigation_base", "npc_medicine_base", "npc_nature_base", "npc_perception_base", "npc_performance_base", "npc_persuasion_base", "npc_piloting_base", "npc_sleight_of_hand_base", "npc_stealth_base", "npc_survival_base", "npc_acrobatics", "npc_animal_handling", "npc_technology", "npc_athletics", "npc_deception", "npc_lore", "npc_insight", "npc_intimidation", "npc_investigation", "npc_medicine", "npc_nature", "npc_perception", "npc_performance", "npc_persuasion", "npc_piloting", "npc_sleight_of_hand", "npc_stealth", "npc_survival"], function(v) {
+        var update = {};
+        var stats = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
+        var npc_stats = ["npc_str_save","npc_dex_save","npc_con_save","npc_int_save","npc_wis_save","npc_cha_save","npc_acrobatics", "npc_animal_handling", "npc_technology", "npc_athletics", "npc_deception", "npc_lore", "npc_insight", "npc_intimidation", "npc_investigation", "npc_medicine", "npc_nature", "npc_perception", "npc_performance", "npc_persuasion", "npc_piloting", "npc_sleight_of_hand", "npc_stealth", "npc_survival"];
+        _.each(stats, function(attr) {
+            if(v[attr] && v[attr] != "10" && v[attr + "_base"] == "10") {
+                update[attr + "_base"] = v[attr];
+            }
+
+        });
+        _.each(npc_stats, function(attr) {
+            if(v[attr] && !isNaN(v[attr]) && v[attr + "_base"] == "") {
+                update[attr + "_base"] = v[attr];
+            }
+
+        });
+        if(v["deathsavemod"] && v["deathsavemod"] != "0" && v["death_save_mod"] === "0") {v["death_save_mod"] = v["deathsavemod"];};
+
+        if(v["npc"] && v["npc"] == "1") {
+            var callback = function() {
+                update_attr("all");
+                update_mod("strength");
+                update_mod("dexterity");
+                update_mod("constitution");
+                update_mod("intelligence");
+                update_mod("wisdom");
+                update_mod("charisma");
+                update_npc_action("all");
+                update_npc_saves();
+                update_npc_skills();
+                update_initiative();
+            }
+        }
+        else {
+            var callback = function() {
+                update_attr("all");
+                update_mod("strength");
+                update_mod("dexterity");
+                update_mod("constitution");
+                update_mod("intelligence");
+                update_mod("wisdom");
+                update_mod("charisma");
+                update_all_saves();
+                update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "technology", "lore", "investigation", "nature", "piloting", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"]);
+                update_tool("all")
+                update_attacks("all");
+                update_pb();
+                update_jack_attr();
+                update_initiative();
+                update_weight();
+                update_power_info();
+                update_ac();
+            }
+        }
+
+        setAttrs(update, {silent: true}, callback);
+        doneupdating();
+    });
+};
+
+var upgrade_to_2_1 = function(doneupdating) {
+    v2_old_values_check();
+    doneupdating();
+};
+
+var upgrade_to_2_2 = function(doneupdating) {
+    setAttrs({l1mancer_status: "completed"}, function(eventinfo) {
+        setAttrs({"options-class-selection":"0"});
+        console.log("Preprocessed v2.2 upgrade");
+        update_tool("all");
+        update_attacks("all");
+        update_class();
+        update_race_display();
+        doneupdating();
+    });
+};
+
+var upgrade_to_2_3 = function(doneupdating) {
+    getSectionIDs("damagemod", function(ids) {
+        var update = {};
+        _.each(ids, function(rowid) {
+            update[`repeating_damagemod_${rowid}_options-flag`] = "0";
+        });
+        getSectionIDs("tohitmod", function(ids) {
+            _.each(ids, function(rowid) {
+                update[`repeating_tohitmod_${rowid}_options-flag`] = "0";
+            });
+            setAttrs(update);
+            doneupdating();
+        });
+    });
+};
+
+var upgrade_to_2_4 = function(doneupdating) {
+    clear_npc_power_attacks(function() {
+        update_globalskills(function() {
+            update_globalsaves(function() {
+                update_globalattack(function() {
+                    update_globaldamage(function() {
+                        getAttrs(["npc", "npcpowercastingflag", "powercasting_ability", "caster_level", "level_calculations"], function(v) {
+                            if(v.npc == "1" && v.npcpowercastingflag == "1") {
+                                getSectionIDs("npctrait", function(secIds) {
+                                    var getList = [];
+                                    _.each(secIds, function(x) {
+                                        getList.push("repeating_npctrait_" + x + "_name");
+                                        getList.push("repeating_npctrait_" + x + "_desc");
+                                    });
+                                    getAttrs(getList, function(traits) {
+                                        var update = {};
+                                        if(v.powercasting_ability == "0*" || v.caster_level == "0") {
+                                            var powerSec = "";
+                                            if (v.powercasting_ability == "0*") {
+                                                update.powercasting_ability = "@{intelligence_mod}+";
+                                            }
+                                            _.each(secIds, function(traitId) {
+                                                if(traits["repeating_npctrait_" + traitId + "_name"].toLowerCase().includes("powercasting.")) powerSec = traitId;
+                                            });
+                                            if(powerSec  != "") {
+                                                var powercasting = traits["repeating_npctrait_" + powerSec + "_desc"].toLowerCase();
+                                                if (v.powercasting_ability == "0*") {
+                                                    var lastIndex = 9999;
+                                                    _.each(["intelligence", "wisdom", "charisma"], function(ability) {
+                                                        var found = powercasting.indexOf(ability);
+                                                        if(found > -1 && found < lastIndex) {
+                                                            lastIndex = found;
+                                                            update.powercasting_ability = "@{" + ability + "_mod}+";
+                                                        }
+                                                    });
+                                                }
+                                                if (v.caster_level == "0") {
+                                                    var foundLevelidx = powercasting.search(/(\d|\d\d)(st|nd|rd|th)/);
+                                                    if (foundLevelidx) {
+                                                        var level = parseInt(powercasting.substring(foundLevelidx, foundLevelidx+4));
+                                                        console.log(`Found powercasting level ${level} in trait, setting caster_level...`);
+                                                        update.caster_level = level;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        setAttrs(update, function() {
+                                            // Recalculate power slots in case NPC level was restored
+                                            if(!v["level_calculations"] || v["level_calculations"] == "on") {
+                                                update_power_slots();
+                                            };
+                                            // Set all powers without a given modifier to 'power'
+                                            var spgetList = [];
+                                            getSectionIDs("power-cantrip", function(secIds0) {
+                                                _.each(secIds0, function(x) {
+                                                    spgetList.push("repeating_power-cantrip_" + x + "_power_ability");
+                                                });
+                                                getSectionIDs("power-1", function(secIds1) {
+                                                    _.each(secIds1, function(x) {
+                                                        spgetList.push("repeating_power-1_" + x + "_power_ability");
+                                                    });
+                                                    getSectionIDs("power-2", function(secIds2) {
+                                                        _.each(secIds2, function(x) {
+                                                            spgetList.push("repeating_power-2_" + x + "_power_ability");
+                                                        });
+                                                        getSectionIDs("power-3", function(secIds3) {
+                                                            _.each(secIds3, function(x) {
+                                                                spgetList.push("repeating_power-3_" + x + "_power_ability");
+                                                            });
+                                                            getSectionIDs("power-4", function(secIds4) {
+                                                                _.each(secIds4, function(x) {
+                                                                    spgetList.push("repeating_power-4_" + x + "_power_ability");
+                                                                });
+                                                                getSectionIDs("power-5", function(secIds5) {
+                                                                    _.each(secIds5, function(x) {
+                                                                        spgetList.push("repeating_power-5_" + x + "_power_ability");
+                                                                    });
+                                                                    getSectionIDs("power-6", function(secIds6) {
+                                                                        _.each(secIds6, function(x) {
+                                                                            spgetList.push("repeating_power-6_" + x + "_power_ability");
+                                                                        });
+                                                                        getSectionIDs("power-7", function(secIds7) {
+                                                                            _.each(secIds7, function(x) {
+                                                                                spgetList.push("repeating_power-7_" + x + "_power_ability");
+                                                                            });
+                                                                            getSectionIDs("power-8", function(secIds8) {
+                                                                                _.each(secIds8, function(x) {
+                                                                                    spgetList.push("repeating_power-8_" + x + "_power_ability");
+                                                                                });
+                                                                                getSectionIDs("power-9", function(secIds9) {
+                                                                                    _.each(secIds9, function(x) {
+                                                                                        spgetList.push("repeating_power-9_" + x + "_power_ability");
+                                                                                    });
+                                                                                    getAttrs(spgetList, function(powerAbilities) {
+                                                                                        spupdate = {};
+                                                                                        _.each(powerAbilities, function(ability, attributeName) {
+                                                                                            if (ability == "0*") {
+                                                                                                console.log("UPDATING POWER: " + attributeName);
+                                                                                                spupdate[attributeName] = "power";
+                                                                                            }
+                                                                                        });
+                                                                                        setAttrs(spupdate, function() {
+                                                                                            update_attacks("powers");
+                                                                                            update_challenge();
+                                                                                            doneupdating();
+                                                                                        });
+                                                                                    });
+                                                                                });
+                                                                            });
+                                                                        });
+                                                                    });
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            } else if(v.npc != "1") {
+                                doneupdating();
+                            } else {
+                                doneupdating();
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
+var no_version_bugfix = function(doneupdating) {
+    getAttrs(["npc","class"], function(v) {
+        if(v["npc"] && v["npc"] != "0" || v["class"] && v["class"] != "") {
+            setAttrs({version: "2.1"});
+        }
+        else {
+            setAttrs({version: "2.3"}, {silent: true});
+        }
+    });
+    doneupdating();
+};
+
+var versioning = function(finished) {
+    getAttrs(["version"], function(v) {
+        if(v["version"] === "2.5") {
+            setAttrs({version: "2.5"}, function(){
+                finished();
+            });
+            console.log("5th Edition OGL by Roll20 v" + v["version"]);
+            return;
+        }
+        else if(!v["version"] || v["version"] === "") {
+            console.log("NO VERSION FOUND");
+            no_version_bugfix(function() {
+                versioning(finished);
+            });
+        }
+        else if(v["version"] === "2.4") {
+            console.log("UPGRADING TO v2.5");
+            setAttrs({version: "2.5"}, function(){
+                finished();
+            });
+            console.log("5th Edition OGL by Roll20 v" + v["version"]);
+        }
+        else if(v["version"] === "2.3") {
+            console.log("UPGRADING TO v2.4");
+            upgrade_to_2_4(function() {
+                setAttrs({version: "2.4"});
+                versioning(finished);
+            });
+        }
+        else if(v["version"] === "2.2") {
+            console.log("UPGRADING TO v2.3");
+            upgrade_to_2_3(function() {
+                setAttrs({version: "2.3"});
+                versioning(finished);
+            });
+        }
+        else if(v["version"] === "2.1") {
+            console.log("UPGRADING TO v2.2");
+            upgrade_to_2_2(function() {
+                setAttrs({version: "2.2"});
+                versioning(finished);
+            });
+        }
+        else if(v["version"] === "2.0") {
+            console.log("UPGRADING TO v2.1");
+            upgrade_to_2_1(function() {
+                setAttrs({version: "2.1"});
+                versioning(finished);
+            });
+        }
+        else {
+            console.log("UPGRADING TO v2.0");
+            upgrade_to_2_0(function() {
+                setAttrs({version: "2.0"});
+                versioning(finished);
+            });
+        };
+    });
+};
+
+
+var v2_old_values_check = function() {
+    // update_attacks("all");
+    var update = {};
+    var attrs = ["simpletraits","features_and_traits","initiative_bonus","npc","character_id"];
+    getSectionIDs("repeating_power-npc", function(idarray) {
+        _.each(idarray, function(id) {
+            attrs.push("repeating_power-npc_" + id + "_rollcontent");
+        });
+        getAttrs(attrs, function(v) {
+            if(v["npc"] && v["npc"] == 1 && (!v["initiative_bonus"] || v["initiative_bonus"] == 0)) {
+                update_initiative();
+            }
+            var powerflag = idarray && idarray.length > 0 ? 1 : 0;
+            var missing = v["features_and_traits"] && v["simpletraits"] === "complex" ? 1 : 0;
+            update["npcpower_flag"] = powerflag;
+            update["missing_info"] = missing;
+            _.each(idarray, function(id) {
+                var content = v["repeating_power-npc_" + id + "_rollcontent"];
+                if(content.substring(0,3) === "%{-" && content.substring(22,41) === "|repeating_attack_-" && content.substring(60,68) === "_attack}") {
+                    var thisid = content.substring(2,21);
+                    if(thisid != v["character_id"]) {
+                        update["repeating_power-npc_" + id + "_rollcontent"] = content.substring(0,2) + v["character_id"] + content.substring(22,68);
+                    }
+                }
+            });
+            setAttrs(update);
+        });
+
+    });
+
+};
+
+var clear_npc_power_attacks = function(complete) {
+    getSectionIDs("repeating_attack", function(attack_ids) {
+        var getList = [];
+        var done = false;
+        _.each(attack_ids, function(id) {
+            getList.push(`repeating_attack_${id}_powerid`);
+        });
+        getAttrs(getList, function(v) {
+            _.each(attack_ids, function(id) {
+                if (v[`repeating_attack_${id}_powerid`] && v[`repeating_attack_${id}_powerid`].indexOf("npc_") != -1) {
+                    removeRepeatingRow(`repeating_attack_${id}`);
+                }
+            });
+            complete();
+        });
+    });
+}
