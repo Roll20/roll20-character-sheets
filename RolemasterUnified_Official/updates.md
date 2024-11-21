@@ -1,3 +1,15 @@
+# 2024-11-19
+
+- Stats are now right aligned.
+- Fix update for specialised skills.
+- RRs:
+    - now have a box.  Make them standout more.
+    - Use the pretty name. not the attribute name.
+    - Number now rolls with modifier.
+- Fix an issue causing some characters to have problems levelling up.
+- Fixed specialisations show the skill name when rolling.
+- Handle knacks for Alchemists.
+
 # 2024-11-14
 
 - Add description to each step of the Charactermancer buttons
