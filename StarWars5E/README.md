@@ -8,6 +8,9 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
+## 2024-??-??
+* Massive refactor of the sheet using GULP as build engine
+* Removal of leftover unused code for 5e compendium & Charmancer integration
 ## 2024-11-16
 * correction following problem in PR 13282 : Npc traits visibility & Sheet Refresh problem
 ## 2024-07-06
