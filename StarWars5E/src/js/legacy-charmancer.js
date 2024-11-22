@@ -3402,3 +3402,1327 @@ var clear_npc_power_attacks = function(complete) {
         });
     });
 }
+on("sheet:compendium-drop", function() {
+    getAttrs(["hp_max","npc_senses","token_size","cd_bar1_v","cd_bar1_m","cd_bar1_l","cd_bar2_v","cd_bar2_m","cd_bar2_l","cd_bar3_v","cd_bar3_m","cd_bar3_l"], function(v) {
+
+        var default_attr = {};
+        default_attr["width"] = 70;
+        default_attr["height"] = 70;
+        if(v["npc_senses"].toLowerCase().match(/(darkvision|blindsight|tremorsense|truesight)/)) {
+            default_attr["light_radius"] = Math.max.apply(Math, v["npc_senses"].match(/\d+/g));
+        }
+        if(v["token_size"]) {
+            var squarelength = 70;
+            if(v["token_size"].indexOf(",") > -1) {
+                var setwidth = !isNaN(v["token_size"].split(",")[0]) ? v["token_size"].split(",")[0] : 1;
+                var setheight = !isNaN(v["token_size"].split(",")[1]) ? v["token_size"].split(",")[1] : 1;
+                default_attr["width"] = setwidth * squarelength;
+                default_attr["height"] = setheight * squarelength;
+            }
+            else {
+                default_attr["width"] = squarelength * v["token_size"]
+                default_attr["height"] = squarelength * v["token_size"]
+            };
+        }
+
+        var getList = {};
+        for(x = 1; x<=3; x++) {
+            _.each(["v", "m"], function(letter) {
+                var keyname = "cd_bar" + x + "_" + letter;
+                if(v[keyname] != undefined && isNaN(v[keyname])) {
+                    getList[keyname] = v[keyname];
+                }
+            });
+        }
+
+        getAttrs(_.values(getList), function(values) {
+            _.each(_.keys(getList), function(keyname) {
+                v[keyname] = values[getList[keyname]] == undefined ? "" : values[getList[keyname]];
+            });
+
+            if(v["cd_bar1_l"]) {
+                default_attr["bar1_link"] = v["cd_bar1_l"];
+            }
+            else if(v["cd_bar1_v"] || v["cd_bar1_m"]) {
+                if(v["cd_bar1_v"]) {
+                    default_attr["bar1_value"] = v["cd_bar1_v"];
+                }
+                if(v["cd_bar1_m"]) {
+                    default_attr["bar1_max"] = v["cd_bar1_m"];
+                }
+            }
+            else {
+                default_attr["bar1_value"] = v["hp_max"];
+                default_attr["bar1_max"] = v["hp_max"];
+            }
+
+            if(v["cd_bar2_l"]) {
+                default_attr["bar2_link"] = v["cd_bar2_l"];
+            }
+            else if(v["cd_bar2_v"] || v["cd_bar2_m"]) {
+                if(v["cd_bar2_v"]) {
+                    default_attr["bar2_value"] = v["cd_bar2_v"];
+                }
+                if(v["cd_bar2_m"]) {
+                    default_attr["bar2_max"] = v["cd_bar2_m"];
+                }
+            }
+            else {
+                default_attr["bar2_link"] = "npc_ac";
+            }
+
+            if(v["cd_bar3_l"]) {
+                default_attr["bar3_link"] = v["cd_bar3_l"];
+            }
+            else if(v["cd_bar3_v"] || v["cd_bar3_m"]) {
+                if(v["cd_bar3_v"]) {
+                    default_attr["bar3_value"] = v["cd_bar3_v"];
+                }
+                if(v["cd_bar3_m"]) {
+                    default_attr["bar3_max"] = v["cd_bar3_m"];
+                }
+            }
+
+            setDefaultToken(default_attr);
+        });
+    });
+});
+
+
+on("change:drop_category", function(eventinfo) {
+    if(eventinfo.newValue === "Monsters") {
+        getAttrs(["class","race","speed","hp"], function(v) {
+            if(v["class"] != "" || v["race"] != "" || v["speed"] != "" || v["hp"] != "") {
+                setAttrs({monster_confirm_flag: 1});
+            }
+            else {
+                handle_drop(eventinfo.newValue);
+            }
+        });
+    }
+    else {
+        handle_drop(eventinfo.newValue);
+    }
+});
+
+on("change:confirm", function(eventinfo) {
+    setAttrs({monster_confirm_flag: ""});
+    getAttrs(["drop_category"], function(v) {
+        if(v["drop_category"]) {
+            handle_drop(v["drop_category"]);
+        }
+    });
+});
+
+on("change:cancel", function(eventinfo) {
+    setAttrs({monster_confirm_flag: ""});
+    cleanup_drop_fields();
+});
+
+
+var handle_drop = function(category, eventinfo) {
+    var callbacks = [];
+    var update = {};
+    var id = generateRowID();
+
+    getAttrs(["drop_name", "drop_weight", "drop_properties", "drop_modifiers", "drop_content", "drop_itemtype", "drop_damage", "drop_damagetype", "drop_damage2", "drop_damagetype2", "drop_alt_damage", "drop_alt_damagetype", "drop_alt_damage2", "drop_alt_damagetype2", "drop_range", "drop_ac", "drop_powerschool", "drop_powercastingtime", "drop_powertarget", "drop_powercomp", "drop_powercomp_materials", "drop_powerconcentrationflag", "drop_powerduration", "drop_powerhealing", "drop_powerdmgmod", "drop_powersave", "drop_powersavesuccess", "drop_powerhldie", "drop_powerhldietype", "drop_powerhlbonus", "drop_powerlevel", "drop_power_damage_progression", "drop_power_ability", "drop_attack_type", "drop_speed", "drop_str", "drop_dex", "drop_con", "drop_int", "drop_wis", "drop_cha", "drop_vulnerabilities", "drop_resistances", "drop_immunities", "drop_condition_immunities", "drop_languages", "drop_challenge_rating", "drop_size", "drop_type", "drop_alignment", "drop_hp", "drop_saving_throws", "drop_senses", "drop_passive_perception", "drop_skills", "drop_token_size", "character_id", "drop_actions", "drop_legendary_actions", "drop_legendary_actions_desc", "drop_reactions", "drop_traits", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "powercasting_ability", "drop_toolbonus_base", "drop_itemcount", "drop_armor_prof", "drop_hit_die", "drop_weapon_prof", "drop_powercasting_ability", "drop_class_saving_throws", "base_level", "drop_language_prof", "drop_tool_prof", "drop_power_ability", "drop_skill_proficiency", "drop_parent", "drop_hp_per_level", "drop_class_powers", "drop_global_damage", "drop_feature_name", "drop_feature_description", "drop_resources", "drop_powerhldesc", "drop_powerdesc", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base"], function(v) {
+        id = generateRowID();
+        if(category === "Items") {
+            if(v["npc"] === "0") {
+                update["tab"] = "core";
+                if(v.drop_name) {update["repeating_inventory_" + id + "_itemname"] = v.drop_name};
+                if(v.drop_itemcount) {update["repeating_inventory_" + id + "_itemcount"] = v.drop_itemcount};
+                if(v.drop_weight) {update["repeating_inventory_" + id + "_itemweight"] = v.drop_weight};
+                if(v.drop_properties) {update["repeating_inventory_" + id + "_itemproperties"] = v.drop_properties};
+                if(v.drop_content) {update["repeating_inventory_" + id + "_itemcontent"] = v.drop_content};
+                if(!v.drop_itemtype || v.drop_itemtype == "") {v.drop_itemtype = category};
+                var mods = "Item Type: " + v.drop_itemtype;
+                if(v.drop_ac && v.drop_ac != "") {
+                    mods += ", AC: " + v.drop_ac;
+                    callbacks.push( function() {update_ac();} )
+                };
+                if(v.drop_damage && v.drop_damage != "") {mods += ", Damage: " + v.drop_damage};
+                if(v.drop_damagetype && v.drop_damagetype != "") {mods += ", Damage Type: " + v.drop_damagetype};
+                if(v.drop_damage2 && v.drop_damage2 != "") {mods += ", Secondary Damage: " + v.drop_damage2};
+                if(v.drop_damagetype2 && v.drop_damagetype2 != "") {mods += ", Secondary Damage Type: " + v.drop_damagetype2};
+                if(v.drop_alt_damage && v.drop_alt_damage != "") {mods += ", Alternate Damage: " + v.drop_alt_damage};
+                if(v.drop_alt_damagetype && v.drop_alt_damagetype != "") {mods += ", Alternate Damage Type: " + v.drop_alt_damagetype};
+                if(v.drop_alt_damage2 && v.drop_alt_damage2 != "") {mods += ", Alternate Secondary Damage: " + v.drop_alt_damage2};
+                if(v.drop_alt_damagetype2 && v.drop_alt_damagetype2 != "") {mods += ", Alternate Secondary Damage Type: " + v.drop_alt_damagetype2};
+                if(v.drop_range && v.drop_range != "") {mods += ", Range: " + v.drop_range};
+                if(v.drop_modifiers && v.drop_modifiers != "") {mods += ", " + v.drop_modifiers};
+                update["repeating_inventory_" + id + "_itemmodifiers"] = mods;
+                if(v.drop_itemtype.indexOf("Weapon") > -1) {
+                    update["repeating_inventory_" + id + "_hasattack"] = 1;
+                    callbacks.push( function() {
+                        if(v.drop_alt_damage && v.drop_alt_damage !== "") {
+                            create_attack_from_item(id, {versatile: true});
+                        } else {
+                            create_attack_from_item(id);
+                        }
+                    } );
+                }
+                else if(v.drop_itemtype.indexOf("Ammunition") > -1) {
+                    update["repeating_inventory_" + id + "_useasresource"] = 1;
+                    callbacks.push( function() {create_resource_from_item(id);} );
+                };
+                if(v["drop_modifiers"]) {
+                    callbacks.push( function() {check_itemmodifiers(v["drop_modifiers"]);} );
+                };
+                callbacks.push( function() {update_weight();} );
+            }
+            else {
+                if(v.drop_itemtype && new RegExp('\\bweapon\\b', 'i').test(v.drop_itemtype)) {
+                    var make_npc_attack_from_item = function(rowid, options) {
+                        update["repeating_npcaction_" + rowid + "_npc_options-flag"] = "0";
+                        update["repeating_npcaction_" + rowid + "_attack_flag"] = "on";
+
+                        if(v.drop_name) {
+                            update["repeating_npcaction_" + rowid + "_name"] = v.drop_name;
+                            if(options && options.versatile) {
+                                update["repeating_npcaction_" + rowid + "_name"] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
+                            } else if(options && options.thrown) {
+                                update["repeating_npcaction_" + rowid + "_name"] += " (Thrown)";
+                            }
+                        }
+                        if(v.drop_content) { update["repeating_npcaction_" + rowid + "_description"] = v.drop_content; }
+
+                        update["repeating_npcaction_" + rowid + "_attack_display_flag"] = "{{attack=1}}";
+                        update["repeating_npcaction_" + rowid + "_attack_options"] = "{{attack=1}}";
+                        update["repeating_npcaction_" + rowid + "_attack_type"] = v.drop_itemtype.substring(0, v.drop_itemtype.indexOf(" "));
+
+                        var thrown = v.drop_properties && new RegExp('\\bthrown\\b', 'i').test(v.drop_properties);
+
+                        if(v.drop_range && v.drop_range != "" && (!thrown || (options && options.thrown))) {
+                            update["repeating_npcaction_" + rowid + "_attack_range"] = v.drop_range;
+                        }
+                        else if(v.drop_properties && new RegExp('\\breach\\b', 'i').test(v.drop_properties)) {
+                            update["repeating_npcaction_" + rowid + "_attack_range"] = "10 ft";
+                        }
+                        else {
+                            update["repeating_npcaction_" + rowid + "_attack_range"] = "5 ft";
+                        }
+
+                        update["repeating_npcaction_" + rowid + "_attack_target"] = "one target";
+
+                        var isFinesse = v.drop_properties && new RegExp('\\bfinesse\\b', 'i').test(v.drop_properties);
+                        var attack_type = update[`repeating_npcaction_${id}_attack_type`].toLowerCase();
+                        var use_dex_mod = attack_type === "ranged" || (isFinesse && v.dexterity_mod > v.strength_mod);
+                        var weapon_attr_mod = use_dex_mod ? v.dexterity_mod : v.strength_mod;
+                        update["repeating_npcaction_" + rowid + "_attack_tohit"] = weapon_attr_mod;
+
+                        if(options && options.versatile === 2) {
+                            if(v.drop_alt_damage) { update["repeating_npcaction_" + rowid + "_attack_damage"] = v.drop_alt_damage + "+" + weapon_attr_mod; }
+                            if(v.drop_alt_damagetype) { update["repeating_npcaction_" + rowid + "_attack_damagetype"] = v.drop_alt_damagetype; }
+                            if(v.drop_alt_damage2) { update["repeating_npcaction_" + rowid + "_attack_damage2"] = v.drop_alt_damage2; }
+                            if(v.drop_alt_damagetype2) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = v.drop_alt_damagetype2; }
+                        }
+                        else {
+                            if(v.drop_damage) { update["repeating_npcaction_" + rowid + "_attack_damage"] = v.drop_damage + "+" + weapon_attr_mod; }
+                            if(v.drop_damagetype) {update["repeating_npcaction_" + rowid + "_attack_damagetype"] = v.drop_damagetype; }
+                            if(v.drop_damage2) { update["repeating_npcaction_" + rowid + "_attack_damage2"] = v.drop_damage2; }
+                            if(v.drop_damagetype2) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = v.drop_damagetype2; }
+                        }
+
+                        if(v.drop_modifiers) {
+                            if(attack_type === "melee") {
+                                var tohit_regex = /(?:melee|weapon) *attacks? *([\\+\\-] *[0-9]+)/i;
+                                var melee_damage_regex = /(?:melee|weapon) *damage *([\\+\\-] *[0-9]+)/i;
+                                var tohit_match = tohit_regex.exec(v.drop_modifiers);
+                                var damage_match = melee_damage_regex.exec(v.drop_modifiers);
+
+                                if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
+                                if(v.drop_damage && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
+                            } else if(attack_type === "ranged") {
+                                var tohit_regex = /(?:ranged|weapon) *attacks? *([\\+\\-] *[0-9]+)/i;
+                                var ranged_damage_regex = /(?:ranged|weapon) *damage *([\\+\\-] *[0-9]+)/i;
+                                var tohit_match = tohit_regex.exec(v.drop_modifiers);
+                                var damage_match = ranged_damage_regex.exec(v.drop_modifiers);
+
+                                if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
+                                if(v.drop_damage && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
+                            }
+                        }
+                    };
+
+                    var versatile = v.drop_properties && new RegExp('\\bversatile\\b', 'i').test(v.drop_properties) ? 1 : undefined;
+                    make_npc_attack_from_item(id, {versatile: versatile});
+                    if(v.drop_properties && new RegExp('\\bthrown\\b', 'i').test(v.drop_properties)) {
+                        make_npc_attack_from_item(generateRowID(), {thrown: true});
+                    }
+                    if(versatile && v.drop_alt_damage) {
+                        make_npc_attack_from_item(generateRowID(), {versatile:2})
+                    }
+
+                    callbacks.push(function() { check_itemmodifiers(v.drop_modifiers); }, function() { update_npc_action("all"); });
+                }
+            }
+        };
+        if(category === "Powers") {
+            var lvl = v.drop_powerlevel && v.drop_powerlevel > 0 ? v.drop_powerlevel : "cantrip";
+            update["repeating_power-" + lvl + "_" + id + "_powerlevel"] = lvl;
+            if(v.drop_power_ability) {
+                update["repeating_power-" + lvl + "_" + id + "_power_ability"] = v.drop_power_ability;
+            } else {
+                update["repeating_power-" + lvl + "_" + id + "_power_ability"] = "power";
+            }
+            if(v.drop_name) {update["repeating_power-" + lvl + "_" + id + "_powername"] = v.drop_name};
+            if(v.drop_powerschool) {update["repeating_power-" + lvl + "_" + id + "_powerschool"] = v.drop_powerschool.toLowerCase()};
+            if(v.drop_powercastingtime) {update["repeating_power-" + lvl + "_" + id + "_powercastingtime"] = v.drop_powercastingtime};
+            if(v.drop_range) {update["repeating_power-" + lvl + "_" + id + "_powerrange"] = v.drop_range};
+            if(v.drop_powertarget) {update["repeating_power-" + lvl + "_" + id + "_powertarget"] = v.drop_powertarget};
+            if(v.drop_powercomp) {
+                if(v.drop_powercomp.toLowerCase().indexOf("v") === -1) {update["repeating_power-" + lvl + "_" + id + "_powercomp_v"] = "0"};
+                if(v.drop_powercomp.toLowerCase().indexOf("s") === -1) {update["repeating_power-" + lvl + "_" + id + "_powercomp_s"] = "0"};
+                if(v.drop_powercomp.toLowerCase().indexOf("m") === -1) {update["repeating_power-" + lvl + "_" + id + "_powercomp_m"] = "0"};
+            };
+            if(v.drop_powercomp_materials) {update["repeating_power-" + lvl + "_" + id + "_powercomp_materials"] = v.drop_powercomp_materials};
+            if(v.drop_powerconcentrationflag) {update["repeating_power-" + lvl + "_" + id + "_powerconcentration"] = "{{concentration=1}}"};
+            if(v.drop_powerduration) {update["repeating_power-" + lvl + "_" + id + "_powerduration"] = v.drop_powerduration};
+            if(v.drop_damage || v.drop_powerhealing) {
+                update["repeating_power-" + lvl + "_" + id + "_poweroutput"] = "ATTACK";
+                callbacks.push( function() {create_attack_from_power(lvl, id, v["character_id"]);} );
+            }
+            else if(v.drop_powerhldesc && v.drop_powerhldesc != "") {
+                var powerlevel = "?{Cast at what level?";
+                for(i = 0; i < 10-lvl; i++) {
+                    powerlevel = powerlevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
+                }
+                powerlevel = powerlevel + "}";
+                update["repeating_power-" + lvl + "_" + id + "_rollcontent"] = "@{wtype}&{template:power} {{level=@{powerschool} " + powerlevel + "}} {{name=@{powername}}} {{castingtime=@{powercastingtime}}} {{range=@{powerrange}}} {{target=@{powertarget}}}  {{duration=@{powerduration}}} {{description=@{powerdescription}}} {{athigherlevels=@{powerathigherlevels}}}  {{innate=@{innate}}} @{powerconcentration} @{charname_output}";
+            };
+            if(v.drop_attack_type) {update["repeating_power-" + lvl + "_" + id + "_powerattack"] = v.drop_attack_type};
+            if(v.drop_damage) {update["repeating_power-" + lvl + "_" + id + "_powerdamage"] = v.drop_damage};
+            if(v.drop_damagetype) {update["repeating_power-" + lvl + "_" + id + "_powerdamagetype"] = v.drop_damagetype};
+            if(v.drop_damage2) {update["repeating_power-" + lvl + "_" + id + "_powerdamage2"] = v.drop_damage2};
+            if(v.drop_damagetype2) {update["repeating_power-" + lvl + "_" + id + "_powerdamagetype2"] = v.drop_damagetype2};
+            if(v.drop_powerhealing) {update["repeating_power-" + lvl + "_" + id + "_powerhealing"] = v.drop_powerhealing;};
+            if(v.drop_powerdmgmod) {update["repeating_power-" + lvl + "_" + id + "_powerdmgmod"] = v.drop_powerdmgmod};
+            if(v.drop_powersave) {update["repeating_power-" + lvl + "_" + id + "_powersave"] = v.drop_powersave};
+            if(v.drop_powersavesuccess) {update["repeating_power-" + lvl + "_" + id + "_powersavesuccess"] = v.drop_powersavesuccess};
+            if(v.drop_powerhldie) {update["repeating_power-" + lvl + "_" + id + "_powerhldie"] = v.drop_powerhldie};
+            if(v.drop_powerhldietype) {update["repeating_power-" + lvl + "_" + id + "_powerhldietype"] = v.drop_powerhldietype};
+            if(v.drop_powerhlbonus) {update["repeating_power-" + lvl + "_" + id + "_powerhlbonus"] = v.drop_powerhlbonus};
+            if(v.drop_powerhldesc) {update["repeating_power-" + lvl + "_" + id + "_powerathigherlevels"] = v.drop_powerhldesc};
+            if(v.drop_power_damage_progression && lvl == "cantrip") {update["repeating_power-" + lvl + "_" + id + "_power_damage_progression"] = v.drop_power_damage_progression};
+            if(v.drop_powerdesc) { update["repeating_power-" + lvl + "_" + id + "_powerdescription"] = v.drop_powerdesc};
+            update["repeating_power-" + lvl + "_" + id + "_options-flag"] = "0";
+        };
+        if(category === "Monsters") {
+            update["npc"] = "1";
+            update["npc_options-flag"] = "0";
+            if(v["drop_name"] && v["drop_name"] != "") {update["npc_name"] = v["drop_name"]};
+            update["npc_speed"] = v["drop_speed"] ? v["drop_speed"] : "";
+            update["strength_base"] = v["drop_str"] ?  v["drop_str"] : "";
+            update["dexterity_base"] = v["drop_dex"] ? v["drop_dex"] : "";
+            update["constitution_base"] = v["drop_con"] ? v["drop_con"] : "";
+            update["intelligence_base"] = v["drop_int"] ? v["drop_int"] : "";
+            update["wisdom_base"] = v["drop_wis"] ? v["drop_wis"] : "";
+            update["charisma_base"] = v["drop_cha"] ? v["drop_cha"] : "";
+            callbacks.push( function() {update_attr("strength");} );
+            callbacks.push( function() {update_attr("dexterity");} );
+            callbacks.push( function() {update_attr("constitution");} );
+            callbacks.push( function() {update_attr("intelligence");} );
+            callbacks.push( function() {update_attr("wisdom");} );
+            callbacks.push( function() {update_attr("charisma");} );
+            update["npc_vulnerabilities"] = v["drop_vulnerabilities"] ? v["drop_vulnerabilities"] : "";
+            update["npc_resistances"] = v["drop_resistances"] ? v["drop_resistances"] : "";
+            update["npc_immunities"] = v["drop_immunities"] ? v["drop_immunities"] : "";
+            update["npc_condition_immunities"] = v["drop_condition_immunities"] ? v["drop_condition_immunities"] : "";
+            update["npc_languages"] = v["drop_languages"] ? v["drop_languages"] : "";
+            update["token_size"] = v["drop_token_size"] ? v["drop_token_size"] : "";
+            if(v["drop_challenge_rating"] && v["drop_challenge_rating"] != "") {
+                callbacks.push( function() {update_challenge();} );
+                update["npc_challenge"] = v["drop_challenge_rating"];
+            }
+            else {
+                update["npc_challenge"] = "";
+            }
+
+            var type = "";
+            if(v["drop_size"]) {type = v["drop_size"]};
+            if(v["drop_type"]) {
+                if(type.length > 0) {
+                    type = type + " " + v["drop_type"].toLowerCase();
+                }
+                else {
+                    type = v["drop_type"].toLowerCase();
+                }
+            };
+            if(v["drop_alignment"]) {
+                if(type.length > 0) {
+                    type = type + ", " + v["drop_alignment"];
+                }
+                else {
+                    type = v["drop_alignment"];
+                }
+            };
+            update["npc_type"] = type;
+
+            if(v["drop_hp"]) {
+                if(v["drop_hp"].indexOf("(") > -1) {
+                    update["hp_max"] = v["drop_hp"].split(" (")[0];
+                    update["npc_hpformula"] = v["drop_hp"].split(" (")[1].slice(0, -1);
+                }
+                else {
+                    update["hp_max"] = v["drop_hp"]
+                    update["npc_hpformula"] = ""
+                };
+            }
+            else {
+                update["hp_max"] = ""
+                update["npc_hpformula"] = ""
+            };
+
+            if(v["drop_ac"]) {
+                if(v["drop_ac"].indexOf("(") > -1) {
+                    update["npc_ac"] = v["drop_ac"].split(" (")[0];
+                    update["npc_actype"] = v["drop_ac"].split(" (")[1].slice(0, -1);
+                }
+                else {
+                    update["npc_ac"] = v["drop_ac"];
+                    update["npc_actype"] = "";
+                };
+            }
+            else {
+                update["npc_ac"] = "";
+                update["npc_actype"] = "";
+            };
+
+            if(v["drop_hp"]) {
+                if(v["drop_hp"].indexOf("(") > -1) {
+                    update["hp_max"] = v["drop_hp"].split(" (")[0];
+                    update["npc_hpformula"] = v["drop_hp"].split(" (")[1].slice(0, -1);
+                }
+                else {
+                    update["hp_max"] = v["drop_hp"];
+                    update["npc_hpformula"] = "";
+                }
+            }
+            else {
+                update["hp_max"] = "";
+                update["npc_hpformula"] = "";
+            };
+
+            var senses = v["drop_senses"] ? v["drop_senses"] : "";
+            if(v["drop_passive_perception"]) {
+                if(senses.length > 0) {
+                    senses = senses + ", passive Perception " + v["drop_passive_perception"];
+                }
+                else {
+                    senses = "passive Perception " + v["drop_passive_perception"];
+                }
+            }
+            update["npc_senses"] = senses;
+
+            update["npc_str_save_base"] = "";
+            update["npc_dex_save_base"] = "";
+            update["npc_con_save_base"] = "";
+            update["npc_int_save_base"] = "";
+            update["npc_wis_save_base"] = "";
+            update["npc_cha_save_base"] = "";
+            if(v["drop_saving_throws"] && v["drop_saving_throws"] != "") {
+                var savearray = v["drop_saving_throws"].split(", ");
+                _.each(savearray, function(save) {
+                    kv = save.indexOf("-") > -1 ? save.split(" ") : save.split(" +");
+                    update["npc_" + kv[0].toLowerCase() + "_save_base"] = parseInt(kv[1], 10);
+                });
+                callbacks.push( function() {update_npc_saves();} );
+            };
+
+            update["npc_acrobatics_base"] = "";
+            update["npc_animal_handling_base"] = "";
+            update["npc_technology_base"] = "";
+            update["npc_athletics_base"] = "";
+            update["npc_deception_base"] = "";
+            update["npc_lore_base"] = "";
+            update["npc_insight_base"] = "";
+            update["npc_intimidation_base"] = "";
+            update["npc_investigation_base"] = "";
+            update["npc_medicine_base"] = "";
+            update["npc_nature_base"] = "";
+            update["npc_perception_base"] = "";
+            update["npc_performance_base"] = "";
+            update["npc_persuasion_base"] = "";
+            update["npc_piloting_base"] = "";
+            update["npc_sleight_of_hand_base"] = "";
+            update["npc_stealth_base"] = "";
+            update["npc_survival_base"] = "";
+            if(v["drop_skills"] && v["drop_skills"] != "") {
+                skillarray = v["drop_skills"].split(", ");
+                _.each(skillarray, function(skill) {
+                    kv = skill.indexOf("-") > -1 ? skill.split(" ") : skill.split(" +");
+                    update["npc_" + kv[0].toLowerCase().replace(/ /g, '_') + "_base"] = parseInt(kv[1], 10);
+                });
+                callbacks.push( function() {update_npc_skills();} );
+            }
+
+            getSectionIDs("repeating_npcaction-l", function(idarray) {
+                _.each(idarray, function(currentID, i) {
+                    removeRepeatingRow("repeating_npcaction-l_" + currentID);
+                });
+            });
+            getSectionIDs("repeating_npcreaction", function(idarray) {
+                _.each(idarray, function(currentID, i) {
+                    removeRepeatingRow("repeating_npcreaction_" + currentID);
+                });
+            });
+            getSectionIDs("repeating_npcaction", function(idarray) {
+                _.each(idarray, function(currentID, i) {
+                    removeRepeatingRow("repeating_npcaction_" + currentID);
+                });
+            });
+            getSectionIDs("repeating_npctrait", function(idarray) {
+                _.each(idarray, function(currentID, i) {
+                    removeRepeatingRow("repeating_npctrait_" + currentID);
+                });
+            });
+
+            var contentarray = v["drop_content"];
+            if(v.drop_legendary_actions) {
+                var legendaryactionsarray = JSON.parse(v.drop_legendary_actions);
+                update["npc_legendary_actions"] = 1;
+                if(v.drop_legendary_actions_desc) {
+                    update["npc_legendary_actions_desc"] = v.drop_legendary_actions_desc;
+                }
+                else if(v.npc_legendary_actions > 0){
+                    update["npc_legendary_actions_desc"] = `The ${v.drop_name} can take ${v.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${v.drop_name} regains spent legendary actions at the start of its turn.`;
+                }
+                else {
+                    update["npc_legendary_actions_desc"] = "";
+                }
+            }
+            else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
+                if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
+                    temp = contentarray.split(/\n Legendary Actions\n/)
+                }
+                else {
+                    temp = contentarray.split(/Legendary Actions\n/)
+                }
+                var legendaryactionsarray = temp[1];
+                contentarray = temp[0];
+            }
+
+            if(v.drop_reactions) {
+                var reactionsarray = JSON.parse(v.drop_reactions);
+            }
+            else if(contentarray && contentarray.indexOf("Reactions") > -1) {
+                if(contentarray.indexOf(/\n Reactions\n/) > -1) {
+                    temp = contentarray.split(/\n Reactions\n/)
+                }
+                else {
+                    temp = contentarray.split(/Reactions\n/)
+                }
+                var reactionsarray = temp[1];
+                contentarray = temp[0];
+            }
+
+            if(v.drop_actions) {
+                var actionsarray = JSON.parse(v.drop_actions);
+            }
+            else if(contentarray && contentarray.indexOf("Actions") > -1) {
+                if(contentarray.indexOf("Lair Actions") > -1) {
+                    contentarray = contentarray.replace("Lair Actions","Lair Action");
+                }
+                if(contentarray.indexOf(/\n Actions\n/) > -1) {
+                    temp = contentarray.split(/\n Actions\n/)
+                }
+                else {
+                    temp = contentarray.split(/Actions\n/)
+                }
+                var actionsarray = temp[1];
+                contentarray = temp[0];
+            }
+
+            if(v.drop_traits) {
+                var traitsarray = JSON.parse(v.drop_traits);
+            }
+            else if(contentarray && contentarray.indexOf("Traits") > -1) {
+                if(contentarray.indexOf("Lair Traits") > -1) {
+                    contentarray = contentarray.replace("Lair Traits","Lair Trait");
+                }
+                if(contentarray.indexOf(/\n Traits\n/) > -1) {
+                    temp = contentarray.split(/\n Traits\n/)
+                }
+                else {
+                    temp = contentarray.split(/Traits\n/)
+                }
+                var traitsarray = temp[1];
+                contentarray = temp[0];
+            }
+
+            if(traitsarray) {
+                if(v.drop_traits) {
+                    var traitsobj = {};
+                    traitsarray.forEach(function(val) { traitsobj[val.Name] = val.Desc; });
+                }
+                else {
+                    traitsarray = traitsarray.split("**");
+                    traitsarray.shift();
+                    var traitsobj = {};
+                    traitsarray.forEach(function(val, i) {
+                        if (i % 2 === 1) return;
+                        traitsobj[val] = traitsarray[i + 1];
+                    });
+                }
+                _.each(traitsobj, function(desc, name) {
+                    newrowid = generateRowID();
+                    update["repeating_npctrait_" + newrowid + "_name"] = name + ".";
+                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                        desc = desc.substring(2);
+                    }
+                    update["repeating_npctrait_" + newrowid + "_desc"] = desc.trim();
+                    // POWERCASTING NPCS
+                    if(name === "Powercasting") {
+                        var lvl = parseInt(desc.substring(desc.indexOf("-level")-4, desc.indexOf("-level")-2).trim(), 10);
+                        lvl = !isNaN(lvl) ? lvl : 1;
+                        var ability = desc.match(/casting ability is (.*?) /);
+                        ability = ability && ability.length > 1 ? ability[1] : false;
+                        ability = ability ? "@{" + ability.toLowerCase() + "_mod}+" : "0*";
+                        update["npcpowercastingflag"] = 1;
+                        update["powercasting_ability"] = ability;
+                        update["caster_level"] = lvl;
+                        update["class"] = "Consular";
+                        update["base_level"] = lvl;
+                        update["level"] = lvl;
+                        callbacks.push( function() {update_pb();} );
+                        callbacks.push( function() {update_power_slots();} );
+                    }
+                });
+            }
+            if(actionsarray) {
+                if(v.drop_actions) {
+                    var actionsobj = {};
+                    actionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
+
+                    _.each(actionsobj, function(data, name) {
+                        newrowid = generateRowID();
+                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
+                        update["repeating_npcaction_" + newrowid + "_name"] = name;
+                        if(data["Desc"]) {
+                            update["repeating_npcaction_" + newrowid + "_description"] = data["Desc"];
+                        }
+
+                        if(data["Type Attack"]) {
+                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
+                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                            if(data["Type"]) { update["repeating_npcaction_" + newrowid + "_attack_type"] = data["Type"]; }
+                            if(data["Reach"]) { update["repeating_npcaction_" + newrowid + "_attack_range"] = data["Reach"]; }
+                            if(data["Hit Bonus"]) { update["repeating_npcaction_" + newrowid + "_attack_tohit"] = data["Hit Bonus"]; }
+                            if(data["Target"]) { update["repeating_npcaction_" + newrowid + "_attack_target"] = data["Target"]; }
+                            if(data["Damage"]) { update["repeating_npcaction_" + newrowid + "_attack_damage"] = data["Damage"]; }
+                            if(data["Damage Type"]) { update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = data["Damage Type"]; }
+
+                            if(data["Damage 2"] && data["Damage 2 Type"]) {
+                                update["repeating_npcaction_" + newrowid + "_attack_damage2"] = data["Damage 2"];
+                                update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = data["Damage 2 Type"];
+                            }
+                        }
+                    })
+                }
+                else {
+                    actionsarray = actionsarray.split("**");
+                    actionsarray.shift();
+                    var actionsobj = {};
+                    actionsarray.forEach(function(val, i) {
+                        if (i % 2 === 1) return;
+                        actionsobj[val] = actionsarray[i + 1];
+                    });
+                    _.each(actionsobj, function(desc, name) {
+                        newrowid = generateRowID();
+                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
+                        update["repeating_npcaction_" + newrowid + "_name"] = name;
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                            desc = desc.substring(2);
+                        }
+                        if(desc.indexOf(" Attack:") > -1) {
+                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
+                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Power Attack:") > -1) {
+                                attacktype = desc.split(" Power Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Power Attack)");
+                                return;
+                            }
+
+                            update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
+                            if(attacktype === "Melee") {
+                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
+                            }
+                            else {
+                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
+                            }
+                            update["repeating_npcaction_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
+                            update["repeating_npcaction_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
+                            if(desc.toLowerCase().indexOf("damage") > -1) {
+                                update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
+                                update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
+                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/)) {
+                                    var second_match = desc.match(/\((?!.*\()([^)]+)\)/);
+                                    if(second_match[1] && second_match[1].indexOf(" DC") === -1) {
+                                        update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
+                                        update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
+                                    };
+                                };
+                                ctest1 = desc.split("damage.")[1];
+                                ctest2 = desc.split("damage, ")[1];
+                                if(ctest1 && ctest1.length > 0) {
+                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest1.trim();
+                                }
+                                else if(ctest2 && ctest2.length > 0) {
+                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest2.trim();
+                                }
+                            }
+                            else {
+                                update["repeating_npcaction_" + newrowid + "_description"] = desc.split("Hit:")[1].trim();
+                            }
+                        }
+                        else {
+                            update["repeating_npcaction_" + newrowid + "_description"] = desc;
+                        }
+
+                    });
+                }
+                callbacks.push( function() {update_npc_action("all");} );
+            }
+            if(reactionsarray) {
+                update["npcreactionsflag"] = 1;
+                if(v.drop_reactions) {
+                    var reactionsobj = {};
+                    reactionsarray.forEach(function(val) { reactionsobj[val.Name] = val.Desc; });
+                }
+                else {
+                    reactionsarray = reactionsarray.split("**");
+                    reactionsarray.shift();
+                    var reactionsobj = {};
+                    reactionsarray.forEach(function(val, i) {
+                        if (i % 2 === 1) return;
+                        reactionsobj[val] = reactionsarray[i + 1];
+                    });
+                }
+                _.each(reactionsobj, function(desc, name) {
+                    newrowid = generateRowID();
+                    update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
+                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                        desc = desc.substring(2);
+                    }
+                    update["repeating_npcreaction_" + newrowid + "_desc"] = desc.trim();
+                });
+            }
+            if(legendaryactionsarray) {
+                if(v.drop_legendary_actions) {
+                    var actionsobj = {};
+                    legendaryactionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
+                    _.each(actionsobj, function(data, name) {
+                        newrowid = generateRowID();
+                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
+                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
+                        update["repeating_npcaction-l_" + newrowid + "_description"] = data["Desc"];
+
+                        if(data["Type Attack"]) {
+                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
+                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = data["Type Attack"];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_range"] = data["Reach"];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = data["Hit Bonus"];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = data["Target"];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = data["Damage"];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = data["Damage Type"];
+
+                            if(data["Damage 2"] && data["Damage 2 Type"]) {
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = data["Damage 2"];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = data["Damage 2 Type"];
+                            }
+                        }
+                    });
+                }
+                else {
+                    var numlegendaryactions = (legendaryactionsarray.match(/\d+/) || [""])[0];
+                    update["npc_legendary_actions"] = numlegendaryactions;
+                    update["npc_legendary_actions_desc"] = `The ${v.drop_name} can take ${numlegendaryactions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${v.drop_name} regains spent legendary actions at the start of its turn.`;
+                    legendaryactionsarray = legendaryactionsarray.split("**");
+                    legendaryactionsarray.shift();
+                    var actionsobj = {};
+                    legendaryactionsarray.forEach(function(val, i) {
+                        if (i % 2 === 1) return;
+                        actionsobj[val] = legendaryactionsarray[i + 1];
+                    });
+                    _.each(actionsobj, function(desc, name) {
+                        newrowid = generateRowID();
+                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
+                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                            desc = desc.substring(2);
+                        }
+                        if(desc.indexOf(" Attack:") > -1) {
+                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
+                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Power Attack:") > -1) {
+                                attacktype = desc.split(" Power Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Power Attack)");
+                                return;
+                            }
+                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
+                            if(attacktype === "Melee") {
+                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
+                            }
+                            else {
+                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
+                            }
+                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
+                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
+                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
+                            }
+                        }
+                        else {
+                            update["repeating_npcaction-l_" + newrowid + "_description"] = desc;
+                        }
+                    });
+                }
+
+            }
+        }
+        if(category === "Feats") {
+            update["tab"] = "core";
+            if(v.drop_name) {update["repeating_traits_" + id + "_name"] = v.drop_name};
+            if(v.drop_content) {update["repeating_traits_" + id + "_description"] = v.drop_content};
+            update["repeating_traits_" + id + "_source"] = "Feat";
+            update["repeating_traits_" + id + "_source_type"] = v.drop_properties ? v.drop_properties : "";
+            update["repeating_traits_" + id + "_options-flag"] = "0";
+            update["repeating_traits_" + id + "_display_flag"] = "on";
+        }
+        if(category === "Proficiencies") {
+            newrowid = generateRowID();
+            update["tab"] = "core";
+            if(v.drop_type.toLowerCase() === "language" || v.drop_type.toLowerCase() === "armor"
+                || v.drop_type.toLowerCase() === "weapon" || v.drop_type.toLowerCase() === "other") {
+                getSectionIDs("proficiencies", function(ids) {
+                    var idArray = [];
+                    _.each(ids, function(sectionId) {
+                        idArray.push("repeating_proficiencies_" + sectionId + "_name");
+                    });
+                    getAttrs(idArray, function(vals) {
+                        var prof_names = [];
+                        _.each(vals, function(value) {
+                            prof_names.push(value.toLowerCase());
+                        });
+                        if( prof_names.indexOf(v.drop_name.toLowerCase()) == -1 ) {
+                            update["repeating_proficiencies_" + newrowid + "_prof_type"] = v.drop_type.replace("custom", "").toUpperCase();
+                            update["repeating_proficiencies_" + newrowid + "_name"] = v.drop_name;
+                            update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
+                        };
+                        callbacks.push( function() {cleanup_drop_fields();} );
+                        setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
+                        return;
+                    });
+                });
+            }
+            else if(v.drop_type.toLowerCase() === "tool" || v.drop_type.toLowerCase() === "skillcustom") {
+                getSectionIDs("tool", function(ids) {
+                    var idArray = [];
+                    _.each(ids, function(sectionId) {
+                        idArray.push("repeating_tool_" + sectionId + "_toolname");
+                    });
+                    getAttrs(idArray, function(vals) {
+                        var prof_names = [];
+                        _.each(vals, function(value) {
+                            prof_names.push(value.toLowerCase());
+                        });
+                        if( prof_names.indexOf(v.drop_name.toLowerCase()) == -1 ) {
+                            update["repeating_tool_" + newrowid + "_toolname"] = v.drop_name;
+                            update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
+                            update["repeating_tool_" + newrowid + "_options-flag"] = 0;
+                            if(v.drop_toolbonus_base) { update["repeating_tool_" + newrowid + "_toolbonus_base"] = v.drop_toolbonus_base };
+                            callbacks.push( function() {update_tool(newrowid);} );
+                        } else {
+                            var match =_.keys(vals)[_.values(vals).indexOf(v.drop_name)];
+                            if(v.drop_toolbonus_base) { update[match.replace("_toolname", "_toolbonus_base")] = v.drop_toolbonus_base };
+                            callbacks.push( function() {update_tool(match.split("_")[2]);} );
+                        };
+                        callbacks.push( function() {cleanup_drop_fields();} );
+                        setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
+                        return;
+                    });
+                });
+            }
+            if(v.drop_type.toLowerCase() === "skill") {
+                var skill_string = v.drop_name.toLowerCase().replace(/ /g, '_');
+                update[skill_string + "_prof"] = "(@{pb}*@{" + skill_string + "_type})";
+            };
+        }
+
+        var modStringToAttrib = function(modString) {
+            var finalAttrib = "";
+            if (modString == "FIN") {
+                if (parseInt(v.strength_base) > parseInt(v.dexterity_base)) {
+                    finalAttrib = "@{strength_mod}";
+                } else {
+                    finalAttrib = "@{dexterity_mod}";
+                }
+            } else {
+                switch(modString) {
+                    case "STR":
+                        finalAttrib = "@{strength_mod}";
+                        break;
+                    case "DEX":
+                        finalAttrib = "@{dexterity_mod}";
+                        break;
+                    case "CON":
+                        finalAttrib = "@{constitution_mod}";
+                        break;
+                    case "WIS":
+                        finalAttrib = "@{wisdom_mod}";
+                        break;
+                    case "INT":
+                        finalAttrib = "@{intelligence_mod}";
+                        break;
+                    case "CHA":
+                        finalAttrib = "@{charisma_mod}";
+                        break;
+                }
+            }
+            return finalAttrib;
+        };
+
+        if(category === "Classes") {
+            update["tab"] = "core";
+            if(v.drop_name && v.drop_name !== "") { update["class"] = v.drop_name; }
+            if(v.drop_hit_die && v.drop_hit_die !== "") {
+                update["base_level"] = v.base_level ? v.base_level : "1";
+                update["hit_dice_max"] = update["base_level"] + v.drop_hit_die;
+                update["hit_dice"] = update["base_level"];
+            }
+            if(v.drop_traits) {
+                var traits = JSON.parse(v.drop_traits);
+                _.each(traits, function(value) {
+                    var id = generateRowID();
+                    update["repeating_traits_" + id + "_name"] = value["Name"];
+                    update["repeating_traits_" + id + "_description"] = value["Desc"];
+                    update["repeating_traits_" + id + "_source"] = "Class";
+                    update["repeating_traits_" + id + "_source_type"] = v.drop_name ? v.drop_name : "";
+                    update["repeating_traits_" + id + "_options-flag"] = "0";
+                    update["repeating_traits_" + id + "_display_flag"] = "on";
+                });
+            }
+            if(v.drop_class_saving_throws) {
+                var saves = JSON.parse(v.drop_class_saving_throws);
+                _.each(saves, function(value) {
+                    update[value.toLowerCase() + "_save_prof"] = "(@{pb})";
+                });
+            }
+            if(v.drop_powercasting_ability && v.drop_powercasting_ability !== "") {
+                update["powercasting_ability"] = "+@{" + v.drop_powercasting_ability.toLowerCase() + "}";
+            }
+            if(v.drop_global_damage) {
+                var dmgmod = JSON.parse(v.drop_global_damage);
+                var id = generateRowID();
+                update["repeating_damagemod_" + id + "_global_damage_rollstring"] = `${dmgmod["Uses"]}[${dmgmod["Name"]}]`;
+                update["repeating_damagemod_" + id + "_global_damage_active_flag"] = "1";
+                update["repeating_damagemod_" + id + "_options-flag"] = "0";
+                update["repeating_damagemod_" + id + "_global_damage_type"] = dmgmod["Name"];
+                update["global_damage_mod_flag"] = "1";
+            }
+            if(v.drop_actions) {
+                var actionsobj = {};
+                JSON.parse(v.drop_actions).forEach(function(val) { actionsobj[val.Name] = val; });
+
+                _.each(actionsobj, function(data, name) {
+                    newrowid = generateRowID();
+                    update["repeating_attack_" + newrowid + "_options-flag"] = "0";
+                    update["repeating_attack_" + newrowid + "_atkname"] = name;
+                    if(data["Desc"]) {
+                        update["repeating_attack_" + newrowid + "_atk_desc"] = data["Desc"];
+                    }
+
+                    if(data["Type Attack"]) {
+                        update["repeating_attack_" + newrowid + "_attack_flag"] = "on";
+                        update["repeating_attack_" + newrowid + "_atkflag"] = "{{attack=1}}";
+                        update["repeating_attack_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                        if(data["Type"]) {
+                            update["repeating_attack_" + newrowid + "_attack_type"] = data["Type"];
+                        }
+                        if(data["Reach"]) { update["repeating_attack_" + newrowid + "_atkrange"] = data["Reach"]; }
+
+                        if(data["Damage"]) { update["repeating_attack_" + newrowid + "_dmgbase"] = data["Damage"]; }
+                        if(data["Damage Type"]) { update["repeating_attack_" + newrowid + "_dmgtype"] = data["Damage Type"]; }
+                        if (data["Modifier"]) {
+                            update["repeating_attack_" + newrowid + "_dmgattr"] = modStringToAttrib(data["Modifier"]);
+                            update["repeating_attack_" + newrowid + "_atkattr_base"] = modStringToAttrib(data["Modifier"]);
+                        }
+
+
+                        if(data["Damage 2"] && data["Damage 2 Type"]) {
+                            update["repeating_attack_" + newrowid + "_dmg2flag"] = "{{damage=1}} {{dmg2flag=1}}";
+                            update["repeating_attack_" + newrowid + "_atk_dmg2base"] = data["Damage 2"];
+                            update["repeating_attack_" + newrowid + "_attack_damagetype2"] = data["Damage 2 Type"];
+                            if (data["Modifier 2"]) {
+                                update["repeating_attack_" + newrowid + "_dmg2attr"] = modStringToAttrib(data["Modifier 2"]);
+                            }
+                        }
+                    }
+                });
+            }
+            if(v.drop_resources) {
+                var resources = JSON.parse(v.drop_resources);
+                var resource_count = 0;
+                var numUses = function(uses_string) {
+                    var attribs = ["strength", "dexterity", "constitution", "wisdom", "intelligence", "charisma"];
+                    uses_string = uses_string.toLowerCase();
+                    _.each(attribs, function(attrib) {
+                        var attribMod = Math.floor((parseInt(v[attrib + "_base"]) - 10) / 2);
+                        if (attribMod < 0) attribMod = 0;
+                        uses_string = uses_string.replace(attrib, attribMod);
+                    });
+                    var terms = uses_string.split("+");
+                    var total = 0;
+                    _.each(terms, function(term) {
+                        total += parseInt(term);
+                    });
+                    return total;
+                };
+                _.each(resources, function(value) {
+                    if (resource_count == 0) {
+                        update["class_resource_name"] = value["Name"];
+                        var uses = numUses(value["Uses"]);
+                        update["class_resource"] = uses;
+                        update["class_resource_max"] = uses;
+                        resource_count++;
+                    } else if (resource_count == 1) {
+                        update["other_resource_name"] = value["Name"];
+                        var uses = numUses(value["Uses"]);
+                        update["other_resource"] = uses;
+                        update["other_resource_max"] = uses;
+                        resource_count++;
+                    }
+                });
+            }
+
+            callbacks.push(update_class);
+        }
+        if(category === "Subclasses") {
+            if(v.drop_name && v.drop_name !== "") { update["subclass"] = v.drop_name; }
+            if(v.drop_hp_per_level && v.drop_hp_per_level !== "") {
+                var id = generateRowID();
+                update["repeating_hpmod_" + id + "_mod"] = v.drop_hp_per_level;
+                update["repeating_hpmod_" + id + "_source"] = v.drop_name ? v.drop_name : "Subclass";
+            }
+            if(v.drop_traits) {
+                var traits = JSON.parse(v.drop_traits);
+                _.each(traits, function(value) {
+                    var id = generateRowID();
+                    update["repeating_traits_" + id + "_name"] = value["Name"];
+                    update["repeating_traits_" + id + "_description"] = value["Desc"];
+                    update["repeating_traits_" + id + "_source"] = "Class";
+                    update["repeating_traits_" + id + "_source_type"] = v.drop_name ? v.drop_name : "";
+                    update["repeating_traits_" + id + "_options-flag"] = "0";
+                    update["repeating_traits_" + id + "_display_flag"] = "on";
+                });
+            }
+            callbacks.push(update_class);
+        }
+        if(category === "Races" || category === "Subraces") {
+            update["tab"] = "core";
+            if(category === "Races") {
+                update["race"] = v.drop_name;
+                if (v.drop_name == "Halfling") {
+                    update["precognition_flag"] = "1";
+                }
+            }
+            else {
+                update["subrace"] = v.drop_name;
+            };
+            if(v.drop_speed) {update["speed"] = v.drop_speed};
+            if(v.drop_size) {update["size"] = v.drop_size};
+
+            if(v.drop_traits) {
+                var trait_array = JSON.parse(v.drop_traits);
+                if(trait_array && trait_array.length) {
+                    _.each(trait_array, function(trait) {
+                        newrowid = generateRowID();
+                        update["repeating_traits_" + newrowid + "_name"] = trait["Name"];
+                        update["repeating_traits_" + newrowid + "_description"] = trait["Desc"];
+                        update["repeating_traits_" + newrowid + "_source"] = "Racial";
+                        update["repeating_traits_" + newrowid + "_source_type"] = v.drop_name;
+                        update["repeating_traits_" + newrowid + "_options-flag"] = 0;
+                        update["repeating_traits_" + newrowid + "_display_flag"] = "on";
+                    });
+                };
+            };
+
+            if(v.drop_actions) {
+                var actionsobj = {};
+                JSON.parse(v.drop_actions).forEach(function(val) { actionsobj[val.Name] = val; });
+
+                _.each(actionsobj, function(data, name) {
+                    newrowid = generateRowID();
+                    update["repeating_attack_" + newrowid + "_options-flag"] = "0";
+                    update["repeating_attack_" + newrowid + "_atkname"] = name;
+                    if(data["Desc"]) {
+                        update["repeating_attack_" + newrowid + "_atk_desc"] = data["Desc"];
+                    }
+
+                    if(data["Type Attack"]) {
+                        if (data["Type"] == "Power") {
+                            update["repeating_attack_" + newrowid + "_atkflag"] = "0";
+                            update["repeating_attack_" + newrowid + "_attack_options"] = "";
+                            update["repeating_attack_" + newrowid + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}} {{savedc=[[[[@{savedc}]][SAVE]]]}}"
+                        } else {
+                            update["repeating_attack_" + newrowid + "_attack_flag"] = "on";
+                            update["repeating_attack_" + newrowid + "_atkflag"] = "{{attack=1}}";
+                            update["repeating_attack_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                        }
+                        if(data["Reach"]) { update["repeating_attack_" + newrowid + "_atkrange"] = data["Reach"]; }
+
+                        if(data["Damage"]) { update["repeating_attack_" + newrowid + "_dmgbase"] = data["Damage"]; }
+                        if(data["Damage Type"]) { update["repeating_attack_" + newrowid + "_dmgtype"] = data["Damage Type"]; }
+                        if (data["Modifier"]) {
+                            update["repeating_attack_" + newrowid + "_dmgattr"] = modStringToAttrib(data["Modifier"]);
+                            update["repeating_attack_" + newrowid + "_atkattr_base"] = modStringToAttrib(data["Modifier"]);
+                        } else {
+                            update["repeating_attack_" + newrowid + "_dmgattr"] = "0";
+                        }
+                        if (data["Save"]) { update["repeating_attack_" + newrowid + "_saveattr"] = data["Save"] }
+                        if (data["Save DC"]) { update["repeating_attack_" + newrowid + "_savedc"] = "(" + modStringToAttrib(data["Save DC"]) + "+8+@{pb})" }
+                        if (data["Save Effect"]) { update["repeating_attack_" + newrowid + "_saveeffect"] = data["Save Effect"] }
+
+                        if(data["Damage 2"] && data["Damage 2 Type"]) {
+                            update["repeating_attack_" + newrowid + "_dmg2flag"] = "{{damage=1}} {{dmg2flag=1}}";
+                            update["repeating_attack_" + newrowid + "_atk_dmg2base"] = data["Damage 2"];
+                            update["repeating_attack_" + newrowid + "_attack_damagetype2"] = data["Damage 2 Type"];
+                            if (data["Modifier 2"]) {
+                                update["repeating_attack_" + newrowid + "_dmg2attr"] = modStringToAttrib(data["Modifier 2"]);
+                            } else {
+                                update["repeating_attack_" + newrowid + "_dmgattr"] = "0";
+                            }
+                        }
+                    }
+                });
+            }
+            callbacks.push(update_race_display);
+        }
+        if(category === "Backgrounds") {
+            update["tab"] = "core";
+            if(v.drop_name && v.drop_name !== "") { update["background"] = v.drop_name; }
+            if(v.drop_feature_name) {
+                var id = generateRowID();
+                update["repeating_traits_" + id + "_name"] = v.drop_feature_name;
+                update["repeating_traits_" + id + "_description"] = v.drop_feature_description || "";
+                update["repeating_traits_" + id + "_source"] = "Background";
+                update["repeating_traits_" + id + "_source_type"] = v.drop_name ? v.drop_name : "";
+                update["repeating_traits_" + id + "_options-flag"] = "0";
+                update["repeating_traits_" + id + "_display_flag"] = "on";
+            }
+            if(v.drop_traits) {
+                var traits = JSON.parse(v.drop_traits);
+                _.each(traits, function(value) {
+                    var id = generateRowID();
+                    update["repeating_traits_" + id + "_name"] = value["Name"];
+                    update["repeating_traits_" + id + "_description"] = value["Desc"];
+                    update["repeating_traits_" + id + "_source"] = "Background";
+                    update["repeating_traits_" + id + "_source_type"] = v.drop_name ? v.drop_name : "";
+                    update["repeating_traits_" + id + "_options-flag"] = "0";
+                    update["repeating_traits_" + id + "_display_flag"] = "on";
+                });
+            }
+        }
+        //This one is just a catch-all for proficiencies, as they are formated the same regardless of the category
+        if(["Races", "Subraces", "Classes", "Subclasses", "Backgrounds"].indexOf(category) != -1) {
+            if(v.drop_skill_proficiency) {
+                var skill_array = JSON.parse(v.drop_skill_proficiency);
+                if(skill_array["Proficiencies"] && skill_array["Proficiencies"].length) {
+                    _.each(skill_array["Proficiencies"], function(prof) {
+                        var skill_string = prof.toLowerCase().replace(/ /g, '_');
+                        update[skill_string + "_prof"] = "(@{pb}*@{" + skill_string + "_type})";
+                    });
+                };
+            };
+            if(v.drop_language_prof || v.drop_weapon_prof || v.drop_armor_prof || v.drop_tool_prof) {
+                getSectionIDs("proficiencies", function(ids) {
+                    var idArray = [];
+                    _.each(ids, function(sectionId) {
+                        idArray.push("repeating_proficiencies_" + sectionId + "_name");
+                    });
+                    getSectionIDs("tool", function(ids) {
+                        _.each(ids, function(sectionId) {
+                            idArray.push("repeating_tool_" + sectionId + "_toolname");
+                        });
+                        getAttrs(idArray, function(vals) {
+                            var prof_names = [];
+                            _.each(vals, function(value) {
+                                prof_names.push(value.toLowerCase());
+                            });
+
+                            if(v.drop_language_prof) {
+                                var lang_array = JSON.parse(v.drop_language_prof);
+                                if(lang_array["Proficiencies"] && lang_array["Proficiencies"].length) {
+                                    _.each(lang_array["Proficiencies"], function(prof) {
+                                        if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                                            newrowid = generateRowID();
+                                            update["repeating_proficiencies_" + newrowid + "_prof_type"] = "LANGUAGE";
+                                            update["repeating_proficiencies_" + newrowid + "_name"] = prof;
+                                            update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
+                                        }
+                                    });
+                                }
+                            };
+                            if(v.drop_weapon_prof) {
+                                var weap_array = JSON.parse(v.drop_weapon_prof);
+                                if(weap_array["Proficiencies"] && weap_array["Proficiencies"].length) {
+                                    _.each(weap_array["Proficiencies"], function(prof) {
+                                        if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                                            newrowid = generateRowID();
+                                            update["repeating_proficiencies_" + newrowid + "_prof_type"] = "WEAPON";
+                                            update["repeating_proficiencies_" + newrowid + "_name"] = prof;
+                                            update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
+                                        }
+                                    });
+                                }
+                            };
+                            if(v.drop_armor_prof) {
+                                var armor_array = JSON.parse(v.drop_armor_prof);
+                                if(armor_array["Proficiencies"] && armor_array["Proficiencies"].length) {
+                                    _.each(armor_array["Proficiencies"], function(prof) {
+                                        if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                                            newrowid = generateRowID();
+                                            update["repeating_proficiencies_" + newrowid + "_prof_type"] = "ARMOR";
+                                            update["repeating_proficiencies_" + newrowid + "_name"] = prof;
+                                            update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
+                                        }
+                                    });
+                                }
+                            };
+                            if(v.drop_tool_prof) {
+                                var tool_array = JSON.parse(v.drop_tool_prof);
+                                if(tool_array["Proficiencies"] && tool_array["Proficiencies"].length) {
+                                    _.each(tool_array["Proficiencies"], function(prof) {
+                                        if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                                            newrowid = generateRowID();
+                                            update["repeating_tool_" + newrowid + "_toolname"] = prof;
+                                            update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
+                                            update["repeating_tool_" + newrowid + "_options-flag"] = 0;
+                                            callbacks.push( function() {update_tool(newrowid);} );
+                                        }
+                                    });
+                                }
+                            };
+
+                            callbacks.push( function() {cleanup_drop_fields();} );
+                            setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
+                            return;
+                        });
+                    });
+                });
+            }
+        }
+
+
+        callbacks.push( function() {cleanup_drop_fields();} );
+        setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
+    });
+
+
+};
+
+
+var cleanup_drop_fields = function() {
+    var update = {};
+    update["drop_category"] = "";
+    update["drop_name"] = "";
+    update["drop_weight"] = "";
+    update["drop_properties"] = "";
+    update["drop_modifiers"] = "";
+    update["drop_content"] = "";
+    update["drop_itemtype"] = "";
+    update["drop_damage"] = "";
+    update["drop_damagetype"] = "";
+    update["drop_range"] = "";
+    update["drop_ac"] = "";
+    update["drop_actions"] = "";
+    update["drop_legendary_actions"] = "";
+    update["drop_legendary_actions_desc"] = "";
+    update["drop_reactions"] = "";
+    update["drop_traits"] = "";
+    update["drop_attack_type"] = "";
+    update["drop_damage2"] = "";
+    update["drop_damagetype2"] = "";
+    update["drop_alt_damage"] = "";
+    update["drop_alt_damagetype"] = "";
+    update["drop_alt_damage2"] = "";
+    update["drop_alt_damagetype2"] = "";
+    update["drop_powerschool"] = "";
+    update["drop_powercastingtime"] = "";
+    update["drop_powertarget"] = "";
+    update["drop_powercomp"] = "";
+    update["drop_powercomp_materials"] = "";
+    update["drop_powerconcentrationflag"] = "";
+    update["drop_powerduration"] = "";
+    update["drop_powerhealing"] = "";
+    update["drop_powerdmgmod"] = "";
+    update["drop_powersave"] = "";
+    update["drop_powersavesuccess"] = "";
+    update["drop_powerhldie"] = "";
+    update["drop_powerhldietype"] = "";
+    update["drop_powerhlbonus"] = "";
+    update["drop_powerlevel"] = "";
+    update["drop_power_damage_progression"] = "";
+    update["drop_speed"] = "";
+    update["drop_str"] = "";
+    update["drop_dex"] = "";
+    update["drop_con"] = "";
+    update["drop_int"] = "";
+    update["drop_wis"] = "";
+    update["drop_cha"] = "";
+    update["drop_vulnerabilities"] = "";
+    update["drop_resistances"] = "";
+    update["drop_immunities"] = "";
+    update["drop_condition_immunities"] = "";
+    update["drop_languages"] = "";
+    update["drop_challenge_rating"] = "";
+    update["drop_size"] = "";
+    update["drop_type"] = "";
+    update["drop_alignment"] = "";
+    update["drop_hp"] = "";
+    update["drop_saving_throws"] = "";
+    update["drop_senses"] = "";
+    update["drop_passive_perception"] = "";
+    update["drop_skills"] = "";
+    update["drop_token_size"] = "";
+    update["drop_armor_prof"] = "";
+    update["drop_hit_die"] = "";
+    update["drop_weapon_prof"] = "";
+    update["drop_powercasting_ability"] = "";
+    update["drop_class_saving_throws"] = "";
+    update["drop_language_prof"] = "";
+    update["drop_tool_prof"] = "";
+    update["drop_hp_per_level"] = "";
+    update["drop_class_powers"] = "";
+    update["drop_global_damage"] = "";
+    update["drop_feature_name"] = "";
+    update["drop_feature_description"] = "";
+    update["drop_power_ability"] = "";
+    update["drop_toolbonus_base"] = "";
+    update["drop_itemcount"] = "";
+    update["drop_skill_proficiency"] = "";
+    update["drop_parent"] = "";
+    update["drop_resources"] = "";
+    update["drop_powerhldesc"] = "";
+    update["drop_powerdesc"] = "";
+    setAttrs(update, {silent: true});
+};

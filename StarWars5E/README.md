@@ -9,8 +9,10 @@ More Information
 
 # Changelog
 ## 2024-??-??
-* Massive refactor of the sheet using GULP as build engine
-* Removal of leftover unused code for 5e compendium & Charmancer integration
+* Chore : Massive refactor of the sheet using GULP as build engine
+* Chore : Removal of leftover unused code for 5e compendium & Charmancer integration
+* Bugfix : Removal of handler for turning speed and flying speed
+* Bugfix : Removal of Hp calculationf for ship and PC which was causing problem or not working.
 ## 2024-11-16
 * correction following problem in PR 13282 : Npc traits visibility & Sheet Refresh problem
 ## 2024-07-06
