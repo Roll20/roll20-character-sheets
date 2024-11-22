@@ -81,7 +81,7 @@ const NO_CSS_KEY: ValidationStatus = {
 const CSS_FONT_ERROR: ValidationStatus = {
   name: "CSS_FONT_ERROR",
   description: "There is an error in the CSS file",
-  type: "error",
+  type: "notice",
   responsibility: RESPONSIBILITY.CONTRIBUTOR,
 }
 
