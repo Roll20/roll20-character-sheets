@@ -11,6 +11,7 @@ More Information
 ## 2024-??-??
 * Chore : Massive refactor of the sheet using GULP as build engine
 * Chore : Removal of leftover unused code for 5e compendium & Charmancer integration
+* Chore : Migrating from Legacy sheet to CSE
 * Bugfix : Removal of handler for turning speed and flying speed
 * Bugfix : Removal of Hp calculationf for ship and PC which was causing problem or not working.
 ## 2024-11-16

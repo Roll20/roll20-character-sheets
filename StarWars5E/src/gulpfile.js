@@ -14,7 +14,9 @@ function bundle_html(done){
 
 /* Bundle the css in one big file */
 function bundle_css(done){
-    src('css/legacy.css')
+    src('css/main.css')
+        .pipe(include())
+        .on('error',console.log)
         .pipe(rename('StarWars5e_CSS.css'))
         .pipe(dest('../dist'));
     done();
