@@ -38,7 +38,7 @@
       <input type="checkbox" class="announcements-show" name="attr_show_announcements" value="1" data-i18n-title="close-announcements" title="Close Announcements" />
       <span class="announcements-exit" data-i18n-title="close">*</span><br>
       <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-      <span class="footer">11/12/24</span>
+      <span class="footer">11/21/24</span>
       <ol>
         <strong>v1.9</strong>
         <li>Push your rolls without the API! The sheet's rolls have been updated to CRP (custom roll parsing). You can now make yor rolls and push them from the chat window. (thank you Richard for letting me copy your MYZ code for this!)</li>
@@ -6630,11 +6630,9 @@
   const consumables = ['food', 'water', 'arrows', 'torches'];
   const consumableRolled = consumables.map((thisConsumable) => `clicked:${thisConsumable}`).join(' ');
   on(consumableRolled, (eventInfo) => {
-    console.log(eventInfo);
     const resource = eventInfo.triggerName.replace('clicked:', '');
     getAttrs([resource], (values) => {
       let resourceDieSize = +values[resource] || 0;
-      clog(`resourceDieSize:${resourceDieSize}`);
       switch (resourceDieSize) {
         case 0:
           resourceDieSize = 0;
@@ -6660,7 +6658,9 @@
       const resourceSubtitle = resourceDieSize === 0 ? '{out-of-food}' : `{die-${resourceDieSize}-u}`;
       const rollString = `@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{subtitle=^${resourceSubtitle} ^{of-${resource}}}} {{imageInsert${resourceTitle}= }} {{consumable-die-${resourceDieSizeWord}=[[ 1 ]]}} {{consumable-roll-${resourceDieSizeWord}=[[ 1d${resourceDieSize} ]]}} {{footer}} {{consumable-flag= [[ 1 ]]}}`;
       startRoll(rollString, (roll) => {
-        console.log(eventInfo);
+        console.log(roll);
+        const total = roll.results[`consumable-roll-${resourceDieSizeWord}`].result;
+        clog(total);
         finishRoll(roll.rollId);
       });
     });
