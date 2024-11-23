@@ -5855,6 +5855,7 @@
             "armor":'armor rating',
             "augmented":'augmented_stat',
             "capacity":'capacity_type',
+            "control environment":'environments',
             "conversion":'convert',
             "enemy attack":'enemy',
             "enemy defense":'enemy'
@@ -5904,7 +5905,11 @@
             //case "combat technique": description = `${query.elevel} Techniques Remaining`; break;
             case "companion": description = `${query.elevel * 10} Character Points`; break;
             case "connected": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "control environment": description = `${query.elevel} Environments Remaining`; break;
+            case "control environment": 
+                description = `${query.elevel} environments maximum`;
+                query.c_index = query.config.findIndex(c => c.name === 'environments');
+                description += query.config.length !== 0 ? ': ' + query.config[query.c_index].rank.sort().join(", ") : '';
+            break;
             case "conversion": description = `${query.elevel} Character Points/10 Damage`; break;
             case "data access": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "defense mastery": description = `DCV +${query.elevel}`; await setDerivedValues(cache, set_values); break;
@@ -5938,8 +5943,8 @@
             case "inspire": description = `Stat/Skill Rolls +${query.elevel}`; break;
             case "jumping": description = `${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 1) / 2)))} Times Normal Distance`; break;
             case "massive damage": description = setMassiveDamageCharacteristic(debug, timer, value, rowID, level, setObj); break;
-            case "melee attack": description = `ACV +${query.elevel * 2} with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
-            case "melee defense": description = `DCV +${query.elevel * 2} with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
+            case "melee attack": description = `+${query.elevel * 2} ACV with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
+            case "melee defense": description = `+${query.elevel * 2} DCV with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
             case "merge": description = `Contribute ${query.elevel * 10} Character Points`; break;
             case "metamorphosis": description = `Race Template +/- ${query.elevel * 5} Character Points`; break;
             case "mimic": description = `Mimic Level ${query.elevel} Attributes`; break;
@@ -6119,8 +6124,8 @@
                     "default": "Does not improve beyond level 6"
                 },
                 "features": {
-                    1: "Up to 2 features",
-                    2: "Up to 5 features",
+                    1: "2",
+                    2: "5",
                     3: "Up to 10 features",
                     4: "Up to 25 features",
                     5: "Up to 50 features",
@@ -6287,6 +6292,14 @@
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
                         `Stretch body up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 4) / 2)))} km`;
+                break;
+                case 'features':
+                    characteristic = (query.elevel < 3) ?
+                        (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
+                        get1or2andHalfor5(query.elevel) * (10 ** (Math.ceil((query.elevel - 2) / 3)));
+                    characteristic += ' features maximum';
+                    query.c_index = query.config.findIndex(c => c.name === 'features');
+                    characteristic += query.config.length !== 0 ? ': ' + query.config[query.c_index].rank.sort().join(", ") : '';
                 break;
                 case 'mind control':
                     characteristic = (query.elevel < 7) ? 
@@ -10159,6 +10172,7 @@
                         'defense type',
                         'enemy',
                         'environments',
+                        'features',
                         'focused damage',
                         'group',
                         'material category',
@@ -10274,13 +10288,15 @@
                     query.last = query.next;
                 break;
                 case 'environment':
-                    query.title = getTranslationByKey("set-environment");
+                case 'feature':
+                    query.title = getTranslationByKey(`set-${query.next}`);
                     query.options = `|${query.environment}`;
                     query.last = query.next;
                 break;
                 case 'environments':
-                    query.config_index = query.db.config.findIndex(c => c.name === 'environments');
-                    query.title = getTranslationByKey("choose-environments");
+                case 'features':
+                    query.config_index = query.db.config.findIndex(c => c.name === query.next);
+                    query.title = getTranslationByKey(`choose-${query.next}`);
                     query.options = `|${getTranslationByKey("add")},add`;
                     for (let i = 0; i < query.db.config[query.config_index].rank.length; i++) {
                         query.options += `|${query.db.config[query.config_index].rank[i]},${i}`;
@@ -11135,15 +11151,17 @@
                         }
                     break;
                     case 'environment':
-                        query.environment = query.selection === 0 ? '' : query.selection;
-                        query.next = 'write_environment';
+                    case 'feature':
+                        query[query.next] = query.selection === 0 ? '' : query.selection;
+                        query.next = `write_${query.next}`;
                     break;
                     case 'environments':
+                    case 'features':
                         if (query.selection === 'exit') { return; }
                         query.env_index = query.selection === 'add' ? -1 : int(query.selection);
                         query.environment = query.selection === 'add' ? 
                             '' : query.db.config[query.config_index].rank[query.env_index];
-                        query.next = 'environment';
+                        query.next = query.next.slice(0, -1);
                     break;
                     case 'techniques':
                         const combat_techinique_ranks = {
@@ -11308,6 +11326,12 @@
                                 query.config.push({
                                     name: 'enemy',
                                     rank: 'not configued'
+                                });
+                            break;
+                            case 'features':
+                                query.config.push({
+                                    name: 'features',
+                                    rank: []
                                 });
                             break;
                             case 'ranged defense':
@@ -11669,16 +11693,18 @@
                         set_values[`repeating_${cache.source_attribute}_${cache.source_id}_name`] = query.selection;
                     break;
                     case 'write_environment':
+                    case 'write_feature':
+                        const variable = query.next.substring(6);
                         if (query.env_index === -1) {
-                            query.db.config[query.config_index].rank.push(query.environment);
-                        } else if (query.env_index !== -1 && query.environment === '') {
+                            query.db.config[query.config_index].rank.push(query[variable]);
+                        } else if (query.env_index !== -1 && query[variable] === '') {
                             query.db.config[query.config_index].rank.splice(query.env_index, 1);
                         } else {
-                            query.db.config[query.config_index].rank[query.env_index] = query.environment;
+                            query.db.config[query.config_index].rank[query.env_index] = query[variable];
                         }
-                        set_values[`${cache.source}`] = 
-                            `${query.db.config[query.config_index].name.capitalize()} ` +
-                            `(${query.db.config[query.config_index].rank.sort().join(", ")})`;
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                            //`${query.db.config[query.config_index].name.capitalize()} ` +
+                            //`(${query.db.config[query.config_index].rank.sort().join(", ")})`;
                     break;
                     case 'write_groupname':
                         cache.groupdb[cache.static_group_visible_id].name = query.selection;
@@ -11791,6 +11817,20 @@
                                     cache.attrdb.energized[i].elevel * 10 : 0;
                             }
                             setDerivedValues(cache, set_values);
+                        } else if (query.attribute === 'extra actions') {
+                            cache.statsdb.actions.base = 1;
+                            for (let i = 0; i < cache.attrdb['extra actions'].length; i++) {
+                                cache.statsdb.actions.base += cache.attrdb['extra actions'][i].active? 
+                                    cache.attrdb['extra actions'][i].elevel : 0;
+                            }
+                            set_values.static_character_actions_base = cache.statsdb.actions.base;
+                        } else if (query.attribute === 'extra defenses') {
+                            cache.statsdb.defenses.base = 0;
+                            for (let i = 0; i < cache.attrdb['extra defenses'].length; i++) {
+                                cache.statsdb.defenses.base += cache.attrdb['extra defenses'][i].active? 
+                                    cache.attrdb['extra defenses'][i].elevel : 0;
+                            }
+                            set_values.static_character_defenses_base = cache.statsdb.defenses.base;
                         }
                     break;
                     case 'write_stat':
@@ -13093,45 +13133,76 @@
                 },
             ];
             const statsdb = {
-                acv: {base:0},
+                actions:{
+                    base:1,
+                    extra:0
+                },
+                acv:{
+                    base:0,
+                    mastery:0
+                },
                 body:{
                     base:0,
                     damage:0,
-                    temp:0
+                    temp:0,
+                    augmented:0
                 },
-                dcv: {base:0},
+                dcv:{
+                    base:0,
+                    mastery:0
+                },
+                defenses:{
+                    base:0,
+                    extra:0
+                },
+                dm:{
+                    base:5,
+                    massive:0
+                },
                 mind:{
                     base:0,
                     damage:0,
-                    temp:0
+                    temp:0,
+                    augmented:0
                 },
-                scv: {base:0},
-                shockvalue: {base:0},
+                scv:{
+                    base:0,
+                    mastery:0
+                },
+                shockvalue:{
+                    base:0,
+                    hardboiled:0
+                },
                 soul:{
                     base:0,
                     damage:0,
-                    temp:0
+                    temp:0,
+                    augmented:0
                 },
                 energy:{
                     base:0,
                     damage:0,
-                    temp:0
+                    temp:0,
+                    energized:0
                 },
                 health:{
                     base:0,
                     damage:0,
                     stun:0,
-                    temp:0
+                    temp:0,
+                    tough:0
                 },
                 sanity:{
                     base:0,
                     damage:0,
-                    temp:0
+                    temp:0,
+                    unassailable:0
                 },
                 society:{
                     base:0,
                     damage:0,
-                    temp:0
+                    temp:0,
+                    mastery:0
                 },
                 cp:{
                     base:cache.character_default_value_points || 0,
@@ -13210,16 +13281,16 @@
                             break;
                             case 'active':
                                 const attr_to_value = {
-                                    'attack mastery': ['acv'],
-                                    'defense mastery': ['dcv'],
-                                    'energized': ['energy'],
-                                    'extra actions': ['actions'],
-                                    'extra defenses': ['defenses'],
-                                    'hardboiled': ['shockvalue'],
-                                    'massive damage':['dm'],
-                                    'social mastery': ['scv','society'],
-                                    'tough': ['health'],
-                                    'unassailable': ['sanity'],
+                                    'attack mastery': 'acv',
+                                    'defense mastery': 'dcv',
+                                    'energized': 'energy',
+                                    'extra actions': 'actions',
+                                    'extra defenses': 'defenses',
+                                    'hardboiled': 'shockvalue',
+                                    'massive damage':'dm',
+                                    'social mastery': 'scv',
+                                    'tough': 'health',
+                                    'unassailable': 'sanity',
                                 };
                                 const db = cache.source_section === 'attribute' ? 'attrdb' : 'defectdb';
                                 cache.attribute = 
@@ -13233,15 +13304,32 @@
                                     cache.active;
                                 //await setActiveAttribute(cache, set_values);
                                 if (Object.keys(attr_to_value).indexOf(cache.attribute) !== -1) {
+                                    let value = 0;
+                                    for (let i = 0; i < cache[db][cache.attribute].length; i++) {
+                                        value += cache[db][cache.attribute][i].active ?
+                                            cache[db][cache.attribute][i].elevel : 0;
+                                    }
+                                    set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = (value * (
+                                        cache.attribute === 'energized' ||
+                                        cache.attribute === 'hardboiled' ||
+                                        cache.attribute === 'tough' ? 10 :
+                                        cache.attribute === 'social mastery' ||
+                                        cache.attribute === 'unassailable' ? 2 : 1
+                                    )) + (
+                                        cache.attribute === 'extra actions' ? 1 :
+                                        cache.attribute === 'massive damage' ? 5 : 0
+                                    );
+                                    /*
                                     set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = 
                                         cache[attr_to_value[cache.attribute]];
-                                    if (cache.attribute[0] === 'social mastery') {
+                                    if (cache.attribute === 'social mastery') {
                                         set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = 
                                             cache[attr_to_value[cache.attribute]];
                                     }
-                                    await setDerivedValues(cache, set_values);
+                                    */
+                                    //await setDerivedValues(cache, set_values);
                                 }
-                                if (cache.attribute[0] === 'augmented') {
+                                if (cache.attribute === 'augmented') {
                                     cache.aug_index = cache.attrdb.augmented[cache.index].config.findIndex(c => c.name === 'augmented_stat');
                                     cache.augmented_stat = cache.attrdb.augmented[cache.index].config[cache.aug_index].rank;
                                     cache.augmented_rank = 0;
