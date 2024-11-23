@@ -287,10 +287,13 @@
             </div>
           </div>
           <div class="attributes-box2">
-            <button type="action" name="act_strength-roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            <button type="action" class="toggle-monster-only" name="act_strength-roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
               <span class="label broken-str" data-i18n="strength">Strength</span>
             </button>
             <button class="rollme-relative" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
+            <button type="action" class="monster" style="pointer-events:none;">
+              <span class="label broken-str" data-i18n="strength">Strength</span>
+            </button>
           </div>
           <div class="attributes-box3">
             <!-- PC or Monster Strength attr_strength updates pc/monster str depending on sheet tab-->
@@ -2159,12 +2162,12 @@
                 <span class="label" data-i18n-title="artifact-bonus" data-i18n="artifact">Artifact Dice</span>
               </div>
               <div class="dice-artifact-rolls">
-                <input type="checkbox" name="attr_artifact_die_eight" value="1" class="dice-selection mighty2" data-i18n-title="mighty" title="Mighty" />
-                <span class="mighty2"></span>
-                <span class="artifact-die mighty2 font-color-initial" data-i18n-title="die-8"></span>
                 <input type="checkbox" name="attr_artifact_die_ocho" value="1" class="dice-selection mighty" data-i18n-title="mighty" title="Mighty" />
                 <span class="mighty"></span>
                 <span class="artifact-die mighty font-color-initial" data-i18n-title="die-8"></span>
+                <input type="checkbox" name="attr_artifact_die_eight" value="1" class="dice-selection mighty2" data-i18n-title="mighty" title="Mighty" />
+                <span class="mighty2"></span>
+                <span class="artifact-die mighty2 font-color-initial" data-i18n-title="die-8"></span>
                 <input type="checkbox" name="attr_artifact_die_ten" value="1" class="dice-selection epic" data-i18n-title="epic" title="Epic" />
                 <span class="epic"></span>
                 <span class="artifact-die epic font-color-initial" data-i18n-title="die-10"></span>
@@ -6461,11 +6464,11 @@
 
   /* set strength dice pool */
   on('clicked:strength-roll', function (eventInfo) {
-    clog(`Change Detected: ${eventInfo.sourceAttribute}`);
+    //clog(`Change Detected: ${eventInfo.sourceAttribute}`);
     getAttrs(['strength_total'], function (values) {
       const strength_total = int(values.strength_total);
       setAttrs({
-        attribute: strength_total,
+        attribute: Math.min(strength_total, 12),
         skill: 0,
         gear: 0,
         artifact_die_eight: 0,
