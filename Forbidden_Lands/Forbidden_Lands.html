@@ -736,7 +736,7 @@
                 <button class="weapons-box24 roll-button" type="action" name="act_attack-roll" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">t</button>
                 <!-- <button class="weapons-box25 roll-button" type="action" name="act_attack-parry-roll" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">t</button> -->
                 <button class="rollme" type="roll" name="roll_the_dice_local" data-i18n-title="roll-dice" title="Roll the Dice!" value="@{the_dice_local_macro}">&nbsp;<span data-i18n="roll">Roll</span>&nbsp;</button>
-                <input class="weapons-box25 input" type="text" list="weapon_actions" name="attr_weapon_action" title="@{repeating_weapons_$X_weapon_action}" />
+                <input class="weapons-box25 input" type="text" list="weapon_actions" name="attr_weapon_action" data-i18n-placeholder="not-applicable-abbr" placeholder="n/a" title="@{repeating_weapons_$X_weapon_action}" />
                 <datalist id="weapon_actions">
                   <option data-i18n="action-disarm">Disarm</option>
                   <option data-i18n="action-parry">Parry</option>
@@ -3583,7 +3583,7 @@
     <div class="template-grid">
       {{#attribute-die-one}}
         <div class="template-grid-item template-span-left">
-          <span class="template-smaller small-caps stacked-text" data-i18n="base-dice">Base Dice</span>
+          <span class="template-stacked-text small-caps" data-i18n="base-dice">Base Dice</span>
         </div>
         <div class="template-grid-item template-span-one template-white-dice">
           {{#rollTotal() attribute-roll-one 1}}
@@ -3728,7 +3728,7 @@
     <div class="template-grid">
       {{#rollTotal() skill-die-one 1}}
       <div class="template-grid-item template-span-center">
-        <span class="template-smaller small-caps stacked-text" data-i18n="skill-dice">Skill Dice</span>
+        <span class="template-stacked-text small-caps" data-i18n="skill-dice">Skill Dice</span>
       </div>
       <div class="template-grid-item template-span-three template-maroon-dice">
         {{#rollBetween() skill-roll-one 1 5}} {{skill-roll-one}} {{/rollBetween() skill-roll-one 1 5}}
@@ -3747,7 +3747,7 @@
       {{/rollTotal() skill-die-two 1}}
       {{#rollTotal() negative-die-one 1}}
         <div class="template-grid-item template-span-center">
-          <span class="template-smaller small-caps stacked-text" data-i18n="negative-dice">Negative Dice</span>
+          <span class="template-stacked-text small-caps" data-i18n="negative-dice">Negative Dice</span>
         </div>
       <div class="template-grid-item template-span-three template-purple-dice">
         {{#rollBetween() negative-roll-one 1 5}} {{negative-roll-one}} {{/rollBetween() negative-roll-one 1 5}}
@@ -3840,7 +3840,7 @@
     <div class="template-grid">
       {{#rollTotal() gear-die-one 1}}
         <div class="template-grid-item template-span-right">
-          <span class="template-smaller small-caps stacked-text" data-i18n="gear-dice">Gear Dice</span>
+          <span class="template-stacked-text small-caps" data-i18n="gear-dice">Gear Dice</span>
         </div>
         <div class="template-grid-item template-span-five template-black-dice">
           {{#rollTotal() gear-roll-one 1}}
@@ -4033,7 +4033,6 @@
         {{/rollTotal() artifact-roll-ten 10}}
       </div>
       {{/rollTotal() artifact-die-ten 1}}
-
 
       {{#rollTotal() artifact-die-twelve 1}}
       <div class="template-grid-item template-span-five template-orange-dice">
@@ -4487,13 +4486,11 @@
 </rolltemplate>
 
 <script type="text/worker">
-  // type="text/worker"
-
   'use strict';
 
-  /* GLOBAL number and log handling */
-  const int = (score, on_error = 0) => parseInt(score) || on_error;
-  const float = (score, on_error = 0) => parseFloat(score) || on_error;
+  /* GLOBALS */
+
+  // custom logs
   const clog = (text, title = '', color = 'green', style = 'font-size:12px; font-weight:normal;', headerstyle = 'font-size:13px; font-weight:bold;') => {
     const titleStyle = `color:${color}; ${headerstyle} text-decoration:underline;`;
     const textStyle = `color:${color}; ${style}`;
@@ -4506,7 +4503,11 @@
     }
   };
 
-  // adds to primary and returns updated primary
+  // common number handling
+  const int = (score, on_error = 0) => parseInt(score) || on_error;
+  const float = (score, on_error = 0) => parseFloat(score) || on_error;
+
+  // adds to primary and returns updated/incremented primary
   const incrementWith = (primary, secondary) => {
     if (typeof primary !== 'number' || typeof secondary !== 'number') {
       throw new Error('Both inputs must be numbers.');
@@ -4517,6 +4518,9 @@
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
+
+  // map numbers to the literal numbers, e.g. 1 to "one", 2 to "two" by using litnum[1] and litnum[2] respectively
+  const litnum = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
   const stats = ['strength', 'agility', 'wits', 'empathy'];
 
@@ -5216,8 +5220,6 @@
     },
   };
 
-  // need to convert numbers 1-12 to text. index 0 is "", as its not needed.
-  const numbers = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
   Object.keys(pools).forEach((which) => {
     on(`change:${which}`, function () {
       getAttrs([which, 'skill'], function (values) {
@@ -5227,17 +5229,17 @@
         // loop through numbers from 1 to the pool's max, and enter a value of 1 if less < pool value, or 0 otherwise.
         for (let d = 1; d <= pools[which].max; d++) {
           // pools[which].max gets the max value from the pools object.
-          settings[`${which}_die_${numbers[d]}`] = d <= score ? 1 : 0;
-          // `${which}_die_${numbers[d]}` creates a name like 'gear_die_three'
+          settings[`${which}_die_${litnum[d]}`] = d <= score ? 1 : 0;
+          // `${which}_die_${litnum[d]}` creates a name like 'gear_die_three'
           // (d <= score) ? 1 : 0; checks current index and assigns value of 1 if less than equal to pool score
           // settings[attribute] = value stores the appropriate attribute names and values
         }
         // need to check negative dice, and compare score
         // negative dice are set to zero. They are set to 1 only if pools.negative > 0, score is below zero, and absolute value of score is below 1-3.
         for (let n = 1; n <= 3; n++) {
-          // settings[`negative_die_${numbers[n]}`] = pools[which].negative && score < 0 && n <= Math.abs(score) ? 1 : 0;
-          settings[`negative_die_${numbers[n]}`] = negativeDice && n <= Math.abs(negativeDice) ? 1 : 0;
-          // clog(`Negative dice are being evaluated. |pools.negative value=${pools[which].negative} |Skill score=${score} |n=${n} |abs of score=${Math.abs(score)} |include negative die=${settings[`negative_die_${numbers[n]}`]}`);
+          // settings[`negative_die_${litnum[n]}`] = pools[which].negative && score < 0 && n <= Math.abs(score) ? 1 : 0;
+          settings[`negative_die_${litnum[n]}`] = negativeDice && n <= Math.abs(negativeDice) ? 1 : 0;
+          // clog(`Negative dice are being evaluated. |pools.negative value=${pools[which].negative} |Skill score=${score} |n=${n} |abs of score=${Math.abs(score)} |include negative die=${settings[`negative_die_${litnum[n]}`]}`);
         }
         setAttrs(settings);
       });
@@ -5487,9 +5489,6 @@
     console.log('Output post: ' + JSON.stringify(output));
     return output;
   };
-
-  // Array to map number to literal numbers, e.g. 1 to "one", 2 to "two" by using litnum[1] and litnum[2] respectively
-  const litnum = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 
   on('clicked:push', async (ev) => {
     clog('Starting push roll!');
