@@ -141,8 +141,11 @@
         <input class="broken-wit" type="hidden" name="attr_wits_total" value="0" />
         <input class="broken-emp" type="hidden" name="attr_empathy_total" value="0" />
         <div class="attributes-box2">
-          <button type="action" name="act_strength_roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
-            <span class="label broken-str" data-i18n="strength" name="attr_strength_name">Strength</span>
+          <button type="action" class="char-mutant char-animal char-human" data-i18n="strength" name="act_strength_roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            <!-- <span class="label broken-str" data-i18n="strength">Strength</span> -->
+          </button>
+          <button type="action" class="char-robot" name="act_servos_roll" data-i18n="servos" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            
           </button>
         </div>
         <div class="attributes-box3">
@@ -209,8 +212,10 @@
           <span class="input-span broken-str" name="attr_strength_total" value="1" title="@{strength_total}">1</span>
         </div>
         <div class="attributes-box6">
-          <button type="action" name="act_agility_roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
-            <span class="label broken-agi" data-i18n="agility" name="attr_agility_name">Agility</span>
+          <button type="action" name="act_agility_roll" class="char-mutant char-animal char-human" data-i18n="agility" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            <!-- <span class="label broken-agi" data-i18n="agility" name="attr_agility_name">Agility</span> -->
+          </button>
+          <button type="action" class="char-robot" name="act_stability_roll" data-i18n="stability" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
           </button>
         </div>
         <div class="attributes-box7">
@@ -239,9 +244,11 @@
           <span class="input-span broken-agi" name="attr_agility_total" value="1" title="@{agility_total}">1</span>
         </div>
         <div class="attributes-box10">
-          <button type="action" name="act_wits_roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
-            <span class="label broken-wit" data-i18n="wits" name="attr_wits_name">Wits</span>
+          <button type="action" name="act_wits_roll" class="char-mutant char-animal char-human" data-i18n="wits" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            <!-- <span class="label broken-wit" data-i18n="wits" name="attr_wits_name">Wits</span> -->
           </button>
+          <button type="action" class="char-robot" name="act_processor_roll" data-i18n="processor" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+          </button>        
         </div>
         <div class="attributes-box11">
           <input class="input-number broken-wit" type="number" name="attr_wits" value="1" min="0" title="@{wits}" />
@@ -269,9 +276,14 @@
           <span class="input-span broken-wit" name="attr_wits_total" value="1" title="@{wits_total}">1</span>
         </div>
         <div class="attributes-box14">
-          <button type="action" name="act_empathy_roll" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
-            <span class="label broken-emp" data-i18n="empathy" name="attr_empathy_name">Empathy</span>
+          <button type="action" name="act_empathy_roll" class="char-mutant char-human" data-i18n="empathy" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+            <!-- <span class="label broken-emp" data-i18n="empathy" name="attr_empathy_name">Empathy</span> -->
           </button>
+          <button type="action" class="char-animal" name="act_instinct_roll" data-i18n="instinct" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+          </button>
+          <button type="action" class="char-robot" name="act_network_roll" data-i18n="network" value="" data-i18n-title="update-dice-pool" title="Update the dice pool. Use the 'Roll' button to roll the dice.">
+          </button>
+        
         </div>
         <div class="attributes-box15">
           <input class="input-number broken-emp" type="number" name="attr_empathy" value="1" min="0" title="@{empathy}" />
@@ -5854,8 +5866,38 @@ function getSingleAttrAsync(prop){
       });
     });
   });
+
+  const attributeArr = [
+      {name:"strength",attr:"strength"},
+      {name:"agility",attr:"agility"},
+      {name:"wits",attr:"wits"},
+      {name:"empathy",attr:"empathy"},
+      {name:"instinct",attr:"empathy"},
+      {name:"servos",attr:"strength"},
+      {name:"stability",attr:"agility"},
+      {name:"processor",attr:"wits"},
+      {name:"network",attr:"empathy"}
+    ];
+  attributeArr.forEach( (attrb) => {
+    on(`clicked:${attrb.name}_roll`, function (ev) {
+       clog(`Change Detected: ${attrb.name} - button clicked`);
+        clog(`Event : ${JSON.stringify(ev)}`);
+       getAttrs([`${attrb.attr}_total`], function (values) {
+         const total = int(values[`${attrb.attr}_total`]),
+         name = getTranslationByKey(attrb.name);
+         clog(name + " : " + total);
+         setAttrs({
+           attribute: total,
+           skill: 0,
+           gear: 0,
+           current_preset: name,
+           include_with_roll: "",
+         });
+       });
+     });
+  });
   
-  /* set strength dice pool */
+  /* set strength dice pool
   on("clicked:strength_roll", function () {
     clog("Change Detected: Strength - button clicked");
     getAttrs(["strength_total", "strength_name"], function (values) {
@@ -5870,9 +5912,9 @@ function getSingleAttrAsync(prop){
         include_with_roll: "",
       });
     });
-  });
+  }); */
   
-  /* set agility dice pool */
+  /* set agility dice pool
   on("clicked:agility_roll", function () {
     clog("Change Detected: agility - button clicked");
     getAttrs(["agility_total", "agility_name"], function (values) {
@@ -5887,9 +5929,9 @@ function getSingleAttrAsync(prop){
         include_with_roll: "",
       });
     });
-  });
+  }); */
   
-  /* set wits dice pool */
+  /* set wits dice pool
   on("clicked:wits_roll", function () {
     clog("Change Detected: wits - button clicked");
     getAttrs(["wits_total","wits_name"], function (values) {
@@ -5904,9 +5946,9 @@ function getSingleAttrAsync(prop){
         include_with_roll: "",
       });
     });
-  });
+  }); */
   
-  /* set empathy dice pool */
+  /* set empathy dice pool
   on("clicked:empathy_roll", function () {
     clog("Change Detected: empathy - button clicked");
     getAttrs(["empathy_total", "empathy_name"], function (values) {
@@ -5921,14 +5963,7 @@ function getSingleAttrAsync(prop){
         include_with_roll: "",
       });
     });
-  });
-  
-  /* delete empty repeating rows w/out having to close/reopen sheet*/
-  on('remove:repeating_injuries remove:repeating_weapons remove:repeating_skills remove:repeating_gear remove:repeating_vehicle remove:repeating_relationships remove:repeating_spells remove:repeating_beasts remove:repeating_notes remove:repeating_ark-notes remove:repeating_log remove:repeating_monster remove:repeating_mutations remove:repeating_armor remove:repeating_biomechs remove:repeating_contacts remove:repeating_animalpowers remove:repeating_modules remove:repeating_talents', function() { 
-    const timestamp = Number(new Date())
-    setAttrs({ repeat_delete: timestamp });
-    clog("repeating row has been removed");
-  });
+  }); */
   
   /* beautify preserve:end */
 </script>
