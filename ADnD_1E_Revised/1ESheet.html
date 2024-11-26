@@ -63,9 +63,10 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 11/24/24'</span>
+            <span class="right"> • 11/25/24'</span>
           </h5>
           <ul>
+            <li>Added an option in the Sheet settings to auto-roll weapon damage regardless of the attack roll.</li>
             <li>
               <span>Updated some of the sheet's font settings.</span><br>
               <details style="max-width:98%;">
@@ -4504,6 +4505,10 @@
             <span>Use THAC0:</span>
             <input type="checkbox" name="attr_toggle_to_hit_table" value="1" />
           </label>
+          <label title="@{toggle_auto_damage} | Auto roll damage regardless of the attack roll.">
+            <span>Auto Roll Damage:</span>
+            <input type="checkbox" name="attr_toggle_auto_damage" value="1" />
+          </label>
           <label title="@{toggle_critdamage} | Use crit damage rolls on natural 20. Defaults to weapon damage x2. Crit damage handling can be adjusted per attack.">
             <span>Use Crit Damage:</span>
             <input type="checkbox" name="attr_toggle_critdamage" value="1" />
@@ -4808,7 +4813,7 @@
           {{#crit}}
             {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                 <span class="sheet-row">
-                  <span class="sheet-span-two sheet-center">
+                  <span class="sheet-span-two sheet-center sheet-tcat">
                     {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                   </span>
                 </span>
@@ -4821,7 +4826,7 @@
             {{#^rollWasCrit() attack1}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4830,7 +4835,7 @@
             {{#rollWasCrit() attack1}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -4856,7 +4861,7 @@
             {{#^rollWasCrit() attack2}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4865,7 +4870,7 @@
             {{#rollWasCrit() attack2}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -4891,7 +4896,7 @@
             {{#^rollWasCrit() attack3}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4900,7 +4905,7 @@
             {{#rollWasCrit() attack3}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -4926,7 +4931,7 @@
             {{#^rollWasCrit() attack4}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4935,7 +4940,7 @@
             {{#rollWasCrit() attack4}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -5435,7 +5440,6 @@
   };
 
   // during version updates, we need to check that an attribute exists and is not equal to its default, before updating it.
-  // changed != to !==   ie eslint suggestion
   const doUpdate = (stat, def = 0) => typeof stat !== 'undefined' && stat !== def;
 
   // handles regex for testing and replacing macrotext attributes
@@ -5481,7 +5485,7 @@
     return generated;
   };
 
-  // Validate input for illegal characters
+  // Validate character name for illegal characters
   on('change:character_name', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['character_name'], (v) => {
@@ -5677,7 +5681,7 @@
     'armorother6_mod',
   ];
 
-  // use in getSectionIds to separate repeating attribute names
+  // used in getSectionIds to separate a repeating attribute names into 3 components
   const section_attribute = (section, id, field) => `repeating_${section}_${id}_${field}`;
 
   // VERSIONATOR example
@@ -9692,24 +9696,49 @@
     calcAC(recalc);
   });
 
+  // Creates the chat menu buttons or auto rolls damage with the attack based on settings
   damageMacro = (id) => {
-    const output = {};
-    output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
-    output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
-    output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_npc_roll)`;
-    output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_npc_roll)`;
-    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_roll)`;
-    output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_roll)`;
-    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
-    output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
-    setAttrs(output, {silent: true});
+    getAttrs(['toggle_auto_damage'], (v) => {
+      const output = {};
+      const autoDamage = +v.toggle_auto_damage;
+      clog(`auto damage toggle:${autoDamage}`);
+      // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
+      const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageSmallMediumNpc = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageLargeNPC = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageSmallMediumCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageLargeCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}}`;
+      const damageLargeNpcCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      if (autoDamage === 0) {
+        output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
+        output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
+        output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_npc_roll)`;
+        output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_npc_roll)`;
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_roll)`;
+        output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_roll)`;
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
+        output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
+      } else {
+        output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = damageSmallMedium;
+        output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = damageLarge;
+        output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = damageSmallMediumNpc;
+        output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = damageLargeNPC;
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = damageSmallMediumCrit;
+        output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = damageLargeCrit;
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = damageSmallMediumNpcCrit;
+        output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = damageLargeNpcCrit;
+      }
+      setAttrs(output, {silent: true});
+    });
   };
 
   // Ensures Chat Menu Buttons have updated Damage Rolls
   on(
     'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
     (eventInfo) => {
-      // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+      clog(`Change Detected:${eventInfo.sourceAttribute}`);
       const id = eventInfo.sourceAttribute.split('_')[2];
       damageMacro(id);
     },
@@ -9729,6 +9758,18 @@
           output[section_attribute('weapon', id, 'weapon_critdamage_flag')] = 1 - currentValue;
         });
         setAttrs(output);
+      });
+    });
+  });
+
+  on('change:toggle_auto_damage change:toggle_critdamage', (eventInfo) => {
+    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const fields = [];
+      getAttrs(fields, (v) => {
+        idArray.forEach((id) => {
+          damageMacro(id);
+        });
       });
     });
   });
