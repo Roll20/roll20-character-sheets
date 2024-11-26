@@ -5355,7 +5355,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 624786d99fedd96187dc1c0bd0628ea8183cb488
+Revision f33a0056e3c9290689d2e3d6124d8e7cb5c4c3e4
 
 
 <hr>
@@ -14159,16 +14159,17 @@ weaponcodes = {
   fa: "Falchion",
   ma: "Mace",
   cu: "Club",
+  lc: { "Club", size: 1 },
   sb: "Bow, Short",
   lb: "Bow, Long",
+  ss: { table: "Arming Sword", size: -1 },
+  ls: { table: "Arming Sword", size: 1 },
+  fa: "Falchion",
+  
 
   
 /*
-Short Sword		ss
-Longsword		ls
-Falchion		fa
 Two-handed Sword		ts
-Club		cu
 Two-handed Club		tc
 Shield		sh
 Quarterstaff		qs
@@ -14314,13 +14315,22 @@ creature.newCreature = function(name, jdata) {
 
     if (weaponcodes[type]) {
       console.log("Look up", weaponcodes[type]);
-      getCompendiumPage(`AttackTable:${weaponcodes[type]}`, cdata => {
+      const wc = weaponcodes[type];
+      let table;
+      let sizemod = 0;
+      if (typeof(wc == 'string')) {
+        table = wc;
+      } else {
+        table = wc.table;
+        table = wc.sizemod;
+      }
+      getCompendiumPage(`AttackTable:${table}`, cdata => {
           let nu = {};
           // FIXME: Handle errors in size slookup gracefully.
           nu[`${prefix}_attackname`] = creature.getLongSize(size) + " " + weaponcodes[type];
-          nu[`${prefix}_attacksize`] = size;
+          nu[`${prefix}_attacksize`] = size + wc.sizemod;
           nu[`${prefix}_attackbasefumble`] = 1; // FIXMEitems.attackaddfumble;
-          nu[`${prefix}_attacktable`] = weaponcodes[type];
+          nu[`${prefix}_attacktable`] = table;
           nu[`${prefix}_attackstr`] = 100;
           nu[`${prefix}_attacksource`] = 'creature';
           nu[`${prefix}_attackskill`] = ob;
@@ -14503,6 +14513,8 @@ injury.updateInjuryString = function(hits, critical, attacker, result) {
 	} else {
 	    // Sometimes negatives has '( )' around them
 	    value = value.replace(/[)(]/g, "");
+	    // Knockback may have a foot marker (single quote)
+	    value = value.replace(/(\d+)'/g, "$1");
 	    istr += `${istrfield}${Math.abs(value)}`;
 	}
     }
