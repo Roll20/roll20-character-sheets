@@ -63,9 +63,10 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 11/24/24'</span>
+            <span class="right"> • 11/25/24'</span>
           </h5>
           <ul>
+            <li>Added an option in the Sheet settings to auto-roll weapon damage regardless of the attack roll.</li>
             <li>
               <span>Updated some of the sheet's font settings.</span><br>
               <details style="max-width:98%;">
@@ -4504,7 +4505,7 @@
             <span>Use THAC0:</span>
             <input type="checkbox" name="attr_toggle_to_hit_table" value="1" />
           </label>
-          <label title="@{toggle_auto_damage} | Auto roll weapon damage for regardless of the attack roll.">
+          <label title="@{toggle_auto_damage} | Auto roll damage regardless of the attack roll.">
             <span>Auto Roll Damage:</span>
             <input type="checkbox" name="attr_toggle_auto_damage" value="1" />
           </label>
@@ -4812,7 +4813,7 @@
           {{#crit}}
             {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                 <span class="sheet-row">
-                  <span class="sheet-span-two sheet-center">
+                  <span class="sheet-span-two sheet-center sheet-tcat">
                     {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                   </span>
                 </span>
@@ -4825,7 +4826,7 @@
             {{#^rollWasCrit() attack1}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4834,7 +4835,7 @@
             {{#rollWasCrit() attack1}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -4860,7 +4861,7 @@
             {{#^rollWasCrit() attack2}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4869,7 +4870,7 @@
             {{#rollWasCrit() attack2}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -4895,7 +4896,7 @@
             {{#^rollWasCrit() attack3}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4904,7 +4905,7 @@
             {{#rollWasCrit() attack3}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -4930,7 +4931,7 @@
             {{#^rollWasCrit() attack4}}
               {{#damagevsSMchatmenu}}{{#damagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{damagevsSMchatmenu}}{{damagevsLchatmenu}}
                     </span>
                   </span>
@@ -4939,7 +4940,7 @@
             {{#rollWasCrit() attack4}}
               {{#critdamagevsSMchatmenu}}{{#critdamagevsLchatmenu}}
                   <span class="sheet-row">
-                    <span class="sheet-span-two sheet-center">
+                    <span class="sheet-span-two sheet-center sheet-tcat">
                       {{critdamagevsSMchatmenu}}{{critdamagevsLchatmenu}}
                     </span>
                   </span>
@@ -9701,16 +9702,15 @@
       const output = {};
       const autoDamage = +v.toggle_auto_damage;
       clog(`auto damage toggle:${autoDamage}`);
-      // NOTE: these macros use '}}' to close/hide the chatmenu key and also use the chatmenu's closing '}}'
-      // PROBLEM: crit damages are being shown 100% if 'use crit' is enabled.  should only show on nat 20!
-      const damageSmallMedium = `}} {{damage1vsSM=[[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]`;
-      const damageLarge = `}} {{damage1vsL=[[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]`;
-      const damageSmallMediumNpc = `}} {{damage1vsSM=[[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]`;
-      const damageLargeNPC = `}} {{damage1vsL=[[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]`;
-      const damageSmallMediumCrit = `}} {{damage1vsSM=[[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]}} {{crit=[[ @{toggle_critdamage} ]]`;
-      const damageLargeCrit = `}} {{damage1vsL=[[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]}} {{crit=[[ @{toggle_critdamage} ]]`;
-      const damageSmallMediumNpcCrit = `}} {{damage1vsSM=[[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]}} {{crit=[[ @{toggle_critdamage} ]]`;
-      const damageLargeNpcCrit = `}} {{damage1vsL=[[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}} {{backstab=[[ @{repeating_weapon_${id}_weapon_backstab_mult} ]]}} {{crit=[[ @{toggle_critdamage} ]]`;
+      // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
+      const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageSmallMediumNpc = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageLargeNPC = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageSmallMediumCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageLargeCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+      const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}}`;
+      const damageLargeNpcCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
       if (autoDamage === 0) {
         output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
         output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
