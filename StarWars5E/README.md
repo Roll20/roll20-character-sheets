@@ -8,7 +8,7 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
-## 2024-11-??
+## 2024-11-27
 * Chore : Massive refactor of the sheet using GULP as build engine
 * Chore : Removal of leftover unused code for 5e compendium & Charmancer integration
 * Chore : Migrating from Legacy sheet to CSE
