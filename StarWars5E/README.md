@@ -4,7 +4,7 @@ This is a character sheet for Star Wars 5E (SW5E), a D&D5E conversion.
 More Information
 - [Full SW5e Site and Rules](https://sw5e.com/)
 - [Star Wars 5E Subreddit](https://www.reddit.com/r/sw5e)
-- [Star Wars 5E Sheet Wiki article](https://wiki.roll20.net/StarWars5E-Sheet)²
+- [Star Wars 5E Sheet Wiki article](https://wiki.roll20.net/StarWars5E-Sheet)
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
