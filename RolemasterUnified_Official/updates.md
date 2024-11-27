@@ -1,3 +1,9 @@
+# 2024-11-26
+
+- Handle the knockback results when they have a ' in them.
+- Handle short swords and a few other weapons for creatures.
+
+
 # 2024-11-19
 
 - Stats are now right aligned.
