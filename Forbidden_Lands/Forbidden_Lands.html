@@ -4902,32 +4902,32 @@
   on('change:tab change:strength_pc change:strength_monster sheet:opened', (eventInfo) => {
     getAttrs(['tab', 'strength', 'strength_pc', 'strength_monster'], (v) => {
       // clog(`Change Detected: ${eventInfo.sourceAttribute}`);
-      const settings = {};
+      const output = {};
       const tab = int(v.tab, 1); // sets tab to 1 if not recognized - so goes to pc tab;
-      const str = int(v.strength);
-      let pc = int(v.strength_pc);
-      let monster = int(v.strength_monster);
+      const hiddenStrength = int(v.strength);
+      let strengthPC = int(v.strength_pc);
+      let strengthMonster = int(v.strength_monster);
       let forceupdate = 0;
 
       // check if character existed before strength_pc or _monster stats were introduced.
-      if (str > 0) {
-        if (pc === 0 || monster === 0) forceupdate = 1;
-        if (pc === 0) {
-          pc = str;
-          settings.strength_pc = str;
+      if (hiddenStrength > 0) {
+        if (strengthPC === 0 || strengthMonster === 0) forceupdate = 1;
+        if (strengthPC === 0) {
+          strengthPC = hiddenStrength;
+          output.strength_pc = hiddenStrength;
         }
-        if (monster === 0) {
-          monster = str;
-          settings.strength_monster = str;
+        if (strengthMonster === 0) {
+          strengthMonster = hiddenStrength;
+          output.strength_monster = hiddenStrength;
         }
       }
       // if tab is not pc or monster, end the function and leave strength unchanged
       if (tab !== 1 && tab !== 3 && !forceupdate) return;
 
       // if tab = 1 or 3, set strength to the appropriate value
-      settings.strength = tab === 3 ? monster : pc;
+      output.strength = tab === 3 ? strengthMonster : strengthPC;
 
-      setAttrs(settings);
+      setAttrs(output);
     });
   });
 
@@ -6403,11 +6403,15 @@
 
   stats.forEach((stat) => {
     on(`change:${stat} change:tab`, function (eventInfo) {
-      getAttrs([stat, 'tab'], function (values) {
+      getAttrs([stat, 'tab', 'strength_pc', 'strength_monster'], function (values) {
         const total = int(values[stat]);
         const tab = int(values.tab);
+        let max = 7;
         // monsters(tab 3) can have a 48 max
-        const max = tab === 3 && stat === 'strength' ? 48 : 7;
+        const pc = int(values.strength_pc);
+        const monster = int(values.strength_monster);
+        max = tab !== 2 && stat === 'strength' ? Math.min(monster, 48) : Math.min(pc, 7);
+
         const settings = checkMax(stat, total, max);
         if (settings) setAttrs(settings);
       });
