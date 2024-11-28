@@ -38,9 +38,10 @@
       <input type="checkbox" class="announcements-show" name="attr_show_announcements" value="1" data-i18n-title="close-announcements" title="Close Announcements" />
       <span class="announcements-exit" data-i18n-title="close">*</span><br>
       <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-      <span class="footer">11/24/24</span>
+      <span class="footer">11/27/24</span>
       <ol>
         <strong>v1.9</strong>
+        <li>Fixed a bug where PC Strength could get switched to '7' when moving between the PC and Monster tab.</li>
         <li>Push your rolls without the API! The sheet's rolls have been updated with CRP(custom roll parsing). You can now roll your dice pool and push them directly from the chat window without having to manually adjust the pool and re-rolling. (thank you Richard for letting me mangle your MYZ CRP code for this.)</li>
         <li>Consumable rolls will now auto-decrement the resource's die size on failed rolls.</li>
         <li>The roll template now displays the dice pool results horizontally.</li>
@@ -646,7 +647,7 @@
             <span data-i18n="effects">Effects</span>
           </div>
           <div class="injuries-box6 column-header-bottom">
-            <span data-i18n="healing-time" style="white-space:nowrap; margin-left:-2.75em;">Healing Time</span>
+            <span data-i18n="healing-time" style="margin-left:-4.4em;">Healing Time</span>
           </div>
           <div class="injuries-box7">
             <fieldset class="repeating_injuries">
@@ -699,7 +700,7 @@
             <span data-i18n="total-abbr">Tot</span>
           </div>
           <div class="weapons-box10 column-header-bottom">
-            <span data-i18n="bonus">Bonus</span>
+            <span data-i18n="bonus-abbr">Bonus</span>
           </div>
           <div class="weapons-box11 column-header-bottom">
             <span data-i18n="max-abbr">Max</span>
@@ -3037,7 +3038,7 @@
           <div class="willpower-box1 header-top">
             <h1 data-i18n="willpower-u" style="margin-left: 3em;">WILLPOWER</h1>
           </div>
-          <div class="willpower-box2">
+          <!-- <div class="willpower-box2">
             <input type="radio" name="attr_willpower" value="0" data-i18n-title="no-willpower" title="No Willpower" style="margin: 3px 6px 3px 3px;" checked />
             <input class="xbox" type="radio" name="attr_willpower" value="1" title="1 @{willpower}" /><span></span> <input
               class="xbox" type="radio" name="attr_willpower" value="2" title="2 @{willpower}" /><span></span>
@@ -3049,6 +3050,21 @@
               class="xbox" type="radio" name="attr_willpower" value="8" title="8 @{willpower}" /><span></span>
             <input class="xbox" type="radio" name="attr_willpower" value="9" title="9 @{willpower}" /><span></span> <input
               class="xbox" type="radio" name="attr_willpower" value="10" title="10 @{willpower}" /><span></span>
+            <input type="hidden" name="attr_willpower_max" value="10" />
+          </div> -->
+          <div class="willpower-box2">
+            <button class="reset" type="action" name="act_reset" data-i18n-title="no-willpower" title="No Willpower"></button><span></span>
+            <input class="hidden" type="checkbox" name="attr_willpower" value="0" checked />
+            <input class="xbox" type="checkbox" name="attr_willpower" value="1" title="1 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="2" title="2 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="3" title="3 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="4" title="4 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="5" title="5 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="6" title="6 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="7" title="7 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="8" title="8 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="9" title="9 @{willpower}" /><span></span>
+            <input class="xbox" type="checkbox" name="attr_willpower" value="10" title="10 @{willpower}" /><span></span>
             <input type="hidden" name="attr_willpower_max" value="10" />
           </div>
           <span class="willpower-box3">=</span>
@@ -4902,32 +4918,32 @@
   on('change:tab change:strength_pc change:strength_monster sheet:opened', (eventInfo) => {
     getAttrs(['tab', 'strength', 'strength_pc', 'strength_monster'], (v) => {
       // clog(`Change Detected: ${eventInfo.sourceAttribute}`);
-      const settings = {};
+      const output = {};
       const tab = int(v.tab, 1); // sets tab to 1 if not recognized - so goes to pc tab;
-      const str = int(v.strength);
-      let pc = int(v.strength_pc);
-      let monster = int(v.strength_monster);
+      const hiddenStrength = int(v.strength);
+      let strengthPC = int(v.strength_pc);
+      let strengthMonster = int(v.strength_monster);
       let forceupdate = 0;
 
       // check if character existed before strength_pc or _monster stats were introduced.
-      if (str > 0) {
-        if (pc === 0 || monster === 0) forceupdate = 1;
-        if (pc === 0) {
-          pc = str;
-          settings.strength_pc = str;
+      if (hiddenStrength > 0) {
+        if (strengthPC === 0 || strengthMonster === 0) forceupdate = 1;
+        if (strengthPC === 0) {
+          strengthPC = hiddenStrength;
+          output.strength_pc = hiddenStrength;
         }
-        if (monster === 0) {
-          monster = str;
-          settings.strength_monster = str;
+        if (strengthMonster === 0) {
+          strengthMonster = hiddenStrength;
+          output.strength_monster = hiddenStrength;
         }
       }
       // if tab is not pc or monster, end the function and leave strength unchanged
       if (tab !== 1 && tab !== 3 && !forceupdate) return;
 
       // if tab = 1 or 3, set strength to the appropriate value
-      settings.strength = tab === 3 ? monster : pc;
+      output.strength = tab === 3 ? strengthMonster : strengthPC;
 
-      setAttrs(settings);
+      setAttrs(output);
     });
   });
 
@@ -6403,11 +6419,15 @@
 
   stats.forEach((stat) => {
     on(`change:${stat} change:tab`, function (eventInfo) {
-      getAttrs([stat, 'tab'], function (values) {
+      getAttrs([stat, 'tab', 'strength_pc', 'strength_monster'], function (values) {
         const total = int(values[stat]);
         const tab = int(values.tab);
+        let max = 7;
         // monsters(tab 3) can have a 48 max
-        const max = tab === 3 && stat === 'strength' ? 48 : 7;
+        const pc = int(values.strength_pc);
+        const monster = int(values.strength_monster);
+        max = tab !== 2 && stat === 'strength' ? Math.min(monster, 48) : Math.min(pc, 7);
+
         const settings = checkMax(stat, total, max);
         if (settings) setAttrs(settings);
       });
@@ -6536,6 +6556,22 @@
         subtitle2: '',
         include_with_roll: '',
       });
+    });
+  });
+
+  /* willpower */
+  on('clicked:reset change:willpower', (eventInfo) => {
+    getAttrs(['willpower'], (v) => {
+      const zero = eventInfo.triggerName.replace('clicked:', '');
+      const output = {};
+      const newValue = +v.willpower;
+      const previousValue = eventInfo.previousValue;
+      if (eventInfo.triggerName === 'clicked:reset') {
+        output.willpower = 0;
+      } else if (newValue === 0) {
+        output.willpower = previousValue - 1;
+      }
+      setAttrs(output, {silent: true});
     });
   });
 
