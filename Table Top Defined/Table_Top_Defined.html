@@ -2788,10 +2788,10 @@
         <div>Item Name: <textarea name="attr_main-inv-name" placeholder="Item name, description, notes etc..."/></div>
        </div>
        <div class="quantity">
-        <div>Quantity: <input type="text" name="attr_mainquantity"/></div>
+        <div>Quantity: <input type="number" name="attr_mainquantity"/></div>
        </div>
        <div class="piece-weight">
-        <div>Unit Weight: <input type="text" name="attr_mainpieceweight"/></div>
+        <div>Unit Weight: <input type="number" name="attr_mainpieceweight"/></div>
        </div>
        <div class="total-weight">
         <div>Total Weight: <input type="text" name="attr_maintotalweight" readonly/></div>
@@ -2919,16 +2919,16 @@
         let location_names = {};
         for (let arrayID of locationArray){
          // The assumption is that bag names will be unique, if they're not the last one will take precedence
-         location_names[values[`repeating_locationtotals_${arrayID}_inventoryLocationName`]] =
+         location_names[values[`repeating_locationtotals_${arrayID}_inventoryLocationName`].toLowerCase()] =
                  `repeating_locationtotals_${arrayID}`;
         }
         for (let arrayID of inventoryArray) {
          let item_weight = parseFloat(values[`repeating_maininventory_${arrayID}_maintotalweight`]);
          let item_location = values[`repeating_maininventory_${arrayID}_inventoryLocation`];
          let item_quantity = parseInt(values[`repeating_maininventory_${arrayID}_mainquantity`]);
-         if (item_location in location_names) {
-          attrsToSet[location_names[item_location]+"_locationTotalWeight"] += item_weight;
-          attrsToSet[location_names[item_location]+"_locationItemCount"] += item_quantity;
+         if (item_location.toLowerCase() in location_names) {
+          attrsToSet[location_names[item_location.toLowerCase()]+"_locationTotalWeight"] += item_weight;
+          attrsToSet[location_names[item_location.toLowerCase()]+"_locationItemCount"] += item_quantity;
           attrsToSet[`repeating_maininventory_${arrayID}_locationValidation`] = 1;
          } else {
           attrsToSet[`repeating_maininventory_${arrayID}_locationValidation`] = 0;
@@ -2951,8 +2951,8 @@
        getAttrs(AttrsToGet, function (values) {
         let total = 0;
         for (let arrayID of locationArray){
-         total += values[`repeating_locationtotals_${arrayID}_locationTotalWeight`] *
-                 values[`repeating_locationtotals_${arrayID}_locationOnPerson`]
+         total += Math.round((values[`repeating_locationtotals_${arrayID}_locationTotalWeight`] *
+                 values[`repeating_locationtotals_${arrayID}_locationOnPerson`])*100)/100
         }
         setAttrs({
          totalweight: total
@@ -2967,7 +2967,7 @@
             "repeating_maininventory_mainpieceweight"], function(values){
             let quantity = parseFloat(values.repeating_maininventory_mainquantity)||0;
             let weight = parseFloat(values.repeating_maininventory_mainpieceweight)||0;
-            let total = (quantity * weight);
+            let total = Math.round((quantity * weight)*100)/100;
             setAttrs({
                 repeating_maininventory_maintotalweight : total
             });
