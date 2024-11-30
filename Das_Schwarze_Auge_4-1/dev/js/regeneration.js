@@ -2015,9 +2015,10 @@ on(
 		"character_name",
 		"gm_roll_opt",
 		"in", "ch", "ko",
-		"le", "ae", "ae_max",
+		"le", "le_max", "ae", "ae_max",
 		"eisern", "vorteil_zaeher_hund",
 		"sf_astrale_meditation",
+		"reg_astralmeditation_automode",
 		"reg_astralmeditation_mod_skill_value",
 		"reg_astralmeditation_mod_other",
 		"reg_astralmeditation_use_thonnys",
@@ -2025,6 +2026,7 @@ on(
 		"reg_astralmeditation_conversion_target",
 		"reg_astralmeditation_location_limbo",
 		"reg_astralmeditation_limit_life_energy_soft",
+		"reg_astralmeditation_mod_other",
 	].map(attr => "change:" + attr).join(" "),
 	function(eventInfo) {
 	safeGetAttrs(
@@ -2032,9 +2034,10 @@ on(
 			"character_name",
 			"gm_roll_opt",
 			"IN", "CH", "KO",
-			"LE", "AE", "AE_max",
+			"LE", "LE_max", "AE", "AE_max",
 			"Eisern", "vorteil_zaeher_hund",
 			"sf_astrale_meditation",
+			"reg_astralmeditation_automode",
 			"reg_astralmeditation_mod_skill_value",
 			"reg_astralmeditation_mod_other",
 			"reg_astralmeditation_use_thonnys",
@@ -2042,6 +2045,7 @@ on(
 			"reg_astralmeditation_conversion_target",
 			"reg_astralmeditation_location_limbo",
 			"reg_astralmeditation_limit_life_energy_soft",
+			"reg_astralmeditation_mod_other",
 		], function(values) {
 		const caller = "Action Listener for Generation of Regeneration Roll (Astral Meditation)";
 		debugLog(caller, "eventInfo", eventInfo, "values", values);
@@ -2052,7 +2056,9 @@ on(
 		*/
 		const LE = parseInt(values["LE"]);
 		const AE = parseInt(values["AE"]);
+		const LEMax = values["LE_max"];
 		const AEMax = values["AE_max"];
+		const auto = values["reg_astralmeditation_automode"];
 		const eisern = values["Eisern"];
 		const tough = values["vorteil_zaeher_hund"];
 		const specialSkill = parseInt(values["sf_astrale_meditation"]);
@@ -2061,16 +2067,18 @@ on(
 		// Combined with the special skill Thonnys grants reduced cost only at full dose
 		const thonnysFullDoseLeaves = 7;
 		const targetRaw = parseInt(values["reg_astralmeditation_conversion_target"]);
+		const limbo = values["reg_astralmeditation_location_limbo"];
 		const limitLifeEnergySoftRaw = parseInt(values["reg_astralmeditation_limit_life_energy_soft"]);
+		const modOther = parseInt(values["reg_astralmeditation_mod_other"]);
 		// Explanation for that magic number
 		/// Character incapacitated at 5 LeP or below
 		/// 1 LeP minimum conversion
 		/// (1W3 - 1) LeP = 2 LeP additional LE loss
-		const LEAliveMinimum = 1;
-		const LEIncapacitatedMin = 5;
+		const LEIncapacitatedMin = 1;
+		const LEIncapacitatedDefault = 5;
 		const LECostConversionMin = 1;
 		const LECostAdditionalMax = 2;
-		const limitLifeEnergyHardMaxDefault = LEIncapacitatedMin + LECostConversionMin + LECostAdditionalMax;
+		const limitLifeEnergyHardMaxDefault = LEIncapacitatedDefault + LECostConversionMin + LECostAdditionalMax;
 		const AECostInitiationDefault = 1;
 		let attrsToChange = {};
 
@@ -2102,37 +2110,20 @@ on(
 		// Determination of hard limit
 		// Set hard limit to default value:
 		let limitLifeEnergyHard = limitLifeEnergyHardMaxDefault;
-		if (
-			(eisern !== "2") && (tough !== "1") && (setup !== 3)
-		)
+		let LEIncapacitated = LEIncapacitatedDefault;
+		if ( (eisern === "2") || (tough === "1"))
 		{
-			// Incapacitation at 5, 1 conversion, 2 max. additional loss
-			limitLifeEnergyHard = LEIncapacitatedMin + LECostConversionMin + LECostAdditionalMax;
-		} else if (
-		 (
-		 	(eisern !== "2") && (tough !== "1")
-		 ) && (setup === 3)
-		)
-		{
-			// Incapacitation at 5, 1 conversion, no additional loss
-			limitLifeEnergyHard = LEIncapacitatedMin + LECostConversionMin;
-		} else if (
-		 (
-		 	(eisern === "2") || (tough === "1")
-		 ) && (setup !== 3)
-		)
-		{
-			// No incapacitation, 1 conversion, 2 max. additional loss
-			limitLifeEnergyHard = LEAliveMinimum + LECostConversionMin + LECostAdditionalMax;
-		} else if (
-		 (
-		 	(eisern === "2") || (tough === "1")
-		 ) && (setup === 3)
-		)
-		{
-			// No incapacitation, 1 conversion, no additional loss
-			limitLifeEnergyHard = LEAliveMinimum + LECostConversionMin;
+			LEIncapacitated = LEIncapacitatedMin;
 		}
+
+		let LECostAdditional = LECostAdditionalMax;
+		let AECostInitiation = AECostInitiationDefault;
+		if (setup === 3)
+		{
+			LECostAdditional = 0;
+			AECostInitiation = 0;
+		}
+		limitLifeEnergyHard = LECostConversionMin + LEIncapacitated + LECostAdditional;
 
 		// Determination of soft limit
 		// Must be >= hard limit
@@ -2145,23 +2136,141 @@ on(
 			attrsToChange["reg_astralmeditation_limit_life_energy_soft"] = limitLifeEnergyHard;
 		}
 
-		// Determination of conversion target
+		// Determination of conversion target (target and targetDice)
 		// Limited by max. astral energy
 		let target = targetRaw;
 		let targetAdapted = false;
+		let targetDice = "";
+
 		if (targetRaw > maxConversionRequired)
 		{
 			target = maxConversionRequired;
 			targetAdapted = true;
 		}
+		if (limbo === "1")
+		{
+			targetDice = `${target}d6`;
+		}
+
+		if (auto === "1")
+		{
+			const LELevelLimitRelaxed = 2/3;
+			const LELevelLimitDesperate = 1/2;
+			const AELevelLimitRelaxed = 90; //%
+			const AELevelLimitDesperate = 50; //%
+			const AEDeficitRelaxed = 3;
+			const AEDeficitDesperate = 15;
+			// Percentage of AE of AE_max
+			let AELevel = 1;
+			// Absolute AE required
+			let AEDeficit = 0;
+			// Minimum percentage of life energy to keep after meditation
+			let LELevelLimit = 1;
+
+			if (AE < AEMax)
+			{
+				// JS Math.round only rounds to integers, the "100" "converts" this to a "percent number"
+				AELevel = Math.round(100 * AE / AEMax);
+				AEDeficit = Math.max(0, AEMax - AE) + AECostInitiation;
+			}
+			// Nine cases in total, three are covered by the LELevelLimit default value defined above
+			// Basic idea: The lower the AE (relatively) and the higher the demand for full AE (absolute), the more aggressively try to restore AE.
+			if (
+				(
+					(AELevel >= AELevelLimitRelaxed)
+					&&
+					(AEDeficit > AEDeficitDesperate)
+				)
+				||
+				(
+					 (AELevel >= AELevelLimitDesperate) && (AELevel < AELevelLimitRelaxed)
+					&&
+					(AEDeficit > AEDeficitRelaxed) && (AEDeficit <= AEDeficitDesperate)
+				)
+				||
+				(
+					(AELevel < AELevelLimitDesperate)
+					&&
+					(AEDeficit <= AEDeficitRelaxed)
+				)
+			)
+			{
+				LELevelLimit = LELevelLimitRelaxed;
+			} else if (
+				(
+					(AELevel < AELevelLimitDesperate)
+					&&
+					(AEDeficit > AEDeficitRelaxed) && (AEDeficit <= AEDeficitDesperate)
+				)
+				||
+				(
+					(AELevel >= AELevelLimitDesperate) && (AELevel < AELevelLimitRelaxed)
+					&&
+					(AEDeficit > AEDeficitDesperate)
+				)
+				||
+				(
+					(AELevel < AELevelLimitDesperate)
+					&&
+					(AEDeficit > AEDeficitDesperate)
+				)
+			)
+			{
+				LELevelLimit = LELevelLimitDesperate;
+			}
+
+			// Calculate actual absolute limit and available absolute LeP
+			const LELimit = Math.ceil(LELevelLimit * LEMax);
+			const LEAvailable = Math.max(0, LE - LELimit);
+
+			// Calculate "target", i.e. the amount of LE to convert
+			if (limbo === "1")
+			{
+				// Heuristic
+				/// Estimates required life energy points to fill target astral energy points with 90% probability
+				/// Underestimates the effect for large values (>100 AsP required)
+				/// Regeneration slightly higher for these values
+				let LERequired = 1 + Math.ceil(AEDeficit / 3);
+
+				// Calculate target and targetDice
+				if (LEAvailable - LECostAdditional >= LERequired)
+				{
+					target = LERequired;
+				} else {
+					target = Math.max(0, LEAvailable - LECostAdditional);
+				}
+				if (target === 0)
+				{
+					targetDice = '0d6';
+					attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
+				} else if (target === 1)
+				{
+					targetDice = '1d6';
+					attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
+				} else {
+					let dice = 0;
+					// Heuristic again
+					dice = target.toFixed(0);
+					targetDice = `${dice}d6`;
+					attrsToChange["reg_astralmeditation_conversion_target_auto"] = parseInt(dice);
+				}
+			} else {
+				// Calculate target
+				if (LEAvailable - LECostAdditional >= AEDeficit)
+				{
+					target = AEDeficit;
+				} else {
+					target = Math.max(0, LEAvailable - LECostAdditional);
+				}
+				attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
+			}
+			debugLog(caller, "AEDeficit", AEDeficit, "LEAvailable", LEAvailable);
+			attrsToChange["reg_astralmeditation_limit_life_energy_soft_auto"] = LELimit;
+		}
 
 		// Determination of max. LE cost
 		let LECostMax = 0;
-		LECostMax += target;
-		if (setup !== 3)
-		{
-			LECostMax += LECostAdditionalMax;
-		}
+		LECostMax += target + LECostAdditional;
 
 		/*
 		Three main outcomes must be distinguished:
@@ -2170,7 +2279,7 @@ on(
 			** no astral energy for meditation initiation if required (not required if special skill AND Thonnys)
 			** not enough life energy left for safely performing the ritual (regarding soft/hard limits)
 			* Meditation not required
-			** astral energy is full
+			** astral energy is full (auto: or close enough)
 			* Meditation possible (all other cases)
 		*/
 		let outcome = "unset";
@@ -2187,7 +2296,11 @@ on(
 		)
 		{
 			outcome = "impossible";
-		} else if (AE >= AEMax) {
+		} else if (
+			(AE >= AEMax)
+			||
+			(target === 0)
+		) {
 			outcome = "not required";
 		} else {
 			outcome = "possible";
@@ -2199,6 +2312,30 @@ on(
 			"&{template:reg-astralmeditation}",
 			`{{setup=[[${setup}]]}}`,
 		];
+
+		/// Limbo
+		if (limbo === "1")
+		{
+			baseRoll = [
+				... baseRoll,
+				`{{conversiontarget=[[${targetDice}]]}}`,
+				'{{limbo=[[0d1]]}}',
+			];
+		} else {
+			baseRoll = [
+				... baseRoll,
+				`{{conversiontarget=[[${target}]]}}`,
+			];
+		}
+
+		/// Auto mode
+		if (auto === "1")
+		{
+			baseRoll = [
+				... baseRoll,
+				`{{automode=[[0d1]]}}`,
+			];
+		}
 		switch(outcome)
 		{
 			case "impossible":
@@ -2220,11 +2357,16 @@ on(
 				/// Bonus is half of whatever was selected for reg_astralmeditation_mod_skill_value
 				let mod = parseInt(values["reg_astralmeditation_mod_skill_value"]);
 				mod = -DSAround(mod / 2);
+				mod += modOther;
 
 				let LELossAdditional = '1d3cs1cf3 - 1';
-				let AELossInitiation = '1';
+				if (LECostAdditional === 0)
+				{
+					LELossAdditional = '0d1';
+				}
+				let AELossInitiation = AECostInitiation.toFixed(0);
 
-				// Adaptation of target
+				// Adaptations of target
 				if (targetAdapted === true)
 				{
 					debugLog(caller, `Conversion target (${targetRaw}) higher than necessary. Reducing to appropriate value (${target}).`);
@@ -2268,8 +2410,6 @@ on(
 					case 3: // Special skill + Thonnys
 						const modThonnys = -3;
 						mod += modThonnys;
-						LELossAdditional = '0d1';
-						AELossInitiation = '0';
 						break;
 					default:
 						debugLog(caller, "switch(setup) default case triggered. Should not happen.");
@@ -2288,7 +2428,6 @@ on(
 					'{{checkresult=[[0d1]]}}',
 					'{{criticality=[[0d1]]}}',
 					`{{duration=[[${target}]]}}`,
-					`{{conversiontarget=[[${target}]]}}`,
 					`{{le=[[${values["LE"]}]]}}`,
 					'{{leneu=[[0d1]]}}',
 					'{{lelossconversion=[[0d1]]}}',
@@ -2449,6 +2588,7 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 						thonnysLimit = resultsOnly["thonnyslimit"];
 					}
 					conversion = Math.min(thonnysLimit, resultsOnly["conversiontarget"]);
+					computed["conversiontarget"] = conversion;
 					computed["duration"] = conversion;
 				} else {
 					conversion = resultsOnly["conversiontarget"];
@@ -2456,9 +2596,16 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 				// Life energy
 				let LEneu = resultsOnly["le"];
 				let LELossAdditional = resultsOnly["lelossadditional"];
-				LEneu = LEneu - LELossAdditional - conversion;
+				let LELossConversion = 0;
+				if ( Object.hasOwn(resultsOnly, "limbo") )
+				{
+					LELossConversion = results["conversiontarget"]["dice"].length;
+				} else {
+					LELossConversion = conversion;
+				}
+				LEneu = LEneu - LELossAdditional - LELossConversion;
 				computed["leneu"] = LEneu;
-				computed["lelossconversion"] = -conversion;
+				computed["lelossconversion"] = -LELossConversion;
 				computed["lelossadditional"] = -LELossAdditional;
 				attrsToChange["LE"] = LEneu;
 
@@ -2469,6 +2616,7 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 				computed["aeneu"] = AEneu;
 				computed["aelossinitiation"] = -AELossInitiation;
 				computed["aegainconversion"] = conversion;
+				computed["conversiontarget"] = conversion;
 				attrsToChange["AE"] = AEneu;
 			} else {
 				const AEmin = 0;
@@ -2488,6 +2636,7 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 					"lelossadditional",
 					"aelossinitiation",
 					"aegainconversion",
+					"conversiontarget",
 					"mod"
 				];
 				for (let part of useComputed)
