@@ -20,11 +20,14 @@ on("change:repeating_attaques-modifiers",  (eventInfo) => {
     if (eventInfo.sourceAttribute.includes("options-flag")) {
         return;
     }
+    getAttacksModifiersAndUpdateValues();
+});
+
+let getAttacksModifiersAndUpdateValues = () =>{
     getSectionIDs("repeating_attaques-modifiers", (idArray) => {
         getNextModifierFromList(idArray, [], null);
     });
-});
-
+}
 let getNextModifierFromList = (modifierList, modifiers, attackId) => {
     let modifierListToChange = [... modifierList];
     if (!modifierListToChange.length) {

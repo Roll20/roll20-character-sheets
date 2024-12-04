@@ -1,14 +1,3 @@
-/* Concept : Construire une liste de modificateurs
-
-
- */
-
-const modifiersTypes = ["alchemical", "circumstance", "competence", "enhancement", "insight", "luck", "morale",
-    "profane", "racial", "resistance", "sacred", "divine", "epic", "untyped"];
-const modifiersApplicationSubTypes = ["carac_all", "carac_other", "init", "speed", "skill_all", "skill_other",
-    "save_all", "save_ref", "save_vig", "save_vol", "armor_ca", "armor_cac", "armor_cad"];
-const modifiersApplicationTypes = ["carac", "init", "speed", "skill", "saves", "armor"];
-
 on("change:repeating_modifiers", (eventInfo) => {
     let modifierId = eventInfo.triggerName;
     if (eventInfo.sourceAttribute.includes("options-flag")) {
@@ -85,15 +74,14 @@ let getNextModifierByTypeAndUpdateValues = (modifierToGetList,modifierList,appli
 
 let getLargestModifierOfEachTypeFor = (modifiersList,attr_name) =>{
     let types = {};
-    let filteredModifierList = []
-    debugger;
+    let filteredModifierList = [];
     for(let modifier of modifiersList){
-        if(modifier.applyTo.endsWith("_all") ||
+        if(modifier.applyTo.endsWith("_all") || !attr_name ||
             (modifier.applyTo.endsWith("_other") && modifier.applyToOther.includes(attr_name))
         ){
             let type = modifier.type;
             //Untyped && circumstance always apply
-            if(type === "untyped" || type === "circumstance"){
+            if(type === "untyped" || type === "circumstance" || type === "dodge"){
                 filteredModifierList.push(modifier);
                 continue;
             }
@@ -111,7 +99,7 @@ let getLargestModifierOfEachTypeFor = (modifiersList,attr_name) =>{
 let getModifierCallBackByApplicationType = (applicationType) =>{
     switch (applicationType) {
         case "carac":
-            return updateAllAttributes;
+            return updateAllCharacteristics;
         case "init":
             return updateInitiative;
         case "speed":
@@ -121,7 +109,7 @@ let getModifierCallBackByApplicationType = (applicationType) =>{
         case "saves":
             return updateAllSaves;
         case "armor":
-            return updateAllArmors;
+            return updateArmor;
         default:
             return () => {};
     }
