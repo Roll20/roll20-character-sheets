@@ -4,4 +4,5 @@
 //=include attacks.js
 //=include skills.js
 //=include spells.js
+//=include modifiers.js
 
