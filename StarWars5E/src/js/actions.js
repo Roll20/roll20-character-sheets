@@ -1,5 +1,5 @@
 on("clicked:adv_advantage", () =>{
-    setAttrs({"advantagetoggle":"{{query=1}} {{advantage=1}} {{r2=[[0d20"});
+    setAttrs({"advantagetoggle":"{{query=1}} {{advantage=1}} {{r2=[[@{d20}"});
 });
 
 on("clicked:adv_normal", () =>{
@@ -8,7 +8,7 @@ on("clicked:adv_normal", () =>{
 });
 
 on("clicked:adv_disadvantage", () =>{
-    setAttrs({"advantagetoggle":"{{query=1}} {{disadvantage=1}} {{r2=[[0d20"});
+    setAttrs({"advantagetoggle":"{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}"});
 
 });
 
