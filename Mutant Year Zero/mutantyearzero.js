@@ -114,7 +114,53 @@ return new Promise((resolve,reject)=>{
 }
 /* END ASYNC FUNCTIONS */
 
+/*
+SPINES
+*/
 
+const mainAttributeArr = [
+   {name:"strength",attr:"strength"},
+   {name:"agility",attr:"agility"},
+   {name:"wits",attr:"wits"},
+   {name:"empathy",attr:"empathy"},
+   ],
+ extraAttributeArr = [
+   {name:"instinct",attr:"empathy"},
+   {name:"servos",attr:"strength"},
+   {name:"stability",attr:"agility"},
+   {name:"processor",attr:"wits"},
+   {name:"network",attr:"empathy"}
+ ],
+ attributeArr = [...mainAttributeArr, ...extraAttributeArr],
+ skillsArr = [
+   {name:"endure",attr_name:"strength",attr:"strength"},
+   {name:"force",attr_name:"strength",attr:"strength"},
+   {name:"fight",attr_name:"strength",attr:"strength"},
+   {name:"sneak",attr_name:"agility",attr:"agility"},
+   {name:"move",attr_name:"agility",attr:"agility"},
+   {name:"shoot",attr_name:"agility",attr:"agility"},
+   {name:"scout",attr_name:"wits",attr:"wits"},
+   {name:"comprehend",attr_name:"wits",attr:"wits"},
+   {name:"know_the_zone",attr_name:"wits",attr:"wits"},
+   {name:"sense_emotion",attr_name:"empathy",attr:"empathy"},
+   {name:"manipulate",attr_name:"empathy",attr:"empathy"},
+   {name:"heal",attr_name:"empathy",attr:"empathy"},
+   {name:"know_nature",attr_name:"instinct",attr:"empathy"},
+   {name:"sense_emotion_animal",attr_name:"instinct",attr:"empathy"},
+   {name:"dominate",attr_name:"instinct",attr:"empathy"},
+   {name:"overload",attr_name:"servos",attr:"strength"},
+   {name:"force-robot",attr_name:"servos",attr:"strength"},
+   {name:"assault",attr_name:"servos",attr:"strength"},
+   {name:"infiltrate",attr_name:"stability",attr:"agility"},
+   {name:"move-robot",attr_name:"stability",attr:"agility"},
+   {name:"shoot-robot",attr_name:"stability",attr:"agility"},
+   {name:"scan",attr_name:"processor",attr:"wits"},
+   {name:"datamine",attr_name:"processor",attr:"wits"},
+   {name:"analyze",attr_name:"processor",attr:"wits"},
+   {name:"question",attr_name:"network",attr:"empathy"},
+   {name:"interact",attr_name:"network",attr:"empathy"},
+   {name:"repair",attr_name:"network",attr:"empathy"},
+ ];
      
  let race_att_names;
  
@@ -2032,7 +2078,7 @@ return new Promise((resolve,reject)=>{
  });
  */
  
- /* Update attributes total max */
+ /* Update attributes total max
  on("sheet:opened change:strength_total", function () {
    //clog("Change Detected: strength_total has changed");
    getAttrs(["strength", "strength_total"], function (values) {
@@ -2079,15 +2125,28 @@ return new Promise((resolve,reject)=>{
        empathy_total: empathy_total,
      });
    });
- });
+ });*/
+mainAttributeArr.forEach( (attrb) => {
+   on(`sheet:opened change:${attrb.name}_total`, function () {
+      clog(`Change Detected: ${attrb.name}_total has changed`);
+      getAttrs([`${attrb.name}`, `${attrb.name}_total`], function (values) {
+        const attr = int(values[`${attrb.name}`]),
+          attr_total = int(values[`${attrb.name}_total`]);
+        setAttrs({
+          empathy: attr,
+          empathy_total: attr_total,
+        });
+      });
+    });
+});
 
- const attributeArr = ["strength","","wits","empathy","instinct","servos","","processor","network"];
  attributeArr.forEach( (attrb) => {
-   on(`clicked:${attrb}_roll`, function () {
-      clog(`Change Detected: ${attrb} - button clicked`);
-      getAttrs([`${attrb}_total`, `${attrb}_name`], function (values) {
-        const total = int(values[`${attrb}_total`]),
-        name = values[`${attrb}_name`];
+   on(`clicked:${attrb.name}_roll`, function (ev) {
+      clog(`Change Detected: ${attrb.name} - button clicked`);
+       clog(`Event : ${JSON.stringify(ev)}`);
+      getAttrs([`${attrb.attr}_total`], function (values) {
+        const total = int(values[`${attrb.attr}_total`]),
+        name = getTranslationByKey(attrb.name);
         clog(name + " : " + total);
         setAttrs({
           attribute: total,
@@ -2167,12 +2226,5 @@ return new Promise((resolve,reject)=>{
      });
    });
  }); */
- 
- /* delete empty repeating rows w/out having to close/reopen sheet*/
- on('remove:repeating_injuries remove:repeating_weapons remove:repeating_skills remove:repeating_gear remove:repeating_vehicle remove:repeating_relationships remove:repeating_spells remove:repeating_beasts remove:repeating_notes remove:repeating_ark-notes remove:repeating_log remove:repeating_monster remove:repeating_mutations remove:repeating_armor remove:repeating_biomechs remove:repeating_contacts remove:repeating_animalpowers remove:repeating_modules remove:repeating_talents', function() { 
-   const timestamp = Number(new Date())
-   setAttrs({ repeat_delete: timestamp });
-   clog("repeating row has been removed");
- });
  
  /* beautify preserve:end */
