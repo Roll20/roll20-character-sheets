@@ -1,5 +1,5 @@
-//=include variables.js
 //=include actions.js
+//=include variables.js
 //=include characteristics.js
 //=include init_armor_inventory.js
 //=include attacks.js

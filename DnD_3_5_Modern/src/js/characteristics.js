@@ -46,10 +46,6 @@ let updateCharacteristicsList = (characteristicList, modifierList) => {
 }
 
 on("change:for_mod change:dex_mod change:con_mod change:int_mod change:sag_mod change:cha_mod change:skills_malus", function () {
-    getSectionIDs("skills", function (idarray) {
-        for (var i = 0; i < idarray.length; i++) {
-            updateSkill("repeating_skills_" + idarray[i]);
-        }
-    });
+
     getAttacksModifiersAndUpdateValues();
 });

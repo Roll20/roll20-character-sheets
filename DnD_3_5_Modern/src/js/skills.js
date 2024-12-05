@@ -4,33 +4,75 @@ on("change:repeating_skills", function(eventInfo) {
     if(eventInfo.sourceAttribute.includes("options-flag")){
         return;
     }
-    updateSkill(skillId);
+    updateAllskills([],skillId);
 });
 
-function updateSkill(skillId){
-    const rankAttr = skillId+"_ranks";
-    const modAttr = skillId+"_mod";
-    const caracAttr = skillId+"_carac";
-    const totalAttr = skillId+"_total";
-    const malusAttr = skillId+"_has_armor_malus";
-    const caracnameAttr = skillId+"_caracname";
-    getAttrs(["skills_malus",modAttr,rankAttr,caracAttr,malusAttr],function (values){
-        let malus = values[malusAttr] == "on";
-        let skills_malus = malus ? (parseInt(values.skills_malus)||0) : 0;
-        let rank = parseInt(values[rankAttr])||0;
-        let carac = values[caracAttr];
-        let mod = parseInt(values[modAttr])||0;
-        carac = carac.replace("@{","").replace("}","");
-        let caracname = carac.split("_")[0];
-        caracname = caracname.charAt(0).toUpperCase() + caracname.slice(1);
-        caracname = "("+caracname+")";
-        getAttrs([carac],function(values){
-            let caracVal = parseInt(values[carac])||0;
-            let total = rank+caracVal+mod+skills_malus;
-            let update = {};
-            update[totalAttr] = total;
-            update[caracnameAttr] = caracname;
-            setAttrs(update,{silent:true});
-        });
+let updateAllskills = (modifierList, skillId) => {
+    if (skillId) {
+        return updateSkillList([skillId], modifierList);
+    }
+    getSectionIDs("skills", function (idarray) {
+        return updateSkillList(idarray, modifierList);
+    });
+}
+function updateSkillList(skillList,modifiers){
+    let toGet = [];
+    for(let skillId of skillList) {
+        toGet.push(skillId + "_name");
+        toGet.push(skillId + "_ranks");
+        toGet.push(skillId + "_mod");
+        toGet.push(skillId + "_mod");
+        toGet.push(skillId + "_carac");
+        toGet.push(skillId + "_total");
+        toGet.push(skillId + "_has_armor_malus");
+        toGet.push(skillId + "_caracname");
+    }
+    toGet.push("skill_malus");
+    toGet.push("for_mod");
+    toGet.push("dex_mod");
+    toGet.push("con_mod");
+    toGet.push("int_mod");
+    toGet.push("sag_mod");
+    toGet.push("cha_mod");
+
+    getAttrs(toGet,function (values){
+        let skills_malus = parseInt(values.skills_malus) || 0;
+        let caracs = {};
+        caracs["for_mod"] = parseInt(values.for_mod) || 0;
+        caracs["dex_mod"] = parseInt(values.dex_mod) || 0;
+        caracs["con_mod"] = parseInt(values.con_mod) || 0;
+        caracs["int_mod"] = parseInt(values.int_mod) || 0;
+        caracs["sag_mod"] = parseInt(values.sag_mod) || 0;
+        caracs["cha_mod"] = parseInt(values.cha_mod) || 0;
+
+        let toUpdate = {};
+        for(let skillId of skillList) {
+            let name = values[`${skillId}_name`]
+            let malus = values[`${skillId}_has_armor_malus`];
+            let skill_malus = 0;
+            if(malus === "on"){
+                skill_malus = skills_malus;
+            }
+            if(malus === "double"){
+                skill_malus = skills_malus * 2;
+            }
+            let rank = parseInt(values[`${skillId}_ranks`]) || 0;
+            let carac = values[`${skillId}_carac`];
+            let mod = parseInt(values[`${skillId}_mod`]) || 0;
+            let synergy = parseInt(values[`${skillId}_synergy`]) || 0;
+            carac = carac.replace("@{", "").replace("}", "");
+            let caracname = carac.split("_")[0];
+            caracname = caracname.charAt(0).toUpperCase() + caracname.slice(1);
+            caracname = "(" + caracname + ")";
+            let caracVal = caracs[carac] || 0;
+            let total = rank + caracVal + mod + skills_malus + synergy;
+            let roll = `${rank}[rank] + @{${carac}[${carac}_mod] + @{mod}[General Modifier] + @{synergy}[Synergy]`;
+            debugger;
+
+            toUpdate[`${skillId}_total`] = total;
+            toUpdate[`${skillId}_skillrollvalue`] = `&{template:main} {{titre=Test de '@{name}'}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
+            toUpdate[`${skillId}_caracname`] = caracname;
+        }
+        setAttrs(toUpdate, {silent: true});
     });
 }
