@@ -26,7 +26,7 @@ const applicationTypes = {
     init: "init",
     speed: "speed",
     skill: "skill",
-    saves: "saves",
+    save: "save",
     armor: "armor"
 }
 
@@ -35,6 +35,6 @@ const allApplicationTypes = [
     applicationTypes.init,
     applicationTypes.speed,
     applicationTypes.skill,
-    applicationTypes.saves,
+    applicationTypes.save,
     applicationTypes.armor
 ];

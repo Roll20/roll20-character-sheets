@@ -75,7 +75,6 @@ function updateSkillList(skillList,modifierList){
             if(skill_malus){
                 roll += ` ${skill_malus}[Armor Malus]`
             }
-            debugger;
             let filteredModifiers = getLargestModifierOfEachTypeFor(modifierList,name);
             for(let modifier of filteredModifiers){
                 mods+= modifier.value;

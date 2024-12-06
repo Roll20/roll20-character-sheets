@@ -9,6 +9,12 @@ on("change:class1_bab change:class2_bab change:class3_bab", () => {
    updateBAB();
 });
 
+
+on("change:class1_ref change:class2_ref change:class3_ref change:class1_vig change:class2_vig change:class3_vig"
+    +"change:class1_vol change:class2_vol change:class3_vol", () => {
+    updateClassSaves();
+});
+
 let updateClassLevel = () => {
     getAttrs(["class1_name","class2_name","class3_name","class1_lvl","class2_lvl","class3_lvl"], (attrs) => {
         let class1_name = attrs.class1_name;

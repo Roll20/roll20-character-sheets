@@ -33,6 +33,7 @@ let updateModifierAndApplyChanges = (modifier_id) => {
 
 //Get all modifiers Id then call a recursive method to build a list of modifiers
 let getModifiersByTypeAndUpdateValues = (applicationType,callback,callback_id) => {
+    debugger;
     getSectionIDs("repeating_modifiers", (idArray) => {
         getNextModifierByTypeAndUpdateValues(idArray, [], applicationType,callback,callback_id);
     });
@@ -73,12 +74,13 @@ let getNextModifierByTypeAndUpdateValues = (modifierToGetList,modifierList,appli
 }
 
 let getLargestModifierOfEachTypeFor = (modifiersList,attr_name) =>{
+    debugger;
     let types = {};
     let _name = attr_name?.toLowerCase();
     let filteredModifierList = [];
     for(let modifier of modifiersList){
         const applyToOther = modifier.applyToOther?.map(apply => apply?.toLowerCase());
-        if(modifier.applyTo.endsWith("_all") || !_name ||
+        if(modifier.applyTo.endsWith("_all") || !_name || modifier.applyTo.endsWith(_name) ||
             (modifier.applyTo.endsWith("_other") && applyToOther?.includes(_name))
         ){
             let type = modifier.type;
@@ -108,7 +110,7 @@ let getModifierCallBackByApplicationType = (applicationType) =>{
             return updateSpeed;
         case "skill":
             return updateAllSkills;
-        case "saves":
+        case "save":
             return updateAllSaves;
         case "armor":
             return updateArmor;
