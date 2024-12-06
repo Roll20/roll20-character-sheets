@@ -74,10 +74,12 @@ let getNextModifierByTypeAndUpdateValues = (modifierToGetList,modifierList,appli
 
 let getLargestModifierOfEachTypeFor = (modifiersList,attr_name) =>{
     let types = {};
+    let _name = attr_name?.toLowerCase();
     let filteredModifierList = [];
     for(let modifier of modifiersList){
-        if(modifier.applyTo.endsWith("_all") || !attr_name ||
-            (modifier.applyTo.endsWith("_other") && modifier.applyToOther.includes(attr_name))
+        const applyToOther = modifier.applyToOther?.map(apply => apply?.toLowerCase());
+        if(modifier.applyTo.endsWith("_all") || !_name ||
+            (modifier.applyTo.endsWith("_other") && applyToOther?.includes(_name))
         ){
             let type = modifier.type;
             //Untyped && circumstance always apply

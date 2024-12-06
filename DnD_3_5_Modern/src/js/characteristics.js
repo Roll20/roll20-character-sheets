@@ -46,6 +46,6 @@ let updateCharacteristicsList = (characteristicList, modifierList) => {
 }
 
 on("change:for_mod change:dex_mod change:con_mod change:int_mod change:sag_mod change:cha_mod change:skills_malus", function () {
-
+    getModifiersByTypeAndUpdateValues(applicationTypes.skill,updateAllSkills);
     getAttacksModifiersAndUpdateValues();
 });

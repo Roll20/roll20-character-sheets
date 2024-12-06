@@ -4,18 +4,18 @@ on("change:repeating_skills", function(eventInfo) {
     if(eventInfo.sourceAttribute.includes("options-flag")){
         return;
     }
-    updateAllskills([],skillId);
+    getModifiersByTypeAndUpdateValues(applicationTypes.skill,updateAllSkills,skillId);
 });
 
-let updateAllskills = (modifierList, skillId) => {
+let updateAllSkills = (modifierList, skillId) => {
     if (skillId) {
         return updateSkillList([skillId], modifierList);
     }
-    getSectionIDs("skills", function (idarray) {
-        return updateSkillList(idarray, modifierList);
+    getSectionIDs("repeating_skills", function (idarray) {
+        return updateSkillList(idarray.map(id => "repeating_skills_"+id), modifierList);
     });
 }
-function updateSkillList(skillList,modifiers){
+function updateSkillList(skillList,modifierList){
     let toGet = [];
     for(let skillId of skillList) {
         toGet.push(skillId + "_name");
@@ -27,7 +27,7 @@ function updateSkillList(skillList,modifiers){
         toGet.push(skillId + "_has_armor_malus");
         toGet.push(skillId + "_caracname");
     }
-    toGet.push("skill_malus");
+    toGet.push("skills_malus");
     toGet.push("for_mod");
     toGet.push("dex_mod");
     toGet.push("con_mod");
@@ -47,7 +47,11 @@ function updateSkillList(skillList,modifiers){
 
         let toUpdate = {};
         for(let skillId of skillList) {
-            let name = values[`${skillId}_name`]
+            let name = values[`${skillId}_name`];
+            //Si pas de nom on continue
+            if(!name){
+                continue;
+            }
             let malus = values[`${skillId}_has_armor_malus`];
             let skill_malus = 0;
             if(malus === "on"){
@@ -65,11 +69,20 @@ function updateSkillList(skillList,modifiers){
             caracname = caracname.charAt(0).toUpperCase() + caracname.slice(1);
             caracname = "(" + caracname + ")";
             let caracVal = caracs[carac] || 0;
-            let total = rank + caracVal + mod + skills_malus + synergy;
-            let roll = `${rank}[rank] + @{${carac}[${carac}_mod] + @{mod}[General Modifier] + @{synergy}[Synergy]`;
+            let mods = 0;
+            let total = rank + caracVal + skill_malus + synergy + mod;
+            let roll = `${rank}[rank] + ${caracVal}[${carac}] + ${mod}[General Modifier] + ${synergy}[Synergy]`;
+            if(skill_malus){
+                roll += ` ${skill_malus}[Armor Malus]`
+            }
             debugger;
-
-            toUpdate[`${skillId}_total`] = total;
+            let filteredModifiers = getLargestModifierOfEachTypeFor(modifierList,name);
+            for(let modifier of filteredModifiers){
+                mods+= modifier.value;
+                roll += `+${modifier.value}[${modifier.name}(${modifier.type})]`;
+            }
+            toUpdate[`${skillId}_modified`] = (!!mods);
+            toUpdate[`${skillId}_total`] = total+mods;
             toUpdate[`${skillId}_skillrollvalue`] = `&{template:main} {{titre=Test de '@{name}'}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
             toUpdate[`${skillId}_caracname`] = caracname;
         }

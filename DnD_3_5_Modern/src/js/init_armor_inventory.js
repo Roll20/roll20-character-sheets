@@ -51,13 +51,13 @@ on("change:armor_bonus change:armor_malus change:armor_max_dex change:armor_equi
 
 let updateArmor = (modifierList) => {
     getAttrs(["armor_bonus","armor_malus","armor_max_dex","size","armor_equipe","shield_bonus","shield_malus","shield_equipe","touch_bonus","flatfooted_bonus","universal_armor_bonus","dex_mod"],function(values){
-        let armor_bonus = parseInt(values.armor_bonus) || 0;
-        let armor_malus = parseInt(values.armor_malus) || 0;
-        let armor_max_dex = parseInt(values.armor_max_dex) || 0;
+        let armor_equipe = values.armor_equipe === "on";
+        let armor_bonus = armor_equipe ? parseInt(values.armor_bonus) || 0 : 0;
+        let armor_malus = armor_equipe ? parseInt(values.armor_malus) || 0 : 0;
+        let armor_max_dex = armor_equipe ? parseInt(values.armor_max_dex) || 0 : 0;
         let size = parseInt(values.size) || 0;
         if(armor_max_dex < 0) armor_max_dex = 1000;
         let shield_equipe = values.shield_equipe === "on";
-        let armor_equipe = values.armor_equipe === "on";
         let shield_bonus = shield_equipe ? (parseInt(values.shield_bonus) || 0) : 0;
         let shield_malus = shield_equipe ? (parseInt(values.shield_malus) || 0) : 0;
         let touch_bonus = parseInt(values.touch_bonus) || 0;
