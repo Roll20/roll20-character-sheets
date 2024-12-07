@@ -2746,6 +2746,7 @@
     const melee_types = ['exotic','hafted','hilted','polearm','unarmed'];
     const ranged_types = ['archery','artillery','hand gun','heavy weapon','long gun','special','thrown weapon','weaponry'];
     const senses = ['hearing','sight','smell','taste','touch'];
+    const supersenses = ['echolocation','infrared vision','magnetic field detection','microscopic vision','radar','sonar','ultravision','vibration detection','x-ray vision'];
     const nested_enhancements = {
         'connected':['significant power','great power'],
         'dynamic powers':['major category','primal category'],
@@ -2973,7 +2974,7 @@
     }
 
     String.prototype.fromSnakeCase = function() {
-        return this.replace(/(?:_| |\b)(\w)/g, function($1){return $1.toUpperCase().replace('_',' ');});
+        return this.replace(/(?:_| |\b)(\w)/g, function($1){return $1.replace('_',' ');});
     }
 
     /* Async Functions by OnyxRing and Scott C */
@@ -5858,7 +5859,11 @@
             "control environment":'environments',
             "conversion":'convert',
             "enemy attack":'enemy',
-            "enemy defense":'enemy'
+            "enemy defense":'enemy',
+            "force field":'armor rating',
+            "heightened senses":'senses',
+            "sensory block":'senses_or_techniques',
+            //"resilient":'complete_resilience',
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
         const characteristic = await setAttrCharacteristic(cache, set_values, query);
@@ -5868,10 +5873,48 @@
                 `(${
                     c.name === 'techniques' ?
                         c.rank.map(t => t.name.capitalize() + ' (' + t.rank + ')').sort().join(", ") :
+                    c.name === 'complete_resilience' ?
+                        c.rank.map(r => r.capitalize()).sort().join(", ") :
                     c.name === query.attribute || c.name === configurations[query.attribute] ?
                     characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank
                 })`
         ).sort().join("\n");
+        if (query.attribute === 'defense mastery') {
+
+        } else if (query.attribute === 'energized') {
+            cache.statsdb.energy.energized = 0;
+            for (let i = 0; i < cache.attrdb.energized.length; i++) {
+                cache.statsdb.energy.energized += cache.attrdb.energized[i].active ? 
+                    cache.attrdb.energized[i].elevel * 10 : 0;
+            }
+            setDerivedValues(cache, set_values);
+        } else if (query.attribute === 'extra actions') {
+            cache.statsdb.actions.base = 1;
+            for (let i = 0; i < cache.attrdb['extra actions'].length; i++) {
+                cache.statsdb.actions.base += cache.attrdb['extra actions'][i].active ? 
+                    cache.attrdb['extra actions'][i].elevel : 0;
+            }
+            set_values.static_character_actions_base = cache.statsdb.actions.base;
+        } else if (query.attribute === 'extra defenses') {
+            cache.statsdb.defenses.base = 0;
+            for (let i = 0; i < cache.attrdb['extra defenses'].length; i++) {
+                cache.statsdb.defenses.base += cache.attrdb['extra defenses'][i].active ? 
+                    cache.attrdb['extra defenses'][i].elevel : 0;
+            }
+            set_values.static_character_defenses_base = cache.statsdb.defenses.base;
+        } else if (query.attribute === 'massive damage') {
+            cache.statsdb.dm.base = 5;
+            for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
+                const is_focused = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'focussed damage') !== -1;
+                const is_targetted = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'targeted damage') !== -1;
+                cache.statsdb.dm.base += 
+                    cache.attrdb['massive damage'][i].active && 
+                    !is_focused && 
+                    !is_targetted ?
+                    cache.attrdb['massive damage'][i].elevel : 0;
+            }
+            set_values.static_character_dm_base = cache.statsdb.dm.base;
+        }
         return configuration;
     }
     
@@ -5908,7 +5951,7 @@
             case "control environment": 
                 description = `${query.elevel} environments maximum`;
                 query.c_index = query.config.findIndex(c => c.name === 'environments');
-                description += query.config.length !== 0 ? ': ' + query.config[query.c_index].rank.sort().join(", ") : '';
+                description += query.config[query.c_index].rank.length !== 0 ? ': ' + query.config[query.c_index].rank.sort().join(", ") : '';
             break;
             case "conversion": description = `${query.elevel} Character Points/10 Damage`; break;
             case "data access": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -5930,42 +5973,63 @@
             case "extra defenses": description = `+${query.elevel} defensive actions each round`; break;
             case "features": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "flight": description = `Flight speed up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} kph`; break;
-            case "force field": description = `${query.elevel * 10} Armor Rating`; break;
+            case "force field": description = query.elevel * 10; break;
             //case "gear": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "ground speed": description = `${query.elevel} kph`; break;
+            case "ground speed": description = `${get1or2andHalfor5(query.elevel + 2) * (10 ** (Math.ceil((query.elevel) / 3)))} kph`; break;
             case "healing": description = `Restore ${query.elevel * 5} Health Points`; break;
             case "heightened awareness": description = `${query.elevel} Awareness Bonus`; break;
-            case "heightened senses": description = `${query.elevel} Senses Remaining`; break;
+            case "heightened senses":
+                description = `${query.elevel} senses`; 
+                query.c_index = query.config.findIndex(c => c.name === 'senses');
+                description += query.config[query.c_index].rank.length !== 0 ? ': ' + 
+                    query.config[query.c_index].rank.map(s => `${s.name} (${s.rank})`).sort().capitalize().join(", ") : '';
+            break;
             case "illusion": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "immovable": description = `Knockback reduced by ${query.elevel * 10} m`; break;
-            case "immunity": description = `Immune to ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
-            case "immutable": const immutablestat = getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute); characteristic = `+${query.elevel * 2} ${capital(immutablestat)} roll to resist effects`; break;
+            case "immunity":
+                query.c_index = query.config.findIndex(c => c.name === 'immunity');
+                description = query.elevel === 0 ? 'not configured' :
+                `immune to ${query.config[query.c_index].rank}`;
+            break;
+            case "immutable": description = `+${query.elevel * 2} to resist effects`; break;
             case "inspire": description = `Stat/Skill Rolls +${query.elevel}`; break;
-            case "jumping": description = `${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 1) / 2)))} Times Normal Distance`; break;
-            case "massive damage": description = setMassiveDamageCharacteristic(debug, timer, value, rowID, level, setObj); break;
-            case "melee attack": description = `+${query.elevel * 2} ACV with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
-            case "melee defense": description = `+${query.elevel * 2} DCV with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
+            case "jumping": description = `${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 1) / 2)))} x normal distance`; break;
+            case "massive damage": description = `+${query.elevel} DM`; break;
+            case "melee attack": description = `+${query.elevel * 2} ACV with weapons of a specific type`; break;
+            case "melee defense": description = `+${query.elevel * 2} DCV with weapons of a specific type`; break;
             case "merge": description = `Contribute ${query.elevel * 10} Character Points`; break;
             case "metamorphosis": description = `Race Template +/- ${query.elevel * 5} Character Points`; break;
-            case "mimic": description = `Mimic Level ${query.elevel} Attributes`; break;
+            case "mimic": description = `Mimic Attribute Level ${query.elevel}`; break;
             case "mind control": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "mind shield": description = `${query.elevel} + Mind`; break;
             case "minions": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "mulligan": description = `${query.elevel * 2} re-rolls each game session`; break;
-            case "nullify": description = `Nullify ${query.elevel} Levels of an attribute`; break;
+            case "nullify": description = `${query.elevel} Levels of an attribute`; break;
             case "plant control": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "pocket dimension": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "portal": description = `${query.elevel} one-way portals`; break;
             //case "power flux": description = `${query.elevel * 5} Flux Points`; break;
             //case "power variation": description = `${query.elevel + 1} Variable Attributes`; break;
             case "projection": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "range dattack": description = `ACV +${query.elevel * 2} with ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} weapons`; break;
-            case "range ddefense": description = `DCV +${query.elevel * 2} ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)} Ranged Defense`; break;
+            case "ranged attack": description = `ACV +${query.elevel * 2} with weapons of a specific type`; break;
+            case "ranged defense": description = `DCV +${query.elevel * 2} against ranged attacks`; break;
             case "regeneration": description = `Regenerate ${query.elevel * 5} Heath Points/Round`; break;
             case "reincarnation": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "resilient": description = `${query.elevel} Resiliencies Remaining`; break;
-            case "sensory block": description = `Block ${getCharacteristicByCustomizations(debug, timer, value, rowID, attribute)}`; break;
-            case "sixth sense": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "resilient":
+                description = `${query.elevel} environments/conditions maximum`;
+                query.c_index = query.config.findIndex(c => c.name === 'resilient');
+                description += query.config[query.c_index].rank.length !== 0 ? ': ' + query.config[query.c_index].rank.capitalize().sort().join(", ") : '';
+            break;
+            case "sensory block":
+                description = `${query.elevel} are partially blocked`;
+                query.c_index = query.config.findIndex(c => c.name === 'senses_or_techniques');
+                description += query.config[query.c_index].rank.length !== 0 ? ': ' + query.config[query.c_index].rank.capitalize().sort().join(", ") : '';
+            break;
+            case "sixth sense":
+                description = `${query.elevel} sixth senses maximum`;
+                query.c_index = query.config.findIndex(c => c.name === 'sixth sense');
+                description += query.config[query.c_index].rank.length !== 0 ? ': ' + query.config[query.c_index].rank.capitalize().sort().join(", ") : '';
+            break;
             case "size change": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "skill": description = `${query.elevel * 10} Skill Points to Skill Group ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
             case "social mastery": description = `SCV +${query.elevel * 2}`; break;
@@ -5995,23 +6059,9 @@
         }
         return description;
     }
-    
-    function setMassiveDamageCharacteristic(debug, timer, value, rowID, level, setObj) {
-        const targeted = getIsTargeted(debug, timer, value, rowID, setObj);
-        const focused = getCustomizationValue(debug, timer, value, rowID, 'rank', 'focuseddamage');
-        const enemy = value[`repeating_attr_${rowID}_enemy`] || '<not configured>';
-        const weaponclass = value[`repeating_attr_${rowID}_weaponclass`];
-        let characteristic = `DM +${temp.elevel}`;
-        if (targeted) characteristic = characteristic + ` vs. ${enemy}`;
-        if (focused > 0) characteristic = characteristic + ` with ${weaponclass} weapons`;
-        return characteristic;
-    }
         
     function getCharacteristicByAttr(cache, set_values, query = {}) {
         clog(cache, query, 'getCharacteristicByAttr()');
-        //query.attribute = query.attribute === undefined ? cache.attribute[0] : query.attribute;
-        //query.elevel = query.elevel === undefined ? 0 : query.elevel;
-        //const level = parseInt(setObj[`repeating_attr_${rowID}_effectivelevel`]) || parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) || 0,
         const chardb = {
                 "capacity": {
                     "cargo": {
@@ -6178,12 +6228,12 @@
                     "default": ""
                 },
                 "plant control": {
-                    1: "Control 10 cm radius, Growth 3x",
-                    2: "Control 1 m radius, Growth 10x",
-                    3: "Control 10 m radius, Growth 30x",
-                    4: "Control 100 m radius, Growth 100x",
-                    5: "Control 1 km radius, Growth 300x",
-                    6: "Control 10 km radius, Growth 1000x",
+                    1: "Control radius 10 cm, Growth 3x",
+                    2: "Control radius 1 m, Growth 10x",
+                    3: "Control radius 10 m, Growth 30x",
+                    4: "Control radius 100 m, Growth 100x",
+                    5: "Control radius 1 km, Growth 300x",
+                    6: "Control radius 10 km, Growth 1000x",
                     "default": ""
                 },
                 "pocket dimension": {
@@ -6314,7 +6364,7 @@
                 case 'plant control':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Control ${(10 ** (query.elevel - 5))} km radius\nGrowth ${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 4) / 2)))}x`;
+                        `Control radius ${(10 ** (query.elevel - 5))} km, Growth ${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 4) / 2)))}x`;
                 break;
                 case 'pocket dimension':
                     characteristic = (query.elevel < 7) ? 
@@ -6360,8 +6410,13 @@
     
     function getConfigurationByCustomization(cache, query) {
         const customizations = {
+            "complete":'complete_resilience',
             "emphasized":'damage_type',
+            "group":'group',
             "optimized":'damage_type',
+            "focussed damage":'damage_type',
+            "targeted damage":'enemy',
+            "species":'species',
         };
         return customizations[query.customization[0]] || false;
     }
@@ -6374,6 +6429,7 @@
             'assisted',
             'backlash',
             'charges',
+            'complete',
             'concentration',
             'consumable',
             'delay',
@@ -6384,12 +6440,14 @@
             'emotional',
             'environmental',
             'equipment',
+            'extra sense',
             'haywire',
             'ignore',
             'imbue',
             'irreversible',
             'localized',
             'maximum',
+            'multiple illusions',
             'object',
             'permanent',
             'potent',
@@ -6955,7 +7013,7 @@
                     roll.template += roll.type === 'skill' || roll.type === 'skill_group' ?
                         ` {{stat=1}} {{title=${roll.type === 'skill_group' ? 'Skill Group' : query.name} Roll}}` :
                         ` {{stat=1}} {{title=${roll.title_stats}Stat Roll}}`;
-                    query.get = getStatsRemaining(cache, roll.stat);debugger;
+                    query.get = getStatsRemaining(cache, roll.stat);
                     roll.cv = Math.round(query.get.reduce(
                         (m, n) => { return m + n; }, 0) / roll.denominator
                     );
@@ -7604,7 +7662,7 @@
                             roll.type === 'stat'
                         ) && roll.attacker !== undefined
                     ) {
-                        roll.template += ` {{emote=${roll.attacker.name}'s ${roll.attacker.type.fromSnakeCase()} ` +
+                        roll.template += ` {{emote=${roll.attacker.name}'s ${roll.attacker.type.fromSnakeCase().capitalize()} ` +
                         `roll vs. ${roll.name} was a ${roll.mos.toLowerCase()}}}`;
                     }
 
@@ -9495,19 +9553,22 @@
                     query.last = query.next;
                 break;
                 case 'remove_attribute':
+                    const removable_attributes = [];
                     query.title = 'Remove';
                     query.options = '';
                     for (let i = 0; i < all_attributes.length; i++) {
                         for (let j = 0; j < cache.attrdb[all_attributes[i]].length; j++) {
                             const attribute = cache.attrdb[all_attributes[i]];
                             if (attribute[j].group_id === cache.static_group_visible_id) {
-                                query.options +=
-                                `|${attribute[j].name}` +
-                                ` [${all_attributes[i].capitalize()}],` +
-                                `${all_attributes[i]}~${cache.attrdb[all_attributes[i]][j].row_id}`;
+                                removable_attributes.push(
+                                    `${attribute[j].name === '' ? all_attributes[i].capitalize() : attribute[j].name}` +
+                                    `${attribute[j].name === '' ? '' : ' [' + all_attributes[i].capitalize() + ']'},` +
+                                    `${all_attributes[i]}~${cache.attrdb[all_attributes[i]][j].row_id}`
+                                );
                             }
                         }
                     }
+                    query.options = '|' + removable_attributes.sort().join("|");
                     query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
@@ -9817,7 +9878,8 @@
                         cache.source_type === 'repeating' && cache.source_section === 'defect' ? 'defect' : 
                         'group';
                     query.title = `${getTranslationByKey("rename-" + type)}`;
-                    query.options = '';
+                    query.options = type === 'group' ? `|${cache.groupdb[cache.static_group_visible_id].name}` :
+                        `|${query.db.name === '' ? query.attribute.capitalize() : query.db.name}`;
                     query.last = query.next;
                 break;
                 case 'set_group_source':
@@ -10023,9 +10085,13 @@
                 break;
                 case 'technique_rank':
                 case 'customization_rank':
+                case 'sense_rank':
                     query.title = `${getTranslationByKey("set-value")}`;
-                    query.options = query.next === 'technique_rank' ? 
-                        `|${query.has_technique !== -1 ? query.techniques[query.techniques.findIndex(t => t.name === query.technique)].rank : 0}` : 
+                    query.options = 
+                        query.next === 'technique_rank' ? 
+                        `|${query.has_technique !== -1 ? query.techniques[query.techniques.findIndex(t => t.name === query.technique)].rank : 0}` :
+                        query.next === 'sense_rank' ?
+                        `|${query.env_index !== -1 ? query.db.config[query.c_index].rank[query.env_index].rank : 0}` :
                         `|${query.customization[1]}`;
                     query.last = query.next;
                 break;
@@ -10167,6 +10233,7 @@
                         'broad category',
                         'capacity_type',
                         'capped',
+                        'complete_resilience',
                         'convert',
                         'damage_type',
                         'defense type',
@@ -10175,9 +10242,15 @@
                         'features',
                         'focused damage',
                         'group',
+                        'immunity',
                         'material category',
                         'movements',
+                        'origin template',
+                        'resilient',
                         'senses',
+                        'senses_or_techniques',
+                        'sixth sense',
+                        'source',
                         'species',
                         'targeted damage',
                         'techniques',
@@ -10282,26 +10355,112 @@
                         `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
+                case 'defense type':
+                    query.title = getTranslationByKey("choose-defense");
+                    query.options = 
+                        `|${getTranslationByKey("movement")},movement` +
+                        `|${getTranslationByKey("ranged")},ranged`;
+                    query.last = query.next;
+                break;
                 case 'enemy':
-                    query.title = `${getTranslationByKey("choose-enemy")}`;
+                case 'group':
+                case 'origin template':
+                case 'species':
+                    query.title =
+                        query.next === 'enemy' ? `${getTranslationByKey("choose-enemy")}` :
+                        query.next === 'group' ? `${getTranslationByKey("choose-group")}` :
+                        query.next === 'origin template' ? `${getTranslationByKey("choose-origin-template")}` :
+                        query.next === 'species' ? `${getTranslationByKey("choose-species")}` :
+                        '';
+                    query.options = `|${query.db.config[query.config_index].rank}`;
+                    query.last = query.next;
+                break;
+                case 'add_sixth_sense':
+                case 'environment':
+                case 'feature':
+                case 'resiliency':
+                    query.title = getTranslationByKey(`${query.next === 'add_sixth_sense' ? 'add_sixth_sense' : 'set-' + query.next}`);
                     query.options = '';
                     query.last = query.next;
                 break;
-                case 'environment':
-                case 'feature':
-                    query.title = getTranslationByKey(`set-${query.next}`);
-                    query.options = `|${query.environment}`;
+                case 'complete_resilience':
+                    query.r_index = query.db.config.findIndex(c => c.name === 'resilient');
+                    if (query.db.config[query.r_index].rank.length === 0) {
+                        clog(cache, 'Must be resilient to something before assigning complete resilence.', 'ERROR');
+                        return;
+                    }
+                    query.temp_resilient = [...query.db.config[query.r_index].rank].sort();
+                    query.title = getTranslationByKey("choose-complete-resilience");
+                    for (let i = 0; i < query.temp_resilient.length; i++) {
+                        const bracket = query.db.config[query.config_index].rank.findIndex(c => c === query.temp_resilient[i]);
+                        query.temp_resilient[i] = 
+                        `${bracket !== -1 ? '[' : ''}` +
+                        `${query.temp_resilient[i].capitalize()}` +
+                        `${bracket !== -1 ? ']' : ''}` +
+                        `,${query.temp_resilient[i]}~${bracket}`;
+                    }
+                    query.options = '|' + query.temp_resilient.join("|");
+                    query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
                 case 'environments':
                 case 'features':
+                case 'immunity':
+                case 'resilient':
+                case 'sixth sense':
                     query.config_index = query.db.config.findIndex(c => c.name === query.next);
                     query.title = getTranslationByKey(`choose-${query.next}`);
-                    query.options = `|${getTranslationByKey("add")},add`;
-                    for (let i = 0; i < query.db.config[query.config_index].rank.length; i++) {
-                        query.options += `|${query.db.config[query.config_index].rank[i]},${i}`;
+                    if (query.next === 'immunity') {
+                        query.options = query.db.config[query.config_index].rank !== '' ?
+                            `|${query.db.config[query.config_index].rank}` : '';
+                    } else {
+                        query.complete = 
+                            query.attribute === 'resilient' &&
+                            query.db.enhancements.findIndex(e => e.name === 'complete');
+                        query.options = `|${getTranslationByKey("add")},add`;
+                        if (query.db.config[query.config_index].rank.length !== 0) {
+                            query.options += '|' + 
+                                query.db.config[query.config_index].rank.map((r, i) => r + ',' + i).sort().join("|");
+                        }
+                        query.options += `|${getTranslationByKey("exit")},exit`;
                     }
-                    query.options += `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'other_sense':
+                    query.title = getTranslationByKey("create-sense-or-technique");
+                    query.options = '';
+                    query.last = query.next;
+                break;
+                case 'senses':
+                    query.title = getTranslationByKey("choose-senses");
+                    query.options = '|' + senses.map(s => `${s.capitalize()},${s}`).sort().join('|');
+                    query.last = query.next;
+                break;
+                case 'senses_or_techniques':
+                    query.blockable_senses = ['sixth sense'].concat(senses, supersenses);
+                    for (let i = 0; i < query.db.config[query.config_index].rank.length; i++) {
+                        if (query.blockable_senses.findIndex(s => s === query.db.config[query.config_index].rank[i]) === -1) {
+                            query.blockable_senses.push(query.db.config[query.config_index].rank[i]);
+                        }
+                    }
+                    query.options = '|' + query.blockable_senses.sort().map(s => query.db.config[query.config_index].rank.findIndex(a => a === s) !== -1 ? `[${s.capitalize()}],${s}` : `${s.capitalize()},${s}`).join('|');
+                    /*
+                    for (let i = 0; i < query.blockable_senses.length; i++) {
+                        if (query.db.config[query.config_index].rank.findIndex(s => s === query.db.config[query.config_index].rank[i]) !== -1) {
+                            query.blockable_senses[i] = `[${query.blockable_senses[i].capitalize()}]`;
+                        } else {
+                            query.blockable_senses[i] = query.blockable_senses[i].capitalize();
+                        }
+                    }
+                    */
+                    query.title = getTranslationByKey("choose-senses");
+                    //query.options = '|' + query.blockable_senses.join('|');
+                    query.options += `|${getTranslationByKey("other")},other`;
+                    query.last = query.next;
+                break;
+                case 'source':
+                    query.title = getTranslationByKey("choose-source");
+                    query.options = '|' + sources_4e.map(s => `${s.capitalize()},${s}`).sort().join('|');
                     query.last = query.next;
                 break;
                 case 'techniques':
@@ -10709,13 +10868,16 @@
                     break;
                     case 'technique_rank':
                     case 'customization_rank':
+                    case 'sense_rank':
                         if (isNaN(query.selection)) {
                             clog(cache, 'Value must be an integer.', 'ERROR');
                             query.next = query.last;
                         } else {
                             query.rank = int(query.selection);
-                            query.next = query.next === 'customization_rank' ?
-                                'write_customizations' : 'write_technique';
+                            query.next = 
+                                query.next === 'customization_rank' ? 'write_customizations' :
+                                query.next === 'sense_rank' ? 'write_sense' :
+                                'write_technique';
                         }
                     break;
                     case 'enhancement_rank':
@@ -11100,13 +11262,13 @@
                     case 'augmented_stat':
                         if (query.selection === 'exit') { return; }
                         cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
-                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
                     case 'capacity_type':
                         if (query.selection === 'exit') { return; }
                         cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
-                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
                     /*
@@ -11140,28 +11302,82 @@
                                 c.name.capitalize()} (${isNaN(c.rank) ? c.rank.capitalize() : c.rank
                             })`).sort().join("\n");
                         */
-                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
+                    case 'defense type':
                     case 'enemy':
+                    case 'group':
+                    case 'origin template':
+                    case 'species':
                         if (query.selection !== 0) {
-                            query.db.config[query.db.config.findIndex(c => c.name === 'enemy')].rank = query.selection;
+                            query.db.config[query.config_index].rank = query.selection;
                             set_values[cache.source] = await setConfiguration(cache, set_values, query);
                             query.next = 'exit';
                         }
                     break;
+                    case 'add_sixth_sense':
+                        query['sixth sense'] = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_sixth_sense';
+                    break;
                     case 'environment':
                     case 'feature':
+                    case 'resiliency':
                         query[query.next] = query.selection === 0 ? '' : query.selection;
                         query.next = `write_${query.next}`;
                     break;
+                    case 'complete_resilience':
+                        query.load = query.selection.split("~");
+                        query.resilient = query.load[0];
+                        query.is_complete = int(query.load[1]);
+                        if (query.is_complete !== -1) {
+                            query.db.config[query.config_index].rank.splice(query.is_complete, 1);
+                        } else {
+                            query.db.config[query.config_index].rank.push(query.resilient);
+                        }
+                        query.next = 'write_complete_resiliency';
+                    break;
                     case 'environments':
                     case 'features':
+                    case 'resilient':
                         if (query.selection === 'exit') { return; }
                         query.env_index = query.selection === 'add' ? -1 : int(query.selection);
-                        query.environment = query.selection === 'add' ? 
+                        query.next = 
+                            query.next === 'resilient' ? 'resiliency' :
+                            query.next === 'complete_resilience' ? 'complete_resiliency' :
+                            query.next.slice(0, -1);
+                        query[query.next] = query.selection === 'add' ? 
                             '' : query.db.config[query.config_index].rank[query.env_index];
-                        query.next = query.next.slice(0, -1);
+                    break;
+                    case 'sixth sense':
+                        if (query.selection === 'exit') { return; }
+                        query.env_index = query.selection === 'add' ? -1 : int(query.selection);
+                        query[query.next] = query.selection === 'add' ? 
+                            '' : query.db.config[query.config_index].rank[query.env_index];
+                        query.next = 'add_sixth_sense';
+                    break;
+                    case 'immunity':
+                        query.immunity = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_immunity';
+                    break;
+                    case 'other_sense':
+                        if (query.selection === 0) { return; }
+                        query.sense = query.selection;
+                        query.next = 'write_sensory_block';
+                    break;
+                    case 'senses':
+                        query.c_index = query.db.config.findIndex(c => c.name === 'senses');
+                        query.env_index = query.db.config[query.c_index].rank.findIndex(s => s.name === query.selection);
+                        query.sense = query.selection;
+                        query.next = 'sense_rank';
+                    break;
+                    case 'senses_or_techniques':
+                        query.sense = query.selection === 0 ? '' : query.selection;
+                        query.next = query.selection === 'other' ? 'other_sense' : 'write_sensory_block';
+                    break;
+                    case 'source':
+                        query.source = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_source';
                     break;
                     case 'techniques':
                         const combat_techinique_ranks = {
@@ -11204,7 +11420,7 @@
                     case 'transform':
                         if (query.selection === 'exit') { return; }
                         cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.selection;
-                        set_values[`${cache.source_path}_configuration`] = await await setConfiguration(cache, set_values, query);
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
 
@@ -11270,7 +11486,7 @@
                                     value = '0 (0)';
                                 break;
                                 case 'name':
-                                    value = `${getTranslationByKey('new-attribute')}${query.attribute === 'skill group' ?
+                                    value = `${getTranslationByKey(query.attribute.toKebobCase())}${query.attribute === 'skill group' ?
                                         ' (' + query.attribute.capitalize() + ')' : ''}`;
                                 break;
                                 case 'points':
@@ -11333,11 +11549,59 @@
                                     name: 'features',
                                     rank: []
                                 });
+                            case 'heightened senses':
+                                query.config.push({
+                                    name: 'senses',
+                                    rank: []
+                                });
+                            break;
+                            case 'melee attack':
+                            case 'melee defense':
+                            case 'ranged attack':
+                                query.config.push({
+                                    name: query.attribute,
+                                    rank: 0
+                                });
+                                query.config.push({
+                                    name: 'weapon_class',
+                                    rank: ''
+                                });
+                            break;
+                            case 'metamorphosis':
+                                query.config.push({
+                                    name: query.attribute,
+                                    rank: 0
+                                });
+                                query.config.push({
+                                    name: 'origin template',
+                                    rank: ''
+                                });
+                            break;
+                            case 'mimic':
+                            case 'nullify':
+                                query.config.push({
+                                    name: query.attribute,
+                                    rank: 0
+                                });
+                                query.config.push({
+                                    name: 'source',
+                                    rank: ''
+                                });
                             break;
                             case 'ranged defense':
                                 query.config.push({
+                                    name: query.attribute,
+                                    rank: 0
+                                });
+                                query.config.push({
                                     name: 'defense type',
                                     rank: 'personal'
+                                });
+                            break;
+                            case 'sensory block':
+                                query.config.push({
+                                    name: 'senses_or_techniques',
+                                    rank: []
                                 });
                             break;
                             case 'skills':
@@ -11349,7 +11613,11 @@
                             default:
                                 query.config.push({
                                     name: query.attribute,
-                                    rank: 0
+                                    rank:
+                                        query.attribute === 'immunity' ? '' :
+                                        query.attribute === 'resilient' ||
+                                        query.attribute === 'sixth sense' ? [] :
+                                        0
                                 });
                         }
                         if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
@@ -11504,207 +11772,61 @@
                         cache.groupdb[defectdb_entry.group_id].points += defectdb_entry.points;
                         setGroupCharacterPoints(cache, set_values, defectdb_entry.group_id);
                     break;
-                    /*
-                    case 'update_attr':
-                        const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
-                        const row_id = query.row_id.toLowerCase();
-                        const attrdb_entry = {};
-                        for (let i = 0; i < fields.length; i++) {
-                            let value = '';
-                            switch (fields[i]) {
-                                case 'attribute':
-                                    value = query.attribute.capitalize();
-                                break;
-                                case 'configuration':
-                                    if (
-                                        query.attribute === 'absorption' ||
-                                        query.attribute === 'armor' ||
-                                        query.attribute === 'conversion' ||
-                                        query.attribute === 'force field'
-                                    ) {
-                                        query.armor_rating = int(`${query.elevel * (
-                                            query.attribute === 'absorption' ||
-                                            query.attribute === 'armor' ? 
-                                                5 :
-                                            query.attribute === 'conversion' ||
-                                            query.attribute === 'force field' ? 
-                                                10 : 0
-                                        )}`);
-                                        const ar_index = query.config.findIndex(c => {
-                                            return c.name === 'armor rating' || c.name === 'absorb' || c.name === 'convert';
-                                        });
-                                        if (ar_index !== -1) {
-                                            query.config[ar_index].rank = query.armor_rating;
-                                        } else {
-                                            query.config.push({
-                                                name: `${
-                                                    query.attribute === 'absorption' ? 'absorb' :
-                                                    query.attribute === 'conversion' ? 'convert' :
-                                                        'armor rating'
-                                                }`,
-                                                rank: query.armor_rating
-                                            });
-                                        }
-                                        if (
-                                            query.attribute === 'absorption' &&
-                                            query.config.findIndex(c => {
-                                                return c.name === 'transform'
-                                            }) === -1
-                                        ) {
-                                            query.config.push({
-                                                name: 'transform',
-                                                rank: query.transform
-                                            });
-                                        }
-                                    } else if (query.attribute === 'ranged defense') {
-                                        query.config.push({
-                                            name: 'defense type',
-                                            rank: query.attribute_type
-                                        })
-                                    }
-                                    if (
-                                        cache.groupdb[cache.static_group_visible_id].group_type === 'power variation' &&
-                                        cache.groupdb[cache.static_group_visible_id].locked === false
-                                    ) {
-                                        const base_index = query.config.findIndex(c => c.name === 'base points');
-                                        if (base_index === -1) {
-                                            query.config.push({
-                                                name: 'base points',
-                                                rank: query.cost * query.level
-                                            });
-                                        } else {
-                                            query.config[base_index].rank = query.cost * query.level;
-                                        }
-                                    }
-                                    if (query.config.length !== 0) {
-                                        query.config.sort();
-                                        for (let i = 0; i < query.config.length; i++) {
-                                            if (query.config[i].name === 'flare') {
-                                                value += `Flare\n`;
-                                                for (let j = 0; j < senses.length; j++) {
-                                                    value += query.config[i].senses[j].rank ?
-                                                        `   ${query.config[i].senses[j].name.capitalize()} (` +
-                                                        `${query.config[i].senses[j].rank === 1 ?
-                                                            'minor' : 'major'} obstacle)\n` : '';
-                                                }
-                                            } else if (query.config[i].name === 'skill points') {
-                                                query.config[i].rank = query.elevel * 10;
-                                            } else {
-                                                value += `${query.config[i].name.capitalize()}`;
-                                                value += `${
-                                                    query.config[i].name === 'absorb' ? ' up to ' :
-                                                    query.config[i].name === 'convert' ? 
-                                                        query.elevel !== 1 ? ' 10 to ' : ' ' :
-                                                    ' ('
-                                                }`;
-                                                value += `${
-                                                    isNaN(query.config[i].rank) ?
-                                                    query.config[i].rank.capitalize() : 
-                                                    int(query.config[i].rank)
-                                                }`;
-                                                value += `${
-                                                    query.config[i].name === 'absorb' ? ' damage' :
-                                                    query.config[i].name === 'convert' ? ' damage into character points' :
-                                                    ')'
-                                                }`;
-                                                value += '\n';
-                                            }
-                                        }
-                                    }
-                                break;
-                                case 'cost':
-                                    if (query.attribute === 'skills') {
-                                        
-                                    } else if (query.attribute === 'skill group') {
-                                        const index = query.config.findIndex(c => {
-                                            const skill_type = 
-                                                cache.rulesdb.rules_optional_individual_status ?
-                                                'skills' : 'skill group';
-                                            return c.name === skill_type;
-                                        });
-                                        query.cost = skill_group_costs[query.config[index].rank.toLowerCase()];
-                                    } else {
-                                        query.cost = attribute_costs[query.attribute];
-                                    }
-                                    value = query.cost;
-                                break;
-                                case 'enhancements':
-                                case 'limiters':
-                                    const data = query[`${fields[i]}`];
-                                    for (let i = 0; i < data.length; i++) {
-                                        const config = data[i].config !== undefined ? 
-                                            ` (${data[i].config.capitalize()})` : '';
-                                        value += `${data[i].name.capitalize()}${config}:` +
-                                            ` ${data[i].rank}`;
-                                        value += i < data.length - 1 ? '\n' : '';
-                                    }
-                                break;
-                                case 'level':
-                                    value = `${query.level} (${query.elevel})`;
-                                break;
-                                case 'name':
-                                    value = `${query[fields[i]].capitalize()}${query.attribute === 'skill group' ?
-                                        ' (' + query.attribute.capitalize() + ')' : ''}`;
-                                break;
-                                case 'points':
-                                    value = int(
-                                        `${query.attribute === 'skills' ?
-                                        query.cost : attribute_costs[query.attribute]}`
-                                    ) * query.level;
-                                break;
-                                case 'stat':
-                                    value = getTranslationByKey(`${query.stat}`).capitalize();
-                                break;
-                            }
-                            set_values[`repeating_attribute_${row_id}_${fields[i]}`] = value;
-                        }
-                        attrdb_entry.config = query.config;
-                        attrdb_entry.elevel = query.elevel;
-                        attrdb_entry.enhancements = query.enhancements;
-                        attrdb_entry.level = query.level;
-                        attrdb_entry.limiters = query.limiters;
-                        attrdb_entry.name = `${query.name}${query.attribute === 'skill group' ?
-                            ' (' + query.attribute.capitalize() + ')' : ''}`;
-                        attrdb_entry.stat = query.stat;
-                        attrdb_entry.points = query.cost * query.level;
-                        const keys = Object.keys(attrdb_entry);
-                        for (let i = 0, n = keys.length; i < n; i++) {
-                            cache.attrdb[query.attribute][query.load[1]][keys[i]] = attrdb_entry[keys[i]];
-                        }
-                        if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
-                            setPowerFluxPoolPoints(cache, set_values);
-                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
-                            setPowerVariationGroupPoints(cache, set_values);
-                            setPowerVariationPoolPoints(cache, set_values);
-                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
-                            setDynamicPowersPoolLevels(cache, set_values);
-                        } else {
-                            setGroupCharacterPoints(cache, set_values, attrdb_entry.group_id);
-                        }
-                        if (query.attribute === 'skills') {
-                            query.skill_index = int(cache.static_skills_visible_id);
-                            setSkillsPointTotal(cache, set_values);
-                        }
-                    break;
-                    */
                     case 'write_attributename':
                         const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
                         db[query[`${cache.source_attribute}`]][query.index].name = query.selection;
                         set_values[`repeating_${cache.source_attribute}_${cache.source_id}_name`] = query.selection;
                     break;
+                    case 'write_complete_resiliency':
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                    break;
                     case 'write_environment':
                     case 'write_feature':
-                        const variable = query.next.substring(6);
+                    case 'write_resiliency':
+                    case 'write_sixth_sense':
+                        query.config_name = query.next.substring(6).fromSnakeCase();
                         if (query.env_index === -1) {
-                            query.db.config[query.config_index].rank.push(query[variable]);
-                        } else if (query.env_index !== -1 && query[variable] === '') {
+                            query.db.config[query.config_index].rank.push(query[query.config_name]);
+                        } else if (query.env_index !== -1 && query[query.config_name] === '') {
                             query.db.config[query.config_index].rank.splice(query.env_index, 1);
                         } else {
-                            query.db.config[query.config_index].rank[query.env_index] = query[variable];
+                            query.db.config[query.config_index].rank[query.env_index] = query[query.config_name];
                         }
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
-                            //`${query.db.config[query.config_index].name.capitalize()} ` +
-                            //`(${query.db.config[query.config_index].rank.sort().join(", ")})`;
+                    break;
+                    case 'write_immunity':
+                        query.db.config[query.config_index].rank = query.immunity;
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                    break;
+                    case 'write_sense':
+                        if (query.env_index === -1) {
+                            if (query.rank === 0) { return; }
+                            query.db.config[query.config_index].rank.push({
+                                name: query.sense,
+                                rank: query.rank
+                            });
+                        } else {
+                            if (query.rank === 0) {
+                                query.db.config[query.config_index].rank.splice(query.env_index, 1);
+                            } else {
+                                query.db.config[query.config_index].rank[query.env_index].rank = query.rank;
+                            }
+                        }
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                    break;
+                    case 'write_sensory_block':
+                        query.has_sense = query.db.config[query.config_index].rank.findIndex(s => s === query.sense);
+                        if (query.has_sense !== -1) {
+                            query.db.config[query.config_index].rank.splice(query.has_sense, 1);
+                        } else {
+                            query.db.config[query.config_index].rank.push(query.sense);
+                        }
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                    break;
+                    case 'write_source':
+                        query.config_name = query.next.substring(6);
+                        query.db.config[query.config_index].rank = query[query.config_name];
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
                     case 'write_groupname':
                         cache.groupdb[cache.static_group_visible_id].name = query.selection;
@@ -11808,6 +11930,7 @@
                         } else {
                             setGroupCharacterPoints(cache, set_values);
                         }
+                        /*
                         if (query.attribute === 'defense mastery') {
 
                         } else if (query.attribute === 'energized') {
@@ -11820,18 +11943,31 @@
                         } else if (query.attribute === 'extra actions') {
                             cache.statsdb.actions.base = 1;
                             for (let i = 0; i < cache.attrdb['extra actions'].length; i++) {
-                                cache.statsdb.actions.base += cache.attrdb['extra actions'][i].active? 
+                                cache.statsdb.actions.base += cache.attrdb['extra actions'][i].active ? 
                                     cache.attrdb['extra actions'][i].elevel : 0;
                             }
                             set_values.static_character_actions_base = cache.statsdb.actions.base;
                         } else if (query.attribute === 'extra defenses') {
                             cache.statsdb.defenses.base = 0;
                             for (let i = 0; i < cache.attrdb['extra defenses'].length; i++) {
-                                cache.statsdb.defenses.base += cache.attrdb['extra defenses'][i].active? 
+                                cache.statsdb.defenses.base += cache.attrdb['extra defenses'][i].active ? 
                                     cache.attrdb['extra defenses'][i].elevel : 0;
                             }
                             set_values.static_character_defenses_base = cache.statsdb.defenses.base;
+                        } else if (query.attribute === 'massive damage') {
+                            cache.statsdb.dm.base = 5;
+                            for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
+                                const is_focused = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'focussed damage') !== -1;
+                                const is_targetted = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'targeted damage') !== -1;
+                                cache.statsdb.dm.base += 
+                                    cache.attrdb['massive damage'][i].active && 
+                                    !is_focused && 
+                                    !is_targetted ?
+                                    cache.attrdb['massive damage'][i].elevel : 0;
+                            }
+                            set_values.static_character_dm_base = cache.statsdb.dm.base;
                         }
+                        */
                     break;
                     case 'write_stat':
                         if (query.type === 'group') {
@@ -11888,7 +12024,11 @@
                                 if (configuration) {
                                     cache.attrdb[query.attribute][query.index].config.push({
                                         name: configuration,
-                                        rank:'carry',
+                                        rank:
+                                            query.attribute === 'capacity' ? 'carry' :
+                                            configuration === 'complete_resilience' ? [] :
+                                            ''
+                                        ,
                                     });
                                     //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                                 }
