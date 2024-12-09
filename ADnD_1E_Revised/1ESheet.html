@@ -7825,6 +7825,31 @@
     setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
+  // One-time update: add parenthesis to critical damage macro-text
+  const updateCriticalDamageMacro = (current_version, final_version) => {
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(section_attribute('weapon', id, 'weapon_critdamagesmallmedium'));
+        fields.push(section_attribute('weapon', id, 'weapon_critdamagelarge'));
+      });
+      getAttrs([...fields], (v) => {
+        const output = {};
+        const macrodefaultSmall = '(@{weapon_damagesmallmedium})*2';
+        const macrodefaultLarge = '(@{weapon_damagelarge})*2';
+        _.each(idArray, (id) => {
+          const macrotextSmall = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium')] || macrodefaultSmall;
+          const macrotextLarge = v[section_attribute('weapon', id, 'weapon_critdamagelarge')] || macrodefaultLarge;
+          output[section_attribute('weapon', id, 'weapon_critdamagesmallmedium')] = macrotextSmall.replace(/@{weapon_damagesmallmedium}*2/g, '(@{weapon_damagesmallmedium})*2');
+          output[section_attribute('weapon', id, 'weapon_critdamagelarge')] = macrotextLarge.replace(/@{weapon_damagelarge}*2/g, '(@{weapon_damagelarge})*2');
+        });
+        output.sheet_version = current_version;
+        clog(`VERSION UPDATE: updateCriticalDamageMacro completed`);
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      });
+    });
+  };
+
   // Check and set Ability defaults to 8 on new sheets
   const newSheet = () => {
     getAttrs(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character'], (v) => {
@@ -7938,6 +7963,8 @@
       recalcAC(1.654, final_version);
     } else if (current_version < 1.656) {
       initMacroUpdate(1.656, final_version);
+    } else if (current_version < 1.658) {
+      updateCriticalDamageMacro(1.658, final_version);
       // all updates completed
     } else if (current_version < final_version) {
       setAttrs({
@@ -7951,7 +7978,7 @@
   // Versioning
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-    const final_version = 1.657;
+    const final_version = 1.658;
     getAttrs(['sheet_version', 'old_character'], (v) => {
       const output = {};
       let current_version = float(v.sheet_version);
