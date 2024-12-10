@@ -1,3 +1,22 @@
+# 2024-12-10
+
+- Finalise handling of Professions with selectable Base lists
+    - Alchemists are the first users
+- Creatures: Add hx for Hand Crossbows, and a few other attacks
+- Half shield bonus skill for partial block - not the full one.
+- Try and squash the super long list of errors when you first update stateud
+- Compendium data: Move a long bow to Bow, Long for the table.
+- Creatures: Creatures can now roll skills.
+- Equipment:
+  - Perception Penalties are now applied
+  - Ranged Penalties are now applied.
+- Take a terrible guess if it's a ranged or melee weapon when adding attacks
+- Creatures now have framework for type of attack (melee, ranged, directed)
+  - Does not (yet) change attack
+  - Add test to validate attack types
+- Change 'maneuver_penalty' -> status_penalty
+  - Update everywhere except inventory; it was a collision of names before.
+
 # 2024-12-3
 
 - Initiative modified by maneuver penalty
@@ -5,6 +24,7 @@
 - Add tests and validations for creatures.
 - All creature weapons now have a size (usually 0)
 - Display a message when an injury takes a character to negative hits.
+- Fix a stupid misplaced class for RRs
 
 # 2024-11-26
 
