@@ -82,6 +82,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 ///// ============ Change Log ============ /////  
 
 
+Dec 14th 2024 v1.74a
+
+- Fix for Conditions not working
+
+
 Dec 12th 2024 v1.74
 
 - New Dwarf Player's Guide Talents, to support the new Dwarf career's. Talents with direct roll modifier are integrated, but some of the indirect ones are manually applied by the GM/players. Including new attack mode Whirlwind of Death. These Talents are intended for Dwarfs only, but sheet will allow any race to use them (at GM discretion).
