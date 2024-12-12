@@ -63,9 +63,13 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 11/27/24'</span>
+            <span class="right"> • 12/8/24'</span>
           </h5>
           <ul>
+            <li>Roll templates now have an increased max-height for embedded images based on the viewport width. Should help to display larger images.<br>
+              <strong>FYI:</strong> images can be included with sheet rolls by using roll20's normal chat image format. ie <strong>[x](URL that ends in a common image format such as .jpg, .png, .gif)</strong> So if you want to display an image with a given roll, simply include a properly formatted image code macro within any text-based field. ie Name, Notes, Description. Macro-text can also be modified to include an image. ie <strong>{{subtag=[x](URL)}}</strong></li>
+            <li>Fix for crit damage rolls; I've added parenthesis around the crit damage dice so that the entire roll is multiplied x2. This is a non-issue unless you want bonuses included with the crit multiplier. While it's common for crit damage to only double the dice roll and then add bonuses, you can include bonuses with the damage dice if desired. Note that the damage modifier field will also be included after any multiplier. Use it however you like.</li>
+            <li>Rollback of last weeks single column not spanning full width 'fix' and a proper redo that doesn't cause collateral issues with the spell header layout.</li>
             <li>Small fix for single column spells and special abilities not spanning the full width.</li>
             <li>Added an option in the Sheet settings to auto-roll weapon damage regardless of the attack roll.</li>
             <li>
@@ -3046,7 +3050,7 @@
                 <label class="label-under toggle-critdamage">
                   <button class="text-only hide-as-npc" type="roll" name="roll_weapon_critdamagesmallmedium_roll" title="%{repeating_weapon_$X_weapon_critdamagesmallmedium_roll} | PC Roll" value="@{weapon_critdamagesmallmedium_macro_text}"><span class="dice-button nowrap">Roll Crit</span></button>
                   <button class="text-only hide-as-pc" type="roll" name="roll_weapon_critdamagesmallmedium_npc_roll" title="%{repeating_weapon_$X_weapon_critdamagesmallmedium_npc_roll} | NPC Roll" value="@{weapon_critdamagesmallmedium_macro_npc_text}"><span class="dice-button nowrap">Roll Crit</span></button>
-                  <textarea class="height-short toggle-macros" name="attr_weapon_critdamagesmallmedium" title="@{repeating_weapon_$X_weapon_critdamagesmallmedium} | Crit Damage roll in lieu of normal damage roll.  Defaults to x2 of the weapon's normal damage. ie @{weapon_damagesmallmedium}*2">@{weapon_damagesmallmedium}*2</textarea>
+                  <textarea class="height-short toggle-macros" name="attr_weapon_critdamagesmallmedium" title="@{repeating_weapon_$X_weapon_critdamagesmallmedium} | Crit Damage roll in lieu of normal damage roll.  Defaults to x2 of the weapon's normal damage. ie @{weapon_damagesmallmedium}*2">(@{weapon_damagesmallmedium})*2</textarea>
                 </label>
               </details>
               <details class="large-damage">
@@ -3072,7 +3076,7 @@
                 <label class="label-under toggle-critdamage">
                   <button class="text-only hide-as-npc" type="roll" name="roll_weapon_critdamagelarge_roll" title="%{repeating_weapon_$X_weapon_critdamagelarge_roll} | PC Roll" value="@{weapon_critdamagelarge_macro_text}"><span class="dice-button nowrap">Roll Crit</span></button>
                   <button class="text-only hide-as-pc" type="roll" name="roll_weapon_critdamagelarge_npc_roll" title="%{repeating_weapon_$X_weapon_critdamagelarge_npc_roll} | NPC Roll" value="@{weapon_critdamagelarge_macro_npc_text}"><span class="dice-button nowrap">Roll Crit</span></button>
-                  <textarea class="height-short toggle-macros" name="attr_weapon_critdamagelarge" title="@{repeating_weapon_$X_weapon_critdamagelarge} | Crit Damage roll instead of normal damage roll.  Defaults to x2 of the weapon's normal damage. ie @{weapon_damagelarge}*2">@{weapon_damagelarge}*2</textarea>
+                  <textarea class="height-short toggle-macros" name="attr_weapon_critdamagelarge" title="@{repeating_weapon_$X_weapon_critdamagelarge} | Crit Damage roll instead of normal damage roll.  Defaults to x2 of the weapon's normal damage. ie @{weapon_damagelarge}*2">(@{weapon_damagelarge})*2</textarea>
                 </label>
               </details>
               <!--inserted into the NPC attack roll. Needed so that damage chat menu respects the whisper_npc setting-->
@@ -7823,6 +7827,31 @@
     setAttrs(output, {silent: true}, versionator(current_version, final_version));
   };
 
+  // One-time update: add parenthesis to critical damage macro-text
+  const updateCriticalDamageMacro = (current_version, final_version) => {
+    getSectionIDs('repeating_weapon', (idArray) => {
+      const fields = [];
+      _.each(idArray, (id) => {
+        fields.push(section_attribute('weapon', id, 'weapon_critdamagesmallmedium'));
+        fields.push(section_attribute('weapon', id, 'weapon_critdamagelarge'));
+      });
+      getAttrs([...fields], (v) => {
+        const output = {};
+        const macrodefaultSmall = '(@{weapon_damagesmallmedium})*2';
+        const macrodefaultLarge = '(@{weapon_damagelarge})*2';
+        _.each(idArray, (id) => {
+          const macrotextSmall = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium')] || macrodefaultSmall;
+          const macrotextLarge = v[section_attribute('weapon', id, 'weapon_critdamagelarge')] || macrodefaultLarge;
+          output[section_attribute('weapon', id, 'weapon_critdamagesmallmedium')] = macrotextSmall.replace(/@{weapon_damagesmallmedium}*2/g, '(@{weapon_damagesmallmedium})*2');
+          output[section_attribute('weapon', id, 'weapon_critdamagelarge')] = macrotextLarge.replace(/@{weapon_damagelarge}*2/g, '(@{weapon_damagelarge})*2');
+        });
+        output.sheet_version = current_version;
+        clog(`VERSION UPDATE: updateCriticalDamageMacro completed`);
+        setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      });
+    });
+  };
+
   // Check and set Ability defaults to 8 on new sheets
   const newSheet = () => {
     getAttrs(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character'], (v) => {
@@ -7936,6 +7965,8 @@
       recalcAC(1.654, final_version);
     } else if (current_version < 1.656) {
       initMacroUpdate(1.656, final_version);
+    } else if (current_version < 1.658) {
+      updateCriticalDamageMacro(1.658, final_version);
       // all updates completed
     } else if (current_version < final_version) {
       setAttrs({
@@ -7949,7 +7980,7 @@
   // Versioning
   on('sheet:opened', () => {
     // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-    const final_version = 1.657;
+    const final_version = 1.658;
     getAttrs(['sheet_version', 'old_character'], (v) => {
       const output = {};
       let current_version = float(v.sheet_version);
