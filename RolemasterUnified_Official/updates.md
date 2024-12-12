@@ -1,3 +1,12 @@
+# 2024-12-12
+
+The Author is an Idiot bugfix release for Treasure Law.
+
+- Allow drops from all magic item types
+- Save descriptions for all items (even new format)
+- Funky line as you lose hits or PP
+- Fix a maneuver penalty error which was messing up item drops
+
 # 2024-12-10
 
 - Finalise handling of Professions with selectable Base lists
