@@ -2,7 +2,6 @@
 <input type="hidden" name="attr_sheetTab" value="character" />
 <input type="hidden" name="attr_weaponEncumbrance" value="0" />
 <input type="hidden" name="attr_attackBonus" value="0" />
-<input type="hidden" name="attr_damageBonus" value="0" />
 <input type="hidden" name="attr_descendingArmorClass" value="" />
 
 <!-- SHEET SELECTOR -->
@@ -18,7 +17,7 @@
 <div class="sheet-character">
   <div class="logo-and-header">
     <img
-      src="https://raw.githubusercontent.com/machado-cesar/roll20-character-sheets/feature_d20age/d20age/images/d20agelogo.png"
+      src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/d20age/images/d20agelogo.png"
       alt="logo d20age"
     />
     <!-- Header -->
@@ -418,11 +417,12 @@
         <div class="weapon-grid">
           <div id="weapon-roll">
             <span>.</span>
+            <input type="hidden" name="attr_bonusDamage" value="0" />
             <button
               type="roll"
               name="dacAttackRoll"
               class="attack-roll attack-roll-dac"
-              value="&{template:simple} {{descendingArmorClass=@{descendingArmorClass}}}  {{roll=@{character_name} ataca com @{weaponName}}} {{ataque=[[1d20+@{dexMod}+@{weaponAttackBonus}+@{attackBonus}]]}} {{dano=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{damageBonus}]]}} {{descrição=@{weaponDescription}}} {{attackMatrix9=@{attackMatrix9}}} {{attackMatrix8=@{attackMatrix8}}} {{attackMatrix7=@{attackMatrix7}}} {{attackMatrix6=@{attackMatrix6}}} {{attackMatrix5=@{attackMatrix5}}} {{attackMatrix4=@{attackMatrix4}}} {{attackMatrix3=@{attackMatrix3}}} {{attackMatrix2=@{attackMatrix2}}} {{attackMatrix1=@{attackMatrix1}}} {{attackMatrix0=@{attackMatrix0}}}"
+              value="&{template:simple} {{descendingArmorClass=@{descendingArmorClass}}}  {{roll=@{character_name} ataca com @{weaponName}}} {{ataque=[[1d20+@{dexMod}+@{weaponAttackBonus}+@{attackBonus}]]}} {{dano=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{bonusDamage}]]}} {{descrição=@{weaponDescription}}} {{attackMatrix9=@{attackMatrix9}}} {{attackMatrix8=@{attackMatrix8}}} {{attackMatrix7=@{attackMatrix7}}} {{attackMatrix6=@{attackMatrix6}}} {{attackMatrix5=@{attackMatrix5}}} {{attackMatrix4=@{attackMatrix4}}} {{attackMatrix3=@{attackMatrix3}}} {{attackMatrix2=@{attackMatrix2}}} {{attackMatrix1=@{attackMatrix1}}} {{attackMatrix0=@{attackMatrix0}}}"
             ></button>
           </div>
           <div id="weapon-name">
@@ -1224,7 +1224,6 @@
           []
         );
         getAttrs(attrArray, (v) => {
-          console.log("===== values of v: " + JSON.stringify(v) + " =====");
           // getValue: if not a number, returns 1 if it is 'on' (checkbox), otherwise returns 0..
           const getValue = (section, id, field) =>
             parseFloat(v[`repeating_${section}_${id}_${field}`]) ||
@@ -1340,22 +1339,26 @@
       });
     });
 
-    on("sheet:opened change:attackType change:strMod", function () {
-      getAttrs(["attackType", "strMod"], function (values) {
-          const attackType = values.attackType;
-          const strMod = parseInt(values.strMod) || 0;
-          let bonusDamage = 0; // Valor padrão
-          // Define bonusDamage com base no valor de attackType
-          if (attackType === "melee") {
-              bonusDamage = strMod;
-          } else if (attackType === "ranged") {
-              bonusDamage = 0;
-          }
-          // Atualiza o atributo bonusDamage
-          setAttrs({
-              bonusDamage: bonusDamage
-          });
-      });
+    on("sheet:opened change:repeating_weapons:attackType change:strMod", function () {
+        getSectionIDs("repeating_weapons", function (idArray) {
+            idArray.forEach(function (id) {
+                const attributes = [`repeating_weapons_${id}_attackType`, "strMod"];
+                getAttrs(attributes, function (values) {
+                    const attackType = values[`repeating_weapons_${id}_attackType`] || "";
+                    const strMod = parseInt(values.strMod) || 0; // Global strMod
+                    let bonusDamage = 0;
+                    if (attackType.toLowerCase() === "melee") {
+                        bonusDamage = strMod;
+                    } else if (attackType.toLowerCase() === "ranged") {
+                        bonusDamage = 0;
+                    }
+                    console.log(`Repeating weapon update - ID: ${id}, attackType: ${attackType}, bonusDamage: ${bonusDamage}`);
+                    setAttrs({
+                        [`repeating_weapons_${id}_bonusDamage`]: bonusDamage
+                    });
+                });
+            });
+        });
     });
 
     // Atualizar weaponEncumbrance com a soma de todos os weaponWeight em repeating_weapons
@@ -1479,8 +1482,6 @@
                   ids.forEach((id) => {
                       const armorValue = parseInt(itemValues[`repeating_armor_${id}_armorValue`]) || 0;
                       const armorWorn = itemValues[`repeating_armor_${id}_armorWorn`] === "on";
-                      console.log(itemValues[`repeating_armor_${id}_armorWorn`])
-                      console.log(`Item ID: ${id}, armorValue: ${armorValue}, armorWorn: ${armorWorn}`);
                       if (armorWorn) {
                           totalArmorValue += armorValue;
                       }
