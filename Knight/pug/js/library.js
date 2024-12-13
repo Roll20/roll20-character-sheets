@@ -860,6 +860,7 @@ const i18n_deplacement = getTranslationByKey("deplacement"),
     i18n_devasterAnatheme = getTranslationByKey("devaster-anatheme"),
     i18n_bourreauTenebres = getTranslationByKey("bourreau-tenebres"),
     i18n_equilibrerBalance = getTranslationByKey("equilibrer-balance"),
+    i18n_equilibrerBalanceShort = getTranslationByKey("equilibrer-balance-short"),
     i18n_bourreau = getTranslationByKey("bourreau"),
     i18n_conviction = getTranslationByKey("conviction"),
     i18n_devastation = getTranslationByKey("devastation"),
@@ -1059,6 +1060,92 @@ function isApplied(e) {
         result = e;
 
     return result;
+}
+
+async function postRoll(computed, gmroll, stringRoll, mainRoll, conditions={}, startString=`&{template:simple} {{Nom=@{name}}}`) {
+    const isGuidage = conditions.isGuidage || false;
+    const results = mainRoll.results;
+    const pairOrImpair = isGuidage === true ? 'cs1cs3cs5cf2cf4cf6s' : 'cs2cs4cs6cf1cf3cf5s';
+    const dices = results.jet.dice;
+    let success = 0;
+
+    success += computed.basejet;
+
+    if(conditions.equilibre && dices.length !== success) {
+        const notSuccess = parseInt(dices.length)-parseInt(success);
+      
+        const relance = await startRoll(`${gmroll} ${startString} {{special1=${i18n_equilibrerBalanceShort}}} {{jet=[[ ${notSuccess}d6${pairOrImpair}]]}}`);
+        const rRelance = relance.results.jet.dice;
+        const relancePairOrImpair = isGuidage === true ? 1 : 0;
+
+        const jetRelance = rRelance.reduce((accumulateur, valeurCourante) => {
+          const vC = valeurCourante;
+          let nV = 0;
+
+          if (vC % 2 === relancePairOrImpair) {
+            nV = 1;
+          }
+
+          return accumulateur + nV;
+        }, 0);
+
+        const relanceComputed = {
+          jet: jetRelance,
+        };
+
+        finishRoll(relance.rollId, relanceComputed);
+
+        success += relanceComputed.jet;
+    }
+
+    if (success !== 0 && success === dices.length) {
+        const isGuidage = conditions.isGuidage || false;
+
+        const exploitRoll = await startRoll(`${gmroll} ${startString} {{special1=${i18n_exploit}}}${stringRoll}`);
+        const rExploit = exploitRoll.results.jet.dice;
+        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
+
+        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
+            const vC = valeurCourante;
+            let nV = 0;
+
+            if (vC % 2 === exploitPairOrImpair) {
+            nV = 1;
+            }
+
+            return accumulateur + nV;
+        }, 0);
+
+        const exploitComputed = {
+            jet: jetExploit,
+        };
+
+        finishRoll(exploitRoll.rollId, exploitComputed);
+    }
+}
+
+function computeSimpleRoll(mainRoll, bonus = 0, pairOrImpair = 0) {
+    const results = mainRoll.results;
+    console.warn(results);
+    let jet = 0;
+    let dices = results.jet.dice.reduce((accumulateur, valeurCourante) => {
+        const vC = valeurCourante;
+        let nV = 0;
+
+        if (vC % 2 === pairOrImpair) {
+            nV = 1;
+        }
+
+        return accumulateur + nV;
+    }, 0);
+
+    jet += dices;
+    jet += bonus;
+
+    return {
+        jet:jet,
+        basejet:dices,
+    }
 }
 
 var PI = {
