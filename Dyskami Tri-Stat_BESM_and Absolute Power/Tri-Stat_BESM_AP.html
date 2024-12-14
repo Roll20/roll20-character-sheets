@@ -4640,8 +4640,20 @@
                         switch (temp.attrdb.config[i].name) {
                             case 'hardboiled':
                                 cache.shockvalue =
+                                (
                                     cache.statsdb.body.base +
-                                    cache.statsdb.soul.base;
+                                    (cache.statsdb.body.augmented || 0) +
+                                    cache.statsdb.body.temp -
+                                    cache.statsdb.body.damage -
+                                    (cache.statsdb.body.shortcoming || 0)
+                                ) +
+                                (
+                                    cache.statsdb.soul.base +
+                                    (cache.statsdb.soul.augmented || 0) +
+                                    cache.statsdb.soul.temp -
+                                    cache.statsdb.soul.damage -
+                                    (cache.statsdb.soul.shortcoming || 0)
+                                )
                             break;
                         }
                     }
@@ -4676,8 +4688,20 @@
                 case 'energized':
                     if (cache.energy === undefined) {
                         cache.energy = (
-                            cache.statsdb.mind.base +
-                            cache.statsdb.soul.base
+                            (
+                                cache.statsdb.mind.base +
+                                (cache.statsdb.mind.augmented || 0) +
+                                cache.statsdb.mind.temp -
+                                cache.statsdb.mind.damage -
+                                (cache.statsdb.mind.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.soul.base +
+                                (cache.statsdb.soul.augmented || 0) +
+                                cache.statsdb.soul.temp -
+                                cache.statsdb.soul.damage -
+                                (cache.statsdb.soul.shortcoming || 0)
+                            )
                         ) * 5;
                     }
                 break;
@@ -4685,10 +4709,25 @@
                     cache.dm = 5;
                 break;
                 case 'social mastery':
-                    if (cache.society === undefined) {
+                    if (
+                        cache.scv === undefined ||
+                        cache.society === undefined
+                    ) {
                         const scv = Math.round((
-                            cache.statsdb.mind.base +
-                            cache.statsdb.soul.base
+                            (
+                                cache.statsdb.mind.base +
+                                (cache.statsdb.mind.augmented || 0) +
+                                cache.statsdb.mind.temp -
+                                cache.statsdb.mind.damage -
+                                (cache.statsdb.mind.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.soul.base +
+                                (cache.statsdb.soul.augmented || 0) +
+                                cache.statsdb.soul.temp -
+                                cache.statsdb.soul.damage -
+                                (cache.statsdb.soul.shortcoming || 0)
+                            )
                         ) / 2);
                         cache.scv = scv;
                         cache.society = scv;
@@ -4697,16 +4736,40 @@
                 case 'tough':
                     if (cache.health === undefined) {
                         cache.health = (
-                            cache.statsdb.body.base +
-                            cache.statsdb.soul.base
+                            (
+                                cache.statsdb.body.base +
+                                (cache.statsdb.body.augmented || 0) +
+                                cache.statsdb.body.temp -
+                                cache.statsdb.body.damage -
+                                (cache.statsdb.body.shortcoming || 0)
+                            ) +
+                            (
+                                cache.statsdb.soul.base +
+                                (cache.statsdb.soul.augmented || 0) +
+                                cache.statsdb.soul.temp -
+                                cache.statsdb.soul.damage -
+                                (cache.statsdb.soul.shortcoming || 0)
+                            )
                         ) * 5;
                     }
                 break;
                 case 'unassailable':
                     if (cache.sanity === undefined) {
                         cache.sanity =
+                        (
                             cache.statsdb.mind.base +
-                            cache.statsdb.soul.base;
+                            (cache.statsdb.mind.augmented || 0) +
+                            cache.statsdb.mind.temp -
+                            cache.statsdb.mind.damage -
+                            (cache.statsdb.mind.shortcoming || 0)
+                        ) +
+                        (
+                            cache.statsdb.soul.base +
+                            (cache.statsdb.soul.augmented || 0) +
+                            cache.statsdb.soul.temp -
+                            cache.statsdb.soul.damage -
+                            (cache.statsdb.soul.shortcoming || 0)
+                        )
                     }
                 break;
             }
@@ -4743,7 +4806,7 @@
                         }
                     });
                     cache.hardboiled = Math.min(cache.hardboiled, cache.shockvalue / 2);
-                    cache.shockvalue = cache.shockvalue + cache.hardboiled;
+                    cache.shockvalue += cache.hardboiled;
                 break;
                 case 'defense mastery':
                     cache.attrdb[cache.attribute[i]].forEach(a => {
@@ -4790,7 +4853,7 @@
                         if (a.active) {
                             const scv = a.elevel * 2;
                             cache.scv += scv;
-                            cache.society += scv;
+                            //cache.society += scv;
                         }
                     });
                 break;
@@ -5939,7 +6002,7 @@
             case "alternate form": description = `${query.elevel * 5} Character Points`; break;
             case "alternate identity": description = `${query.elevel} Alternate Identities`; break;
             case "armor": description = query.elevel * 5; break;
-            case "attack mastery": description = `+${query.elevel} ACV`; break;
+            case "attack mastery": description = `+${query.elevel} ACV`; await setDerivedValues(cache, set_values); break;
             case "augmented":
                 query.stat = query.config[query.config.findIndex(c => c.name === 'augmented_stat')].rank;
                 description = `+${query.elevel} ${getTranslationByKey(query.stat).capitalize()}`;
@@ -6055,7 +6118,7 @@
                 }
                 description = `${query.elevel * 10} Skill Points`;
             break;
-            case "social mastery": description = `SCV +${query.elevel * 2}`; break;
+            case "social mastery": description = `SCV +${query.elevel * 2}`; await setDerivedValues(cache, set_values); break;
             case "space flight": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
             case "summon creatures": description = `Summon up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} Creatures`; break;
@@ -9947,7 +10010,6 @@
                 case 'static_attribute_group_level':
                 case 'repeating_attribute_level':
                 case 'repeating_defect_rank':
-                    
                     query.title = cache.source_section === 'defect' ?
                         `${getTranslationByKey("rank")}` :
                         `${getTranslationByKey("level")}`;
@@ -13485,6 +13547,7 @@
                                 cache[db][cache.attribute][cache.index].active = 
                                     cache.active;
                                 //await setActiveAttribute(cache, set_values);
+                                /*
                                 if (Object.keys(attr_to_value).indexOf(cache.attribute) !== -1) {
                                     let value = 0;
                                     for (let i = 0; i < cache[db][cache.attribute].length; i++) {
@@ -13510,7 +13573,8 @@
                                     }
                                     */
                                     //await setDerivedValues(cache, set_values);
-                                }
+                                //}
+                                
                                 if (cache.attribute === 'augmented') {
                                     cache.aug_index = cache.attrdb.augmented[cache.index].config.findIndex(c => c.name === 'augmented_stat');
                                     cache.augmented_stat = cache.attrdb.augmented[cache.index].config[cache.aug_index].rank;
@@ -13524,7 +13588,7 @@
                                         }
                                     }
                                     cache.statsdb[cache.augmented_stat].augmented = cache.augmented_rank;
-                                    await setDerivedValues(cache, set_values);
+                                    //await setDerivedValues(cache, set_values);
                                     set_values[`static_character_${cache.augmented_stat}_remaining`] = 
                                         cache.statsdb[cache.augmented_stat].base +
                                         cache.statsdb[cache.augmented_stat].augmented +
@@ -13532,6 +13596,8 @@
                                         cache.statsdb[cache.augmented_stat].damage -
                                         (cache.statsdb[cache.augmented_stat].shortcoming || 0);
                                 }
+                                //await setActiveAttribute(cache, set_values);
+                                await setDerivedValues(cache, set_values);
                                 if (cache.source_attribute === 'active' && cache.source_section === 'defect') {
                                     const index = cache.defectdb.shortcoming.findIndex(s => s.row_id.toLowerCase() === cache.source_id);
                                     const aspect_type = cache.defectdb.shortcoming[index].config.findIndex(s => s.name === 'aspect_type');
