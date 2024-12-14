@@ -82,6 +82,16 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 ///// ============ Change Log ============ /////  
 
 
+Dec 16th 2024 v1.74b
+
+- Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section
+- Fix issue with impact/damaging not showing on Attack rolls with Size modifer Large Vs Small
+- Fix mixed up Impact/Impale checkboxes on the NPC pages
+- Fix Warpstone Quality now only triggered on crit again
+- Resolved some issues with dulpicate crit translations
+- Cleaned up minor CSS file errors
+
+
 Dec 14th 2024 v1.74a
 
 - Fix for Conditions not working
