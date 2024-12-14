@@ -5944,7 +5944,7 @@
             db.map(c =>
                 `${c.name.capitalize()} ` +
                 `(${
-                    c.name === 'techniques' ?
+                    c.name === 'techniques' || c.name === 'movements' ?
                         c.rank.map(t => t.name.capitalize() + ' (' + t.rank + ')').sort().join(", ") :
                     c.name === 'complete_resilience' ?
                         c.rank.map(r => r.capitalize()).sort().join(", ") :
@@ -6120,7 +6120,7 @@
             break;
             case "social mastery": description = `SCV +${query.elevel * 2}`; await setDerivedValues(cache, set_values); break;
             case "spaceflight": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            //case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
             case "summon creatures": description = `Summon up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} Creatures`; break;
             case "supersense": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
             case "superspeed": description = `Superspeed up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel + 2) / 2)))} kph`; break;
@@ -10175,11 +10175,14 @@
                     query.last = `${query.customization_type}_remove`;
                     query.next = 'write_customizations';
                 break;
-                case 'technique_rank':
                 case 'customization_rank':
+                case 'movement_rank':
                 case 'sense_rank':
+                case 'technique_rank':
                     query.title = `${getTranslationByKey("set-value")}`;
                     query.options = 
+                        query.next === 'movement_rank' ? 
+                        `|${query.has_movement !== -1 ? query.movements[query.movements.findIndex(m => m.name === query.movement)].rank : 0}` :
                         query.next === 'technique_rank' ? 
                         `|${query.has_technique !== -1 ? query.techniques[query.techniques.findIndex(t => t.name === query.technique)].rank : 0}` :
                         query.next === 'sense_rank' ?
@@ -10559,6 +10562,39 @@
                 case 'source':
                     query.title = getTranslationByKey("choose-source");
                     query.options = '|' + sources_4e.map(s => `${s.capitalize()},${s}`).sort().join('|');
+                    query.last = query.next;
+                break;
+                case 'movements':
+                    const standard_movements = [
+                        'balance',
+                        'cat-like',
+                        'fast',
+                        'light-footed',
+                        'slithering',
+                        'swinging',
+                        'untrackable',
+                        'wall-bouncing',
+                        'wall-crawling',
+                        'water-walking',
+                        'zen direction',
+                    ];
+                    const optional_movements = ['speedburst',];
+                    query.movements = [];
+                    query.title = getTranslationByKey("choose-special-movements");
+                    for (let i = 0; i < optional_movements.length; i++) {
+                        if (cache.rulesdb[`rules_attribute_${optional_movements[i].removeWhiteSpace()}_status`]) {
+                            standard_movements.push(optional_movements[i]);
+                        }
+                    }
+                    for (let i = 0; i < standard_movements.length; i++) {
+                        const has_movement = query.db.config[query.load[1]].rank.findIndex(r => r.name === standard_movements[i]);
+                        query.movements.push(
+                            `${standard_movements[i].capitalize()}` +
+                            `${has_movement !== -1 ? ' (' + query.db.config[query.load[1]].rank[has_movement].rank + ')' : ''}` +
+                            `,${standard_movements[i]}`
+                        );
+                    }
+                    query.options = '|' + query.movements.sort().join('|');
                     query.last = query.next;
                 break;
                 case 'techniques':
@@ -10966,9 +11002,10 @@
                             query.config.splice(query.customization_index, 1);
                         }
                     break;
-                    case 'technique_rank':
                     case 'customization_rank':
+                    case 'movement_rank':
                     case 'sense_rank':
+                    case 'technique_rank':
                         if (isNaN(query.selection)) {
                             clog(cache, 'Value must be an integer.', 'ERROR');
                             query.next = query.last;
@@ -10976,6 +11013,7 @@
                             query.rank = int(query.selection);
                             query.next = 
                                 query.next === 'customization_rank' ? 'write_customizations' :
+                                query.next === 'movement_rank' ? 'write_movement' :
                                 query.next === 'sense_rank' ? 'write_sense' :
                                 'write_technique';
                         }
@@ -11485,6 +11523,29 @@
                         query.source = query.selection === 0 ? '' : query.selection;
                         query.next = 'write_source';
                     break;
+                    case 'movements':
+                        const special_movement_ranks = {
+                            'balance':{rank:1},
+                            'cat-like':{rank:1},
+                            'fast':{},
+                            'light-footed':{rank:1},
+                            'slithering':{rank:1},
+                            'speedburst':{},
+                            'swinging':{rank:1},
+                            'untrackable':{rank:1},
+                            'wall-bouncing':{rank:1},
+                            'wall-crawling':{rank:1},
+                            'water-walking':{rank:1},
+                            'zen direction':{rank:1},
+                        };
+                        query.movement = query.selection;
+                        query.rank = special_movement_ranks[query.movement].rank;
+                        query.has_rank = query.rank === undefined ? true : false;
+                        query.movement_index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'movements');
+                        query.movements = cache.attrdb[query.attribute][query.index].config[query.movement_index].rank;
+                        query.has_movement = query.movements.findIndex(m => m.name === query.movement);
+                        query.next = query.rank === undefined ? 'movement_rank' : 'write_movement';
+                    break;
                     case 'techniques':
                         const combat_techinique_ranks = {
                             'blackout':{rank:1},
@@ -11710,6 +11771,12 @@
                                 query.config.push({
                                     name: 'skill points',
                                     rank: 0
+                                });
+                            break;
+                            case 'special movement':
+                                query.config.push({
+                                    name: 'movements',
+                                    rank: []
                                 });
                             break;
                             default:
@@ -12172,6 +12239,27 @@
                             set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         }
                     break;
+                    case 'write_movement':
+                        if (query.has_movement === -1 && query.rank !== 0) {
+                            cache.attrdb[query.attribute][query.index].config[query.movement_index].rank.push(
+                                {
+                                    name: query.movement,
+                                    rank: query.rank
+                                }
+                            );
+                        } else if (
+                            query.has_movement !== -1 &&
+                            ((query.has_rank && query.rank === 0) || !query.has_rank)
+                        ) {
+                            cache.attrdb[query.attribute][query.index].config[query.movement_index].rank.splice(query.has_movement, 1);
+                        } else if (query.has_movement !== -1 && query.has_rank && query.rank !== 0) {
+                            cache.attrdb[query.attribute][query.index].config[query.movement_index].rank[query.has_movement].rank = query.rank;
+                        } else {
+                            return;
+                        }
+                        const config_movements = cache.attrdb[query.attribute][query.index].config[query.movement_index].rank.map(m => `${m.name.capitalize()} (${m.rank})`).sort().join(", ");
+                        set_values[cache.source] = `${query.load[0].capitalize()} (${config_movements})`;
+                    break;
                     case 'write_technique':
                         if (query.has_technique === -1 && query.rank !== 0) {
                             cache.attrdb[query.attribute][query.index].config[query.technique_index].rank.push(
@@ -12192,7 +12280,6 @@
                         }
                         const config_techniques = cache.attrdb[query.attribute][query.index].config[query.technique_index].rank.map(t => `${t.name.capitalize()} (${t.rank})`).sort().join(", ");
                         set_values[cache.source] = `${query.load[0].capitalize()} (${config_techniques})`;
-                            
                     break;
                     case 'write_newgroup':
                         const groupdb_entry = Object.assign({}, new_group_template);
