@@ -2699,6 +2699,11 @@
         'wealth':3,
         'weapon':2
     };
+    const skill_group_costs = {
+        'background': 1,
+        'field': 2,
+        'action': 3
+    };
     const defect_costs = {
         'achilles heel':2,
         'awkward size':2,
@@ -5300,13 +5305,17 @@
         
     }
 
-    function setSkillsPointTotal(cache, set_values) {
+    function setSkillsPointTotal(cache, set_values, query = {}) {
         const temp = {};
         clog(cache, temp, 'setSkillsPointTotal()');
-        temp.skills = cache.attrdb.skills[cache.skill_index].individual;
-        temp.spent = temp.skills.map(s => s.points).reduce((a, b) => a + b, 0);
-        temp.index = cache.attrdb.skills[cache.skill_index].config.findIndex(c => c.name === 'skill points');
-        temp.total = cache.attrdb.skills[cache.skill_index].config[temp.index].rank;
+        temp.index = cache.skill_index === undefined ? query.index : cache.skill_index;
+        temp.skills = cache.attrdb.skills[temp.index].individual;
+        temp.spent = temp.skills === [] ? 0 :
+            temp.skills.map(s => s.points).reduce((a, b) => a + b, 0);
+        //temp.index = cache.attrdb.skills[cache.skill_index].config.findIndex(c => c.name === 'skill points');
+        //temp.total = cache.attrdb.skills[cache.skill_index].config[temp.index].rank;
+        temp.total = cache.attrdb.skills[temp.index].elevel * 10;
+        set_values.static_skills_points_total = temp.spent;
         set_values.static_skills_points_remaining = temp.total - temp.spent;
     }
 
@@ -5863,6 +5872,7 @@
             "force field":'armor rating',
             "heightened senses":'senses',
             "sensory block":'senses_or_techniques',
+            "skills":'skill points',
             //"resilient":'complete_resilience',
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
@@ -6031,7 +6041,20 @@
                 description += query.config[query.c_index].rank.length !== 0 ? ': ' + query.config[query.c_index].rank.capitalize().sort().join(", ") : '';
             break;
             case "size change": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "skill": description = `${query.elevel * 10} Skill Points to Skill Group ${getCharacteristicSpecializationByAttr(debug, timer, value, rowID, attribute)}`; break;
+            case "skill group":
+                query.c_index = query.config.findIndex(c => c.name === 'skill group');
+                description = query.config[query.c_index].rank.capitalize();
+            break;
+            case "skills":
+                if (
+                    cache.static_skills_visible_id === query.index && 
+                    query.next !== 'write_newattr'
+                ) {
+                    set_values.static_skills_attribute_name = query.db.name === '' ? query.attribute.capitalize() : query.db.name;
+                    setSkillsPointTotal(cache, set_values, query);
+                }
+                description = `${query.elevel * 10} Skill Points`;
+            break;
             case "social mastery": description = `SCV +${query.elevel * 2}`; break;
             case "space flight": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
@@ -6377,8 +6400,10 @@
                         `Massive-sized projection (${(10 ** (query.elevel - 5))} km radius)`;
                 break;
                 case 'size change':
-                    characteristic = (query.elevel < 11) ? 
-                        `Grow/Shrink by ${temp.elevel} Size Ranks` : `Does not improve beyond level 10`;
+                    query.config_index = query.config.findIndex(c => c.name === 'size change');
+                    characteristic = (query.elevel < 11) ? query.config[query.config_index].rank === 'grow' ?
+                        `Grow Size Ranks up by ${query.elevel}` : `Shrink Size Ranks down by ${query.elevel}` :
+                        `Does not improve beyond level 10`;
                 break;
                 case 'telekinesis':
                     characteristic = (query.elevel < 7) ? 
@@ -9922,10 +9947,11 @@
                 case 'static_attribute_group_level':
                 case 'repeating_attribute_level':
                 case 'repeating_defect_rank':
+                    
                     query.title = cache.source_section === 'defect' ?
                         `${getTranslationByKey("rank")}` :
                         `${getTranslationByKey("level")}`;
-                    query.options = '';
+                    query.options = `|${query.db.level || 0}`;
                     query.last = query.next;
                 break;
                 /*
@@ -10250,6 +10276,7 @@
                         'senses',
                         'senses_or_techniques',
                         'sixth sense',
+                        'size change',
                         'source',
                         'species',
                         'targeted damage',
@@ -10456,6 +10483,11 @@
                     query.title = getTranslationByKey("choose-senses");
                     //query.options = '|' + query.blockable_senses.join('|');
                     query.options += `|${getTranslationByKey("other")},other`;
+                    query.last = query.next;
+                break;
+                case 'size change':
+                    query.title = getTranslationByKey("choose-size-change");
+                    query.options = `|${getTranslationByKey("grow")},grow|${getTranslationByKey("shrink")},shrink`;
                     query.last = query.next;
                 break;
                 case 'source':
@@ -10728,18 +10760,20 @@
                     break;
                     
                     case 'set_skill':
-                        if (query.selection !== 'add_attribute') {
+                        //if (query.selection !== 'add_attribute') {
                             const skill_and_group = query.selection.split("~");
-                            query.name = `${skill_and_group[0].capitalize()}`;
+                            query.name = `${skill_and_group[0]}`;
+                            /*
                             if (query.attribute.indexOf('group') !== -1) {
                                 query.config.push({
                                     name: 'skill group',
-                                    rank: skill_and_group[1].capitalize()
+                                    rank: skill_and_group[1]
                                 });
                             }
+                            */
                             query.category = skill_and_group[1];
-                        }
-                        query.next = query.selection !== 'add_attribute' ? `${query.type}_menu` : 'add_attribute';
+                        //}
+                        query.next = 'write_newattr';// query.selection !== 'add_attribute' ? `${query.type}_menu` : 'add_attribute';
                     break;
                     case 'set_name':
                         query.name = query.selection;
@@ -11375,6 +11409,12 @@
                         query.sense = query.selection === 0 ? '' : query.selection;
                         query.next = query.selection === 'other' ? 'other_sense' : 'write_sensory_block';
                     break;
+                    case 'size change':
+                        query.config_index = query.db.config.findIndex(c => c.name === 'size change');
+                        query.db.config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                        query.next = 'exit';
+                    break;
                     case 'source':
                         query.source = query.selection === 0 ? '' : query.selection;
                         query.next = 'write_source';
@@ -11460,11 +11500,6 @@
                 switch (query.next) {
                     case 'write_newattr':
                         //-> write attribute object into cache and create repeating section
-                        const skill_group_costs = {
-                            'background': 1,
-                            'field': 2,
-                            'action': 3
-                        };
                         //const fields = ['attribute','cost','enhancements','level','limiters','name','points','stat','configuration'];
                         const attrdb_entry = {};
                         for (let i = 0; i < query.fields.length; i++) {
@@ -11486,8 +11521,9 @@
                                     value = '0 (0)';
                                 break;
                                 case 'name':
-                                    value = `${getTranslationByKey(query.attribute.toKebobCase())}${query.attribute === 'skill group' ?
-                                        ' (' + query.attribute.capitalize() + ')' : ''}`;
+                                    value = query.attribute === 'skill group' ? 
+                                        query.name.capitalize() :// (${query.attribute.capitalize()})` :
+                                        getTranslationByKey(query.attribute.toKebobCase());
                                 break;
                                 case 'points':
                                     value = 0;
@@ -11615,8 +11651,10 @@
                                     name: query.attribute,
                                     rank:
                                         query.attribute === 'immunity' ? '' :
+                                        query.attribute === 'size change' ? 'grow' :
                                         query.attribute === 'resilient' ||
                                         query.attribute === 'sixth sense' ? [] :
+                                        query.attribute === 'skill group' ? query.category :
                                         0
                                 });
                         }
@@ -11878,7 +11916,11 @@
                                 query.elevel = query.level + query.limiters_ranks - query.enhancements_ranks;
                                 cache.attrdb[query.attribute][query.index].elevel = query.elevel;
                             }
+                            query.type_index = query.attribute !== 'skill group' ? 0 :
+                                query.db.config.findIndex(c => c.name === 'skill group');
                             query.cost = cache.source_section === 'attribute' ?
+                                query.attribute === 'skill group' ?
+                                skill_group_costs[query.db.config[query.type_index].rank] :
                                 attribute_costs[query.attribute] :
                                 defect_costs[query.defect];
                             query.points = query.cost * query.level;
