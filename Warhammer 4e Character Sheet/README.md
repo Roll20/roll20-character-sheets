@@ -82,7 +82,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 ///// ============ Change Log ============ /////  
 
 
-Dec 16th 2024 v1.74b
+Dec 14th 2024 v1.74b
 
 - Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section
 - Fix issue with impact/damaging not showing on Attack rolls with Size modifer Large Vs Small
