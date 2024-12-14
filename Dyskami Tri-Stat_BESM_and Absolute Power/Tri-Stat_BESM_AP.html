@@ -6045,10 +6045,10 @@
             case "extra arms": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "extra defenses": description = `+${query.elevel} defensive actions each round`; break;
             case "features": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "flight": description = `Flight speed up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} kph`; break;
+            case "flight": description = `Flight speed up to ${(get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))).toLocaleString()} kph`; break;
             case "force field": description = query.elevel * 10; break;
             //case "gear": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "ground speed": description = `${get1or2andHalfor5(query.elevel + 2) * (10 ** (Math.ceil((query.elevel) / 3)))} kph`; break;
+            case "ground speed": description = `${(get1or2andHalfor5(query.elevel + 2) * (10 ** (Math.ceil((query.elevel) / 3)))).toLocaleString()} kph`; break;
             case "healing": description = `Restore ${query.elevel * 5} Health Points`; break;
             case "heightened awareness": description = `${query.elevel} Awareness Bonus`; break;
             case "heightened senses":
@@ -6121,8 +6121,17 @@
             case "social mastery": description = `SCV +${query.elevel * 2}`; await setDerivedValues(cache, set_values); break;
             case "spaceflight": description = getCharacteristicByAttr(cache, set_values, query); break;
             //case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
-            case "summon creatures": description = `Summon up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))} Creatures`; break;
-            case "supersense": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "summon creatures": description = `up to ${query.elevel === 0 ? 0 : (get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))).toLocaleString()}`; break;
+            case "supersense": description = getCharacteristicByAttr(cache, set_values, query);
+            /*
+                query.config_index = query.config_index !== undefined ?
+                    query.config_index : query.config.findIndex(c => c.name === 'supersense');
+                query.supersense = query.config[query.config_index].rank === '' ? 
+                    'not configured' : query.config[query.config_index].rank;
+                description = `${query.supersense.capitalize()} ` +
+                    `detection range ${getCharacteristicByAttr(cache, set_values, query)}`;
+            */
+            break;
             case "superspeed": description = `Superspeed up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel + 2) / 2)))} kph`; break;
             case "superstrength": description = `${query.elevel} tonns`; break;
             case "swarm": description = `Health Points * ${query.elevel} Creatures`; break;
@@ -6362,6 +6371,10 @@
                     10: "Extremely rapid faster-than-light Spaceflight – up to 100,000 times the speed of light. Travel between solar systems takes a few minutes.",
                     "default": "Does not improve beyond level 10"
                 },
+                "supersense": {
+                    1: "10 m",
+                    2: "100 m",
+                },
                 "telekinesis": {
                     1: "Move 1 kg",
                     2: "Move 10 kg",
@@ -6380,7 +6393,7 @@
                     3: "1 km teleportation distance",
                     4: "10 km teleportation distance",
                     5: "100 km teleportation distance",
-                    6: "1000 km teleportation distance",
+                    6: "1,000 km teleportation distance",
                     "default": ""
                 },
                 "tunneling": {
@@ -6414,9 +6427,9 @@
                     characteristic = (query.elevel < 11) ? 
                         chardb[`${query.attribute}`][query.capacity_type][query.elevel] || '' : 
                         query.selection === "cargo" ? 
-                            `${(2 ** (query.elevel - 9)) * 100} tonnes` : 
+                            `${((2 ** (query.elevel - 9)) * 100).toLocaleString()} tonnes` : 
                         query.selection === "carry" ? 
-                            `+${(2 ** (query.elevel - 10)) * 1000} people` : '';
+                            `+${((2 ** (query.elevel - 10)) * 1000).toLocaleString()} people` : '';
                 break;
                 case 'cognition':
                     characteristic = (query.elevel < 9) ? 
@@ -6426,12 +6439,12 @@
                 case 'data access':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `${10 ** (query.elevel - 5)} km radius`;
+                        `${(10 ** (query.elevel - 5)).toLocaleString()} km radius`;
                 break;
                 case 'elasticity':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Stretch body up to ${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 4) / 2)))} km`;
+                        `Stretch body up to ${(get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 4) / 2)))).toLocaleString()} km`;
                 break;
                 case 'features':
                     characteristic = (query.elevel < 3) ?
@@ -6449,22 +6462,22 @@
                 case 'minions':
                     characteristic = (query.elevel < 7) ? 
                     (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                    `Up to ${400 * (query.elevel - 6)} Minions`;
+                    `Up to ${(400 * (query.elevel - 6)).toLocaleString()} Minions`;
                 break;
                 case 'plant control':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Control radius ${(10 ** (query.elevel - 5))} km, Growth ${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 4) / 2)))}x`;
+                        `Control radius ${((10 ** (query.elevel - 5))).toLocaleString()} km, Growth ${(get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 4) / 2)))).toLocaleString()}x`;
                 break;
                 case 'pocket dimension':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Massive dimension (${(10 ** (query.elevel - 5))} km radius)`;
+                        `Massive dimension (${((10 ** (query.elevel - 5))).toLocaleString()} km radius)`;
                 break;
                 case 'projection':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Massive-sized projection (${(10 ** (query.elevel - 5))} km radius)`;
+                        `Massive-sized projection (${((10 ** (query.elevel - 5))).toLocaleString()} km radius)`;
                 break;
                 case 'size change':
                     query.config_index = query.config.findIndex(c => c.name === 'size change');
@@ -6472,25 +6485,32 @@
                         `Grow Size Ranks up by ${query.elevel}` : `Shrink Size Ranks down by ${query.elevel}` :
                         `Does not improve beyond level 10`;
                 break;
+                case 'supersense':
+                    query.config_index = query.db.config.findIndex(c => c.name === 'supersense');
+                    query.supersense = query.db.config[query.config_index].rank;
+                    characteristic =
+                        `${query.supersense === '' ? 'not configured' : query.supersense.capitalize()} ` +
+                        `detection range ${query.elevel < 3 ? chardb[`${query.attribute}`][query.elevel] : ((10 ** (query.elevel - 3))).toLocaleString() + ' km'}`;
+                break;
                 case 'telekinesis':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Move ${(10 ** (query.elevel - 4))} tonnes`;
+                        `Move ${(10 ** (query.elevel - 4)).toLocaleString()} tonnes`;
                 break;
                 case 'teleport':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `${(10 ** (query.elevel - 3))} km teleportation distance`;
+                        `${(10 ** (query.elevel - 3)).toLocaleString()} km teleportation distance`;
                 break;
                 case 'tunneling':
-                    const highlevel = `${get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 6) / 2)))} kph`;
+                    const highlevel = `${(get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel - 6) / 2)))).toLocaleString()} kph`;
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : highlevel;
                 break;
                 case 'wealth':
                     characteristic = (query.elevel < 7) ? 
                         (chardb[`${query.attribute}`][query.elevel] || chardb[`${query.attribute}`]["default"]) : 
-                        `Extremely wealthy ($${get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 3) / 2)))}M)`;
+                        `Extremely wealthy ($${(get1or3(query.elevel, 3) * (10 ** (Math.ceil((query.elevel - 3) / 2)))).toLocaleString()}M)`;
                 break;
                 default:
                     characteristic = 
@@ -10348,6 +10368,7 @@
                         'size change',
                         'source',
                         'species',
+                        'supersense',
                         'targeted damage',
                         'techniques',
                         'transform',
@@ -10522,9 +10543,49 @@
                     }
                     query.last = query.next;
                 break;
+                case 'movements':
+                    const standard_movements = [
+                        'balance',
+                        'cat-like',
+                        'fast',
+                        'light-footed',
+                        'slithering',
+                        'swinging',
+                        'untrackable',
+                        'wall-bouncing',
+                        'wall-crawling',
+                        'water-walking',
+                        'zen direction',
+                    ];
+                    const optional_movements = ['speedburst',];
+                    query.movements = [];
+                    query.title = getTranslationByKey("choose-special-movements");
+                    for (let i = 0; i < optional_movements.length; i++) {
+                        if (cache.rulesdb[`rules_attribute_${optional_movements[i].removeWhiteSpace()}_status`]) {
+                            standard_movements.push(optional_movements[i]);
+                        }
+                    }
+                    for (let i = 0; i < standard_movements.length; i++) {
+                        const has_movement = query.db.config[query.load[1]].rank.findIndex(r => r.name === standard_movements[i]);
+                        query.movements.push(
+                            `${standard_movements[i].capitalize()}` +
+                            `${has_movement !== -1 ? ' (' + query.db.config[query.load[1]].rank[has_movement].rank + ')' : ''}` +
+                            `,${standard_movements[i]}`
+                        );
+                    }
+                    query.options = '|' + query.movements.sort().join('|');
+                    query.last = query.next;
+                break;
                 case 'other_sense':
                     query.title = getTranslationByKey("create-sense-or-technique");
                     query.options = '';
+                    query.last = query.next;
+                break;
+                case 'other_supersense':
+                    query.title = getTranslationByKey("choose-super-sense");
+                    query.config_index = query.db.config.findIndex(c => c.name === 'supersense');
+                    query.supersense = query.db.config[query.config_index].rank;
+                    query.options = query.supersense === '' ? '' : `|${query.supersense}`;
                     query.last = query.next;
                 break;
                 case 'senses':
@@ -10564,37 +10625,21 @@
                     query.options = '|' + sources_4e.map(s => `${s.capitalize()},${s}`).sort().join('|');
                     query.last = query.next;
                 break;
-                case 'movements':
-                    const standard_movements = [
-                        'balance',
-                        'cat-like',
-                        'fast',
-                        'light-footed',
-                        'slithering',
-                        'swinging',
-                        'untrackable',
-                        'wall-bouncing',
-                        'wall-crawling',
-                        'water-walking',
-                        'zen direction',
+                case 'supersense':
+                    const supersenses = [
+                        'echolocation',
+                        'infrared vision',
+                        'magnetic field detection',
+                        'microscopic vision',
+                        'radar',
+                        'sonar',
+                        'ultravision',
+                        'vibration detection',
+                        'x-ray vision',
                     ];
-                    const optional_movements = ['speedburst',];
-                    query.movements = [];
-                    query.title = getTranslationByKey("choose-special-movements");
-                    for (let i = 0; i < optional_movements.length; i++) {
-                        if (cache.rulesdb[`rules_attribute_${optional_movements[i].removeWhiteSpace()}_status`]) {
-                            standard_movements.push(optional_movements[i]);
-                        }
-                    }
-                    for (let i = 0; i < standard_movements.length; i++) {
-                        const has_movement = query.db.config[query.load[1]].rank.findIndex(r => r.name === standard_movements[i]);
-                        query.movements.push(
-                            `${standard_movements[i].capitalize()}` +
-                            `${has_movement !== -1 ? ' (' + query.db.config[query.load[1]].rank[has_movement].rank + ')' : ''}` +
-                            `,${standard_movements[i]}`
-                        );
-                    }
-                    query.options = '|' + query.movements.sort().join('|');
+                    query.title = getTranslationByKey("choose-supersense");
+                    query.options = '|' + supersenses.map(s => `${s.capitalize()},${s}`).sort().join('|');
+                    query.options += '|Other,other';
                     query.last = query.next;
                 break;
                 case 'techniques':
@@ -11487,41 +11532,9 @@
                         query[query.next] = query.selection === 'add' ? 
                             '' : query.db.config[query.config_index].rank[query.env_index];
                     break;
-                    case 'sixth sense':
-                        if (query.selection === 'exit') { return; }
-                        query.env_index = query.selection === 'add' ? -1 : int(query.selection);
-                        query[query.next] = query.selection === 'add' ? 
-                            '' : query.db.config[query.config_index].rank[query.env_index];
-                        query.next = 'add_sixth_sense';
-                    break;
                     case 'immunity':
                         query.immunity = query.selection === 0 ? '' : query.selection;
                         query.next = 'write_immunity';
-                    break;
-                    case 'other_sense':
-                        if (query.selection === 0) { return; }
-                        query.sense = query.selection;
-                        query.next = 'write_sensory_block';
-                    break;
-                    case 'senses':
-                        query.c_index = query.db.config.findIndex(c => c.name === 'senses');
-                        query.env_index = query.db.config[query.c_index].rank.findIndex(s => s.name === query.selection);
-                        query.sense = query.selection;
-                        query.next = 'sense_rank';
-                    break;
-                    case 'senses_or_techniques':
-                        query.sense = query.selection === 0 ? '' : query.selection;
-                        query.next = query.selection === 'other' ? 'other_sense' : 'write_sensory_block';
-                    break;
-                    case 'size change':
-                        query.config_index = query.db.config.findIndex(c => c.name === 'size change');
-                        query.db.config[query.config_index].rank = query.selection;
-                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
-                        query.next = 'exit';
-                    break;
-                    case 'source':
-                        query.source = query.selection === 0 ? '' : query.selection;
-                        query.next = 'write_source';
                     break;
                     case 'movements':
                         const special_movement_ranks = {
@@ -11545,6 +11558,45 @@
                         query.movements = cache.attrdb[query.attribute][query.index].config[query.movement_index].rank;
                         query.has_movement = query.movements.findIndex(m => m.name === query.movement);
                         query.next = query.rank === undefined ? 'movement_rank' : 'write_movement';
+                    break;
+                    case 'other_sense':
+                        if (query.selection === 0) { return; }
+                        query.sense = query.selection;
+                        query.next = 'write_sensory_block';
+                    break;
+                    case 'other_supersense':
+                        query.selection = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_supersense';
+                    break;
+                    case 'senses':
+                        query.c_index = query.db.config.findIndex(c => c.name === 'senses');
+                        query.env_index = query.db.config[query.c_index].rank.findIndex(s => s.name === query.selection);
+                        query.sense = query.selection;
+                        query.next = 'sense_rank';
+                    break;
+                    case 'senses_or_techniques':
+                        query.sense = query.selection === 0 ? '' : query.selection;
+                        query.next = query.selection === 'other' ? 'other_sense' : 'write_sensory_block';
+                    break;
+                    case 'sixth sense':
+                        if (query.selection === 'exit') { return; }
+                        query.env_index = query.selection === 'add' ? -1 : int(query.selection);
+                        query[query.next] = query.selection === 'add' ? 
+                            '' : query.db.config[query.config_index].rank[query.env_index];
+                        query.next = 'add_sixth_sense';
+                    break;
+                    case 'size change':
+                        query.config_index = query.db.config.findIndex(c => c.name === 'size change');
+                        query.db.config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                        query.next = 'exit';
+                    break;
+                    case 'source':
+                        query.source = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_source';
+                    break;
+                    case 'supersense':
+                        query.next = query.selection === 'other' ? 'other_supersense' : 'write_supersense';
                     break;
                     case 'techniques':
                         const combat_techinique_ranks = {
@@ -11783,7 +11835,8 @@
                                 query.config.push({
                                     name: query.attribute,
                                     rank:
-                                        query.attribute === 'immunity' ? '' :
+                                        query.attribute === 'immunity' ||
+                                        query.attribute === 'supersense' ? '' :
                                         query.attribute === 'size change' ? 'grow' :
                                         query.attribute === 'resilient' ||
                                         query.attribute === 'sixth sense' ? [] :
@@ -11997,6 +12050,10 @@
                     case 'write_source':
                         query.config_name = query.next.substring(6);
                         query.db.config[query.config_index].rank = query[query.config_name];
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                    break;
+                    case 'write_supersense':
+                        query.db.config[query.config_index].rank = query.selection;
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
                     case 'write_groupname':
