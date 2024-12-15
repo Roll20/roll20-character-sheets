@@ -3158,6 +3158,15 @@
         return oneTwoAndHalfOrFive(level % 3);
     }
 
+    function get1or5or25(level) {
+        const oneFiveOrTwentyFive = mod =>
+            mod === 0 ? 1 :
+            mod === 1 ? 5 :
+            mod === 2 ? 25 :
+            0;
+        return oneFiveOrTwentyFive(level % 3);
+    }
+
     function clog(cache, data, title, type = 'event') {
         //types = 'info', 'event'
         //debug = 0:none, 1:info, 2:event, 3:performance
@@ -6133,7 +6142,9 @@
             */
             break;
             case "superspeed": description = `up to ${query.elevel === 0 ? 0 : (get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel + 2) / 2)))).toLocaleString()} kph`; break;
-            case "superstrength": description = `${query.elevel} tonns`; break;
+            case "superstrength": description = `lift up to ${getCharacteristicByAttr(cache, set_values, query)}`; //((10 ** (query.elevel - 3))).toLocaleString() + ' tonnes'}`;; 
+            
+            break;
             case "swarm": description = `Health Points * ${query.elevel} Creatures`; break;
             case "telekinesis": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "telepathy": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -6375,6 +6386,13 @@
                     1: "10 m",
                     2: "100 m",
                 },
+                "superstrength": {
+                    1: "250 kg",
+                    2: "500 kg",
+                    3: "1 tonne",
+                    4: "2 tonnes",
+                    5: "5 tonnes",
+                },
                 "telekinesis": {
                     1: "Move 1 kg",
                     2: "Move 10 kg",
@@ -6488,9 +6506,21 @@
                 case 'supersense':
                     query.config_index = query.db.config.findIndex(c => c.name === 'supersense');
                     query.supersense = query.db.config[query.config_index].rank;
-                    characteristic =
-                        `${query.supersense === '' ? 'not configured' : query.supersense.capitalize()} ` +
-                        `detection range ${query.elevel < 3 ? chardb[`${query.attribute}`][query.elevel] : ((10 ** (query.elevel - 3))).toLocaleString() + ' km'}`;
+                    characteristic = `${
+                        query.supersense === '' ? 'not configured' : query.supersense.capitalize()} ` +
+                        `detection range ${query.elevel < 3 ? chardb[`${query.attribute}`][query.elevel] : ((10 ** (query.elevel - 3))).toLocaleString() + ' km'
+                    }`;
+                break;
+                case 'superstrength':
+                    characteristic = cache.rulebook === 'absolutepower' ? (
+                        query.elevel === 1 ? '500 kg' : 
+                        query.elevel === 2 ? '2 tonnes' :
+                        ((get1or5or25(query.elevel) * (10 ** (Math.ceil((query.elevel - 2) / 3)))) * (query.elevel < 6 ? 1 : 10 ** Math.ceil((query.elevel - 5) / 3))).toLocaleString() + ' tonnes'
+                    ) : (
+                        query.elevel < 6 ? 
+                        chardb[`${query.attribute}`][query.elevel] :
+                        ((get1or2andHalfor5(query.elevel) * (10 ** (Math.ceil((query.elevel - 5) / 3))))).toLocaleString() + ' tonnes'// * (query.elevel < 9 ? 1 : 10 ** Math.ceil((query.elevel - 8) / 3))).toLocaleString() + ' tonnes'
+                    );
                 break;
                 case 'telekinesis':
                     characteristic = (query.elevel < 7) ? 
