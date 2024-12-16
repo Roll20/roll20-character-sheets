@@ -1625,8 +1625,9 @@ on(
 	[
 		"character_name",
 		"gm_roll_opt",
+		"reg_relax_automode",
 		"reg_relax_duration",
-		"au",
+		"au", "au_max",
 		"ko",
 	].map(attr => "change:" + attr).join(" "),
 	function(eventInfo) {
@@ -1634,78 +1635,168 @@ on(
 		[
 			"character_name",
 			"gm_roll_opt",
+			"reg_relax_automode",
 			"reg_relax_duration",
-			"AU",
+			"AU", "AU_max",
 			"KO",
 		], function(values) {
+		// Boilerplate
 		const caller = "Action Listener for Generation of Regeneration Roll (Relax)";
 		debugLog(caller, "eventInfo", eventInfo, "values", values);
-		const baseRoll = [
+		let attrsToChange = {};
+
+		// Preparation
+		let relaxDuration = parseInt(values["reg_relax_duration"]);
+		if (relaxDuration <= 0)
+		{
+			relaxDuration = 1;
+		}
+
+		// Automode
+		const auto = values["reg_relax_automode"];
+		const AU = parseInt(values["AU"]);
+		const AUMax = parseInt(values["AU_max"]);
+		const KO = parseInt(values["KO"]);
+
+		if (auto === "1")
+		{
+			const AURequired = AUMax - AU;
+			// Average Regeneration at 90% probability per d20 from constitution roll
+			/// capped between 1/3 (KO <= 3) and 6 (KO >= 20)
+			const AURegenerationKO = Math.min(6, Math.max(1/3, (KO - 2) * 1/3));
+
+			if (AURequired === 0)
+			{
+				relaxDuration = 0;
+			} else if (AURequired === 1) {
+				relaxDuration = 1;
+			} else {
+				// Estimation: Full recovery in ~90% of all cases
+				/// Basic formula (heuristic) for just 3d6 rolls: 1 + Math.ceil(AURequired / 9)
+				/// AURequired needs to be reduced by the additional regeneration from KO checks
+				/// AURequired reduced by 1 + (AURequired / 9) * AURegenerationKO
+				/// Accuracy of that formula is quite low due to the step size of 3d6
+				relaxDuration = 1 + Math.ceil((AURequired - (1 + (AURequired / 9) * AURegenerationKO)) / 9);
+			}
+			attrsToChange["reg_relax_duration_auto"] = relaxDuration;
+		}
+
+		// Rolls
+		const rollHead = [
 			values["gm_roll_opt"],
 			"&{template:reg-relax}",
 			`{{charactername=${values["character_name"]}}}`,
-			`{{duration=[[${values["reg_relax_duration"]}]]}}`,
+			`{{duration=[[${relaxDuration}]]}}`,
 			`{{au=[[${values["AU"]}]]}}`,
-			`{{aureg=[[[[${values["reg_relax_duration"]}*3]]d6cs0cf7]]}}`,
-			`{{auko=[[${values["reg_relax_duration"]}d20cs0cf21]]}}`,
-			'{{auneu=[[0d1]]}}',
+			`{{ko=[[${values["KO"]}]]}}`,
 		];
+		const AURoll = [
+			`{{aumax=[[${values["AU_max"]}]]}}`,
+			`{{aubase=[[[[${relaxDuration}*3]]d6cs0cf7]]}}`,
+			`{{auko=[[${relaxDuration}d20cs0cf21]]}}`,
+			'{{aunew=[[0]]}}',
+			"{{aurequired=[[1]]}}",
+		];
+		const noAURoll = [ "{{aurequired=[[0]]}}" ];
+		const nonerequiredRoll = [ "{{nonerequired=[[1]]}}" ];
+		const automodeRoll = [ "{{automode=[[1]]}}" ];
 
 		// Build roll
-		var roll = [];
-		roll = roll.concat(baseRoll);
+		let roll = [];
+		roll = roll.concat(rollHead);
 
-		safeSetAttrs({"reg_relax_roll": roll.join(" ")});
+		if (AU < AUMax)
+		{
+			roll = roll.concat(AURoll);
+		} else {
+			roll = roll.concat(noAURoll);
+		}
+
+		/// Regeneration required?
+		if (AU >= AUMax)
+		{
+			roll = [];
+			roll = roll.concat(rollHead);
+			roll = roll.concat(nonerequiredRoll);
+		}
+
+		if (auto === "1")
+		{
+			roll = roll.concat(automodeRoll);
+		}
+
+		// Finish
+		attrsToChange["reg_relax_roll"] = roll.join(" ").trim();
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
 	});
 });
 
 on('clicked:reg_relax-action', async (info) => {
+	// Boilerplate
 	const caller = "Action Listener for Regeneration Button (Relax)";
+	let computed = {};
+	let attrsToChange = {};
+
+	// Roll
 	let results = await startRoll("@{reg_relax_roll}");
 	debugLog(caller, "head", "info:", info, "results:", results);
+
+	// Convenience
 	let rollID = results.rollId;
-	results = results.results;
-	let computed = {};
 
-	safeGetAttrs([
-			'AU', 'AU_max',
-			'KO'
-		], function(values) {
-		let attrsToChange = {};
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results["results"])
+	{
+		resultsOnly[property] = results["results"][property].result;
+	}
+	Object.freeze(resultsOnly);
 
-		// AU Regeneration (Stamina)
-		let AUReg = 0;
-		let AUneu = parseInt(values["AU"]);
-		AUReg += results["aureg"].result;
+	// Fast Decision
+	if (Object.hasOwn(resultsOnly, "nonerequired"))
+	{
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
+		finishRoll(rollID);
+	} else {
+		// AU
+		/// Preparation
+		const AU = resultsOnly["au"];
+		const AUMax = resultsOnly["aumax"];
+		let AURegTotal = 0;
+		let AUNew = AU;
 
-		AUneu += AUReg;
-		console.log("AUneu2", AUneu);
-		computed["aureg"] = results["aureg"].result;
+		// Calculations
+		/// No condition required here as "aurequired" is the only resource to be regenerated and if that is already full, the "nonerequired" case will fire
+		AURegTotal += resultsOnly["aubase"];
 
-		// KO Bonus
+		/// KO Bonus
 		let AUKO = 0;
-		for (let die of results["auko"].dice)
+		for (let die of results.results["auko"].dice)
 		{
-			if (die <= values["KO"])
+			if (die <= resultsOnly["ko"])
 			{
 				AUKO += 6;
 			}
 		}
+		AURegTotal += AUKO;
 
-		AUneu += AUKO;
-		console.log("AUneu3", AUneu);
+		/// Add regeneration
+		AUNew += AURegTotal;
+
+		/// Cap regeneration
+		AUNew = Math.min(AUNew, AUMax);
+
+		// Finish
+		computed["aubase"] = resultsOnly["aubase"];
 		computed["auko"] = AUKO;
 
-		// Cap regeneration
-		AUneu = Math.min(AUneu, values["AU_max"]);
-		console.log("AUneu4", AUneu);
-
-		// Change only if regeneration actually changed something
-		if (parseInt(values["AU"]) !== AUneu)
+		/// Change only if regeneration actually changed something
+		if (AUNew !== AU)
 		{
-			attrsToChange["AU"] = AUneu;
+			attrsToChange["AU"] = AUNew;
 		}
-		computed["auneu"] = AUneu;
+		computed["aunew"] = AUNew;
 
 		// Prettify certain output
 		{
@@ -1721,25 +1812,26 @@ on('clicked:reg_relax-action', async (info) => {
 				}
 			}
 			let useResults = [
-				"aureg",
+				"aubase",
 			];
 			for (let part of useResults)
 			{
-				if (Object.hasOwn(results, part))
+				if (Object.hasOwn(resultsOnly, part))
 				{
-					computed[part] = prettifyMod(parseInt(results[part].result));
+					computed[part] = prettifyMod(resultsOnly[part]);
 				}
 			}
 		}
 
-		debugLog(caller, "tail", "rollID", rollID, "values", values, "AUKO", AUKO, "attrsToChange", attrsToChange, "computed", computed);
+		// Finish
+		debugLog(caller, "tail", "rollID", rollID, "AUKO", AUKO, "attrsToChange", attrsToChange, "computed", computed);
 		safeSetAttrs(attrsToChange);
 
 		finishRoll(
 			rollID,
 			computed
 		);
-	});
+	}
 });
 
 
