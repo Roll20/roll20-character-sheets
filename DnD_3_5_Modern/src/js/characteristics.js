@@ -33,10 +33,11 @@ let updateCharacteristicsList = (characteristicList, modifierList) => {
             }
 
             let modded = total !== base;
-            if (total % 2 == 1) {
-                total--;
+            let effective_total = total;
+            if (effective_total % 2 == 1) {
+                effective_total--;
             }
-            let mod = (total - 10) / 2;
+            let mod = (effective_total - 10) / 2;
             toUpdate[characteristic + "_modified"] = modded ? "true" : "false";
             toUpdate[characteristic + "_mod"] = mod;
             toUpdate[characteristic + "_total"] = "" + total;

@@ -73,7 +73,7 @@ let updateAllSaves = (modifierList) => {
             }
             let toUpdate = {};
             toUpdate[`${save}_total`] = total + mods;
-            toUpdate[`${save}_roll_value`] = `&{template:main} {{titre=Test de Réflexes}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
+            toUpdate[`${save}_roll_value`] = `&{template:main} {{titre=Test de ${save}}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
             toUpdate[`${save}_modified`] = !!mods;
             setAttrs(toUpdate);
         }

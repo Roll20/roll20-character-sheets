@@ -11,7 +11,7 @@ on("change:class1_bab change:class2_bab change:class3_bab", () => {
 
 
 on("change:class1_ref change:class2_ref change:class3_ref change:class1_vig change:class2_vig change:class3_vig"
-    +"change:class1_vol change:class2_vol change:class3_vol", () => {
+    +" change:class1_vol change:class2_vol change:class3_vol", () => {
     updateClassSaves();
 });
 
