@@ -84,7 +84,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 Dec 14th 2024 v1.74b
 
 - New Weapon Creator script, Weapon Lists are found in the Weapons tab, Includes most Official Melee and Ranged weapons.
-- New Custom Race added to Race dropdown, will allow entering own Race. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.
+- New Custom Race added to Race dropdown, will allow entering own Race. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Characteristics for the Custom Race.
 - Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section.
 - Fix issue with impact/damaging not showing on Attack rolls with Size modifier Large Vs Small.
 - Fix mixed up Impact/Impale checkboxes on the NPC pages.
