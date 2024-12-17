@@ -1,3 +1,11 @@
+# 2024-12-17
+
+- Edit talents so you can delete excess talents (@major havok)
+  - Genericise the code used by edit spells and edit talents
+- Fix rendering of side panel after CSS breaks roll20
+- Set status penalty to 0 on creature creation.
+
+
 # 2024-12-12
 
 The Author is an Idiot bugfix release for Treasure Law.
