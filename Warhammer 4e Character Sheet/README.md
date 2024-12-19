@@ -81,6 +81,17 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Dec 14th 2024 v1.74b
+
+- New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.
+- Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section.
+- Fix issue with impact/damaging not showing on Attack rolls with Size modifier Large Vs Small.
+- Fix mixed up Impact/Impale checkboxes on the NPC pages.
+- Fix Dangerous Quality fumble sometimes not showing when test Unit or 10s Die is 9.
+- Fix Warpstone Quality now only triggered on crit again.
+- Resolved some issues with dulpicate crit translations.
+- Cleaned up minor CSS file errors.
+
 
 Dec 14th 2024 v1.74a
 
