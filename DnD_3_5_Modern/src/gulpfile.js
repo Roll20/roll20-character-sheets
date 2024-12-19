@@ -35,8 +35,13 @@ function copy_to_root_dir(done) {
     return done()
 }
 
+function copyTranslation(){
+    return src('../translation.json')
+        .pipe(dest('../dist'))
+}
 exports.default = series(
     compile_pug,
+    copyTranslation,
     bundle_css,
     bundle_html
 );
