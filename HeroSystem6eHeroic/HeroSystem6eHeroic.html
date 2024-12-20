@@ -13709,7 +13709,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="3.84" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="3.85" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -13756,9 +13756,6 @@
 <!-- Hidden maneuver selection history -->
 <input type="hidden" name="attr_useManeuvers" value="true"/>
 <input type="hidden" name="attr_weaponStates" value="KKKKKNOOOOOO"/>
-
-<!-- Hidden variable for tracking group skills -->
-<input type="hidden" name="attr_skillStateArray" value="000000000000000000000000000000"/>
 
 <!-- Hidden variables for combat rolls -->
 <input type="hidden" name="attr_rangeToTarget" value="0"/>
@@ -14725,10 +14722,10 @@
 			version = 3.50;
 		}
 		
-		if (version < 3.84) {
+		if (version < 3.85) {
 			// No updates needed.
 			
-			version = 3.84;
+			version = 3.85;
 		}
 		
 		if (version != origVersion) {
@@ -17103,34 +17100,20 @@
 	/* -------------- */
 	
 	arrayOf(maxSkillNum).forEach(num => {
-		var lowNum = num;
-		var highNum = (num === maxSkillNum) ? 1 : num + 1;
-		var lowId = String(lowNum).padStart(2,'0');
-		var highId = String(highNum).padStart(2,'0');
+		var lowId = String(num).padStart(2,'0');
+		var highId = String(num === maxSkillNum ? 1 : num + 1).padStart(2,'0');
 		
 		on("clicked:skillDown"+lowId+" clicked:skillUp"+highId, function () {
-			getAttrs(["skillName"+lowId, "skillName"+highId, "skillType"+lowId, "skillType"+highId, "skillCP"+lowId, "skillCP"+highId, "skillStateArray"], function(values) {
+			getAttrs(["skillName"+lowId, "skillName"+highId, "skillType"+lowId, "skillType"+highId, "skillCP"+lowId, "skillCP"+highId], function(values) {
 				var attributes = new Object();
 				
-				const defaultStates = "000000000000000000000000000000";
-				
 				let theString = "";
-				let skillStates = values.skillStateArray||defaultStates;
-				
-				if (skillStates.length != defaultStates.length) {
-					skillStates = defaultStates;
-				}
-				
-				let lowState = skillStates[lowNum-1];
-				let highState = skillStates[highNum-1];
 				
 				theString = values["skillName"+highId];
 				if ( (theString.length === 0) || (theString === null) ) {
 					attributes["skillName"+lowId] = "";
 				} else {
 					attributes["skillName"+lowId] = values["skillName"+highId];
-					skillStates = setCharAt(skillStates, lowNum-1, highState);
-					skillStates = setCharAt(skillStates, highNum-1, lowState);
 				}
 				
 				theString = values["skillName"+lowId];
@@ -17138,11 +17121,8 @@
 					attributes["skillName"+highId] = "";
 				} else {
 					attributes["skillName"+highId] = values["skillName"+lowId];
-					skillStates = setCharAt(skillStates, lowNum-1, highState);
-					skillStates = setCharAt(skillStates, highNum-1, lowState);
 				}
 				
-				attributes["skillStateArray"] = skillStates;
 				attributes["skillType"+lowId] = values["skillType"+highId];
 				attributes["skillType"+highId] = values["skillType"+lowId];
 				attributes["skillCP"+lowId] = values["skillCP"+highId];
@@ -17273,26 +17253,17 @@
 		var priorSkillId2 = (num-2 > 0) ? String(num-2).padStart(2,'0') : false;
 		var priorSkillId3 = (num-3 > 0) ? String(num-3).padStart(2,'0') : false;
 		
-		on("change:skillType"+skillId+" change:skillCP"+skillId+" change:enhancerJack change:enhancerSch change:enhancerSci change:enhancerTrav change:strengthChance change:dexterityChance change:constitutionChance change:intelligenceChance change:egoChance change:presenceChance change:interactionLevels change:intellectLevels change:agilityLevels change:noncombatLevels change:overallLevels change:skillStateArray", function() {	
-			getAttrs(["skillType"+skillId, (priorSkillId1 !== false ? "skillType"+priorSkillId1 : ""), (priorSkillId1 !== false ? "skillCP"+priorSkillId1 : ""), (priorSkillId2 !== false ? "skillType"+priorSkillId2 : ""), (priorSkillId2 !== false ? "skillCP"+priorSkillId2 : ""), (priorSkillId3 !== false ? "skillType"+priorSkillId3 : ""), (priorSkillId3 !== false ? "skillCP"+priorSkillId3 : ""), "skillCP"+skillId, "enhancerJack", "enhancerSch","enhancerSci", "enhancerTrav", "strengthChance", "dexterityChance", "constitutionChance", "intelligenceChance", "egoChance", "presenceChance","interactionLevels", "intellectLevels", "agilityLevels", "noncombatLevels", "overallLevels", "skillStateArray"], function(values) {
+		on("change:skillType"+skillId+" change:skillCP"+skillId+(priorSkillId1 !== false ? " change:skillType"+priorSkillId1 : "")+(priorSkillId2 !== false ? " change:skillType"+priorSkillId2 : "")+(priorSkillId3 !== false ? " change:skillType"+priorSkillId3 : "")+" change:enhancerJack change:enhancerSch change:enhancerSci change:enhancerTrav change:strengthChance change:dexterityChance change:constitutionChance change:intelligenceChance change:egoChance change:presenceChance change:interactionLevels change:intellectLevels change:agilityLevels change:noncombatLevels change:overallLevels", function() {	
+			getAttrs(["skillType"+skillId, (priorSkillId1 !== false ? "skillType"+priorSkillId1 : ""), (priorSkillId1 !== false ? "skillCP"+priorSkillId1 : ""), (priorSkillId2 !== false ? "skillType"+priorSkillId2 : ""), (priorSkillId2 !== false ? "skillCP"+priorSkillId2 : ""), (priorSkillId3 !== false ? "skillType"+priorSkillId3 : ""), (priorSkillId3 !== false ? "skillCP"+priorSkillId3 : ""), "skillCP"+skillId, "enhancerJack", "enhancerSch","enhancerSci", "enhancerTrav", "strengthChance", "dexterityChance", "constitutionChance", "intelligenceChance", "egoChance", "presenceChance","interactionLevels", "intellectLevels", "agilityLevels", "noncombatLevels", "overallLevels"], function(values) {
 				var attributes = new Object();
 				
 				let skillRollChance = 0;
 				let bonusLevels = (parseInt(values.noncombatLevels)||0) + (parseInt(values.overallLevels)||0);
 				let groupBonusLevels = [0, 0, 0];
-				const defaultStates = "000000000000000000000000000000";
-				let skillStates = values.skillStateArray||defaultStates;
-				
-				if (skillStates.length != defaultStates.length) {
-					skillStates = defaultStates;
-				}
 				
 				if (values["skillType"+skillId] === "group") {
-					// Update skillStateArray.
-					skillStates = setCharAt(skillStates, num-1, 1);
 					skillRollChance = 0;
 				} else {
-					skillStates = setCharAt(skillStates, num-1, 0);
 					
 					// Look for preceding groups.
 					for (let i=1; i <= 3; i++) {
@@ -17306,7 +17277,6 @@
 				}
 				
 				attributes["skillRollChance"+skillId] = skillRollChance;	
-				attributes["skillStateArray"] = skillStates;
 				setAttrs(attributes);
 			});
 		});
