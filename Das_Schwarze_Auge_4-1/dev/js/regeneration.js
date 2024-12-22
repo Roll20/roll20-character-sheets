@@ -2117,6 +2117,8 @@ on(
 		"reg_astralmeditation_use_thonnys_amount",
 		"reg_astralmeditation_conversion_target",
 		"reg_astralmeditation_location_limbo",
+		"reg_astralmeditation_location_leyline",
+		"reg_astralmeditation_location_leyline_strength",
 		"reg_astralmeditation_limit_life_energy_soft",
 		"reg_astralmeditation_mod_other",
 	].map(attr => "change:" + attr).join(" "),
@@ -2136,6 +2138,8 @@ on(
 			"reg_astralmeditation_use_thonnys_amount",
 			"reg_astralmeditation_conversion_target",
 			"reg_astralmeditation_location_limbo",
+			"reg_astralmeditation_location_leyline",
+			"reg_astralmeditation_location_leyline_strength",
 			"reg_astralmeditation_limit_life_energy_soft",
 			"reg_astralmeditation_mod_other",
 		], function(values) {
@@ -2160,6 +2164,8 @@ on(
 		const thonnysFullDoseLeaves = 7;
 		const targetRaw = parseInt(values["reg_astralmeditation_conversion_target"]);
 		const limbo = values["reg_astralmeditation_location_limbo"];
+		const leyline = values["reg_astralmeditation_location_leyline"];
+		const leylineStrength = values["reg_astralmeditation_location_leyline_strength"];
 		const limitLifeEnergySoftRaw = parseInt(values["reg_astralmeditation_limit_life_energy_soft"]);
 		const modOther = parseInt(values["reg_astralmeditation_mod_other"]);
 		// Explanation for that magic number
@@ -2172,6 +2178,7 @@ on(
 		const LECostAdditionalMax = 2;
 		const limitLifeEnergyHardMaxDefault = LEIncapacitatedDefault + LECostConversionMin + LECostAdditionalMax;
 		const AECostInitiationDefault = 1;
+		const leylineBonusTime = 6; // unit: SR (5 min)
 		let attrsToChange = {};
 
 		// Determination of setup
@@ -2331,21 +2338,6 @@ on(
 				} else {
 					target = Math.max(0, LEAvailable - LECostAdditional);
 				}
-				if (target === 0)
-				{
-					targetDice = '0d6';
-					attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
-				} else if (target === 1)
-				{
-					targetDice = '1d6';
-					attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
-				} else {
-					let dice = 0;
-					// Heuristic again
-					dice = target.toFixed(0);
-					targetDice = `${dice}d6`;
-					attrsToChange["reg_astralmeditation_conversion_target_auto"] = parseInt(dice);
-				}
 			} else {
 				// Calculate target
 				if (LEAvailable - LECostAdditional >= AEDeficit)
@@ -2354,15 +2346,81 @@ on(
 				} else {
 					target = Math.max(0, LEAvailable - LECostAdditional);
 				}
-				attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
+			}
+			// Adapt "target" to meditation conditions
+			/// Limbo dice
+			if (limbo === "1")
+			{
+				if (target === 0)
+				{
+					targetDice = '0d6';
+				} else if (target === 1)
+				{
+					targetDice = '1d6';
+				} else {
+					let dice = 0;
+					// Heuristic again
+					dice = target.toFixed(0);
+					targetDice = `${dice}d6`;
+				}
+			}
+			/// Adaptation for additional AE from leylines
+			//// Bruteforce algorithm in its simplicity beat every complicated other algorithm I could think of
+			if (leyline === "1")
+			{
+				// Offset = reducedTarget's value
+				let reducedTargetRegenerations = [];
+				if (target > leylineBonusTime)
+				{
+					const leylineBonus = DSAround(leylineStrength / 2);
+					for (let reducedTarget = target; reducedTarget >= leylineBonusTime; reducedTarget--)
+					{
+						let leylineBonusCount = Math.floor(reducedTarget / leylineBonusTime);
+						let leylineBonusTotal = leylineBonusCount * leylineBonus;
+						if (limbo === "1")
+						{
+							// Reverse heuristic
+							let limboReg = 3 * reducedTarget - 3;
+							reducedTargetRegenerations[reducedTarget] = limboReg + leylineBonusTotal;
+						} else {
+							reducedTargetRegenerations[reducedTarget] = reducedTarget + leylineBonusTotal;
+						}
+					}
+					// target has already been limited so that using values up to and including target is still okay
+					// this way we might be able to fully restore astral energy
+					// using for ... in skips undefined offsets :) (for ... of does not!)
+					let newTarget = target;
+					for (let reducedTarget in reducedTargetRegenerations)
+					{
+						if (reducedTargetRegenerations[reducedTarget] >= target)
+						{
+							newTarget = reducedTarget;
+						}
+						if (reducedTargetRegenerations[reducedTarget] >= AEDeficit)
+						{
+							break;
+						}
+					}
+					target = parseInt(newTarget);
+				}
 			}
 			debugLog(caller, "AEDeficit", AEDeficit, "LEAvailable", LEAvailable);
+			attrsToChange["reg_astralmeditation_conversion_target_auto"] = target;
 			attrsToChange["reg_astralmeditation_limit_life_energy_soft_auto"] = LELimit;
 		}
 
 		// Determination of max. LE cost
 		let LECostMax = 0;
 		LECostMax += target + LECostAdditional;
+
+		// Determination of Leyline Effect
+		let AEGainLeyline = 0;
+		let meditationDuration = target; // unit: SR (5 min)
+
+		if (leyline === "1")
+		{
+			AEGainLeyline = DSAround(leylineStrength / 2) * Math.floor(meditationDuration / leylineBonusTime);
+		}
 
 		/*
 		Three main outcomes must be distinguished:
@@ -2420,6 +2478,14 @@ on(
 			];
 		}
 
+		/// Leyline
+		if (AEGainLeyline > 0)
+		{
+			baseRoll = [
+				... baseRoll,
+				`{{aegainleyline=[[${AEGainLeyline}d1]]}}`,
+			];
+		}
 		/// Auto mode
 		if (auto === "1")
 		{
@@ -2703,7 +2769,13 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 
 				// Astral energy
 				let AEneu = resultsOnly["ae"];
-				AEneu = AEneu - AELossInitiation + conversion;
+				let AEGainLeyline = 0;
+				if (Object.hasOwn(resultsOnly, "aegainleyline"))
+				{
+					AEGainLeyline = resultsOnly["aegainleyline"];
+					computed["aegainleyline"] = AEGainLeyline;
+				}
+				AEneu = AEneu - AELossInitiation + conversion + AEGainLeyline;
 				AEneu = Math.min(resultsOnly["aemax"], AEneu);
 				computed["aeneu"] = AEneu;
 				computed["aelossinitiation"] = -AELossInitiation;
@@ -2728,6 +2800,7 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 					"lelossadditional",
 					"aelossinitiation",
 					"aegainconversion",
+					"aegainleyline",
 					"conversiontarget",
 					"mod"
 				];
