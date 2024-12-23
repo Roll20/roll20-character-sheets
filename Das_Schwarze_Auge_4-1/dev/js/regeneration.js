@@ -2825,4 +2825,324 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 	}
 });
 
+// Generating Regeneration Roll (Karmic Meditation)
+on(
+	[
+		"gm_roll_opt",
+		"mu", "in", "ch",
+		"ke", "ke_max", "entrueckung",
+		"liturgiekenntnis",
+		"reg_karmicmeditation_mod_location_demonic",
+		"reg_karmicmeditation_mod_location_demonic_value",
+		"reg_karmicmeditation_mod_location_holy_ground_god",
+		"reg_karmicmeditation_mod_location_holy_ground_pantheon",
+		"reg_karmicmeditation_mod_location_nonbeliever_presence",
+		"reg_karmicmeditation_mod_location_nonbeliever_territory",
+		"reg_karmicmeditation_mod_location_other_world",
+		"reg_karmicmeditation_mod_location_other_world_value",
+		"reg_karmicmeditation_mod_location_sanctum_god",
+		"reg_karmicmeditation_mod_location_temple_god",
+		"reg_karmicmeditation_mod_motivation_controlled",
+		"reg_karmicmeditation_mod_motivation_emergency",
+		"reg_karmicmeditation_mod_motivation_freshman",
+		"reg_karmicmeditation_mod_motivation_mission",
+		"reg_karmicmeditation_mod_motivation_mission_value",
+		"reg_karmicmeditation_mod_motivation_selfish",
+		"reg_karmicmeditation_mod_motivation_selfish_value",
+		"reg_karmicmeditation_mod_motivation_sinner",
+		"reg_karmicmeditation_mod_motivation_sinner_value",
+		"reg_karmicmeditation_mod_other",
+		"reg_karmicmeditation_mod_time_holiday",
+		"reg_karmicmeditation_mod_time_last_meditation",
+		"reg_karmicmeditation_mod_time_month",
+		"reg_karmicmeditation_mod_time_nameless",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			'gm_roll_opt',
+			'MU', 'IN', 'CH',
+			'KE', 'KE_max', 'Entrueckung',
+			'Liturgiekenntnis',
+			'reg_karmicmeditation_mod_location_demonic',
+			'reg_karmicmeditation_mod_location_demonic_value',
+			'reg_karmicmeditation_mod_location_holy_ground_god',
+			'reg_karmicmeditation_mod_location_holy_ground_pantheon',
+			'reg_karmicmeditation_mod_location_nonbeliever_presence',
+			'reg_karmicmeditation_mod_location_nonbeliever_territory',
+			'reg_karmicmeditation_mod_location_other_world',
+			'reg_karmicmeditation_mod_location_other_world_value',
+			'reg_karmicmeditation_mod_location_sanctum_god',
+			'reg_karmicmeditation_mod_location_temple_god',
+			'reg_karmicmeditation_mod_motivation_controlled',
+			'reg_karmicmeditation_mod_motivation_emergency',
+			'reg_karmicmeditation_mod_motivation_freshman',
+			'reg_karmicmeditation_mod_motivation_mission',
+			'reg_karmicmeditation_mod_motivation_mission_value',
+			'reg_karmicmeditation_mod_motivation_selfish',
+			'reg_karmicmeditation_mod_motivation_selfish_value',
+			'reg_karmicmeditation_mod_motivation_sinner',
+			'reg_karmicmeditation_mod_motivation_sinner_value',
+			'reg_karmicmeditation_mod_other',
+			'reg_karmicmeditation_mod_time_holiday',
+			'reg_karmicmeditation_mod_time_last_meditation',
+			'reg_karmicmeditation_mod_time_month',
+			'reg_karmicmeditation_mod_time_nameless',
+		], function(values) {
+		const caller = "Action Listener for Generation of Regeneration Roll (Karmic Meditation)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		let attrsToChange = {};
+
+		const lkw = parseInt(values["Liturgiekenntnis"]);
+		const entrueckung = parseInt(values["Entrueckung"]);
+		const KE = parseInt(values["KE"]);
+		const KEMax = parseInt(values["KE_max"]);
+
+		const lastMeditation = parseInt(values["reg_karmicmeditation_mod_time_last_meditation"]);
+		const emergency = values["reg_karmicmeditation_mod_motivation_emergency"];
+		const mission = values["reg_karmicmeditation_mod_motivation_mission"];
+		const missionValue = parseInt(values["reg_karmicmeditation_mod_motivation_mission_value"]);
+		const selfish = values["reg_karmicmeditation_mod_motivation_selfish"];
+		const selfishValue = parseInt(values["reg_karmicmeditation_mod_motivation_selfish_value"]);
+		const controlled = values["reg_karmicmeditation_mod_motivation_controlled"];
+		const freshman = values["reg_karmicmeditation_mod_motivation_freshman"];
+		const sinner = values["reg_karmicmeditation_mod_motivation_sinner"];
+		const sinnerValue = parseInt(values["reg_karmicmeditation_mod_motivation_sinner_value"]);
+		const nonbelieverPresence = values["reg_karmicmeditation_mod_location_nonbeliever_presence"];
+		const holyGroundPantheon = values["reg_karmicmeditation_mod_location_holy_ground_pantheon"];
+		const holyGroundGod = values["reg_karmicmeditation_mod_location_holy_ground_god"];
+		const templeGod = values["reg_karmicmeditation_mod_location_temple_god"];
+		const sanctumGod = values["reg_karmicmeditation_mod_location_sanctum_god"];
+		const nonbelieverTerritory = values["reg_karmicmeditation_mod_location_nonbeliever_territory"];
+		const otherWorld = values["reg_karmicmeditation_mod_location_other_world"];
+		const otherWorldValue = parseInt(values["reg_karmicmeditation_mod_location_other_world_value"]);
+		const demonic = values["reg_karmicmeditation_mod_location_demonic"];
+		const demonicValue = parseInt(values["reg_karmicmeditation_mod_location_demonic_value"]);
+		const month = values["reg_karmicmeditation_mod_time_month"];
+		const holiday = values["reg_karmicmeditation_mod_time_holiday"];
+		const nameless = values["reg_karmicmeditation_mod_time_nameless"];
+		const modOther = parseInt(values["reg_karmicmeditation_mod_other"]);
+
+		// Constant modifiers
+		const modEmergency = -3;
+		const modControlled = 12;
+		const modFreshman = 3;
+		const modNonbelieverPresence = 3;
+		const modHolyGroundPantheon = -1;
+		const modHolyGroundGod = -2;
+		const modTempleGod = -3;
+		const modSanctumGod = -4;
+		const modNonbelieverTerritory = 3;
+		const modMonth = -1;
+		const modHoliday = -3;
+		const modNameless = 7;
+
+		// Calculate modifier
+		let mod = 0;
+
+		mod += lastMeditation;
+
+		if (emergency === "1") { mod += modEmergency; }
+		if (mission === "1") { mod += missionValue; }
+		if (selfish === "1") { mod += selfishValue; }
+		if (controlled === "1") { mod += modControlled; }
+		if (freshman === "1") { mod += modFreshman; }
+		if (sinner === "1") { mod += sinnerValue; }
+		if (nonbelieverPresence === "1") { mod += modNonbelieverPresence; }
+		if (holyGroundPantheon === "1") { mod += modHolyGroundPantheon; }
+		if (holyGroundGod === "1") { mod += modHolyGroundGod; }
+		if (templeGod === "1") { mod += modTempleGod; }
+		if (sanctumGod === "1") { mod += modSanctumGod; }
+		if (nonbelieverTerritory === "1") { mod += modNonbelieverTerritory; }
+		if (otherWorld === "1") { mod += otherWorldValue; }
+		if (demonic === "1") { mod += demonicValue; }
+		if (month === "1") { mod += modMonth; }
+		if (holiday === "1") { mod += modHoliday; }
+		if (nameless === "1") { mod += modNameless; }
+
+		mod += modOther;
+
+		// Build roll
+		const baseRoll = [
+			values["gm_roll_opt"],
+			"&{template:reg-karmicmeditation}",
+			`{{ke=[[${KE}]]}}`,
+			`{{kemax=[[${KEMax}]]}}`,
+		];
+
+		const KERegenerationRoll = [
+			"{{kegain=[[0]]}}",
+			`{{entrueckung=[[${entrueckung}]]}}`,
+			`{{entrueckunggain=[[0]]}}`,
+			`{{wert=[[${lkw}]]}}`,
+			`{{mod=[[${mod}]]}}`,
+			`{{stats=[[ [MU:] [[${values["MU"]}]]d1cs0cf2 + [IN:] [[${values["IN"]}]]d1cs0cf2 + [CH:] [[${values["CH"]}]]d1cs0cf2]]}}`,
+			'{{checkroll=[[ [MU-Wurf:] 1d20cs1cf20 + [IN-Wurf:] 1d20cs1cf20 + [CH-Wurf:] 1d20cs1cf20]]}}',
+			"{{checkresult=[[0]]}}",
+			"{{checkpoints=[[0]]}}",
+		];
+
+		const notRequiredRoll = [ "{{notrequired=[[0]]}}", ];
+
+		let roll = [ ... baseRoll ];
+		if (KE >= KEMax)
+		{
+			roll = [
+				... roll,
+				... notRequiredRoll,
+			];
+		} else {
+			roll = [
+				... roll,
+				... KERegenerationRoll,
+			];
+		}
+
+		attrsToChange["reg_karmicmeditation_roll"] = roll.join(" ").trim();
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
+
+on('clicked:reg_karmicmeditation-action', async (info) => {
+	const caller = "Action Listener for Regeneration Button (Karmic Meditation)";
+	let results = await startRoll("@{reg_karmicmeditation_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+
+	const rollID = results.rollId;
+	results = results.results;
+	let computed = {};
+	let attrsToChange = {};
+
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results)
+	{
+		resultsOnly[property] = results[property].result;
+	}
+
+	// Roll required?
+	if (Object.hasOwn(resultsOnly, "notrequired"))
+	{
+		finishRoll(rollID);
+	} else {
+		const stats = [
+			results.stats.rolls[0].dice,
+			results.stats.rolls[1].dice,
+			results.stats.rolls[2].dice
+		];
+		const LkW = resultsOnly["wert"];
+		const mod = resultsOnly["mod"];
+		const rolls = [
+			results["checkroll"]["rolls"][0].results[0],
+			results["checkroll"]["rolls"][1].results[0],
+			results["checkroll"]["rolls"][2].results[0],
+		];
+		let KE = resultsOnly["ke"];
+		const KEMax = resultsOnly["kemax"];
+		const regenerationMinimum = 1;
+		let entrueckung = resultsOnly["entrueckung"];
+
+		// Last meditation was right now
+		attrsToChange["reg_karmicmeditation_mod_time_last_meditation"] = "12";
+
+		// 3d20 Check (Liturgy rules apply)
+		/// Result: 0 (Failure) or 1 (Success)
+		let result = 0;
+
+		/// Calculation of remaining skill points (= after check)
+		let effRolls = rolls.slice(); // copying the array
+		let effLkW = LkW - mod;
+		let LkPstar = effLkW;
+
+		//// Negative effective skill value: add |effLkW| to each individual roll
+		if (effLkW < 0)
+		{
+			for (let roll in rolls)
+			{
+				effRolls[roll] = rolls[roll] + Math.abs(effLkW);
+			}
+			LkPstar = 0;
+		}
+
+		//// Skill point consumption for every roll
+		for (let roll in effRolls)
+		{
+			LkPstar -= Math.max(0, effRolls[roll] - stats[roll]);
+		}
+
+		//// Limit result to skill value
+		LkPstar = Math.min(LkW, LkPstar);
+		computed["checkpoints"] = LkPstar;
+
+		//// Liturgies: Result only dependent on remaining skill points
+		result = LkPstar < 0 ? 0 : 1;
+		computed["checkresult"] = result;
+
+		// Effects of result
+		if (result === 1)
+		{
+			// Results of 0 remaining skill points count as 1
+			let KEGain = 0;
+			if (LkPstar === 0)
+			{
+				KEGain = regenerationMinimum;
+			} else {
+				KEGain = LkPstar;
+			}
+			computed["kegain"] = KEGain;
+			KE += KEGain;
+
+			// Limit to maximum
+			KE = Math.min(KEMax, KE);
+			computed["ke"] = KE;
+			attrsToChange["KE"] = KE;
+
+			// Limit rapture gain to only those karma points which could be stored
+			let entrueckungGain = KE - resultsOnly["ke"]
+			entrueckung += entrueckungGain;
+			computed["entrueckung"] = entrueckung;
+			computed["entrueckunggain"] = entrueckungGain;
+			attrsToChange["Entrueckung"] = entrueckung;
+		}
+
+		// Prepare output
+		computed["stats"] = stats.toString().replaceAll(",", "/");
+		computed["checkroll"] = rolls.toString().replaceAll(",", "/");
+		computed["mod"] = mod;
+
+		/// Prettify certain output
+		{
+			// "mod" and "result" correspond to the prettification function used
+			let modUseComputed = [
+				"kegain",
+				"entrueckunggain",
+				"mod"
+			];
+			for (let part of modUseComputed)
+			{
+				if (Object.hasOwn(computed, part))
+				{
+					computed[part] = prettifyMod(computed[part]);
+				}
+			}
+			let resultUseComputed = [
+				"wert",
+				"checkpoints",
+			];
+			for (let part of resultUseComputed)
+			{
+				if (Object.hasOwn(computed, part))
+				{
+					computed[part] = prettifyResult(computed[part]);
+				}
+			}
+		}
+
+		// Finishing
+		debugLog(caller, "tail", "rollID", rollID, "resultsOnly", resultsOnly, "attrsToChange", attrsToChange, "computed", computed);
+		safeSetAttrs(attrsToChange);
+		finishRoll(rollID, computed);
+	}
+});
 /* regeneration end */

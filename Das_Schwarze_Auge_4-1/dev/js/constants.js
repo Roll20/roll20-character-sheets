@@ -263,6 +263,7 @@ const defaultValues = {
 	"shield_tpkk": "13/3",
 	"shield_tp_roll": "1d6 + 1",
 
+	/// 
 	/// Encumbrance, Armour, Initiative
 	"BE": 0,
 	"be_at_mod": 0,
@@ -1037,6 +1038,7 @@ const melee = [
 const reg = [
 	'reg_astralmeditation',
 	'reg_deepbreath',
+	'reg_karmicmeditation',
 	'reg_relax',
 	'reg_rest',
 	'reg_sleep'
