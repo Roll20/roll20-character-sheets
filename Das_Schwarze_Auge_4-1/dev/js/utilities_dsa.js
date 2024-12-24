@@ -338,7 +338,7 @@ function DSAround (num) {
 }
 
 /*
-	When displaying modifiers, make use of real minus sign (U+2212) or ± (U+00B1).
+	When displaying modifiers, make use of plus sign, the real minus sign (U+2212) or ± (U+00B1).
 */
 function prettifyMod(uglyModifier) {
 	var prettyModifier;
