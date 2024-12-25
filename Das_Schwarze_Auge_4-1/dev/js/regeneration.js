@@ -669,7 +669,7 @@ on(
 	[
 		"character_name",
 		"gm_roll_opt",
-		"le", "au", "ae", "ke",
+		"le", "au", "ae", "ke", "entrueckung",
 		"le_max", "au_max", "ae_max", "ke_max",
 		"erschoepfung",
 		"ueberanstrengung",
@@ -705,7 +705,7 @@ on(
 		[
 			'character_name',
 			'gm_roll_opt',
-			'LE', 'AU', 'AE', 'KE',
+			'LE', 'AU', 'AE', 'KE', 'Entrueckung',
 			'LE_max', 'AU_max', 'AE_max', 'KE_max',
 			'erschoepfung',
 			'ueberanstrengung',
@@ -737,6 +737,21 @@ on(
 		], function(values) {
 		const caller = "Action Listener for Generation of Regeneration Roll (Sleep)";
 		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		let attrsToChange = {};
+
+		// Combined effect of having astral energy and karma energy
+		let entrueckung = parseInt(values["Entrueckung"]);
+		let AEKERoll = [ "{{aeen=[[0]]}}" ];
+		if (isNaN(entrueckung) === false)
+		{
+			let aeen = -DSAround(entrueckung / 10);
+			// Only add iff there is a visible effect
+			if (aeen !== 0)
+			{
+				AEKERoll = [ `{{aeen=[[${aeen}]]}}` ];
+			}
+		}
+
 		const baseRoll = [
 			values["gm_roll_opt"],
 			"&{template:reg-sleep}",
@@ -765,7 +780,9 @@ on(
 		const KERoll = [
 			`{{ke=${values["KE"]}}}`,
 			`{{kebase=[[1d1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
-			"{{keneu=[[0d1]]}}"
+			"{{keneu=[[0d1]]}}",
+			`{{entrueckung=[[${values["Entrueckung"]}]]}}`,
+			`{{entrueckungloss=[[${values["Entrueckung"]}]]}}`,
 		];
 		const homesicknessRoll = `{{heimwehkrank=[[${values["reg_sleep_ae_mod_homesickness"]}]]}}`;
 		const foodRestrictionRoll = [
@@ -821,6 +838,12 @@ on(
 			roll = roll.concat(KERoll);
 		}
 
+		// Additional properties for astral energy and karma energy regeneration, "0" = not hidden
+		if ( (values["MagieTab"] === "0") && (values["LiturgienTab"] === "0") )
+		{
+			roll = roll.concat(AEKERoll);
+		}
+
 		// Additional property for homesickness
 		if (values["reg_sleep_ae_mod_homesickness"] !== 0)
 		{
@@ -867,7 +890,11 @@ on(
 			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=[[${values["reg_sleep_ae_fixed"]}d1]]}}`;
 			roll[roll.findIndex(value => /aein=/.test(value))] = "{{aein=[[0d1]]}}";
 		}
-		safeSetAttrs({"reg_sleep_roll": roll.join(" ")});
+
+		// Finishing
+		attrsToChange["reg_sleep_roll"] = roll.join(" ").trim();
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
 	});
 });
 
@@ -1237,6 +1264,13 @@ on('clicked:reg_sleep-action', async (info) => {
 				computed["aein"] = AEIN;
 				AERegTotal += AEIN;
 
+				// Rapture reduces astral energy regeneration
+				if (Object.hasOwn(results, "aeen"))
+				{
+					computed["aeen"] = results["aeen"].result;
+					AERegTotal += results["aeen"].result;
+				}
+
 				// Regeneration from homesickness
 				if (Object.hasOwn(results, "heimwehkrank"))
 				{
@@ -1276,6 +1310,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				computed["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
 				computed["aead"] = 0;
 				computed["aein"] = 0;
+				computed["aeen"] = 0;
 				AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
 			}
 			computed["aeneu"] = attrsToChange["AE"];
@@ -1311,6 +1346,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				computed["kebase"] = 0;
 			}
 
+			// KE
 			computed["kebase"] = KERegTotal;
 			var KEneu = parseInt(values["KE"]);
 
@@ -1321,6 +1357,19 @@ on('clicked:reg_sleep-action', async (info) => {
 				attrsToChange["KE"] = KEneu;
 			}
 			computed["keneu"] = KEneu;
+
+			// Rapture
+			const entrueckungMin = 0;
+			let entrueckungLoss = -Math.floor(computed["duration"] / 2);
+			let entrueckungNeu = parseInt(results["entrueckung"].result);
+			entrueckungNeu += entrueckungLoss;
+			entrueckungNeu = Math.max(entrueckungMin, entrueckungNeu);
+			if (parseInt(results["entrueckung"].result) !== entrueckungNeu)
+			{
+				attrsToChange["Entrueckung"] = entrueckungNeu;
+			}
+			computed["entrueckungloss"] = entrueckungLoss;
+			computed["entrueckung"] = entrueckungNeu;
 		}
 
 		// Prettify certain output
@@ -1333,7 +1382,9 @@ on('clicked:reg_sleep-action', async (info) => {
 				"aead",
 				"aess",
 				"aein",
+				"aeen",
 				"kebase",
+				"entrueckungloss",
 			];
 			let useResults = [
 				"lefr",
