@@ -4606,17 +4606,19 @@
     /* Attribute Related Fuctions */
     async function setActiveAttribute(cache, set_values) {
         const temp = {};
-        clog(cache, temp, `setActiveAttribute(${cache.attribute})`);
+        clog(cache, temp, `setActiveAttribute(${cache.active_attributes})`);
         // Collect required values
         temp.get_attrs = [];
-        if (!Array.isArray(cache.attribute)) {
+        if (!Array.isArray(cache.active_attributes)) {
             const string_to_array = [];
-            string_to_array.push(cache.attribute);
-            cache.attribute = string_to_array;
+            string_to_array.push(cache.active_attributes);
+            cache.active_attributes = string_to_array;
+        } else {
+            cache.active_attributes.push('massive damage');
         }
         // Calculate Base Value
-        for (let i = 0; i < cache.attribute.length; i++) {
-            switch(cache.attribute[i]) {
+        for (let i = 0; i < cache.active_attributes.length; i++) {
+            switch(cache.active_attributes[i]) {
                 case 'attack mastery':
                     if (cache.acv === undefined) {
                         cache.acv = Math.round((
@@ -4783,9 +4785,9 @@
                 break;
             }
             // Apply values
-            switch(cache.attribute[i]) {
+            switch(cache.active_attributes[i]) {
                 case 'attack mastery':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.acv += a.elevel;
                         }
@@ -4794,11 +4796,11 @@
                 case 'combat technique':
                     cache.hardboiled = 0;
                     cache.reflexes = 0;
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         for (let i = 0, n = a.config.length; i < n; i++) {
                             switch (a.config[i].name) {
                                 case 'hardboiled':
-                                    cache.attribute.unshift('hardboiled');
+                                    cache.active_attributes.unshift('hardboiled');
                                     if (a.active) {
                                         cache.hardboiled += (a.config[i].rank * 10);
                                     }
@@ -4818,7 +4820,7 @@
                     cache.shockvalue += cache.hardboiled;
                 break;
                 case 'defense mastery':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.dcv += a.elevel;
                         }
@@ -4826,7 +4828,7 @@
                 break;
                 case 'extra actions':
                     cache.actions = 1;
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.actions += a.elevel;
                         }
@@ -4834,21 +4836,21 @@
                 break;
                 case 'extra defenses':
                     cache.defenses = 0;
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.defenses += a.elevel;
                         }
                     });
                 break;
                 case 'energized':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.energy += (a.elevel * 10);
                         }
                     });
                 break;
                 case 'massive damage':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             const limited = a.limiters.find(l => {
                                 return l.name === 'focussed damage' || l.name === 'targetted damage';
@@ -4858,7 +4860,7 @@
                     });
                 break;
                 case 'social mastery':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             const scv = a.elevel * 2;
                             cache.scv += scv;
@@ -4867,26 +4869,30 @@
                     });
                 break;
                 case 'tough':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.health += (a.elevel * 10);
                         }
                     });
                 break;
                 case 'unassailable':
-                    cache.attrdb[cache.attribute[i]].forEach(a => {
+                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.sanity += (a.elevel * 2);
                         }
                     });
                 break;
             }
+            if (cache.active_attributes[i] === 'massive damage') {
+                cache.statsdb.dm.base = cache.dm;
+                set_values.static_character_dm_base = cache.statsdb.dm.base;
+            }
         }
         if (
-            cache.attribute[0] === 'energized' ||
-            cache.attribute[0] === 'tough' ||
-            cache.attribute[0] === 'unassailable' ||
-            cache.attribute[0] === 'social mastery'
+            cache.active_attributes[0] === 'energized' ||
+            cache.active_attributes[0] === 'tough' ||
+            cache.active_attributes[0] === 'unassailable' ||
+            cache.active_attributes[0] === 'social mastery'
         ) {
             const derived_values = {
                 'energized':'energy',
@@ -4895,12 +4901,12 @@
                 'social mastery':'society',
             };
             const point_max = 
-                cache[derived_values[cache.attribute[0]]] + 
-                cache.statsdb[derived_values[cache.attribute[0]].temp];
+                cache[derived_values[cache.active_attributes[0]]] + 
+                cache.statsdb[derived_values[cache.active_attributes[0]].temp];
             const point_loss = 
-                cache.statsdb[derived_values[cache.attribute[0]].damage] + 
-                cache.statsdb[derived_values[cache.attribute[0]].stun];
-            setStatusStateDescription(cache, set_values, derived_values[cache.attribute[0]], point_max, point_loss);
+                cache.statsdb[derived_values[cache.active_attributes[0]].damage] + 
+                cache.statsdb[derived_values[cache.active_attributes[0]].stun];
+            setStatusStateDescription(cache, set_values, derived_values[cache.active_attributes[0]], point_max, point_loss);
         }
     }
 
@@ -6851,19 +6857,40 @@
         const color = rulebook === 'besmx' ? 'besm' : rulebook;
         query.attributes = [];
         const filtered_attributes = all_attributes.map(a => {
-            return (a === 'skills' || a === 'skill group' || a === 'weapon') ? '' : a;
+            return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
         }).filter(n => n);
         for (let i = 0; i < filtered_attributes.length; i++) {
             for (let j = 0; j < cache.attrdb[filtered_attributes[i]].length; j++) {
                 const attribute = cache.attrdb[filtered_attributes[i]][j];
                 if (attribute.active && attribute.stat !== 'none') {
                     query.attributes.length = query.attributes.push(
-                        `|${attribute.name.capitalize()},` +
+                        `|${attribute.name === '' ? filtered_attributes[i].capitalize() : attribute.name.capitalize()},` +
                         `${filtered_attributes[i]}~${j}`
                     );
+                    roll.is_swarm = filtered_attributes[i] === 'swarm';
+                    if (roll.is_swarm) {
+                        query.elevel = cache.attrdb.swarm[j].elevel;
+                    }
                 }
             }
         }
+        query.skill_type = cache.rulesdb.rules_optional_individual_status ? 'skills' : 'skill group';
+        if (query.skill_type === 'skill group') {
+            query.skills = cache.attrdb[query.skill_type].map(s => s.active ? s.name : '').filter(n => n).sort();
+        } else {
+            query.skills = [];
+            for (let i = 0; i < cache.attrdb.skills.length; i++) {
+                if (cache.attrdb.skills[i].active) {
+                    for (let j = 0; j < cache.attrdb.skills[i].individual.length; j++) {
+                        if (cache.attrdb.skills[i].individual[j].active) {
+                            query.skills.push(cache.attrdb.skills[i].individual[j].skill);
+                        }
+                    }
+                }
+            }
+            query.skills.sort();
+        }
+        
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
@@ -6887,8 +6914,7 @@
                         `|${getTranslationByKey("attribute")},attribute` : '';
                     query.options +=
                         `|${getTranslationByKey("initiative")},initiative`;
-                    query.options +=
-                    cache.attrdb[`${cache.rulesdb.rules_optional_individual_status ? 'skills' : 'skill group'}`].length !== 0 ?
+                    query.options += query.skills.length !== 0 ?
                         `|${getTranslationByKey("skill")},` +
                         `${cache.rulesdb.rules_optional_individual_status ? 'skill': 'skill_group'}` : '';
                     query.options +=
@@ -6924,9 +6950,11 @@
                 case 'select_weapon':
                     query.has_weapons = cache.attrdb.weapon.length;
                     if (
-                        roll.type === 'defense' &&
-                        query.has_weapons === 0 &&
-                        roll.attacker.weapon.range === 0
+                        (
+                            roll.type === 'defense' &&
+                            query.has_weapons === 0 &&
+                            roll.attacker.weapon.range === 0
+                        ) || roll.is_swarm
                     ) {
                         query.title = '';
                         query.selection = 'unarmed';
@@ -7256,27 +7284,30 @@
                         temp: [],
                         stats: [],
                     };
-                    query.shortcoming.exists = cache.defectdb.shortcoming.length !== 0;
-                    if (query.shortcoming.exists) {
+                    //query.shortcoming.exists = cache.defectdb.shortcoming.length !== 0;
+                    if (cache.defectdb.shortcoming.length !== 0) {
                         query.shortcoming.temp = cache.defectdb.shortcoming.map(s => {
-                            if (
-                                roll.denominator === 1 &&
-                                s.config[0].rank === roll.stat[0]
-                            ) {
-                                return s.config[0].rank;
-                            } else {
-                                for (let i = 0; i < roll.stat.length; i++) {
-                                    if (
-                                        s.config[0].rank === roll.stat[i]
-                                    ) {
-                                        return s.config[0].rank;
+                            if (s.active) {
+                                if (
+                                    roll.denominator === 1 &&
+                                    s.config[0].rank === roll.stat[0]
+                                ) {
+                                    return s.config[0].rank;
+                                } else {
+                                    for (let i = 0; i < roll.stat.length; i++) {
+                                        if (
+                                            s.config[0].rank === roll.stat[i]
+                                        ) {
+                                            return s.config[0].rank;
+                                        }
                                     }
                                 }
                             }
                         }).filter(n => n);
                         query.shortcoming.stats = [...new Set(query.shortcoming.temp)];
                     }
-                    query.next = query.next === 'stat' ? 
+                    query.next = 
+                        query.next === 'stat' ? 
                         query.shortcoming.stats.length !== 0 && applyShortcomingObstacle(cache, query) ? 'shortcoming' :
                         'target_type' : 'select_weapon';
                     query.do_roll = cache.source_type === 'react' && (
@@ -7323,6 +7354,7 @@
                             cache.attrdb.weapon[roll.weapon.index].elevel;
                     }
                     roll.weapon.severity = 
+                        roll.is_swarm ? 'damage' :
                         roll.weapon.index === -1 || roll.weapon.is_attribute ? 'none' :
                         query.selection === 'unarmed' ? 'stun' :
                         cache.attrdb.weapon[roll.weapon.index].enhancements.findIndex(e => {
@@ -7438,13 +7470,20 @@
                         }
                     }
                 } else {
-                    roll.weapon.weapon_class = 'unarmed';
-                    roll.weapon.damage_type = 'blunt';
+                    roll.weapon.weapon_class = roll.is_swarm ? 'special' : 'unarmed';
+                    roll.weapon.damage_type = roll.is_swarm ? 'penetrating' : 'blunt';
                     roll.weapon.elevel = 0;
-                    roll.weapon.severity = 'stun';
+                    roll.weapon.range = 0;
+                    roll.weapon.severity = roll.is_swarm ? 'damage' : 'stun';
+                    if (roll.is_swarm) {
+                        roll.swarm_acv = 4 + query.elevel;
+                        roll.swarm_damage = 
+                            cache.statsdb.health.base -
+                            cache.statsdb.health.damage;
+                    }
                 }
                 // Weapon ACV/DCV
-                roll.cv = getCV(cache, roll.type);
+                roll.cv = roll.is_swarm ? roll.swarm_acv : getCV(cache, roll.type);
                 const weapon_type = roll.weapon.range !== 0 ? 'ranged attack' : 'melee attack';
                 if (cache.attrdb[weapon_type].length !== 0) {
                     for (let i = 0; i < cache.attrdb[weapon_type].length; i++) {
@@ -7980,13 +8019,15 @@
                             }
                         }
                         damage.percentage = roll.attacker.weapon.is_attribute ? 0 : damage.percentage;
-                        damage.received = roll.attacker.weapon.elevel !== -1 ? Math.round(
-                            (
+                        damage.received = 
+                            roll.attacker.is_swarm ? roll.attacker.swarm_damage :
+                            roll.attacker.weapon.elevel !== -1 ? Math.round(
                                 (
-                                    damage.multiplier * roll.attacker.weapon.elevel
-                                ) + roll.attacker.cv
-                            ) * damage.percentage
-                        ) : 0;
+                                    (
+                                        damage.multiplier * roll.attacker.weapon.elevel
+                                    ) + roll.attacker.cv
+                                ) * damage.percentage
+                            ) : 0;
                         roll.template += ` {{damage=${damage.received}}}`;
                         roll.template += roll.attacker.weapon.severity === 'stun' ?
                             ` {{stun=Stun }}` : '';
@@ -9429,8 +9470,10 @@
                     break;
                 }
             } else {
-                const skilldb = cache.attrdb.skills[cache.skill_index].individual[query.individual_index];
-                const cost = skills_cost[skilldb.skill][cache.rulesdb.rules_optional_genre_status];
+                const skilldb = query.next === 'write_newskill' ?
+                    cache.attrdb.skills[cache.skill_index].individual :
+                    cache.attrdb.skills[cache.skill_index].individual[query.individual_index];
+                const cost = skills_cost[query.skill][cache.rulesdb.rules_optional_genre_status];
                 switch (query.next) {
                     case 'write_newskill'://-> write skill object into cache and create repeating section
                         const fields = ['cost','points','rank','skill','specializations','stat'];
@@ -9440,8 +9483,8 @@
                             let value = '';
                             switch (fields[i]) {
                                 case 'cost':
-                                    query.cost = skills_cost[query.skill][cache.rulesdb.rules_optional_genre_status];
-                                    value = query.cost;
+                                    //query.cost = skills_cost[query.skill][cache.rulesdb.rules_optional_genre_status];
+                                    value = cost;
                                 break;
                                 case 'points':
                                     query.points = 0;
@@ -9470,7 +9513,7 @@
                             }
                             set_values[`repeating_skill_${row_id}_${fields[i]}`] = value;
                         }
-                        attrdb_entry.points = query.cost * query.rank;
+                        attrdb_entry.points = cost * query.rank;
                         attrdb_entry.rank = query.rank;
                         attrdb_entry.row_id = row_id;
                         attrdb_entry.skill = query.skill;
@@ -11863,6 +11906,12 @@
                                     rank: []
                                 });
                             break;
+                            case 'swarm':
+                                query.config.push({
+                                    name: 'critter',
+                                    rank: ''
+                                });
+                            break;
                             default:
                                 query.config.push({
                                     name: query.attribute,
@@ -11884,7 +11933,7 @@
                         }
                         set_values[`repeating_attribute_${query.row_id}_configuration`] = await setConfiguration(cache, set_values, query);
                         
-                        attrdb_entry.active = true;
+                        attrdb_entry.active = query.attribute === 'swarm' ? false : true;
                         attrdb_entry.config = query.config;
                         attrdb_entry.elevel = query.elevel;
                         attrdb_entry.enhancements = query.enhancements;
@@ -12977,7 +13026,7 @@
             (cache.statsdb[all_stats[i]].shortcoming || 0);
         }
         cache.energy = (cache.mind + cache.soul) * 5;
-        cache.health = (cache.body + cache.soul) * 5;
+        cache.health = ((cache.body + cache.soul) * 5);
         cache.sanity = (cache.mind + cache.soul) * int(cache.rulesdb.rules_optional_sanity_status);
         cache.society = Math.round((cache.mind + cache.soul) / 2) * int(cache.rulesdb.rules_optional_society_status);
         cache.shockvalue = (cache.body + cache.soul) * int(cache.rulesdb.rules_optional_shockvalue_status);
@@ -12985,20 +13034,32 @@
         cache.acv = Math.round((cache.body + cache.mind + cache.soul) / 3);
         cache.dcv = Math.round((cache.body + cache.mind + cache.soul) / 3);
         cache.scv = Math.round((cache.mind + cache.soul) / 2) * int(cache.rulesdb.rules_optional_society_status);
-        cache.attribute = [];
+        cache.active_attributes = [];
         for (let i = 0; i < derived_values.length; i++) {
             if (cache[derived_values[i]] !== 0) {
-                cache.attribute.push(derived_attributes[derived_values[i]]);
+                cache.active_attributes.push(derived_attributes[derived_values[i]]);
             }
         }
         // Apply defects
         // Apply attributes to combat values
         await setActiveAttribute(cache, set_values);
         // Record new values
+        cache.elevel = cache.attribute === undefined ? '' :
+            cache.attrdb[cache.attribute][cache.attrdb[cache.attribute].findIndex(s => s.row_id.toLowerCase() === cache.source_id)].elevel;
         for (let i = 0; i < derived_values.length; i++) {
             if (derived_values_points.indexOf(derived_values[i]) !== -1) {
-                cache.statsdb[derived_values[i]].base = cache[derived_values[i]];
-                set_values[`static_character_${derived_values[i]}_base`] = cache[derived_values[i]];
+                if (cache.attribute === 'swarm' && derived_values[i] === 'health') {
+                    //cache.elevel = cache.attrdb.swarm[cache.attrdb.swarm.findIndex(s => s.row_id.toLowerCase() === cache.source_id)].elevel || 1;
+                    cache.swarm_multiplier = cache.active ? cache.elevel : 1;
+                    if (cache.active) {
+                        cache.statsdb[derived_values[i]].damage *= cache.elevel;
+                    } else {
+                        Math.ceil(cache.statsdb[derived_values[i]].damage /= cache.elevel);
+                    }
+                    
+                }
+                cache.statsdb[derived_values[i]].base = cache[derived_values[i]] * (derived_values[i] === 'health' ? cache.swarm_multiplier : 1);
+                set_values[`static_character_${derived_values[i]}_base`] = cache.statsdb[derived_values[i]].base;
                 const point_max = 
                     cache.statsdb[derived_values[i]].base +
                     cache.statsdb[derived_values[i]].temp;
@@ -13007,6 +13068,12 @@
                     (cache.statsdb[derived_values[i]].stun || 0);
                 setStatusStateDescription(cache, set_values, derived_values[i], point_max, point_loss);
             } else {
+                if (cache.attribute === 'swarm' && cache.active) {
+                    switch (derived_values[i]) {
+                        case 'acv': cache[derived_values[i]] = 4 + cache.elevel; break;
+                        default: cache[derived_values[i]] = 0;
+                    }
+                }
                 cache.statsdb[derived_values[i]].base = cache[derived_values[i]];
                 set_values[`static_character_${derived_values[i]}_base`] = cache[derived_values[i]];
             }
@@ -13664,6 +13731,7 @@
     });
 
     on(getEvents(), async (event_info) => {
+        if (event_info.sourceType === 'sheetworker') { return; }
         const set_values = {}; // all value changes to be written
         const cache = {}; // cache of all databases and values required by event
         setTimer(cache);
@@ -13705,16 +13773,16 @@
                             break;
                             case 'active':
                                 const attr_to_value = {
-                                    'attack mastery': 'acv',
-                                    'defense mastery': 'dcv',
-                                    'energized': 'energy',
-                                    'extra actions': 'actions',
-                                    'extra defenses': 'defenses',
-                                    'hardboiled': 'shockvalue',
+                                    'attack mastery':'acv',
+                                    'defense mastery':'dcv',
+                                    'energized':'energy',
+                                    'extra actions':'actions',
+                                    'extra defenses':'defenses',
+                                    'hardboiled':'shockvalue',
                                     'massive damage':'dm',
-                                    'social mastery': 'scv',
-                                    'tough': 'health',
-                                    'unassailable': 'sanity',
+                                    'social mastery':'scv',
+                                    'tough':'health',
+                                    'unassailable':'sanity',
                                 };
                                 const db = cache.source_section === 'attribute' ? 'attrdb' : 'defectdb';
                                 cache.attribute = 
@@ -13724,37 +13792,7 @@
                                         return a.row_id.toLowerCase() === cache.source_id;
                                     });
                                 cache.active = cache.newValue === 1 ? true : false;
-                                cache[db][cache.attribute][cache.index].active = 
-                                    cache.active;
-                                //await setActiveAttribute(cache, set_values);
-                                /*
-                                if (Object.keys(attr_to_value).indexOf(cache.attribute) !== -1) {
-                                    let value = 0;
-                                    for (let i = 0; i < cache[db][cache.attribute].length; i++) {
-                                        value += cache[db][cache.attribute][i].active ?
-                                            cache[db][cache.attribute][i].elevel : 0;
-                                    }
-                                    set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = (value * (
-                                        cache.attribute === 'energized' ||
-                                        cache.attribute === 'hardboiled' ||
-                                        cache.attribute === 'tough' ? 10 :
-                                        cache.attribute === 'social mastery' ||
-                                        cache.attribute === 'unassailable' ? 2 : 1
-                                    )) + (
-                                        cache.attribute === 'extra actions' ? 1 :
-                                        cache.attribute === 'massive damage' ? 5 : 0
-                                    );
-                                    /*
-                                    set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = 
-                                        cache[attr_to_value[cache.attribute]];
-                                    if (cache.attribute === 'social mastery') {
-                                        set_values[`static_character_${attr_to_value[cache.attribute]}_base`] = 
-                                            cache[attr_to_value[cache.attribute]];
-                                    }
-                                    */
-                                    //await setDerivedValues(cache, set_values);
-                                //}
-                                
+                                cache[db][cache.attribute][cache.index].active = cache.active;
                                 if (cache.attribute === 'augmented') {
                                     cache.aug_index = cache.attrdb.augmented[cache.index].config.findIndex(c => c.name === 'augmented_stat');
                                     cache.augmented_stat = cache.attrdb.augmented[cache.index].config[cache.aug_index].rank;
@@ -13768,15 +13806,40 @@
                                         }
                                     }
                                     cache.statsdb[cache.augmented_stat].augmented = cache.augmented_rank;
-                                    //await setDerivedValues(cache, set_values);
                                     set_values[`static_character_${cache.augmented_stat}_remaining`] = 
                                         cache.statsdb[cache.augmented_stat].base +
                                         cache.statsdb[cache.augmented_stat].augmented +
                                         cache.statsdb[cache.augmented_stat].temp -
                                         cache.statsdb[cache.augmented_stat].damage -
                                         (cache.statsdb[cache.augmented_stat].shortcoming || 0);
+                                } else if (cache.attribute === 'swarm') {
+                                    const db = cache.attrdb.swarm[cache.attrdb.swarm.findIndex(s => s.row_id.toLowerCase() === cache.source_id)];
+                                    if (cache.newValue) {
+                                        db.active_map = {};
+                                        for (let i = 0; i < all_attributes.length; i++) {
+                                            db.active_map[all_attributes[i]] = [];
+                                            cache.attrdb[all_attributes[i]].forEach(a => {
+                                                if (a.row_id.toLowerCase() !== cache.source_id) {
+                                                    db.active_map[all_attributes[i]].push({
+                                                        row_id: a.row_id,
+                                                        active: a.active,
+                                                    });
+                                                    a.active = false;
+                                                    set_values[`repeating_attribute_${a.row_id.toLowerCase()}_active`] = 0;
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        for (let i = 0; i < all_attributes.length; i++) {
+                                            db.active_map[all_attributes[i]].forEach(a => {
+                                                const restore_index = cache.attrdb[all_attributes[i]].findIndex(r => r.row_id.toLowerCase() === a.row_id.toLowerCase());
+                                                cache.attrdb[all_attributes[i]][restore_index].active = a.active;
+                                                set_values[`repeating_attribute_${a.row_id.toLowerCase()}_active`] = a.active ? 1 : 0;
+                                            });
+
+                                        }
+                                    }
                                 }
-                                //await setActiveAttribute(cache, set_values);
                                 await setDerivedValues(cache, set_values);
                                 if (cache.source_attribute === 'active' && cache.source_section === 'defect') {
                                     const index = cache.defectdb.shortcoming.findIndex(s => s.row_id.toLowerCase() === cache.source_id);
