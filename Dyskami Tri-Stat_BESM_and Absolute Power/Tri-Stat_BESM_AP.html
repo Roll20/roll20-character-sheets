@@ -3167,6 +3167,10 @@
         return oneFiveOrTwentyFive(level % 3);
     }
 
+    function isEven(number) {
+        return number % 2 === 0;
+    }
+
     function clog(cache, data, title, type = 'event') {
         //types = 'info', 'event'
         //debug = 0:none, 1:info, 2:event, 3:performance
@@ -6152,6 +6156,7 @@
             
             break;
             case "swarm": description = `Health Points * ${query.elevel} Creatures`; break;
+            case "taunt": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "telekinesis": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "telepathy": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "teleport": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -6399,6 +6404,19 @@
                     4: "2 tonnes",
                     5: "5 tonnes",
                 },
+                "taunt": {
+                    1: 'Base Taunt',
+                    2: 'Precise Taunt',
+                    3: 'Moderate Taunt',
+                    4: 'Upgraded Taunt',
+                    5: 'Significant Taunt',
+                    6: 'Dramatic Taunt',
+                    7: 'Exceptional Taunt',
+                    8: 'Extreme Taunt',
+                    9: 'Excessive Taunt',
+                    10: 'Legendary Taunt',
+                    "default": "Does not improve beyond level 10"
+                },
                 "telekinesis": {
                     1: "Move 1 kg",
                     2: "Move 10 kg",
@@ -6529,6 +6547,20 @@
                     );
                     characteristic += `, +${(query.elevel * 5) * (cache.rulebook === 'absolutepower' ? 2 : 1)} unarmed damage`;
                     characteristic += `, +${(query.elevel * 1) * (cache.rulebook === 'absolutepower' ? 2 : 1)} DM with muscle weapons`;
+                break;
+                case 'taunt':
+                    query.config_index = 
+                        query.next === 'write_newattr' ? -1 :
+                        query.config_index === undefined ? query.db.config.findIndex(c => c.name === 'taunt') : 
+                        query.config_index;
+                    query.roll_type = query.next === 'write_newattr' ?
+                        'not configured' : query.db.config[query.config_index].rank
+                    characteristic = chardb[query.attribute][query.elevel];
+                    characteristic += query.elevel < 11 ?
+                        ` - ${isEven(query.elevel) ?
+                        'Opponent suffers a major obstacle with:' :
+                        'Opponent suffers a minor obstacle with:'
+                        } ${query.roll_type}` : '';
                 break;
                 case 'telekinesis':
                     characteristic = (query.elevel < 7) ? 
@@ -10445,6 +10477,7 @@
                         'species',
                         'supersense',
                         'targeted damage',
+                        'taunt',
                         'techniques',
                         'transform',
                         'weapon_class'
@@ -10715,6 +10748,12 @@
                     query.title = getTranslationByKey("choose-supersense");
                     query.options = '|' + supersenses.map(s => `${s.capitalize()},${s}`).sort().join('|');
                     query.options += '|Other,other';
+                    query.last = query.next;
+                break;
+                case 'taunt':
+                    query.config_index = query.db.config.findIndex(c => c.name === 'taunt');
+                    query.title = getTranslationByKey("define-dice-roll");
+                    query.options = `|${query.db.config[query.config_index].rank}`;
                     query.last = query.next;
                 break;
                 case 'techniques':
@@ -11635,9 +11674,12 @@
                         query.next = query.rank === undefined ? 'movement_rank' : 'write_movement';
                     break;
                     case 'other_sense':
+                    case 'taunt':
                         if (query.selection === 0) { return; }
                         query.sense = query.selection;
-                        query.next = 'write_sensory_block';
+                        query.next = query.next === 'taunt' ?
+                            'write_taunt' :
+                            'write_sensory_block';
                     break;
                     case 'other_supersense':
                         query.selection = query.selection === 0 ? '' : query.selection;
@@ -11917,7 +11959,8 @@
                                     name: query.attribute,
                                     rank:
                                         query.attribute === 'immunity' ||
-                                        query.attribute === 'supersense' ? '' :
+                                        query.attribute === 'supersense' ||
+                                        query.attribute === 'taunt' ? '' :
                                         query.attribute === 'size change' ? 'grow' :
                                         query.attribute === 'resilient' ||
                                         query.attribute === 'sixth sense' ? [] :
@@ -12134,6 +12177,7 @@
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
                     case 'write_supersense':
+                    case 'write_taunt':
                         query.db.config[query.config_index].rank = query.selection;
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
