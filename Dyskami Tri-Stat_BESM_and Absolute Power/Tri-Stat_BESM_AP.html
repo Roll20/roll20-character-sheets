@@ -6047,7 +6047,7 @@
             break;
             case "conversion": description = `${query.elevel} Character Points/10 Damage`; break;
             case "data access": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "defense mastery": description = `DCV +${query.elevel}`; await setDerivedValues(cache, set_values); break;
+            case "defense mastery": description = `+${query.elevel} DCV`; await setDerivedValues(cache, set_values); break;
             case "dimension walk": description = getCharacteristicByAttr(cache, set_values, query); break;
             //case "dynamic powers": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "elasticity": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -6055,11 +6055,10 @@
             case "enemy defense":
                 query.enemy = query.config[query.config.findIndex(c => c.name === 'enemy')].rank;
                 description = 
-                    `${query.attribute === 'enemy attack' ? 'ACV' : 'DCV'} ` +
-                    `+${query.elevel * 2} vs. ${query.enemy}`;
+                    `+${query.elevel * 2} ${query.attribute === 'enemy attack' ? 'ACV' : 'DCV'} vs. ${query.enemy}`;
             break;
-            case "energized": description = `Energy Points +${query.elevel * 10}`; break;
-            case "exorcism": description = `Soul +${query.elevel * 2}`; break;
+            case "energized": description = `+${query.elevel * 10} Energy Points`; break;
+            case "exorcism": description = `+${query.elevel * 2} Soul`; break;
             case "extra actions": description = `+${query.elevel} additional actions each round`; break;
             case "extra arms": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "extra defenses": description = `+${query.elevel} defensive actions each round`; break;
@@ -6103,8 +6102,8 @@
             //case "power flux": description = `${query.elevel * 5} Flux Points`; break;
             //case "power variation": description = `${query.elevel + 1} Variable Attributes`; break;
             case "projection": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "ranged attack": description = `ACV +${query.elevel * 2} with weapons of a specific type`; break;
-            case "ranged defense": description = `DCV +${query.elevel * 2} against ranged attacks`; break;
+            case "ranged attack": description = `+${query.elevel * 2} ACV with weapons of a specific type`; break;
+            case "ranged defense": description = `+${query.elevel * 2} DCV against ranged attacks`; break;
             case "regeneration": description = `Regenerate ${query.elevel * 5} Heath Points/Round`; break;
             case "reincarnation": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "resilient":
@@ -6137,7 +6136,7 @@
                 }
                 description = `${query.elevel * 10} Skill Points`;
             break;
-            case "social mastery": description = `SCV +${query.elevel * 2}`; await setDerivedValues(cache, set_values); break;
+            case "social mastery": description = `+${query.elevel * 2} SCV`; await setDerivedValues(cache, set_values); break;
             case "spaceflight": description = getCharacteristicByAttr(cache, set_values, query); break;
             //case "special movement": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
             case "summon creatures": description = `up to ${query.elevel === 0 ? 0 : (get1or3(query.elevel, 1) * (10 ** (Math.ceil((query.elevel) / 2)))).toLocaleString()}`; break;
@@ -6160,7 +6159,7 @@
             case "telekinesis": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "telepathy": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "teleport": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "tough": description = `Health Points +${query.elevel * 10}`; break;
+            case "tough": description = `+${query.elevel * 10} Health Points`; await setDerivedValues(cache, set_values); break;
             case "transfer": description = `Transer Attributes as Level ${query.elevel}`; break;
             case "transmute": description = `Transmute objects of ${query.elevel * 5} Character Points`; break;
             case "tunneling": description = getCharacteristicByAttr(cache, set_values, query); break;
@@ -13252,10 +13251,11 @@
         // Apply attributes to combat values
         await setActiveAttribute(cache, set_values);
         // Record new values
-        cache.elevel = cache.attribute === undefined ? '' :
+        cache.elevel = cache.attribute === undefined ? 0 :
             cache.attrdb[cache.attribute][cache.attrdb[cache.attribute].findIndex(s => s.row_id.toLowerCase() === cache.source_id)].elevel;
         for (let i = 0; i < derived_values.length; i++) {
             if (derived_values_points.indexOf(derived_values[i]) !== -1) {
+                cache.swarm_multiplier = 1;
                 if (cache.attribute === 'swarm' && derived_values[i] === 'health') {
                     //cache.elevel = cache.attrdb.swarm[cache.attrdb.swarm.findIndex(s => s.row_id.toLowerCase() === cache.source_id)].elevel || 1;
                     cache.swarm_multiplier = cache.active ? cache.elevel : 1;
