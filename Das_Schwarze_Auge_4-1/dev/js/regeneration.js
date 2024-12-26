@@ -791,7 +791,8 @@ on(
 			"{{keneu=[[0d1]]}}",
 			"{{kechanged=[[1]]}}",
 			`{{entrueckung=[[${values["Entrueckung"]}]]}}`,
-			`{{entrueckungloss=[[${values["Entrueckung"]}]]}}`,
+			`{{entrueckungloss=[[0]]}}`,
+			`{{entrueckunggain=[[0]]}}`,
 			"{{entrueckungchanged=[[1]]}}",
 		];
 		const homesicknessRoll = `{{heimwehkrank=[[${values["reg_sleep_ae_mod_homesickness"]}]]}}`;
@@ -1411,10 +1412,12 @@ on('clicked:reg_sleep-action', async (info) => {
 
 				// KE
 				computed["kebase"] = KERegTotal;
-				var KEneu = parseInt(values["KE"]);
+				let KEalt = parseInt(values["KE"]);
+				let KEneu = KEalt;
 
 				KEneu += KERegTotal;
 				KEneu = Math.min(KEneu, values["KE_max"]);
+				let KEchange = KEneu - KEalt;
 				if (parseInt(values["KE"]) !== KEneu)
 				{
 					attrsToChange["KE"] = KEneu;
@@ -1428,7 +1431,8 @@ on('clicked:reg_sleep-action', async (info) => {
 				const entrueckungMin = 0;
 				let entrueckungLoss = -Math.floor(computed["duration"] / 2);
 				let entrueckungNeu = parseInt(results["entrueckung"].result);
-				entrueckungNeu += entrueckungLoss;
+				let entrueckungGain = KEchange;
+				entrueckungNeu += entrueckungLoss + entrueckungGain;
 				entrueckungNeu = Math.max(entrueckungMin, entrueckungNeu);
 				if (parseInt(results["entrueckung"].result) !== entrueckungNeu)
 				{
@@ -1437,6 +1441,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				} else {
 					computed["entrueckungchanged"] = 0;
 				}
+				computed["entrueckunggain"] = entrueckungGain;
 				computed["entrueckungloss"] = entrueckungLoss;
 				computed["entrueckung"] = entrueckungNeu;
 			}
@@ -1453,6 +1458,7 @@ on('clicked:reg_sleep-action', async (info) => {
 					"aein",
 					"aeen",
 					"kebase",
+					"entrueckunggain",
 					"entrueckungloss",
 				];
 				let useResults = [
