@@ -304,12 +304,12 @@ const defaultValues = {
 
 	// Regeneration
 	"reg_sleep_le_ko": "@{KO} - 1d20",
-	"reg_sleep_le_fixed": "off",
+	"reg_sleep_le_fixed": -1,
 	"reg_sleep_le_mod_advantages_disadvantages": 0,
 	"reg_sleep_le_mod_food_restriction": 0,
 	"reg_sleep_ae_base": "1d6",
 	"reg_sleep_ae_in": "@{IN} - 1d20",
-	"reg_sleep_ae_fixed": "off",
+	"reg_sleep_ae_fixed": -1,
 	"reg_sleep_ae_mod_advantages_disadvantages": 0,
 	"reg_sleep_ae_mod_special_skills": 0,
 	"reg_sleep_ae_mod_food_restriction": 0,

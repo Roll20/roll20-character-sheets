@@ -6,8 +6,8 @@ on(
 	"change:vorteil_schnelle_heilung_ii " +
 	"change:vorteil_schnelle_heilung_iii ",
 	function(eventInfo) {
-		var attrsToChange = {};
-		var regenerationLevel = 0; // -1 to +3
+		let attrsToChange = {};
+		let regenerationLevel = 0; // -1 to +3
 		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
 
@@ -88,10 +88,10 @@ on(
 				'vorteil_schnelle_heilung_iii',
 				'reg_sleep_spoilt_satisfied'
 			], function(values) {
-			var attrsToChange = {};
+			let attrsToChange = {};
 
 			// Handle "spoilt"
-			var spoilt = 0;
+			let spoilt = 0;
 			if (
 				values["nachteil_verwoehnt"] === "1" &&
 				values["reg_sleep_spoilt_satisfied"] === "0"
@@ -101,7 +101,7 @@ on(
 				spoilt = 0;
 			}
 
-			var regLEKOMod = spoilt;
+			let regLEKOMod = spoilt;
 			// Handle changes to degree of life regeneration
 			if (values["nachteil_schlechte_regeneration"] === "1") {
 				regLEKOMod += 2;
@@ -127,8 +127,8 @@ on(
 	"change:vorteil_astrale_regeneration_ii " +
 	"change:vorteil_astrale_regeneration_iii ",
 	function(eventInfo) {
-		var attrsToChange = {};
-		var regenerationLevel = 0; // -1 to +3
+		let attrsToChange = {};
+		let regenerationLevel = 0; // -1 to +3
 		const sourceType = eventInfo.sourceType;
 
 		if (sourceType === "player") {
@@ -200,10 +200,10 @@ on(
 				'nachteil_heimwehkrank',
 				'reg_sleep_homesickness_away_from_home'
 			], function(values) {
-			var attrsToChange = {};
+			let attrsToChange = {};
 
 			// Handle "homesickness"
-			var homesick = 0;
+			let homesick = 0;
 			if (
 				values["nachteil_heimwehkrank"] === "1" &&
 				values["reg_sleep_homesickness_away_from_home"] === "1"
@@ -228,10 +228,10 @@ on(
 				'nachteil_nahrungsrestriktion',
 				'reg_sleep_food_restriction_violated_duration'
 			], function(values) {
-			var attrsToChange = {};
+			let attrsToChange = {};
 
 			// Handle "food restriction"
-			var restriction = 0;
+			let restriction = 0;
 			if (values["nachteil_nahrungsrestriktion"] === "1")
 			{
 				if (
@@ -291,10 +291,10 @@ on(
 				'vorteil_astrale_regeneration_iii',
 				'reg_sleep_spoilt_satisfied'
 			], function(values) {
-			var attrsToChange = {};
+			let attrsToChange = {};
 
 			// Handle "spoilt"
-			var spoilt = 0;
+			let spoilt = 0;
 			if (
 				values["nachteil_verwoehnt"] === "1" &&
 				values["reg_sleep_spoilt_satisfied"] === "0"
@@ -304,7 +304,7 @@ on(
 				spoilt = 0;
 			}
 
-			var regAEINMod = spoilt;
+			let regAEINMod = spoilt;
 			// Handle changes to degree of life regeneration
 			if (values["nachteil_astraler_block"] === "1") {
 				regAEINMod += 2;
@@ -330,7 +330,7 @@ on(
 	"change:vorteil_immunitaet_gegen_krankheiten_wundfieber " +
 	"change:vorteil_resistenz_gegen_krankheiten_alle ",
 	function(eventInfo) {
-		var attrsToChange = {};
+		let attrsToChange = {};
 		const sourceType = eventInfo.sourceType;
 
 		if (sourceType === "player") {
@@ -358,14 +358,14 @@ on(
 	"change:nachteil_schlafstoerungen_i " +
 	"change:nachteil_schlafstoerungen_ii ",
 	function(eventInfo) {
-		var attrsToChange = {};
+		let attrsToChange = {};
 		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
 		/*
 		Sleep Disorder I has a 25% chance (4 on 1d4) to strike, Sleep Disorder II a 50% chance (2 on 1d2).
 		Effect is is the same in both cases.
 		*/
-		var sleepDisorder = { "trigger": "1d0", "effect": "1d6 - 1" };
+		let sleepDisorder = { "trigger": "1d0", "effect": "1d6 - 1" };
 
 		if (sourceType === "player") {
 			// Handle changes to degree of sleep disorder
@@ -393,10 +393,10 @@ on(
 
 on("change:nachteil_schlafwandler",
 	function(eventInfo) {
-		var attrsToChange = {};
+		let attrsToChange = {};
 		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
-		var effect = 0;
+		let effect = "0";
 		/*
 		Somnambulism has a 25% chance (4 on 1d4) to strike.
 		*/
@@ -429,13 +429,13 @@ on(
 				'reg_sleep_addiction_withdrawal_duration'
 			], function(values) {
 			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
-			var attrsToChange = {};
+			let attrsToChange = {};
 
 			// Handle "addiction"
-			var addiction = 0;
+			let addiction = 0;
 			if (values["nachteil_sucht"] === "1")
 			{
-				var threshold = 15 - parseInt(values["nachteil_sucht_giftstufe"]);
+				let threshold = 15 - parseInt(values["nachteil_sucht_giftstufe"]);
 				if (values["reg_sleep_addiction_withdrawal_duration"] < threshold)
 				{
 					addiction = 0;
@@ -473,7 +473,7 @@ function generateAEBaseMasterlyRegenerationRoll (statValue) {
 	const func = "generateAEBaseMasterlyRegenerationRoll";
 	debugLog(func, "statValue", statValue);
 
-	var roll = parseInt(statValue) / 3;
+	let roll = parseInt(statValue) / 3;
 	if (isNaN(roll))
 	{
 		debugLog(func, "statValue cannot be parsed as integer. Using default value.");
@@ -502,7 +502,7 @@ on(statAttrs.map(attr => "change:" + attr.toLowerCase()).join(" "),
 			if (v["sf_meisterliche_regeneration_leiteigenschaft"] === "@{" + source + "}")
 			{
 				const principalStatValue = eventInfo.newValue;
-				var attrsToChange = {};
+				let attrsToChange = {};
 				attrsToChange["reg_sleep_ae_base"] = generateAEBaseMasterlyRegenerationRoll(principalStatValue);
 
 				debugLog(func, "attrsToChange", attrsToChange);
@@ -522,8 +522,8 @@ on(astralRegenerationAttrs.map(attr => "change:" + attr.toLowerCase()).join(" ")
 		], function(v) {
 		const func = "Action Listener Astral Regeneration";
 		debugLog(func, eventInfo, v);
-		var attrsToChange = {};
-		var regenerationLevel = 0; // 0 to +3
+		let attrsToChange = {};
+		let regenerationLevel = 0; // 0 to +3
 		const stats = {
 			"@{MU}": v["MU"], 
 			"@{KL}": v["KL"], 
@@ -534,7 +534,7 @@ on(astralRegenerationAttrs.map(attr => "change:" + attr.toLowerCase()).join(" ")
 			"@{KO}": v["KO"], 
 			"@{KK}": v["KK"]
 		};
-		var AEBaseRegenerationRoll = "1d6";
+		let AEBaseRegenerationRoll = "1d6";
 		const source = eventInfo.sourceAttribute;
 		const sourceType = eventInfo.sourceType;
 		const mainStat = stats[v["sf_meisterliche_regeneration_leiteigenschaft"]];
@@ -605,7 +605,7 @@ on(
 				'reg_sleep_addiction_withdrawal_effect'
 			], function(values) {
 			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
-			var attrsToChange = {};
+			let attrsToChange = {};
 			const addiction = values["reg_sleep_addiction_withdrawal_effect"];
 			const restriction = values["reg_sleep_food_restriction_effect"];
 
@@ -617,8 +617,8 @@ on(
 				attrsToChange["reg_sleep_le_fixed"] = 0;
 				attrsToChange["reg_sleep_ae_fixed"] = 0;
 			} else {
-				attrsToChange["reg_sleep_le_fixed"] = "off";
-				attrsToChange["reg_sleep_ae_fixed"] = "off";
+				attrsToChange["reg_sleep_le_fixed"] = -1;
+				attrsToChange["reg_sleep_ae_fixed"] = -1;
 			}
 			debugLog(caller, "tail", "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
@@ -671,9 +671,10 @@ on(
 		"gm_roll_opt",
 		"le", "au", "ae", "ke", "entrueckung",
 		"le_max", "au_max", "ae_max", "ke_max",
-		"erschoepfung",
-		"ueberanstrengung",
+		"erschoepfung", "erschoepfung_max", "verstecke_erschoepfung",
+		"ueberanstrengung", "ueberanstrengung_max", "verstecke_ueberanstrengung",
 		"nachteil_sucht_suchtmittel",
+		"nachteil_sucht_giftstufe",
 		"nachteil_verwoehnt",
 		"reg_sleep_le_fixed",
 		"reg_sleep_ae_fixed",
@@ -707,9 +708,10 @@ on(
 			'gm_roll_opt',
 			'LE', 'AU', 'AE', 'KE', 'Entrueckung',
 			'LE_max', 'AU_max', 'AE_max', 'KE_max',
-			'erschoepfung',
-			'ueberanstrengung',
+			'erschoepfung', 'erschoepfung_max', 'verstecke_erschoepfung',
+			'ueberanstrengung', 'ueberanstrengung_max', 'verstecke_ueberanstrengung',
 			'nachteil_sucht_suchtmittel',
+			'nachteil_sucht_giftstufe',
 			'nachteil_verwoehnt',
 			'reg_sleep_le_fixed',
 			'reg_sleep_ae_fixed',
@@ -740,139 +742,238 @@ on(
 		let attrsToChange = {};
 
 		// Combined effect of having astral energy and karma energy
-		let entrueckung = parseInt(values["Entrueckung"]);
-		let AEKERoll = [ "{{aeen=[[0]]}}" ];
-		if (isNaN(entrueckung) === false)
+		let rapture = parseInt(values["Entrueckung"]);
+		let AEKERoll = [ "{{aert=[[0]]}}" ];
+		if (isNaN(rapture) === false)
 		{
-			let aeen = -DSAround(entrueckung / 10);
+			let aert = -DSAround(rapture / 10);
 			// Only add iff there is a visible effect
-			if (aeen !== 0)
+			if (aert !== 0)
 			{
-				AEKERoll = [ `{{aeen=[[${aeen}]]}}` ];
+				AEKERoll = [ `{{aert=[[${aert}]]}}` ];
 			}
 		}
 
 		const rollHead = [
 			values["gm_roll_opt"],
 			"&{template:reg-sleep}",
-		];
-		const baseRoll = [
 			`{{charactername=${values["character_name"]}}}`,
 			`{{duration=[[${values["reg_sleep_duration"]}]]}}`,
+			`{{le=[[${values["LE"]}]]}}`,
 			`{{au=[[${values["AU"]}]]}}`,
-			`{{aumax=[[${values["AU_max"]}]]}}`,
-			"{{auchanged=[[1]]}}",
-			`{{erschoepfung=[[${values["erschoepfung"]}]]}}`,
-			'{{erschoepfungneu=[[0d1]]}}',
-			"{{erschoepfungchanged=[[1]]}}",
-			`{{ueberanstrengung=[[${values["ueberanstrengung"]}]]}}`,
-			'{{ueberanstrengungneu=[[0d1]]}}',
-			"{{ueberanstrengungchanged=[[1]]}}",
-			`{{le=${values["LE"]}}}`,
+			`{{xh=[[${values["erschoepfung"]}]]}}`,
+			`{{ox=[[${values["ueberanstrengung"]}]]}}`,
+			`{{ae=[[${values["AE"]}]]}}`,
+			`{{ke=[[${values["KE"]}]]}}`,
+			`{{rt=[[${values["Entrueckung"]}]]}}`,
+		];
+		const LERoll = [
+			`{{lemax=[[${values["LE_max"]}]]}}`,
+			`{{lefixed=[[${values["reg_sleep_le_fixed"]}]]}}`,
 			`{{lebase=[[1d6 + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für LE-Regeneration](${values["reg_sleep_le_mod_general"]})]]}}`,
 			`{{lead=[[(${values["reg_sleep_le_mod_advantages_disadvantages"]})]]}}`,
 			`{{leko=[[${values["reg_sleep_le_ko"]}]]}}`,
-			"{{leneu=[[0d1]]}}",
-			"{{lechanged=[[1]]}}",
+			"{{lenew=[[0]]}}",
+			"{{lerequired=[[1]]}}",
 		];
-		const durationRoll = [ `{{duration=[[${values["reg_sleep_duration"]}]]}}` ];
+		const noLERoll = [ "{{lerequired=[[0]]}}" ];
+		// sleepDisorderRoll incorporates part of AURoll, leaving out the last element (aurequired)
+		const AURoll = [
+			`{{aumax=[[${values["AU_max"]}]]}}`,
+			`{{aunew=[[0]]}}`,
+			"{{aurequired=[[1]]}}",
+		];
+		const noAURoll = [ "{{aurequired=[[0]]}}" ];
+		const exhaustionRoll = [
+			`{{xhmax=[[${values["erschoepfung_max"]}]]}}`,
+			'{{xhloss=[[0]]}}',
+			'{{xhnew=[[0]]}}',
+			"{{xhrequired=[[1]]}}",
+		];
+		const noExhaustionRoll = [ "{{xhrequired=[[0]]}}" ];
+		const overexertionRoll = [
+			`{{oxmax=[[${values["ueberanstrengung_max"]}]]}}`,
+			'{{oxloss=[[0]]}}',
+			'{{oxnew=[[0]]}}',
+			"{{oxrequired=[[1]]}}",
+		]
+		const noOverexertionRoll = [ "{{oxrequired=[[0]]}}" ];
 		const AERoll = [
-			`{{ae=${values["AE"]}}}`,
+			`{{aemax=[[${values["AE_max"]}]]}}`,
+			`{{aefixed=[[${values["reg_sleep_ae_fixed"]}]]}}`,
 			`{{aebase=[[${values["reg_sleep_ae_base"]} + [allgemeiner Modifikator](${values["reg_sleep_mod_general"]}) + [Modifikator für AE-Regeneration](${values["reg_sleep_ae_mod_general"]})]]}}`,
 			`{{aead=[[${values["reg_sleep_ae_mod_advantages_disadvantages"]}]]}}`,
 			`{{aess=[[${values["reg_sleep_ae_mod_special_skills"]}]]}}`,
 			`{{aein=[[${values["reg_sleep_ae_in"]}]]}}`,
-			"{{aeneu=[[0d1]]}}",
-			"{{aechanged=[[1]]}}",
+			"{{aenew=[[0]]}}",
+			"{{aerequired=[[1]]}}",
 		];
+		const noAERoll = [ "{{aerequired=[[0]]}}" ];
 		const KERoll = [
-			`{{ke=${values["KE"]}}}`,
-			`{{kebase=[[1d1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
-			"{{keneu=[[0d1]]}}",
-			"{{kechanged=[[1]]}}",
-			`{{entrueckung=[[${values["Entrueckung"]}]]}}`,
-			`{{entrueckungloss=[[0]]}}`,
-			`{{entrueckunggain=[[0]]}}`,
-			"{{entrueckungchanged=[[1]]}}",
+			`{{kemax=[[${values["KE_max"]}]]}}`,
+			`{{kebase=[[ 0 + [Basisregeneration] 1 + [Modifikator für KE-Regeneration](${values["reg_sleep_ke_mod_general"]})]]}}`,
+			"{{kenew=[[0]]}}",
+			"{{kerequired=[[1]]}}",
+			`{{rtloss=[[0]]}}`,
+			`{{rtgain=[[0]]}}`,
+			"{{rtnew=[[0]]}}",
+			"{{rtrequired=[[1]]}}",
 		];
-		const homesicknessRoll = `{{heimwehkrank=[[${values["reg_sleep_ae_mod_homesickness"]}]]}}`;
+		const noKERoll = [
+			"{{kerequired=[[0]]}}",
+			"{{rtrequired=[[0]]}}",
+		];
+		const homesicknessRoll = `{{homesick=[[${values["reg_sleep_ae_mod_homesickness"]}]]}}`;
 		const foodRestrictionRoll = [
-			'{{nahrungsrestriktion=[[(@{reg_sleep_food_restriction_effect})]]}}',
+			'{{foodrestriction=[[(@{reg_sleep_food_restriction_effect})]]}}',
 			`{{lefr=[[${values["reg_sleep_le_mod_food_restriction"]}]]}}`,
 			`{{aefr=[[${values["reg_sleep_ae_mod_food_restriction"]}]]}}`
 		];
+		// This incorporates AURoll, so be careful to changes to AURoll
 		const sleepDisorderRoll = [
 			// general decision for triggering sleep disorder or not
-			`{{schlafstoerung=[[${values["reg_sleep_sleep_disorder_trigger"]}]]}}`,
-			// effect of sleep disorder on life regeneration
-			"{{leschlafstoerung=[[(@{reg_sleep_sleep_disorder_effect})]]}}",
-			// effect of sleep disorder on astral regeneration
-			"{{aeschlafstoerung=[[(@{reg_sleep_sleep_disorder_effect})]]}}",
+			`{{sleepdisorder=[[${values["reg_sleep_sleep_disorder_trigger"]}]]}}`,
+			// effect of sleep disorder on life regeneration, "(-1) *", because Roll20 cannot parse the unary minus
+			"{{lesd=[[(-1) * (@{reg_sleep_sleep_disorder_effect})]]}}",
+			// effect of sleep disorder on astral regeneration, "(-1) *", because Roll20 cannot parse the unary minus
+			"{{aesd=[[(-1) * (@{reg_sleep_sleep_disorder_effect})]]}}",
 			// case for showing correct parts in roll template
-			"{{schlafstoerungfall=[[0d1]]}}"
+			"{{sleepdisordercase=[[0]]}}",
+			... AURoll.slice(0,-1),
 		];
 		const sleepDisorderIIRoll = [
-			`{{taw=[[${values["TaW_selbstbeherrschung"]}d1cs0cf2]]}}`,
-			"{{mod=[[7d1cs0cf2]]}}",
+			`{{taw=[[${values["TaW_selbstbeherrschung"]}]]}}`,
+			"{{mod=[[7]]}}",
 			"{{stats=[[ " +
 				`[Eigenschaft 1:] [[${values["Eigenschaft1selbstbeherrschung"]}]]d1cs0cf2 + ` +
 				`[Eigenschaft 2:] [[${values["Eigenschaft2selbstbeherrschung"]}]]d1cs0cf2 + ` +
 				`[Eigenschaft 3:] [[${values["Eigenschaft3selbstbeherrschung"]}]]d1cs0cf2 + ` +
 				"]]}}",
-			`{{selbstbeherrschung=[[3d20cs<${values["cs_talent"]}cf>${values["cf_talent"]}]]}}`,
-			"{{selbstbeherrschungresult=[[0]]}}",
-			"{{selbstbeherrschungcriticality=[[0]]}}",
-			`{{critThresholds=[[[[${values["cs_talent"]}]]d1cs0cf2 + [[${values["cf_talent"]}]]d1cs0cf2]]}}`
+			`{{selfcontrol=[[3d20cs<${values["cs_talent"]}cf>${values["cf_talent"]}]]}}`,
+			"{{selfcontrolresult=[[0]]}}",
+			"{{selfcontrolcriticality=[[0]]}}",
+			`{{critthresholds=[[[[${values["cs_talent"]}]]d1cs0cf2 + [[${values["cf_talent"]}]]d1cs0cf2]]}}`
 		];
-		const somnambulismRoll = "{{schlafwandeln=[[(@{reg_sleep_mod_somnambulism})]]}}";
+		const somnambulismRoll = "{{somnambulism=[[(@{reg_sleep_mod_somnambulism})]]}}";
 		const addictionRoll = [
-			`{{suchteffekt=[[${values["reg_sleep_addiction_withdrawal_effect"]}]]}}`,
-			`{{suchtmittel=${values["nachteil_sucht_suchtmittel"]}}}`
+			`{{addictioneffect=[[${values["reg_sleep_addiction_withdrawal_effect"]}]]}}`,
+			`{{addictionpoisonstrength=[[${values["nachteil_sucht_giftstufe"]}]]}}`,
+			`{{addictiondrug=${values["nachteil_sucht_suchtmittel"]}}}`,
+			'{{xhaddiction=[[0]]}}',
+			'{{oxaddiction=[[0]]}}',
 		];
-		const notrequiredRoll = [
-			"{{notrequired=[[1]]}}"
+		const spoiltRoll = [
+			`{{spoilt=[[${values["nachteil_verwoehnt"]}]]}}`,
+			`{{spoiltsatisfied=[[${values["reg_sleep_spoilt_satisfied"]}]]}}`,
 		];
-		const unusedRoll = [
-			"{{wound=[[2d1]]}}"
+		const nonerequiredRoll = [
+			"{{nonerequired=[[1]]}}"
 		];
 
 		// Build roll
-		var roll = [];
+		let roll = [];
 		roll = roll.concat(rollHead);
-		roll = roll.concat(baseRoll);
-		roll = roll.concat(durationRoll);
 
-		// Additional properties for astral energy regeneration, "0" = not hidden
-		if (values["MagieTab"] === "0")
+		/// LE
+		if (values["LE"] < values["LE_max"])
+		{
+			roll = roll.concat(LERoll);
+		} else {
+			roll = roll.concat(noLERoll);
+		}
+
+		/// AU
+		if (values["AU"] < values["AU_max"])
+		{
+			roll = roll.concat(AURoll);
+		} else {
+			roll = roll.concat(noAURoll);
+		}
+
+		/// Exhaustion
+		const exhaustionMin = 0;
+		const overexertionMin = 0;
+		if (
+			(
+				(values["erschoepfung"] > exhaustionMin)
+				||
+				(values["ueberanstrengung"] > overexertionMin)
+				||
+				(values["reg_sleep_addiction_withdrawal_effect"] !== 0)
+			)
+			&&
+			(values["verstecke_erschoepfung"] !== "1")
+		)
+		{
+			roll = roll.concat(exhaustionRoll);
+		} else {
+			roll = roll.concat(noExhaustionRoll);
+		}
+
+		/// Overexertion
+		if (
+			(
+				(values["ueberanstrengung"] > overexertionMin)
+				||
+				(values["reg_sleep_addiction_withdrawal_effect"] !== 0)
+			)
+			&&
+			(values["verstecke_ueberanstrengung"] !== "1")
+		)
+		{
+			roll = roll.concat(overexertionRoll);
+		} else {
+			roll = roll.concat(noOverexertionRoll);
+		}
+
+		/// Additional properties for astral energy regeneration, "0" = not hidden
+		if (
+			(values["MagieTab"] === "0")
+			&&
+			(values["AE"] < values["AE_max"])
+		)
 		{
 			roll = roll.concat(AERoll);
+		} else {
+			roll = roll.concat(noAERoll);
 		}
 
-		// Additional properties for karma energy regeneration, "0" = not hidden
-		if (values["LiturgienTab"] === "0")
+		/// Additional properties for karma energy regeneration, "0" = not hidden
+		const raptureMin = 0;
+		if (
+			(values["LiturgienTab"] === "0")
+			&&
+			(
+				(values["KE"] < values["KE_max"])
+				||
+				(values["Entrueckung"] > raptureMin)
+			)
+		)
 		{
 			roll = roll.concat(KERoll);
+		} else {
+			roll = roll.concat(noKERoll);
 		}
 
-		// Additional properties for astral energy and karma energy regeneration, "0" = not hidden
+		/// Additional properties for astral energy and karma energy regeneration, "0" = not hidden
 		if ( (values["MagieTab"] === "0") && (values["LiturgienTab"] === "0") )
 		{
 			roll = roll.concat(AEKERoll);
 		}
 
-		// Additional property for homesickness
+		/// Additional property for homesickness
 		if (values["reg_sleep_ae_mod_homesickness"] !== 0)
 		{
 			roll = roll.concat(homesicknessRoll);
 		}
 
-		// Additional property for food restriction
+		/// Additional property for food restriction
 		if (values["reg_sleep_food_restriction_effect"] !== 0)
 		{
 			roll = roll.concat(foodRestrictionRoll);
 		}
 
-		// Additional properties for sleep disorder
+		/// Additional properties for sleep disorder
 		switch(values["reg_sleep_sleep_disorder_trigger"])
 		{
 			case "1d2":
@@ -883,56 +984,80 @@ on(
 				break;
 		}
 
-		// Additional property for somnambulism
+		/// Additional property for somnambulism
 		if (values["reg_sleep_mod_somnambulism"] !== "0")
 		{
 			roll = roll.concat(somnambulismRoll);
 		}
 
-		// Additional properties for addition
-		if (values["reg_sleep_addiction_withdrawal_effect"] !== "0")
+		/// Additional properties for addition
+		if (values["reg_sleep_addiction_withdrawal_effect"] !== 0)
 		{
 			roll = roll.concat(addictionRoll);
 		}
 
-		// Modifications if fixed regeneration
-		if (values["reg_sleep_le_fixed"] !== "off")
+		/// Additional properties for spoilt
+		if (values["nachteil_verwoehnt"] !== "0")
 		{
-			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=[[${values["reg_sleep_le_fixed"]}d1]]}}`;
-			roll[roll.findIndex(value => /leko=/.test(value))] = "{{leko=[[0d1]]}}";
-		}
-		if (values["reg_sleep_ae_fixed"] !== "off")
-		{
-			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=[[${values["reg_sleep_ae_fixed"]}d1]]}}`;
-			roll[roll.findIndex(value => /aein=/.test(value))] = "{{aein=[[0d1]]}}";
+			roll = roll.concat(spoiltRoll);
 		}
 
-		// Regeneration required?
-		const erschoepfungMin = 0;
-		const ueberanstrengungMin = 0;
-		const entrueckungMin = 0;
+		/// Modifications if fixed regeneration
+		if (values["reg_sleep_le_fixed"] !== -1)
+		{
+			roll[roll.findIndex(value => /lebase=/.test(value))] = `{{lebase=[[${values["reg_sleep_le_fixed"]}]]}}`;
+			roll[roll.findIndex(value => /leko=/.test(value))] = "{{leko=[[0]]}}";
+		}
+		if (values["reg_sleep_ae_fixed"] !== -1)
+		{
+			roll[roll.findIndex(value => /aebase=/.test(value))] = `{{aebase=[[${values["reg_sleep_ae_fixed"]}]]}}`;
+			roll[roll.findIndex(value => /aein=/.test(value))] = "{{aein=[[0]]}}";
+		}
+
+		/// Regeneration required?
 		if (
 			(parseInt(values["LE"]) >= parseInt(values["LE_max"]))
 			&&
 			(parseInt(values["AU"]) >= parseInt(values["AU_max"]))
 			&&
-			(parseInt(values["AE"]) >= parseInt(values["AE_max"]))
+			(
+				(parseInt(values["AE"]) >= parseInt(values["AE_max"]))
+				||
+				(values["MagieTab"] === "1")
+			)
 			&&
-			(parseInt(values["KE"]) >= parseInt(values["KE_max"]))
+			(
+				(parseInt(values["KE"]) >= parseInt(values["KE_max"]))
+				||
+				(values["LiturgienTab"] === "1")
+			)
 			&&
-			(parseInt(values["erschoepfung"]) === erschoepfungMin)
+			(
+				(parseInt(values["erschoepfung"]) === exhaustionMin)
+				||
+				(values["verstecke_erschoepfung"] === "1")
+			)
 			&&
-			(parseInt(values["ueberanstrengung"]) === ueberanstrengungMin)
+			(
+				(parseInt(values["ueberanstrengung"]) === overexertionMin)
+				||
+				(values["verstecke_ueberanstrengung"] === "1")
+			)
 			&&
-			(parseInt(values["Entrueckung"]) === entrueckungMin)
+			(
+				(parseInt(values["Entrueckung"]) === raptureMin)
+				||
+				(values["LiturgienTab"] === "1")
+			)
 			&&
 			(values["reg_sleep_sleep_disorder_trigger"] === "1d0")
+			&&
+			(parseInt(values["reg_sleep_addiction_withdrawal_effect"]) === 0)
 		)
 		{
 			roll = [];
 			roll = roll.concat(rollHead);
-			roll = roll.concat(notrequiredRoll);
-			roll = roll.concat(durationRoll);
+			roll = roll.concat(nonerequiredRoll);
 		}
 
 		// Finishing
@@ -943,98 +1068,129 @@ on(
 });
 
 on('clicked:reg_sleep-action', async (info) => {
+	// Boilerplate
 	const caller = "Action Listener for Regeneration Button (Sleep)";
-	results = await startRoll("@{reg_sleep_roll}");
-	debugLog(caller, "head", "info:", info, "results:", results);
-	var rollID = results.rollId;
-	var results = results.results;
+	let computed = {};
+	let attrsToChange = {};
 
-	if (Object.hasOwn(results, "notrequired"))
+	// Roll
+	let results = await startRoll("@{reg_sleep_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+
+	// Convenience
+	let rollID = results.rollId;
+
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results["results"])
 	{
+		resultsOnly[property] = results["results"][property].result;
+	}
+	Object.freeze(resultsOnly);
+
+	// Fast Decision
+	if (Object.hasOwn(resultsOnly, "nonerequired"))
+	{
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
 		finishRoll(rollID);
 	} else {
-		var computed = { "duration": results["duration"]["result"] };
-
+		// Sleep Disorder
 		/* Sleep Disorder 2 can have convoluted consequences
-		If the sleep disorder did not trigger, the character needs to roll a
-		self-control check +7.
+		If the sleep disorder did not trigger, the character needs to roll a self-control check +7.
 		If the check succeeds, normal regeneration takes place.
 		If the check fails, reduced regeneration takes place.
+		If the sleep disorder triggers, reduced regeneration takes place.
 
-		This requires CRP and reaction rolls:
-			Sleep Disorder 2 triggered -> no reaction required (results = regeneration results)
-			Sleep Disorder 2 did not trigger
-				-> normal result not shown
-				-> results for both cases calculated
-				-> results for both cases passed to "reaction" roll
-				-> self-control +7 -> roll + regeneration results (stored from initial roll)
+		Algorithm:
+			Determine the sleep disorder level (0, 1 or 2)
+			Determine the triggered state of the sleep disorder (based on the highest roll result)
+			Evaluate the self-control check (if available)
+			Apply the self-control results to sleep duration (and thereby also exhaustion and overexertion), LE, AU and AE regeneration
 		*/
-		if (Object.hasOwn(results, "schlafstoerungfall"))
+		/// Always relevant, because negative effects limit stamina to 3/4 (no constant, so it can be changed later)
+		const sleepDisorderAULimitActive = 3/4
+		const sleepDisorderAULimitInactive = 1;
+		let sleepDisorderAULimit = sleepDisorderAULimitInactive;
+		let sleepDisorderResult = 0;
+		let sleepDisorder = {"level": 0, "triggered": -1};
+
+		/// Level (of sleep disorder) and case (triggered)
+		//// triggered
+		//// 	-1 not triggered (no sleep disorder)
+		//// 	0 not triggered (sleep disorder)
+		//// 	1 (triggered)
+		//// 	2 (triggered, but self-control check allowed; only sleep disorder 2)
+		if (Object.hasOwn(resultsOnly, "sleepdisordercase"))
 		{
-			var sleepDisorder = {"level": 0, "triggered": -1};
-
+			const sleepDisorderDice = { "1d0": 0, "1d4": 1, "1d2": 2 };
+			let expression = results.results["sleepdisorder"]["expression"] ?? 0;
+			let result = resultsOnly["sleepdisorder"] ?? 1;
+			let level = 0;
+			let triggered = -1;
+			if (expression !== 0)
 			{
-				const sleepDisorderDice = { "1d0": 0, "1d4": 1, "1d2": 2 };
-				let expression = results["schlafstoerung"]["expression"] ?? 0;
-				let result = results["schlafstoerung"]["result"] ?? 1;
-				let level = 0;
-				let triggered = -1;
-				if (expression !== 0)
-				{
-					level = sleepDisorderDice[expression];
-				} else {
-					level = 0;
-				}
-
-				switch(level)
-				{
-					case 0:
-						triggered = -1;
-						break;
-					case 1:
-						if (result === 4)
-						{
-							triggered = 1;
-						} else {
-							triggered = 0;
-						}
-						break;
-					case 2:
-						if (result === 2)
-						{
-							triggered = 1;
-						} else {
-							triggered = 2;
-						}
-						break;
-					default:
-						triggered = -1;
-				}
-
-				sleepDisorder["level"] = level;
-				sleepDisorder["triggered"] = triggered;
+				level = sleepDisorderDice[expression];
+			} else {
+				level = 0;
 			}
-			computed["schlafstoerungfall"] = sleepDisorder["triggered"];
+
+			switch(level)
+			{
+				case 0:
+					triggered = -1;
+					sleepDisorderAULimit = sleepDisorderAULimitInactive;
+					break;
+				case 1:
+					if (result === 4)
+					{
+						triggered = 1;
+						sleepDisorderAULimit = sleepDisorderAULimitActive;
+					} else {
+						triggered = 0;
+						sleepDisorderAULimit = sleepDisorderAULimitInactive;
+					}
+					break;
+				case 2:
+					if (result === 2)
+					{
+						triggered = 1;
+						sleepDisorderAULimit = sleepDisorderAULimitActive;
+					} else {
+						triggered = 2;
+					}
+					break;
+				default:
+					triggered = -1;
+					sleepDisorderAULimit = sleepDisorderAULimitInactive;
+			}
+
+			sleepDisorder["level"] = level;
+			sleepDisorder["triggered"] = triggered;
+			computed["sleepdisordercase"] = sleepDisorder["triggered"];
 		}
 
 		// Process potential self-control roll for sleep disorder
-		if (Object.hasOwn(results, "selbstbeherrschung"))
+		if (
+			(Object.hasOwn(resultsOnly, "selfcontrol"))
+			&&
+			(sleepDisorder["triggered"] === 2)
+		)
 		{
-			var TaW = results.taw.result;
-			var mod = results.mod.result;
-			var stats = [
-				results.stats.rolls[0].dice,
-				results.stats.rolls[1].dice,
-				results.stats.rolls[2].dice
+			let TaW = resultsOnly["taw"];
+			let mod = resultsOnly["mod"];
+			let stats = [
+				results.results.stats.rolls[0].dice,
+				results.results.stats.rolls[1].dice,
+				results.results.stats.rolls[2].dice
 			];
-			var rolls = results.selbstbeherrschung.rolls[0].results;
-			var success = results.critThresholds.rolls[0].dice;
-			var failure = results.critThresholds.rolls[1].dice;
+			let rolls = results.results.selfcontrol.rolls[0].results;
+			let success = results.results.critthresholds.rolls[0].dice;
+			let failure = results.results.critthresholds.rolls[1].dice;
 			/* Result
 			0	Failure
 			1	Success
 			*/
-			var result = 0;
+			let result = 0;
 			/* Criticality
 			-3	Triple 20
 			-2	Double 20
@@ -1042,7 +1198,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			+2	Double 1
 			+3	Triple 1
 			*/
-			var criticality = 0;
+			let criticality = 0;
 
 			/*
 				Doppel/Dreifach-1/20-Berechnung
@@ -1071,9 +1227,9 @@ on('clicked:reg_sleep-action', async (info) => {
 			/*
 				TaP*-Berechnung
 			*/
-			var effRolls = rolls;
-			var effTaW = TaW - mod;
-			var TaPstar = effTaW;
+			let effRolls = rolls;
+			let effTaW = TaW - mod;
+			let TaPstar = effTaW;
 
 			// Negativer TaW: |effTaW| zu Teilwürfen addieren
 			if (criticality >= 2)
@@ -1107,392 +1263,609 @@ on('clicked:reg_sleep-action', async (info) => {
 					result = 0;
 				}
 			}
-			computed["selbstbeherrschung"] = TaPstar;
-			computed["selbstbeherrschungresult"] = result;
-			computed["selbstbeherrschungcriticality"] = criticality;
+
+			// Finish
+			sleepDisorderResult = result;
+			if (sleepDisorderResult === 0)
+			{
+				sleepDisorderAULimit = sleepDisorderAULimitActive;
+			} else {
+				sleepDisorderAULimit = sleepDisorderAULimitInactive;
+			}
+			computed["selfcontrol"] = TaPstar;
+			computed["selfcontrolresult"] = result;
+			computed["selfcontrolcriticality"] = criticality;
 			computed["stats"] = stats.toString().replaceAll(",", "/");
 		}
 
-		safeGetAttrs(
-			[
-				'LE', 'AE', 'KE',
-				'LE_max', 'AE_max', 'KE_max',
-				'reg_sleep_le_fixed',
-				'reg_sleep_ae_fixed',
-				'nachteil_verwoehnt',
-				'reg_sleep_spoilt_satisfied'
-			], function(values) {
-			var attrsToChange = {};
-
-			// Sleep Duration
-			// Sleeping disorder reduces the sleep time, rules are not comprehensive
-			// Default sleep duration: 6 h, shortened to 4 h (according to rules)
-			// Apply that to longer durations as well (no rules)
-			// What happens for sleep duration < 6 h? (no rules) -> 2/3
-			if (
-				Object.hasOwn(results, "schlafstoerungfall") &&
+		// Sleep Duration
+		// Sleeping disorder reduces the sleep time, rules are not comprehensive
+		// Default sleep duration: 6 h, shortened to 4 h (according to rules)
+		// Apply that to longer durations as well (no rules)
+		// What happens for sleep duration < 6 h? (no rules) -> 2/3, rounded down to full hours
+		let duration = resultsOnly["duration"];
+		if (
+			Object.hasOwn(resultsOnly, "sleepdisordercase") &&
+			(
+				sleepDisorder["triggered"] === 1 ||
 				(
-					sleepDisorder["triggered"] === 1 ||
-					(
-						sleepDisorder["triggered"] === 2 &&
-						computed["selbstbeherrschungresult"] === 0
-					)
+					sleepDisorder["triggered"] === 2 &&
+					computed["selfcontrolresult"] === 0
 				)
 			)
+		)
+		{
+			if (resultsOnly["duration"] >= 6)
 			{
-				if (results["duration"]["result"] >= 6)
-				{
-					computed["duration"] = 4;
-				} else {
-					computed["duration"] = Math.floor(results["duration"]["result"] * 2 / 3);
-				}
+				duration = 4;
+			} else {
+				duration = Math.floor(resultsOnly["duration"] * 2 / 3);
 			}
+		}
+		computed["duration"] = duration;
 
-			// AU/exhaustion/overexertion/LE Regeneration
-			// Regeneration Order: Overexertion, Exhaustion
-			// As long as there is overexertion, there cannot be exhaustion regeneration
-			let exhaustionNeu = results["erschoepfung"]["result"];
-			let overexertionNeu = results["ueberanstrengung"]["result"];
+		// LE
+		/// Preparation
+		let LERegTotal = 0;
+		let LENew = resultsOnly["le"];
+		let LEChanged = resultsOnly["lerequired"];
 
-			// Hourly regeneration rates
-			const exhaustionReg = -4;
-			const overexertionReg = -2;
+		if (LEChanged === 1 && duration > 0)
+		{
 
-			var LERegTotal = 0;
-			var LEneu = parseInt(values["LE"]);
-
-			if (values["reg_sleep_le_fixed"] === "off")
+			// No need for calculations in case the regeneration is fixed
+			/// Calculate the total amount of regeneration from all sources
+			if (resultsOnly["lefixed"] === -1)
 			{
-				for (let hour = 0; hour < computed["duration"]; hour++)
-				{
-					if (overexertionNeu > 0)
-					{
-						overexertionNeu += overexertionReg;
-					} else if (exhaustionNeu > 0) {
-						exhaustionNeu += exhaustionReg;
-					} else {
-						break;
-					}
-				}
-
-				// Cap at 0
-				exhaustionNeu = Math.max(0, exhaustionNeu);
-				overexertionNeu = Math.max(0, overexertionNeu);
-
-				computed["erschoepfungneu"] = exhaustionNeu;
-				computed["ueberanstrengungneu"] = overexertionNeu;
-
-				// Change only if regeneration actually changed something
-				// Stamina will always be full even after 1 h
-				if (parseInt(results["au"]["result"]) !== parseInt(results["aumax"]["result"]))
-				{
-					attrsToChange["AU"] = results["aumax"]["result"];
-					computed["au"] = results["aumax"]["result"];
-					computed["auchanged"] = 1;
-				} else {
-					computed["auchanged"] = 0;
-				}
-				if (parseInt(results["erschoepfung"]["result"]) !== exhaustionNeu)
-				{
-					attrsToChange["erschoepfung"] = exhaustionNeu;
-					computed["erschoepfungchanged"] = 1;
-				} else {
-					computed["erschoepfungchanged"] = 0;
-				}
-				if (parseInt(results["ueberanstrengung"]["result"]) !== overexertionNeu)
-				{
-					attrsToChange["ueberanstrengung"] = overexertionNeu;
-					computed["ueberanstrengungchanged"] = 1;
-				} else {
-					computed["ueberanstrengungchanged"] = 0;
-				}
-
 				// Base regeneration
-				LERegTotal = results["lebase"].result;
-				computed["lebase"] = LERegTotal;
+				LERegTotal = resultsOnly["lebase"];
 
 				// Regeneration from advantages/disadvantages
-				computed["lead"] = results["lead"].result;
-				LERegTotal += results["lead"].result;
+				LERegTotal += resultsOnly["lead"];
 
 				// Additional regeneration from KO check
-				var LEKO = 0;
-				if (results["leko"].result >= 0) {
+				/// It's usually 1 or 0 depending on the check result, except when your spoilt, then it can also be -1
+				let LEKO = 0;
+				if (resultsOnly["leko"] >= 0) {
 					LEKO = 1;
 				} else {
-					if (values["nachteil_verwoehnt"] === "1" && values["reg_sleep_spoilt_satisfied"] === "0") {
+					if (resultsOnly["spoilt"] === 1 && resultsOnly["spoiltsatisfied"] === 0) {
 						LEKO = -1;
 					} else {
 						LEKO = 0;
 					}
 				}
-				computed["leko"] = LEKO;
 				LERegTotal += LEKO;
 
 				// Regeneration from food restrction
-				if (Object.hasOwn(results, "lefr"))
+				if (Object.hasOwn(resultsOnly, "lefr"))
 				{
-					LERegTotal += results["lefr"].result;
+					LERegTotal += resultsOnly["lefr"];
 				}
 
 				// Sleep disorder
 				if (
-					Object.hasOwn(results, "schlafstoerungfall") &&
+					Object.hasOwn(resultsOnly, "sleepdisordercase") &&
 					(
 						sleepDisorder["triggered"] === 1 ||
 						(
 							sleepDisorder["triggered"] === 2 &&
-							computed["selbstbeherrschungresult"] === 0
+							computed["selfcontrolresult"] === 0
 						)
 					)
 				)
 				{
-					// Roll is positive, but convention dictates regenerations reductions to be negative
-					results["leschlafstoerung"]["result"] = -results["leschlafstoerung"]["result"];
-					LERegTotal += results["leschlafstoerung"]["result"];
+					LERegTotal += resultsOnly["lesd"];
 				}
 
 				// Somnambulism
-				if (Object.hasOwn(results, "schlafwandeln"))
+				if (Object.hasOwn(resultsOnly, "somnambulism"))
 				{
-					LERegTotal += parseInt(results["schlafwandeln"]["result"]);
+					LERegTotal += resultsOnly["somnambulism"];
+				}
+
+				// Finish
+				computed["lebase"] = resultsOnly["lebase"];
+				computed["lead"] = resultsOnly["lead"];
+				computed["leko"] = LEKO;
+			} else {
+				// required for roll template
+				computed["lebase"] = resultsOnly["lefixed"];
+				computed["lead"] = 0;
+				computed["leko"] = 0;
+				LERegTotal = resultsOnly["lefixed"];
+			}
+			LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
+		} else if (LEChanged === 1 && duration === 0) {
+			// No sleep, no regeneration
+			LERegTotal = 0;
+			computed["lebase"] = 0;
+			computed["lead"] = 0;
+			computed["leko"] = 0;
+			LEChanged = 0;
+		}
+		/// Finish
+		LENew += LERegTotal;
+		LENew = Math.min(LENew, resultsOnly["lemax"]);
+		if (LEChanged === 1)
+		{
+			computed["lenew"] = LENew;
+			attrsToChange["LE"] = LENew;
+		}
+
+		// AU
+		/// Preparation
+		const AU = resultsOnly["au"];
+		const AUMax = resultsOnly["aumax"];
+		let AUNew = AU;
+		let AUChanged = 0;
+
+		if (
+			(
+				(resultsOnly["aurequired"] === 1)
+				||
+				(Object.hasOwn(resultsOnly, "sleepdisordercase"))
+			)
+			&&
+			(duration > 0)
+		)
+		{
+			// Calculations
+			AUNew = DSAround(sleepDisorderAULimit * AUMax);
+			AUChanged = 1;
+		} else if (
+			(
+				(resultsOnly["aurequired"] === 1)
+				||
+				(Object.hasOwn(resultsOnly, "sleepdisordercase"))
+			)
+			&&
+			(duration === 0)
+		)
+		{
+			AUNew = AU;
+			AUChanged = 1;
+		}
+		/// Finish
+		if (AUChanged === 1)
+		{
+			computed["aurequired"] = AUChanged;
+			computed["aunew"] = AUNew;
+			attrsToChange["AU"] = AUNew;
+		}
+
+		// Exhaustion or Overexertion
+		/// Preparations
+		const exhaustion = resultsOnly["xh"];
+		const exhaustionMax = resultsOnly["xhmax"];
+		const exhaustionMin = 0;
+		const overexertion = resultsOnly["ox"];
+		const overexertionMax = resultsOnly["oxmax"];
+		const overexertionMin = 0;
+		let exhaustionNew = 0;
+		let exhaustionLoss = 0;
+		let exhaustionAddiction = 0;
+		let exhaustionChanged = 0;
+		let overexertionNew = 0;
+		let overexertionLoss = 0;
+		let overexertionAddiction = 0;
+		let overexertionChanged = 0;
+
+		/// Regeneration can only take place if not under severe food restriction or even mild addiction withdrawal
+		if (
+			(duration > 0)
+			&&
+			(
+				(resultsOnly["xhrequired"] === 1)
+				||
+				(resultsOnly["oxrequired"] === 1)
+			)
+		)
+		{
+			// Determine regeneration case
+			// from good to bad: normal (reduction), foodrestricted (no reduction), withdrawal (buildup)
+			/// Preparation
+			let regCase = "normal";
+
+			if (
+				(Object.hasOwn(resultsOnly, "foodrestriction"))
+				&&
+				(resultsOnly["foodrestriction"] === 2)
+			)
+			{
+				regCase = "foodrestricted";
+			}
+
+			if (
+				(Object.hasOwn(resultsOnly, "addictioneffect"))
+				&&
+				(resultsOnly["addictioneffect"] !== 0)
+			)
+			{
+				regCase = "withdrawal";
+			}
+
+			// Handle regeneration cases
+			exhaustionNew = exhaustion;
+			overexertionNew = overexertion;
+			switch(regCase)
+			{
+				case "normal":
+					// Regeneration Order: Overexertion, Exhaustion
+					// As long as there is overexertion, there cannot be exhaustion regeneration
+					/// Take into account that people can turn off exhaustion but keep overexertion turned on
+					/// In case both are disabled, nothing happens (see checks below).
+					/// If only overexertion is disabled, exhaustion changes accordingly, excess exhaustion will be lost.
+					/// If only exhaustion is disabled, use overexertion like it's exhaustion.
+
+					// Hourly regeneration rates
+					const exhaustionReg = -4;
+					const overexertionReg = -2;
+
+					// Calculations
+					if (resultsOnly["xhrequired"] === 1 & resultsOnly["oxrequired"] === 0)
+					{
+						overexertionNew = 0;
+					} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 1) {
+						exhaustionNew = 0;
+					} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 0) {
+						exhaustionNew = 0;
+						overexertionNew = 0;
+					}
+					for (let hour = 0; hour < duration; hour++)
+					{
+						if (overexertionNew > 0)
+						{
+							overexertionNew += overexertionReg;
+							overexertionChanged = 1;
+						} else if (exhaustionNew > 0) {
+							exhaustionNew += exhaustionReg;
+							exhaustionChanged = 1;
+						} else {
+							break;
+						}
+					}
+
+					// Cap at 0
+					exhaustionNew = Math.max(0, exhaustionNew);
+					overexertionNew = Math.max(0, overexertionNew);
+
+					// Finish
+					exhaustionLoss = exhaustionNew - exhaustion;
+					overexertionLoss = overexertionNew - overexertion;
+					break;
+				case "foodrestricted":
+					const foodRestrictionRegeneration = 0;
+					exhaustionLoss = foodRestrictionRegeneration;
+					overexertionLoss = foodRestrictionRegeneration;
+					break;
+				case "withdrawal":
+					// Preparations
+					const withdrawalMild = 1/3;
+					const withdrawalSevere = 1/2;
+					const toxicity = resultsOnly["addictionpoisonstrength"];
+					let exhaustionGain = 0;
+
+					// Calculate addiction effect
+					if (resultsOnly["addictioneffect"] === 1)
+					{
+						exhaustionGain = DSAround(toxicity * withdrawalMild);
+					} else {
+						exhaustionGain = DSAround(toxicity * withdrawalSevere);
+					}
+
+					// Apply addiction effect
+					/// Take into account that people can turn off exhaustion but keep overexertion turned on
+					/// In case both are disabled, nothing happens (see checks below).
+					/// If only overexertion is disabled, exhaustion changes accordingly, excess exhaustion will be lost.
+					/// If only exhaustion is disabled, use overexertion like it's exhaustion.
+					if (resultsOnly["oxrequired"] === 1 && resultsOnly["xhrequired"] === 0)
+					{
+						exhaustionNew = overexertionNew;
+					}
+					exhaustionNew += exhaustionGain;
+					exhaustionChanged = 1;
+
+					let excessExhaustion = Math.max(0, exhaustionNew - exhaustionMax);
+					if (exhaustionNew > exhaustionMax)
+					{
+						overexertionNew += excessExhaustion;
+						overexertionChanged = 1;
+						overexertionNew = Math.min(overexertionNew, overexertionMax);
+						exhaustionNew = Math.min(exhaustionNew, exhaustionMax);
+					}
+
+					// Finish
+					exhaustionAddiction = Math.max(0, exhaustionNew - exhaustion);
+					if (resultsOnly["oxrequired"] === 1)
+					{
+						if (resultsOnly["xhrequired"] === 1)
+						{
+							overexertionAddiction = excessExhaustion;
+						} else {
+							overexertionAddiction = exhaustionAddication;
+							exhaustionAddiction = exhaustionMin;
+						}
+					} else {
+						overexertionAddiction = overexertionMin;
+					}
+					break;
+				default:
+					debugLog(caller, "Default case of exhaustion/overexertion regCase triggered. Should not happen.");
+					break;
+			}
+		} else if (
+			(duration === 0)
+			&&
+			(
+				(resultsOnly["xhrequired"] === 1)
+				||
+				(resultsOnly["oxrequired"] === 1)
+			)
+		)
+		{
+			exhaustionNew = exhaustion;
+			overexertionNew = overexertion;
+		}
+		/// Finish
+		/// Show exhaustion if there is overexertion even if no regeneration took place
+		if (
+			(
+				(exhaustionChanged === 1)
+				||
+				(overexertionChanged === 1)
+			)
+			&&
+			(resultsOnly["xhrequired"] === 1)
+		)
+		{
+			computed["xhnew"] = exhaustionNew;
+			computed["xhloss"] = exhaustionLoss;
+			computed["xhaddiction"] = exhaustionAddiction;
+			attrsToChange["erschoepfung"] = exhaustionNew;
+		}
+		if (overexertionChanged === 1 && resultsOnly["oxrequired"] === 1)
+		{
+			computed["oxnew"] = overexertionNew;
+			computed["oxloss"] = overexertionLoss;
+			computed["oxaddiction"] = overexertionAddiction;
+			attrsToChange["ueberanstrengung"] = overexertionNew;
+		}
+
+		// AE
+		/// Preparation
+		let AERegTotal = 0;
+		let AEBase = 0;
+		let AEAD = 0;
+		let AESS = 0;
+		let AEIN = 0;
+		let AERT = 0;
+		let AENew = resultsOnly["ae"];
+
+		if (resultsOnly["aerequired"] === 1 && duration > 0)
+		{
+			// No need for calculations in case the regeneration is fixed
+			/// Calculate the total amount of regeneration from all sources
+			if (resultsOnly["aefixed"] === -1)
+			{
+				// Base regeneration
+				AEBase = resultsOnly["aebase"];
+				AERegTotal = AEBase;
+
+				// Regeneration from advantages/disadvantages
+				AEAD = resultsOnly["aead"];
+				AERegTotal += AEAD;
+
+				// Regeneration from special skills
+				AESS = resultsOnly["aess"];
+				AERegTotal += AESS;
+
+				// Additional regeneration from IN check
+				/// It's usually 1 or 0 depending on the check result, except when your spoilt, then it can also be -1
+				if (resultsOnly["aein"] >= 0) {
+					AEIN = 1;
+				} else {
+					if (resultsOnly["spoilt"] === 1 && resultsOnly["spoiltsatisfied"] === 0) {
+						AEIN = -1;
+					} else {
+						AEIN = 0;
+					}
+				}
+				AERegTotal += AEIN;
+
+				// Rapture reduces astral energy regeneration
+				if (Object.hasOwn(resultsOnly, "aert"))
+				{
+					AERT = resultsOnly["aert"];
+					AERegTotal += AERT;
+				}
+
+				// Regeneration from homesickness
+				if (Object.hasOwn(resultsOnly, "homesick"))
+				{
+					AERegTotal += resultsOnly["homesick"];
+				}
+
+				// Regeneration from food restriction
+				if (Object.hasOwn(resultsOnly, "aefr"))
+				{
+					AERegTotal += resultsOnly["aefr"];
+				}
+
+				// Sleep disorder
+				if (
+					Object.hasOwn(resultsOnly, "sleepdisordercase") &&
+					(
+						sleepDisorder["triggered"] === 1 ||
+						(
+							sleepDisorder["triggered"] === 2 &&
+							computed["selfcontrolresult"] === 0
+						)
+					)
+				)
+				{
+					AERegTotal += resultsOnly["aesd"];
+				}
+
+				// Somnambulism
+				if (Object.hasOwn(resultsOnly, "somnambulism"))
+				{
+					AERegTotal += resultsOnly["somnambulism"];
 				}
 			} else {
 				// required for roll template
-				computed["lebase"] = { "result": parseInt(values["reg_sleep_le_fixed"]) };
-				computed["lead"] = 0;
-				computed["leko"] = 0;
-				LERegTotal = parseInt(values["reg_sleep_le_fixed"]);
+				AEBase = resultsOnly["aefixed"];
+				AEAD = 0;
+				AESS = 0;
+				AEIN = 0;
+				AERT = 0;
+				AERegTotal = resultsOnly["aefixed"];
 			}
-			LERegTotal = Math.max(LERegTotal, regLimitLower["le"]);
-
+			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
+		} else if (resultsOnly["aerequired"] === 1 && duration === 0)
+		{
 			// No sleep, no regeneration
-			if (computed["duration"] === 0)
+			AERegTotal = 0;
+			AEBase = 0;
+			AEAD = 0;
+			AESS = 0;
+			AEIN = 0;
+			AERT = 0;
+		}
+		/// Finish
+		if (resultsOnly["aerequired"] === 1)
+		{
+			AENew += AERegTotal;
+			AENew = Math.min(AENew, resultsOnly["aemax"]);
+			computed["aebase"] = AEBase;
+			computed["aead"] = AEAD;
+			computed["aess"] = AESS;
+			computed["aein"] = AEIN;
+			computed["aert"] = AERT;
+			computed["aenew"] = AENew;
+			attrsToChange["AE"] = AENew;
+		}
+
+		// KE and Rapture
+		const KEOld = resultsOnly["ke"];
+		let KERegTotal = 0;
+		let KENew = KEOld;
+		let raptureNew = resultsOnly["rt"];
+		let raptureLoss = 0;
+		let raptureGain = 0;
+
+		if (
+			(duration > 0)
+			&&
+			(resultsOnly["kerequired"] === 1)
+			&&
+			(resultsOnly["rtrequired"] === 1)
+		)
+		{
+			// KE
+			/// Calculations
+			KERegTotal += resultsOnly["kebase"];
+			KERegTotal = Math.max(0, KERegTotal);
+			KENew += KERegTotal;
+			KENew = Math.min(KENew, resultsOnly["kemax"]);
+			let KEChange = KENew - KEOld;
+
+			// Rapture
+			/// Preparation
+			const raptureMin = 0;
+
+			/// Calculations
+			raptureLoss = -Math.floor(computed["duration"] / 2);
+			raptureGain = Math.abs(KEChange);
+			raptureNew += raptureLoss + raptureGain;
+			raptureNew = Math.max(raptureMin, raptureNew);
+		} else if (
+			(duration === 0)
+			&&
+			(resultsOnly["kerequired"] === 1)
+			&&
+			(resultsOnly["rtrequired"] === 1)
+		)
+		{
+			KERegTotal = 0;
+			KENew = resultsOnly["ke"];
+			raptureGain = 0;
+			raptureLoss = 0;
+			raptureNew = resultsOnly["rt"];
+		}
+		/// Finish
+		if (resultsOnly["kerequired"] === 1 && resultsOnly["rtrequired"] === 1)
+		{
+			computed["kebase"] = KERegTotal;
+			computed["kenew"] = KENew;
+			computed["rtgain"] = raptureGain;
+			computed["rtloss"] = raptureLoss;
+			computed["rtnew"] = raptureNew;
+			attrsToChange["KE"] = KENew;
+			attrsToChange["Entrueckung"] = raptureNew;
+		}
+
+		// Prettify certain output
+		{
+			let useComputed = [
+				"lebase",
+				"lead",
+				"leko",
+				"xhloss",
+				"xhaddiction",
+				"oxloss",
+				"oxaddiction",
+				"aebase",
+				"aead",
+				"aess",
+				"aein",
+				"aert",
+				"kebase",
+				"rtgain",
+				"rtloss",
+			];
+			for (let part of useComputed)
 			{
-				LERegTotal = 0;
-				computed["au"] = results["au"]["result"];
-				delete attrsToChange["AU"];
-				computed["erschoepfungneu"] = results["erschoepfung"]["result"];
-				delete attrsToChange["erschoepfung"];
-				computed["ueberanstrengungneu"] = results["ueberanstrengung"]["result"];
-				delete attrsToChange["ueberanstrengung"];
-				computed["lebase"] = 0;
-				computed["lead"] = 0;
-				computed["leko"] = 0;
-			}
-			LEneu += LERegTotal;
-			LEneu = Math.min(LEneu, values["LE_max"]);
-			if (parseInt(values["LE"]) !== LEneu)
-			{
-				attrsToChange["LE"] = LEneu;
-				computed["lechanged"] = 1;
-			} else {
-				computed["lechanged"] = 0;
-			}
-			computed["leneu"] = LEneu;
-
-			// AE Regeneration
-			var AERegTotal = 0;
-			var AEneu = parseInt(values["AE"]);
-
-			if (results["aebase"])
-			{
-				if (values["reg_sleep_ae_fixed"] === "off")
+				if (Object.hasOwn(computed, part))
 				{
-					// Base regeneration
-					AERegTotal = results["aebase"].result;
-					computed["aebase"] = AERegTotal;
-
-					// Regeneration from advantages/disadvantages
-					computed["aead"] = results["aead"].result;
-					AERegTotal += results["aead"].result;
-
-					// Regeneration from special skills
-					computed["aess"] = results["aess"].result;
-					AERegTotal += results["aess"].result;
-
-					// Additional regeneration from IN check
-					var AEIN = 0;
-					if (results["aein"].result >= 0) {
-						AEIN = 1;
-					} else {
-						if (values["nachteil_verwoehnt"] === "1" && values["reg_sleep_spoilt_satisfied"] === "0") {
-							AEIN = -1;
-						} else {
-							AEIN = 0;
-						}
-					}
-					computed["aein"] = AEIN;
-					AERegTotal += AEIN;
-
-					// Rapture reduces astral energy regeneration
-					if (Object.hasOwn(results, "aeen"))
-					{
-						computed["aeen"] = results["aeen"].result;
-						AERegTotal += results["aeen"].result;
-					}
-
-					// Regeneration from homesickness
-					if (Object.hasOwn(results, "heimwehkrank"))
-					{
-						AERegTotal += results["heimwehkrank"].result;
-					}
-
-					// Regeneration from food restriction
-					if (Object.hasOwn(results, "aefr"))
-					{
-						AERegTotal += results["aefr"].result;
-					}
-
-					// Sleep disorder
-					if (
-						Object.hasOwn(results, "schlafstoerungfall") &&
-						(
-							sleepDisorder["triggered"] === 1 ||
-							(
-								sleepDisorder["triggered"] === 2 &&
-								computed["selbstbeherrschungresult"] === 0
-							)
-						)
-					)
-					{
-						// Roll is positive, but convention dictates regenerations reductions to be negative
-						results["aeschlafstoerung"]["result"] = -results["aeschlafstoerung"]["result"];
-						AERegTotal += results["aeschlafstoerung"]["result"];
-					}
-
-					// Somnambulism
-					if (Object.hasOwn(results, "schlafwandeln"))
-					{
-						AERegTotal += parseInt(results["schlafwandeln"]["result"]);
-					}
-				} else {
-					// required for roll template
-					computed["aebase"] = { "result": parseInt(values["reg_sleep_ae_fixed"]) };
-					computed["aead"] = 0;
-					computed["aein"] = 0;
-					computed["aeen"] = 0;
-					AERegTotal = parseInt(values["reg_sleep_ae_fixed"]);
-				}
-				computed["aeneu"] = attrsToChange["AE"];
-				AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
-
-				// No sleep, no regeneration
-				if (computed["duration"] === 0)
-				{
-					AERegTotal = 0;
-					computed["aebase"] = 0;
-					computed["aead"] = 0;
-					computed["aess"] = 0;
-					computed["aein"] = 0;
-				}
-				AEneu += AERegTotal;
-				AEneu = Math.min(AEneu, values["AE_max"]);
-				if (parseInt(values["AE"]) !== AEneu)
-				{
-					attrsToChange["AE"] = AEneu;
-					computed["aechanged"] = 1;
-				} else {
-					computed["aechanged"] = 0;
-				}
-				computed["aeneu"] = AEneu;
-			}
-
-			// KE Regeneration
-			// No rule reduces or boosts the basal regeneration
-			var KERegTotal = 1;
-			if (results["kebase"])
-			{
-				// No sleep, no regeneration
-				if (computed["duration"] === 0)
-				{
-					KERegTotal = 0;
-					computed["kebase"] = 0;
-				}
-
-				// KE
-				computed["kebase"] = KERegTotal;
-				let KEalt = parseInt(values["KE"]);
-				let KEneu = KEalt;
-
-				KEneu += KERegTotal;
-				KEneu = Math.min(KEneu, values["KE_max"]);
-				let KEchange = KEneu - KEalt;
-				if (parseInt(values["KE"]) !== KEneu)
-				{
-					attrsToChange["KE"] = KEneu;
-					computed["kechanged"] = 1;
-				} else {
-					computed["kechanged"] = 0;
-				}
-				computed["keneu"] = KEneu;
-
-				// Rapture
-				const entrueckungMin = 0;
-				let entrueckungLoss = -Math.floor(computed["duration"] / 2);
-				let entrueckungNeu = parseInt(results["entrueckung"].result);
-				let entrueckungGain = KEchange;
-				entrueckungNeu += entrueckungLoss + entrueckungGain;
-				entrueckungNeu = Math.max(entrueckungMin, entrueckungNeu);
-				if (parseInt(results["entrueckung"].result) !== entrueckungNeu)
-				{
-					attrsToChange["Entrueckung"] = entrueckungNeu;
-					computed["entrueckungchanged"] = 1;
-				} else {
-					computed["entrueckungchanged"] = 0;
-				}
-				computed["entrueckunggain"] = entrueckungGain;
-				computed["entrueckungloss"] = entrueckungLoss;
-				computed["entrueckung"] = entrueckungNeu;
-			}
-
-			// Prettify certain output
-			{
-				let useComputed = [
-					"lebase",
-					"lead",
-					"leko",
-					"aebase",
-					"aead",
-					"aess",
-					"aein",
-					"aeen",
-					"kebase",
-					"entrueckunggain",
-					"entrueckungloss",
-				];
-				let useResults = [
-					"lefr",
-					"heimwehkrank",
-					"aefr",
-					"leschlafstoerung",
-					"aeschlafstoerung",
-					"schlafwandeln"
-				];
-				for (let part of useComputed)
-				{
-					if (Object.hasOwn(computed, part))
-					{
-						computed[part] = prettifyMod(computed[part]);
-					}
-				}
-				for (let part of useResults)
-				{
-					if (Object.hasOwn(results, part))
-					{
-						computed[part] = prettifyMod(parseInt(results[part].result));
-					}
+					computed[part] = prettifyMod(computed[part]);
 				}
 			}
+			let useResults = [
+				"lefr",
+				"homesick",
+				"aefr",
+				"mod",
+				"lesd",
+				"aesd",
+				"somnambulism"
+			];
+			for (let part of useResults)
+			{
+				if (Object.hasOwn(resultsOnly, part))
+				{
+					computed[part] = prettifyMod(parseInt(resultsOnly[part]));
+				}
+			}
+			let resultUseComputed = [
+				"selfcontrol",
+			];
+			for (let part of resultUseComputed)
+			{
+				if (Object.hasOwn(computed, part))
+				{
+					computed[part] = prettifyResult(computed[part]);
+				}
+			}
+		}
 
-			debugLog(caller, "tail", "rollID", rollID, "values", values, "LERegTotal", LERegTotal, "AERegTotal", AERegTotal, "attrsToChange", attrsToChange, "computed", computed);
-			safeSetAttrs(attrsToChange);
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
+		safeSetAttrs(attrsToChange);
 
-			finishRoll(
-				rollID,
-				computed
-			);
-		});
+		finishRoll(
+			rollID,
+			computed
+		);
 	}
 });
 
