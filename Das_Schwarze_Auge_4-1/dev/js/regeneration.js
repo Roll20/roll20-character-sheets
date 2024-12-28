@@ -274,6 +274,35 @@ on(
 });
 
 on(
+	[
+		"nachteil_unvertraeglichkeit_mit_verarbeitetem_metall",
+		"vorteil_eisenaffine_aura",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+		const caller = "Action Listener for Iron Affinity Related Advantages/Disadvantages";
+		debugLog(caller, "eventInfo", eventInfo);
+
+		// Preparation
+		const sourceType = eventInfo["sourceType"];
+		const sourceAttr = eventInfo["sourceAttribute"];
+		const newValue = eventInfo["newValue"];
+		let attrsToChange = {};
+
+		// Handling changes to iron affinity related advantages/disadvantages
+		if (sourceType === "player") {
+			if (sourceAttr === "nachteil_unvertraeglichkeit_mit_verarbeitetem_metall" && newValue === "1") {
+				attrsToChange["vorteil_eisenaffine_aura"] = "0";
+			} else if (sourceAttr === "vorteil_eisenaffine_aura" && newValue === "1") {
+				attrsToChange["nachteil_unvertraeglichkeit_mit_verarbeitetem_metall"] = "0";
+			}
+		}
+
+		// Finish
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+});
+
+on(
 	"change:nachteil_verwoehnt " +
 	"change:nachteil_verwoehnt_wert " +
 	"change:nachteil_astraler_block " +
@@ -594,32 +623,151 @@ on(astralRegenerationAttrs.map(attr => "change:" + attr.toLowerCase()).join(" ")
 // Handling all changes leading to fixed regeneration
 on(
 	[
+		"vorteil_eisenaffine_aura",
+		"reg_sleep_addiction_withdrawal_effect",
+		"reg_sleep_ae_armour_metal",
+		"reg_sleep_ae_cuffed_feet",
+		"reg_sleep_ae_cuffed_forehead",
+		"reg_sleep_ae_cuffed_hands",
+		"reg_sleep_ae_cuffed_neck",
 		"reg_sleep_food_restriction_effect",
-		"reg_sleep_addiction_withdrawal_effect"
-	].map(attr => "change:" + attr).join(" "),
+		"reg_sleep_ae_kosch_basalt",
+	].map(attr => "change:" + attr).join(" ").trim(),
 	function(eventInfo) {
-		const caller = "Action Listener for Fixed Regeneration";
+		const caller = "Action Listener for Fixed Regeneration (Sleep)";
 		safeGetAttrs(
 			[
-				'reg_sleep_food_restriction_effect',
-				'reg_sleep_addiction_withdrawal_effect'
+				"vorteil_eisenaffine_aura",
+				"reg_sleep_addiction_withdrawal_effect",
+				"reg_sleep_ae_armour_metal",
+				"reg_sleep_ae_cuffed_feet",
+				"reg_sleep_ae_cuffed_forehead",
+				"reg_sleep_ae_cuffed_hands",
+				"reg_sleep_ae_cuffed_neck",
+				"reg_sleep_food_restriction_effect",
+				"reg_sleep_ae_kosch_basalt",
 			], function(values) {
 			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
-			let attrsToChange = {};
-			const addiction = values["reg_sleep_addiction_withdrawal_effect"];
-			const restriction = values["reg_sleep_food_restriction_effect"];
 
+			// Preparation
+			let attrsToChange = {};
+			const affine = values["vorteil_eisenaffine_aura"];
+			const addiction = values["reg_sleep_addiction_withdrawal_effect"];
+			const metalArmour = values["reg_sleep_ae_armour_metal"];
+			const cuffed = parseInt(values["reg_sleep_ae_cuffed_feet"]) || parseInt(values["reg_sleep_ae_cuffed_forehead"]) || parseInt(values["reg_sleep_ae_cuffed_hands"]) || parseInt(values["reg_sleep_ae_cuffed_neck"]);
+			const restriction = values["reg_sleep_food_restriction_effect"];
+			const koschBasalt = values["reg_sleep_ae_kosch_basalt"];
+			// -1 is interpreted as "not set to a fixed value"
+			let lefixed = -1;
+			let aefixed = -1;
+
+			// Handle addiction and food restriction
 			if (
 				addiction === 1 ||
 				addiction === 2 ||
 				restriction === 2
 			) {
-				attrsToChange["reg_sleep_le_fixed"] = 0;
-				attrsToChange["reg_sleep_ae_fixed"] = 0;
-			} else {
-				attrsToChange["reg_sleep_le_fixed"] = -1;
-				attrsToChange["reg_sleep_ae_fixed"] = -1;
+				lefixed = 0;
+				aefixed = 0;
 			}
+
+			// Handle curse of iron related effects (AE regeneration only)
+			if (
+				(cuffed > 0 && affine !== "1") ||
+				metalArmour === "1" ||
+				koschBasalt === "1"
+			)
+			{
+				aefixed = 0;
+			}
+
+			// Finish
+			attrsToChange["reg_sleep_le_fixed"] = lefixed;
+			attrsToChange["reg_sleep_ae_fixed"] = aefixed;
+			debugLog(caller, "tail", "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange);
+		});
+});
+
+// Handling all changes for the effects of metal cuffs on AE regeneration
+on(
+	[
+		"vorteil_eisenaffine_aura",
+		"reg_sleep_ae_cuffed_feet",
+		"reg_sleep_ae_cuffed_forehead",
+		"reg_sleep_ae_cuffed_hands",
+		"reg_sleep_ae_cuffed_neck",
+	].map(attr => "change:" + attr).join(" ").trim(),
+	function(eventInfo) {
+		const caller = "Action Listener for Determination of Mild Effect of Cuffs (Sleep)";
+		safeGetAttrs(
+			[
+			"vorteil_eisenaffine_aura",
+			"reg_sleep_ae_cuffed_feet",
+			"reg_sleep_ae_cuffed_forehead",
+			"reg_sleep_ae_cuffed_hands",
+			"reg_sleep_ae_cuffed_neck",
+			], function(values) {
+			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
+
+			// Preparation
+			let attrsToChange = {};
+			const affine = values["vorteil_eisenaffine_aura"];
+			const cuffed = parseInt(values["reg_sleep_ae_cuffed_feet"]) || parseInt(values["reg_sleep_ae_cuffed_forehead"]) || parseInt(values["reg_sleep_ae_cuffed_hands"]) || parseInt(values["reg_sleep_ae_cuffed_neck"]);
+
+			let modCuffed = 0;
+
+			// Handle curse of iron related effects (AE regeneration only)
+			if (
+				(cuffed > 0)
+				&&
+				(affine === "1")
+			)
+			{
+				modCuffed = -2;
+			}
+
+			// Finish
+			attrsToChange["reg_sleep_ae_mod_cuffed"] = modCuffed;
+			debugLog(caller, "tail", "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange);
+		});
+});
+
+// Handling all changes for the effects of prolonged metal contact for sensitive characters AE regeneration
+on(
+	[
+		"nachteil_unvertraeglichkeit_mit_verarbeitetem_metall",
+		"reg_sleep_ae_sensitive_too_long_contact",
+	].map(attr => "change:" + attr).join(" ").trim(),
+	function(eventInfo) {
+		const caller = "Action Listener for Determination of the Effect of Prolonged Metal Contact (Sleep)";
+		safeGetAttrs(
+			[
+				"nachteil_unvertraeglichkeit_mit_verarbeitetem_metall",
+				"reg_sleep_ae_sensitive_too_long_contact",
+			], function(values) {
+			debugLog(caller, "head", "eventInfo", eventInfo, "values", values);
+
+			// Preparation
+			let attrsToChange = {};
+			const sensitive = values["nachteil_unvertraeglichkeit_mit_verarbeitetem_metall"];
+			const contact = values["reg_sleep_ae_sensitive_too_long_contact"];
+
+			let factor = 1;
+
+			// Handle curse of iron related effects (AE regeneration only)
+			if (
+				(sensitive === "1")
+				&&
+				(contact === "1")
+			)
+			{
+				factor = 0.5;
+			}
+
+			// Finish
+			attrsToChange["reg_sleep_ae_factor_metal_sensitive_conscious_contact"] = factor;
 			debugLog(caller, "tail", "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange);
 		});
@@ -683,10 +831,12 @@ on(
 		"reg_sleep_le_mod_advantages_disadvantages",
 		"reg_sleep_ae_base",
 		"reg_sleep_ae_in",
+		"reg_sleep_ae_factor_metal_sensitive_conscious_contact",
 		"reg_sleep_ae_mod_homesickness",
 		"reg_sleep_ae_mod_food_restriction",
 		"reg_sleep_ae_mod_special_skills",
 		"reg_sleep_ae_mod_advantages_disadvantages",
+		"reg_sleep_ae_mod_cuffed",
 		"reg_sleep_duration",
 		"reg_sleep_mod_general", "reg_sleep_ae_mod_general", "reg_sleep_ke_mod_general", "reg_sleep_le_mod_general",
 		"reg_sleep_mod_somnambulism",
@@ -720,10 +870,12 @@ on(
 			'reg_sleep_le_mod_advantages_disadvantages',
 			'reg_sleep_ae_base',
 			'reg_sleep_ae_in',
+			'reg_sleep_ae_factor_metal_sensitive_conscious_contact',
 			'reg_sleep_ae_mod_homesickness',
 			'reg_sleep_ae_mod_food_restriction',
 			'reg_sleep_ae_mod_special_skills',
 			'reg_sleep_ae_mod_advantages_disadvantages',
+			'reg_sleep_ae_mod_cuffed',
 			'reg_sleep_duration',
 			'reg_sleep_mod_general', 'reg_sleep_ae_mod_general', 'reg_sleep_ke_mod_general', 'reg_sleep_le_mod_general',
 			'reg_sleep_mod_somnambulism',
@@ -807,6 +959,11 @@ on(
 			`{{aein=[[${values["reg_sleep_ae_in"]}]]}}`,
 			"{{aenew=[[0]]}}",
 			"{{aerequired=[[1]]}}",
+		];
+		const AECuffedRoll = [ `{{aecuffed=[[${values["reg_sleep_ae_mod_cuffed"]}]]}}` ];
+		const AEMetalContactRoll = [
+			`{{aefactor=[[${values["reg_sleep_ae_factor_metal_sensitive_conscious_contact"]}]]}}`,
+			"{{aemetal=[[0]]}}",
 		];
 		const noAERoll = [ "{{aerequired=[[0]]}}" ];
 		const KERoll = [
@@ -934,6 +1091,14 @@ on(
 		)
 		{
 			roll = roll.concat(AERoll);
+			if (values["reg_sleep_ae_mod_cuffed"] !== 0)
+			{
+				roll = roll.concat(AECuffedRoll);
+			}
+			if (values["reg_sleep_ae_factor_metal_sensitive_conscious_contact"] !== 1)
+			{
+				roll = roll.concat(AEMetalContactRoll);
+			}
 		} else {
 			roll = roll.concat(noAERoll);
 		}
@@ -1634,12 +1799,14 @@ on('clicked:reg_sleep-action', async (info) => {
 
 		// AE
 		/// Preparation
+		const AEMetalFactor = resultsOnly["aefactor"] ?? 1;
 		let AERegTotal = 0;
 		let AEBase = 0;
 		let AEAD = 0;
 		let AESS = 0;
 		let AEIN = 0;
 		let AERT = 0;
+		let AEMetal = 0;
 		let AENew = resultsOnly["ae"];
 
 		if (resultsOnly["aerequired"] === 1 && duration > 0)
@@ -1712,6 +1879,21 @@ on('clicked:reg_sleep-action', async (info) => {
 				{
 					AERegTotal += resultsOnly["somnambulism"];
 				}
+
+				// Sensitivity towards processed metals, prolonged contact
+				/// Rules say "regeneration halved"
+				/// Simple interpretation: Divide AERegTotal by 2, DSAround() the result
+				/// Complex interpretation: Divide the sum of all positive contributions to AERegTotal by 2, DSAround() the result
+				/// Decision: simple, because most users will expect it that way
+				/// Only applicable if there would be a regeneration (aka > 0)
+				if (Object.hasOwn(resultsOnly, "aemetal") && AERegTotal > 0)
+				{
+					// Careful: For odd numbers DSAround( something / 2) - something is not the same as -DSAround( something / 2)!
+					let AERegRemaining = DSAround(AERegTotal * AEMetalFactor)
+					// Since AEMetal is a modifier, it must be negative when reducing the regeneration
+					AEMetal = AERegRemaining - AERegTotal;
+					AERegTotal += AEMetal;
+				}
 			} else {
 				// required for roll template
 				AEBase = resultsOnly["aefixed"];
@@ -1719,6 +1901,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				AESS = 0;
 				AEIN = 0;
 				AERT = 0;
+				AEMetal = 0;
 				AERegTotal = resultsOnly["aefixed"];
 			}
 			AERegTotal = Math.max(AERegTotal, regLimitLower["ae"]);
@@ -1731,6 +1914,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			AESS = 0;
 			AEIN = 0;
 			AERT = 0;
+			AEMetal = 0;
 		}
 		/// Finish
 		if (resultsOnly["aerequired"] === 1)
@@ -1742,6 +1926,7 @@ on('clicked:reg_sleep-action', async (info) => {
 			computed["aess"] = AESS;
 			computed["aein"] = AEIN;
 			computed["aert"] = AERT;
+			computed["aemetal"] = AEMetal;
 			computed["aenew"] = AENew;
 			attrsToChange["AE"] = AENew;
 		}
@@ -1820,6 +2005,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				"aess",
 				"aein",
 				"aert",
+				"aemetal",
 				"kebase",
 				"rtgain",
 				"rtloss",
@@ -1835,6 +2021,7 @@ on('clicked:reg_sleep-action', async (info) => {
 				"lefr",
 				"homesick",
 				"aefr",
+				"aecuffed",
 				"mod",
 				"lesd",
 				"aesd",
