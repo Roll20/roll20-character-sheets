@@ -2928,18 +2928,18 @@
             hyphens: /-/g.test(this),
             whitespace: /\s|_/g.test(this),
         };
-        const dont_capitalize = /^a$|^an$|^and$|^as$|^at$|^but$|^by$|^for$|^in$|^nor$|^of$|^on$|^or$|^the$|^up$/g;
+        const dont_capitalize = /^a$|^an$|^and$|^as$|^at$|^but$|^by$|^for$|^in$|^nor$|^of$|^on$|^or$|^the$|^up$|^with$/g;
         temp.str = temp.whitespace ? this.split(/\s|_/g) : [`${this}`];
-        for (let i = 0, n = temp.str.length; i < n; i++) {
+        for (let i = 0; i < temp.str.length; i++) {
             temp.str[i] = dont_capitalize.test(temp.str[i]) && (
-                i !== 0 || i !== n
+                i !== 0 || i !== temp.str.length
             ) ? temp.str[i][0] + temp.str[i].substring(1) : 
                 temp.str[i][0].toUpperCase() + temp.str[i].substring(1);
         }
         temp.str = temp.whitespace ? temp.str.join(" ") : temp.str[0];
         if (temp.hyphens) {
             temp.str = temp.hyphens ? temp.str.split("-") : [`${temp.str}`];
-            for (let i = 0, n = temp.str.length; i < n; i++) {
+            for (let i = 0; i < temp.str.length; i++) {
                 temp.str[i] = temp.str[i][0].toUpperCase() + temp.str[i].substring(1);
             }
             temp.str = temp.hyphens ? temp.str.join("-") : temp.str[0];
@@ -2953,14 +2953,18 @@
                 hyphens: /-/g.test(r),
                 whitespace: /\s/g.test(r),
             };
+            const dont_capitalize = /^a$|^an$|^and$|^as$|^at$|^but$|^by$|^for$|^in$|^nor$|^of$|^on$|^or$|^the$|^up$|^with$/g;
             temp.str = temp.whitespace ? r.split(" ") : [`${r}`];
-            for (let i = 0, n = temp.str.length; i < n; i++) {
-                temp.str[i] = temp.str[i][0].toUpperCase() + temp.str[i].substring(1);
+            for (let i = 0; i < temp.str.length; i++) {
+                temp.str[i] = dont_capitalize.test(temp.str[i]) && (
+                    i !== 0 || i !== temp.str.length
+                ) ? temp.str[i][0] + temp.str[i].substring(1) : 
+                    temp.str[i][0].toUpperCase() + temp.str[i].substring(1);
             }
             temp.str = temp.whitespace ? temp.str.join(" ") : temp.str[0];
             if (temp.hyphens) {
                 temp.str = temp.hyphens ? temp.str.split("-") : [`${temp.str}`];
-                for (let i = 0, n = temp.str.length; i < n; i++) {
+                for (let i = 0; i < temp.str.length; i++) {
                     temp.str[i] = temp.str[i][0].toUpperCase() + temp.str[i].substring(1);
                 }
                 temp.str = temp.hyphens ? temp.str.join("-") : temp.str[0];
@@ -3305,7 +3309,7 @@
             break;
         }
     }
-
+    /*
     function capitalize(str) {
         const temp = {
             str: str,
@@ -3317,7 +3321,7 @@
         }
         return temp.whitespace ? temp.str.join(" ") : temp.str[0];
     }
-
+    */
     function convertUnitMeasurement(cache, query, type) {
         const temp = {};
         clog(cache, temp, 'convertUnitMeasurement()');
@@ -5956,6 +5960,7 @@
             "sensory block":'senses_or_techniques',
             "skills":'skill points',
             //"resilient":'complete_resilience',
+            //"unaffected":'source',
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
         const characteristic = await setAttrCharacteristic(cache, set_values, query);
@@ -5967,6 +5972,8 @@
                         c.rank.map(t => t.name.capitalize() + ' (' + t.rank + ')').sort().join(", ") :
                     c.name === 'complete_resilience' ?
                         c.rank.map(r => r.capitalize()).sort().join(", ") :
+                    c.name === 'source' && query.attribute === 'unaffected' ?
+                        c.rank !== '' ? c.rank.capitalize() : '' :
                     c.name === query.attribute || c.name === configurations[query.attribute] ?
                     characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank
                 })`
@@ -6163,9 +6170,33 @@
             case "transfer": description = `Transer Attributes as Level ${query.elevel}`; break;
             case "transmute": description = `Transmute objects of ${query.elevel * 5} Character Points`; break;
             case "tunneling": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "unaffected": description = `Attacker's roll ${query.elevel * -2}`; break;
-            case "unassailable": description = `Sanity Points +${query.elevel * 2}`; break;
-            case "undetectable": description = getCharacteristicByCustomizations(debug, timer, value, rowID, attribute); break;
+            case "unaffected":
+                if (query.next !== 'write_newattr') {
+                    const unaffected_config = query.db === undefined ? query.config : query.db.config;
+                    query.unaffected_index = query.unaffected_index === undefined ? 
+                        unaffected_config.findIndex(c => c.name === 'unaffected') : query.unaffected_index;
+                    query.attributes = query.attributes === undefined ?
+                        unaffected_config[query.unaffected_index].rank.map(a => a.name) : query.attributes;
+                    query.weapon_index = query.weapon_index === undefined ?
+                        unaffected_config[query.unaffected_index].rank.findIndex(a => a.name === 'weapon') : query.weapon_index;
+                    query.weapons = query.weapons === undefined ?
+                        query.weapon_index !== -1 ? 
+                        [...unaffected_config[query.unaffected_index].rank[query.weapon_index].rank] : [] :
+                        query.weapons;
+                    
+                    description = `${query.elevel * -2} Attacker's roll on offensive use of${
+                        query.attributes.length !== 0 ? 
+                            ': ' + query.attributes.map(a => a !== 'weapon' ? a : '').filter(a => a).sort().capitalize().join(', ') : ''
+                    }${
+                        query.weapons.length !== 0 ?
+                            (query.attributes.length !== 1 ? ', ' : '') +
+                            query.weapons.map(w => 'weapon with ' + w).sort().capitalize().join(', ') : ''
+                    }`;
+                }
+                
+            break;
+            case "unassailable": description = `+${query.elevel * 2} Sanity Points`; break;
+            case "undetectable": description = ""; break;
             case "unique attribute": description = ""; break;
             case "unknown power": description = `${query.elevel} Character Points`; break;
             case "water speed": description = `Water speed up tp ${get1or3(query.elevel, 1) * (10 ** (Math.ceil(query.elevel / 2)))} kph`; break;
@@ -10613,6 +10644,7 @@
                     const all_configurations = [
                         'aspect_stat',
                         'attacktype',
+                        //'attribute',
                         'attributetype',
                         'augmented_stat',
                         'broad category',
@@ -10643,14 +10675,22 @@
                         'taunt',
                         'techniques',
                         'transform',
+                        'unaffected',
                         'weapon_class'
                     ];
                     query.configurations = [];
+                    query.unaffected_index = query.attribute === 'unaffected' ? query.db.config.findIndex(c => c.name === 'unaffected') : -1;
+                    query.all_attributes = query.unaffected_index !== -1 ? query.db.config[query.unaffected_index].rank.findIndex(u => u.name === 'all attributes') !== -1 : false;
+                    query.all_weapons = query.unaffected_index !== -1 ? query.db.config[query.unaffected_index].rank.findIndex(u => u.name === 'all weapons') !== -1 : false;
                     for (let i = 0; i < query.db.config.length; i++) {
                         if (all_configurations.includes(query.db.config[i].name)) {
-                            query.configurations.push(
-                                `${query.db.config[i].name.fromSnakeCase().capitalize()},${query.db.config[i].name}~${i}`
-                            );
+                            if (query.db.config[i].name === 'unaffected' && query.all_attributes && query.all_weapons) {
+                                //=>do not add unaffected.
+                            } else {
+                                query.configurations.push(
+                                    `${query.db.config[i].name.fromSnakeCase().capitalize()},${query.db.config[i].name}~${i}`
+                                );
+                            }
                         }
                     }
                     if (query.configurations.length === 0) {
@@ -10684,6 +10724,54 @@
                     }
                     query.options = '|' + aspects.sort().join('|') + 
                         `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'unaffected':
+                    query.config_index = query.db.config.findIndex(c => c.name === 'unaffected');
+                    query.attributes = query.db.config[query.config_index].rank.map(a => a.name);
+                    query.weapon_index = query.db.config[query.config_index].rank.findIndex(a => a.name === 'weapon');
+                    query.weapons = query.weapon_index !== -1 ? 
+                        [...query.db.config[query.config_index].rank[query.weapon_index].rank] : [];
+                    if (query.attributes.findIndex(a => a === 'all attributes') === -1) {
+                        query.title = `${getTranslationByKey("choose-attribute")}`;
+                        query.options = '|' + all_attributes.map(a => {
+                            const bracket = query.attributes.indexOf(a);
+                            const line = 
+                                a === 'skill group' || 
+                                a === 'skills' ||
+                                a === 'unknown power' || 
+                                (
+                                    a === 'weapon' && query.attributes.findIndex(a => a === 'all weapons') !== -1
+                                ) ? null :
+                            `${bracket !== -1 ? '[' : ''}` +
+                            `${a.capitalize()}` +
+                            `${bracket !== -1 ? ']' : ''},${a}~${bracket}`;
+                            return line;
+                        }).filter(a => a).join('|');
+                    } else if (
+                        query.attributes.findIndex(a => a === 'all attributes') !== -1 &&
+                        query.attributes.findIndex(a => a === 'all weapons') !== -1
+                    ) {
+                        query.next = 'exit';
+                    }
+                    query.last = query.next;
+                break;
+                case 'weapon_enhancement':
+                    query.config_index = query.config_index === undefined ? query.db.config.findIndex(c => c.name === 'unaffected') : query.config_index;
+                    query.attributes = query.attributes === undefined ? query.db.config[query.config_index].rank.map(a => a.name) : query.attributes;
+                    query.weapon_index = query.weapon_index === undefined ? query.db.config[query.config_index].rank.findIndex(a => a.name === 'weapon') : query.weapon_index;
+                    query.weapons = query.weapons === undefined ? query.weapon_index !== -1 ? 
+                        [...query.db.config[query.config_index].rank[query.weapon_index].rank] : [] : query.weapons;
+                    if (query.weapon_index === -1) { query.attributes.push('weapon'); }
+                    query.title = `${getTranslationByKey("choose-weapon-enhancement")}`;
+                    query.options = '|' + base_weapon_enhancements.map(e => {
+                        const bracket = query.weapons.indexOf(e);
+                        const line = 
+                        `${bracket !== -1 ? '[' : ''}` +
+                        `${e.capitalize()}` +
+                        `${bracket !== -1 ? ']' : ''},${e}~${bracket}`;
+                        return line;
+                    }).join('|');
                     query.last = query.next;
                 break;
                 case 'augmented_stat':
@@ -11704,7 +11792,11 @@
                         query.load = query.selection.split("~");
                         query.config_index = int(query.load[1]);
                         query.config_name = query.load[0];
-                        query.next = query.config_name;
+                        query.next = (
+                            query.config_name === 'unaffected' &&
+                            query.all_attributes &&
+                            !query.all_weapons
+                        ) ? 'weapon_enhancement' : query.config_name;
                     break;
                     // => configurations
                     case 'aspect_stat':
@@ -11718,6 +11810,31 @@
                         set_values[`repeating_defect_${cache.source_id}_configuration`] = query.load[0];
                         await setDerivedValues(cache, set_values);
                         query.next = 'exit';
+                    break;
+                    case 'unaffected':
+                        const attribute_temp = query.selection.split('~');
+                        query.unaffected = attribute_temp[0];
+                        query.unaffected_index = int(attribute_temp[1]);
+                        if (query.unaffected_index === -1) {
+                            query.attributes.push(query.unaffected);
+                        } else if (query.unaffected !== 'weapon') {
+                            query.attributes.splice(query.unaffected_index, 1);
+                        }
+                        query.next = query.unaffected === 'weapon' ? 'weapon_enhancement' : 'write_unaffected';
+                    break;
+                    case 'weapon_enhancement':
+                        const weapon_enhancement = query.selection.split('~');
+                        const weapon_index = int(weapon_enhancement[1]);
+                        query.unaffected = 'weapon';
+                        if (weapon_index === -1) {
+                            query.weapons.push(weapon_enhancement[0]);
+                        } else {
+                            query.weapons.splice(weapon_index, 1);
+                            if (query.weapons.length === 0) {
+                                query.attributes.splice(query.weapon_index, 1);
+                            }
+                        }
+                        query.next = 'write_unaffected';
                     break;
                     case 'augmented_stat':
                         if (query.selection === 'exit') { return; }
@@ -11922,7 +12039,6 @@
                         set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
-
                     case 'add_defect':
                         query.defect = query.selection;
                         query.defect_translation = query.defect.toKebobCase();
@@ -12117,6 +12233,16 @@
                                     rank: ''
                                 });
                             break;
+                            case 'unaffected':
+                                query.config.push({
+                                    name: 'unaffected',
+                                    rank: [],
+                                });
+                                query.config.push({
+                                    name: 'source',
+                                    rank: '',
+                                });
+                            break;
                             default:
                                 query.config.push({
                                     name: query.attribute,
@@ -12151,6 +12277,9 @@
                         attrdb_entry.stat = query.stat;
                         attrdb_entry.points = query.cost * query.level;
                         attrdb_entry.visibility = 1;
+                        if (query.attribute === 'unaffected') {
+                            attrdb_entry.unaffected_weapons = [];
+                        }
                         cache.attrdb[query.attribute].push(attrdb_entry);
                         cache.groupdb[cache.static_group_visible_id].attribute_ids.push(query.row_id);
                         if (cache.groupdb[attrdb_entry.group_id].group_type === 'power flux') {
@@ -12342,6 +12471,37 @@
                     case 'write_supersense':
                     case 'write_taunt':
                         query.db.config[query.config_index].rank = query.selection;
+                        set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
+                    break;
+                    case 'write_unaffected':
+                        query.db.config[query.config_index].rank = 
+                            query.attributes.map(a => {
+                                if (a === 'weapon') {
+                                    return {name:a, rank:[...query.weapons]};
+                                } else {
+                                    return {name:a};
+                                }
+                            });
+                        /*
+                        if (query.unaffected_index !== -1) {
+                            if (query.unaffected === 'weapon' && query.weapons.length !== 0) {
+                                query.db.config[query.config_index].rank[query.unaffected_index].rank = 
+                                    query.attributes.map(a => {
+                                        if (a === 'weapon') {
+                                            return {name:a, rank:[...query.weapons]};
+                                        } else {
+                                            return {name:a};
+                                        }
+                                    });
+                            } else {
+                                query.db.config[query.config_index].rank.splice(query.unaffected_index, 1);
+                            }
+                        } else {
+                            const new_unaffected = query.unaffected === 'weapon' ?
+                                {name:query.unaffected, rank:[...query.weapons]} : {name:query.unaffected};
+                            query.db.config[query.config_index].rank.push(new_unaffected);
+                        }
+                        */
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
                     case 'write_groupname':
@@ -12552,6 +12712,24 @@
                                     });
                                     //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                                 }
+                                if (query.attribute === 'unaffected') {
+                                    query.config_index = query.db.config.findIndex(c => c.name === 'unaffected');
+                                    const has_weapon = query.db.config[query.config_index].rank.findIndex(a => a.name === 'weapon' || a.name === 'all weapons');
+                                    if (query.customization[0] === 'all attributes') {
+                                        const attributes = [];
+                                        if (has_weapon !== -1) {
+                                            attributes.push(query.db.config[query.config_index].rank[has_weapon]);
+                                        }
+                                        attributes.push({name:'all attributes'});
+                                        query.db.config[query.config_index].rank = [...attributes];
+                                    }
+                                    if (query.customization[0] === 'all weapons') {
+                                        if (has_weapon !== -1) {
+                                            query.db.config[query.config_index].rank.splice(has_weapon, 1);
+                                        }
+                                        query.db.config[query.config_index].rank.push({name:'all weapons'});
+                                    }
+                                }
                             } else {//=> remove customization or update rank
                                 query.rank = query.has_rank ? query.rank : 0;
                                 if (query.rank === 0) {
@@ -12565,6 +12743,18 @@
                                     cache.attrdb[query.attribute][query.index][cache.source_attribute].splice(query.customization[2], 1);
                                 } else {
                                     cache.attrdb[query.attribute][query.index][cache.source_attribute][query.customization[2]].rank = query.rank;
+                                }
+                                if (query.attribute === 'unaffected') {
+                                    query.config_index = query.db.config.findIndex(c => c.name === 'unaffected');
+                                    const has_weapon = query.db.config[query.config_index].rank.findIndex(a => a.name === 'weapon');
+                                    if (query.customization[0] === 'all attributes') {
+                                        const attributes_index = query.db.config[query.config_index].rank.findIndex(u => u.name === 'all attributes');
+                                        query.db.config[query.config_index].rank.splice(attributes_index, 1);
+                                    }
+                                    if (query.customization[0] === 'all weapons') {
+                                        const weapons_index = query.db.config[query.config_index].rank.findIndex(u => u.name === 'all weapons');
+                                        query.db.config[query.config_index].rank.splice(weapons_index, 1);
+                                    }
                                 }
                             }
                             const enhancement_ranks =
