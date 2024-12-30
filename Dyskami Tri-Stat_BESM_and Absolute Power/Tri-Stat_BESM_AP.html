@@ -5960,7 +5960,7 @@
             "sensory block":'senses_or_techniques',
             "skills":'skill points',
             //"resilient":'complete_resilience',
-            //"unaffected":'source',
+            "unaffected":'senses_or_techniques',
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
         const characteristic = await setAttrCharacteristic(cache, set_values, query);
@@ -5974,6 +5974,7 @@
                         c.rank.map(r => r.capitalize()).sort().join(", ") :
                     c.name === 'source' && query.attribute === 'unaffected' ?
                         c.rank !== '' ? c.rank.capitalize() : '' :
+                    c.name === 'senses_or_techniques' ? characteristic :
                     c.name === query.attribute || c.name === configurations[query.attribute] ?
                     characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank
                 })`
@@ -6196,7 +6197,11 @@
                 
             break;
             case "unassailable": description = `+${query.elevel * 2} Sanity Points`; await setDerivedValues(cache, set_values); break;
-            case "undetectable": description = ""; break;
+            case "undetectable":
+                query.c_index = query.config.findIndex(c => c.name === 'senses_or_techniques');
+                description = `${query.elevel - query.config[query.c_index].rank.length} remaining`;
+                description += query.config[query.c_index].rank.length !== 0 ? '; hidden from ' + query.config[query.c_index].rank.capitalize().sort().join(", ") : '';
+            break;
             case "unique attribute": description = ""; break;
             case "unknown power": description = `${query.elevel} Character Points`; break;
             case "water speed": description = `Water speed up tp ${get1or3(query.elevel, 1) * (10 ** (Math.ceil(query.elevel / 2)))} kph`; break;
@@ -10953,7 +10958,7 @@
                     query.last = query.next;
                 break;
                 case 'senses_or_techniques':
-                    query.blockable_senses = ['sixth sense'].concat(senses, supersenses);
+                    query.blockable_senses = ['sixth sense', ...senses, ...supersenses];
                     for (let i = 0; i < query.db.config[query.config_index].rank.length; i++) {
                         if (query.blockable_senses.findIndex(s => s === query.db.config[query.config_index].rank[i]) === -1) {
                             query.blockable_senses.push(query.db.config[query.config_index].rank[i]);
@@ -10985,6 +10990,8 @@
                     query.last = query.next;
                 break;
                 case 'supersense':
+                case'supersenses_or_techniques':
+                    /*
                     const supersenses = [
                         'echolocation',
                         'infrared vision',
@@ -10996,6 +11003,7 @@
                         'vibration detection',
                         'x-ray vision',
                     ];
+                    */
                     query.title = getTranslationByKey("choose-supersense");
                     query.options = '|' + supersenses.map(s => `${s.capitalize()},${s}`).sort().join('|');
                     query.options += '|Other,other';
@@ -12210,6 +12218,7 @@
                                 });
                             break;
                             case 'sensory block':
+                            case 'undetectable':
                                 query.config.push({
                                     name: 'senses_or_techniques',
                                     rank: []
