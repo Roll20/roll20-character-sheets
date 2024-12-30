@@ -2442,7 +2442,7 @@
         'unknown power':{},
         'water speed':{},
         'wealth':{},
-        'weapon':{'alt-munition':{rank:0},'fieldless':{rank:1},'hands':{rank:1},'ingest':{rank:1}}
+        'weapon':{'alt-munition':{rank:0},'anemic':{rank:1},'aura':{rank:1},'autofire':{rank:3},'demoralize':{rank:1},'fieldless':{rank:1},'hands':{rank:1},'helper':{rank:1},'inconspicuous':{rank:3},'indirect':{rank:1},'ingest':{rank:1},'insidious':{rank:3},'linked':{rank:1},'multidimensional':{rank:1},'muscle':{rank:1},'psychic':{rank:4},'reach':{rank:1},'selective':{rank:1},'stun':{rank:1},'trap':{rank:1}}
     };
     const limiter_ranks = {
         'absorption':{'capped':{rank:1}},
@@ -4861,7 +4861,7 @@
                     cache.attrdb[cache.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             const limited = a.limiters.find(l => {
-                                return l.name === 'focussed damage' || l.name === 'targetted damage';
+                                return l.name === 'focussed damage' || l.name === 'targeted damage';
                             });
                             if (limited === undefined) { cache.dm += a.elevel; }
                         }
@@ -5961,6 +5961,7 @@
             "skills":'skill points',
             //"resilient":'complete_resilience',
             "unaffected":'senses_or_techniques',
+            "weapon":'damage',
         };
         const db = query.next === 'write_newattr' ? query.config : cache.attrdb[query.attribute][query.index].config;
         const characteristic = await setAttrCharacteristic(cache, set_values, query);
@@ -6006,11 +6007,11 @@
             cache.statsdb.dm.base = 5;
             for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
                 const is_focused = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'focussed damage') !== -1;
-                const is_targetted = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'targeted damage') !== -1;
+                const is_targeted = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'targeted damage') !== -1;
                 cache.statsdb.dm.base += 
                     cache.attrdb['massive damage'][i].active && 
                     !is_focused && 
-                    !is_targetted ?
+                    !is_targeted ?
                     cache.attrdb['massive damage'][i].elevel : 0;
             }
             set_values.static_character_dm_base = cache.statsdb.dm.base;
@@ -6206,7 +6207,7 @@
             case "unknown power": description = `${query.elevel} Character Points`; break;
             case "water speed": description = `Water speed up to ${(get1or3(query.elevel, 1) * (10 ** (Math.ceil(query.elevel / 2)))).toLocaleString()} kph`; break;
             case "wealth": description = getCharacteristicByAttr(cache, set_values, query); break;
-            case "weapon": description = `${query.elevel} Damage`; break;
+            case "weapon": description = `${query.elevel}`; break;
             default: description = "";
         }
         return description;
@@ -6796,6 +6797,7 @@
             "group":'group',
             "optimized":'damage_type',
             "focussed damage":'damage_type',
+            "targeted":'enemy',
             "targeted damage":'enemy',
             "species":'species',
         };
@@ -6805,40 +6807,62 @@
     function customizationHasRank(query) {
         const customizations = [
             'acceleration',
+            'accurate',
             'activation',
             'area',
             'assisted',
             'backlash',
+            'blight',
             'charges',
             'complete',
+            'contact',
             'concentration',
             'consumable',
+            'contagious',
+            'continuing',
             'delay',
             'dependent',
             'deplete',
             'detectable',
+            'drain',
             'duration',
             'emotional',
+            'enervation',
             'environmental',
             'equipment',
             'extra sense',
+            'flare',
+            'flexible',
             'haywire',
+            'homing',
             'ignore',
             'imbue',
+            'incapacitating',
+            'incurable',
             'irreversible',
+            'irritant',
+            'knockback',
+            'lethargy',
             'localized',
             'maximum',
             'multiple illusions',
             'object',
+            'penetrating',
             'permanent',
+            'piercing',
             'potent',
+            'quake',
             'range',
             'recovery',
             'semi-permanent',
+            'spreading',
+            'tangle',
             'targets',
+            'targeted',
             'timed',
             'unique',
-            'unpredictable'
+            'unpredictable',
+            'vampiric'
         ];
         return customizations.indexOf(query.customization[0]) !== -1;
     }
@@ -12252,6 +12276,20 @@
                                     rank: '',
                                 });
                             break;
+                            case 'weapon':
+                                query.config.push({
+                                    name: 'damage',
+                                    rank: 0,
+                                });
+                                query.config.push({
+                                    name: 'damage_type',
+                                    rank: '',
+                                });
+                                query.config.push({
+                                    name: 'weapon_class',
+                                    rank: '',
+                                });
+                            break;
                             default:
                                 query.config.push({
                                     name: query.attribute,
@@ -12647,11 +12685,11 @@
                             cache.statsdb.dm.base = 5;
                             for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
                                 const is_focused = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'focussed damage') !== -1;
-                                const is_targetted = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'targeted damage') !== -1;
+                                const is_targeted = cache.attrdb['massive damage'][i].limiters.findIndex(l => l.name === 'targeted damage') !== -1;
                                 cache.statsdb.dm.base += 
                                     cache.attrdb['massive damage'][i].active && 
                                     !is_focused && 
-                                    !is_targetted ?
+                                    !is_targeted ?
                                     cache.attrdb['massive damage'][i].elevel : 0;
                             }
                             set_values.static_character_dm_base = cache.statsdb.dm.base;
