@@ -9036,6 +9036,7 @@
 					<input type="text" value="0" name="attr_skillCP74" readonly tabindex="-1"/>
 				</div>
 				
+				<!-- This block of skills can be used as combat skills if optionFewerLanguages is true.  -->
 				<div class="item-flex-container-language-block-extension">
 					<!-- Language skill 05 (75 overall) -->
 					<div class="subitem-skillsTab-flex-container-language">
@@ -16349,10 +16350,11 @@
 	const maxEquipmentNum = 16;
 	const maxManeuverNum = 10;
 	const maxSkillNum = 50;
-	const spanSkillNum = 60-maxSkillNum; // Spanning gap between last general and first combat skill IDs.
+	const reserveSkillNum = 60-maxSkillNum; // Spanning gap between last general and first combat skill IDs.
 	const maxCombatSkillNum = 7;
 	const maxCombatLevelNum = 3;
 	const maxLanguageSkillNum = 9;
+	const flexSkillNum = 5;
 	const upperPowerNum = 10;
 	const lowerPowerNum = 10;
 	const maxPowerNum = 20;
@@ -18692,70 +18694,6 @@
 		});
 	});
 	
-	
-	/* ------------------------------ */
-	/* General Skill List Scrolling   */
-	/* ------------------------------ */
-
-	// on("clicked:buttonScrollIndicator01", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "1"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator02", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "2"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator03", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "3"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator04", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "3"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator05", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "3"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator06", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "3"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator07", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "3"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator08", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "3"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator09", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "4"
-	// 	});
-	// });
-	// 
-	// on("clicked:buttonScrollIndicator10", function() {		
-	// 	setAttrs({
-	// 		"skillSetVisibility": "5"
-	// 	});
-	// });
 
 	/* -------------------------- */
 	/* Characteristic Rolls       */
@@ -18989,51 +18927,64 @@
 	
 	
 	/* Combat Skills */
-	on("change:skillLevels61 change:skillType61 change:skillLevels62 change:skillType62 change:skillLevels63 change:skillType63 change:skillLevels64 change:skillType64 change:skillLevels65 change:skillType65 change:skillLevels66 change:skillType66 change:skillLevels67 change:skillType67 change:skillLevels68 change:skillLevels69 change:skillLevels70", function () {
+	on("change:skillLevels61 change:skillType61 change:skillLevels62 change:skillType62 change:skillLevels63 change:skillType63 change:skillLevels64 change:skillType64 change:skillLevels65 change:skillType65 change:skillLevels66 change:skillType66 change:skillLevels67 change:skillType67 change:skillLevels68 change:skillLevels69 change:skillLevels70 change:skillLevels75 change:skillType75 change:skillLevels76 change:skillType76 change:skillLevels77 change:skillType77 change:skillLevels78 change:skillType78 change:skillLevels79 change:skillType79 change:optionFewerLanguages", function () {
 		//
 		// Calculation of combat skill costs is based on many user selections.
 		// If the skill is a weapon familiarity, the cost is either 1 CP (WF1) or 2 CP (WF2).
 		// Weapon Elements (ELM) cost 1 point category. We'll count them as a type of level.
 		// If the selection is a skill level, the cost is determined by number of levels and the scope (single: 2, small group: 3, or large group: 5).
 		// The costs of general combat skills are calculated by the function calculateCombatSkillCost(..).
-		//
 		// Skill level costs for all HTH, all ranged, and all combat are calculated here without the calculateCombatSkillCost(..).
-		//
-		getAttrs(["skillLevels61", "skillType61", "skillLevels62", "skillType62", "skillLevels63", "skillType63", "skillLevels64", "skillType64", "skillLevels65", "skillType65", "skillLevels66", "skillType66", "skillLevels67", "skillType67", "skillLevels68","skillLevels69","skillLevels70"], function(values) {
+		// optionFewerLanguages, when true, shifts five language skill over to combat skills.
+		
+		getAttrs(["skillLevels61", "skillType61", "skillLevels62", "skillType62", "skillLevels63", "skillType63", "skillLevels64", "skillType64", "skillLevels65", "skillType65", "skillLevels66", "skillType66", "skillLevels67", "skillType67", "skillLevels68","skillLevels69","skillLevels70", "skillLevels75", "skillType75", "skillLevels76", "skillType76", "skillLevels77", "skillType77", "skillLevels78", "skillType78", "skillLevels79", "skillType79", "optionFewerLanguages"], function(values) {
+			var attributes = new Object();
 			
-			// Skills 31-37 are general combat skills with costs determined by their skill type or levels.
-			let skill61Cost = calculateCombatSkillCost(values.skillType61, (parseInt(values.skillLevels61)||0) );
-			let skill62Cost = calculateCombatSkillCost(values.skillType62, (parseInt(values.skillLevels62)||0) );
-			let skill63Cost = calculateCombatSkillCost(values.skillType63, (parseInt(values.skillLevels63)||0) );
-			let skill64Cost = calculateCombatSkillCost(values.skillType64, (parseInt(values.skillLevels64)||0) );
-			let skill65Cost = calculateCombatSkillCost(values.skillType65, (parseInt(values.skillLevels65)||0) );
-			let skill66Cost = calculateCombatSkillCost(values.skillType66, (parseInt(values.skillLevels66)||0) );
-			let skill67Cost = calculateCombatSkillCost(values.skillType67, (parseInt(values.skillLevels67)||0) );
+			let skillId = "";
+			let tempCost = 0;
+			let combatSkillsCost = 0;	
+			let startCount = maxSkillNum+reserveSkillNum+1;
+			let endCount = startCount+maxCombatSkillNum;
+			
+			for (let i = startCount; i <= endCount; i++) {
+				// General combat skills with costs determined by their skill type or levels.
+				skillId = String(i).padStart(2,'0');
+				tempCost = calculateCombatSkillCost(values["skillType"+skillId]||"none", (parseInt(values["skillLevels"+skillId])||0) );
+				combatSkillsCost += tempCost;
+				attributes["skillCP"+skillId] = tempCost;
+			}
 			
 			// Skill 68: All HTH Combat Levels cost 8 CP each.
-			let skill68Cost = 8*(parseInt(values.skillLevels68)||0);
+			tempCost = 8*(parseInt(values.skillLevels68)||0);
+			attributes.skillCP68 = tempCost;
+			combatSkillsCost = tempCost;
 			
 			// Skill 69: All Range Combat Levels cost 8 CP each.
-			let skill69Cost = 8*(parseInt(values.skillLevels69)||0);
+			tempCost = 8*(parseInt(values.skillLevels69)||0);
+			attributes.skillCP69 = tempCost;
+			combatSkillsCost += tempCost;
 			
-			// Skill 40: All Combat Levels cost 10 CP each.
-			let skill70Cost = 10*(parseInt(values.skillLevels70)||0);
+			// Skill 70: All Combat Levels cost 10 CP each.
+			tempCost = 10*(parseInt(values.skillLevels70)||0);
+			attributes.skillCP70 = tempCost;
+			combatSkillsCost += tempCost;
 			
-			let combatSkillsCost = skill61Cost+skill62Cost+skill63Cost+skill64Cost+skill65Cost+skill66Cost+skill67Cost+skill68Cost+skill69Cost+skill70Cost;
+			// Option to flex language skills as combat skill instead.
+			if (values.optionFewerLanguages === "on") {
+				startCount = maxSkillNum+reserveSkillNum+maxCombatSkillNum+maxCombatLevelNum+maxLanguageSkillNum-flexSkillNum+1;
+				endCount = startCount+flexSkillNum;
+				
+				for (let i = startCount; i <= endCount; i++) {
+					skillId = String(i).padStart(2,'0');
+					tempCost = calculateCombatSkillCost(values["skillType"+skillId], (parseInt(values["skillLevels"+skillId])||0) );
+					combatSkillsCost += tempCost;
+					attributes["skillCP"+skillId] = tempCost;
+				}
+			}
 			
-			setAttrs({
-				"hiddenCombatSkillsCost":combatSkillsCost,
-				"skillCP61":skill61Cost,
-				"skillCP62":skill62Cost,
-				"skillCP63":skill63Cost,
-				"skillCP64":skill64Cost,
-				"skillCP65":skill65Cost,
-				"skillCP66":skill66Cost,
-				"skillCP67":skill67Cost,
-				"skillCP68":skill68Cost,
-				"skillCP69":skill69Cost,
-				"skillCP70":skill70Cost
-			});
+			attributes.hiddenCombatSkillsCost = combatSkillsCost;
+			
+			setAttrs(attributes);
 		});
 	});
 	
@@ -19112,9 +19063,9 @@
 	/* Combat skill movers */
 	/* ------------------- */
 		
-	arrayOfRange(maxSkillNum + spanSkillNum + 1, maxSkillNum + spanSkillNum + maxCombatSkillNum, 1).forEach(num => {
+	arrayOfRange(maxSkillNum + reserveSkillNum + 1, maxSkillNum + reserveSkillNum + maxCombatSkillNum, 1).forEach(num => {
 		var lowId = String(num).padStart(2,'0');
-		var highId = String(num == maxSkillNum + spanSkillNum + maxCombatSkillNum ? maxSkillNum + spanSkillNum + 1 : num + 1).padStart(2,'0');
+		var highId = String(num == maxSkillNum + reserveSkillNum + maxCombatSkillNum ? maxSkillNum + reserveSkillNum + 1 : num + 1).padStart(2,'0');
 		
 		swapCombatSkillPositions(lowId, highId);
 	});
@@ -19154,47 +19105,38 @@
 	
 	
 	/* Language Skills */
-	on("change:enhancerLing change:skillFluency71 change:skillLiteracy71 change:skillFluency72 change:skillLiteracy72 change:skillFluency73 change:skillLiteracy73 change:skillFluency74 change:skillLiteracy74 change:skillFluency75 change:skillLiteracy75 change:skillFluency76 change:skillLiteracy76 change:skillFluency77 change:skillLiteracy77 change:skillFluency78 change:skillLiteracy78 change:skillFluency79 change:skillLiteracy79, change:optionLiteracyCostsPoints", function () {
+	on("change:enhancerLing change:skillFluency71 change:skillLiteracy71 change:skillFluency72 change:skillLiteracy72 change:skillFluency73 change:skillLiteracy73 change:skillFluency74 change:skillLiteracy74 change:skillFluency75 change:skillLiteracy75 change:skillFluency76 change:skillLiteracy76 change:skillFluency77 change:skillLiteracy77 change:skillFluency78 change:skillLiteracy78 change:skillFluency79 change:skillLiteracy79, change:optionLiteracyCostsPoints change:optionFewerLanguages", function () {
 		// Language skills are relatively simple without levels or roll calculations. The linguist enhancer is the only complication. 
 		// All calculations handled by the function calculateLanguageSkillCost(...).
+		// optionFewerLanguages, when true, shifts five language skill over to combat skills.
 		
-		getAttrs(["enhancerLing", "skillFluency71", "skillLiteracy71", "skillFluency72","skillLiteracy72", "skillFluency73","skillLiteracy73", "skillFluency74","skillLiteracy74", "skillFluency75","skillLiteracy75", "skillFluency76","skillLiteracy76", "skillFluency77","skillLiteracy77", "skillFluency78", "skillLiteracy78", "skillFluency79", "skillLiteracy79", "optionLiteracyCostsPoints"], function(values) {
-			const linguist = values.enhancerLing;
-			let literacyCost = 0;
+		getAttrs(["enhancerLing", "skillFluency71", "skillLiteracy71", "skillFluency72","skillLiteracy72", "skillFluency73","skillLiteracy73", "skillFluency74","skillLiteracy74", "skillFluency75","skillLiteracy75", "skillFluency76","skillLiteracy76", "skillFluency77","skillLiteracy77", "skillFluency78", "skillLiteracy78", "skillFluency79", "skillLiteracy79", "optionLiteracyCostsPoints", "optionFewerLanguages"], function(values) {
+			var attributes = new Object();
 			
-			if (values.optionLiteracyCostsPoints!=0) {
-				literacyCost = 1;
+			const linguist = values.enhancerLing;
+			const literacyCost = (values.optionLiteracyCostsPoints !== 0) ? 1 : 0;
+			let skillId = "";
+			let tempCost = 0;
+			let languageSkillsCost = 0;	
+			const startCount = maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1;
+			const endCount = startCount + maxLanguageSkillNum - ( (values.optionFewerLanguages === "on") ? flexSkillNum : 0 );
+			
+			for (let i = startCount; i <= endCount; i++) {
+				// General combat skills with costs determined by their skill type or levels.
+				skillId = String(i).padStart(2,'0');
+				tempCost = calculateLanguageSkillCost(values["skillFluency"+skillId]||"none", values["skillLiteracy"+skillId], linguist, literacyCost);
+				languageSkillsCost += tempCost;
+				attributes["skillCP"+skillId] = tempCost;
 			}
 			
-			let skill71Cost = calculateLanguageSkillCost( values.skillFluency71 , values.skillLiteracy71, linguist, literacyCost);
-			let skill72Cost = calculateLanguageSkillCost( values.skillFluency72 , values.skillLiteracy72, linguist, literacyCost);
-			let skill73Cost = calculateLanguageSkillCost( values.skillFluency73 , values.skillLiteracy73, linguist, literacyCost);
-			let skill74Cost = calculateLanguageSkillCost( values.skillFluency74 , values.skillLiteracy74, linguist, literacyCost);
-			let skill75Cost = calculateLanguageSkillCost( values.skillFluency75 , values.skillLiteracy75, linguist, literacyCost);
-			let skill76Cost = calculateLanguageSkillCost( values.skillFluency76 , values.skillLiteracy76, linguist, literacyCost);
-			let skill77Cost = calculateLanguageSkillCost( values.skillFluency77 , values.skillLiteracy77, linguist, literacyCost);
-			let skill78Cost = calculateLanguageSkillCost( values.skillFluency78 , values.skillLiteracy78, linguist, literacyCost);
-			let skill79Cost = calculateLanguageSkillCost( values.skillFluency79 , values.skillLiteracy79, linguist, literacyCost);
+			attributes.hiddenLanguageSkillsCost = languageSkillsCost;
 			
-			let totalLanguageCosts = skill71Cost+skill72Cost+skill73Cost+skill74Cost+skill75Cost+skill76Cost+skill77Cost+skill78Cost+skill79Cost;
-			
-			setAttrs({
-				"hiddenLanguageSkillsCost":totalLanguageCosts,
-				"skillCP71":skill71Cost,
-				"skillCP72":skill72Cost,
-				"skillCP73":skill73Cost,
-				"skillCP74":skill74Cost,
-				"skillCP75":skill75Cost,
-				"skillCP76":skill76Cost,
-				"skillCP77":skill77Cost,
-				"skillCP78":skill78Cost,
-				"skillCP79":skill79Cost
-			});
+			setAttrs(attributes);
 		});
 	});
 	
 	
-	// Show or hide extended languages and combat skills sections.
+	// Show or hide flexed languages and combat skills sections.
 	on("change:optionFewerLanguages", function () {
 		getAttrs(["optionFewerLanguages"], function(values) {
 			
@@ -19210,9 +19152,9 @@
 	/* Language skill movers */
 	/* --------------------- */
 		
-	arrayOfRange(maxSkillNum+spanSkillNum+maxCombatSkillNum+maxCombatLevelNum + 1, maxSkillNum+spanSkillNum+maxCombatSkillNum+maxCombatLevelNum+maxLanguageSkillNum, 1).forEach(num => {
+	arrayOfRange(maxSkillNum+reserveSkillNum+maxCombatSkillNum+maxCombatLevelNum + 1, maxSkillNum+reserveSkillNum+maxCombatSkillNum+maxCombatLevelNum+maxLanguageSkillNum, 1).forEach(num => {
 		var lowId = String(num).padStart(2,'0');
-		var highId = String(num == maxSkillNum+spanSkillNum+maxCombatSkillNum+maxCombatLevelNum+maxLanguageSkillNum ? maxSkillNum+spanSkillNum+maxCombatSkillNum+maxCombatLevelNum + 1 : num + 1).padStart(2,'0');
+		var highId = String(num == maxSkillNum+reserveSkillNum+maxCombatSkillNum+maxCombatLevelNum+maxLanguageSkillNum ? maxSkillNum+reserveSkillNum+maxCombatSkillNum+maxCombatLevelNum + 1 : num + 1).padStart(2,'0');
 		
 		swapLanguagePositions(lowId, highId);
 	});
@@ -20064,7 +20006,7 @@
 				}
 				
 				// Combat skills.
-				for (var i = maxSkillNum + spanSkillNum + 1; i <= maxSkillNum + spanSkillNum + maxCombatSkillNum; i++) {
+				for (var i = maxSkillNum + reserveSkillNum + 1; i <= maxSkillNum + reserveSkillNum + maxCombatSkillNum; i++) {
 					itemId = String(i).padStart(2,'0');
 					
 					if (values["skillDelete"+itemId] === "on") {
@@ -20078,13 +20020,13 @@
 				}
 				
 				// Language skills.
-				for (var i = maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1; i <= maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum; i++) {
+				for (var i = maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1; i <= maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum; i++) {
 					itemId = String(i).padStart(2,'0');
 					
 					if (values["skillDelete"+itemId] === "on") {
 						// Reset the skill to defaults.
 						attributes["skillDelete"+itemId] = 0;
-						attributes["skillName"+itemId] = (i === maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1) ? "Native Language" : "";
+						attributes["skillName"+itemId] = (i === maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1) ? "Native Language" : "";
 						attributes["skillFluency"+itemId] = "none";
 						attributes["skillLiteracy"+itemId] = 0;
 						attributes["skillCP"+itemId] = 0;
@@ -20108,13 +20050,13 @@
 		}
 		
 		// Combat skills.
-		for (var i = maxSkillNum+1; i <= maxSkillNum + spanSkillNum + maxCombatSkillNum; i++) {
+		for (var i = maxSkillNum+1; i <= maxSkillNum + reserveSkillNum + maxCombatSkillNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["skillDelete"+itemId] = 0;
 		}
 		
 		// Language skills.
-		for (var i = maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1; i <= maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum; i++) {
+		for (var i = maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1; i <= maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["skillDelete"+itemId] = 0;
 		}
@@ -20328,13 +20270,13 @@
 		}
 		
 		// Combat skills.
-		for (var i = maxSkillNum + spanSkillNum + 1; i <= maxSkillNum + spanSkillNum + maxCombatSkillNum; i++) {
+		for (var i = maxSkillNum + reserveSkillNum + 1; i <= maxSkillNum + reserveSkillNum + maxCombatSkillNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["skillDelete"+itemId] = 0;
 		}
 		
 		// Language skills.
-		for (var i = maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1; i <= maxSkillNum + spanSkillNum + maxCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum; i++) {
+		for (var i = maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + 1; i <= maxSkillNum + reserveSkillNum + maxCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum; i++) {
 			itemId = String(i).padStart(2,'0');
 			attributes["skillDelete"+itemId] = 0;
 		}
