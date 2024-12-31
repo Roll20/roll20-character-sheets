@@ -1,6 +1,98 @@
+# 2024-12-17
+
+- Edit talents so you can delete excess talents (@major havok)
+  - Genericise the code used by edit spells and edit talents
+- Fix rendering of side panel after CSS breaks roll20
+- Set status penalty to 0 on creature creation.
+
+
+# 2024-12-12
+
+The Author is an Idiot bugfix release for Treasure Law.
+
+- Allow drops from all magic item types
+- Save descriptions for all items (even new format)
+- Funky line as you lose hits or PP
+- Fix a maneuver penalty error which was messing up item drops
+
+# 2024-12-10
+
+- Finalise handling of Professions with selectable Base lists
+    - Alchemists are the first users
+- Creatures: Add hx for Hand Crossbows, and a few other attacks
+- Half shield bonus skill for partial block - not the full one.
+- Try and squash the super long list of errors when you first update stateud
+- Compendium data: Move a long bow to Bow, Long for the table.
+- Creatures: Creatures can now roll skills.
+- Equipment:
+  - Perception Penalties are now applied
+  - Ranged Penalties are now applied.
+- Take a terrible guess if it's a ranged or melee weapon when adding attacks
+- Creatures now have framework for type of attack (melee, ranged, directed)
+  - Does not (yet) change attack
+  - Add test to validate attack types
+- Change 'maneuver_penalty' -> status_penalty
+  - Update everywhere except inventory; it was a collision of names before.
+
+# 2024-12-3
+
+- Initiative modified by maneuver penalty
+- Update rolltemplate for initiative to show penalty if present.
+- Add tests and validations for creatures.
+- All creature weapons now have a size (usually 0)
+- Display a message when an injury takes a character to negative hits.
+- Fix a stupid misplaced class for RRs
+
+# 2024-11-26
+
+- Handle the knockback results when they have a ' in them.
+- Handle short swords and a few other weapons for creatures.
+
+
+# 2024-11-19
+
+- Stats are now right aligned.
+- Fix update for specialised skills.
+- RRs:
+    - now have a box.  Make them standout more.
+    - Use the pretty name. not the attribute name.
+    - Number now rolls with modifier.
+- Fix an issue causing some characters to have problems levelling up.
+- Fixed specialisations show the skill name when rolling.
+- Handle knacks for Alchemists.
+
+# 2024-11-14
+
+- Add description to each step of the Charactermancer buttons
+- Clear ranks on specialised skills if 0.  Previously worked for non specilised skills, this fixes
+    specialised skills as well (@ixs)
+- Add base lists selection in charactermancer.   Useful for professions with base lists.  Additionally
+base lists are now stored on the sheet.  So they persist.
+- Add control to stop progression until you have entered all data on the sheet required.
+- Bump sheet version 7
+  - Existing charaacters will have their base lists updated on the main sheet.
+
+# 2024-11-7
+
+- Sheet version to 6.  Funny how lots happen at once.
+- Force a skill recalculation after update.
+- Fix dependancy issue in edit.js: It depends on the skill list.   Can now edit dynamic specialisations for
+the new vocational skills.
+- Remove some dead code in skills.
+- Update similar skills modifier for fixed specialisations.
+- Make roll button for dynamic specialisations actually visible.  0 width buttons are really hard to see and click.
+
+# 2024-11-5
+
+- Bump sheet version to 5
+- Vocational skills are now dynamic specialisations.  No longer a fixed list.
+  - Cleans up a lot of space on the sheet
+  - Update the level up process to match
+  - Automatically move old skills across
+
 # 2024-10-29
 
-- Finally update skills to show specilisations,
+- Finaly update skills to show specilisations,
 - Fix translation issue identified by Jon_joe.
     - Seems French has 2 strings translated.  And one exposed a bug
     - Add tests for case

@@ -115,7 +115,7 @@ With the Weapon Worksheet open, begin by entering a weapon's base damage (the sh
 
 HERO System 6th Edition considers certain power advantages when determining enhancements to damage (e.g., armor piercing, see 6E2 98-100). HS6eH uses an algorithm that duplicates the *Damage Classes Quick-Reference Tables* found on 6E2 101 plus a best attempt to expand them using the *Expanded Damage Class Tables* available for a small fee separately from Hero Games. The expanded tables were used only as guidance since they do not always agree with the rulebook (and are missing some important common values).
 
-![A/B Button](/HeroSystem6eHeroic/images/ABButton.png) The "A/B" buttons in the Weapons and Armor title bars swap the visible set with an alternate set. One set could be an adventurer's traveling kit and the second a heavier battlefield loadout. Alternatively, a hero such as Neo in the Matrix might just need as many weapons as they can carry. The "up" mover button of the top item exchanges the top items of each set. The "down" mover button of the bottom item likewise exchanges the bottom items of each set.
+![A/B Button](/HeroSystem6eHeroic/images/ABButton.png) The "A/B" buttons in the Armor, Weapons, and Equipment title bars swap the visible set with an alternate set. One set could be an adventurer's traveling kit and the second a heavier battlefield loadout. Alternatively, a hero such as Neo in the Matrix might just need as many weapons as they can carry. The "up" mover button of the top item exchanges the top items of each set. The "down" mover button of the bottom item likewise exchanges the bottom items of each set.
 
 ![Weapons Table A](/HeroSystem6eHeroic/images/weaponsAB.png)
 
@@ -279,7 +279,7 @@ This dropdown offers three options: Never, Always, or Prompt. These give the opt
 
 ### Activate Item Delete Mode. Deactivate to complete Deletion
 
-This option activates or deactivates the line item deletion mode for armor, weapons, equipment, and the shield. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. If you close the character sheet the deletion marks will be reset, aborting the action.
+This option activates or deactivates the line item deletion mode for gear, skills, powers, talents, and complications. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. You may abandon your selections and abort the mode by either pressing one of the *reset* buttons or by closing the character sheet.
 
 >[!CAUTION]
 > Use of the Delete Mode may lead to unwanted data loss. Deleted items are not recoverable.
@@ -331,4 +331,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
-*Last updated by Villain in Glasses on October 15, 2024 to represent the sheet as of version 3.50.*
+*Last updated by Villain in Glasses on November 12, 2024 to represent the sheet as of Version 3.80.*

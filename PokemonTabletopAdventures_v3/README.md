@@ -23,6 +23,15 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Nov 27, 2024
+- Removed scrollbars from the collapsing sections
+
+### Nov 17, 2024
+- Added a new roll template used by skills that has a more streamlined appearance
+- Added a new toggle button at the top of the sheet to toggle between skill roll templates, that defaults to the existing style
+- Added transitions for all collapsible sections of the sheet to make it more pleasing to use
+- Added collapsing sections for all areas of the sheet's character page
+
 ### Apr 10, 2024
 - Added support for collapsing the character avatar/stat grid section to show only the stat grid when collapsed
 - Resolved a small issue with the background when the sheet scrolled sideways for the mobile app

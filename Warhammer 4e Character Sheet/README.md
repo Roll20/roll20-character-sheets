@@ -81,6 +81,35 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Dec 14th 2024 v1.74b
+
+- New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.
+- Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section.
+- Fix issue with impact/damaging not showing on Attack rolls with Size modifier Large Vs Small.
+- Fix mixed up Impact/Impale checkboxes on the NPC pages.
+- Fix Dangerous Quality fumble sometimes not showing when test Unit or 10s Die is 9.
+- Fix Warpstone Quality now only triggered on crit again.
+- Resolved some issues with dulpicate crit translations.
+- Cleaned up minor CSS file errors.
+
+
+Dec 14th 2024 v1.74a
+
+- Fix for Conditions not working
+
+
+Dec 12th 2024 v1.74
+
+- New Dwarf Player's Guide Talents, to support the new Dwarf career's. Talents with direct roll modifier are integrated, but some of the indirect ones are manually applied by the GM/players. Including new attack mode Whirlwind of Death. These Talents are intended for Dwarfs only, but sheet will allow any race to use them (at GM discretion).
+- New Grudges, option to switch between Goals or Grudges recording on the Background Tab. Dwarf Race PCs automatically switch to Grudges, but can be changed back manually if desired.
+- New Characteristics Auto Roller for new characters, for every officially supported Race. This will only show if Starting WeaponSkill and Fellowship are empty, like at PC creation.
+- All talent based situational SL modifiers (Grey ones) now have mouse over labels with their RAW test text added. To aid GM/player to determine if they should be added to the roll. 
+- Reworked the Weapon Quality configuration boxes, added more linear layout and alphabetized. New added are, Entangle to Melee weapon Qualities. And Crewed and Salvo to Ranged weapon Qualities.
+- Magic/Melee/Range Quickbar rework, new pop out buttons under the Combat Actions section. Declared Attack Options, e.g. Charge/Defensive/Called Shot/Frenzy/DW/Disarm etc, have all been moved to Declare Attack Options. Players must click these to enable talents add automatically to the Roll outcome. This simulates how Talent based Special Action options have to be called before attacking. 
+- Dual Wield is no longer a situational bonus, its now been moved in the Declared Attack Options section of the Melee Quickbar. Brining all these types of special attack actions into one place.
+- Distracted now correctly applies to all test rolls.
+- Warpstone Quality changed to the EiS version.
+
 
 Oct  9th 2024 v1.73a
 

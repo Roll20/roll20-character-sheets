@@ -1699,16 +1699,16 @@
             <!-- end of line-->
             <label style="width:23%">Normal Move</label>
             <label style="width:8%">Half:</label>
-            <input name="attr_HalfMove" type="text" style="width:8%" title="Agility Bonus (AB)" value="ceil( (@{AB} + @{CharSize}) * @{movementhalved})" disabled />
+            <input name="attr_HalfMove" type="text" style="width:8%" title="Agility Bonus" value="ceil( (floor(@{Agility}/10) + (@{CharSize})) * @{movementhalved} )" disabled />
             <div class="spacing" style="width:3%"></div>
             <label style="width:8%">Full:</label>
-            <input name="attr_FullMove" type="text" style="width:8%" title="Agility Bonus x2" value="ceil( ( (@{AB}*2) + @{CharSize}) * @{movementhalved})" disabled />
+            <input name="attr_FullMove" type="text" style="width:8%" title="Agility Bonus x2" value="ceil( ((floor(@{Agility}/10) + (@{CharSize}))*2) * @{movementhalved} )" disabled />
             <div class="spacing" style="width:3%"></div>
             <label style="width:12%">Charge:</label>
-            <input name="attr_ChargeMove" type="text" style="width:8%" title="Agility Bonus x3" value="ceil( ( (@{AB}*3) + @{CharSize} ) * @{movementhalved})" disabled />
+            <input name="attr_ChargeMove" type="text" style="width:8%" title="Agility Bonus x3" value="ceil( ((floor(@{Agility}/10) + (@{CharSize}))*3) * @{movementhalved} )" disabled />
             <div class="spacing" style="width:3%"></div>
             <label style="width:8%">Run:</label>
-            <input name="attr_RunMove" type="text" style="width:8%" title="Agility Bonus x6" value="ceil( ( (@{AB}*6) + @{CharSize} ) * @{movementhalved})" disabled />
+            <input name="attr_RunMove" type="text" style="width:8%" title="Agility Bonus x6" value="ceil( ((floor(@{Agility}/10) + (@{CharSize}))*6) * @{movementhalved} )" disabled />
             <!-- end of line-->
             <label style="width:23%">Custom Move</label>
             <label style="width:8%">Half:</label>
@@ -4963,36 +4963,86 @@ on("change:startingFEL change:AdvancedFEL1 change:AdvancedFEL2 change:AdvancedFE
             {{#p1}}
                 <div class="sheet-result">{{p1}}</div>
             {{/p1}}
-		<!--section for attacks and hit location -->
-			{{#d100a}}
-                <div class="sheet-result">{{d100a}}&#160;d100 Roll</div>
-                {{#rollWasFumble() d100a }}
+		<!--section for attacks and hit location-->
+		{{#d100a}}
+                	<div class="sheet-result">{{d100a}}&#160;d100 Roll</div>
+                	{{#rollWasFumble() d100a }}
 				    <div class="sheet-result" style="color:red">the weapon malfunctions!</div>
-				{{/rollWasFumble() d100a }}
-            {{/d100a}}
+			{{/rollWasFumble() d100a }}
+            	{{/d100a}}
             {{#attack}}
-                <div class="sheet-result">{{attack}}&#160;
-                    {{#rollGreater() d100a testtarget }}Missed...{{/rollGreater() d100a testtarget }}
-                    {{#rollLess() d100a testtarget }}Attack Hits! &#x1F4A2;
-						<div class="sheet-result">{{hitloc}}&#160;
-                            {{#rollBetween() hitloc 1 10}}HEAD{{/rollBetween() hitloc 1 10}}
-                            {{#rollBetween() hitloc 11 20}}RIGHT ARM{{/rollBetween() hitloc 11 20}}
-                            {{#rollBetween() hitloc 21 30}}LEFT ARM{{/rollBetween() hitloc 21 30}}
-                            {{#rollBetween() hitloc 31 70}}BODY{{/rollBetween() hitloc 31 70}}
-                            {{#rollBetween() hitloc 71 85}}RIGHT LEG{{/rollBetween() hitloc 71 85}}
-                            {{#rollBetween() hitloc 86 100}}LEFT LEG{{/rollBetween() hitloc 86 100}}
-                        </div>
-					{{/rollLess() d100a testtarget }}
-                    {{#rollTotal() d100a testtarget }}Attack Hits! &#x1F4A2;
-						<div class="sheet-result">{{hitloc}}&#160;
-                            {{#rollBetween() hitloc 1 10}}HEAD{{/rollBetween() hitloc 1 10}}
-                            {{#rollBetween() hitloc 11 20}}RIGHT ARM{{/rollBetween() hitloc 11 20}}
-                            {{#rollBetween() hitloc 21 30}}LEFT ARM{{/rollBetween() hitloc 21 30}}
-                            {{#rollBetween() hitloc 31 70}}BODY{{/rollBetween() hitloc 31 70}}
-                            {{#rollBetween() hitloc 71 85}}RIGHT LEG{{/rollBetween() hitloc 71 85}}
-                            {{#rollBetween() hitloc 86 100}}LEFT LEG{{/rollBetween() hitloc 86 100}}
-                        </div>
-					{{/rollTotal() d100a testtarget }}
+		<div class="sheet-result">{{attack}}
+                    {{#rollGreater() d100a testtarget}}Missed...{{/rollGreater() d100a testtarget}}
+                    {{#^rollGreater() d100a testtarget}}Attack Hits! &#x1F4A2; <br>
+                            <!--head locations-->
+                            {{#rollTotal() hitloc 01}}Head{{/rollTotal() hitloc 01}}
+                            {{#rollTotal() hitloc 10}}Head{{/rollTotal() hitloc 10}}
+                            {{#rollTotal() hitloc 20}}Head{{/rollTotal() hitloc 20}}
+                            {{#rollTotal() hitloc 30}}Head{{/rollTotal() hitloc 30}}
+                            {{#rollTotal() hitloc 40}}Head{{/rollTotal() hitloc 40}}
+                            {{#rollTotal() hitloc 50}}Head{{/rollTotal() hitloc 50}}
+                            {{#rollTotal() hitloc 60}}Head{{/rollTotal() hitloc 60}}
+                            {{#rollTotal() hitloc 70}}Head{{/rollTotal() hitloc 70}}
+                            {{#rollTotal() hitloc 80}}Head{{/rollTotal() hitloc 80}}
+                            {{#rollTotal() hitloc 90}}Head{{/rollTotal() hitloc 90}}
+                            <!--right arm locations-->
+                            {{#rollTotal() hitloc 91}}Right Arm{{/rollTotal() hitloc 91}}
+                            {{#rollTotal() hitloc 81}}Right Arm{{/rollTotal() hitloc 81}}
+                            {{#rollTotal() hitloc 71}}Right Arm{{/rollTotal() hitloc 71}}
+                            {{#rollTotal() hitloc 61}}Right Arm{{/rollTotal() hitloc 61}}
+                            {{#rollTotal() hitloc 51}}Right Arm{{/rollTotal() hitloc 51}}
+                            {{#rollTotal() hitloc 41}}Right Arm{{/rollTotal() hitloc 41}}
+                            {{#rollTotal() hitloc 31}}Right Arm{{/rollTotal() hitloc 31}}
+                            {{#rollTotal() hitloc 21}}Right Arm{{/rollTotal() hitloc 21}}
+                            {{#rollTotal() hitloc 11}}Right Arm{{/rollTotal() hitloc 11}}
+                            {{#rollTotal() hitloc 02}}Right Arm{{/rollTotal() hitloc 02}}
+                            <!--left arm locations-->
+                            {{#rollTotal() hitloc 92}}Left Arm{{/rollTotal() hitloc 92}}
+                            {{#rollTotal() hitloc 82}}Left Arm{{/rollTotal() hitloc 82}}
+                            {{#rollTotal() hitloc 72}}Left Arm{{/rollTotal() hitloc 72}}
+                            {{#rollTotal() hitloc 62}}Left Arm{{/rollTotal() hitloc 62}}
+                            {{#rollTotal() hitloc 52}}Left Arm{{/rollTotal() hitloc 52}}
+                            {{#rollTotal() hitloc 42}}Left Arm{{/rollTotal() hitloc 42}}
+                            {{#rollTotal() hitloc 32}}Left Arm{{/rollTotal() hitloc 32}}
+                            {{#rollTotal() hitloc 22}}Left Arm{{/rollTotal() hitloc 22}}
+                            {{#rollTotal() hitloc 12}}Left Arm{{/rollTotal() hitloc 12}}
+                            {{#rollTotal() hitloc 03}}Left Arm{{/rollTotal() hitloc 03}}
+                            <!--body locations-->
+                            {{#rollBetween() hitloc 93 96}}Body{{/rollBetween() hitloc 93 96}}
+                            {{#rollBetween() hitloc 83 86}}Body{{/rollBetween() hitloc 83 86}}
+                            {{#rollBetween() hitloc 73 76}}Body{{/rollBetween() hitloc 73 76}}
+                            {{#rollBetween() hitloc 63 66}}Body{{/rollBetween() hitloc 63 66}}
+                            {{#rollBetween() hitloc 53 56}}Body{{/rollBetween() hitloc 53 56}}
+                            {{#rollBetween() hitloc 43 46}}Body{{/rollBetween() hitloc 43 46}}
+                            {{#rollBetween() hitloc 33 36}}Body{{/rollBetween() hitloc 33 36}}
+                            {{#rollBetween() hitloc 23 26}}Body{{/rollBetween() hitloc 23 26}}
+                            {{#rollBetween() hitloc 13 16}}Body{{/rollBetween() hitloc 13 16}}
+                            {{#rollBetween() hitloc 13 16}}Body{{/rollBetween() hitloc 13 16}}
+                            {{#rollBetween() hitloc 04 07}}Body{{/rollBetween() hitloc 04 07}}
+                            <!--right leg locations-->
+                            {{#rollTotal() hitloc 97}}Right Leg{{/rollTotal() hitloc 97}}
+                            {{#rollTotal() hitloc 87}}Right Leg{{/rollTotal() hitloc 87}}
+                            {{#rollTotal() hitloc 77}}Right Leg{{/rollTotal() hitloc 77}}
+                            {{#rollTotal() hitloc 67}}Right Leg{{/rollTotal() hitloc 67}}
+                            {{#rollBetween() hitloc 57 58}}Right Leg{{/rollBetween() hitloc 57 58}}
+                            {{#rollBetween() hitloc 47 48}}Right Leg{{/rollBetween() hitloc 47 48}}
+                            {{#rollBetween() hitloc 37 38}}Right Leg{{/rollBetween() hitloc 37 38}}
+                            {{#rollBetween() hitloc 27 28}}Right Leg{{/rollBetween() hitloc 27 28}}
+                            {{#rollBetween() hitloc 17 18}}Right Leg{{/rollBetween() hitloc 17 18}}
+                            {{#rollTotal() hitloc 08}}Right Leg{{/rollTotal() hitloc 08}}
+                            <!--left leg locations-->
+                            {{#rollTotal() hitloc 100}}Left Leg{{/rollTotal() hitloc 100}}
+                            {{#rollBetween() hitloc 98 99}}Left Leg{{/rollBetween() hitloc 98 99}}
+                            {{#rollBetween() hitloc 88 89}}Left Leg{{/rollBetween() hitloc 88 89}}
+                            {{#rollBetween() hitloc 78 79}}Left Leg{{/rollBetween() hitloc 78 79}}
+                            {{#rollBetween() hitloc 68 69}}Left Leg{{/rollBetween() hitloc 68 69}}
+                            {{#rollTotal() hitloc 59}}Left Leg{{/rollTotal() hitloc 59}}
+                            {{#rollTotal() hitloc 49}}Left Leg{{/rollTotal() hitloc 49}}
+                            {{#rollTotal() hitloc 39}}Left Leg{{/rollTotal() hitloc 39}}
+                            {{#rollTotal() hitloc 29}}Left Leg{{/rollTotal() hitloc 29}}
+                            {{#rollTotal() hitloc 19}}Left Leg{{/rollTotal() hitloc 19}}
+                            {{#rollTotal() hitloc 09}}Left Leg{{/rollTotal() hitloc 09}}
+                    {{/^rollGreater() d100a testtarget}}
                 </div>
             {{/attack}}
         <!--section for strike to stun -->
