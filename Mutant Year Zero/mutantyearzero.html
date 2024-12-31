@@ -1487,9 +1487,8 @@
                 </div>
               </div>
               
-              <div class="dice-rolls-info">
-                
-              </div> 
+              <!-- <div class="dice-rolls-info"></div>  -->
+
               <!-- Needs to be handled in dice pool and clear dice pool
               <div class="api-button dice-rolls-copy hidden">
                 <input type="checkbox" class="dice-pool dice-rolls-copy-button" name="attr_command_toggle" value="@{whisper_option_api} [[(@{skill})d6]] [[(@{attribute})d6]] [[(@{gear})d6]] --Character|@{character_name} --Roll|@{current_preset}" title="Copy macro">
@@ -1538,13 +1537,19 @@
             <button type="action" name="act_dice_pool_clear" class="small-caps dice-footer-clear dice-rolls-smaller" data-i18n-title="reset-dice" title="Reset dice pool." data-i18n="clear-dice-pool">
               Clear Dice Pool
             </button>
-            <div class="dice-footer-api">
+
+            <!-- <div class="dice-footer-api">
               <button type="action" name="act_api_dice_toggle" class="api-button small-caps" data-i18n="api-dice">
                 api dice 
               </button> 
               <span class="informative-qmark" data-i18n-title="api-dice-info">?</span> 
+            </div> -->
+
+            <div class="dice-rolls-pushable">
+              <label for="pushable-toggle" data-i18n="pushable-toggle" data-i18n-title="pushable-title">Pushable</label>
+              <input name="attr_pushable" id="pushable-toggle" type="checkbox" value="1" data-i18n-title="pushable-title" />
             </div>
-            
+              
           <!-- </div> -->
         </div>
       </div>
@@ -2949,6 +2954,12 @@
     <span style="display: none;" data-i18n="whisper-query">Whisper roll?</span>
     <span style="display: none;" data-i18n="yes">yes</span>
     <span style="display: none;" data-i18n="no">no</span>
+
+    <div>
+      <span data-i18n="api-toggle">Use API script for dice rolls</span>:
+      <input type="checkbox" name="attr_api_toggle" value="1" title="@{api_toggle}" style="vertical-align: center;"  />
+    </div>
+
     <!--<div>
       <span data-i18n="sort-skills">Sort Skills by Attribute:</span>
       <input type="checkbox" name="attr_skill_order_group" value="1" title="@{skill_order_group}" style="vertical-align: middle;" />
@@ -3216,7 +3227,18 @@
 
 <!-- Roll Templates -->
 <rolltemplate class="sheet-rolltemplate-mutantyearzero">
-  <div class="template-wrap">
+  {{#rollTotal() chartype_id 1}}
+  <div class="template-wrap mutant">
+  {{/rollTotal() chartype_id 1}}
+  {{#rollTotal() chartype_id 2}}
+  <div class="template-wrap animal">
+  {{/rollTotal() chartype_id 2}}
+  {{#rollTotal() chartype_id 3}}
+  <div class="template-wrap robot">
+  {{/rollTotal() chartype_id 3}}
+  {{#rollTotal() chartype_id 4}}
+  <div class="template-wrap human">
+  {{/rollTotal() chartype_id 4}}    
     <div class="template-grid">
       <div class="template-grid-item template-span-six template-header">
         {{#character_name}}
@@ -5411,7 +5433,7 @@ const mainAttributeArr = [
     });
   });
   
-  /* api dice toggle */
+  /* api dice toggle
   on("clicked:api_dice_toggle", function () {
     clog("Change Detected: API Dice Toggle - button clicked");
     getAttrs(["api_toggle"], function (values) {
@@ -5425,9 +5447,9 @@ const mainAttributeArr = [
       }
       setAttrs({
         api_toggle: buttonState,
-      });
+      },{silent:true});
     });
-  });  
+  });   */
 
   
   const rollEscape = {
@@ -5475,11 +5497,12 @@ const mainAttributeArr = [
   
 
   on("clicked:roll_the_dice", () => {
-    getAttrs( ["character_name", "character_id", "attribute", "skill", "gear", "current_preset", "whisper_option", "pushable"], async (values) => {
+    getAttrs( ["character_name", "character_id", "chartype","attribute", "skill", "gear", "current_preset", "whisper_option", "pushable"], async (values) => {
       const trigger = {name : values.current_preset},
         attributes = {
           character_name : values.character_name||"Unknown",
           character_id : values.character_id||0,
+          chartype_id : values.chartype === 'Mutant' ? 1 : ( values.chartype === 'Animal' ? 2 : ( values.chartype === 'Robot' ? 3 : ( values.chartype === 'Human' ? 4 : 1 ))), 
         },
         roll = {  
           name: values.current_preset||'Roll',
@@ -5515,7 +5538,7 @@ const mainAttributeArr = [
         for(let i = 1; i <= Math.abs(roll.skill); i++) { skillStr += `{{negative-die-${litnum[i]}= [[1]] }} {{negative-roll-${litnum[i]}= [[1d6]] }} `; }
       }
       for(let i = 1; i <= roll.gear; i++) { gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6]] }} `; }
-      rollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
+      rollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
     }    
 
     //clog("Roll string; "+ rollStr);
@@ -5598,7 +5621,7 @@ const mainAttributeArr = [
         roll.pushable = 0;
       }
 
-      roll.pushRollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
+      roll.pushRollStr = `&{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
       
       const pushRoll = {
         attributes: attributes,
