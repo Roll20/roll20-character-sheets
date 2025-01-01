@@ -2713,17 +2713,21 @@ on('clicked:reg_relax-action', async (info) => {
 	}
 });
 
-
 // Generating Regeneration Roll (Rest)
 on(
 	[
 		"character_name",
 		"gm_roll_opt",
 		"reg_rest_duration",
-		"au",
-		"au_max",
-		"erschoepfung",
-		"ueberanstrengung",
+		"reg_rest_duration_auto",
+		"reg_rest_automode",
+		"au", "erschoepfung", "ueberanstrengung", "entrueckung",
+		"au_max", "erschoepfung_max", "ueberanstrengung_max",
+		"verstecke_erschoepfung", "verstecke_ueberanstrengung",
+		"reg_sleep_addiction_withdrawal_effect",
+		"reg_sleep_food_restriction_effect",
+		// Comfort for choosing only relevant regeneration
+		"liturgientab"
 	].map(attr => "change:" + attr).join(" "),
 	function(eventInfo) {
 	safeGetAttrs(
@@ -2731,102 +2735,521 @@ on(
 			"character_name",
 			"gm_roll_opt",
 			"reg_rest_duration",
-			"AU",
-			"AU_max",
-			"erschoepfung",
-			"ueberanstrengung",
+			"reg_rest_duration_auto",
+			"reg_rest_automode",
+			"AU", "erschoepfung", "ueberanstrengung", "Entrueckung",
+			"AU_max", "erschoepfung_max", "ueberanstrengung_max",
+			"verstecke_erschoepfung", "verstecke_ueberanstrengung",
+			"reg_sleep_addiction_withdrawal_effect",
+			"reg_sleep_food_restriction_effect",
+			"LiturgienTab",
 		], function(values) {
+		// Boilerplate
 		const caller = "Action Listener for Generation of Regeneration Roll (Rest)";
 		debugLog(caller, "eventInfo", eventInfo, "values", values);
-		const baseRoll = [
+		let attrsToChange = {};
+
+		// Constants (used more than once)
+		const exhaustionMin = 0;
+		const overexertionMin = 0;
+		const withdrawal = parseInt(values["reg_sleep_addiction_withdrawal_effect"]);
+		const foodRestriction = parseInt(values["reg_sleep_food_restriction_effect"]);
+
+		// Preparation
+		let restDuration = parseInt(values["reg_rest_duration"]);
+		if (restDuration <= 0)
+		{
+			restDuration = 1;
+		}
+
+		// Rolls
+		const rollHead = [
 			values["gm_roll_opt"],
 			"&{template:reg-rest}",
 			`{{charactername=${values["character_name"]}}}`,
-			`{{duration=[[${values["reg_rest_duration"]}]]}}`,
 			`{{au=[[${values["AU"]}]]}}`,
-			`{{aumax=[[${values["AU_max"]}]]}}`,
-			`{{erschoepfung=[[${values["erschoepfung"]}]]}}`,
-			'{{erschoepfungneu=[[0d1]]}}',
-			`{{ueberanstrengung=[[${values["ueberanstrengung"]}]]}}`,
-			'{{ueberanstrengungneu=[[0d1]]}}',
+			`{{xh=[[${values["erschoepfung"]}]]}}`,
+			`{{xhmax=[[${values["erschoepfung_max"]}]]}}`,
+			`{{ox=[[${values["ueberanstrengung"]}]]}}`,
+			`{{oxmax=[[${values["ueberanstrengung_max"]}]]}}`,
+			`{{rt=[[${values["Entrueckung"]}]]}}`,
 		];
+		if (values["reg_rest_automode"] === "1")
+		{
+			rollHead.push(`{{automode=[[${values["reg_rest_automode"]}]]}}`);
+		}
+		const durationRoll = [];
+		if (values["reg_rest_automode"] === "1")
+		{
+			durationRoll.push(`{{duration=[[${values["reg_rest_duration_auto"]}]]}}`);
+		} else {
+			durationRoll.push(`{{duration=[[${restDuration}]]}}`);
+		}
+		const AURoll = [
+			`{{aumax=[[${values["AU_max"]}]]}}`,
+			'{{aunew=[[0]]}}',
+			"{{aurequired=[[1]]}}",
+		];
+		const noAURoll = [ "{{aurequired=[[0]]}}" ];
+		const exhaustionRoll = [
+			'{{xhloss=[[0]]}}',
+			'{{xhnew=[[0]]}}',
+			"{{xhrequired=[[1]]}}",
+		];
+		const noExhaustionRoll = [ "{{xhrequired=[[0]]}}" ];
+		const overexertionRoll = [
+			'{{oxloss=[[0]]}}',
+			'{{oxnew=[[0]]}}',
+			"{{oxrequired=[[1]]}}",
+		]
+		const overexertionMaxRoll = [
+			"{{oxrequired=[[1]]}}",
+			"{{impossible=[[1]]}}",
+		]
+		const noOverexertionRoll = [ "{{oxrequired=[[0]]}}" ];
+		const RTRoll = [
+			`{{rtloss=[[0]]}}`,
+			"{{rtnew=[[0]]}}",
+			"{{rtrequired=[[1]]}}",
+		];
+		const noRTRoll = [
+			"{{rtrequired=[[0]]}}",
+		];
+		const foodRestrictionRoll = [
+			`{{foodrestriction=[[${values["reg_sleep_food_restriction_effect"]}]]}}`,
+		];
+		const addictionRoll = [
+			`{{addictioneffect=[[${values["reg_sleep_addiction_withdrawal_effect"]}]]}}`,
+			`{{addictiondrug=${values["nachteil_sucht_suchtmittel"]}}}`,
+			`{{xhnew=[[${values["erschoepfung"]}]]}}`,
+			`{{oxnew=[[${values["ueberanstrengung"]}]]}}`,
+		];
+		const nonerequiredRoll = [ "{{nonerequired=[[1]]}}" ];
+
+		// Calculate automode duration
+		const exhaustion = parseInt(values["erschoepfung"]);
+		const overexertion = parseInt(values["ueberanstrengung"]);
+		const exhaustionReg = -2;
+		const overexertionReg = -1;
+		const durationAutoCurrent = parseInt(values["reg_rest_duration_auto"]);
+		let durationAuto = 0;
+		let durationExhaustion = 0;
+		let durationOverexertion = 0;
+		if (values["reg_rest_automode"] === "1")
+		{
+			// Consider only exhaustion and overexertion
+			if (
+				(withdrawal === 0)
+				&&
+				(foodRestriction < 2)
+			)
+			{
+				if (
+					(values["verstecke_erschoepfung"] === "0")
+					&&
+					(exhaustion > exhaustionMin)
+				)
+				{
+					durationExhaustion = Math.ceil(Math.abs(exhaustion / exhaustionReg));
+				}
+
+				if (
+					(values["verstecke_ueberanstrengung"] === "0")
+					&&
+					(overexertion > overexertionMin)
+				)
+				{
+					durationOverexertion = Math.ceil(Math.abs(overexertion / overexertionReg));
+				}
+				durationAuto = durationExhaustion + durationOverexertion;
+			} else {
+				durationAuto = 0;
+			}
+		}
+		/// Only trigger attribute change if it really changed
+		if (Math.abs(durationAutoCurrent - durationAuto) !== 0)
+		{
+			attrsToChange["reg_rest_duration_auto"] = durationAuto;
+		}
 
 		// Build roll
-		var roll = [];
-		roll = roll.concat(baseRoll);
+		let roll = [];
+		roll = roll.concat(rollHead);
+		roll = roll.concat(durationRoll);
 
-		safeSetAttrs({"reg_rest_roll": roll.join(" ")});
+		if (parseInt(values["AU"]) < parseInt(values["AU_max"]))
+		{
+			roll = roll.concat(AURoll);
+		} else {
+			roll = roll.concat(noAURoll);
+		}
+
+		/// No regeneration during withdrawal or severe food restriction (but also no build-up)
+		if (
+			(withdrawal === 0)
+			&&
+			(foodRestriction < 2)
+		)
+		{
+			if (
+				(values["verstecke_erschoepfung"] === "0")
+				&&
+				(
+					(exhaustion > exhaustionMin)
+					||
+					(overexertion > overexertionMin)
+				)
+			)
+			{
+				roll = roll.concat(exhaustionRoll);
+			} else {
+				roll = roll.concat(noExhaustionRoll);
+			}
+
+			if (
+				(values["verstecke_ueberanstrengung"] === "0")
+				&&
+				(overexertion > overexertionMin)
+			)
+			{
+				roll = roll.concat(overexertionRoll);
+			} else {
+				roll = roll.concat(noOverexertionRoll);
+			}
+		} else {
+			if (withdrawal !== 0)
+			{
+				roll = roll.concat(addictionRoll);
+			}
+			if (foodRestriction !== 0)
+			{
+				roll = roll.concat(foodRestrictionRoll);
+			}
+		}
+
+		/// Additional properties for rapture loss "0" = not hidden
+		const raptureMin = 0;
+		if (
+			(values["LiturgienTab"] === "0")
+			&&
+			(parseInt(values["Entrueckung"]) > raptureMin)
+		)
+		{
+			roll = roll.concat(RTRoll);
+		} else {
+			roll = roll.concat(noRTRoll);
+		}
+
+		/// Regeneration required?
+		if (
+			(parseInt(values["AU"]) >= parseInt(values["AU_max"]))
+			&&
+			(
+				(
+					(values["verstecke_erschoepfung"] === "0")
+					&&
+					(exhaustion <= exhaustionMin)
+				)
+				||
+				(values["verstecke_erschoepfung"] !== "0")
+			)
+			&&
+			(
+				(
+					(values["verstecke_ueberanstrengung"] === "0")
+					&&
+					(overexertion <= overexertionMin)
+				)
+				||
+				(values["verstecke_ueberanstrengung"] !== "0")
+			)
+		)
+		{
+			roll = [];
+			roll = roll.concat(rollHead);
+			roll = roll.concat(nonerequiredRoll);
+		}
+
+		// Finish
+		attrsToChange["reg_rest_roll"] = roll.join(" ").trim();
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
 	});
 });
 
 on('clicked:reg_rest-action', async (info) => {
+	// Boilerplate
 	const caller = "Action Listener for Regeneration Button (Rest)";
+	let computed = {};
+	let attrsToChange = {};
+
+	// Roll
 	let results = await startRoll("@{reg_rest_roll}");
 	debugLog(caller, "head", "info:", info, "results:", results);
-	let rollID = results.rollId;
-	results = results.results;
-	let computed = {};
 
 	// Convenience Object
 	let resultsOnly = {};
-	for (let property in results)
+	for (let property in results["results"])
 	{
-		resultsOnly[property] = results[property].result;
+		resultsOnly[property] = results["results"][property].result;
 	}
-
-	let attrsToChange = {};
-
-	// Regeneration Order: Overexertion, Exhaustion
-	// As long as there is overexertion, there cannot be exhaustion regeneration
-	let exhaustionNeu = resultsOnly["erschoepfung"];
-	let overexertionNeu = resultsOnly["ueberanstrengung"];
-
-	// Hourly regeneration rates
-	const exhaustionReg = -2;
-	const overexertionReg = -1;
-
-	for (let hour = 0; hour < resultsOnly["duration"]; hour++)
+	if (Object.hasOwn(resultsOnly, "xhrequired"))
 	{
-		if (overexertionNeu > 0)
+		if (resultsOnly["xhrequired"] === 1)
 		{
-			overexertionNeu += overexertionReg;
-		} else if (exhaustionNeu > 0) {
-			exhaustionNeu += exhaustionReg;
+			resultsOnly["xhrequired"] = true;
 		} else {
-			break;
+			resultsOnly["xhrequired"] = false;
 		}
 	}
-
-	// Cap at 0
-	exhaustionNeu = Math.max(0, exhaustionNeu);
-	overexertionNeu = Math.max(0, overexertionNeu);
-
-	computed["erschoepfungneu"] = exhaustionNeu;
-	computed["ueberanstrengungneu"] = overexertionNeu;
-
-	// Change only if regeneration actually changed something
-	// Stamina will always be full after 1 h (min. regeneration is 36d6 = 36, KO checks not even considered!)
-	if (parseInt(resultsOnly["au"]) !== parseInt(resultsOnly["aumax"]))
-	{
-		attrsToChange["AU"] = resultsOnly["aumax"];
-		computed["au"] = resultsOnly["aumax"];
+	if (Object.hasOwn(resultsOnly, "oxrequired"))
+		{
+		if (resultsOnly["oxrequired"] === 1)
+		{
+			resultsOnly["oxrequired"] = true;
+		} else {
+			resultsOnly["oxrequired"] = false;
+		}
 	}
-	if (parseInt(resultsOnly["erschoepfung"]) !== exhaustionNeu)
-	{
-		attrsToChange["erschoepfung"] = exhaustionNeu;
-	}
-	if (parseInt(resultsOnly["ueberanstrengung"]) !== overexertionNeu)
-	{
-		attrsToChange["ueberanstrengung"] = overexertionNeu;
-	}
+	Object.freeze(resultsOnly);
 
-	debugLog(caller, "tail", "rollID", rollID, "resultsOnly", resultsOnly, "attrsToChange", attrsToChange, "computed", computed);
-	safeSetAttrs(attrsToChange);
+	// Convenience
+	const rollID = results.rollId;
+	const duration = resultsOnly["duration"];
 
-	finishRoll(
-		rollID,
-		computed
-	);
+	// Fast Decision
+	if (Object.hasOwn(resultsOnly, "nonerequired"))
+	{
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
+		finishRoll(rollID);
+	} else {
+		// AU
+		/// Preparation
+		const AU = resultsOnly["au"];
+		const AUMax = resultsOnly["aumax"];
+		let AUNew = 0;
+
+		if (resultsOnly["aurequired"] === 1)
+		{
+			AUNew = AUMax;
+		} else {
+			AUNew = AU;
+		}
+
+		/// Finish
+		computed["aunew"] = AUNew;
+		if (AUNew !== AU)
+		{
+			attrsToChange["AU"] = AUNew;
+		}
+
+		// Exhaustion or Overexertion
+		/// Preparations
+		const exhaustion = resultsOnly["xh"];
+		const exhaustionMax = resultsOnly["xhmax"];
+		const exhaustionMin = 0;
+		const overexertion = resultsOnly["ox"];
+		const overexertionMax = resultsOnly["oxmax"];
+		const overexertionMin = 0;
+		let exhaustionNew = 0;
+		let exhaustionLoss = 0;
+		let exhaustionChange = 0;
+		let overexertionNew = 0;
+		let overexertionLoss = 0;
+		let overexertionChange = 0;
+
+		let withdrawal = 0;
+		let foodRestriction = 0;
+		if (Object.hasOwn(resultsOnly, "addictioneffect"))
+		{
+			withdrawal = resultsOnly["addictioneffect"];
+		}
+		if (Object.hasOwn(resultsOnly, "foodrestriction"))
+		{
+			foodRestriction = resultsOnly["foodrestriction"];
+		}
+
+		/// Regeneration can only take place if not under severe food restriction or even mild addiction withdrawal
+		if (
+			(withdrawal === 0)
+			&&
+			(foodRestriction < 2)
+			&&
+			(duration > 0)
+			&&
+			(
+				(resultsOnly["xhrequired"])
+				||
+				(resultsOnly["oxrequired"])
+			)
+		)
+		{
+			// Preparations
+			const exhaustionReg = -2;
+			const overexertionReg = -1;
+
+			// Calculations
+			exhaustionNew = exhaustion;
+			overexertionNew = overexertion;
+
+			{
+				let result = changeExhaustionOverexertion(
+					{
+						"xhEnabled": resultsOnly["xhrequired"],
+						"xh": resultsOnly["xh"],
+						"xhMax": exhaustionMax,
+						"xhRate": exhaustionReg,
+						"oxEnabled": resultsOnly["oxrequired"],
+						"ox": resultsOnly["ox"],
+						"oxMax": overexertionMax,
+						"oxRate": overexertionReg,
+						"steps": duration,
+					}
+				);
+				// Finish
+				exhaustionNew = result["xhNew"];
+				overexertionNew = result["oxNew"];
+				exhaustionLoss = result["xhChange"];
+				overexertionLoss = result["oxChange"];
+				exhaustionChange = result["xhChange"];
+				overexertionChange = result["oxChange"];
+			}
+		} else if (
+			(
+				(withdrawal !== 0)
+				||
+				(foodRestriction >= 2)
+				||
+				(duration === 0)
+			)
+			&&
+			(!resultsOnly["xhrequired"])
+			&&
+			(!resultsOnly["oxrequired"])
+		)
+		{
+			exhaustionNew = exhaustion;
+			overexertionNew = overexertion;
+			exhaustionLoss = 0;
+			overexertionLoss = 0;
+			overexertionChange = 0;
+			exhaustionChange = 0;
+		}
+		/// Finish
+		//// Show exhaustion if there is overexertion even if no regeneration took place
+		//// But only show if it is also enabled
+
+		let showResults = "both";
+		if (resultsOnly["xhrequired"] && resultsOnly["oxrequired"])
+		{
+			showResults = "both";
+		}
+		if (!resultsOnly["xhrequired"] && resultsOnly["oxrequired"])
+		{
+			showResults = "ox";
+		}
+		if (resultsOnly["xhrequired"] && !resultsOnly["oxrequired"])
+		{
+			showResults = "xh";
+		}
+		if (!resultsOnly["xhrequired"] && !resultsOnly["oxrequired"])
+		{
+			showResults = "none";
+		}
+
+		switch(showResults)
+		{
+			case "both":
+			case "ox":
+				computed["oxnew"] = overexertionNew;
+				computed["oxloss"] = overexertionLoss;
+				computed["xhrequired"] = 1;
+				if (overexertionChange !== 0)
+				{
+					attrsToChange["ueberanstrengung"] = overexertionNew;
+				}
+				// fallthrough
+			case "xh":
+				computed["xhnew"] = exhaustionNew;
+				computed["xhloss"] = exhaustionLoss;
+				if (exhaustionChange !== 0)
+				{
+					attrsToChange["erschoepfung"] = exhaustionNew;
+				}
+				break;
+			case "none":
+				break;
+			default:
+				debugLog(caller, `switch(showResults) default case (${showResults}) triggered. Should not happen.`);
+				break;
+		}
+
+		//// Consider deactivation
+		if (!resultsOnly["xhrequired"])
+		{
+			computed["xhrequired"] = 0;
+		}
+		if (!resultsOnly["oxrequired"])
+		{
+			computed["oxrequired"] = 0;
+		}
+
+		// Rapture
+		let raptureNew = resultsOnly["rt"];
+		let raptureLoss = 0;
+		let raptureChange = 0;
+
+		if (duration > 0 && resultsOnly["rtrequired"] === 1)
+		{
+			/// Preparation
+			const raptureMin = 0;
+
+			/// Calculations
+			raptureLoss = -Math.floor(duration / 2);
+			raptureNew += raptureLoss;
+			raptureNew = Math.max(raptureMin, raptureNew);
+			raptureChange = raptureNew - resultsOnly["rt"];
+		} else if (duration === 0 && resultsOnly["rtrequired"] === 1)	{
+			raptureLoss = 0;
+			raptureNew = resultsOnly["rt"];
+			raptureChange = 0;
+		}
+		/// Finish
+		if (resultsOnly["rtrequired"] === 1)
+		{
+			computed["rtloss"] = raptureLoss;
+			computed["rtnew"] = raptureNew;
+			if (raptureChange !== 0)
+			{
+				attrsToChange["Entrueckung"] = raptureNew;
+			}
+		}
+
+		// Prettify certain output
+		{
+			let useComputed = [
+				"xhloss",
+				"oxloss",
+				"rtloss",
+			];
+			for (let part of useComputed)
+			{
+				if (Object.hasOwn(computed, part))
+				{
+					computed[part] = prettifyMod(computed[part]);
+				}
+			}
+		}
+
+		// Finish
+		debugLog(caller, "tail", "rollID", rollID, "attrsToChange", attrsToChange, "computed", computed);
+		safeSetAttrs(attrsToChange);
+
+		finishRoll(
+			rollID,
+			computed
+		);
+	}
 });
 
 // Determine value and source of bonus on astral meditation roll
