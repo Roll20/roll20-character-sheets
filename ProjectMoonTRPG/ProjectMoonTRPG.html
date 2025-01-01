@@ -13453,11 +13453,11 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 		/* Custom Ailments */
 		updateCustomAilments(["RoundEnd"], "standard", "true", function(returnValues) {
 		Object.assign(autoScriptOverrideList, returnValues.overrideList);
-		output = {...output, ...returnValues.output};
+		autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 	
 		updateCustomAilments(["OnAction", "WhenHit"], "decay", "true", function(returnValues) {
 		Object.assign(autoScriptOverrideList, returnValues.overrideList);
-		output = {...output, ...returnValues.output};
+		autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 	
 		/* AutoScripts */
 		resetConditionals();
@@ -13945,12 +13945,12 @@ on('clicked:rollCombat', (info) => {
 	let autoScriptOverrideList = {};
 	updateBleed("standard", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	output = {...output, ...returnValues.output};
+	autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 		
 	/* Custom Ailments processing */
 	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	output = {...output, ...returnValues.output};
+	autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -15379,12 +15379,12 @@ on('clicked:declareAction', (info) => {
 	let autoScriptOverrideList = {};
 	updateBleed("standard", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	output = {...output, ...returnValues.output};
+	autoScriptOverrideList.output = returnValues.output;
 
 	/* Custom Ailments processing */
 	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	output = {...output, ...returnValues.output};
+	autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -16601,7 +16601,7 @@ Block and Evade also include Defensive */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
 async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
-	
+
 	/* If using generic token mode, switches to the correct token before applying incoming AutoEffects */
 	let tokenId = (overrideList.tokenId != undefined) ? overrideList.tokenId : "";
 	changeActiveToken(tokenId, () => {
@@ -16671,6 +16671,12 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 	let stylingList = parseAutoScriptStyling(values.autoScriptStyling);
 	
 	let output = {};
+	console.log(overrideList)
+	if (overrideList.output) {
+		output = overrideList.output;
+		delete overrideList.output;
+	}
+	console.log(output)
 	let tempOutput = {};
 	let returnValues = { checkResult:"success", error:false };
 	let challengeRollList = {};
@@ -16680,6 +16686,8 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 		
 	/* Get all ailments */
 	exportAilmentList(overrideList, (ailmentList) => {
+
+	console.log({...ailmentList})
 
 	/* If targeting is in use, get target ailments and bars */
 	let targetAilmentList = {};
@@ -17152,6 +17160,7 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 		});
 	}
 
+	console.log(output)
 	setAttrs(output);
 	callback(returnValues);
 	});
@@ -18887,8 +18896,11 @@ async function exportAilmentList(overrideList={}, callback=() => {}) {
 				ailmentList[ailment] = [HasNextTurn, values[ailment], values[`${ailment}NextTurn`], values[ailment], values[`${ailment}DecayPause`], 0, ailment];
 			}
 			if (overrideList.hasOwnProperty(ailment)) {
+				console.log(ailmentList[ailment]);
+				console.log(overrideList[ailment]);
 				ailmentList[ailment][1] = Math.max(overrideList[ailment][0], 0);
 				ailmentList[ailment][3] = Math.max(overrideList[ailment][1], 0);
+				console.log(ailmentList[ailment])
 			}
 		});
 
